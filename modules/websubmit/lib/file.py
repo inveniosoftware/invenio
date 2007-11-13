@@ -35,6 +35,7 @@ from invenio.config import \
      weburl, \
      webdir
 from invenio.dbquery import run_sql
+from invenio.errorlib import register_exception
 from mimetypes import MimeTypes
 from invenio.access_control_engine import acc_authorize_action
 
@@ -49,6 +50,9 @@ _extensions = _mimes.encodings_map.keys() + \
               _mimes.types_map[1].keys()
 _extensions.sort()
 _extensions.reverse()
+
+class InvenioWebSubmitFileError(Exception):
+    pass
 
 def file_strip_ext(file):
     """Strip in the best way the extension from a filename"""
@@ -102,11 +106,8 @@ class BibRecDocs:
             "where id=id_bibdoc and id_bibrec=%s", (self.id,))
         for row in res:
             if row[2] != 'DELETED':
-                try:
-                    cur_doc = BibDoc(bibdocid=row[0], recid=self.id)
-                    self.bibdocs.append(cur_doc)
-                except StandardError:
-                    pass
+                cur_doc = BibDoc(bibdocid=row[0], recid=self.id)
+                self.bibdocs.append(cur_doc)
 
     def listBibDocs(self, type=""):
         """Returns the list all bibdocs object belonging to a recid.
@@ -159,7 +160,7 @@ class BibRecDocs:
             #self.bibdocs.append(bibdoc)
             #return bibdoc
         if docname in self.getBibDocNames(type):
-            raise StandardError, "%s has already a bibdoc with docname %s" % (self.id, docname)
+            raise InvenioWebSubmitFileError, "%s has already a bibdoc with docname %s" % (self.id, docname)
         else:
             return BibDoc(recid=self.id, type=type, docname=docname)
 
@@ -169,10 +170,8 @@ class BibRecDocs:
         """
         basename = decompose_file(fullpath)[1]
         bibdoc = self.addBibDoc(type, basename)
-        if bibdoc is not None:
-            bibdoc.addFilesNewVersion([fullpath])
-            return bibdoc
-        return None
+        bibdoc.addFilesNewVersion([fullpath])
+        return bibdoc
 
     def addNewVersion(self, fullpath, bibdocid):
         """Adds a new fullpath file to an already existent bibdocid making the
@@ -180,10 +179,11 @@ class BibRecDocs:
         It returns the bibdoc object.
         """
         bibdoc = self.getBibDoc(bibdocid)
-        if bibdoc is not None:
+        if bibdoc:
             bibdoc.addFilesNewVersion([fullpath])
-            return bibdoc
-        return None
+        else:
+            raise InvenioWebSubmitFileError, "bibdocid '%s' is not linked with recid '%s'" % (bibdocid, self.id)
+        return bibdoc
 
     def addNewFormat(self, fullpath, bibdocid):
         """Adds a new format for a fullpath file to an already existent
@@ -191,10 +191,11 @@ class BibRecDocs:
         It returns the bibdoc object.
         """
         bibdoc = self.getBibDoc(bibdocid)
-        if bibdoc is not None:
+        if bibdoc:
             bibdoc.addFilesNewFormat([fullpath])
-            return bibdoc
-        return None
+        else:
+            raise InvenioWebSubmitFileError, "bibdocid '%s' is not linked with recid '%s'" % (bibdocid, self.id)
+        return bibdoc
 
     def listLatestFiles(self, type=""):
         docfiles = []
@@ -217,8 +218,10 @@ class BibRecDocs:
         else:
             return 0
 
-
     def display(self, bibdocid="", version="", type="", ln = cdslang):
+        """Returned a formatted panel with information and links about a given
+        bibdocid of a particular version (or any), of a particular type (or any)
+        """
         t = ""
         bibdocs = []
         if bibdocid != "":
@@ -281,7 +284,7 @@ class BibDoc:
                     self.type = res[0][0]
                 else:
                     #this bibdoc isn't associated with the corresponding bibrec.
-                    raise StandardError, "No docid associated with the recid %s" % recid
+                    raise InvenioWebSubmitFileError, "No docid associated with the recid %s" % recid
             # gather the other information
             res = run_sql("select id,status,docname,creation_date,"
                 "modification_date from bibdoc where id=%s", (bibdocid,))
@@ -296,11 +299,11 @@ class BibDoc:
                 self.basedir = "%s/%s/%s" % (filedir, group, self.id)
             else:
                 # this bibdoc doesn't exist
-                raise StandardError, "The docid %s does not exist." % bibdocid
+                raise InvenioWebSubmitFileError, "The docid %s does not exist." % bibdocid
         # else it is a new document
         else:
             if docname == "" or type == "":
-                raise StandardError, "Argument missing for creating a new bibdoc"
+                raise InvenioWebSubmitFileError, "Argument missing for creating a new bibdoc"
             else:
                 self.recid = recid
                 self.type = type
@@ -309,7 +312,7 @@ class BibDoc:
                 if recid:
                     res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (recid, docname))
                     if res:
-                        raise StandardError, "A bibdoc called %s already exists for recid %s" % (docname, recid)
+                        raise InvenioWebSubmitFileError, "A bibdoc called %s already exists for recid %s" % (docname, recid)
                 self.id = run_sql("INSERT INTO bibdoc (status,docname,creation_date,modification_date) "
                     "values(%s,%s,NOW(),NOW())", (self.status, docname,))
                 if self.id is not None:
@@ -319,7 +322,7 @@ class BibDoc:
                         run_sql("INSERT INTO bibrec_bibdoc (id_bibrec, id_bibdoc, type) VALUES (%s,%s,%s)",
                             (recid, self.id, self.type,))
                 else:
-                    raise StandardError, "New docid cannot be created"
+                    raise InvenioWebSubmitFileError, "New docid cannot be created"
                 group = "g" + str(int(int(self.id) / filedirsize))
                 self.basedir = "%s/%s/%s" % (filedir, group, self.id)
                 # we create the corresponding storage directory
@@ -357,32 +360,43 @@ class BibDoc:
 
     def addFilesNewVersion(self, files=[]):
         """add a new version of a file to an archive"""
-        latestVersion = self.getLatestVersion()
-        if latestVersion == "0":
-            myversion = "1"
-        else:
-            myversion = str(int(latestVersion) + 1)
-        for file in files:
-            if os.path.exists(file):
-                dummy, basename, extension = decompose_file(file)
-                if extension:
-                    extension = '.' + extension
-                #self.changeName(basename)
-                #destination = propose_unique_name("%s/%s%s;%s" %
-                    #(self.basedir, basename, extension, myversion), True)
-                destination = "%s/%s%s;%s" % (self.basedir, self.docname, extension, myversion)
-                shutil.copyfile(file, destination)
-                os.chmod(destination, 0644)
-        self.touch()
-        self.BuildFileList()
+        try:
+            latestVersion = self.getLatestVersion()
+            if latestVersion == "0":
+                myversion = "1"
+            else:
+                myversion = str(int(latestVersion) + 1)
+            for file in files:
+                if os.path.exists(file):
+                    dummy, basename, extension = decompose_file(file)
+                    if extension:
+                        extension = '.' + extension
+                    #self.changeName(basename)
+                    #destination = propose_unique_name("%s/%s%s;%s" %
+                        #(self.basedir, basename, extension, myversion), True)
+                    destination = "%s/%s%s;%s" % (self.basedir, self.docname, extension, myversion)
+                    try:
+                        shutil.copyfile(file, destination)
+                        os.chmod(destination, 0644)
+                    except Exception, e:
+                        register_exception()
+                        raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (file, destination, e)
+                else:
+                    raise InvenioWebSubmitFileError, "'%s' does not exists!" % file
+        finally:
+            self.touch()
+            self.BuildFileList()
 
     def purge(self):
         """Phisically Remove all the previous version of the given bibdoc"""
         version = self.getLatestVersion()
-        if version > 1:
+        if version >= 1:
             for file in self.docfiles:
                 if file.getVersion() < version:
-                    os.remove(file.getFullPath())
+                    try:
+                        os.remove(file.getFullPath())
+                    except Exception, e:
+                        register_exception()
             Md5Folder(self.basedir).update()
             self.touch()
             self.BuildFileList()
@@ -391,7 +405,10 @@ class BibDoc:
     def expunge(self):
         """Phisically remove all the traces of a given bibdoc"""
         for file in self.docfiles:
-            os.remove(file.getFullPath())
+            try:
+                os.remove(file.getFullPath())
+            except Exception, e:
+                register_exception()
         Md5Folder(self.basedir).update()
         self.touch()
         self.BuildFileList()
@@ -400,22 +417,30 @@ class BibDoc:
 
     def addFilesNewFormat(self, files=[], version=""):
         """add a new format of a file to an archive"""
-        if version == "":
-            version = self.getLatestVersion()
-        for file in files:
-            if os.path.exists(file):
-                dummy, basename, extension = decompose_file(file)
-                if extension:
-                    extension = '.' + extension
-                destination = "%s/%s%s;%s" % (self.basedir, self.docname, extension, version)
-                if os.path.exists(destination):
-                    raise StandardError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, extension)
-                #destination = propose_unique_name("%s/%s%s;%s" %
-                    #(self.basedir, basename, extension, version), True)
-                shutil.copyfile(file, destination)
-                os.chmod(destination, 0644)
-        self.touch()
-        self.BuildFileList()
+        try:
+            if version == "":
+                version = self.getLatestVersion()
+            for file in files:
+                if os.path.exists(file):
+                    dummy, basename, extension = decompose_file(file)
+                    if extension:
+                        extension = '.' + extension
+                    destination = "%s/%s%s;%s" % (self.basedir, self.docname, extension, version)
+                    if os.path.exists(destination):
+                        raise InvenioWebSubmitFileError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, extension)
+                    #destination = propose_unique_name("%s/%s%s;%s" %
+                        #(self.basedir, basename, extension, version), True)
+                    try:
+                        shutil.copyfile(file, destination)
+                        os.chmod(destination, 0644)
+                    except Exception, e:
+                        register_exception()
+                        raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (file, destination, e)
+                else:
+                    raise InvenioWebSubmitFileError, "'%s' does not exists!" % file
+        finally:
+            self.touch()
+            self.BuildFileList()
 
     def getIcon(self):
         if self.relatedFiles.has_key('Icon'):
@@ -436,17 +461,17 @@ class BibDoc:
         newicon.addFilesNewVersion([file])
         run_sql("INSERT INTO bibdoc_bibdoc (id_bibdoc1, id_bibdoc2, type) VALUES (%s,%s,'Icon')",
             (self.id, newicon.getId(),))
-        if os.path.exists(newicon.getBaseDir()):
+        try:
             old_umask = os.umask(022)
-            fp = open("%s/.docid" % newicon.getBaseDir(), "w")
-            fp.write(str(self.id))
-            fp.close()
-            fp = open("%s/.type" % newicon.getBaseDir(), "w")
-            fp.write(str(self.type))
-            fp.close()
+            open("%s/.docid" % newicon.getBaseDir(), "w").write(str(self.id))
+            open("%s/.type" % newicon.getBaseDir(), "w").write(str(self.type))
             os.umask(old_umask)
-        self.touch()
-        self.BuildRelatedFileList()
+        except Exception, e:
+            register_exception()
+            raise InvenioWebSubmitFileError, "Encountered an exception while writing .docid and .type for folder '%s': '%s'" % (newicon.getBaseDir(), e)
+        finally:
+            self.touch()
+            self.BuildRelatedFileList()
         return newicon
 
     def deleteIcon(self):
@@ -502,7 +527,7 @@ class BibDoc:
         bibrecs."""
         res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (self.recid, newname))
         if res:
-            raise StandardError, "A bibdoc called %s already exists for recid %s" % (newname, self.recid)
+            raise InvenioWebSubmitFileError, "A bibdoc called %s already exists for recid %s" % (newname, self.recid)
         run_sql("update bibdoc set docname=%s where id=%s", (newname, self.id,))
         for f in os.listdir(self.basedir):
             if f.startswith(self.docname):
@@ -541,7 +566,7 @@ class BibDoc:
         for docfile in docfiles:
             if docfile.getName()==name and (docfile.getFormat()==format or not format):
                 return docfile
-        raise StandardError, "No file called '%s' of format '%s', version '%s'" % (name, format, version)
+        raise InvenioWebSubmitFileError, "No file called '%s' of format '%s', version '%s'" % (name, format, version)
 
     def listVersions(self):
         versions = []
@@ -583,11 +608,8 @@ class BibDoc:
             if row[2] != 'DELETED':
                 if not self.relatedFiles.has_key(type):
                     self.relatedFiles[type] = []
-                try:
-                    cur_doc = BibDoc(bibdocid=bibdocid)
-                    self.relatedFiles[type].append(cur_doc)
-                except StandardError:
-                    pass
+                cur_doc = BibDoc(bibdocid=bibdocid)
+                self.relatedFiles[type].append(cur_doc)
 
     def listAllFiles(self):
         return self.docfiles
@@ -634,7 +656,7 @@ class BibDocFile:
         self.md = os.path.getmtime(fullpath)
         try:
             self.cd = os.path.getctime(fullpath)
-        except:
+        except OSError:
             self.cd = self.md
         self.name = name
         self.format = format
@@ -644,6 +666,8 @@ class BibDocFile:
             self.encoding = ""
             self.fullname = name
         else:
+            if format[0] == '.':
+                format = format[1:]
             self.fullname = "%s.%s" % (name, format)
             (self.mime, self.encoding) = _mimes.guess_type(self.fullname)
             if self.mime is None:
@@ -669,7 +693,10 @@ class BibDocFile:
         """return restriction state"""
         if self.status not in ('', 'DELETED'):
             return acc_authorize_action(req, 'viewrestrdoc', status=self.status)
-        return (0, '')
+        elif self.status == 'DELETED':
+            return (1, 'File has ben deleted')
+        else:
+            return (0, '')
 
     def getType(self):
         return self.type
@@ -702,8 +729,12 @@ class BibDocFile:
         return self.checksum
 
     def getRecid(self):
-        return run_sql("select id_bibrec from bibrec_bibdoc where "
-            "id_bibdoc=%s",(self.bibdocid,))[0][0]
+        try:
+            return run_sql("select id_bibrec from bibrec_bibdoc where "
+                "id_bibdoc=%s",(self.bibdocid,))[0][0]
+        except Exception, e:
+            register_exception()
+            raise InvenioWebSubmitFileError, "Encountered an exception when getting the recid of bibdocid %s: '%s'" % (self.bibdocid, e)
 
     def stream(self, req):
         if self.status:
@@ -718,26 +749,29 @@ class BibDocFile:
                 req.headers_out["Content-Disposition"] = \
                     "attachment; filename=%s" % quoteattr(self.fullname)
                 req.send_http_header()
-                fp = file(self.fullpath, "r")
-                content = fp.read()
-                fp.close()
-                return content
+                try:
+                    return open(self.fullpath).read()
+                except Exception, e:
+                    register_exception()
+                    raise InvenioWebSubmitFileError, "Encountered exception while reading '%s': '%s'" % (self.fullpath, e)
             else:
-                raise StandardError, "%s does not exists!" % self.fullpath
+                raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
         else:
-            raise StandardError, "You are not authorized to download %s: %s" % (self.fullname, auth_message)
+            raise InvenioWebSubmitFileError, "You are not authorized to download %s: %s" % (self.fullname, auth_message)
 
 def streamRestrictedIcon(req):
+    """Return the content of the "Restricted Icon" file."""
     req.content_type = 'image/gif'
     req.encoding = None
     req.filename = 'restricted'
     req.headers_out["Content-Disposition"] = \
         "attachment; filename=%s" % quoteattr('restricted')
     req.send_http_header()
-    fp = file('%s/img/restricted.gif' % webdir, "r")
-    content = fp.read()
-    fp.close()
-    return content
+    try:
+        return open('%s/img/restricted.gif' % webdir, "r").read()
+    except Exception, e:
+        register_exception()
+        raise InvenioWebSubmitFileError, "Encountered exception while streaming restricted icon: '%s'" % (e, )
 
 
 def readfile(path):
@@ -746,16 +780,11 @@ def readfile(path):
        @param path: (string) - path to the file
        @return: (string) contents of file or empty string
     """
-    content = ""
-    if os.access(path, os.F_OK|os.R_OK):
-        try:
-            fp = open(path, "r")
-        except IOError:
-            pass
-        else:
-            content = fp.read()
-            fp.close()
-    return content
+    try:
+        return open(path).read()
+    except Exception, e:
+        register_exception()
+        raise InvenioWebSubmitFileError, "Encountered exception while reading '%s': '%s'" % (path, e)
 
 def listTypesFromArray(bibdocs):
     types = []
@@ -782,26 +811,37 @@ class Md5Folder:
     def __init__(self, folder):
         """Initialize the class from the md5 checksum of a given path"""
         self.folder = folder
-        self.load()
+        try:
+            self.load()
+        except InvenioWebSubmitFileError:
+            self.md5s = {}
+            self.update()
 
     def update(self, only_new = True):
         """Update the .doc_checksum file with the current files. If only_new
         is specified then only not already calculated file are calculated."""
-        self.md5s = {}
         for filename in os.listdir(self.folder):
             if not only_new or self.md5s.get(filename, None) is None and \
-                not filename.startswith('.'):
-                self.md5s[filename] = md5.new(open("%s/%s" %
-                    (self.folder, filename), "rb").read()).hexdigest()
+                    not filename.startswith('.'):
+                try:
+                    self.md5s[filename] = md5.new(open("%s/%s" %
+                        (self.folder, filename), "rb").read()).hexdigest()
+                except Exception, e:
+                    register_exception()
+                    raise InvenioWebSubmitFileError, "Encountered an exception while updating .doc_checksum for folder '%s' with file '%s': '%s'" % (self.folder, filename, e)
         self.store()
 
     def store(self):
         """Store the current md5 dictionary into .doc_checksum"""
-        old_umask = os.umask(022)
-        md5file = open("%s/.doc_checksum" % self.folder, "w")
-        for key, value in self.md5s.items():
-            md5file.write('%s *%s\n' % (value, key))
-        os.umask(old_umask)
+        try:
+            old_umask = os.umask(022)
+            md5file = open("%s/.doc_checksum" % self.folder, "w")
+            for key, value in self.md5s.items():
+                md5file.write('%s *%s\n' % (value, key))
+            os.umask(old_umask)
+        except Exception, e:
+            register_exception()
+            raise InvenioWebSubmitFileError, "Encountered an exception while storing .doc_checksum for folder '%s': '%s'" % (self.folder, e)
 
     def load(self):
         """Load .doc_checksum into the md5 dictionary"""
@@ -811,20 +851,30 @@ class Md5Folder:
                 md5hash = row[:32]
                 filename = row[34:].strip()
                 self.md5s[filename] = md5hash
-        except IOError:
-            pass
+        except Exception, e:
+            register_exception()
+            raise InvenioWebSubmitFileError, "Encountered an exception while loading .doc_checksum for folder '%s': '%s'" % (self.folder, e)
+
 
     def check(self, filename = ''):
         """Check the specified file or all the files for which it exists a hash
         for being coherent with the stored hash."""
         if filename and filename in self.md5s.keys():
-            return self.md5s[filename] == md5.new(open("%s/%s" %
-                    (self.folder, filename), "rb").read()).hexdigest()
+            try:
+                return self.md5s[filename] == md5.new(open("%s/%s" %
+                        (self.folder, filename), "rb").read()).hexdigest()
+            except Exception, e:
+                register_exception()
+                raise InvenioWebSubmitFileError, "Encountered an exception while loading '%s/%s': '%s'" % (self.folder, filename, e)
         else:
             for filename, md5hash in self.md5s.items():
-                if md5.new(open("%s/%s" % (self.folder, filename),
-                    "rb").read()).hexdigest() != md5hash:
+                try:
+                    if md5.new(open("%s/%s" % (self.folder, filename),
+                        "rb").read()).hexdigest() != md5hash:
                         return False
+                except Exception, e:
+                    register_exception()
+                    raise InvenioWebSubmitFileError, "Encountered an exception while loading '%s/%s': '%s'" % (self.folder, filename, e)
             return True
 
     def get_checksum(self, filename):
