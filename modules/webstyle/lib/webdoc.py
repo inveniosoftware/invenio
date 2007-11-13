@@ -38,7 +38,7 @@ from invenio.config import \
      cdsnameintl, \
      cachedir
 from invenio.webpage import page
-
+from invenio.dateutils import convert_datestruct_to_dategui
 #try:
 from invenio.messages import \
      gettext_set_language, \
@@ -51,14 +51,15 @@ import re
 import getopt
 import os
 import sys
+import stat
+import time
 
 # List of (webdoc_source_dir, webdoc_cache_dir)
 webdoc_dirs = [('%s/lib/webdoc/help' % CFG_PREFIX, '%s/webdoc/help-pages' % cachedir),
                ('%s/lib/webdoc/admin' % CFG_PREFIX, '%s/webdoc/admin-pages' % cachedir),
                ('%s/lib/webdoc/hacking' % CFG_PREFIX, '%s/webdoc/hacking-pages' % cachedir,)]
 
-# Regular expression for finding text to be translated in format
-# templates
+# Regular expression for finding text to be translated
 translation_pattern = re.compile(r'''
     _\((?P<word>.*?)\)_
     ''',\
@@ -72,15 +73,20 @@ comments_pattern = re.compile(r'^\s*#.*$',\
 pattern_lang_current = re.compile(r'<lang \s*:\s*current\s*\s*/>',\
                                   re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
-# Regular expression for finding <: print function(..) > tag
-function_pattern = re.compile(r'''
-    <:\s*print\s*(?P<function>.*?)\s*\(\s*(\'|\")
-    (?P<param>.*?)
-    (\'|\")\s*\)\s*;\s*:>
-    ''',\
-                                   re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
-# Regular expression for finding <!-- %s: %s --> tag in format templates,
+# Regular expression for finding <lang:link/> tag
+pattern_lang_link_current = re.compile(r'<lang \s*:\s*link\s*\s*/>',\
+                                  re.IGNORECASE | re.DOTALL | re.VERBOSE)
+
+## # Regular expression for finding <: print function(..) > tag
+## function_pattern = re.compile(r'''
+##     <:\s*print\s*(?P<function>.*?)\s*\(\s*(\'|\")
+##     (?P<param>.*?)
+##     (\'|\")\s*\)\s*;\s*:>
+##     ''',\
+##                                   re.IGNORECASE | re.DOTALL | re.VERBOSE)
+
+# Regular expression for finding <!-- %s: %s --> tag
 # where %s will be replaced at run time
 pattern_tag = r'''
     <!--\s*(?P<tag>%s)   #<!-- %%s tag (no matter case)
@@ -108,33 +114,7 @@ for tag in pattern_tags.keys():
     pattern_tags[tag] = re.compile(pattern_tag % tag, \
                                    re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
-## cdslangs = []
-## try:
-##     cdslangs = [lang.strip() for lang in \
-##                 file(os.path.abspath(sys.path[0]+'/../../../po/LINGUAS'),'r').readlines() \
-##                 if not lang.strip().startswith('#') and \
-##                 not lang.strip() == '']
-## except Exception, e:
-##     print e
-##     print "Cannot read LINGUAS file"
-##     sys.exit(1)
-
-# Regular expression for finding variable defined in config file:
-# Eg: <define-tag CDSLANG whitespace=delete>
-#       en
-#     </define-tag>
-# TODO: extend to deal with more parameters than just
-# 'whitespace=delete' ?
-pattern_define_tag = re.compile(r'''
-    <define-tag \s*
-    (?P<tag>\S*?) \s*
-    (?P<whitespace>whitespace\s*=\s*delete)\s*
-    >                                #closing start tag
-    (?P<value>.*?)
-    (</define-tag\s*>)               #end tag
-    ''', re.IGNORECASE | re.DOTALL | re.VERBOSE)
-
-# Regular expression for finding <lang>...</lang> tag in format templates
+# Regular expression for finding <lang>...</lang> tag
 pattern_lang = re.compile(r'''
     <lang              #<lang tag (no matter case)
     \s*
@@ -146,12 +126,12 @@ pattern_lang = re.compile(r'''
     ''', re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
 # Builds regular expression for finding each known language in <lang> tags
-ln_pattern_text = r"<("
+ln_pattern_text = r"<(?P<lang>"
 for lang in cdslangs:
     ln_pattern_text += lang +r"|"
 
 ln_pattern_text = ln_pattern_text.rstrip(r"|")
-ln_pattern_text += r")>(.*?)</\1>"
+ln_pattern_text += r')\s*(revision="[^"]"\s*)?>(?P<translation>.*?)</\1>'
 
 ln_pattern =  re.compile(ln_pattern_text, re.IGNORECASE | re.DOTALL)
 
@@ -164,7 +144,8 @@ defined_tags = {'<CDSNAME>': cdsname,
                 '<CDSNAMEINTL>': cdsnameintl}
 
 def get_webdoc_parts(webdoc, parts=['title','keywords'],
-                     update_cache=True, ln=cdslang):
+                     update_cache_mode=1, ln=cdslang,
+                     verbose=0):
     """
     Returns the html of the specified 'webdoc' part(s).
 
@@ -172,26 +153,29 @@ def get_webdoc_parts(webdoc, parts=['title','keywords'],
 
     Parameters:
 
-            webdoc       - *string* the name of a webdoc that can be
-                           found in standard webdoc dir, or a webdoc
-                           filepath. Priority is given to filepath if
-                           both match.
+                  webdoc - *string* the name of a webdoc that can be
+                            found in standard webdoc dir, or a webdoc
+                            filepath. Priority is given to filepath if
+                            both match.
 
-            parts        - *list(string)* the parts that should be
+                   parts - *list(string)* the parts that should be
                             returned by this function. Can be in:
                             'title', 'keywords', 'navbar-name',
                             'navtrail-previous-links', 'body'
 
-            update_cache - *boolean* update the cached version of the
-                           given 'webdoc'.
+       update_cache_mode - *int* update the cached version of the
+                            given 'webdoc':
+                               - 0 : do not update
+                               - 1 : update if needed
+                               - 2 : always update
 
     Returns : *dictionary* with keys being in 'parts' input parameter and values
               being the corresponsding html part.
     """
     html_parts = {}
 
-    if update_cache == True:
-        update_webdoc_cache(webdoc)
+    if update_cache_mode in [1, 2]:
+        update_webdoc_cache(webdoc, update_cache_mode, verbose)
 
     for part in parts:
         for (_webdoc_source_dir, _web_doc_cache_dir) in webdoc_dirs:
@@ -206,7 +190,7 @@ def get_webdoc_parts(webdoc, parts=['title','keywords'],
 
     return html_parts
 
-def update_webdoc_cache(webdoc):
+def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=cdslangs):
     """
     Update the cache (on disk) of the given webdoc.
 
@@ -215,44 +199,90 @@ def update_webdoc_cache(webdoc):
             webdoc       - *string* the name of a webdoc that can be
                            found in standard webdoc dir, or a webdoc
                            filepath.
+
+            mode         - *int* update cache mode:
+                                - 0 : do not update
+                                - 1 : only if necessary (webdoc source
+                                      is newer than its cache)
+                                - 2 : always update
     """
+    if mode in [1, 2]:
+        (webdoc_source_path, \
+         webdoc_cache_dir, \
+         webdoc_name,\
+         webdoc_source_modification_date, \
+         webdoc_cache_modification_date) = get_webdoc_info(webdoc)
 
-    (webdoc_source, webdoc_cache_dir, webdoc_name) = read_webdoc_source(webdoc)
+        if mode == 1 and webdoc_source_modification_date < webdoc_cache_modification_date:
+            # Cache was update after source. No need to update
+            return
 
-    if webdoc_source is not None:
-        htmls = transform(webdoc_source)
-        for (lang, body, title, keywords, navbar_name, \
-             navtrail_previous_links) in htmls:
-            # Body
-            if body is not None:
-                write_cache_file('%(name)s.body%(lang)s.html' % {'name': webdoc_name,
-                                                                 'lang': '-'+lang},
-                                 webdoc_cache_dir,
-                                 body)
-            # Title
-            if title is not None:
-                write_cache_file('%(name)s.title%(lang)s.html' % {'name': webdoc_name,
-                                                                  'lang': '-'+lang},
-                                 webdoc_cache_dir,
-                                 title)
-            # Keywords
-            if keywords is not None:
-                write_cache_file('%(name)s.keywords%(lang)s.html' % {'name': webdoc_name,
+        (webdoc_source, webdoc_cache_dir, webdoc_name) = read_webdoc_source(webdoc)
+
+        if webdoc_source is not None:
+            htmls = transform(webdoc_source)
+            for (lang, body, title, keywords, navbar_name, \
+                 navtrail_previous_links) in htmls:
+                # Body
+                if body is not None:
+                    write_cache_file('%(name)s.body%(lang)s.html' % {'name': webdoc_name,
                                                                      'lang': '-'+lang},
+                                     webdoc_cache_dir,
+                                     body)
+                    if verbose > 2:
+                        print 'Written %(dir)s/%(name)s.body%(lang)s.html' % {'dir':webdoc_cache_dir,
+                                                                             'name': webdoc_name,
+                                                                             'lang': '-'+lang}
+                # Title
+                if title is not None:
+                    write_cache_file('%(name)s.title%(lang)s.html' % {'name': webdoc_name,
+                                                                      'lang': '-'+lang},
+                                     webdoc_cache_dir,
+                                     title)
+                    if verbose > 2:
+                        print 'Written %(dir)s/%(name)s.body%(lang)s.html' % {'dir':webdoc_cache_dir,
+                                                                             'name': webdoc_name,
+                                                                             'lang': '-'+lang}
+                # Keywords
+                if keywords is not None:
+                    write_cache_file('%(name)s.keywords%(lang)s.html' % {'name': webdoc_name,
+                                                                         'lang': '-'+lang},
+                                     webdoc_cache_dir,
+                                     keywords)
+                    if verbose > 2:
+                        print 'Written %(dir)s/%(name)s.body%(lang)s.html' % {'dir':webdoc_cache_dir,
+                                                                             'name': webdoc_name,
+                                                                             'lang': '-'+lang}
+                # Navtrail previous links
+                if navtrail_previous_links is not None:
+                    write_cache_file('%(name)s.navtrail-previous-links%(lang)s.html' % {'name': webdoc_name,
+                                                                                        'lang': '-'+lang},
+                                     webdoc_cache_dir,
+                                     navtrail_previous_links)
+                    if verbose > 2:
+                        print 'Written %(dir)s/%(name)s.body%(lang)s.html' % {'dir':webdoc_cache_dir,
+                                                                             'name': webdoc_name,
+                                                                             'lang': '-'+lang}
+                # Navbar name
+                if navbar_name is not None:
+                    write_cache_file('%(name)s.navbar-name%(lang)s.html' % {'name': webdoc_name,
+                                                                            'lang': '-'+lang},
+                                     webdoc_cache_dir,
+                                     navbar_name)
+                    if verbose > 2:
+                        print 'Written %(dir)s/%(name)s.body%(lang)s.html' % {'dir':webdoc_cache_dir,
+                                                                             'name': webdoc_name,
+                                                                             'lang': '-'+lang}
+                # Last updated file
+                write_cache_file('last_updated',
                                  webdoc_cache_dir,
-                                 keywords)
-            # Navtrail previous links
-            if navtrail_previous_links is not None:
-                write_cache_file('%(name)s.navtrail-previous-links%(lang)s.html' % {'name': webdoc_name,
-                                                                                    'lang': '-'+lang},
-                                 webdoc_cache_dir,
-                                 navtrail_previous_links)
-            # Navbar name
-            if navbar_name is not None:
-                write_cache_file('%(name)s.navbar-name%(lang)s.html' % {'name': webdoc_name,
-                                                                        'lang': '-'+lang},
-                                 webdoc_cache_dir,
-                                 navbar_name)
+                                 convert_datestruct_to_dategui(time.localtime()))
+                if verbose > 4:
+                    print 'Written %(name)s.body%(lang)s.html' % {'name': webdoc_name,
+                                                                  'lang': '-'+lang}
+
+            if verbose > 0:
+                print 'Written cache in %s' % webdoc_cache_dir
 
 def read_webdoc_source(webdoc):
     """
@@ -270,25 +300,12 @@ def read_webdoc_source(webdoc):
 
     Returns: *tuple* (webdoc_source, webdoc_cache_dir, webdoc_name)
     """
-    webdoc_source_path = None
-    webdoc_cache_dir = None
-    webdoc_name = None
 
-    # Search at given path or in webdoc cache dir
-    if os.path.exists(os.path.abspath(webdoc)):
-        webdoc_source_path = os.path.abspath(webdoc)
-        (webdoc_cache_dir, webdoc_name) = os.path.split(webdoc_source_path)
-        webdoc_name = os.path.splitext(webdoc_name)
-    else:
-        for (_webdoc_source_dir, _web_doc_cache_dir) in webdoc_dirs:
-            webdoc_source_path = _webdoc_source_dir + os.sep + webdoc + '.webdoc'
-            if os.path.exists(webdoc_source_path):
-                webdoc_cache_dir = _web_doc_cache_dir + os.sep + webdoc
-                webdoc_name = webdoc
-                break
-            else:
-                webdoc_source_path = None
-                webdoc_name = None
+    (webdoc_source_path, \
+     webdoc_cache_dir, \
+     webdoc_name,\
+     webdoc_source_modification_date, \
+     webdoc_cache_modification_date) = get_webdoc_info(webdoc)
 
     if webdoc_source_path is not None:
         webdoc_source = file(webdoc_source_path, 'r').read()
@@ -297,7 +314,58 @@ def read_webdoc_source(webdoc):
 
     return (webdoc_source, webdoc_cache_dir, webdoc_name)
 
-def transform(webdoc_source,  verbose=0, req=None, header_p=True):
+def get_webdoc_info(webdoc):
+    """
+    Locate the file corresponding to given webdoc and returns its
+    path, the path to its cache directory (even if it does not exist
+    yet), the last modification dates of the source and the cache, and
+    the webdoc name (i.e. webdoc id)
+
+    Parameters:
+
+       webdoc - *string* the name of a webdoc that can be found in
+                 standard webdoc dir, or a webdoc filepath. Priority
+                 is given to filepath if both match.
+
+    Returns: *tuple* (webdoc_source_path, webdoc_cache_dir,
+                      webdoc_name webdoc_source_modification_date,
+                      webdoc_cache_modification_date)
+    """
+    webdoc_source_path = None
+    webdoc_cache_dir = None
+    webdoc_name = None
+    last_updated_date = None
+    webdoc_source_modification_date = 1
+    webdoc_cache_modification_date  = 0
+
+    # Search at given path or in webdoc cache dir
+    if os.path.exists(os.path.abspath(webdoc)):
+        webdoc_source_path = os.path.abspath(webdoc)
+        (webdoc_cache_dir, webdoc_name) = os.path.split(webdoc_source_path)
+        webdoc_name = os.path.splitext(webdoc_name)
+        webdoc_source_modification_date = os.stat(webdoc_source_path).st_mtime
+    else:
+        for (_webdoc_source_dir, _web_doc_cache_dir) in webdoc_dirs:
+            webdoc_source_path = _webdoc_source_dir + os.sep + webdoc + '.webdoc'
+            if os.path.exists(webdoc_source_path):
+                webdoc_cache_dir = _web_doc_cache_dir + os.sep + webdoc
+                webdoc_name = webdoc
+                webdoc_source_modification_date = os.stat(webdoc_source_path).st_mtime
+                break
+            else:
+                webdoc_source_path = None
+                webdoc_name = None
+                webdoc_source_modification_date = 1
+
+    if webdoc_cache_dir is not None and \
+           os.path.exists(webdoc_cache_dir + os.sep + 'last_updated'):
+       webdoc_cache_modification_date = os.stat(webdoc_cache_dir + \
+                                                os.sep + 'last_updated').st_mtime
+
+    return (webdoc_source_path, webdoc_cache_dir, webdoc_name,
+            webdoc_source_modification_date, webdoc_cache_modification_date)
+
+def transform(webdoc_source,  verbose=0, req=None, languages=cdslangs):
     """
     Transform a WebDoc into html
 
@@ -331,38 +399,29 @@ def transform(webdoc_source,  verbose=0, req=None, header_p=True):
         translated_word = _(word)
         return translated_word
 
-##     def current_lang(match):
+##     def function_print(match):
 ##         """
-##         Returns the value with * char replaced by current language
+##         Format the given document version
 ##         """
-##         value = match.group("value")
-##         value = value.replace('*', ln)
+##         function = match.group("function")
+##         param = match.group("param")
+##         out = ''
+##         if function == 'generate_pretty_revision_date_string':
+##             # Input: CVS DOLLAR Id DOLLAR string
+##             # Output: nicely formatted revision/date number suitable for Admin Guides
+##             # Example: ``DOLLAR Id: webcoll.wml,v 1.41 2004/04/21 11:20:06 tibor Exp DOLLAR''
+##             #          will generate output like ``CDS Invenio/0
+##             (junk, filename, revision, date, junk, junk, junk, junk) = param.split(' ')
+##             out = revision + ', ' + date
+##         elif function == 'generate_language_list_for_python':
+##             # Return Python-ready language list out of user-configured WML language list.
+##             # May return short or long version, depending on the first argument.
+##             # Output example: ['en','fr']
+##             # Output example: [['en','English'],['fr','French']]
+##             # TODO MAYBE
+##             pass
 
-##         return value
-
-    def function_print(match):
-        """
-        Format the given document version
-        """
-        function = match.group("function")
-        param = match.group("param")
-        out = ''
-        if function == 'generate_pretty_revision_date_string':
-            # Input: CVS DOLLAR Id DOLLAR string
-            # Output: nicely formatted revision/date number suitable for Admin Guides
-            # Example: ``DOLLAR Id: webcoll.wml,v 1.41 2004/04/21 11:20:06 tibor Exp DOLLAR''
-            #          will generate output like ``CDS Invenio/0
-            (junk, filename, revision, date, junk, junk, junk, junk) = param.split(' ')
-            out = revision + ', ' + date
-        elif function == 'generate_language_list_for_python':
-            # Return Python-ready language list out of user-configured WML language list.
-            # May return short or long version, depending on the first argument.
-            # Output example: ['en','fr']
-            # Output example: [['en','English'],['fr','French']]
-            # TODO MAYBE
-            pass
-
-        return out
+##         return out
 
     # 1 step
     ## First filter, used to remove comments
@@ -377,11 +436,11 @@ def transform(webdoc_source,  verbose=0, req=None, header_p=True):
     # 2 step
     ## Execute custom functions
     ## TODO : remove
-    webdoc_source = function_pattern.sub(function_print, webdoc_source)
+    ##webdoc_source = function_pattern.sub(function_print, webdoc_source)
 
     html_texts = []
     # Language dependent filters
-    for ln in cdslangs:
+    for ln in languages:
         _ = gettext_set_language(ln)
 
         # 3 step
@@ -390,7 +449,12 @@ def transform(webdoc_source,  verbose=0, req=None, header_p=True):
 
         # 4 step
         ## Print current language 'en', 'fr', .. instead of
-        ## <lang:current /> tags
+        ## <lang:current /> tags and '?ln=en', '?ln=fr', .. instead of
+        ## <lang:link /> if ln is not default language
+        if ln != cdslang:
+            localized_webdoc = pattern_lang_link_current.sub('?ln=' + ln, localized_webdoc)
+        else:
+            localized_webdoc = pattern_lang_link_current.sub('', localized_webdoc)
         localized_webdoc = pattern_lang_current.sub(ln, localized_webdoc)
 
         # 5 step
@@ -429,39 +493,9 @@ def transform(webdoc_source,  verbose=0, req=None, header_p=True):
         ## cdspageboxrightbottomadd
         ## cdspagefooteradd
         ##
-##         if header_p == True:
         localized_body = localized_webdoc
         for tag, pattern in pattern_tags.iteritems():
             localized_body = pattern.sub(get_param_and_remove, localized_body)
-##         if page is not None:
-##             out = page(title=parameters.get('WML-Page-Title', ''),
-##                        body=localized_body,
-##                        navtrail=parameters.get('WML-Page-Navtrail-Previous-Links', ''), # or navtrail_body ?
-##                        description=parameters.get('WML-Page-Description', ''),
-##                        keywords=parameters.get('WML-Page-Keywords', ''),
-##                        uid=0,
-##                        cdspageheaderadd=parameters.get('WML-Page-Header-Add', ''),
-##                        cdspageboxlefttopadd=parameters.get('WML-Page-Box-Left-Top-Add', ''),
-##                        cdspageboxleftbottomadd=parameters.get('WML-Page-Box-Left-Bottom-Add', ''),
-##                        cdspageboxrighttopadd=parameters.get('WML-Page-Box-Right-Top-Add', ''),
-##                        cdspageboxrightbottomadd=parameters.get('WML-Page-Box-Right-Bottom-Add', ''),
-##                        cdspagefooteradd=parameters.get('WML-Page-Footer-Add', ''),
-##                        lastupdated="",
-##                        language=ln,
-##                        verbose=verbose,
-##                        titleprologue="",
-##                        titleepilogue="",
-##                        secure_page_p=0,
-##                        req=req,
-##                        errors=[],
-##                        warnings=[],
-##                        navmenuid=parameters.get('WML-Page-Navbar-Name', ''),
-##                        navtrail_append_title_p=1,
-##                        of="")
-##         else:
-##             out = localized_webdoc
-##         else:
-##             out = localized_webdoc
 
         out = localized_body
 
@@ -516,177 +550,6 @@ def write_cache_file(filename, webdoc_cache_dir, filebody):
     # close file:
     f.close()
 
-## def transform(wml_text, config_text='', lns=[cdslang], verbose=0, req=None, header_p=True):
-##     """
-##     Transform a WebDoc into html
-
-##     This is made through a serie of transformations, mainly substitutions.
-
-##     Parameters:
-
-##       - wml_text   :  *string* the WebDoc input to transform to HTML
-##       - config_text:  *string* the configuration with the defined tags
-##       - lns        :  *list[string]* the list of languages to return
-##       - header_p   :  *boolean* when True, print html headers
-##     """
-
-##     body = wml_text
-##     parameters = {}
-
-##     def get_param_and_remove(match):
-##         """
-##         Analyses 'match', get the parameter and return empty string to remove it.
-
-##         Called by substitution in 'transform(...)'
-
-##         @param match a match object corresponding to the special tag that must be interpreted
-##         """
-##         tag = match.group("tag")
-##         value = match.group("value")
-##         parameters[tag] = value
-##         return ''
-
-##     def translate(match):
-##         """
-##         Translate matching values
-##         """
-##         word = match.group("word")
-##         translated_word = _(word)
-##         return translated_word
-
-##     def current_lang(match):
-##         """
-##         Returns the value with * char replaced by current language
-##         """
-##         value = match.group("value")
-##         value = value.replace('*', ln)
-
-##         return value
-
-##     def function_print(match):
-##         """
-##         Format the given document version
-##         """
-##         function = match.group("function")
-##         param = match.group("param")
-##         out = ''
-##         if function == 'generate_pretty_revision_date_string':
-##             # Input: CVS DOLLAR Id DOLLAR string
-##             # Output: nicely formatted revision/date number suitable for Admin Guides
-##             # Example: ``DOLLAR Id: webcoll.wml,v 1.41 2004/04/21 11:20:06 tibor Exp DOLLAR''
-##             #          will generate output like ``CDS Invenio/0
-##             (junk, filename, revision, date, junk, junk, junk, junk) = param.split(' ')
-##             out = revision + ', ' + date
-##         elif function == 'generate_language_list_for_python':
-##             # Return Python-ready language list out of user-configured WML language list.
-##             # May return short or long version, depending on the first argument.
-##             # Output example: ['en','fr']
-##             # Output example: [['en','English'],['fr','French']]
-##             # TODO MAYBE
-##             pass
-
-##         return out
-
-##     # 1 step
-##     ## First filter, used to remove comments
-##     #wml_text = comments_pattern.sub('', wml_text)
-##     uncommented_wml_text = ''
-##     for line in wml_text.splitlines(True):
-##         if not line.strip().startswith('#'):
-##             uncommented_wml_text += line
-##     wml_text = uncommented_wml_text.replace('<protect>', '')
-##     wml_text = wml_text.replace('</protect>', '')
-
-##     # 2 step
-##     ## Execute custom functions
-##     wml_text = function_pattern.sub(function_print, wml_text)
-
-##     html_texts = []
-##     defined_tags = parse_config(config_text)
-##     # Language dependent filters
-##     for ln in lns:
-##         _ = gettext_set_language(ln)
-
-##         # 3 step
-##         ## Filter used to translate string in _(..)_
-##         localized_wml_text = translation_pattern.sub(translate, wml_text)
-
-##         # 4 step
-##         ## Print current language 'en', 'fr', .. instead of
-##         ## * in <lang:star ..> tags
-##         localized_wml_text = pattern_lang_star.sub(current_lang, localized_wml_text)
-
-##         # 5 step
-##         ## Filter out languages
-##         localized_wml_text = filter_languages(localized_wml_text, ln, defined_tags)
-
-##         # 6 Step
-##         ## Replace defined tags with their value from config file
-##         ## Eg. replace <weburl> with 'http://cdsweb.cern.ch/':
-##         for defined_tag, value in defined_tags.iteritems():
-##             localized_wml_text = localized_wml_text.replace('<%s>' % defined_tag, value)
-
-##         # 7 Step
-##         # Second language filtering, in case some <lang> tags have been
-##         # introduced by previous step
-##         localized_wml_text = filter_languages(localized_wml_text, ln)
-
-##         # 8 step
-##         ## Get the parameters defined in dedicated tags in the wml,
-##         ## and use them later to build the page:
-##         ## title
-##         ## navtrail_previous_links
-##         ## navbar_name
-##         ## navtrail_body
-##         ## navbar_select
-##         ## description
-##         ## keywords
-##         ## cdspageheaderadd
-##         ## cdspageboxlefttopadd
-##         ## cdspageboxleftbottomadd
-##         ## cdspageboxrighttopadd
-##         ## cdspageboxrightbottomadd
-##         ## cdspagefooteradd
-##         ##
-## ##         if header_p == True:
-## ##             localized_body = localized_wml_text
-## ##             for tag, pattern in pattern_tags.iteritems():
-## ##                 localized_body = pattern.sub(get_param_and_remove, localized_body)
-## ##             if page is not None:
-## ##                 out = page(title=parameters.get('WML-Page-Title', ''),
-## ##                            body=localized_body,
-## ##                            navtrail=parameters.get('WML-Page-Navtrail-Previous-Links', ''), # or navtrail_body ?
-## ##                            description=parameters.get('WML-Page-Description', ''),
-## ##                            keywords=parameters.get('WML-Page-Keywords', ''),
-## ##                            uid=0,
-## ##                            cdspageheaderadd=parameters.get('WML-Page-Header-Add', ''),
-## ##                            cdspageboxlefttopadd=parameters.get('WML-Page-Box-Left-Top-Add', ''),
-## ##                            cdspageboxleftbottomadd=parameters.get('WML-Page-Box-Left-Bottom-Add', ''),
-## ##                            cdspageboxrighttopadd=parameters.get('WML-Page-Box-Right-Top-Add', ''),
-## ##                            cdspageboxrightbottomadd=parameters.get('WML-Page-Box-Right-Bottom-Add', ''),
-## ##                            cdspagefooteradd=parameters.get('WML-Page-Footer-Add', ''),
-## ##                            lastupdated="",
-## ##                            language=ln,
-## ##                            verbose=verbose,
-## ##                            titleprologue="",
-## ##                            titleepilogue="",
-## ##                            secure_page_p=0,
-## ##                            req=req,
-## ##                            errors=[],
-## ##                            warnings=[],
-## ##                            navmenuid=parameters.get('WML-Page-Navbar-Name', ''),
-## ##                            navtrail_append_title_p=1,
-## ##                            of="")
-## ##             else:
-## ##                 out = localized_wml_text
-## ##         else:
-## ##             out = localized_wml_text
-
-##         out = localized_wml_text
-
-##         html_texts.append((ln, out))
-##     return html_texts
-
 def filter_languages(text, ln='en', defined_tags=None):
     """
     Filters the language tags that do not correspond to the specified language.
@@ -730,23 +593,9 @@ def filter_languages(text, ln='en', defined_tags=None):
 
             @param match a match object corresponding to the special tag that must be interpreted
             """
-            if match.group(1) == current_lang or \
+            if match.group('lang') == current_lang or \
                    keep == True:
-                # Additional step:
-                # if there are tags such as <WEBURL> and <CDSNAMEINTL>,
-                # replace them with their value, and apply the correct
-                # language to them (especially CDSNAMEINTL)
-                localized_text = match.group(2)
-                if defined_tags is not None:
-                    for defined_tag, value in defined_tags.iteritems():
-                        if defined_tag.upper() == '<CDSNAMEINTL>':
-                            localized_text = localized_text.replace(defined_tag, \
-                                                                    value.get(current_lang, value['en']))
-                        else:
-                            localized_text = localized_text.replace(defined_tag, value)
-                    localized_text = filter_languages(localized_text, match.group(1))
-
-                return localized_text # match.group(2)
+                return match.group('translation')
             else:
                 return ""
             # End of clean_language_tag(..)
@@ -777,42 +626,20 @@ def filter_languages(text, ln='en', defined_tags=None):
     filtered_text = pattern_lang.sub(search_lang_tag, text)
     return filtered_text
 
-def parse_config(config_text):
-    """
-    Get the variables defined in dedicated tags in the config file,
-    and return them as dict.
-    """
-    defined_tags = {}
-    for match in pattern_define_tag.finditer(config_text):
-        tag = match.group('tag')
-        value = match.group('value')
-        delete_whitespace = match.group('whitespace')
-        if 'delete' in delete_whitespace:
-            value = value.strip()
-
-        # Also replace <%s> with already parsed tags
-        for defined_tag, defined_value in defined_tags.iteritems():
-            value = value.replace('<%s>' % defined_tag, defined_value)
-        defined_tags[tag] = value
-
-    return defined_tags
-
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
-    sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
+    sys.stderr.write("Usage: %s [options] webdocfile\n" % sys.argv[0])
     sys.stderr.write("  -h,  --help                \t\t Print this help.\n")
     sys.stderr.write("  -V,  --version             \t\t Print version information.\n")
     sys.stderr.write("  -v,  --verbose=LEVEL       \t\t Verbose level (0=min,1=normal,9=max).\n")
-    sys.stderr.write("  -l,  --language=LN1,LN2,.. \t\t Language(s) of the output (default all)\n")
-    sys.stderr.write("  -i,  --input=input.html.wml \t\t Input WML file\n")
-    sys.stderr.write("  -o,  --output=output.html \t\t Path of the output file (default: same as input, without .wml extension)\n")
-    sys.stderr.write("  -c,  --config=config.wml \t\t Config file\n")
+    sys.stderr.write("  -l,  --language=LN1,LN2,.. \t\t Language(s) to process (default all)\n")
+    sys.stderr.write("  -m,  --mode=MODE           \t\t Update cache mode(0=Never,1=if necessary,2=always)\n")
     sys.stderr.write("\n")
-    sys.stderr.write(" Example: webdoc -i inputfile.wml -o outputfile.html\n")
-    sys.stderr.write(" Example: webdoc -i inputfile.wml -o outputfile.html -l en,fr,\n")
-    sys.stderr.write(" Example: webdoc -i ../../miscutil/lib/config.py.wml -c ../../../config/config.wml -c ../../../config/configbis.wml  -o /tmp/config.py -l en ")
+    sys.stderr.write(" Example: webdoc help-pages\n")
+    sys.stderr.write(" Example: webdoc -l en,fr help-pages\n")
+    sys.stderr.write(" Example: webdoc -m 1 help-pages")
     sys.stderr.write("\n")
 
     sys.exit(exitcode)
@@ -821,16 +648,16 @@ def main():
     """
     main entry point for webdoc via command line
     """
-    options = {'language':cdslangs, 'verbose':0}
+    options = {'language':cdslangs, 'verbose':1, 'mode':2}
 
     try:
         opts, args = getopt.getopt(sys.argv[1:],
-                                   "hVv:l:i:o:c:",
+                                   "hVv:l:m:",
                                    ["help",
                                     "version",
                                     "verbose=",
                                     "language=",
-                                    "output="])
+                                    "mode="])
     except getopt.GetoptError, err:
         usage(1, err)
 
@@ -844,64 +671,28 @@ def main():
             elif opt[0] in ["-v", "--verbose"]:
                 options["verbose"]  = int(opt[1])
             elif opt[0] in ["-l", "--language"]:
-                options["language"]  = [wash_language(lang.strip().lower()) for lang in opt[1].split(',')]
-            elif opt[0] in ["-o", "--output"]:
-                options["outputfile"] = opt[1]
+                options["language"]  = [wash_language(lang.strip().lower()) \
+                                        for lang in opt[1].split(',') \
+                                        if lang in cdslangs]
+            elif opt[0] in ["-m", "--mode"]:
+                options["mode"] = opt[1]
     except StandardError, e:
         usage(e)
 
-    #options["inputfile"] = os.path.abspath(args[0])
-    options["inputfile"] = args[0]
+    options["webdoc"] = args[0]
 
-    if not options.has_key("inputfile"):
+    if not options.has_key("webdoc"):
         usage(0)
 
-    if not options.has_key("outputfile"):
-        outputfile_components = options["inputfile"].split('.')
-        options["outputfile"] = '.'.join(outputfile_components[:-1])
+    # check if webdoc exists
+    infos = get_webdoc_info(options["webdoc"])
+    if infos[0] is None:
+        usage(1, "Could not find %s" %  options["webdoc"])
 
-    if len(options["language"]) > 1 and '%(ln)s' not in options["outputfile"]:
-        outputfile_components = options["outputfile"].split('.')
-        options["outputfile"] = '.'.join(outputfile_components[:-1]) +'.%(ln)s.' +\
-                                outputfile_components[-1]
-
-    options["outputfile"] = os.path.abspath(options["outputfile"])
-
-    try:
-        # Load input file
-        webdoc_text = file(options["inputfile"], 'r').read()
-    except:
-        usage(1, "Could not open file %s" %  options["inputfile"])
-
-    config_text = ''
-    if options.has_key("configfile"):
-        for config_file in options["configfile"]:
-            try:
-                # Load config file(s).
-                # We can simply concatenate them
-                config_text += file(config_file, 'r').read()
-            except Exception,e :
-                usage(1, "Could not open file %s" %  config_file)
-
-    # Print HTML header only when doing html output
-    if options["outputfile"].endswith('html') or \
-       options["outputfile"].endswith('htm') or \
-       options["outputfile"].endswith('php'):
-        header_p = True
-    else:
-        header_p = False
-
-    # Then process for each language
-##     html_texts = transform(webdoc_text,
-##                            config_text,
-##                            options["language"],
-##                            verbose=options["verbose"],
-##                            req=None,
-##                            header_p=header_p)
-##     for lang, html_text in html_texts:
-##         html_file = open(options["outputfile"] % {'ln':lang}, 'w')
-##         html_file.write(html_text)
-##         html_file.close()
+    update_webdoc_cache(webdoc=options["webdoc"],
+                        mode=options["mode"],
+                        verbose=options["verbose"],
+                        languages=options["language"])
 
 if __name__ == "__main__":
     main()
