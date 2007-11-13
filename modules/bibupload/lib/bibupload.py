@@ -712,6 +712,7 @@ def elaborate_fft_tags(record, rec_id, mode):
         """Sinchronize the 8564 tags for record with actual files. descriptions
         should be a dictionary docname:description for the new description to be
         inserted."""
+        write_message("Synchronizing MARC of recid '%s' with:\n%s\nwith descriptions: %s\nand comments: %s\nand changed urls: %s" % (rec_id, record, descriptions, comments, changed), verbose=9, stream=sys.stderr)
         tags8564s = record_get_field_instances(record, '856', '4', ' ')
         filtered_tags8564s = []
 
@@ -841,9 +842,8 @@ def elaborate_fft_tags(record, rec_id, mode):
             url = field_get_subfield_values(fft, 'a')
             if url:
                 url = url[0]
-            elif doctype not in ('PURGE', 'DELETE', 'EXPUNGE'):
-                write_message('url not specified for fft %s' % str(fft), stream=sys.stderr)
-
+            else:
+                url = ''
             # Let's discover the description
             description = field_get_subfield_values(fft, 'd')
             if description:
@@ -856,7 +856,11 @@ def elaborate_fft_tags(record, rec_id, mode):
             if name:
                 name = file_strip_ext(name[0])
             else:
-                name = get_docname_from_url(url)
+                if url:
+                    name = get_docname_from_url(url)
+                else:
+                    write_message("fft '%s' doesn't specifies neither a url nor a name" % str(fft), stream=sys.stderr)
+                    break
 
             # Let's discover the desired new docname in case we want to change it
             newname = field_get_subfield_values(fft, 'm')
@@ -870,9 +874,13 @@ def elaborate_fft_tags(record, rec_id, mode):
             if format:
                 format = format[0]
             else:
-                path = urllib2.urlparse.urlsplit(url)[2]
-                filename = os.path.split(path)[-1]
-                format = filename[len(file_strip_ext(filename)):].lower()
+                if url:
+                    path = urllib2.urlparse.urlsplit(url)[2]
+                    filename = os.path.split(path)[-1]
+                    format = filename[len(file_strip_ext(filename)):].lower()
+                else:
+                    write_message("fft '%s' doesn't specifies neither a url nor a format" % str(fft), stream=sys.stderr)
+                    break
 
             # Let's discover the icon
             icon = field_get_subfield_values(fft, 'x')
@@ -912,13 +920,19 @@ def elaborate_fft_tags(record, rec_id, mode):
                 for (url2, format2) in urls:
                     if format == format2:
                         write_message("fft '%s' specifies a second file '%s' with the same format '%s' from previous fft with docname '%s'" % (str(fft), url, format, name), stream=sys.stderr)
-                urls.append((url, format))
+                if url:
+                    urls.append((url, format))
             else:
-                docs[name] = (doctype, newname, restriction, icon, [(url, format)])
+                if url:
+                    docs[name] = (doctype, newname, restriction, icon, [(url, format)])
+                else:
+                    docs[name] = (doctype, newname, restriction, icon, [])
             comments['%s/record/%s/files/%s%s' % (weburl, rec_id, newname, format)] = comment
             descriptions['%s/record/%s/files/%s%s' % (weburl, rec_id, newname, format)] = description
             if newname != name:
                 changed['%s/record/%s/files/%s%s' % (weburl, rec_id, newname, format)] = '%s/record/%s/files/%s%s' % (weburl, rec_id, name, format)
+
+        write_message('Result of FFT analysis:\n\tDocs: %s\n\tComments: %s\n\tDescriptions: %s' % (docs, comments, descriptions), verbose=9, stream=sys.stderr)
 
         # Let's remove all FFT tags
         record_delete_field(record, 'FFT', ' ', ' ')
@@ -932,6 +946,7 @@ def elaborate_fft_tags(record, rec_id, mode):
             bibrecdocs.buildBibDocList()
 
         for docname, (doctype, newname, restriction, icon, urls) in docs.iteritems():
+            write_message("Elaborating olddocname: '%s', newdocname: '%s', doctype: '%s', restriction: '%s', icon: '%s', urls: '%s', mode: '%s'" % (docname, newname, doctype, restriction, icon, urls, mode), verbose=9, stream=sys.stderr)
             if mode in ('insert', 'replace'): # new bibdocs, new docnames, new marc
                 if newname in bibrecdocs.getBibDocNames(doctype):
                     write_message("('%s', '%s', '%s') not inserted because docname already exists." % (doctype, newname, urls), stream=sys.stderr)
@@ -972,12 +987,13 @@ def elaborate_fft_tags(record, rec_id, mode):
                             # Since the docname already existed we have to first
                             # bump the version by pushing the first new file
                             # then pushing the other files.
-                            (first_url, first_format) = urls[0]
-                            other_urls = urls[1:]
-                            if not _add_new_version(bibdoc, first_url, first_format, docname, doctype, newname):
-                                continue
-                            for (url, format) in other_urls:
-                                _add_new_format(bibdoc, url, format, docname, doctype, newname)
+                            if urls:
+                                (first_url, first_format) = urls[0]
+                                other_urls = urls[1:]
+                                if not _add_new_version(bibdoc, first_url, first_format, docname, doctype, newname):
+                                    continue
+                                for (url, format) in other_urls:
+                                    _add_new_format(bibdoc, url, format, docname, doctype, newname)
                         if icon != 'KEEP-OLD-VALUE':
                             _add_new_icon(bibdoc, icon, restriction)
                 if not found_bibdoc:
@@ -1008,12 +1024,13 @@ def elaborate_fft_tags(record, rec_id, mode):
                         else:
                             if restriction != 'KEEP-OLD-VALUE':
                                 bibdoc.setStatus(restriction)
-                            (first_url, first_format) = urls[0]
-                            other_urls = urls[1:]
-                            if not _add_new_version(bibdoc, first_url, first_format, docname, doctype, newname):
-                                continue
-                            for (url, format) in other_urls:
-                                _add_new_format(bibdoc, url, format, docname, description, doctype, newname)
+                            if urls:
+                                (first_url, first_format) = urls[0]
+                                other_urls = urls[1:]
+                                if not _add_new_version(bibdoc, first_url, first_format, docname, doctype, newname):
+                                    continue
+                                for (url, format) in other_urls:
+                                    _add_new_format(bibdoc, url, format, docname, description, doctype, newname)
                         if icon != 'KEEP-OLD-VALUE':
                             _add_new_icon(bibdoc, icon, restriction)
                 if not found_bibdoc:
@@ -1037,6 +1054,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                             _add_new_icon(bibdoc, icon, restriction)
                     except Exception, e:
                         write_message("('%s', '%s', '%s') not appended." % (doctype, newname, urls), stream=sys.stderr)
+        write_message('Changed urls: %s' % str(changed), verbose=9, stream=sys.stderr)
         return _synchronize_8564(rec_id, record, descriptions, comments, changed)
     else:
         return record
