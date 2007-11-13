@@ -329,7 +329,7 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-        out = "<p>" + _("If you have lost password for your %(cdsname)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form and having a request link for a new password emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'cdsname' : cdsnameintl[ln]} + "</p>"
+        out = "<p>" + _("If you have lost password for your %(cdsname)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form in order to have a reset password link emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'cdsname' : cdsnameintl[ln]} + "</p>"
 
         out += """
           <blockquote>
@@ -598,7 +598,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        out = """\
+        out = """
 %(intro)s
 
 %(intro2)s
@@ -607,10 +607,9 @@ class Template:
 
 %(outro)s
 
-%(outro2)s
-""" % {
+%(outro2)s""" % {
             'intro': _("Somebody (possibly you) coming from %(ip_address)s "
-                "have asked for a\npassword reset for %(cdsname)s for "
+                "has asked\nfor a password reset at %(cdsname)s\nfor "
                 "the account \"%(email)s\"." % {
                     'cdsname' :cdsnameintl.get(ln, cdsname),
                     'email' : email,
@@ -623,13 +622,8 @@ class Template:
                     'ln' : ln,
                     'mailcookie' : reset_key
                 }, {})),
-            'outro' : _("and follow the instructions presented there."),
-            'outro2' : _("Please note that this URL will remain valid only for about %(days)s day(s).") % {'days' : CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS},
-            'best_regards': _("Best regards"),
-            'cdsnameintl' :cdsnameintl.get(ln, cdsname),
-            'weburl': weburl,
-            'need_intervention_please_contact': _("Need human intervention?  Contact"),
-            'supportemail': supportemail
+            'outro' : _("in order to confirm the validity of this request."),
+            'outro2' : _("Please note that this URL will remain valid for about %(days)s days only.") % {'days' : CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS},
         }
         return out
 
@@ -641,7 +635,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        out = """\
+        out = """
 %(intro)s
 
 %(intro2)s
@@ -650,32 +644,25 @@ class Template:
 
 %(outro)s
 
-%(outro2)s
-""" % {
+%(outro2)s""" % {
             'intro': _("Somebody (possibly you) coming from %(ip_address)s "
-                "have asked to register an account\nfor %(cdsname)s using the "
-                "email address \"%(email)s\"." % {
+                "has asked\nto register a new account at %(cdsname)s\nfor the "
+                "following email address \"%(email)s\"." % {
                     'cdsname' :cdsnameintl.get(ln, cdsname),
                     'email' : email,
                     'ip_address' : ip_address,
                     }
                 ),
-            'intro2' : _("If you want to confirm this address, please go to:"),
+            'intro2' : _("If you want to complete this account registration, please go to:"),
             'link' : "%s/youraccount/access%s" %
                 (sweburl, make_canonical_urlargd({
                     'ln' : ln,
                     'mailcookie' : address_activation_key
                 }, {})),
-            'outro' : _("and follow the instructions presented there."),
-            'outro2' : _("Please note that this URL will remain valid only for about %(days)s day(s).") % {'days' : CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS},
-            'best_regards': _("Best regards"),
-            'cdsnameintl' :cdsnameintl.get(ln, cdsname),
-            'weburl': weburl,
-            'need_intervention_please_contact': _("Need human intervention?  Contact"),
-            'supportemail': supportemail
+            'outro' : _("in order to confirm the validity of this request."),
+            'outro2' : _("Please note that this URL will remain valid for about %(days)s days only.") % {'days' : CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS},
         }
         return out
-
 
     def tmpl_account_emailSent(self, ln, email):
         """
@@ -692,7 +679,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out =""
-        out += _("Okay, request for a new password has been emailed to %s.") % email
+        out += _("Okay, a password reset link has been emailed to %s.") % email
         return out
 
     def tmpl_account_delete(self, ln):

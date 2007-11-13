@@ -407,10 +407,9 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
             address_activation_key = mail_cookie_create_mail_activation(email)
             ip_address = req.connection.remote_host or req.connection.remote_ip
             try:
-                if not send_email(supportemail, email, _("Email address activation request for %s") % cdsnameintl.get(ln, cdsname),
-                    tmpl.tmpl_account_address_activation_email_body(
-                        email, address_activation_key, ip_address, ln),
-                    header='', footer=''):
+                if not send_email(supportemail, email, _("Account registration at %s") % cdsnameintl.get(ln, cdsname),
+                                  tmpl.tmpl_account_address_activation_email_body(email,
+                                                  address_activation_key, ip_address, ln)):
                     return 1
             except (smtplib.SMTPException, socket.error):
                 return 6

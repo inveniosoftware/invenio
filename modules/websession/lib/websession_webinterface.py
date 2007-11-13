@@ -513,8 +513,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 % (_("Password reset request for"),
                 cdsnameintl.get(args['ln'], cdsname)),
                 websession_templates.tmpl_account_reset_password_email_body(
-                    args['p_email'], reset_key, ip_address, args['ln']),
-                header='', footer=''):
+                    args['p_email'],reset_key, ip_address, args['ln'])):
             eMsg = _("The entered email address is incorrect, please check that it is written correctly (e.g. johndoe@example.com).")
             return page(title=_("Incorrect email address"),
                         body=webaccount.perform_emailMessage(eMsg, args['ln']),
@@ -725,7 +724,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             mess = _("Your account has been successfully created.")
             title = _("Account created")
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
-                mess += " " + _("An email has been sent to the given address with instructions about how to confirm the email validity.")
+                mess += " " + _("In order to confirm its validity, an email message containing an account activation key has been sent to the given email address.")
+                mess += " " + _("Please follow instructions presented there in order to complete the account registration process.")
             if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
                 mess += " " + _("A second email will be sent when the account has been activated and can be used.")
             elif CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT != 1:
