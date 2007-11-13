@@ -70,7 +70,6 @@ import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 webcomment_templates = invenio.template.load('webcomment')
 
-#if CFG_EXPERIMENTAL_FEATURES:
 from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
@@ -3431,7 +3430,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 if of == "id":
                     return []
 
-    elif CFG_EXPERIMENTAL_FEATURES and p.startswith("cocitedwith:"):
+    elif p.startswith("cocitedwith:"):  #WAS EXPERIMENTAL
         ## 3-terter - cited by search needed
         page_start(req, of, cc, as, ln, uid, _("Search Results"))
         if of.startswith("h"):
