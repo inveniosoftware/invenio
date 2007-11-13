@@ -19,7 +19,7 @@
 
 <!-- WebDoc-Page-Title: Search Engine API -->
 <!-- WebDoc-Page-Navbar-Name: hacking-websearch -->
-<!-- WebDoc-Page-Navtrail-Previous-Links: <a class="navtrail" href="<WEBURL>/hacking/">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="search-engine-internals">WebSearch Internals</a>  -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/hacking/">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="search-engine-internals">WebSearch Internals</a>  -->
 <!-- WebDoc-Page-Navbar-Select: hacking-websearch-api -->
 <!-- WebDoc-Page-Revision: $Id$-->
 
