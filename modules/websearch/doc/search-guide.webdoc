@@ -177,7 +177,7 @@ documents on <em>standard model</em> that are written by (or mention)
 
     <form action="<WEBURL>/search" method="get">
     <blockquote>
-    <input size=40 type="text" name="p" value="ellis standard model">
+    <input size="40" type="text" name="p" value="ellis standard model">
     <select name="f"><option value="">any field<option>title<option>author</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
     </blockquote>
@@ -199,7 +199,7 @@ escribir:
 
      <form action="<WEBURL>/search" method="get">
     <blockquote>
-    <input size=40 type="text" name="p" value="ellis modelos estandar">
+    <input size="40" type="text" name="p" value="ellis modelos estandar">
     <select name="f"><option value="">cualquier campo<option>t&iacute;tulo<option>autor</select>
     <input class="formbutton" type="submit" name="action" value="BUSCAR">
     </blockquote>
@@ -221,7 +221,7 @@ estàndard</em> que han estat escrits per (o que fan esment a)
 
      <form action="<WEBURL>/search" method="get">
     <blockquote>
-    <input size=40 type="text" name="p" value="ellis models est&agrave;ndar">
+    <input size="40" type="text" name="p" value="ellis models est&agrave;ndar">
     <select name="f"><option value="">qualsevol camp<option>t&iacute;tol<option>autor</select>
     <input class="formbutton" type="submit" name="action" value="SEARCH">
     </blockquote>
@@ -912,9 +912,9 @@ We have already seen how whitespace adds a silent boolean AND in the
 search for words.  The other boolean operators include:
 
 <blockquote>
-<table border="1" cellpadding=10>
+<table border="1" cellpadding="10">
 <tr>
-<td rowspan=3 align=center>
+<td rowspan="3" align="center">
 <strong>+<br>AND</strong>
 </td>
 <td>
@@ -942,7 +942,7 @@ search for words.  The other boolean operators include:
 </td>
 </tr>
 <tr>
-<td rowspan=2 align=center>
+<td rowspan="2" align="center">
 <strong>-<br>NOT</strong>
 </td>
 <td>
@@ -963,7 +963,7 @@ ditto, syntactic sugar
 </td>
 </tr>
 <tr>
-<td rowspan=2 align=center>
+<td rowspan="2" align="center">
 <strong>|<br>OR</strong>
 </td>
 <td>
@@ -990,9 +990,9 @@ Ya hemos visto como la inclusión de un espacio en blanco es
 equivalente a la adición de un operador booleano en la búsqueda por
 palabras. El resto de operadores booleanos son:
 <blockquote>
-<table BORDER="1" cellpadding=10>
+<table BORDER="1" cellpadding="10">
 <tr>
-<TD rowspan=3 align=center>
+<TD rowspan="3" align="center">
 <strong>+<BR>AND</strong>
 </td>
 <td>
@@ -1020,7 +1020,7 @@ palabras. El resto de operadores booleanos son:
 </td>
 </tr>
 <tr>
-<TD rowspan=2 align=center>
+<TD rowspan="2" align="center">
 <strong>-<BR>NOT</strong>
 </td>
 <td>
@@ -1040,7 +1040,7 @@ ditto, "syntactic sugar"
 </td>
 </tr>
 <tr>
-<TD rowspan=2 align=center>
+<TD rowspan="2" align="center">
 <strong>|<BR>OR</strong>
 </td>
 <td>
@@ -1059,7 +1059,7 @@ recupera todos los registros que contengan al menos, una de las dos palabras
 </td>
 </tr>
 <tr>
-<td colspan="2"><font size=1>(*)Nota de la traducción española: syntactic sugar es una espresión
+<td colspan="2"><font size="1">(*)Nota de la traducción española: syntactic sugar es una espresión
 utilizada en inglés para describir "otra forma similar de llamar a una función"</font></td>
 </tr>
 </table>
@@ -1071,9 +1071,9 @@ Hem vist com la inclusió d’un espai en blanc és equivalent a l’adició
 d’un operador booleà a la cerca per paraules.  La resta d’operadors
 booleans són:
 <blockquote>
-<table BORDER="1" cellpadding=10>
+<table BORDER="1" cellpadding="10">
 <tr>
-<TD rowspan=3 align=center>
+<TD rowspan="3" align="center">
 <strong>+<BR>AND</strong>
 </td>
 <td>
@@ -1101,7 +1101,7 @@ booleans són:
 </td>
 </tr>
 <tr>
-<TD rowspan=2 align=center>
+<TD rowspan="2" align="center">
 <strong>-<BR>NOT</strong>
 </td>
 <td>
@@ -1120,7 +1120,7 @@ recupera tots els registres que contenen la paraula <em>ellis</em> però que no 
 </td>
 </tr>
 <tr>
-<TD rowspan=2 align=center>
+<TD rowspan="2" align="center">
 <strong>|<BR>OR</strong>
 </td>
 <td>
@@ -1139,7 +1139,7 @@ recupera tots els registres que contenen, com a mínim, una de les dues paraules
 </td>
 </tr>
 <tr>
-<td colspan="2"><sup>(*)</sup><font size=1>Nota de la traducció catalana: syntactic sugar es una espressió
+<td colspan="2"><sup>(*)</sup><font size="1">Nota de la traducció catalana: syntactic sugar es una espressió
 emprada en anglès per a descriure "altre forma similar de cridar una funció"</font></td>
 </tr>
 </table>
@@ -2243,7 +2243,7 @@ between <em>1983</em> and <em>1992</em>, type:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=30 type="text" name="p" value="muon decay year:1983->1992">
+      <input size="30" type="text" name="p" value="muon decay year:1983->1992">
       <select name="f"><option value="">any field<option>title<option>author</select>
       <input class="formbutton" type="submit" name="action" value="SEARCH">
       </blockquote>
@@ -2254,7 +2254,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=30 type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
+      <input size="30" type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
       <select name="f"><option value="">any field<option>title<option>author</select>
       <input class="formbutton" type="submit" name="action" value="SEARCH">
       </blockquote>
@@ -2269,7 +2269,7 @@ sobre <em>par motor</em> publicados entre <em>1983</em> y
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=30 type="text" name="p" value="destintegraci&oacute;n muon a&ntilde;o:1983->1992">
+      <input size="30" type="text" name="p" value="destintegraci&oacute;n muon a&ntilde;o:1983->1992">
       <select name="f"><option value="">cualquier campo<option>t&iacute;tulo<option>autor</select>
       <input class="formbutton" type="submit" name="action" value="BUSCAR">
       </blockquote>
@@ -2281,7 +2281,7 @@ debemos escribir:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=30 type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
+      <input size="30" type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
       <select name="f"><option value="">cualquier campo<option>t&iacute;tulo<option>autor</select>
       <input class="formbutton" type="submit" name="action" value="BUSCAR">
       </blockquote>
@@ -2296,7 +2296,7 @@ escriure:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=30 type="text" name="p" value="destintegraci&oacute; muon any:1983->1992">
+      <input size="30" type="text" name="p" value="destintegraci&oacute; muon any:1983->1992">
       <select name="f"><option value="">qualsevol camp<option>t&iacute;tol<option>autor</select>
       <input class="formbutton" type="submit" name="action" value="CERCA">
       </blockquote>
@@ -2308,7 +2308,7 @@ cal escriure:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=30 type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
+      <input size="30" type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
       <select name="f"><option value="">qualsevol camp<option>t&iacute;tol<option>autor</select>
       <input class="formbutton" type="submit" name="action" value="CERCA">
       </blockquote>
@@ -2337,7 +2337,7 @@ cal escriure:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*">
+      <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*">
       <select name="f"><option value="">any field<option>title<option>author</select>
       <input class="formbutton" type="submit" name="action" value="SEARCH">
       </blockquote>
@@ -2350,7 +2350,7 @@ cal escriure:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="higgs or reference:higgs or fulltext:higgs">
+      <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs">
       <select name="f"><option value="">any field<option>title<option>author</select>
       <input class="formbutton" type="submit" name="action" value="SEARCH">
       </blockquote>
@@ -2364,7 +2364,7 @@ cal escriure:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;">
+      <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;">
       <select name="f"><option value="">any field<option>title<option>author</select>
       <input class="formbutton" type="submit" name="action" value="SEARCH">
       </blockquote>
@@ -2382,7 +2382,7 @@ debe escribirse:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*">
+      <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*">
       <select name="f"><option value="">qualsevol camp<option>t&iacute;tulo<option>autor</select>
       <input class="formbutton" type="submit" name="action" value="BUSCAR">
       </blockquote>
@@ -2398,7 +2398,7 @@ los metadatos, las citas o el texto completo, debe escribirse:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="higgs or reference:higgs or fulltext:higgs">
+      <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs">
       <select name="f"><option value="">cualquier campo<option>t&iacute;tulo<option>autor</select>
       <input class="formbutton" type="submit" name="action" value="BUSCAR">
       </blockquote>
@@ -2413,7 +2413,7 @@ escribirse:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;">
+      <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;">
       <select name="f"><option value="">cualquier campo<option> t&iacute;tulo <option>autor</select>
       <input class="formbutton" type="submit" name="action" value="BUSCAR">
       </blockquote>
@@ -2432,7 +2432,7 @@ publicats dins els anys que comencen pels dígits '200', cal escriure:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*">
+      <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*">
       <select name="f"><option value="">qualsevol camp<option>t&iacute;tol<option>autor</select>
       <input class="formbutton" type="submit" name="action" value="CERCA">
       </blockquote>
@@ -2448,7 +2448,7 @@ les metadades, les referències o el text complet, cal escriure:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="higgs or reference:higgs or fulltext:higgs">
+      <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs">
       <select name="f"><option value="">qualsevol camp<option>t&iacute;tol<option>autor</select>
       <input class="formbutton" type="submit" name="action" value="CERCA">
       </blockquote>
@@ -2462,7 +2462,7 @@ les metadades, les referències o el text complet, cal escriure:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;">
+      <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;">
       <select name="f"><option value="">qualsevol camp<option> t&iacute;tol <option>autor</select>
       <input class="formbutton" type="submit" name="action" value="CERCA">
       </blockquote>
@@ -2700,7 +2700,7 @@ query:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
+      <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
       <select name="f"><option value="">any field<option>title<option>author</select>
       <input class="formbutton" type="submit" name="action" value="SEARCH">
       </blockquote>
@@ -2800,7 +2800,7 @@ una misma búsqueda, se puede utilizar el operador booleano O:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
+      <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
       <select name="f"><option value="">cualquier campo<option>t&iacute;tulo<option>autor</select>
       <input class="formbutton" type="submit" name="action" value="BUSCAR">
       </blockquote>
@@ -2910,7 +2910,7 @@ una mateixa cerca, es pot utilitzar l’operador booleà O:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=60 type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
+      <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
       <select name="f"><option value="">qualsevol camp<option>t&iacute;tol<option>autor</select>
       <input class="formbutton" type="submit" name="action" value="CERCA">
       </blockquote>
@@ -3334,7 +3334,7 @@ To search for all records that cite an article from <em>Giddings</em> and <em>Ro
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=70 type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000">
+      <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000">
       <select name="f"><option value="">any field<option>title<option>author</select>
       <input class="formbutton" type="submit" name="action" value="SEARCH">
       </blockquote>
@@ -3387,7 +3387,7 @@ D</em> volumen <em>61</em> y en el año <em>2000</em>, escribiremos:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=70 type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:20000">
+      <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:20000">
       <select name="f"><option value="">cualquier campo<option>t&iacute;tulo<option>autor</select>
       <input class="formbutton" type="submit" name="action" value="BUSCAR">
       </blockquote>
@@ -3443,7 +3443,7 @@ volum <em>61</em> i a l’any <em>2000</em>, escriurem:
 
       <form action="<WEBURL>/search" method="get">
       <blockquote>
-      <input size=70 type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000">
+      <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000">
       <select name="f"><option value="">qualsevol camp<option>t&iacute;tol<option>autor</select>
       <input class="formbutton" type="submit" name="action" value="CERCA">
       </blockquote>

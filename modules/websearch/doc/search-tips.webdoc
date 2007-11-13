@@ -29,7 +29,7 @@
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
-    <input size=20 type="text" name="p" value="" />
+    <input size="20" type="text" name="p" value="" />
     <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
     <input class="formbutton" type="submit" name="action" value="SEARCH" />
     </form>
