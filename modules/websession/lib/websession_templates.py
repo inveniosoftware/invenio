@@ -329,7 +329,7 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-        out = "<p>" + _("If you have lost password for your %(cdsname)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form in order to have a reset password link emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'cdsname' : cdsnameintl[ln]} + "</p>"
+        out = "<p>" + _("If you have lost password for your %(cdsname)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form in order to have a password reset link emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'cdsname' : cdsnameintl[ln]} + "</p>"
 
         out += """
           <blockquote>
@@ -352,7 +352,7 @@ class Template:
           """ % {
             'ln': ln,
             'email' : _("Email address"),
-            'send' : _("Send new password"),
+            'send' : _("Send password reset link"),
           }
 
         if CFG_CERN_SITE:
