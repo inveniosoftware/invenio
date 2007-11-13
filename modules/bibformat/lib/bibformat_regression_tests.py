@@ -101,7 +101,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
 
         self.record_74_hd_pubinfo = '''<strong>Published in: </strong><a href="http://weblib.cern.ch/cgi-bin/ejournals?publication=Phys.%20Lett.%2C%20B&amp;volume=481&amp;year=2000&amp;page=79">Phys. Lett., B :481 2000 79-88</a>'''
 
-        self.record_74_hd_fulltext = '''<small>(external link)</small>:<br /><small><a  href="http://documents.cern.ch/cgi-bin/setlink?base=preprint&amp;categ=hep-th&amp;id=0003295"><img style="border:none" src="http://pcdh23.cern.ch/img/file-icon-text-34x48.gif" alt="Download fulltext" /><br />Fulltext</a></small>'''
+        self.record_74_hd_fulltext = '''0003295.pdf"><img style="border:none"'''
 
         self.record_74_hd_citations = '''<strong>Cited by:</strong> try citation search for <a href="%(weburl)s/search?f=reference&amp;p=hep-th/0003295&amp;ln=%(lang)s">hep-th/0003295</a>'''% \
                                       {'weburl' : weburl,
