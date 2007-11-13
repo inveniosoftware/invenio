@@ -100,7 +100,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     'expiration' : '<em>%s</em>' % expiration.strftime("%Y-%m-%d %H:%M:%S")},
                     'login', _('login'), args['ln']),
                 req=req,
-                uid=webuser.getUid(uid),
+                uid=webuser.getUid(req),
                 language=args['ln'],
                 lastupdated=__lastupdated__,
                 navmenuid='youraccount')
@@ -119,7 +119,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         uid = webuser.update_Uid(req, email)
                         body += "<p>" + _("You can now go to %(x_url_open)syour account page%(x_url_close)s.") % {'x_url_open' : '<a href="/youraccount/display?ln=%s">' % args['ln'], 'x_url_close' : '</a>'} + "</p>"
                     return page(title=_("Email address successfully activated"),
-                    body=body, req=req, language=args['ln'], uid=webuser.getUid(uid), lastupdated=__lastupdated__, navmenuid='youraccount')
+                    body=body, req=req, language=args['ln'], uid=webuser.getUid(req), lastupdated=__lastupdated__, navmenuid='youraccount')
                 except InvenioWebAccessMailCookieDeletedError, e:
                     body = "<p>" + _("You have already confirmed the validity of your email address!") + "</p>"
                     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
