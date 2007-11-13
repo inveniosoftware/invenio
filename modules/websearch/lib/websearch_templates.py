@@ -41,7 +41,7 @@ from invenio.config import \
      supportemail
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
-from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
+#from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
 from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
 from invenio.htmlutils import nmtoken_from_string
 
@@ -1032,9 +1032,8 @@ class Template:
                                         _("Similar records"),
                                         {'class': "moreinfo"})}
 
-        if CFG_EXPERIMENTAL_FEATURES:
-            out += '''<span class="moreinfo"> - %s </span>''' % \
-                   create_html_link(self.build_search_url(p='recid:%d' % recid, rm='cit', ln=ln),
+        out += '''<span class="moreinfo"> - %s </span>''' % \
+                   create_html_link(self.build_search_url(p='recid:%d' % recid, rm='citation', ln=ln),
                                     {}, _("Cited by"), {'class': "moreinfo"})
 
         return out
@@ -2357,10 +2356,9 @@ class Template:
                                     {}, _("Similar records"),
                                     {'class': "moreinfo"})
 
-        if CFG_EXPERIMENTAL_FEATURES:
-            out += '<span class="moreinfo"> - %s</span>' % \
+        out += '<span class="moreinfo"> - %s</span>' % \
                    create_html_link(self.build_search_url(p="recid:%d" % recID,
-                                                     rm="cit",
+                                                     rm="citation",
                                                      ln=ln),
                                     {}, _("Cited by"),
                                     {'class': "moreinfo"})
