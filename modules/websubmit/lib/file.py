@@ -462,13 +462,14 @@ class BibDoc:
         run_sql("INSERT INTO bibdoc_bibdoc (id_bibdoc1, id_bibdoc2, type) VALUES (%s,%s,'Icon')",
             (self.id, newicon.getId(),))
         try:
-            old_umask = os.umask(022)
-            open("%s/.docid" % newicon.getBaseDir(), "w").write(str(self.id))
-            open("%s/.type" % newicon.getBaseDir(), "w").write(str(self.type))
-            os.umask(old_umask)
-        except Exception, e:
-            register_exception()
-            raise InvenioWebSubmitFileError, "Encountered an exception while writing .docid and .type for folder '%s': '%s'" % (newicon.getBaseDir(), e)
+            try:
+                old_umask = os.umask(022)
+                open("%s/.docid" % newicon.getBaseDir(), "w").write(str(self.id))
+                open("%s/.type" % newicon.getBaseDir(), "w").write(str(self.type))
+                os.umask(old_umask)
+            except Exception, e:
+                register_exception()
+                raise InvenioWebSubmitFileError, "Encountered an exception while writing .docid and .type for folder '%s': '%s'" % (newicon.getBaseDir(), e)
         finally:
             self.touch()
             self.BuildRelatedFileList()
