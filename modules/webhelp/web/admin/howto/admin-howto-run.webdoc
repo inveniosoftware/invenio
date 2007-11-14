@@ -1,0 +1,189 @@
+## $Id$
+
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<!-- WebDoc-Page-Title: HOWTO Run Your CDS Invenio Installation -->
+<!-- WebDoc-Page-Navbar-Name: admin -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/">Admin Area</a> &gt; <a class="navtrail" href="admin-howto">Admin HOWTOs</a> -->
+<!-- WebDoc-Page-Navbar-Select: howto_run -->
+<!-- WebDoc-Page-Revision: $Id$-->
+
+<h2>Overview</h2>
+
+<p>This HOWTO guide intends to give you ideas on how to run your
+CDS Invenio installation and how to take care of its normal operation day
+by day.
+</p>
+
+<h2>BibSched Periodical Tasks</h2>
+
+<p>Many tasks that manipulate the bibliographic record database can be
+set to run in a periodical mode.  For example, we want to have the
+indexing engine to scan periodically for newly arrived documents to
+index them as soon as they enter into the system.  It is the role of
+the BibSched system to take care of the task scheduling and the task
+execution.
+</p>
+
+<p>Periodical tasks (such as regular metadata indexing) as well as
+one-time tasks (such as a batch upload of newly acquired metadata
+file) are not executed straight away but are stored in the BibSched
+task queue.  BibSched daemon looks periodically in the queue and
+launches the tasks according to their order or the date of programmed
+runtime.  You can consider BibSched to be a kind of cron daemon for
+bibliographic tasks.
+</p>
+
+<p>This means that after having installed CDS Invenio you will want to
+have the BibSched daemon running permanently.  To launch BibSched
+daemon, do:
+
+<blockquote>
+<pre>
+ $ bibsched start
+</pre>
+</blockquote>
+</p>
+
+<p>To setup indexing, ranking, formatting, and collection cache updating
+daemons to run periodically with a sleeping period of, say, 1 hour:
+
+<blockquote>
+<pre>
+$ bibindex -f50000 -s1h
+$ bibreformat -oHB -s1h
+$ webcoll -v0 -s1h
+$ bibrank -f50000 -s1h
+</pre>
+</blockquote>
+</p>
+
+<p>It is imperative to have the above four tasks permanently in your
+BibSched queue so that newly submitted documents will be processed
+automatically.
+</p>
+
+<p>You may also want to set up periodical recalculating of word
+similarity ranking weights every, say, thirty days:
+
+<blockquote>
+<pre>
+$ bibrank -f50000 -R -wwrd -s30d
+</pre>
+</blockquote>
+</p>
+
+Please consult the section below entitled "Recalculate ranking
+weights" for more details.
+</p>
+
+<p>Note that the BibSched daemon automatic mode stops as soon as some
+of the tasks ends with an error.  It it therefore a good idea to
+inspect BibSched queue from time to time, say several times per day.
+This can be done by running the BibSched command-line monitor:
+
+<blockquote>
+<pre>
+$ bibsched
+</pre>
+</blockquote>
+</p>
+
+<p>The monitor will permit you to stop/start the daemon mode, to
+delete the tasks already submitted, to run some of the tasks manually,
+etc.  Note also that BibSched daemon writes log and error files on its
+operation and on the operation of its tasks.  The log and error files
+can be found at <code>@prefix@/var/log</code>.
+</p>
+
+<p>You may want to clean up the old BibSched tasks with the DONE
+status, let us say once per month, to make the task table slim and the
+bibsched daemon both faster and less memory hungry:
+
+<blockquote>
+<pre>
+$ echo "DELETE FROM schTASK WHERE status='DONE' AND runtime&lt;DATE_SUB(NOW(), INTERVAL 7 DAY);" | dbexec
+</pre>
+</blockquote>
+</p>
+
+<h2>Recalculate ranking weights</h2>
+
+<p>When you are adding new records to the system, the word frequency
+ranking weights for old records aren't recalculated by default in
+order to speed up the insertion of new records.  This may influence a
+bit the precision of word similarity searches.  It is therefore
+advised to expressely run bibrank in the recalculating mode once in a
+while by doing:
+
+<blockquote>
+<pre>
+$ bibrank -R -wwrd
+</pre>
+</blockquote>
+
+You may want to do this either (i) periodically, say once per month
+(see the previous section), or (ii) depending on the frequency of new
+additions to the record database, say when the size grows by 2-3
+percent.
+</p>
+
+<h2>Guest Users Cleanup</h2>
+
+<p>Guest users create a lot of entries in CDS Invenio tables that are
+related to their web sessions, their search history, personal baskets,
+etc.  This data has to be garbage-collected periodically.  You can run this,
+say every day, via:
+
+<blockquote>
+<pre>
+$ sessiongc -s1d
+</pre>
+</blockquote>
+</p>
+
+<h2>Cleaning Up the Filesystem</h2>
+
+<p>Different temporary log and err files  are created in <code>@prefix@/var/log</code>
+and <code>@prefix@/var/tmp</code> directory that is good to clean up from time to time.  The previous command could be used to clean those files, too, via:
+
+<blockquote>
+<pre>
+$ sessiongc -s1d -f
+</pre>
+</blockquote>
+</p>
+
+<h2>Alert Engine</h2>
+
+<p>CDS Invenio users may set up an automatic notification email alerts
+that would send them documents corresponding to the user profile by
+email either daily, weekly, or monthly.  It is the job of the alert
+engine to do this.  The alert engine has to be run every day:
+
+<blockquote>
+<pre>
+$ alertengine
+</pre>
+</blockquote>
+</p>
+
+<p>You may want to set up an external cron job to call
+<code>alertengine</code> each day.
+</p>
+

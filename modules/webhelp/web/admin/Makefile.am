@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -23,10 +23,15 @@ docdir = $(localstatedir)/www/admin
 
 doc_DATA = index.en.html index.fr.html index.de.html index.es.html index.ca.html index.pl.html index.pt.html index.hr.html index.it.html index.ja.html index.ru.html index.sk.html index.cs.html index.no.html index.sv.html index.el.html index.bg.html index.zh_CN.html index.zh_TW.html index.uk.html
 
-FILESWML = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+webdoclibdir = $(libdir)/webdoc/admin
 
-CLEANFILES = $(doc_DATA) *~ *.tmp
+webdoclib_DATA = \
+	admin.webdoc
+
+FILESWML = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(webdoclib_DATA)
+
+CLEANFILES = *~ *.tmp
 
 LINGUAS = $(shell grep -v '^\#' $(top_srcdir)/po/LINGUAS)
 MO = $(LINGUAS:%=$(top_builddir)/po/%.gmo)

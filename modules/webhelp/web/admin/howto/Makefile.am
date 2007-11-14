@@ -21,10 +21,18 @@ docdir = $(localstatedir)/www/admin/howto
 
 doc_DATA=index.html marc.html migrate.html run.html
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+webdoclibdir = $(libdir)/webdoc/admin
 
-CLEANFILES = $(doc_DATA) *~ *.tmp
+webdoclib_DATA = \
+	admin-howto.webdoc \
+	admin-howto-run.webdoc \
+	admin-howto-marc.webdoc \
+	admin-howto-migrate.webdoc
+
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(webdoclib_DATA)
+
+CLEANFILES = *~ *.tmp
 
 %.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
