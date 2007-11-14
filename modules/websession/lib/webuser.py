@@ -100,7 +100,16 @@ def createGuestUser():
 
 def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=cdslang,
                         navmenuid=""):
-    """Show error message when account is not activated"""
+    """Show error message when user is not authorized to do something.
+
+    @param referer: in case the displayed message propose a login link, this
+    is the url to return to after logging in.
+
+    @param uid: the uid of the user. If not specified it is guessed from req.
+
+    @param text: the message to be displayed. If not specified it will be
+    guessed from the context.
+    """
 
     from invenio.webpage import page
 
@@ -111,7 +120,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=cdslan
         if not uid:
             uid = getUid(req)
         try:
-            res = run_sql("SELECT email FROM user WHERE id=%s" % uid)
+            res = run_sql("SELECT email FROM user WHERE id=%s AND note=1" % uid)
 
             if res and res[0][0]:
                 if text:
