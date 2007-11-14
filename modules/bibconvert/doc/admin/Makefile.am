@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -21,14 +21,20 @@ docdir=$(localstatedir)/www/admin/bibconvert
 
 doc_DATA=index.html guide.html
 
+webdoclibdir = $(libdir)/webdoc/admin
+
+webdoclib_DATA = \
+	bibconvert-admin.webdoc \
+	bibconvert-admin-guide.webdoc
+
 sampledir=$(localstatedir)/www/admin/bibconvert
 sample_DATA=sample.cfg sample.dat sample.kb bibtex.cfg dcq.cfg dcq.dat dcxml-to-marcxml.cfg \
 	    example_oaimarc2xm.xsl example_oaimarc2xm_collID.kb
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) $(sample_DATA)
+EXTRA_DIST = $(sample_DATA) $(webdoclib_DATA)
 
-CLEANFILES = $(doc_DATA) *~ *.tmp
+CLEANFILES =  *~ *.tmp
 
 %.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
