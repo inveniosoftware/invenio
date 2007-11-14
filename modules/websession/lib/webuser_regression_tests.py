@@ -30,12 +30,17 @@ import unittest
 
 from mechanize import Browser
 
+from invenio.dbquery import run_sql
 from invenio.config import sweburl, adminemail
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
 class WebSessionYourSettingsTest(unittest.TestCase):
     """Check WebSession web pages whether they are up or not."""
+
+    def tearDown(self):
+        run_sql('DELETE FROM user WHERE email="foo@bar.org"')
+        run_sql('DELETE FROM user WHERE email="FOO@bar.org"')
 
     def test_password_setting(self):
         """webuser - check password settings"""
