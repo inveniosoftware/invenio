@@ -17,21 +17,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(localstatedir)/www/admin/elmsubmit
+<!-- WebDoc-Page-Title: ElmSubmit Admin Guide -->
+<!-- WebDoc-Page-Navbar-Name: admin -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Admin Area)_</a> &gt; <a class="navtrail" href="elmsubmit-admin">ElmSubmit Admin</a> -->
+<!-- WebDoc-Page-Navbar-Select: elsubmit-admin-guide -->
+<!-- WebDoc-Page-Revision: $Id$-->
 
-doc_DATA = index.html guide.html
-
-webdoclibdir = $(libdir)/webdoc/admin
-
-webdoclib_DATA = \
-	elmsubmit-admin.webdoc \
-	elmsubmit-admin-guide.webdoc
-
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(webdoclib_DATA)
-
-CLEANFILES = *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
+FIXME.
