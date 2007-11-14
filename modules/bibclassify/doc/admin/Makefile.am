@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -21,9 +21,20 @@ docdir = $(localstatedir)/www/admin/bibclassify
 
 doc_DATA = index.html guide.html guide_cloud.jpeg
 
-EXTRA_DIST = index.html.wml guide.html.wml guide_cloud.jpeg
+imgdir = $(localstatedir)/www/img/admin
 
-CLEANFILES = index.html guide.html *~ *.tmp
+img_DATA = bibclassify-admin-guide-cloud.jpeg
+
+webdoclibdir = $(libdir)/webdoc/admin
+
+webdoclib_DATA = \
+	bibclassify-admin.webdoc \
+	bibclassify-admin-guide.webdoc
+
+EXTRA_DIST = bibclassify-admin-guide-cloud.jpeg \
+	bibclassify-admin.webdoc bibclassify-admin-guide.webdoc
+
+CLEANFILES = *~ *.tmp
 
 %.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
