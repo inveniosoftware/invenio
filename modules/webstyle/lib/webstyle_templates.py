@@ -99,7 +99,7 @@ class Template:
                   boxrightbottom="", boxrightbottomadd="",
                   titleprologue="", title="", titleepilogue="",
                   body="", lastupdated=None, pagefooteradd="", uid=0,
-                  secure_page_p=0, navmenuid=""):
+                  secure_page_p=0, navmenuid="", metaheaderadd=""):
 
         """Creates a complete page
 
@@ -118,6 +118,8 @@ class Template:
           - 'description' *string* - description goes to the metadata in the header of the HTML page
 
           - 'keywords' *string* - keywords goes to the metadata in the header of the HTML page
+
+          - 'metaheaderadd' *string* - list of further tags to add to the <HEAD></HEAD> part of the page
 
           - 'userinfobox' *string* - the HTML code for the user information box
 
@@ -170,6 +172,7 @@ class Template:
                                    headertitle = title,
                                    description = description,
                                    keywords = keywords,
+                                   metaheaderadd = metaheaderadd,
                                    userinfobox = userinfobox,
                                    navtrailbox = navtrailbox,
                                    pageheaderadd = pageheaderadd,
@@ -222,7 +225,7 @@ class Template:
     def tmpl_pageheader(self, req, ln=cdslang, headertitle="",
                         description="", keywords="", userinfobox="",
                         navtrailbox="", pageheaderadd="", uid=0,
-                        secure_page_p=0, navmenuid="admin"):
+                        secure_page_p=0, navmenuid="admin", metaheaderadd=""):
 
         """Creates a page header
 
@@ -241,6 +244,8 @@ class Template:
           - 'description' *string* - description goes to the metadata in the header of the HTML page
 
           - 'keywords' *string* - keywords goes to the metadata in the header of the HTML page
+
+          - 'metaheaderadd' *string* - list of further tags to add to the <HEAD></HEAD> part of the page
 
           - 'userinfobox' *string* - the HTML code for the user information box
 
@@ -277,6 +282,7 @@ class Template:
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
  <meta name="description" content="%(description)s" />
  <meta name="keywords" content="%(keywords)s" />
+ %(metaheaderadd)s
 </head>
 <body>
 <div class="pageheader">
@@ -354,6 +360,7 @@ class Template:
 
           'description' : cgi.escape(description),
           'keywords' : cgi.escape(keywords),
+          'metaheaderadd' : metaheaderadd,
 
           'userinfobox' : userinfobox,
           'navtrailbox' : navtrailbox,

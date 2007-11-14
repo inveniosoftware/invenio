@@ -46,6 +46,7 @@ from invenio.config import \
      CFG_WEBSEARCH_FIELDS_CONVERT, \
      CFG_WEBSEARCH_NB_RECORDS_TO_SORT, \
      CFG_WEBSEARCH_SEARCH_CACHE_SIZE, \
+     CFG_WEBSEARCH_JSMATH_ENABLED_FORMAT, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
      cdslang, \
      cdsname, \
@@ -525,7 +526,6 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
 def page_start(req, of, cc, as, ln, uid, title_message=None,
                description='', keywords='', recID=-1, tab=''):
     "Start page according to given output format."
-
     _ = gettext_set_language(ln)
 
     if not title_message: title_message = _("Search Results")
@@ -565,6 +565,17 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
 
         navtrail = create_navtrail_links(cc, as, ln)
         navtrail_append_title_p = 1
+
+        # FIXME: Find a good point to put this code.
+        # This is a nice hack to trigger jsMath only when displaying single
+        # records.
+        if of.lower() in CFG_WEBSEARCH_JSMATH_ENABLED_FORMAT:
+            metaheaderadd = """
+ <script> jsMath = {styles: {'#jsMath_button': 'display: none'}}; </script>
+ <script src='/jsMath/easy/load.js'></script>
+"""
+        else:
+            metaheaderadd = ''
         if tab != '' or ((of != '' or of.lower() != 'hd') and of != 'hb'):
             # If we are not in information tab in HD format, customize
             # the nav. trail to have a link back to main record. (Due
@@ -590,6 +601,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
                                  navtrail=navtrail,
                                  description=description,
                                  keywords=keywords,
+                                 metaheaderadd=metaheaderadd,
                                  uid=uid,
                                  language=ln,
                                  navmenuid='search',

@@ -32,7 +32,7 @@ from invenio.config import \
      supportemail
 from invenio.messages import gettext_set_language
 from invenio.webuser import create_userinfobox_body
-from invenio.errorlib import get_msgs_for_code_list, register_errors 
+from invenio.errorlib import get_msgs_for_code_list, register_errors
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -124,23 +124,23 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                 warning_node.setAttribute('code', warning_code)
                 warning_text = output.createTextNode(warning_msg)
                 warning_node.appendChild(warning_text)
-                warnings_node.appendChild(warning_node)    
+                warnings_node.appendChild(warning_node)
             root.appendChild(warnings_node)
         return output.toprettyxml(encoding="utf-8" )
-        
+
     else:
         #usual output
         # if there are event
         if warnings:
             warnings = get_msgs_for_code_list(warnings, 'warning', language)
             register_errors(warnings, 'warning')
-    
+
         # if there are errors
         if errors:
             errors = get_msgs_for_code_list(errors, 'error', language)
             register_errors(errors, 'error', req)
-            body = create_error_box(req, errors=errors, ln=language) 
-    
+            body = create_error_box(req, errors=errors, ln=language)
+
         return webstyle_templates.tmpl_page(req, ln=language,
                           description = description,
                           keywords = keywords,
@@ -164,17 +164,17 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                           titleprologue = titleprologue,
                           title = title,
                           titleepilogue = titleepilogue,
-                          body = body,                                        
+                          body = body,
                           # pagefooter = CFG_WEBSTYLE_CDSPAGEFOOTER,
                           lastupdated = lastupdated,
                           pagefooteradd = cdspagefooteradd,
                           navmenuid = navmenuid)
-        
 
-def pageheaderonly(title, navtrail="", description="", keywords="",
-                   uid=0, cdspageheaderadd="", language=cdslang,
-                   req=None, secure_page_p=0, verbose=1, navmenuid="admin",
-                   navtrail_append_title_p=1):
+
+def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
+                   cdspageheaderadd="", language=cdslang, req=None,
+                   secure_page_p=0, verbose=1, navmenuid="admin",
+                   navtrail_append_title_p=1, metaheaderadd="", ):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
 
@@ -183,6 +183,7 @@ def pageheaderonly(title, navtrail="", description="", keywords="",
                       headertitle = title,
                       description = description,
                       keywords = keywords,
+                      metaheaderadd = metaheaderadd,
                       userinfobox = create_userinfobox_body(req, uid, language),
                       navtrailbox = create_navtrailbox_body(navtrail_append_title_p \
                                                             and title or '',
