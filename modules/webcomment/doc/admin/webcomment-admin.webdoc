@@ -1,4 +1,3 @@
-## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -18,9 +17,16 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-<title>WebComment Admin Guide</title>
-<navbar_name>admin</navbar_name>
-<navtrail_previous_links><a class="navtrail" href="<WEBURL>/admin/<lang:star: index.*.html>">_(Admin Area)_</a> &gt; <a class="navtrail" href="<WEBURL>/admin/webcomment/">WebComment Admin</a></navtrail_previous_links>
-<navbar_select>webcomment-admin-guide</navbar_select>
+<!-- WebDoc-Page-Title: WebComment Admin -->
+<!-- WebDoc-Page-Navbar-Name: admin -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Admin Area)_</a> -->
+<!-- WebDoc-Page-Navbar-Select: webcomment -->
 
-FIXME
+<dl>
+ <dt><a href="<WEBURL>/admin/webcomment/webcommentadmin.py">WebComment Admin Interface</a></dt>
+ <dd>Start area for WebComment administration.</dd>
+</dl>
+<dl>
+ <dt><a href="webcomment-admin-guide">WebComment Admin Guide</a></dt>
+ <dd>Everything you want to know about WebComment administration</dd>
+</dl>
