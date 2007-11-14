@@ -65,7 +65,7 @@ def display_webdoc_page(webdocname, ln=cdslang, req=None):
 
     # get page parts in given language:
     page_parts = get_webdoc_parts(webdocname, parts=['title','body',
-                                                     'navtrail-previous-links'],
+                                                     'navtrail'],
                                   ln=ln)
 
     # set page title:
@@ -74,7 +74,7 @@ def display_webdoc_page(webdocname, ln=cdslang, req=None):
         page_title = _("Page %s Not Found") % cgi.escape(webdocname)
 
     # set page navtrail:
-    page_navtrail = page_parts.get('navtrail-previous-links', '')
+    page_navtrail = page_parts.get('navtrail', '')
 
     # set page body:
     page_body = page_parts.get('body' , '')
