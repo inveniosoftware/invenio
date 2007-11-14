@@ -10,25 +10,27 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 docdir = $(localstatedir)/www/admin/bibformat
-gifsdir=$(localstatedir)/www/admin/bibformat
-
 doc_DATA = index.html guide.html
 
-IMGS = $(wildcard $(srcdir)/*.gif $(srcdir)/*.jpg $(srcdir)/*.png)
+imgdir = $(localstatedir)/www/img/admin/
+img_DATA = $(wildcard $(srcdir)/*.gif $(srcdir)/*.jpg $(srcdir)/*.png)
 
-gifs_DATA = $(IMGS:$(srcdir)/%=%)
+webdoclibdir = $(libdir)/webdoc/admin
+webdoclib_DATA = \
+	bibformat-admin.webdoc \
+	bibformat-admin-guide.webdoc
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) $(gifs_DATA)
+EXTRA_DIST = $(img_DATA) $(webdoclib_DATA)
 
-CLEANFILES = $(doc_DATA) *~ *.tmp
+CLEANFILES = *~ *.tmp
 
 %.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<

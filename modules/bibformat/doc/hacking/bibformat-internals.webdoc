@@ -17,24 +17,20 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(localstatedir)/www/hacking/bibformat
+<!-- WebDoc-Page-Title: BibFormat Internals -->
+<!-- WebDoc-Page-Navtrail:  <a class="navtrail" href="<WEBURL>/hacking/">Hacking CDS Invenio</a> -->
+<!-- WebDoc-Page-Navbar-Name: admin -->
+<!-- WebDoc-Page-Navbar-Select: hacking-bibformat-index -->
 
-doc_DATA = index.html api.html
 
-webdoclibdir = $(libdir)/webdoc/hacking
+This page summarizes all the information suitable to dig inside
+BibFormat internals.
 
-webdoclib_DATA = \
-	bibformat-internals.webdoc \
-	bibformat-api.webdoc
+<blockquote>
+<dl>
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(webdoclibdir_DATA)
+<dt><a href="bibformat-api">BibFormat API</a> <dd>Explains how to call
+the formatting engine from your Python programs, should a need be.
 
-CLEANFILES = *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	for wml_file in $(FILESWML); do \
-		$(PYTHON) $(top_srcdir)/modules/bibformat/lib/wml2html.py \
-		-c $(top_srcdir)/config/config.wml -c $(top_builddir)/config/configbis.wml \
-		-l en -i $${wml_file} ; \
-	done
+</dl>
+</blockquote>
