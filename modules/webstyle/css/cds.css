@@ -1439,82 +1439,20 @@ div.detailed img, div.mini-panel img{
     border:none;
 }
 div.detailed div.content, div.mini-panel {
-   /* Should be removed for future CERN style*/
    border: 1px solid #36c;
    padding-top:3px;
    padding-bottom:3px;
 }
 div.mini-panel{
-   /* Should be removed for future CERN style*/
    background-color:#F2F2FD;
-   background-image: url(mini_panel_background.gif);
 }
 .notopgap    { margin: 0; height:0;}
 .nobottomgap { margin-bottom: 0; height:0;}
-/* CERN-specific style
-div.detailed .inside, div.mini-panel .inside{
-   border-left: 1px solid #B2B2B2;
-   border-right: 1px solid #B2B2B2;
-   background: #FFF url(gradient-lightgray-1x100.gif) repeat-x left top;
-   color: #000000;
-   padding-left: 0px;
-   padding-right:0px;
-}
-*/
-
-/* mini-panel in detailed record pages*/
-
-/* Future CERN-specific style
-.top-left, .top-right, .bottom-left, .bottom-right {
-   background-image: url(rcorners-gray-1280x18.gif);
-   height: 9px;
-   font-size: 2px;
-}
-.top-left, .bottom-left {
-   margin-right: 9px;
-}
-.top-right, .bottom-right {
-   margin-left: 9px;
-   margin-top: -9px;
-}
-.top-right {
-   background-position: 100% 0;
-}
-.bottom-left  {
-   background-position: 0 -9px;
-}
-.bottom-right {
-   background-position: 100% -9px;
-}
-*/
 
 /* Detailed record box */
 .top-left-folded {
    height: 10px;
 }
-/* Future CERN-specific style
-.top-left-folded, .top-right-folded, .bottom-left-folded, .bottom-right-folded {
-   background-image: url(rcorners-gray-1280x60-folded.gif);
-   height: 30px;
-   font-size: 2px;
-}
-.top-left-folded, .bottom-left-folded {
-   margin-right: 21px;
-}
-.top-right-folded, .bottom-right-folded {
-   margin-left: 21px;
-   margin-top: -30px;
-}
-.top-right-folded {
-   background-position: 100% 0;
-}
-.bottom-left-folded  {
-   background-position: 0 -30px;
-}
-.bottom-right-folded {
-   background-position: 100% -30px;
-}
-*/
 
 /* tabs as used in detailed record pages */
 ul.tabs{
@@ -1550,39 +1488,6 @@ ul.tabs{
 .tabs li.first a{
    border-left: 1px solid #36c;
 }
-
-/*Future CERN-specific style
-ul.tabs{
-   margin-top:5px;
-   margin-bottom:5px;
-   list-style-type:none;
-   text-align:center;
-}
-.tabs li{
-   display:inline;
-}
-.tabs li a{
-   border-top: 1px solid #B2B2B2;
-   border-right: 1px solid #B2B2B2;
-   border-bottom: 1px solid #B2B2B2;
-   border-left: none;
-   background: #EBEBEB url(gradient_tab-gray-1x23.gif) repeat-x left top;
-   padding:4px;
-   color:#000;
-   text-decoration:none;
-   zoom:100%;
-}
-.tabs li.on a{
-   background: #D6D6D6 url(gradient_tab_on-gray-1x23.gif) repeat-x left top;
-}
-.tabs li.disabled a{
-   color:#999;
-   cursor:default
-}
-.tabs li.first a{
-   border-left: 1px solid #B2B2B2;
-}
-*/
 
 /* Actions in mini-box in detailed view */
 ul.detailedRecordActions{
