@@ -30,7 +30,7 @@ webdoclib_DATA = \
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
 
-EXTRA_DIST = $(webdoclib_DATA:$(srcdir)/%=%)
+EXTRA_DIST = $(webdoclib_DATA)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
 
