@@ -92,7 +92,7 @@ class WebSessionLostYourPasswordTest(unittest.TestCase):
 
 
         # verify the response:
-        expected_response = "Okay, request for a new password has been emailed to " + \
+        expected_response = "Okay, a password reset link has been emailed to " + \
                             try_with_account
         lost_password_response_body = browser.response().read()
         try:
