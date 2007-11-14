@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -21,10 +21,19 @@ docdir = $(localstatedir)/www/hacking/webaccess
 
 doc_DATA=index.html api.html admin-internals.html table-structure.html firerole_api.html
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+webdoclibdir = $(libdir)/webdoc/hacking
 
-CLEANFILES = $(doc_DATA) *~ *.tmp
+webdoclib_DATA = \
+	webaccess-internals.webdoc \
+	webaccess-api.webdoc \
+	webaccess-admin-internals.webdoc \
+	webaccess-table-structure.webdoc \
+	webaccess-firerole-api.webdoc
+
+FILESWML   = $(wildcard $(srcdir)/*.wml)
+EXTRA_DIST = $(webdoclib_DATA)
+
+CLEANFILES = *~ *.tmp
 
 %.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
