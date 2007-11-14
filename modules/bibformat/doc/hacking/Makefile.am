@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
+## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -33,8 +33,5 @@ EXTRA_DIST = $(webdoclibdir_DATA)
 CLEANFILES = *~ *.tmp
 
 %.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	for wml_file in $(FILESWML); do \
-		$(PYTHON) $(top_srcdir)/modules/bibformat/lib/wml2html.py \
-		-c $(top_srcdir)/config/config.wml -c $(top_builddir)/config/configbis.wml \
-		-l en -i $${wml_file} ; \
-	done
+	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
+	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
