@@ -20,7 +20,7 @@
 
 <!-- WebDoc-Page-Title: BibMatch Admin Guide -->
 <!-- WebDoc-Page-Navbar-Name: admin -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Admin Area)_</a> &gt; <a class="navtrail" href="bibmatch-admin-guide">BibMatch Admin</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Admin Area)_</a> &gt; <a class="navtrail" href="bibmatch-admin">BibMatch Admin</a> -->
 <!-- WebDoc-Page-Navbar-Select:bibmatch-admin-guide -->
 
 <p>BibMatch allows to match bibliographic data in a MARCXML file against database content. Providing an input file in MARCXML the produced output corresponds to a selection of records in MARCXML that do (not) match the database content. This way it is for example possible to identify potential double entries before they get uploaded in a database. </p>
