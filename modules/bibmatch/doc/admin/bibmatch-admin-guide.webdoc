@@ -1,0 +1,87 @@
+## -*- mode: html; coding: utf-8; -*-
+## $Id$
+
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<!-- WebDoc-Page-Title: BibMatch Admin Guide -->
+<!-- WebDoc-Page-Navbar-Name: admin -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Admin Area)_</a> &gt; <a class="navtrail" href="bibmatch-admin-guide">BibMatch Admin</a> -->
+<!-- WebDoc-Page-Navbar-Select:bibmatch-admin-guide -->
+
+<p>BibMatch allows to match bibliographic data in a MARCXML file against database content. Providing an input file in MARCXML the produced output corresponds to a selection of records in MARCXML that do (not) match the database content. This way it is for example possible to identify potential double entries before they get uploaded in a database. </p>
+
+<h4>BibMatch commmand-line tool</h4>
+
+<blockquote>
+<pre>
+
+ Usage: bibmatch [options] < input.xml > output.xml
+
+ Options:
+
+ Output:
+
+ -0 --print-new (default)
+ -1 --print-match
+ -2 --print-ambiguous
+ -b --batch-output=(filename)
+
+ Simple query:
+
+ -f --field=(field)
+
+ Advanced query:
+
+ -c --config=(config-filename)
+ -q --query-string=(uploader_querystring)
+ -m --mode=(a|e|o|p|r)[3]
+ -o --operator=(a|o)[2]
+
+ General options:
+
+ -h,  --help               print this help and exit
+ -v,  --verbose=LEVEL      verbose level (from 0 to 9, default 1)
+
+</pre>
+</blockquote>
+
+<h4>Examples</h4>
+
+To match records on title and print out only new (unmatched) ones:
+
+<blockquote>
+<pre>
+ $ bibmatch [--print-new] --field=\"title\" < input.xml > output.xml
+</pre>
+</blockquote>
+
+To print potential double entries before upload for manual double check:
+
+<blockquote>
+<pre>
+ $ bibmatch --print-match --field=\"245__a\" --mode=\"a\" < input.xml > output.xml
+</pre>
+</blockquote>
+
+To print undecided result from a match on multiple fields:
+
+<blockquote>
+<pre>
+ $ bibmatch --print-ambiguous --query-string=\"245__a||100__a\" < input.xml > output.xml
+</pre>
+</blockquote>
