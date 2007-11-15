@@ -1,0 +1,101 @@
+## -*- mode: html; coding: utf-8; -*-
+## $Id$
+
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<!-- WebDoc-Page-Title: _(Help Central)_ -->
+<!-- WebDoc-Page-Navbar-Name: help -->
+<!-- WebDoc-Page-Navbar-Select: help -->
+
+<p>
+<lang>
+  <en>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</en>
+  <fr>Bienvenu au _(Help Central)_ de <CDSNAMEINTL>.</fr>
+  <de>Herzlich Willkommen in der _(Help Central)_ von <CDSNAMEINTL>.</de>
+  <es>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</es>
+  <ca>Benvinguts al _(Help Central)_ de <CDSNAMEINTL>.</ca>
+  <pl>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</pl>
+  <pt>Bem vindo à _(Help Central)_ do <CDSNAMEINTL>.</pt>
+  <it>Benvenuti nell'_(Help Central)_ di <CDSNAMEINTL>.</it>
+  <ru>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</ru>
+  <sk>Víta Vás _(Help Central)_ <CDSNAMEINTL>.</sk>
+  <cs>Vítá Vás _(Help Central)_ <CDSNAMEINTL>.</cs>
+  <no>Velkommen til _(Help Central)_ for <CDSNAMEINTL>.</no>
+  <sv>Välkommen till _(Help Central)_en för <CDSNAMEINTL>.</sv>
+  <el>Καλωσήλθατε στην _(Help Central)_ για το <CDSNAMEINTL>.</el>
+  <uk>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</uk>
+  <ja>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</ja>
+  <bg>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</bg>
+  <hr>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</hr>
+  <zh_CN>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</zh_CN>
+  <zh_TW>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</zh_TW>
+</lang>
+</p>
+<blockquote>
+<dl>
+
+<dt><a href="search<lang:link/>">_(Search Help)_</a></dt>
+<dd><lang>
+      <en>Get help with searching <CDSNAMEINTL>.</en>
+      <fr>Obtenez de l'aide avec la recherche sur <CDSNAMEINTL>.</fr>
+      <de>Hier können Sie die Suchhilfe für den <CDSNAMEINTL> konsultieren.</de>
+      <es>Get help with searching <CDSNAMEINTL>.</es>
+      <ca>Ajuda en la cerca de <CDSNAMEINTL>.</ca>
+      <pl>Get help with searching <CDSNAMEINTL>.</pl>
+      <pt>Obtenha ajuda em buscas no <CDSNAMEINTL>.</pt>
+      <it>Aiuto alla ricerca in <CDSNAMEINTL>.</it>
+      <ru>Get help with searching <CDSNAMEINTL>.</ru>
+      <sk>Pomoc pre hľadanie <CDSNAMEINTL>.</sk>
+      <cs>Nápověda pro hledání <CDSNAMEINTL>.</cs>
+      <no>Få hjelp til søking i <CDSNAMEINTL>.</no>
+      <sv>För hjälp med sökning av <CDSNAMEINTL>.</sv>
+      <el>Πληροφορίες σχετικά με τις αναζητήσεις σας στο <CDSNAMEINTL>.</el>
+      <uk>Get help with searching <CDSNAMEINTL>.</uk>
+      <ja>Get help with searching <CDSNAMEINTL>.</ja>
+      <bg>Get help with searching <CDSNAMEINTL>.</bg>
+      <hr>Get help with searching <CDSNAMEINTL>.</hr>
+      <zh_CN>Get help with searching <CDSNAMEINTL>.</zh_CN>
+      <zh_TW>Get help with searching <CDSNAMEINTL>.</zh_TW>
+    </lang>
+</dd>
+<dt><a href="submit<lang:link/>">_(Submit Help)_</a></dt>
+<dd><lang>
+      <en>Get help with submitting to <CDSNAMEINTL>.</en>
+      <fr>Obtenez de l'aide avec la soumission dans <CDSNAMEINTL>.</fr>
+      <de>Hier können Sie die Eintragehilfe für den <CDSNAMEINTL> konsultieren.</de>
+      <es>Get help with submitting to <CDSNAMEINTL>.</es>
+      <ca>Ajuda per la tramesa de documents a <CDSNAMEINTL>.</ca>
+      <pl>Get help with submitting to <CDSNAMEINTL>.</pl>
+      <pt>Obtenha ajuda em submissões ao <CDSNAMEINTL>.</pt>
+      <it>Aiuto per la sottomissione di documenti ad <CDSNAMEINTL>.</it>
+      <ru>Get help with submitting to <CDSNAMEINTL>.</ru>
+      <sk>Pomoc pre pridávanie do <CDSNAMEINTL>.</sk>
+      <cs>Nápověda pro přidávaní do <CDSNAMEINTL>.</cs>
+      <no>Få hjelp til innsending til <CDSNAMEINTL>.</no>
+      <sv>För hjälp med publicering i <CDSNAMEINTL>.</sv>
+      <el>Πληροφορίες σχετικά με τις υποβολές σας στο <CDSNAMEINTL>.</el>
+      <uk>Get help with submitting to <CDSNAMEINTL>.</uk>
+      <ja>Get help with submitting to <CDSNAMEINTL>.</ja>
+      <bg>Get help with submitting to <CDSNAMEINTL>.</bg>
+      <hr>Get help with submitting to <CDSNAMEINTL>.</hr>
+      <zh_CN>Get help with submitting to <CDSNAMEINTL>.</zh_CN>
+      <zh_TW>Get help with submitting to <CDSNAMEINTL>.</zh_TW>
+    </lang>
+</dd>
+</dl>
+</blockquote>
