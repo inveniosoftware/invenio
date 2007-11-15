@@ -22,6 +22,7 @@
 __revision__ = "$Id$"
 
 import time
+import sys
 import os
 import marshal
 from zlib import decompress, compress, error
@@ -30,6 +31,7 @@ from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_mars
 from invenio.search_engine import print_record, search_pattern
 from invenio.bibrecord import create_records, record_get_field_values
 from invenio.bibformat_utils import parse_tag
+from invenio.bibtask import write_message, task_get_option
 
 class memoise:
     def __init__(self, function):
@@ -54,7 +56,9 @@ def get_citation_weight(rank_method_code, config):
     """
     begin_time = time.time()
     last_update_time = get_bibrankmethod_lastupdate(rank_method_code)
+    #if task_get_option('verbose') >= 3:	
     last_modified_records = get_last_modified_rec(last_update_time)
+    write_message("Last update "+str(last_update_time)+" records: "+str(last_modified_records), sys.stderr)	
 
     if last_modified_records:
         updated_recid_list = create_recordid_list(last_modified_records)
@@ -64,7 +68,9 @@ def get_citation_weight(rank_method_code, config):
         citation_list_intermediate = result_intermediate[1]
         reference_list_intermediate = result_intermediate[2]
         citation_informations = get_citation_informations(updated_recid_list, config)
-        dic = ref_analyzer(citation_informations, citation_weight_dic_intermediate, citation_list_intermediate, reference_list_intermediate) #dic is docid-nuberofreferences like {1: 2, 2: 0, 3: 1}
+	#write_message("citation_informations: "+str(citation_informations),sys.stderr)
+        dic = ref_analyzer(citation_informations, citation_weight_dic_intermediate, citation_list_intermediate, reference_list_intermediate) #dic is docid-numberofreferences like {1: 2, 2: 0, 3: 1}
+	#write_message("Docid-number of known references "+str(dic),sys.stderr)
         end_time = time.time()
         print "Total time of software: ", (end_time - begin_time)
     else:
@@ -176,7 +182,10 @@ def make_initial_result():
     return [dic, cit, ref]
 
 def get_citation_informations(recid_list, config):
-    """return une dictionary that contains the citation information of cds records
+    """returns a 3-part dictionary that contains the citation information of cds records
+       examples: [ {} {} {} ]
+                 [ { 93: ['astro-ph/9812088']},{ 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
+	         part 1: parsed from fulltext  part 2: parsed from record
     """
     begin_time = os.times()[4]
     d_reports_numbers = {}
@@ -239,7 +248,7 @@ def get_citation_informations(recid_list, config):
     citation_informations.append(d_references_s)
     citation_informations.append(d_records_s)
     end_time = os.times()[4]
-    print "Execution time for generating citation inforamtions by parsing xml contents: ", (end_time - begin_time)
+    print "Execution time for generating citation informations by parsing xml contents: ", (end_time - begin_time)
     return citation_informations
 
 def ref_analyzer(citation_informations, initialresult, initial_citationlist, initial_referencelist):
@@ -251,7 +260,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
     result = initialresult
     d_reports_numbers = citation_informations[0]
     d_references_report_numbers = citation_informations[1]
-    d_references_s = citation_informations[2] #of type: {77: ['Nucl. Phys. B 72 (1974) 461','blah blah'], 93: ['
+    d_references_s = citation_informations[2] #of type: {77: ['Nucl. Phys. B 72 (1974) 461','blah blah'], 93: ['..'], ..}
     d_records_s = citation_informations[3]
     t1 = os.times()[4]
     for recid, refnumbers in d_references_report_numbers.iteritems():
@@ -306,8 +315,10 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
                 if not recid in reference_list[rec_id]:
                     reference_list[rec_id].append(recid)
     t5 = os.times()[4]
+    write_message("citation_list (x cites y): "+str(citation_list),sys.stderr)	
+    write_message("reference_list (x is cited by y): "+str(reference_list),sys.stderr)	
     insert_cit_ref_list_intodb(citation_list, reference_list)
-    print "\nExecution time for analizing the citation information generating the dictionary: "
+    print "\nExecution time for analyzing the citation information generating the dictionary: "
     print "checking ref number: ", (t2-t1)
     print "checking ref ypvt: ", (t3-t2)
     print "checking rec number: ", (t4-t3)
