@@ -329,7 +329,7 @@ class Template:
           <tr valign="baseline">
            <td class="searchboxbody" colspan="3" align="right">
              <small>
-               <a href="%(weburl)s/help/search/tips.%(ln)s.html">%(msg_search_tips)s</a> ::
+               <a href="%(weburl)s/help/search-tips%(langlink)s">%(msg_search_tips)s</a> ::
                %(asearch)s
              </small>
            </td>
@@ -338,6 +338,7 @@ class Template:
         </table>
         <!--/create_searchfor_simple()-->
         ''' % {'ln' : ln,
+               'langlink': ln != cdslang and '?ln=' + ln or '',
                'weburl' : weburl,
                'asearch' : create_html_link(asearchurl, {}, _('Advanced Search')),
                'header' : header,
@@ -445,7 +446,7 @@ class Template:
           <tr valign="bottom">
             <td colspan="3" class="searchboxbody" align="right">
               <small>
-                <a href="%(weburl)s/help/search/tips.%(ln)s.html">%(msg_search_tips)s</a> ::
+                <a href="%(weburl)s/help/search-tips%(langlink)s">%(msg_search_tips)s</a> ::
                 %(ssearch)s
               </small>
             </td>
@@ -454,6 +455,7 @@ class Template:
         </table>
         <!-- @todo - more imports -->
         ''' % {'ln' : ln,
+               'langlink': ln != cdslang and '?ln=' + ln or '',
                'weburl' : weburl,
                'ssearch' : create_html_link(ssearchurl, {}, _("Simple Search")),
                'header' : header,
@@ -1392,7 +1394,7 @@ class Template:
               <tr valign="bottom">
                 <td colspan="3" align="right" class="searchboxbody">
                   <small>
-                    <a href="%(weburl)s/help/search/tips.%(ln)s.html">%(search_tips)s</a> ::
+                    <a href="%(weburl)s/help/search-tips%(langlink)s">%(search_tips)s</a> ::
                     %(simple_search)s
                   </small>
                 </td>
@@ -1443,6 +1445,7 @@ class Template:
               'browse' : _("Browse"),
               'weburl' : weburl,
               'ln' : ln,
+              'langlink': ln != cdslang and '?ln=' + ln or '',
               'search_tips': _("Search Tips")
             }
         else:
@@ -1468,7 +1471,7 @@ class Template:
               <tr valign="bottom">
                 <td colspan="3" align="right" class="searchboxbody">
                   <small>
-                    <a href="%(weburl)s/help/search/tips.%(ln)s.html">%(search_tips)s</a> ::
+                    <a href="%(weburl)s/help/search-tips%(langlink)s">%(search_tips)s</a> ::
                     %(advanced_search)s
                   </small>
                 </td>
@@ -1499,6 +1502,7 @@ class Template:
               'browse' : _("Browse"),
               'weburl' : weburl,
               'ln' : ln,
+              'langlink': ln != cdslang and '?ln=' + ln or '',
               'search_tips': _("Search Tips")
             }
 
