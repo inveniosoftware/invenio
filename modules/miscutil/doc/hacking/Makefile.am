@@ -21,7 +21,7 @@ docdir = $(localstatedir)/www/hacking/miscutil
 
 doc_DATA=index.html dbquery.html errorlib.html dateutils.html
 
-webdoclibdir = $(libdir)/webdoc/admin
+webdoclibdir = $(libdir)/webdoc/hacking
 
 webdoclib_DATA = \
 	miscutil-internals.webdoc \

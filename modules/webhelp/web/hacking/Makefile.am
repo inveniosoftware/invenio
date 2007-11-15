@@ -25,7 +25,7 @@ doc_DATA=index.html modules.html style.html concepts.html directory.html cdsware
 
 img_DATA=modules-overview-graph.jpeg
 
-webdoclibdir = $(libdir)/webdoc/admin
+webdoclibdir = $(libdir)/webdoc/hacking
 
 webdoclib_DATA = \
 	internals.webdoc \
