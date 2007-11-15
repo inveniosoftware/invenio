@@ -20,7 +20,7 @@
 
 <!-- WebDoc-Page-Title: _(Search Help)_ -->
 <!-- WebDoc-Page-Navbar-Name: search-new -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/index.<lang:current/>.html">_(Help Central)_</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/<lang:link/>">_(Help Central)_</a> -->
 <!-- WebDoc-Page-Navbar-Select: tips -->
 
 <p><lang>
