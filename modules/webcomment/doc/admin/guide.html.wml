@@ -18,9 +18,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-<title>WebComment Admin Guide</title>
-<navbar_name>admin</navbar_name>
-<navtrail_previous_links><a class="navtrail" href="<WEBURL>/admin/<lang:star: index.*.html>">_(Admin Area)_</a> &gt; <a class="navtrail" href="<WEBURL>/admin/webcomment/">WebComment Admin</a></navtrail_previous_links>
-<navbar_select>webcomment-admin-guide</navbar_select>
+#include "cdspage.wml" \
+    title="WebComment Admin Guide" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a> &gt; <a class=navtrail href=<WEBURL>/admin/webcomment/>WebComment Admin</a>" \
+    navbar_name="admin" \
+    navbar_select="webcomment-admin-guide"
 
 FIXME

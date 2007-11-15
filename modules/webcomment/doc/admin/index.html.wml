@@ -17,11 +17,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-<title>WebComment Admin</title>
-<navbar_name>admin</navbar_name>
-<navtrail_previous_links><a class="navtrail" href="<WEBURL>/admin/<lang:star: index.*.html>">_(Admin Area)_</a></navtrail_previous_links>
-<navbar_select>webcomment</navbar_select>
-
+#include "cdspage.wml" \
+    title="WebComment Admin" \
+    navtrail_previous_links="<a class=navtrail href=<WEBURL>/admin/<lang:star: index.*.html>>_(Admin Area)_</a>" \
+    navbar_name="admin" \
+    navbar_select="webcomment" 
+     
 <dl>
  <dt><a href="webcommentadmin.py">WebComment Admin Interface</a></dt>
  <dd>Start area for WebComment administration.</dd>

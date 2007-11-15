@@ -11,16 +11,17 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
+## General Public License for more details.  
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-<title>_(Admin Area)_</title>
-<navbar_name>admin</navbar_name>
-<navtrail_previous_links></navtrail_previous_links>
-<navbar_select>admin</navbar_select>
+#include "cdspage.wml" \
+    title="_(Admin Area)_" \
+    navbar_name="admin" \
+    navtrail_previous_links="" \
+    navbar_select="admin"
 
 Welcome to the Admin Area of the <CDSNAME>.  You'll find here pointers
 to the available runtime admin-level interfaces and admin-level guides
@@ -91,7 +92,7 @@ data are uploaded in CDS Invenio, you may want to modify them via
     upload of data.  For example, when migrating the metadata from
     your old system, or when integrating metadata acquisitions from
     non-OAI sources, or just about any line-based
-    not-so-well-structured metadata.
+    not-so-well-structured metadata.    
 </td>
 <td>
   <small class="note">command-line program</small>
@@ -263,7 +264,7 @@ engine.
     the end user in the search interface.  You can decide that titles should be
     presented in bold font, that for each author an automatic link to
     author's home page should be created according to some receipt, etc.
-
+    
 </td>
 <td>
   <a href="bibformat/bibformatadmin.py">BibFormat Admin Interface</a>
@@ -297,7 +298,7 @@ engine.
   <strong>WebStat Admin</strong>
 </td>
 <td>
-  Enables you to configure the usage statistics reporting system.
+  Enables you to configure the usage statistics reporting system.  
 </td>
 <td>
   <small class="note">command-line configuration</small>
@@ -368,7 +369,7 @@ set up personal email notification alerts.
   system, to run the alert engine, etc.
 </td>
 <td>
-  <small class="note">not available, but see the guide for the command-line way</small>
+  <small class="note">not available, but see the guide for the command-line way</small>  
 </td>
 <td>
   <a href="webalert/guide.html">WebAlert Admin Guide</a>
@@ -380,8 +381,8 @@ set up personal email notification alerts.
   <strong>WebComment Admin</strong>
 </td>
 <td>
-  Enables you to manipulate readers comments and reviews,
-  see which ones were reported as abuse/spam, delete them, etc.
+  Enables you to manipulate readers comments and reviews, 
+  see which ones were reported as abuse/spam, delete them, etc.  
 </td>
 <td>
   <a href="webcomment/webcommentadmin.py">WebComment Admin Interface</a>
@@ -396,7 +397,7 @@ set up personal email notification alerts.
   <strong>WebMessage Admin</strong>
 </td>
 <td>
-  Enables you to configure the messaging system.
+  Enables you to configure the messaging system.  
 </td>
 <td>
   <small class="note">command-line configuration</small>
@@ -446,7 +447,7 @@ define a common look and feel of CDS Invenio web pages.
   <strong>WebAccess Admin</strong>
 </td>
 <td>
-    Enables you to define who has got access or admin rights on various CDS Invenio modules.
+    Enables you to define who has got access or admin rights on various CDS Invenio modules. 
     For example, you can define that John is the bibliographic
     data manager, that Jim can modify the search interface pages, that
     Jill is the submission approval editor, etc.
