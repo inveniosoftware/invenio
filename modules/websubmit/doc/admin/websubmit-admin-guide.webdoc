@@ -1,0 +1,2218 @@
+## $Id$
+
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+<!-- WebDoc-Page-Title: _(Guide)_ -->
+<!-- WebDoc-Page-Navbar-Name: admin -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Admin Area)_</a> &gt; <a class="navtrail" href="websubmit-admin"/>_(WebSubmit Administration)_</a> -->
+<!-- WebDoc-Page-Navbar-Select: websubmit-admin-guide -->
+<!-- WebDoc-Page-Revision: $Id$ -->
+
+   <p><table class="errorbox">
+   <thead>
+   <tr>
+   <th class="errorboxheader">
+   WARNING: OLD WEBSUBMIT ADMIN GUIDE FOLLOWS
+   </th>
+   </tr>
+   </thead>
+   <tbody>
+   <tr>
+   <td class="errorboxbody">
+
+     This WebSubmit Admin Guide was written for the previous PHP-based
+     version of the admin tool.  The submission concepts and pipeline
+     description remain valid, but the interface snapshot examples
+     would now differ.  The guide is to be updated soon.
+
+   </td>
+   </tr>
+   </tbody>
+   </table>
+
+        <h1>Table of Contents</h1>
+
+        <ul>
+          <li><b>Introduction</b>
+        <ul>
+          <li><a href="#introduction">General Overview of the Manager Tool</a>
+          <li><a href="#example">Using the manager through an example</a>
+          <li><a href="#philosophy">Philosophy behind the document submission system</a>
+        </ul>
+        <li><b>The Interface</b>
+        <ul>
+          <li><a href="#description">Description</a>
+        </ul>
+          <li><b><a href="#documents">Types of Document</a></b>
+          <ul>
+            <li><a href="#documentnew">Add a New Type of Document</a>
+              <li><a href="#documentremove">Remove a type of document</a>
+            <li><a href="#documentmodify">Modify an Existing Type of Document</a>
+          </ul>
+        <li><b><a href="#actions">Actions</a></b>
+        <ul>
+          <li><a href="#actionnew">Add a New Action</a>
+          <li><a href="#actionremove">Remove an Action</a>
+          <li><a href="#actionmodify">Modify an Existing Action</a>
+          <li><a href="#actionimplement">Implement an Action over a Document Type</a>
+             <ul>
+            <li><a href="#implementwebform">Create and Maintain the Web Form</a>
+            <li><a href="#implementfunctions">Create and Maintain the Data Treatment</a>
+             </ul>
+        </ul>
+        <li><b><a href="#functions">Functions</a></b>
+        <ul>
+          <li><a href="#functionnew">Create a New Function</a>
+          <li><a href="#functiondelete">Remove a Function</a>
+          <li><a href="#functionedit">Edit a Function</a>
+          <li><a href="#functiondescription">All Functions Explained</a>
+        </ul>
+        <li><b><a href="#protection">Protection</a></b>
+        <li><b><a href="#catalogues">Catalogues Organisation</a></b>
+        <li><b><a href="#bibconvert">BibConvert</a></b>
+          <li><b>Notes</b>
+        <ul>
+        </ul>
+        <li><b><a href="#faq">FAQ</a></b>
+        </ul>
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="introduction"></a>
+<h1>General Overview of the Manager Tool</h1>
+
+        <h3>Things to know before using the Manager:</h3>
+        <blockquote>
+            <ul>
+                &nbsp;<span class="guideheader">T</span>his manager tool allows you to administrate all the WebSubmit
+                interface. With it, you will be able to create new actions, new types of documents and edit the existing ones.
+                <br/><br/>
+                &nbsp;<span class="guideheader">T</span>he main objects in webSubmit are the "action" (such as
+                "Submit New Record", "Submit New File", "Modify Record"...) and the "type of document" (such as "preprint",
+                "photo"...).<br/><br/>
+                &nbsp;<span class="guideheader">T</span>o one given type of document can be attached several actions.
+                An action is the addition of two processes:
+                <ul>
+                    <li>The first one is the <a href="#implementwebform">data gathering</a>. The manager
+                    will allow you to create new web forms corresponding to the fields the user will have to fill in when using
+                    webSubmit.
+                    <li>The second one is the <a href="#implementfunctions">data treatement</a>.
+                     Basically, what the program will do with the data gathered during the first phase. The treatment appears
+                     in this tool as a sequence of functions. This manager will allow you to add functions to an action, edit the
+                     existing functions, and reorder the functions.
+                </ul>
+            </ul>
+        </blockquote>
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#example">using the manager through an example</a><br/>
+                <li><a href="#description">interface description</a><br/>
+                <li><a href="#actions">actions</a><br/>
+                <li><a href="#documents">document types</a><br/>
+            </blockquote>
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="example"></a>
+<h1>Using the manager through an example</h1>
+
+        <h3>what is this?</h3>
+        <blockquote>
+            <ul>
+            This page presents you the typical situations a user could meet using WebSubmit, and for each situation how to use the manager to configure it.
+            </ul>
+        </blockquote>
+
+    <h3>The user reaches WebSubmit main page.</h3>
+    <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-main_menu.png" alt="Main Page" class="guideimg" align="left">
+    &nbsp;<span class="guideheader">T</span>o add a document type to WebSubmit, you should go to the <a target=top href="<WEBURL>/admin/websubmit/index.php">main page</a>
+     and click on "New Doctype" in the left blue panel.<br/><br/>
+    &nbsp;<span class="guideheader">E</span>ven once created, a document type will not appear automatically on this page. To configure the list of catalogues and document
+     types displayed on this page, the administrator shall go to the <a target=top href="<WEBURL>/admin/websubmit/editCatalogues.php">edit catalogues</a>
+      page. (see the <a href="#catalogues">guide section</a>)<br/>
+
+    <h3>The user can then click on the document type he is interested in.</h3>
+    <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-menu_doc.png" alt="Document type Page" class="guideimg" align="left">
+    &nbsp;<span class="guideheader">T</span>he text appearing under the header containing the name of the document
+     can be configured by going to the <a target=top href="websubmit-admin">main page</a>, click on
+     the title of the document type then on the "Edit Document Types Details" button.<br/><br/>
+    &nbsp;<span class="guideheader">Y</span>ou can associate several categories to a document type which can be defined by going to the
+     <a target=top href="websubmit-admin">main page</a>, click on the title of the document type
+     then on the "View Categories" button. The selected category will be saved in a file named "comboXXX"
+     (where XXX is the short name of the document type) in the submission directory.<br/><br/>
+    &nbsp;<span class="guideheader">T</span>o add an action button to this page, first implement this action by going to the
+    <a target=top href="websubmit-admin">main page</a>, click on the title of the document type then
+    on the "Add a new submission" button. If the action is already implemented and the button still does not appear
+    on the submision page, then you should edit the details of this implementation: go to the
+    <a target=top href="websubmit-admin">main page</a>, click on the title of the document type then
+    on the icon in the "Edit Submission" column and in the line of the desired action. There you should set the
+    "Displayed" form field to "YES".<br/><br/>
+    &nbsp;<span class="guideheader">Y</span>ou can also change the order of the buttons, by going to the <a target=top href="websubmit-admin">
+    main page</a>, click on the title of the document type then on the icon in the "Edit Submission" column and in the
+    line of the desired action. There you can set the "buttonorder" form field.<br/><br/>
+
+    <h3>The user now may choose a category, then click on the action button he wishes.<br/>The submission starts, the first page of the web form appears.</h3>
+    <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-form.png" alt="Document type Page" class="guideimg" align="left">
+    &nbsp;<span class="guideheader">T</span>his web form is composed of several pages, on each of these
+    pages form fields can be found. To modify the number of pages, add or withdraw form fields and modify
+    the texts before each form field, you shall go to the <a target=top href="websubmit-admin">main page</a>,
+    click on the title of the document type then on the icon in the "Edit Submission Pages" column and in the line of the
+    desired action. (see the <a href="#actionimplement">guide section</a>)<br/><br/>
+
+    <h3>On the last page of the submission, there should be a button like in the following image which will
+    trigger the end script</h3>
+    <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-end_action.png" alt="Document type End Page" class="guideimg" align="left">
+    &nbsp;<span class="guideheader">T</span>his button is defined like any other form field. Its definition should include
+     a <i> onclick="finish();"</i> javascript attribute.<br/><br/>
+    &nbsp;<span class="guideheader">A</span>fter clicking this button, WebSubmit will apply the end script functions
+    to the gathered data. To modify the end script, you shall go to the <a target=top href="websubmit-admin">
+    main page</a>, click on the title of the document type then on the icon in the "Edit Functions" column and in the line
+    of the desired action. (see the <a href="#implementfunctions">guide section</a>)<br/>
+
+
+        <h3>See also:</h3>
+            <blockquote>
+        <a href="#description">interface description</a><br/>
+        <a href="#actions">actions</a><br/>
+        <a href="#documents">document types</a><br/>
+            </blockquote>
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="philosophy"></a>
+<h1>Philosophy behind the document submission system</h1>
+
+<p>This page will explain some philosophical issues behind the document submission system.
+
+        <h3>On the relation between a search collection and a submission doctype:</h3>
+        <blockquote>
+            <ul>
+
+                &nbsp;<span class="guideheader">T</span>he relation
+                between a search collection and a submission document
+                type may be prone to certain confusion for CDS Invenio
+                administrators. This comes from the fact that there is
+                no one-to-one direct mapping between them, as is usual
+                elsewhere.  The relation is more flexible than that.<br/><br/>
+
+		&nbsp;<span class="guideheader">A</span> search
+		collection in CDS Invenio is defined through a search
+		query. For example, "all records where field F
+		contains the value V belong to collection C". Several
+		assertions can be deduced from this definition:<br/>
+
+		&nbsp;1/ A single record can appear in several collections.<br/>
+
+		&nbsp;2/ There is no limitation to the number of
+		collections in which a record can appear.<br/>
+
+		&nbsp;3/ Any query can be used to build a
+		collection. The query can also be a complex one using
+		logical operators, hence can rely on the value of
+		several fields.<br/><br/>
+
+                &nbsp;(In addition, a search collection can be defined
+                via a set of its subcollections in the hierarchy tree.
+                Refer to the <a
+                href="websearch-guide">WebSearch
+                Admin Guide</a> for that matter.)<br/><br/>
+
+		&nbsp;<span class="guideheader">T</span>he submission
+		system basically creates an XML MARC record and stores
+		it in the database.  To which collection this new
+		record belongs depends exclusively on the content of
+		the XML MARC record. This XML MARC record is created
+		by the <a href="#Make_Record">Make_Record</a> function. So the
+		secret of the matching of a submitted record to a
+		particular collection lies in the configuration of
+		this function. Some examples will clarify this
+		point:<br/><br/>
+
+		&nbsp;<span class="guideheader">E</span>xample 1:
+		Let's consider a "Preprints" collection which is
+		defined by this query: "980__a:PREPRINT". We want to
+		create a submission document type from which all
+		records will go to this "Preprints" collection. For
+		this, the Make_Record function should be configured so
+		that a 980__a field containing "PREPRINT" will always
+		be created.<br/>
+
+		&nbsp;<span class="guideheader">E</span>xample 2:
+		Let's still consider the same "Preprints" collection,
+		and an additional "Theses" collection based on a
+		slightly different query "980__a:THESIS". We want to
+		create a single submission type from which the records
+		will go in the "Preprints" or "Theses" collections
+		depending on a field chosen by the submitter. In this
+		case, the Make_Record function should be configured so
+		that a 980__a field will contain either "PREPRINT" or
+		"THESIS" depending on the value entered by
+		the submitter.<br/><br/>
+
+		&nbsp;<span class="guideheader">T</span>he apparent
+		disconnection between a submission document type and a
+		search collection allows a great flexibility, allowing
+		administrators to create 1 to 1, 1 to n, n to 1 or
+		even 1 to 0 (not very useful!) relations.
+
+            </ul>
+        </blockquote>
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="description"></a>
+<h1>Interface Description</h1>
+
+        <h3>Welcome to webSubmit Management tool:</h3>
+        <blockquote>
+            <ul>
+                &nbsp;<span class="guideheader">o</span>n the websubmit admin <a href="websubmit-admin">main page</a> you will find:<br/><br/>
+                <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-main_page.png" class="guideimg"><br/><br/>
+                <ul>
+                    <li>The list of all existing document type in the middle of the page. Click on one line in the list to have
+                     access to the main document modification panel
+                    <li>The right menu panel with the following links inside:
+                        <ul>
+                            <li>"<b>webSubmit Admin</b>": This links leads you back to the main page of the manager.
+                            <li>"<b>New Doctype</b>": Click here if you wish to create a new document type.
+                            <li>"<b>Remove Doctype</b>": Click here if you want to remove an existing document type.
+                            <li>"<b>Available Actions</b>": Lists all existing actions
+                            <li>"<b>Available Javascript Checks</b>": Lists all existing Javascript checking functions.
+                            <li>"<b>Available Element Description</b>": Lists all existing html form element descriptions.
+                            <li>"<b>Available Functions</b>": Lists all existing functions in CDS Submit.
+                            <li>"<b>Organise Main Page</b>": Allows you to manage the appearance and order of the list of document
+                             types on CDS Submit User main page.
+                        </ul>
+                </ul>
+        </blockquote>
+
+
+        <h3>See also:</h3>
+            <blockquote>
+                <a href="#description">interface description</a><br/>
+                <a href="#actions">actions</a><br/>
+                <a href="#documents">document types</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="documents"></a>
+<h1>Document Types</h1>
+
+
+        <blockquote>
+            <ul>
+                &nbsp;<span class="guideheader">W</span>ebSubmit can propose several actions on different document
+                types. Each of these document type may or may not implement all possible actions. The main difference
+                between each document type is the metadata which define each of them, and may also be the kind of fulltext
+                files attached to one record. <br/><br/>
+                &nbsp;<span class="guideheader">A</span> document type can be one of "Thesis", "Photos", "Videotapes"...
+                or whatever type of document you may invent. A document type is always defined by its metadata. It may or
+                may not have a fulltext file attached to it.<br/><br/>
+                &nbsp;<span class="guideheader">T</span>his tool leaves you free to create the web forms adapted to whatever type of document you want to
+                create (see "<a href="#implementwebform">Create and Maintain the Web Form</a>") as well as free
+                to determine what treatment you wish to apply to the collected data (see
+                 "<a href="#implementfunctions">Create and Maintain the Data Treatment</a>").
+            </ul>
+        </blockquote>
+
+        <h3>See also:</h3>
+            <blockquote>
+                <a href="#documentnew">add a new type of document</a><br/>
+                <a href="#documentremove">remove a type of document</a><br/>
+                <a href="#documentmodify">modify a type of document</a><br/>
+                <a href="#actionimplement">implement an action over a type of document</a><br/>
+            </blockquote>
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="documentnew"></a>
+<h1>Ading new type of document</h1>
+
+    <h3>How to get there?</h3>
+            <blockquote>
+                &nbsp;<span class="guideheader">C</span>lick on the "New Doctype" link in the webSubmit right menu.
+            </blockquote>
+    <h3>How to do this?</h3>
+            <blockquote>
+                &nbsp;<span class="guideheader">A</span> new document type is defined by 6 fields:<br/>
+                <ul>
+                    <li><b>Creation Date</b> and <b>Modification Dates</b> are generated and modified automatically.<br/>
+                    <li><b>Document Type ID</b>: This is the acronym for your new document type. We usually use a 3 letters
+                    acronym.
+                    <li><b>Document Type Name</b>: This is the full name of your new document. This is the text which will
+                    appear on the list of available documents and catalogues on webSubmit main page.
+                    <li><b>Document Type Description</b>: This is the text which will appear on the document type submission
+                    page. This can be pure text or html.
+                    <li><b>Doctype to clone</b>: Here you can choose to create your document type as a clone of another
+                    existing document type. If so, the new document type will implement all actions implemented by the chosen
+                    one. The web forms will be the same, and the functions also, as well as the values of the parameters for
+                    these functions. Of course once cloned, you will be able to modify the implemented actions.
+                </ul>
+            </blockquote>
+
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#documentremove">remove a type of document</a><br/>
+                <li><a href="#documentmodify">modify a type of document</a><br/>
+                <li><a href="#actionimplement">implement an action over a type of document</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="documentremove"></a>
+<h1>Removing a Document Type</h1>
+
+        <h3>How to get there?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">C</span>lick on the "Remove Doctype" link in the
+            webSubmit admin right menu
+        </blockquote>
+        <h3>How to do this?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">S</span>elect the document type to delete then click on the "Remove Doctype" button. Remember by doing this, you
+            will delete this document type as well as all the implementation of actions for this document type!
+        </blockquote>
+
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#documentnew">create a type of document</a><br/>
+                <li><a href="#documentmodify">modify a type of document</a><br/>
+                <li><a href="#actionimplement">implement an action over a type of document</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="documentmodify"></a>
+<h1>Modifying a Document Type</h1>
+
+        <h3>What is it?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">M</span>odifying a document type in webSubmit - this will modify its
+            general data description, not the implementations of
+            the actions on this document type. For the later, please see <a href="#actionimplement">
+            implement an action over a type of document</a>.
+        </blockquote>
+        <h3>How to get there?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">F</span>rom the main page of the manager, click on the title of the
+            document type you want to modify, then click on the "Edit Document Type Details".
+        </blockquote>
+        <h3>How to do this?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">O</span>nce here, you can modify 2 fields:<br/>
+            <li><b>Document Type Name</b>: This is the full name of your new document. This is the text which will appear
+            on the list of available documents and catalogues on webSubmit main page.
+            <li><b>Document Type Description</b>: This is the text which will appear on the right of the screen when the user
+            moves the mouse over the document type title and on the document type submission page. This can be pure
+            text or html.
+        </blockquote>
+
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#documentremove">remove a type of document</a><br/>
+                <li><a href="#documentnew">create a type of document</a><br/>
+                <li><a href="#actionimplement">implement an action over a type of document</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="actions"></a>
+<h1>Actions</h1>
+
+
+        <blockquote>
+            &nbsp;<span class="guideheader">I</span>n webSubmit you can create several actions (for example
+            "Submit New Record", "Submit a New File", "Send to a Distribution List", etc. in fact any action you can imagine
+            to perform on a document stored in your database). The creation of an action is very simple and consists in
+            filling in a name, description and associating a directory to this action. The directory parameter indicates where
+            the collected data will be stored when the action is carried on.<br/><br/>
+            &nbsp;<span class="guideheader">O</span>nce an action is created, you have to implement it over a document
+            type. Implementing an action means defining the web form which will be displayed to a user, and defining the
+            treatment (set of functions) applied to the data which have been gathered. The implementation of the same action
+            over two document types can be very different. The fields in the web form can be different as well as the functions
+            applied at the end of this action.
+        </blockquote>
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#actionnew">create a new action</a><br/>
+                <li><a href="#actionremove">remove an action</a><br/>
+                <li><a href="#actionmodify">modify an action</a><br/>
+                <li><a href="#actionimplement">implement an action over a type of document</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="actionnew"></a>
+<h1>Adding a New Action</h1>
+
+    <h3>How to get there?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">C</span>lick on the "Available Actions" link in the websubmit right menu,
+            then on the "Add an Action" button.
+        </blockquote>
+    <h3>How to do this?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">A</span> new action is defined by 6 fields:<br/><br/>
+            <ul>
+                <li><b>Creation Date</b> and <b>Modification Dates</b> are generated and modified automatically.<br/>
+                <li><b>Action Code</b>: This is the acronym for your new action. We usually use a 3 letters acronym.
+                <li><b>Action Description</b>: This is a short description of the new action.
+                <li><b>dir</b>: This is the name of the directory in which the submission data will be stored temporarily. If
+                the dir value is "running" as for the "Submit New Record" action (SBI), then the submission data for a
+                Text Document (document acronym "TEXT") will be stored in the
+                <CFG_SUBMIT_DIR>/running/TEXT/9089760_90540 directory (where 9089760_90540 is what we call
+                the submission number. It is a string automatically generated at the beginning of each submission). Once
+                finished, the submission data will be moved to the
+                <CFG_SUBMIT_DIR>/done/running/TEXT/ directory by the "Move_to_Done" function.
+                <li><b>statustext</b>: text displayed in the status bar of the browser when the user moves his mouse upon
+                 the action button.
+            </ul>
+        </blockquote>
+
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#actionremove">remove an action</a><br/>
+                <li><a href="#actionmodify">modify an action</a><br/>
+                <li><a href="#actionimplement">implement an action over a type of document</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="actionremove"></a>
+<h1>Removing an Action</h1>
+
+
+        <h3>What is it?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">R</span>emoving the implementation of an action over a document type -
+            Please note the removal of the action itself is not allowed with this tool.
+        </blockquote>
+
+        <h3>How to get there?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">F</span>rom the websubmit admin main page, click on the title of the
+            relevant document type. Then click on the red cross corresponding to the line of the action you want to remove.
+        </blockquote>
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#actionnew">create an action</a><br/>
+                <li><a href="#actionmodify">modify an action</a><br/>
+                <li><a href="#actionimplement">implement an action over a type of document</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="actionmodify"></a>
+<h1>Modifying an Action</h1>
+
+
+        <h3>What is it?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">T</span>his page is about how to modify the general data about an
+            action - for modifying the implementation of an action over a document type, see
+            <a href="#actionimplement">implement an action over a type of document</a>
+       </blockquote>
+
+        <h3>How to get there?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">C</span>lick on the "View Actions" link in the right menu of the websubmit
+            admin, then on the title of the action you want to modify...
+        </blockquote>
+
+        <h3>How to do this?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">Y</span>ou may modify 3 fields:<br/>
+            <ul>
+                <li><b>Action Description</b>: This is a short description of the new action.
+                <li><b>dir</b>: This is the name of the directory in which the submission data will be stored temporarily.
+                See the meaning of this parameter in <a href="#actionnew">create an action</a>.
+                <li><b>statustext</b>: text displayed in the status bar of the browser when the user moves his mouse
+                upon the action button.
+            </ul>
+        </blockquote>
+
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#actionremove">remove an action</a><br/>
+                <li><a href="#actionnew">create an action</a><br/>
+                <li><a href="#actionimplement">implement an action over a type of document</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="actionimplement"></a>
+<h1>Implement an action over a document type</h1>
+
+        <h3>What is it?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">I</span>mplement an action over a document type. Create the web forms
+            and the treatment process.
+        </blockquote>
+
+        <h3>How to get there?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">F</span>rom the main page of the manager, click on the title of the
+            relevant document type.<br/>Then click on the "Add a New Submission" button.
+        </blockquote>
+
+        <h3>How to do this?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">J</span>ust select the name of the action you want to implement. When you
+            select an action, the list of document which already implement this action appears. Then you can select from
+            this list the document from which you want to clone the implementation, or just choose "No Clone" if you want
+            to build this implementation from scratch.<br/><br/>
+            &nbsp;<span class="guideheader">A</span>fter selecting the correct fields, click on the "Add Submission"
+            button.<br/><br/>
+            &nbsp;<span class="guideheader">Y</span>ou then go back to the document type manager page where you
+            can see that in the bottom array your newly implemented action appears (check the acronym in the first
+            column).<br/><br/>
+            <img src="<WEBURL>/img/admin/websubmit-admin-guide-implement.png" class="guideimg"><br/><br/>
+            <ul>
+                <li>Clicking on the action acronym will allow you to modify the general data about the action (remember
+                in this case that all the other implementations of this particular action will also be changed).
+                <li>The second column indicates whether the button representing this action will appear on the submission page.
+                <li>The third column shows you the number of pages composing the web form for this implementation.
+                (see <a href="#implementwebform">create and maintain the web form</a>).
+                <li>The 4th and 5th columns indicate the creation and last modification dates for this implementation.
+                <li>In the 6th column, you can find the order in which the button will be displayed on the submission page
+                of this document type.<br/>
+                <li>The following 4 columns (level, score, stpage, endtxt) deal with the insertion of this action in an action
+                set.<br/><br/>
+
+            <table border=0 bgcolor="eeeeff"><tr><td><small><br/>
+                An action set is a succession of actions which should be done in a given order when a user starts.<br/>
+                For example the submission of a document is usually composed of two actions: Submission of Bibliographic
+                Information (SBI) and Fulltext Transfer (FTT) which should be done one after the other.<br/>
+                When the user starts the submission, we want CDS Submit to get him first in SBI and when he finishes SBI to
+                carry him to FTT.<br/>
+                SBI and FTT are in this case in the same action set.<br/>
+                They will both have a level of 1 ("level" is a bad name, it should be "action set number"), SBI will have a
+                score of 1, and FTT a score of 2 (which means it will be started after SBI). If you set the stpage of FTT to 2,
+                the user will be directly carried to the 2nd page of the FTT web form. This value is usually set to 1.<br/>
+                The endtxt field contains the text which will be display to the user at the end of the first action (here
+                it could be "you now have to transfer your files")
+                <br/><br/>
+                A single action like "Modify Bibliographic Information" should have the 3 columns to 0,0 and 1.<br/>&nbsp;
+            </small></td></tr></TABLE>
+                    <br/><br/>
+                    <li>Click on the icon in the 12th column ("Edit Submission Pages") to
+                    <a href="#implementwebform">create or edit the web form</a>.
+                    <li>Click on the icon in the 13th column ("Edit Functions") to
+                    <a href="#implementfunctions">create or edit the function list</a>.
+                    <li>The "Edit Submission" column allows you to modify the data (level, status text...) for this implementation.
+                    <li> Finally the last column allows you to delete this implementation.<br/>&nbsp;
+            </ul><br/>
+            &nbsp;<span class="guideheader">I</span>f you chose to clone the implementation from an existing one,
+            the web form as well as the functions list will already be defined. Else you will have to create them from scratch.
+        </blockquote>
+
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#implementwebform">create and maintain the web form</a><br/>
+                <li><a href="#implementfunctions">create and maintain the data treatment</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="implementwebform"></a>
+<h1>Create and maintain the web form</h1>
+
+        <h3>What is it?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">C</span>reate and define the web form used during an action.
+        </blockquote>
+
+        <h3>How to get there?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">F</span>rom the main page of the manager, click on the title of the relevant
+            document type. Then click on the icon in the "Edit Submission Pages" column of the relevant line.
+        </blockquote>
+
+        <h3>List of the form pages</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">A</span> web form can be split over several pages. This is a matter
+            of easiness for the user: he will have an overview of all form fields present on the page without having to scroll it.
+            Moreover, each time the user goes from one page to the other, all entered data are saved. If he wants to stop
+            then come back later (or if the browser crashes!) he will be able to get back to the submission at the exact
+            moment he left it.<br/><br/>
+            &nbsp;<span class="guideheader">O</span>nce here:<br/><br/>
+            <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-menu_page.png" class="guideimg"><br/><br/>
+            you can see the ordered list of already existing pages in the web form. In this example there are 4 pages.
+            You can then:
+            <ul>
+                <li> Move one page from one place to an other, using the small blue arrows under each page number.
+                <li>Suppress one page by clicking on the relevant red cross.
+                <li>Add a page, by clicking the "ADD A PAGE" button!
+                <li><a href="#onepage">Edit the content of one page</a> by clicking on the page number.
+                <li>Go back to the document main page.
+            </ul>
+        </blockquote>
+
+        <a name="onepage"></a>
+        <h3>Edit one form page</h3>
+            <blockquote>
+            &nbsp;<span class="guideheader">C</span>lick on a page number, you then arrive to a place where you can
+            edit this form page.<br/><br/>
+            &nbsp;<span class="guideheader">A</span> form page is composed of a list of form elements. Each of these
+            form elements is roughly made of an html template and a text displayed before the form field.<br/><br/>
+            &nbsp;<span class="guideheader">I</span>n the first part of the page, you have a preview of what the form
+            will look like to the user:<br/>
+            <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-preview.png" class="guideimg"><br/><br/>
+            &nbsp;<span class="guideheader">T</span>hen the second table shows you the list of the form elements
+            present on the page:<br/>
+            <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-elements.png" class="guideimg"><br/><br/>
+            &nbsp;<span class="guideheader">Y</span>ou can then:
+            <ul>
+                <li>Move one element from one place to another using the drop-down menus in the first
+                column ("Item No") of the table, or the little blue arrows in the second column.
+                <li><a href="#edittemplate">Edit the html template of one form element</a> by clicking on the name of the
+                template in the 3rd column ("Name").
+                <li><a href="#editelement">Edit one of the form elements</a> by clicking on the icon in the 10th column.
+                <li>delete one form element by clicking on the relevant red cross.
+                <li><a href="#addelement">Add an element to the page</a> by clicking the "ADD ELEMENT TO PAGE" button.
+            </ul>
+            </blockquote>
+
+        <a name="edittemplate"></a>
+        <h3>Edit the html template of one form element</h3>
+            <blockquote>
+            &nbsp;<span class="guideheader">I</span>n the html template edition page, you can modify the following values:
+            <ul>
+                <li><b>Element type</b>: indicates which html form element to create
+                <li><b>Aleph code</b>: <font color=red>Aleph users only!</font> - This indicates in which field of the Aleph
+                document database to retrieve the original value when modifying this information (function
+                Create_Modify_Interface of action MBI).
+                <li><b>Marc Code</b>: <font color=red>MySQL users only!</font> - This indicates in which field of the MySQL
+                document database to retrieve the original value when modifying this information (function
+                Create_Modify_Interface of action MBI).
+                <li><b>Cookies</b>: indicates whether WebSubmit will set a cookie on the value filled in by the user. If yes,
+                next time the user will come to this submission, the value he has entered last time will be filled in
+                automatically. <span style="font-weight: bold;">Note:</span> <span style="color: red; font-weight: bold;">
+                This feature has been REMOVED.</span>
+                <li><b>other fields</b>: The other fields help defining the html form element.
+            </ul>
+            <font color=red>Important warning!</font> Please remember this is a template! This means it can be used in
+            many different web forms/implementations. When you modify this template the modification will take place in
+            each of the implementations this template has been used.
+            </blockquote>
+
+        <a name="editelement"></a>
+        <h3>Edit one form element</h3>
+            <blockquote>
+            &nbsp;<span class="guideheader">I</span>n the form element edition page, you may modify the following values:
+            <ul>
+                <li><b>element label</b>: This is the text displayed before the actual form field.
+                <li><b>level</b>: can be one of "mandatory" or "optional". If mandatory, the user won't be able to leave
+                this page before filling this field in.
+                <li><b>short desc</b>: This is the text displayed in the summary window when it is opened.
+                <li><b>Check</b>: Select here the <a href="#addcheck">javascript checking function</a> to be applied to
+                the submitted value of this field
+                <li><b>Modify Text</b>: This text will be displayed before the form field when modifying the value (action
+                "Modify Record", function "Create_Modify_Interface")
+            </ul>
+            </blockquote>
+
+        <a name="addelement"></a>
+        <h3>Add one form element</h3>
+            <blockquote>
+            &nbsp;<span class="guideheader">C</span>lick on the "ADD ELEMENT TO PAGE" button. There you will have
+            to decide which <a href="#addtemplate">html template field</a> to use ("Element Description code"),  and
+            also the field mentioned <a href="#editelement">above</a>.
+            </blockquote>
+
+        <a name="addtemplate"></a>
+        <h3>Create a new html template</h3>
+            <blockquote>
+            &nbsp;<span class="guideheader">Y</span>ou have access to the list of all existing html templates by clicking
+            on the "View element descriptions" link in the websubmit admin right menu.<br/>
+            By clicking on one of them, you will have access to its description.<br/>
+            If no template corresponds to the one you seek, click on the "ADD NEW ELEMENT DESCRIPTION" button to
+            create one.<br/>
+            &nbsp;<span class="guideheader">T</span>he fields you have to enter in the creation form are the one
+            described in the <a href="#edittemplate">Edit the html template of one form element</a> section.<br/>
+            You also have to choose a name for this new element.<br/>
+             <font color=red>IMPORTANT!</font> The name you choose for your html element is also the name of the file
+             in which webSubmit will save the value entered in this field. This is also the one you will use in your
+             <a href="#bibconvert">BibConvert</a> configuration. Bibconvert is the program which will
+             convert the data gathered in webSubmit in a formatted XML file for insertion in the documents database.
+             <br/>
+             &nbsp;<span class="guideheader">T</span>ips:
+             <li>Elements of type "select box" which are used as a mandatory field in a form must start with "&lt;option&gt;Select:&lt;/option&gt;"
+            </blockquote>
+
+        <a name="addcheck"></a>
+        <h3>Create and edit a checking function.</h3>
+            <blockquote>
+            &nbsp;<span class="guideheader">C</span>lick on the "View Checks" link in the websubmit admin right menu.
+            You then have access to a list of all the defined javascript functions.<br/>
+            You can then click on the name of the function you want to modify, or click on the "ADD NEW CHECK" button
+            to create a new javascript function.<br/>
+            These functions are inserted in the web page when the user is doing his submission. When he clicks on
+            "next page", this function will be called with the value entered by the user as a parameter. If the function returns
+            false, the page does not change and an error message should be output. If the function returns true, everything
+            is correct, so page can be changed.
+            </blockquote>
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#implementfunctions">create and maintain the data treatment</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="implementfunctions"></a>
+<h1>Setup the Data Treatment</h1>
+
+
+        <h3>What is it?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">A</span>t the end of a submission, we have to tell webSubmit what to do
+            with the data it has gathered. This is expressed through one or several lists of functions (we call this the
+            "end script").
+        </blockquote>
+
+        <h3>How to get there?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">F</span>rom the main page of the manager, click on the title of the relevant
+            document type.<br/>Then click on the icon in the "Edit Functions" column of the relevant line.
+        </blockquote>
+
+        <h3>List of functions</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">H</span>ere is what you may see then (this is the end script list of functions
+            for a document type named "TEST" and action "FTT" - Fulltext Transfer):<br/><br/>
+            <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-list_functions.png" class="guideimg"><br/><br/>
+            &nbsp;<span class="guideheader">Y</span>ou can see the ordered list of all the functions in the end script.
+            This end script is composed of 2 steps (see the "step" column). The functions composing the first step are called,
+             then there should be  action from the user which would trigger step 2 - in the present case the
+             <a href="#Upload_Files">Upload_Files</a> function (last of step 1) allows
+             the user to upload additional files by creating a web form, then when the user finishes, he presses another
+             button created by the function, which ends the process. Functions of step 2 are then called.<br/><br/>
+            &nbsp;<span class="guideheader">W</span>hy implement multiple steps? The reason can vary with the task
+            you want to accomplish. For example with the example above (Fulltext Transfer), we use the first step to allow
+            the upload of multiple additional files (dynamic action) which could not be done in the
+            <a href="#implementwebform">static web form</a>. In the case of the
+            "Modify Bibliographic Information" action, the first step is used to display the fields the user wants to modify,
+            prefilled with the existing values. The reason is once again that the task we want to realise is dynamic.<br/><br/>
+            &nbsp;<span class="guideheader">T</span>he "score" column is used to order the functions. The function
+            which has the smallest score will be called first, and the largest score will be called last.<br/><br/>
+            &nbsp;<span class="guideheader">Y</span>ou can then:
+            <ul>
+                <li> View and edit the parameters of each function by clicking on the name of the function.
+                <li> Move one function up and down, by using the small blue arrows.
+                <li> Suppress one function by clicking on the relevant red cross.
+                <li> Add a function to the list by clicking the "ADD FUNCTION" button.
+                <li> Go back to the document main page ("FINISHED" button).
+            </ul>
+            &nbsp;<span class="guideheader">P</span>lease note: To pass one function from one step to another,
+            you have to delete it then add it again in the proper step.
+            </ul>
+        </blockquote>
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#functions">all about functions</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="functions"></a>
+<h1>Functions</h1>
+
+
+        <h3>Description:</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">I</span>n webSubmit, each action process is divided into two phases: the
+            gathering of data (through a web form) and the treatment of the data.<br/><br/>
+            &nbsp;<span class="guideheader">T</span>he treatment is organised in a succession of functions, each of
+            which has its own input and output.<br/><br/>
+            &nbsp;<span class="guideheader">T</span>he functions themselves are stored in separate files (one per
+            function) in the <LIBDIR>/python/invenio/websubmit_functions directory. A file containing a function MUST
+            be named after the function name itself. For example, a function called "Move_to_Done" MUST be stored in a
+            file called Move_to_Done.py. The case is important here.<br/><br/>
+            &nbsp;<span class="guideheader">F</span>or a description of what should be inside the file, have a look to
+            the "create a new function" page of this guide.<br/><br/>
+            &nbsp;<span class="guideheader">T</span>o each function you can associate one or several parameters,
+            which may have different values according to the document type the function is used for. One parameter may
+            be used for different functions. For example one standard parameter used in several functions is called "edsrn".
+            It contains the name of the file in which the reference of the document is stored.
+        </blockquote>
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#functionnew">create a new function</a><br/>
+                <li><a href="#functiondelete">delete a function</a><br/>
+                <li><a href="#functionedit">edit a function</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="functionnew"></a>
+<h1>Creating a New Function</h1>
+
+        <h3>How to get there?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">C</span>lick on the "Available Functions" link in the websubmit admin right
+            menu. Then click on the "Add New Function" button.
+        </blockquote>
+
+        <h3>How to do this?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">E</span>nter the name of the new function as well as a text description if
+            you wish.<br/>
+            &nbsp;<span class="guideheader">Y</span>ou will then reach a page where you can add parameters to your
+            new function.<br/><br/>
+            &nbsp;<span class="guideheader">D</span>on't forget to add the function file inside the
+            <LIBDIR>/python/invenio/websubmit_functions directory and to name the file after the function. Functions must
+            be written in Python. Here is an example implementation of a function:<br/><br/>
+            <LIBDIR>/python/invenio/websubmit_functions/Get_Report_Number.py:</small>
+            <table border=0 width=75% bgcolor="eeeeff"><tr><td><small><pre><br/>
+def Get_Report_Number (parameters,curdir,form):
+    global rn
+
+    #Path of file containing report number
+    if os.path.exists("%s/%s" % (curdir,parameters['edsrn'])):
+        fp = open("%s/%s" % (curdir,parameters['edsrn']),"r")
+        rn = fp.read()
+        rn = rn.replace("/","_")
+        rn = re.sub("[\n\r ]+","",rn)
+    else:
+        rn = ""
+    return ""
+            <pre></small></td></tr></TABLE>
+            <br/>
+            The function parameters are passed to the function through the parameters dictionary.<br/>
+            The curdir parameter contains the current submission directory path.<br/>
+            The form parameter contains the form passed to the current web page for possible reference from inside the
+            function.
+        </blockquote>
+
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#functionedit">edit a function</a><br/>
+                <li><a href="#functiondelete">delete a function</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="functiondelete"></a>
+<h1>Removing a Function</h1>
+
+        <h3>Note</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">T</span>here are currently no way of deleting a function through this
+            interface. Use the direct MySQL command line interface for this.
+        </blockquote>
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#functionedit">edit a function</a><br/>
+                <li><a href="#functionnew">create a function</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="functionedit"></a>
+<h1>Editing a Function</h1>
+
+        <h3>What is it?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">E</span>dit a function, add parameters to it...
+        </blockquote>
+
+        <h3>How to get there?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">C</span>lick on the "Available Functions" link in the websubmit admin
+            right menu.
+        </blockquote>
+
+        <h3>How to do this?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">O</span>n this page appears a list of all functions defined into the system.
+            Two columns give you access to some features:
+            <ul>
+                <li><font color=green>View function usage</font> Click here to have access to the list of all document
+                types and all actions in which this function is used. Then by clicking on one of the items, you will be given a
+                chance to modify the parameters value for the given document type.
+                <li><font color=green>View/Edit function details</font> There you will be able to modify the function
+                description, as well as add/withdraw parameters for this function.
+            </ul>
+        </blockquote>
+
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#functionnew">create a new function</a><br/>
+                <li><a href="#functiondelete">delete a function</a><br/>
+            </blockquote>
+
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="functiondescription"></a>
+<h1>All functions explained</h1>
+
+        <h3>Description:</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">T</span>his page lists and explains all the functions used in the demo
+            provided with the CDS Invenio package. This list is not exhaustive since you can add any new function you need.<br/>
+            &nbsp;<span class="guideheader">C</span>lick on one function name to get its description.<br/>
+            &nbsp;<span class="guideheader">P</span>lease note in this page when we refer to [param] this means the
+            value of the parameter 'param' for a given document type.<br/><br/>
+            <table cellspacing=5><tr>
+            <td valign="top">
+                <a href="#CaseEDS">CaseEDS</a><br/>
+                <a href="#Create_Modify_Interface">Create_Modify_Interface</a><br/>
+                <a href="#Create_Recid">Create_Recid</a><br/>
+                <a href="#Finish_Submission">Finish_Submission</a><br/>
+                <a href="#Get_Info">Get_Info</a><br/>
+                <a href="#Get_Recid">Get_Recid</a><br/>
+                <a href="#Get_Report_Number">Get_Report_Number</a><br/>
+                <a href="#Get_Sysno">Get_Sysno</a><br/>
+                <a href="#Get_TFU_Files">Get_TFU_Files</a><br/>
+                <a href="#Insert_Modify_Record">Insert_Modify_Record</a><br/>
+                <a href="#Insert_Record">Insert_Record</a><br/>
+            </td>
+            <td valign="top">
+                <a href="#Is_Original_Submitter">Is_Original_Submitter</a><br/>
+                <a href="#Is_Referee">Is_Referee</a><br/>
+                <a href="#Mail_Submitter">Mail_Submitter</a><br/>
+                <a href="#Make_Modify_Record">Make_Modify_Record</a><br/>
+                <a href="#Make_Record">Make_Record</a><br/>
+                <a href="#Move_From_Pending">Move_From_Pending</a><br/>
+                <a href="#Move_to_Done">Move_to_Done</a><br/>
+                <a href="#Move_to_Pending">Move_to_Pending</a><br/>
+                <a href="#Print_Success">Print_Success</a><br/>
+                <a href="#Print_Success_APP">Print_Success_APP</a><br/>
+                <a href="#Print_Success_MBI">Print_Success_MBI</a><br/>
+            </td>
+            <td valign="top">
+                <a href="#Print_Success_SRV">Print_Success_SRV</a><br/>
+                <a href="#Report_Number_Generation">Report_Number_Generation</a><br/>
+                <a href="#Send_Approval_Request">Send_Approval_Request</a><br/>
+                <a href="#Send_APP_Mail">Send_APP_Mail</a><br/>
+                <a href="#Send_Modify_Mail">Send_Modify_Mail</a><br/>
+                <a href="#Send_SRV_Mail">Send_SRV_Mail</a><br/>
+                <a href="#Test_Status">Test_Status</a><br/>
+                <a href="#Update_Approval_DB">Update_Approval_DB</a><br/>
+                <a href="#Upload_Files">Upload_Files</a><br/>
+            </td>
+            </tr></table>
+        </blockquote>
+
+        <br/><br/><a name="CaseEDS">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>CaseEDS</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function may be used if the treatment to be done after a submission depends on a field entered by
+                the user. Typically this is used in an approval interface. If the referee approves then we do this. If he rejects,
+                then we do other thing.<br/>
+                More specifically, the function gets the value from the file named [casevariable] and compares it with the
+                values stored in [casevalues]. If a value matches, the function directly goes to the corresponding step stored
+                in [casesteps]. If no value is matched, it goes to step [casedefault].
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>casevariable</b></small></td>
+            <td><small>
+                This parameters contains the name of the file in which the function will get the chosen value.<br/>
+                Eg: "decision"
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>casevalues</b></small></td>
+            <td><small>
+                Contains the list of recognized values to match with the chosen value. Should be a comma separated list of words.<br/>
+                Eg: "approve,reject"
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>casesteps</b></small></td>
+            <td><small>
+                Contains the list of steps corresponding to the values matched in [casevalue]. It should be a comma
+                separated list of numbers<br/>
+                Eg: "2,3"<br/>
+                <i>In this example, if the value stored in the file named "decision" is "approved", then the function launches
+                step 2 of this action. If it is "reject", then step 3 is launched.</i>
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>casedefault</b></small></td>
+            <td><small>
+                Contains the step number to go by default if no match is found.<br/>
+                Eg: "4"<br/>
+                <i>In this example, if the value stored in the file named "decision" is not "approved" nor "reject", then
+                step 4 is launched.</i>
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+        <br/><br/><a name="Create_Modify_Interface">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Create_Modify_Interface</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                To be used in the MBI-Modify Record action.
+                It displays a web form allowing the user to modify the fields he chose. The fields are prefilled with the existing
+                values extracted from the documents database.
+                This functions takes the values stored in the [fieldnameMBI] file. This file contains a list of field name separated
+                with "+" (it is usually generated from a multiple select form field). Then the function retrieves the corresponding
+                tag name (marc-21) stored in the element definition. Finally it displays the web form and fills it with the existing
+                values found in the documents database.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>fieldnameMBI</b></small></td>
+            <td><small>
+                Contains the name of the file in which the function will find the list of fields the user wants to modify. Depends
+                on the web form configuration.
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+
+        <br/><br/><a name="Create_Recid">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Create_Recid</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function retrieves a new record id from the records database. This record id will then be used to create the
+                XML record afterwards, or to link with the fulltext files. The created id is stored in a file named "SN".
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+        <br/><br/><a name="Finish_Submission">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Finish_Submission</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function stops the data treatment process even if further steps exist. This is used for example in the
+                approval action. In the first step, the program determines whether the user approved or rejected the
+                document (see <a href="#CaseEDS">CaseEDS</a> function description). Then depending on  the result, it
+                executes step 2 or step 3. If it executes step 2, then it should continue with step 3 if nothing stopped it. The
+                Finish_Submission function plays this role.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+
+
+        <br/><br/><a name="Get_Info">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Get_Info</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function tries to retrieve in the "pending" directory or directly in the documents database, some information
+                 about the document: title, original submitter's email and author(s).<br/>
+                If found, this information is stored in 3 global variables: $emailvalue, $titlevalue, $authorvalue to be used
+                in other functions.<br/>
+                If not found, an error message is displayed.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>authorFile</b></small></td>
+            <td><small>
+                Name of the file in which the author may be found if the document has not yet been integrated (in this case
+                it is still in the "pending" directory).
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>emailFile</b></small></td>
+            <td><small>
+                Name of the file in which the email of the original submitter may be found if the document has not yet been
+                integrated (in this case it is still in the "pending" directory).
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>titleFile</b></small></td>
+            <td><small>
+                Name of the file in which the title may be found if the document has not yet been integrated (in this case it is
+                still in the "pending" directory).
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+        <br/><br/><a name="Get_Recid">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Get_Recid</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function searches for the document in the database and stores the recid of this document in the "SN" file and in a global variable "sysno".<br/>
+                The function conducts the search based upon the document's report-number (and relies upon the global variable "rn") so the "Get_Report_Number" function should be called before this one.<br/>
+                <i>This function replaces the older function "Get_Sysno".</i><br/>
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+        <br/><br/><a name="Get_Report_Number">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Get_Report_Number</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function gets the value contained in the [edsrn] file and stores it in the reference global variable.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>edsrn</b></small></td>
+            <td><small>
+                Name of the file which stores the reference.<br/>
+                This value depends on the web form configuration you did. It should contain the name of the form element used for storing the reference of the document.
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+        <br/><br/><a name="Get_Sysno">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Get_Sysno</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function searches for the document in the database and stores the system number of this document in the "SN" file and in a global variable.<br/>
+                "Get_Report_Number" should be called before.<br/>
+                <span style="color: red; font-style: italic;">Deprecated: Use Get_Recid instead.</span>
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+
+        <br/><br/><a name="Insert_Modify_Record">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Insert_Modify_Record</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function gets the output of bibconvert and uploads it into the MySQL bibliographical database.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+
+        <br/><br/><a name="Insert_Record">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Insert_Record</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function gets the output of bibFormat and uploads it into the MySQL bibliographical database.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+
+
+        <br/><br/><a name="Is_Original_Submitter">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Is_Original_Submitter</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                If the authentication module (login) is active in webSubmit, this function compares the current login with the email of the original submitter. If it is the same (or if the current user has superuser rights), we go on. If it differs, an error message is issued.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+        <br/><br/><a name="Is_Referee">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Is_Referee</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function checks whether the currently logged user is a referee for this document.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+        <br/><br/><a name="Mail_Submitter">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Mail_Submitter</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function send an email to the submitter to warn him the document he has just submitted has been
+                correctly received.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>authorfile</b></small></td>
+            <td><small>
+                Name of the file containing the authors of the document<br/>
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>titleFile</b></small></td>
+            <td><small>
+                Name of the file containing the title of the document<br/>
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>emailFile</b></small></td>
+            <td><small>
+                Name of the file containing the email of the submitter of the document<br/>
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>status</b></small></td>
+            <td><small>
+                Depending on the value of this parameter, the function adds an additional text to the email.<br/>
+                This parameter can be one of:<br/>
+                <b>ADDED</b>: The file has been integrated in the database.<br/>
+                <b>APPROVAL</b>: The file has been sent for approval to a referee.<br/>
+                or can stay empty.
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>edsrn</b></small></td>
+            <td><small>
+                Name of the file containing the reference of the document<br/>
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>newrnin</b></small></td>
+            <td><small>
+                Name of the file containing the 2nd reference of the document (if any)<br/>
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+        <br/><br/><a name="Make_Modify_Record">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Make_Modify_Record</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function creates the record file formatted for a direct insertion in the documents database. It uses the
+                <a href="#bibconvert">BibConvert</a> tool.<br/>
+                The main difference between all the Make_..._Record functions are the parameters.<br/>
+                As its name says, this particular function should be used for the modification of a record. (MBI- Modify
+                Record action).
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>modifyTemplate</b></small></td>
+            <td><small>
+                Name of bibconvert's configuration file used for creating the mysql record.
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>sourceTemplate</b></small></td>
+            <td><small>
+                Name of bibconvert's source file.
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+
+        <br/><br/><a name="Make_Record">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Make_Record</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function creates the record file formatted for a direct insertion in the documents database. It uses the
+                <a href="#bibconvert">BibConvert</a> tool.<br/>
+                The main difference between all the Make_..._Record functions are the parameters.<br/>
+                As its name does not say :), this particular function should be used for the submission of a document.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>createTemplate</b></small></td>
+            <td><small>
+                Name of bibconvert's configuration file used for creating the mysql record.
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>sourceTemplate</b></small></td>
+            <td><small>
+                Name of bibconvert's source file.
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+        <br/><br/><a name="Move_From_Pending">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Move_From_Pending</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function retrieves the data of a submission which was temporarily stored in the "pending" directory
+                (waiting for an approval for example), and moves it to the current action directory.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+
+
+        <br/><br/><a name="Move_to_Done">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Move_to_Done</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function moves the existing submission directory to the <CFG_SUBMIT_DIR>/done directory. If the
+                Then it tars and gzips the directory.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+        <br/><br/><a name="Move_to_Pending">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Move_to_Pending</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function moves the existing submission directory to the <CFG_SUBMIT_DIR>/pending directory. It is
+                used to store temporarily this data until it is approved or...
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+        <br/><br/><a name="Print_Success">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Print_Success</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function simply displays a text on the screen, telling the user the submission went fine. To be used in
+                the "Submit New Record" action.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>status</b></small></td>
+            <td><small>
+                Depending on the value of this parameter, the function adds an additional text to the email.<br/>
+                This parameter can be one of:<br/>
+                <b>ADDED</b>: The file has been integrated in the database.<br/>
+                <b>APPROVAL</b>: The file has been sent for approval to a referee.<br/>
+                or can stay empty.
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>edsrn</b></small></td>
+            <td><small>
+                Name of the file containing the reference of the document<br/>
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>newrnin</b></small></td>
+            <td><small>
+                Name of the file containing the 2nd reference of the document (if any)<br/>
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+
+        <br/><br/><a name="Print_Success_APP">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Print_Success_APP</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function simply displays a text on the screen, telling the referee his decision has been taken into account.
+                To be used in the Approve (APP) action.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+
+
+        <br/><br/><a name="Print_Success_MBI">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Print_Success_MBI</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function simply displays a text on the screen, telling the user the modification went fine. To be used in
+                the Modify Record (MBI) action.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+
+        <br/><br/><a name="Print_Success_SRV">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Print_Success_SRV</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function simply displays a text on the screen, telling the user the revision went fine. To be used in the
+                Submit New File (SRV) action.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small>none</td>
+        </tr>
+        </TABLE>
+
+
+
+
+        <br/><br/><a name="Report_Number_Generation">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Report_Number_Generation</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function is used to automatically generate a reference number.<br/>
+                After generating the reference, the function saves it into the [newrnin] file and sets the global variable
+                containing this reference.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>autorngen</b></small></td>
+            <td><small>
+                If set to "<b>Y</b>": The reference number is generated.<br/>
+                If set to "<b>N</b>": The reference number is read from a file ([newrnin])<br/>
+                If set to "<b>A</b>": The reference number will be the access number of the submission.
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>counterpath</b></small></td>
+            <td><small>
+                indicates the file in which the program will find the counter for this reference generation.<br/>
+                The value of this parameter may contain one of:<br/>
+                "<b>&lt;PA&gt;categ&lt;/PA&gt;</b>": in this case this string is replaced with the content of the file [altrnin]<br/>
+                "<b>&lt;PA&gt;yy&lt;/PA&gt;</b>": in this case this string is replaced by the current year (4 digits) if [altyeargen]
+                is set to "AUTO", or by the content of the [altyeargen] file in any other case. (this content should be formatted
+                as a date (dd/mm/yyyy).<br/>
+                "<b>&lt;PA&gt;file:<i>name_of_file</i>&lt;/PA&gt;</b>": in this case, this string is replaced by the first line of the given file<br />
+                "<b>&lt;PA&gt;file*:<i>name_of_file</i>&lt;/PA&gt;</b>": in this case, this string is replaced by all the lines of the given file, separated by a dash ('-') character.
+
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>rnformat</b></small></td>
+            <td><small>
+                This is the format used by the program to create the reference. The program computes the value of the
+                parameter and appends a "-" followed by the current value of the counter increased by 1.<br/>
+                The value of this parameter may contain one of:<br/>
+                "<b>&lt;PA&gt;categ&lt;/PA&gt;</b>": in this case this string is replaced with the content of the file [altrnin]<br/>
+                "<b>&lt;PA&gt;yy&lt;/PA&gt;</b>": in this case this string is replaced by the current year (4 digits) if [altyeargen]
+                is set to "AUTO", or by the content of the [altyeargen] file in any other case. (this content should be formatted
+                as a date (dd/mm/yyyy).
+                <br/>
+                "<b>&lt;PA&gt;file:<i>name_of_file</i>&lt;/PA&gt;</b>": in this case, this string is replaced by the first line of the given file<br />
+                "<b>&lt;PA&gt;file*:<i>name_of_file</i>&lt;/PA&gt;</b>": in this case, this string is replaced by all the lines of the given file, separated by a dash ('-') character.
+
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>rnin</b></small></td>
+            <td><small>
+                This parameter contains the name of the file in which the program will find the category if needed. The content
+                of thif file will then replace the string &lt;PA&gt;categ&lt;/PA&gt; in the reference format or in the counter
+                path.
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>yeargen</b></small></td>
+            <td><small>
+                This parameter can be one of:<br/>
+                "<b>AUTO</b>": in this case the program takes the current 4 digit year.<br/>
+                "<b>&lt;filename&gt;</b>": in this case the program extract the year from the file which name is
+                &lt;filename&gt;. This file should contain a date (dd/mm/yyyy).
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>edsrn</b></small></td>
+            <td><small>
+                Name of the file in which the created reference will be stored.
+            </small></td>
+        </tr>
+
+        </TABLE>
+
+
+
+
+
+        <br/><br/><a name="Send_Approval_Request">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Send_Approval_Request</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function sends an email to the referee in order to start the simple approval process.<br/>
+                This function is very CERN-specific and should be changed in case of external use.<br/>
+                Must be called after the <a href=#Get_Report_Number>Get_Report_Number</a> function.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>addressesDAM</b></small></td>
+            <td><small>
+                email addresses of the people who will receive this email (comma separated list). this parameter may contain the <b>&lt;CATEG&gt;</b> string. In which case the variable computed from the [categformatDAM] parameter replaces this string.<br/>
+                eg.: "&lt;CATEG&gt;-email@cern.ch"
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>categformatDAM</b></small></td>
+            <td><small>
+                contains a regular expression used to compute the category of the document given the reference of the document.<br/>
+                eg.: if [categformatAFP]="TEST-&lt;CATEG&gt;-.*" and the reference of the document is "TEST-CATEGORY1-2001-001", then the computed category equals "CATEGORY1"
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>authorfile</b></small></td>
+            <td><small>
+                name of the file in which the authors are stored
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>titlefile</b></small></td>
+            <td><small>
+                name of the file in which the title is stored.
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>directory</b></small></td>
+            <td><small>
+                parameter used to create the URL to access the files.
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+
+        <br/><br/><a name="Send_APP_Mail">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Send_APP_Mail</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                Sends an email to warn people that a document has been approved.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>addressesAPP</b></small></td>
+            <td><small>
+                email addresses of the people who will receive this email (comma separated list). this parameter may contain
+                the <b>&lt;CATEG&gt;</b> string. In which case the variable computed from the [categformatAFP] parameter
+                replaces this string.<br/>
+                eg.: "&lt;CATEG&gt;-email@cern.ch"
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>categformatAPP</b></small></td>
+            <td><small>
+                contains a regular expression used to compute the category of the document given the reference of the
+                document.<br/>
+                eg.: if [categformatAFP]="TEST-&lt;CATEG&gt;-.*" and the reference of the document is
+                "TEST-CATEGORY1-2001-001", then the computed category equals "CATEGORY1"
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>newrnin</b></small></td>
+            <td><small>
+                Name of the file containing the 2nd reference of the approved document (if any).
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>edsrn</b></small></td>
+            <td><small>
+                Name of the file containing the reference of the approved document.
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+
+        <br/><br/><a name="Send_Modify_Mail">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Send_Modify_Mail</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function sends an email to warn people a document has been modified and the user his modifications
+                have been taken into account..
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>addressesMBI</b></small></td>
+            <td><small>
+                email addresses of the people who will receive this email (comma separated list).
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>fieldnameMBI</b></small></td>
+            <td><small>
+                name of the file containing the modified fields.
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>sourceDoc</b></small></td>
+            <td><small>
+                Long name for the type of document. This name will be displayed in the mail.
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>emailfile</b></small></td>
+            <td><small>
+                name of the file in which the email of the modifier will be found.
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+
+        <br/><br/><a name="Send_SRV_Mail">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Send_SRV_Mail</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function sends an email to warn people a revision has been carried out.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>notefile</b></small></td>
+            <td><small>
+                name of the file in which the note can be found
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>emailfile</b></small></td>
+            <td><small>
+                name of the file containing the submitter's email
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>addressesSRV</b></small></td>
+            <td><small>
+                email addresses of the people who will receive this email (comma separated list). this parameter may contain the <b>&lt;CATEG&gt;</b> string. In which case the variable computed from the [categformatDAM] parameter replaces this string.<br/>
+                eg.: "&lt;CATEG&gt;-email@cern.ch"
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>categformatDAM</b></small></td>
+            <td><small>
+                contains a regular expression used to compute the category of the document given the reference of the
+                document.<br/>
+                eg.: if [categformatAFP]="TEST-&lt;CATEG&gt;-.*" and the reference of the document is
+                "TEST-CATEGORY1-2001-001", then the computed category equals "CATEGORY1"
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+
+
+
+
+
+        <br/><br/><a name="Test_Status">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Test_Status</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function checks whether the considered document has been requested for approval and is still waiting
+                for approval. It also checks whether the password stored in file "password" of the submission directory
+                corresponds to the password associated with the document..
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top" colspan="2"><small><b>none</b></small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+
+
+
+        <br/><br/><a name="Update_Approval_DB">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Update_Approval_DB</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function updates the approval database when a document has just been approved or rejected. It uses
+                the [categformatDAM] parameter to compute the category of the document.<br/>
+                Must be called after the <a href=#Get_Report_Number>Get_Report_Number</a> function.
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>categformatDAM</b></small></td>
+            <td><small>
+                It contains the regular expression which allows the retrieval of the category from the reference number.<br/>
+                Eg: if [categformatDAM]="TEST-&lt;CATEG&gt;-.*" and the reference is "TEST-CATEG1-2001-001" then the
+                category will be recognized as "CATEG1".
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+
+
+
+
+
+        <br/><br/><a name="Upload_Files">
+        <table border="1" width="80%">
+        <tr><td colspan="2" bgcolor="#ddddff"><small><b>Upload_Files</b></small></td></tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>description</small></td></tr>
+        <tr>
+            <td colspan="2">
+                <small>
+                This function displays the list of already transfered files (main and additional ones), and also outputs an html
+                form for uploading other files (pictures or fulltexts).
+                </small>
+            </td>
+        </tr>
+        <tr><td colspan="2" bgcolor="#eeeeff" align="center"><small>parameters</small></td></tr>
+        <tr>
+            <td valign="top"><small><b>maxsize</b></small></td>
+            <td><small>
+                Maximum allowed size for the transfered files (size in bits)
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>minsize</b></small></td>
+            <td><small>
+                Minimum allowed size for the transfered files (size in bits)
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>iconsize</b></small></td>
+            <td><small>
+                In case the transfered files are pictures (jpg, gif or pdf), the function will automatically try to create icons from them.
+                This parameter indicates the size in pixel of the created icon.
+            </small></td>
+        </tr>
+        <tr>
+            <td valign="top"><small><b>type</b></small></td>
+            <td><small>
+                This can be one of "fulltext" or "picture". If the type is set to "picture" then the function will try to create icons
+                (uses the ImageMagick's "convert" tool)
+            </small></td>
+        </tr>
+        </TABLE>
+
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#functionnew">create a new function</a><br/>
+                <li><a href="#functiondelete">delete a function</a><br/>
+                <li><a href="#functionedit">edit a function</a><br/>
+            </blockquote>
+
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="protection"></a>
+<h1>Protection and Restriction</h1>
+
+
+        <h3>Description:</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">I</span>n webSubmit, you can restrict the use of some actions on a given
+            document type to a list of users. You can use the <a href="webaccess-admin">webAccess</a>
+            manager for this.<br/><br/>
+            &nbsp;<span class="guideheader">L</span>et's say you want to restrict the submission of new TEXT documents
+            to a given user. You should then create a role in webAccess which will authorize the action "submit" over doctype
+            "TEXT" and act "SBI" (Submit new record). You can call this role "submitter_TEXT_SBI" for example.
+            Then link the role to the proper users.<br/>
+            &nbsp;<span class="guideheader">A</span>nother example: if you wish to authorize a user to Modify the
+            bibliographic data of PICT documents, you have to create a role which authorize the action "submit" over doctype
+            "PICT" and act "MBI". This role can be called "submitter_PICT_MBI" or whatever you want.<br/><br/>
+            &nbsp;<span class="guideheader">I</span>f no role is defined for a given action and a given document type,
+            then all users will be allowed to use it.
+        </blockquote>
+
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="catalogues"></a>
+<h1>Submission Catalogue Organisation</h1>
+
+        <h3>What is it?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">T</span>his feature allows you to organise the way webSubmit main page
+            will look like. You will be able to group document types inside catalogues and order the catalogues the way you
+            wish.
+        </blockquote>
+
+        <h3>How to get there?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">C</span>lick on the "Organisation" link in the websubmit admin right menu.
+        </blockquote>
+
+        <h3>How to do this?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">O</span>nce on the "Edit Catalogues page", you will find the currently
+            defined organisation chart in the middle of the page. To the right, one form allows you to create a new catalogue
+            ("Add a Catalogue") and one to add a document type to an existing catalogue ("Add a document type").
+            <br/>&nbsp;<br/>
+            <ul>
+                <li><font color=green>To add a catalogue:</font> Enter the name of your new catalogue in the
+                "Catalogue Name" free text field then choose to which existing catalogue this one will be attached to. If you
+                attach the new one to an already existing catalogue, you can create a sub-catalogue. To actually create it,
+                click on "ADD".
+                <li><font color=green>To add a document type to a catalogue:</font> Choose in the list of existing
+                "Document type names" the one you want to add to the chart. Then choose to which catalogue the document
+                type will be associated. Click on "ADD" to finalise this action.
+                <li><font color=green>To withdraw a document type or a catalogue from the chart:</font> Click on the
+                red cross next to the item you want to withdraw. If you withdraw a catalogue all document types attached to
+                it will be withdrawn also (of course the actual document types in webSubmit won't be destroyed!).
+                <li><font color=green>To move a document type or a catalogue in the chart:</font> Use the small up
+                and down arrows next to the document type/catalogue title.
+            </ul>
+        </blockquote>
+
+
+        <h3>See also:</h3>
+            <blockquote>
+                <li><a href="#newtype">Create a New Document Type</a><br/>
+                <li><a href="#documents">document types</a><br/>
+            </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="bibconvert"></a>
+<h1>BibConvert</h1>
+
+        <h3>What is it?</h3>
+        <blockquote>
+            &nbsp;<span class="guideheader">W</span>ebSubmit stores the data gathered during a submission in a
+            directory. In this directory each file corresponds to a field saved during the submission. <br/>
+            &nbsp;<span class="guideheader">B</span>ibConvert is used to create a formatted file which will be easy to
+            upload in the bibliographical database from this directory.<br/>
+            &nbsp;<span class="guideheader">T</span>his BibConvert program is called from the
+            <a href="#Make_Record">Make_Record</a> and
+            <a href="#Make_Modify_Record">Make_Modify_Record</a> functions
+            from the <a href="#functions">end script</a> system of webSubmit.<br/>
+            &nbsp;<span class="guideheader">T</span>he BibConvert configuration files used by webSubmit are in the
+            <ETCDIR>/bibconvert/config directory.<br/><br/>
+            &nbsp;<span class="guideheader">F</span>or more info about bibconvert, please see the dedicated
+            <a href="bibconvert-admin">guide</a>.
+        </blockquote>
+
+
+
+<p>&nbsp;<p>
+<p>&nbsp;<p>
+<a name="faq"></a>
+<h1>FAQ</h1>
+
+
+    &nbsp;<span class="guideheader">Q</span>1. <a href="#Q1">I'd like to be warned each time there is an error, or an important
+    action is made through the manager. Is this possible?
+    </a><br/>
+    &nbsp;<span class="guideheader">Q</span>2. <a href="#Q2">Where are all the files stored in this system?
+    </a><br/>
+    &nbsp;<span class="guideheader">Q</span>3. <a href="#Q3">How is the documents archive organised?
+    </a><br/><br/><br/><br/>
+
+
+    <a name="Q1"></a>
+    <i>&nbsp;<span class="guideheader">Q</span>1. I'd like to be warned each time there is an error, or an important
+    action is made through the manager. Is this possible?
+    </i>
+    <blockquote>
+        Yes, it is. Edit the config.wml file in CDS Invenio distribution, find the "ADMINEMAIL" definition and set it to your email
+        address. You will then receive all the warning emails issued by the manager.
+    </blockquote>
+    <a name="Q2"></a>
+    <i>&nbsp;<span class="guideheader">Q</span>2. Where are all the files stored in this system?
+    </i>
+    <blockquote>
+        <li>the counter files are here: <CFG_SUBMIT_COUNTER>. There are used by the
+        <a href="#Report_Number_Generation">Report_Number_Generation</a>
+        function.
+        <li>all running and completed submissions are stored here: <CFG_SUBMIT_DIR>.
+        <li>all the document files attached to records are stored here: <CFG_FILE_DIR>.
+        <li>all python functions used by webSubmit are stored here: <LIBDIR>/python/invenio/websubmit_functions
+    </blockquote>
+    <a name="Q3"></a>
+    <i>&nbsp;<span class="guideheader">Q</span>3. How is the documents archive organised?
+    </i>
+    <blockquote>
+        First of all, the documents files attached to records are stored here: <CFG_FILE_DIR>. <br/><br/>
+        The <a href="#Upload_Files">Upload_Files</a> webSubmit function is used
+        to link a document with a record.<br/><br/>
+        All documents get an id from the system and are stored in the "bibdoc" table in the database. The link between a
+        document and a record is stored using the "bibdoc_bibrec" table.<br/><br/>
+        The document id is used to determine where the files are stored. For example the files of document #14 will be
+        stored here: <CFG_FILE_DIR>/g0/14<br/><br/>
+        The subdirectory g0 is used to split the documents accross the filesystem.  The CFG_FILE_DIR_SIZE variable from
+        config.wml determines how many documents will be stored under one subdirectory.<br/><br/>
+        Several files may be stored under the same document directory: they are the different formats and versions of the
+        same document. Versions are indicated by a string of the form ";1.0" concatenated to the name of the file.
+    </blockquote>
+
+
+    <h3>See also:</h3>
+        <blockquote>
+            notes
+        </blockquote>
+
+
