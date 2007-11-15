@@ -11,24 +11,35 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 docdir = $(localstatedir)/www/hacking
-imgdir = $(localstatedir)/www/img
+imgdir = $(localstatedir)/www/img/hacking
 
 doc_DATA=index.html modules.html style.html concepts.html directory.html cdsware.el \
          releases.html testsuite.html
 
-img_DATA=modules.jpeg
+img_DATA=modules-overview-graph.jpeg
+
+webdoclibdir = $(libdir)/webdoc/admin
+
+webdoclib_DATA = \
+	internals.webdoc \
+	modules-overview.webdoc \
+	coding-style.webdoc \
+	common-concepts.webdoc \
+	directory-organization.webdoc \
+	release-numbering-scheme.webdoc \
+	test-suite-strategy.webdoc
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) modules.jpeg cdsware.el
+EXTRA_DIST = $(webdoclib_DATA) modules-overview-graph.jpeg cdsware.el
 
-CLEANFILES = $(wildcard *.html) *~ *.tmp
+CLEANFILES = *~ *.tmp
 
 %.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
