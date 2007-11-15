@@ -326,7 +326,7 @@ class Template:
              &nbsp;
        </td>
        <td class="headermoduleboxbody%(help_selected)s">
-             <a class="header%(help_selected)s" href="%(weburl)s/help/index.%(ln)s.html">%(msg_help)s</a>
+             <a class="header%(help_selected)s" href="%(weburl)s/help/%(langlink)s">%(msg_help)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
@@ -352,6 +352,7 @@ class Template:
           'sweburl' : sweburl,
           'cssurl' : secure_page_p and sweburl or weburl,
           'ln' : ln,
+          'langlink': ln != cdslang and '?ln=' + ln or '',
 
           'sitename' : cdsnameintl.get(ln, cdsname),
           'headertitle' : cgi.escape(headertitle),
@@ -425,7 +426,7 @@ class Template:
 %(pagefooteradd)s
 <!-- replaced page footer -->
  <div class="pagefooterstripeleft">
-  %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/submit?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/help/index.%(ln)s.html">%(msg_help)s</a>
+  %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/submit?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/help/%(langlink)s">%(msg_help)s</a>
   <br />
   %(msg_poweredby)s <a class="footer" href="http://cdsware.cern.ch/">CDS Invenio</a> v%(version)s
   <br />
@@ -444,6 +445,7 @@ class Template:
           'weburl' : weburl,
           'sweburl' : sweburl,
           'ln' : ln,
+          'langlink': ln != cdslang and '?ln=' + ln or '',
 
           'sitename' : cdsnameintl.get(ln, cdsname),
           'supportemail' : supportemail,
