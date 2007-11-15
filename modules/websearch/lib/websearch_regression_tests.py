@@ -105,19 +105,23 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-    def test_search_user_help_pages_availability(self):
-        """websearch - availability of search user help pages"""
+    def test_search_help_page_availability(self):
+        """websearch - availability of Search Help page"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/help/search',
+                                               expected_text="Search Help"))
 
-        baseurl = weburl + '/help/search/'
+    def test_search_tips_page_availability(self):
+        """websearch - availability of Search Tips"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/help/search-tips?ln=fr',
+                                               expected_text="Conseils de recherche"))
 
-        _exports = ['', 'index.fr.html', 'tips.fr.html', 'guide.fr.html']
-
-        error_messages = []
-        for url in [baseurl + page for page in _exports]:
-            error_messages.extend(test_web_page_content(url))
-        if error_messages:
-            self.fail(merge_error_messages(error_messages))
-        return
+    def test_search_guide_page_availability(self):
+        """websearch - availability of Search Guide"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/help/search-guide',
+                                               expected_text="Search Guide"))
 
 class WebSearchTestLegacyURLs(unittest.TestCase):
 
@@ -177,7 +181,23 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
         check(make_url('/search.py', recid=1, ln='es'),
               make_url('/record/1', ln='es'))
 
+    def test_legacy_search_help_link(self):
+        """websearch - legacy Search Help page link"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/help/search/index.en.html',
+                                               expected_text="Search Help"))
 
+    def test_legacy_search_tips_link(self):
+        """websearch - legacy Search Tips page link"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/help/search/tips.fr.html',
+                                               expected_text="Conseils de recherche"))
+
+    def test_legacy_search_guide_link(self):
+        """websearch - legacy Search Guide page link"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/help/search/guide.en.html',
+                                               expected_text="Search Guide"))
 
 class WebSearchTestRecord(unittest.TestCase):
     """ Check the interface of the /record results """
