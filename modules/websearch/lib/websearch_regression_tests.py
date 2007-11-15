@@ -110,9 +110,15 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
 	self.assertEqual([],
                          test_web_page_content(weburl + '/help/search',
                                                expected_text="Search Help"))
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/help/search?ln=fr',
+                                               expected_text="Aide de recherche"))
 
     def test_search_tips_page_availability(self):
         """websearch - availability of Search Tips"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/help/search-tips',
+                                               expected_text="Search Tips"))
 	self.assertEqual([],
                          test_web_page_content(weburl + '/help/search-tips?ln=fr',
                                                expected_text="Conseils de recherche"))
@@ -122,6 +128,9 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
 	self.assertEqual([],
                          test_web_page_content(weburl + '/help/search-guide',
                                                expected_text="Search Guide"))
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/help/search-guide?ln=fr',
+                                               expected_text="Guide de Recherche"))
 
 class WebSearchTestLegacyURLs(unittest.TestCase):
 
