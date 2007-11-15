@@ -20,6 +20,18 @@ docdir = $(localstatedir)/www/admin/websubmit
 
 doc_DATA = index.html guide.html
 
+imgdir = $(localstatedir)/www/img/admin/
+img_DATA = websubmit-admin-guide-elements.png \
+	websubmit-admin-guide-implement.png \
+	websubmit-admin-guide-main_page.png \
+	websubmit-admin-guide-preview.png \
+	websubmit-admin-guide-end_action.png \
+	websubmit-admin-guide-list_functions.png \
+	websubmit-admin-guide-menu_doc.png \
+	websubmit-admin-guide-form.png \
+	websubmit-admin-guide-main_menu.png \
+	websubmit-admin-guide-menu_page.png
+
 webdoclibdir = $(libdir)/webdoc/admin
 
 webdoclib_DATA = \
@@ -27,7 +39,7 @@ webdoclib_DATA = \
 	websubmit-admin-guide.webdoc
 
 FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = $(img_DATA) $(webdoclib_DATA)
 
 CLEANFILES = *~ *.tmp
 
