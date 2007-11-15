@@ -414,9 +414,13 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
         parameters[tag] = value
         if tag == 'WebDoc-Page-Revision':
             # Special case: print version
-            (junk, filename, revision, date, junk, junk, junk, junk) = value.split(' ')
-            parameters['WebDoc-Page-Last-Updated'] = date
-            return revision + ', ' + date
+            try:
+                (junk, filename, revision, date, junk, junk, junk, junk) = value.split(' ')
+                parameters['WebDoc-Page-Last-Updated'] = date
+                return revision + ', ' + date
+            except ValueError:
+                # Date is not correctly formatted. Nothing to do
+                pass
 
         return ''
 
