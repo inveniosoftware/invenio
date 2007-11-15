@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-WebDoc web interface, handling URLs such as </doc/foo?ln=el>.
+WebDoc web interface, handling URLs such as </help/foo?ln=el>.
 """
 
 __revision__ = \
@@ -35,14 +35,14 @@ from invenio.webdoc import get_webdoc_parts
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 
 class WebInterfaceDocumentationPages(WebInterfaceDirectory):
-    """Defines the set of /doc pages."""
+    """Defines the set of documentation pages, usually installed under /help."""
 
-    def __init__(self, webdocname='search-help'):
+    def __init__(self, webdocname='help-central'):
         """Constructor."""
         self.webdocname = webdocname
 
     def _lookup(self, component, path):
-        """This handler parses dynamic URLs (/doc/component)."""
+        """This handler parses dynamic URLs (/help/component)."""
         return WebInterfaceDocumentationPages(component), path
 
     def __call__(self, req, form):
@@ -61,7 +61,7 @@ def display_webdoc_page(webdocname, ln=cdslang, req=None):
 
     # wash arguments:
     if not webdocname:
-        webdocname = 'search-help'
+        webdocname = 'help-central'
 
     # get page parts in given language:
     page_parts = get_webdoc_parts(webdocname, parts=['title','body',

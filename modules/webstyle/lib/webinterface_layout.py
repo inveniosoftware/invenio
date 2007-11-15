@@ -64,7 +64,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'rss',
         'stats',
 	'journal',
-        'doc',
+        'help'
         ]
 
     def __init__(self):
@@ -95,7 +95,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
 
     #journal = WebInterfaceJournalPages()
 
-    doc = WebInterfaceDocumentationPages()
+    help = WebInterfaceDocumentationPages()
 
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.
