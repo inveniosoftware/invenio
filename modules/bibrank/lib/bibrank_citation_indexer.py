@@ -58,7 +58,7 @@ def get_citation_weight(rank_method_code, config):
     last_update_time = get_bibrankmethod_lastupdate(rank_method_code)
     #if task_get_option('verbose') >= 3:	
     last_modified_records = get_last_modified_rec(last_update_time)
-    write_message("Last update "+str(last_update_time)+" records: "+str(last_modified_records), sys.stderr)	
+    write_message("Last update "+str(last_update_time)+" records: "+str(len(last_modified_records)), sys.stderr)	
 
     if last_modified_records:
         updated_recid_list = create_recordid_list(last_modified_records)
@@ -314,6 +314,18 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
                     citation_list[recid].append(rec_id)
                 if not recid in reference_list[rec_id]:
                     reference_list[rec_id].append(recid)
+
+    #remove empty lists in citation and reference
+    keys = citation_list.keys()
+    for k in keys:
+	if not citation_list[k]:
+		del citation_list[k]
+
+    keys = reference_list.keys()
+    for k in keys:
+	if not reference_list[k]:
+		del reference_list[k]
+
     t5 = os.times()[4]
     write_message("citation_list (x cites y): "+str(citation_list),sys.stderr)	
     write_message("reference_list (x is cited by y): "+str(reference_list),sys.stderr)	
