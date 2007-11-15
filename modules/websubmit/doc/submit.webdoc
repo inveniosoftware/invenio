@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -19,4 +20,6 @@
 
 <!-- WebDoc-Page-Title: _(Submit Help)_ -->
 <!-- WebDoc-Page-Navbar-Name: help -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/index.<lang:current/>.html">_(Help Central)_</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/help-central<lang:link/>">_(Help Central)_</a> -->
+
+FIXME.
