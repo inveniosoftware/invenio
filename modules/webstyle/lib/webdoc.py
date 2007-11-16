@@ -185,7 +185,7 @@ def get_webdoc_parts(webdoc,
                                                      ln=cdslang,
                                                      verbose=verbose)
                 if default_html_part.has_key(part):
-                    html_parts[part] = default_html_part
+                    html_parts[part] = default_html_part[part]
                     break
 
     return html_parts
