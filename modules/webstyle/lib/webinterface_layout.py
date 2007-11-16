@@ -43,7 +43,8 @@ from invenio.webmessage_webinterface import WebInterfaceYourMessagesPages
 from invenio.errorlib_webinterface import WebInterfaceErrorPages
 from invenio.oai_repository_webinterface import WebInterfaceOAIProviderPages
 from invenio.webstat_webinterface import WebInterfaceStatsPages
-#from invenio.webjournal_webinterface import WebInterfaceJournalPages
+
+from invenio.webjournal_webinterface import WebInterfaceJournalPages
 from invenio.webdoc_webinterface import WebInterfaceDocumentationPages
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
@@ -93,7 +94,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
 
     stats = WebInterfaceStatsPages()
 
-    #journal = WebInterfaceJournalPages()
+    journal = WebInterfaceJournalPages()
 
     help = WebInterfaceDocumentationPages()
 

@@ -1715,6 +1715,7 @@ class BibFormatObject:
         if xml_record is not None:
             # If record is given as parameter
             self.record = create_record(xml_record)[0]
+           # raise repr(create_record(xml_record.decode('utf-8').encode('utf-8')))
             recID = record_get_field_value(self.record,"001")
 
 

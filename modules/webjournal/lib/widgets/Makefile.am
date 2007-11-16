@@ -1,5 +1,5 @@
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 ##
@@ -17,6 +17,9 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bibclassify bibconvert bibedit bibharvest bibmatch bibsched bibindex bibrank bibupload bibformat elmsubmit miscutil webstyle websession webhelp webbasket webalert websearch websubmit webaccess webmessage webstat webcomment webjournal
+pylibdir=$(libdir)/python/invenio/bibformat_elements
 
-CLEANFILES = *~
+pylib_DATA = bfe_webjournal_widget_weather.py bfe_webjournal_widget_seminars.py bfe_webjournal_widget_latestPhoto.py
+EXTRA_DIST = $(pylib_DATA) $(tmp_DATA)
+
+CLEANFILES = *~ *.tmp
