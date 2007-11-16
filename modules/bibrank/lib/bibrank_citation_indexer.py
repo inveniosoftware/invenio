@@ -69,7 +69,7 @@ def get_citation_weight(rank_method_code, config):
         reference_list_intermediate = result_intermediate[2]
         citation_informations = get_citation_informations(updated_recid_list, config)
 	#write_message("citation_informations: "+str(citation_informations),sys.stderr)
-        dic = ref_analyzer(citation_informations, citation_weight_dic_intermediate, citation_list_intermediate, reference_list_intermediate) #dic is docid-numberofreferences like {1: 2, 2: 0, 3: 1}
+        dic = ref_analyzer(citation_informations, citation_weight_dic_intermediate, citation_list_intermediate, reference_list_intermediate,config) #dic is docid-numberofreferences like {1: 2, 2: 0, 3: 1}
 	#write_message("Docid-number of known references "+str(dic),sys.stderr)
         end_time = time.time()
         print "Total time of software: ", (end_time - begin_time)
@@ -251,10 +251,13 @@ def get_citation_informations(recid_list, config):
     print "Execution time for generating citation informations by parsing xml contents: ", (end_time - begin_time)
     return citation_informations
 
-def ref_analyzer(citation_informations, initialresult, initial_citationlist, initial_referencelist):
+def ref_analyzer(citation_informations, initialresult, initial_citationlist, initial_referencelist,config):
     """Analyze the citation informations and calculate the citation weight
        and cited by list dictionary
     """
+    pubrefntag = record_pri_number_tag = config.get(config.get("rank_method", "function"),"publication_reference_number_tag")
+    pubreftag = record_pri_number_tag = config.get(config.get("rank_method", "function"),"publication_reference_tag")
+    #pubrefntab is prob 999C5r, pubreftab 999c5s
     citation_list = initial_citationlist
     reference_list = initial_referencelist
     result = initialresult
@@ -288,8 +291,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
     for rec_id, recnumbers in d_reports_numbers.iteritems():
         for recnumber in recnumbers:
             p = recnumber
-            f = '999C5r'
-            recid_list = get_recids_matching_query(p, f)
+            recid_list = get_recids_matching_query(p, pubrefntag)
             if recid_list:
                 for recid in recid_list:
                     if not recid in citation_list[rec_id]:
@@ -305,8 +307,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
         else:
             recs_modified = recs[:tmp]
         p = recs_modified
-        f = '999C5s'
-        rec_ids = get_recids_matching_query(p, f)
+        rec_ids = get_recids_matching_query(p, pubreftab)
         if rec_ids:
             for rec_id in rec_ids:
                 if not rec_id in citation_list[recid]:
@@ -326,16 +327,18 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
 	if not reference_list[k]:
 		del reference_list[k]
 
-    t5 = os.times()[4]
-    write_message("citation_list (x cites y): "+str(citation_list),sys.stderr)	
-    write_message("reference_list (x is cited by y): "+str(reference_list),sys.stderr)	
+    if task_get_option('verbose') >= 9:		
+    	write_message("citation_list (x is cited by y): "+str(citation_list),sys.stderr)	
+	write_message("reference_list (x cites y): "+str(reference_list),sys.stderr)	
     insert_cit_ref_list_intodb(citation_list, reference_list)
+
+    t5 = os.times()[4]
     print "\nExecution time for analyzing the citation information generating the dictionary: "
     print "checking ref number: ", (t2-t1)
     print "checking ref ypvt: ", (t3-t2)
     print "checking rec number: ", (t4-t3)
     print "checking rec ypvt: ", (t5-t4)
-    print "total time of refAnalize: ", (t5-t1)
+    print "total time of ref_analyze: ", (t5-t1)
     return result
 
 def get_decompressed_xml(xml):
