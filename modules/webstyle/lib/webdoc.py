@@ -57,9 +57,7 @@ webdoc_dirs = [('%s/lib/webdoc/help' % CFG_PREFIX, \
                 '%s/webdoc/hacking-pages' % cachedir)]
 
 # Regular expression for finding text to be translated
-translation_pattern = re.compile(r'''
-    _\((?P<word>.*?)\)_
-    ''', \
+translation_pattern = re.compile(r'_\((?P<word>.*?)\)_', \
                                  re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
 # # Regular expression for finding comments
@@ -179,6 +177,16 @@ def get_webdoc_parts(webdoc,
                 webdoc_cached_part = file(webdoc_cached_part_path, 'r').read()
                 html_parts[part] = webdoc_cached_part
                 break
+            elif ln != cdslang:
+                # Get the part in the default language
+                default_html_part = get_webdoc_parts(webdoc=webdoc,
+                                                     parts=[part],
+                                                     update_cache_mode=update_cache_mode,
+                                                     ln=cdslang,
+                                                     verbose=verbose)
+                if default_html_part.has_key(part):
+                    html_parts[part] = default_html_part
+                    break
 
     return html_parts
 
@@ -442,17 +450,20 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
     webdoc_source = uncommented_webdoc.replace('<protect>', '')
     webdoc_source = webdoc_source.replace('</protect>', '')
 
-    html_texts = []
+    html_texts = {}
     # Language dependent filters
     for ln in languages:
         _ = gettext_set_language(ln)
 
         # Check if translation is really needed
+        ## Just a quick check. Might trigger false negative, but it is
+        ## ok.
         if ln != cdslang and \
            translation_pattern.search(webdoc_source) is None and \
            pattern_lang_link_current.search(webdoc_source) is None and \
            pattern_lang_current.search(webdoc_source) is None and \
-           '<%s>' % ln not in webdoc_source:
+           '<%s>' % ln not in webdoc_source and \
+           ('_(') not in webdoc_source:
             continue
 
         # 2 step
@@ -492,13 +503,29 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
 
         out = localized_body
 
-        html_texts.append((ln,
-                           out,
-                           parameters.get('WebDoc-Page-Title'),
-                           parameters.get('WebDoc-Page-Keywords'),
-                           parameters.get('WebDoc-Page-Navbar-Name'),
-                           parameters.get('WebDoc-Page-Navtrail')))
-    return html_texts
+        html_texts[ln] =(ln,
+                         out,
+                         parameters.get('WebDoc-Page-Title'),
+                         parameters.get('WebDoc-Page-Keywords'),
+                         parameters.get('WebDoc-Page-Navbar-Name'),
+                         parameters.get('WebDoc-Page-Navtrail'))
+
+    # Remove duplicates
+    filtered_html_texts = []
+    if html_texts.has_key(cdslang):
+        filtered_html_texts = [(html_text[0], \
+                                (html_text[1] != html_texts[cdslang][1] and html_text[1]) or None, \
+                                (html_text[2] != html_texts[cdslang][2] and html_text[2]) or None, \
+                                (html_text[3] != html_texts[cdslang][3] and html_text[3]) or None, \
+                                (html_text[4] != html_texts[cdslang][4] and html_text[4]) or None, \
+                                (html_text[5] != html_texts[cdslang][5] and html_text[5]) or None)
+                               for html_text in html_texts.values() \
+                               if html_text[0] != cdslang]
+        filtered_html_texts.append(html_texts[cdslang])
+    else:
+        filtered_html_texts = html_texts.values()
+
+    return filtered_html_texts
 
 def mymkdir(newdir, mode=0777):
     """works the way a good mkdir should :)
