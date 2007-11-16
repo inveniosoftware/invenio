@@ -38,7 +38,7 @@ from invenio.config import \
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
-from invenio.bibrank_citation_searcher import calculate_cited_by_list
+from invenio.bibrank_citation_searcher import calculate_cited_by_list, get_cited_by_list
 
 
 
@@ -340,14 +340,7 @@ def find_citations(rank_method_code, recID, hitset, verbose):
     #calculate the cited-by values for all the members of the hitset
     #returns: ((recordid,weight),prefix,postfix,message)
     voutput = ""
-    recweightdic = {}
-    for m in hitset:
-        #put stuff in a dict key -> weight 
-        wlist = calculate_cited_by_list(int(m), "a")
-        recweightdic[m] = len(wlist)     #could be by weight not by lenght, but thats a BD problem
-        #voutput = voutput + str(m)+":"+str(wlist)+" "
-        
-    ret = [ (key,value) for key, value in recweightdic.iteritems() ] #sort according to values
+    ret = get_cited_by_list(hitset)
 
     ret.sort(lambda x,y:cmp(x[1],y[1]))      #ascending by the second memeber of the tuples
     

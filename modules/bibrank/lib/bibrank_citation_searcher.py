@@ -59,6 +59,23 @@ cache_reference_list_dictionary = init_reference_list_dictionary()
 
 ### INTERFACE
 
+def get_cited_by_list(recordlist):
+    """Return a tuple of ([recid,citation_weight],...) for all the
+       records in recordlist. 
+    """
+    result = []
+    query = "select relevance_data from rnkMETHODDATA, rnkMETHOD WHERE rnkMETHOD.id=rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.name='citation'"
+    compressed_citation_weight_dic = run_sql(query)
+    if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
+        citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
+    rdic = {} #return this, but include only keys in recordlist
+    for rid in recordlist:
+	if citation_dic[rid]:
+            tmp = [rid, citation_dic[rid]]
+            result.append(tmp)
+    return result
+	
+
 def calculate_cited_by_list(record_id, sort_order="d"):
     """Return a tuple of ([recid,citation_weight],...) for all the
        record in citing RECORD_ID.  The resulting recids is sorted by
@@ -69,13 +86,14 @@ def calculate_cited_by_list(record_id, sort_order="d"):
     # determine which record cite RECORD_ID:
     if cache_cited_by_dictionary:
         citation_list = cache_cited_by_dictionary.get(record_id, [])
-    # get their weights:
+    # get their weights, this is weighted citation_list (x is cited by y)
     query = "select relevance_data from rnkMETHODDATA, rnkMETHOD WHERE rnkMETHOD.id=rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.name='citation'"
     compressed_citation_weight_dic = run_sql(query)
     if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
         #has to be prepared for corrupted data!
         try:
             citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
+	    #citation_dic is {1: 0, .. 81: 4, 82: 0, 83: 0, 84: 3} etc, e.g. recnum-weight
             for id in citation_list:
                 tmp = [id, citation_dic[id]]
                 result.append(tmp)
