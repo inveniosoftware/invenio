@@ -639,6 +639,12 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/webbasket/doc/hacking/Makefile \
 	  modules/webbasket/lib/Makefile \
 	  modules/webbasket/web/Makefile \
+	  modules/webjournal/Makefile \
+	  modules/webjournal/doc/Makefile \
+	  modules/webjournal/doc/admin/Makefile \
+	  modules/webjournal/doc/hacking/Makefile \
+	  modules/webjournal/lib/Makefile \
+	  modules/webjournal/lib/widgets/Makefile \
 	  modules/webmessage/Makefile \
 	  modules/webmessage/bin/Makefile \
 	  modules/webmessage/bin/webmessageadmin \
