@@ -25,6 +25,13 @@ SUBDIRS = po config modules
 
 EXTRA_DIST = UNINSTALL CREDITS RELEASE-NOTES configure-tests.py config.nice.in
 
+# current jsMath version and packages
+JSMV = 3.4f
+JSMFV = 1.3f
+JSMATH = jsMath-$(JSMV).zip
+JSMATHFONTS = jsMath-fonts-$(JSMFV).zip
+
+
 ## submit stuff for demo data link creation
 sbmdir = $(localstatedir)/www/submit/access/protected
 sbmdat = SBITEXT MBITEXT FTTTEXT SRVTEXT TFUTEXT \
@@ -104,6 +111,33 @@ install-data-local:
 	@echo "** you may want to restart your Apache server now by      **"
 	@echo "** running 'sudo apachectl restart'.                      **"
 	@echo "************************************************************"
+
+install-jsmath-plugin:
+	@if [ ! -e /usr/bin/wget ]; then \
+		echo "In order to install the jsMath plugin you need the wget command!"; \
+	elif [ ! -e /usr/bin/unzip ]; then \
+		echo "In order to insstall the jsMath plugin you need the unzip command!"; \
+	else \
+		mkdir /tmp/invenio-jsmath-plugin; \
+		pushd /tmp/invenio-jsmath-plugin; \
+		wget 'http://downloads.sourceforge.net/jsmath/$(JSMATH)'; \
+		wget 'http://downloads.sourceforge.net/jsmath/$(JSMATHFONTS)'; \
+		wget 'http://www.math.union.edu/~dpvc/jsMath/download/extra-fonts/msam10/msam10.zip'; \
+		wget 'http://www.math.union.edu/~dpvc/jsMath/download/extra-fonts/msbm10/msbm10.zip'; \
+		unzip -d ${prefix}/var/www $(JSMATH); \
+		unzip -d ${prefix}/var/www $(JSMATHFONTS); \
+		unzip -d ${prefix}/var/www/jsMath/fonts msam10.zip; \
+		unzip -d ${prefix}/var/www/jsMath/fonts msbm10.zip; \
+		rm -fr /tmp/invenio-jsmath-plugin; \
+		echo "Overriding jsMath config with Invenio config..."; \
+		popd; \
+		(cd $(top_srcdir)/modules/webstyle/etc && make install); \
+		echo "Don't forget to properly set up the"; \
+		echo "CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS variable in config.wml"; \
+		echo "Done"; \
+	fi
+	
+	
 
 create-tables: local-dbexec local-tabfill
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
