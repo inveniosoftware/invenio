@@ -59,6 +59,17 @@ cache_reference_list_dictionary = init_reference_list_dictionary()
 
 ### INTERFACE
 
+def get_cited_by(recordid):
+    """Return a list of records that cite recordid"""
+    query = "select citation_data from rnkCITATIONDATA"
+    compressed_citation_dic = run_sql(query)
+    if compressed_citation_dic and compressed_citation_dic[0]:
+        citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
+    ret = [] #empty list
+    if citation_dic[recordid]:
+        ret = citation_dic[recordid]
+    return ret
+
 def get_cited_by_list(recordlist):
     """Return a tuple of ([recid,citation_weight],...) for all the
        records in recordlist. 

@@ -38,8 +38,8 @@ from invenio.config import \
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
-from invenio.bibrank_citation_searcher import calculate_cited_by_list, get_cited_by_list
-
+from invenio.bibrank_citation_searcher import calculate_cited_by_list, get_cited_by, get_cited_by_list
+from invenio.intbitset import intbitset
 
 
 def compare_on_val(first, second):
@@ -199,6 +199,10 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     voutput = ""
     configcreated = ""
 
+    starttime = time.time()
+    afterfind = starttime - time.time()
+    aftermap = starttime - time.time()
+    
     try:
         hitset = copy.deepcopy(hitset_global) #we are receiving a global hitset
         if not globals().has_key('methods'):
@@ -212,6 +216,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
         elif rank_method_code == "citation" and pattern:
             #we get rank_method_code correctly here. pattern[0] is the search word - not used by find_cit
             result = find_citations(rank_method_code, pattern[0][6:], hitset, verbose)
+            
         elif func_object:
             result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
         else:
@@ -219,17 +224,24 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     except Exception, e:
         result = (None, "", adderrorbox("An error occured when trying to rank the search result "+rank_method_code, ["Unexpected error: %s<br><b>Traceback:</b>%s" % (e, traceback.format_tb(sys.exc_info()[2]))]), voutput)
 
+    afterfind = time.time() - starttime
 
     if result[0] and result[1]: #split into two lists for search_engine
         results_similar_recIDs = map(lambda x: x[0], result[0])
         results_similar_relevances = map(lambda x: x[1], result[0])
         result = (results_similar_recIDs, results_similar_relevances, result[1], result[2], "%s" % configcreated + result[3])
+        aftermap = time.time() - starttime;
     else:
         result = (None, None, result[1], result[2], result[3])
 
     if verbose > 0:
+        voutput = voutput+"\nElapsed time after finding: "+str(afterfind)+"\nElapsed after mapping: "+str(aftermap)
         print string.replace(voutput, "<br>", "\n")
 
+    #add stuff from here into voutput from result
+    tmp = result[4]+voutput
+    result = (result[0],result[1],result[2],result[3],tmp)
+    
     #dbg = string.join(map(str,methods[rank_method_code].items()))
     #result = (None, "", adderrorbox("Debug ",rank_method_code+" "+dbg),"",voutput);
     return result
@@ -335,24 +347,44 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
     return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
+def isNumber(n):
+    """An aux function to be used below"""
+    try:
+        dummy = int(n)
+        return True
+    except ValueError:
+        return False
+    
+
 def find_citations(rank_method_code, recID, hitset, verbose):
     """Rank by the amount of citations."""
     #calculate the cited-by values for all the members of the hitset
     #returns: ((recordid,weight),prefix,postfix,message)
-    voutput = ""
-    ret = get_cited_by_list(hitset)
 
-    ret.sort(lambda x,y:cmp(x[1],y[1]))      #ascending by the second memeber of the tuples
+    global voutput
+    voutput = ""
     
+    #If the recID is numeric, return only stuff that cites it. Otherwise return
+    #stuff that cites hitset
+
+    ret = []
+    if isNumber(recID):
+        myrecords = get_cited_by(int(recID)) #this is a simple list
+        for r in myrecords:
+            ret.append([r,0])
+    else:
+        ret = get_cited_by_list(hitset)
+        ret.sort(lambda x,y:cmp(x[1],y[1]))      #ascending by the second member of the tuples
+
     if verbose > 0:
-        voutput = voutput+"\n"+"find_citations retlist "+str(ret)    
+        voutput = voutput+"\nrecID "+str(recID)+" hitset "+str(hitset)+"\n"+"find_citations retlist "+str(ret)
 
     #voutput = voutput + str(ret)
     
     if ret:
-        return (ret,"(", ")", "Warning: citation search functionality is experimental."+voutput)
+        return (ret,"(", ")", "Warning: citation search functionality is experimental.")
     else:
-        return ((),"", "", "Warning: citation search functionality is experimental.."+voutput)
+        return ((),"", "", "Warning: citation search functionality is experimental..")
 
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     """Finding terms to use for calculating similarity. Terms are taken from the recid given, returns a list of recids's and relevance,
