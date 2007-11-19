@@ -27,7 +27,7 @@ __lastupdated__ = """$Date$"""
 from mod_python import apache
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import weburl, webdir, cdslang, etcdir, \
-                           CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_MISCUTIL_SMTP_HOST
+                           CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
@@ -191,7 +191,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                         issue_number_tag[5],
                                         issue_number, marc_tag, marc_ind1,
                                         marc_ind2, marc_subfield, rule_match)
-        temp_marc = temp_marc.decode('utf-8').encode('utf-8')
+        #temp_marc = temp_marc.decode('utf-8').encode('utf-8')
 
         # create a record and get HTML back from bibformat
         bfo = BibFormatObject(0, ln=language, xml_record=temp_marc, req=req) # pass 0 for rn, we don't need it
