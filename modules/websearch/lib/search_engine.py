@@ -46,7 +46,7 @@ from invenio.config import \
      CFG_WEBSEARCH_FIELDS_CONVERT, \
      CFG_WEBSEARCH_NB_RECORDS_TO_SORT, \
      CFG_WEBSEARCH_SEARCH_CACHE_SIZE, \
-     CFG_WEBSEARCH_JSMATH_ENABLED_FORMAT, \
+     CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
      cdslang, \
      cdsname, \
@@ -569,7 +569,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
         # FIXME: Find a good point to put this code.
         # This is a nice hack to trigger jsMath only when displaying single
         # records.
-        if of.lower() in CFG_WEBSEARCH_JSMATH_ENABLED_FORMAT:
+        if of.lower() in CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS:
             metaheaderadd = """
  <script> jsMath = {styles: {'#jsMath_button': 'display: none'}}; </script>
  <script src='/jsMath/easy/load.js'></script>

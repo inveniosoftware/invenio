@@ -465,13 +465,13 @@ default
 1
 </define-tag>
 
-## CFG_WEBSEARCH_JSMATH_ENABLED_FORMAT -- jsMath is a Javascript library
+## CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS -- jsMath is a Javascript library
 ## that renders math (La)TeX formulas in the client browser.
 ## This parameter must contain a list of output format for which to apply
 ## jsMath rendering. If the list is empty, jsMath is disabled.
 ## Note: the system expect to find jsMath library under /var/www/jsMath.
 ##  (example: "['hd', 'hb']")
-<define-tag CFG_WEBSEARCH_JSMATH_ENABLED_FORMAT whitespace=delete>
+<define-tag CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS whitespace=delete>
 []
 </define-tag>
 
