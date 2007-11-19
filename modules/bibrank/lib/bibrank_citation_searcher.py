@@ -66,7 +66,7 @@ def get_cited_by(recordid):
     if compressed_citation_dic and compressed_citation_dic[0]:
         citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
     ret = [] #empty list
-    if citation_dic[recordid]:
+    if citation_dic.has_key(recordid):
         ret = citation_dic[recordid]
     return ret
 
