@@ -334,7 +334,7 @@ def get_xml_from_config(xpath_list, journal_name):
         results[xpath] = []
         for result in result_list:
             try:
-                result_string = result.firstChild.toxml()
+                result_string = result.firstChild.toxml(encoding="utf-8")
             except:
                 # WARNING, config did not have a value
                 continue
