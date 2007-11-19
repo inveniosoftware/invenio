@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.93.50.20071112, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20071112)
+AC_INIT(cds-invenio, 0.93.50.20070924, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20070924)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -639,6 +639,8 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/webbasket/doc/hacking/Makefile \
 	  modules/webbasket/lib/Makefile \
 	  modules/webbasket/web/Makefile \
+	  modules/webjournal/etc/Makefile \
+	  modules/webjournal/img/Makefile \
 	  modules/webjournal/Makefile \
 	  modules/webjournal/doc/Makefile \
 	  modules/webjournal/doc/admin/Makefile \
