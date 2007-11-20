@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,17 +27,17 @@ def format(bfo):
     Prints html image and link to photo resources.
     """
     from invenio.config import weburl
-    
+
     resources = bfo.fields("8564_")
     out = ""
     for resource in resources:
 
-        if resource.get("x", "") == "icon" and resource.get("u", "") == "": 
+        if resource.get("x", "") == "icon" and resource.get("u", "") == "":
             out += '<a href="'+weburl+'/record/'+bfo.control_field("001")+ \
                    '?ln='+ bfo.lang + '"><img src="' + resource.get("q", "").replace(" ","") \
-                   + '" alt="" /></a>'
+                   + '" alt="" border="0"/></a>'
 
-    return out 
+    return out
 
 def escape_values(bfo):
     """
