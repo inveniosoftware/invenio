@@ -440,7 +440,7 @@ L'équipe du %s
             
             subject = "%s %s released!" % (display_name, issue)
             message = createhtmlmail(html_string, plain_text, subject)
-            server.smtplib.SMTP("localhost", 25)
+            server = smtplib.SMTP("localhost", 25)
             server.sendmail('Bulletin-Support@cern.ch', argd['recipients'], message)
 
             return page(title="Alert sent successfully!", body="")
