@@ -331,7 +331,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             journal_name = argd['name']
             
         # login
-        if acc_authorize_action(req, 'cfgwebjournal', name="%s" % journal_name)[0] != 0:
+        if acc_authorize_action(getUid(req), 'cfgwebjournal', name="%s" % journal_name)[0] != 0:
             # todo: pass correct language
             return please_login(req, journal_name, backlink='%s/journal/feature_record?name=%s' % (weburl, journal_name))
        
@@ -385,7 +385,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             url = '%s/journal/%s' % (weburl, journal_name)
         issue = get_current_issue(journal_name)
         # login
-        if acc_authorize_action(req, 'cfgwebjournal', name="%s" % journal_name)[0] != 0:
+        if acc_authorize_action(getUid(req), 'cfgwebjournal', name="%s" % journal_name)[0] != 0:
             # todo: pass correct language
             return please_login(req, journal_name, backlink='%s/journal/alert?name=%s' % (weburl, journal_name))
         plain_text = u'''Dear Subscriber,
@@ -604,7 +604,7 @@ L'équipe du %s
         action = argd['action_publish']
         issue_numbers = argd['issue_number']
         
-        if acc_authorize_action(req, 'cfgwebjournal', name="%s" % journal_name)[0] != 0:
+        if acc_authorize_action(getUid(req), 'cfgwebjournal', name="%s" % journal_name)[0] != 0:
             # todo: pass correct language
             return please_login(req, journal_name)
         
