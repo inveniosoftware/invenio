@@ -55,7 +55,7 @@ from email import message_from_string
 from xml.dom import minidom
 from invenio.bibformat_engine import format_with_format_template, BibFormatObject
 from invenio.search_engine import search_pattern
-
+from invenio.mailutils import send_email
 
 from invenio.webjournal_utils import get_recid_from_order, \
                                         get_recid_from_order_CERNBulletin, \
@@ -192,7 +192,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                         issue_number, marc_tag, marc_ind1,
                                         marc_ind2, marc_subfield, rule_match)
         #temp_marc = temp_marc.decode('utf-8').encode('utf-8')
-
+        
         # create a record and get HTML back from bibformat
         bfo = BibFormatObject(0, ln=language, xml_record=temp_marc, req=req) # pass 0 for rn, we don't need it
         html_out = format_with_format_template(index_page_template_path, bfo)[0]
@@ -441,10 +441,8 @@ L'équipe du %s
             
             subject = "%s %s released!" % (display_name, issue)
             message = createhtmlmail(html_string, plain_text, subject)
-            server = smtplib.SMTP("mailer.konnektiv.ch")
-            server.login('web52p9', 'getin2')
-            server.sendmail('gabriel.hase@konnektiv.ch', argd['recipients'], message)
-            server.quit()
+            server.smtplib.SMTP("localhost", 25)
+            server.sendmail('Bulletin-Support@cern.ch', argd['recipients'], message)
 
             return page(title="Alert sent successfully!", body="")
     
