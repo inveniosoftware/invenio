@@ -379,6 +379,13 @@ class Collection:
             # firstly, get last 'rg' records:
             recIDs = list(self.reclist)
 
+            # FIXME: temporary hack in order to tweak latest additions
+            # list for some CERN collections:
+            if CFG_CERN_SITE and self.name in ['CERN Yellow Reports']:
+                # detect recIDs only from the current year:
+                recIDs = list(self.reclist & \
+                              search_pattern(p='year:' + time.strftime("%Y", time.localtime())))
+
             total = len(recIDs)
             to_display = min(rg, total)
 
