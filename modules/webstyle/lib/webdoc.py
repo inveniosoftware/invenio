@@ -214,10 +214,10 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=cdslangs):
          webdoc_cache_modification_date) = get_webdoc_info(webdoc)
 
         if mode == 1 and \
-               webdoc_source_modification_date < webdoc_cache_modification_date:
+               webdoc_source_modification_date < webdoc_cache_modification_date and \
+               get_mo_last_modification() < webdoc_cache_modification_date:
             # Cache was update after source. No need to update
             return
-
         (webdoc_source, \
          webdoc_cache_dir, \
          webdoc_name) = read_webdoc_source(webdoc)
@@ -561,6 +561,20 @@ def write_cache_file(filename, webdoc_cache_dir, filebody, verbose=0):
     if verbose > 2:
         print 'Written %s' % fullfilename
 
+def get_mo_last_modification():
+    """
+    Returns the timestamp of the most recently modified mo (compiled
+    po) file
+    """
+    # Take one of the mo files. They are all installed at the same
+    # time, so last modication date should be the same
+    mo_file = '%s/share/locale/%s/LC_MESSAGES/cds-invenio.mo' % (CFG_PREFIX, cdslang)
+
+    if os.path.exists(os.path.abspath(mo_file)):
+        return os.stat(mo_file).st_mtime
+    else:
+        return 0
+
 def filter_languages(text, ln='en', defined_tags=None):
     """
     Filters the language tags that do not correspond to the specified language.
@@ -646,7 +660,7 @@ def usage(exitcode=1, msg=""):
     sys.stderr.write("  -V,  --version             \t\t Print version information.\n")
     sys.stderr.write("  -v,  --verbose=LEVEL       \t\t Verbose level (0=min,1=normal,9=max).\n")
     sys.stderr.write("  -l,  --language=LN1,LN2,.. \t\t Language(s) to process (default all)\n")
-    sys.stderr.write("  -m,  --mode=MODE           \t\t Update cache mode(0=Never,1=if necessary,2=always)\n")
+    sys.stderr.write("  -m,  --mode=MODE           \t\t Update cache mode(0=Never,1=if necessary,2=always) (default 2)\n")
     sys.stderr.write("\n")
     sys.stderr.write(" Example: webdoc help-pages\n")
     sys.stderr.write(" Example: webdoc -l en,fr help-pages\n")
@@ -689,6 +703,11 @@ def main():
                 options["mode"] = opt[1]
     except StandardError, e:
         usage(e)
+
+    try:
+        options["mode"] = int(options["mode"])
+    except ValueError:
+        usage(1, "Mode must be an integer")
 
     options["webdoc"] = args[0]
 
