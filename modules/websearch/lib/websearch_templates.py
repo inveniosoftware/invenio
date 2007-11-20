@@ -2566,7 +2566,7 @@ class Template:
                     </td></tr>''' % {
                 'more': create_html_link(
                 self.build_search_url(p='recid:%d' % \
-                                      row['recid'],
+                                      recID,      #XXXX
                                       rm='cit', ln=ln),
                                       {}, _("more")),
                 'similar': similar}
@@ -2580,7 +2580,7 @@ class Template:
                     <tr><td>
                       %(similar)s&nbsp;%(more)s
                       <br />
-                    </td></tr>''' % { 'more': create_html_link(self.build_search_url(p='cocitedwith:%d' % row['recid'], ln=ln),
+                    </td></tr>''' % { 'more': create_html_link(self.build_search_url(p='cocitedwith:%d' % recID, ln=ln),
                                                                 {}, _("more")),
                                       'similar': similar}
             out += '<br />'
@@ -2595,7 +2595,7 @@ class Template:
             out += '''
                     <tr><td>%(graph)s</td></tr>
                     <tr><td>%(similar)s</td></tr>
-                    ''' % { 'weburl': weburl,   'recid': row ['recid'], 'ln': ln,
+                    ''' % { 'weburl': weburl,   'recid': recID, 'ln': ln,
                              'similar': similar, 'more': _("more"),
                              'graph': downloadsimilarity
                              }
