@@ -2132,9 +2132,9 @@ def get_field_tags(field):
        Example: field='author', output=['100__%','700__%']."""
     out = []
     query = """SELECT t.value FROM tag AS t, field_tag AS ft, field AS f
-                WHERE f.code='%s' AND ft.id_field=f.id AND t.id=ft.id_tag
-                ORDER BY ft.score DESC""" % field
-    res = run_sql(query)
+                WHERE f.code=%s AND ft.id_field=f.id AND t.id=ft.id_tag
+                ORDER BY ft.score DESC"""
+    res = run_sql(query, (field, ))
     for val in res:
         out.append(val[0])
     return out

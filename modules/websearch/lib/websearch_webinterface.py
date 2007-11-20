@@ -329,7 +329,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
     _exports = [('index.py', 'legacy_collection'),
                 ('', 'legacy_collection'),
                 ('search.py', 'legacy_search'),
-                'search']
+                'search', 'openurl']
 
     search = WebInterfaceSearchResultsPages()
 
@@ -410,6 +410,48 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         (user, passwd) = http_get_credentials(req, realm)
         setApacheUser(req, user)
         return redirect_to_url(req, referer or '%s/youraccount/youradminactivities' % sweburl)
+
+    def openurl(self, req, form):
+        pass
+        #openurl_journal_accepted_args = {
+            #'url_ver' : (str, ''),
+            #'ctx_ver' : (str, ''),
+            #'rft_val_fmt' : (str, 'info:ofi/fmt:kev:mtx:journal'),
+            #'rfr_id' : (str, ''),
+            #'rft.atitle' : (str, ''),
+            #'rft.title' : (str, ''),
+            #'rft.jtitle' : (str, ''),
+            #'rft.date' : (str, ''),
+            #'rft.volume' : (str, ''),
+            #'rft.issue' : (str, ''),
+            #'rft.spage' : (str, ''),
+            #'rft.epage' : (str, ''),
+            #'rft.pages' : (str, ''),
+            #'rft.artnumber' : (str, ''),
+            #'rft.issn' : (str, ''),
+            #'rft.eissn' : (str, ''),
+            #'rft.aulast' : (str, ''),
+            #'rft.aufirst' : (str, ''),
+            #'rft.auinit' : (str, ''),
+            #'rft.auinit1' : (str, ''),
+            #'rft.auinitm' : (str, ''),
+            #'rft.ausuffix' : (str, ''),
+            #'rft.au' : (str, ''),
+            #'rft.aucorp' : (str, ''),
+            #'rft.isbn' : (str, ''),
+            #'rft.coden' : (str, ''),
+            #'rft.sici' : (str, ''),
+            #'rft.genre' : (str, 'unknown'),
+            #'rft.chron' : (str, ''),
+            #'rft.ssn' : (str, ''),
+            #'rft.quarter' : (int, ''),
+            #'rft.part' : (str, ''),
+        #argd_journal = wash_search_urlargd(form, openurl_accepted_args)
+        #if argd_journal['url_ver'] == 'Z39.88-2004' and \
+           #argd_journal['ctx_ver'] == 'Z39.88-2004' and \
+           #argd_journal['rft_val_fmt'] == 'nfo:ofi/fmt:kev:mtx:journal':
+            #pass
+
 
     def legacy_collection(self, req, form):
         """Collection URL backward compatibility handling."""
