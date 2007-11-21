@@ -31,7 +31,7 @@ from invenio.config import \
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DELEGATEADDUSERROLE, SUPERADMINROLE, \
     DEF_USERS, DEF_ROLES, DEF_ACTIONS, DEF_AUTHS
-from invenio.dbquery import run_sql, ProgrammingError
+from invenio.dbquery import run_sql, ProgrammingError, run_sql_cached
 from invenio.access_control_firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize
 from sets import Set
@@ -93,7 +93,7 @@ def acc_delete_action(id_action=0, name_action=0):
     """
     id_action = id_action or acc_get_action_id(name_action=name_action)
     if not id_action:
-        return 0       
+        return 0
 
     # delete the action
     if run_sql("""DELETE FROM accACTION WHERE id=%s""", (id_action, )):
@@ -1399,6 +1399,100 @@ def acc_find_possible_actions_argument_listid(id_role, id_action, arglistid):
     # return this list
     return res2
 
+def acc_find_possible_roles(name_action, arguments):
+    """Find all the possible roles that are enabled to action_name with
+    given arguments. roles is a list of role_id"""
+
+    query1 = """select a.id, a.allowedkeywords, a.optional
+                from accACTION a
+                where a.name = '%s'""" % (name_action)
+
+    try:
+        id_action, aallowedkeywords, optional = run_sql_cached(query1, affected_tables=['accACTION'])[0]
+    except IndexError:
+        return []
+    defkeys = aallowedkeywords.split(',')
+    for key in arguments.keys():
+        if key not in defkeys:
+            raise StandardError, "Incorrect arguments"
+
+    roles = run_sql_cached("""SELECT id_accROLE FROM
+            accROLE_accACTION_accARGUMENT
+            WHERE id_accACTION = %s""", (id_action, ), affected_tables=['accROLE_accACTION_accARGUMENT'])
+
+    # create role string (add default value? roles='(raa.id_accROLE='def' or ')
+    str_roles = ''
+    for (role, ) in roles:
+        if str_roles: str_roles += ','
+        str_roles += '%s' % (role, )
+
+
+    # create dictionary with default values and replace entries from input arguments
+    defdict = {}
+
+    for key in defkeys:
+        defdict[key] = arguments[key]
+
+    # create or-string from arguments
+    str_args = ''
+    for key in defkeys:
+        if str_args: str_args += ' OR '
+        str_args += """(arg.keyword = '%s' AND arg.value = '%s')""" % (key, defdict[key])
+
+
+    query4 = """SELECT DISTINCT raa.id_accROLE, raa.id_accACTION, raa.argumentlistid,
+            raa.id_accARGUMENT, arg.keyword, arg.value
+            FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT arg
+            WHERE raa.id_accACTION = %s AND
+            raa.id_accROLE IN (%s) AND
+            (%s) AND
+            raa.id_accARGUMENT = arg.id """ % (id_action, str_roles, str_args)
+
+    res4 = run_sql_cached(query4, affected_tables=['accROLE_accACTION_accARGUMENT', 'accARGUMENT', 'accROLE'])
+
+    # CHECK WITH MORE THAN 1 ARGUMENT
+
+    cur_role = cur_action = cur_arglistid = 0
+
+    booldict = {}
+    for key in defkeys: booldict[key] = 0
+
+    res4 = list(res4)
+    res4.sort()
+
+    # run through the results
+
+    results = []
+
+    go_to_next_role = False
+    for (role, action, arglistid, arg, keyword, val) in res4 + [(-1, -1, -1, -1, -1, -1)]:
+        # not the same role or argumentlist (authorization group), i.e. check if thing are satisfied
+        # if cur_arglistid != arglistid or cur_role != role or cur_action != action:
+        if go_to_next_role:
+            if (cur_role == role):
+                cur_arglistid, cur_role, cur_action = arglistid, role, action
+                continue
+            else:
+                go_to_next_role = False
+        if (cur_arglistid, cur_role, cur_action) != (arglistid, role, action):
+            # test if all keywords are satisfied
+            for value in booldict.values():
+                if not value:
+                    go_to_next_role = True
+                    continue
+            else:
+                results.append(cur_role)
+
+            # assign the values for the current tuple from the query
+            cur_arglistid, cur_role, cur_action = arglistid, role, action
+
+            for key in booldict.keys():
+                booldict[key] = 0
+
+        # set keyword qualified for the action, (whatever result of the test)
+        booldict[keyword] = 1
+
+    return results[1:]
 
 def acc_find_possible_actions_user(id_user, id_action):
     """user based function to find all action combination for a given

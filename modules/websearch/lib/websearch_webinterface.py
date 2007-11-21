@@ -40,6 +40,8 @@ from invenio.messages import gettext_set_language
 from invenio.search_engine import get_colID, get_coll_i18nname, collection_restricted_p
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
+from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
+
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -250,8 +252,9 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             if collection_restricted_p(coll):
                 (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
                 if auth_code and user_info['email'] == 'guest':
+                    cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = '/youraccount/login' + \
-                    make_canonical_urlargd({'action' : VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
+                    make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : \
                     weburl + '/search' + make_canonical_urlargd(argd, \
                     search_results_default_urlargd)}, {'ln' : cdslang})
                     return redirect_to_url(req, target)
@@ -620,8 +623,9 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
             user_info = collect_user_info(req)
             (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
             if auth_code and user_info['email'] == 'guest':
+                cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                 target = '/youraccount/login' + \
-                        make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
+                        make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                         weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
                         search_results_default_urlargd)}, {'ln' : cdslang})
                 return redirect_to_url(req, target)

@@ -61,7 +61,7 @@ from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
     mail_cookie_check_pw_reset, mail_cookie_delete_cookie, \
     mail_cookie_create_pw_reset, mail_cookie_check_role, \
     mail_cookie_check_mail_activation, InvenioWebAccessMailCookieError, \
-    InvenioWebAccessMailCookieDeletedError
+    InvenioWebAccessMailCookieDeletedError, mail_cookie_check_authorize_action
 
 import invenio.template
 websession_templates = invenio.template.load('websession')
@@ -613,7 +613,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'p_un': (str, None),
             'p_pw': (str, None),
             'login_method': (str, None),
-            'action': (str, None),
+            'action': (str, ''),
             'referer': (str, '')})
 
         if args['p_un']:
@@ -632,7 +632,12 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         apache_msg = ""
         if args['action']:
-            apache_msg = make_apache_message(args['action'], args['referer'])
+            cookie = args['action']
+            try:
+                action, arguments = mail_cookie_check_authorize_action(cookie)
+                apache_msg = make_apache_message(action, arguments, args['referer'])
+            except InvenioWebAccessMailCookieError:
+                pass
 
         if not CFG_EXTERNAL_AUTH_USING_SSO:
             if args['p_un'] is None or not args['login_method']:

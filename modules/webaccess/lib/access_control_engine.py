@@ -39,13 +39,16 @@ try:
 except ImportError, e:
     called_from = 0
 
-def _make_list_apache_firerole(name_action):
-    res = run_sql_cached('SELECT r.name, r.description, r.firerole_def_ser FROM accACTION a JOIN accROLE_accACTION_accARGUMENT raa ON a.id=raa.id_accACTION JOIN accROLE r ON raa.id_accROLE=r.id WHERE a.name=%s', (name_action, ), affected_tables=['accACTION', 'accROLE_accACTION_accARGUMENT', 'accROLE'])
-    if res:
-        roles = [(row[0], row[1]) for row in res if access_control_firerole.acc_firerole_suggest_apache_p(access_control_firerole.deserialize(row[2]))]
-        return roles
-    else:
-        return []
+def _make_list_apache_firerole(name_action, arguments):
+    roles = aca.acc_find_possible_roles(name_action, arguments)
+
+    ret = []
+
+    for role in roles:
+        res = run_sql_cached('SELECT name, description, firerole_def_ser FROM accROLE WHERE id=%s', (role, ), affected_tables=['accROLE'])
+        if access_control_firerole.acc_firerole_suggest_apache_p(access_control_firerole.deserialize(res[0][2])):
+            ret.append((res[0][0], res[0][1]))
+    return ret
 
 def _format_list_of_apache_firerole(roles, referer):
     out = ""
@@ -63,10 +66,10 @@ def _format_list_of_apache_firerole(roles, referer):
         out += "</p>"
     return out
 
-def make_apache_message(name_action, referer=None):
+def make_apache_message(name_action, arguments, referer=None):
     if not referer:
         referer = '%s/youraccount/youradminactivities' % sweburl
-    roles = _make_list_apache_firerole(name_action)
+    roles = _make_list_apache_firerole(name_action, arguments)
     if roles:
         return _format_list_of_apache_firerole(roles, referer)
     else:
@@ -238,9 +241,9 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
                 if user_info.has_key('uri'):
-                    return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info.get('referer', None))))
+                    return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, arguments, user_info.get('referer', None))))
                 else:
-                    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, user_info.get('referer', None))))
+                    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, arguments, user_info.get('referer', None))))
 
         # 3.2
         if optional == 'yes':
@@ -270,9 +273,9 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                     if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(id_accROLE[0])):
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
                 if user_info.has_key('uri'):
-                    return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info.get('referer', None))))
+                    return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, arguments, user_info.get('referer', None))))
                 else:
-                    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, user_info.get('referer', None))))
+                    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, arguments, user_info.get('referer', None))))
 
         # none of the zeroargs tests succeded
         if verbose: print ' - not authorization without arguments'
@@ -339,9 +342,9 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 res5.append(row)
         if not res5:
             if user_info.has_key('uri'):
-                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, user_info.get('referer', None))))
+                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, arguments, user_info.get('referer', None))))
             else:
-                return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, user_info.get('referer', None))))
+                return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, arguments, user_info.get('referer', None))))
 
     res5.sort()
 

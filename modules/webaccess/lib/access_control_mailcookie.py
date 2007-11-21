@@ -44,7 +44,7 @@ class InvenioWebAccessMailCookieDeletedError(Exception):
     pass
 
 
-_authorizations_kind = ('pw_reset', 'mail_activation', 'role')
+_authorizations_kind = ('pw_reset', 'mail_activation', 'role', 'authorize_action')
 _datetime_format = "%Y-%m-%d %H:%M:%S"
 
 def mail_cookie_create_generic(kind, params, cookie_timeout=timedelta(days=1), onetime=False):
@@ -86,6 +86,14 @@ def mail_cookie_create_mail_activation(email, cookie_timeout=timedelta(days=1)):
     params = email
     return mail_cookie_create_generic(kind, params, cookie_timeout, True)
 
+def mail_cookie_create_authorize_action(action_name, arguments,  cookie_timeout=timedelta(days=1)):
+    """Create a cookie for a valid authorization contanin all the
+    information to authorize an action. Well it's a meta-cookie :-)."""
+
+    kind = 'authorize_action'
+    params = (action_name, arguments)
+    return mail_cookie_create_generic(kind, params, cookie_timeout, False)
+
 def mail_cookie_retrieve_kind(cookie):
     """Retrieve if it exists the kind of a cookie."""
     try:
@@ -102,8 +110,11 @@ def mail_cookie_retrieve_kind(cookie):
 def mail_cookie_check_generic(cookie, delete=False):
     """Retrieve data pointed by a cookie, returning a tuple (kind, params) or None
     if the cookie is not valid or is expired"""
-    password = cookie[:16]+cookie[-16:]
-    cookie_id = int(cookie[16:-16], 16)
+    try:
+        password = cookie[:16]+cookie[-16:]
+        cookie_id = int(cookie[16:-16], 16)
+    except Exception, e:
+        raise InvenioWebAccessMailCookieError, "Cookie not valid: %s" % e
     try:
         res = run_sql("SELECT kind, AES_DECRYPT(data,%s), onetime, status FROM accMAILCOOKIE WHERE "
             "id=%s AND expiration>=NOW()", (password, cookie_id))
@@ -160,6 +171,17 @@ def mail_cookie_check_mail_activation(cookie):
             raise InvenioWebAccessMailCookieError, "email '%s' doesn't exist" % email
     except (TypeError, AssertionError), e:
         raise InvenioWebAccessMailCookieError, e
+
+def mail_cookie_check_authorize_action(cookie):
+    """Check a given cookie for a valid authorization contanin all the
+    information to authorize an action. Well it's a meta-cookie :-)."""
+    try:
+        (kind, params) = mail_cookie_check_generic(cookie)
+        assert(kind == 'authorize_action')
+        return params
+    except (TypeError, AssertionError), e:
+        raise InvenioWebAccessMailCookieError, e
+
 
 def mail_cookie_delete_cookie(cookie):
     """Remove a particular cookie."""
