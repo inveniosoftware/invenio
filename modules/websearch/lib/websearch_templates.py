@@ -33,6 +33,12 @@ from invenio.config import \
      CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH, \
      CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD, \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
+     CFG_BIBRANK_SHOW_READING_STATS, \
+     CFG_BIBRANK_SHOW_DOWNLOAD_STATS, \
+     CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
+     CFG_BIBRANK_SHOW_CITATION_LINKS, \
+     CFG_BIBRANK_SHOW_CITATION_STATS, \
+     CFG_BIBRANK_SHOW_CITATION_GRAPHS, \
      cdslang, \
      cdsname, \
      cdsnameintl, \
@@ -1034,7 +1040,8 @@ class Template:
                                         _("Similar records"),
                                         {'class': "moreinfo"})}
 
-        out += '''<span class="moreinfo"> - %s </span>''' % \
+        if CFG_BIBRANK_SHOW_CITATION_LINKS:
+            out += '''<span class="moreinfo"> - %s </span>''' % \
                    create_html_link(self.build_search_url(p='recid:%d' % recid, rm='citation', ln=ln),
                                     {}, _("Cited by"), {'class': "moreinfo"})
 
@@ -2360,10 +2367,11 @@ class Template:
                                     {}, _("Similar records"),
                                     {'class': "moreinfo"})
 
-        out += '<span class="moreinfo"> - %s</span>' % \
+        if CFG_BIBRANK_SHOW_CITATION_LINKS:
+            out += '<span class="moreinfo"> - %s</span>' % \
                    create_html_link(self.build_search_url(p="recid:%d" % recID,
-                                                     rm="citation",
-                                                     ln=ln),
+                                                          rm="citation",
+                                                          ln=ln),
                                     {}, _("Cited by"),
                                     {'class': "moreinfo"})
 
@@ -2555,7 +2563,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = ''
-        if citinglist is not None:
+        if CFG_BIBRANK_SHOW_CITATION_STATS and citinglist is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen(
                 _("Cited by: %s records") % len (citinglist), citinglist, ln)
 
@@ -2572,7 +2580,7 @@ class Template:
                 'similar': similar}
             out += '<br />'
 
-        if cociting is not None:
+        if CFG_BIBRANK_SHOW_CITATION_STATS and cociting is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen (
                 _("Co-cited with: %s records") % len (cociting), cociting, ln)
 
@@ -2585,10 +2593,10 @@ class Template:
                                       'similar': similar}
             out += '<br />'
 
-        if citationhistory is not None:
+        if CFG_BIBRANK_SHOW_CITATION_GRAPHS and citationhistory is not None:
             out += '<tr><td>%s</td></tr>' % citationhistory
 
-        if downloadsimilarity is not None:
+        if CFG_BIBRANK_SHOW_DOWNLOAD_STATS and downloadsimilarity is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen (
                 _("People who downloaded this document also downloaded:"), downloadsimilarity, ln)
 
@@ -2603,11 +2611,11 @@ class Template:
             out += '</table>'
             out +=  '<br />'
 
-        if viewsimilarity is not None:
+        if CFG_BIBRANK_SHOW_READING_STATS and viewsimilarity is not None:
             out += self.tmpl_print_record_list_for_similarity_boxen (
                 _("People who viewed this page also viewed:"), viewsimilarity, ln)
 
-        if downloadhistory is not None:
+        if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS and downloadhistory is not None:
             out += downloadhistory + '<br />'
 
         return out
