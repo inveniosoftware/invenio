@@ -202,7 +202,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     starttime = time.time()
     afterfind = starttime - time.time()
     aftermap = starttime - time.time()
-    
+
     try:
         hitset = copy.deepcopy(hitset_global) #we are receiving a global hitset
         if not globals().has_key('methods'):
@@ -216,7 +216,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
         elif rank_method_code == "citation" and pattern:
             #we get rank_method_code correctly here. pattern[0] is the search word - not used by find_cit
             result = find_citations(rank_method_code, pattern[0][6:], hitset, verbose)
-            
+
         elif func_object:
             result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
         else:
@@ -241,7 +241,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
     #add stuff from here into voutput from result
     tmp = result[4]+voutput
     result = (result[0],result[1],result[2],result[3],tmp)
-    
+
     #dbg = string.join(map(str,methods[rank_method_code].items()))
     #result = (None, "", adderrorbox("Debug ",rank_method_code+" "+dbg),"",voutput);
     return result
@@ -354,7 +354,7 @@ def isNumber(n):
         return True
     except ValueError:
         return False
-    
+
 
 def find_citations(rank_method_code, recID, hitset, verbose):
     """Rank by the amount of citations."""
@@ -363,7 +363,7 @@ def find_citations(rank_method_code, recID, hitset, verbose):
 
     global voutput
     voutput = ""
-    
+
     #If the recID is numeric, return only stuff that cites it. Otherwise return
     #stuff that cites hitset
 
@@ -380,11 +380,11 @@ def find_citations(rank_method_code, recID, hitset, verbose):
         voutput = voutput+"\nrecID "+str(recID)+" hitset "+str(hitset)+"\n"+"find_citations retlist "+str(ret)
 
     #voutput = voutput + str(ret)
-    
+
     if ret:
         return (ret,"(", ")", "Warning: citation search functionality is experimental.")
     else:
-        return ((),"", "", "Warning: citation search functionality is experimental..")
+        return ((),"", "", "Warning: citation search functionality is experimental.")
 
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     """Finding terms to use for calculating similarity. Terms are taken from the recid given, returns a list of recids's and relevance,
