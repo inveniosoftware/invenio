@@ -2070,7 +2070,7 @@ def roledetails(id_role=0):
     actionshlp = acca.acc_get_role_actions(id_role)
     actions = []
     for (action_id, name, dummy) in actionshlp:
-        actions.append([id, name,
+        actions.append([action_id, name,
                         '<a href="showactiondetails?id_role=%s&amp;id_action=%s">show action details</a>' % (id_role, action_id),
                         '<a href="simpleauthorization?id_role=%s&amp;id_action=%s">show authorization details</a>' % (id_role, action_id)])
 
