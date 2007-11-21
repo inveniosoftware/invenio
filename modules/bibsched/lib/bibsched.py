@@ -44,6 +44,7 @@ import getopt
 import curses
 import curses.panel
 from curses.wrapper import wrapper
+from socket import gethostname
 import signal
 
 from invenio.config import \
@@ -737,14 +738,15 @@ def usage(exitcode=1, msg=""):
         sys.stderr.write("Error: %s.\n" % msg)
 
     sys.stderr.write ("""\
-Usage: %s [options] [start|stop|restart|monitor]
+Usage: %s [options] [start|stop|restart|monitor|status]
 
 The following commands are available for bibsched:
 
-  - start:   start bibsched in background
-  - stop:    stop a running bibsched
-  - restart: restart a running bibsched
-  - monitor: enter the interactive monitor
+   start      start bibsched in background
+   stop       stop a running bibsched
+   restart    restart a running bibsched
+   monitor    enter the interactive monitor
+   status     get report about current status of the queue
 
 Command options:
   -d, --daemon\t Launch BibSched in the daemon mode (deprecated, use 'start')
@@ -839,6 +841,47 @@ def monitor(verbose = True):
     manager = Manager()
     return
 
+def write_message(msg, stream=sys.stdout, verbose=1):
+    """Write message and flush output stream (may be sys.stdout or sys.stderr).
+    Useful for debugging stuff."""
+    if msg:
+        if stream == sys.stdout or stream == sys.stderr:
+            stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ",
+                time.localtime()))
+            try:
+                stream.write("%s\n" % msg)
+            except UnicodeEncodeError:
+                stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
+            stream.flush()
+        else:
+            sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
+
+def report_queue_status(verbose=True):
+    """
+    Report about the current status of BibSched queue on standard output.
+    """
+
+    def report_about_processes(status='RUNNING'):
+        """
+        Helper function to report about processes with the given status.
+        """
+        res = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress
+                           FROM schTASK WHERE status=%s ORDER BY id ASC""",
+                      (status,))
+        write_message("%s processes: %d" % (status, len(res)))
+        for (proc_id, proc_proc, proc_user, proc_runtime, proc_sleeptime,
+             proc_status, proc_progress) in res:
+            write_message(' * ID="%s" PROC="%s" USER="%s" RUNTIME="%s" SLEEPTIME="%s" STATUS="%s" PROGRESS="%s"' % \
+                          (proc_id, proc_proc, proc_user, proc_runtime,
+                           proc_sleeptime, proc_status, proc_progress))
+        return
+
+    write_message("BibSched queue status report for %s:" % gethostname())
+    report_about_processes('Running')
+    report_about_processes('Waiting')
+    write_message("Done.")
+    return
+
 def restart(verbose = True):
     stop(verbose)
     start(verbose)
@@ -881,7 +924,8 @@ def main():
         { 'start':   start,
           'stop':    stop,
           'restart': restart,
-          'monitor': monitor } [cmd] (verbose)
+          'monitor': monitor,
+          'status': report_queue_status, } [cmd] (verbose)
 
     except KeyError:
         usage (1, 'unkown command: %s' % `cmd`)
