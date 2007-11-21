@@ -64,7 +64,7 @@ def task_run_core():
     The task prints Fibonacci numbers for up to NUM on the stdout, and some
     messages on stderr.
     Return 1 in case of success and 0 in case of failure."""
-    n = task_get_option('number')
+    n = int(task_get_option('number'))
     write_message("Printing %d Fibonacci numbers." % n, verbose=9)
     for i in range(0, n):
         if i > 0 and i % 4 == 0:
