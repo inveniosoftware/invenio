@@ -54,14 +54,16 @@ def get_field_values(recID, tag):
 def calculate_citation_history_coordinates(recid):
     """Return a list of citation graph coordinates for RECID, sorted by year."""
     result = []
+    dbg = ""
     initial_result= get_initial_result(calculate_citation_graphe_x_coordinates(recid))
     citlist = calculate_cited_by_list(recid)
     for rec_id, cit_weight in citlist:
         cit_year = get_field_values(rec_id,'773__y')
         if not cit_year: cit_year = get_field_values(rec_id, '260__c')
-        #print rec_idh,str(cit_year[0])
-        if initial_result.has_key(int(cit_year[0][0:4])):
-            initial_result[int(cit_year[0][0:4])] += 1
+        #some records simlpy do not have these fields 
+        if cit_year:
+            if initial_result.has_key(int(cit_year[0][0:4])):
+                initial_result[int(cit_year[0][0:4])] += 1
     for key, value in initial_result.items():
         result.append((key, value))
     result.sort()
