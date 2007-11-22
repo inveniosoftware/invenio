@@ -496,7 +496,7 @@ def get_basket_content(bskid, format='hb'):
     GROUP BY rec.id_bibrec_or_bskEXTREC
 
     ORDER BY rec.score
-    """, (format, format, id))
+    """, (format, format, bskid))
     if res:
         query2 = "UPDATE bskBASKET SET nb_views=nb_views+1 WHERE id=%i"
         run_sql(query2 % int(bskid))
