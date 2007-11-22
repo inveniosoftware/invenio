@@ -39,7 +39,7 @@ try:
 except ImportError, e:
     called_from = 0
 
-def _make_list_apache_firerole(name_action, arguments):
+def make_list_apache_firerole(name_action, arguments):
     roles = aca.acc_find_possible_roles(name_action, arguments)
 
     ret = []
@@ -69,7 +69,7 @@ def _format_list_of_apache_firerole(roles, referer):
 def make_apache_message(name_action, arguments, referer=None):
     if not referer:
         referer = '%s/youraccount/youradminactivities' % sweburl
-    roles = _make_list_apache_firerole(name_action, arguments)
+    roles = make_list_apache_firerole(name_action, arguments)
     if roles:
         return _format_list_of_apache_firerole(roles, referer)
     else:

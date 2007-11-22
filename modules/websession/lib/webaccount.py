@@ -271,6 +271,10 @@ def create_login_page_box(referer='', apache_msg="", ln=cdslang):
             msg = txt
             break
 
+    # FIXME: Temporary Hack to help CDS current migration
+    if CFG_CERN_SITE and apache_msg:
+        return msg + apache_msg
+
     if apache_msg:
         msg += apache_msg + "<p>Otherwise please, provide the correct authorization" \
         " data in the following form.</p>"

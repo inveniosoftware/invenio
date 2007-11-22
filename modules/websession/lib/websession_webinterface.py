@@ -40,7 +40,8 @@ from invenio.config import \
      cdsnameintl, \
      supportemail, \
      sweburl, \
-     weburl
+     weburl, \
+     CFG_CERN_SITE
 from invenio.websession_config import CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
 from invenio import webuser
 from invenio.webpage import page
@@ -50,7 +51,7 @@ from invenio import webalert
 from invenio.dbquery import run_sql
 from invenio.webmessage import account_new_mail
 from invenio.access_control_config import *
-from invenio.access_control_engine import make_apache_message
+from invenio.access_control_engine import make_apache_message, make_list_apache_firerole
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup
@@ -636,6 +637,14 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             try:
                 action, arguments = mail_cookie_check_authorize_action(cookie)
                 apache_msg = make_apache_message(action, arguments, args['referer'])
+
+                # FIXME: Temporary Hack to help CDS current migration
+                if CFG_CERN_SITE:
+                    roles = make_list_apache_firerole(action, arguments)
+                    if len(roles) == 1:
+                        # There's only one role enabled to see this collection
+                        # Let's redirect to log to it!
+                        return redirect_to_url(req, '%s%s' % (sweburl, make_canonical_urlargd({'realm' : roles[0][0], 'referer' : args['referer']}, {})))
             except InvenioWebAccessMailCookieError:
                 pass
 
