@@ -108,47 +108,51 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
 
     @return 1 if successfully wrote to stream, 0 if not
     """
-    exc_info =  sys.exc_info()
-    if exc_info[0]:
-        if stream=='error':
-            stream='err'
+    try:
+        exc_info =  sys.exc_info()
+        if exc_info[0]:
+            if stream=='error':
+                stream='err'
+            else:
+                stream='log'
+            stream_to_write = open(logdir + '/invenio.' + stream, 'a')
+            # <type 'exceptions.StandardError'> -> exceptions.StandardError
+            exc_name = str(exc_info[0])[7:-2]
+            # exceptions.StandardError -> StandardError
+            if exc_name.startswith('exceptions.'):
+                exc_name = exc_name[11:]
+            exc_value = str(exc_info[1])
+            print >> stream_to_write, "%(time)s -> %(name)s %(value)s" % {
+                'time' : time.strftime("%Y-%m-%d %H:%M:%S"),
+                'name' : exc_name,
+                'value' : exc_value
+            }
+            if prefix:
+                print >> stream_to_write, prefix
+            print >> stream_to_write, get_pretty_wide_client_info(req)
+            if not exc_name.startswith('Invenio') or force_stack:
+                tracestack = traceback.extract_stack()[-5:-2] #force traceback except for this call
+                tracestack_pretty = "%sForced traceback (most recent call last)" % (' '*4,)
+                for trace_tuple in tracestack:
+                    tracestack_pretty += """
+    File "%(file)s", line %(line)s, in %(function)s
+        %(text)s""" % \
+                        {   'file'      : trace_tuple[0],
+                            'line'      : trace_tuple[1],
+                            'function'  : trace_tuple[2],
+                            'text'      : trace_tuple[3] is not None and str(trace_tuple[3]) or ""
+                        }
+            print >> stream_to_write, tracestack_pretty
+            traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, stream_to_write)
+            if suffix:
+                print >> stream_to_write, suffix
+            print >> stream_to_write
+            stream_to_write.close()
+            return 1
         else:
-            stream='log'
-        stream_to_write = open(logdir + '/invenio.' + stream, 'a')
-        # <type 'exceptions.StandardError'> -> exceptions.StandardError
-        exc_name = str(exc_info[0])[7:-2]
-        # exceptions.StandardError -> StandardError
-        if exc_name.startswith('exceptions.'):
-            exc_name = exc_name[11:]
-        exc_value = str(exc_info[1])
-        print >> stream_to_write, "%(time)s -> %(name)s %(value)s" % {
-            'time' : time.strftime("%Y-%m-%d %H:%M:%S"),
-            'name' : exc_name,
-            'value' : exc_value
-        }
-        if prefix:
-            print >> stream_to_write, prefix
-        print >> stream_to_write, get_pretty_wide_client_info(req)
-        if not exc_name.startswith('Invenio') or force_stack:
-            tracestack = traceback.extract_stack()[-5:-2] #force traceback except for this call
-            tracestack_pretty = "%sForced traceback (most recent call last)" % (' '*4,)
-            for trace_tuple in tracestack:
-                tracestack_pretty += """
-  File "%(file)s", line %(line)s, in %(function)s
-    %(text)s""" % \
-                    {   'file'      : trace_tuple[0],
-                        'line'      : trace_tuple[1],
-                        'function'  : trace_tuple[2],
-                        'text'      : trace_tuple[3] is not None and str(trace_tuple[3]) or ""
-                    }
-        print >> stream_to_write, tracestack_pretty
-        traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, stream_to_write)
-        if suffix:
-            print >> stream_to_write, suffix
-        print >> stream_to_write
-        stream_to_write.close()
-        return 1
-    else:
+            return 0
+    except Exception, e:
+        print >> sys.stderr, "Error in registering exception to '%s': '%s'" % (logdir + '/invenio.' + stream, e)
         return 0
 
 def register_errors(errors_or_warnings_list, stream, req=None):
