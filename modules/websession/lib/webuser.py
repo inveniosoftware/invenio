@@ -476,7 +476,7 @@ def loginUser(req, p_un, p_pw, login_method):
             else:
                 raise InvenioWebAccessExternalAuthError
         except InvenioWebAccessExternalAuthError:
-            return([], p_email, p_pw, 16)
+            return([], p_email, p_pw, 15)
         if p_email: # Authenthicated externally
             query_result = run_sql("SELECT id from user where email=%s", (p_email,))
             if not query_result: # First time user
