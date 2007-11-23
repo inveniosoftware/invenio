@@ -71,7 +71,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     """Defines the set of /journal pages."""
 
     _exports = ['', 'administrate', 'article', 'issue_control', 'search', 'alert',
-                'feature_record']
+                'feature_record', 'popup']
 
     def index(self, req, form):
         """Index page."""
@@ -725,6 +725,73 @@ L'équipe du %s
                     weburl + "/journal/?name=" + journal_name)
             
         return page(title="Publish System", body=output)
+    
+    def popup(self, req, form):
+        """
+        checks if the required popup page is in the cache and serves it if so
+        """
+        argd = wash_urlargd(form, {'name': (str, ""),
+                                    'record': (str, ""),
+                                    'type': (str, ""),
+                                    'ln': (str, "")
+                                    })
+        if argd['name'] == "":
+            return webjournal_missing_info_box(req, title="Journal not found",
+                                          msg_title="We don't know which journal you are looking for",
+                                          msg='''You were looking for a journal without providing a name.
+                    Unfortunately we cannot know which journal you are looking for.
+                    Below you have a selection of journals that are available on this server.
+                    If you should find your journal there, just click the link,
+                    otherwise please contact the server admin and ask for existence
+                    of the journal you are looking for.''')
+        else:
+            journal_name = argd['name']
+            
+        if argd['record'] == "":
+            return "no recid" # todo: make exception
+        else:
+            record = argd['recid']
+            
+        if argd['type'] == "":
+            return "no popup type" # todo: make exception
+        else:
+            type = argd['type']
+            
+        if argd['ln'] == "":
+            ln = "en"
+        else:
+            ln = argd['ln']
+            
+        config_strings = get_xml_from_config(["popup"], journal_name)        
+        try:
+            popup_page_template = config_strings["popup"][0]
+        except:
+            return "no popup template" # todo: make exception
+        
+        
+        
+        temp_marc = '''<record>
+                            <controlfield tag="001">%s</controlfield>
+                        </record>''' % (record)
+        #temp_marc = temp_marc.decode('utf-8').encode('utf-8')
+        
+        # create a record and get HTML back from bibformat
+        bfo = BibFormatObject(0, ln=ln, xml_record=temp_marc, req=req) # pass 0 for rn, we don't need it
+        html_out = format_with_format_template(popup_page_template_path, bfo)[0]
+        # done ;)
+        return html_out
+        
+        #    
+        #try:
+        #    open('%s/%s_%s_%s_%s.html' % (cachedir,
+        #                                  journal_name,
+        #                                  type,
+        #                                  record,
+        #                                  ln), "r")
+        #except:
+        #    return "popup does not exist" # todo: make exception, and make it in the popup!!
+        #
+        #index()
 
 if __name__ == "__main__":
     index()
