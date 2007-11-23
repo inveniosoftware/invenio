@@ -232,11 +232,8 @@ def interface(req,
         return errorMsg(_("Unknown document type"), req, c, ln)
 
     ## get the action's long-name:
-    action_lname = get_longname_of_action(act)
-    if action_lname is not None:
-        ## Got the action long-name: replace spaces with HTML chars:
-        actname = action_lname.replace(" ", "&nbsp;")
-    else:
+    actname = get_longname_of_action(act)
+    if actname is None:
         ## Unknown action:
         return errorMsg(_("Unknown action"), req, c, ln)
 
@@ -843,11 +840,8 @@ def endaction(req,
         return errorMsg(_("Unknown document type"), req, c, ln)
 
     ## get the action's long-name:
-    action_lname = get_longname_of_action(act)
-    if action_lname is not None:
-        ## Got the action long-name: replace spaces with HTML chars:
-        actname = action_lname.replace(" ", "&nbsp;")
-    else:
+    actname = get_longname_of_action(act)
+    if actname is None:
         ## Unknown action:
         return errorMsg(_("Unknown action"), req, c, ln)
 
