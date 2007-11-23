@@ -750,7 +750,7 @@ L'équipe du %s
         if argd['record'] == "":
             return "no recid" # todo: make exception
         else:
-            record = argd['recid']
+            record = argd['record']
             
         if argd['type'] == "":
             return "no popup type" # todo: make exception
@@ -768,7 +768,7 @@ L'équipe du %s
         except:
             return "no popup template" # todo: make exception
         
-        
+        popup_page_template_path = 'webjournal/%s' % popup_page_template
         
         temp_marc = '''<record>
                             <controlfield tag="001">%s</controlfield>
