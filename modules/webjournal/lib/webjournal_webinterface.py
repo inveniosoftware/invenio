@@ -770,13 +770,14 @@ L'équipe du %s
         
         popup_page_template_path = 'webjournal/%s' % popup_page_template
         
-        temp_marc = '''<record>
-                            <controlfield tag="001">%s</controlfield>
-                        </record>''' % (record)
+#        temp_marc = '''<record>
+#                            <controlfield tag="001">%s</controlfield>
+#                        </record>''' % (record)
         #temp_marc = temp_marc.decode('utf-8').encode('utf-8')
         
         # create a record and get HTML back from bibformat
-        bfo = BibFormatObject(0, ln=ln, xml_record=temp_marc, req=req) # pass 0 for rn, we don't need it
+#        bfo = BibFormatObject(0, ln=ln, xml_record=temp_marc, req=req) # pass 0 for rn, we don't need it
+        bfo = BibFormatObject(record, ln=ln, req=req)
         html_out = format_with_format_template(popup_page_template_path, bfo)[0]
         # done ;)
         return html_out
