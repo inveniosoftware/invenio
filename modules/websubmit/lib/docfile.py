@@ -328,59 +328,65 @@ class BibRecDocs:
         """
         bibdoc = self.get_bibdoc(docname)
         versions = {}
+        res = []
         new_bibdocs = [] # List of files with the same version/format of
                         # existing file which need new bibdoc.
         counter = 0
-        for filename in os.listdir(bibdoc.basedir):
-            if filename[0] != '.' and ';' in filename:
-                name, version = filename.split(';')
-                format = name[len(file_strip_ext(name)):]
-                format = normalize_format(format)
-                if not versions.has_key(version):
-                    versions[version] = {}
-                new_name = 'FIXING-%s-%s' % (str(counter), name)
-                try:
-                    shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name))
-                except Exception, e:
-                    register_exception()
-                    raise InvenioWebSubmitFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name), e)
-                if versions[version].has_key(format):
-                    new_bibdocs.append((new_name, version))
-                else:
-                    versions[version][format] = new_name
-                counter += 1
+        if os.path.exists(bibdoc.basedir):
+            for filename in os.listdir(bibdoc.basedir):
+                if filename[0] != '.' and ';' in filename:
+                    name, version = filename.split(';')
+                    format = name[len(file_strip_ext(name)):]
+                    format = normalize_format(format)
+                    if not versions.has_key(version):
+                        versions[version] = {}
+                    new_name = 'FIXING-%s-%s' % (str(counter), name)
+                    try:
+                        shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name))
+                    except Exception, e:
+                        register_exception()
+                        raise InvenioWebSubmitFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name), e)
+                    if versions[version].has_key(format):
+                        new_bibdocs.append((new_name, version))
+                    else:
+                        versions[version][format] = new_name
+                    counter += 1
 
-        for version, formats in versions.iteritems():
-            for format, filename in formats.iteritems():
-                destination = '%s%s;%s' % (docname, format, version)
-                try:
-                    shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination))
-                except Exception, e:
-                    register_exception()
-                    raise InvenioWebSubmitFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination), e)
+        if not versions:
+            bibdoc.delete()
+        else:
+            for version, formats in versions.iteritems():
+                for format, filename in formats.iteritems():
+                    destination = '%s%s;%s' % (docname, format, version)
+                    try:
+                        shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination))
+                    except Exception, e:
+                        register_exception()
+                        raise InvenioWebSubmitFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination), e)
 
-        try:
-            open("%s/.recid" % bibdoc.basedir, "w").write(str(self.id))
-            open("%s/.type" % bibdoc.basedir, "w").write(str(bibdoc.doctype))
-        except Exception, e:
-            register_exception()
-            raise InvenioWebSubmitFileError, "Error in creating .recid and .type file for '%s' folder: '%s'" % (bibdoc.basedir, e)
-
-        self.build_bibdoc_list()
-
-        res = []
-
-        for (filename, version) in new_bibdocs:
-            new_bibdoc = self.add_bibdoc(doctype=bibdoc.doctype, docname=docname, never_fail=True)
-            new_bibdoc.add_file_new_format('%s/%s' % (bibdoc.basedir, filename), version)
-            res.append(new_bibdoc)
             try:
-                os.remove('%s/%s' % (bibdoc.basedir, filename))
+                open("%s/.recid" % bibdoc.basedir, "w").write(str(self.id))
+                open("%s/.type" % bibdoc.basedir, "w").write(str(bibdoc.doctype))
             except Exception, e:
                 register_exception()
-                raise InvenioWebSubmitFileError, "Error in removing '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), e)
+                raise InvenioWebSubmitFileError, "Error in creating .recid and .type file for '%s' folder: '%s'" % (bibdoc.basedir, e)
 
-        Md5Folder(bibdoc.basedir).update(only_new=False)
+            self.build_bibdoc_list()
+
+            res = []
+
+            for (filename, version) in new_bibdocs:
+                new_bibdoc = self.add_bibdoc(doctype=bibdoc.doctype, docname=docname, never_fail=True)
+                new_bibdoc.add_file_new_format('%s/%s' % (bibdoc.basedir, filename), version)
+                res.append(new_bibdoc)
+                try:
+                    os.remove('%s/%s' % (bibdoc.basedir, filename))
+                except Exception, e:
+                    register_exception()
+                    raise InvenioWebSubmitFileError, "Error in removing '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), e)
+
+            Md5Folder(bibdoc.basedir).update(only_new=False)
+
         self.build_bibdoc_list()
 
         return res
