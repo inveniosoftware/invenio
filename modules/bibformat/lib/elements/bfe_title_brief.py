@@ -28,8 +28,14 @@ def format(bfo, highlight="no"):
 
     @param highlight highlights the words corresponding to search query if set to 'yes'
     """
-
-    title = bfo.field('245__a')
+    
+    if multilang == 'yes':
+        if bfo.lang == 'fr':
+            title = bfo.field('246_1a')
+        else:
+            title = bfo.field('245__a')
+    else:
+        title = bfo.field('245__a')
     title_remainder = bfo.field('245__b')
     edition_statement = bfo.field('250__a')
 
