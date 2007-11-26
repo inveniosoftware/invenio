@@ -1411,7 +1411,10 @@ def acc_find_possible_roles(name_action, arguments):
         id_action, aallowedkeywords, optional = run_sql_cached(query1, affected_tables=['accACTION'])[0]
     except IndexError:
         return []
-    defkeys = aallowedkeywords.split(',')
+
+    defkeys = [key for key in aallowedkeywords.split(',') if key]
+    # There's a trick to remove empty key
+
     for key in arguments.keys():
         if key not in defkeys:
             raise StandardError, "Incorrect arguments"
@@ -1419,6 +1422,9 @@ def acc_find_possible_roles(name_action, arguments):
     roles = run_sql_cached("""SELECT id_accROLE FROM
             accROLE_accACTION_accARGUMENT
             WHERE id_accACTION = %s""", (id_action, ), affected_tables=['accROLE_accACTION_accARGUMENT'])
+
+    if not roles:
+        return []
 
     # create role string (add default value? roles='(raa.id_accROLE='def' or ')
     str_roles = ''
@@ -1431,6 +1437,7 @@ def acc_find_possible_roles(name_action, arguments):
     defdict = {}
 
     for key in defkeys:
+
         defdict[key] = arguments[key]
 
     # create or-string from arguments
@@ -1439,14 +1446,22 @@ def acc_find_possible_roles(name_action, arguments):
         if str_args: str_args += ' OR '
         str_args += """(arg.keyword = '%s' AND arg.value = '%s')""" % (key, defdict[key])
 
+    if defkeys:
+        query4 = """SELECT DISTINCT raa.id_accROLE, raa.id_accACTION, raa.argumentlistid,
+                raa.id_accARGUMENT, arg.keyword, arg.value
+                FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT arg
+                WHERE raa.id_accACTION = '%s' AND
+                raa.id_accROLE IN (%s) AND
+                (%s) AND
+                raa.id_accARGUMENT = arg.id """ % (id_action, str_roles, str_args)
+    else:
+        query4 = """SELECT DISTINCT raa.id_accROLE, raa.id_accACTION, raa.argumentlistid,
+                raa.id_accARGUMENT, arg.keyword, arg.value
+                FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT arg
+                WHERE raa.id_accACTION = '%s' AND
+                raa.id_accROLE IN (%s) AND
+                raa.id_accARGUMENT = arg.id """ % (id_action, str_roles)
 
-    query4 = """SELECT DISTINCT raa.id_accROLE, raa.id_accACTION, raa.argumentlistid,
-            raa.id_accARGUMENT, arg.keyword, arg.value
-            FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT arg
-            WHERE raa.id_accACTION = %s AND
-            raa.id_accROLE IN (%s) AND
-            (%s) AND
-            raa.id_accARGUMENT = arg.id """ % (id_action, str_roles, str_args)
 
     res4 = run_sql_cached(query4, affected_tables=['accROLE_accACTION_accARGUMENT', 'accARGUMENT', 'accROLE'])
 
