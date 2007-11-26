@@ -62,9 +62,9 @@ def _debug(msg):
 def _check_result(req, result):
     """ Check that a page handler actually wrote something, and
     properly finish the apache request."""
-    
+
     if result or req.bytes_sent > 0 or req.next:
-        
+
         if result is None:
             result = ""
         else:
@@ -90,7 +90,7 @@ def _check_result(req, result):
     else:
         req.log_error("mod_python.publisher: %s returned nothing." % `object`)
         return apache.HTTP_INTERNAL_SERVER_ERROR
-    
+
 
 
 class TraversalError(Exception):
@@ -135,13 +135,13 @@ class WebInterfaceDirectory(object):
         continue.
         """
         return None, path
-    
+
     def _traverse(self, req, path):
         """ Locate the handler of an URI by traversing the elements of
         the path."""
 
         _debug('traversing %r' % path)
-        
+
         component, path = path[0], path[1:]
 
         name = self._translate(component)
@@ -160,7 +160,7 @@ class WebInterfaceDirectory(object):
         if has_https_support and self._force_https:
             is_over_https = req.subprocess_env.has_key('HTTPS') \
                             and req.subprocess_env['HTTPS'] == 'on'
-            
+
             if not is_over_https:
                 # We need to isolate the part of the URI that is after
                 # weburl, and append that to our sweburl.
@@ -197,7 +197,7 @@ class WebInterfaceDirectory(object):
         # When this method is called, we either are a directory which
         # has an 'index' method, and we redirect to it, or we don't
         # have such a method, in which case it is a traversal error.
-        
+
         if "" in self._exports:
             if not form:
                 # Fix missing trailing slash as a convenience, unless
@@ -213,7 +213,7 @@ class WebInterfaceDirectory(object):
 def create_handler(root):
     """ Return a handler function that will dispatch apache requests
     through the URL layout passed in parameter."""
-    
+
     def _handler(req):
         """ This handler is invoked by mod_python with the apache request."""
 
@@ -239,39 +239,6 @@ def create_handler(root):
     return _handler
 
 
-def http_get_credentials(req, realm="restricted collection"):
-    if req.headers_in.has_key("Authorization"):
-        try:
-            s = req.headers_in["Authorization"][6:]
-            s = base64.decodestring(s)
-            user, passwd = s.split(":", 1)
-        except (ValueError, base64.binascii.Error, base64.binascii.Incomplete):
-            raise apache.SERVER_RETURN, apache.HTTP_BAD_REQUEST
-
-        return (user, passwd)
-    return (None, None)
-
-def http_check_credentials(req, realm, check_auth):
-
-    authorized = False
-    
-    if req.headers_in.has_key("Authorization"):
-        try:
-            s = req.headers_in["Authorization"][6:]
-            s = base64.decodestring(s)
-            user, passwd = s.split(":", 1)
-        except (ValueError, base64.binascii.Error, base64.binascii.Incomplete):
-            raise apache.SERVER_RETURN, apache.HTTP_BAD_REQUEST
-
-        authorized = check_auth(user, passwd)
-        
-    if not authorized:
-        # note that Opera supposedly doesn't like spaces around "=" below
-        s = 'Basic realm="%s"' % realm 
-        req.err_headers_out["WWW-Authenticate"] = s
-        raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED    
-
-    return
 
 def wash_urlargd(form, content):
     """
@@ -295,7 +262,7 @@ def wash_urlargd(form, content):
     result = {}
 
     content['ln'] = (str, cdslang)
-    
+
     for k, (dst_type, default) in content.items():
         try:
             value = form[k]
@@ -335,10 +302,10 @@ def wash_urlargd(form, content):
 
         elif dst_type is tuple:
             result[k] = (value,)
-        
+
         elif dst_type is list:
             result[k] = [value]
-        
+
         elif dst_type is dict:
             result[k] = {0: str(value)}
 
@@ -346,6 +313,6 @@ def wash_urlargd(form, content):
             raise ValueError('cannot cast form into type %r' % dst_type)
 
     result['ln'] = wash_language(result['ln'])
-    
+
     return result
 

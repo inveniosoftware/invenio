@@ -33,6 +33,11 @@ It also contains Apache-related user authentication stuff.
 
 __revision__ = "$Id$"
 
+try:
+    from mod_python import apache
+except ImportError:
+    pass
+
 import marshal
 from zlib import compress, decompress
 from socket import gethostbyname
@@ -43,6 +48,7 @@ import socket
 import smtplib
 import re
 import random
+import base64
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -68,11 +74,11 @@ from invenio.dbquery import run_sql, OperationalError, \
 from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
 from invenio.access_control_config import *
-from invenio.access_control_admin import acc_find_user_role_actions
+from invenio.access_control_admin import acc_find_user_role_actions, acc_get_role_id
 from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
+from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
 from invenio.messages import gettext_set_language
 from invenio.mailutils import send_email
-from invenio.webinterface_handler import http_get_credentials
 from invenio.webgroup_dblayer import get_groups
 from invenio.external_authentication import InvenioWebAccessExternalAuthError
 import invenio.template
@@ -883,10 +889,10 @@ def collect_user_info(req):
 
 ## --- follow some functions for Apache user/group authentication
 
-def auth_apache_user_p(user, password, apache_password_file=CFG_APACHE_PASSWORD_FILE):
+def auth_apache_user_p(req, user, password, role, apache_password_file=CFG_APACHE_PASSWORD_FILE):
     """Check whether user-supplied credentials correspond to valid
-    Apache password data file.  Return 0 in case of failure, 1 in case
-    of success."""
+    Apache password data file and if these credentials enable the user
+    to be part of the given Role."""
     try:
         if not apache_password_file.startswith("/"):
             apache_password_file = tmpdir + "/" + apache_password_file
@@ -897,7 +903,10 @@ def auth_apache_user_p(user, password, apache_password_file=CFG_APACHE_PASSWORD_
         return False
     salt = password_apache[:2]
     if crypt.crypt(password, salt) == password_apache:
-        return True
+        setApacheUser(req, user)
+        authorized = acc_firerole_check_user(collect_user_info(req), load_role_definition(acc_get_role_id(role)))
+        setApacheUser(req, '')
+        return authorized
     else:
         return False
 
@@ -913,3 +922,42 @@ def auth_apache_user_in_groups(user, apache_group_file=CFG_APACHE_GROUP_FILE):
     except: # no groups found, so return empty list
         pass
     return out
+
+def http_get_credentials(req):
+    if req.headers_in.has_key("Authorization"):
+        try:
+            s = req.headers_in["Authorization"][6:]
+            s = base64.decodestring(s)
+            user, passwd = s.split(":", 1)
+        except (ValueError, base64.binascii.Error, base64.binascii.Incomplete):
+            raise apache.SERVER_RETURN, apache.HTTP_BAD_REQUEST
+        return (user, passwd)
+    return (None, None)
+
+def http_check_credentials(req, role):
+    """Retrieve Apache password and check user credential with the
+    check_auth function. If this function returns True check if the user
+    is enabled to the given role. If this is True, return, otherwise
+    popup a new apache login box.
+    """
+
+    authorized = False
+    while True:
+        if req.headers_in.has_key("Authorization"):
+            try:
+                s = req.headers_in["Authorization"][6:]
+                s = base64.decodestring(s)
+                user, passwd = s.split(":", 1)
+            except (ValueError, base64.binascii.Error, base64.binascii.Incomplete):
+                raise apache.SERVER_RETURN, apache.HTTP_BAD_REQUEST
+
+            authorized = auth_apache_user_p(req, user, passwd, role)
+
+        if not authorized:
+            # note that Opera supposedly doesn't like spaces around "=" below
+            s = 'Basic realm="%s"' % role
+            req.err_headers_out["WWW-Authenticate"] = s
+            raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED
+        else:
+            setApacheUser(req, user)
+            return

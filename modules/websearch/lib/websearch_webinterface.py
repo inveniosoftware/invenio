@@ -27,11 +27,10 @@ from mod_python import apache
 
 from invenio.config import weburl, cdsname, cachedir, cdsnameintl, cdslang, adminemail, sweburl
 from invenio.dbquery import Error
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory, \
-    http_check_credentials, http_get_credentials
+from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
-    collect_user_info, auth_apache_user_p, auth_apache_user_in_groups, setApacheUser
+    collect_user_info, http_check_credentials
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
@@ -408,12 +407,6 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
         return None, []
 
-    def _apache_authentication(self, req, referer, realm):
-        http_check_credentials(req, realm, auth_apache_user_p)
-        (user, passwd) = http_get_credentials(req, realm)
-        setApacheUser(req, user)
-        return redirect_to_url(req, referer or '%s/youraccount/youradminactivities' % sweburl)
-
     def legacy_collection(self, req, form):
         """Collection URL backward compatibility handling."""
         accepted_args = dict(legacy_collection_default_urlargd)
@@ -423,7 +416,8 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
         # Apache authentication stuff
         if argd['realm']:
-            return self._apache_authentication(req, argd['referer'], argd['realm'])
+            http_check_credentials(req, argd['realm'])
+            return redirect_to_url(req, argd['referer'] or '%s/youraccount/youradminactivities' % sweburl)
 
         del argd['referer']
         del argd['realm']

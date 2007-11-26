@@ -96,7 +96,6 @@ class pSession(Session):
             self.__apache_user = str(newApacheUser)
             self.__dirty = 1
         else:
-            # something bad happened, e.g. database down, so return user id -1
             self.__apache_user = None
             self.__dirty = 1
 

@@ -990,30 +990,32 @@ class Template:
             return "<p>" + _("You are not authorized to access administrative functions.") + "</p>"
 
         # displaying form
-        out += "<p>" + _("You seem to be %(x_role)s.") % {'x_role': ('<em>' + string.join(roles, ", ") + "</em> ")} + '</p>'
-        out += _("Here are some interesting web admin links for you:")
+        out += "<p>" + _("You are enabled to the following roles: %(x_role)s.") % {'x_role': ('<em>' + string.join(roles, ", ") + "</em> ")} + '</p>'
 
-        # print proposed links:
-        activities.sort(lambda x, y: cmp(string.lower(x), string.lower(y)))
-        for action in activities:
-            if action == "runbibedit":
-                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibedit/bibeditadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Run BibEdit"))
-            if action == "cfgbibformat":
-                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibFormat"))
-            if action == "cfgbibharvest":
-                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/">%s</a>""" % (weburl, _("Configure BibHarvest"))
-            if action == "cfgbibindex":
-                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibIndex"))
-            if action == "cfgbibrank":
-                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibRank"))
-            if action == "cfgwebaccess":
-                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebAccess"))
-            if action == "cfgwebcomment":
-                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webcomment/webcommentadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebComment"))
-            if action == "cfgwebsearch":
-                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSearch"))
-            if action == "cfgwebsubmit":
-                out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSubmit"))
+        if activities:
+            out += _("Here are some interesting web admin links for you:")
+
+            # print proposed links:
+            activities.sort(lambda x, y: cmp(string.lower(x), string.lower(y)))
+            for action in activities:
+                if action == "runbibedit":
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibedit/bibeditadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Run BibEdit"))
+                if action == "cfgbibformat":
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibFormat"))
+                if action == "cfgbibharvest":
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/">%s</a>""" % (weburl, _("Configure BibHarvest"))
+                if action == "cfgbibindex":
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibIndex"))
+                if action == "cfgbibrank":
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibRank"))
+                if action == "cfgwebaccess":
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebAccess"))
+                if action == "cfgwebcomment":
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webcomment/webcommentadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebComment"))
+                if action == "cfgwebsearch":
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSearch"))
+                if action == "cfgwebsubmit":
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSubmit"))
         out += "<br />" + _("For more admin-level activities, see the complete %(x_url_open)sAdmin Area%(x_url_close)s.") %\
             {'x_url_open': '<a href="' + weburl + '/admin/index.' + ln + '.html">',
              'x_url_close': '</a>'}

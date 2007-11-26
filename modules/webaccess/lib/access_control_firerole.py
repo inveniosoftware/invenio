@@ -29,7 +29,6 @@ webaccess to connect user to roles using every infos about users.
 """
 
 from invenio.webgroup_dblayer import get_groups
-from invenio.webinterface_handler import http_get_credentials
 from invenio.access_control_config import InvenioWebAccessFireroleError
 from invenio.dbquery import run_sql
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
