@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -22,15 +22,18 @@ SUBDIRS = functions
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = websubmit_config.py websubmit_engine.py file.py	\
-	     websubmit_dblayer.py \
-	     websubmit_webinterface.py \
+             websubmit_dblayer.py \
+             websubmit_webinterface.py \
              websubmit_templates.py \
              websubmit_regression_tests.py \
              websubmitadmin_config.py \
              websubmitadmin_dblayer.py \
              websubmitadmin_engine.py \
              websubmitadmin_templates.py \
-             websubmitadmin_regression_tests.py
+             websubmitadmin_regression_tests.py \
+             docfile.py
+
+noinst_DATA = fulltext_files_migration_kit.py
 
 EXTRA_DIST = $(pylib_DATA)
 
