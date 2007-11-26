@@ -22,7 +22,7 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo, highlight="no"):
+def format(bfo, highlight="no", multilang='no'):
     """
     Prints a short title, suitable for brief format.
 
