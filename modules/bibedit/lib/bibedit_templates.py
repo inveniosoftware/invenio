@@ -47,6 +47,8 @@ class Template:
                 print_input_add_form = ''
                 
             print_action_add_subfield = print_input_add_form + self.tmpl_input('hidden', str(num_field), 'num_field')
+
+            print_action_edit_100 = print_input_add_form + self.tmpl_input('hidden', str(num_field), 'num_field')            
                                             
             if add != 1:
                 link_add_subfields = self.tmpl_link(ln, _("Add Subfield"), weburl_bibedit, 'edit',
@@ -56,12 +58,34 @@ class Template:
                                                      'format_tag' : format_tag,
                                                      'temp'       : 'true',
                                                      'add'        : 1})
+
+                link_edit_100 = ""
+                print_action_edit_100 = ""
+
+                #tag[:3] == 100x is never true, of course. This functionality TBD
+                #and will be used in enrichment editing
+                if str(tag[:3]) == "100x":
+                            link_edit_100 = self.tmpl_link(
+                                ln, _("Edit institute"), weburl_bibedit, 'edit',
+                                {'recid'      : str(recid),
+                                 'tag'        : tag[:3],
+                                 'num_field'  : str(num_field),
+                                 'format_tag' : format_tag,
+                                 'temp'       : 'true',
+                                 'add'        : 1})
+                            print_action_edit_100 = """ %(field)s: 
+                                                        %(link_edit_100)s
+                                                        """ % {'field'              : _("Field"),
+                                                               'link_edit_100' : link_edit_100}
+                    
+
                 
                 print_action_add_subfield = """ %(field)s: 
                                                 %(link_add_subfields)s
-                                                
+
                                             """ % {'field'              : _("Field"),
                                                    'link_add_subfields' : link_add_subfields}
+
                 
             if add == 1:
                 link_form = "edit"
@@ -74,13 +98,15 @@ class Template:
                            %(input_ln)s
                          <div class="bibEditCellRight" style="font-weight: normal;">
                            %(print_action_add_subfield)s
+                           %(print_action_edit_100)s
                          </div>
                      """ % {'weburl_bibedit'            : weburl_bibedit,
                             'input_recid'               : self.tmpl_input('hidden', recid,  'recid'),
                             'input_temp'                : self.tmpl_input('hidden', 'true', 'temp'),
                             'input_ln'                  : self.tmpl_input('hidden', ln,     'ln'),
                             'link_form'                 : link_form,
-                            'print_action_add_subfield' : print_action_add_subfield}
+                            'print_action_add_subfield' : print_action_add_subfield,
+                            'print_action_edit_100' : print_action_edit_100}
         else:
             link_submit         = ''
             link_add_field      = self.tmpl_link(ln, _("Add Field"), weburl_bibedit, 'index',
