@@ -25,13 +25,16 @@ import sys
 from time import sleep
 import smtplib
 import socket
+import re
+import os
 
 from email.Header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEImage import MIMEImage
 from email.encoders import encode_quopri
-import os
+from cStringIO import StringIO
+from formatter import DumbWriter, AbstractFormatter
 
 from invenio.config import \
      supportemail, \
@@ -255,6 +258,25 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='', html_images
         msgRoot['Subject'] = Header(subject, 'utf-8')
     msgRoot.add_header('User-Agent', 'CDS Invenio %s' % version)
     return msgRoot.as_string()
+
+newlines_re = re.compile(r'<br\s*/?>|</p>', re.I)
+spaces_re = re.compile(r'\s+')
+words_boundary_re = re.compile(r'\b')
+html_tags_re = re.compile(r'<.+?>')
+
+def email_strip_html(html_content):
+    """Strip html tags from html_content, trying to respect formatting."""
+    html_content = spaces_re.sub(' ', html_content)
+    html_content = newlines_re.sub('\n', html_content)
+    html_content = html_tags_re.sub('', html_content)
+    html_content = html_content.split('\n')
+    out = StringIO()
+    out_format = AbstractFormatter(DumbWriter(out))
+    for row in html_content:
+        out_format.add_flowing_data(row)
+        out_format.end_paragraph(1)
+    return out.getvalue()
+
 
 def log(*error):
     """Register error
