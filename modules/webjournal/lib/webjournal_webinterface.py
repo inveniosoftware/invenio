@@ -361,7 +361,8 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                     'sent': (str, "false"),
                                     'plainText': (str, u''),
                                     'htmlMail': (str, ""),
-                                    'recipients': (str, "")})
+                                    'recipients': (str, ""),
+                                    'subject': (str, "")})
         if argd['name'] == "":
             return webjournal_missing_info_box(req, title="Journal not found",
                                           msg_title="We don't know which journal you are looking for",
@@ -387,6 +388,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         if acc_authorize_action(getUid(req), 'cfgwebjournal', name="%s" % journal_name)[0] != 0:
             # todo: pass correct language
             return please_login(req, journal_name, backlink='%s/journal/alert?name=%s' % (weburl, journal_name))
+        subject = "%s %s released!" % (display_name, issue)
         plain_text = u'''Dear Subscriber,
                     
 The latest issue of the %s, no. %s, has been released.
@@ -416,6 +418,8 @@ L'équipe du %s
                 <input type="hidden" name="name" value="%s"/>
                 <p>Recipients:</p>
                 <input type="text" name="recipients" value="gabriel.hase@cern.ch" />
+                <p>Subject:</p>
+                <input type="text" name="subject" value="%s" />
                 <p>Plain Text Message:</p>
                 <textarea name="plainText" wrap="soft" rows="25" cols="50">%s</textarea>
                 <p> Send Homepage as html:
@@ -424,10 +428,11 @@ L'équipe du %s
                 <br/>
                 <input class="formbutton" type="submit" value="alert" name="sent"/>
             </form>
-            ''' % (weburl, journal_name, plain_text)
+            ''' % (weburl, journal_name, subject, plain_text)
             return page(title="alert system", body=interface)
         else:
             plain_text = argd['plainText']
+            subject = argd['subject']
             
             if argd['htmlMail'] == "html": 
                 html_file = urlopen('%s/journal/?name=%s&ln=en' % (weburl, journal_name))    
@@ -438,8 +443,8 @@ L'équipe du %s
                 html_string = plain_text.replace("\n", "<br/>")
             #html_message = message_from_string(html_string)
             
-            subject = "%s %s released!" % (display_name, issue)
-            message = createhtmlmail(html_string, plain_text, subject)
+            #subject = "%s %s released!" % (display_name, issue)
+            message = createhtmlmail(html_string, plain_text, subject, argd['recipients'])
             server = smtplib.SMTP("localhost", 25)
             server.sendmail('Bulletin-Support@cern.ch', argd['recipients'], message)
 
@@ -775,9 +780,14 @@ L'équipe du %s
 #                        </record>''' % (record)
         #temp_marc = temp_marc.decode('utf-8').encode('utf-8')
         
+        #xml_record = record_get_xml(recid)
+        #if xml_record == "":
+        #    return
+        #record = bibrecord.create_record(xml_answer)
         # create a record and get HTML back from bibformat
-#        bfo = BibFormatObject(0, ln=ln, xml_record=temp_marc, req=req) # pass 0 for rn, we don't need it
+        #bfo = BibFormatObject(0, ln=ln, xml_record=temp_marc, req=req) # pass 0 for rn, we don't need it
         bfo = BibFormatObject(record, ln=ln, req=req)
+
         html_out = format_with_format_template(popup_page_template_path, bfo)[0]
         # done ;)
         return html_out

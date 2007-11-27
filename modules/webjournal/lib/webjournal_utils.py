@@ -441,7 +441,7 @@ def get_monday_of_the_week(week_number, year):
     timetuple = time.strptime('1-%s-%s' % (week_number, year), "%w-%W-%Y")
     return time.strftime("%A %d %B %Y", timetuple)
 
-def createhtmlmail (html, text, subject):
+def createhtmlmail (html, text, subject, toaddr):
         """Create a mime-message that will render HTML in popular
            MUAs, text in better ones"""
         import MimeWriter
@@ -460,6 +460,7 @@ def createhtmlmail (html, text, subject):
         #
         writer.addheader("Subject", subject)
         writer.addheader("MIME-Version", "1.0")
+        writer.addheader("To", toaddr)
         #
         # start the multipart section of the message
         # multipart/alternative seems to work better
