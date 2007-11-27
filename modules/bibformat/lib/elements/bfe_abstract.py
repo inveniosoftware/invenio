@@ -63,6 +63,8 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
     """
     out = ''
 
+    if print_lang == 'auto':
+        print_lang = bfo.lang
     languages = print_lang.split(',')
 
     abstract_en = bfo.fields('520__a', escape=int(escape))
