@@ -554,6 +554,35 @@ def make_full_paths_in_css(css, journal_name):
         
     return css
 
+header_pattern = re.compile('<p\s*(align=justify)??>\s*<strong>(?P<header>.*?)</strong>\s*</p>')    
+para_pattern = re.compile('<p.*?>(?P<paragraph>.+?)</p>', re.DOTALL)
+image_pattern = re.compile(r'''
+                               (<a\s*href=["']?(?P<hyperlink>\S*)["']?>)?# get the link location for the image
+                               \s*# after each tag we can have arbitrary whitespaces
+                               <center># the image is always centered
+                               \s*                                  
+                               <img\s*(class=["']imageScale["'])*?\s*src=(?P<image>\S*)\s*border=1\s*(/)?># getting the image itself
+                               \s*
+                               </center>
+                               \s*
+                               (</a>)?
+                               (<br>|<br />|<br/>)*# the caption can be separated by any nr of line breaks
+                               (
+                               <b>
+                               \s*
+                               <i>
+                               \s*
+                               <center>(?P<caption>.*?)</center># getting the caption
+                               \s*
+                               </i>
+                               \s*
+                               </b>
+                               )?''',  re.DOTALL | re.VERBOSE | re.IGNORECASE )
+                               #''',re.DOTALL | re.IGNORECASE | re.VERBOSE | re.MULTILINE)
+    
+    # (<a\s*href=["']?(?P<hyperlink>\S*)["']?>)?\s*<center>\s*<img\s*(class=["']imageScale["'])*?\s*src=(?P<image>\S*)\s*border=1\s*(/)?>
+    # \s*</center>\s*(</a>)?(<br>|<br />|<br/>)*(<b>\s*<i>\s*<center>(?P<caption>.*?)</center>\s*</i>\s*</b>)?
+
 
 
 #url(["']?(?P<url>\S*)["']?)
