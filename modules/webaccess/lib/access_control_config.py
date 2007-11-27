@@ -24,9 +24,11 @@ __revision__ = \
 
 # pylint: disable-msg=C0301
 
-from invenio.config import cdsname, sweburl, supportemail, CFG_CERN_SITE
+from invenio.config import cdsname, weburl, sweburl, supportemail, CFG_CERN_SITE
 import cPickle
 from zlib import compress
+from invenio.messages import gettext_set_language
+
 
 class InvenioWebAccessFireroleError(Exception):
     """Just an Exception to discover if it's a FireRole problem"""
@@ -156,6 +158,20 @@ DEF_AUTHS = (
              (SUPERADMINROLE,    'runoaiarchive',            -1,      0,       {}),
              (SUPERADMINROLE,    'runbibedit',            -1,      0,       {}),
             )
+
+
+_ = gettext_set_language('en')
+CFG_ACC_ACTIVITIES_URLS = {
+    'runbibedit' : (_("Run BibEdit"), "%s/admin/bibedit/bibeditadmin.py?ln=%%s" % weburl),
+    'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % weburl),
+    'cfgbibharvest' : (_("Configure BibHarvest"), "%s/admin/bibharvest/?ln=%%s" % weburl),
+    'cfgbibindex' : (_("Configure BibIndex"), "%s/admin/bibindex/bibindexadmin.py?ln=%%s" % weburl),
+    'cfgbibrank' : (_("Configure BibRank"), "%s/admin/bibrank/bibrankadmin.py?ln=%%s" % weburl),
+    'cfgwebaccess' : (_("Configure WebAccess"), "%s/admin/webaccess/?ln=%%s" % weburl),
+    'cfgwebcomment' : (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % weburl),
+    'cfgwebsearch' : (_("Configure WebSearch"), "%s/admin/websearch/websearchadmin.py?ln=%%s" % weburl),
+    'cfgwebsubmit' : (_("Configure BibIndex"), "%s/admin/websubmit?ln=%%s" % weburl),
+}
 
 CFG_WEBACCESS_MSGS = {
                                 0: 'Try to <a href="%s/youraccount/login?referer=%%s">login</a> with another account.' % (sweburl),

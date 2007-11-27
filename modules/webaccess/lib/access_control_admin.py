@@ -26,15 +26,17 @@ __revision__ = "$Id$"
 
 ## import interesting modules:
 
-from invenio.config import \
-    supportemail
+
+from invenio.messages import gettext_set_language
+from invenio.config import supportemail, cdslang
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DELEGATEADDUSERROLE, SUPERADMINROLE, \
-    DEF_USERS, DEF_ROLES, DEF_ACTIONS, DEF_AUTHS
+    DEF_USERS, DEF_ROLES, DEF_ACTIONS, DEF_AUTHS, CFG_ACC_ACTIVITIES_URLS
 from invenio.dbquery import run_sql, ProgrammingError, run_sql_cached
 from invenio.access_control_firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize
 from sets import Set
+
 
 # ACTIONS
 
@@ -1314,6 +1316,27 @@ def acc_find_user_info_names(id_user=0):
     res2.sort()
 
     return res2
+
+def acc_find_possible_activities(user_info, ln=cdslang):
+    """Return a dictionary with all the possible activities for which the user
+    is allowed (i.e. all the administrative action which are connected to
+    an web area in Invenio) and the corresponding url.
+    """
+    _ = gettext_set_language(ln)
+    your_role_actions = acc_find_user_role_actions(user_info)
+    your_admin_activities = {}
+    for (role, action) in your_role_actions:
+        if CFG_ACC_ACTIVITIES_URLS.has_key(action):
+            your_admin_activities[action] = CFG_ACC_ACTIVITIES_URLS[action]
+        if role == "superadmin":
+            your_admin_activities = dict(CFG_ACC_ACTIVITIES_URLS)
+            break
+
+    ret = {}
+    for action, (name, url) in your_admin_activities.iteritems():
+        ret[_(name)] =  url % ln
+
+    return ret
 
 def acc_find_user_role_actions(user_info):
     """find name of all roles and actions connected to user_info (or uid), id
