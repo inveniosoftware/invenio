@@ -28,25 +28,34 @@ import socket
 
 from email.Header import Header
 from email.MIMEText import MIMEText
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEImage import MIMEImage
+from email.encoders import encode_quopri
+import os
 
 from invenio.config import \
      supportemail, \
      weburl, \
      cdslang, \
      cdsnameintl, \
+     cdsname, \
      adminemail, \
      CFG_MISCUTIL_SMTP_HOST, \
      CFG_MISCUTIL_SMTP_PORT
 
 from invenio.messages import wash_language, gettext_set_language
-from invenio.errorlib import get_msgs_for_code_list, register_errors
+from invenio.errorlib import get_msgs_for_code_list, register_errors, register_exception
 
 def send_email(fromaddr,
                toaddr,
                subject,
                content,
+               html_content='',
+               html_images={},
                header=None,
                footer=None,
+               html_header=None,
+               html_footer=None,
                copy_to_admin=0,
                attempt_times=1,
                attempt_sleeptime=10,
@@ -59,8 +68,12 @@ def send_email(fromaddr,
     @param toaddr: [string] receivers separated by ,
     @param subject: [string] subject of the email
     @param content: [string] content of the email
-    @param header: [int] if 1 add header
-    @param footer: [int] if 1 add footer
+    @param html_content: [string] html version of the email
+    @param html_images: [dict] dictionary of image id, image path
+    @param header: [string] header to add, None for the Default
+    @param footer: [string] footer to add, None for the Default
+    @param html_header: [string] header to add to the html part, None for the Default
+    @param html_footer: [string] footer to add to the html part, None for the Default
     @param copy_to_admin: [int] if 1 add emailamin in receivers
     @attempt_time: [int] number of tries
     @attempt_sleeptime: [int] seconds in between tries
@@ -69,6 +82,9 @@ def send_email(fromaddr,
 
     If sending fails, try to send it ATTEMPT_TIMES, and wait for
     ATTEMPT_SLEEPTIME seconds in between tries.
+
+    e.g.:
+    send_email('Samuele.Kaplun@cern.ch', 'Samuele.Kaplun@cern.ch', 'Proviamo un po\'', '123 prova', '<strong>123</strong> <em>prova</em><img src="cid:image1">', {'image1': '/home/sam/Desktop/Documenti/Foto/Labex/quantum.jpg'})
 
     @return [int]: 0 if email was sent okay, 1 if it was not.
     """
@@ -79,7 +95,7 @@ def send_email(fromaddr,
             toaddr += ",%s" % (adminemail,)
         else:
             toaddr = adminemail
-    body = forge_email(fromaddr, toaddr, subject, content, usebcc, header, footer, ln)
+    body = forge_email(fromaddr, toaddr, subject, content, html_content, html_images, usebcc, header, footer, html_header, html_footer, ln)
     toaddr = toaddr.split(",")
     if attempt_times < 1 or len(toaddr[0]) == 0:
         log('ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL', fromaddr, toaddr, body)
@@ -100,8 +116,10 @@ def send_email(fromaddr,
             return send_email(fromaddr, toaddr, body, attempt_times-1, attempt_sleeptime)
         else:
             log('ERR_MISCUTIL_SENDING_EMAIL', fromaddr, toaddr, body)
-            raise e
-
+            return False
+    except Exception, e:
+        register_exception()
+        return False
     return True
 
 def email_header(ln=cdslang):
@@ -116,6 +134,20 @@ def email_header(ln=cdslang):
             'hello':  _("Hello:")
             }
     return out
+
+def email_html_header(ln=cdslang):
+    """The header of the email
+    @param ln: language
+    @return header as a string"""
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    #standard header
+    out = """%(hello)s<br />
+        """ % {
+            'hello':  _("Hello:")
+            }
+    return out
+
 
 def email_footer(ln=cdslang):
     """The footer of the email
@@ -137,13 +169,36 @@ def email_footer(ln=cdslang):
             }
     return out
 
-def forge_email(fromaddr, toaddr, subject, content, usebcc=False, header=None, footer=None, ln=cdslang):
+def email_html_footer(ln=cdslang):
+    """The html footer of the email
+    @param ln: language
+    @return footer as a string"""
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    #standard footer
+    out = """<br /><br /><em>%(best_regards)s</em>
+    <hr />
+<a href="%(weburl)s"><strong>%(cdsnameintl)s</strong></a><br />
+%(need_intervention_please_contact)s <a href="mailto:%(supportemail)s">%(supportemail)s</a>
+        """ % {
+            'cdsnameintl': cdsnameintl.get(ln, cdsname),
+            'best_regards': _("Best regards"),
+            'weburl': weburl,
+            'need_intervention_please_contact': _("Need human intervention?  Contact"),
+            'supportemail': supportemail
+            }
+    return out
+
+
+def forge_email(fromaddr, toaddr, subject, content, html_content='', html_images={}, usebcc=False, header=None, footer=None, html_header=None, html_footer=None, ln=cdslang):
     """Prepare email. Add header and footer if needed.
     @param fromaddr: [string] sender
     @param toaddr: [string] receivers separated by ,
     @param usebcc: [bool] True for using Bcc in place of To
     @param subject: [string] subject of the email
     @param content: [string] content of the email
+    @param html_content: [string] html version of the email
+    @param html_images: [dict] dictionary of image id, image path
     @param header: [string] None for the default header
     @param footer: [string] None for the default footer
     @param ln: language
@@ -156,14 +211,48 @@ def forge_email(fromaddr, toaddr, subject, content, usebcc=False, header=None, f
         content += email_footer(ln)
     else:
         content += footer
-    msg = MIMEText(content, _charset='utf-8')
-    msg['From'] = fromaddr
-    if usebcc:
-        msg['Bcc'] = toaddr
+    if html_content:
+        if html_header is None:
+            html_content = email_html_header(ln) + html_content
+        else:
+            html_content = html_header + content
+        if html_footer is None:
+            html_content += email_html_footer(ln)
+        else:
+            html_content += html_footer
+
+        msgRoot = MIMEMultipart('related')
+        msgRoot['Subject'] = Header(subject, 'utf-8')
+        msgRoot['From'] = fromaddr
+        if usebcc:
+            msgRoot['Bcc'] = toaddr
+        else:
+            msgRoot['To'] = toaddr
+        msgRoot.preamble = 'This is a multi-part message in MIME format.'
+
+        msgAlternative = MIMEMultipart('alternative')
+        msgRoot.attach(msgAlternative)
+
+        msgText = MIMEText(content, _charset='utf-8')
+        msgAlternative.attach(msgText)
+
+        msgText = MIMEText(html_content, 'html', _charset='utf-8')
+        msgAlternative.attach(msgText)
+
+        for image_id, image_path in html_images.iteritems():
+            msgImage = MIMEImage(open(image_path, 'rb').read())
+            msgImage.add_header('Content-ID', '<%s>' % image_id)
+            msgImage.add_header('Content-Disposition', 'attachment', filename=os.path.split(image_path)[1])
+            msgRoot.attach(msgImage)
     else:
-        msg['To'] = toaddr
-    msg['Subject'] = Header(subject, 'utf-8')
-    return msg.as_string()
+        msgRoot = MIMEText(content, _charset='utf-8')
+        msgRoot['From'] = fromaddr
+        if usebcc:
+            msgRoot['Bcc'] = toaddr
+        else:
+            msgRoot['To'] = toaddr
+        msgRoot['Subject'] = Header(subject, 'utf-8')
+    return msgRoot.as_string()
 
 def log(*error):
     """Register error
