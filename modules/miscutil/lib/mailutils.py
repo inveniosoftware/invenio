@@ -41,7 +41,8 @@ from invenio.config import \
      cdsname, \
      adminemail, \
      CFG_MISCUTIL_SMTP_HOST, \
-     CFG_MISCUTIL_SMTP_PORT
+     CFG_MISCUTIL_SMTP_PORT, \
+     version
 
 from invenio.messages import wash_language, gettext_set_language
 from invenio.errorlib import get_msgs_for_code_list, register_errors, register_exception
@@ -252,6 +253,7 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='', html_images
         else:
             msgRoot['To'] = toaddr
         msgRoot['Subject'] = Header(subject, 'utf-8')
+    msgRoot.add_header('User-Agent', 'CDS Invenio %s' % version)
     return msgRoot.as_string()
 
 def log(*error):
