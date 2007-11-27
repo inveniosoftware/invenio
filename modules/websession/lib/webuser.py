@@ -79,6 +79,7 @@ from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
 from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
 from invenio.messages import gettext_set_language
 from invenio.mailutils import send_email
+from invenio.errorlib import register_exception
 from invenio.webgroup_dblayer import get_groups
 from invenio.external_authentication import InvenioWebAccessExternalAuthError
 import invenio.template
@@ -857,34 +858,52 @@ def collect_user_info(req):
     If the user is authenticated with Apache should provide also
     apache_user and apache_group.
     """
-    user_info = {}
+    user_info = {
+        'remote_ip' : '',
+        'remote_host' : '',
+        'referer' : '',
+        'uri' : '',
+        'agent' : '',
+        'apache_user' : '',
+        'apache_group' : [],
+        'uid' : -1,
+        'nickname' : '',
+        'email' : '',
+        'group' : [],
+        'guest' : '1'
+    }
 
-    if type(req) in [type(1), type(1L)]:
-        uid = req
-    else:
-        uid = getUid(req)
-        user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
-        user_info['remote_host'] = req.connection.remote_host or ''
-        user_info['referer'] = req.headers_in.get('Referer', '')
-        user_info['uri'] = req.unparsed_uri or ''
-        user_info['agent'] = req.headers_in.get('User-Agent', 'N/A')
-        try:
-            user_info['apache_user'] = getApacheUser(req)
-            if user_info['apache_user']:
-                user_info['apache_group'] = auth_apache_user_in_groups(user_info['apache_user'])
-        except AttributeError:
-            pass
-    user_info['uid'] = uid
-    user_info['nickname'] = get_nickname(uid) or ''
-    user_info['email'] = get_email(uid) or ''
-    user_info['group'] = []
-    user_info['guest'] = str(isGuestUser(uid))
-    if uid:
-        user_info['group'] = [group[1] for group in get_groups(uid)]
-        prefs = get_user_preferences(uid)
-        if prefs:
-            for key, value in prefs.items():
-                user_info[key.lower()] = value
+    try:
+        if req is None:
+            uid = -1
+        elif type(req) in [type(1), type(1L)]:
+            uid = req
+        else:
+            uid = getUid(req)
+            user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
+            user_info['remote_host'] = req.connection.remote_host or ''
+            user_info['referer'] = req.headers_in.get('Referer', '')
+            user_info['uri'] = req.unparsed_uri or ''
+            user_info['agent'] = req.headers_in.get('User-Agent', 'N/A')
+            try:
+                user_info['apache_user'] = getApacheUser(req)
+                if user_info['apache_user']:
+                    user_info['apache_group'] = auth_apache_user_in_groups(user_info['apache_user'])
+            except AttributeError:
+                pass
+        user_info['uid'] = uid
+        user_info['nickname'] = get_nickname(uid) or ''
+        user_info['email'] = get_email(uid) or ''
+        user_info['group'] = []
+        user_info['guest'] = str(isGuestUser(uid))
+        if uid:
+            user_info['group'] = [group[1] for group in get_groups(uid)]
+            prefs = get_user_preferences(uid)
+            if prefs:
+                for key, value in prefs.items():
+                    user_info[key.lower()] = value
+    except Exception, e:
+        register_exception()
     return user_info
 
 ## --- follow some functions for Apache user/group authentication
