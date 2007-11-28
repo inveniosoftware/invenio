@@ -698,7 +698,7 @@ L'équipe du %s
                 file_issue_group.write('%s-%s/%s - %s' % (low_bound,
                                                      high_bound,
                                                      year,
-                                                     get_monday_of_the_week(high_bound, year)))
+                                                     get_monday_of_the_week(low_bound, year)))
                 file_current_issue.write('%s/%s - %s' % (high_bound,
                                                          year,
                                                          get_monday_of_the_week(high_bound, year)))
@@ -774,35 +774,12 @@ L'équipe du %s
             return "no popup template" # todo: make exception
         
         popup_page_template_path = 'webjournal/%s' % popup_page_template
-        
-#        temp_marc = '''<record>
-#                            <controlfield tag="001">%s</controlfield>
-#                        </record>''' % (record)
-        #temp_marc = temp_marc.decode('utf-8').encode('utf-8')
-        
-        #xml_record = record_get_xml(recid)
-        #if xml_record == "":
-        #    return
-        #record = bibrecord.create_record(xml_answer)
-        # create a record and get HTML back from bibformat
-        #bfo = BibFormatObject(0, ln=ln, xml_record=temp_marc, req=req) # pass 0 for rn, we don't need it
         bfo = BibFormatObject(record, ln=ln, req=req)
 
         html_out = format_with_format_template(popup_page_template_path, bfo)[0]
         # done ;)
         return html_out
         
-        #    
-        #try:
-        #    open('%s/%s_%s_%s_%s.html' % (cachedir,
-        #                                  journal_name,
-        #                                  type,
-        #                                  record,
-        #                                  ln), "r")
-        #except:
-        #    return "popup does not exist" # todo: make exception, and make it in the popup!!
-        #
-        #index()
 
 if __name__ == "__main__":
     index()
