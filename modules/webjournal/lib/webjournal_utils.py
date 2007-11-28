@@ -21,7 +21,7 @@
 from invenio.bibformat_engine import BibFormatObject
 from invenio.errorlib import register_exception
 from invenio.search_engine import search_pattern
-from invenio.config import etcdir, weburl, adminemail
+from invenio.config import etcdir, weburl, adminemail, cachedir
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.dbquery import run_sql
@@ -29,6 +29,7 @@ from xml.dom import minidom
 from urllib2 import urlopen
 import time
 import re
+import os
 
 def get_order_dict_from_recid_list(list, issue_number):
     """
@@ -401,10 +402,51 @@ def get_current_issue(journal_name):
     issue_number = current_issue.split(" - ")[0].replace(" ", "")
     return issue_number
 
-def cache_page():
+def cache_index_page(journal_name, category, issue, html, ln):
+    """
+    caches the index page of a Bulletin
+    """
+    issue = issue.replace("/", "_")
+    if not (os.path.isdir('%s/webjournal/%s' % (cachedir, journal_name) )):
+        os.makedirs('%s/webjournal/%s' % (cachedir, journal_name))
+    cached_file = open('%s/webjournal/%s/%s_index_%s_%s.html' % (cachedir, journal_name, issue, category, ln), "w")
+    cached_file.write(html)
+    cached_file.close()
+
+def get_index_page_from_cache(journal_name, category, issue, ln):
+    """
+    gets an index page from the cache
+    """
+    issue = issue.replace("/", "_")
+#    raise "trying to get %s_index_%s.html" % (issue, category)
+    try:
+        cached_file = open('%s/webjournal/%s/%s_index_%s_%s.html' % (cachedir, journal_name, issue, category, ln)).read()
+    except:
+        return False
+    
+    return cached_file
+
+def cache_article_page(html, journal_name, category, recid, issue, ln):
     """
     """
-    pass
+    issue = issue.replace("/", "_")
+    if not (os.path.isdir('%s/webjournal/%s' % (cachedir, journal_name) )):
+        os.makedirs('%s/webjournal/%s' % (cachedir, journal_name))
+    cached_file = open('%s/webjournal/%s/%s_article_%s_%s_%s.html' % (cachedir, journal_name, issue, category, recid, ln), "w")
+    cached_file.write(html)
+    cached_file.close()
+    
+def get_article_page_from_cache(journal_name, category, recid, issue, ln):
+    """
+    """
+    issue = issue.replace("/", "_")
+    try:
+        cached_file = open('%s/webjournal/%s/%s_article_%s_%s_%s.html' % (cachedir, journal_name, issue, category, recid, ln)).read()
+    except:
+        return False
+    
+    return cached_file
+
 
 def get_rule_string_from_rule_list(rule_list, category):
     """

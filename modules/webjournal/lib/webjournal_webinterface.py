@@ -46,6 +46,7 @@ from webjournal_config import InvenioWebJournalNoArticleNumberError, \
                                 InvenioWebJournalNoArticleTemplateError, \
                                 webjournal_missing_info_box, \
                                 webjournal_error_box
+                                
 
 import time
 import os
@@ -65,7 +66,11 @@ from invenio.webjournal_utils import get_recid_from_order, \
                                         get_rule_string_from_rule_list, \
                                         get_monday_of_the_week, \
                                         createhtmlmail, \
-                                        put_css_in_file
+                                        put_css_in_file, \
+                                        cache_index_page, \
+                                        get_index_page_from_cache, \
+                                        get_article_page_from_cache, \
+                                        cache_article_page
 
 class WebInterfaceJournalPages(WebInterfaceDirectory):
     """Defines the set of /journal pages."""
@@ -109,13 +114,22 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         try :
             category = argd['category']
         except KeyError:
-            pass # optional parameter
+            category = "" # optional parameter
         try:
             language = argd['ln']
         except KeyError:
             language = "en"
             req.journal_defaults["ln"] = "en"
             # english is default
+            
+        # try to get the page from the cache
+        if category == "": # todo: make this nicer
+            category = "NewsArticles"
+        html = get_index_page_from_cache(journal_name, category, issue_number, language)
+        if html:
+        #    raise "got page from cache %s" % html
+            return html    
+            
         # get all strings you want from the config files
         config_strings = get_xml_from_config(["index", "rule", "issue_number"], journal_name)        
         try:
@@ -196,6 +210,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         bfo = BibFormatObject(0, ln=language, xml_record=temp_marc, req=req) # pass 0 for rn, we don't need it
         html_out = format_with_format_template(index_page_template_path, bfo)[0]
         # done ;)
+        cache_index_page(journal_name, category, issue_number, html_out, language)
         return html_out
     
     def article(self, req, form):
@@ -265,6 +280,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         except KeyError:
             language = "en"
             req.journal_defaults["ln"] = "en"
+        
         config_strings = get_xml_from_config(["detailed", "rule"], journal_name)
         # get the path to the format_template of this page    
         try:
@@ -297,11 +313,19 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         
        # recid = get_recid_from_order(number, rule, issue_number)
         recid = get_recid_from_order_CERNBulletin(number, rule, issue_number)
+    
+        # try to get the page from the cache
+        cached_html = get_article_page_from_cache(journal_name, category, recid, issue_number, language)
+        if cached_html:
+            return cached_html
         # create a record and get HTML back from bibformat
         bfo = BibFormatObject(recid, ln=language, req=req)
         
         html_out = format_with_format_template(index_page_template_path,
                                                bfo)[0]
+        
+        cache_article_page(html_out, journal_name, category, recid, issue_number, language)
+        
         return html_out
         
     def administrate(self, req, form):
