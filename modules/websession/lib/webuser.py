@@ -720,6 +720,8 @@ def get_email_from_username(username):
     untouched if not found in the database or if found several
     matching entries.
     """
+    if username == '':
+        return ''
     out = username
     res = run_sql("SELECT email FROM user WHERE email=%s", (username,), 1) + \
           run_sql("SELECT email FROM user WHERE nickname=%s", (username,), 1)
