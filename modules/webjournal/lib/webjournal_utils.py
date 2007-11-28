@@ -30,6 +30,7 @@ from urllib2 import urlopen
 import time
 import re
 import os
+import cPickle
 
 def get_order_dict_from_recid_list(list, issue_number):
     """
@@ -189,6 +190,13 @@ def get_recid_from_order_CERNBulletin(order, rule, issue_number):
     returns:
         recid:  the recid of the ordered record
     """
+    # try to get it from cache
+    recid_dict = {}
+    recid_dict = get_cached_recid_data_dict_CERNBulletin(issue_number, rule)
+    if recid_dict.has_key(order):
+        recid = recid_dict[order]
+        return recid
+    
     # get the id list
     all_records = list(search_pattern(p="%s and 773__n:%s" %
                                       (rule, issue_number),
@@ -196,7 +204,7 @@ def get_recid_from_order_CERNBulletin(order, rule, issue_number):
     ordered_records = {}
     new_addition_records = []
     for record in all_records:
-        temp_rec = BibFormatObject(record)
+        temp_rec = BibFormatObject(record)  # todo: refactor with get_fieldValues from search_engine
         issue_numbers = temp_rec.fields('773__n')
         order_number = temp_rec.fields('773__c')
         # todo: fields for issue number and order number have to become generic
@@ -243,7 +251,54 @@ def get_recid_from_order_CERNBulletin(order, rule, issue_number):
         recid = ordered_records[int(order)]
     except:
         register_exception()
+        
+    cache_recid_data_dict_CERNBulletin(recid, issue_number, rule, order)    
     return recid
+
+def cache_recid_data_dict_CERNBulletin(recid, issue, rule, order):
+    """
+    """
+    issue = issue.replace("/", "_")
+    # get whats in there
+    if not os.path.isdir('%s/webjournal/CERNBulletin' % cachedir):
+        os.makedirs('%s/webjournal/CERNBulletin' % cachedir)
+    try:
+        temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat' % (cachedir, issue))
+    except:
+        temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat' % (cachedir, issue), "w")
+    try:
+        recid_map = cPickle.load(temp_file)
+    except:
+        recid_map = ""
+    temp_file.close()
+    # add new recid
+    if recid_map == "":
+        recid_map = {}
+    if not recid_map.has_key(rule):
+        recid_map[rule] = {}
+    recid_map[rule][order] = recid
+    # save back
+    temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat' % (cachedir, issue), "w")
+    cPickle.dump(recid_map, temp_file)
+    temp_file.close()
+   
+def get_cached_recid_data_dict_CERNBulletin(issue, rule):
+    """
+    """
+    issue = issue.replace("/", "_")
+    try:
+        temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat' % (cachedir, issue))
+    except:
+        return {}
+    try:
+        recid_map = cPickle.load(temp_file)
+    except:
+        return {}
+    try:
+        recid_dict = recid_map[rule]
+    except:
+        recid_dict = {}
+    return recid_dict
 
 def pop_newest_article_CERNBulletin(news_article_dict):
     """
@@ -402,9 +457,9 @@ def get_current_issue(journal_name):
     issue_number = current_issue.split(" - ")[0].replace(" ", "")
     return issue_number
 
-def cache_index_page(journal_name, category, issue, html, ln):
+def cache_index_page(html, journal_name, category, issue, ln):
     """
-    caches the index page of a Bulletin
+    caches the index page main area of a Bulletin (right hand menu cannot be cached)
     """
     issue = issue.replace("/", "_")
     if not (os.path.isdir('%s/webjournal/%s' % (cachedir, journal_name) )):
