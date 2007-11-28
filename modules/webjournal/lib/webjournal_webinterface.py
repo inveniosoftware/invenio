@@ -126,9 +126,9 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         if category == "": # todo: make this nicer
             category = "NewsArticles"
         html = get_index_page_from_cache(journal_name, category, issue_number, language)
-        if html:
-        #    raise "got page from cache %s" % html
-            return html    
+        #if html:
+        ##    raise "got page from cache %s" % html
+        #    return html    
             
         # get all strings you want from the config files
         config_strings = get_xml_from_config(["index", "rule", "issue_number"], journal_name)        
@@ -210,7 +210,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         bfo = BibFormatObject(0, ln=language, xml_record=temp_marc, req=req) # pass 0 for rn, we don't need it
         html_out = format_with_format_template(index_page_template_path, bfo)[0]
         # done ;)
-        cache_index_page(journal_name, category, issue_number, html_out, language)
+     #   cache_index_page(journal_name, category, issue_number, html_out, language)
         return html_out
     
     def article(self, req, form):
