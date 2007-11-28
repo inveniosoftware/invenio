@@ -745,8 +745,9 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
         ln_for_preview = wash_language(ln_for_preview)
         pattern_for_preview = wash_url_argument(pattern_for_preview, 'str')
         if pattern_for_preview == "":
-            recIDs = search_pattern(p='-collection:DELETED').tolist()
-            if len(recIDs) == 0:
+            try:
+                recID = search_pattern(p='-collection:DELETED').pop()
+            except KeyError:
                 return page(title="No Document Found",
                             body="",
                             uid=uid,
@@ -755,13 +756,13 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
                             lastupdated=__lastupdated__,
                             req=req,
                             navmenuid='search')
-            else:
-                recID = recIDs[0]
-                pattern_for_preview = "recid:%s" % recID
+
+            pattern_for_preview = "recid:%s" % recID
         else:
-            recIDs = search_pattern(p=pattern_for_preview + \
-                                    ' -collection:DELETED').tolist()
-            if len(recIDs) == 0:
+            try:
+                recID = search_pattern(p=pattern_for_preview + \
+                                        ' -collection:DELETED').pop()
+            except KeyError:
                 return page(title="No Record Found for %s" % pattern_for_preview,
                             body="",
                             uid=uid,
@@ -769,8 +770,7 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
                             navtrail = "",
                             lastupdated=__lastupdated__,
                             req=req)
-            else:
-                recID = recIDs[0]
+
         units = create_basic_search_units(None, pattern_for_preview, None)
         keywords = [unit[1] for unit in units if unit[0] != '-']
         bfo = bibformat_engine.BibFormatObject(recID,
