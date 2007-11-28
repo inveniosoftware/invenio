@@ -77,8 +77,12 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
 
     _exports = ['', 'administrate', 'article', 'issue_control', 'search', 'alert',
                 'feature_record', 'popup']
-
     def index(self, req, form):
+        import hotshot
+        pr = hotshot.Profile('/tmp/journal_profile')
+        return pr.runcall(self.index_bla, req=req, form=form)
+
+    def index_bla(self, req, form):
         """Index page."""
         argd = wash_urlargd(form, {'name': (str, ""),
                                     'issue': (str, ""),
@@ -123,9 +127,9 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             # english is default
             
         # try to get the page from the cache
-        if category == "": # todo: make this nicer
-            category = "NewsArticles"
-        html = get_index_page_from_cache(journal_name, category, issue_number, language)
+        #if category == "": # todo: make this nicer
+        #    category = "NewsArticles"
+        #html = get_index_page_from_cache(journal_name, category, issue_number, language)
         #if html:
         ##    raise "got page from cache %s" % html
         #    return html    
@@ -208,9 +212,11 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         
         # create a record and get HTML back from bibformat
         bfo = BibFormatObject(0, ln=language, xml_record=temp_marc, req=req) # pass 0 for rn, we don't need it
+        
         html_out = format_with_format_template(index_page_template_path, bfo)[0]
         # done ;)
      #   cache_index_page(journal_name, category, issue_number, html_out, language)
+
         return html_out
     
     def article(self, req, form):
@@ -470,7 +476,7 @@ L'équipe du %s
             #subject = "%s %s released!" % (display_name, issue)
             message = createhtmlmail(html_string, plain_text, subject, argd['recipients'])
             server = smtplib.SMTP("localhost", 25)
-            server.sendmail('Bulletin-Support@cern.ch', argd['recipients'], message)
+            server.sendmail('Bulletin.Support@cern.ch', argd['recipients'], message)
 
             return page(title="Alert sent successfully!", body="")
     
