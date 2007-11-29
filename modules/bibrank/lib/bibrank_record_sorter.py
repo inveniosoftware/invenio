@@ -347,15 +347,6 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
     return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
-def isNumber(n):
-    """An aux function to be used below"""
-    try:
-        dummy = int(n)
-        return True
-    except ValueError:
-        return False
-
-
 def find_citations(rank_method_code, recID, hitset, verbose):
     """Rank by the amount of citations."""
     #calculate the cited-by values for all the members of the hitset
@@ -368,8 +359,8 @@ def find_citations(rank_method_code, recID, hitset, verbose):
     #stuff that cites hitset
 
     ret = []
-    if isNumber(recID):
-        myrecords = get_cited_by(int(recID)) #this is a simple list
+    if isinstance(recID, int):
+        myrecords = get_cited_by(recID) #this is a simple list
         for r in myrecords:
             ret.append([r,0])
     else:
