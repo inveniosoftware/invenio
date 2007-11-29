@@ -62,12 +62,13 @@ def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
         ips = database_tuples_to_single_list(run_sql("select client_host from rnkDOWNLOADS where id_bibrec=%s;" % id_bibrec))
         if ips:
             users_analysis_results = create_users_analysis_graph(id_bibrec, ips)
-            graph_file_users = weburl + "/img/"  + users_analysis_results[0]
-            file_to_close_users = users_analysis_results[1]      
-            html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_users
-            if file_to_close_users:
-                if os.path.exists(file_to_close_users):
-                    os.unlink(file_to_close_users)
+	    if users_analysis_results[0]:
+	            graph_file_users = weburl + "/img/"  + users_analysis_results[0]
+        	    file_to_close_users = users_analysis_results[1]      
+	            html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_users
+        	    if file_to_close_users:
+                	if os.path.exists(file_to_close_users):
+	                    os.unlink(file_to_close_users)
     
     #Downloads history graph and return html code used by get_file or search_engine
     if cfg_bibrank_print_download_history:
@@ -80,7 +81,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
             history_analysis_results = draw_downloads_statistics(id_bibrec, list(id_bibdocs))
         else:
             history_analysis_results = draw_downloads_statistics(id_bibrec, [])
-        if history_analysis_results:
+        if history_analysis_results[0]:
             graph_file_history = weburl + "/img/" + history_analysis_results[0]
             file_to_close_history = history_analysis_results[1]
             html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_history
@@ -278,6 +279,10 @@ def create_users_analysis_graph(id_bibrec, ips):
     coordinates_list.append((3, str(float(other_users)/tot*100)))
     #write coordinates in a temporary file 
     result2 = write_coordinates_in_tmp_file([coordinates_list])
+    #result2 example: [/path/to-invenio/var/www/img/tmpeC9GP5,'100.0']
+    #the file contains e.g. 
+    #1 100.0
+    #3 0.0
     #plot the graph
     return create_temporary_image(id_bibrec, 'download_users', result2[0], '', '', (0, 0), result2[1], [], [], [1, 3])
 
