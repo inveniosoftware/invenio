@@ -297,8 +297,11 @@ def perform_request_format_elements_documentation(ln=cdslang):
     keys.sort()
     elements = map(elements.get, keys)
     # Remove all elements found in table and that begin with a number (to remove 'garbage')
-    filtered_elements = [element for element in elements if element['type'] == 'python' or \
-                         element['attrs']['name'][0] not in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']]
+    filtered_elements = [element for element in elements \
+                         if element is not None and \
+                         element['type'] == 'python' and \
+                         element['attrs']['name'][0] not in \
+                         ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']]
 
     return bibformat_templates.tmpl_admin_format_elements_documentation(ln, filtered_elements)
 
