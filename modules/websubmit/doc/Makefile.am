@@ -22,6 +22,6 @@ SUBDIRS = admin hacking
 webdoclibdir = $(libdir)/webdoc/help
 
 webdoclib_DATA = \
-	submit.webdoc
+	submit-guide.webdoc
 
 CLEANFILES = *~ *.tmp *.php
