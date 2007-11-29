@@ -40,11 +40,15 @@ image_pattern = re.compile('''
                            '''
                            ,re.DOTALL | re.IGNORECASE | re.VERBOSE)
 
-def format(bfo, title=""):
+def format(bfo, title_en="", title_fr=""):
     """
     wrapper function needed for BibFormat to route the widget HTML
     """
     out = get_widget_HTML()
+    if bfo.lang == "fr":
+        title = title_fr
+    else:
+        title = title_en
     if title != "":
         try:
             weather_image_match = image_pattern.findall(out)[0]
