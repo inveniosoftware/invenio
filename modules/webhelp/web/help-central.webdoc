@@ -48,7 +48,7 @@
 </p>
 <blockquote>
 <dl>
-<dt><a href="search-tips?ln=<lang:current/>">_(Search Tips)_</a></dt>
+<dt><a href="search-tips<lang:link/>">_(Search Tips)_</a></dt>
 <dd><lang>
       <en>
         This page presents you with useful tips and techniques in order to
@@ -92,7 +92,7 @@
       </sv>
     </lang>
 </dd>
-<dt><a href="search-guide?ln=<lang:current/>">
+<dt><a href="search-guide<lang:link/>">
      <lang>
        <en>Search Guide</en>
        <fr>Guide de Recherche</fr>
@@ -109,7 +109,7 @@
     </lang>
     <CDSNAMEINTL>.
 </dd>
-<dt><a href="submit<lang:link/>">_(Submit Help)_</a></dt>
+<dt><a href="submit-guide<lang:link/>">_(Submit Guide)_</a></dt>
 <dd><lang>
       <en>Get help with submitting to <CDSNAMEINTL>.</en>
       <fr>Obtenez de l'aide avec la soumission dans <CDSNAMEINTL>.</fr>
