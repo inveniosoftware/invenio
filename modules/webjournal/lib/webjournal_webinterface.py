@@ -76,13 +76,13 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     """Defines the set of /journal pages."""
 
     _exports = ['', 'administrate', 'article', 'issue_control', 'search', 'alert',
-                'feature_record', 'popup']
-    def index(self, req, form):
-        import hotshot
-        pr = hotshot.Profile('/tmp/journal_profile')
-        return pr.runcall(self.index_bla, req=req, form=form)
+                'feature_record', 'popup', 'regenerate']
+    #def index(self, req, form):
+    #    import hotshot
+    #    pr = hotshot.Profile('/tmp/journal_profile')
+    #    return pr.runcall(self.index_bla, req=req, form=form)
 
-    def index_bla(self, req, form):
+    def index(self, req, form):
         """Index page."""
         argd = wash_urlargd(form, {'name': (str, ""),
                                     'issue': (str, ""),
@@ -385,6 +385,54 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             fptr.close()
             return page(title="Successfully featured record: %s" % argd['recid'], body="")
     
+    def regenerate(self, req, form):
+        """
+        clears the cache for one issue
+        """
+        argd = wash_urlargd(form, {'name': (str, ""),
+                                    'issue': (str, "")})
+        
+        if argd['name'] == "":
+            return webjournal_missing_info_box(req, title="Journal not found",
+                                          msg_title="We don't know which journal you are looking for",
+                                          msg='''You were looking for a journal without providing a name.
+                    Unfortunately we cannot know which journal you are looking for.
+                    Below you have a selection of journals that are available on this server.
+                    If you should find your journal there, just click the link,
+                    otherwise please contact the server admin and ask for existence
+                    of the journal you are looking for.''')
+        else:
+            journal_name = argd['name']
+        
+        if argd['issue'] == "":
+            return webjournal_missing_info_box(req, title="No Issue Number provided",
+                                               msg_title="You need to provide an issue number for regeneration",
+                                               msg='''You tried to regenerate a journal without providing
+                                               the issue number for the issue you want to regenerate. Please
+                                               call the url again and provide the correct issue number.
+                                               ''')
+        else:
+            issue_number = argd['issue']
+        
+        if acc_authorize_action(getUid(req), 'cfgwebjournal', name="%s" % journal_name)[0] != 0:
+            # todo: pass correct language
+            return please_login(req, journal_name, backlink='%s/journal/regenerate?name=%s' % (weburl, journal_name))
+        
+        from webjournal_utils import clear_cache_for_issue
+        success = clear_cache_for_issue(journal_name, issue_number)
+        if success:
+            return page(title="Issue regenerated", body = '''
+                        The issue number %s for the journal %s has been successfully
+                        regenerated.
+                        Look at your changes: >> <a href="%s/journal/?name=%s"> %s </a>
+                        
+                        ''' % (issue_number, journal_name, weburl, journal_name, journal_name))
+        else:
+            return page(title="Regeneration Error", body = '''
+                        The issue could not be correctly regenerated. Please contact
+                        your administrator.
+                        ''')
+        
     def alert(self, req, form):
         """Alert system."""
         argd = wash_urlargd(form, {'name': (str, ""),

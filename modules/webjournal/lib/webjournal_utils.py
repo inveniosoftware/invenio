@@ -533,11 +533,26 @@ def clear_cache_for_article(journal_name, category, recid, issue):
     # delete the entry in the recid_order_map
     # todo: make this per entry
     try:
-        os.remove('%s/webjournal/CERNBulletin/%s_recid_order_map.dat' % (cachedir, issue))
+        os.remove('%s/webjournal/%s/%s_recid_order_map.dat' % (cachedir, journal_name, issue))
     except:
         pass
     
-    
+    return True
+
+def clear_cache_for_issue(journal_name, issue):
+    """
+    clears the cache of a whole issue
+    """
+    issue = issue.replace("/", "_")
+    all_cached_files = os.listdir('%s/webjournal/%s/' % (cachedir, journal_name))
+    for cached_file in all_cached_files:
+        if cached_file[:7] == issue:
+            try:
+                os.remove('%s/webjournal/%s/%s' % (cachedir, journal_name, cached_file))
+            except:
+                return False
+                #raise "could not delete %s" % cached_file
+            
     return True
 
 def get_rule_string_from_rule_list(rule_list, category):
