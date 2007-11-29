@@ -60,7 +60,7 @@ def calculate_citation_history_coordinates(recid):
     for rec_id, cit_weight in citlist:
         cit_year = get_field_values(rec_id,'773__y')
         if not cit_year: cit_year = get_field_values(rec_id, '260__c')
-        #some records simlpy do not have these fields 
+        #some records simlpy do not have these fields
         if cit_year:
             if initial_result.has_key(int(cit_year[0][0:4])):
                 initial_result[int(cit_year[0][0:4])] += 1
@@ -119,7 +119,7 @@ def create_citation_history_graph_and_box(recid, ln=cdslang):
     if cfg_bibrank_print_citation_history:
         coordinates = calculate_citation_history_coordinates(recid)
         if coordinates:
-            html_head = """<br /><table><tr><td class="blocknote">%s</td></tr></table>""" % _("Citation history")
+            html_head = """<br /><table><tr><td class="blocknote">%s</td></tr></table>""" % _("Citation history:")
             graphe_file_name = 'citation_%s_stats.png' % str(recid)
             remove_old_img(graphe_file_name)
             years = calculate_citation_graphe_x_coordinates(recid)
