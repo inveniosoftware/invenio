@@ -27,7 +27,10 @@ __revision__ = "$Id$"
 from invenio import bibformat_utils
 from urllib import quote
 from invenio.config import weburl
-from invenio.bibformat_config import CFG_BIBFORMAT_HAS_MIMETEX
+try:
+    from invenio.bibformat_config import CFG_BIBFORMAT_HAS_MIMETEX
+except:
+    CFG_BIBFORMAT_HAS_MIMETEX
 import re
 
 latex_formula_re = re.compile(r'\$(.*?)\$')
