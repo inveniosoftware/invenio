@@ -32,7 +32,6 @@ from email.Header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEImage import MIMEImage
-from email.encoders import encode_quopri
 from cStringIO import StringIO
 from formatter import DumbWriter, AbstractFormatter
 
