@@ -22,7 +22,6 @@ SUBDIRS = admin hacking
 webdoclibdir = $(libdir)/webdoc/help
 
 webdoclib_DATA = \
-	search.webdoc \
 	search-tips.webdoc \
 	search-guide.webdoc
 
