@@ -48,30 +48,66 @@
 </p>
 <blockquote>
 <dl>
-
-<dt><a href="search<lang:link/>">_(Search Help)_</a></dt>
+<dt><a href="search-tips?ln=<lang:current/>">_(Search Tips)_</a></dt>
 <dd><lang>
-      <en>Get help with searching <CDSNAMEINTL>.</en>
-      <fr>Obtenez de l'aide avec la recherche sur <CDSNAMEINTL>.</fr>
-      <de>Hier können Sie die Suchhilfe für den <CDSNAMEINTL> konsultieren.</de>
-      <es>Get help with searching <CDSNAMEINTL>.</es>
-      <ca>Ajuda en la cerca de <CDSNAMEINTL>.</ca>
-      <pl>Get help with searching <CDSNAMEINTL>.</pl>
-      <pt>Obtenha ajuda em buscas no <CDSNAMEINTL>.</pt>
-      <it>Aiuto alla ricerca in <CDSNAMEINTL>.</it>
-      <ru>Get help with searching <CDSNAMEINTL>.</ru>
-      <sk>Pomoc pre hľadanie <CDSNAMEINTL>.</sk>
-      <cs>Nápověda pro hledání <CDSNAMEINTL>.</cs>
-      <no>Få hjelp til søking i <CDSNAMEINTL>.</no>
-      <sv>För hjälp med sökning av <CDSNAMEINTL>.</sv>
-      <el>Πληροφορίες σχετικά με τις αναζητήσεις σας στο <CDSNAMEINTL>.</el>
-      <uk>Get help with searching <CDSNAMEINTL>.</uk>
-      <ja>Get help with searching <CDSNAMEINTL>.</ja>
-      <bg>Get help with searching <CDSNAMEINTL>.</bg>
-      <hr>Get help with searching <CDSNAMEINTL>.</hr>
-      <zh_CN>Get help with searching <CDSNAMEINTL>.</zh_CN>
-      <zh_TW>Get help with searching <CDSNAMEINTL>.</zh_TW>
+      <en>
+        This page presents you with useful tips and techniques in order to
+        help you use the <CDSNAMEINTL> site to the full.
+      </en>
+      <fr>
+        Cette page vous présente des suggestions et des techniques qui puissent vous être utiles
+        afin d'utiliser au mieux <CDSNAMEINTL>.
+      </fr>
+      <de>
+        Diese Seite zeigt Ihnen alle nützliche Tipps und Techniken die
+        beim <CDSNAMEINTL> zur Verfügung stehen.
+      </de>
+      <ca>
+        Aquesta pàgina us presenta suggeriments i tècniques que us poden
+        resultar útils per usar <CDSNAMEINTL> en totes les seves possibilitats.
+      </ca>
+      <pt>
+        Esta página oferece dicas  úteis e técnicas para ajuda-lo a usar o sítio do
+        <CDSNAMEINTL> em toda sua potencialidade.
+      </pt>
+      <it>
+        Questa pagina vi fornisce utili consigli per servirvi al meglio
+        <CDSNAMEINTL>.
+      </it>
+      <sk>
+        Táto stránka Vám ponúka užitočné tipy a triky ktoré Vám umožnia
+        plne využívať možností <CDSNAMEINTL>.
+      </sk>
+      <cs>
+        Tato stránka Vám nabízí užitečné tipy a triky které Vám umožní
+        plně využívat možností <CDSNAMEINTL>.
+      </cs>
+      <no>
+        Denne siden presenter nyttige tips og teknikker slik at du lettere kan få
+        fullt utbytte av <CDSNAMEINTL> sine sider.
+      </no>
+      <sv>
+        Denna sida ger dig användbara tips och tekniker för att hjälpa dig att
+        till fullo använda denna webbplats som <CDSNAMEINTL> erbjuder dig.
+      </sv>
     </lang>
+</dd>
+<dt><a href="search-guide?ln=<lang:current/>">
+     <lang>
+       <en>Search Guide</en>
+       <fr>Guide de Recherche</fr>
+       <ca>Guia de Cerca</ca>
+       <pt>Guia de buscas</pt>
+     </lang>
+    </a>
+</dt>
+<dd><lang>
+      <en>Full guide on how to search</en>
+      <fr>Le guide complet sur comment rechercher sur</fr>
+      <ca>Guia completa de com cercar a l'</ca>
+      <pt>Guia completo de como realizar buscas no</pt>
+    </lang>
+    <CDSNAMEINTL>.
 </dd>
 <dt><a href="submit<lang:link/>">_(Submit Help)_</a></dt>
 <dd><lang>
