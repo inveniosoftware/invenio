@@ -125,7 +125,7 @@ def create_citation_history_graph_and_box(recid, ln=cdslang):
             years = calculate_citation_graphe_x_coordinates(recid)
             years.sort()
             datas_info = write_coordinates_in_tmp_file([coordinates])
-            graphe = create_temporary_image(recid, 'citation', datas_info[0], 'Year', 'Times Cited', [0,0], datas_info[1], [], ' ', years)
+            graphe = create_temporary_image(recid, 'citation', datas_info[0], 'Year', 'Times cited', [0,0], datas_info[1], [], ' ', years)
             graphe_image = graphe[0]
             graphe_source_file = graphe[1]
             if graphe_image and graphe_source_file:
