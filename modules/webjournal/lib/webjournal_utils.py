@@ -462,6 +462,7 @@ def cache_index_page(html, journal_name, category, issue, ln):
     caches the index page main area of a Bulletin (right hand menu cannot be cached)
     """
     issue = issue.replace("/", "_")
+    category = category.replace(" ", "")
     if not (os.path.isdir('%s/webjournal/%s' % (cachedir, journal_name) )):
         os.makedirs('%s/webjournal/%s' % (cachedir, journal_name))
     cached_file = open('%s/webjournal/%s/%s_index_%s_%s.html' % (cachedir, journal_name, issue, category, ln), "w")
@@ -473,6 +474,7 @@ def get_index_page_from_cache(journal_name, category, issue, ln):
     gets an index page from the cache
     """
     issue = issue.replace("/", "_")
+    category = category.replace(" ", "")
 #    raise "trying to get %s_index_%s.html" % (issue, category)
     try:
         cached_file = open('%s/webjournal/%s/%s_index_%s_%s.html' % (cachedir, journal_name, issue, category, ln)).read()
@@ -485,6 +487,7 @@ def cache_article_page(html, journal_name, category, recid, issue, ln):
     """
     """
     issue = issue.replace("/", "_")
+    category = category.replace(" ", "")
     if not (os.path.isdir('%s/webjournal/%s' % (cachedir, journal_name) )):
         os.makedirs('%s/webjournal/%s' % (cachedir, journal_name))
     cached_file = open('%s/webjournal/%s/%s_article_%s_%s_%s.html' % (cachedir, journal_name, issue, category, recid, ln), "w")
@@ -495,6 +498,7 @@ def get_article_page_from_cache(journal_name, category, recid, issue, ln):
     """
     """
     issue = issue.replace("/", "_")
+    category = category.replace(" ", "")
     try:
         cached_file = open('%s/webjournal/%s/%s_article_%s_%s_%s.html' % (cachedir, journal_name, issue, category, recid, ln)).read()
     except:
@@ -502,6 +506,39 @@ def get_article_page_from_cache(journal_name, category, recid, issue, ln):
     
     return cached_file
 
+def clear_cache_for_article(journal_name, category, recid, issue):
+    """
+    resets the cache for an article (e.g. after an article has been modified)
+    """
+    issue = issue.replace("/", "_")
+    category = category.replace(" ", "")
+    # try to delete the article
+    try:
+        os.remove('%s/webjournal/%s/%s_article_%s_%s_en.html' % (cachedir, journal_name, issue, category, recid))
+    except:
+        pass
+    try:
+        os.remove('%s/webjournal/%s/%s_article_%s_%s_fr.html' % (cachedir, journal_name, issue, category, recid))
+    except:
+        pass
+    # delete the index page for the category
+    try:
+        os.remove('%s/webjournal/%s/%s_index_%s_en.html' % (cachedir, journal_name, issue, category))
+    except:
+        pass
+    try:
+        os.remove('%s/webjournal/%s/%s_index_%s_fr.html' % (cachedir, journal_name, issue, category))
+    except:
+        pass
+    # delete the entry in the recid_order_map
+    # todo: make this per entry
+    try:
+        os.remove('%s/webjournal/CERNBulletin/%s_recid_order_map.dat' % (cachedir, issue))
+    except:
+        pass
+    
+    
+    return True
 
 def get_rule_string_from_rule_list(rule_list, category):
     """
