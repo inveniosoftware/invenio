@@ -40,6 +40,11 @@ except ImportError, e:
     called_from = 0
 
 def make_list_apache_firerole(name_action, arguments):
+    """Given an action and a dictionary arguments returns a list of all the
+    roles (and their descriptions) which are authorized to perform this
+    action with these arguments, and whose FireRole definition expect
+    an Apache Password membership.
+    """
     roles = aca.acc_find_possible_roles(name_action, arguments)
 
     ret = []
@@ -51,6 +56,12 @@ def make_list_apache_firerole(name_action, arguments):
     return ret
 
 def _format_list_of_apache_firerole(roles, referer):
+    """Given a list of tuples (role, description) (returned by make_list_apache_firerole), and a referer url, returns a nice string for
+    presenting urls that let the user login with Apache password through
+    Firerole.
+    This function is needed only at CERN for aiding in the migration of
+    Apache Passwords restricted collections to FireRole roles.
+    Please use it with care."""
     out = ""
     if roles:
         out += "<p>Here's a list of administrative roles you may have " \
@@ -67,6 +78,12 @@ def _format_list_of_apache_firerole(roles, referer):
     return out
 
 def make_apache_message(name_action, arguments, referer=None):
+    """Given an action name and a dictionary of arguments and a refere url
+    it returns a a nice string for presenting urls that let the user login
+    with Apache password through Firerole authorized roles.
+    This function is needed only at CERN for aiding in the migration of
+    Apache Passwords restricted collections to FireRole roles.
+    Please use it with care."""
     if not referer:
         referer = '%s/youraccount/youradminactivities' % sweburl
     roles = make_list_apache_firerole(name_action, arguments)
