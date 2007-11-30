@@ -43,7 +43,7 @@ h1 {
 }
 h2 {
    font-size: 144%;
-   font-weight: 650;
+   font-weight: 700;
    margin-left: 0px;
    color: #36c;
    background: transparent;
@@ -1146,11 +1146,11 @@ input,select {
 }
 .bsktab{
    float: left;
-   vertical-align: center;
+   vertical-align: middle;
    margin: 0px 20px 0px 20px;
    padding: 4px 10px 5px 5px;
    background-repeat: no-repeat;
-   background-position: top-left;
+   background-position: top left;
    background-color: #ffe;
 }
 #bsktab_selected{
@@ -1385,7 +1385,7 @@ input.hyperlinkformSubmitButton {
 
 .externalcollectionsboxbody {
    color: #333;
-   background: ##fffbf5;
+   background: #fffbf5;
    padding: 0px 5px 0px 5px;
    font-size: small;
    text-align: left;
