@@ -20,13 +20,13 @@
 __revision__ = "$Id$"
 
 """This script updates the filesystem structure of fulltext files in order
-to make it coherent with docfile implementation (docfile.py structure is backward
+to make it coherent with bibdocfile implementation (bibdocfile.py structure is backward
 compatible with file.py structure, but the viceversa is not true).
 """
 
 import sys
 from invenio.dbquery import run_sql, OperationalError
-from invenio.docfile import BibRecDocs, InvenioWebSubmitFileError
+from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
 
 def retrieve_fulltext_recids():
     """Returns the list of all the recid number linked with at least a fulltext
