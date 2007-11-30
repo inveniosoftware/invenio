@@ -287,7 +287,7 @@ class Template:
 <body>
 <div class="pageheader">
 <!-- replaced page header -->
-<div style="background-image: url(%(weburl)s/img/header_background.gif);">
+<div style="background-image: url(%(cssurl)s/img/header_background.gif);">
 <table class="headerbox">
  <tr>
   <td rowspan="2" class="headerboxbodylogo">
@@ -713,7 +713,7 @@ URI: http://%(host)s%(page)s
                 <p class="nobottomgap" >&nbsp;</p>
             </div>
             <div class="bottom-left-folded">%(dates)s</div>
-            <div class="bottom-right-folded"style="text-align:right"><span class="moreinfo" style="margin-right:25px">%(similar)s</span></div>
+            <div class="bottom-right-folded" style="text-align:right"><span class="moreinfo" style="margin-right:25px">%(similar)s</span></div>
         </div>
     </div>
     <br/>
