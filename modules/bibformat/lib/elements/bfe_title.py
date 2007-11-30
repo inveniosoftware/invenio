@@ -25,17 +25,7 @@ __revision__ = "$Id$"
 import cgi
 from urllib import quote
 from invenio.config import weburl
-from invenio.bibformat_config import CFG_BIBFORMAT_HAS_MIMETEX
 import re
-
-latex_formula_re = re.compile(r'\$(.*?)\$')
-def fix_latex_formulas(text):
-    """Substitute every occurency of a Latex Formula with a proper image
-    representing it, produce by MimeTeX."""
-    def replace(match):
-        return '<img src="%s/cgi-bin/mimetex.cgi?%s" alt="%s" border="0" />' % (weburl, quote(r'\large ' + match.group(1)), match.group(1))
-    return latex_formula_re.sub(replace, text)
-
 
 def format(bfo, separator=" ", highlight='no'):
     """
@@ -83,10 +73,7 @@ def format(bfo, separator=" ", highlight='no'):
         from invenio import bibformat_utils
         titles = [bibformat_utils.highlight(x, bfo.search_pattern) for x in titles]
 
-    if CFG_BIBFORMAT_HAS_MIMETEX:
-        return fix_latex_formulas(separator.join(titles))
-    else:
-        return separator.join(titles)
+    return separator.join(titles)
 
 def escape_values(bfo):
     """

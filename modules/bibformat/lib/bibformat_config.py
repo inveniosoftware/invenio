@@ -33,10 +33,6 @@ from invenio.config import etcdir, pylibdir
 #new format cannot be found, old format will be used.
 CFG_BIBFORMAT_USE_OLD_BIBFORMAT = False
 
-#Set this to True if you have provided mimetex.cgi (from
-#http://www.forkosh.com/mimetex.html) in your web server cgi-bin directory.
-CFG_BIBFORMAT_HAS_MIMETEX = False
-
 #Paths to main formats directories
 CFG_BIBFORMAT_TEMPLATES_PATH = "%s%sbibformat%sformat_templates" % (etcdir, os.sep, os.sep)
 CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "invenio.bibformat_elements"
