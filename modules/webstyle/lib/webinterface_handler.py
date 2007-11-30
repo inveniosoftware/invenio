@@ -28,9 +28,7 @@ specification,...
 
 __revision__ = "$Id$"
 
-import os
 import urlparse
-import base64
 import cgi
 import sys
 
@@ -55,7 +53,6 @@ has_https_support = weburl != sweburl
 
 
 DEBUG = False
-PROFILING = False
 
 def _debug(msg):
     if DEBUG:
@@ -181,7 +178,7 @@ class WebInterfaceDirectory(object):
                 final_parts[-3:] = original_parts[-3:]
 
                 target = urlparse.urlunparse(final_parts)
-                return redirect_to_url(req, target)
+                redirect_to_url(req, target)
 
         # Continue the traversal. If there is a path, continue
         # resolving, otherwise call the method as it is our final
@@ -219,41 +216,48 @@ def create_handler(root):
 
     def _profiler(req):
         """ This handler wrap the default handler with a profiler.
-        Profiling data is written into ${tmpdir}/invenio-stats.raw, and
+        Profiling data is written into ${tmpdir}/invenio-profile-stats-datetime.raw, and
         is displayed at the bottom of the webpage.
         To use add profile=1 to your url. To change sorting algorithm you
-        can provide sort_profile=string.
+        can provide profile=algorithm_name. You can add more than one
+        profile requirement like ?profile=time&profile=cumulative.
         The list of available algorithm is displayed at the end of the profile.
         """
-        if req.args and cgi.parse_qs(req.args).get('profile', ['0']) == ['1']:
+        if req.args and cgi.parse_qs(req.args).has_key('profile'):
             from cStringIO import StringIO
             import pstats
             import datetime
             date = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-            filename = '%s/invenio-stats-%s.raw' % (tmpdir, date)
-            sorts = pstats.Stats.sort_arg_dict_default.keys()
-            sort_type = cgi.parse_qs(req.args).get('sort_profile', ['cumulative'])[0]
-            if sort_type not in sorts:
-                sort_type = 'cumulative'
+            filename = '%s/invenio-profile-stats-%s.raw' % (tmpdir, date)
+            existing_sorts = pstats.Stats.sort_arg_dict_default.keys()
+            required_sorts = []
+            profile_dump = []
+            for sort in cgi.parse_qs(req.args)['profile']:
+                if sort not in existing_sorts:
+                    sort = 'cumulative'
+                if sort not in required_sorts:
+                    required_sorts.append(sort)
             if sys.hexversion < 0x02050000:
                 import hotshot, hotshot.stats
                 pr = hotshot.Profile(filename)
                 ret = pr.runcall(_handler, req)
-                tmp_out = sys.stdout
-                sys.stdout = StringIO()
-                hotshot.stats.load(filename).strip_dirs().sort_stats(sort_type).print_stats()
-                profile_dump = sys.stdout.getvalue()
-                sys.stdout = tmp_out
+                for sort_type in required_sorts:
+                    tmp_out = sys.stdout
+                    sys.stdout = StringIO()
+                    hotshot.stats.load(filename).strip_dirs().sort_stats(sort_type).print_stats()
+                    profile_dump.append(sys.stdout.getvalue())
+                    sys.stdout = tmp_out
             else:
-                import cProfile, pstats
+                import cProfile
                 pr = cProfile.Profile()
                 ret = pr.runcall(_handler, req)
                 pr.dump_stats(filename)
-                strstream = StringIO()
-                pstats.Stats(filename, stream=strstream).strip_dirs().sort_stats(sort_type).print_stats()
-                profile_dump = strstream.getvalue()
-            profile_dump += '\nYou can use sort_profile=%s' % sorts
-            profile_dump += '\n%s' % (sort_type)
+                for sort_type in required_sorts:
+                    strstream = StringIO()
+                    pstats.Stats(filename, stream=strstream).strip_dirs().sort_stats(sort_type).print_stats()
+                    profile_dump.append(strstream.getvalue())
+            profile_dump = ''.join(["<pre>%s</pre>" % single_dump for single_dump in profile_dump])
+            profile_dump += '\nYou can use sort_profile=%s' % existing_sorts
             req.write("<pre>%s</pre>" % profile_dump)
             return ret
         else:
