@@ -341,20 +341,19 @@ def get_basket_record(bskid, recid, format='hb'):
                 LEFT JOIN %(format_table)s fmt
                 ON (record.id=fmt.%(id_field)s)
 
-    WHERE bskREC.id_bskBASKET=%(bskid)i AND
+    WHERE bskREC.id_bskBASKET=%(bskid)s AND
           bskREC.id_bibrec_or_bskEXTREC=%(recid)s AND
-          fmt.format=%(format)s
+          fmt.format='%(format)s'
 
     GROUP BY bskREC.id_bibrec_or_bskEXTREC
-    """
-    params = {'rec_table': rec_table,
-              'format_table': format_table,
-              'sign': sign,
-              'bskid': int(bskid),
-              'recid': int(recid),
-              'format': '%s',
-              'id_field': id_field}
-    res = run_sql(query, (format,))
+    """ % {'rec_table': rec_table,
+           'format_table': format_table,
+           'sign': sign,
+           'bskid': int(bskid),
+           'recid': int(recid),
+           'format': format,
+           'id_field': id_field}
+    res = run_sql(query)
     if res:
         return __decompress_last(res[0])
     return ()
