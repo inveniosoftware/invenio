@@ -27,7 +27,7 @@ EXTRA_DIST = UNINSTALL CREDITS RELEASE-NOTES configure-tests.py config.nice.in
 
 # current jsMath version and packages
 JSMV = 3.4f
-JSMFV = 1.3f
+JSMFV = 1.3
 JSMATH = jsMath-$(JSMV).zip
 JSMATHFONTS = jsMath-fonts-$(JSMFV).zip
 
@@ -124,20 +124,22 @@ install-jsmath-plugin:
 		wget 'http://downloads.sourceforge.net/jsmath/$(JSMATHFONTS)'; \
 		wget 'http://www.math.union.edu/~dpvc/jsMath/download/extra-fonts/msam10/msam10.zip'; \
 		wget 'http://www.math.union.edu/~dpvc/jsMath/download/extra-fonts/msbm10/msbm10.zip'; \
-		unzip -d ${prefix}/var/www $(JSMATH); \
-		unzip -d ${prefix}/var/www $(JSMATHFONTS); \
-		unzip -d ${prefix}/var/www/jsMath/fonts msam10.zip; \
-		unzip -d ${prefix}/var/www/jsMath/fonts msbm10.zip; \
+		unzip -u -d ${prefix}/var/www $(JSMATH); \
+		unzip -u -d ${prefix}/var/www $(JSMATHFONTS); \
+		unzip -u -d ${prefix}/var/www/jsMath/fonts msam10.zip; \
+		unzip -u -d ${prefix}/var/www/jsMath/fonts msbm10.zip; \
 		rm -fr /tmp/invenio-jsmath-plugin; \
 		echo "Overriding jsMath config with Invenio config..."; \
 		popd; \
 		(cd $(top_srcdir)/modules/webstyle/etc && make install); \
-		echo "Don't forget to properly set up the"; \
-		echo "CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS variable in config.wml"; \
-		echo "Done"; \
+		echo "***************************************************************"; \
+		echo "* Don't forget to properly set up the                         *"; \
+		echo "* CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS variable in config.wml *"; \
+		echo "***************************************************************"; \
 	fi
-	
-	
+
+uninstall-jsmath-plugin:
+	rm -rvf ${prefix}/var/www/jsMath
 
 create-tables: local-dbexec local-tabfill
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql

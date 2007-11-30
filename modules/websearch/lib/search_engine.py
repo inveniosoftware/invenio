@@ -572,7 +572,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
         if of.lower() in CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS:
             metaheaderadd = """
  <script> jsMath = {styles: {'#jsMath_button': 'display: none'}}; </script>
- <script src='/jsMath/easy/load.js'></script>
+ <script src='/jsMath/easy/invenio-jsmath.js'></script>
 """
         else:
             metaheaderadd = ''

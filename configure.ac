@@ -622,6 +622,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/webstyle/bin/webdoc \
 	  modules/webstyle/css/Makefile \
 	  modules/webstyle/doc/Makefile \
+	  modules/webstyle/etc/Makefile \
 	  modules/webstyle/doc/admin/Makefile \
 	  modules/webstyle/doc/hacking/Makefile \
 	  modules/webstyle/img/Makefile \

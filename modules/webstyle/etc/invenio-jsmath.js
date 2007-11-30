@@ -4,17 +4,17 @@
  *   You can make additional copies of this file with
  *   different customizated settings if you need to load
  *   jsMath with different parameters.
- *   
+ *
  *   Load this page via:
- *   
+ *
  *   <SCRIPT SRC="path-to-jsMath/easy/load.js"></SCRIPT>
- *   
+ *
  *   (If you are including this file into your page via Server-Side
  *   Includes, you should remove line above.)
- *   
+ *
  *   You can make copies of this file with different settings
  *   if you need to have several different configurations.
- *   
+ *
  **********************************************************************/
 
 if (!window.jsMath) {window.jsMath = {}}
@@ -27,18 +27,18 @@ jsMath.Easy = {
   //  be relative to the root of your server.  It is possible
   //  to be a relative URL, but it will be relative to the
   //  HTML page loading this file.
-  //  
+  //
   //  If you leave this blank, jsMath will try to look it up from
   //  the URL where it loaded this file, but that may not work.
   //
   root: "",
-  
+
   //
   //  The default scaling factor for mathematics compared to the
   //  surrounding text.
   //
   scale: 120,
-  
+
   //
   //  1 means use the autoload plug-in to decide if jsMath should be loaded
   //  0 means always load jsMath
@@ -66,7 +66,7 @@ jsMath.Easy = {
   //  as well, though you can use them in combination with the
   //  custom delimiters if you wish.  See the tex2math documentation
   //  for more details.
-  //  
+  //
   //customDelimiters: [
   //  '[math]','[/math]',        // to begin and end in-line math
   //  '[display]','[/display]'   // to begin and end display math
@@ -76,14 +76,14 @@ jsMath.Easy = {
   //  Show TeX source when mathematics is double-clicked?
   //
   allowDoubleClicks: 1,
-  
+
   //
   //  Show jsMath font warning messages?  (Disabling this prevents yours
   //  users from finding out that they can have a better experience on your
   //  site by installing some fonts, so don't disable this).
   //
   showFontWarnings: 0,
-  
+
   //
   //  Use "Process" or "ProcessBeforeShowing".  See the jsMath
   //  author's documentation for the difference between these
@@ -95,7 +95,7 @@ jsMath.Easy = {
   //  List of plug-ins and extensions that you want to be
   //  loaded automatically.  E.g.
   //      ["plugins/mimeTeX.js","extensions/AMSsymbols.js"]
-  //  
+  //
   loadFiles: ["extensions/AMSsymbols.js","extensions/AMSmath.js"],
 
   //
@@ -103,18 +103,18 @@ jsMath.Easy = {
   //      ["cmmib10"]
   //
   loadFonts: [],
-  
+
   //
   //  Allow jsMath to enter global mode?
   //  (Uses frames, so may not always work with complex web sites)
   //
   allowGlobal: 1,
-  
+
   //
   //  Disable image fonts?  (In case you don't load them on your server.)
   //
-  noImageFonts: 1
-  
+  noImageFonts: 0
+
 };
 
 /****************************************************************/
