@@ -195,6 +195,7 @@ Contents
       $ make
       $ make check-custom-templates ## optional, only when upgrading
       $ make install
+      $ make install-jsmath-plugin  ## optional
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
       $ sudo /path/to/apache/bin/apachectl graceful
       $ sudo chgrp -R www-data /opt/cds-invenio
@@ -449,6 +450,15 @@ Contents
           "make install" process.  We continue by setting up the
           Apache web server.
 
+      $ sudo make install-jsmath-plugin  ## optional
+
+          This will automatically download and install in the proper place
+          jsMath, a Javascript library to render LaTeX formulas in the client 
+          browser.
+          In order to enable the rendering you have to set the variable 
+          CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS in the config.wml to a suitable 
+          list of output format codes like in "['hd', 'hb']".
+
       $ sudo vi /path/to/apache/conf/httpd.conf
 
           Please ask your webserver administrator to put the following
@@ -487,7 +497,8 @@ Contents
                       LogLevel warn
                       CustomLog /opt/cds-invenio/var/log/apache.log combined
                       DirectoryIndex index.en.html index.html
-                      <LocationMatch "^(/+$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss|/help)">
+                      <LocationMatch
+                      "^(/+$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss|/help|/journal)">
                          SetHandler python-program
                          PythonHandler invenio.webinterface_layout
                          PythonDebug On
@@ -534,7 +545,8 @@ Contents
                       LogLevel warn
                       CustomLog /opt/cds-invenio/var/log/apache-ssl.log combined
                       DirectoryIndex index.en.html index.html
-                      <LocationMatch "^(/+$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss|/help)">
+                      <LocationMatch
+                      "^(/+$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss|/help|/journal)">
                          SetHandler python-program
                          PythonHandler invenio.webinterface_layout
                          PythonDebug On
