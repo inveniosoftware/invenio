@@ -145,9 +145,10 @@ Contents
      j) (recommended) Gnuplot, the command-line driven interactive
         plotting program.  It is used to display download and citation
         history graphs on the Detailed record pages on the web
-        interface.  Note that Gnuplot is not required, only
-        recommended.
-          <http://www.gnuplot.info/>                      
+        interface.  Note that Gnuplot must be compiled with PNG output
+        support, that is, with the GD library.  Note also that Gnuplot
+        is not required, only recommended.  
+          <http://www.gnuplot.info/>
 
      k) (recommended) A Common Lisp implementation, such as CLISP,
         SBCL or CMUCL.  It is used for the web server log analysing
@@ -433,10 +434,16 @@ Contents
                  on the --prefix location (prefix/lib/python/invenio)
                  and the exact symlink source location depends on the
                  Python version you are using.
-             
+
                  Note that the "make install" process will hint you at
                  the exact command to use based on the values you have
                  used in the configure line.
+
+                 Note also that on some system architectures you may
+                 also need to create later another symlink for lib64:
+             
+                   $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
+                                /usr/local/lib64/python2.3/site-packages/invenio
 
           At this point you should now have successfully completed the
           "make install" process.  We continue by setting up the
