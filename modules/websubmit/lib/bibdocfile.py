@@ -24,6 +24,7 @@ import os
 import re
 import shutil
 import md5
+import filecmp
 from xml.sax.saxutils import quoteattr
 from mimetypes import MimeTypes
 
@@ -34,6 +35,14 @@ from invenio.config import cdslang, images, weburl, webdir, filedir, filedirsize
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
+
+try:
+    from mod_python import apache
+except ImportError:
+    pass
+
+CFG_BIBDOCFILE_MD5_THRESHOLD = 256 * 1024
+CFG_BIBDOCFILE_MD5_BUFFER = 1024 * 1024
 
 _mimes = MimeTypes()
 _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
@@ -148,15 +157,14 @@ class BibRecDocs:
         potential = [file for file in files if file.get_size() == size]
 
         if potential:
-            content = open(path, 'rb').read()
-            checksum = md5.new(content).hexdigest()
+            checksum = calculate_md5(path)
 
             # Let's consider all the latest files with the same size and the
             # same checksum
             potential = [file for file in potential if file.get_checksum() == checksum]
 
             if potential:
-                potential = [file for file in potential if file.get_content() == content]
+                potential = [file for file in potential if filecmp.cmp(file.get_full_path(), path)]
 
                 if potential:
                     return True
@@ -321,7 +329,7 @@ class BibRecDocs:
         """Algorithm that transform an a broken/old bibdoc into a coherent one:
         i.e. the corresponding folder will have files named after the bibdoc
         name. All extensions will be lowercase. Proper .recid, .type,
-        .doc_checksum files will be created/updated.
+        .md5 files will be created/updated.
         In case of more than one file with the same format revision a new bibdoc
         will be created in order to put does files.
         Returns the list of newly created bibdocs if any.
@@ -741,8 +749,7 @@ class BibDoc:
         if os.path.exists(self.basedir):
             self.md5s = Md5Folder(self.basedir)
             for fil in os.listdir(self.basedir):
-                if fil not in (".recid", ".docid", ".", "..",
-                        '.doc_checksum', '.type'):
+                if not fil.startswith('.'):
                     filepath = "%s/%s" % (self.basedir, fil)
                     fileversion = re.sub(".*;", "", fil)
                     fullname = fil.replace(";%s" % fileversion, "")
@@ -752,7 +759,7 @@ class BibDoc:
                     # we can append file:
                     self.docfiles.append(BibDocFile(filepath, self.doctype,
                         fileversion, basename, format,
-                        self.id, self.status, checksum))
+                        self.recid, self.id, self.status, checksum))
 
     def build_related_file_list(self):
         """Lists all files attached to the bibdoc. This function should be
@@ -812,17 +819,18 @@ class BibDoc:
             userid, ip_address,))
 
 def readfile(filename):
-    """Backward compatible function."""
+    """Used only for backward compatibility."""
     return open(filename).read()
 
 class BibDocFile:
     """This class represents a physical file in the CDS Invenio filesystem.
     It should never be instantiated directly"""
 
-    def __init__(self, fullpath, doctype, version, name, format, docid, status, checksum):
+    def __init__(self, fullpath, doctype, version, name, format, recid, docid, status, checksum):
         self.fullpath = fullpath
         self.doctype = doctype
         self.docid = docid
+        self.recid = recid
         self.version = version
         self.status = status
         self.checksum = checksum
@@ -850,7 +858,7 @@ class BibDocFile:
         return websubmit_templates.tmpl_bibdocfile_filelist(
                  ln = ln,
                  weburl = weburl,
-                 recid = BibDoc(self.docid).get_recid(),
+                 recid = self.recid,
                  version = self.version,
                  name = self.name,
                  format = self.format,
@@ -902,12 +910,7 @@ class BibDocFile:
 
     def get_recid(self):
         """Returns the recid connected with the bibdoc of this file."""
-        try:
-            return run_sql("select id_bibrec from bibrec_bibdoc where "
-                "id_bibdoc=%s",(self.docid,))[0][0]
-        except Exception, e:
-            register_exception()
-            raise InvenioWebSubmitFileError, "Encountered an exception when getting the recid of docid %s: '%s'" % (self.docid, e)
+        return self.recid
 
     def stream(self, req):
         """Stream the file."""
@@ -917,15 +920,19 @@ class BibDocFile:
             auth_code = 0
         if auth_code == 0:
             if os.path.exists(self.fullpath):
+                if calculate_md5(self.fullpath) != self.checksum:
+                    raise InvenioWebSubmitFileError, "File %s, version %s, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
                 req.content_type = self.mime
                 req.encoding = self.encoding
                 req.filename = self.fullname
                 req.headers_out["Content-Disposition"] = \
-                    "attachment; filename=%s" % quoteattr(self.fullname)
-                req.send_http_header()
+                    "inline; filename=%s" % quoteattr(self.fullname)
+                req.set_content_length(self.size)
+                #req.send_http_header()
                 try:
-                    return open(self.fullpath).read()
-                except Exception, e:
+                    req.sendfile(self.fullpath)
+                    return apache.OK
+                except IOError, e:
                     register_exception(req=req)
                     raise InvenioWebSubmitFileError, "Encountered exception while reading '%s': '%s'" % (self.fullpath, e)
             else:
@@ -939,13 +946,15 @@ def stream_restricted_icon(req):
     req.encoding = None
     req.filename = 'restricted'
     req.headers_out["Content-Disposition"] = \
-        "attachment; filename=%s" % quoteattr('restricted')
+        "inline; filename=%s" % quoteattr('restricted')
     req.send_http_header()
     try:
-        return open('%s/img/restricted.gif' % webdir, "r").read()
+        req.sendfile('%s/img/restricted.gif' % webdir)
+        return apache.OK
     except Exception, e:
         register_exception(req=req)
         raise InvenioWebSubmitFileError, "Encountered exception while streaming restricted icon: '%s'" % (e, )
+
 
 def list_types_from_array(bibdocs):
     """Retrieves the list of types from the given bibdoc list."""
@@ -987,37 +996,32 @@ class Md5Folder:
             self.update()
 
     def update(self, only_new = True):
-        """Update the .doc_checksum file with the current files. If only_new
+        """Update the .md5 file with the current files. If only_new
         is specified then only not already calculated file are calculated."""
         if os.path.exists(self.folder):
             for filename in os.listdir(self.folder):
                 if not only_new or self.md5s.get(filename, None) is None and \
                         not filename.startswith('.'):
-                    try:
-                        self.md5s[filename] = md5.new(open("%s/%s" %
-                            (self.folder, filename), "rb").read()).hexdigest()
-                    except Exception, e:
-                        register_exception()
-                        raise InvenioWebSubmitFileError, "Encountered an exception while updating .doc_checksum for folder '%s' with file '%s': '%s'" % (self.folder, filename, e)
+                    self.md5s[filename] = calculate_md5("%s/%s" %                          (self.folder, filename))
         self.store()
 
     def store(self):
-        """Store the current md5 dictionary into .doc_checksum"""
+        """Store the current md5 dictionary into .md5"""
         try:
             old_umask = os.umask(022)
-            md5file = open("%s/.doc_checksum" % self.folder, "w")
+            md5file = open("%s/.md5" % self.folder, "w")
             for key, value in self.md5s.items():
                 md5file.write('%s *%s\n' % (value, key))
             os.umask(old_umask)
         except Exception, e:
             register_exception()
-            raise InvenioWebSubmitFileError, "Encountered an exception while storing .doc_checksum for folder '%s': '%s'" % (self.folder, e)
+            raise InvenioWebSubmitFileError, "Encountered an exception while storing .md5 for folder '%s': '%s'" % (self.folder, e)
 
     def load(self):
-        """Load .doc_checksum into the md5 dictionary"""
+        """Load .md5 into the md5 dictionary"""
         self.md5s = {}
         try:
-            for row in open("%s/.doc_checksum" % self.folder, "r"):
+            for row in open("%s/.md5" % self.folder, "r"):
                 md5hash = row[:32]
                 filename = row[34:].strip()
                 self.md5s[filename] = md5hash
@@ -1025,24 +1029,22 @@ class Md5Folder:
             self.update()
         except Exception, e:
             register_exception()
-            raise InvenioWebSubmitFileError, "Encountered an exception while loading .doc_checksum for folder '%s': '%s'" % (self.folder, e)
-
+            raise InvenioWebSubmitFileError, "Encountered an exception while loading .md5 for folder '%s': '%s'" % (self.folder, e)
 
     def check(self, filename = ''):
         """Check the specified file or all the files for which it exists a hash
         for being coherent with the stored hash."""
         if filename and filename in self.md5s.keys():
             try:
-                return self.md5s[filename] == md5.new(open("%s/%s" %
-                        (self.folder, filename), "rb").read()).hexdigest()
+                return self.md5s[filename] == calculate_md5("%s/%s" %
+                        (self.folder, filename))
             except Exception, e:
                 register_exception()
                 raise InvenioWebSubmitFileError, "Encountered an exception while loading '%s/%s': '%s'" % (self.folder, filename, e)
         else:
             for filename, md5hash in self.md5s.items():
                 try:
-                    if md5.new(open("%s/%s" % (self.folder, filename),
-                        "rb").read()).hexdigest() != md5hash:
+                    if calculate_md5("%s/%s" % (self.folder, filename)) != md5hash:
                         return False
                 except Exception, e:
                     register_exception()
@@ -1058,3 +1060,35 @@ class Md5Folder:
         md5hash = self.md5s[filename]
         return md5hash
 
+def calculate_md5_external(filename):
+    """Calculate the md5 of a physical file through md5sum Command Line Tool.
+    This is suitable for file larger than 256Kb."""
+    try:
+        md5_result = os.popen('md5sum --binary "%s"' % filename)
+        ret = md5_result.read()[:32]
+        if md5_result.close():
+            # Error in running md5sum. Let's fallback to internal
+            # algorithm.
+            return calculate_md5(filename, force_internal=True)
+    except Exception, e:
+        raise InvenioWebSubmitFileError, "Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e)
+
+def calculate_md5(filename, force_internal=False):
+    """Calculate the md5 of a physical file. This is suitable for files smaller
+    than 256Kb."""
+    if force_internal or os.path.getsize(filename) < CFG_BIBDOCFILE_MD5_THRESHOLD:
+        try:
+            to_be_read = open(filename, "rb")
+            computed_md5 = md5.new()
+            while True:
+                buf = to_be_read.read(CFG_BIBDOCFILE_MD5_BUFFER)
+                if buf:
+                    computed_md5.update(buf)
+                else:
+                    break
+            return computed_md5.hexdigest()
+        except Exception, e:
+            register_exception()
+            raise InvenioWebSubmitFileError, "Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e)
+    else:
+        return calculate_md5_external(filename)
