@@ -928,10 +928,10 @@ class BibDocFile:
                 req.headers_out["Content-Disposition"] = \
                     "inline; filename=%s" % quoteattr(self.fullname)
                 req.set_content_length(self.size)
-                #req.send_http_header()
+                req.send_http_header()
                 try:
                     req.sendfile(self.fullpath)
-                    return apache.OK
+                    return ""
                 except IOError, e:
                     register_exception(req=req)
                     raise InvenioWebSubmitFileError, "Encountered exception while reading '%s': '%s'" % (self.fullpath, e)
@@ -947,10 +947,11 @@ def stream_restricted_icon(req):
     req.filename = 'restricted'
     req.headers_out["Content-Disposition"] = \
         "inline; filename=%s" % quoteattr('restricted')
+    req.set_content_length(os.path.getsize('%s/img/restricted.gif' % webdir))
     req.send_http_header()
     try:
         req.sendfile('%s/img/restricted.gif' % webdir)
-        return apache.OK
+        return ""
     except Exception, e:
         register_exception(req=req)
         raise InvenioWebSubmitFileError, "Encountered exception while streaming restricted icon: '%s'" % (e, )
