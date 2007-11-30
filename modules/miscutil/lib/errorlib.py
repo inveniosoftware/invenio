@@ -119,8 +119,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             # <type 'exceptions.StandardError'> -> exceptions.StandardError
             exc_name = str(exc_info[0])[7:-2]
             # exceptions.StandardError -> StandardError
-            if exc_name.startswith('exceptions.'):
-                exc_name = exc_name[11:]
+            exc_name = exc_name.split('.')[-1]
             exc_value = str(exc_info[1])
             print >> stream_to_write, "%(time)s -> %(name)s %(value)s" % {
                 'time' : time.strftime("%Y-%m-%d %H:%M:%S"),
@@ -135,8 +134,8 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 tracestack_pretty = "%sForced traceback (most recent call last)" % (' '*4,)
                 for trace_tuple in tracestack:
                     tracestack_pretty += """
-    File "%(file)s", line %(line)s, in %(function)s
-        %(text)s""" % \
+  File "%(file)s", line %(line)s, in %(function)s
+    %(text)s""" % \
                         {   'file'      : trace_tuple[0],
                             'line'      : trace_tuple[1],
                             'function'  : trace_tuple[2],
@@ -146,7 +145,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, stream_to_write)
             if suffix:
                 print >> stream_to_write, suffix
-            print >> stream_to_write
+            print >> stream_to_write, '\n'
             stream_to_write.close()
             return 1
         else:
