@@ -31,6 +31,8 @@ __revision__ = "$Id$"
 import os
 import urlparse
 import base64
+import cgi
+import sys
 
 # The following mod_python imports are done separately in a particular
 # order (util first) because I was getting sometimes publisher import
@@ -45,7 +47,7 @@ try:
 except ImportError:
     pass
 
-from invenio.config import cdslang, weburl, sweburl
+from invenio.config import cdslang, weburl, sweburl, tmpdir
 from invenio.messages import wash_language
 from invenio.urlutils import redirect_to_url
 
@@ -53,6 +55,7 @@ has_https_support = weburl != sweburl
 
 
 DEBUG = False
+PROFILING = False
 
 def _debug(msg):
     if DEBUG:
@@ -214,6 +217,48 @@ def create_handler(root):
     """ Return a handler function that will dispatch apache requests
     through the URL layout passed in parameter."""
 
+    def _profiler(req):
+        """ This handler wrap the default handler with a profiler.
+        Profiling data is written into ${tmpdir}/invenio-stats.raw, and
+        is displayed at the bottom of the webpage.
+        To use add profile=1 to your url. To change sorting algorithm you
+        can provide sort_profile=string.
+        The list of available algorithm is displayed at the end of the profile.
+        """
+        if req.args and cgi.parse_qs(req.args).get('profile', ['0']) == ['1']:
+            from cStringIO import StringIO
+            import pstats
+            import datetime
+            date = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
+            filename = '%s/invenio-stats-%s.raw' % (tmpdir, date)
+            sorts = pstats.Stats.sort_arg_dict_default.keys()
+            sort_type = cgi.parse_qs(req.args).get('sort_profile', ['cumulative'])[0]
+            if sort_type not in sorts:
+                sort_type = 'cumulative'
+            if sys.hexversion < 0x02050000:
+                import hotshot, hotshot.stats
+                pr = hotshot.Profile(filename)
+                ret = pr.runcall(_handler, req)
+                tmp_out = sys.stdout
+                sys.stdout = StringIO()
+                hotshot.stats.load(filename).strip_dirs().sort_stats(sort_type).print_stats()
+                profile_dump = sys.stdout.getvalue()
+                sys.stdout = tmp_out
+            else:
+                import cProfile, pstats
+                pr = cProfile.Profile()
+                ret = pr.runcall(_handler, req)
+                pr.dump_stats(filename)
+                strstream = StringIO()
+                pstats.Stats(filename, stream=strstream).strip_dirs().sort_stats(sort_type).print_stats()
+                profile_dump = strstream.getvalue()
+            profile_dump += '\nYou can use sort_profile=%s' % sorts
+            profile_dump += '\n%s' % (sort_type)
+            req.write("<pre>%s</pre>" % profile_dump)
+            return ret
+        else:
+            return _handler(req)
+
     def _handler(req):
         """ This handler is invoked by mod_python with the apache request."""
 
@@ -236,7 +281,8 @@ def create_handler(root):
         # Serve an error by default.
         return apache.HTTP_NOT_FOUND
 
-    return _handler
+
+    return _profiler
 
 
 
