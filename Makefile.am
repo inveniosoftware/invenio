@@ -132,10 +132,10 @@ install-jsmath-plugin:
 		echo "Overriding jsMath config with Invenio config..."; \
 		popd; \
 		(cd $(top_srcdir)/modules/webstyle/etc && make install); \
-		echo "***************************************************************"; \
-		echo "* Don't forget to properly set up the                         *"; \
-		echo "* CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS variable in config.wml *"; \
-		echo "***************************************************************"; \
+		echo "*****************************************************************"; \
+		echo "** Don't forget to properly set up the                         **"; \
+		echo "** CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS variable in config.wml **"; \
+		echo "*****************************************************************"; \
 	fi
 
 uninstall-jsmath-plugin:
