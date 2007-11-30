@@ -910,10 +910,9 @@ def collect_user_info(req):
 
 ## --- follow some functions for Apache user/group authentication
 
-def auth_apache_user_p(req, user, password, role, apache_password_file=CFG_APACHE_PASSWORD_FILE):
+def auth_apache_user_p(user, password, apache_password_file=CFG_APACHE_PASSWORD_FILE):
     """Check whether user-supplied credentials correspond to valid
-    Apache password data file and if these credentials enable the user
-    to be part of the given Role."""
+    Apache password data file."""
     try:
         if not apache_password_file.startswith("/"):
             apache_password_file = tmpdir + "/" + apache_password_file
@@ -923,13 +922,7 @@ def auth_apache_user_p(req, user, password, role, apache_password_file=CFG_APACH
     except: # no pw found, so return not-allowed status
         return False
     salt = password_apache[:2]
-    if crypt.crypt(password, salt) == password_apache:
-        setApacheUser(req, user)
-        authorized = acc_firerole_check_user(collect_user_info(req), load_role_definition(acc_get_role_id(role)))
-        setApacheUser(req, '')
-        return authorized
-    else:
-        return False
+    return crypt.crypt(password, salt) == password_apache
 
 def auth_apache_user_in_groups(user, apache_group_file=CFG_APACHE_GROUP_FILE):
     """Return list of Apache groups to which Apache user belong."""
@@ -972,7 +965,12 @@ def http_check_credentials(req, role):
             except (ValueError, base64.binascii.Error, base64.binascii.Incomplete):
                 raise apache.SERVER_RETURN, apache.HTTP_BAD_REQUEST
 
-            authorized = auth_apache_user_p(req, user, passwd, role)
+            authorized = auth_apache_user_p(user, passwd)
+
+        if authorized:
+            setApacheUser(req, user)
+            authorized = acc_firerole_check_user(collect_user_info(req), load_role_definition(acc_get_role_id(role)))
+            setApacheUser(req, '')
 
         if not authorized:
             # note that Opera supposedly doesn't like spaces around "=" below
