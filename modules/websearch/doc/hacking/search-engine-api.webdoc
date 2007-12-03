@@ -62,7 +62,7 @@ via both a high-level and low-level API interface.
                 cc - current collection (e.g. "ATLAS").  The collection the
                      user started to search/browse from.
 
-                 c - collectin list (e.g. ["Theses", "Books"]).  The
+                 c - collection list (e.g. ["Theses", "Books"]).  The
                      collections user may have selected/deselected when
                      starting to search from 'cc'.
 
