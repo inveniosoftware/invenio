@@ -76,7 +76,7 @@ def write_coordinates_in_tmp_file(lists_coordinates):
 def create_temporary_image(recid, kind_of_graphe, data_file, x_label, y_label, origin_tuple, y_max, docid_list, graphe_titles, intervals):
     """From a temporary file, draw a gnuplot graph
     The arguments are as follows:
-    recid          - reccord ID
+    recid          - record ID
     kind_of_graph  - takes one of these values : "citation" ,"download_history", "download_users"
                      All the commons gnuplot commands for these cases, are written at the beginning
                      After the particular commands dependaing of each case are written.
