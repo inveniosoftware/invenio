@@ -54,7 +54,7 @@ cdef extern from "Python.h":
 
 cdef extern from "intbitset.h":
     ctypedef unsigned long long int word_t
-    ctypedef unsigned char bool_t
+    #ctypedef unsigned char bool_t
     ctypedef struct IntBitSet:
         int size
         int allocated
@@ -64,7 +64,7 @@ cdef extern from "intbitset.h":
     int wordbytesize
     int wordbitsize
     int maxelem
-    IntBitSet *intBitSetCreate(int size, bool_t trailing_bits)
+    IntBitSet *intBitSetCreate(int size, bint trailing_bits)
     IntBitSet *intBitSetCreateFromBuffer(void *buf, int bufsize)
     IntBitSet *intBitSetCreateNoAllocate()
     IntBitSet *intBitSetResetFromBuffer(IntBitSet *bitset, void *buf, int bufsize)
@@ -74,10 +74,10 @@ cdef extern from "intbitset.h":
     int intBitSetGetSize(IntBitSet *bitset)
     int intBitSetGetAllocated(IntBitSet *bitset)
     int intBitSetGetTot(IntBitSet * bitset)
-    bool_t intBitSetIsInElem(IntBitSet *bitset, int elem)
+    bint intBitSetIsInElem(IntBitSet *bitset, int elem)
     void intBitSetAddElem(IntBitSet *bitset, int elem)
     void intBitSetDelElem(IntBitSet *bitset, int elem)
-    bool_t intBitSetEmpty(IntBitSet *bitset)
+    bint intBitSetEmpty(IntBitSet *bitset)
     IntBitSet *intBitSetUnion(IntBitSet *x, IntBitSet *y)
     IntBitSet *intBitSetIntersection(IntBitSet *x, IntBitSet *y)
     IntBitSet *intBitSetSub(IntBitSet *x, IntBitSet *y)
@@ -107,9 +107,9 @@ cdef class intbitset:
 
     """
     cdef IntBitSet *bitset
-    cdef bool_t sanity_checks
+    cdef bint sanity_checks
 
-    def __cinit__(self, rhs=0, int preallocate=-1, int trailing_bits=0, bool_t sanity_checks=CFG_INTBITSET_ENABLE_SANITY_CHECKS, int no_allocate=0):
+    def __cinit__(self, rhs=0, int preallocate=-1, int trailing_bits=0, bint sanity_checks=CFG_INTBITSET_ENABLE_SANITY_CHECKS, int no_allocate=0):
         """
         Initialize intbitset.
         * rhs can be:
