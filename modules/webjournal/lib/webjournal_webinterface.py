@@ -56,6 +56,7 @@ from email import message_from_string
 from xml.dom import minidom
 from invenio.bibformat_engine import format_with_format_template, BibFormatObject
 from invenio.search_engine import search_pattern
+from invenio.urlutils import redirect_to_url
 
 from invenio.webjournal_utils import get_recid_from_order, \
                                         get_recid_from_order_CERNBulletin, \
@@ -75,7 +76,7 @@ from invenio.webjournal_utils import get_recid_from_order, \
 class WebInterfaceJournalPages(WebInterfaceDirectory):
     """Defines the set of /journal pages."""
 
-    _exports = ['', 'administrate', 'article', 'issue_control', 'search', 'alert',
+    _exports = ['', 'administrate', 'article', 'issue_control', 'edit_article', 'alert',
                 'feature_record', 'popup', 'regenerate']
     #def index(self, req, form):
     #    import hotshot
@@ -226,9 +227,23 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                     'issue': (str, ""),
                                     'category': (str, ""),
                                     'number': (str, ""),
-                                    'ln': (str, "")}
+                                    'ln': (str, ""),
+                                    'editor': (str, "False")}
                             )
-        
+        try:
+            journal_name = argd['name']
+            if journal_name == "":
+                raise KeyError
+        except KeyError:
+            register_exception(stream='warning', req=req, suffix="No Journal Name was provided.")
+            return webjournal_missing_info_box(req, title="Template not found",
+                                          msg_title="We don't know which journal you are looking for",
+                                          msg='''You were looking for a journal without providing a name.
+                    Unfortunately we cannot know which journal you are looking for.
+                    Below you have a selection of journals that are available on this server.
+                    If you should find your journal there, just click the link,
+                    otherwise please contact the server admin and ask for existence
+                    of the journal you are looking for.''')
          # get / set url parameter
         journal_name = ""
         issue_number = ""
@@ -322,18 +337,44 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     
         # try to get the page from the cache
         cached_html = get_article_page_from_cache(journal_name, category, recid, issue_number, language)
-        if cached_html:
+        if cached_html and argd['editor'] == False:
             return cached_html
         # create a record and get HTML back from bibformat
         bfo = BibFormatObject(recid, ln=language, req=req)
         
         html_out = format_with_format_template(index_page_template_path,
                                                bfo)[0]
-        
-        cache_article_page(html_out, journal_name, category, recid, issue_number, language)
-        
+        if argd['editor'] == False:
+            cache_article_page(html_out, journal_name, category, recid, issue_number, language)
         return html_out
+    
+    def edit_article(self, req, form):
+        """
+        simple url redirecter to add an edit link
+        """
+        import urllib
+        argd = wash_urlargd(form, {'name': (str, ""),
+                                                    }
+                            )
+        try:
+            journal_name = argd['name']
+            if journal_name == "":
+                raise KeyError
+        except KeyError:
+            register_exception(stream='warning', req=req, suffix="No Journal Name was provided.")
+            return webjournal_missing_info_box(req, title="Template not found",
+                                          msg_title="We don't know which journal you are looking for",
+                                          msg='''You were looking for a journal without providing a name.
+                    Unfortunately we cannot know which journal you are looking for.
+                    Below you have a selection of journals that are available on this server.
+                    If you should find your journal there, just click the link,
+                    otherwise please contact the server admin and ask for existence
+                    of the journal you are looking for.''')
+        if acc_authorize_action(getUid(req), 'cfgwebjournal', name="%s" % journal_name)[0] != 0:
+            return please_login(req, journal_name, backlink='%s/journal/edit_article?%s' % (weburl, urllib.quote(req.args))) #use make_canonical_url from urlutils
         
+        redirect_to_url(req, "%s/journal/article?%s&editor=True" % (weburl, req.args))
+
     def administrate(self, req, form):
         """Index page."""
         return "Not implemented yet."
@@ -524,6 +565,7 @@ L'équipe du %s
             #subject = "%s %s released!" % (display_name, issue)
             message = createhtmlmail(html_string, plain_text, subject, argd['recipients'])
             server = smtplib.SMTP("localhost", 25)
+            recipients = argd['recipients']
             server.sendmail('Bulletin-Support@cern.ch', argd['recipients'], message)
 
             return page(title="Alert sent successfully!", body="")
