@@ -56,7 +56,6 @@ from email import message_from_string
 from xml.dom import minidom
 from invenio.bibformat_engine import format_with_format_template, BibFormatObject
 from invenio.search_engine import search_pattern
-from invenio.urlutils import redirect_to_url
 
 from invenio.webjournal_utils import get_recid_from_order, \
                                         get_recid_from_order_CERNBulletin, \
