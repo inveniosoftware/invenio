@@ -64,7 +64,7 @@ class Template:
 
                 #tag[:3] == 100x is never true, of course. This functionality TBD
                 #and will be used in enrichment editing
-                if str(tag[:3]) == "100x":
+                if str(tag[:3]) == "100x": #FIXME
                             link_edit_100 = self.tmpl_link(
                                 ln, _("Edit institute"), weburl_bibedit, 'edit',
                                 {'recid'      : str(recid),
