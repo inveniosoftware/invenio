@@ -561,7 +561,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
             description = "%s %s." % (cc, _("Search Results"))
 
         if not keywords:
-            keywords = "%s, WebSearch, %s" % (cdsnameintl.get(ln, cdsname), cc)
+            keywords = "%s, WebSearch, %s" % (cdsnameintl.get(ln, cdsname), get_coll_i18nname(cc, ln))
 
         navtrail = create_navtrail_links(cc, as, ln)
         navtrail_append_title_p = 1
@@ -662,11 +662,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
     _ = gettext_set_language(ln)
 
     # some computations
-    if cc == cdsname:
-        cc_intl = cdsnameintl.get(ln, cdsname)
-    else:
-        cc_intl = get_coll_i18nname(cc, ln)
-
+    cc_intl = get_coll_i18nname(cc, ln)
     cc_colID = get_colID(cc)
 
     colls_nicely_ordered = []
