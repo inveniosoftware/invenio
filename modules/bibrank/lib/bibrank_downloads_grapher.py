@@ -65,7 +65,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
             history_analysis_results = draw_downloads_statistics(id_bibrec, list(id_bibdocs))
         else:
             history_analysis_results = draw_downloads_statistics(id_bibrec, [])
-        if history_analysis_results[0]:
+        if history_analysis_results and history_analysis_results[0]:
             graph_file_history = weburl + "/img/" + history_analysis_results[0]
             file_to_close_history = history_analysis_results[1]
             html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_history
