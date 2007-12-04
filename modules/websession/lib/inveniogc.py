@@ -33,7 +33,7 @@ try:
     from invenio.bibtask import task_init, task_set_option, task_get_option, \
         write_message, write_messages
     from invenio.access_control_mailcookie import mail_cookie_gc
-    from invenio.file import BibDoc
+    from invenio.bibdocfile import BibDoc
     import time
     import os
 except ImportError, e:
