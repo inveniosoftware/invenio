@@ -91,7 +91,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 try:
                     (role_name, expiration) = mail_cookie_check_role(args['mailcookie'], uid)
                 except InvenioWebAccessMailCookieDeletedError:
-                    return webuser.page(title=_("Role authorization request"), req=req, body=_("This request for an authorization has already been authorized."), uid=webuser.getUid(req), navmenuid='youraccount', language=args['ln'])
+                    return page(title=_("Role authorization request"), req=req, body=_("This request for an authorization has already been authorized."), uid=webuser.getUid(req), navmenuid='youraccount', language=args['ln'])
                 return page(title=title,
                 body=webaccount.perform_back(
                     _("You have successfully obtained an authorization as %(role)s! "
@@ -778,7 +778,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             act = "register"
             title = _("Registration failure")
         elif ruid == 6:
-            mess = _("The site is having troubles in sending you an email for confirming your email address. The error has been logged and will be taken in consideration as soon as possibile.")
+            mess = _("The site is having troubles in sending you an email for confirming your email address.") + _("The error has been logged and will be taken in consideration as soon as possibile.")
             act = "register"
             title = _("Registration failure")
         else:
