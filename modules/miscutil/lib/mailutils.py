@@ -51,8 +51,8 @@ from invenio.errorlib import get_msgs_for_code_list, register_errors, register_e
 
 def send_email(fromaddr,
                toaddr,
-               subject,
-               content,
+               subject="",
+               content="",
                html_content='',
                html_images={},
                header=None,
@@ -87,7 +87,7 @@ def send_email(fromaddr,
     ATTEMPT_SLEEPTIME seconds in between tries.
 
     e.g.:
-    send_email('Samuele.Kaplun@cern.ch', 'Samuele.Kaplun@cern.ch', 'Proviamo un po\'', '123 prova', '<strong>123</strong> <em>prova</em><img src="cid:image1">', {'image1': '/home/sam/Desktop/Documenti/Foto/Labex/quantum.jpg'})
+    send_email('foo.bar@cern.ch', 'bar.foo@cern.ch', 'Let\'s try!'', 'check 1234', '<strong>check</strong> <em>1234</em><img src="cid:image1">', {'image1': '/tmp/quantum.jpg'})
 
     @return [int]: 0 if email was sent okay, 1 if it was not.
     """
