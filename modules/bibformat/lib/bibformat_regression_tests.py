@@ -124,7 +124,8 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
         self.record_7_hd_abstract = '''<p><span class="blocknote">
  Caption</span><br /> <small>Conference "Internet, Web, What's next?" on 26 June 1998 at CERN : Tim Berners-Lee, inventor of the World-Wide Web and Director of the W3C, explains how the Web came to be and give his views on the future.</small></p><p><span class="blocknote">
  Légende</span><br /><small>Conference "Internet, Web, What's next?" le 26 juin 1998 au CERN: Tim Berners-Lee, inventeur du World-Wide Web et directeur du W3C, explique comment le Web est ne, et donne ses opinions sur l'avenir.</small></p>'''
-        self.record_7_hd_resource = '''<span class="blocknote">Resources</span><br /><br />High resolution: <a href="http://preprints.cern.ch/cgi-bin/setlink?base=PHO&amp;categ=photo-ge&amp;id=9806033">http://preprints.cern.ch/cgi-bin/setlink?base=PHO&amp;categ=photo-ge&amp;id=9806033</a><br /><br /><img src="http://preprints.cern.ch/photo/photo-ge/9806033.gif" alt="" /><br /><font size="-2"><b>© CERN Geneva</b></font>'''
+        self.record_7_hd_resource = '''<img src="%s/record/7/files/icon-9806033.gif" alt="" /><br /><font size="-2"><b>© CERN Geneva</b></font>''' % weburl
+        self.record_7_hd_resource_link = '%s/record/7/files/9806033.jpeg' %  weburl
 
     def test_detailed_html_output(self):
         """bibformat - Detailed HTML output"""
@@ -150,7 +151,8 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
                                                       self.record_7_hd_title,
                                                       self.record_7_hd_date,
                                                       self.record_7_hd_abstract,
-                                                      self.record_7_hd_resource])
+                                                      self.record_7_hd_resource,
+                                                      self.record_7_hd_resource_link])
         self.assertEqual([], result)
 
     def test_detailed_html_edit_record(self):
