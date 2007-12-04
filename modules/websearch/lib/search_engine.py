@@ -50,7 +50,6 @@ from invenio.config import \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
      cdslang, \
      cdsname, \
-     cdsnameintl, \
      logdir, \
      weburl
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES, InvenioWebSearchUnknownCollectionError
@@ -561,7 +560,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
             description = "%s %s." % (cc, _("Search Results"))
 
         if not keywords:
-            keywords = "%s, WebSearch, %s" % (cdsnameintl.get(ln, cdsname), get_coll_i18nname(cc, ln))
+            keywords = "%s, WebSearch, %s" % (get_coll_i18nname(cdsname, ln), get_coll_i18nname(cc, ln))
 
         navtrail = create_navtrail_links(cc, as, ln)
         navtrail_append_title_p = 1
