@@ -31,7 +31,7 @@ from mimetypes import MimeTypes
 from invenio.dbquery import run_sql
 from invenio.errorlib import register_exception
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import cdslang, images, weburl, webdir, filedir, filedirsize
+from invenio.config import cdslang, images, weburl, webdir, filedir, filedirsize, sweburl
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -76,6 +76,11 @@ def normalize_format(format):
         format = '.' + format
     return format
 
+_docname_re = re.compile(r'[^-\w]*')
+def normalize_docname(docname):
+    """Normalize the docname (only digit and alphabetic letters and underscore are allowed)"""
+    return _docname_re.sub('', docname)
+
 def normalize_version(version):
     """Normalize the version."""
     try:
@@ -85,7 +90,7 @@ def normalize_version(version):
             return 'all'
         else:
             return ''
-    return version
+    return str(version)
 
 _path_re = re.compile(r'.*[\\/:]')
 def decompose_file(file):
@@ -176,6 +181,7 @@ class BibRecDocs:
 
     def propose_unique_docname(self, docname):
         """Propose a unique docname."""
+        docname = normalize_docname(docname)
         goodname = docname
         i = 1
         while goodname in self.get_bibdoc_names():
@@ -226,6 +232,7 @@ class BibRecDocs:
         If never_fail is True then the system will always be able
         to create a bibdoc.
         """
+        docname = normalize_docname(docname)
         if never_fail:
             docname = self.propose_unique_docname(docname)
         if docname in self.get_bibdoc_names():
@@ -233,6 +240,7 @@ class BibRecDocs:
         else:
             bibdoc = BibDoc(recid=self.id, doctype=doctype, docname=docname)
             self.build_bibdoc_list()
+            _log_action('add_bibdoc', recid=self.id, docname=docname, doctype=doctype, docid=bibdoc.id)
             return bibdoc
 
     def add_new_file(self, fullpath, doctype="Main", docname='', never_fail=False):
@@ -247,6 +255,7 @@ class BibRecDocs:
         """
         if not docname:
             docname = decompose_file(fullpath)[1]
+        docname = normalize_docname(docname)
         try:
             bibdoc = self.get_bibdoc(docname)
         except InvenioWebSubmitFileError:
@@ -408,6 +417,7 @@ class BibDoc:
         """Constructor of a bibdoc. At least the docid or the recid/docname
         pair is needed."""
         # docid is known, the document already exists
+        docname = normalize_docname(docname)
         if docid != "":
             if recid == "":
                 recid = None
@@ -507,10 +517,12 @@ class BibDoc:
         self.status = new_status
         self.build_file_list()
         self.build_related_file_list()
+        _log_action('set_status_bibdoc', recid=self.recid, docid=self.id, docname=self.docname, status=new_status)
 
     def add_file_new_version(self, filename):
         """Add a new version of a file."""
         try:
+            ok = False
             latestVersion = self.get_latest_version()
             if int(latestVersion) == 0:
                 myversion = "1"
@@ -523,6 +535,7 @@ class BibDoc:
                 try:
                     shutil.copyfile(filename, destination)
                     os.chmod(destination, 0644)
+                    ok = True
                 except Exception, e:
                     register_exception()
                     raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (file, destination, e)
@@ -532,13 +545,16 @@ class BibDoc:
             self.touch()
             Md5Folder(self.basedir).update()
             self.build_file_list()
+            if ok:
+                current_file= self.get_file(self.docname, format, myversion)
+                _log_action(action="add_file", recid=self.recid, docid=self.id, docname=self.docname, format=format, version=myversion, checksum=current_file.get_checksum(), size=current_file.get_size())
 
     def purge(self):
         """Phisically Remove all the previous version of the given bibdoc"""
         version = self.get_latest_version()
-        if version > 1:
+        if int(version) > 1:
             for file in self.docfiles:
-                if file.get_version() < version:
+                if int(file.get_version()) < version:
                     try:
                         os.remove(file.get_full_path())
                     except Exception, e:
@@ -547,6 +563,7 @@ class BibDoc:
             self.touch()
             self.build_file_list()
             self.build_related_file_list()
+            _log_action(action="purge_bibdoc", recid=self.recid, docid=self.id, docname=self.docname)
 
     def expunge(self):
         """Phisically remove all the traces of a given bibdoc"""
@@ -559,10 +576,13 @@ class BibDoc:
         self.touch()
         self.build_file_list()
         self.build_related_file_list()
+        _log_action(action="expunge_bibdoc", recid=self.recid, docid=self.id, docname=self.docname)
+
 
     def add_file_new_format(self, filename, version=""):
         """add a new format of a file to an archive"""
         try:
+            ok = False
             if version == "":
                 version = self.get_latest_version()
             if int(version) == 0:
@@ -576,6 +596,7 @@ class BibDoc:
                 try:
                     shutil.copyfile(filename, destination)
                     os.chmod(destination, 0644)
+                    ok = True
                 except Exception, e:
                     register_exception()
                     raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (file, destination, e)
@@ -585,6 +606,9 @@ class BibDoc:
             Md5Folder(self.basedir).update()
             self.touch()
             self.build_file_list()
+            if ok:
+                current_file= self.get_file(self.docname, format, version)
+                _log_action(action="add_file", recid=self.recid, docid=self.id, docname=self.docname, format=format, version=version, checksum=current_file.get_checksum(), size=current_file.get_size())
 
     def get_icon(self):
         """Returns the bibdoc corresponding to an icon of the given bibdoc."""
@@ -607,11 +631,13 @@ class BibDoc:
         run_sql("INSERT INTO bibdoc_bibdoc (id_bibdoc1, id_bibdoc2, type) VALUES (%s,%s,'Icon')",
             (self.id, newicon.get_id(),))
         try:
+            ok = False
             try:
                 old_umask = os.umask(022)
                 open("%s/.docid" % newicon.get_base_dir(), "w").write(str(self.id))
                 open("%s/.type" % newicon.get_base_dir(), "w").write(str(self.doctype))
                 os.umask(old_umask)
+                ok = True
             except Exception, e:
                 register_exception()
                 raise InvenioWebSubmitFileError, "Encountered an exception while writing .docid and .doctype for folder '%s': '%s'" % (newicon.get_base_dir(), e)
@@ -619,6 +645,8 @@ class BibDoc:
             Md5Folder(newicon.basedir).update()
             self.touch()
             self.build_related_file_list()
+            if ok:
+                _log_action(action="add_icon", recid=self.recid, docid=self.id, docid2=newicon.id, docname=newicon.docname)
         return newicon
 
     def delete_icon(self):
@@ -628,6 +656,7 @@ class BibDoc:
             existing_icon.delete()
         self.touch()
         self.build_related_file_list()
+        _log_action(action="delete_icon", docid=self.id)
 
     def display(self, version="", ln = cdslang):
         """Returns a formatted representation of the files linked with
@@ -675,6 +704,7 @@ class BibDoc:
     def change_name(self, newname):
         """Rename the bibdoc name. New name must not be already used by the linked
         bibrecs."""
+        newname = normalize_docname(newname)
         res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (self.recid, newname))
         if res:
             raise InvenioWebSubmitFileError, "A bibdoc called %s already exists for recid %s" % (newname, self.recid)
@@ -687,6 +717,8 @@ class BibDoc:
         self.touch()
         self.build_file_list()
         self.build_related_file_list()
+        _log_action(action='rename_bibdoc', recid=self.recid, docid=self.id, docname=self.docname)
+
 
     def get_docname(self):
         """retrieve bibdoc name"""
@@ -708,7 +740,7 @@ class BibDoc:
         """retrieve bibdoc id"""
         return self.id
 
-    def get_file(self, name, format, version):
+    def get_file(self, name, format, version=""):
         """Return a DocFile with docname name, with format (the extension), and
         with the given version.
         """
@@ -735,12 +767,15 @@ class BibDoc:
     def delete(self):
         """delete the current bibdoc instance"""
         run_sql("UPDATE bibdoc SET status='DELETED' WHERE id=%s", (self.id,))
+        _log_action(action="delete_bibdoc", recid=self.recid, docid=self.id, docname=self.docname)
 
     def undelete(self, previous_status=''):
         """undelete a deleted file (only if it was actually deleted). The
         previous status, i.e. the restriction key can be provided.
         Otherwise the bibdoc will pe public."""
         run_sql("UPDATE bibdoc SET status=%s WHERE id=%s AND status='DELETED'", (self.id, previous_status))
+        _log_action(action="undelete_bibdoc", recid=self.recid, docid=self.id, docname=self.docname, status=previous_status)
+
 
     def build_file_list(self):
         """Lists all files attached to the bibdoc. This function should be
@@ -1071,6 +1106,8 @@ def calculate_md5_external(filename):
             # Error in running md5sum. Let's fallback to internal
             # algorithm.
             return calculate_md5(filename, force_internal=True)
+        else:
+            return ret
     except Exception, e:
         raise InvenioWebSubmitFileError, "Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e)
 
@@ -1093,3 +1130,54 @@ def calculate_md5(filename, force_internal=False):
             raise InvenioWebSubmitFileError, "Encountered an exception while calculating md5 for file '%s': '%s'" % (filename, e)
     else:
         return calculate_md5_external(filename)
+
+
+def bibdocfile_url_to_bibrecdocs(url):
+    """Given a url in the form (s)weburl/record/xxx/files/... it returns
+    a BibRecDocs object for the corresponding recid."""
+
+    recid = decompose_bibdocfile_url(url)[0]
+    return BibRecDocs(recid)
+
+def bibdocfile_url_to_bibdoc(url):
+    """Given a url in the form (s)weburl/record/xxx/files/... it returns
+    a BibDoc object for the corresponding recid/docname."""
+
+    docname = decompose_bibdocfile_url(url)[1]
+    return bibdocfile_url_to_bibrecdocs(url).get_bibdoc(docname)
+
+def bibdocfile_url_to_bibdocfile(url):
+    """Given a url in the form (s)weburl/record/xxx/files/... it returns
+    a BibDocFile object for the corresponding recid/docname/format."""
+    dontcare, docname, format = decompose_bibdocfile_url(url)
+    return bibdocfile_url_to_bibdoc(url).get_file(docname, format)
+
+def bibdocfile_url_to_fullpath(url):
+    """Given a url in the form (s)weburl/record/xxx/files/... it returns
+    the fullpath for the corresponding recid/docname/format."""
+
+    return bibdocfile_url_to_bibdocfile(url).get_full_path()
+
+def bibdocfile_url_p(url):
+    """Return True when the url is a potential valid url pointing to a
+    fulltext owned by a system."""
+    if not (url.startswith('%s/record/' % weburl) or url.startswith('%s/record/' % sweburl)):
+        return False
+    splitted_url = url.split('/files/')
+    return len(splitted_url) == 2 and splitted_url[0] != '' and splitted_url[1] != ''
+
+def decompose_bibdocfile_url(url):
+    """Given a bibdocfile_url return a triple (recid, docname, format)."""
+    if url.startswith('%s/record/' % weburl):
+        recid_file = url[len('%s/record/' % weburl):]
+    elif url.startswith('%s/record/' % sweburl):
+        recid_file = url[len('%s/record/' % sweburl):]
+    else:
+        raise InvenioWebSubmitFileError, "Url %s doesn't correspond to a valid record inside the system." % url
+    recid_file = recid_file.replace('/files/', '/')
+    recid, docname, format = decompose_file(recid_file)
+    return (int(recid), docname, format)
+
+def _log_action(action, recid=None, docid=None, doctype=None, docid2=None, docname=None, format=None, version=None, status=None, size=None, checksum=None):
+    """Log an action into the bibdoclog table."""
+    run_sql('INSERT INTO bibdoclog(action, recid, docid, type, docid2, docname, format, version, status, size, checksum, date) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())', (action, recid, docid, doctype, docid2, docname, format, version, status, size, checksum))

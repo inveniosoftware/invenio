@@ -2338,6 +2338,31 @@ CREATE TABLE IF NOT EXISTS bibdoc (
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS bibdoclog (
+  action varchar(50) NOT NULL,
+  recid mediumint(9) unsigned NULL default NULL,
+  docid mediumint(9) unsigned NULL default NULL,
+  type varchar(255) NULL default NULL,
+  docid2 mediumint(9) unsigned NULL default NULL,
+  docname varchar(250) NULL default NULL,
+  format varchar(50) NULL default NULL,
+  version tinyint(4) unsigned NULL default NULL,
+  status varchar(50) NULL default NULL,
+  size mediumint(9) unsigned NULL default NULL,
+  checksum char(32) NULL default NULL,
+  date datetime NOT NULL,
+  KEY (action),
+  KEY (recid),
+  KEY (docid),
+  KEY (type),
+  KEY (docname),
+  KEY (format),
+  KEY (status),
+  KEY (size),
+  key (date)
+) TYPE=MyISAM;
+
+
 CREATE TABLE IF NOT EXISTS bibrec_bibdoc (
   id_bibrec mediumint(9) unsigned NOT NULL default '0',
   id_bibdoc mediumint(9) unsigned NOT NULL default '0',
