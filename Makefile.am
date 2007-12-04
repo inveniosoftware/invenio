@@ -119,19 +119,18 @@ install-jsmath-plugin:
 	@echo "***********************************************************"
 	rm -rf /tmp/invenio-jsmath-plugin
 	mkdir /tmp/invenio-jsmath-plugin
-	cd /tmp/invenio-jsmath-plugin
-	wget 'http://downloads.sourceforge.net/jsmath/$(JSMATH)'
-	wget 'http://downloads.sourceforge.net/jsmath/$(JSMATHFONTS)'
-	wget 'http://www.math.union.edu/~dpvc/jsMath/download/extra-fonts/msam10/msam10.zip'
-	wget 'http://www.math.union.edu/~dpvc/jsMath/download/extra-fonts/msbm10/msbm10.zip'
-	unzip -u -d ${prefix}/var/www $(JSMATH)
-	unzip -u -d ${prefix}/var/www $(JSMATHFONTS)
-	unzip -u -d ${prefix}/var/www/jsMath/fonts msam10.zip
-	unzip -u -d ${prefix}/var/www/jsMath/fonts msbm10.zip
+	(cd /tmp/invenio-jsmath-plugin && \
+	wget 'http://downloads.sourceforge.net/jsmath/$(JSMATH)' && \
+	wget 'http://downloads.sourceforge.net/jsmath/$(JSMATHFONTS)' && \
+	wget 'http://www.math.union.edu/~dpvc/jsMath/download/extra-fonts/msam10/msam10.zip' && \
+	wget 'http://www.math.union.edu/~dpvc/jsMath/download/extra-fonts/msbm10/msbm10.zip' && \
+	unzip -u -d ${prefix}/var/www $(JSMATH) && \
+	unzip -u -d ${prefix}/var/www $(JSMATHFONTS) && \
+	unzip -u -d ${prefix}/var/www/jsMath/fonts msam10.zip && \
+	unzip -u -d ${prefix}/var/www/jsMath/fonts msbm10.zip)
 	rm -fr /tmp/invenio-jsmath-plugin
 	@echo "* Installing Invenio-specific jsMath config..."
 	(cd $(top_srcdir)/modules/webstyle/etc && make install)
-	rm -rf /tmp/invenio-jsmath-plugin
 	@echo "***********************************************************"
 	@echo "** The jsMath plugin was successfully installed.         **"
 	@echo "** Please do not forget to properly set the              **"
