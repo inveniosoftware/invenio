@@ -141,7 +141,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                             'function'  : trace_tuple[2],
                             'text'      : trace_tuple[3] is not None and str(trace_tuple[3]) or ""
                         }
-            print >> stream_to_write, tracestack_pretty
+                print >> stream_to_write, tracestack_pretty
             traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, stream_to_write)
             if suffix:
                 print >> stream_to_write, suffix
@@ -377,5 +377,5 @@ Please see the %(logdir)s/invenio.err for traceback details.""" % \
             'contact'   : "Please contact %s quoting the following information:"  % (supportemail,) #! is support email always cds?
         }
     from invenio.mailutils import send_email
-    send_email(from_addr, to_addr, content=body)
+    send_email(from_addr, to_addr, subject="Error notification", content=body)
 
