@@ -38,6 +38,7 @@ def format(bfo, separator=" ", highlight='no'):
 
     title = bfo.field('245__a')
     title_remainder = bfo.field('245__b')
+    edition_statement = bfo.field('250__a')
 
     if len(title) > 0:
         if title_remainder:
@@ -73,7 +74,10 @@ def format(bfo, separator=" ", highlight='no'):
         from invenio import bibformat_utils
         titles = [bibformat_utils.highlight(x, bfo.search_pattern) for x in titles]
 
-    return separator.join(titles)
+    if len(edition_statement) > 0:
+        return separator.join(titles) + "; " + edition_statement
+    else:
+        return separator.join(titles)
 
 def escape_values(bfo):
     """
