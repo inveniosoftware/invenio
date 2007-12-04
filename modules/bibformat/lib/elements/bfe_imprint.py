@@ -22,14 +22,22 @@
 """
 __revision__ = "$Id$"
 
-def format(bfo, place_label, publisher_label, date_label, separator=', ',):
+import time
+
+def format(bfo, place_label, publisher_label, date_label, separator=', ', date_format=""):
     """
     Print imprint (Order: Name of publisher, place of publication and date of publication).
-
+    Parameter <code>date_format</code> allows to specify the string representation of the output.
+    The format string has the same behaviour as the strftime() function.
+    <pre>Eg: 1982-09-24 07:32:00
+         "%d %B %Y"   -> 24 September 1982
+         "%I:%M"      -> 07:32
+    </pre>
     @param separator a separator between the elements of imprint
     @param place_label a label to print before the publication place value
     @param publisher_label a label to print before the publisher name
     @param date_label a a label to print before the publication date
+    @param date_format date format
     @see place.py, publisher.py, date.py, reprints.py, pagination.py
     """
 
@@ -46,4 +54,13 @@ def format(bfo, place_label, publisher_label, date_label, separator=', ',):
         out += place_label + ' ' + place + separator
 
     if len(date) > 0:
-        out += date_label + ' ' + date
+        if format != '':
+            try:
+                date_time = time.strptime(date, "%Y-%m-%d")
+                out += date_label + " " + date_time.strftime(date_format)
+            except ValueError:
+                out += date_label + ' ' + date
+        else:
+            out += date_label + ' ' + date
+
+    return out
