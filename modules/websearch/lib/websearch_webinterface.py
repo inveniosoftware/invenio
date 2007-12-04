@@ -25,7 +25,7 @@ import cgi
 from urllib import quote
 from mod_python import apache
 
-from invenio.config import weburl, cdsname, cachedir, cdsnameintl, cdslang, adminemail, sweburl
+from invenio.config import weburl, cdsname, cachedir, cdslang, adminemail, sweburl
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
@@ -40,7 +40,6 @@ from invenio.search_engine import get_colID, get_coll_i18nname, collection_restr
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
-
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -493,7 +492,7 @@ def display_collection(req, c, as, verbose, ln):
     colID = get_colID(c)
     if type(colID) is not int:
         page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
-        page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + weburl + '?ln=' + ln + '">' + cdsnameintl.get(ln, cdsname) + '</a>')) + '</p>'
+        page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + weburl + '?ln=' + ln + '">' + get_coll_i18nname(cdsname, ln) + '</a>')) + '</p>'
         return page(title=_("Collection %s Not Found") % cgi.escape(c),
                     body=page_body,
                     description=(cdsname + ' - ' + _("Not found") + ': ' + cgi.escape(str(c))),
@@ -529,10 +528,7 @@ def display_collection(req, c, as, verbose, ln):
         filedesc = open("%s/collections/%d/last-updated-ln=%s.html" % (cachedir, colID, ln), "r")
         c_last_updated = filedesc.read()
         filedesc.close()
-        if c == cdsname:
-            title = cdsnameintl.get(ln, cdsname)
-        else:
-            title = get_coll_i18nname(c, ln)
+        title = get_coll_i18nname(c, ln)
 
         return page(title=title,
                     body=c_body,
