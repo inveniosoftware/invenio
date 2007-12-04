@@ -28,7 +28,6 @@ def format(bfo, highlight="no", multilang='no'):
 
     @param highlight highlights the words corresponding to search query if set to 'yes'
     """
-    
     if multilang == 'yes':
         if bfo.lang == 'fr':
             title = bfo.field('246_1a')
@@ -41,9 +40,9 @@ def format(bfo, highlight="no", multilang='no'):
 
     out = title
     if len(title_remainder) > 0:
-        out += " : " + title_remainder
+        out += ": " + title_remainder
     if len(edition_statement) > 0:
-        out += " ; " + edition_statement
+        out += "; " + edition_statement
 
     #Try to display 'Conference' title if other titles were not found
     if out == '':
