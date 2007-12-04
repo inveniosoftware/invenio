@@ -42,8 +42,9 @@ from invenio.config import \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
      CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
      CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE, \
-     weburl
+     weburl, tmpdir
 from invenio.bibindex_engine_config import *
+from invenio.bibdocfile import bibdocfile_url_to_fullpath, bibdocfile_url_p, decompose_bibdocfile_url
 from invenio.search_engine import perform_request_search, strip_accents, wash_index_term
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stopwords import is_stopword
@@ -52,6 +53,7 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
     task_update_progress
 from invenio.intbitset import intbitset
+from invenio.errorlib import register_exception
 
 ## import optional modules:
 try:
@@ -206,16 +208,114 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
         match =  expr.search(htmlpagebody)
         if match and ext not in ['htm', 'html']:
             out.append([ext, match.group(1)])
-        else: # FIXME: workaround for getfile, should use bibdoc tables
-            expr_getfile = re.compile(r"\"(http://.*getfile\.py\?.*format=" + ext + r"&version=.*)\"")
-            match =  expr_getfile.search(htmlpagebody)
-            if match and ext not in ['htm', 'html']:
-                out.append([ext, match.group(1)])
+        #else: # FIXME: workaround for getfile, should use bibdoc tables
+            #expr_getfile = re.compile(r"\"(http://.*getfile\.py\?.*format=" + ext + r"&version=.*)\"")
+            #match =  expr_getfile.search(htmlpagebody)
+            #if match and ext not in ['htm', 'html']:
+                #out.append([ext, match.group(1)])
     return out
 
+def get_words_from_local_fulltext(path, ext=''):
+    # FIXME
+    if not ext:
+        ext = path[len(file_strip_ext(path))+1:].lower()
+
+    tmp_name = path.replace(';', '\\;')
+    tmp_dst_name = tempfile.mkstemp('invenio.tmp.txt', dir=tmpdir)[1]
+
+    # try all available conversion programs according to their order:
+    bingo = 0
+    for conv_program in CONV_PROGRAMS.get(ext, []):
+        if os.path.exists(conv_program):
+            # intelligence on how to run various conversion programs:
+            cmd = ""  # wil keep command to run
+            bingo = 0 # had we success?
+            if os.path.basename(conv_program) == "pdftotext":
+                cmd = "%s -enc UTF-8 %s %s" % (conv_program, tmp_name, tmp_dst_name)
+            elif os.path.basename(conv_program) == "pstotext":
+                if ext == "ps.gz":
+                    # is there gzip available?
+                    if os.path.exists(CONV_PROGRAMS_HELPERS["gz"]):
+                        cmd = "%s -cd %s | %s > %s" \
+                                % (CONV_PROGRAMS_HELPERS["gz"], tmp_name, conv_program, tmp_dst_name)
+                else:
+                    cmd = "%s %s > %s" \
+                            % (conv_program, tmp_name, tmp_dst_name)
+            elif os.path.basename(conv_program) == "ps2ascii":
+                if ext == "ps.gz":
+                        # is there gzip available?
+                    if os.path.exists(CONV_PROGRAMS_HELPERS["gz"]):
+                        cmd = "%s -cd %s | %s > %s"\
+                                % (CONV_PROGRAMS_HELPERS["gz"], tmp_name,
+                                    conv_program, tmp_dst_name)
+                else:
+                    cmd = "%s %s %s" \
+                            % (conv_program, tmp_name, tmp_dst_name)
+            elif os.path.basename(conv_program) == "antiword":
+                cmd = "%s %s > %s" % (conv_program, tmp_name, tmp_dst_name)
+            elif os.path.basename(conv_program) == "catdoc":
+                cmd = "%s %s > %s" % (conv_program, tmp_name, tmp_dst_name)
+            elif os.path.basename(conv_program) == "wvText":
+                cmd = "%s %s %s" % (conv_program, tmp_name, tmp_dst_name)
+            elif os.path.basename(conv_program) == "ppthtml":
+                # is there html2text available?
+                if os.path.exists(CONV_PROGRAMS_HELPERS["html"]):
+                    cmd = "%s %s | %s > %s"\
+                            % (conv_program, tmp_name,
+                                CONV_PROGRAMS_HELPERS["html"], tmp_dst_name)
+                else:
+                    cmd = "%s %s > %s" \
+                            % (conv_program, tmp_name, tmp_dst_name)
+            elif os.path.basename(conv_program) == "xlhtml":
+                # is there html2text available?
+                if os.path.exists(CONV_PROGRAMS_HELPERS["html"]):
+                    cmd = "%s %s | %s > %s" % \
+                            (conv_program, tmp_name,
+                            CONV_PROGRAMS_HELPERS["html"], tmp_dst_name)
+                else:
+                    cmd = "%s %s > %s" % \
+                            (conv_program, tmp_name, tmp_dst_name)
+            elif os.path.basename(conv_program) == "html2text":
+                    cmd = "%s %s > %s" % \
+                            (conv_program, tmp_name, tmp_dst_name)
+            else:
+                sys.stderr.write("Error: Do not know how to handle %s conversion program.\n" % conv_program)
+            # try to run it:
+            try:
+                write_message("..... launching %s" % cmd, verbose=9)
+                # Note we replace ; in order to make happy internal file names
+                errcode = os.system(cmd)
+                if errcode == 0 and os.path.exists(tmp_dst_name):
+                    bingo = 1
+                    break # bingo!
+                else:
+                    write_message("Error while running %s for %s.\n" % (cmd, path), sys.stderr)
+            except:
+                write_message("Error running %s for %s.\n" % (cmd, path), sys.stderr)
+
+    # were we successful?
+    if bingo:
+        tmp_name_txt_file = open(tmp_dst_name)
+        for phrase in tmp_name_txt_file.xreadlines():
+            for word in get_words_from_phrase(phrase):
+                if not words.has_key(word):
+                    words[word] = 1
+        tmp_name_txt_file.close()
+    else:
+        write_message("No conversion success for %s.\n" % (path), sys.stderr)
+
+    # delete temp files (they might not exist):
+    try:
+        os.unlink(tmp_dst_name)
+    except StandardError:
+        write_message("Error: Could not delete file. It didn't exist", sys.stderr)
+
+    write_message("... reading fulltext files from %s ended" % path, verbose=2)
+
+    return words.keys()
+
+
 def get_words_from_fulltext(url_direct_or_indirect,
-                            split=str.split,
-                            lower=str.lower,
                             force_file_extension=None):
     """Returns all the words contained in the document specified by
        URL_DIRECT_OR_INDIRECT with the words being split by various
@@ -235,12 +335,16 @@ def get_words_from_fulltext(url_direct_or_indirect,
         return []
     write_message("... reading fulltext files from %s started" % url_direct_or_indirect, verbose=2)
 
-    fulltext_urls = None
-    if not force_file_extension:
-        url_direct = None
-        fulltext_urls = None
+    fulltext_urls = []
+    if bibdocfile_url_p(url_direct_or_indirect):
+        write_message("... url %s is an internal url" % url_direct_or_indirect, verbose=9)
+        ext = decompose_bibdocfile_url(url_direct_or_indirect)[2]
+        if ext[0] == '.':
+            ext = ext[1:].lower()
+        fulltext_urls = [(ext, url_direct_or_indirect)]
+    elif not force_file_extension:
         # check for direct link in url
-        url_direct_or_indirect_ext = lower(split(url_direct_or_indirect,".")[-1])
+        url_direct_or_indirect_ext = url_direct_or_indirect.split(".")[-1].lower()
 
         if url_direct_or_indirect_ext in CONV_PROGRAMS.keys():
             fulltext_urls = [(url_direct_or_indirect_ext, url_direct_or_indirect)]
@@ -250,13 +354,16 @@ def get_words_from_fulltext(url_direct_or_indirect,
             # read "setlink" data
             try:
                 htmlpagebody = urllib2.urlopen(url_direct_or_indirect).read()
-            except:
-                sys.stderr.write("Error: Cannot read %s.\n" % url_direct_or_indirect)
+            except Exception, e:
+                register_exception()
+                sys.stderr.write("Error: Cannot read %s: %s" % (url_direct_or_indirect, e))
                 return []
             fulltext_urls = get_fulltext_urls_from_html_page(htmlpagebody)
             write_message("... fulltext_urls = %s" % fulltext_urls, verbose=9)
     else:
-        fulltext_urls = [[force_file_extension, url_direct_or_indirect]]
+        fulltext_urls = [(force_file_extension, url_direct_or_indirect)]
+
+    write_message('... data to elaborate: %s' % fulltext_urls, verbose=9)
 
     words = {}
 
@@ -269,19 +376,35 @@ def get_words_from_fulltext(url_direct_or_indirect,
         if not url_direct:
             break
 
-        # read fulltext file:
-        try:
-            url = urllib2.urlopen(url_direct)
-        except:
-            sys.stderr.write("Error: Cannot read %s.\n" % url_direct)
-            break # try other fulltext files...
+        if bibdocfile_url_p(url_direct):
+            # Let's manage this with BibRecDocs...
+            # We got something like http://$(weburl)/record/xxx/yyy.ext
+            try:
+                tmp_name = bibdocfile_url_to_fullpath(url_direct)
+                write_message("Found internal path %s for url %s" % (tmp_name, url_direct), verbose=2)
+                no_src_delete = True
+            except Exception, e:
+                register_exception()
+                sys.stderr.write("Error in retrieving fulltext from internal url %s: %s\n" % (url_direct, e))
+                break # try other fulltext files...
+        else:
+            # read fulltext file:
+            try:
+                url = urllib2.urlopen(url_direct)
+                no_src_delete = False
+            except Exception, e:
+                register_exception()
+                sys.stderr.write("Error: Cannot read %s: %s\n" % (url_direct, e))
+                break # try other fulltext files...
 
-        tmp_fd, tmp_name = tempfile.mkstemp('invenio.tmp')
-        data_chunk = url.read(8*1024)
-        while data_chunk:
-            os.write(tmp_fd, data_chunk)
+            tmp_fd, tmp_name = tempfile.mkstemp('invenio.tmp')
             data_chunk = url.read(8*1024)
-        os.close(tmp_fd)
+            while data_chunk:
+                os.write(tmp_fd, data_chunk)
+                data_chunk = url.read(8*1024)
+            os.close(tmp_fd)
+
+        tmp_dst_name = tempfile.mkstemp('invenio.tmp.txt', dir=tmpdir)[1]
 
         # try all available conversion programs according to their order:
         bingo = 0
@@ -291,60 +414,61 @@ def get_words_from_fulltext(url_direct_or_indirect,
                 cmd = ""  # wil keep command to run
                 bingo = 0 # had we success?
                 if os.path.basename(conv_program) == "pdftotext":
-                    cmd = "%s -enc UTF-8 %s %s.txt" % (conv_program, tmp_name, tmp_name)
+                    cmd = "%s -enc UTF-8 %s %s" % (conv_program, tmp_name, tmp_dst_name)
                 elif os.path.basename(conv_program) == "pstotext":
                     if ext == "ps.gz":
                         # is there gzip available?
                         if os.path.exists(CONV_PROGRAMS_HELPERS["gz"]):
-                            cmd = "%s -cd %s | %s > %s.txt" \
-                                  % (CONV_PROGRAMS_HELPERS["gz"], tmp_name, conv_program, tmp_name)
+                            cmd = "%s -cd %s | %s > %s" \
+                                  % (CONV_PROGRAMS_HELPERS["gz"], tmp_name, conv_program, tmp_dst_name)
                     else:
-                        cmd = "%s %s > %s.txt" \
-                              % (conv_program, tmp_name, tmp_name)
+                        cmd = "%s %s > %s" \
+                              % (conv_program, tmp_name, tmp_dst_name)
                 elif os.path.basename(conv_program) == "ps2ascii":
                     if ext == "ps.gz":
                          # is there gzip available?
                         if os.path.exists(CONV_PROGRAMS_HELPERS["gz"]):
-                            cmd = "%s -cd %s | %s > %s.txt"\
+                            cmd = "%s -cd %s | %s > %s"\
                                   % (CONV_PROGRAMS_HELPERS["gz"], tmp_name,
-                                     conv_program, tmp_name)
+                                     conv_program, tmp_dst_name)
                     else:
-                        cmd = "%s %s %s.txt" \
-                              % (conv_program, tmp_name, tmp_name)
+                        cmd = "%s %s %s" \
+                              % (conv_program, tmp_name, tmp_dst_name)
                 elif os.path.basename(conv_program) == "antiword":
-                    cmd = "%s %s > %s.txt" % (conv_program, tmp_name, tmp_name)
+                    cmd = "%s %s > %s" % (conv_program, tmp_name, tmp_dst_name)
                 elif os.path.basename(conv_program) == "catdoc":
-                    cmd = "%s %s > %s.txt" % (conv_program, tmp_name, tmp_name)
+                    cmd = "%s %s > %s" % (conv_program, tmp_name, tmp_dst_name)
                 elif os.path.basename(conv_program) == "wvText":
-                    cmd = "%s %s %s.txt" % (conv_program, tmp_name, tmp_name)
+                    cmd = "%s %s %s" % (conv_program, tmp_name, tmp_dst_name)
                 elif os.path.basename(conv_program) == "ppthtml":
                     # is there html2text available?
                     if os.path.exists(CONV_PROGRAMS_HELPERS["html"]):
-                        cmd = "%s %s | %s > %s.txt"\
+                        cmd = "%s %s | %s > %s"\
                               % (conv_program, tmp_name,
-                                 CONV_PROGRAMS_HELPERS["html"], tmp_name)
+                                 CONV_PROGRAMS_HELPERS["html"], tmp_dst_name)
                     else:
-                        cmd = "%s %s > %s.txt" \
-                              % (conv_program, tmp_name, tmp_name)
+                        cmd = "%s %s > %s" \
+                              % (conv_program, tmp_name, tmp_dst_name)
                 elif os.path.basename(conv_program) == "xlhtml":
                     # is there html2text available?
                     if os.path.exists(CONV_PROGRAMS_HELPERS["html"]):
-                        cmd = "%s %s | %s > %s.txt" % \
+                        cmd = "%s %s | %s > %s" % \
                               (conv_program, tmp_name,
-                               CONV_PROGRAMS_HELPERS["html"], tmp_name)
+                               CONV_PROGRAMS_HELPERS["html"], tmp_dst_name)
                     else:
-                        cmd = "%s %s > %s.txt" % \
-                              (conv_program, tmp_name, tmp_name)
+                        cmd = "%s %s > %s" % \
+                              (conv_program, tmp_name, tmp_dst_name)
                 elif os.path.basename(conv_program) == "html2text":
-                        cmd = "%s %s > %s.txt" % \
-                              (conv_program, tmp_name, tmp_name)
+                        cmd = "%s %s > %s" % \
+                              (conv_program, tmp_name, tmp_dst_name)
                 else:
                     sys.stderr.write("Error: Do not know how to handle %s conversion program.\n" % conv_program)
                 # try to run it:
                 try:
                     write_message("..... launching %s" % cmd, verbose=9)
-                    errcode = os.system(cmd)
-                    if errcode == 0 and os.path.exists("%s.txt" % tmp_name):
+                    # Note we replace ; in order to make happy internal file names
+                    errcode = os.system(cmd.replace(';', '\\;'))
+                    if errcode == 0 and os.path.exists(tmp_dst_name):
                         bingo = 1
                         break # bingo!
                     else:
@@ -354,7 +478,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
 
         # were we successful?
         if bingo:
-            tmp_name_txt_file = open("%s.txt" % tmp_name)
+            tmp_name_txt_file = open(tmp_dst_name)
             for phrase in tmp_name_txt_file.xreadlines():
                 for word in get_words_from_phrase(phrase):
                     if not words.has_key(word):
@@ -365,8 +489,9 @@ def get_words_from_fulltext(url_direct_or_indirect,
 
         # delete temp files (they might not exist):
         try:
-            os.unlink(tmp_name)
-            os.unlink(tmp_name + ".txt")
+            if not no_src_delete:
+                os.unlink(tmp_name)
+            os.unlink(tmp_dst_name)
         except StandardError:
             write_message("Error: Could not delete file. It didn't exist", sys.stderr)
 
@@ -395,7 +520,7 @@ def remove_latex_markup(phrase):
 tagToWordsFunctions = {'8564_u':get_words_from_fulltext}
 
 latex_formula_re = re.compile(r'\$.*?\$')
-def get_words_from_phrase(phrase, split=str.split):
+def get_words_from_phrase(phrase):
     """Return list of words found in PHRASE.  Note that the phrase is
        split into groups depending on the alphanumeric characters and
        punctuation characters definition present in the config file.
@@ -409,7 +534,7 @@ def get_words_from_phrase(phrase, split=str.split):
         blocks = strip_accents(latex_formula_re.sub(' ', phrase)).split()
     phrase = phrase.lower()
     # 1st split phrase into blocks according to whitespace
-    for block in split(strip_accents(phrase)):
+    for block in strip_accents(phrase).split():
         # 2nd remove leading/trailing punctuation and add block:
         block = re_block_punctuation_begin.sub("", block)
         block = re_block_punctuation_end.sub("", block)
@@ -566,6 +691,15 @@ def beautify_range_list(range_list):
             ret_list.append(new)
 
     return ret_list
+
+def truncate_index_table(index_name):
+    """Properly truncate the given index."""
+    index_id = get_index_id(index_name)
+    if index_id:
+        write_message('Truncating %s index table in order to reindex.' % index_name, verbose=2)
+        run_sql("UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00' WHERE id=%s", (index_id,))
+        run_sql("TRUNCATE idxWORD%02dF" % index_id)
+        run_sql("TRUNCATE idxWORD%02dR" % index_id)
 
 class WordTable:
     "A class to hold the words table."
@@ -1186,7 +1320,8 @@ def main():
     task_set_option("collection", [])
     task_set_option("maxmem", 0)
     task_set_option("flush", 10000)
-    task_set_option("windex", [])
+    task_set_option("windex", ','.join(get_all_indexes()))
+    task_set_option("reindex", False)
     task_init(authorization_action='runbibindex',
             authorization_msg="BibIndex Task Submission",
             description="""Examples:
@@ -1198,6 +1333,7 @@ def main():
   -i, --id=low[-high]\t\tselect according to doc recID
   -m, --modified=from[,to]\tselect according to modification date
   -c, --collection=c1[,c2]\tselect according to collection
+  -R, --reindex\treindex the selected indexes from scratch
 
  Repairing options:
   -k, --check\t\tcheck consistency for all records in the table(s)
@@ -1209,7 +1345,7 @@ def main():
   -f, --flush=NNN\t\tfull consistent table flush after NNN records (10000)
 """,
             version=__revision__,
-            specific_params=("adi:m:c:w:krM:f:", [
+            specific_params=("adi:m:c:w:krRM:f:", [
                 "add",
                 "del",
                 "id=",
@@ -1218,6 +1354,7 @@ def main():
                 "windex=",
                 "check",
                 "repair",
+                "reindex",
                 "maxmem=",
                 "flush=",
             ]),
@@ -1253,8 +1390,10 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option("modified", get_date_range(value))
     elif key in ("-c", "--collection"):
         task_set_option("collection", value)
+    elif key in ("-R", "--reindex"):
+        task_set_option("reindex", True)
     elif key in ("-w", "--windex"):
-        task_set_option("windex", get_word_tables(value))
+        task_set_option("windex", value)
     elif key in ("-M", "--maxmem"):
         task_set_option("maxmem", int(value))
         if task_get_option("maxmem") < base_process_size + 1000:
@@ -1279,17 +1418,19 @@ def task_run_core():
     messages on stderr.
     Return 1 in case of success and 0 in case of failure."""
     global _last_word_table
-    if not task_get_option("windex"):
-        task_set_option("windex", get_word_tables(None))
     if task_get_option("cmd") == "check":
-        for table in task_get_option("windex"):
+        for table in get_word_tables(task_get_option("windex")):
             wordTable = WordTable(table.keys()[0], table.values()[0])
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
         _last_word_table = None
         return True
 
-    for table in task_get_option("windex"):
+    if task_get_option("reindex"):
+        for index_name in task_get_option("windex").split(','):
+            truncate_index_table(index_name)
+
+    for table in get_word_tables(task_get_option("windex")):
         wordTable = WordTable(table.keys()[0], table.values()[0])
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
