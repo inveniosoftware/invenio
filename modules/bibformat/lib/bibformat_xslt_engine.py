@@ -114,7 +114,7 @@ def get_creation_date_libxslt(ctx, recID):
 
 def get_creation_date_4suite(ctx, recID):
     """
-    libxslt extension function:
+    4suite extension function:
     Bridge between BibFormat and XSL stylesheets.
     Returns record creation date.
 
@@ -172,7 +172,7 @@ def get_modification_date_libxslt(ctx, recID):
 
 def get_modification_date_4suite(ctx, recID):
     """
-    libxslt extension function:
+    4suite extension function:
     Bridge between BibFormat and XSL stylesheets.
     Returns record modification date.
 
@@ -192,6 +192,80 @@ def get_modification_date_4suite(ctx, recID):
             recID_int = int(recID_int)
 
         return get_modification_date(recID_int)
+    except Exception, err:
+        sys.stderr.write("Error during formatting function evaluation: " + \
+                         str(err) + \
+                         '\n')
+
+        return ''
+
+def eval_bibformat_libxslt(ctx, recID, template_code):
+    """
+    libxslt extension function:
+    Bridge between BibFormat and XSL stylesheets.
+    Returns the evaluation of the given piece of format template
+
+    Can be used in that way in XSL stylesheet
+    (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
+    <xsl:value-of select="fn:eval_bibformat(marc:controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
+
+    if recID is string, value is converted to int
+    if recID is Node, first child node (text node) is taken as value
+    template_code is evaluated as a format template piece of code. '<'
+    and '"' need to be escaped with '&lt;' and '&quot;'
+    """
+    from invenio.bibformat_engine import \
+    format_with_format_template, \
+    BibFormatObject
+    try:
+        if isinstance(recID, str):
+            recID_int = int(recID)
+        elif isinstance(recID, int):
+            recID_int = recID
+        else:
+            recID_int = libxml2.xmlNode(_obj=recID[0]).children.content
+        bfo = BibFormatObject(recID_int)
+        return format_with_format_template(None, bfo,
+                                           verbose=0,
+                                           format_template_code=template_code)[0]
+    except Exception, err:
+        sys.stderr.write("Error during formatting function evaluation: " + \
+                         str(err) + \
+                         '\n')
+
+        return ''
+
+
+def eval_bibformat_4suite(ctx, recID, template_code):
+    """
+    4suite extension function:
+    Bridge between BibFormat and XSL stylesheets.
+    Returns the evaluation of the given piece of format template
+
+    Can be used in that way in XSL stylesheet
+    (provided xmlns:fn="http://cdsweb.cern.ch/bibformat/fn" has been declared):
+    <xsl:value-of select="fn:eval_bibformat(marc:controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
+
+    if recID is string, value is converted to int
+    if recID is Node, first child node (text node) is taken as value
+    template_code is evaluated as a format template piece of code. '<'
+    and '"' need to be escaped with '&lt;' and '&quot;'
+    """
+    from invenio.bibformat_engine import \
+    format_with_format_template, \
+    BibFormatObject
+    try:
+        if len(recID) > 0 and isinstance(recID[0], Node):
+            recID_int = recID[0].firstChild.nodeValue
+            if recID_int is None:
+                return ''
+        else:
+            recID_int = int(recID_int)
+
+        bfo = BibFormatObject(recID_int)
+        return format_with_format_template(None, bfo,
+                                           verbose=0,
+                                           format_template_code=template_code)[0]
     except Exception, err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
@@ -255,7 +329,9 @@ def format(xmltext, template_filename=None, template_source=None):
         libxslt.registerExtModuleFunction("modification_date",
                                           CFG_BIBFORMAT_FUNCTION_NS,
                                           get_modification_date_libxslt)
-
+        libxslt.registerExtModuleFunction("eval_bibformat",
+                                          CFG_BIBFORMAT_FUNCTION_NS,
+                                          eval_bibformat_libxslt)
         # Load template and source
         template_xml = libxml2.parseDoc(template)
         processor = libxslt.parseStylesheetDoc(template_xml)
@@ -283,7 +359,9 @@ def format(xmltext, template_filename=None, template_source=None):
         processor.registerExtensionFunction(CFG_BIBFORMAT_FUNCTION_NS,
                                             "modification_date",
                                             get_modification_date_4suite)
-
+        processor.registerExtensionFunction(CFG_BIBFORMAT_FUNCTION_NS,
+                                            "eval_bibformat",
+                                            eval_bibformat_4suite)
         # Load template and source
         transform = InputSource.DefaultFactory.fromString(template,
                                                        uri=weburl)
