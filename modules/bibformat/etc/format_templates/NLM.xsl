@@ -292,10 +292,7 @@ exclude-result-prefixes="marc fn">
           </contrib-group>
           <pub-date pub-type="pub">
               <year>
-                  <xsl:value-of select="datafield[@tag='773' and @ind1=' ' and @ind2=' ']/subfield[@code='y']" />
-                  <xsl:value-of select="datafield[@tag='260' and @ind1=' ' and @ind2=' ']/subfield[@code='c']" />
-                  <xsl:value-of select="datafield[@tag='925' and @ind1=' ' and @ind2=' ']/subfield[@code='a']" />
-                  <xsl:value-of select="datafield[@tag='909' and @ind1='C' and @ind2='4']/subfield[@code='y']" />
+                 <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_YEAR date_format=&quot;%Y&quot;>')" />
               </year>
           </pub-date>
 
