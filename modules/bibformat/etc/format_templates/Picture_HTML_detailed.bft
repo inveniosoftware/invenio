@@ -5,18 +5,18 @@
 </div>
 <hr />
 <div style="padding-left:10px;padding-right:10px">
-<BFE_TITLE prefix="<center><big><big><strong>" 
-separator="<br/><br/>" 
-suffix="</strong></big></big></center>" /> 
+<BFE_TITLE prefix="<center><big><big><strong>"
+separator="<br/><br/>"
+suffix="</strong></big></big></center>" />
 
 <BFE_NOTES />
 <BFE_DATE prefix="<center>" suffix="</center>"/>
 <BFE_CONTACT />
 <center>
-<BFE_AUTHORS prefix="Photographer:<small> " suffix="</small>" 
-print_links="yes" 
-print_affiliations="yes" 
-limit="10" 
+<BFE_AUTHORS prefix="Photographer:<small> " suffix="</small>"
+print_links="yes"
+print_affiliations="yes"
+limit="10"
 interactive="yes"/>
 
 <BFE_ADDRESSES prefix="<small>" suffix="</small>" print_link="yes"/>
@@ -26,34 +26,34 @@ interactive="yes"/>
 <BFE_KEYWORDS prefix="<small><strong>Keyword(s): </strong>" suffix="</small>"/>
 
 <table> <tr>
-<td valign="top" align="left"> 
+<td valign="top" align="left">
 <BFE_FIELD tag="909CP$s" prefix="<br/> <strong>Original ref.</strong>: " suffix=" " />
 <BFE_FIELD tag="909CP$t" prefix="<br/><strong>Available pictures</strong>: " suffix="  "/>
 
-<BFE_ABSTRACT 
-prefix_en='<p><span class="blocknote"> 
+<BFE_ABSTRACT
+prefix_en='<p><span class="blocknote">
  Caption</span><br /> <small>'
 suffix_en='</small></p>'
 
-prefix_fr='<p><span class="blocknote">  
+prefix_fr='<p><span class="blocknote">
  Légende</span><br /><small>'
 suffix_fr='</small></p>'
 />
 
-<BFE_EXTERNAL_PUBLICATIONS prefix='<p><span class="blocknote">See also:</span><br /><small>' 
+<BFE_EXTERNAL_PUBLICATIONS prefix='<p><span class="blocknote">See also:</span><br /><small>'
  suffix="</small></p>" />
 
 </td>
 
 <td valign="top">
 <BFE_PHOTO_RESOURCES prefix='<span class="blocknote">Resources</span><br />' />
-</td> 
+</td>
 
 </tr>
 
 <tr><td colspan="2">
  <strong>© CERN Geneva: </strong>
-<small>The use of photos requires prior authorization (from <a href="http://cern.ch/cern-copyright/">CERN copyright</a>). 
+<small>The use of photos requires prior authorization (from <a href="http://cern.ch/cern-copyright/">CERN copyright</a>).
 The words CERN Photo must be quoted for each use. </small>
 </td>
 </tr>
