@@ -1180,4 +1180,5 @@ def decompose_bibdocfile_url(url):
 
 def _log_action(action, recid=None, docid=None, doctype=None, docid2=None, docname=None, format=None, version=None, status=None, size=None, checksum=None):
     """Log an action into the bibdoclog table."""
+    return
     run_sql('INSERT INTO bibdoclog(action, recid, docid, type, docid2, docname, format, version, status, size, checksum, date) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())', (action, recid, docid, doctype, docid2, docname, format, version, status, size, checksum))
