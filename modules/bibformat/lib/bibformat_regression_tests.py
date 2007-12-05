@@ -185,10 +185,42 @@ class BibFormatNLMTest(unittest.TestCase):
         """Prepare some ideal outputs"""
         self.record_70_xn = '''<?xml version="1.0" encoding="UTF-8"?>
 <articles>
-<article><front><journal-meta><journal-title>J. High Energy Phys.</journal-title><abbrev-journal-title>J. High Energy Phys.</abbrev-journal-title><issn>1126-6708</issn></journal-meta><article-meta><title-group><article-title>AdS/CFT For Non-Boundary Manifolds</article-title></title-group><contrib-group><contrib contrib-type="author"><name><surname>McInnes</surname><given-names>B</given-names></name></contrib></contrib-group><pub-date pub-type="pub"><year>2000</year></pub-date><volume>05</volume><fpage></fpage><lpage></lpage><self-uri xlink:href="%s/record/70" xmlns:xlink="http://www.w3.org/1999/xlink/"/><self-uri xlink:href="http://documents.cern.ch/cgi-bin/setlink?base=preprint&amp;categ=hep-th&amp;id=0003291" xmlns:xlink="http://www.w3.org/1999/xlink/" /></article-meta><abstract>In its Euclidean formulation, the AdS/CFT correspondence begins as a study of Yang-Mills conformal field theories on the sphere, S^4. It has been successfully extended, however, to S^1 X S^3 and to the torus T^4. It is natural tohope that it can be made to work for any manifold on which it is possible to define a stable Yang-Mills conformal field theory. We consider a possible classification of such manifolds, and show how to deal with the most obviousobjection : the existence of manifolds which cannot be represented as boundaries. We confirm Witten's suggestion that this can be done with the help of a brane in the bulk.</abstract></front><article-type>research-article</article-type><ref></ref></article>
+<article xmlns:xlink="http://www.w3.org/1999/xlink/">
+  <front>
+    <journal-meta>
+      <journal-title>J. High Energy Phys.</journal-title>
+      <abbrev-journal-title>J. High Energy Phys.</abbrev-journal-title>
+      <issn>1126-6708</issn>
+    </journal-meta>
+    <article-meta>
+      <title-group>
+        <article-title>AdS/CFT For Non-Boundary Manifolds</article-title>
+      </title-group>
+      <contrib-group>
+        <contrib contrib-type="author">
+          <name>
+            <surname>McInnes</surname>
+            <given-names>B</given-names>
+          </name>
+        </contrib>
+      </contrib-group>
+      <pub-date pub-type="pub">
+        <year>2000</year>
+      </pub-date>
+      <volume>05</volume>
+      <fpage/>
+      <lpage/>
+      <self-uri xlink:href="%(weburl)s/record/70"/>
+      <self-uri xlink:href="%(weburl)s/record/70/files/0003291.pdf"/>
+      <self-uri xlink:href="%(weburl)s/record/70/files/0003291.ps.gz"/>
+    </article-meta>
+    <abstract>In its Euclidean formulation, the AdS/CFT correspondence begins as a study of Yang-Mills conformal field theories on the sphere, S^4. It has been successfully extended, however, to S^1 X S^3 and to the torus T^4. It is natural tohope that it can be made to work for any manifold on which it is possible to define a stable Yang-Mills conformal field theory. We consider a possible classification of such manifolds, and show how to deal with the most obviousobjection : the existence of manifolds which cannot be represented as boundaries. We confirm Witten's suggestion that this can be done with the help of a brane in the bulk.</abstract>
+  </front>
+  <article-type>research-article</article-type>
+  <ref/>
+</article>
 
-
-</articles>''' % weburl
+</articles>''' % {'weburl': weburl}
 
     def test_nlm_output(self):
         """bibformat - NLM output"""
