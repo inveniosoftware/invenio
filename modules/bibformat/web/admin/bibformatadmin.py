@@ -476,7 +476,7 @@ def format_template_show(req, bft, code=None, ln=config.cdslang,
     _ = gettext_set_language(ln)
 
     navtrail_previous_links = bibformatadminlib.getnavtrail('''
-    &gt; <a class"=navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln ,  _("Manage Format Templates")))
+    &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.weburl, ln ,  _("Manage Format Templates")))
 
     try:
         uid = getUid(req)
