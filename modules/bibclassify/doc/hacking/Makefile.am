@@ -17,9 +17,6 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(localstatedir)/www/hacking/bibclassify
-
-doc_DATA = index.html extraction-algorithm.html hep-taxonomy.html
 
 webdoclibdir = $(libdir)/webdoc/hacking
 
@@ -28,12 +25,6 @@ webdoclib_DATA = \
 	bibclassify-extraction-algorithm.webdoc \
 	bibclassify-hep-taxonomy.webdoc
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-
 EXTRA_DIST = $(webdoclib_DATA)
 
 CLEANFILES = $(doc_DATA) *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
