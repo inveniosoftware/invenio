@@ -36,6 +36,7 @@ from invenio.config import \
      etcdir, \
      version
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
+from invenio.webpage import adderrorbox
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibrank_citation_searcher import calculate_cited_by_list, get_cited_by, get_cited_by_list
@@ -44,27 +45,6 @@ from invenio.intbitset import intbitset
 
 def compare_on_val(first, second):
     return cmp(second[1], first[1])
-
-def adderrorbox(header='', datalist=[]):
-    """used to create table around main data on a page, row based"""
-
-    try:
-        perc = str(100 // len(datalist)) + '%'
-    except ZeroDivisionError:
-        perc = 1
-
-    output  = '<table class="errorbox">'
-    output += '<thead><tr><th class="errorboxheader" colspan="%s">%s</th></tr></thead>' % (len(datalist), header)
-    output += '<tbody>'
-    for row in [datalist]:
-        output += '<tr>'
-        for data in row:
-            output += '<td style="vertical-align: top; margin-top: 5px; width: %s;">' % (perc, )
-            output += data
-            output += '</td>'
-        output += '</tr>'
-    output += '</tbody></table>'
-    return output
 
 def check_term(term, col_size, term_rec, max_occ, min_occ, termlength):
     """Check if the tem is valid for use

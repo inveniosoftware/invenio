@@ -919,25 +919,6 @@ def createhiddenform(action="", text="", button="confirm", cnfrm='', **hidden):
 
     return output
 
-def adderrorbox(header='', datalist=[]):
-    """used to create table around main data on a page, row based"""
-
-    try: perc= str(100 // len(datalist)) + '%'
-    except ZeroDivisionError: perc= 1
-
-    output  = '<table class="errorbox">'
-    output += '<thead><tr><th class="errorboxheader" colspan="%s">%s</th></tr></thead>' % (len(datalist), header)
-    output += '<tbody>'
-    for row in [datalist]:
-        output += '<tr>'
-        for data in row:
-            output += '<td style="vertical-align: top; margin-top: 5px; width: %s;">' % (perc, )
-            output += data
-            output += '</td>'
-        output += '</tr>'
-    output += '</tbody></table>'
-    return output
-
 def get_languages():
     languages = []
     for (lang, lang_namelong) in language_list_long():

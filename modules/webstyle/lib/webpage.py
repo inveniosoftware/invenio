@@ -217,3 +217,25 @@ def create_error_box(req, title=None, verbose=1, ln=cdslang, errors=None):
                                              req = req,
                                              supportemail = supportemail,
                                              errors = errors)
+
+def adderrorbox(header='', datalist=[]):
+    """used to create table around main data on a page, row based"""
+
+    try:
+        perc = str(100 // len(datalist)) + '%'
+    except ZeroDivisionError:
+        perc = 1
+
+    output  = '<table class="errorbox">'
+    output += '<thead><tr><th class="errorboxheader" colspan="%s">%s</th></tr></thead>' % (len(datalist), header)
+    output += '<tbody>'
+    for row in [datalist]:
+        output += '<tr>'
+        for data in row:
+            output += '<td style="vertical-align: top; margin-top: 5px; width: %s;">' % (perc, )
+            output += data
+            output += '</td>'
+        output += '</tr>'
+    output += '</tbody></table>'
+    return output
+
