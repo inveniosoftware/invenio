@@ -17,10 +17,6 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(localstatedir)/www/admin/bibclassify
-
-doc_DATA = index.html guide.html guide_cloud.jpeg
-
 imgdir = $(localstatedir)/www/img/admin
 
 img_DATA = bibclassify-admin-guide-cloud.jpeg
@@ -31,11 +27,6 @@ webdoclib_DATA = \
 	bibclassify-admin.webdoc \
 	bibclassify-admin-guide.webdoc
 
-EXTRA_DIST = bibclassify-admin-guide-cloud.jpeg \
-	bibclassify-admin.webdoc bibclassify-admin-guide.webdoc
+EXTRA_DIST = $(img_DATA) $(webdoclib_DATA)
 
 CLEANFILES = *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
