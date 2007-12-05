@@ -86,7 +86,7 @@ page header and footer.</p>
 
 <h4><a name="overview_page_layout_stat">1.2.1 Layout of HTML Static Pages</a></h4>
 
-<p>Static HTML pages are all located in the $INVENIO$/lib/webdoc/
+<p>Static HTML pages are all located in the /opt/cds-invenio/lib/webdoc/
 installation directory. These files are organized in 3 directories:</p>
 <ul>
 <li><b>help:</b> Help pages available to users of your website</li>
@@ -249,9 +249,8 @@ style footer will be seen in action.</p>
     templates have been installed, in order to ensure that
     modifications you have done to your templates are valid. To do so
     move to your CDS Invenio installation directory, and run: <br/>
-    <code>$python $INVENIO$/lib/python/invenio/template.py
-    --check-custom-templates</code> (replace $INVENIO$ with your Invenio
-    installation path)
+    <code>$python /opt/cds-invenio/lib/python/invenio/template.py
+    --check-custom-templates</code>
 </li>
 
 </ul>

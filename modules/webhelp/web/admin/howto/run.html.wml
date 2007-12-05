@@ -110,7 +110,7 @@ $ bibsched
 delete the tasks already submitted, to run some of the tasks manually,
 etc.  Note also that BibSched daemon writes log and error files on its
 operation and on the operation of its tasks.  The log and error files
-can be found at <code>@prefix@/var/log</code>.
+can be found at <code>/opt/cds-invenio/var/log</code>.
 </p>
 
 <p>You may want to clean up the old BibSched tasks with the DONE
@@ -161,8 +161,8 @@ $ sessiongc -s1d
 
 <h2>Cleaning Up the Filesystem</h2>
 
-<p>Different temporary log and err files  are created in <code>@prefix@/var/log</code>
-and <code>@prefix@/var/tmp</code> directory that is good to clean up from time to time.  The previous command could be used to clean those files, too, via:
+<p>Different temporary log and err files  are created in <code>/opt/cds-invenio/var/log</code>
+and <code>/opt/cds-invenio/var/tmp</code> directory that is good to clean up from time to time.  The previous command could be used to clean those files, too, via:
 
 <blockquote>
 <pre>

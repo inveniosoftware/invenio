@@ -241,8 +241,8 @@ def get_default_templates(base_dir=None):
     base_dir - path to where templates should be recursively searched
     """
     # If base_dir is not specified we assume that this template.py
-    # file is located in $INVENIO$/modules/webstyle/lib, which allows
-    # us to guess where base $Invenio$/modules dir is.
+    # file is located in modules/webstyle/lib, which allows
+    # us to guess where base Invenio modules dir is.
     # Note that by luck it also works if file is installed
     # in /lib/python/invenio/
 

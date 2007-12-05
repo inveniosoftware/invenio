@@ -190,7 +190,7 @@ the generated results. Please check the <a href="<WEBURL>/hacking/bibclassify/">
 
 <p><span class="adminbox">&nbsp;<b>NB.</b> BibClassify can run as a CDS Invenio
 module or as a standalone program. If you already run a server with a CDS Invenio installation,
-you can simply run <em>INVENIO_INSTALLATION/bin/bibclassify</em>. Otherwise, run <em>python bibclassifylib.py</em> and you might need to set
+you can simply run <em>/opt/cds-invenio/bin/bibclassify</em>. Otherwise, run <em>python bibclassifylib.py</em> and you might need to set
 a couple of variables manually (location of pdftotext binary and
 temporary directory)</li></span></p>
 
