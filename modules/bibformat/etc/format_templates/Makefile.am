@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,6 +27,7 @@ etc_DATA = Default_HTML_captions.bft Picture_HTML_brief.bft \
 	   EndNote.bft EndNote.bfx \
 	   DC.bft DC.bfx \
 	   NLM.bft NLM.bfx \
+	   NLM.xsl \
 	   RSS.bft RSS.bfx \
 	   MARCXML.bfx \
 	   OAI_DC.xsl DC.xsl\
