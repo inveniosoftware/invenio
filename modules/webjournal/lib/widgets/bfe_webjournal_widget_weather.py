@@ -58,13 +58,17 @@ def format(bfo, title_en="", title_fr=""):
             register_exception(req=bfo.req)
             weather_image = ""
         weather_image = weather_image.replace("\"", "\'")
-        out = '''<div id="weather" style="background: url(%s) left bottom no-repeat;" class="rmenuitem">
-                    <h3 class="rmenutext">%s</h3>
-                </div>
-                <ul class="rmenulist">
-                %s
-                </ul>
-                ''' % (weather_image, title, out)
+        out = '''
+<div id="weather" style="background: url(%s) left bottom no-repeat;" class="rmenuitem">
+    <h3 class="rmenutext">
+        <a href="http://weather.yahoo.com/" target="_blank"%s</a>
+    </h3>
+</div>
+<ul class="rmenulist">
+%s
+</ul>
+''' % (weather_image, title, out)
+
     return out
 
 def escape_values(bfo):
