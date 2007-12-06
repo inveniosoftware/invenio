@@ -375,5 +375,6 @@ DROP TABLE IF EXISTS externalcollection;
 DROP TABLE IF EXISTS collectiondetailedpagetabs;
 DROP TABLE IF EXISTS staEVENT;
 DROP TABLE IF EXISTS clsMETHOD;
+DROP TABLE IF EXISTS jrnJOURNAL;
 
 -- end of file
