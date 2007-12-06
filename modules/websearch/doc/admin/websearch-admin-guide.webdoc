@@ -106,7 +106,7 @@ detail further below in the <a href="#2.2">section 2.2</a>.
 <a name="2.1"></a><h3>2.1 Add new collection</h3>
 
 <p>To add a new collection, enter its default name in the default
-language of the installation (<CDSLANG>) and click on the ADD button
+language of the installation and click on the ADD button
 to add it.  There are two important actions that you have to perform
 after adding a collection:
 
@@ -211,7 +211,7 @@ follows:
 <table border="1">
 <tr>
  <td>
-  <img border="0" src="<weburl>/img/iconcross.gif">
+  <img border="0" src="<WEBURL>/img/iconcross.gif">
  </td>
  <td>
   Remove chosen collection with its subcollections from the collection tree,
@@ -221,8 +221,8 @@ follows:
 </tr>
 <tr>
  <td>
-  <img border="0" src="<weburl>/img/arrow_up.gif"> &nbsp;
-  <img border="0" src="<weburl>/img/arrow_down.gif">
+  <img border="0" src="<WEBURL>/img/arrow_up.gif"> &nbsp;
+  <img border="0" src="<WEBURL>/img/arrow_down.gif">
  </td>
  <td>
   Move chosen collection up or down among its brothers and sisters, i.e.
@@ -231,14 +231,14 @@ follows:
 </tr>
 <tr>
  <td>
-  <img border="0" src="<weburl>/img/move_from.gif">
-  <img border="0" src="<weburl>/img/move_to.gif">
+  <img border="0" src="<WEBURL>/img/move_from.gif">
+  <img border="0" src="<WEBURL>/img/move_to.gif">
  </td>
  <td>
   Move chosen collection among branches of the tree.
-  Press the first icon (<img border="0" src="<weburl>/img/move_from.gif">)
+  Press the first icon (<img border="0" src="<WEBURL>/img/move_from.gif">)
   to choose a collection to move, and the second icon
-  (<img border="0" src="<weburl>/img/move_to.gif">)
+  (<img border="0" src="<WEBURL>/img/move_to.gif">)
   to select a new father collection that the chosen collection should be attached to.
  </td>
 </tr>
