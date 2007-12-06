@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.93.50.20071119, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20071119)
+AC_INIT(cds-invenio, 0.93.50.20071206, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20071206)
 
 ## Check for install:
 AC_PROG_INSTALL
