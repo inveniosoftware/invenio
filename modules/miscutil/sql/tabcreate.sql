@@ -2126,7 +2126,7 @@ CREATE TABLE IF NOT EXISTS rnkDOWNLOADS (
   download_time datetime default '0000-00-00 00:00:00',
   client_host int(10) unsigned default NULL,
   id_user int(15) unsigned default NULL,
-  id_bibdoc mediumint(8) unsigned default NULL,
+  id_bibdoc mediumint(9) unsigned default NULL,
   file_version smallint(2) unsigned default NULL,
   file_format text,
   KEY download_time (download_time),
@@ -2336,31 +2336,6 @@ CREATE TABLE IF NOT EXISTS bibdoc (
   creation_date datetime NOT NULL default '0000-00-00',
   modification_date datetime NOT NULL default '0000-00-00',
   PRIMARY KEY  (id)
-) TYPE=MyISAM;
-
-CREATE TABLE IF NOT EXISTS hstDOCUMENT (
-  id_bibdoc mediumint(9) unsigned NOT NULL,
-  docname varchar(250) NOT NULL,
-  docformat varchar(50) NOT NULL,
-  docversion tinyint(4) unsigned NOT NULL,
-  docsize mediumint(9) unsigned NOT NULL,
-  docchecksum char(32) NOT NULL,
-  doctimestamp datetime NOT NULL,
-  action varchar(50) NOT NULL,
-  job_id mediumint(15) unsigned NULL default NULL,
-  job_name varchar(255) NULL default NULL,
-  job_person varchar(255) NULL default NULL,
-  job_date datetime NULL default NULL,
-  job_details blob NULL default NULL,
-  KEY (action),
-  KEY (id_bibdoc),
-  KEY (docname),
-  KEY (docformat),
-  KEY (doctimestamp),
-  KEY (job_id),
-  KEY (job_name),
-  KEY (job_person),
-  KEY (job_date)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bibdoc (
@@ -3141,11 +3116,54 @@ CREATE TABLE IF NOT EXISTS clsMETHOD (
 ) TYPE=MyISAM;
 
 -- WebJournal tables:
+
 CREATE TABLE IF NOT EXISTS jrnJOURNAL (
   id mediumint(9) unsigned NOT NULL auto_increment,
   name varchar(50) NOT NULL default '',
   PRIMARY KEY (id),
   UNIQUE KEY name (name)
+) TYPE=MyISAM;
+
+-- tables recording history of record's metadata and fulltext documents:
+
+CREATE TABLE IF NOT EXISTS hstRECORD (
+  id_bibrec mediumint(8) unsigned NOT NULL,
+  marcxml blob NOT NULL,
+  job_id mediumint(15) unsigned NOT NULL,
+  job_name varchar(255) NOT NULL,
+  job_person varchar(255) NOT NULL,
+  job_date datetime NOT NULL,
+  job_details blob NOT NULL,
+  KEY (id_bibrec),
+  KEY (job_id),
+  KEY (job_name),
+  KEY (job_person),
+  KEY (job_date)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS hstDOCUMENT (
+  id_bibdoc mediumint(9) unsigned NOT NULL,
+  docname varchar(250) NOT NULL,
+  docformat varchar(50) NOT NULL,
+  docversion tinyint(4) unsigned NOT NULL,
+  docsize mediumint(9) unsigned NOT NULL,
+  docchecksum char(32) NOT NULL,
+  doctimestamp datetime NOT NULL,
+  action varchar(50) NOT NULL,
+  job_id mediumint(15) unsigned NULL default NULL,
+  job_name varchar(255) NULL default NULL,
+  job_person varchar(255) NULL default NULL,
+  job_date datetime NULL default NULL,
+  job_details blob NULL default NULL,
+  KEY (action),
+  KEY (id_bibdoc),
+  KEY (docname),
+  KEY (docformat),
+  KEY (doctimestamp),
+  KEY (job_id),
+  KEY (job_name),
+  KEY (job_person),
+  KEY (job_date)
 ) TYPE=MyISAM;
 
 -- end of file
