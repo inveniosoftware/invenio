@@ -16,22 +16,27 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(localstatedir)/www/admin/bibformat
-doc_DATA = index.html guide.html
-
 imgdir = $(localstatedir)/www/img/admin/
-img_DATA = $(wildcard $(srcdir)/*.gif $(srcdir)/*.jpg $(srcdir)/*.png)
+img_DATA = bibformat-guide-output_format_attributes_tutorial.png \
+           bibformat-guide-output_format_check_dependencies.png \
+           bibformat-guide-output_format_edit_rule.png \
+           bibformat-guide-output_format_edit_rule2.png \
+           bibformat-guide-output_format_hb_migrate.png \
+           bibformat-guide-output_format_hd_rules.png \
+           bibformat-guide-output_formats_manage_tutorial.png \
+           bibformat-guide-rules_editor_tutorial.png \
+           bibformat-guide-template_attributes_tutorial.png \
+           bibformat-guide-template_editor.png \
+           bibformat-guide-template_editor_tutorial.png \
+           bibformat-guide-template_preview.png \
+           bibformat-guide-templates_manage_tutorial.png \
+           bibformat-guide-url_bar.png \
+           bibformat-guide-bfe.gif
 
 webdoclibdir = $(libdir)/webdoc/admin
+
 webdoclib_DATA = \
 	bibformat-admin.webdoc \
 	bibformat-admin-guide.webdoc
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(img_DATA) $(webdoclib_DATA)
-
-CLEANFILES = *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
