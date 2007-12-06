@@ -3140,4 +3140,12 @@ CREATE TABLE IF NOT EXISTS clsMETHOD (
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
+-- WebJournal tables:
+CREATE TABLE IF NOT EXISTS jrnJOURNAL (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  name varchar(50) NOT NULL default '',
+  PRIMARY KEY (id),
+  UNIQUE KEY name (name)
+) TYPE=MyISAM;
+
 -- end of file
