@@ -43,7 +43,9 @@ class Template:
 
     # Parameters allowed in the web interface for fetching files
     files_default_urlargd = {
-        'version': (str, "") # version "" means "latest"
+        'version': (str, ""), # version "" means "latest"
+        'docname': (str, ""), # the docname (optional)
+        'format' : (str, "") # the format
         }
 
 
@@ -1080,7 +1082,7 @@ class Template:
         out += "</ul>"
         return out
 
-    def tmpl_filelist(self, ln, filelist, recid, docid, version):
+    def tmpl_filelist(self, ln, filelist='', recid='', docname='', version=''):
         """
         Displays the file list for a record.
 
@@ -1088,11 +1090,11 @@ class Template:
 
           - 'ln' *string* - The language to display the interface in
 
-          - 'recid' *string* - The record id
+          - 'recid' *int* - The record id
 
-          - 'docid' *string* - The document id
+          - 'docname' *string* - The document name
 
-          - 'version' *string* - The version of the document
+          - 'version' *int* - The version of the document
 
           - 'filelist' *string* - The HTML string of the filelist (produced by the BibDoc classes)
         """
@@ -1101,8 +1103,8 @@ class Template:
         _ = gettext_set_language(ln)
 
         title = _("record") + ' #' + '<a href="%s/record/%s">%s</a>' % (weburl, recid, recid)
-        if docid != "":
-            title += ' ' + _("document") + ' #' + str(docid)
+        if docname != "":
+            title += ' ' + _("document") + ' #' + str(docname)
         if version != "":
             title += ' ' + _("version") + ' #' + str(version)
 
@@ -1141,7 +1143,7 @@ class Template:
             out += "</ul>"
         return out
 
-    def tmpl_bibdoc_filelist(self, ln, weburl, versions, imagepath, docname, id, recid):
+    def tmpl_bibdoc_filelist(self, ln, weburl='', versions=[], imagepath='', recid='', docname=''):
         """
         Displays the file list for a record.
 
@@ -1161,12 +1163,9 @@ class Template:
 
           - 'imagepath' *string* - The path to the image of the file
 
-          - 'docname' *string* - The name of the document
-
-         - 'id' *int* - The id of the document
-
          - 'recid' *int* - The record id
 
+         - 'docname' *string* - The name of the document
         """
 
         # load the right message language
@@ -1183,10 +1182,10 @@ class Template:
                    }
         for version in versions:
             if version['previous']:
-                versiontext =  """<br />(%(see)s <a href="%(weburl)s/record/%(recID)s/files/getfile.py?docid=%(id)s&amp;version=all">%(previous)s</a>)""" % {
+                versiontext =  """<br />(%(see)s <a href="%(weburl)s/record/%(recID)s/files/?docname=%(docname)s&amp;version=all">%(previous)s</a>)""" % {
                                  'see' : _("see"),
                                  'weburl' : weburl,
-                                 'id' : id,
+                                 'docname' : urllib.quote(docname),
                                  'recID': recid,
                                  'previous': _("previous"),
                                }
@@ -1209,7 +1208,7 @@ class Template:
         out += "</table>"
         return out
 
-    def tmpl_bibdocfile_filelist(self, ln, weburl, id, name, selfformat, version, format, size):
+    def tmpl_bibdocfile_filelist(self, ln, weburl, recid, name, version, format, size):
         """
         Displays a file in the file list.
 
@@ -1219,11 +1218,9 @@ class Template:
 
           - 'weburl' *string* - The url of CDS Invenio
 
-          - 'id' *int* - The id of the document
+          - 'recid' *int* - The id of the record
 
           - 'name' *string* - The name of the file
-
-          - 'selfformat' *string* - The format to pass in parameter
 
           - 'version' *string* - The version
 
@@ -1237,7 +1234,7 @@ class Template:
 
         return """<tr>
                     <td valign="top">
-                      <small><a href="%(weburl)s/getfile.py?docid=%(docid)s&amp;name=%(quotedname)s&amp;format=%(selfformat)s&amp;version=%(version)s">
+                      <small><a href="%(weburl)s/record/%(recid)s/files/%(docname)s%(format)s?version=%(version)s">
                         %(name)s%(format)s
                       </a></small>
                     </td>
@@ -1245,9 +1242,8 @@ class Template:
                       <font size="-2" color="green">[%(size)s&nbsp;B]</font>
                     </td></tr>""" % {
                       'weburl' : weburl,
-                      'docid' : id,
-                      'quotedname' : urllib.quote(name),
-                      'selfformat' : urllib.quote(selfformat),
+                      'recid' : recid,
+                      'docname' : name,
                       'version' : version,
                       'name' : name,
                       'format' : format,

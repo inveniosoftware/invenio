@@ -20,7 +20,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.file import BibRecDocs
+from invenio.bibdocfile import BibRecDocs
 import os
 import re
 from invenio.websubmit_config import InvenioWebSubmitFunctionWarning
@@ -33,7 +33,7 @@ def Move_Files_to_Storage(parameters, curdir, form):
     The function moves files received from the standard submission's form through
     file input element(s).
     Websubmit_engine built the following file organization in the directory curdir/files
-    
+
                   curdir/files
                         |
       _______________________________________________________________________________
@@ -41,8 +41,8 @@ def Move_Files_to_Storage(parameters, curdir, form):
       ./file input 1 element's name      ./file input 2 element's name    ....
          |                                     |
       test1.pdf                             test2.pdf
-    
-    
+
+
     There is only one instance of all possible extension(pdf, gz...) in each part
     otherwise we may encount problems when renaming files.
     +parameters['rename']: if given, all the files in curdir/files are renamed.
@@ -71,7 +71,7 @@ def Move_Files_to_Storage(parameters, curdir, form):
     bibrecdocs = BibRecDocs(sysno)
 
     paths_and_suffixes = get_dictionary_from_string(paths_and_suffixes)
-        
+
     ## Go through all the directory specified in the keys
     ## of parameters['paths_and_suffixes']
     for path in paths_and_suffixes.keys():
@@ -80,13 +80,13 @@ def Move_Files_to_Storage(parameters, curdir, form):
             mybibdoc = None
             ## Check if there is no document with the same status (status=path)
             ## already associated with the current recid
-            existing_with_same_status = bibrecdocs.listBibDocs(path)
-            ## If yes, use the existing docid 
+            existing_with_same_status = bibrecdocs.list_bibdocs(path)
+            ## If yes, use the existing docid
             if existing_with_same_status:
                 mybibdoc = existing_with_same_status[0]
             ## Go through all the files in curdir/files/path
             for current_file in os.listdir("%s/files/%s" % (curdir, path)):
-                ## retrieve filename and extension 
+                ## retrieve filename and extension
                 filename, extension = os.path.splitext(current_file)
                 if len(paths_and_suffixes[path]) != 0:
                     extension = "_%s%s" % (paths_and_suffixes[path], extension)
@@ -96,7 +96,7 @@ def Move_Files_to_Storage(parameters, curdir, form):
                                       get_pa_tag_content, \
                                       parameters['rename'])
                 if rename or len(paths_and_suffixes[path]) != 0:
-                    ## Rename the file 
+                    ## Rename the file
                     try:
                         # Write the log rename_cmd
                         fd = open("%s/rename_cmd" % curdir, "a+")
@@ -107,7 +107,7 @@ def Move_Files_to_Storage(parameters, curdir, form):
                                   "%s/files/%s/%s%s" % (curdir, path, filename, extension))
                         fd.close()
                         ## Save the new name in a text file in curdir so that
-                        ## the new filename can be used by templates to created the recmysl 
+                        ## the new filename can be used by templates to created the recmysl
                         fd = open("%s/%s_RENAMED" % (curdir, path), "w")
                         fd.write("%s%s" % (filename, extension))
                         fd.close()
@@ -117,28 +117,29 @@ def Move_Files_to_Storage(parameters, curdir, form):
                         raise InvenioWebSubmitFunctionWarning(msg)
                 fullpath = "%s/files/%s/%s%s" % (curdir, path, filename, extension)
                 ## Check if there is any existing similar file
-                if not bibrecdocs.checkFileExists(fullpath, path):
+                if not bibrecdocs.check_file_exists(fullpath):
                     if not mybibdoc:
                         ## New docid is created
-                        mybibdoc = bibrecdocs.addNewFile(fullpath, path)
+                        mybibdoc = bibrecdocs.add_new_file(fullpath, never_fail=True)
                     else:
                         ## No new docid created but the file
-                        ## is archive in /bibdoc ID/ directory 
-                        mybibdoc = bibrecdocs.addNewFormat(fullpath, mybibdoc.getId()) 
+                        ## is archive in /bibdoc ID/ directory
+                        mybibdoc = bibrecdocs.add_new_format(fullpath, mybibdoc.get_docname())
                 ## Create related formats
                 if mybibdoc:
                     ## Fulltext
                     if documenttype == "fulltext":
                         additionalformats = createRelatedFormats(fullpath)
                         if len(additionalformats) > 0:
-                            mybibdoc.addFilesNewFormat(additionalformats)
+                            for additionalformat in additionalformats:
+                                mybibdoc.add_file_new_format(additionalformat)
                     ## Icon
                     elif documenttype == "picture":
                         iconpath = createIcon(fullpath, iconsize)
                         if iconpath is not None and mybibdoc is not None:
-                            mybibdoc.addIcon(iconpath)
+                            mybibdoc.add_icon(iconpath)
                             ## Save the new icon filename in a text file in curdir so that
-                            ## it can be used by templates to created the recmysl 
+                            ## it can be used by templates to created the recmysl
                             try:
                                 fd = open("%s/%s_ICON" % (curdir, path), "w")
                                 fd.write(os.path.basename(iconpath))
@@ -148,14 +149,14 @@ def Move_Files_to_Storage(parameters, curdir, form):
                                 msg %= str(err)
                                 raise InvenioWebSubmitFunctionWarning(msg)
                         elif mybibdoc is not None:
-                            mybibdoc.deleteIcon()
+                            mybibdoc.delete_icon()
 
     return ""
 
 def get_pa_tag_content(pa_content):
     """Get content for <PA>XXX</PA>.
     @param pa_content: MatchObject for <PA>(.*)</PA>.
-    return: the content of the file possibly filtered by an regular expression  
+    return: the content of the file possibly filtered by an regular expression
     if pa_content=file[re]:a_file => first line of file a_file matching re
     if pa_content=file*p[re]:a_file => all lines of file a_file, matching re,
     separated by - (dash) char.
@@ -180,5 +181,5 @@ def get_pa_tag_content(pa_content):
             else:
                 out = re.split(regexp, fp.readline().strip())[-1]
             fp.close()
-    return out  
-    
+    return out
+

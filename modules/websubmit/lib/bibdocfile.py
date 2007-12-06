@@ -19,16 +19,16 @@
 
 __revision__ = "$Id$"
 
-## import interesting modules:
 import os
 import re
 import shutil
 import md5
 import filecmp
+import time
 from xml.sax.saxutils import quoteattr
 from mimetypes import MimeTypes
 
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, DatabaseError
 from invenio.errorlib import register_exception
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import cdslang, images, weburl, webdir, filedir, filedirsize, sweburl
@@ -240,7 +240,6 @@ class BibRecDocs:
         else:
             bibdoc = BibDoc(recid=self.id, doctype=doctype, docname=docname)
             self.build_bibdoc_list()
-            _log_action('add_bibdoc', recid=self.id, docname=docname, doctype=doctype, docid=bibdoc.id)
             return bibdoc
 
     def add_new_file(self, fullpath, doctype="Main", docname='', never_fail=False):
@@ -353,6 +352,7 @@ class BibRecDocs:
             for filename in os.listdir(bibdoc.basedir):
                 if filename[0] != '.' and ';' in filename:
                     name, version = filename.split(';')
+                    version = int(version)
                     format = name[len(file_strip_ext(name)):]
                     format = normalize_format(format)
                     if not versions.has_key(version):
@@ -374,7 +374,7 @@ class BibRecDocs:
         else:
             for version, formats in versions.iteritems():
                 for format, filename in formats.iteritems():
-                    destination = '%s%s;%s' % (docname, format, version)
+                    destination = '%s%s;%i' % (docname, format, version)
                     try:
                         shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination))
                     except Exception, e:
@@ -499,9 +499,9 @@ class BibDoc:
                         raise InvenioWebSubmitFileError, e
                     os.umask(old_umask)
         # build list of attached files
-        self.build_file_list()
+        self._build_file_list('init')
         # link with related_files
-        self.build_related_file_list()
+        self._build_related_file_list()
 
     def get_status(self):
         """Retrieve the status."""
@@ -515,27 +515,24 @@ class BibDoc:
         """Set a new status."""
         run_sql('UPDATE bibdoc SET status=%s WHERE id=%s', (new_status, self.id))
         self.status = new_status
-        self.build_file_list()
-        self.build_related_file_list()
-        _log_action('set_status_bibdoc', recid=self.recid, docid=self.id, docname=self.docname, status=new_status)
+        self._build_file_list()
+        self._build_related_file_list()
 
     def add_file_new_version(self, filename):
         """Add a new version of a file."""
         try:
-            ok = False
             latestVersion = self.get_latest_version()
-            if int(latestVersion) == 0:
-                myversion = "1"
+            if latestVersion == 0:
+                myversion = 1
             else:
-                myversion = str(int(latestVersion) + 1)
+                myversion = latestVersion + 1
             if os.path.exists(filename):
                 dummy, basename, format = decompose_file(filename)
                 format = normalize_format(format)
-                destination = "%s/%s%s;%s" % (self.basedir, self.docname, format, myversion)
+                destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, myversion)
                 try:
                     shutil.copyfile(filename, destination)
                     os.chmod(destination, 0644)
-                    ok = True
                 except Exception, e:
                     register_exception()
                     raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (file, destination, e)
@@ -544,26 +541,21 @@ class BibDoc:
         finally:
             self.touch()
             Md5Folder(self.basedir).update()
-            self.build_file_list()
-            if ok:
-                current_file= self.get_file(self.docname, format, myversion)
-                _log_action(action="add_file", recid=self.recid, docid=self.id, docname=self.docname, format=format, version=myversion, checksum=current_file.get_checksum(), size=current_file.get_size())
+            self._build_file_list()
 
     def purge(self):
         """Phisically Remove all the previous version of the given bibdoc"""
         version = self.get_latest_version()
-        if int(version) > 1:
+        if version > 1:
             for file in self.docfiles:
-                if int(file.get_version()) < version:
+                if file.get_version() < version:
                     try:
                         os.remove(file.get_full_path())
                     except Exception, e:
                         register_exception()
             Md5Folder(self.basedir).update()
             self.touch()
-            self.build_file_list()
-            self.build_related_file_list()
-            _log_action(action="purge_bibdoc", recid=self.recid, docid=self.id, docname=self.docname)
+            self._build_file_list()
 
     def expunge(self):
         """Phisically remove all the traces of a given bibdoc"""
@@ -574,29 +566,24 @@ class BibDoc:
                 register_exception()
         Md5Folder(self.basedir).update()
         self.touch()
-        self.build_file_list()
-        self.build_related_file_list()
-        _log_action(action="expunge_bibdoc", recid=self.recid, docid=self.id, docname=self.docname)
-
+        self._build_file_list()
 
     def add_file_new_format(self, filename, version=""):
         """add a new format of a file to an archive"""
         try:
-            ok = False
             if version == "":
                 version = self.get_latest_version()
-            if int(version) == 0:
-                version = '1'
+            if version == 0:
+                version = 1
             if os.path.exists(filename):
                 dummy, basename, format = decompose_file(filename)
                 format = normalize_format(format)
-                destination = "%s/%s%s;%s" % (self.basedir, self.docname, format, version)
+                destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, version)
                 if os.path.exists(destination):
                     raise InvenioWebSubmitFileError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, format)
                 try:
                     shutil.copyfile(filename, destination)
                     os.chmod(destination, 0644)
-                    ok = True
                 except Exception, e:
                     register_exception()
                     raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (file, destination, e)
@@ -605,10 +592,7 @@ class BibDoc:
         finally:
             Md5Folder(self.basedir).update()
             self.touch()
-            self.build_file_list()
-            if ok:
-                current_file= self.get_file(self.docname, format, version)
-                _log_action(action="add_file", recid=self.recid, docid=self.id, docname=self.docname, format=format, version=version, checksum=current_file.get_checksum(), size=current_file.get_size())
+            self._build_file_list()
 
     def get_icon(self):
         """Returns the bibdoc corresponding to an icon of the given bibdoc."""
@@ -631,22 +615,18 @@ class BibDoc:
         run_sql("INSERT INTO bibdoc_bibdoc (id_bibdoc1, id_bibdoc2, type) VALUES (%s,%s,'Icon')",
             (self.id, newicon.get_id(),))
         try:
-            ok = False
             try:
                 old_umask = os.umask(022)
                 open("%s/.docid" % newicon.get_base_dir(), "w").write(str(self.id))
                 open("%s/.type" % newicon.get_base_dir(), "w").write(str(self.doctype))
                 os.umask(old_umask)
-                ok = True
             except Exception, e:
                 register_exception()
                 raise InvenioWebSubmitFileError, "Encountered an exception while writing .docid and .doctype for folder '%s': '%s'" % (newicon.get_base_dir(), e)
         finally:
             Md5Folder(newicon.basedir).update()
             self.touch()
-            self.build_related_file_list()
-            if ok:
-                _log_action(action="add_icon", recid=self.recid, docid=self.id, docid2=newicon.id, docname=newicon.docname)
+            self._build_related_file_list()
         return newicon
 
     def delete_icon(self):
@@ -655,8 +635,7 @@ class BibDoc:
         if existing_icon is not None:
             existing_icon.delete()
         self.touch()
-        self.build_related_file_list()
-        _log_action(action="delete_icon", docid=self.id)
+        self._build_related_file_list()
 
     def display(self, version="", ln = cdslang):
         """Returns a formatted representation of the files linked with
@@ -666,6 +645,7 @@ class BibDoc:
         if version == "all":
             docfiles = self.list_all_files()
         elif version != "":
+            version = int(version)
             docfiles = self.list_version_files(version)
         else:
             docfiles = self.list_latest_files()
@@ -684,7 +664,7 @@ class BibDoc:
                             'previous' : 0,
                             'content' : []
                           }
-            if version == self.get_latest_version() and version != "1":
+            if version == self.get_latest_version() and version != 1:
                 currversion['previous'] = 1
             for docfile in docfiles:
                 if docfile.get_version() == version:
@@ -715,9 +695,8 @@ class BibDoc:
         self.docname = newname
         Md5Folder(self.basedir).update()
         self.touch()
-        self.build_file_list()
-        self.build_related_file_list()
-        _log_action(action='rename_bibdoc', recid=self.recid, docid=self.id, docname=self.docname)
+        self._build_file_list('rename')
+        self._build_related_file_list()
 
 
     def get_docname(self):
@@ -740,21 +719,22 @@ class BibDoc:
         """retrieve bibdoc id"""
         return self.id
 
-    def get_file(self, name, format, version=""):
+    def get_file(self, format, version=""):
         """Return a DocFile with docname name, with format (the extension), and
         with the given version.
         """
         if version == "":
             docfiles = self.list_latest_files()
         else:
+            version = int(version)
             docfiles = self.list_version_files(version)
 
         format = normalize_format(format)
 
         for docfile in docfiles:
-            if docfile.get_name()==name and (docfile.get_format()==format or not format):
+            if (docfile.get_format()==format or not format):
                 return docfile
-        raise InvenioWebSubmitFileError, "No file called '%s' of format '%s', version '%s'" % (name, format, version)
+        raise InvenioWebSubmitFileError, "No file called '%s' of format '%s', version '%s'" % (self.docname, format, version)
 
     def list_versions(self):
         """Returns the list of existing version numbers for a given bibdoc."""
@@ -766,37 +746,110 @@ class BibDoc:
 
     def delete(self):
         """delete the current bibdoc instance"""
-        run_sql("UPDATE bibdoc SET status='DELETED' WHERE id=%s", (self.id,))
-        _log_action(action="delete_bibdoc", recid=self.recid, docid=self.id, docname=self.docname)
+        try:
+            run_sql("UPDATE bibdoc SET status='DELETED' WHERE id=%s", (self.id,))
+        except Exception, e:
+            register_exception()
+            raise InvenioWebSubmitFileError, "It's impossible to delete bibdoc %s: %s" % (self.id, e)
 
     def undelete(self, previous_status=''):
         """undelete a deleted file (only if it was actually deleted). The
         previous status, i.e. the restriction key can be provided.
         Otherwise the bibdoc will pe public."""
-        run_sql("UPDATE bibdoc SET status=%s WHERE id=%s AND status='DELETED'", (self.id, previous_status))
-        _log_action(action="undelete_bibdoc", recid=self.recid, docid=self.id, docname=self.docname, status=previous_status)
+        try:
+            run_sql("UPDATE bibdoc SET status=%s WHERE id=%s AND status='DELETED'", (self.id, previous_status))
+        except Exception, e:
+            register_exception()
+            raise InvenioWebSubmitFileError, "It's impossible to undelete bibdoc %s: %s" % (self.id, e)
 
-
-    def build_file_list(self):
+    def _build_file_list(self, context=''):
         """Lists all files attached to the bibdoc. This function should be
-        called everytime the bibdoc is modified"""
+        called everytime the bibdoc is modified.
+        As a side effect it log everything that has happened to the bibdocfiles
+        in the log facility, according to the context:
+        "init": means that the function has been called;
+        for the first time by a constructor, hence no logging is performed
+        "": by default means to log every deleted file as deleted and every
+        added file as added;
+        "rename": means that every appearently deleted file is logged as
+        renamef and every new file as renamet.
+        """
+
+        def log_action(action, docid, docname, format, version, size, checksum, timestamp=''):
+            """Log an action into the bibdoclog table."""
+            try:
+                if timestamp:
+                    run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)', (action, docid, docname, format, version, size, checksum, time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(timestamp))))
+                else:
+                    run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, NOW())', (action, docid, docname, format, version, size, checksum))
+            except DatabaseError:
+                register_exception()
+
+
+        def make_removed_added_bibdocfiles(previous_file_list):
+            """Internal function for build the log of changed files."""
+
+            # Let's rebuild the previous situation
+            old_files = {}
+            for bibdocfile in previous_file_list:
+                old_files[(bibdocfile.name, bibdocfile.format, bibdocfile.version)] = (bibdocfile.size, bibdocfile.checksum, bibdocfile.md)
+
+            # Let's rebuild the new situation
+            new_files = {}
+            for bibdocfile in self.docfiles:
+                new_files[(bibdocfile.name, bibdocfile.format, bibdocfile.version)] = (bibdocfile.size, bibdocfile.checksum, bibdocfile.md)
+
+            # Let's subtract from added file all the files that are present in
+            # the old list, and let's add to deleted files that are not present
+            # added file.
+            added_files = dict(new_files)
+            deleted_files = {}
+            for key, value in old_files.iteritems():
+                if added_files.has_key(key):
+                    del added_files[key]
+                else:
+                    deleted_files[key] = value
+            return (added_files, deleted_files)
+
+        if context != 'init':
+            previous_file_list = self.docfiles
         self.docfiles = []
         if os.path.exists(self.basedir):
             self.md5s = Md5Folder(self.basedir)
             for fil in os.listdir(self.basedir):
                 if not fil.startswith('.'):
-                    filepath = "%s/%s" % (self.basedir, fil)
-                    fileversion = re.sub(".*;", "", fil)
-                    fullname = fil.replace(";%s" % fileversion, "")
-                    checksum = self.md5s.get_checksum(fil)
-                    (dirname, basename, format) = decompose_file(fullname)
+                    try:
+                        filepath = "%s/%s" % (self.basedir, fil)
+                        fileversion = int(re.sub(".*;", "", fil))
+                        fullname = fil.replace(";%s" % fileversion, "")
+                        checksum = self.md5s.get_checksum(fil)
+                        (dirname, basename, format) = decompose_file(fullname)
 
-                    # we can append file:
-                    self.docfiles.append(BibDocFile(filepath, self.doctype,
-                        fileversion, basename, format,
-                        self.recid, self.id, self.status, checksum))
+                        # we can append file:
+                        self.docfiles.append(BibDocFile(filepath, self.doctype,
+                            fileversion, basename, format,
+                            self.recid, self.id, self.status, checksum))
+                    except Exception, e:
+                        register_exception()
+        if context == 'init':
+            return
+        else:
+            added_files, deleted_files = make_removed_added_bibdocfiles(previous_file_list)
+            deletedstr = "DELETED"
+            addedstr = "ADDED"
+            if context == 'rename':
+                deletedstr = "RENAMEDFROM"
+                addedstr = "RENAMEDTO"
+            for (docname, format, version), (size, checksum, md) in added_files.iteritems():
+                if context == 'rename':
+                    md = '' # No modification time
+                log_action(addedstr, self.id, docname, format, version, size, checksum, md)
+            for (docname, format, version), (size, checksum, md) in deleted_files.iteritems():
+                if context == 'rename':
+                    md = '' # No modification time
+                log_action(deletedstr, self.id, docname, format, version, size, checksum, md)
 
-    def build_related_file_list(self):
+    def _build_related_file_list(self):
         """Lists all files attached to the bibdoc. This function should be
         called everytime the bibdoc is modified within e.g. its icon.
         """
@@ -823,9 +876,10 @@ class BibDoc:
 
     def list_version_files(self, version):
         """Return all the docfiles of a particular version."""
+        version = int(version)
         tmp = []
         for docfile in self.docfiles:
-            if docfile.get_version() == str(version):
+            if docfile.get_version() == version:
                 tmp.append(docfile)
         return tmp
 
@@ -837,7 +891,7 @@ class BibDoc:
             self.docfiles.sort(order_files_with_version)
             return self.docfiles[0].get_version()
         else:
-            return '0'
+            return 0
 
     def get_file_number(self):
         """Return the total number of files."""
@@ -956,7 +1010,7 @@ class BibDocFile:
         if auth_code == 0:
             if os.path.exists(self.fullpath):
                 if calculate_md5(self.fullpath) != self.checksum:
-                    raise InvenioWebSubmitFileError, "File %s, version %s, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
+                    raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
                 req.content_type = self.mime
                 req.encoding = self.encoding
                 req.filename = self.fullname
@@ -1010,8 +1064,8 @@ def list_versions_from_array(docfiles):
 
 def order_files_with_version(docfile1, docfile2):
     """order docfile objects according to their version"""
-    version1 = int(docfile1.get_version())
-    version2 = int(docfile2.get_version())
+    version1 = docfile1.get_version()
+    version2 = docfile2.get_version()
     return cmp(version2, version1)
 
 def _make_base_dir(docid):
@@ -1150,7 +1204,7 @@ def bibdocfile_url_to_bibdocfile(url):
     """Given a url in the form (s)weburl/record/xxx/files/... it returns
     a BibDocFile object for the corresponding recid/docname/format."""
     dontcare, docname, format = decompose_bibdocfile_url(url)
-    return bibdocfile_url_to_bibdoc(url).get_file(docname, format)
+    return bibdocfile_url_to_bibdoc(url).get_file(format)
 
 def bibdocfile_url_to_fullpath(url):
     """Given a url in the form (s)weburl/record/xxx/files/... it returns
@@ -1177,8 +1231,3 @@ def decompose_bibdocfile_url(url):
     recid_file = recid_file.replace('/files/', '/')
     recid, docname, format = decompose_file(recid_file)
     return (int(recid), docname, format)
-
-def _log_action(action, recid=None, docid=None, doctype=None, docid2=None, docname=None, format=None, version=None, status=None, size=None, checksum=None):
-    """Log an action into the bibdoclog table."""
-    return
-    run_sql('INSERT INTO bibdoclog(action, recid, docid, type, docid2, docname, format, version, status, size, checksum, date) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())', (action, recid, docid, doctype, docid2, docname, format, version, status, size, checksum))

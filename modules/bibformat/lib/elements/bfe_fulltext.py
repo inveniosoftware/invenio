@@ -22,7 +22,7 @@
 """
 __revision__ = "$Id$"
 
-from invenio.file import BibRecDocs, file_strip_ext
+from invenio.bibdocfile import BibRecDocs, file_strip_ext
 from invenio.config import weburl, CFG_CERN_SITE
 from cgi import escape
 from urlparse import urlparse
@@ -179,13 +179,13 @@ def getFiles(bfo):
                     parsed_urls['others_urls'][url] = descr # external url
             else: # It's a bibdoc!
                 assigned = False
-                for doc in bibarchive.listBibDocs():
-                    if int(doc.getLatestVersion()) > 1:
+                for doc in bibarchive.list_bibdocs():
+                    if int(doc.get_latest_version()) > 1:
                         old_versions = True
-                    if filename in [f.fullname for f in doc.listAllFiles()]:
+                    if filename in [f.fullname for f in doc.list_all_files()]:
                         assigned = True
                         #doc.getIcon()
-                        if not doc.type == 'Main':
+                        if not doc.doctype == 'Main':
                             additionals = True
                         else:
                             if not descr:
@@ -196,6 +196,6 @@ def getFiles(bfo):
                 if not assigned: # Url is not a bibdoc :-S
                     if not descr:
                         descr = filename
-                    parsed_url['others_urls'][url] = descr # Let's put it in a general other url
+                    parsed_urls['others_urls'][url] = descr # Let's put it in a general other url
 
     return (parsed_urls, old_versions, additionals)

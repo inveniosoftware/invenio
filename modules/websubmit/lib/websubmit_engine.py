@@ -30,8 +30,11 @@ import sys
 import time
 import types
 import re
-import shutil
-from mod_python import apache
+
+try:
+    from mod_python import apache
+except ImportError:
+    pass
 
 from invenio.config import \
      bibconvert, \
@@ -49,7 +52,6 @@ from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, collect_user_info
 from invenio.websubmit_config import *
-from invenio.file import *
 from invenio.messages import gettext_set_language, wash_language
 
 from websubmit_dblayer import \
@@ -1442,32 +1444,6 @@ def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=
               actions = actions,
             )
     return t
-
-def errorMsg(title, req, c=cdsname, ln=cdslang):
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    return page(title = _("Error"),
-                body = create_error_box(req, title=title, verbose=0, ln=ln),
-                description="%s - Internal Error" % c,
-                keywords="%s, Internal Error" % c,
-                uid = getUid(req),
-                language=ln,
-                req=req,
-                navmenuid='submit')
-
-def warningMsg(title, req, c=cdsname, ln=cdslang):
-    # load the right message language
-    _ = gettext_set_language(ln)
-
-    return page(title = _("Warning"),
-                body = title,
-                description="%s - Internal Error" % c,
-                keywords="%s, Internal Error" % c,
-                uid = getUid(req),
-                language=ln,
-                req=req,
-                navmenuid='submit')
 
 def specialchars(text):
     text = string.replace(text, "&#147;", "\042");

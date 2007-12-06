@@ -19,35 +19,31 @@
 
 __revision__ = "$Id$"
 
-from invenio.file import *
+from os
+from invenio.bibdocfile import BibRecDocs, decompose_file, normalize_format
 
-def Move_Files_Archive(parameters,curdir,form):  
+def Move_Files_Archive(parameters, curdir, form):
     MainDir = "%s/files/MainFiles" % curdir
-    IncludeDir = "%s/files/AdditionalFiles" %curdir
-    watcheddirs = {'Main':MainDir, 'Additional':IncludeDir}
-    for type in watcheddirs.keys():
-        dir = watcheddirs[type]
+    IncludeDir = "%s/files/AdditionalFiles" % curdir
+    watcheddirs = {'Main' : MainDir, 'Additional' : IncludeDir}
+    for type, dir in watcheddirs.iteritems():
         if os.path.exists(dir):
             formats = {}
             files = os.listdir(dir)
             files.sort()
             for file in files:
-                extension = re.sub("^[^\.]*\.","",file)
-                if extension == file:
-                    extension = ""
-                filename = re.sub("\..*","",file)
+                dontcare, filename, extension = decompose_file(file)
                 if not formats.has_key(filename):
                     formats[filename] = []
-                formats[filename].append(extension)
+                formats[filename].append(normalize_format(extension))
             # first delete all missing files
             bibarchive = BibRecDocs(sysno)
-            existingBibdocs = bibarchive.listBibDocs(type)
-            if existingBibdocs is not None:
-                for existingBibdoc in existingBibdocs:
-                    if not formats.has_key(existingBibdoc.getFileName()):
-                        existingBibdoc.delete()
+            existingBibdocs = bibarchive.list_bibdocs(type)
+            for existingBibdoc in existingBibdocs:
+                if not formats.has_key(existingBibdoc.get_docname()):
+                    existingBibdoc.delete()
             # then create/update the new ones
             for key in formats.keys():
                 # instanciate bibdoc object
-                bibarchive.addFile(path=dir, type=type,filename=key,formats=formats[key])
+                bibarchive.add_new_file('%s/%s%s' % (dir, key, formats[key]), doctype=type, never_fail=True)
     return ""

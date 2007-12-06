@@ -27,7 +27,9 @@ from invenio.config import \
      CFG_PATH_GUNZIP, \
      CFG_PATH_GZIP, \
      images
-from invenio.file import *
+import os
+import re
+from invenio.bibdocfile import BibRecDocs, list_versions_from_array, list_types_from_array
 from invenio.websubmit_functions.Shared_Functions import createRelatedFormats, createIcon
 
 def Upload_Files(parameters,curdir,form):
@@ -47,16 +49,16 @@ def Upload_Files(parameters,curdir,form):
         deletedfile = form['deletedfile']
     else:
         deletedfile = ""
-    if form.has_key("mybibdocid"):
-        mybibdocid = form['mybibdocid']
+    if form.has_key("mybibdocname"):
+        mybibdocname = form['mybibdocname']
     else:
-        mybibdocid = ""
+        mybibdocname = ""
     if form.has_key("fileAction"):
         fileAction = form['fileAction']
     else:
         fileAction = ""
     if deleted == "yes":
-        bibrecdocs.deleteBibDoc(int(deletedfile))
+        bibrecdocs.delete_bibdoc(deletedfile)
     # then check if a file has been requested for addition
     if os.path.exists("%s/myfile" % curdir):
         fp = open("%s/myfile" % curdir,"r")
@@ -76,28 +78,29 @@ def Upload_Files(parameters,curdir,form):
         else:
             bibdoc = None
             if fileAction == "AddMain":
-                if not bibrecdocs.checkFileExists(fullpath,"Main"):
-                    bibdoc = bibrecdocs.addNewFile(fullpath,"Main")
+                if not bibrecdocs.check_file_exists(fullpath):
+                    bibdoc = bibrecdocs.add_new_file(fullpath, "Main", never_fail=True)
             if fileAction == "AddAdditional":
-                if not bibrecdocs.checkFileExists(fullpath,"Additional"):
-                    bibdoc = bibrecdocs.addNewFile(fullpath,"Additional")
-            if fileAction == "ReviseAdditional" and mybibdocid != "":
-                if not bibrecdocs.checkFileExists(fullpath,"Additional"):
-                    bibdoc = bibrecdocs.addNewVersion(fullpath,int(mybibdocid))
-            if fileAction == "AddAdditionalFormat" and mybibdocid != "":
-                bibdoc = bibrecdocs.addNewFormat(fullpath,int(mybibdocid))
+                if not bibrecdocs.check_file_exists(fullpath):
+                    bibdoc = bibrecdocs.add_new_file(fullpath, "Additional", never_fail=True)
+            if fileAction == "ReviseAdditional" and mybibdocname != "":
+                if not bibrecdocs.check_file_exists(fullpath):
+                    bibdoc = bibrecdocs.add_new_version(fullpath, mybibdocname)
+            if fileAction == "AddAdditionalFormat" and mybibdocname != "":
+                bibdoc = bibrecdocs.add_new_format(fullpath, mybibdocname)
             if type == "fulltext" and fileAction != "AddMainFormat" and fileAction != "AddAdditionalFormat":
                 additionalformats = createRelatedFormats(fullpath)
                 if len(additionalformats) > 0 and bibdoc is not None:
-                    bibdoc.addFilesNewFormat(additionalformats)
+                    for additionalformat in additionalformats:
+                        bibdoc.add_file_new_format(additionalformat)
             if type == "picture" and fileAction != "AddMainFormat" and fileAction != "AddAdditionalFormat":
                 iconpath = createIcon(fullpath,iconsize)
                 if iconpath is not None and bibdoc is not None:
-                    bibdoc.addIcon(iconpath)
+                    bibdoc.add_icon(iconpath)
                     os.unlink(iconpath)
                 elif bibdoc is not None:
-                    bibdoc.deleteIcon()
-                bibrecdocs.buildBibDocList()
+                    bibdoc.delete_ocon()
+                bibrecdocs.build_bibdoc_list()
             os.unlink(fullpath)
             os.unlink("%s/myfile" % curdir)
     t+="<form>"
@@ -109,25 +112,25 @@ def Upload_Files(parameters,curdir,form):
 
 def Display_File_List(bibrecdocs):
     t="""<br><br><table cellpadding=0 cellspacing=0 border=0 bgcolor=#dddddd width=80% align=center><tr><td>"""
-    bibdocs = bibrecdocs.listBibDocs()
+    bibdocs = bibrecdocs.list_bibdocs()
     if len(bibdocs) > 0:
-        types = listTypesFromArray(bibdocs)
+        types = list_types_from_array(bibdocs)
         for mytype in types:
-            if len(bibrecdocs.listBibDocs(mytype)) > 1:
+            if len(bibrecdocs.list_bibdocs(mytype)) > 1:
                 plural = "s"
             else:
                 plural = ""
             t+="<small><b>%s</b> document%s:</small>" % (mytype,plural)
             for bibdoc in bibdocs:
-                if mytype == bibdoc.getType():
+                if mytype == bibdoc.get_type():
                     t+="<table cellpadding=0 cellspacing=1 border=0><tr><td bgcolor=\"white\">"
-                    t+="<center><input type=radio name=mybibdocid value=%s><br><br><A href=\"\" onClick=\"if (confirm('Are you sure you want to delete this file?')) { document.forms[0].deletedfile.value='%s';document.forms[0].deleted.value='yes';document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/smallbin.gif border=0 align=center></a><br></small></center>" % (bibdoc.getId(),bibdoc.getId(),images)
+                    t+="<center><input type=radio name=mybibdocname value=%s><br><br><A href=\"\" onClick=\"if (confirm('Are you sure you want to delete this file?')) { document.forms[0].deletedfile.value='%s';document.forms[0].deleted.value='yes';document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/smallbin.gif border=0 align=center></a><br></small></center>" % (bibdoc.get_docname(),bibdoc.get_docname(),images)
                     t+="</td><td>"
                     t+=bibdoc.display()
                     t+="</td></tr></table>"
     t+="""</td></tr></table>"""
     return t
-    
+
 def Display_Form(bibrecdocs):
     #output the upload files form.
     t=""
@@ -148,10 +151,10 @@ def Display_Form(bibrecdocs):
     <TD>
         <small><SELECT name=fileAction>
         <option selected> Select:"""
-    if len(bibrecdocs.listBibDocs("Main")) == 0:
+    if len(bibrecdocs.list_bibdocs("Main")) == 0:
         t+="\n<option value=AddMain> Add Main Document"
     t+= "<option value=AddAdditional> Add Additional Document"
-    if len(bibrecdocs.listBibDocs()) != 0:
+    if len(bibrecdocs.list_bibdocs()) != 0:
         t+="\n<option value=ReviseAdditional> Revise Document"
         t+="\n<option value=AddAdditionalFormat> Add new Format to Document"
     t+="""
@@ -182,7 +185,7 @@ function checkAdd()
 {
     if (document.forms[0].fileAction.value == "ReviseAdditional" || document.forms[0].fileAction.value =="AddAdditionalFormat")
     {
-        if (getRadioValue(document.forms[0].mybibdocid) == null) {
+        if (getRadioValue(document.forms[0].mybibdocname) == '') {
             alert("please choose the document you wish to modify");
             return false;
         }
@@ -202,7 +205,7 @@ function checkAdd()
 
 function getRadioValue (radioButtonOrGroup) {
   var value = null;
-  if (radioButtonOrGroup.length) { // group 
+  if (radioButtonOrGroup.length) { // group
     for (var b = 0; b < radioButtonOrGroup.length; b++)
       if (radioButtonOrGroup[b].checked)
         value = radioButtonOrGroup[b].value;
@@ -213,9 +216,9 @@ function getRadioValue (radioButtonOrGroup) {
 }
 
 function step2()
-{    
+{
       if(confirm(\"You are about to submit the files and end the upload process.\"))
-      {    
+      {
           document.forms[0].step.value = 2;
           document.forms[0].submit();
       }

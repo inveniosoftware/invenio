@@ -118,7 +118,7 @@ def compare_hmbuffers(hmbuffer1, hmbuffer2):
         print "\n=" + hmbuffer1 + "=\n"
         print "\n=" + hmbuffer2 + "=\n"
 
-    return (hmbuffer1 == hmbuffer2)
+    return ok
 
 def try_url_download(url):
     """Try to download a given URL"""

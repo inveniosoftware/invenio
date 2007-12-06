@@ -26,7 +26,11 @@ import os
 import time
 import types
 import re
-from mod_python import apache
+try:
+    from mod_python import apache
+except ImportError:
+    pass
+
 import sys
 from urllib import quote
 
@@ -42,10 +46,10 @@ from invenio.config import \
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
-from invenio.webpage import page, create_error_box, pageheaderonly, pagefooteronly
+from invenio.webpage import page, create_error_box, pageheaderonly, \
+    pagefooteronly
 from invenio.webuser import getUid, get_email, page_not_authorized
 from invenio.websubmit_config import *
-from invenio.file import *
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url
 from invenio.messages import gettext_set_language
@@ -53,6 +57,9 @@ from invenio.search_engine import \
      guess_primary_collection_of_a_record, \
      get_colID, \
      create_navtrail_links
+from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
+    stream_restricted_icon, BibDoc, InvenioWebSubmitFileError
+from invenio.errorlib import register_exception
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -68,8 +75,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
     def _lookup(self, component, path):
         # after /record/<recid>/files/ every part is used as the file
-        # name (with possible path in the case of archives to be
-        # uncompressed)
+        # name
         filename = component
 
         def getfile(req, form):
@@ -83,63 +89,93 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 return page_not_authorized(req, "../getfile.py/index",
                                            navmenuid='submit')
 
-            uid_email = get_email(uid)
             readonly = CFG_ACCESS_CONTROL_LEVEL_SITE == 1
 
             # From now on: either the user provided a specific file
             # name (and a possible version), or we return a list of
             # all the available files. In no case are the docids
             # visible.
-            bibarchive = BibRecDocs(self.recid)
+            try:
+                bibarchive = BibRecDocs(self.recid)
+            except InvenioWebSubmitFileError, e:
+                register_exception(req=req)
+                msg = "<p>%s</p><p>%s</p>" % (
+                    _("The system has encountered an error in retrieving the list of files for this document."),
+                    _("The error has been logged and will be taken in consideration as soon as possibile."))
+                return errorMsg(msg, req, cdsname, ln)
+
+            docname = ''
+            format = ''
+            version = ''
 
             if filename:
                 # We know the complete file name, guess which docid it
                 # refers to
                 ## TODO: Change the extension system according to ext.py from setlink
                 ##       and have a uniform extension mechanism...
-                name = file_strip_ext(filename)
-                format = filename[len(name):]
-                if format and format[0] == '.':
-                    format = format[1:]
+                docname = file_strip_ext(filename)
+                format = filename[len(docname):]
+                if format and format[0] != '.':
+                    format = '.' + format
+            else:
+                docname = args['docname']
 
+            if not format:
+                format = args['format']
+
+            if not version:
+                version = args['version']
+
+            # version could be either empty, or all or an integer
+            try:
+                int(version)
+            except ValueError:
+                if version != 'all':
+                    version = ''
+
+            if version != 'all':
                 # search this filename in the complete list of files
-                for doc in bibarchive.listBibDocs():
-                    if filename in [f.fullname for f in doc.listAllFiles()]:
+                for doc in bibarchive.list_bibdocs():
+                    if docname == doc.get_docname():
                         try:
-                            docfile = doc.getFile(name,format,args['version'])
-                        except StandardError, msg:
+                            docfile = doc.get_file(format, version)
+                        except InvenioWebSubmitFileError, msg:
+                            register_exception(req=req)
                             return errorMsg(msg, req, cdsname, ln)
 
-                        (auth_code, auth_message) = docfile.isRestricted(req)
+                        (auth_code, auth_message) = docfile.is_restricted(req)
                         if auth_code != 0:
                             return warningMsg(_("This file is restricted: ") + auth_message, req, cdsname, ln)
 
                         if not readonly:
                             ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
-                            res = doc.registerDownload(ip, version, format, uid)
+                            res = doc.register_download(ip, version, format, uid)
                         try:
                             return docfile.stream(req)
-                        except StandardError, msg:
+                        except InvenioWebSubmitFileError, msg:
+                            register_exception(req=req)
                             return errorMsg(msg, req, cdsname, ln)
 
-                    elif doc.getIcon() is not None and doc.getIcon().docname in filename:
-                        icon = doc.getIcon()
+                    elif doc.get_icon() is not None and doc.get_icon().docname in filename:
+                        icon = doc.get_icon()
                         try:
-                            iconfile = icon.getFile(icon.docname, 'gif', args['version'])
-                        except StandardError, msg:
+                            iconfile = icon.get_file('gif', args['version'])
+                        except InvenioWebSubmitFileError, msg:
+                            register_exception(req=req)
                             return errorMsg(msg, req, cdsname, ln)
 
-                        (auth_code, auth_message) = iconfile.isRestricted(req)
+                        (auth_code, auth_message) = iconfile.is_restricted(req)
                         if auth_code != 0:
-                            return streamRestrictedIcon(req)
+                            return stream_restricted_icon(req)
                             #return warningMsg(_("This Icon is restricted: ") + auth_message, req, cdsname, ln)
 
                         if not readonly:
                             ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
-                            res = doc.registerDownload(ip, version, format, uid)
+                            res = doc.register_download(ip, version, format, uid)
                         try:
                             return iconfile.stream(req)
-                        except StandardError, msg:
+                        except InvenioWebSubmitFileError, msg:
+                            register_exception(req=req)
                             return errorMsg(msg, req, c, ln)
 
             filelist = bibarchive.display("", args['version'], ln=ln)
@@ -147,7 +183,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             t = websubmit_templates.tmpl_filelist(
                 ln=ln,
                 recid=self.recid,
-                docid="",
+                docname=args['docname'],
                 version=args['version'],
                 filelist=filelist)
 
@@ -237,22 +273,20 @@ def websubmit_legacy_getfile(req, form):
                 return errorMsg(_("Parameter docid missing"), req, c, ln)
 
             try:
-                doc = BibDoc(bibdocid=docid)
-            except StandardError, msg:
+                doc = BibDoc(docid=docid)
+            except InvenioWebSubmitFileError, msg:
+                register_exception(req=req)
                 return errorMsg(msg, req, c, ln)
             try:
-                docfile = doc.getFile(name,format,version)
-            except StandardError, msg:
+                docfile = doc.get_file(format,version)
+            except InvenioWebSubmitFileError, msg:
+                register_exception(req=req)
                 return errorMsg(msg, req, c, ln)
 
             # redirect to this specific file, possibly dropping
             # the version if we are referring to the latest one.
-            if docfile.format:
-                format = '.' + docfile.format
-            else:
-                format = ''
             target = '%s/record/%d/files/%s%s' % (
-                weburl, doc.recid, quote(docfile.name), format)
+                weburl, doc.recid, quote(docfile.name), docfile.format)
 
             if version and int(version) == int(doc.getLatestVersion()):
                 version = ''
@@ -269,16 +303,17 @@ def websubmit_legacy_getfile(req, form):
         # a precise filename
         elif docid!="":
             try:
-                bibdoc = BibDoc(bibdocid=docid)
-            except StandardError, msg:
+                bibdoc = BibDoc(docid=docid)
+            except InvenioWebSubmitFileError, msg:
+                register_exception(req=req)
                 return errorMsg(msg, req, cdsname, ln)
-            recid = bibdoc.getRecid()
+            recid = bibdoc.get_recid()
             filelist = bibdoc.display(version, ln=ln)
 
         t = websubmit_templates.tmpl_filelist(
               ln = ln,
               recid = recid,
-              docid = docid,
+              docname = name,
               version = version,
               filelist = filelist,
             )
@@ -467,26 +502,28 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
     # Answer to both /submit/ and /submit
     __call__ = index
 
-
-def errorMsg(title,req,c=cdsname,ln=cdslang):
+def errorMsg(title, req, c=cdsname, ln=cdslang):
+    # load the right message language
     _ = gettext_set_language(ln)
-    return page(title=_("Error"),
-                    body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description=_("Internal Error"),
-                    keywords="%s, Internal Error" % c,
-                    uid = getUid(req),
-                    language=ln,
-                    req=req,
-                    navmenuid='submit')
 
-def warningMsg(title,req,c=cdsname,ln=cdslang):
+    return page(title = _("Error"),
+                body = create_error_box(req, title=title, verbose=0, ln=ln),
+                description="%s - Internal Error" % c,
+                keywords="%s, Internal Error" % c,
+                uid = getUid(req),
+                language=ln,
+                req=req,
+                navmenuid='submit')
+
+def warningMsg(title, req, c=cdsname, ln=cdslang):
+    # load the right message language
     _ = gettext_set_language(ln)
-    return page(title=_("Warning"),
-                    body = title,
-                    description=_("Internal Error"),
-                    keywords="%s, Internal Error" % c,
-                    uid = getUid(req),
-                    language=ln,
-                    req=req,
-                    navmenuid='submit')
 
+    return page(title = _("Warning"),
+                body = title,
+                description="%s - Internal Error" % c,
+                keywords="%s, Internal Error" % c,
+                uid = getUid(req),
+                language=ln,
+                req=req,
+                navmenuid='submit')
