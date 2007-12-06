@@ -280,13 +280,13 @@ exclude-result-prefixes="marc fn">
                           <xsl:value-of select="normalize-space(substring-after(subfield[@code='a'], ','))" />
                       </given-names>
                   </name>
-                  <xsl:if test="subfield[@code='u']">
-                     <aff>
-                         <institution>
-                            <xsl:value-of select="subfield[@code='u']" />
-                         </institution>
-                     </aff>
-                  </xsl:if>
+                  <xsl:for-each select="subfield[@code='u']">
+                      <aff>
+                          <institution>
+                            <xsl:value-of select="." />
+                          </institution>
+                      </aff>
+                  </xsl:for-each>
                 </contrib>
             </xsl:for-each>
           </contrib-group>
