@@ -18,6 +18,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Various utilities for WebJournal, e.g. config parser, etc.
+"""
+
 from invenio.bibformat_engine import BibFormatObject
 from invenio.errorlib import register_exception
 from invenio.search_engine import search_pattern
@@ -31,6 +35,7 @@ import time
 import re
 import os
 import cPickle
+
 
 def get_order_dict_from_recid_list(list, issue_number):
     """
@@ -443,17 +448,19 @@ def please_login(req, journal_name, ln="en", title="", message="", backlink=""):
                 language = ln,
                 req = req)
 
-def get_current_issue(journal_name):
+def get_current_issue(language, journal_name):
     """
     checks the flat files for issue numbers of this journal and returns
     the most recent issue number.
     """
+    #todo: move this to DB
+    from invenio.webjournal_config import InvenioWebJournalNoCurrentIssueError
     try:
         current_issue = open('%s/webjournal/%s/current_issue' % (etcdir,
                                                                  journal_name)).read()
     except:
-        #todo: Error, no current issue number, returning this week
-        return '%s/%s' (time.strptime("%U/%Y", time.localtime()))
+        raise InvenioWebJournalNoCurrentIssueError(language)
+        #return '%s/%s' (time.strptime("%U/%Y", time.localtime()))
     issue_number = current_issue.split(" - ")[0].replace(" ", "")
     return issue_number
 
@@ -588,6 +595,8 @@ def get_monday_of_the_week(week_number, year):
     Monday of each week as: Monday <dd> <Month> <Year>
     """
     timetuple = time.strptime('1-%s-%s' % (week_number, year), "%w-%W-%Y")
+    #time_string = time.strftime("%A %d %B %Y", timetuple)
+    #raise "HERE: %s %s %s" % (week_number, year, time_string)
     return time.strftime("%A %d %B %Y", timetuple)
 
 def createhtmlmail (html, text, subject, toaddr):
@@ -669,7 +678,7 @@ def put_css_in_file(html_message, journal_name):
     css = make_full_paths_in_css(css, journal_name)
     html_parted = html_message.split("</head>")
     if len(html_parted) > 1:
-        html = '%s<style type="text/css">%s</style>%s' % (html_parted[0],
+        html = '%s<style type="text/css">%s</style></head>%s' % (html_parted[0],
                                                         css,
                                                         html_parted[1])
     else:
@@ -735,3 +744,20 @@ image_pattern = re.compile(r'''
 
 
 #url(["']?(?P<url>\S*)["']?)
+
+def guess_journal_name(language):
+    """
+    tries to take a guess what a user was looking for on the server if not
+    providing a name for the journal.
+    if there is only one journal on the server, returns the name of which,
+    otherwise redirects to a list with possible journals.
+    """
+    from invenio.webjournal_config import InvenioWebJournalNoJournalOnServerError
+    from invenio.webjournal_config import InvenioWebJournalNoNameError
+    all_journals = run_sql("SELECT * FROM jrnJOURNAL ORDER BY id")
+    if len(all_journals) == 0:
+        raise InvenioWebJournalNoJournalOnServerError(language)
+    elif len(all_journals) == 1:
+        return all_journals[0][1]
+    else:
+        raise InvenioWebJournalNoNameError(language)

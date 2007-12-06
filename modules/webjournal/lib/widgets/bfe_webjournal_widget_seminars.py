@@ -30,7 +30,7 @@ Update_Frequency = 3600 # in seconds
 def format(bfo):
     """
     """
-    out = get_widget_HTML()
+    out = get_widget_HTML(bfo)
     return out
 
 def escape_values(bfo):
@@ -38,7 +38,7 @@ def escape_values(bfo):
     """
     return 0
 
-def get_widget_HTML():
+def get_widget_HTML(bfo):
     """
     Indico seminars of the day service
     Gets seminars of the day from CERN Indico every 60 minutes and displays
@@ -59,7 +59,6 @@ def get_widget_HTML():
     if last_update + Update_Frequency < now:
         _update_seminars()
         seminar_xml = minidom.parse('%s/%s' % (cachedir, Cached_Filename))
-
     html = ""
     seminars = seminar_xml.getElementsByTagName("seminar")
     if len(seminars) == 0:
@@ -96,7 +95,8 @@ def get_widget_HTML():
         html += room
         
         html += "</li>"
-        
+
+            
     return html.encode('utf-8')
     
 def _update_seminars():

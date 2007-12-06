@@ -23,7 +23,7 @@ pylibdir = $(libdir)/python/invenio
 
 formatdir = $(pylibdir)/bibformat_elements
 
-pylib_DATA = webjournal_webinterface.py webjournal_utils.py webjournal_config.py
+pylib_DATA = webjournal_webinterface.py webjournal_utils.py webjournal_config.py webjournal.py webjournal_washer.py webjournal_templates.py
 format_DATA = bfe_ObjectLanguage.py
 
 #noinst_DATA = webbasket_migration_kit.py
