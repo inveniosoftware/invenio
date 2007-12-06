@@ -27,7 +27,7 @@ import sys
 
 import invenio.websearchadminlib as wsc
 from invenio.bibrankadminlib import check_user
-from invenio.webpage import page, create_error_box
+from invenio.webpage import page, create_error_box, adderrorbox
 from invenio.config import weburl, sweburl, cdslang, cdsname
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
@@ -196,29 +196,6 @@ def showtree(req, colID, ln=cdslang):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def modifyrestricted(req, colID, ln=cdslang, rest='', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-
-    try:
-        uid = getUid(req)
-    except Error, e:
-        return error_page(req)
-
-    auth = check_user(req,'cfgwebsearch')
-    if not auth[0]:
-        return page(title="Edit Collection",
-                body=wsc.perform_modifyrestricted(colID=colID,
-                                              ln=ln,
-                                              rest=rest,
-                                              confirm=confirm),
-                uid=uid,
-                language=ln,
-                req=req,
-                navtrail = navtrail_previous_links,
-                lastupdated=__lastupdated__)
-    else:
-        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-
 def modifytranslations(req, colID, ln=cdslang, sel_type='', trans = [], confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
 
@@ -269,7 +246,7 @@ def addcollectiontotree(req, colID, ln=cdslang, add_dad='', add_son='', rtype=''
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def addcollection(req, colID, ln=cdslang, colNAME='', dbquery='', rest='', callback="yes", confirm=-1):
+def addcollection(req, colID, ln=cdslang, colNAME='', dbquery='', callback="yes", confirm=-1):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
 
     try:
@@ -284,7 +261,6 @@ def addcollection(req, colID, ln=cdslang, colNAME='', dbquery='', rest='', callb
                                                ln=cdslang,
                                                colNAME=colNAME,
                                                dbquery=dbquery,
-                                               rest=rest,
                                                callback=callback,
                                                confirm=confirm),
                 uid=uid,
@@ -506,10 +482,10 @@ def update_external_collections(req, colID, ln=cdslang, state=None, recurse=None
 
 def update_detailed_record_options(req, colID, ln=cdslang, tabs=[], recurse=0):
     """Update the preferences for the tab to show/hide in the detailed record page. """
-    
+
     _tabs = wash_url_argument(tabs, 'list')
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
-    
+
     try:
         uid = getUid(req)
     except Error, e:
@@ -526,7 +502,7 @@ def update_detailed_record_options(req, colID, ln=cdslang, tabs=[], recurse=0):
                     lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
-    
+
 def removefieldvalue(req, colID, ln=cdslang, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
     navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/websearch/websearchadmin.py/">Collection Management</a> """ % (weburl)
 
@@ -679,7 +655,7 @@ def addexistingfield(req, colID, ln=cdslang, fldID=-1, fldvID=-1, fmeth='', call
     else:
         return page(title='Authorization failure',
                 uid=uid,
-                body=wsc.adderrorbox('try to login first',
+                body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
                                      <a href="%s/youraccount/login?referer=%s/admin/websearch/">login</a> with another account.""" % (sweburl, weburl)]),
                 navtrail= navtrail_previous_links,
@@ -709,7 +685,7 @@ def rearrangefield(req, colID, ln=cdslang, fmeth='', callback='yes', confirm=-1)
     else:
         return page(title='Authorization failure',
                 uid=uid,
-                body=wsc.adderrorbox('try to login first',
+                body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
                                      <a href="%s/youraccount/login?referer=%s/admin/websearch/">login</a> with another account.""" % (sweburl, weburl)]),
                 navtrail= navtrail_previous_links,
@@ -739,7 +715,7 @@ def addexistingfieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm
     else:
         return page(title='Authorization failure',
                 uid=uid,
-                body=wsc.adderrorbox('try to login first',
+                body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
                                      <a href="%s/youraccount/login?referer=%s/admin/websearch/">login</a> with another account.""" % (sweburl, weburl)]),
                 navtrail= navtrail_previous_links,
@@ -769,7 +745,7 @@ def rearrangefieldvalue(req, colID, fldID, ln=cdslang, callback='yes', confirm=-
     else:
         return page(title='Authorization failure',
                 uid=uid,
-                body=wsc.adderrorbox('try to login first',
+                body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
                                      <a href="%s/youraccount/login?referer=%s/admin/websearch/">login</a> with another account.""" % (sweburl, weburl)]),
                 navtrail= navtrail_previous_links,
@@ -955,7 +931,7 @@ def addexistingportalbox(req, colID, ln=cdslang, pbxID=-1, score=0, position='',
     else:
         return page(title='Authorization failure',
                 uid=uid,
-                body=wsc.adderrorbox('try to login first',
+                body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
                                      <a href="%s/youraccount/login?referer=%s/admin/websearch/">login</a> with another account.""" % (sweburl, weburl)]),
                 navtrail= navtrail_previous_links,

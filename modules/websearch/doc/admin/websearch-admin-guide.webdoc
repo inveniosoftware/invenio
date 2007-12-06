@@ -294,22 +294,29 @@ its contents will be empty.
 
 <a name="3.2"></a><h3>3.2 Modify access restrictions</h3>
 
-<p>If there is a need to restrict access to certain collections, you
-can configure which Apache group the access should be granted to.
-Users will then be prompted to enter Apache user and password.  The
-search engine will check whether user has entered appropriate
-credentials and whether the user belongs to the Apache group that can
-access this restricted collection.
+<p>Until <em>CDS Invenio-0.92.1</em> there was the possibility to directly
+restrict a collection by specifying an Apache group. Users who had an
+Apache user and password belonging to the given group would have been able
+to access the restricted collection.</p>
 
-<p>So, from the admin point of view, you should set up corresponding
-Apache user and group files, and you should have specified their
-location in the appropriate section of CDS Invenio <code>config.wml</code>
-file during CDS Invenio compilation.
+<p>Collection restriction managament is now integrated with the wider
+<a href="webaccess-admin-guide">Role Based Access Control</a>
+facility of CDS Invenio.</p>
 
-<p>(Note that in the future we may use CDS Invenio user identities in
-order to avoid the Apache way of authentication.)
+<p>In order to restrict access to a collection you just have to create
+at least an authorization for the action <code>accrestrcoll</code>
+specifying the name of the collection as the parameter</p>
 
-<p>To remove any access restrictions, set the parameter empty.
+<p>If you have just upgraded your installation from <em>CDS
+Invenio-0.92.1</em> you probably have run
+<code>collection_restrictions_migration_kit.py</code> tool in order
+to migrate to the new framework. For every Apache Group with access to a
+restricted collection a <em>role</em> will be created, with proper
+authorization to access the restricted collections. Each role will have
+a <em>FireRole</em> definition that specifies to allow for the given
+Apache group. Trough the WebAccess admin interface you will then be able
+to change these definition in order to softly migrate your restriction
+to whatever is your need.</p>
 
 <a name="3.3"></a><h3>3.3 Modify translations</h3>
 
