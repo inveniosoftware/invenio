@@ -17,10 +17,6 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir=$(localstatedir)/www/admin/bibconvert
-
-doc_DATA=index.html guide.html
-
 webdoclibdir = $(libdir)/webdoc/admin
 
 webdoclib_DATA = \
@@ -31,11 +27,6 @@ sampledir=$(localstatedir)/www/admin/bibconvert
 sample_DATA=sample.cfg sample.dat sample.kb bibtex.cfg dcq.cfg dcq.dat dcxml-to-marcxml.cfg \
 	    example_oaimarc2xm.xsl example_oaimarc2xm_collID.kb
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(sample_DATA) $(webdoclib_DATA)
 
 CLEANFILES =  *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
