@@ -2535,10 +2535,56 @@ class Template:
         return out
 
     def tmpl_detailed_record_statistics(self, recID, ln,
-                                        citinglist, citationhistory,
-                                        cociting, downloadsimilarity,
+                                        downloadsimilarity,
                                         downloadhistory, viewsimilarity):
         """Returns the statistics page of a record
+
+        Parameters:
+
+          - 'recID' *int* - The ID of the printed record
+
+          - 'ln' *string* - The language to display
+
+          - downloadsimilarity *string* - downloadsimilarity box
+
+          - downloadhistory *string* - downloadhistory box
+
+          - viewsimilarity *string* - viewsimilarity box
+
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = ''
+
+        if CFG_BIBRANK_SHOW_DOWNLOAD_STATS and downloadsimilarity is not None:
+            similar = self.tmpl_print_record_list_for_similarity_boxen (
+                _("People who downloaded this document also downloaded:"), downloadsimilarity, ln)
+
+            out += '''
+                    <tr><td>%(graph)s</td></tr>
+                    <tr><td>%(similar)s</td></tr>
+                    ''' % { 'weburl': weburl,   'recid': recID, 'ln': ln,
+                             'similar': similar, 'more': _("more"),
+                             'graph': downloadsimilarity
+                             }
+
+            out += '</table>'
+            out +=  '<br />'
+
+        if CFG_BIBRANK_SHOW_READING_STATS and viewsimilarity is not None:
+            out += self.tmpl_print_record_list_for_similarity_boxen (
+                _("People who viewed this page also viewed:"), viewsimilarity, ln)
+
+        if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS and downloadhistory is not None:
+            out += downloadhistory + '<br />'
+
+        return out
+
+    def tmpl_detailed_record_citations(self, recID, ln,
+                                       citinglist, citationhistory,
+                                       cociting):
+        """Returns the citations page of a record
 
         Parameters:
 
@@ -2551,12 +2597,6 @@ class Template:
           - citationhistory *string* - citationhistory box
 
           - cociting *string* - cociting box
-
-          - downloadsimilarity *string* - downloadsimilarity box
-
-          - downloadhistory *string* - downloadhistory box
-
-          - viewsimilarity *string* - viewsimilarity box
 
         """
         # load the right message language
@@ -2595,28 +2635,6 @@ class Template:
 
         if CFG_BIBRANK_SHOW_CITATION_GRAPHS and citationhistory is not None:
             out += '<tr><td>%s</td></tr>' % citationhistory
-
-        if CFG_BIBRANK_SHOW_DOWNLOAD_STATS and downloadsimilarity is not None:
-            similar = self.tmpl_print_record_list_for_similarity_boxen (
-                _("People who downloaded this document also downloaded:"), downloadsimilarity, ln)
-
-            out += '''
-                    <tr><td>%(graph)s</td></tr>
-                    <tr><td>%(similar)s</td></tr>
-                    ''' % { 'weburl': weburl,   'recid': recID, 'ln': ln,
-                             'similar': similar, 'more': _("more"),
-                             'graph': downloadsimilarity
-                             }
-
-            out += '</table>'
-            out +=  '<br />'
-
-        if CFG_BIBRANK_SHOW_READING_STATS and viewsimilarity is not None:
-            out += self.tmpl_print_record_list_for_similarity_boxen (
-                _("People who viewed this page also viewed:"), viewsimilarity, ln)
-
-        if CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS and downloadhistory is not None:
-            out += downloadhistory + '<br />'
 
         return out
 

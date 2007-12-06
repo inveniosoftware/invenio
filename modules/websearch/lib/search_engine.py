@@ -591,7 +591,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
                             (weburl, recID, title_message, format_name)
             else:
                 # Discussion, statistics, etc. tabs
-                tab_label = get_detailed_page_tabs(cc)[tab]['label']
+                tab_label = get_detailed_page_tabs(cc, ln=ln)[tab]['label']
                 navtrail += ' &gt; <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
                             (weburl, recID, title_message, _(tab_label))
             navtrail_append_title_p = 0
@@ -2572,11 +2572,14 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                 # HTML detailed format:
                 for irec in range(irec_max, irec_min, -1):
                     unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(recIDs[irec])),
-                                                            recIDs[irec])
+                                                            recIDs[irec], ln=ln)
                     ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
                     ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
+                    link_ln = ''
+                    if ln != cdslang:
+                        link_ln = '?ln=%s' % ln
                     tabs = [(unordered_tabs[tab_id]['label'], \
-                             '%s/record/%s/%s' % (weburl, recIDs[irec], tab_id), \
+                             '%s/record/%s/%s%s' % (weburl, recIDs[irec], tab_id, link_ln), \
                              tab_id == tab,
                              unordered_tabs[tab_id]['enabled']) \
                             for (tab_id, order) in ordered_tabs_id
@@ -2585,17 +2588,6 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                     content = ''
                     # load content
                     if tab == 'statistics':
-                        citinglist = None
-                        citationhistory = None
-                        r = calculate_cited_by_list(recIDs[irec])
-                        if r:
-                            citinglist = r
-                            citationhistory = create_citation_history_graph_and_box(recIDs[irec], ln)
-
-                        r = calculate_co_cited_with_list(recIDs[irec])
-                        cociting = None
-                        if r:
-                            cociting = r
                         r = calculate_reading_similarity_list(recIDs[irec], "downloads")
                         downloadsimilarity = None
                         downloadhistory = None
@@ -2609,12 +2601,31 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         if r: viewsimilarity = r
                         content = websearch_templates.tmpl_detailed_record_statistics(recIDs[irec],
                                                                                       ln,
-                                                                                      citinglist=citinglist,
-                                                                                      citationhistory=citationhistory,
-                                                                                      cociting=cociting,
                                                                                       downloadsimilarity=downloadsimilarity,
                                                                                       downloadhistory=downloadhistory,
                                                                                       viewsimilarity=viewsimilarity)
+                        req.write(webstyle_templates.detailed_record_container(content,
+                                                                               recIDs[irec],
+                                                                               tabs,
+                                                                               ln))
+                    elif tab == 'citations':
+                        citinglist = None
+                        citationhistory = None
+                        r = calculate_cited_by_list(recIDs[irec])
+                        if r:
+                            citinglist = r
+                            citationhistory = create_citation_history_graph_and_box(recIDs[irec], ln)
+
+                        r = calculate_co_cited_with_list(recIDs[irec])
+                        cociting = None
+                        if r:
+                            cociting = r
+
+                        content = websearch_templates.tmpl_detailed_record_citations(recIDs[irec],
+                                                                                     ln,
+                                                                                     citinglist=citinglist,
+                                                                                     citationhistory=citationhistory,
+                                                                                     cociting=cociting)
                         req.write(webstyle_templates.detailed_record_container(content,
                                                                                recIDs[irec],
                                                                                tabs,

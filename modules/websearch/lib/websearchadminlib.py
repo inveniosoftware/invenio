@@ -60,6 +60,8 @@ from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTIO
 from invenio.bibformat_elements import bfe_references
 from invenio.bibformat_engine import BibFormatObject
 from invenio.file import BibRecDocs
+from invenio.messages import gettext_set_language
+from invenio.bibrank_citation_searcher import get_cited_by
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""
@@ -3211,7 +3213,7 @@ def switch_score(colID, id_1, id_2, table):
     except Exception, e:
         return (0, e)
 
-def get_detailed_page_tabs(colID=None, recID=None):
+def get_detailed_page_tabs(colID=None, recID=None, ln=cdslang):
     """
     Returns the complete list of tabs to be displayed in the
     detailed record pages.
@@ -3223,15 +3225,18 @@ def get_detailed_page_tabs(colID=None, recID=None):
                                          - visible: *boolean* if False, tab should not be shown
                                          - enabled: *boolean* if True, tab should be disabled
                                          - order: *int* position of the tab in the list of tabs
+      - ln: language of the tab labels
 
     returns dict
     """
+    _ = gettext_set_language(ln)
 
-    tabs = {'metadata'  : {'label': 'Information',      'visible': False, 'enabled': True, 'order': 1},
-            'references': {'label': 'References',       'visible': False, 'enabled': True, 'order': 2},
-            'comments'  : {'label': 'Discussion',       'visible': False, 'enabled': True, 'order': 3},
-            'statistics': {'label': 'Usage statistics', 'visible': False, 'enabled': True, 'order': 4},
-            'files'     : {'label': 'Fulltext',         'visible': False, 'enabled': True, 'order': 5}
+    tabs = {'metadata'  : {'label': _('Information'),      'visible': False, 'enabled': True, 'order': 1},
+            'references': {'label': _('References'),       'visible': False, 'enabled': True, 'order': 2},
+            'citations' : {'label': _('Citations'),        'visible': False, 'enabled': True, 'order': 3},
+            'comments'  : {'label': _('Discussion'),       'visible': False, 'enabled': True, 'order': 4},
+            'statistics': {'label': _('Usage statistics'), 'visible': False, 'enabled': True, 'order': 5},
+            'files'     : {'label': _('Fulltext'),         'visible': False, 'enabled': True, 'order': 6}
             }
 
     res = run_sql("SELECT tabs FROM collectiondetailedpagetabs " + \
@@ -3260,6 +3265,10 @@ def get_detailed_page_tabs(colID=None, recID=None):
         bfo = BibFormatObject(recID)
         if bfe_references.format(bfo, '', '') == '':
             tabs['references']['enabled'] = False
+        # Disable citations if not citations found
+        if len(get_cited_by(recID)) == 0:
+            # TODO: Also check for cocitations
+            tabs['citations']['enabled'] = False
         # Disable fulltext if no file found
         brd =  BibRecDocs(recID)
         if len(brd.listBibDocs()) == 0:

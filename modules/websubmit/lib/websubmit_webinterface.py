@@ -155,8 +155,11 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             unordered_tabs = get_detailed_page_tabs(get_colID(cc), self.recid)
             ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
             ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
+            link_ln = ''
+            if ln != cdslang:
+                link_ln = '?ln=%s' % ln
             tabs = [(unordered_tabs[tab_id]['label'], \
-                     '%s/record/%s/%s' % (weburl, self.recid, tab_id), \
+                     '%s/record/%s/%s%s' % (weburl, self.recid, tab_id, link_ln), \
                      tab_id == 'files',
                      unordered_tabs[tab_id]['enabled']) \
                     for (tab_id, order) in ordered_tabs_id
@@ -189,7 +192,13 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
         """Called in case of URLs like /record/123/files without
            trailing slash.
         """
-        return redirect_to_url(req, '%s/record/%s/files/' % (weburl, self.recid))
+        args = wash_urlargd(form, websubmit_templates.files_default_urlargd)
+        ln = args['ln']
+        link_ln = ''
+        if ln != cdslang:
+            link_ln = '?ln=%s' % ln
+
+        return redirect_to_url(req, '%s/record/%s/files/%s' % (weburl, self.recid, link_ln))
 
 def websubmit_legacy_getfile(req, form):
     """ Handle legacy /getfile.py URLs """

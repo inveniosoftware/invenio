@@ -118,11 +118,15 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                                    uid=uid)
 
             unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
-                                                    self.recid)
+                                                    self.recid,
+                                                    ln=argd['ln'])
             ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
             ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
+            link_ln = ''
+            if argd['ln'] != cdslang:
+                link_ln = '?ln=%s' % argd['ln']
             tabs = [(unordered_tabs[tab_id]['label'], \
-                     '%s/record/%s/%s' % (weburl, self.recid, tab_id), \
+                     '%s/record/%s/%s%s' % (weburl, self.recid, tab_id, link_ln), \
                      tab_id in ['comments', 'reviews'],
                      unordered_tabs[tab_id]['enabled']) \
                     for (tab_id, order) in ordered_tabs_id

@@ -81,7 +81,8 @@ def wash_search_urlargd(form):
 class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /record/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'statistics', 'references', 'export']
+    _exports = ['', 'files', 'reviews', 'comments', 'statistics',
+                'references', 'export', 'citations']
 
     #_exports.extend(output_formats)
 
@@ -96,6 +97,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.comments = WebInterfaceCommentsPages(self.recid)
         self.statistics = self
         self.references = self
+        self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
 
         return
@@ -155,7 +157,8 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'statistics', 'references', 'export']
+    _exports = ['', 'files', 'reviews', 'comments', 'statistics',
+                'references', 'export', 'citations']
 
     #_exports.extend(output_formats)
 
@@ -169,6 +172,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.comments = WebInterfaceCommentsPages(self.recid)
         self.statistics = self
         self.references = self
+        self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
 
         return
@@ -381,7 +385,8 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             format = None
             tab = ''
             try:
-                if path[1] in ['', 'files', 'reviews', 'comments', 'statistics', 'references']:
+                if path[1] in ['', 'files', 'reviews', 'comments',
+                               'statistics', 'references', 'citations']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''
