@@ -909,7 +909,11 @@ class BibDoc:
 
 def readfile(filename):
     """Used only for backward compatibility."""
-    return open(filename).read()
+    try:
+        return open(filename).read()
+    except Exception, e:
+        register_exception()
+        raise InvenioWebSubmitFileError, "It's impossible to read %s: %s" % (filename, e)
 
 class BibDocFile:
     """This class represents a physical file in the CDS Invenio filesystem.
