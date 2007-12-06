@@ -225,7 +225,12 @@ def create_handler(root):
         """
         if req.args and cgi.parse_qs(req.args).has_key('profile'):
             from cStringIO import StringIO
-            import pstats
+            try:
+                import pstats
+            except ImportError:
+                ret = _handler(req)
+                req.write("<pre>%s</pre>" % "The Python Profiler is not installed!")
+                return ret
             import datetime
             date = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
             filename = '%s/invenio-profile-stats-%s.raw' % (tmpdir, date)
