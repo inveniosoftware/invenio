@@ -191,12 +191,10 @@ be able to access it.
 
      <pre>
        $ /opt/cds-invenio/bin/dbexec &lt; /opt/cds-invenio/src/cds-invenio-0.90/modules/miscutil/sql/tabbibclean.sql
+       $ rm -rf /opt/cds-invenio/var/data/files/*
        $ /opt/cds-invenio/bin/webcoll
+       $ /opt/cds-invenio/bin/bibindex --reindex
      </pre>
-
-     Note that you may also want to truncate some idxWORD11* tables,
-     in case you have created additional indexes.  Look into
-     <code>tabbibclean.sql</code> to see exactly what it does.
 
      Note that you may also want to delete the fulltext files and the
      submission counters in <code>/opt/cds-invenio/var/data</code>
