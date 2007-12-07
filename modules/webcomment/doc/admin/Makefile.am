@@ -17,21 +17,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(localstatedir)/www/admin/webcomment
-
-doc_DATA = index.html guide.html
-
 webdoclibdir = $(libdir)/webdoc/admin
 
 webdoclib_DATA = \
 	webcomment-admin.webdoc \
 	webcomment-admin-guide.webdoc
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(webdoclib_DATA)
 
 CLEANFILES = *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@

@@ -235,26 +235,26 @@ instead of) provided demo ones, you have to truncate them too:
 
 <blockquote>
 <pre>
-  \# find out which custom indexes were added:
-  $ echo "SELECT id FROM idxINDEX" | /opt/cds-invenio/bin/dbexec
-  id
-  55
-  [...]
-
-  \# for every index id, truncate corresponding word tables:
-  $ echo "TRUNCATE idxWORD55F" | /opt/cds-invenio/bin/dbexec
-  $ echo "TRUNCATE idxWORD55R" | /opt/cds-invenio/bin/dbexec
-  [...]
-
-  \# repeat the same operation for ranking tables:
-  $ echo "SELECT id FROM rnkMETHOD" | /opt/cds-invenio/bin/dbexec
-  id
-  66
-  67
-  $ echo "TRUNCATE rnkWORD66F" | /opt/cds-invenio/bin/dbexec
-  $ echo "TRUNCATE rnkWORD66R" | /opt/cds-invenio/bin/dbexec
-  $ echo "TRUNCATE rnkWORD67F" | /opt/cds-invenio/bin/dbexec
-  $ echo "TRUNCATE rnkWORD67R" | /opt/cds-invenio/bin/dbexec
+&nbsp; # find out which custom indexes were added:
+&nbsp; $ echo "SELECT id FROM idxINDEX" | /opt/cds-invenio/bin/dbexec
+&nbsp; id
+&nbsp; 55
+&nbsp; [...]
+&nbsp;
+&nbsp; # for every index id, truncate corresponding word tables:
+&nbsp; $ echo "TRUNCATE idxWORD55F" | /opt/cds-invenio/bin/dbexec
+&nbsp; $ echo "TRUNCATE idxWORD55R" | /opt/cds-invenio/bin/dbexec
+&nbsp; [...]
+&nbsp;
+&nbsp; # repeat the same operation for ranking tables:
+&nbsp; $ echo "SELECT id FROM rnkMETHOD" | /opt/cds-invenio/bin/dbexec
+&nbsp; id
+&nbsp; 66
+&nbsp; 67
+&nbsp; $ echo "TRUNCATE rnkWORD66F" | /opt/cds-invenio/bin/dbexec
+&nbsp; $ echo "TRUNCATE rnkWORD66R" | /opt/cds-invenio/bin/dbexec
+&nbsp; $ echo "TRUNCATE rnkWORD67F" | /opt/cds-invenio/bin/dbexec
+&nbsp; $ echo "TRUNCATE rnkWORD67R" | /opt/cds-invenio/bin/dbexec
 </pre>
 </blockquote>
 

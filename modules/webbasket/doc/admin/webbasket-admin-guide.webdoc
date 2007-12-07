@@ -24,5 +24,4 @@
 <!-- WebDoc-Page-Revision: $Id$-->
 
 
-<p>Not implemented yet.  If you want to manipulate user baskets, see
-tables <code>user_basket, basket, basket_record</code>.
+<p>FIXME.
