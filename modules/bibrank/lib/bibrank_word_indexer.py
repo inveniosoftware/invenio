@@ -849,7 +849,7 @@ def get_tags(config):
             tag[2] = tag[2].strip()
 
             #check if stemmer for language is available
-            if config.get(function,"stemming") and stem("information", "en") != "inform":
+            if config.get(function,"stemming") and stem("information", "english") != "inform":
                 if shown_error == 0:
                     write_message("Warning: Stemming not working. Please check it out!")
                     shown_error = 1
