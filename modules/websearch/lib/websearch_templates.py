@@ -2555,12 +2555,13 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = ''
+        out = '<br/>'
 
         if CFG_BIBRANK_SHOW_DOWNLOAD_STATS and downloadsimilarity is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen (
                 _("People who downloaded this document also downloaded:"), downloadsimilarity, ln)
 
+            out = '<table>'
             out += '''
                     <tr><td>%(graph)s</td></tr>
                     <tr><td>%(similar)s</td></tr>
@@ -2602,7 +2603,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = ''
+        out = '<br/><table>'
         if CFG_BIBRANK_SHOW_CITATION_STATS and citinglist is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen(
                 _("Cited by: %s records") % len (citinglist), citinglist, ln)
@@ -2635,6 +2636,8 @@ class Template:
 
         if CFG_BIBRANK_SHOW_CITATION_GRAPHS and citationhistory is not None:
             out += '<tr><td>%s</td></tr>' % citationhistory
+
+        out += '</table>'
 
         return out
 

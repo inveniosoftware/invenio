@@ -1108,7 +1108,7 @@ class Template:
         if version != "":
             title += ' ' + _("version") + ' #' + str(version)
 
-        out = """<div style="width:90%%;margin:auto;min-height:100px;">
+        out = """<div style="width:90%%;margin:auto;min-height:100px;margin-top:10px">
                 <!--start file list-->
                   %s
                 <!--end file list--></div>

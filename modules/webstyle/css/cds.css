@@ -1438,13 +1438,17 @@ div.detailed div.content {
 div.detailed img, div.mini-panel img{
     border:none;
 }
-div.detailed div.content, div.mini-panel {
+div.detailed div.content {
    border: 1px solid #36c;
+   padding-bottom:3px;
+}
+div.mini-panel {
+   border: 1px solid #ddd;
    padding-top:3px;
    padding-bottom:3px;
 }
 div.mini-panel{
-   background-color:#F2F2FD;
+   background-color:#f7f7f7;
 }
 .notopgap    { margin: 0; height:0;}
 .nobottomgap { margin-bottom: 0; height:0;}
@@ -1464,7 +1468,7 @@ ul.tabs{
 .tabs li{
    display:inline;
 }
-.tabs li a{
+.tabs li a, .tabs li a:hover{
    border-top: 1px solid #36c;
    border-right: 1px solid #36c;
    border-bottom: 1px solid #36c;
@@ -1477,7 +1481,7 @@ ul.tabs{
    text-decoration:none;
    zoom:100%; /*We loose CSS validity here, but necessary because of ie7*/
 }
-.tabs li.on a{
+.tabs li.on a, .tabs li.on a:hover{
    background-color: #36c;
    color: #FFF
 }
@@ -1485,7 +1489,7 @@ ul.tabs{
    color:#ccf;
    cursor:default;
 }
-.tabs li.first a{
+.tabs li.first a, .tabs li.first a:hover{
    border-left: 1px solid #36c;
 }
 
@@ -1534,6 +1538,7 @@ ul.detailedRecordActions{
 /* Short bib notice displayed as sheet of paper in detailed record pages */
 #commentHB {
    background: #fff url(paper-texture-128x128.gif) repeat top left;
+   margin-top:10px;
    padding:4px;
    border-bottom: 1px solid #CCC;
    border-right: 1px solid #CCC;

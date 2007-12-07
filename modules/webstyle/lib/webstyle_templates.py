@@ -707,8 +707,8 @@ URI: http://%(host)s%(page)s
             <div class="top-left-folded"></div>
             <div class="top-right-folded"></div>
             <div class="inside">
-                <div style="height:0.1em;">&nbsp;</div>
-                <p class="notopgap">&nbsp;</p>
+                <!--<div style="height:0.1em;">&nbsp;</div>
+                <p class="notopgap">&nbsp;</p>-->
                 %(content)s
                 <p class="nobottomgap" >&nbsp;</p>
             </div>
