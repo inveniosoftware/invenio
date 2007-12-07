@@ -17,7 +17,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-<!-- WebDoc-Page-Title: _(Guide)_ -->
+<!-- WebDoc-Page-Title: _(WebSubmit Admin Guide)_ -->
 <!-- WebDoc-Page-Navbar-Name: admin -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Admin Area)_</a> &gt; <a class="navtrail" href="websubmit-admin"/>_(WebSubmit Administration)_</a> -->
 <!-- WebDoc-Page-Navbar-Select: websubmit-admin-guide -->
@@ -145,7 +145,7 @@
      and click on "New Doctype" in the left blue panel.<br/><br/>
     &nbsp;<span class="guideheader">E</span>ven once created, a document type will not appear automatically on this page. To configure the list of catalogues and document
      types displayed on this page, the administrator shall go to the <a target=top href="<WEBURL>/admin/websubmit/editCatalogues.php">edit catalogues</a>
-      page. (see the <a href="#catalogues">guide section</a>)<br/>
+      page. (see the <a href="#catalogues">guide section</a>)<br clear="all"/>
 
     <h3>The user can then click on the document type he is interested in.</h3>
     <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-menu_doc.png" alt="Document type Page" class="guideimg" align="left">
@@ -165,7 +165,7 @@
     "Displayed" form field to "YES".<br/><br/>
     &nbsp;<span class="guideheader">Y</span>ou can also change the order of the buttons, by going to the <a target=top href="websubmit-admin">
     main page</a>, click on the title of the document type then on the icon in the "Edit Submission" column and in the
-    line of the desired action. There you can set the "buttonorder" form field.<br/><br/>
+    line of the desired action. There you can set the "buttonorder" form field.<br/><br clear="all"/>
 
     <h3>The user now may choose a category, then click on the action button he wishes.<br/>The submission starts, the first page of the web form appears.</h3>
     <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-form.png" alt="Document type Page" class="guideimg" align="left">
@@ -173,7 +173,7 @@
     pages form fields can be found. To modify the number of pages, add or withdraw form fields and modify
     the texts before each form field, you shall go to the <a target=top href="websubmit-admin">main page</a>,
     click on the title of the document type then on the icon in the "Edit Submission Pages" column and in the line of the
-    desired action. (see the <a href="#actionimplement">guide section</a>)<br/><br/>
+    desired action. (see the <a href="#actionimplement">guide section</a>)<br/><br clear="all"/>
 
     <h3>On the last page of the submission, there should be a button like in the following image which will
     trigger the end script</h3>
@@ -183,7 +183,7 @@
     &nbsp;<span class="guideheader">A</span>fter clicking this button, WebSubmit will apply the end script functions
     to the gathered data. To modify the end script, you shall go to the <a target=top href="websubmit-admin">
     main page</a>, click on the title of the document type then on the icon in the "Edit Functions" column and in the line
-    of the desired action. (see the <a href="#implementfunctions">guide section</a>)<br/>
+    of the desired action. (see the <a href="#implementfunctions">guide section</a>)<br clear="all"/>
 
 
         <h3>See also:</h3>
@@ -493,10 +493,10 @@
                 <li><b>dir</b>: This is the name of the directory in which the submission data will be stored temporarily. If
                 the dir value is "running" as for the "Submit New Record" action (SBI), then the submission data for a
                 Text Document (document acronym "TEXT") will be stored in the
-                <CFG_SUBMIT_DIR>/running/TEXT/9089760_90540 directory (where 9089760_90540 is what we call
+                /opt/cds-invenio/var/data/submit/storage/running/TEXT/9089760_90540 directory (where 9089760_90540 is what we call
                 the submission number. It is a string automatically generated at the beginning of each submission). Once
                 finished, the submission data will be moved to the
-                <CFG_SUBMIT_DIR>/done/running/TEXT/ directory by the "Move_to_Done" function.
+                /opt/cds-invenio/var/data/submit/storage/done/running/TEXT/ directory by the "Move_to_Done" function.
                 <li><b>statustext</b>: text displayed in the status bar of the browser when the user moves his mouse upon
                  the action button.
             </ul>
@@ -1528,7 +1528,7 @@ def Get_Report_Number (parameters,curdir,form):
         <tr>
             <td colspan="2">
                 <small>
-                This function moves the existing submission directory to the <CFG_SUBMIT_DIR>/done directory. If the
+                This function moves the existing submission directory to the /opt/cds-invenio/var/data/submit/storage/done directory. If the
                 Then it tars and gzips the directory.
                 </small>
             </td>
@@ -1550,7 +1550,7 @@ def Get_Report_Number (parameters,curdir,form):
         <tr>
             <td colspan="2">
                 <small>
-                This function moves the existing submission directory to the <CFG_SUBMIT_DIR>/pending directory. It is
+                This function moves the existing submission directory to the /opt/cds-invenio/var/data/submit/storage/pending directory. It is
                 used to store temporarily this data until it is approved or...
                 </small>
             </td>
@@ -2185,24 +2185,24 @@ def Get_Report_Number (parameters,curdir,form):
     <i>&nbsp;<span class="guideheader">Q</span>2. Where are all the files stored in this system?
     </i>
     <blockquote>
-        <li>the counter files are here: <CFG_SUBMIT_COUNTER>. There are used by the
+        <li>the counter files are here: /opt/cds-invenio/var/data/submit/counters. There are used by the
         <a href="#Report_Number_Generation">Report_Number_Generation</a>
         function.
-        <li>all running and completed submissions are stored here: <CFG_SUBMIT_DIR>.
-        <li>all the document files attached to records are stored here: <CFG_FILE_DIR>.
+        <li>all running and completed submissions are stored here: /opt/cds-invenio/var/data/submit/storage.
+        <li>all the document files attached to records are stored here: /opt/cds-invenio/var/data/files.
         <li>all python functions used by webSubmit are stored here: <LIBDIR>/python/invenio/websubmit_functions
     </blockquote>
     <a name="Q3"></a>
     <i>&nbsp;<span class="guideheader">Q</span>3. How is the documents archive organised?
     </i>
     <blockquote>
-        First of all, the documents files attached to records are stored here: <CFG_FILE_DIR>. <br/><br/>
+        First of all, the documents files attached to records are stored here: /opt/cds-invenio/var/data/files. <br/><br/>
         The <a href="#Upload_Files">Upload_Files</a> webSubmit function is used
         to link a document with a record.<br/><br/>
         All documents get an id from the system and are stored in the "bibdoc" table in the database. The link between a
         document and a record is stored using the "bibdoc_bibrec" table.<br/><br/>
         The document id is used to determine where the files are stored. For example the files of document #14 will be
-        stored here: <CFG_FILE_DIR>/g0/14<br/><br/>
+        stored here: /opt/cds-invenio/var/data/files/g0/14<br/><br/>
         The subdirectory g0 is used to split the documents accross the filesystem.  The CFG_FILE_DIR_SIZE variable from
         config.wml determines how many documents will be stored under one subdirectory.<br/><br/>
         Several files may be stored under the same document directory: they are the different formats and versions of the

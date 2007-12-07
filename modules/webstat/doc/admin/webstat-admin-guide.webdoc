@@ -57,7 +57,7 @@ Configuration:
 
 Edit the config file:
 
-   $ vim <ETCDIR>/webstat/webstat.cfg
+   $ vim /opt/cds-invenio/etc/webstat/webstat.cfg
 
 The file is self-explanatory.
 

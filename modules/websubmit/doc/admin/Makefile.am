@@ -16,11 +16,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(localstatedir)/www/admin/websubmit
+imgdir = $(localstatedir)/www/img/admin
 
-doc_DATA = index.html guide.html
-
-imgdir = $(localstatedir)/www/img/admin/
 img_DATA = websubmit-admin-guide-elements.png \
 	websubmit-admin-guide-implement.png \
 	websubmit-admin-guide-main_page.png \
@@ -38,11 +35,6 @@ webdoclib_DATA = \
 	websubmit-admin.webdoc \
 	websubmit-admin-guide.webdoc
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(img_DATA) $(webdoclib_DATA)
 
 CLEANFILES = *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdsnavbar.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
