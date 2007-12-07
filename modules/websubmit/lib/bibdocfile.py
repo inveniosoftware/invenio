@@ -76,7 +76,7 @@ def normalize_format(format):
         format = '.' + format
     return format
 
-_docname_re = re.compile(r'[^-\w]*')
+_docname_re = re.compile(r'[^-\w.]*')
 def normalize_docname(docname):
     """Normalize the docname (only digit and alphabetic letters and underscore are allowed)"""
     return _docname_re.sub('', docname)
@@ -348,11 +348,14 @@ class BibRecDocs:
         new_bibdocs = [] # List of files with the same version/format of
                         # existing file which need new bibdoc.
         counter = 0
+        zero_version_bug = False
         if os.path.exists(bibdoc.basedir):
             for filename in os.listdir(bibdoc.basedir):
                 if filename[0] != '.' and ';' in filename:
                     name, version = filename.split(';')
                     version = int(version)
+                    if version == 0:
+                        zero_version_bug = True
                     format = name[len(file_strip_ext(name)):]
                     format = normalize_format(format)
                     if not versions.has_key(version):
@@ -373,6 +376,8 @@ class BibRecDocs:
             bibdoc.delete()
         else:
             for version, formats in versions.iteritems():
+                if zero_version_bug:
+                    version += 1
                 for format, filename in formats.iteritems():
                     destination = '%s%s;%i' % (docname, format, version)
                     try:
@@ -393,6 +398,8 @@ class BibRecDocs:
             res = []
 
             for (filename, version) in new_bibdocs:
+                if zero_version_bug:
+                    version += 1
                 new_bibdoc = self.add_bibdoc(doctype=bibdoc.doctype, docname=docname, never_fail=True)
                 new_bibdoc.add_file_new_format('%s/%s' % (bibdoc.basedir, filename), version)
                 res.append(new_bibdoc)
@@ -403,7 +410,7 @@ class BibRecDocs:
                     raise InvenioWebSubmitFileError, "Error in removing '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), e)
 
             Md5Folder(bibdoc.basedir).update(only_new=False)
-
+        bibdoc._build_file_list()
         self.build_bibdoc_list()
 
         return res
