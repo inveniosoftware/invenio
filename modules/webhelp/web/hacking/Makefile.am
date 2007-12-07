@@ -18,29 +18,21 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 docdir = $(localstatedir)/www/hacking
+doc_DATA = cdsware.el
+
 imgdir = $(localstatedir)/www/img/hacking
-
-doc_DATA=index.html modules.html style.html concepts.html directory.html cdsware.el \
-         releases.html testsuite.html
-
-img_DATA=modules-overview-graph.jpeg
+img_DATA = modules-overview-diagram.jpeg
 
 webdoclibdir = $(libdir)/webdoc/hacking
-
 webdoclib_DATA = \
-	internals.webdoc \
+	hacking.webdoc \
 	modules-overview.webdoc \
 	coding-style.webdoc \
 	common-concepts.webdoc \
 	directory-organization.webdoc \
-	release-numbering-scheme.webdoc \
-	test-suite-strategy.webdoc
+	release-numbering.webdoc \
+	test-suite.webdoc
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(webdoclib_DATA) modules-overview-graph.jpeg cdsware.el
+EXTRA_DIST = $(webdoclib_DATA) $(doc_DATA) $(img_DATA)
 
 CLEANFILES = *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
