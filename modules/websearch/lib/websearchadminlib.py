@@ -62,6 +62,8 @@ from invenio.bibformat_engine import BibFormatObject
 from invenio.bibdocfile import BibRecDocs
 from invenio.messages import gettext_set_language
 from invenio.bibrank_citation_searcher import get_cited_by
+from invenio.access_control_admin import acc_get_action_id
+from invenio.access_control_config import VIEWRESTRCOLL
 
 def getnavtrail(previous = ''):
     """Get the navtrail"""
@@ -84,7 +86,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
 
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="2">2. Modify translations for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a href="%s/admin/websearch/guide.html#3.3">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="3">3. Modify translations for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a href="%s/admin/websearch/guide.html#3.3">?</a>]</small>""" % (col_dict[colID], weburl)
 
         if type(trans) is str:
             trans = [trans]
@@ -164,7 +166,7 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
         elif func in ["1", 1] and confirm in ["1", 1]:
             finresult = detach_rnk_col(colID, rnkID)
 
-        subtitle = """<a name="8">8. Modify rank options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.9">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="9">9. Modify rank options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.9">?</a>]</small>""" % (col_dict[colID], weburl)
         output  = """
         <dl>
         <dt>The rank methods enabled for the collection '%s' is:</dt>
@@ -871,7 +873,7 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """<a name="4">4. Modify portalboxes for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.5">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="5">5. Modify portalboxes for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.5">?</a>]</small>""" % (col_dict[colID], weburl)
     output  = ""
     pos = get_pbx_pos()
 
@@ -1363,7 +1365,7 @@ def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="7">7. Modify sort options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.8">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="8">8. Modify sort options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.8">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available sort options</dd>
@@ -1424,7 +1426,7 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="5">5. Modify search fields for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.6">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="6">6. Modify search fields for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.6">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available search fields</dd>
@@ -1485,7 +1487,7 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="6">6. Modify search options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.7">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="7">7. Modify search options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.7">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available search options</dd>
@@ -1608,7 +1610,7 @@ def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1)
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """<a name="9">9. Modify output formats for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.10">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="10">10. Modify output formats for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.10">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """
     <dl>
      <dt>Output format actions (not specific to the chosen collection)
@@ -1681,7 +1683,7 @@ def perform_manage_external_collections(colID, ln, callback='yes', content='', c
 
     colID = int(colID)
 
-    subtitle = """<a name="10">10. Configuration of related external collections</a>
+    subtitle = """<a name="11">11. Configuration of related external collections</a>
     &nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.11">?</a>]</small>""" % weburl
     output = '<form action="update_external_collections" method="POST"><input type="hidden" name="colID" value="%(colID)d">' % {'colID': colID}
 
@@ -1732,7 +1734,7 @@ def perform_showdetailedrecordoptions(colID, ln, callback='yes', content='', con
 
     colID = int(colID)
 
-    subtitle = """<a name="11">11. Configuration of detailed record page</a>
+    subtitle = """<a name="12">12. Configuration of detailed record page</a>
     &nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.12">?</a>]</small>""" % weburl
     output = '''<form action="update_detailed_record_options" method="post">
     <table><tr><td>
@@ -2191,7 +2193,7 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     col_dict = dict(get_def_name('', "collection"))
     if colID != 1 and colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="3">3. Delete collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.4">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.4">?</a>]</small>""" % (col_dict[colID], weburl)
         res = run_sql("SELECT * from collection_collection WHERE id_dad=%s" % colID)
         res2 = run_sql("SELECT * from collection_collection WHERE id_son=%s" % colID)
 
@@ -2240,6 +2242,7 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
         return """<b><span class="info">Collection deleted.</span></b>
         """
 
+    action_id = acc_get_action_id(VIEWRESTRCOLL)
     fin_output = """
     <table>
     <tr>
@@ -2248,26 +2251,32 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     <tr>
     <td>0.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s">Show all</a></small></td>
     <td>1.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifydbquery">Modify collection query</a></small></td>
-    <td>2.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifytranslations">Modify translations</a></small></td>
-    <td>3.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_deletecollection">Delete collection</a></small></td>
+    <td>2.&nbsp;<small><a href="/admin/webaccess/webaccessadmin.py/modifyauthorizations?id_action=%i&reverse=1">Modify access restrictions</a></small></td>
+    <td>3.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifytranslations">Modify translations</a></small></td>
+    <td>4.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_deletecollection">Delete collection</a></small></td>
     </tr><tr>
-    <td>4.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showportalboxes">Modify portalboxes</a></small></td>
-    <td>5.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showsearchfields#6">Modify search fields</a></small></td>
-    <td>6.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showsearchoptions#7">Modify search options</a></small></td>
-    <td>7.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showsortoptions#8">Modify sort options</a></small></td>
-    <td>8.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifyrankmethods#9">Modify rank options</a></small></td>
+    <td>5.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showportalboxes">Modify portalboxes</a></small></td>
+    <td>6.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showsearchfields#6">Modify search fields</a></small></td>
+    <td>7.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showsearchoptions#7">Modify search options</a></small></td>
+    <td>8.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showsortoptions#8">Modify sort options</a></small></td>
+    <td>9.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifyrankmethods#9">Modify rank options</a></small></td>
     </tr><tr>
-    <td>9.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showoutputformats#10">Modify output formats</a></small></td>
-    <td>10.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_manage_external_collections#11">Configuration of related external collections</a></small></td>
-    <td>11.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showdetailedrecordoptions#12">Detailed record page options</a></small></td>
+    <td>10.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showoutputformats#10">Modify output formats</a></small></td>
+    <td>11.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_manage_external_collections#11">Configuration of related external collections</a></small></td>
+    <td>12.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showdetailedrecordoptions#12">Detailed record page options</a></small></td>
     </tr>
     </table>
-    """ % (colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln)
+    """ % (colID, ln, colID, ln, action_id, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln)
 
     if mtype == "perform_modifydbquery" and content:
         fin_output += content
     elif mtype == "perform_modifydbquery" or not mtype:
         fin_output += perform_modifydbquery(colID, ln, callback='')
+
+    if mtype == "perform_modifyrestricted" and content:
+        fin_output += content
+    elif mtype == "perform_modifyrestricted" or not mtype:
+        fin_output += perform_modifyrestricted(colID, ln, callback='')
 
     if mtype == "perform_modifytranslations" and content:
         fin_output += content
@@ -2414,8 +2423,34 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     else:
         return addadminbox(subtitle, body)
 
+def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
+    """modify which apache group is allowed to access the collection.
+    rest - the groupname"""
+
+    subtitle = ''
+    output  = ""
+
+    col_dict = dict(get_def_name('', "collection"))
+    action_id = acc_get_action_id(VIEWRESTRCOLL)
+    if colID and col_dict.has_key(int(colID)):
+        colID = int(colID)
+        subtitle = """<a name="2">2. Modify access restrictions for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.2">?</a>]</small>""" % (col_dict[colID], weburl)
+
+        output = """<p>Please, note that after <em>CDS Invenio-0.91.2</em> applying
+        restrictions to a collection is done through the more integrated
+        <strong><a href="/admin/webaccess/webaccessadmin.py/modifyauthorizations?id_action=%i&reverse=1">WebAccess facility</a></strong>.</p>
+        """ % action_id
+    body = [output]
+
+    if callback:
+        return perform_editcollection(colID, ln, "perform_modifyrestricted", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
 def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
     """Check the configuration of the collections."""
+
+    from invenio.search_engine import collection_restricted_p
 
     subtitle = """<a name="11"></a>Collections Status&nbsp;&nbsp&nbsp;[<a href="%s/admin/websearch/guide.html#5">?</a>]""" % weburl
     output  = ""
@@ -2424,7 +2459,7 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
     col_dict = dict(get_def_name('', "collection"))
     collections = run_sql("SELECT id, name, dbquery FROM collection ORDER BY id")
 
-    header = ['ID', 'Name', 'Query', 'Subcollections', 'I18N', 'Status']
+    header = ['ID', 'Name', 'Query', 'Subcollections', 'Restricted', 'I18N', 'Status']
     rnk_list = get_def_name('', "rnkMETHOD")
     actions = []
 
@@ -2457,9 +2492,19 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
         if dbquery is None:
             dbquery = """<b><span class="info">No</span></b>"""
 
+        restricted = collection_restricted_p(name)
+        if restricted:
+            restricted = """<b><span class="warning">Yes</span></b>"""
+            if status:
+                status += """<b><span class="warning">,4:Restricted</span></b>"""
+            else:
+                status += """<b><span class="warning">4:Restricted</span></b>"""
+        else:
+            restricted = """<b><span class="info">No</span></b>"""
+
         if status == "":
             status = """<b><span class="info">OK</span></b>"""
-        actions.append([id, """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s">%s</a>""" % (weburl, id, ln, name), dbquery, subs, i8n, status])
+        actions.append([id, """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s">%s</a>""" % (weburl, id, ln, name), dbquery, subs, restricted, i8n, status])
 
 
     output += tupletotable(header=header, tuple=actions)
