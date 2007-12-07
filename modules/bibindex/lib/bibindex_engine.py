@@ -42,6 +42,7 @@ from invenio.config import \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
      CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
      CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE, \
+     CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES, \
      weburl, tmpdir
 from invenio.bibindex_engine_config import *
 from invenio.bibdocfile import bibdocfile_url_to_fullpath, bibdocfile_url_p, decompose_bibdocfile_url
@@ -520,7 +521,7 @@ def remove_latex_markup(phrase):
 tagToWordsFunctions = {'8564_u':get_words_from_fulltext}
 
 latex_formula_re = re.compile(r'\$.*?\$')
-def get_words_from_phrase(phrase):
+def get_words_from_phrase(phrase, stemming=True):
     """Return list of words found in PHRASE.  Note that the phrase is
        split into groups depending on the alphanumeric characters and
        punctuation characters definition present in the config file.
@@ -539,17 +540,20 @@ def get_words_from_phrase(phrase):
         block = re_block_punctuation_begin.sub("", block)
         block = re_block_punctuation_end.sub("", block)
         if block:
-            block = apply_stemming_and_stopwords_and_length_check(block)
+            if stemming:
+                block = apply_stemming_and_stopwords_and_length_check(block)
             if block:
                 words[block] = 1
             # 3rd break each block into subblocks according to punctuation and add subblocks:
             for subblock in re_punctuation.split(block):
-                subblock = apply_stemming_and_stopwords_and_length_check(subblock)
+                if stemming:
+                    subblock = apply_stemming_and_stopwords_and_length_check(subblock)
                 if subblock:
                     words[subblock] = 1
                     # 4th break each subblock into alphanumeric groups and add groups:
                     for alphanumeric_group in re_separators.split(subblock):
-                        alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group)
+                        if stemming:
+                            alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group)
                         if alphanumeric_group:
                             words[alphanumeric_group] = 1
     return words.keys()
@@ -645,6 +649,16 @@ def get_word_tables(tables):
                                get_index_tags(index)})
     return wordTables
 
+def get_not_stemmed_tables():
+    """Returns the name of the tables for which stemming is not enabled."""
+    ret = []
+    for index in CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES:
+        index_id = get_index_id(index)
+        if index_id:
+            ret.append("idxWORD%02dF" % index_id)
+            ret.append("rnkWORD%02dF" % index_id)
+    return ret
+
 def get_date_range(var):
     "Returns the two dates contained as a low,high tuple"
     limits = var.split(",")
@@ -704,13 +718,18 @@ def truncate_index_table(index_name):
 class WordTable:
     "A class to hold the words table."
 
-    def __init__(self, tablename, fields_to_index, separators="[^\s]"):
+    def __init__(self, tablename, fields_to_index, separators="[^\s]", stemming=True):
         "Creates words table instance."
         self.tablename = tablename
         self.recIDs_in_mem = []
         self.fields_to_index = fields_to_index
         self.separators = separators
         self.value = {}
+        self.stemming = stemming
+        if stemming and CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE:
+            write_message('Stemming is enabled for table %s' % tablename)
+        else:
+            write_message('Stemming is disabled for table %s' % tablename)
 
     def get_field(self, recID, tag):
         """Returns list of values of the MARC-21 'tag' fields for the
@@ -991,7 +1010,10 @@ class WordTable:
             if tag in tagToWordsFunctions.keys():
                 get_words_function = tagToWordsFunctions[tag]
             else:
-                get_words_function = get_words_from_phrase
+                if self.stemming:
+                    get_words_function = get_words_from_phrase
+                else:
+                    get_words_function = lambda phrase: get_words_from_phrase(phrase, False)
             bibXXx = "bib" + tag[0] + tag[1] + "x"
             bibrec_bibXXx = "bibrec_" + bibXXx
             query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
@@ -1418,9 +1440,11 @@ def task_run_core():
     messages on stderr.
     Return 1 in case of success and 0 in case of failure."""
     global _last_word_table
+    not_stemmed_tables = get_not_stemmed_tables()
+
     if task_get_option("cmd") == "check":
         for table in get_word_tables(task_get_option("windex")):
-            wordTable = WordTable(table.keys()[0], table.values()[0])
+            wordTable = WordTable(table.keys()[0], table.values()[0], table.keys()[0] not in not_stemmed_tables)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
         _last_word_table = None
@@ -1431,7 +1455,8 @@ def task_run_core():
             truncate_index_table(index_name)
 
     for table in get_word_tables(task_get_option("windex")):
-        wordTable = WordTable(table.keys()[0], table.values()[0])
+        write_message('Not stemmed tables are %s and this table is %s' % (not_stemmed_tables, table.keys()[0]), verbose=8)
+        wordTable = WordTable(table.keys()[0], table.values()[0], stemming=table.keys()[0] not in not_stemmed_tables)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
         try:

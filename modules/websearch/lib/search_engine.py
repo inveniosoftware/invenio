@@ -48,6 +48,7 @@ from invenio.config import \
      CFG_WEBSEARCH_SEARCH_CACHE_SIZE, \
      CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
+     CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES, \
      cdslang, \
      cdsname, \
      logdir, \
@@ -1617,11 +1618,13 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
     set = HitSet() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
     # deduce into which bibwordsX table we will search:
+    apply_stemming = not "anyfield" in CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES
     bibwordsX = "idxWORD%02dF" % get_index_id("anyfield")
     if f:
         index_id = get_index_id(f)
         if index_id:
             bibwordsX = "idxWORD%02dF" % index_id
+            apply_stemming = not f in CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES
         else:
             return HitSet() # word index f does not exist
 
@@ -1631,13 +1634,15 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
     if len(words) == 2:
         word0 = re_word.sub('', words[0])
         word1 = re_word.sub('', words[1])
-        word0 = stem(word0)
-        word1 = stem(word1)
+        if apply_stemming:
+            word0 = stem(word0)
+            word1 = stem(word1)
         res = run("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
                   (wash_index_term(word0), wash_index_term(word1)))
     else:
         word = re_word.sub('', word)
-        word = stem(word)
+        if apply_stemming:
+            word = stem(word)
         if string.find(word, '%') >= 0: # do we have wildcard in the word?
             res = run_sql("SELECT term,hitlist FROM %s WHERE term LIKE %%s" % bibwordsX,
                           (wash_index_term(word),))

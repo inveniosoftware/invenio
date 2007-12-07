@@ -114,7 +114,7 @@ word "information" will be stemmed to "inform"; or "looking", "looks",
 and "looked" will be all stemmed to "look", thus giving more hits to each
 word.
 
-<p>Currently only the English stemmer is supported.  All searches will
+<p>Currently only stemming in a single language  is supported.  All searches will
 also be stemmed based on this same language. For documents in other
 languages, there will be no difference if stemmer is used or not.
 
@@ -122,18 +122,30 @@ languages, there will be no difference if stemmer is used or not.
 <b>CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE</b> in the general config
 file.  To disable use of stemmer, set the value to empty string.
 
+<p>You will also have to properly configure the indexes you don't want to
+have stem (e.g. collection, for properly work of collection management, author,
+since it indexes proper names...). You can do this by properly setting the variable
+<b>CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES</b> in the general config file.
+
 <a name="3.5"></a><h3>3.5 Configure Word Length</h3>
 
 <p>By setting the value of <b>CFG_BIBINDEX_MIN_WORD_LENGTH</b> in the
 general config file higher than 0, only words with the number of
 characters higher than this will be added to the index.
 
-<a name="3.6"></a><h3>3.6 Configure Removal of HTML Code</h3>
+<a name="3.6"></a><h3>3.6 Configure Removal of HTML and LaTeX Code</h3>
 
 <p>By setting the value of <b>CFG_BIBINDEX_REMOVE_HTML_MARKUP</b> in
 the general config file, the indexer may try to remove all HTML code
 from documents before indexing, and index only the text left.  (HTML
-code is defined as everything between '<' and '>' in a text.)
+code is defined as everything between '<' and '>' in a text.)</p>
+
+<p>By setting the value of <b>CFG_BIBINDEX_REMOVE_LATEX_MARKUP</b> in
+the general config file, the indexer may try to remove all LaTeX code
+from documents before indexing, and index only the text left.  (LaTeX
+code is defined as everything between '\command{' and '}' in a text, or
+'{\command ' and '}').</p>
+
 
 <a name="3.7"></a><h3>3.7 Configure Accent Stripping</h3>
 
@@ -206,25 +218,44 @@ scheduled for the forthcoming night or weekend.
 <p>The procedure of reindexing is taking place into the real indexes that
 are also used for searching.  Therefore the end users will feel
 immediately any change in the indexes.  If you need to reindex your
-records from scratch, then the best procedure is the following: wipe out
-existing indexes, reindex the collection index only (fast operation),
-recreate collection cache, and only after that reindex all the other
-indexes (slow operation).  This will ensure that the records in your
-system will be at least browsable while the indexes are being rebuilt.
-The steps to perform are:
+records from scratch, then the best procedure is the following: reindex
+the collection index only (fast operation), recreate collection cache,
+and only after that reindex all the other indexes (slow operation).
+This will ensure that the records in your system will be at least
+browsable while the indexes are being rebuilt. The steps to perform are:
 
-<p>Firstly, we truncate existing indexes:
+<p>First we reindex the collection index:
+
+<blockquote>
+<pre>
+  $ bibindex --reindex -f50000 -wcollection # reindex the collection index (fast)
+  $ echo "UPDATE collection SET reclist=NULL;" | \
+    /opt/cds-invenio/bin/dbexec # clean collection cache
+  $ webcoll -f # recreate the collection cache
+  $ bibsched # run the two above-submitted tasks
+  $ sudo apachectl restart
+</pre>
+</blockquote>
+
+<p>Then we launch (slower) reindexing of the remaining indexes:
+
+<blockquote>
+<pre>
+  $ bibindex --reindex -f50000 # reindex other indexes (slow)
+  $ webcoll -f
+  $ bibsched # run the two above-submitted tasks, and put the queue back in auto mode
+  $ sudo apachectl restart
+</pre>
+</blockquote>
+
+You may optionally want to reindex the word ranking tables:
 
 <blockquote>
 <pre>
   $ bibsched # wait for all active tasks to finish, and put the queue into manual mode
-  $ cd cds-invenio-0.90 # source dir
-  $ echo "UPDATE collection SET reclist=NULL;" | \
-    /opt/cds-invenio/bin/dbexec # clean collection cache
-  $ grep WORD ./modules/miscutil/sql/tabbibclean.sql | \
-    /opt/cds-invenio/bin/dbexec # truncate word and rank indexes
-  $ echo "UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00';" | \
-    /opt/cds-invenio/bin/dbexec # rewind the last indexing time
+  $ cd cds-invenio-0.92.1 # source dir
+  $ grep rnkWORD ./modules/miscutil/sql/tabbibclean.sql | \
+    /opt/cds-invenio/bin/dbexec # truncate rank indexes
   $ echo "UPDATE rnkMETHOD SET last_updated='0000-00-00 00:00:00';" | \
     /opt/cds-invenio/bin/dbexec # rewind the last ranking time
 </pre>
@@ -241,12 +272,7 @@ instead of) provided demo ones, you have to truncate them too:
 &nbsp; 55
 &nbsp; [...]
 &nbsp;
-&nbsp; # for every index id, truncate corresponding word tables:
-&nbsp; $ echo "TRUNCATE idxWORD55F" | /opt/cds-invenio/bin/dbexec
-&nbsp; $ echo "TRUNCATE idxWORD55R" | /opt/cds-invenio/bin/dbexec
-&nbsp; [...]
-&nbsp;
-&nbsp; # repeat the same operation for ranking tables:
+&nbsp; # for every index id, truncate corresponding ranking tables:
 &nbsp; $ echo "SELECT id FROM rnkMETHOD" | /opt/cds-invenio/bin/dbexec
 &nbsp; id
 &nbsp; 66
@@ -258,35 +284,11 @@ instead of) provided demo ones, you have to truncate them too:
 </pre>
 </blockquote>
 
-<p>Thirdly, verify that all word tables have well been truncated:
+<p>At last, we launch reindexing of the ranking indexes:
 
 <blockquote>
 <pre>
-  $ /opt/cds-invenio/bin/bibstat | grep idxWORD
-  idxWORD01F                 0                 0              1024
-  idxWORD01R                 0                 0              1024
-  [...]
-</pre>
-</blockquote>
-
-<p>Fourthly, we launch (fast) reindexing of the collection index:
-
-<blockquote>
-<pre>
-  $ bibindex -f50000 -wcollection # reindex the collection index (fast)
-  $ webcoll -f # recreate the collection cache
-  $ bibsched # run the two above-submitted tasks
-  $ sudo apachectl restart
-</pre>
-</blockquote>
-
-<p>At last, we launch (slower) reindexing of the remaining indexes:
-
-<blockquote>
-<pre>
-  $ bibindex -f50000 # reindex other indexes (slow)
   $ bibrank -f50000
-  $ webcoll -f
   $ bibsched # run the three above-submitted tasks, and put the queue back in auto mode
   $ sudo apachectl restart
 </pre>
