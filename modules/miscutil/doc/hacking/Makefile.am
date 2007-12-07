@@ -17,10 +17,6 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(localstatedir)/www/hacking/miscutil
-
-doc_DATA=index.html dbquery.html errorlib.html dateutils.html
-
 webdoclibdir = $(libdir)/webdoc/hacking
 
 webdoclib_DATA = \
@@ -29,11 +25,6 @@ webdoclib_DATA = \
 	miscutil-errorlib.webdoc \
 	miscutil-dateutils.webdoc
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(webdoclib_DATA)
 
 CLEANFILES = *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
