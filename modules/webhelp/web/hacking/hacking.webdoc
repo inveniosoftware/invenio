@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: Hacking CDS Invenio -->
-<!-- WebDoc-Page-Navbar-Name: hacking-test-suite-strategy -->
+<!-- WebDoc-Page-Navbar-Name: hacking-test-suite -->
 <!-- WebDoc-Page-Navbar-Select: hacking -->
 
 Welcome to the CDS Invenio Developers' corner.  Before diving into the
@@ -37,7 +37,7 @@ href="<WEBURL>/admin/">admin-level</a> documentation as well.  And now, back to 
 <dt><a href="coding-style">Coding Style</a></dt>
 <dd>A policy we try to follow, for good or bad.</dd>
 
-<dt><a href="release-numbering-scheme">Release Numbering Scheme</a></dt>
+<dt><a href="release-numbering">Release Numbering</a></dt>
 <dd>Presenting the version numbering scheme adopted for CDS Invenio stable and development releases.</dd>
 
 <dt><a href="directory-organization">Directory Organization</a></dt>
@@ -47,8 +47,8 @@ sources get installed to, what is the visible URL policy, etc.</dd>
 <dt><a href="modules-overview">Modules Overview</a></dt>
 <dd>Presenting a summary of various CDS Invenio modules and their relationships.</dd>
 
-<dt><a href="test-suite-strategy">Test Suite Strategy</a></dt>
-<dd>Describes our test suite strategy.</dd>
+<dt><a href="test-suite">Test Suite</a></dt>
+<dd>Describes our unit and regression test suites.</dd>
 
 </dl>
 </blockquote>

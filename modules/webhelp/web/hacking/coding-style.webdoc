@@ -136,7 +136,7 @@ A brief description of things we strive at, more or less unsuccessfully.
    integral part of the development process.  Test along as you
    program.  The testing process should be automatized via our unit
    test and regression test suite infrastructures.  Please read the
-   <a href="test-suite-strategy">test suite strategy</a> to know more.
+   <a href="test-suite">test suite strategy</a> to know more.
 
    Python promotes writing clear, readable, easily maintainable code.
    Write it as such.  Recall Albert Einstein's ``Everything should be
