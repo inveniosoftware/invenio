@@ -2436,10 +2436,9 @@ def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
         colID = int(colID)
         subtitle = """<a name="2">2. Modify access restrictions for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.2">?</a>]</small>""" % (col_dict[colID], weburl)
 
-        output = """<p>Please, note that after <em>CDS Invenio-0.91.2</em> applying
-        restrictions to a collection is done through the more integrated
-        <strong><a href="/admin/webaccess/webaccessadmin.py/modifyauthorizations?id_action=%i&reverse=1">WebAccess facility</a></strong>.</p>
-        """ % action_id
+        output = """<p>Please note that CDS Invenio versions greater than <em>0.92.1</em> manage collection restriction via the standard
+        <strong><a href="/admin/webaccess/webaccessadmin.py/modifyauthorizations?id_action=%i&reverse=1">WebAccess Admin Interface</a></strong> (action '%s').</p>
+        """ % (action_id, VIEWRESTRCOLL)
     body = [output]
 
     if callback:
