@@ -54,9 +54,9 @@
 Journal Impact Factor
 Word Similarity/Similar Records
 Combined Method
-##Number of downloads
-##Author Impact
-##Citation Impact
+&nbsp;##Number of downloads
+&nbsp;##Author Impact
+&nbsp;##Citation Impact
 </blockquote>
 </pre>
 bibrankgkb - For generating knowledge base files for use with bibrank
@@ -240,7 +240,7 @@ The parameters needed to be configured for this method is the 'tag','kb_src' and
 <br/><br/><b>Example</b>
 <blockquote>
 <pre>
-<protect>
+
 [rank_method]
 function = single_tag_rank_method
 
@@ -248,30 +248,29 @@ function = single_tag_rank_method
 tag = 909C4p
 kb_src = /home/invenio/etc/bibrank/jif.kb
 check_mandatory_tags = 909C4c,909C4v,909C4y
-</protect>
+
 </pre>
 </blockquote>
 
 <b>Explanation:</b>
 <pre>
 <blockquote>
-<protect>
 [rank_method]
-##The function which is responsible for doing the work. Should not be changed
-function = single_tag_rank_method
-
-##This section must be available if the single_tag_rank_method is going to be used
-[single_tag_kb]
-
-##The tag which got the value to be searched for on the left side in the kb file (like the journal name)
-tag = 909C4p
-
-##The path to the kb file which got the content of the tag above on left side, and value on the left side
-kb_src = /home/invenio/etc/bibrank/jif.kb
-
-##Tags that must be included for a record to be added to the ranking data, to disable remove tags
-check_mandatory_tags = 909C4c,909C4v,909C4y
-</protect>
+&nbsp; ##The function which is responsible for doing the work. Should not be changed
+&nbsp; function = single_tag_rank_method
+&nbsp; 
+&nbsp; ##This section must be available if the single_tag_rank_method is going to be used
+&nbsp; [single_tag_kb]
+&nbsp; 
+&nbsp; ##The tag which got the value to be searched for on the left side in the kb file (like the journal name)
+&nbsp; tag = 909C4p
+&nbsp; 
+&nbsp; ##The path to the kb file which got the content of the tag above on left side, and value on the left side
+&nbsp; kb_src = /home/invenio/etc/bibrank/jif.kb
+&nbsp; 
+&nbsp; ##Tags that must be included for a record to be added to the ranking data, to disable remove tags
+&nbsp; check_mandatory_tags = 909C4c,909C4v,909C4y
+&nbsp; 
 </blockquote>
 The kb_src file must contain data on the form:
 <blockquote>
@@ -290,7 +289,7 @@ When running BibRank to update the index for this rank method, it is not necessa
 <br/><br/><b>Example</b>
 <pre>
 <blockquote>
-<protect>
+
 [rank_method]
 function = word_similarity
 
@@ -300,9 +299,7 @@ table = rnkWORD01F
 stopword = True
 relevance_number_output_prologue = (
 relevance_number_output_epilogue = )
-#relevance_number_output_prologue = <!-
-#relevance_number_output_epilogue = -->
-#MARC tag,tag points, tag language
+&nbsp;#MARC tag,tag points, tag language
 tag1 = 6531_a, 2, en
 tag2 = 695__a, 1, en
 tag3 = 6532_a, 1, en
@@ -328,36 +325,35 @@ min_nr_words_docs = 3
 max_nr_words_upper = 20
 max_nr_words_lower = 10
 default_min_relevance = 75
-</protect>
+
 </blockquote>
 </pre>
 
 <b>Explanation:</b>
 <pre>
 <blockquote>
-<protect>
 [rank_method]
-#internal name for the bibrank program, do not modify
+&nbsp;#internal name for the bibrank program, do not modify
 function = word_similarity
 
 [word_similarity]
-#if stemmer is available, default stemminglanguage should be given here. Adviced to turn off if not installed
+&nbsp;#if stemmer is available, default stemminglanguage should be given here. Adviced to turn off if not installed
 stemming = en
-#the internal table to load the index tables from.
+&nbsp;#the internal table to load the index tables from.
 table = rnkWORD01F
-#remove stopwords?
+&nbsp;#remove stopwords?
 stopword = True
-#text to show before the rank value when the search result is presented. <-- to hide result
+&nbsp;#text to show before the rank value when the search result is presented. <-- to hide result
 relevance_number_output_prologue = (
-#text to show after the rank value when the search result is presented. --> to hide result
+&nbsp;#text to show after the rank value when the search result is presented. --> to hide result
 relevance_number_output_epilogue = )
 
-#MARC tag,tag points, tag language
-#a list of the tags to be used, together with a number describing the importance of the tag, and the
-#most common language for the content. Not all languages are supported. Among the supported ones are:
-#fr/french, en/english, no/norwegian, se/swedish, de/german, it/italian, pt/portugese
+&nbsp;#MARC tag,tag points, tag language
+&nbsp;#a list of the tags to be used, together with a number describing the importance of the tag, and the
+&nbsp;#most common language for the content. Not all languages are supported. Among the supported ones are:
+&nbsp;#fr/french, en/english, no/norwegian, se/swedish, de/german, it/italian, pt/portugese
 
-#keyword
+&nbsp;#keyword
 tag1 = 6531_a, 1, en #keyword
 tag2 = 695__a, 1, en #keyword
 tag3 = 6532_a, 1, en #keyword
@@ -369,21 +365,21 @@ tag8 = 210__a, 1, en #abbreviated
 tag9 = 222__a, 1, en #key title
 
 [find_similar]
-#term should exist in maximum X/100% of documents
+&nbsp;#term should exist in maximum X/100% of documents
 max_word_occurence = 0.05
-#term should exist in minimum X/100% of documents
+&nbsp;#term should exist in minimum X/100% of documents
 min_word_occurence = 0.00
-#term should be atleast 3 characters long
+&nbsp;#term should be atleast 3 characters long
 min_word_length = 3
-#term should be in atleast 3 documents or more
+&nbsp;#term should be in atleast 3 documents or more
 min_nr_words_docs = 3
-#do not use more than 20 terms for "find similar"
+&nbsp;#do not use more than 20 terms for "find similar"
 max_nr_words_upper = 20
-#if a document contains less than 10 terms, use much used terms too, if not ignore them
+&nbsp;#if a document contains less than 10 terms, use much used terms too, if not ignore them
 max_nr_words_lower = 10
-#default minimum relevance value to use for find similar
+&nbsp;#default minimum relevance value to use for find similar
 default_min_relevance = 75
-</protect>
+
 </blockquote>
 Tip: When executing a search using a ranking method, you can add "verbose=1" to the list of parameteres
 in the URL to see which terms have been used in the ranking.
@@ -395,7 +391,7 @@ based on the importance of the method given by the percentage.
 <br/><br/><b>Example</b>
 <pre>
 <blockquote>
-<protect>
+
 [rank_method]
 function = combine_method
 [combine_method]
@@ -404,27 +400,27 @@ method2 = cern_acc,33
 method3 = wrd,33
 relevance_number_output_prologue = (
 relevance_number_output_epilogue = )
-</protect>
+
 </blockquote>
 </pre>
 
 <b>Explanation:</b>
 <pre>
 <blockquote>
-<protect>
+
 [rank_method]
-#tells which method to use, do not change
+&nbsp;#tells which method to use, do not change
 function = combine_method
 [combine_method]
-#each line tells which method to use, the code is the same as in the BibRank interface, the number describes how
-#much of the total score the method should count.
+&nbsp;#each line tells which method to use, the code is the same as in the BibRank interface, the number describes how
+&nbsp;#much of the total score the method should count.
 method1 = jif,50
 method2 = wrd,50
-#text to be shown before the rank value on the search result screen.
+&nbsp;#text to be shown before the rank value on the search result screen.
 relevance_number_output_prologue = (
-#text to be shown after the rank value on the search result screen.
+&nbsp;#text to be shown after the rank value on the search result screen.
 relevance_number_output_epilogue = )
-</protect>
+
 </blockquote>
 </pre>
 
@@ -459,13 +455,13 @@ Since some of the data used for ranking purposes is not freely available, it can
 you may find it useful to ask your library if they have a copy of the data that can be used (like the Journal Impact Factors from the Science Citation Index), or use google to search the web for any public source.
 <h4>Step 2 - Create configuration file</h4>
 The default configuration file is shown below.
-<protect>
+
 <pre>
 <blockquote>
 
-##The main section
+&nbsp;##The main section
 [bibrankgkb]
-##The url to a web page with the data to be read, does not need to have the same name as this one, but if there
+&nbsp;##The url to a web page with the data to be read, does not need to have the same name as this one, but if there
 are several links, the url parameter should end with _0->
 url_0 = http://www.taelinke.land.ru/impact_A.html
 url_1 = http://www.taelinke.land.ru/impact_B.html
@@ -477,36 +473,36 @@ url_6 = http://www.taelinke.land.ru/impact_J.html
 url_7 = http://www.taelinke.land.ru/impact_KN.html
 url_8 = http://www.taelinke.land.ru/impact_QQ.html
 url_9 = http://www.taelinke.land.ru/impact_RZ.html
-##The regular expression for the url mentioned should be given here
+&nbsp;##The regular expression for the url mentioned should be given here
 url_regexp =
 
-##The various sources that can be read in, can either be a file, web page or from the database
+&nbsp;##The various sources that can be read in, can either be a file, web page or from the database
 kb_1 = /home/invenio/modules/bibrank/etc/cern_jif.kb
 kb_2 = /home/invenio/modules/bibrank/etc/demo_jif.kb
 kb_2_filter = /home/invenio/modules/bibrank/etc/convert.kb
 kb_3 = SELECT id_bibrec,value FROM bib93x,bibrec_bib93x WHERE tag='938__f' AND id_bibxxx=id
 kb_4 = SELECT id_bibrec,value FROM bib21x,bibrec_bib21x WHERE tag='210__a' AND id_bibxxx=id
-##This points to the url above (the common part of the url is 'url_' followed by a number
+&nbsp;##This points to the url above (the common part of the url is 'url_' followed by a number
 kb_5 = url_%s
 
-##This is the part that will be read by the bibrankgkb tool to determine what to read.
-##The first two part (separated by ,,) gives where to look for the conversion file (which convert
-##the names between to formats), and the second part is the data source. A conversion file is not
-##needed, as shown in create_0. If the source is from a file, url or the database, it must be
-##given with file,www or db. If several create lines exists, each will be read in turn, and added
-##to a common kb file.
-##So this means that:
-##create_0: Load from file in variable kb_1 without converting
-##create_1: Load from file in variable kb_2 using convertion from file kb_2_filter
-##create_3: Load from www using url in variable kb_5 and regular expression in url_regexp
-##create_4: Load from database using sql statements in kb_4 and kb_5
+&nbsp;##This is the part that will be read by the bibrankgkb tool to determine what to read.
+&nbsp;##The first two part (separated by ,,) gives where to look for the conversion file (which convert
+&nbsp;##the names between to formats), and the second part is the data source. A conversion file is not
+&nbsp;##needed, as shown in create_0. If the source is from a file, url or the database, it must be
+&nbsp;##given with file,www or db. If several create lines exists, each will be read in turn, and added
+&nbsp;##to a common kb file.
+&nbsp;##So this means that:
+&nbsp;##create_0: Load from file in variable kb_1 without converting
+&nbsp;##create_1: Load from file in variable kb_2 using convertion from file kb_2_filter
+&nbsp;##create_3: Load from www using url in variable kb_5 and regular expression in url_regexp
+&nbsp;##create_4: Load from database using sql statements in kb_4 and kb_5
 create_0 = ,, ,,file,,%(kb_1)s
 create_1 = file,,%(kb_2_filter)s,,file,,%(kb_2)s
-#create_2 = ,, ,,www,,%(kb_5)s,,%(url_regexp)s
-#create_3 = ,, ,,db,,%(kb_4)s,,%(kb_4)s
+&nbsp;#create_2 = ,, ,,www,,%(kb_5)s,,%(url_regexp)s
+&nbsp;#create_3 = ,, ,,db,,%(kb_4)s,,%(kb_4)s
 </pre>
 </blockquote>
-</protect>
+
 When you have found a source for the data, created the configuration file, it may be necessary to
 create an convertion file, but this depends on the conversions used in the available data versus
 the convertion used in your CDS Invenio installation.
