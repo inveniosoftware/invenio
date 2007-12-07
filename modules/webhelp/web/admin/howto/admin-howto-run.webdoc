@@ -152,7 +152,7 @@ say every day, via:
 
 <blockquote>
 <pre>
-$ sessiongc -s1d
+$ inveniogc -s1d
 </pre>
 </blockquote>
 </p>
@@ -164,7 +164,7 @@ and <code>/opt/cds-invenio/var/tmp</code> directory that is good to clean up fro
 
 <blockquote>
 <pre>
-$ sessiongc -s1d -f
+$ inveniogc -s1d -d
 </pre>
 </blockquote>
 </p>

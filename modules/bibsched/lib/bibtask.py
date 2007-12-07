@@ -385,16 +385,16 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
         sys.stderr.write("Command options:\n")
         sys.stderr.write(help_specific_usage)
     sys.stderr.write("Scheduling options:\n")
-    sys.stderr.write("  -u, --user=USER \t User name to submit the"
+    sys.stderr.write("  -u, --user=USER\tUser name to submit the"
         " task as, password needed.\n")
-    sys.stderr.write("  -t, --runtime=TIME \t Time to execute the"
+    sys.stderr.write("  -t, --runtime=TIME\tTime to execute the"
         " task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26\n")
-    sys.stderr.write("  -s, --sleeptime=SLEEP \t Sleeping frequency after"
+    sys.stderr.write("  -s, --sleeptime=SLEEP\tSleeping frequency after"
         " which to repeat task (no), e.g.: 30m, 2h, 1d\n")
     sys.stderr.write("General options:\n")
-    sys.stderr.write("  -h, --help      \t\t Print this help.\n")
-    sys.stderr.write("  -V, --version   \t\t Print version information.\n")
-    sys.stderr.write("  -v, --verbose=LEVEL \t Verbose level (0=min,"
+    sys.stderr.write("  -h, --help\t\tPrint this help.\n")
+    sys.stderr.write("  -V, --version\t\tPrint version information.\n")
+    sys.stderr.write("  -v, --verbose=LEVEL\tVerbose level (0=min,"
         " 1=default, 9=max).\n")
     if description:
         sys.stderr.write(description)

@@ -330,25 +330,26 @@ def guest_user_garbage_collector():
 def main():
     """Main that construct all the bibtask."""
     task_set_option('logs', False)
-    task_set_option('user', False)
+    task_set_option('guests', False)
     task_set_option('documents', False)
     task_init(authorization_action='runsessiongc',
             authorization_msg="InvenioGC Task Submission",
-            help_specific_usage="  -l, --logs\t\t Clean up the"
-                " logs.\n" \
-                "  -u, --user\t\t Clean up exipired user related information.\n" \
-                "  -d, --documents\t\t Clean up old delete documents and revisions\n",
+            help_specific_usage="  -l, --logs\t\tClean up/compress old"
+                " logs and temporary files.\n" \
+                "  -g, --guests\t\tClean up expired guest user related information. (default if nothing is specified)\n" \
+                "  -d, --documents\tClean up deleted documents and revisions older than %s days\n" \
+                "  -a, --all\t\tCalls every cleaning action.\n" % CFG_DELETED_BIBDOC_MAXLIFE,
             version=__revision__,
-            specific_params=("lud", ["logs", "user", "documents"]),
+            specific_params=("lgda", ["logs", "guests", "documents", "all"]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_submit_check_options_fnc=task_submit_check_options,
             task_run_fnc=task_run_core)
 
 def task_submit_check_options():
     if not task_get_option('logs') and \
-       not task_get_option('user') and \
+       not task_get_option('guests') and \
        not task_get_option('documents'):
-        task_set_option('user', True)
+        task_set_option('sessions', True)
     return True
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
@@ -365,17 +366,22 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     if key in ('-l', '--logs'):
         task_set_option('logs', True)
         return True
-    elif key in ('-u', '--user'):
-        task_set_option('user', True)
+    elif key in ('-g', '--guests'):
+        task_set_option('guests', True)
         return True
     elif key in ('-d', '--documents'):
+        task_set_option('documents', True)
+        return True
+    elif key in ('-a', '--all'):
+        task_set_option('logs', True)
+        task_set_option('guests', True)
         task_set_option('documents', True)
         return True
     return False
 
 def task_run_core():
     """ Reimplement to add the body of the task."""
-    if task_get_option('user'):
+    if task_get_option('guests'):
         guest_user_garbage_collector()
     if task_get_option('logs'):
         clean_logs()

@@ -43,18 +43,45 @@
    </td>
    </tr>
    </tbody>
-   </table>
+   </table></p>
 
 <h2>Guest User Sessions</h2>
 
 <p>Guest users create a lot of entries in <CDSNAMEINTL> tables that are
 related to their web sessions, their search history, personal baskets,
 etc.  This data has to be garbage-collected periodically. This is done
-via a bibsched program:
+via a bibsched program, the <em>Invenio Gargabe Collector</em> (<strong>InvenioGC</strong>):
 
    <blockquote>
    <pre>
-   $ sessiongc -s 1d
+   $ inveniogc -s 1d
    </pre>
    </blockquote>
+</p>
 
+<p>The Invenio Gargabe Collector can be used for keeping clean and slim other
+areas of CDS Invenio, too:
+    <blockquote>
+    <pre>
+Usage: /opt/cds-dev/bin/inveniogc [options]
+Command options:
+  -l, --logs            Clean up/compress old logs and temporary files.
+  -g, --guests          Clean up expired guest user related information. (default if nothing is specified)
+  -d, --documents       Clean up delete documents and revisions older than 3650 days
+  -a, --all             Calls every cleaning action.
+Scheduling options:
+  -u, --user=USER       User name to submit the task as, password needed.
+  -t, --runtime=TIME    Time to execute the task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26
+  -s, --sleeptime=SLEEP Sleeping frequency after which to repeat task (no), e.g.: 30m, 2h, 1d
+General options:
+  -h, --help            Print this help.
+  -V, --version         Print version information.
+  -v, --verbose=LEVEL   Verbose level (0=min, 1=default, 9=max).
+    </pre>
+    </blockquote>
+
+You can use InvenioGC for cleaning old logs (e.g. BibSched task logs) and temporary
+files, by specfying the <tt>--logs</tt> option on the command line,
+or very old revisions of documents, by specfying <tt>--documents</tt>.</p>
+
+<p>Please see also the <a href="admin-howto-run">HOWTO Run<a> guide.</p>
