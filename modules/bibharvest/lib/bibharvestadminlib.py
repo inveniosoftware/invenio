@@ -45,14 +45,13 @@ from invenio.bibrankadminlib import \
      get_languages,\
      check_user,\
      is_adminuser,\
-     adderrorbox,\
      addadminbox,\
      tupletotable,\
      tupletotable_onlyselected,\
      addcheckboxes,\
      createhiddenform
 from invenio.dbquery import run_sql
-from invenio.webpage import page, pageheaderonly, pagefooteronly
+from invenio.webpage import page, pageheaderonly, pagefooteronly, adderrorbox
 from invenio.webuser import getUid, get_email
 
 import invenio.template
