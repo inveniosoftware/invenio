@@ -101,24 +101,24 @@ def compare_hmbuffers(hmbuffer1, hmbuffer2):
     split_hmbuffer1 = hmbuffer1.split('\n')
     split_hmbuffer2 = hmbuffer1.split('\n')
 
-    ok = True
+    compare_hmbuffers = True
     for row in split_hmbuffer1:
         if row:
             if row not in split_hmbuffer2:
-                ok = False
+                compare_hmbuffers = False
                 break
-    if ok:
+    if compare_hmbuffers:
         for row in split_hmbuffer2:
             if row:
                 if row not in split_hmbuffer1:
-                    ok = False
+                    compare_hmbuffers = False
                     break
 
-    if not ok:
+    if not compare_hmbuffers:
         print "\n=" + hmbuffer1 + "=\n"
         print "\n=" + hmbuffer2 + "=\n"
 
-    return ok
+    return compare_hmbuffers
 
 def try_url_download(url):
     """Try to download a given URL"""
