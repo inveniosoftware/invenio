@@ -2242,7 +2242,6 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
         return """<b><span class="info">Collection deleted.</span></b>
         """
 
-    action_id = acc_get_action_id(VIEWRESTRCOLL)
     fin_output = """
     <table>
     <tr>
@@ -2251,7 +2250,7 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     <tr>
     <td>0.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s">Show all</a></small></td>
     <td>1.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifydbquery">Modify collection query</a></small></td>
-    <td>2.&nbsp;<small><a href="/admin/webaccess/webaccessadmin.py/modifyauthorizations?id_action=%i&reverse=1">Modify access restrictions</a></small></td>
+    <td>2.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifyrestricted">Modify access restrictions</a></small></td>
     <td>3.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_modifytranslations">Modify translations</a></small></td>
     <td>4.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_deletecollection">Delete collection</a></small></td>
     </tr><tr>
@@ -2266,7 +2265,7 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
     <td>12.&nbsp;<small><a href="editcollection?colID=%s&amp;ln=%s&amp;mtype=perform_showdetailedrecordoptions#12">Detailed record page options</a></small></td>
     </tr>
     </table>
-    """ % (colID, ln, colID, ln, action_id, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln)
+    """ % (colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln, colID, ln)
 
     if mtype == "perform_modifydbquery" and content:
         fin_output += content
