@@ -54,6 +54,7 @@ from invenio.webuser import getUid, get_email, collect_user_info
 from invenio.websubmit_config import *
 from invenio.messages import gettext_set_language, wash_language
 
+
 from websubmit_dblayer import \
      get_storage_directory_of_action, \
      get_longname_of_doctype, \
@@ -1467,3 +1468,31 @@ def log_function(curdir, message, start_time, filename="function_log"):
         fd.write("""%s --- %s\n""" % (message, time_lap))
         fd.close()
 
+
+## FIXME: Duplicated
+
+def errorMsg(title, req, c=cdsname, ln=cdslang):
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    return page(title = _("Error"),
+                body = create_error_box(req, title=title, verbose=0, ln=ln),
+                description="%s - Internal Error" % c,
+                keywords="%s, Internal Error" % c,
+                uid = getUid(req),
+                language=ln,
+                req=req,
+                navmenuid='submit')
+
+def warningMsg(title, req, c=cdsname, ln=cdslang):
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    return page(title = _("Warning"),
+                body = title,
+                description="%s - Internal Error" % c,
+                keywords="%s, Internal Error" % c,
+                uid = getUid(req),
+                language=ln,
+                req=req,
+                navmenuid='submit')
