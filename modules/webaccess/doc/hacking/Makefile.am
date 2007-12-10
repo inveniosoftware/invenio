@@ -17,10 +17,6 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-docdir = $(localstatedir)/www/hacking/webaccess
-
-doc_DATA=index.html api.html admin-internals.html table-structure.html firerole_api.html
-
 webdoclibdir = $(libdir)/webdoc/hacking
 
 webdoclib_DATA = \
@@ -30,11 +26,6 @@ webdoclib_DATA = \
 	webaccess-table-structure.webdoc \
 	webaccess-firerole-api.webdoc
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
 EXTRA_DIST = $(webdoclib_DATA)
 
 CLEANFILES = *~ *.tmp
-
-%.html: %.html.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o\(ALL-LANG_*\)+LANG_EN:$@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
