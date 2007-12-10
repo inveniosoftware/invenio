@@ -27,4 +27,4 @@ webdoclib_DATA = \
 
 EXTRA_DIST = $(webdoclib_DATA)
 
-CLEANFILES = $(doc_DATA) *~ *.tmp
+CLEANFILES = *~ *.tmp
