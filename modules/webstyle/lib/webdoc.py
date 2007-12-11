@@ -177,12 +177,18 @@ def get_webdoc_parts(webdoc,
                 webdoc_cached_part = file(webdoc_cached_part_path, 'r').read()
                 html_parts[part] = webdoc_cached_part
                 break
-            elif ln != cdslang:
-                # Get the part in the default language
+            elif ln != 'en':
+                if ln != cdslang:
+                    # Get the part in the default language
+                    language = cdslang
+                else:
+                    # Get the part in English, as it should always exist
+                    language = 'en'
+
                 default_html_part = get_webdoc_parts(webdoc=webdoc,
                                                      parts=[part],
                                                      update_cache_mode=update_cache_mode,
-                                                     ln=cdslang,
+                                                     ln=language,
                                                      verbose=verbose)
                 if default_html_part.has_key(part):
                     html_parts[part] = default_html_part[part]
