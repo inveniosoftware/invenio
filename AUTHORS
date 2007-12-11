@@ -40,14 +40,22 @@ The CERN development group currently consists of:
 
  - Samuele Kaplun <samuele.kaplun@cern.ch>
      External authentication rewrite, user preferences and external
-     groups management.
+     groups management.  Firewall-like access control RBAC system.
+     Fulltext file management rewrite.  Intbitset Python C extension 
+     for the indexer.
 
- - Jan Brice Krause <jan.brice.krause@cern.ch>
-     Fulltext file transfer mode for BibUpload.
+ - Gabriel Hase <gabriel.hase@konnektiv.ch>
+     WebJournal module.
+
+ - Marko Niinimaki <manzikki@gmail.com>
+     Contributions to the BibRank citation module.
 
 Many former group members (CERN and EPFL staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project.  In an approximate decreasing chronological order:
+
+ - Jan Brice Krause <jan.brice.krause@cern.ch>
+     Fulltext file transfer mode for BibUpload.
 
  - Axel Voitier <axel.voitier@gmail.com> 
      Complex approval and refereeing subsystem, for WebSubmit.
