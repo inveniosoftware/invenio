@@ -58,7 +58,7 @@ import invenio.template
 bibharvest_templates = invenio.template.load('bibharvest')
 
 tmppath = tmpdir + '/bibharvestadmin.' + str(os.getpid())
-guideurl = "admin/bibharvest/guide.html"
+guideurl = "help/admin/bibharvest-admin-guide"
 
 freqs = [[0, "never"], [24, "daily"], [168, "weekly"], [720, "monthly"] ]
 posts = [["h", "harvest only (h)"], ["h-c", "harvest and convert (h-c)"], ["h-u", "harvest and upload (h-u)"], ["h-c-u", "harvest, convert and upload (h-c-u)"], ["h-c-f-u", "harvest, convert, filter, upload (h-c-f-u)"]]

@@ -38,14 +38,14 @@ class Template:
         """Get the navigation trail
           - 'previous' *string* - The previous navtrail"""
         _ = gettext_set_language(ln)
-        navtrail = """<a class="navtrail" href="%s/admin/">Admin Area</a> &gt; <a class="navtrail" href="%s/admin/bibharvest/">BibHarvest Admin</a> """ % (weburl, weburl)
+        navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (weburl,)
         navtrail = navtrail + previous
         return navtrail
 
     def tmpl_draw_titlebar(self, ln, weburl, title, guideurl, extraname="", extraurl=""):
         """Draws an html title bar
           - 'title' *string* - The name of the titlebar
-          - 'weburl' *string* - The general weburl root for this admin section (e.g. admin/bibharvest/guide.html#mi )
+          - 'weburl' *string* - The general weburl root for this admin section (e.g. help/admin/bibharvest-admin-guide#mi )
           - 'guideurl' *string* - The relative url of the guide relative to this section
           - 'extraname' *string* - The name of an extra function
           - 'extraurl' *string* - The relative url to an extra function
@@ -66,7 +66,7 @@ class Template:
         """Draws an html title bar
           - 'title' *string* - The name of the titlebar
           - 'subtitle' *string* - The header name of the subtitle
-          - 'weburl' *string* - The general weburl root for this admin section (e.g. admin/bibharvest/guide.html#mi )
+          - 'weburl' *string* - The general weburl root for this admin section (e.g. help/admin/bibharvest-admin-guide#mi )
           - 'guideurl' *string* - The relative url of the guide relative to this section
           """
         _ = gettext_set_language(ln)
@@ -79,7 +79,7 @@ class Template:
 
     def tmpl_link_with_args(self, ln, weburl, funcurl, title, args):
         """Draws an html title bar
-          - 'weburl' *string* - The general weburl root for this admin section (e.g. admin/bibharvest/guide.html#mi )
+          - 'weburl' *string* - The general weburl root for this admin section (e.g. help/admin/bibharvest-admin-guide#mi )
           - 'funcurl' *string* - The relative url to this section
           - 'title' *string* - The name of the link
           - 'args' *list* - The list of arguments to be appended to the url in the form [name, value]
