@@ -169,9 +169,7 @@ class Template:
            @param ln: language
            return html formatted navtrail
         """
-        nav_h1 =  '<a class="navtrail" href="%s/admin/">Admin Area</a>'
-        nav_h1 += ' &gt; <a class="navtrail" href="%s/admin/websubmit/">WebSubmit Admin</a>'
-        return  nav_h1 % (weburl, weburl)
+        return '<a class="navtrail" href="%s/help/admin">Admin Area</a> ' % (weburl,)
 
     def _create_adminbox(self, header="", datalist=[], cls="admin_wvar"):
         """Create an adminbox  table around the main data on a page - row based.
@@ -258,12 +256,12 @@ class Template:
           <td>6.&nbsp;<small><a href="%(adminurl)s/elementlist">Available Element descriptions</a></small></td>
           <td>&nbsp;7.&nbsp;<small><a href="%(adminurl)s/functionlist">Available Functions</a></small></td>
           <td>&nbsp;8.&nbsp;<small><a href="%(adminurl)s/organisesubmissionpage">Organise Main Page</a></small></td>
-          <td colspan=2>&nbsp;9.&nbsp;<small><a href="%(adminurl)s/">WebSubmit Admin Guide</a></small></td>
+          <td colspan=2>&nbsp;9.&nbsp;<small><a href="%(weburl)s/help/admin/websubmit-admin-guide">Guide</a></small></td>
          </tr>
         </table>
         </div>
         <br />
-        """ % { 'adminurl' : WEBSUBMITADMIN_WEBURL }
+        """ % { 'adminurl' : WEBSUBMITADMIN_WEBURL, 'weburl': weburl }
         return self._create_adminbox(header="Main Menu", datalist=[menu_body])
 
     def _element_display_preview_get_element(self,
