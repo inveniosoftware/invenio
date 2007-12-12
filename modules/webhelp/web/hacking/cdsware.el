@@ -47,8 +47,8 @@
 (when (locate-library "ipython")
   (require 'ipython))
 
-;; most WML files in CDS Invenio are Python files
-(setq auto-mode-alist (cons '("\\.wml$" . python-mode) auto-mode-alist))
+;; WebDoc files are like HTML files:
+(setq auto-mode-alist (cons '("\\.webdoc$" . html-mode) auto-mode-alist))
 
 ;; Pythonic things:
 (autoload 'python-mode "python-mode" "Python editing mode." t)
