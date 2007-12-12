@@ -1,5 +1,10 @@
-;;; cdsware.el -- CDS Invenio-related Emacs definitions people may find useful.
 ;;; $Id$
+;;;
+;;; cdsware.el -- Emacs definitions people may find useful when
+;;; hacking CDS Invenio.  For deeper Emacs customizations and various
+;;; tips concerning Invenio development in Emacs, such as how to use
+;;; TAGS, CEDET and ECB environments, please see the wiki page:
+;;; <https://twiki.cern.ch/twiki/bin/view/CDS/EmacsTips#Programming_Source_Code_Indexes>
 ;;;
 ;;; This file is part of CDS Invenio.
 ;;; Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
