@@ -68,7 +68,7 @@ from invenio.access_control_config import VIEWRESTRCOLL
 def getnavtrail(previous = ''):
     """Get the navtrail"""
 
-    navtrail = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/websearch/">WebSearch Admin</a> """ % (weburl, weburl)
+    navtrail = """<a class=navtrail href="%s/help/admin">Admin Area</a> """ % (weburl,)
     navtrail = navtrail + previous
     return navtrail
 
@@ -86,7 +86,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
 
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="3">3. Modify translations for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a href="%s/admin/websearch/guide.html#3.3">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="3">3. Modify translations for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a href="%s/help/admin/websearch-admin-guide#3.3">?</a>]</small>""" % (col_dict[colID], weburl)
 
         if type(trans) is str:
             trans = [trans]
@@ -166,7 +166,7 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
         elif func in ["1", 1] and confirm in ["1", 1]:
             finresult = detach_rnk_col(colID, rnkID)
 
-        subtitle = """<a name="9">9. Modify rank options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.9">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="9">9. Modify rank options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.9">?</a>]</small>""" % (col_dict[colID], weburl)
         output  = """
         <dl>
         <dt>The rank methods enabled for the collection '%s' is:</dt>
@@ -248,7 +248,7 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
 
     output = ""
     output2 = ""
-    subtitle = """Attach collection to tree&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#2.2">?</a>]</small>""" % (weburl)
+    subtitle = """Attach collection to tree&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.2">?</a>]</small>""" % (weburl)
 
     col_dict = dict(get_def_name('', "collection"))
     if confirm not in [-1, "-1"] and not (add_son and add_dad and rtype):
@@ -330,7 +330,7 @@ def perform_addcollection(colID, ln, colNAME='', dbquery='', callback="yes", con
     dbquery - the dbquery of the new collection"""
 
     output = ""
-    subtitle = """Create new collection&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#2.1">?</a>]</small>""" % (weburl)
+    subtitle = """Create new collection&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.1">?</a>]</small>""" % (weburl)
     text = """
     <span class="adminlabel">Default name</span>
     <input class="admin_w200" type="text" name="colNAME" value="%s" /><br>
@@ -366,7 +366,7 @@ def perform_modifydbquery(colID, ln, dbquery='', callback='yes', confirm=-1):
     col_dict = dict(get_def_name('', "collection"))
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="1">1. Modify collection query for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.1">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="1">1. Modify collection query for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.1">?</a>]</small>""" % (col_dict[colID], weburl)
 
         if confirm == -1:
             res = run_sql("SELECT dbquery FROM collection WHERE id=%s" % colID)
@@ -426,7 +426,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
     tree = get_col_tree(colID, rtype)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """Modify collection tree: %s&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#2.3">?</a>]&nbsp;&nbsp;&nbsp;<a href="%s/admin/websearch/websearchadmin.py/showtree?colID=%s&amp;ln=%s">Printer friendly version</a></small>""" % (col_dict[colID], weburl, weburl, colID, ln)
+    subtitle = """Modify collection tree: %s&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.3">?</a>]&nbsp;&nbsp;&nbsp;<a href="%s/admin/websearch/websearchadmin.py/showtree?colID=%s&amp;ln=%s">Printer friendly version</a></small>""" % (col_dict[colID], weburl, weburl, colID, ln)
     fin_output = ""
     output = ""
 
@@ -873,7 +873,7 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """<a name="5">5. Modify portalboxes for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.5">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="5">5. Modify portalboxes for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.5">?</a>]</small>""" % (col_dict[colID], weburl)
     output  = ""
     pos = get_pbx_pos()
 
@@ -1365,7 +1365,7 @@ def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="8">8. Modify sort options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.8">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="8">8. Modify sort options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.8">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available sort options</dd>
@@ -1426,7 +1426,7 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="6">6. Modify search fields for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.6">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="6">6. Modify search fields for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.6">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available search fields</dd>
@@ -1487,7 +1487,7 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="7">7. Modify search options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.7">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="7">7. Modify search options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.7">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available search options</dd>
@@ -1610,7 +1610,7 @@ def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1)
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """<a name="10">10. Modify output formats for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.10">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="10">10. Modify output formats for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.10">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """
     <dl>
      <dt>Output format actions (not specific to the chosen collection)
@@ -1684,7 +1684,7 @@ def perform_manage_external_collections(colID, ln, callback='yes', content='', c
     colID = int(colID)
 
     subtitle = """<a name="11">11. Configuration of related external collections</a>
-    &nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.11">?</a>]</small>""" % weburl
+    &nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.11">?</a>]</small>""" % weburl
     output = '<form action="update_external_collections" method="POST"><input type="hidden" name="colID" value="%(colID)d">' % {'colID': colID}
 
     table_header = ['External collection', 'Mode', 'Apply also to daughter collections?']
@@ -1735,7 +1735,7 @@ def perform_showdetailedrecordoptions(colID, ln, callback='yes', content='', con
     colID = int(colID)
 
     subtitle = """<a name="12">12. Configuration of detailed record page</a>
-    &nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.12">?</a>]</small>""" % weburl
+    &nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.12">?</a>]</small>""" % weburl
     output = '''<form action="update_detailed_record_options" method="post">
     <table><tr><td>
     <input type="hidden" name="colID" value="%(colID)d">
@@ -1980,10 +1980,11 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     <td>3.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_modifycollectiontree">Modify collection tree</a></small></td>
     <td>4.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkwebcollstatus">Webcoll Status</a></small></td>
     </tr><tr>
-    <td>5.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkcollectionstatus">Collections Status</a></small></td>
+    <td>5.&nbsp;<small><a href="%s/admin/websearch/websearchadmin.py?colID=%s&amp;ln=%s&amp;mtype=perform_checkcollectionstatus">Collection Status</a></small></td>
+    <td>6.&nbsp;<small><a href="%s/help/admin/websearch-admin-guide?ln=%s">Guide</a></small></td>
     </tr>
     </table>
-    """ % (weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln)
+    """ % (weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, ln)
 
     if mtype == "":
         fin_output += """<br><br><b><span class="info">For managing the collections, select an item from the menu.</span><b><br>"""
@@ -2184,7 +2185,7 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     <dl>
      <dt>WARNING:</dt>
      <dd>When deleting a collection, you also deletes all data related to the collection like translations, relations to other collections and information about which rank methods to use.
-     <br>For more information, please go to the <a title="See guide" href="%s/admin/websearch/guide.html">WebSearch guide</a> and read the section regarding deleting a collection.</dd>
+     <br>For more information, please go to the <a title="See guide" href="%s/help/admin/websearch-admin-guide">WebSearch guide</a> and read the section regarding deleting a collection.</dd>
     </dl>
     </strong>
     </span>
@@ -2193,7 +2194,7 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     col_dict = dict(get_def_name('', "collection"))
     if colID != 1 and colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.4">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.4">?</a>]</small>""" % (col_dict[colID], weburl)
         res = run_sql("SELECT * from collection_collection WHERE id_dad=%s" % colID)
         res2 = run_sql("SELECT * from collection_collection WHERE id_son=%s" % colID)
 
@@ -2332,7 +2333,7 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
 def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     """Check status of the collection tables with respect to the webcoll cache."""
 
-    subtitle = """<a name="11"></a>Webcoll Status&nbsp;&nbsp&nbsp;[<a href="%s/admin/websearch/guide.html#4">?</a>]""" % weburl
+    subtitle = """<a name="11"></a>Webcoll Status&nbsp;&nbsp&nbsp;[<a href="%s/help/admin/websearch-admin-guide#4">?</a>]""" % weburl
     output  = ""
 
     colID = int(colID)
@@ -2433,7 +2434,7 @@ def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
     action_id = acc_get_action_id(VIEWRESTRCOLL)
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="2">2. Modify access restrictions for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/websearch/guide.html#3.2">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="2">2. Modify access restrictions for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.2">?</a>]</small>""" % (col_dict[colID], weburl)
 
         output = """<p>Please note that CDS Invenio versions greater than <em>0.92.1</em> manage collection restriction via the standard
         <strong><a href="/admin/webaccess/webaccessadmin.py/modifyauthorizations?id_action=%i&reverse=1">WebAccess Admin Interface</a></strong> (action '%s').</p>
@@ -2450,7 +2451,7 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
 
     from invenio.search_engine import collection_restricted_p
 
-    subtitle = """<a name="11"></a>Collections Status&nbsp;&nbsp&nbsp;[<a href="%s/admin/websearch/guide.html#5">?</a>]""" % weburl
+    subtitle = """<a name="11"></a>Collection Status&nbsp;&nbsp&nbsp;[<a href="%s/help/admin/websearch-admin-guide#5">?</a>]""" % weburl
     output  = ""
 
     colID = int(colID)
