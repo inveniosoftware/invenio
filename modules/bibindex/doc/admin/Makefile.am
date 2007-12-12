@@ -18,9 +18,7 @@
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	bibindex-admin.webdoc \
-	bibindex-admin-guide.webdoc
+webdoclib_DATA = bibindex-admin-guide.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 
