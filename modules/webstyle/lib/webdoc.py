@@ -113,6 +113,12 @@ pattern_lang = re.compile(r'''
     (</lang\s*>)       #end tag
     ''', re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
+# Regular expression for finding <en>...</en> tag (particular case of
+# pattern_lang)
+pattern_cdslang = re.compile(r"<("+cdslang+ \
+                             r")\s*>(.*?)(</"+cdslang+r"\s*>)",
+                             re.IGNORECASE | re.DOTALL)
+
 # Builds regular expression for finding each known language in <lang> tags
 ln_pattern_text = r"<(?P<lang>"
 ln_pattern_text += r"|".join(cdslangs)
@@ -160,39 +166,36 @@ def get_webdoc_parts(webdoc,
                                - 2 : always update
 
     Returns : *dictionary* with keys being in 'parts' input parameter and values
-              being the corresponsding html part.
+              being the corresponding html part.
     """
     html_parts = {}
 
     if update_cache_mode in [1, 2]:
         update_webdoc_cache(webdoc, update_cache_mode, verbose)
 
+    def get_webdoc_cached_part_path(webdoc, ln, part):
+        "Build path for given webdoc, ln and part"
+        return _web_doc_cache_dir + os.sep + webdoc + \
+               os.sep + webdoc + '.' + part + '-' + \
+               ln + '.html'
+
     for part in parts:
         for (_webdoc_source_dir, _web_doc_cache_dir) in webdoc_dirs:
-            webdoc_cached_part_path = _web_doc_cache_dir + os.sep + webdoc + \
-                                      os.sep + webdoc + '.' + part + '-' + \
-                                      ln + '.html'
+            webdoc_cached_part_path = None
+            if os.path.exists(get_webdoc_cached_part_path(webdoc, ln, part)):
+                # Check given language
+                webdoc_cached_part_path = get_webdoc_cached_part_path(webdoc, ln, part)
+            elif os.path.exists(get_webdoc_cached_part_path(webdoc, cdslang, part)):
+                # Check cdslang
+                webdoc_cached_part_path = get_webdoc_cached_part_path(webdoc, 'en', part)
+            elif os.path.exists(get_webdoc_cached_part_path(webdoc, ln, part)):
+                # Check English
+                webdoc_cached_part_path = get_webdoc_cached_part_path(webdoc, 'en', part)
 
-            if os.path.exists(webdoc_cached_part_path):
+            if webdoc_cached_part_path is not None:
                 webdoc_cached_part = file(webdoc_cached_part_path, 'r').read()
                 html_parts[part] = webdoc_cached_part
                 break
-            elif ln != 'en':
-                if ln != cdslang:
-                    # Get the part in the default language
-                    language = cdslang
-                else:
-                    # Get the part in English, as it should always exist
-                    language = 'en'
-
-                default_html_part = get_webdoc_parts(webdoc=webdoc,
-                                                     parts=[part],
-                                                     update_cache_mode=update_cache_mode,
-                                                     ln=language,
-                                                     verbose=verbose)
-                if default_html_part.has_key(part):
-                    html_parts[part] = default_html_part[part]
-                    break
 
     return html_parts
 
@@ -633,13 +636,16 @@ def filter_languages(text, ln='en', defined_tags=None):
 
         lang_tag_content = match.group("langs")
         # Try to find tag with current lang. If it does not exists,
-        # then current_lang becomes cdslang until the end of this
-        # replace
+        # then try to look for cdslang. If still does not exist, use
+        # 'en' as current_lang
         pattern_current_lang = re.compile(r"<("+current_lang+ \
                                           r")\s*>(.*?)(</"+current_lang+r"\s*>)", re.IGNORECASE | re.DOTALL)
 
         if re.search(pattern_current_lang, lang_tag_content) is None:
             current_lang = cdslang
+            # Can we find translation in 'cdslang'?
+            if re.search(pattern_cdslang, lang_tag_content) is None:
+                current_lang = 'en'
 
         cleaned_lang_tag = ln_pattern.sub(clean_language_tag, lang_tag_content)
         # Remove empty lines
