@@ -29,7 +29,7 @@ on how to configure and run the CDS Invenio system.
 <p>CDS Invenio comes as a suite of several more or less independent
 modules.  You'll find brief descriptions for each admin module below.
 (More background information on each module may be read in the <a
-href="<WEBURL>/hacking/modules.html">modules overview</a> article.)
+href="<WEBURL>/help/hacking/modules-overview">modules overview</a> article.)
 </p>
 
 <h3>Admin HOWTO guides</h3>
