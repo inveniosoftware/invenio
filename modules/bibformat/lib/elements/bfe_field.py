@@ -62,21 +62,23 @@ def format(bfo, tag, limit, instances_separator=" ",
 
     if len(values) > 0 and isinstance(values[0], dict):
         x = 0
+        instances_out = [] # Retain each instance output
         for instance in values:
             filtered_values = [value for (subcode, value) in instance.iteritems()
                               if p_tag[3] == '' or p_tag[3] == '%' \
                                or p_tag[3] == subcode]
-            if filtered_values:
-                x += 1
-            out += subfields_separator.join(filtered_values)
-            if x >= limit:
-                out += extension
-                break
+            if len(filtered_values) > 0:
+                # We have found some corresponding subcode(s)
+                x += len(filtered_values)
+                instance_out = subfields_separator.join(filtered_values)
+                if x >= limit:
+                    instance_out += extension
+                    instances_out.append(instance_out)
+                    break
+                else:
+                    instances_out.append(instance_out)
 
-            # Print separator between non-empty instances, and if not
-            # last instance
-            if x < len(values) and filtered_values:
-                out += instances_separator
+        out += instances_separator.join(instances_out)
 
     else:
         out += subfields_separator.join(values[:int(limit)])
