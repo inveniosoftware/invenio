@@ -18,9 +18,7 @@
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	bibsched-admin.webdoc \
-	bibsched-admin-guide.webdoc
+webdoclib_DATA = bibsched-admin-guide.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 
