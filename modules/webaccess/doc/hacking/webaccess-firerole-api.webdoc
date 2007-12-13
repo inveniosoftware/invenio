@@ -26,7 +26,7 @@
 The "Firewall like role definition engine" (FireRole) is a tool for describing
 formally sets of users and checking users against this description for their membership.
 
-FireRole rules are strings defined as in the <a href="webaccess-firerole">FireRole language description</a> page.
+FireRole rules are strings defined as in the <a href="webaccess-admin-guide#6">FireRole language description</a> page.
 
 In order to use FireRole rules with the engine you have to compile these strings with
 the <strong>compile_role_definition</strong> function.
