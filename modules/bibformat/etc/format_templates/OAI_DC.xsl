@@ -69,6 +69,9 @@ exclude-result-prefixes="marc fn">
 	        <xsl:for-each select="datafield[@tag=245]">
 			<dc:title>
                                 <xsl:value-of select="subfield[@code='a']"/>
+                                <xsl:if test="subfield[@code='b']">
+                                    <xsl:text>: </xsl:text><xsl:value-of select="subfield[@code='b']"/>
+                                </xsl:if>
 			</dc:title>
 		</xsl:for-each>
 	        <xsl:for-each select="datafield[@tag=111]">
