@@ -19,9 +19,7 @@
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	bibconvert-admin.webdoc \
-	bibconvert-admin-guide.webdoc
+webdoclib_DATA = bibconvert-admin-guide.webdoc
 
 sampledir=$(localstatedir)/www/admin/bibconvert
 sample_DATA=sample.cfg sample.dat sample.kb bibtex.cfg dcq.cfg dcq.dat dcxml-to-marcxml.cfg \
