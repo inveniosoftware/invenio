@@ -19,7 +19,7 @@
 
 <!-- WebDoc-Page-Title: WebSearch Internals -->
 <!-- WebDoc-Page-Navbar-Name: hacking-websearch -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/hacking/">Hacking CDS Invenio</a>  -->
+<!-- WebDoc-Page-Navtrailo: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a>  -->
 <!-- WebDoc-Page-Navbar-Select: hacking-websearch-index -->
 
 This page summarizes all the information suitable to dig inside

@@ -19,7 +19,7 @@
 
 <!-- WebDoc-Page-Title: BibFormat API -->
 <!-- WebDoc-Page-Navbar-Name: hacking-bibformat -->
-<!-- WebDoc-Page-Navtrail: <a class=navtrail href="<WEBURL>/hacking/">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibformat-internals">BibFormat Internals</a> -->
+<!-- WebDoc-Page-Navtrail: <a class=navtrail href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibformat-internals">BibFormat Internals</a> -->
 <!-- WebDoc-Page-Navbar-Select: hacking-bibformat-api -->
 <!-- WebDoc-Page-Revision: $Id$-->
 

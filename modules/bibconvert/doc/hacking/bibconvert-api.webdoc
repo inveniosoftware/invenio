@@ -19,7 +19,7 @@
 
 <!-- WebDoc-Page-Title: BibConvert API -->
 <!-- WebDoc-Page-Navbar-Name: hacking-bibconvert -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/hacking/">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibconvert-internals">BibConvert Internals</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibconvert-internals">BibConvert Internals</a> -->
 <!-- WebDoc-Page-Navbar-Select: hacking-bibconvert-api -->
 <!-- WebDoc-Page-Revision: $Id$-->
 

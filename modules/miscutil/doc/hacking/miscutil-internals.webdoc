@@ -19,7 +19,7 @@
 
 <!-- WebDoc-Page-Title: MiscUtil Internals -->
 <!-- WebDoc-Page-Navbar-Name: hacking-miscutil -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/hacking/">Hacking CDS Invenio</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> -->
 <!-- WebDoc-Page-Navbar-Select: hacking-miscutil-index -->
 
 This page summarizes all the information suitable to dig inside

@@ -19,7 +19,7 @@
 
 <!-- WebDoc-Page-Title: HOWTO Migrate Your Old Documents Into CDS Invenio -->
 <!-- WebDoc-Page-Navbar-Name: admin -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin">Admin Area</a> &gt; <a class="navtrail" href="howto">Admin HOWTOs</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">Admin Area</a> &gt; <a class="navtrail" href="howto">Admin HOWTOs</a> -->
 <!-- WebDoc-Page-Navbar-Select: howto_migrate -->
 <!-- WebDoc-Page-Revision: $Id$-->
 

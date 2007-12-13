@@ -19,7 +19,7 @@
 
 <!-- WebDoc-Page-Title: BibIndex Admin Guide -->
 <!-- WebDoc-Page-Navbar-Name: admin -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Admin Area)_</a> &gt; <a class="navtrail" href="bibindex-admin">BibIndex Admin</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Navbar-Select: bibindex-admin-guide -->
 <!-- WebDoc-Page-Revision: $Id$-->
 

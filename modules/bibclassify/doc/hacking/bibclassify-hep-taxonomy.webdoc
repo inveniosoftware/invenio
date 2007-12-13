@@ -19,7 +19,7 @@
 
 <!-- WebDoc-Page-Title: The HEP taxonomy: rationale and extensions -->
 <!-- WebDoc-Page-Navbar-Name: hacking-bibclassify -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/hacking/">Hacking CDS Invenio</a>  &gt; <a class="navtrail" href="bibclassify-internals"/>BibClassify Internals</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a>  &gt; <a class="navtrail" href="bibclassify-internals"/>BibClassify Internals</a> -->
 <!-- WebDoc-Page-Navbar-Select: hacking-bibclassify-index -->
 <!-- WebDoc-Page-Revision: $Id$-->
 

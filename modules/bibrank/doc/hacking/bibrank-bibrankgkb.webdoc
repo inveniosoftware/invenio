@@ -17,7 +17,7 @@
 
 <!-- WebDoc-Page-Title: Create knowledgebase files (bibrankgkb) -->
 <!-- WebDoc-Page-Navbar-Name: admin -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/hacking/">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibrank-internals">BibRank Internals</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibrank-internals">BibRank Internals</a> -->
 <!-- WebDoc-Page-Navbar-Select: hacking-bibrank-index -->
 
 <pre>

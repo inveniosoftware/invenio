@@ -20,7 +20,7 @@
 
 <!-- WebDoc-Page-Title: _(WebSearch Admin Guide)_ -->
 <!-- WebDoc-Page-Navbar-Name: admin -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Admin Area)_</a> &gt; <a class="navtrail" href="websearch-admin">WebSearch Admin</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Navbar-Select: websearch-admin-guide -->
 
    <p><table class="errorbox">
