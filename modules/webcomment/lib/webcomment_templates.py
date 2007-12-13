@@ -1033,10 +1033,12 @@ class Template:
             out += """
                 <li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/delete?ln=%(ln)s&amp;comid=-1">%(delete_label)s</a></small></li>
                 <li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/users?ln=%(ln)s">%(view_users)s</a></li>
+                <li><a href="%(weburl)s/help/admin/webcomment-admin-guide">%(guide)s</a></li>
                 """ % {'weburl'    : weburl,
                        'delete_label': _("Delete a specific comment/review (by ID)"),
                        'view_users': _("View all users who have been reported"),
-                       'ln'        : ln}
+                       'ln'        : ln,
+                       'guide'     : _("Guide")}
         else:
             out += _("Comments and reviews are disabled") + '<br />'
         out += '</ol>'

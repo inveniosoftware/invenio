@@ -19,9 +19,7 @@
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	webcomment-admin.webdoc \
-	webcomment-admin-guide.webdoc
+webdoclib_DATA = webcomment-admin-guide.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 

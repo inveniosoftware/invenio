@@ -43,7 +43,7 @@ def index(req, ln=cdslang):
     _ = gettext_set_language(ln)
     navtrail_previous_links = getnavtrail()
     navtrail_previous_links +=' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
-    navtrail_previous_links += _("Comment Management") + '</a>'
+    navtrail_previous_links += _("WebComment Admin") + '</a>'
 
     try:
         uid = getUid(req)
@@ -57,7 +57,7 @@ def index(req, ln=cdslang):
 
     (auth_code, auth_msg) = check_user(req, 'cfgwebcomment')
     if (auth_code != 'false'):
-        return page(title=_("Comment Management"),
+        return page(title=_("WebComment Admin"),
                 body=perform_request_index(ln=ln),
                 uid=uid,
                 language=ln,
@@ -77,7 +77,7 @@ def delete(req, ln=cdslang, comid=""):
     _ = gettext_set_language(ln)
     navtrail_previous_links = getnavtrail()
     navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
-    navtrail_previous_links += _("Comment Management") + '</a>'
+    navtrail_previous_links += _("WebComment Admin") + '</a>'
 
     try:
         uid = getUid(req)
@@ -117,7 +117,7 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
     _ = gettext_set_language(ln)
     navtrail_previous_links = getnavtrail()
     navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
-    navtrail_previous_links += _("Comment Management") + '</a>'
+    navtrail_previous_links += _("WebComment Admin") + '</a>'
 
     try:
         auid = getUid(req)
@@ -151,7 +151,7 @@ def users(req, ln=cdslang):
     _ = gettext_set_language(ln)
     navtrail_previous_links = getnavtrail()
     navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
-    navtrail_previous_links += _("Comment Management") + '</a>'
+    navtrail_previous_links += _("WebComment Admin") + '</a>'
 
     try:
         uid = getUid(req)
@@ -188,7 +188,7 @@ def del_com(req, ln=cdslang, action="delete", **hidden):
     _ = gettext_set_language(ln)
     navtrail_previous_links = getnavtrail()
     navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
-    navtrail_previous_links += _("Comment Management") + '</a>'
+    navtrail_previous_links += _("WebComment Admin") + '</a>'
 
     try:
         uid = getUid(req)

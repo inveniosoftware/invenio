@@ -345,7 +345,7 @@ Please go to the WebComment Admin interface %(comment_admin_link)s to delete thi
                     'review_stuff'          : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
                                               "star score\t\t= %s\n\t\t\treview title\t\t= %s" % (cmt_star, cmt_title) or "",
                     'cmt_body'              : cmt_body,
-                    'comment_admin_link'    : weburl + "/admin/webcomment/",
+                    'comment_admin_link'    : weburl + "/admin/webcomment/webcommentadmin.py",
                     'user_admin_link'       : "user_admin_link" #! FIXME
                 }
 
