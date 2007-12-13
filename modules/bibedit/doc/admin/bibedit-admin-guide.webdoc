@@ -20,7 +20,7 @@
 
 <!-- WebDoc-Page-Title: BibEdit Admin Guide -->
 <!-- WebDoc-Page-Navbar-Name: admin -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Admin Area)_</a> &gt; <a class="navtrail" href="bibedit-admin">BibEdit Admin</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Navbar-Select: bibedit-admin-guide -->
 <!-- WebDoc-Page-Revision: $Id$-->
 

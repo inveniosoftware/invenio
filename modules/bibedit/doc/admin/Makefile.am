@@ -19,9 +19,7 @@
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	bibedit-admin.webdoc \
-	bibedit-admin-guide.webdoc
+webdoclib_DATA = bibedit-admin-guide.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 
