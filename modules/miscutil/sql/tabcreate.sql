@@ -3124,6 +3124,15 @@ CREATE TABLE IF NOT EXISTS jrnJOURNAL (
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS jrnISSUE (
+  id_jrnJOURNAL mediumint(9) unsigned NOT NULL,
+  issue_number varchar(50) NOT NULL default '',
+  issue_display varchar(50) NOT NULL default '',
+  date_released datetime NOT NULL default '0000-00-00 00:00:00',
+  date_announced datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY (id_jrnJOURNAL,issue_number)
+) TYPE=MyISAM;
+
 -- tables recording history of record's metadata and fulltext documents:
 
 CREATE TABLE IF NOT EXISTS hstRECORD (
