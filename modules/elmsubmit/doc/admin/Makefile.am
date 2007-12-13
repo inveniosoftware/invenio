@@ -19,9 +19,7 @@
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	elmsubmit-admin.webdoc \
-	elmsubmit-admin-guide.webdoc
+webdoclib_DATA = elmsubmit-admin-guide.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 
