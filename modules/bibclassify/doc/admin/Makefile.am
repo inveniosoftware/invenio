@@ -23,9 +23,7 @@ img_DATA = bibclassify-admin-guide-cloud.jpeg
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	bibclassify-admin.webdoc \
-	bibclassify-admin-guide.webdoc
+webdoclib_DATA = bibclassify-admin-guide.webdoc
 
 EXTRA_DIST = $(img_DATA) $(webdoclib_DATA)
 
