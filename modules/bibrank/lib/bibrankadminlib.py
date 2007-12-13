@@ -45,7 +45,7 @@ from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
 
 def getnavtrail(previous = ''):
-    navtrail = """<a class=navtrail href="%s/admin/">Admin Area</a> &gt; <a class=navtrail href="%s/admin/bibrank/">BibRank Admin</a> """ % (weburl, weburl)
+    navtrail = """<a class=navtrail href="%s/help/admin">Admin Area</a> """ % (weburl,)
     navtrail = navtrail + previous
     return navtrail
 
@@ -83,7 +83,7 @@ def perform_index(ln=cdslang):
     """ % (weburl, ln)
 
     output += tupletotable(header=header, tuple=actions)
-    return addadminbox("""Overview of rank methods&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mi">?</a>]</small>""" % weburl, datalist=[output, ''])
+    return addadminbox("""Overview of rank methods&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mi">?</a>]</small>""" % weburl, datalist=[output, ''])
 
 def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0):
     """Modify which collections the rank method is visible to"""
@@ -183,7 +183,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
 
     body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mc">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mc">?</a>]</small>""" % weburl, body)
 
 def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='yes'):
     """Modify the translations of a rank method"""
@@ -260,7 +260,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
 
     body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mt">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mt">?</a>]</small>""" % weburl, body)
 
 def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
     """form to add a new rank method with these values:"""
@@ -271,7 +271,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
      <dt>BibRank code:</dt>
      <dd>A unique code that identifies a rank method, is used when running the bibrank daemon and used to name the configuration file for the method.
      <br>The template files includes the necessary parameters for the chosen rank method, and only needs to be edited with the correct tags and paths.
-     <br>For more information, please go to the <a title="See guide" href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section about adding a rank method</dd>
+     <br>For more information, please go to the <a title="See guide" href="%s/help/admin/bibrank-admin-guide">BibRank guide</a> and read the section about adding a rank method</dd>
     </dl>
     """ % weburl
     text = """
@@ -343,7 +343,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
 
     body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#ar">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#ar">?</a>]</small>""" % weburl, body)
 
 def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', confirm=0):
     """form to modify a rank method
@@ -365,7 +365,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
     output  = """
     <dl>
      <dd>When changing the BibRank code of a rank method, you must also change any scheduled tasks using the old value.
-     <br>For more information, please go to the <a title="See guide" href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section about modifying a rank method's  BibRank code.</dd>
+     <br>For more information, please go to the <a title="See guide" href="%s/help/admin/bibrank-admin-guide">BibRank guide</a> and read the section about modifying a rank method's  BibRank code.</dd>
     </dl>
     """ % weburl
 
@@ -425,7 +425,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
             text = """<b><span class="info"><br>Sorry, could not modify configuration file, please check for rights to do so: '%s/bibrank/%s.cfg'<br>Please modify the file manually.</span></b>""" % (etcdir, get_rnk_code(rnkID)[0][0])
         output += text
 
-    finoutput = addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#mr">?</a>]</small>""" % weburl, [output])
+    finoutput = addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mr">?</a>]</small>""" % weburl, [output])
     output = ""
 
     text = """
@@ -472,7 +472,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
      <dt>WARNING:</dt>
      <dd>When deleting a rank method, you also deletes all data related to the rank method, like translations, which collections
      it was attached to and the data necessary to rank the searchresults. Any scheduled tasks using the deleted rank method will also stop working.
-     <br><br>For more information, please go to the <a title="See guide" href="%s/admin/bibrank/guide.html">BibRank guide</a> and read the section regarding deleting a rank method.</dd>
+     <br><br>For more information, please go to the <a title="See guide" href="%s/help/admin/bibrank-admin-guide">BibRank guide</a> and read the section regarding deleting a rank method.</dd>
     </dl>
     </strong>
     </span>
@@ -516,7 +516,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
 
     body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/admin/bibrank/guide.html#dr">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#dr">?</a>]</small>""" % weburl, body)
 
 
 def perform_showrankdetails(rnkID, ln=cdslang):

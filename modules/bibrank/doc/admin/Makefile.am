@@ -19,9 +19,7 @@
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	bibrank-admin.webdoc \
-	bibrank-admin-guide.webdoc
+webdoclib_DATA = bibrank-admin-guide.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 
