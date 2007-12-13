@@ -31,9 +31,7 @@ img_DATA = websubmit-admin-guide-elements.png \
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	websubmit-admin.webdoc \
-	websubmit-admin-guide.webdoc
+webdoclib_DATA = websubmit-admin-guide.webdoc
 
 EXTRA_DIST = $(img_DATA) $(webdoclib_DATA)
 
