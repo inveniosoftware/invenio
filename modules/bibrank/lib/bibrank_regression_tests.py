@@ -63,7 +63,7 @@ class BibRankWebPagesAvailabilityTest(unittest.TestCase):
 class BibRankWordSimilarityRankingTest(unittest.TestCase):
     """Check BibRank word similarity ranking tools."""
 
-    def test_search_results_ranked_by_citations(self):
+    def test_search_results_ranked_by_similarity(self):
         """bibrank - search results ranked by word similarity"""
 	self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=ellis&rm=wrd&of=id',
