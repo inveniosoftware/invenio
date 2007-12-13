@@ -19,7 +19,7 @@
 
 <!-- WebDoc-Page-Title: HOWTO Migrate Your Old Documents Into CDS Invenio -->
 <!-- WebDoc-Page-Navbar-Name: admin -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/">Admin Area</a> &gt; <a class="navtrail" href="admin-howto">Admin HOWTOs</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin">Admin Area</a> &gt; <a class="navtrail" href="howto">Admin HOWTOs</a> -->
 <!-- WebDoc-Page-Navbar-Select: howto_migrate -->
 <!-- WebDoc-Page-Revision: $Id$-->
 
@@ -68,7 +68,7 @@ also use XSLT if your dumped file is in the XML format.)
 <p>This step will enable you to transform your data into MARCXML format
 that the CDS Invenio system internally uses for bibliographic data
 handling.  (If you have not chosen yet your MARC scheme, please read
-the <a href="admin-howto-marc.html">MARC HOWTO</a>.)
+the <a href="howto-marc">MARC HOWTO</a>.)
 
 <p>When writing the transformation configuration file, you may want to
 add a collection identifier to your records so that they would belong

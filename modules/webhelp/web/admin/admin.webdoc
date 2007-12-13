@@ -34,11 +34,11 @@ href="<WEBURL>/help/hacking/modules-overview">modules overview</a> article.)
 
 <h3>Admin HOWTO guides</h3>
 
-<p><a href="admin-howto">Admin HOWTO Guides</a> give you you both short and
-not-so-short recipes and thoughts on some of the most frequently
-encountered administrative tasks.  They tend to answer various
-admin-level questions of a rather general level.  The specific tasks
-are better addressed by module-specific guides and interfaces
+<p><a href="<WEBURL>/help/admin/howto">Admin HOWTO Guides</a> give you
+you both short and not-so-short recipes and thoughts on some of the
+most frequently encountered administrative tasks.  They tend to answer
+various admin-level questions of a rather general level.  The specific
+tasks are better addressed by module-specific guides and interfaces
 presented below.
 </p>
 

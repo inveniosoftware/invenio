@@ -30,17 +30,17 @@ administrative tasks.</p>
 
 <dl>
 
-<dt><a href="admin-howto-marc">HOWTO MARC</a>
+<dt><a href="howto-marc">HOWTO MARC</a>
 
 <dd>Describes how to choose the MARC representation of your metadata
 and how it will be stored in CDS Invenio.
 
-<dt><a href="admin-howto-migrate">HOWTO Migrate</a>
+<dt><a href="howto-migrate">HOWTO Migrate</a>
 
 <dd>Describes how to migrate a bunch of your old data from any format
 you might have into CDS Invenio.
 
-<dt><a href="admin-howto-run">HOWTO Run</a>
+<dt><a href="howto-run">HOWTO Run</a>
 
 <dd>Describes how to run your CDS Invenio installation and how to take
 care of its normal operation day by day.

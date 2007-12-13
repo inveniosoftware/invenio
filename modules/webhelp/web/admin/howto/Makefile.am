@@ -19,11 +19,10 @@
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	admin-howto.webdoc \
-	admin-howto-run.webdoc \
-	admin-howto-marc.webdoc \
-	admin-howto-migrate.webdoc
+webdoclib_DATA = howto.webdoc \
+                 howto-run.webdoc \
+                 howto-marc.webdoc \
+                 howto-migrate.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 
