@@ -18,8 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: WebStat Admin Guide -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Navbar-Name: admin -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/admin/<lang:star: index.*.html>">_(Admin Area)_</a> &gt; <a class="navtrail" href="<WEBURL>/admin/webstat/">WebStat Admin</a> -->
 <!-- WebDoc-Page-Navbar-Select: webstat-admin-guide -->
 <!-- WebDoc-Page-Revision: $Id$-->
 
