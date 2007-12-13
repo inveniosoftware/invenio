@@ -24,4 +24,4 @@ webdoclibdir = $(libdir)/webdoc/help
 webdoclib_DATA = \
 	submit-guide.webdoc
 
-CLEANFILES = *~ *.tmp *.php
+CLEANFILES = *~ *.tmp
