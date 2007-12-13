@@ -32,20 +32,32 @@ from invenio.webjournal_config import InvenioWebJournalNoIndexTemplateError, \
                                       InvenioWebJournalNoIssueNumberTagError, \
                                       InvenioWebJournalNoArticleTemplateError, \
                                       InvenioWebJournalNoArticleRuleError, \
-                                      InvenioWebJournalNoPopupTemplateError
+                                      InvenioWebJournalNoPopupTemplateError, \
+                                      InvenioWebJournalReleaseUpdateError, \
+                                      InvenioWebJournalIssueNotFoundDBError, \
+                                      InvenioWebJournalJournalIdNotFoundDBError
 from invenio.webjournal_utils import get_xml_from_config
 from invenio.webjournal_utils import get_recid_from_order_CERNBulletin, \
                                     get_article_page_from_cache, \
                                     cache_article_page, \
                                     createhtmlmail, \
                                     put_css_in_file, \
-                                    get_monday_of_the_week
+                                    get_monday_of_the_week, \
+                                    get_current_issue_time, \
+                                    get_all_issue_weeks, \
+                                    release_journal_update, \
+                                    get_next_journal_issues, \
+                                    issue_times_to_week_strings, \
+                                    issue_week_strings_to_times, \
+                                    release_journal_issue
 from invenio.webjournal_templates import tmpl_webjournal_alert_success_msg, \
                                 tmpl_webjournal_alert_subject_CERNBulletin, \
                                 tmpl_webjournal_alert_plain_text_CERNBulletin, \
                                 tmpl_webjournal_alert_interface, \
                                 tmpl_webjournal_issue_control_interface, \
-                                tmpl_webjournal_issue_control_success_msg
+                                tmpl_webjournal_issue_control_success_msg, \
+                                tmpl_webjournal_update_an_issue, \
+                                tmpl_webjournal_updated_issue_msg
 
 def perform_request_index(req, journal_name, issue_number, language, category):
     """
@@ -230,88 +242,90 @@ def perform_request_issue_control(req, journal_name, issue_numbers,
     Todo: move issue control to DB
     """
     if action == "cfg" or action == "Refresh":
-        active_issues = []
-        if action == "Refresh":
-            active_issues = issue_numbers
-            try:
-                active_issues.remove("mm/yyyy")
-            except:
-                pass
-            active_issues = list(sets.Set(active_issues)) # avoid double entries
-            active_issues.sort()
-        else:
-            try:
-                issue_group = open('%s/webjournal/%s/issue_group' % (etcdir,
-                                                        journal_name)).read()
-            except:
-                issue_group = ""
-            try:
-                current_issue = open('%s/webjournal/%s/current_issue' % (etcdir,
-                                                        journal_name)).read()
-            except:
-                register_exception(stream='warning', req=req,
-                                   suffix="Couldn't find any current issue, if \
-                                          this is the first time for this \
-                                          journal this is fine.")
-                current_issue = ""
-            
-            if issue_group != "":
-                issue_part = issue_group.split(" - ")[0]
-                year = issue_part.split("/")[1]
-                low_bound = issue_part.split("/")[0].split("-")[0]
-                high_bound = issue_part.split("/")[0].split("-")[1]
-                for i in range(int(low_bound), int(high_bound)+1):
-                    active_issues.append("%s/%s" % (str(i), year))
-            elif current_issue != "":
-                issue_part = current_issue.split(" - ")[0]
-                issue_number = issue_part.replace(" ", "")
-                active_issues.append(issue_number)
-        this_weeks_issue = time.strftime("%U/%Y", time.localtime())
-        
-        output = tmpl_webjournal_issue_control_interface(language,
-                                                            journal_name,
-                                                            active_issues)
-    elif action == "Publish":
-        active_issues = issue_numbers
+        # find out if we are in update or release
         try:
-            active_issues.remove("ww/yyyy")
-            active_issues.remove("")
-        except:
-            pass
-        active_issues = list(sets.Set(active_issues)) # avoid double entries
-        active_issues.sort()
-        
-        file_issue_group = open('%s/webjournal/%s/issue_group' % (etcdir,
-                                                    journal_name), "w")
-        file_current_issue = open('%s/webjournal/%s/current_issue' % (etcdir,
-                                                    journal_name), "w")
-        
-        if len(active_issues) > 1:
-            low_bound = active_issues[0].split("/")[0]
-            high_bound = active_issues[len(active_issues)-1].split("/")[0]
-            year = active_issues[len(active_issues)-1].split("/")[1]
-            file_issue_group.write('%s-%s/%s - %s' % (low_bound,
-                                        high_bound,
-                                        year,
-                                        get_monday_of_the_week(low_bound, year)))
-            file_current_issue.write('%s/%s - %s' % (high_bound,
-                                    year,
-                                    get_monday_of_the_week(high_bound, year)))
-        elif len(active_issues) > 0:
-            issue_number = active_issues[0].split("/")[0]
-            year = active_issues[0].split("/")[1]
-            file_current_issue.write('%s/%s - %s' % (issue_number,
-                                    year,
-                                    get_monday_of_the_week(issue_number, year)))
+            current_issue_time = get_current_issue_time(journal_name)
+            all_issue_weeks = get_all_issue_weeks(current_issue_time,
+                                                  journal_name,
+                                                  language)
+        except InvenioWebJournalIssueNotFoundDBError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalJournalIdNotFoundDBError, e:
+            register_exception(req=req)
+            return e.user_box()
+        if max(all_issue_weeks) > current_issue_time:
+            # propose an update
+            next_issue_week = None
+            all_issue_weeks.sort()
+            for issue_week in all_issue_weeks:
+                current_issue_week = time.strftime("%W/%Y", current_issue_time)
+                if issue_week > current_issue_time:
+                    next_issue_week = issue_week
+                    break
+            output = tmpl_webjournal_update_an_issue(language,
+                                    journal_name,
+                                    time.strftime("%W/%Y", next_issue_week),
+                                    time.strftime("%W/%Y", current_issue_time))   
         else:
-            register_exception(stream='warning', req=req,
-                               suffix='empty issue has been published.')
-        
-        file_current_issue.close()
-        file_issue_group.close()
+            # propose a release
+            next_issues = get_next_journal_issues(current_issue_time,
+                                                  journal_name)
+            next_issues = issue_times_to_week_strings(next_issues,
+                                                          language)
+            if action == "Refresh":
+                next_issues += issue_numbers
+                highest_issue_so_far = max(next_issues)
+                highest_issue_so_far = issue_week_strings_to_times(
+                    [highest_issue_so_far,], language)
+                one_more_issue = get_next_journal_issues(highest_issue_so_far[0],
+                                                         journal_name,
+                                                         language,
+                                                         1)
+                one_more_issue = issue_times_to_week_strings(one_more_issue,
+                                                            language)
+                next_issues += one_more_issue
+                next_issues = list(sets.Set(next_issues)) # avoid double entries
+                next_issues.sort()
+            else:
+                # get the next (default 2) issue numbers to publish
+                next_issues = get_next_journal_issues(current_issue_time,
+                                                      journal_name,
+                                                      language)
+                next_issues = issue_times_to_week_strings(next_issues,
+                                                          language)
+            output = tmpl_webjournal_issue_control_interface(language,
+                                                                journal_name,
+                                                                next_issues)
+    elif action == "Publish":
+        publish_issues = issue_numbers
+        publish_issues = list(sets.Set(publish_issues)) # avoid double entries
+        publish_issues.sort()
+        try:
+            release_journal_issue(publish_issues, journal_name, language)
+        except InvenioWebJournalJournalIdNotFoundDBError, e:
+                register_exception(req=req)
+                return e.user_box()
         output = tmpl_webjournal_issue_control_success_msg(language,
-                                              active_issues, journal_name)
+                                              publish_issues, journal_name)
         
+    elif action == "Update":
+        try:
+            try:
+                update_issue = issue_numbers[0]    
+            except:
+                raise InvenioWebJournalReleaseUpdateError(language, journal_name)
+        except InvenioWebJournalReleaseUpdateError, e:
+            register_exception(req=req)
+            return e.user_box()
+        try:
+            release_journal_update(update_issue, journal_name, language)
+        except InvenioWebJournalJournalIdNotFoundDBError, e:
+                register_exception(req=req)
+                return e.user_box()
+        output = tmpl_webjournal_updated_issue_msg(language, update_issue,
+                                                   journal_name)
+ 
     return page(title="Publish System", body=output)
 
 def perform_request_popup(req, language, journal_name, type, record):

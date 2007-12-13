@@ -234,15 +234,16 @@ def tmpl_webjournal_issue_control_interface(language, journal_name,
         <form action="%s/journal/issue_control" name="publish">
             <input type="hidden" name="name" value="%s"/>
             <ul>
-            <p>Active issues::..</p>
+            <p>Issue Numbers to publish::..</p>
             %s
             <br/>
 
-            <p>Add custom issue</p>
-            <input type="text" value="ww/YYYY" name="issue_number"/>
+            <p>Add a higher issue number by clicking "Refresh"</p>
             <input class="formbutton" type="submit" value="Refresh" name="action_publish"/>
             <br/>
             <br/>
+            <p>If all issues you want to publish are correctly checked, proceed \
+            by clicking "Publish".</p>
             <input class="formbutton" type="submit" value="Publish" name="action_publish"/>
         </form>
     </div>
@@ -265,6 +266,44 @@ def tmpl_webjournal_issue_control_success_msg(language,
              <a href="%s/journal/?name=%s"> %s </a>\
              </p>\
              <p>or make additional changes here: >> \
+             <a href="%s/journal/issue_control?name=%s">Issue Interface</a> \
+            </p>') % (weburl, journal_name, journal_name,
+                      weburl, journal_name)
+    return title + body
+
+def tmpl_webjournal_update_an_issue(language, journal_name, next_issue,
+                                    current_issue):
+    """
+    A form that lets a user make an update to an issue number.
+    """
+    _ = gettext_set_language(language)
+    html = _('''
+    <p>The Issue that was released on week %s has pending updates scheduled. The
+    next update for this issue is %s.</p>
+    <p><em>Note: If you want to make a new release, please click through all the
+    pending updates first.</em></p>
+    <br/>
+    <p>Do you want to release the update from issue %s to issue %s now?</p>
+    <form action="%s/journal/issue_control" name="publish">
+        <input type="hidden" name="name" value="%s"/>
+        <input type="hidden" name="issue_number" value="%s"/>
+        <input class="formbutton" type="submit" value="Update" name="action_publish"/>
+    </form>
+    ''') % (current_issue, next_issue, current_issue, next_issue,
+            weburl, journal_name, next_issue)
+    return html
+
+def tmpl_webjournal_updated_issue_msg(language, update_issue, journal_name):
+    """
+    Prints a success message for the Update release of a journal.
+    """
+    _ = gettext_set_language(language)
+    title = _('<h2>Journal Update %s published successfully!</h2>' %
+              update_issue)
+    body = _('<p>Return to your journal here: >> \
+             <a href="%s/journal/?name=%s"> %s </a>\
+             </p>\
+             <p>or go back to the publishing interface: >> \
              <a href="%s/journal/issue_control?name=%s">Issue Interface</a> \
             </p>') % (weburl, journal_name, journal_name,
                       weburl, journal_name)

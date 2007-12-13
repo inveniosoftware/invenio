@@ -425,6 +425,100 @@ class InvenioWebJournalNoPopupRecordError(Exception):
                       record was badly formed. Does this link come \
                       from a CDS Invenio Journal? If so, please contact \
                       support.'))
+
+class InvenioWebJournalReleaseUpdateError(Exception):
+    """
+    Exception that is thrown if an update release was not successful.
+    """
+    def __init__(self, language, journal_name):
+        """
+        Initialisation.
+        """
+        self.language = language
+        self.journal_name = journal_name
+    
+    def __str__(self):
+        """
+        String representation.
+        """
+        return 'There were no updates submitted on a click on the update button.\
+         This should never happen and must be due to an internal error.'
+    
+    def user_box(self):
+        """
+        user-friendly message with formatting.
+        """
+        _ = gettext_set_language(self.language)
+        return tmpl_webjournal_error_box(self.language,
+                    _('Update Error'),
+                    _('There was an internal error'),
+                    _('We encountered an internal error trying to update the \
+                      journal issue. You can try to launch the update again or \
+                      contact the Administrator. We apologize for the \
+                      inconvenience.'))
+    
+class InvenioWebJournalIssueNotFoundDBError(Exception):
+    """
+    Exception that is thrown if there was an issue number not found in the
+    """
+    def __init__(self, language, journal_name, issue_number):
+        """
+        Initialisation.
+        """
+        self.language = language
+        self.journal_name = journal_name
+        sefl.issue_number = issue_number
+    
+    def __str__(self):
+        """
+        String representation.
+        """
+        return 'The issue %s could not be found in the DB for journal %s.' % (self.issue_number,
+                                                                              self.journal_name)
+    
+    def user_box(self):
+        """
+        user-friendly message with formatting.
+        """
+        _ = gettext_set_language(self.language)
+        return tmpl_webjournal_error_box(self.language,
+                    _('Publish Interface Error'),
+                    _('We could not find a current issue in the Database'),
+                    _('We encountered an internal error trying to get an issue \
+                      number. You can try to refresh the page or \
+                      contact the Administrator. We apologize for the \
+                      inconvenience.'))
+    
+class InvenioWebJournalJournalIdNotFoundDBError(Exception):
+    """
+    Exception that is thrown if there was an issue number not found in the
+    """
+    def __init__(self, language, journal_name):
+        """
+        Initialisation.
+        """
+        self.language = language
+        self.journal_name = journal_name
+    
+    def __str__(self):
+        """
+        String representation.
+        """
+        return 'The id for journal %s was not found in the Database. Make \
+        sure the entry exists!' % (self.journal_name)
+    
+    def user_box(self):
+        """
+        user-friendly message with formatting.
+        """
+        _ = gettext_set_language(self.language)
+        return tmpl_webjournal_error_box(self.language,
+                    _('Journal ID Error'),
+                    _('We could not find the id for this journal in the Database'),
+                    _('We encountered an internal error trying to get the id \
+                      for this journal. You can try to refresh the page or \
+                      contact the Administrator. We apologize for the \
+                      inconvenience.'))
     
 #!!! depreceated !!!#
 def webjournal_missing_info_box(language, title, msg_title, msg):
