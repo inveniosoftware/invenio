@@ -22,6 +22,7 @@
 <!-- WebDoc-Page-Navbar-Name: admin -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Navbar-Select: websearch-admin-guide -->
+<!-- WebDoc-Page-Revision: $Id$-->
 
    <p><table class="errorbox">
    <thead>
@@ -44,8 +45,6 @@
    </tr>
    </tbody>
    </table>
-
-<p>Version <: print generate_pretty_revision_date_string('$Id$'); :>
 
 <h2>Contents</h2>
 <strong>1. <a href="#1">Overview</a></strong><br>
