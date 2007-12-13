@@ -73,10 +73,8 @@ def index(req, ln=config.cdslang):
     else:
         is_admin = False
 
-    navtrail = '''<a class="navtrail" href="%s/admin/index.%s.html">%s</a>''' % \
-               (config.weburl,
-                ln,
-                _("Admin Area"))
+    navtrail = '''<a class="navtrail" href="%s/help/admin">%s</a>''' % \
+               (config.weburl, _("Admin Area"))
 
     return page(title=_("BibFormat Admin"),
                 body=bibformatadminlib.perform_request_index(ln=ln,
