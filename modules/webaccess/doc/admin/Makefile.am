@@ -19,10 +19,7 @@
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	webaccess-admin.webdoc \
-	webaccess-admin-guide.webdoc \
-	webaccess-firerole.webdoc
+webdoclib_DATA = webaccess-admin-guide.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 

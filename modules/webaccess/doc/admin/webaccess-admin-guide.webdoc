@@ -17,8 +17,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: WebAccess Admin Guide -->
+<!-- WebDoc-Page-Navtrail:<a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Navbar-Name: admin -->
-<!-- WebDoc-Page-Navtrail:<a class="navtrail" href="<WEBURL>/admin/<lang:star: index.*.html>">_(Admin Area)_</a> &gt; <a class="navtrail" href="webaccess-admin">WebAccess Admin</a> -->
 <!-- WebDoc-Page-Navbar-Select: webaccess-admin-guide -->
 <!-- WebDoc-Page-Revision: $Id$-->
 
@@ -29,6 +29,7 @@
 <strong>3. <a href="#3">Example pages, illustrating snapshots</a></strong><br>
 <strong>4. <a href="#4">Managing accounts / Access policy</a></strong><br>
 <strong>5. <a href="#5">Managing login methods</a></strong><br>
+<strong>6. <a href="#6">Firewall-like role definitions</a></strong><br>
 
 <h2><a name="1">1. INTRODUCTION, USING ROLES</a></h2>
 <pre>
@@ -49,11 +50,12 @@
   librarian</em> with action <em>runbibwords</em> using the argument
   <em>index='author'</em>.
 
-  Additionally, roles could have <em><a href="webaccess-firerole">definitions</a></em>. A definition is a formal
-  description of which users are entitled to belong to the role. So you
-  have two ways for connecting users to roles. Either linking explicitly
-  a user with the role or describing the characteristics that makes users
-  belong to the role.
+  Additionally, roles could have <em><a href="#6">firewall-like role
+  definitions</a></em>. A definition is a formal description of which
+  users are entitled to belong to the role. So you have two ways for
+  connecting users to roles. Either linking explicitly a user with the
+  role or describing the characteristics that makes users belong to
+  the role.
 
   WebAccess is based on allowing users to perform actions. This means
   that only allowed actions are stored in the access control engine's
@@ -996,6 +998,129 @@ II. Example - connecting role and user</a>
              """
              raise NotImplementedError
              #return Nickname
-
-- end of file -
 </pre>
+
+<h2><a name="6">VI. FIREWALL-LIKE ROLE DEFINITIONS</a></h2>
+
+    <strong>The FireRole language description</strong>
+
+    <pre>
+    In the WebAccess RBAC system, roles are built up from their names,
+    description and definition.
+
+    A definition is the way to <em>formally implicitly define</em> which users belong
+    to which roles.
+
+    A definition is expressed in a <em>firewall like rules language</em>. It's built up
+    by rows which are matched from top to bottom, in order to decide if the
+    current user (wethever he/she is logged in or not) may belong to a role.
+
+    Any row has this syntax:
+
+        <strong>ALLOW/DENY ANY</strong>
+
+        or
+
+        <strong>ALLOW/DENY [NOT] <em>field</em> {<em>one or more values</em>}</strong>
+
+    The rows are parsed from top to bottom. If a row matches the user than the
+    user belongs to the role if the rule is an ALLOW rule, otherwise, if the
+    rule is a DENY one, the user doesn't belong to the role.
+
+    A rule of the kind ALLOW|DENY ANY always matches, regardless of the user.
+
+    Note, in place of ANY you can use the word ALL. The semantic is the same. The
+    system support both to let the user comply with the English grammar.
+
+    The second type of rule is interpreted as follows: given a dictionary
+    of keys:values describing a user (we will cover this below), the rule
+    considers the value associated with the key named in field, and checks
+    if it corresponds to at least one of the values in the "one or more values" list.
+    This is a list of comma separated strings, which can be literal
+    (double-)quoted strings or regexps (marked by `/' ... `/' signs). If at
+    least a value matches (literally or through the regexp language), the
+    whole rule is considered to match.
+    If the optional NOT keyword is specified than if at least a value of the
+    rule matches the rule is skipped, otherwise if all the value of the rules
+    don't match the whole rule matches.
+
+    A <strong>DENY ANY</strong> rule is implicitly added at the end of every definition.
+
+    Any field is valid, but only rules concerning fields which currently
+    exist in the user describing dictionary are checked. All the rules
+    with non existant fields are skipped.
+
+    The user describing dictionary is built at runtime with all the informations
+    that can be gathered about the current user (and its session).
+    Currently valid fields are: <em>uid, email, nickname, apache_user, remote_ip,
+    remote_host, groups, apache_groups</em> and all the external settings provided
+    by the external authentication systems (e.g. CERN SSO provides:
+    external_authmethod, external_building, external_department, external_email,
+    external_external, external_firstname, external_fullname, external_homdir,
+    external_homeinstitute, external_lastname, external_login, external_mobilenumber,
+    external_phonenumber).
+
+    Among those fields there are some special cases, which are <em>remote_ip</em> and
+    (<em>apache_</em>)<em>groups</em>. Rules can refer to remote_ip either using a literal
+    expression for specifing list of single ips, or a usual regexp (or list
+    of regexps), or, also, using the common network group/mask notation
+    (e.g. <em>"127.0.0.0/24"</em>) as a literal string, which is a mix between literal
+    expressions and regexps. (apache_)groups are related to group memberships.
+    Since a user will probably belong to more than a group, then the rule
+    matches if there's at least one group to which the user belong, that matches
+    at least one of the expressions (NOT rules behave as you can imagine).
+
+    The dictionary is built using the current user session. If the user is
+    authenticated in some way (apache, locally, externally, SSO...) then more
+    infos could be provided to the firerole system in order to decide if the
+    user should belong to a role or not.
+
+    The default fields that are always there are:
+    <ul>
+        <li><strong>uid</strong>: an integer representing the user id</li>
+        <li><strong>nickname</strong>: the nickname of the user</li>
+        <li><strong>email</strong>: the email of the user</li>
+        <li><strong>group/groups</strong>: local or external group to which the user belong</li>
+        <li><strong>guest</strong>: 1 if the user is a guest (not logged), 0 otherwise</li>
+    </ul>
+    plus all the external setting retrieved by an <a href="webaccess-admin-guide#5">external authentication system</a>.
+
+    If the action to which the role defined is raised from the webinterface of
+    CDS Invenio, then you will have those additional fields:
+    <ul>
+        <li><strong>remote_ip</strong>: the remote ip address of the user who is browsing</li>
+        <li><strong>remote_host</strong>: the remote hostname of the user who is browsing</li>
+        <li><strong>referer</strong>: the webpage from where the user is coming from</li>
+        <li><strong>uri</strong>: the uri the user is visiting</li>
+        <li><strong>agent</strong>: the agent string describing the user's browser</li>
+        <li><strong>apache_user</strong>: the <a href="websearch-admin-guide#3.2">Apache user</a> provided by the authenticated user</li>
+        <li><strong>apache_group/apache_groups</strong>: the Apache groups to which the apache user
+            belong</li>
+    </ul>
+
+    Note that you can specify either (apache_)group or (apache_)groups (with or
+    without the trailing s). They are semantically equal and are supported just
+    to let people comply with the English grammar.
+
+    Every rule is <em>case-insensitive</em> (apart values which must match literally
+    and regexp values which don't explicitly specify case-insesitive matches).
+
+    Every rule may contain <em>comments</em> preceded by the '<em>#</em>' character.
+    Any comment is discarded.
+
+    When you set a definition for a role, it is actually compiled and stored
+    in a binary compressed form inside the database. If the syntax isn't correct
+    this will be stated and the definition won't be set or updated.
+
+    Example of role definition:
+        allow not email /.*@gmail.com/,/.*@hotmail.com/
+        deny group badguys
+        allow remote_ip "127.0.0.0/24"
+        deny all
+
+    This definition would match all users whose emails don't end with @gmail.com and
+    @hotmail.com, or who don't belong to the group badguys and have remote_ip
+    in the 24bit mask network of 127.0.0.0. All the the other users don't belong
+    to the role which is being defined.
+
+   </pre>
