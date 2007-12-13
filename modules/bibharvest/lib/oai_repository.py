@@ -168,22 +168,45 @@ def get_field(sysno, field):
     return out
 
 def utc_to_localtime(date):
-    "Convert UTC to localtime"
+    """
+    Convert UTC to localtime
 
+    Reference:
+     - (1) http://www.openarchives.org/OAI/openarchivesprotocol.html#Dates
+     - (2) http://www.w3.org/TR/NOTE-datetime
+
+    This function works only with dates complying with the
+    "Complete date plus hours, minutes and seconds" profile of
+    ISO 8601 defined by (2), and linked from (1).
+
+    Eg:    1994-11-05T13:15:30Z
+    """
     ldate = date.split("T")[0]
     ltime = date.split("T")[1]
 
     lhour   = ltime.split(":")[0]
     lminute = ltime.split(":")[1]
     lsec    = ltime.split(":")[2]
+    lsec    = lsec[:-1] # Remove trailing "Z"
 
     lyear   = ldate.split("-")[0]
     lmonth  = ldate.split("-")[1]
     lday    = ldate.split("-")[2]
 
-    timetoconvert = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.mktime((string.atoi(lyear), string.atoi(lmonth), string.atoi(lday), string.atoi(lhour), string.atoi(lminute), string.atoi(lsec[:-1]), 0, 0, -1)) - time.timezone + (time.daylight)*3600))
 
-    return timetoconvert
+    # 1: Build a time as UTC. Since time.mktime() expect a local time :
+    ## 1a: build it without knownledge of dst
+    ## 1b: substract timezone to get a local time, with possibly wrong dst
+    utc_time = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0,0,-1))
+    local_time = utc_time - time.timezone
+
+    # 2: Fix dst for local_time
+    # Find out the offset for daily saving time of the local
+    # timezone at the time of the given 'date'
+    if time.localtime(local_time)[-1] == 1:
+        local_time = local_time + 3600
+
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(local_time))
 
 def localtime_to_utc(date):
     "Convert localtime to UTC"
@@ -199,9 +222,23 @@ def localtime_to_utc(date):
     lmonth  = ldate.split("-")[1]
     lday    = ldate.split("-")[2]
 
-    timetoconvert = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.mktime((string.atoi(lyear), string.atoi(lmonth), string.atoi(lday), string.atoi(lhour), string.atoi(lminute), string.atoi(lsec), 0, 0, -1))))
+    # Find out the offset for daily saving time of the local
+    # timezone at the time of the given 'date'
+    #
+    # 1: build time that correspond to local date, without knowledge of dst
+    # 2: determine if dst is locally enabled at this time
+    tmp_date = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, -1))
+    if time.localtime(tmp_date)[-1] == 1:
+        dst = time.localtime(tmp_date)[-1]
+    else:
+        dst = 0
 
-    return timetoconvert
+    # 3: Build a new time with knowledge of the dst
+    local_time = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0,0, dst))
+    # 4: Get the time as UTC
+    utc_time = time.gmtime(local_time)
+
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", utc_time)
 
 def get_creation_date(sysno):
     "Returns the creation date of the record 'sysno'."
@@ -227,18 +264,28 @@ def get_earliest_datestamp():
         out = localtime_to_utc(res[0][0])
     return out
 
-def check_date(date, dtime="T00:00:00Z"):
-    "Check if the date has a correct format"
+def check_date(date):
+    """Check if given date has a correct format, complying to "Complete date" or
+    "Complete date plus hours, minutes and seconds" formats defined in ISO8601."""
 
-    if(re.sub("[0123456789\-:TZ]", "", date) == ""):
-        if len(date) == 10:
-            date = date + dtime
-        if len(date) == 20:
-            date = utc_to_localtime(date)
-        else:
-            date = ""
+    if(re.match("\d\d\d\d-\d\d-\d\d(T\d\d:\d\d:\d\dZ)?", date) is not None):
+        return date
     else:
-        date = ""
+        return ""
+
+def normalize_date(date, dtime="T00:00:00Z"):
+    """
+    Normalize the given date to the
+    "Complete date plus hours, minutes and seconds" format defined in ISO8601
+    (If "hours, minutes and seconds" part is missing, append 'dtime' to date).
+    'date' must be checked before with check_date(..).
+
+    Returns empty string if cannot be normalized
+    """
+    if len(date) == 10:
+        date = date + dtime
+    elif len(date) != 20:
+         date = ""
 
     return date
 
@@ -848,6 +895,12 @@ def parse_args(args=""):
             else:
                 out_args['verb'] = ""
 
+    if out_args.has_key('from'):
+        out_args['from'] = normalize_date(out_args['from'], "T00:00:00Z")
+
+    if out_args.has_key('until'):
+        out_args['until'] = normalize_date(out_args['until'], "T23:59:59Z")
+
     return out_args
 
 def check_args(arguments):
@@ -901,14 +954,14 @@ def check_args(arguments):
 #
     if arguments['from'] != "":
         from_length = len(arguments['from'])
-        if check_date(arguments['from'], "T00:00:00Z") == "":
+        if check_date(arguments['from']) == "":
             out = out + oai_error("badArgument", "Bad datestamp format in from")
     else:
         from_length = 0
 
     if arguments['until'] != "":
         until_length = len(arguments['until'])
-        if check_date(arguments['until'], "T23:59:59Z") == "":
+        if check_date(arguments['until']) == "":
             out = out + oai_error("badArgument", "Bad datestamp format in until")
     else:
         until_length = 0
