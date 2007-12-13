@@ -18,9 +18,7 @@
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	webbasket-admin.webdoc \
-	webbasket-admin-guide.webdoc
+webdoclib_DATA = webbasket-admin-guide.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA)
 
