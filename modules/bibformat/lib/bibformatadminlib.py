@@ -52,7 +52,8 @@ def getnavtrail(previous = '', ln=cdslang):
     previous = wash_url_argument(previous, 'str')
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail = '''<a class="navtrail" href="%s/admin/index.%s.html">%s</a> &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a> ''' % (weburl, ln, _("Admin Area"), weburl, ln,  _("BibFormat Admin"))
+    navtrail = '''<a class="navtrail" href="%s/help/admin">%s</a> &gt; <a class=navtrail href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a> ''' % \
+               (weburl, _("Admin Area"), weburl, ln,  _("BibFormat Admin"))
     navtrail = navtrail + previous
     return navtrail
 

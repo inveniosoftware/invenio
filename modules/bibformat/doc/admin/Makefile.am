@@ -35,8 +35,6 @@ img_DATA = bibformat-guide-output_format_attributes_tutorial.png \
 
 webdoclibdir = $(libdir)/webdoc/admin
 
-webdoclib_DATA = \
-	bibformat-admin.webdoc \
-	bibformat-admin-guide.webdoc
+webdoclib_DATA = bibformat-admin-guide.webdoc
 
 EXTRA_DIST = $(img_DATA) $(webdoclib_DATA)

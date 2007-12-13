@@ -192,5 +192,5 @@ class Template:
         use the <a href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage">Format template management console</a> or edit files directly in directory etc/bibformat/templates/ of your CDS Invenio installation base.</p>''' % weburl
         out += '''<p>To check and edit your format elements, open files in lib/python/invenio/bibformat_elements directory of your CDS Invenio installation base</p>'''
 
-        out += '''<a href="%s/admin/bibformat/">Click here to go back to main BibFormat administration page</a>''' % weburl
+        out += '''<a href="%s/admin/bibformat/bibformatadmin.py">Click here to go back to main BibFormat administration page</a>''' % weburl
         return indent_text(out)

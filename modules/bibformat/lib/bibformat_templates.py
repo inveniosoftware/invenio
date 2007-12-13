@@ -73,7 +73,7 @@ class Template:
         <tr>
         <th class="errorboxheader">
         <big>BibFormat has changed!</big>
-        <p>You will need to migrate your old formats if you are not a new user. You can read the <a href="%(weburl)s/admin/bibformat/guide.html">documentation</a> to learn how to write
+        <p>You will need to migrate your old formats if you are not a new user. You can read the <a href="%(weburl)s/help/admin/bibformat-admin-guide">documentation</a> to learn how to write
         formats, or use the <a href="%(weburl)s/admin/bibformat/bibformat_migration_kit_assistant.py">migration assistant</a>.</p>
         %(comment_on_php_admin_interface)s
         </th>
@@ -101,17 +101,17 @@ class Template:
         <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%(ln)s">Manage Output Formats</a></dt>
         <dd>Define which template is applied to which record for a given output.</dd>
         </dl>
-         <dl>
-        <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%(ln)s">Manage Knowledge Bases</a></dt>
-        <dd>Define mappings of values, for standardizing records or declaring often used values.</dd>
-        </dl>
-        <br/>
         <dl>
         <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%(ln)s">Format Elements Documentation</a></dt>
         <dd>Documentation of the format elements to be used inside format templates.</dd>
         </dl>
         <dl>
-        <dt><a href="%(weburl)s/admin/bibformat/guide.html">BibFormat Admin Guide</a></dt>
+        <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%(ln)s">Manage Knowledge Bases</a></dt>
+        <dd>Define mappings of values, for standardizing records or declaring often used values.</dd>
+        </dl>
+        <br/>
+        <dl>
+        <dt><a href="%(weburl)s/help/admin/bibformat-admin-guide">BibFormat Admin Guide</a></dt>
         <dd>Documentation about BibFormat administration</dd>
         </dl>
         '''% {'weburl':weburl, 'ln':ln}
@@ -360,7 +360,7 @@ class Template:
 	    #Offer the possibility to make a duplicate of existing format template code
 	    out += '''
 	     <table><tr>
-	     <th class="adminheaderleft">Make a copy of format template:&nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#addFormatTemplate">?</a>]</th>
+	     <th class="adminheaderleft">Make a copy of format template:&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#addFormatTemplate">?</a>]</th>
 	     </tr>
 	    <tr>
 	    <td><select tabindex="1" name="duplicate" id="duplicate" %(readonly)s>
@@ -376,7 +376,7 @@ class Template:
 
 	out += '''
         <table><tr>
-        <th colspan="2" class="adminheaderleft">%(name)s attributes&nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#attrsFormatTemplate">?</a>]</th>
+        <th colspan="2" class="adminheaderleft">%(name)s attributes&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#attrsFormatTemplate">?</a>]</th>
         </tr>
         <tr>
         <td class="admintdright">
@@ -937,7 +937,7 @@ class Template:
         <th class="adminheaderleft" >%(description)s</th>
         <th class="adminheaderleft" >%(status)s</th>
         <th class="adminheaderleft" >%(last_modification_date)s</th>
-        <th class="adminheadercenter" >%(action)s&nbsp;&nbsp;&nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#formatTemplates">?</a>]</th>
+        <th class="adminheadercenter" >%(action)s&nbsp;&nbsp;&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#formatTemplates">?</a>]</th>
         </tr>
         ''' % {'name':_("Name"),
                'description':_("Description"),
@@ -1063,7 +1063,7 @@ class Template:
         <th class="adminheaderleft" >%(description)s</th>
         <th class="adminheaderleft" >%(status)s</th>
         <th class="adminheaderleft" >%(last_modification_date)s</th>
-        <th class="adminheadercenter" >%(action)s&nbsp;&nbsp;&nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#outputFormats">?</a>]</th>
+        <th class="adminheadercenter" >%(action)s&nbsp;&nbsp;&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#outputFormats">?</a>]</th>
         </tr>
         ''' %  {'code':_("Code"),
                 'name':_("Name"),
@@ -1274,7 +1274,7 @@ class Template:
             &nbsp;<input type="text" name="r_fld" value="%(field)s" size="10" %(readonly)s/>&nbsp;is equal to&nbsp;<input type="text" value="%(value)s" name="r_val" %(readonly)s/>
             </td>
             <td class="adminheaderright" style="vertical-align: middle;">
-            &nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#rulesOutputFormat">?</a>]
+            &nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#rulesOutputFormat">?</a>]
             </td>
             </tr>
             ''' % {'weburl':weburl,
@@ -1406,7 +1406,7 @@ class Template:
         <table class="admin_wvar" cellspacing="0">
         <tr>
         <th colspan="2" class="adminheaderleft">
-        Output Format Attributes&nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#attrsOutputFormat">?</a>]</th>
+        Output Format Attributes&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#attrsOutputFormat">?</a>]</th>
         </tr>
         <tr>
         <td class="admintdright"><label for="outputFormatCode">Code</label>:&nbsp;</td>
@@ -1816,7 +1816,7 @@ class Template:
         <th class="adminheaderleft" >&nbsp;</th>
         <th class="adminheaderleft" >Name</th>
         <th class="adminheaderleft" >Description</th>
-        <th class="adminheadercenter" >Action&nbsp;&nbsp;&nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#KBs">?</a>]</th>
+        <th class="adminheadercenter" >Action&nbsp;&nbsp;&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#KBs">?</a>]</th>
         </tr>''' % {'ln':ln,
                     'menu':_("Menu"),
                     'manage_output_formats':_("Manage Output Formats"),
@@ -1921,7 +1921,7 @@ class Template:
         out += '''
         <table class="admin_wvar" width="100%%" cellspacing="0">
         <tr>
-        <th colspan="2" class="adminheaderleft">Add New Mapping &nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#addMappingKB">?</a>]</th>
+        <th colspan="2" class="adminheaderleft">Add New Mapping &nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#addMappingKB">?</a>]</th>
         </tr>
         <tr>
         <td class="admintdright"><label for="mapFrom"><span style="white-space: nowrap;">Map From</span></label>:&nbsp;</td>
@@ -1951,7 +1951,7 @@ class Template:
         <th class="adminheaderleft" width="34%%"><a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=from">Map From</a></th>
         <th class="adminheaderleft">&nbsp;</th>
         <th class="adminheaderleft" width="34%%"><a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=to">To</a></th>
-        <th class="adminheadercenter" width="25%%">Action&nbsp;&nbsp;&nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#removeMappingKB">?</a>]</th>
+        <th class="adminheadercenter" width="25%%">Action&nbsp;&nbsp;&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#removeMappingKB">?</a>]</th>
         </tr>
         </thead>
         <tfoot>
@@ -2080,7 +2080,7 @@ class Template:
                'sortby':sortby}
 
         out += '''
-        <th colspan="2" class="adminheaderleft">%(kb_name)s attributes&nbsp;[<a href="%(weburl)s/admin/bibformat/guide.html#attrsKB">?</a>]</th>''' % {'kb_name': kb_name,
+        <th colspan="2" class="adminheaderleft">%(kb_name)s attributes&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#attrsKB">?</a>]</th>''' % {'kb_name': kb_name,
                                                                                                                                                        'weburl': weburl}
 
         out += '''

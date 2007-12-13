@@ -18,8 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title:BibFormat Admin Guide -->
-<!-- WebDoc-Page-Navbar-Name: <a class="navtrail" href="<WEBURL>/admin/index.<lang:current/>.html">_(Admin Area)_</a> &gt; <a class="navtrail" href="bibformat-admin">BibFormat Admin</a> -->
-<!-- WebDoc-Page-Navtrail:admin -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
+<!-- WebDoc-Page-Navbar-Name: admin -->
 <!-- WebDoc-Page-Navbar-Select: bibformat-admin-guide -->
 <!-- WebDoc-Page-Revision: $Id$-->
 
