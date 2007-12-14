@@ -146,6 +146,9 @@ uninstall-jsmath-plugin:
 create-tables: local-dbexec local-tabfill
 	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
+	@echo "**************************************************************"
+	@echo "** The database tables were successfully created.           **"
+	@echo "**************************************************************"
 
 update-v0.3.0-tables update-v0.3.1-tables: local-dbexec
 	echo "ALTER TABLE idxINDEXNAME CHANGE id_idxINDEX id_idxINDEX mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec
@@ -264,7 +267,18 @@ update-v0.92.1-tables: local-dbexec
 
 
 drop-tables: local-dbexec
+	@if [ "$(FORCE)" != "yes" ]; then \
+	    echo "***********************************************************************"; \
+	    echo "** WARNING: You are going to destroy your database tables!           **"; \
+	    echo "** Press Ctrl-C if you want to abort this action.                    **"; \
+	    echo "** Press any other key to proceed with destroying your database.     **"; \
+	    echo "***********************************************************************"; \
+	    read; \
+	fi
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
+	@echo "**************************************************************"
+	@echo "** The database tables were successfully dropped.           **"
+	@echo "**************************************************************"
 
 local-dbexec:
 	(cd ./modules/miscutil/bin; make)
@@ -323,6 +337,14 @@ load-demo-records:
 	@echo "***********************************************************************"
 
 drop-demo-site:
+	@if [ "$(FORCE)" != "yes" ]; then \
+	    echo "***********************************************************************"; \
+	    echo "** WARNING: You are going to destroy your site and documents!        **"; \
+	    echo "** Press Ctrl-C if you want to abort this action.                    **"; \
+	    echo "** Press any other key to proceed with destroying your site.         **"; \
+	    echo "***********************************************************************"; \
+	    read; \
+	fi
 	rm -rf ${prefix}/var/data/files/*
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabcreate.sql
@@ -336,6 +358,15 @@ drop-demo-site:
 	@echo "***************************************************************"
 
 remove-demo-records:
+	@if [ "$(FORCE)" != "yes" ]; then \
+	    echo "***********************************************************************"; \
+	    echo "** WARNING: You are going to destroy your records and documents!     **"; \
+	    echo "** Press Ctrl-C if you want to abort this action.                    **"; \
+	    echo "** Press any other key to proceed with destroying your records.      **"; \
+	    echo "***********************************************************************"; \
+	    read; \
+	fi
+	rm -rf ${prefix}/var/data/files/*
 	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabbibclean.sql
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec
 	${prefix}/bin/webcoll -uadmin
