@@ -29,7 +29,7 @@ from zlib import decompress, compress, error
 
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
 from invenio.search_engine import print_record, search_pattern
-from invenio.bibrecord import create_records, record_get_field_values
+from invenio.bibrecord import create_records, record_get_field_values, record_get_field_value
 from invenio.bibformat_utils import parse_tag
 from invenio.bibtask import write_message, task_get_option
 
@@ -251,6 +251,51 @@ def get_citation_informations(recid_list, config):
     print "Execution time for generating citation informations by parsing xml contents: ", (end_time - begin_time)
     return citation_informations
 
+def get_self_citations(citationdic,config):
+   """Check which items have been cited by one of the authors of the
+      citing item
+   """
+   selfcites = {}
+   keys = citationdic.keys()
+   for k in keys:
+	#get the author of k
+	xml = print_record(int(k),'xm')
+        rs = create_records(xml)
+        recs = map((lambda x:x[0]), rs)
+	for rec in recs:
+		#author tag
+		author = record_get_field_value(rec,"100","","","a")
+		otherauthors = record_get_field_values(rec,"700","","","a")
+		moreauthors = record_get_field_values(rec,"720","","","a")
+		authorlist = [author]
+		authorlist.extend(otherauthors)
+		authorlist.extend(moreauthors)
+		#print "record "+str(k)+" by "+str(authorlist)
+		#print "is cited by"
+		#get the "x-cites-this" list
+		xct = citationdic[k]
+		for c in xct:
+			cxml = print_record(int(c),'xm')
+			crs = create_records(cxml)
+			crecs = map((lambda x:x[0]), crs)
+			for crec in crecs:
+				cauthor = record_get_field_value(crec,"100","","","a")
+				cotherauthors = record_get_field_values(crec,"700","","","a")
+				cmoreauthors = record_get_field_values(crec,"720","","","a")
+				cauthorlist = [cauthor]
+				cauthorlist.extend(cotherauthors)
+				cauthorlist.extend(cmoreauthors)
+				#print str(c)+" by "+str(cauthorlist)
+				for ca in cauthorlist:
+					if (ca in authorlist):
+						if selfcites.has_key(k):
+							val = selfcites[k]
+							val.append(c)
+							selfcites[k] = val
+						else:
+							selfcites[k] = [c]
+   return selfcites
+
 def ref_analyzer(citation_informations, initialresult, initial_citationlist, initial_referencelist,config):
     """Analyze the citation informations and calculate the citation weight
        and cited by list dictionary
@@ -326,6 +371,9 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
     for k in keys:
 	if not reference_list[k]:
 		del reference_list[k]
+
+    selfdic = get_self_citations(citation_list,config)
+    #print str(selfdic)
 
     if task_get_option('verbose') >= 9:		
     	write_message("citation_list (x is cited by y): "+str(citation_list),sys.stderr)	

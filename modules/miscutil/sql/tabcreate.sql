@@ -2135,7 +2135,8 @@ CREATE TABLE IF NOT EXISTS rnkDOWNLOADS (
 
 CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
   citation_data longblob,
-  citation_data_reversed longblob
+  citation_data_reversed longblob,
+  self_citation_data longblob
 ) TYPE=MyISAM;
 
 -- tables for collections and collection tree:
