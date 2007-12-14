@@ -67,7 +67,7 @@ class BibRecordSuccessTest(unittest.TestCase):
     
     def test_records_created(self):
         """ bibrecord - demo file how many records are created """
-        self.assertEqual(94, len(self.recs))
+        self.assertEqual(95, len(self.recs))
         
     def test_tags_created(self):
         """ bibrecord - demo file which tags are created """
