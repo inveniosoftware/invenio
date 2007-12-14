@@ -1637,8 +1637,8 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
         if apply_stemming:
             word0 = stem(word0)
             word1 = stem(word1)
-        res = run("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
-                  (wash_index_term(word0), wash_index_term(word1)))
+        res = run_sql("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
+                      (wash_index_term(word0), wash_index_term(word1)))
     else:
         word = re_word.sub('', word)
         if apply_stemming:
