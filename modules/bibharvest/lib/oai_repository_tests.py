@@ -59,7 +59,7 @@ class TestSelectiveHarvesting(unittest.TestCase):
         self.assertEqual([], oai_repository.oaigetsysnolist(set="nonExistingSet"))
 
     def test_from_and_until(self):
-        """bibharvest oai repository - testing selective harvesting with 'from' and 'until' parameter"""
+        """bibharvest oai repository - testing selective harvesting with 'from' and 'until' parameters"""
 
         # List available records, get datestamps and play with them
         identifiers = oai_repository.oailistidentifiers("")
