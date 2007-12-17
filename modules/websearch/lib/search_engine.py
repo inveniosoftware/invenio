@@ -1758,7 +1758,7 @@ def search_unit_in_bibrec(datetext1, datetext2, type='c'):
         type = "modification_date"
     else:
         type = "creation_date" # by default we are searching for creation dates
-    res = run_sql("SELECT id FROM bibrec WHERE %s>=%s AND %s<=%s" % (type, "%s", type, "%s"),
+    res = run_sql("SELECT id FROM bibrec WHERE %s>=%%s AND %s<=%%s" % (type, type),
                   (datetext1, datetext2))
     for row in res:
         set += row[0]
@@ -3601,6 +3601,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
 
         # search stage 5: apply search option limits and restrictions:
         if datetext1 != "":
+            if verbose and of.startswith("h"):
+                print_warning(req, "Search stage 5: applying time limits, from %s until %s..." % (datetext1, datetext2))
             try:
                 results_final = intersect_results_with_hitset(req,
                                                               results_final,
@@ -3623,6 +3625,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
 
         if pl:
             pl = wash_pattern(pl)
+            if verbose and of.startswith("h"):
+                print_warning(req, "Search stage 5: applying search pattern limit %s..." % (pl,))
             try:
                 results_final = intersect_results_with_hitset(req,
                                                               results_final,
