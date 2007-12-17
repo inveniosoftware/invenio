@@ -1088,60 +1088,65 @@ def wash_field(f):
 
 def wash_dates(d1="", d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0):
     """
-    Take user-submitted washed date arguments D1 full datetime or
+    Take user-submitted date arguments D1 (full datetime string) or
     (D1Y, D1M, D1Y) year, month, day tuple and D2 or (D2Y, D2M, D2Y)
-    and return (YYY1-M1-D2 H1:M1:S2, YYY2-M2-D2 H2:M2:S2) strings in
-    the YYYY-MM-DD HH:MM:SS format suitable for time restricted
-    searching.  I.e. pay attention when months are not there to put 01
-    or 12 according to whether it's the starting or the ending date,
-    etc.
+    and return (YYY1-M1-D2 H1:M1:S2, YYY2-M2-D2 H2:M2:S2) datetime
+    strings in the YYYY-MM-DD HH:MM:SS format suitable for time
+    restricted searching.
+
+    Note that when both D1 and (D1Y, D1M, D1D) parameters are present,
+    the precedence goes to D1.  Ditto for D2*.
+
+    Note that when (D1Y, D1M, D1D) are taken into account, some values
+    may be missing and are completed e.g. to 01 or 12 according to
+    whether it is the starting or the ending date.
     """
     datetext1, datetext2 =  "", ""
-    if d1 or d2:
-        # dates passed as full datetime strings:
-        if d1:
-            datetext1 = d1
-        else:
-            datetext1 = "0000-01-01 00:00:00"
-        if d2:
-            datetext2 = d2
-        else:
-            datetext2 = "9999-01-01 00:00:00"
-        return (datetext1, datetext2)
-    # okay, dates passed as (year,month,day):
     # sanity checking:
-    if d1y == 0 and d1m == 0 and d1d == 0 and d2y == 0 and d2m == 0 and d2d == 0:
+    if d1 == "" and d1y == 0 and d1m == 0 and d1d == 0 and d2 == "" and d2y == 0 and d2m == 0 and d2d == 0:
         return ("", "") # nothing selected, so return empty values
-    # construct datetext1 (from):
-    if d1y:
-        datetext1 += "%04d" % d1y
+    # wash first (starting) date:
+    if d1:
+        # full datetime string takes precedence:
+        datetext1 = d1
     else:
-        datetext1 += "0000"
-    if d1m:
-        datetext1 += "-%02d" % d1m
+        # okay, first date passed as (year,month,day):
+        if d1y:
+            datetext1 += "%04d" % d1y
+        else:
+            datetext1 += "0000"
+        if d1m:
+            datetext1 += "-%02d" % d1m
+        else:
+            datetext1 += "-01"
+        if d1d:
+            datetext1 += "-%02d" % d1d
+        else:
+            datetext1 += "-01"
+        datetext1 += " 00:00:00"
+    # wash second (ending) date:
+    if d2:
+        # full datetime string takes precedence:
+        datetext2 = d2
     else:
-        datetext1 += "-01"
-    if d1d:
-        datetext1 += "-%02d" % d1d
-    else:
-        datetext1 += "-01"
-    # construct datetext2 (until):
-    if d2y:
-        datetext2 += "%04d" % d2y
-    else:
-        datetext2 += "9999"
-    if d2m:
-        datetext2 += "-%02d" % d2m
-    else:
-        datetext2 += "-12"
-    if d2d:
-        datetext2 += "-%02d" % d2d
-    else:
-        datetext2 += "-31" # NOTE: perhaps we should add max(datenumber) in
-                      # given month, but for our quering it's not
-                      # needed, 31 will always do
-    # okay, return constructed YYYY-MM-DD HH:MM:SS dates
-    return (datetext1 + " 00:00:00", datetext2 + " 00:00:00")
+        # okay, second date passed as (year,month,day):
+        if d2y:
+            datetext2 += "%04d" % d2y
+        else:
+            datetext2 += "9999"
+        if d2m:
+            datetext2 += "-%02d" % d2m
+        else:
+            datetext2 += "-12"
+        if d2d:
+            datetext2 += "-%02d" % d2d
+        else:
+            datetext2 += "-31" # NOTE: perhaps we should add max(datenumber) in
+                               # given month, but for our quering it's not
+                               # needed, 31 will always do
+        datetext2 += " 00:00:00"
+    # okay, return constructed YYYY-MM-DD HH:MM:SS datetexts:
+    return (datetext1, datetext2)
 
 def get_colID(c):
     "Return collection ID for collection name C.  Return None if no match found."
