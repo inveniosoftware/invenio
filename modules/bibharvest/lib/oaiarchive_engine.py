@@ -106,7 +106,7 @@ def parse_set_definition(set_definition):
 def repository_size():
     "Read repository size"
 
-    return len(perform_request_search(p1=".*", f1=CFG_OAI_ID_FIELD, m1="r"))
+    return len(perform_request_search(p1="oai.*", f1=CFG_OAI_ID_FIELD, m1="r", ap=0))
 
 def get_set_descriptions(setSpec):
     "Retrieve set descriptions from oaiARCHIVE table"
@@ -188,7 +188,8 @@ def get_recID_list(oai_set_descriptions, set):
                     op2=oai['op2'],
                     p3=oai['p3'],
                     f3=oai['f3'],
-                    m3=oai['m3'])
+                    m3=oai['m3'],
+                    ap=0)
 
             for recID in recID_list_:
                 if recID in recID_list:
@@ -230,7 +231,7 @@ def oaiarchive_task():
                 get_recID_list(oai_sets, _set)
 
             oai_has_list = perform_request_search(c=cdsname, p1=_set[2],
-                f1=CFG_OAI_SET_FIELD, m1="e")
+                f1=CFG_OAI_SET_FIELD, m1="e", ap=0)
             oai_has_list_len = "%d" % len(oai_has_list)
 
             set_name = "%s" % _set[1][:32]
@@ -273,7 +274,7 @@ def oaiarchive_task():
             else:
 
                 oai_has_list = perform_request_search(c=cdsname, p1=set,
-                    f1=CFG_OAI_SET_FIELD, m1="e")
+                    f1=CFG_OAI_SET_FIELD, m1="e", ap=0)
 
                 write_message(" setSpec            : %s" % setSpec)
                 write_message(" setName            : %s" % setName)
@@ -470,7 +471,7 @@ def oaiarchive_task():
                 # Fetch records that are currently marked with this set in
                 # the database
                 oai_has_list = perform_request_search(c=cdsname, p1=set,
-                    f1=CFG_OAI_SET_FIELD, m1="e")
+                    f1=CFG_OAI_SET_FIELD, m1="e", ap=0)
 
                 # Fetch records that should not be in this set
                 # (oai_has_list - recID_list)
