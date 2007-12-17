@@ -59,9 +59,9 @@ class TestWashQueryParameters(unittest.TestCase):
 
     def test_wash_dates_from_tuples(self):
         """search engine - washing of date arguments from (year,month,day) tuples"""
-        self.assertEqual(search_engine.wash_dates("", 1980, 1, 28, "", 2003, 2, 2),
-                         ('1980-01-28 00:00:00', '2003-02-02 00:00:00'))
-        self.assertEqual(search_engine.wash_dates("", 1980, 0, 28, "", 2003, 2, 0),
+        self.assertEqual(search_engine.wash_dates(d1y=1980, d1m=1, d1d=28, d2y=2003, d2m=2, d2d=3),
+                         ('1980-01-28 00:00:00', '2003-02-03 00:00:00'))
+        self.assertEqual(search_engine.wash_dates(d1y=1980, d1m=0, d1d=28, d2y=2003, d2m=2, d2d=0),
                          ('1980-01-28 00:00:00', '2003-02-31 00:00:00'))
 
     def test_wash_dates_from_datetexts(self):
@@ -69,9 +69,18 @@ class TestWashQueryParameters(unittest.TestCase):
         self.assertEqual(search_engine.wash_dates(d1="1980-01-28 01:02:03", d2="1980-01-29 12:34:56"),
                          ('1980-01-28 01:02:03', '1980-01-29 12:34:56'))
         self.assertEqual(search_engine.wash_dates(d1="1980-01-28 01:02:03"),
-                         ('1980-01-28 01:02:03', '9999-01-01 00:00:00'))
+                         ('1980-01-28 01:02:03', '9999-12-31 00:00:00'))
         self.assertEqual(search_engine.wash_dates(d2="1980-01-29 12:34:56"),
                          ('0000-01-01 00:00:00', '1980-01-29 12:34:56'))
+
+    def test_wash_dates_from_both(self):
+        """search engine - washing of date arguments from both datetext strings and (year,month,day) tuples"""
+        # datetext mode takes precedence, d1* should be ignored
+        self.assertEqual(search_engine.wash_dates(d1="1980-01-28 01:02:03", d1y=1980, d1m=1, d1d=28),
+                         ('1980-01-28 01:02:03', '9999-12-31 00:00:00'))
+        # datetext mode takes precedence, d2 missing, d2* should be ignored
+        self.assertEqual(search_engine.wash_dates(d1="1980-01-28 01:02:03", d2y=2003, d2m=2, d2d=3),
+                         ('1980-01-28 01:02:03', '2003-02-03 00:00:00'))
 
 class TestStripAccents(unittest.TestCase):
     """Test for handling of UTF-8 accents."""
