@@ -106,7 +106,7 @@ def parse_set_definition(set_definition):
 def repository_size():
     "Read repository size"
 
-    return len(perform_request_search(p1="oai.*", f1=CFG_OAI_ID_FIELD, m1="r", ap=0))
+    return len(perform_request_search(p1="oai:*", f1=CFG_OAI_ID_FIELD, m1="e", ap=0))
 
 def get_set_descriptions(setSpec):
     "Retrieve set descriptions from oaiARCHIVE table"
