@@ -174,23 +174,35 @@ via both a high-level and low-level API interface.
             action - action to do.  "SEARCH" for searching, "Browse" for
                      browsing.  Default is to search.
 
+                d1 - first datetime in full YYYY-mm-dd HH:MM:DD format
+                     (e.g. "1998-08-23 12:34:56"). Useful for search limits
+                     on creation/modification date (see 'dt' argument
+                     below).  Note that 'd1' takes precedence over d1y, d1m,
+                     d1d if these are defined.
+
                d1y - first date's year (e.g. "1998").  Useful for search
-                     limits on creation date.
+                     limits on creation/modification date.
 
                d1m - first date's month (e.g. "08").  Useful for search
-                     limits on creation date.
+                     limits on creation/modification date.
 
                d1d - first date's day (e.g. "23").  Useful for search
-                     limits on creation date.
+                     limits on creation/modification date.
+
+                d2 - second datetime in full YYYY-mm-dd HH:MM:DD format
+                     (e.g. "1998-09-02 12:34:56"). Useful for search limits
+                     on creation/modification date (see 'dt' argument
+                     below).  Note that 'd2' takes precedence over d2y, d2m,
+                     d2d if these are defined.
 
                d2y - second date's year (e.g. "1998").  Useful for search
-                     limits on creation date.
+                     limits on creation/modification date.
 
                d2m - second date's month (e.g. "09").  Useful for search
-                     limits on creation date.
+                     limits on creation/modification date.
 
-               d2d - second date's day (e.g. "02").  Useful for search limits
-                     on creation date.
+               d2d - second date's day (e.g. "02").  Useful for search
+                     limits on creation/modification date.
 
                 dt - first and second date's type (e.g. "c").  Specifies
                      whether to search in creation dates ("c") or in

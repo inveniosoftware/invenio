@@ -1086,47 +1086,62 @@ def wash_field(f):
         f = CFG_WEBSEARCH_FIELDS_CONVERT[f]
     return f
 
-def wash_dates(d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0):
-    """Take user-submitted washed date arguments (D1Y, D1M, D1Y) and
-    (D2Y, D2M, D2Y) and return (YYY1-M1-D2, YYY2-M2-D2) strings in the
-    YYYY-MM-DD format suitable for time restricted searching.
-    I.e. pay attention when months are not there to put 01 or 12
-    according to whether it's the starting or the ending date, etc.
+def wash_dates(d1="", d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0):
     """
-    day1, day2 =  "", ""
+    Take user-submitted washed date arguments D1 full datetime or
+    (D1Y, D1M, D1Y) year, month, day tuple and D2 or (D2Y, D2M, D2Y)
+    and return (YYY1-M1-D2 H1:M1:S2, YYY2-M2-D2 H2:M2:S2) strings in
+    the YYYY-MM-DD HH:MM:SS format suitable for time restricted
+    searching.  I.e. pay attention when months are not there to put 01
+    or 12 according to whether it's the starting or the ending date,
+    etc.
+    """
+    datetext1, datetext2 =  "", ""
+    if d1 or d2:
+        # dates passed as full datetime strings:
+        if d1:
+            datetext1 = d1
+        else:
+            datetext1 = "0000-01-01 00:00:00"
+        if d2:
+            datetext2 = d2
+        else:
+            datetext2 = "9999-01-01 00:00:00"
+        return (datetext1, datetext2)
+    # okay, dates passed as (year,month,day):
     # sanity checking:
     if d1y == 0 and d1m == 0 and d1d == 0 and d2y == 0 and d2m == 0 and d2d == 0:
         return ("", "") # nothing selected, so return empty values
-    # construct day1 (from):
+    # construct datetext1 (from):
     if d1y:
-        day1 += "%04d" % d1y
+        datetext1 += "%04d" % d1y
     else:
-        day1 += "0000"
+        datetext1 += "0000"
     if d1m:
-        day1 += "-%02d" % d1m
+        datetext1 += "-%02d" % d1m
     else:
-        day1 += "-01"
+        datetext1 += "-01"
     if d1d:
-        day1 += "-%02d" % d1d
+        datetext1 += "-%02d" % d1d
     else:
-        day1 += "-01"
-    # construct day2 (until):
+        datetext1 += "-01"
+    # construct datetext2 (until):
     if d2y:
-        day2 += "%04d" % d2y
+        datetext2 += "%04d" % d2y
     else:
-        day2 += "9999"
+        datetext2 += "9999"
     if d2m:
-        day2 += "-%02d" % d2m
+        datetext2 += "-%02d" % d2m
     else:
-        day2 += "-12"
+        datetext2 += "-12"
     if d2d:
-        day2 += "-%02d" % d2d
+        datetext2 += "-%02d" % d2d
     else:
-        day2 += "-31" # NOTE: perhaps we should add max(datenumber) in
+        datetext2 += "-31" # NOTE: perhaps we should add max(datenumber) in
                       # given month, but for our quering it's not
                       # needed, 31 will always do
-    # okay, return constructed YYYY-MM-DD dates
-    return (day1, day2)
+    # okay, return constructed YYYY-MM-DD HH:MM:SS dates
+    return (datetext1 + " 00:00:00", datetext2 + " 00:00:00")
 
 def get_colID(c):
     "Return collection ID for collection name C.  Return None if no match found."
@@ -1731,10 +1746,10 @@ def search_unit_in_bibxxx(p, f, type):
     set = HitSet(l)
     return set
 
-def search_unit_in_bibrec(day1, day2, type='c'):
+def search_unit_in_bibrec(datetext1, datetext2, type='c'):
     """
     Return hitset of recIDs found that were either created or modified
-    (according to 'type' arg being 'c' or 'm') from day1 until day2, inclusive.
+    (according to 'type' arg being 'c' or 'm') from datetext1 until datetext2, inclusive.
     Does not pay attention to pattern, collection, anything.  Useful
     to intersect later on with the 'real' query.
     """
@@ -1744,7 +1759,7 @@ def search_unit_in_bibrec(day1, day2, type='c'):
     else:
         type = "creation_date" # by default we are searching for creation dates
     res = run_sql("SELECT id FROM bibrec WHERE %s>=%s AND %s<=%s" % (type, "%s", type, "%s"),
-                  (day1, day2))
+                  (datetext1, datetext2))
     for row in res:
         set += row[0]
     return set
@@ -3156,8 +3171,8 @@ def wash_url_argument(var, new_type):
 
 def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="", so="d", sp="", rm="", of="id", ot="", as=0,
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
-                           recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="",
-                           d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=cdslang, ec=None, tab=""):
+                           recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
+                           d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=cdslang, ec=None, tab=""):
     """Perform search or browse request, without checking for
        authentication.  Return list of recIDs found, if of=id.
        Otherwise create web page.
@@ -3277,23 +3292,35 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
       action - action to do.  "SEARCH" for searching, "Browse" for
                browsing.  Default is to search.
 
+          d1 - first datetime in full YYYY-mm-dd HH:MM:DD format
+               (e.g. "1998-08-23 12:34:56"). Useful for search limits
+               on creation/modification date (see 'dt' argument
+               below).  Note that 'd1' takes precedence over d1y, d1m,
+               d1d if these are defined.
+
          d1y - first date's year (e.g. "1998").  Useful for search
-               limits on creation date.
+               limits on creation/modification date.
 
          d1m - first date's month (e.g. "08").  Useful for search
-               limits on creation date.
+               limits on creation/modification date.
 
          d1d - first date's day (e.g. "23").  Useful for search
-               limits on creation date.
+               limits on creation/modification date.
+
+          d2 - second datetime in full YYYY-mm-dd HH:MM:DD format
+               (e.g. "1998-09-02 12:34:56"). Useful for search limits
+               on creation/modification date (see 'dt' argument
+               below).  Note that 'd2' takes precedence over d2y, d2m,
+               d2d if these are defined.
 
          d2y - second date's year (e.g. "1998").  Useful for search
-               limits on creation date.
+               limits on creation/modification date.
 
          d2m - second date's month (e.g. "09").  Useful for search
-               limits on creation date.
+               limits on creation/modification date.
 
-         d2d - second date's day (e.g. "02").  Useful for search limits
-               on creation date.
+         d2d - second date's day (e.g. "02").  Useful for search
+               limits on creation/modification date.
 
           dt - first and second date's type (e.g. "c").  Specifies
                whether to search in creation dates ("c") or in
@@ -3340,7 +3367,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
     f2 = wash_field(f2)
     p3 = wash_pattern(p3)
     f3 = wash_field(f3)
-    day1, day2 = wash_dates(d1y, d1m, d1d, d2y, d2m, d2d)
+    datetext1, datetext2 = wash_dates(d1, d1y, d1m, d1d, d2, d2y, d2m, d2d)
 
     _ = gettext_set_language(ln)
 
@@ -3573,11 +3600,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             return page_end(req, of, ln)
 
         # search stage 5: apply search option limits and restrictions:
-        if day1 != "":
+        if datetext1 != "":
             try:
                 results_final = intersect_results_with_hitset(req,
                                                               results_final,
-                                                              search_unit_in_bibrec(day1, day2, dt),
+                                                              search_unit_in_bibrec(datetext1, datetext2, dt),
                                                               ap,
                                                               aptext= _("No match within your time limits, "
                                                                         "discarding this condition..."),

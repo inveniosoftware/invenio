@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -57,12 +57,21 @@ class TestWashQueryParameters(unittest.TestCase):
         self.assertEqual("Ellis, J", search_engine.wash_pattern('Ellis, J'))
         self.assertEqual("ell", search_engine.wash_pattern('ell*'))
 
-    def test_wash_dates(self):
-        """search engine - washing of date arguments"""
-        self.assertEqual(search_engine.wash_dates(1980, 1, 28, 2003, 2, 2),
-                         ('1980-01-28', '2003-02-02'))                         
-        self.assertEqual(search_engine.wash_dates(1980, 0, 28, 2003, 2, 0),
-                         ('1980-01-28', '2003-02-31'))                         
+    def test_wash_dates_from_tuples(self):
+        """search engine - washing of date arguments from (year,month,day) tuples"""
+        self.assertEqual(search_engine.wash_dates("", 1980, 1, 28, "", 2003, 2, 2),
+                         ('1980-01-28 00:00:00', '2003-02-02 00:00:00'))
+        self.assertEqual(search_engine.wash_dates("", 1980, 0, 28, "", 2003, 2, 0),
+                         ('1980-01-28 00:00:00', '2003-02-31 00:00:00'))
+
+    def test_wash_dates_from_datetexts(self):
+        """search engine - washing of date arguments from datetext strings"""
+        self.assertEqual(search_engine.wash_dates(d1="1980-01-28 01:02:03", d2="1980-01-29 12:34:56"),
+                         ('1980-01-28 01:02:03', '1980-01-29 12:34:56'))
+        self.assertEqual(search_engine.wash_dates(d1="1980-01-28 01:02:03"),
+                         ('1980-01-28 01:02:03', '9999-01-01 00:00:00'))
+        self.assertEqual(search_engine.wash_dates(d2="1980-01-29 12:34:56"),
+                         ('0000-01-01 00:00:00', '1980-01-29 12:34:56'))
 
 class TestStripAccents(unittest.TestCase):
     """Test for handling of UTF-8 accents."""
@@ -112,18 +121,18 @@ class TestQueryParser(unittest.TestCase):
         "search engine - parsing exact phrase"
         self._check('"the word"', 'title', None,
                     [['+', 'the word', 'title', 'a']])
-        
+
     def test_parsing_exact_phrase_query_unbalanced(self):
         "search engine - parsing unbalanced exact phrase"
         self._check('"the word', 'title', None,
                     [['+', '"the', 'title', 'w'],
                      ['+', 'word', 'title', 'w']])
-        
+
     def test_parsing_exact_phrase_query_in_any_field(self):
         "search engine - parsing exact phrase in any field"
         self._check('"the word"', '', None,
                     [['+', 'the word', 'anyfield', 'a']])
-        
+
     def test_parsing_partial_phrase_query(self):
         "search engine - parsing partial phrase"
         self._check("'the word'", 'title', None,
@@ -139,12 +148,12 @@ class TestQueryParser(unittest.TestCase):
         self._check("'the word'", '', None,
                     [['+', "'the", '', 'w'],
                      ['+', "word'", '', 'w']])
-            
+
     def test_parsing_regexp_query(self):
         "search engine - parsing regex matches"
         self._check("/the word/", 'title', None,
                     [['+', 'the word', 'title', 'r']])
-        
+
     def test_parsing_regexp_query_unbalanced(self):
         "search engine - parsing unbalanced regexp"
         self._check("/the word", 'title', None,
@@ -156,7 +165,7 @@ class TestQueryParser(unittest.TestCase):
         self._check("/the word/", '', None,
                     [['+', "/the", '', 'w'],
                      ['+', "word/", '', 'w']])
-        
+
     def test_parsing_boolean_query(self):
         "search engine - parsing boolean query with several words"
         self._check("muon kaon ellis cern", '', None,
@@ -164,7 +173,7 @@ class TestQueryParser(unittest.TestCase):
                      ['+', 'kaon', '', 'w'],
                      ['+', 'ellis', '', 'w'],
                      ['+', 'cern', '', 'w']])
-        
+
     def test_parsing_boolean_query_with_word_operators(self):
         "search engine - parsing boolean query with word operators"
         self._check("muon and kaon or ellis not cern", '', None,
@@ -172,7 +181,7 @@ class TestQueryParser(unittest.TestCase):
                      ['+', 'kaon', '', 'w'],
                      ['|', 'ellis', '', 'w'],
                      ['-', 'cern', '', 'w']])
-        
+
     def test_parsing_boolean_query_with_symbol_operators(self):
         "search engine - parsing boolean query with symbol operators"
         self._check("muon +kaon |ellis -cern", '', None,
@@ -180,7 +189,7 @@ class TestQueryParser(unittest.TestCase):
                      ['+', 'kaon', '', 'w'],
                      ['|', 'ellis', '', 'w'],
                      ['-', 'cern', '', 'w']])
-        
+
     def test_parsing_boolean_query_with_symbol_operators_and_spaces(self):
         "search engine - parsing boolean query with operators and spaces"
         self._check("muon + kaon | ellis - cern", '', None,
@@ -188,30 +197,30 @@ class TestQueryParser(unittest.TestCase):
                      ['+', 'kaon', '', 'w'],
                      ['|', 'ellis', '', 'w'],
                      ['-', 'cern', '', 'w']])
-        
+
     def test_parsing_boolean_query_with_symbol_operators_and_no_spaces(self):
         "search engine - parsing boolean query with operators and no spaces"
         self._check("muon+kaon|ellis-cern", '', None,
                     [['+', 'muon+kaon|ellis-cern', '', 'w']])
-        
+
     def test_parsing_combined_structured_query(self):
         "search engine - parsing combined structured query"
         self._check("title:muon author:ellis", '', None,
                     [['+', 'muon', 'title', 'w'],
                      ['+', 'ellis', 'author', 'w']])
-        
+
     def test_parsing_structured_regexp_query(self):
         "search engine - parsing structured regexp query"
         self._check("title:/(one|two)/", '', None,
                     [['+', '(one|two)', 'title', 'r']])
-        
+
     def test_parsing_combined_structured_query_in_a_field(self):
         "search engine - parsing structured query in a field"
         self._check("title:muon author:ellis", 'abstract', None,
                     [['+', 'muon', 'title', 'w'],
                      ['+', 'ellis', 'author', 'w']])
-        
-        
+
+
 def create_test_suite():
     """Return test suite for the search engine."""
     return unittest.TestSuite((unittest.makeSuite(TestWashQueryParameters,
