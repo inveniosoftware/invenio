@@ -22,7 +22,6 @@
 __revision__ = "$Id$"
 
 import cPickle
-import string
 import os
 import re
 import urllib
@@ -45,7 +44,7 @@ from invenio.config import \
 
 from invenio.oai_repository_config import *
 from invenio.dbquery import run_sql
-from invenio.search_engine import record_exists
+from invenio.search_engine import record_exists, perform_request_search
 from invenio.bibformat_dblayer import get_preformatted_record
 from invenio.bibformat import format_record
 
@@ -73,29 +72,29 @@ def encode_for_xml(strxml):
     if strxml is None:
         return strxml
     else:
-        strxml = string.replace(strxml, '&', '&amp;')
-        strxml = string.replace(strxml, '<', '&lt;')
+        strxml = strxml.replace('&', '&amp;')
+        strxml = strxml.replace('<', '&lt;')
         return strxml
 
 def escape_space(strxml):
     "Encode special chars in string for URL-compliancy."
 
-    strxml = string.replace(strxml, ' ', '%20')
+    strxml = strxml.replace(' ', '%20')
     return strxml
 
 def encode_for_url(strxml):
     "Encode special chars in string for URL-compliancy."
 
-    strxml = string.replace(strxml, '%', '%25')
-    strxml = string.replace(strxml, ' ', '%20')
-    strxml = string.replace(strxml, '?', '%3F')
-    strxml = string.replace(strxml, '#', '%23')
-    strxml = string.replace(strxml, '=', '%3D')
-    strxml = string.replace(strxml, '&', '%26')
-    strxml = string.replace(strxml, '/', '%2F')
-    strxml = string.replace(strxml, ':', '%3A')
-    strxml = string.replace(strxml, ';', '%3B')
-    strxml = string.replace(strxml, '+', '%2B')
+    strxml = strxml.replace('%', '%25')
+    strxml = strxml.replace(' ', '%20')
+    strxml = strxml.replace('?', '%3F')
+    strxml = strxml.replace('#', '%23')
+    strxml = strxml.replace('=', '%3D')
+    strxml = strxml.replace('&', '%26')
+    strxml = strxml.replace('/', '%2F')
+    strxml = strxml.replace(':', '%3A')
+    strxml = strxml.replace(';', '%3B')
+    strxml = strxml.replace('+', '%2B')
 
     return strxml
 
@@ -197,7 +196,7 @@ def utc_to_localtime(date):
     # 1: Build a time as UTC. Since time.mktime() expect a local time :
     ## 1a: build it without knownledge of dst
     ## 1b: substract timezone to get a local time, with possibly wrong dst
-    utc_time = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0,0,-1))
+    utc_time = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, -1))
     local_time = utc_time - time.timezone
 
     # 2: Fix dst for local_time
@@ -234,19 +233,11 @@ def localtime_to_utc(date):
         dst = 0
 
     # 3: Build a new time with knowledge of the dst
-    local_time = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0,0, dst))
+    local_time = time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, dst))
     # 4: Get the time as UTC
     utc_time = time.gmtime(local_time)
 
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", utc_time)
-
-def get_creation_date(sysno):
-    "Returns the creation date of the record 'sysno'."
-    out   = ""
-    res = run_sql("SELECT DATE_FORMAT(creation_date, '%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (sysno,), 1)
-    if res[0][0]:
-        out = localtime_to_utc(res[0][0])
-    return out
 
 def get_modification_date(sysno):
     "Returns the date of last modification for the record 'sysno'."
@@ -260,6 +251,14 @@ def get_earliest_datestamp():
     "Get earliest datestamp in the database"
     out = ""
     res = run_sql("SELECT MIN(DATE_FORMAT(creation_date,'%%Y-%%m-%%d %%H:%%i:%%s')) FROM bibrec", (), 1)
+    if res[0][0]:
+        out = localtime_to_utc(res[0][0])
+    return out
+
+def get_latest_datestamp():
+    "Get latest datestamp in the database"
+    out = ""
+    res = run_sql("SELECT MAX(DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s')) FROM bibrec", (), 1)
     if res[0][0]:
         out = localtime_to_utc(res[0][0])
     return out
@@ -285,7 +284,7 @@ def normalize_date(date, dtime="T00:00:00Z"):
     if len(date) == 10:
         date = date + dtime
     elif len(date) != 20:
-         date = ""
+        date = ""
 
     return date
 
@@ -424,42 +423,6 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
 
         elif format == "xd":
             out += format_record(sysno, 'xoaidc')
-##            out = re.sub('<\?xml[^>\?]*\?>', '', out, 1)
-##         # XML Dublin Core format, possibly OAI -- select only some bibXXx fields:
-##             out = out + "       <oaidc:dc xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:oaidc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">\n"
-
-##             for field_ in get_field(sysno, "041__a"):
-##                 out =  "%s         <dc:language>%s</dc:language>\n" % (out, field_)
-
-##             for field_ in get_field(sysno, "100__a"):
-##                 out =  "%s         <dc:creator>%s</dc:creator>\n" % (out, encode_for_xml(field_))
-
-##             # Generate additional authors in reverse order, to get correct order
-##             authors = ""
-##             for field_ in get_field(sysno, "700__a"):
-##                 authors =  "         <dc:creator>%s</dc:creator>\n%s" % (encode_for_xml(field_),
-##                                                                          authors)
-##             out += authors
-
-##             for field_ in get_field(sysno, "245__a"):
-##                 out =  "%s         <dc:title>%s</dc:title>\n" % (out, encode_for_xml(field_))
-
-##             for field_ in get_field(sysno, "111__a"):
-##                 out =  "%s         <dc:title>%s</dc:title>\n" % (out, encode_for_xml(field_))
-
-##             for field_ in get_field(sysno, "65017a"):
-##                 out =  "%s         <dc:subject>%s</dc:subject>\n" % (out, encode_for_xml(field_))
-
-##             for field_ in get_field(sysno, "8564_u"):
-##                 out =  "%s         <dc:identifier>%s</dc:identifier>\n" % (out, encode_for_xml(escape_space(field_)))
-
-##             for field_ in get_field(sysno, "520__a"):
-##                 out = "%s         <dc:description>%s</dc:description>\n" % (out, encode_for_xml(field_))
-
-##             date = get_creation_date(sysno)
-
-##             out = "%s         <dc:date>%s</dc:date>\n" % (out, date)
-##             out = out + "    </oaidc:dc>\n"
 
     # print record closing tags:
 
@@ -613,17 +576,12 @@ def oaigetrecord(args):
     _record_exists = record_exists(sysno)
     if _record_exists == 1 or \
            (_record_exists == -1 and CFG_OAI_DELETED_POLICY != 'no'):
-        datestamp = get_modification_date(sysno)
-        out += print_record(sysno, arg['metadataPrefix'], _record_exists)
+        out = print_record(sysno, arg['metadataPrefix'], _record_exists)
+        out = oai_header(args, "GetRecord") + out + oai_footer("GetRecord")
     else:
-        out = out + oai_error("idDoesNotExist", "invalid record Identifier")
+        out = oai_error("idDoesNotExist", "invalid record Identifier")
         out = oai_error_header(args, "GetRecord") + out + oai_error_footer("GetRecord")
     return out
-
-    out = oai_header(args, "GetRecord") + out + oai_footer("GetRecord")
-
-    return out
-
 
 def oailistidentifiers(args):
     "Prints OAI response to the ListIdentifiers verb."
@@ -760,28 +718,26 @@ def oaigetsysno(identifier):
     return sysno
 
 
-def oaigetsysnolist(set, fromdate, untildate):
-    "Returns list of system numbers for the OAI set 'set', modified from 'date_from' until 'date_until'."
+def oaigetsysnolist(set="", fromdate="", untildate=""):
+    "Returns list of system numbers for the OAI set 'set', modified from 'fromdate' until 'untildate'."
 
-    out_dict = {} # dict to hold list of out sysnos as its keys
-
-    # TODO: Use search engine instead of SQL.
-    if set:
-        query = "SELECT DISTINCT bibx.id_bibrec FROM bib%sx AS bx, bibrec_bib%sx AS bib2x, bib%sx as b2x LEFT JOIN bibrec_bib%sx AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s' AND bx.value='%s' AND bib2x.id_bibrec = bibx.id_bibrec AND bib2x.id_bibxxx = b2x.id AND b2x.tag = '%s'" % (CFG_OAI_SET_FIELD[0:2], CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2], CFG_OAI_SET_FIELD[0:2], CFG_OAI_SET_FIELD, set, CFG_OAI_ID_FIELD)
+    if fromdate != "":
+        fromdate = normalize_date(fromdate, "T00:00:00Z")
     else:
-        query = "SELECT DISTINCT bibx.id_bibrec FROM bib%sx AS bx LEFT JOIN bibrec_bib%sx AS bibx ON bx.id=bibx.id_bibxxx LEFT JOIN bibrec AS b ON b.id=bibx.id_bibrec WHERE bx.tag='%s'" % (CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD)
+        fromdate = get_earliest_datestamp()
 
-    if untildate:
-        query = query + " AND b.modification_date <= '%s'" % utc_to_localtime(untildate)
-    if fromdate:
-        query = query + " AND b.modification_date >= '%s'" % utc_to_localtime(fromdate)
+    if untildate != "":
+        untildate = normalize_date(untildate, "T23:59:59Z")
+    else:
+        untildate = get_latest_datestamp()
 
-    res = run_sql(query)
-
-    for row in res:
-        out_dict[row[0]] = 1
-
-    return out_dict.keys()
+    recids = perform_request_search(f1=CFG_OAI_ID_FIELD, p1="oai:*", m1="e", op1='a',
+                                    f2=((set and CFG_OAI_SET_FIELD) or ""), p2=set, m2="e",
+                                    d1=utc_to_localtime(fromdate),
+                                    d2=utc_to_localtime(untildate),
+                                    dt='m',
+                                    ap=0)
+    return recids
 
 def oaigenresumptionToken():
     "Generates unique ID for resumption token management."
@@ -894,12 +850,6 @@ def parse_args(args=""):
                     out_args[keyvalue[0]] = urllib.unquote(keyvalue[1])
             else:
                 out_args['verb'] = ""
-
-    if out_args.has_key('from'):
-        out_args['from'] = normalize_date(out_args['from'], "T00:00:00Z")
-
-    if out_args.has_key('until'):
-        out_args['until'] = normalize_date(out_args['until'], "T23:59:59Z")
 
     return out_args
 
