@@ -17,12 +17,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-noinst_SCRIPTS=configbis.wml
-wmlincludedir = $(libdir)/wml/invenio
-wmlinclude_DATA = cdsnavbar.wml cdsnavtrail.wml cdspage.wml config.wml configbis.wml \
-                  cdswmllib.wml
+noinst_SCRIPTS = configbis.wml
 
-EXTRA_DIST = cdsnavbar.wml cdsnavtrail.wml cdspage.wml config.wml configbis.wml.in \
-             cdswmllib.wml
+wmlincludedir = $(libdir)/wml/invenio
+
+wmlinclude_DATA = config.wml configbis.wml
+
+EXTRA_DIST = config.wml configbis.wml.in
 
 CLEANFILES = *~

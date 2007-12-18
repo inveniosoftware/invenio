@@ -47,7 +47,6 @@
 ## return to the main CDS Invenio source directory and type 'make'.  Good luck! :-)
 
 ## Before starting, let's include helper functions:
-#include "cdswmllib.wml"
 #include "configbis.wml"
 
 ###################################

@@ -15,11 +15,34 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+## define WML languages:
+#use wml::std::lang
+<lang:new id=bg short>
+<lang:new id=ca short>
+<lang:new id=de short>
+<lang:new id=en short>
+<lang:new id=es short>
+<lang:new id=pt short>
+<lang:new id=fr short>
+<lang:new id=hr>
+<lang:new id=it short>
+<lang:new id=ja short>
+<lang:new id=ru short>
+<lang:new id=sk short>
+<lang:new id=cs short>
+<lang:new id=no short>
+<lang:new id=sv short>
+<lang:new id=el short>
+<lang:new id=uk short>
+<lang:new id=pl short>
+<lang:new id=zh_CN short>
+<lang:new id=zh_TW short>
 
 ## read autoconf parameters and define new WML tags out of them:
 <define-tag VERSION whitespace=delete>
