@@ -21,4 +21,4 @@ bin_SCRIPTS = elmsubmit
 
 EXTRA_DIST = elmsubmit.in
 
-CLEANFILES = *~ *.tmp index.wml
+CLEANFILES = *~ *.tmp
