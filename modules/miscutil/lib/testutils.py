@@ -30,7 +30,8 @@ __revision__ = "$Id$"
 #   $ regressiontestsuite > /tmp/z.log
 # or even:
 #   $ regressiontestsuite > /tmp/z.log 2> /tmp/z.err
-cfg_testutils_verbose = 1
+
+CFG_TESTUTILS_VERBOSE = 1
 
 import string
 import sys
@@ -212,7 +213,7 @@ def test_web_page_content(url,
             expected_link_labels = chain(expected_link_labels, repeat(None))
             expected_link_targets = chain(expected_link_targets, repeat(None))
             # then test
-            for i in range(0, max_links):
+            for dummy in range(0, max_links):
                 cur_expected_link_target = expected_link_targets.next()
                 cur_expected_link_label = expected_link_labels.next()
                 try:
@@ -241,7 +242,7 @@ def test_web_page_content(url,
     # logout after tests:
     browser.open(sweburl + "/youraccount/logout")
 
-    if cfg_testutils_verbose >= 9:
+    if CFG_TESTUTILS_VERBOSE >= 9:
         print "%s test_web_page_content(), tested page `%s', login `%s', expected text `%s', errors `%s'." % \
               (time.strftime("%Y-%m-%d %H:%M:%S -->", time.localtime()),
                url, username, expected_text,
