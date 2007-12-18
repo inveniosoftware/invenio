@@ -45,22 +45,14 @@ EXTRA_DIST = bibrankgkb.cfg.in \
              stopwords.de.kb \
              stopwords.el.kb \
              stopwords.kb \
-             citation.cfg \
              template_citation.cfg \
              template_combine_method.cfg \
              template_download_similarity.cfg \
              template_download_total.cfg \
              template_download_users.cfg \
              template_single_tag_rank_method.cfg.in \
-             template_word_similarity.cfg.wml \
-             wrd.cfg.wml 
+             template_word_similarity.cfg \
+             wrd.cfg \
+             citation.cfg
 
-CLEANFILES = template_word_similarity.cfg wrd.cfg *.tmp
-
-wrd.cfg: wrd.cfg.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
-	$(WML) -o $@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
-
-template_word_similarity.cfg: template_word_similarity.cfg.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
-	$(WML) -o $@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
+CLEANFILES = *~ *.tmp
