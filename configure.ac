@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.93.50.20071206, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20071206)
+AC_INIT(cds-invenio, 0.93.50.20071218, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20071218)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -563,6 +563,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/miscutil/bin/testsuite \
 	  modules/miscutil/bin/regressiontestsuite \
 	  modules/miscutil/lib/Makefile \
+	  modules/miscutil/lib/dbquery.py \
 	  modules/miscutil/demo/Makefile \
 	  modules/miscutil/sql/Makefile \
 	  modules/miscutil/web/Makefile \

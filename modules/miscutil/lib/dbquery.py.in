@@ -27,8 +27,6 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-#include "configbis.wml"
-
 """CDS Invenio utility to run SQL queries."""
 
 __revision__ = "$Id$"
@@ -64,10 +62,10 @@ else:
 ## Configured MySQL credentials are read here and not in config.py in
 ## order to prevent them from appearing elsewhere, as no-one should
 ## know DB credentials but us.
-dbhost = "<DBHOST>"
-dbname = "<DBNAME>"
-dbuser = "<DBUSER>"
-dbpass = "<DBPASS>"
+dbhost = "@DBHOST@"
+dbname = "@DBNAME@"
+dbuser = "@DBUSER@"
+dbpass = "@DBPASS@"
 
 _DB_CONN = {}
 

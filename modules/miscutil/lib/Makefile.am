@@ -18,6 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 pylibdir = $(libdir)/python/invenio
+
 pylib_DATA = __init__.py \
              errorlib.py \
              errorlib_tests.py \
@@ -52,11 +53,11 @@ EXTRA_DIST = __init__.py \
              errorlib_regression_tests.py \
              config.py.wml \
              data_cacher.py \
-             dbquery.py.wml \
+             dbquery.py.in \
              dbquery_tests.py \
              mailutils.py \
              miscutil_config.py \
-             messages.py.wml \
+             messages.py \
              textutils.py \
              dateutils.py \
              dateutils_tests.py \
@@ -85,19 +86,10 @@ install-data-hook:
 	$(PYTHON) $(srcdir)/testimport.py ${prefix}
 	$(PYTHON) $(srcdir)/intbitset_setup.py install
 
-CLEANFILES = config.py dbquery.py messages.py *~ *.tmp *.pyc
+CLEANFILES = config.py *~ *.tmp *.pyc
 
 clean-local:
 	rm -rf build
 
-config.py: config.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-      $(top_srcdir)/config/cdswmllib.wml
-	$(WML) -o $@ $<
-
-dbquery.py: dbquery.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-      $(top_srcdir)/config/cdswmllib.wml
-	$(WML) -o $@ $<
-
-messages.py: messages.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml \
-      $(top_srcdir)/config/cdswmllib.wml
+config.py: config.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
 	$(WML) -o $@ $<

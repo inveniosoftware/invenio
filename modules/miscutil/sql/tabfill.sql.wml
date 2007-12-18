@@ -49,10 +49,10 @@ INSERT INTO collection VALUES (1,"<CDSNAME>",NULL,NULL,NULL,NULL);
 INSERT INTO user VALUES (1, "<ADMINEMAIL>", AES_ENCRYPT(email, ''), 1, NULL, 'admin', '');
 INSERT INTO flxLINKTYPES VALUES ('AUTHOR_SEARCH','N','EXT','','');
 INSERT INTO flxLINKTYPES VALUES ('KEYWORD_SEARCH','N','EXT','','');
-INSERT INTO flxLINKTYPECONDITIONS VALUES ('AUTHOR_SEARCH',0,' \"\"=\"\"	','\"<WEBURL>/search?f=author&p=\" urlencode($author)','EXT','','');
-INSERT INTO flxLINKTYPECONDITIONS VALUES ('KEYWORD_SEARCH',0,' \"\"=\"\"	','\"<WEBURL>/search?f=keyword&p=\" urlencode($keyword)','EXT','','');
-INSERT INTO flxLINKTYPECONDITIONSACTIONS VALUES ('AUTHOR_SEARCH',0,0,'\"<WEBURL>/search?f=author&p=\" urlencode($author)');
-INSERT INTO flxLINKTYPECONDITIONSACTIONS VALUES ('KEYWORD_SEARCH',0,0,'\"<WEBURL>/search?f=keyword&p=\" urlencode($keyword)');
+INSERT INTO flxLINKTYPECONDITIONS VALUES ('AUTHOR_SEARCH',0,' \"\"=\"\"	','\"/search?f=author&p=\" urlencode($author)','EXT','','');
+INSERT INTO flxLINKTYPECONDITIONS VALUES ('KEYWORD_SEARCH',0,' \"\"=\"\"	','\"/search?f=keyword&p=\" urlencode($keyword)','EXT','','');
+INSERT INTO flxLINKTYPECONDITIONSACTIONS VALUES ('AUTHOR_SEARCH',0,0,'\"/search?f=author&p=\" urlencode($author)');
+INSERT INTO flxLINKTYPECONDITIONSACTIONS VALUES ('KEYWORD_SEARCH',0,0,'\"/search?f=keyword&p=\" urlencode($keyword)');
 INSERT INTO flxLINKTYPEPARAMS VALUES ('AUTHOR_SEARCH','AUTHOR',0);
 INSERT INTO flxLINKTYPEPARAMS VALUES ('KEYWORD_SEARCH','KEYWORD',0);
 
