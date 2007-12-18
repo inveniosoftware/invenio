@@ -17,15 +17,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-FILESWML=$(wildcard $(srcdir)/*.wml)
+etcdir = $(sysconfdir)/webstat
 
-etcdir=$(sysconfdir)/webstat
-etc_DATA=$(FILESWML:$(srcdir)/%.wml=%)
+etc_DATA = webstat.cfg
 
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%)
+EXTRA_DIST = $(etc_DATA)
 
-CLEANFILES = $(wildcard *.cfg) *~ *.tmp
-
-%.cfg: %.cfg.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml $(top_srcdir)/config/cdspage.wml
-	$(WML) -o $@ $<
-	$(PYTHON) $(top_srcdir)/po/i18n_update_wml_target.py en $@
+CLEANFILES = *~ *.tmp
