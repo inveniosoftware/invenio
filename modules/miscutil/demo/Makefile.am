@@ -17,17 +17,13 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-noinst_DATA=democfgdata.sql
+noinst_DATA = democfgdata.sql
 
 tmpdir = $(prefix)/var/tmp
 tmp_DATA = demobibdata.xml \
            demo-site-apache-user-passwords \
            demo-site-apache-user-groups 
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) $(tmp_DATA)
+EXTRA_DIST = $(noinst_DATA) $(tmp_DATA)
 
-CLEANFILES = $(noinst_DATA) *~ *.tmp democfgdata.sql 
-
-%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+CLEANFILES = *~ *.tmp

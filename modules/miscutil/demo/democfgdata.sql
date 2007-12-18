@@ -1,6 +1,3 @@
-#include "config.wml"
-#include "configbis.wml"
-
 INSERT INTO accROLE VALUES (4,'thesesviewer','theses viewer',NULL,'allow group "Theses viewers"\nallow apache_group "theses"');
 INSERT INTO accARGUMENT VALUES (2,'collection','Theses');
 INSERT INTO accARGUMENT VALUES (3, 'status', 'restrdoc');
@@ -655,20 +652,20 @@ INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) 
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,70,'zh_TW','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,71,'zh_TW','rt',90);
 
-INSERT INTO example VALUES (1,'author search','Search for <span class=example>Ellis, J</span> within <span class=example>author</span> field.');
-INSERT INTO example VALUES (2,'word search','Search for <span class=example>quantum</span> within <span class=example>any</span> field.');
-INSERT INTO example VALUES (3,'wildcard word search','Search for <span class=example>quant*</span> within <span class=example>any</span> field.');
-INSERT INTO example VALUES (4,'phrase search','Search for <span class=example>\'standard model\'</span> within <span class=example>title</span> field.');
-INSERT INTO example VALUES (5,'boolean search','Search for <span class=example>quark -sigma +dense</span> within <span class=example>any</span> field.');
-INSERT INTO example VALUES (6,'complex boolean search','Search for <span class=example>author:draper title:electrical</span> within <span class=example>any</span> field.');
-INSERT INTO example VALUES (7,'complex boolean search','Search for <span class=example>author:ellis -muon* +abstract:\'dense quark matter\'</span> within <span class=example>any</span> field.');
-INSERT INTO example VALUES (8,'boolean search','Search for <span class=example>ellis muon*</span> within <span class=example>any</span> field.');
+INSERT INTO example VALUES (1,'author search','Search for <span class="example">Ellis, J</span> within <span class="example">author</span> field.');
+INSERT INTO example VALUES (2,'word search','Search for <span class="example">quantum</span> within <span class="example">any</span> field.');
+INSERT INTO example VALUES (3,'wildcard word search','Search for <span class="example">quant*</span> within <span class="example">any</span> field.');
+INSERT INTO example VALUES (4,'phrase search','Search for <span class="example">\'standard model\'</span> within <span class="example">title</span> field.');
+INSERT INTO example VALUES (5,'boolean search','Search for <span class="example">quark -sigma +dense</span> within <span class="example">any</span> field.');
+INSERT INTO example VALUES (6,'complex boolean search','Search for <span class="example">author:draper title:electrical</span> within <span class="example">any</span> field.');
+INSERT INTO example VALUES (7,'complex boolean search','Search for <span class="example">author:ellis -muon* +abstract:\'dense quark matter\'</span> within <span class="example">any</span> field.');
+INSERT INTO example VALUES (8,'boolean search','Search for <span class="example">ellis muon*</span> within <span class="example">any</span> field.');
 INSERT INTO example VALUES (13,'reference search','Search for <span class=\"example\">Theor. Math. Phys. 2 (1998) 231</span> within <span class=\"example\">references</span> field.');
 INSERT INTO example VALUES (14,'phrase search','Search for <span class=\"example\">Higgs boson</span> within <span class=\"example\">abstract</span> field.');
-INSERT INTO example VALUES (15,'wildcard word search','Search for <span class=example>cal*</span> within <span class=example>any</span> field.');
-INSERT INTO example VALUES (16,'keyword search','Search for <span class=example>Nobel</span> within <span class=example>keyword</span> field.');
-INSERT INTO example VALUES (17,'author search','Search for <span class=example>Cole</span> within <span class=example>author</span> field.');
-INSERT INTO example VALUES (18,'phrase search','Search for <span class=example>\'nuclear electronics\'</span> within <span class=example>title</span> field.');
+INSERT INTO example VALUES (15,'wildcard word search','Search for <span class="example">cal*</span> within <span class="example">any</span> field.');
+INSERT INTO example VALUES (16,'keyword search','Search for <span class="example">Nobel</span> within <span class="example">keyword</span> field.');
+INSERT INTO example VALUES (17,'author search','Search for <span class="example">Cole</span> within <span class="example">author</span> field.');
+INSERT INTO example VALUES (18,'phrase search','Search for <span class="example">\'nuclear electronics\'</span> within <span class="example">title</span> field.');
 
 INSERT INTO fieldvalue VALUES (1,'Particle Physics','Particle Physics');
 INSERT INTO fieldvalue VALUES (2,'Particle Physics - Experimental Results','Particle Physics - Experimental Results');
@@ -750,15 +747,15 @@ INSERT INTO portalbox VALUES (41,'ОБ ЭТОМ САЙТЕ','Добро пожа
 INSERT INTO portalbox VALUES (42,'СМОТРИТЕ ТАКЖЕ','<a href=\"http://cdsware.cern.ch/\">CDS Invenio</a><br //><a href=\"http://www.cern.ch/\">CERN</a><br //><a href=\"http://google.com/\">Google</a>');
 INSERT INTO portalbox VALUES (43,'OM DENNA WEBBPLATS','Välkommen till demoinstallationen av CDS Invenio, en fri programvara för hantering av dokument, från CERN. Välkommen att undersöka alla funktioner i denna installation.');
 INSERT INTO portalbox VALUES (44,'SE ÄVEN','<a href=\"http://cdsware.cern.ch/\">CDS Invenio</a><br //><a href=\"http://www.cern.ch/\">CERN</a><br //><a href=\"http://google.com/\">Google</a>');
-INSERT INTO portalbox VALUES (45,'SUBMIT PREPRINT','<a href=\"<WEBURL>/submit?doctype=TEXT\">Submit a new preprint</a>');
-INSERT INTO portalbox VALUES (46,'SUBMIT BOOK','<a href=\"<WEBURL>/submit?doctype=TEXT\">Submit a new book</a>');
-INSERT INTO portalbox VALUES (47,'SUBMIT THESIS','<a href=\"<WEBURL>/submit?doctype=TEXT\">Submit a new thesis</a>');
-INSERT INTO portalbox VALUES (48,'SUBMIT REPORT','<a href=\"<WEBURL>/submit?doctype=TEXT\">Submit a new report</a>');
-INSERT INTO portalbox VALUES (49,'SUBMIT ARTICLE','<a href=\"<WEBURL>/submit?doctype=TEXT\">Submit a new article</a>');
-INSERT INTO portalbox VALUES (50,'SUBMIT PICTURE','<a href=\"<WEBURL>/submit?doctype=DEMOPIC\">Submit a new picture</a>');
-INSERT INTO portalbox VALUES (51,'SUBMIT NEW DOCUMENT','<a href=\"<WEBURL>/submit?doctype=TEXT\">Submit a new article</a><br //><a href=\"<WEBURL>/submit?doctype=TEXT\">Submit a new preprint</a>');
-INSERT INTO portalbox VALUES (52,'SUBMIT NEW DOCUMENT','<a href=\"<WEBURL>/submit?doctype=TEXT\">Submit a new book</a><br //><a href=\"<WEBURL>/submit?doctype=TEXT\">Submit a new thesis</a><br //><a href=\"<WEBURL>/submit?doctype=TEXT\">Submit a new report</a>');
-INSERT INTO portalbox VALUES (53,'SUBMIT NEW DOCUMENT','<a href=\"<WEBURL>/submit?doctype=DEMOPIC\">Submit a new picture</a>');
+INSERT INTO portalbox VALUES (45,'SUBMIT PREPRINT','<a href=\"/submit?doctype=TEXT\">Submit a new preprint</a>');
+INSERT INTO portalbox VALUES (46,'SUBMIT BOOK','<a href=\"/submit?doctype=TEXT\">Submit a new book</a>');
+INSERT INTO portalbox VALUES (47,'SUBMIT THESIS','<a href=\"/submit?doctype=TEXT\">Submit a new thesis</a>');
+INSERT INTO portalbox VALUES (48,'SUBMIT REPORT','<a href=\"/submit?doctype=TEXT\">Submit a new report</a>');
+INSERT INTO portalbox VALUES (49,'SUBMIT ARTICLE','<a href=\"/submit?doctype=TEXT\">Submit a new article</a>');
+INSERT INTO portalbox VALUES (50,'SUBMIT PICTURE','<a href=\"/submit?doctype=DEMOPIC\">Submit a new picture</a>');
+INSERT INTO portalbox VALUES (51,'SUBMIT NEW DOCUMENT','<a href=\"/submit?doctype=TEXT\">Submit a new article</a><br //><a href=\"/submit?doctype=TEXT\">Submit a new preprint</a>');
+INSERT INTO portalbox VALUES (52,'SUBMIT NEW DOCUMENT','<a href=\"/submit?doctype=TEXT\">Submit a new book</a><br //><a href=\"/submit?doctype=TEXT\">Submit a new thesis</a><br //><a href=\"/submit?doctype=TEXT\">Submit a new report</a>');
+INSERT INTO portalbox VALUES (53,'SUBMIT NEW DOCUMENT','<a href=\"/submit?doctype=DEMOPIC\">Submit a new picture</a>');
 INSERT INTO portalbox VALUES (54,'ΣΧΕΤΙΚΑ ΜΕ ΤΗΝ ΣΕΛΙΔΑ','Καλως ήλθατε στον δικτυακό τόπο του CDS Invenio, ενός δωρεάν εξυπηρετητή για έγγραφα προερχόμενο απο το CERN. Είστε ευπρόσδεκτοι να εξερευνήσετε σε βάθος τις δυνατότητες που σας παρέχει ο δικτυακός αυτός τόπος.');
 INSERT INTO portalbox VALUES (55,'ΔΕΙΤΕ ΕΠΙΣΗΣ','<a href=\"http://cdsware.cern.ch/\">CDS Invenio</a><br //><a href=\"http://www.cern.ch/\">CERN</a><br //><a href=\"http://google.com/\">Google</a>');
 INSERT INTO portalbox VALUES (56,'ПРО ЦЕЙ САЙТ','Ласкаво просимо до демонстраційного сайту CDS Invenio, вільного програмного забезпечення, розробленого CERN. Випробуйте всі можливості цього демонстраційного сайту в повному обсязі.');
