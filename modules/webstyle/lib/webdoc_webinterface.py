@@ -31,28 +31,53 @@ from invenio.config import weburl, cdslang, cdsname, cdsnameintl
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid
-from invenio.webdoc import get_webdoc_parts
+from invenio.webdoc import get_webdoc_parts, get_webdoc_topics
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+from invenio.urlutils import redirect_to_url
 
 class WebInterfaceDocumentationPages(WebInterfaceDirectory):
     """Defines the set of documentation pages, usually installed under /help."""
 
-    def __init__(self, webdocname='help-central'):
+    def __init__(self, webdocname='', categ='help'):
         """Constructor."""
         self.webdocname = webdocname
+        self.categ = categ
 
     def _lookup(self, component, path):
         """This handler parses dynamic URLs (/help/component)."""
-        return WebInterfaceDocumentationPages(component), path
+        if component in ['admin', 'hacking'] and len(path) == 1:
+            if path[0] != '':
+                webdocname = path[0]   # /help/hacking/coding-style use
+                                       # coding-style.webdoc
+            elif component == 'admin':
+                webdocname = 'admin'   # /help/admin/ use admin.webdoc
+            else:
+                webdocname = 'hacking' # /help/hacking/ use
+                                       # hacking.webdoc
+            return WebInterfaceDocumentationPages(webdocname, component), []
+        elif len(path) == 0:
+            # Accept any other 'leaf' pages ('help' pages)
+            if component == '':
+                component = 'help-central'
+            return WebInterfaceDocumentationPages(component), []
+        else:
+            # This is a wrong url eg. /help/help-central/foo
+            return None, []
 
     def __call__(self, req, form):
         """Serve webdoc page in the given language."""
         argd = wash_urlargd(form, {'ln': (str, cdslang)})
-        return display_webdoc_page(self.webdocname, ln=argd['ln'], req=req)
+        if self.webdocname in ['admin', 'hacking', ''] and \
+               self.categ == 'help':
+            # Eg. /help/hacking -> /help/hacking/
+            #     /help         -> /help/
+            redirect_to_url(req, req.uri + "/")
+        else:
+            return display_webdoc_page(self.webdocname, categ=self.categ, ln=argd['ln'], req=req)
 
     index = __call__
 
-def display_webdoc_page(webdocname, ln=cdslang, req=None):
+def display_webdoc_page(webdocname, categ="help", ln=cdslang, req=None):
     """Display webdoc page WEBDOCNAME in language LN."""
 
     _ = gettext_set_language(ln)
@@ -64,10 +89,19 @@ def display_webdoc_page(webdocname, ln=cdslang, req=None):
         webdocname = 'help-central'
 
     # get page parts in given language:
-    page_parts = get_webdoc_parts(webdocname, parts=['title','body',
-                                                     'navtrail'],
-                                  ln=ln)
-
+    if webdocname != 'topics':
+        page_parts = get_webdoc_parts(webdocname, parts=['title','body',
+                                                         'navtrail'],
+                                      categ=categ,
+                                      ln=ln)
+    else:
+        page_parts = {'title': _("Help Pages Topics"),
+                      'body': '<strong>Last modifications</strong>' + \
+                              get_webdoc_topics(sort_by='date', sc=0, limit=5) + \
+                              '<br/>' + \
+                              get_webdoc_topics(sort_by='name', sc=1),
+                      'navtrail': ''
+                      }
     # set page title:
     page_title = page_parts.get('title', '')
     if not page_title:
@@ -91,7 +125,9 @@ def display_webdoc_page(webdocname, ln=cdslang, req=None):
     page_description = "FIXME: description"
     page_keywords = "FIXME: keywords"
     page_last_updated = "FIXME: last updated"
-    page_navmenuid = "FIXME: navmenuid"
+
+    if categ == 'hacking':
+        categ = 'help'
 
     # display page:
     return page(title=page_title,
@@ -103,4 +139,4 @@ def display_webdoc_page(webdocname, ln=cdslang, req=None):
                 language=ln,
                 req=req,
                 lastupdated=page_last_updated,
-                navmenuid=page_navmenuid)
+                navmenuid=categ)

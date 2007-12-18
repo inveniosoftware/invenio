@@ -49,12 +49,12 @@ import sys
 import time
 
 # List of (webdoc_source_dir, webdoc_cache_dir)
-webdoc_dirs = [('%s/lib/webdoc/help' % CFG_PREFIX, \
-                '%s/webdoc/help-pages' % cachedir),
-               ('%s/lib/webdoc/admin' % CFG_PREFIX, \
-                '%s/webdoc/admin-pages' % cachedir),
-               ('%s/lib/webdoc/hacking' % CFG_PREFIX, \
-                '%s/webdoc/hacking-pages' % cachedir)]
+webdoc_dirs = {'help':('%s/lib/webdoc/help' % CFG_PREFIX, \
+                       '%s/webdoc/help-pages' % cachedir),
+               'admin':('%s/lib/webdoc/admin' % CFG_PREFIX, \
+                        '%s/webdoc/admin-pages' % cachedir),
+               'hacking':('%s/lib/webdoc/hacking' % CFG_PREFIX, \
+                          '%s/webdoc/hacking-pages' % cachedir)}
 
 # Regular expression for finding text to be translated
 translation_pattern = re.compile(r'_\((?P<word>.*?)\)_', \
@@ -86,8 +86,6 @@ pattern_tag = r'''
 # List of available tags in wml, and the pattern to find it
 pattern_tags = {'WebDoc-Page-Title': '',
                 'WebDoc-Page-Navtrail': '',
-                'WebDoc-Page-Navbar-Name': '',
-                'WebDoc-Page-Navbar-Select': '',
                 'WebDoc-Page-Description': '',
                 'WebDoc-Page-Keywords': '',
                 'WebDoc-Page-Header-Add': '',
@@ -137,8 +135,9 @@ def get_webdoc_parts(webdoc,
                      parts=['title', \
                             'keywords', \
                             'navtrail', \
-                            'body',\
-                            'navbar-name'],
+                            'body',
+                            'lastupdated'],
+                     categ="",
                      update_cache_mode=1,
                      ln=cdslang,
                      verbose=0):
@@ -156,8 +155,11 @@ def get_webdoc_parts(webdoc,
 
                    parts - *list(string)* the parts that should be
                             returned by this function. Can be in:
-                            'title', 'keywords', 'navbar-name',
-                            'navtrail', 'body'
+                            'title', 'keywords', 'navtrail', 'body'.
+
+                   categ - *string* (optional) The category to which
+                            the webdoc file belongs. 'help', 'admin'
+                            or 'hacking'. If "", look in all categories.
 
        update_cache_mode - *int* update the cached version of the
                             given 'webdoc':
@@ -180,7 +182,12 @@ def get_webdoc_parts(webdoc,
                ln + '.html'
 
     for part in parts:
-        for (_webdoc_source_dir, _web_doc_cache_dir) in webdoc_dirs:
+        if categ != "":
+            locations = [webdoc_dirs.get(categ, ('',''))]
+        else:
+            locations = webdoc_dirs.values()
+
+        for (_webdoc_source_dir, _web_doc_cache_dir) in locations:
             webdoc_cached_part_path = None
             if os.path.exists(get_webdoc_cached_part_path(webdoc, ln, part)):
                 # Check given language
@@ -233,8 +240,7 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=cdslangs):
 
         if webdoc_source is not None:
             htmls = transform(webdoc_source, languages=languages)
-            for (lang, body, title, keywords, navbar_name, \
-                 navtrail) in htmls:
+            for (lang, body, title, keywords, navtrail, lastupdated) in htmls:
                 # Body
                 if body is not None:
                     try:
@@ -291,21 +297,21 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=cdslangs):
                     except OSError, e:
                         print e
 
-                # Navbar name
-                if navbar_name is not None:
+                # Last updated timestamp (CVS timestamp)
+                if lastupdated is not None:
                     try:
-                        write_cache_file('%(name)s.navbar-name%(lang)s.html' % \
+                        write_cache_file('%(name)s.lastupdated%(lang)s.html' % \
                                          {'name': webdoc_name,
                                           'lang': '-'+lang},
                                          webdoc_cache_dir,
-                                         navbar_name,
+                                         lastupdated,
                                          verbose)
                     except IOError, e:
                         print e
                     except OSError, e:
                         print e
 
-                # Last updated file
+                # Last updated cache file
                 try:
                     write_cache_file('last_updated',
                                      webdoc_cache_dir,
@@ -380,7 +386,7 @@ def get_webdoc_info(webdoc):
         (webdoc_name, extension) = os.path.splitext(webdoc_name)
         webdoc_source_modification_date = os.stat(webdoc_source_path).st_mtime
     else:
-        for (_webdoc_source_dir, _web_doc_cache_dir) in webdoc_dirs:
+        for (_webdoc_source_dir, _web_doc_cache_dir) in webdoc_dirs.values():
             webdoc_source_path = _webdoc_source_dir + os.sep + \
                                  webdoc + '.webdoc'
             if os.path.exists(webdoc_source_path):
@@ -401,6 +407,74 @@ def get_webdoc_info(webdoc):
 
     return (webdoc_source_path, webdoc_cache_dir, webdoc_name,
             webdoc_source_modification_date, webdoc_cache_modification_date)
+
+def get_webdoc_topics(sort_by='name', sc=0, limit=-1):
+    """
+    List the available webdoc files in html format.
+
+      sort_by - *string* Sort topics by 'name' or 'date'.
+
+           sc - *int* Split the topics by categories if sc=1.
+
+        limit - *int* Max number of topics to be printed.
+                 No limit if limit < 0.
+    """
+    topics = {}
+
+    for (category, (source_path, cache_path)) in webdoc_dirs.iteritems():
+        if not topics.has_key(category):
+            topics[category] = []
+        # Build list of tuples(webdoc_name, webdoc_date, webdoc_url)
+        print category
+        print source_path
+        for webdocfile in os.listdir(source_path):
+            print webdocfile
+            webdoc_name = webdocfile[:-7]
+            webdoc_url = weburl + "/help/" + \
+                         ((category != 'help' and category + '/') or '') + \
+                         webdoc_name
+            try:
+                webdoc_date = time.strptime(get_webdoc_parts(webdoc_name,
+                                                             parts=['lastupdated']).get('lastupdated',
+                                                                                        "1970/01/01"),
+                                            "%Y/%m/%d")
+            except:
+                webdoc_date = "1970/01/01"
+
+            topics[category].append((webdoc_name, webdoc_date, webdoc_url))
+
+    # If not split by category, merge everything
+    if sc == 0:
+        all_topics = []
+        for topic in topics.values():
+            all_topics.extend(topic)
+        topics.clear()
+        topics[''] = all_topics
+
+    # Sort topics
+    if sort_by == 'name':
+        for topic in topics.values():
+            topic.sort()
+    elif sort_by == 'date':
+        for topic in topics.values():
+            topic.sort(lambda x,y:cmp(x[1],y[1]))
+            topic.reverse()
+
+    out = ''
+    for category, topic in topics.iteritems():
+        if category != '':
+            out += '<strong>' + category.capitalize() + ' Pages</strong>'
+        if limit < 0:
+            limit = len(topic)
+        out += '<ul><li>' + \
+               '</li><li>'.join(['%s <a href="%s">%s</a>' % \
+                                 ((sort_by == 'date' and time.strftime('%Y-%m-%d', topic_item[1])) or '', \
+                                  topic_item[2], \
+                                  topic_item[0]) \
+                                 for topic_item in topic[:limit]]) + \
+                                 '</li></ul>'
+
+    return out
 
 def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
     """
@@ -516,8 +590,8 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
                          out,
                          parameters.get('WebDoc-Page-Title'),
                          parameters.get('WebDoc-Page-Keywords'),
-                         parameters.get('WebDoc-Page-Navbar-Name'),
-                         parameters.get('WebDoc-Page-Navtrail'))
+                         parameters.get('WebDoc-Page-Navtrail'),
+                         parameters.get('WebDoc-Page-Last-Updated'))
 
     # Remove duplicates
     filtered_html_texts = []
