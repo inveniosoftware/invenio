@@ -36,7 +36,10 @@ def init_cited_by_dictionary():
         compressed_citation_dic = []
     citation_dic = None
     if compressed_citation_dic and compressed_citation_dic[0]:
-        citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
+	try:
+        	citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
+	except error:
+		citation_dic = []
     #debug
     #dstr = str(citation_dic)
     return citation_dic
@@ -51,7 +54,10 @@ def init_reference_list_dictionary():
         compressed_ref_dic = []
     ref_dic = None
     if compressed_ref_dic and compressed_ref_dic[0] and compressed_ref_dic[0][0]:
-        ref_dic = marshal.loads(decompress(compressed_ref_dic[0][0]))
+	try:
+        	ref_dic = marshal.loads(decompress(compressed_ref_dic[0][0]))
+	except error:
+                ref_dic = []
     return ref_dic
 
 cache_cited_by_dictionary = init_cited_by_dictionary()
