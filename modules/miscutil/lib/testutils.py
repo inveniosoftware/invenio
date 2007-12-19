@@ -122,6 +122,19 @@ class InvenioTestUtilsBrowserException(Exception):
     """Helper exception for the regression test suite browser."""
     pass
 
+def test_web_page_existence(url):
+    """
+    Test whether URL exists and is well accessible.
+    Return True or raise exception in case of problems.
+    """
+    import mechanize
+    browser = mechanize.Browser()
+    try:
+        browser.open(url)
+    except:
+        raise
+    return True
+
 def test_web_page_content(url,
                           username="guest",
                           password="",
@@ -135,7 +148,7 @@ def test_web_page_content(url,
        set).  The EXPECTED_TEXT is checked via substring matching, the
        EXPECTED_LINK_TARGET and EXPECTED_LINK_LABEL via exact string
        matching.
-       
+
        EXPECTED_TEXT, EXPECTED_LINK_LABEL and EXPECTED_LINK_TARGET can
        either be strings or list of strings (in order to check multiple
        values inside same page).
