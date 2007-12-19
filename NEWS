@@ -128,7 +128,7 @@ CDS Invenio v0.92.0 -- released 2006-12-22
  *) new translation (Croatian) and several translation updates
     (Catalan, Bulgarian, French, Greek, Spanish); thanks to Ferran
     Jorba, Beatriu Piera, Alen Vodopijevec, Jasna Marković, Theodoros
-    Theodoropoulos, and Nikolay Dyankov (see also CREDITS file)
+    Theodoropoulos, and Nikolay Dyankov (see also THANKS file)
 
  *) removed dependency on PHP; not needed anymore
 

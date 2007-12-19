@@ -22,7 +22,7 @@ confignice_SCRIPTS=config.nice
 
 SUBDIRS = po config modules
 
-EXTRA_DIST = UNINSTALL CREDITS RELEASE-NOTES configure-tests.py config.nice.in
+EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in
 
 # current jsMath version and packages
 JSMV = 3.4f
