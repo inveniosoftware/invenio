@@ -29,7 +29,7 @@ from invenio.dbquery import run_sql, OperationalError
 def init_cited_by_dictionary():
     """return citation list dictionary from rnkCITATIONDATA
     """
-    query = "select citation_data from rnkCITATIONDATA"
+    query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"
     try:
         compressed_citation_dic = run_sql(query)
     except OperationalError:
@@ -44,7 +44,7 @@ def init_cited_by_dictionary():
 def init_reference_list_dictionary():
     """return reference list dictionary from rnkCITATIONDATA
     """
-    query = "select citation_data_reversed from rnkCITATIONDATA"
+    query = "select object_value from rnkCITATIONDATA where object_name='reversedict'"
     try:
         compressed_ref_dic = run_sql(query)
     except OperationalError:
@@ -62,7 +62,7 @@ cache_reference_list_dictionary = init_reference_list_dictionary()
 def get_cited_by(recordid):
     """Return a list of records that cite recordid"""
     citation_dic = {} #one should always init variables
-    query = "select citation_data from rnkCITATIONDATA"	
+    query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"	
     compressed_citation_dic = run_sql(query)
     if compressed_citation_dic and compressed_citation_dic[0]:
         citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))

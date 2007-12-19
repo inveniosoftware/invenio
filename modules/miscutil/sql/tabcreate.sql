@@ -2133,10 +2133,13 @@ CREATE TABLE IF NOT EXISTS rnkDOWNLOADS (
   KEY id_bibrec (id_bibrec)
 ) TYPE=MyISAM;
 
+-- a table for citations. record-cites-record
+
 CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
-  citation_data longblob,
-  citation_data_reversed longblob,
-  self_citation_data longblob
+  id mediumint(8) unsigned default NULL,
+  object_name varchar(255) NOT NULL,
+  object_value longblob,
+  last_updated datetime NOT NULL default '0000-00-00'  
 ) TYPE=MyISAM;
 
 -- tables for collections and collection tree:

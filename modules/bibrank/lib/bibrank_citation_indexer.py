@@ -135,13 +135,13 @@ def last_updated_result(rank_method_code, recid_list):
             dic = marshal.loads(decompress(dict[0][0]))
         except error:
             return result
-        query = "select citation_data from rnkCITATIONDATA"
+        query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"
         cit_compressed = run_sql(query)
         cit = []
         if cit_compressed and cit_compressed[0] and cit_compressed[0][0]:
             cit = marshal.loads(decompress(cit_compressed[0][0]))
             if cit:
-                query = "select citation_data_reversed from rnkCITATIONDATA"
+                query = "select object_value from rnkCITATIONDATA where object_name='reversedict'"
                 ref_compressed = run_sql(query)
                 if ref_compressed and ref_compressed[0] and ref_compressed[0][0]:
                     ref = marshal.loads(decompress(ref_compressed[0][0]))
@@ -398,14 +398,10 @@ def get_decompressed_xml(xml):
 def insert_cit_ref_list_intodb(citation_dic, reference_dic):
     """Insert the reference and citation list into the database"""
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    id = run_sql("SELECT * from rnkCITATIONDATA ")
-    if id:
-        run_sql("UPDATE rnkCITATIONDATA SET citation_data_reversed = %s",
+    run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name='reversedict'",
                 (serialize_via_marshal(reference_dic), ))
-        run_sql("UPDATE rnkCITATIONDATA SET citation_data = %s",
+    run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name='citationdict'",
                 (serialize_via_marshal(citation_dic), ))
-    else:
-        run_sql("INSERT INTO rnkCITATIONDATA (citation_data, citation_data_reversed) VALUES (%s, null)",
-                (serialize_via_marshal(citation_dic), ))
-        run_sql("UPDATE rnkCITATIONDATA set citation_data_reversed = %s",
-                (serialize_via_marshal(reference_dic), ))
+    run_sql("UPDATE rnkCITATIONDATA SET last_updated = '"+date+"' where object_name='reversedict'")
+    run_sql("UPDATE rnkCITATIONDATA SET last_updated = '"+date+"' where object_name='citationdict'")
+
