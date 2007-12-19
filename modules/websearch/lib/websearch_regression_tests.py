@@ -105,14 +105,14 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-    def test_search_help_page_availability(self):
-        """websearch - availability of Search Help page"""
+    def test_help_page_availability(self):
+        """websearch - availability of Help Central page"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/search',
-                                               expected_text="Search Help"))
+                         test_web_page_content(weburl + '/help',
+                                               expected_text="Help Central"))
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/search?ln=fr',
-                                               expected_text="Aide de recherche"))
+                         test_web_page_content(weburl + '/help/?ln=fr',
+                                               expected_text="Centre d'aide"))
 
     def test_search_tips_page_availability(self):
         """websearch - availability of Search Tips"""
