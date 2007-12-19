@@ -378,7 +378,8 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
     if task_get_option('verbose') >= 9:		
     	write_message("citation_list (x is cited by y): "+str(citation_list),sys.stderr)	
 	write_message("reference_list (x cites y): "+str(reference_list),sys.stderr)	
-    insert_cit_ref_list_intodb(citation_list, reference_list)
+	write_message("selfdic: "+str(selfdic),sys.stderr)	
+    insert_cit_ref_list_intodb(citation_list, reference_list, selfdic)
 
     t5 = os.times()[4]
     print "\nExecution time for analyzing the citation information generating the dictionary: "
@@ -395,13 +396,16 @@ def get_decompressed_xml(xml):
     decompressed_xml = create_records(decompress(xml))
     return decompressed_xml
 
-def insert_cit_ref_list_intodb(citation_dic, reference_dic):
+def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfdic):
     """Insert the reference and citation list into the database"""
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name='reversedict'",
                 (serialize_via_marshal(reference_dic), ))
     run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name='citationdict'",
                 (serialize_via_marshal(citation_dic), ))
+    run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name='selfcitdict'",
+                (serialize_via_marshal(selfdic), ))
     run_sql("UPDATE rnkCITATIONDATA SET last_updated = '"+date+"' where object_name='reversedict'")
     run_sql("UPDATE rnkCITATIONDATA SET last_updated = '"+date+"' where object_name='citationdict'")
+    run_sql("UPDATE rnkCITATIONDATA SET last_updated = '"+date+"' where object_name='selfcitdict'")
 
