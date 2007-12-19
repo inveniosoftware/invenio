@@ -37,7 +37,7 @@ BibConvert High-level API (subject to change)
       conversion configuration language. There are two main functions accessible
       via the BibConvert API: (i) The BibConvert formatter and (ii) The BibConvert
       value generator. For detailed description of formatting functions and
-      generated values please have a look at the <a href=<WEBURL>/admin/bibconvert/guide.html>BibConvert Admin Guide</a>.
+      generated values please have a look at the <a href=<WEBURL>/help/admin/bibconvert-admin-guide>BibConvert Admin Guide</a>.
 
    Signature:
 
