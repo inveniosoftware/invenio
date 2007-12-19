@@ -68,7 +68,14 @@ class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
         return
 
     def test_webcomment_admin_guide_availability(self):
-        """webcomment - availability of WebComment Admin guide pages"""
+        """webcomment - availability of WebComment Admin Guide"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/help/admin/webcomment-admin-guide',
+                                               expected_text="WebComment Admin Guide"))
+        return
+
+    def test_legacy_webcomment_admin_guide_availability(self):
+        """webcomment - legacy availability of WebComment Admin Guide"""
 
         url = weburl + '/admin/webcomment/guide.html'
         error_messages = test_web_page_content(url)
