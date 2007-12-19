@@ -20,7 +20,8 @@
 pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibclassifylib.py \
-             bibclassify_daemon.py
+             bibclassify_daemon.py \
+             bibclassify_regression_tests.py
 
 EXTRA_DIST = $(pylib_DATA)
 
