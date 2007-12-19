@@ -109,12 +109,14 @@ Otherwise use the full path to the file.
 <a name="C"></a><h2>C Plain Text-Oriented Mode</h2>
 <a name="C.1"></a><h3>1 Configuration File Examples</h3>
 
-<p>OAI DublinCore into MARC21 and OAI MARC into MARC21
-configurations will be provided as default configuration, ensuring the
-standard uploading sequence (incl. <a href="../bibharvest/">BibHarvest</a> and <a
-href="../bibupload/">BibUpload</a> utilities). Other configurations can be
-created according to your needs. The configuration file that has to be
-created for each data source is a text file with following structure:
+<p>OAI DublinCore into MARC21 and OAI MARC into MARC21 configurations
+will be provided as default configuration, ensuring the standard
+uploading sequence
+(incl. <a href="bibharvest-admin-guide">BibHarvest</a>
+and <a href="bibupload-admin-guide">BibUpload</a> utilities). Other
+configurations can be created according to your needs. The
+configuration file that has to be created for each data source is a
+text file with following structure:
 
 <protect>
 <blockquote>
@@ -172,8 +174,8 @@ Guide</a> section below.
 <p>For a fully functional demo, consider the following sample input data:
 
 <blockquote>
-<a href="sample.dat">sample.dat</a> -- sample bibliographic data to be converted and inputted into CDS Invenio
-<br /><a href="sample.cfg">sample.cfg</a> -- sample configuration file, featuring knowledge base demo
+<a href="<WEBURL>/admin/bibconvert/sample.dat">sample.dat</a> -- sample bibliographic data to be converted and inputted into CDS Invenio
+<br /><a href="<WEBURL>/admin/bibconvert/sample.cfg">sample.cfg</a> -- sample configuration file, featuring knowledge base demo
 </blockquote>
 
 <p>To convert the above data into XML MARC, use the following command:
@@ -185,21 +187,21 @@ $ bibconvert -b'&lt;collection>' -csample.cfg -e'&lt;/collection>' < sample.dat 
 </blockquote>
 
 and see the XML MARC output file.  You would then continue the upload procedure by calling <a
-href="../bibupload/">BibUpload</a>.
+href="bibupload-admin-guide">BibUpload</a>.
 
 <p>Other useful BibConvert configuration examples:
 
 <blockquote>
-<a href="dcq.cfg">dcq.cfg</a> -- Qualified Dublin Core in SGML to XML MARC example
-<br /><a href="dcq.dat">dcq.dat</a> -- corresponding data file, featuring collection identifiers demo
+<a href="<WEBURL>/admin/bibconvert/dcq.cfg">dcq.cfg</a> -- Qualified Dublin Core in SGML to XML MARC example
+<br /><a href="<WEBURL>/admin/bibconvert/dcq.dat">dcq.dat</a> -- corresponding data file, featuring collection identifiers demo
 </blockquote>
 
 <blockquote>
-<a href="dcxml-to-marcxml.cfg">dcxml-to-marcxml.cfg</a> -- OAI XML Dublin Core to XML MARC example
+<a href="<WEBURL>/admin/bibconvert/dcxml-to-marcxml.cfg">dcxml-to-marcxml.cfg</a> -- OAI XML Dublin Core to XML MARC example
 </blockquote>
 
 <blockquote>
-<a href="bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
+<a href="<WEBURL>/admin/bibconvert/bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
 </blockquote>
 
 <a name="C.3"></a><h3>3 BibConvert Configuration Guide</h3>
