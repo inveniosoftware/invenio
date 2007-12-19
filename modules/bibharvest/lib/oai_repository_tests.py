@@ -52,10 +52,12 @@ class TestSelectiveHarvesting(unittest.TestCase):
     def test_set(self):
         """bibharvest oai repository - testing selective harvesting with 'set' parameter"""
         self.assertNotEqual([], oai_repository.oaigetsysnolist(set="cern:experiment"))
-        self.assert_("Search for R-Parity" in ''.join([oai_repository.print_record(recID) for recID in \
-                                                       oai_repository.oaigetsysnolist(set="cern:experiment")]))
-        self.assert_("Search for R-Parity" not in ''.join([oai_repository.print_record(recID) for recID in \
-                                                           oai_repository.oaigetsysnolist(set="cern:theory")]))
+        self.assert_("Multifractal analysis of minimum bias events" in \
+                     ''.join([oai_repository.print_record(recID) for recID in \
+                              oai_repository.oaigetsysnolist(set="cern:experiment")]))
+        self.assert_("Multifractal analysis of minimum bias events" not in \
+                     ''.join([oai_repository.print_record(recID) for recID in \
+                              oai_repository.oaigetsysnolist(set="cern:theory")]))
         self.assertEqual([], oai_repository.oaigetsysnolist(set="nonExistingSet"))
 
     def test_from_and_until(self):
