@@ -264,7 +264,11 @@ update-v0.92.1-tables: local-dbexec
 	echo "ALTER TABLE user_accROLE ADD COLUMN expiration datetime NOT NULL default '9999-12-31 23:59:59';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE user DROP INDEX id, ADD PRIMARY KEY id (id);" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE format ADD COLUMN visibility TINYINT NOT NULL default 1;" | ./modules/miscutil/bin/dbexec
-
+	echo "drop table rnkCITATIONDATA" | ./modules/miscutil/bin/dbexec
+	echo "CREATE table rnkCITATIONDATA (id mediumint(8) unsigned default NULL, object_name varchar(255) NOT NULL, object_value longblob, last_updated datetime NOT NULL default '0000-00-00' last_updated datetime NOT NULL default '0000-00-00') TYPE=MyISAM;" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO rnkCITATIONDATA VALUES (1,'citationdict','','');" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO rnkCITATIONDATA VALUES (2,'reversedict','','');" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO rnkCITATIONDATA VALUES (3,'selfcitdict','','');" | ./modules/miscutil/bin/dbexec
 
 drop-tables: local-dbexec
 	@if [ "$(FORCE)" != "yes" ]; then \
