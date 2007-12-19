@@ -197,7 +197,7 @@ temporary directory)</li></span></p>
 
 <p>As an example, running BibClassify on document <a
 href="http://cdsweb.cern.ch/record/977446">hep-ph/0608096</a>
-using the <a href="http://cdswebdev.cern.ch/bibclassify/HEP.rdf">high-energy physics SKOS taxonomy</a> would yield the following results (text output):
+using the high-energy physics SKOS taxonomy (<code>HEP.rdf</code>) would yield the following results (text output):
 
 <pre><code>
 <b>Composite keywords:</b>
