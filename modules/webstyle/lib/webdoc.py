@@ -136,7 +136,8 @@ def get_webdoc_parts(webdoc,
                             'keywords', \
                             'navtrail', \
                             'body',
-                            'lastupdated'],
+                            'lastupdated',
+                            'description'],
                      categ="",
                      update_cache_mode=1,
                      ln=cdslang,
@@ -155,7 +156,8 @@ def get_webdoc_parts(webdoc,
 
                    parts - *list(string)* the parts that should be
                             returned by this function. Can be in:
-                            'title', 'keywords', 'navtrail', 'body'.
+                            'title', 'keywords', 'navtrail', 'body',
+                            'description', 'lastupdated'.
 
                    categ - *string* (optional) The category to which
                             the webdoc file belongs. 'help', 'admin'
@@ -240,7 +242,7 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=cdslangs):
 
         if webdoc_source is not None:
             htmls = transform(webdoc_source, languages=languages)
-            for (lang, body, title, keywords, navtrail, lastupdated) in htmls:
+            for (lang, body, title, keywords, navtrail, lastupdated, description) in htmls:
                 # Body
                 if body is not None:
                     try:
@@ -291,6 +293,20 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=cdslangs):
                                           'lang': '-'+lang},
                                          webdoc_cache_dir,
                                          navtrail,
+                                         verbose)
+                    except IOError, e:
+                        print e
+                    except OSError, e:
+                        print e
+
+                # Description
+                if description is not None:
+                    try:
+                        write_cache_file('%(name)s.description%(lang)s.html' % \
+                                         {'name': webdoc_name,
+                                          'lang': '-'+lang},
+                                         webdoc_cache_dir,
+                                         description,
                                          verbose)
                     except IOError, e:
                         print e
@@ -591,7 +607,8 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
                          parameters.get('WebDoc-Page-Title'),
                          parameters.get('WebDoc-Page-Keywords'),
                          parameters.get('WebDoc-Page-Navtrail'),
-                         parameters.get('WebDoc-Page-Last-Updated'))
+                         parameters.get('WebDoc-Page-Last-Updated'),
+                         parameters.get('WebDoc-Page-Description'))
 
     # Remove duplicates
     filtered_html_texts = []
@@ -601,7 +618,8 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
                                 (html_text[2] != html_texts[cdslang][2] and html_text[2]) or None, \
                                 (html_text[3] != html_texts[cdslang][3] and html_text[3]) or None, \
                                 (html_text[4] != html_texts[cdslang][4] and html_text[4]) or None, \
-                                (html_text[5] != html_texts[cdslang][5] and html_text[5]) or None)
+                                (html_text[5] != html_texts[cdslang][5] and html_text[5]) or None, \
+                                (html_text[6] != html_texts[cdslang][6] and html_text[6]) or None)
                                for html_text in html_texts.values() \
                                if html_text[0] != cdslang]
         filtered_html_texts.append(html_texts[cdslang])

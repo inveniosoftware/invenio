@@ -91,7 +91,8 @@ def display_webdoc_page(webdocname, categ="help", ln=cdslang, req=None):
     # get page parts in given language:
     if webdocname != 'topics':
         page_parts = get_webdoc_parts(webdocname, parts=['title','body',
-                                                         'navtrail'],
+                                                         'navtrail', 'lastupdated',
+                                                         'description', 'keywords'],
                                       categ=categ,
                                       ln=ln)
     else:
@@ -121,10 +122,14 @@ def display_webdoc_page(webdocname, categ="help", ln=cdslang, req=None):
                                    cdsnameintl.get(ln, cdsname) + '</a>')) + \
                      '</p>'
 
-    # FIXME:
-    page_description = "FIXME: description"
-    page_keywords = "FIXME: keywords"
-    page_last_updated = "FIXME: last updated"
+    # set page description:
+    page_description = page_parts.get('description' , '')
+
+    # set page keywords:
+    page_keywords = page_parts.get('keywords' , '')
+
+    # set page last updated timestamp:
+    page_last_updated = page_parts.get('lastupdated' , '')
 
     if categ == 'hacking':
         categ = 'help'
