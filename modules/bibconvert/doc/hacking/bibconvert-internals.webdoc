@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -18,12 +19,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibConvert Internals -->
-<!-- WebDoc-Page-Navbar-Name: hacking-bibconvert -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> -->
-<!-- WebDoc-Page-Navbar-Select: hacking-bibconvert-index -->
 
-This page summarizes all the information suitable to dig inside
-BibConvert and it's different methods.
+
+<p>This page summarizes all the information suitable to dig inside
+BibConvert and it's different methods.</p>
 
 <blockquote>
 <dl>

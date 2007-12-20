@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -18,9 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: The HEP taxonomy: rationale and extensions -->
-<!-- WebDoc-Page-Navbar-Name: hacking-bibclassify -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a>  &gt; <a class="navtrail" href="bibclassify-internals"/>BibClassify Internals</a> -->
-<!-- WebDoc-Page-Navbar-Select: hacking-bibclassify-index -->
 <!-- WebDoc-Page-Revision: $Id$-->
 
 <p> The DESY Library has been responsible for maintaining a thesaurus

@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -18,9 +19,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibClassify Internals -->
-<!-- WebDoc-Page-Navbar-Name: hacking-bibclassify -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> -->
-<!-- WebDoc-Page-Navbar-Select: hacking-bibclassify-index -->
+<!-- WebDoc-Page-Revision: $Id$-->
 
 This page collects some information relative to the development of the
 BibClassify module and the high energy physics (HEP) taxonomy.
