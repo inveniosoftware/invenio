@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -18,12 +19,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibRank Internals -->
-<!-- WebDoc-Page-Navbar-Name: hacking-bibrank -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> -->
-<!-- WebDoc-Page-Navbar-Select: hacking-bibrank-index -->
+<!-- WebDoc-Page-Revision: $Id$-->
 
-This page summarizes all the information suitable to dig inside
-BibRank and it's different ranking methods.
+<p>This page summarizes all the information suitable to dig inside
+BibRank and it's different ranking methods.</p>
 
 <blockquote>
 <dl>

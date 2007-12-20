@@ -1,3 +1,6 @@
+## -*- mode: html; coding: utf-8; -*-
+## $Id$
+
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 ##
@@ -16,9 +19,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: Create knowledgebase files (bibrankgkb) -->
-<!-- WebDoc-Page-Navbar-Name: admin -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibrank-internals">BibRank Internals</a> -->
-<!-- WebDoc-Page-Navbar-Select: hacking-bibrank-index -->
+<!-- WebDoc-Page-Revision: $Id$-->
 
 <pre>
 <blockquotes>
