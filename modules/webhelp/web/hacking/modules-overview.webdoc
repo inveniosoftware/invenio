@@ -18,9 +18,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: Modules Overview -->
-<!-- WebDoc-Page-Navbar-Name: hacking-modules -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> -->
-<!-- WebDoc-Page-Navbar-Select: hacking-modules -->
+<!-- WebDoc-Page-Revision: $Id$-->
 
 
 <p>CDS Invenio consists of several more or less independent modules with
