@@ -22,8 +22,8 @@
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> -->
 <!-- WebDoc-Page-Revision: $Id$-->
 
-This page collects some information relative to the development of the
-BibClassify module and the high energy physics (HEP) taxonomy.
+<p>This page collects some information relative to the development of the
+BibClassify module and the high energy physics (HEP) taxonomy.</p>
 
 <blockquote> <dl>
 <dt><a href="bibclassify-hep-taxonomy">The HEP taxonomy: rationale and extensions</a>
