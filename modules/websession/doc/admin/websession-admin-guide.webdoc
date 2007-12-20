@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -19,8 +20,6 @@
 
 <!-- WebDoc-Page-Title: WebSession Admin Guide -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
-<!-- WebDoc-Page-Navbar-Name: admin -->
-<!-- WebDoc-Page-Navbar-Select: websession-admin-guide -->
 <!-- WebDoc-Page-Revision: $Id$-->
 
    <p><table class="errorbox">
