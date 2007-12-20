@@ -446,6 +446,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
     _ = gettext_set_language(ln)
 
     topics = {}
+    ln_link = (ln != cdslang and '?ln=' + ln) or ''
 
     for category in categ:
         if not webdoc_dirs.has_key(category):
@@ -494,10 +495,13 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
         if limit < 0:
             limit = len(topic)
         out += '<ul><li>' + \
-               '</li><li>'.join(['%s <a href="%s">%s</a>' % \
+               '</li><li>'.join(['%s <a href="%s%s">%s</a>' % \
                                  ((sort_by == 'date' and time.strftime('%Y-%m-%d', topic_item[1])) or '', \
                                   topic_item[2], \
-                                  topic_item[0]) \
+                                  ln_link, \
+                                  get_webdoc_parts(topic_item[0], \
+                                                   parts=['title'], \
+                                                   ln=ln).get('title', '')) \
                                  for topic_item in topic[:limit]]) + \
                                  '</li></ul>'
 

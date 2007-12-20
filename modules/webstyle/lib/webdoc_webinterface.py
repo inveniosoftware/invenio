@@ -97,12 +97,13 @@ def display_webdoc_page(webdocname, categ="help", ln=cdslang, req=None):
                                       ln=ln)
     else:
         # Print Table of Contents
-        see_also_links = {'admin': '<a href="%s/help/admin/contents">%s</a>' % \
-                          (weburl, _('Admin Index Pages')),
-                          'help':'<a href="%s/help/admin/contents">%s</a>' % \
-                          (weburl, _('Help Index Pages')),
-                          'hacking':'<a href="%s/help/hacking/contents">%s</a>' % \
-                          (weburl, _('Hacking Index Pages'))}
+        ln_link = (ln != cdslang and '?ln=' + ln) or ''
+        see_also_links = {'admin': '<a href="%s/help/admin/contents%s">%s</a>' % \
+                          (weburl, ln_link, _('Admin Index Pages')),
+                          'help':'<a href="%s/help/contents%s">%s</a>' % \
+                          (weburl, ln_link, _('Help Index Pages')),
+                          'hacking':'<a href="%s/help/hacking/contents%s">%s</a>' % \
+                          (weburl, ln_link, _('Hacking Index Pages'))}
         titles = {'admin': _("Help Index Pages"),
                   'help': _("Help Index Pages"),
                   'hacking': _("Hacking Index Pages")}
