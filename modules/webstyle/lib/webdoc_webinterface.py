@@ -89,20 +89,37 @@ def display_webdoc_page(webdocname, categ="help", ln=cdslang, req=None):
         webdocname = 'help-central'
 
     # get page parts in given language:
-    if webdocname != 'topics':
+    if webdocname != 'contents':
         page_parts = get_webdoc_parts(webdocname, parts=['title','body',
                                                          'navtrail', 'lastupdated',
                                                          'description', 'keywords'],
                                       categ=categ,
                                       ln=ln)
     else:
-        page_parts = {'title': _("Help Pages Topics"),
-                      'body': '<strong>Last modifications</strong>' + \
-                              get_webdoc_topics(sort_by='date', sc=0, limit=5) + \
+        # Print Table of Contents
+        see_also_links = {'admin': '<a href="%s/help/admin/contents">%s</a>' % \
+                          (weburl, _('Admin Index Pages')),
+                          'help':'<a href="%s/help/admin/contents">%s</a>' % \
+                          (weburl, _('Help Index Pages')),
+                          'hacking':'<a href="%s/help/hacking/contents">%s</a>' % \
+                          (weburl, _('Hacking Index Pages'))}
+        titles = {'admin': _("Help Index Pages"),
+                  'help': _("Help Index Pages"),
+                  'hacking': _("Hacking Index Pages")}
+
+        page_parts = {'title': titles.get(categ, ''),
+                      'body': '<strong>' + _("Last modifications") + '</strong>' + \
+                              get_webdoc_topics(sort_by='date', sc=0,
+                                                limit=5, categ=[categ], ln=ln) + \
                               '<br/>' + \
-                              get_webdoc_topics(sort_by='name', sc=1),
+                              get_webdoc_topics(sort_by='name', sc=1,
+                                                categ=[categ], ln=ln) + \
+                              '<br/><strong>' + _("See Also") + '</strong> <br/>' + \
+                              '<br/>'.join([ link for (category, link) in see_also_links.iteritems() \
+                                             if category != categ]),
                       'navtrail': ''
                       }
+
     # set page title:
     page_title = page_parts.get('title', '')
     if not page_title:

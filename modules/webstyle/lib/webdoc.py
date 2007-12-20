@@ -177,9 +177,9 @@ def get_webdoc_parts(webdoc,
     if update_cache_mode in [1, 2]:
         update_webdoc_cache(webdoc, update_cache_mode, verbose)
 
-    def get_webdoc_cached_part_path(webdoc, ln, part):
+    def get_webdoc_cached_part_path(webdoc_cache_dir, webdoc, ln, part):
         "Build path for given webdoc, ln and part"
-        return _web_doc_cache_dir + os.sep + webdoc + \
+        return webdoc_cache_dir + os.sep + webdoc + \
                os.sep + webdoc + '.' + part + '-' + \
                ln + '.html'
 
@@ -191,15 +191,16 @@ def get_webdoc_parts(webdoc,
 
         for (_webdoc_source_dir, _web_doc_cache_dir) in locations:
             webdoc_cached_part_path = None
-            if os.path.exists(get_webdoc_cached_part_path(webdoc, ln, part)):
+            if os.path.exists(get_webdoc_cached_part_path(_web_doc_cache_dir,
+                                                          webdoc, ln, part)):
                 # Check given language
-                webdoc_cached_part_path = get_webdoc_cached_part_path(webdoc, ln, part)
-            elif os.path.exists(get_webdoc_cached_part_path(webdoc, cdslang, part)):
+                webdoc_cached_part_path = get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, ln, part)
+            elif os.path.exists(get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, cdslang, part)):
                 # Check cdslang
-                webdoc_cached_part_path = get_webdoc_cached_part_path(webdoc, 'en', part)
-            elif os.path.exists(get_webdoc_cached_part_path(webdoc, ln, part)):
+                webdoc_cached_part_path = get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, 'en', part)
+            elif os.path.exists(get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, ln, part)):
                 # Check English
-                webdoc_cached_part_path = get_webdoc_cached_part_path(webdoc, 'en', part)
+                webdoc_cached_part_path = get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, 'en', part)
 
             if webdoc_cached_part_path is not None:
                 webdoc_cached_part = file(webdoc_cached_part_path, 'r').read()
@@ -242,7 +243,8 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=cdslangs):
 
         if webdoc_source is not None:
             htmls = transform(webdoc_source, languages=languages)
-            for (lang, body, title, keywords, navtrail, lastupdated, description) in htmls:
+            for (lang, body, title, keywords, \
+                 navtrail, lastupdated, description) in htmls:
                 # Body
                 if body is not None:
                     try:
@@ -424,7 +426,9 @@ def get_webdoc_info(webdoc):
     return (webdoc_source_path, webdoc_cache_dir, webdoc_name,
             webdoc_source_modification_date, webdoc_cache_modification_date)
 
-def get_webdoc_topics(sort_by='name', sc=0, limit=-1):
+def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
+                      categ=['help', 'admin', 'hacking'],
+                      ln=cdslang):
     """
     List the available webdoc files in html format.
 
@@ -434,25 +438,31 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1):
 
         limit - *int* Max number of topics to be printed.
                  No limit if limit < 0.
+
+        categ - *list(string)* the categories to consider
+
+           ln - *string* Language of the page
     """
+    _ = gettext_set_language(ln)
+
     topics = {}
 
-    for (category, (source_path, cache_path)) in webdoc_dirs.iteritems():
+    for category in categ:
+        if not webdoc_dirs.has_key(category):
+            continue
+        (source_path, cache_path) =  webdoc_dirs[category]
         if not topics.has_key(category):
             topics[category] = []
         # Build list of tuples(webdoc_name, webdoc_date, webdoc_url)
-        print category
-        print source_path
+
         for webdocfile in os.listdir(source_path):
-            print webdocfile
             webdoc_name = webdocfile[:-7]
             webdoc_url = weburl + "/help/" + \
                          ((category != 'help' and category + '/') or '') + \
                          webdoc_name
             try:
                 webdoc_date = time.strptime(get_webdoc_parts(webdoc_name,
-                                                             parts=['lastupdated']).get('lastupdated',
-                                                                                        "1970/01/01"),
+                                                             parts=['lastupdated']).get('lastupdated', "1970/01/01"),
                                             "%Y/%m/%d")
             except:
                 webdoc_date = "1970/01/01"
@@ -473,13 +483,14 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1):
             topic.sort()
     elif sort_by == 'date':
         for topic in topics.values():
-            topic.sort(lambda x,y:cmp(x[1],y[1]))
+            topic.sort(lambda x, y:cmp(x[1], y[1]))
             topic.reverse()
 
     out = ''
     for category, topic in topics.iteritems():
-        if category != '':
-            out += '<strong>' + category.capitalize() + ' Pages</strong>'
+        if category != '' and len(categ) > 0:
+            out += '<strong>'+ _("%(category)s Pages")  % \
+                   {'category': _(category).capitalize()} + '</strong>'
         if limit < 0:
             limit = len(topic)
         out += '<ul><li>' + \
@@ -522,7 +533,8 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
         if tag == 'WebDoc-Page-Revision':
             # Special case: print version
             try:
-                (junk, filename, revision, date, junk, junk, junk, junk) = value.split(' ')
+                (junk, filename, revision, date, \
+                 junk, junk, junk, junk) = value.split(' ')
                 parameters['WebDoc-Page-Last-Updated'] = date
                 return revision + ', ' + date
             except ValueError:
@@ -574,9 +586,11 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
         ## <lang:current /> tags and '?ln=en', '?ln=fr', .. instead of
         ## <lang:link /> if ln is not default language
         if ln != cdslang:
-            localized_webdoc = pattern_lang_link_current.sub('?ln=' + ln, localized_webdoc)
+            localized_webdoc = pattern_lang_link_current.sub('?ln=' + ln,
+                                                             localized_webdoc)
         else:
-            localized_webdoc = pattern_lang_link_current.sub('', localized_webdoc)
+            localized_webdoc = pattern_lang_link_current.sub('',
+                                                             localized_webdoc)
         localized_webdoc = pattern_lang_current.sub(ln, localized_webdoc)
 
         # 4 step
@@ -602,13 +616,13 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
 
         out = localized_body
 
-        html_texts[ln] =(ln,
-                         out,
-                         parameters.get('WebDoc-Page-Title'),
-                         parameters.get('WebDoc-Page-Keywords'),
-                         parameters.get('WebDoc-Page-Navtrail'),
-                         parameters.get('WebDoc-Page-Last-Updated'),
-                         parameters.get('WebDoc-Page-Description'))
+        html_texts[ln] = (ln,
+                          out,
+                          parameters.get('WebDoc-Page-Title'),
+                          parameters.get('WebDoc-Page-Keywords'),
+                          parameters.get('WebDoc-Page-Navtrail'),
+                          parameters.get('WebDoc-Page-Last-Updated'),
+                          parameters.get('WebDoc-Page-Description'))
 
     # Remove duplicates
     filtered_html_texts = []
@@ -730,8 +744,9 @@ def filter_languages(text, ln='en', defined_tags=None):
         # Try to find tag with current lang. If it does not exists,
         # then try to look for cdslang. If still does not exist, use
         # 'en' as current_lang
-        pattern_current_lang = re.compile(r"<("+current_lang+ \
-                                          r")\s*>(.*?)(</"+current_lang+r"\s*>)", re.IGNORECASE | re.DOTALL)
+        pattern_current_lang = re.compile(r"<(" + current_lang + \
+                                          r")\s*>(.*?)(</"+current_lang+r"\s*>)",
+                                          re.IGNORECASE | re.DOTALL)
 
         if re.search(pattern_current_lang, lang_tag_content) is None:
             current_lang = cdslang
