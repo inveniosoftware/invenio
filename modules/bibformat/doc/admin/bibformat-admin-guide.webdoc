@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -19,8 +20,6 @@
 
 <!-- WebDoc-Page-Title:BibFormat Admin Guide -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
-<!-- WebDoc-Page-Navbar-Name: admin -->
-<!-- WebDoc-Page-Navbar-Select: bibformat-admin-guide -->
 <!-- WebDoc-Page-Revision: $Id$-->
 
 <h2>Contents</h2>
@@ -56,7 +55,7 @@
     <li>3.9&nbsp;&nbsp;<a href="#attrsFormatTemplate">Edit the Attributes of a Format Template</a></li>
     <li>3.10&nbsp;<a href="#dependenciesFormatTemplate">Check the Dependencies of a Format Template</a></li>
     <li>3.11&nbsp;<a href="#validityFormatTemplate">Check the Validity a Format Template</a></li>
-    <li>3.12&nbsp;<a href="#xslFormatTemplate">XSL Format templates</a></li>
+    <li>3.12&nbsp;<a href="#xslFormatTemplate">XSL Format Templates</a></li>
     </ul>
 </li>
 <li><strong>4. <a href="#FormatElements">Configure Format Elements</a></strong>
@@ -635,7 +634,7 @@ are not returned by the format elements.</p>
     then no problem was found with the template. If message 'Not Ok' is in the column, click on it to see
     the problems that have been found for the template.</p>
 
-    <h3><a name="xslFormatTemplate">3.12 XSL Format templates</a></h3>
+    <h3><a name="xslFormatTemplate">3.12 XSL Format Templates</a></h3>
     <p>In addition to the HTML-like syntax introduced in previous sections, BibFormat also
     has support for server-side XSL transformation. Although you can do all the formatting using this custom HTML syntax, there are
     cases where an XSL stylesheet might be preferred. XSLT is for example a natural choice
@@ -647,6 +646,19 @@ are not returned by the format elements.</p>
     functions like the "Dependencies checker" or the possibility to create a template or edit its attributes are not
     available for the XSL templates.</p>
 
+    <p>In BibFormat XSL you have access to the following functions, provided you have declared <code>xmlns:fn="http://cdsweb.cern.ch/bibformat/fn"</code> in your stylesheet:</p>
+    <dl>
+        <dt><b><code>fn:modification_date(<i>recID</i>)</code></b></dt>
+        <dd>Returns the record modification date. Eg: <code>&lt;xsl:value-of select="fn:modification_date(445)"/&gt;</code> returns modification date of record 445</dd>
+    </dl>
+    <dl>
+        <dt><b><code>fn:creation_date(<i>recID</i>)</code></b></dt>
+        <dd>Returns the record creation date. Eg: <code>&lt;xsl:value-of select="fn:creation_date(445)"/&gt;</code> returns creation date of record 445</dd>
+    </dl>
+    <dl>
+        <dt><b><code>fn:eval_bibformat(<i>recID</i>, <i>bibformat_template_code</i>)</code></b></dt>
+        <dd>Returns the results of the evaluation of the format template code. Eg: <code>&lt;xsl:value-of select="fn:eval_bibformat(marc:controlfield[@tag='001'],'&amp;lt;BFE_SERVER_INFO var=&amp;quot;recurl&amp;quot;>')" /&gt;</code> returns the url of the current record. The parameter <code><i>bibformat_template_code</i></code> is regular code used inside BibFormat format templates, with <code>&lt;</code> escaped as <code>&amp;lt;</code> and <code>"</code>(quotes) escaped as <code>&amp;quot;</code></dd>
+    </dl>
     <p>Finally, please note that you will need to install a supported XSLT parser in order
     to format using XSL stylesheets.</p>
 
