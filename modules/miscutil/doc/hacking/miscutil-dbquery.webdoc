@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
@@ -18,10 +19,8 @@
 
 
 <!-- WebDoc-Page-Title: Database access API -->
-<!-- WebDoc-Page-Navbar-Name: hacking-miscutil -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> &gt;  <a class="navtrail" href="miscutil-internals">MiscUtil Internals</a> -->
 <!-- WebDoc-Page-Navbar-Select: hacking-miscutil-dbquery -->
-
 
 <p>dbquery module handles automatically connection (and reconnection)
 to the database and provides the <code>run_sql()</code> function to
