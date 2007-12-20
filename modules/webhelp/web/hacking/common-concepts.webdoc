@@ -70,7 +70,7 @@ other products, so please read this carefully.
    Thus said, in the implementation of our bibliographic tables
    (bibXXx) we have sort of generalized the term 'tag' to stand for:
 
-      tag = tag code + identifier1 + identifier1 + subfield code
+      tag = tag code + identifier1 + identifier2 + subfield code
 
    This convention, while taking some freedom from the MARC-21
    standard, enables us to write things like "field: base number, tag:
