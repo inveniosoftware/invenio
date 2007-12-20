@@ -20,9 +20,9 @@
 <!-- WebDoc-Page-Title: _(Admin Area)_ -->
 <!-- WebDoc-Page-Revision: $Id$-->
 
-Welcome to the Admin Area of the <CDSNAME>.  You'll find here pointers
+<p>Welcome to the Admin Area of the <CDSNAME>.  You'll find here pointers
 to the available runtime admin-level interfaces and admin-level guides
-on how to configure and run the CDS Invenio system.
+on how to configure and run the CDS Invenio system.</p>
 
 
 <p>CDS Invenio comes as a suite of several more or less independent
