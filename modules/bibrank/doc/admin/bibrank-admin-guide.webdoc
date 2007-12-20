@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -18,9 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibRank Admin Guide -->
-<!-- WebDoc-Page-Navbar-Name: admin -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
-<!-- WebDoc-Page-Navbar-Select: bibrank-admin-guide -->
 <!-- WebDoc-Page-Revision: $Id$-->
 
 <h2>Contents</h2>
@@ -258,19 +257,19 @@ check_mandatory_tags = 909C4c,909C4v,909C4y
 [rank_method]
 &nbsp; ##The function which is responsible for doing the work. Should not be changed
 &nbsp; function = single_tag_rank_method
-&nbsp; 
+&nbsp;
 &nbsp; ##This section must be available if the single_tag_rank_method is going to be used
 &nbsp; [single_tag_kb]
-&nbsp; 
+&nbsp;
 &nbsp; ##The tag which got the value to be searched for on the left side in the kb file (like the journal name)
 &nbsp; tag = 909C4p
-&nbsp; 
+&nbsp;
 &nbsp; ##The path to the kb file which got the content of the tag above on left side, and value on the left side
 &nbsp; kb_src = /home/invenio/etc/bibrank/jif.kb
-&nbsp; 
+&nbsp;
 &nbsp; ##Tags that must be included for a record to be added to the ranking data, to disable remove tags
 &nbsp; check_mandatory_tags = 909C4c,909C4v,909C4y
-&nbsp; 
+&nbsp;
 </blockquote>
 The kb_src file must contain data on the form:
 <blockquote>
