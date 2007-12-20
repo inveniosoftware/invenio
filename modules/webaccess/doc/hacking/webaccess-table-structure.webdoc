@@ -19,7 +19,7 @@
 
 <!-- WebDoc-Page-Title: WebAccess Table Structure -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="webaccess-internals">WebAccess Internals</a> -->
-<!-- WebDoc-Page-Revision: $Id$-->
+<!-- WebDoc-Page-Revision: $Id$ -->
 
 <pre>
 Explanation of the WebAccess table structure and how to create authorizations.

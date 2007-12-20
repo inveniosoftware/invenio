@@ -19,7 +19,7 @@
 
 <!-- WebDoc-Page-Title: Access Control Engine API -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="webaccess-internals">WebAccess Internals</a> -->
-<!-- WebDoc-Page-Revision: $Id$-->
+<!-- WebDoc-Page-Revision: $Id$ -->
 
 <pre>
 CDS Invenio Access Control Engine can be called from within your Python programs

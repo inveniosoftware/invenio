@@ -19,7 +19,7 @@
 
 <!-- WebDoc-Page-Title: Date library -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="<WEBURL>/miscutil-internals">MiscUtil Internals</a> -->
-<!-- WebDoc-Page-Revision: $Id$-->
+<!-- WebDoc-Page-Revision: $Id$ -->
 
 <p>These are the functions and methodologies for date handling in CDS Invenio.</p>
 

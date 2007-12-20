@@ -20,7 +20,7 @@
 
 <!-- WebDoc-Page-Title: BibClassify Internals -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> -->
-<!-- WebDoc-Page-Revision: $Id$-->
+<!-- WebDoc-Page-Revision: $Id$ -->
 
 <p>This page collects some information relative to the development of the
 BibClassify module and the high energy physics (HEP) taxonomy.</p>

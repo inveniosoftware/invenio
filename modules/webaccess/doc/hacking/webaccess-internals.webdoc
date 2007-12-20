@@ -20,7 +20,7 @@
 
 <!-- WebDoc-Page-Title: WebAccess Internals -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> -->
-<!-- WebDoc-Page-Revision: $Id$-->
+<!-- WebDoc-Page-Revision: $Id$ -->
 
 This page summarizes all the information suitable to dig inside
 the WebAccess internals.

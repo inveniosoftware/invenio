@@ -20,7 +20,7 @@
 
 <!-- WebDoc-Page-Title: The code behind BibClassify: the extraction algorithm -->
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibclassify-internals"/>BibClassify Internals</a> -->
-<!-- WebDoc-Page-Revision: $Id$-->
+<!-- WebDoc-Page-Revision: $Id$ -->
 
 
 <h2>Contents</h2>
