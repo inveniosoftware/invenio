@@ -37,7 +37,10 @@ from invenio.config import \
      version, \
      cdsnameintl, \
      cachedir
-from invenio.dateutils import convert_datestruct_to_dategui
+from invenio.dateutils import \
+     convert_datestruct_to_datetext, \
+     convert_datestruct_to_dategui, \
+     convert_datecvs_to_datestruct
 from invenio.messages import \
      gettext_set_language, \
      wash_language
@@ -463,10 +466,10 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
                          webdoc_name
             try:
                 webdoc_date = time.strptime(get_webdoc_parts(webdoc_name,
-                                                             parts=['lastupdated']).get('lastupdated', "1970/01/01"),
-                                            "%Y/%m/%d")
+                                                             parts=['lastupdated']).get('lastupdated', "1970-01-01 00:00:00"),
+                                            "%Y-%m-%d %H:%M:%S")
             except:
-                webdoc_date = "1970/01/01"
+                webdoc_date = time.strptime("1970-01-01 00:00:00", "%Y-%m-%d %H:%M:%S")
 
             topics[category].append((webdoc_name, webdoc_date, webdoc_url))
 
@@ -489,7 +492,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
 
     out = ''
     for category, topic in topics.iteritems():
-        if category != '' and len(categ) > 0:
+        if category != '' and len(categ) > 1:
             out += '<strong>'+ _("%(category)s Pages")  % \
                    {'category': _(category).capitalize()} + '</strong>'
         if limit < 0:
@@ -534,17 +537,6 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
         tag = match.group("tag")
         value = match.group("value")
         parameters[tag] = value
-        if tag == 'WebDoc-Page-Revision':
-            # Special case: print version
-            try:
-                (junk, filename, revision, date, \
-                 junk, junk, junk, junk) = value.split(' ')
-                parameters['WebDoc-Page-Last-Updated'] = date
-                return revision + ', ' + date
-            except ValueError:
-                # Date is not correctly formatted. Nothing to do
-                pass
-
         return ''
 
     def translate(match):
@@ -620,12 +612,17 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
 
         out = localized_body
 
+        # Pre-process date
+        last_updated = parameters.get('WebDoc-Page-Revision', '')
+        last_updated = convert_datecvs_to_datestruct(last_updated)
+        last_updated = convert_datestruct_to_datetext(last_updated)
+
         html_texts[ln] = (ln,
                           out,
                           parameters.get('WebDoc-Page-Title'),
                           parameters.get('WebDoc-Page-Keywords'),
                           parameters.get('WebDoc-Page-Navtrail'),
-                          parameters.get('WebDoc-Page-Last-Updated'),
+                          last_updated,
                           parameters.get('WebDoc-Page-Description'))
 
     # Remove duplicates

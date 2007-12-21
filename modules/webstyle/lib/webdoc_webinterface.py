@@ -71,7 +71,8 @@ class WebInterfaceDocumentationPages(WebInterfaceDirectory):
                self.categ == 'help':
             # Eg. /help/hacking -> /help/hacking/
             #     /help         -> /help/
-            redirect_to_url(req, req.uri + "/")
+            ln_link = (argd['ln'] != cdslang and '?ln=' + argd['ln']) or ''
+            redirect_to_url(req, req.uri + "/" + ln_link)
         else:
             return display_webdoc_page(self.webdocname, categ=self.categ, ln=argd['ln'], req=req)
 
@@ -88,37 +89,48 @@ def display_webdoc_page(webdocname, categ="help", ln=cdslang, req=None):
     if not webdocname:
         webdocname = 'help-central'
 
+    ln_link = (ln != cdslang and '?ln=' + ln) or ''
+
     # get page parts in given language:
     if webdocname != 'contents':
-        page_parts = get_webdoc_parts(webdocname, parts=['title','body',
+        page_parts = get_webdoc_parts(webdocname, parts=['title', 'body',
                                                          'navtrail', 'lastupdated',
                                                          'description', 'keywords'],
                                       categ=categ,
                                       ln=ln)
     else:
         # Print Table of Contents
-        ln_link = (ln != cdslang and '?ln=' + ln) or ''
         see_also_links = {'admin': '<a href="%s/help/admin/contents%s">%s</a>' % \
-                          (weburl, ln_link, _('Admin Index Pages')),
+                          (weburl, ln_link, _('Admin Pages Index')),
                           'help':'<a href="%s/help/contents%s">%s</a>' % \
-                          (weburl, ln_link, _('Help Index Pages')),
+                          (weburl, ln_link, _('Help Pages Index')),
                           'hacking':'<a href="%s/help/hacking/contents%s">%s</a>' % \
-                          (weburl, ln_link, _('Hacking Index Pages'))}
-        titles = {'admin': _("Help Index Pages"),
-                  'help': _("Help Index Pages"),
-                  'hacking': _("Hacking Index Pages")}
+                          (weburl, ln_link, _('Hacking Pages Index'))}
+        titles = {'admin': _("Admin Pages Index"),
+                  'help': _("Help Pages Index"),
+                  'hacking': _("Hacking Pages Index")}
+        navtrails = {'admin': '<a class="navtrail" href="%s/help/admin%s">%s</a>' % \
+                     (weburl, ln_link, _("Admin Area")),
+                     'help': '<a class="navtrail" href="%s/help/%s">%s</a>' % \
+                     (weburl, ln_link, _("Help Central")),
+                     'hacking': '<a class="navtrail" href="%s/help/hacking%s">%s</a>' % \
+                     (weburl, ln_link, _("Hacking CDS Invenio"))}
+        body = '''<div style="float:right;clear:none;font-size:small;color:#666;width:auto;margin-right:30px;padding:5px" class="mini-panel"><strong>''' + \
+               _("Last modifications") + '</strong>' + \
+               get_webdoc_topics(sort_by='date', sc=0, limit=5,
+                                 categ=[categ], ln=ln) + \
+               '</div>' + '<p>' +_('This is the index of the %(category)s pages.') % {'category': categ}
+        if categ != 'help':
+            body += ' ' + _('See also') + ' ' + \
+                              ', '.join([ link for (category, link) in \
+                                          see_also_links.iteritems() \
+                                          if category != categ])
 
+        body += '</p>' + get_webdoc_topics(sort_by='name', sc=1,
+                                           categ=[categ], ln=ln)
         page_parts = {'title': titles.get(categ, ''),
-                      'body': '<strong>' + _("Last modifications") + '</strong>' + \
-                              get_webdoc_topics(sort_by='date', sc=0,
-                                                limit=5, categ=[categ], ln=ln) + \
-                              '<br/>' + \
-                              get_webdoc_topics(sort_by='name', sc=1,
-                                                categ=[categ], ln=ln) + \
-                              '<br/><strong>' + _("See Also") + '</strong> <br/>' + \
-                              '<br/>'.join([ link for (category, link) in see_also_links.iteritems() \
-                                             if category != categ]),
-                      'navtrail': ''
+                      'body': body,
+                      'navtrail': navtrails.get(categ, '')
                       }
 
     # set page title:
@@ -135,9 +147,13 @@ def display_webdoc_page(webdocname, categ="help", ln=cdslang, req=None):
         page_body = '<p>' + (_("Sorry, page %s does not seem to exist.") % \
                     ('<strong>' + cgi.escape(webdocname) + '</strong>')) + \
                     '</p>'
-        page_body += '<p>' + (_("You may want to start browsing from %s.") % \
-                                ('<a href="' + weburl + '?ln=' + ln + '">' + \
-                                   cdsnameintl.get(ln, cdsname) + '</a>')) + \
+        page_body += '<p>' + (_("You may want to start browsing from %(rooturl)s or have a look at the %(x_url_open)s index of the %(category)s pages%(x_url_close)s.") % \
+                              {'rooturl':'<a href="%s%s">%s</a>' % \
+                               (weburl, ln_link, cdsnameintl.get(ln, cdsname)),
+                               'category': _(categ),
+                               'x_url_open': '<a href="%s/help/%scontents%s">' % \
+                               (weburl, ((categ != 'help' and categ + '/') or ''), ln_link),
+                               'x_url_close': '</a>'}) + \
                      '</p>'
 
     # set page description:
