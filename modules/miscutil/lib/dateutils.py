@@ -107,18 +107,20 @@ def convert_datestruct_to_datetext(datestruct):
 
 def convert_datecvs_to_datestruct(datecvs):
     """
-    Convert CVS $Date$ format into datestruct.  Useful for later
-    conversion of Last updated timestamps in the page footers.
+    Convert CVS $Date$ and
+    $Id$
+    formats into datestruct. Useful for later conversion of Last
+    updated timestamps in the page footers.
 
     Example: '$Date$' => (2006, 09, 20, 19, 27, 11, 0, 0)
     """
     try:
-        # here we have to use '$' + 'Date...' here, otherwise the CVS
-        # commit would erase this time format to put commit date:
         if datecvs.startswith("$Id"):
             date_time = ' '.join(datecvs.split(" ")[3:5])
             return strptime(date_time, '%Y/%m/%d %H:%M:%S')
         else:
+            # here we have to use '$' + 'Date...' here, otherwise the CVS
+            # commit would erase this time format to put commit date:
             return strptime(datecvs, '$' + 'Date: %Y/%m/%d %H:%M:%S $')
     except ValueError:
         return datestruct_default
