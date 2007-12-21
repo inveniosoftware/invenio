@@ -88,7 +88,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
     if CFG_CERN_SITE and cern_urls:
         # Put a big file icon if only one file
         if len(main_urls.keys()) == 0 and \
-               len(cern_urls.keys()) == 1 and len(others_urls.keys()) == 0 and \
+               len(cern_urls) == 1 and len(others_urls) == 0 and \
                show_icons.lower() == 'yes':
             file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="Download fulltext" /><br />' % weburl
 
@@ -100,14 +100,14 @@ def format(bfo, style, separator='; ', show_icons='no'):
         link_word = len(cern_urls) == 1 and 'link' or 'links'
         out += '<small>(CERN %s)</small><br />' % link_word
         url_list = []
-        for url,descr in cern_urls.items():
+        for url, descr in cern_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
         out += separator.join(url_list)
 
     if others_urls:
         # Put a big file icon if only one file
         if len(main_urls.keys()) == 0 and \
-               (not CFG_CERN_SITE or len(cern_urls.keys()) == 0) and len(others_urls.keys()) == 1 and \
+               (not CFG_CERN_SITE or len(cern_urls) == 0) and len(others_urls) == 1 and \
                show_icons.lower() == 'yes':
             file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="Download fulltext" /><br />' % weburl
         elif show_icons.lower() == 'yes':
@@ -117,7 +117,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
         link_word = len(others_urls) == 1 and 'link' or 'links'
         out += '<small>(external %s)</small>:%s' % (link_word, separator)
         url_list = []
-        for url,descr in others_urls.items():
+        for url, descr in others_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
         out += '<small>' + separator.join(url_list) + '</small>'
     if out.endswith('<br />'):

@@ -86,7 +86,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
         link_word = len(cern_urls) == 1 and 'link' or 'links'
         out += '<strong>CERN %s</strong>: ' % link_word
         url_list = []
-        for url,descr in cern_urls.items():
+        for url,descr in cern_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+ \
                             file_icon + escape(str(descr))+'</a>')
         out += separator.join(url_list)
@@ -95,7 +95,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
         link_word = len(others_urls) == 1 and 'link' or 'links'
         out += '<strong>External %s</strong>: ' % link_word
         url_list = []
-        for url,descr in others_urls.items():
+        for url,descr in others_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+ \
                             file_icon + escape(str(descr))+'</a>')
         out += separator.join(url_list) + '<br />'
@@ -125,11 +125,11 @@ def getFiles(bfo):
                                    ('http://weburl/record/1/files/aFile.gif', 'aFile', 'GIF')],
                     'Additional': [('http://weburl/record/1/files/bFile.pdf', 'bFile', 'PDF')]},
 
-     'other_urls': {'http://externalurl.com/aFile.pdf': 'Fulltext',      # url(8564_u):description(8564_z/y)
-                    'http://externalurl.com/bFile.pdf': 'Fulltext'},
+     'other_urls': [('http://externalurl.com/aFile.pdf', 'Fulltext'),      # url(8564_u), description(8564_z/y)
+                    ('http://externalurl.com/bFile.pdf', 'Fulltext')],
 
-     'cern_urls' : {'http://cern.ch/aFile.pdf': 'Fulltext',              # url(8564_u):description(8564_z/y)
-                    'http://cern.ch/bFile.pdf': 'Fulltext'},
+     'cern_urls' : [('http://cern.ch/aFile.pdf', 'Fulltext'),              # url(8564_u), description(8564_z/y)
+                    ('http://cern.ch/bFile.pdf', 'Fulltext')],
     }
 
     Some notes about returned structure:
@@ -145,10 +145,10 @@ def getFiles(bfo):
 
     # Prepare object to return
     parsed_urls = {'main_urls':{},    # Urls hosted by Invenio (bibdocs)
-                  'others_urls':{}    # External urls
+                  'others_urls':[]    # External urls
                   }
     if CFG_CERN_SITE:
-        parsed_urls['cern_urls'] = {} # cern.ch urls
+        parsed_urls['cern_urls'] = [] # cern.ch urls
 
     # Parse URLs
     for complete_url in urls:
@@ -174,9 +174,9 @@ def getFiles(bfo):
                         #FIXME remove eventual ?parameters
                         descr = filename or host # Let's take the name from the url
                 if CFG_CERN_SITE and 'cern.ch' in host:
-                    parsed_urls['cern_urls'][url] = descr # Obsolete cern.ch url (we're migrating)
+                    parsed_urls['cern_urls'].append((url, descr)) # Obsolete cern.ch url (we're migrating)
                 else:
-                    parsed_urls['others_urls'][url] = descr # external url
+                    parsed_urls['others_urls'].append((url, descr)) # external url
             else: # It's a bibdoc!
                 assigned = False
                 for doc in bibarchive.list_bibdocs():
@@ -196,6 +196,6 @@ def getFiles(bfo):
                 if not assigned: # Url is not a bibdoc :-S
                     if not descr:
                         descr = filename
-                    parsed_urls['others_urls'][url] = descr # Let's put it in a general other url
+                    parsed_urls['others_urls'].append(url, descr) # Let's put it in a general other url
 
     return (parsed_urls, old_versions, additionals)
