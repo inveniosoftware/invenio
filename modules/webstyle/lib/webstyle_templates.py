@@ -413,7 +413,8 @@ class Template:
         _ = gettext_set_language(ln)
 
         if lastupdated:
-            if lastupdated.startswith("$Date: "):
+            if lastupdated.startswith("$Date: ") or
+            lastupdated.startswith("$Id: "):
                 lastupdated = convert_datestruct_to_dategui(\
                                  convert_datecvs_to_datestruct(lastupdated),
                                  ln=ln)
