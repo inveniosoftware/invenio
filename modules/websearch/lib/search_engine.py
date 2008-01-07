@@ -71,7 +71,7 @@ import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 webcomment_templates = invenio.template.load('webcomment')
 
-from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list, get_self_cited_in
+from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list, get_self_cited_in, get_self_cited_by
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
 from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time, Error
@@ -2637,7 +2637,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         citinglist = None
                         citationhistory = None
 			rid = recIDs[irec]
-			selfcited = get_self_cited_in(rid)
+			selfcited = get_self_cited_by(rid)
 
                         r = calculate_cited_by_list(rid)
                         if r:
@@ -2654,7 +2654,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                                                                      citinglist=citinglist,
                                                                                      citationhistory=citationhistory,
                                                                                      cociting=cociting,
-selfcited=selfcited)
+										     selfcited=selfcited)
                         req.write(webstyle_templates.detailed_record_container(content,
                                                                                recIDs[irec],
                                                                                tabs,

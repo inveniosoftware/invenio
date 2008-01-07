@@ -2620,9 +2620,18 @@ class Template:
                 'more': create_html_link(
                 self.build_search_url(p='recid:%d' % \
                                       recID,      #XXXX
-                                      rm='cit', ln=ln),
+                                      rm='citation', ln=ln),
                                       {}, _("more")),
                 'similar': similar}
+
+        if CFG_BIBRANK_SHOW_CITATION_GRAPHS and selfcited is not None:
+	    sc_scorelist = [] #a score list for print..
+	    for s in selfcited:
+		tmp = [s,0]
+		sc_scorelist.append(tmp)
+            scite = self.tmpl_print_record_list_for_similarity_boxen (
+                _(".. of which self-citations: %s records") % len (selfcited), sc_scorelist, ln)
+            out += '<tr><td>'+scite+'</td></tr>' 
 
         if CFG_BIBRANK_SHOW_CITATION_STATS and cociting is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen (
@@ -2635,15 +2644,6 @@ class Template:
                     </td></tr>''' % { 'more': create_html_link(self.build_search_url(p='cocitedwith:%d' % recID, ln=ln),
                                                                 {}, _("more")),
                                       'similar': similar}
-
-        if CFG_BIBRANK_SHOW_CITATION_GRAPHS and selfcited is not None:
-	    sc_scorelist = [] #a score list for print..
-	    for s in selfcited:
-		tmp = [s,0]
-		sc_scorelist.append(tmp)
-            scite = self.tmpl_print_record_list_for_similarity_boxen (
-                _("Self-cited in: %s records") % len (selfcited), sc_scorelist, ln)
-            out += '<tr><td>'+scite+'</td></tr>' 
 
         if CFG_BIBRANK_SHOW_CITATION_GRAPHS and citationhistory is not None:
             out += '<tr><td>%s</td></tr>' % citationhistory
