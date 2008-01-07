@@ -1538,7 +1538,7 @@ ul.detailedRecordActions{
 /* Short bib notice displayed as sheet of paper in detailed record pages */
 #commentHB {
    background: #fff url(paper-texture-128x128.gif) repeat top left;
-   margin-top:10px;
+   margin: 10px 10px 0px 10px;
    padding:4px;
    border-bottom: 1px solid #CCC;
    border-right: 1px solid #CCC;

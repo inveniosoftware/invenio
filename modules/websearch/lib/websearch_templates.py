@@ -2557,7 +2557,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = '<br/>'
+        out = ''
 
         if CFG_BIBRANK_SHOW_DOWNLOAD_STATS and downloadsimilarity is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen (
@@ -2605,7 +2605,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = '<br/><table>'
+        out = '<table>'
         if CFG_BIBRANK_SHOW_CITATION_STATS and citinglist is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen(
                 _("Cited by: %s records") % len (citinglist), citinglist, ln)
@@ -2621,7 +2621,6 @@ class Template:
                                       rm='cit', ln=ln),
                                       {}, _("more")),
                 'similar': similar}
-            out += '<br />'
 
         if CFG_BIBRANK_SHOW_CITATION_STATS and cociting is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen (
@@ -2634,7 +2633,6 @@ class Template:
                     </td></tr>''' % { 'more': create_html_link(self.build_search_url(p='cocitedwith:%d' % recID, ln=ln),
                                                                 {}, _("more")),
                                       'similar': similar}
-            out += '<br />'
 
         if CFG_BIBRANK_SHOW_CITATION_GRAPHS and citationhistory is not None:
             out += '<tr><td>%s</td></tr>' % citationhistory

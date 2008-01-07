@@ -40,6 +40,7 @@ from invenio.messages import gettext_set_language, language_list_long
 from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
+from invenio.bibformat import format_record
 from invenio import template
 websearch_templates = template.load('websearch')
 
@@ -651,7 +652,7 @@ URI: http://%(host)s%(page)s
     def detailed_record_container(self, content, recid, tabs, ln=cdslang,
                                   show_similar_rec_p=True,
                                   creationdate=None,
-                                  modifydate=None):
+                                  modifydate=None, show_notice_p=True):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
            Parameters:
@@ -663,6 +664,7 @@ URI: http://%(host)s%(page)s
          - show_similar_rec_p *bool* print 'similar records' link in the box
          - creationdate *string* - the creation date of the displayed record
          - modifydate *string* - the last modification date of the displayed record
+         - show_notice_p *boolean* - prints a very short bibl. notice of the record
         """
         # load the right message language
         _ = gettext_set_language(ln)
@@ -701,6 +703,22 @@ URI: http://%(host)s%(page)s
             </div>
         </div>''' % out_tabs
 
+
+        # Add the clip icon and the brief record notice if necessary
+        if show_notice_p:
+            record_details = format_record(recID=recid, of='hs', ln=ln)
+            content = '''<div id="commentHB">
+                             <div id="clip">&nbsp;</div>
+                             <div id="HB">
+                                 %(record_details)s
+                             </div>
+                         </div>
+                         <div style="clear:both;height:1px">&nbsp;</div>
+                         %(content)s
+                      ''' % {'content': content,
+                             'record_details': record_details}
+
+        # Print the content
         out = """
     <div class="detailed">
         %(tabs)s

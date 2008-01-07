@@ -426,7 +426,7 @@ class Template:
         @param avg_score: average score of reviews for this record
         @param warnings: list of warning tuples (warning_msg, color)
         @param border: boolean, active if want to show border around each comment/review
-        @param reviews: booelan, enabled for reviews, disabled for comments
+        @param reviews: boolean, enabled for reviews, disabled for comments
         """
         # load the right message language
         _ = gettext_set_language(ln)
@@ -472,10 +472,6 @@ class Template:
         useful_no = '<a href="%(weburl)s/record/%(recID)s/%(discussion)s/vote?ln=%(ln)s&amp;comid=%%(comid)s&amp;com_value=-1&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(weburl)s/record/%(recID)s/%(discussion)s/display">' + _("No") + '</a>'
         useful_no %= useful_dict
         warnings = self.tmpl_warnings(warnings, ln)
-
-        ## record details
-        from invenio.bibformat import format_record
-        record_details = format_record(recID=recID, of='hs', ln=ln)
 
         link_dic =  {   'weburl'    : weburl,
                         'module'    : 'comments',
@@ -592,13 +588,6 @@ class Template:
 
         # do NOT remove the HTML comments below. Used for parsing
         body = '''
-<div id="commentHB">
-<div id="clip">&nbsp;</div>
-<div id="HB">
-%(record_details)s
-</div>
-</div>
-<div style="clear:both">&nbsp;</div>
 %(comments_and_review_tabs)s
 <!-- start comments table -->
 <table style="border: %(border)spx solid black; width: 95%%; margin:10px;font-size:small">
@@ -610,7 +599,6 @@ class Template:
         {   'record_label': _("Record"),
             'back_label': _("Back to search results"),
             'total_label': total_label,
-            'record_details': record_details,
             'write_button_form' : write_button_form,
             'write_button_form_again' : total_nb_comments>3 and write_button_form or "",
             'comments_rows'             : indent_text(comments_rows, 1),
