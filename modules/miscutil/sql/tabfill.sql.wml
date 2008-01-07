@@ -83,6 +83,7 @@ INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'zh_TW','ln','ç
 INSERT INTO rnkCITATIONDATA VALUES (1,'citationdict','','');
 INSERT INTO rnkCITATIONDATA VALUES (2,'reversedict','','');
 INSERT INTO rnkCITATIONDATA VALUES (3,'selfcitdict','','');
+INSERT INTO rnkCITATIONDATA VALUES (4,'selfcitedbydict','','');
 
 <protect>
 INSERT INTO field VALUES (1,'any field','anyfield');

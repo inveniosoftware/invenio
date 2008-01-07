@@ -60,6 +60,22 @@ def init_reference_list_dictionary():
                 ref_dic = []
     return ref_dic
 
+def init_selfcite_dictionary():
+    """return self cite dictionary from rnkCITATIONDATA
+    """
+    query = "select object_value from rnkCITATIONDATA where object_name='selfcitdict'"
+    try:
+        compressed_sc_dic = run_sql(query)
+    except OperationalError:
+        compressed_sc_dic = []
+    sc_dic = None
+    if compressed_sc_dic and compressed_sc_dic[0] and compressed_sc_dic[0][0]:
+	try:
+        	sc_dic = marshal.loads(decompress(compressed_sc_dic[0][0]))
+	except error:
+                sc_dic = []
+    return sc_dic
+
 cache_cited_by_dictionary = init_cited_by_dictionary()
 cache_reference_list_dictionary = init_reference_list_dictionary()
 
@@ -128,6 +144,16 @@ def calculate_cited_by_list(record_id, sort_order="d"):
         else:
             result.sort(lambda x, y: cmp(x[1], y[1]))
 
+    return result
+
+def get_self_cited(record_id):
+    """Return a list of doc ids for the
+       rec id given as param. 
+    """
+    result = []
+    sc = init_selfcite_dictionary()
+    if sc and sc.has_key(record_id):
+	record = sc[record_id]
     return result
 
 def calculate_co_cited_with_list(record_id, sort_order="d"):

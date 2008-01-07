@@ -373,13 +373,28 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
 		del reference_list[k]
 
     selfdic = get_self_citations(citation_list,config)
-    #print str(selfdic)
+    #selfdic consists of
+    #key k -> list of values [v1,v2,..]
+    #where k is a record with author A and k cites v1,v2.. and A appears in v1,v2..
+
+    #create a reverse "x cited by y" self cit dict
+    selfcitedbydic = {}
+    for k in selfdic.keys():
+	vlist = selfdic[k]
+	for v in vlist:
+		if selfcitedbydic.has_key(v):
+			tmplist = selfcitedbydic[v]
+			tmplist.append(k)
+		else:
+			tmplist = [k]
+		selfcitedbydic[v] = tmplist
 
     if task_get_option('verbose') >= 9:		
     	write_message("citation_list (x is cited by y): "+str(citation_list),sys.stderr)	
 	write_message("reference_list (x cites y): "+str(reference_list),sys.stderr)	
-	write_message("selfdic: "+str(selfdic),sys.stderr)	
-    insert_cit_ref_list_intodb(citation_list, reference_list, selfdic)
+	write_message("selfcitedbydic (x is cited by y and one of the authors of x same as y's): "+str(selfcitedbydic),sys.stderr)	
+	write_message("selfdic (x cites y and one of the authors of x same as y's): "+str(selfdic),sys.stderr)	
+    insert_cit_ref_list_intodb(citation_list, reference_list, selcitedbydic, selfdic)
 
     t5 = os.times()[4]
     print "\nExecution time for analyzing the citation information generating the dictionary: "
@@ -396,16 +411,19 @@ def get_decompressed_xml(xml):
     decompressed_xml = create_records(decompress(xml))
     return decompressed_xml
 
-def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfdic):
+def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,selfdic):
     """Insert the reference and citation list into the database"""
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name='reversedict'",
                 (serialize_via_marshal(reference_dic), ))
     run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name='citationdict'",
                 (serialize_via_marshal(citation_dic), ))
+    run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name='selfcitedbydict'",
+                (serialize_via_marshal(selfcbdic), ))
     run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name='selfcitdict'",
                 (serialize_via_marshal(selfdic), ))
     run_sql("UPDATE rnkCITATIONDATA SET last_updated = '"+date+"' where object_name='reversedict'")
     run_sql("UPDATE rnkCITATIONDATA SET last_updated = '"+date+"' where object_name='citationdict'")
     run_sql("UPDATE rnkCITATIONDATA SET last_updated = '"+date+"' where object_name='selfcitdict'")
+    run_sql("UPDATE rnkCITATIONDATA SET last_updated = '"+date+"' where object_name='selfcitedbydict'")
 
