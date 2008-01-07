@@ -117,7 +117,7 @@ def get_self_cited_by(record_id):
        rec id x given as param, so that x cites y1,y2,.. and x and each y share an author
     """
     result = []
-    sc = init_db_dictionary("selfcitedict")
+    sc = init_db_dictionary("selfcitdict")
     if sc and sc.has_key(record_id):
 	result.extend(sc[record_id])
     if (len(result) == 0):
