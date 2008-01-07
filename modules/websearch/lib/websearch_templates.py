@@ -2586,7 +2586,7 @@ class Template:
 
     def tmpl_detailed_record_citations(self, recID, ln,
                                        citinglist, citationhistory,
-                                       cociting):
+                                       cociting,selfcited):
         """Returns the citations page of a record
 
         Parameters:
@@ -2600,6 +2600,8 @@ class Template:
           - citationhistory *string* - citationhistory box
 
           - cociting *string* - cociting box
+
+          - selfcited *string* - selfcited box
 
         """
         # load the right message language
@@ -2633,6 +2635,15 @@ class Template:
                     </td></tr>''' % { 'more': create_html_link(self.build_search_url(p='cocitedwith:%d' % recID, ln=ln),
                                                                 {}, _("more")),
                                       'similar': similar}
+
+        if CFG_BIBRANK_SHOW_CITATION_GRAPHS and selfcited is not None:
+	    sc_scorelist = [] #a score list for print..
+	    for s in selfcited:
+		tmp = [s,0]
+		sc_scorelist.append(tmp)
+            scite = self.tmpl_print_record_list_for_similarity_boxen (
+                _("Self-cited in: %s records") % len (selfcited), sc_scorelist, ln)
+            out += '<tr><td>'+scite+'</td></tr>' 
 
         if CFG_BIBRANK_SHOW_CITATION_GRAPHS and citationhistory is not None:
             out += '<tr><td>%s</td></tr>' % citationhistory

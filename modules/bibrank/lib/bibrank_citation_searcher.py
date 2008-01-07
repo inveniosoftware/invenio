@@ -26,44 +26,10 @@ from zlib import decompress, error
 
 from invenio.dbquery import run_sql, OperationalError
 
-def init_cited_by_dictionary():
-    """return citation list dictionary from rnkCITATIONDATA
+def init_db_dictionary(dname):
+    """return a dictionary from rnkCITATIONDATA
     """
-    query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"
-    try:
-        compressed_citation_dic = run_sql(query)
-    except OperationalError:
-        compressed_citation_dic = []
-    citation_dic = None
-    if compressed_citation_dic and compressed_citation_dic[0]:
-	try:
-        	citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
-	except error:
-		citation_dic = []
-    #debug
-    #dstr = str(citation_dic)
-    return citation_dic
-
-def init_reference_list_dictionary():
-    """return reference list dictionary from rnkCITATIONDATA
-    """
-    query = "select object_value from rnkCITATIONDATA where object_name='reversedict'"
-    try:
-        compressed_ref_dic = run_sql(query)
-    except OperationalError:
-        compressed_ref_dic = []
-    ref_dic = None
-    if compressed_ref_dic and compressed_ref_dic[0] and compressed_ref_dic[0][0]:
-	try:
-        	ref_dic = marshal.loads(decompress(compressed_ref_dic[0][0]))
-	except error:
-                ref_dic = []
-    return ref_dic
-
-def init_selfcite_dictionary():
-    """return self cite dictionary from rnkCITATIONDATA
-    """
-    query = "select object_value from rnkCITATIONDATA where object_name='selfcitdict'"
+    query = "select object_value from rnkCITATIONDATA where object_name='"+dname+"'"
     try:
         compressed_sc_dic = run_sql(query)
     except OperationalError:
@@ -76,8 +42,8 @@ def init_selfcite_dictionary():
                 sc_dic = []
     return sc_dic
 
-cache_cited_by_dictionary = init_cited_by_dictionary()
-cache_reference_list_dictionary = init_reference_list_dictionary()
+cache_cited_by_dictionary = init_db_dictionary("citationdict")
+cache_reference_list_dictionary = init_db_dictionary("reversedict")
 
 ### INTERFACE
 
@@ -146,14 +112,28 @@ def calculate_cited_by_list(record_id, sort_order="d"):
 
     return result
 
-def get_self_cited(record_id):
-    """Return a list of doc ids for the
-       rec id given as param. 
+def get_self_cited_by(record_id):
+    """Return a list of doc ids [y1,y2,..] for the
+       rec id x given as param, so that x cites y1,y2,.. and x and each y share an author
     """
     result = []
-    sc = init_selfcite_dictionary()
+    sc = init_db_dictionary("selfcitedict")
     if sc and sc.has_key(record_id):
-	record = sc[record_id]
+	result.extend(sc[record_id])
+    if (len(result) == 0):
+	return None
+    return result
+
+def get_self_cited_in(record_id):
+    """Return a list of doc ids [y1,y2,..] for the
+       rec id x given as param, so that x is cited in y1,y2,.. and x and each y share an author
+    """
+    result = []
+    sc = init_db_dictionary("selfcitedbydict")
+    if sc and sc.has_key(record_id):
+	result.extend(sc[record_id])
+    if (len(result) == 0):
+	return None
     return result
 
 def calculate_co_cited_with_list(record_id, sort_order="d"):

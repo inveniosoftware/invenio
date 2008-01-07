@@ -394,7 +394,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
 	write_message("reference_list (x cites y): "+str(reference_list),sys.stderr)	
 	write_message("selfcitedbydic (x is cited by y and one of the authors of x same as y's): "+str(selfcitedbydic),sys.stderr)	
 	write_message("selfdic (x cites y and one of the authors of x same as y's): "+str(selfdic),sys.stderr)	
-    insert_cit_ref_list_intodb(citation_list, reference_list, selcitedbydic, selfdic)
+    insert_cit_ref_list_intodb(citation_list, reference_list, selfcitedbydic, selfdic)
 
     t5 = os.times()[4]
     print "\nExecution time for analyzing the citation information generating the dictionary: "
