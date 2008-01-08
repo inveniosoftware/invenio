@@ -33,6 +33,21 @@ try:
     ### Let's try to use SnowBall PyStemmer
     import Stemmer
 
+    _lang_map = {
+        'danish' : 'da',
+        'dutch' : 'nl',
+        'english' : 'en',
+        'finnish' : 'fi',
+        'german' : 'de',
+        'italian' : 'it',
+        'norwegian' : 'no',
+        'portuguese' : 'pt',
+        'russian' : 'ru',
+        'spanish' : 'es',
+        'swedish' : 'sv'
+    }
+
+
     def is_stemmer_available_for_language(lang):
         """Return true if stemmer for language LANG is available.
         Return false otherwise.
@@ -52,9 +67,11 @@ try:
     def _create_stemmers():
         """Create stemmers dictionary for all possible languages."""
         stemmers_initialized = {}
-        for lang in Stemmer.algorithms():
+        for src_lang in Stemmer.algorithms():
             try:
-                stemmers_initialized[lang] = Stemmer.Stemmer(lang, 40000)
+                dst_lang = _lang_map.get(src_lang, None)
+                if dst_lang:
+                    stemmers_initialized[dst_lang] = Stemmer.Stemmer(src_lang, 40000)
             except TypeError:
                 pass
         return stemmers_initialized
@@ -405,11 +422,11 @@ except ImportError:
         """Return true if stemmer for language LANG is available.
         Return false otherwise.
         """
-        return lang == 'english'
+        return lang == 'en'
 
     def stem(word, lang=CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE):
-        """Return WORD stemmed according to language LANG (e.g. 'english')."""
-        if lang == 'english':
+        """Return WORD stemmed according to language LANG (e.g. 'en')."""
+        if lang == 'en':
             return _stemmers[get_ident()].stem(word, 0, len(word)-1)
         else:
             return word
