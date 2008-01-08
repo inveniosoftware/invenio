@@ -551,7 +551,7 @@ def get_list_of_issues_for_publication(publication):
                 issue_nr = str(i)
                 if len(issue_nr) == 1:
                     issue_nr = "0" + issue_nr
-                issues.append("%s/%s" % (issue_nr, year))
+                issues.append("%s/%s" % (issue_nr, str(int(year)-1)))
             for i in range(1, int(high_bound) + 1):
                 issue_nr = str(i)
                 if len(issue_nr) == 1:
