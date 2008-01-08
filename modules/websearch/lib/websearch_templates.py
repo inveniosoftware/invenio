@@ -2595,13 +2595,13 @@ class Template:
 
           - 'ln' *string* - The language to display
 
-          - citinglist *string* - citinglist box
+          - citinglist *list* - a list of tuples [(x1,y1),(x2,y2),..] where x is doc id and y is number of citations 
 
           - citationhistory *string* - citationhistory box
 
           - cociting *string* - cociting box
 
-          - selfcited *string* - selfcited box
+          - selfcited list - a list of self-citations for recID
 
         """
         # load the right message language
@@ -2627,7 +2627,13 @@ class Template:
         if CFG_BIBRANK_SHOW_CITATION_GRAPHS and selfcited is not None:
 	    sc_scorelist = [] #a score list for print..
 	    for s in selfcited:
-		tmp = [s,0]
+		#copy weight from citations
+		weight = 0
+		for c in citinglist:
+			(crec,score) = c
+			if crec == s:
+				weight = score
+		tmp = [s,weight]
 		sc_scorelist.append(tmp)
             scite = self.tmpl_print_record_list_for_similarity_boxen (
                 _(".. of which self-citations: %s records") % len (selfcited), sc_scorelist, ln)

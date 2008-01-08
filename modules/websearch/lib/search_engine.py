@@ -2649,14 +2649,14 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         if r:
                             cociting = r
 
-                        content = websearch_templates.tmpl_detailed_record_citations(recIDs[irec],
+                        content = websearch_templates.tmpl_detailed_record_citations(rid,
                                                                                      ln,
                                                                                      citinglist=citinglist,
                                                                                      citationhistory=citationhistory,
                                                                                      cociting=cociting,
 										     selfcited=selfcited)
                         req.write(webstyle_templates.detailed_record_container(content,
-                                                                               recIDs[irec],
+                                                                               rid,
                                                                                tabs,
                                                                                ln))
                     elif tab == 'references':
