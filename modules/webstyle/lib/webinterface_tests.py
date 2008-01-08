@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -34,7 +34,7 @@ import unittest, sys, cgi
 class _FakeApache(object):
 
     SERVER_RETURN = 'RETURN'
-    
+
     def __init__(self):
         self.table = None
         self.log_error = None
@@ -55,8 +55,8 @@ class _FakeApache(object):
         self.APR_PIPE = None
         self.APR_LNK = None
         self.APR_SOCK = None
-        self.APR_UNKFILE = None        
-        
+        self.APR_UNKFILE = None
+
     def parse_qs(self, *args, **kargs):
         return cgi.parse_qs(*args, **kargs)
 
@@ -98,14 +98,14 @@ class TestWashArgs(unittest.TestCase):
 
         if not 'ln' in expected:
             expected['ln'] = cdslang
-            
+
         self.failUnlessEqual(result, expected)
 
     def test_single_string(self):
         """ webinterface - check retrieval of a single string field """
 
         default = {'c': (str, 'default')}
-        
+
         self._check('c=Test1', default, {'c': 'Test1'})
         self._check('d=Test1', default, {'c': 'default'})
         self._check('c=Test1&c=Test2', default, {'c': 'Test1'})
@@ -114,7 +114,7 @@ class TestWashArgs(unittest.TestCase):
         """ webinterface - check retrieval of a list of values """
 
         default = {'c': (list, ['default'])}
-        
+
         self._check('c=Test1', default, {'c': ['Test1']})
         self._check('c=Test1&c=Test2', default, {'c': ['Test1', 'Test2']})
         self._check('d=Test1', default, {'c': ['default']})
@@ -123,7 +123,7 @@ class TestWashArgs(unittest.TestCase):
         """ webinterface - check casting into an int. """
 
         default = {'jrec': (int, -1)}
-        
+
         self._check('jrec=12', default, {'jrec': 12})
         self._check('jrec=', default, {'jrec': -1})
         self._check('jrec=foo', default, {'jrec': -1})
