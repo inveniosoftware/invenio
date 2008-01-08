@@ -536,7 +536,7 @@ def get_list_of_issues_for_publication(publication):
     year = publication.split("/")[1]
     issues_string = publication.split("/")[0]
     bounds = issues_string.split("-")
-    if len(issues_string) == 2:
+    if len(bounds) == 2:
         low_bound = issues_string.split("-")[0]
         high_bound = issues_string.split("-")[1]
         issues = []
