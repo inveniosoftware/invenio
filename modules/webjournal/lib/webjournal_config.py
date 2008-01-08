@@ -457,6 +457,37 @@ class InvenioWebJournalReleaseUpdateError(Exception):
                       contact the Administrator. We apologize for the \
                       inconvenience.'))
     
+class InvenioWebJournalReleaseDBError(Exception):
+    """
+    Exception that is thrown if an update release was not successful.
+    """
+    def __init__(self, language):
+        """
+        Initialisation.
+        """
+        self.language = language
+        
+    def __str__(self):
+        """
+        String representation.
+        """
+        return 'There was an error in synchronizing DB times with the actual \
+        python time objects. Debug the code in: \
+        webjournal_utils.issue_times_to_week_strings'
+    
+    def user_box(self):
+        """
+        user-friendly message with formatting.
+        """
+        _ = gettext_set_language(self.language)
+        return tmpl_webjournal_error_box(self.language,
+                    _('Publish DB Error'),
+                    _('There was an internal error'),
+                    _('We encountered an internal error trying to publish the \
+                      journal issue. You can try to launch the publish interface \
+                      again or contact the Administrator. We apologize for the \
+                      inconvenience.'))
+    
 class InvenioWebJournalIssueNotFoundDBError(Exception):
     """
     Exception that is thrown if there was an issue number not found in the

@@ -61,7 +61,7 @@ def format(bfo, title_en="", title_fr=""):
         out = '''
 <div id="weather" style="background: url(%s) left bottom no-repeat;" class="rmenuitem">
     <h3 class="rmenutext">
-        <a href="http://weather.yahoo.com/" target="_blank"%s</a>
+        <a href="http://weather.yahoo.com/" target="_blank">%s</a>
     </h3>
 </div>
 <ul class="rmenulist">

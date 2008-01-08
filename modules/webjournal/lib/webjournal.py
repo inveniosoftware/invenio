@@ -49,7 +49,12 @@ from invenio.webjournal_utils import get_recid_from_order_CERNBulletin, \
                                     get_next_journal_issues, \
                                     issue_times_to_week_strings, \
                                     issue_week_strings_to_times, \
-                                    release_journal_issue
+                                    release_journal_issue, \
+                                    was_alert_sent_for_issue, \
+                                    update_DB_for_alert, \
+                                    get_current_issue, \
+                                    get_current_publication, \
+                                    get_list_of_issues_for_publication
 from invenio.webjournal_templates import tmpl_webjournal_alert_success_msg, \
                                 tmpl_webjournal_alert_subject_CERNBulletin, \
                                 tmpl_webjournal_alert_plain_text_CERNBulletin, \
@@ -57,7 +62,9 @@ from invenio.webjournal_templates import tmpl_webjournal_alert_success_msg, \
                                 tmpl_webjournal_issue_control_interface, \
                                 tmpl_webjournal_issue_control_success_msg, \
                                 tmpl_webjournal_update_an_issue, \
-                                tmpl_webjournal_updated_issue_msg
+                                tmpl_webjournal_updated_issue_msg, \
+                                tmpl_webjournal_alert_was_already_sent, \
+                                tmpl_webjournal_admin_interface
 
 def perform_request_index(req, journal_name, issue_number, language, category):
     """
@@ -198,9 +205,21 @@ def perform_request_article(req, journal_name, issue_number, language,
     
     return html_out
 
+def perform_request_administrate(journal_name, language):
+    """
+    """
+    current_issue = get_current_issue(language, journal_name)
+    current_publication = get_current_publication(journal_name,
+                                                  current_issue,
+                                                  language)
+    issue_list = get_list_of_issues_for_publication(current_publication)
+    return tmpl_webjournal_admin_interface(journal_name, current_issue,
+                                current_publication, issue_list, language)
+    
+
 def perform_request_alert(req, journal_name, issue_number, language,
                               sent, plain_text, subject, recipients,
-                              html_mail):
+                              html_mail, force):
     """
     All the logic for alert emails.
     Messages are retrieved from templates. (should be migrated to msg class)
@@ -216,7 +235,14 @@ def perform_request_alert(req, journal_name, issue_number, language,
         interface = tmpl_webjournal_alert_interface(language, journal_name,
                                                     subject, plain_text)
         return page(title="alert system", body=interface)
-    else:    
+    else:
+        if was_alert_sent_for_issue(issue_number,
+                                    journal_name,
+                                    language) != False and force == "False":
+            return tmpl_webjournal_alert_was_already_sent(language, journal_name,
+                                                          subject, plain_text,
+                                                          recipients,
+                                                          html_mail, issue_number)
         if html_mail == "html": 
             html_file = urlopen('%s/journal/?name=%s&ln=en'
                                 % (weburl, journal_name))    
@@ -231,6 +257,7 @@ def perform_request_alert(req, journal_name, issue_number, language,
         server = smtplib.SMTP("localhost", 25)
         server.sendmail('Bulletin-Support@cern.ch', recipients, message)
         # todo: has to go to some messages config
+        update_DB_for_alert(issue_number, journal_name, language)    
         return tmpl_webjournal_alert_success_msg(language, journal_name)
     
 def perform_request_issue_control(req, journal_name, issue_numbers,
@@ -241,7 +268,7 @@ def perform_request_issue_control(req, journal_name, issue_numbers,
     the which issue is currently active for the journal.
     Todo: move issue control to DB
     """
-    if action == "cfg" or action == "Refresh":
+    if action == "cfg" or action == "Refresh" or action == "Add_One":
         # find out if we are in update or release
         try:
             current_issue_time = get_current_issue_time(journal_name)
@@ -259,14 +286,13 @@ def perform_request_issue_control(req, journal_name, issue_numbers,
             next_issue_week = None
             all_issue_weeks.sort()
             for issue_week in all_issue_weeks:
-                current_issue_week = time.strftime("%W/%Y", current_issue_time)
                 if issue_week > current_issue_time:
                     next_issue_week = issue_week
                     break
             output = tmpl_webjournal_update_an_issue(language,
                                     journal_name,
-                                    time.strftime("%W/%Y", next_issue_week),
-                                    time.strftime("%W/%Y", current_issue_time))   
+                                    issue_times_to_week_strings([next_issue_week,])[0],
+                                    issue_times_to_week_strings([current_issue_time,])[0])   
         else:
             # propose a release
             next_issues = get_next_journal_issues(current_issue_time,
@@ -275,10 +301,14 @@ def perform_request_issue_control(req, journal_name, issue_numbers,
                                                           language)
             if action == "Refresh":
                 next_issues += issue_numbers
-                highest_issue_so_far = max(next_issues)
-                highest_issue_so_far = issue_week_strings_to_times(
-                    [highest_issue_so_far,], language)
-                one_more_issue = get_next_journal_issues(highest_issue_so_far[0],
+                next_issues = list(sets.Set(next_issues))# avoid double entries
+            elif action == "Add_One":
+                next_issues += issue_numbers
+                next_issues = list(sets.Set(next_issues))# avoid double entries
+                next_issues_times = issue_week_strings_to_times(next_issues,
+                                                                language)
+                highest_issue_so_far = max(next_issues_times)
+                one_more_issue = get_next_journal_issues(highest_issue_so_far,
                                                          journal_name,
                                                          language,
                                                          1)

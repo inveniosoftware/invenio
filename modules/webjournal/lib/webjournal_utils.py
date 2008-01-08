@@ -216,9 +216,7 @@ def get_monday_of_the_week(week_number, year):
     CERN Bulletin specific function that returns a string indicating the
     Monday of each week as: Monday <dd> <Month> <Year>
     """
-    timetuple = time.strptime('1-%s-%s' % (week_number, year), "%w-%W-%Y")
-    #time_string = time.strftime("%A %d %B %Y", timetuple)
-    #raise "HERE: %s %s %s" % (week_number, year, time_string)
+    timetuple = issue_week_strings_to_times(['%s/%s' % (week_number, year), ])[0]
     return time.strftime("%A %d %B %Y", timetuple)
 
 def get_issue_number_display(issue_number, journal_name, language=cdslang):
@@ -236,7 +234,10 @@ def get_current_issue_time(journal_name, language=cdslang):
     Return the current issue of a journal as a time object.
     """
     current_issue = get_current_issue(language, journal_name)
-    current_issue_time = time.strptime("1/" + current_issue, "%w/%W/%Y")
+    week_number = current_issue.split("/")[0]
+    year = current_issue.split("/")[1]
+    current_issue_time = issue_week_strings_to_times(['%s/%s' %
+                                                      (week_number, year), ])[0]
     return current_issue_time
 
 def get_all_issue_weeks(issue_time, journal_name, language):
@@ -248,7 +249,7 @@ def get_all_issue_weeks(issue_time, journal_name, language):
     """
     from invenio.webjournal_config import InvenioWebJournalIssueNotFoundDBError
     journal_id = get_journal_id(journal_name)
-    issue_string = time.strftime("%W/%Y", issue_time)
+    issue_string = issue_times_to_week_strings([issue_time,])[0]
     try:
         issue_display = run_sql(
         "SELECT issue_display FROM jrnISSUE WHERE issue_number=%s \
@@ -265,9 +266,9 @@ def get_all_issue_weeks(issue_time, journal_name, language):
         if int(issue_bounds[0]) > int(issue_bounds[1]):
             # get everything from the old year
             old_year_issues = []
-            low_bound_time = time.strptime("1/%s/%s" %
-                                           (issue_bounds[0], str(int(year)-1)),
-                                           "%w/%W/%Y")
+            low_bound_time = issue_week_strings_to_times(['%s/%s' %
+                                                          (issue_bounds[0],
+                                                           str(int(year)-1)), ])[0]
             # if the year changes over the week we always take the higher year
             low_bound_date = datetime.date(int(time.strftime("%Y", low_bound_time)),
                                             int(time.strftime("%m", low_bound_time)),
@@ -277,29 +278,23 @@ def get_all_issue_weeks(issue_time, journal_name, language):
             # count up the weeks until you get to the new year
             while date.year != int(year):
                 old_year_issues.append(date.timetuple())
-                format = time.strftime("%W/%Y", date.timetuple())
+                #format = time.strftime("%W/%Y", date.timetuple())
                 date = date + week_counter
             # get everything from the new year
             new_year_issues = []
             for i in range(1, int(issue_bounds[1])+1):
-                to_append = time.strptime("1/%s/%s"
-                                                     % (i, year),
-                                                     "%w/%W/%Y")
-                format = time.strftime("%W/%Y", to_append)
-                new_year_issues.append(time.strptime("1/%s/%s"
-                                                     % (i, year),
-                                                     "%w/%W/%Y"))
+                to_append = issue_week_strings_to_times(['%s/%s' % (i, year),])[0]
+                new_year_issues.append(to_append)
             all_issue_weeks += old_year_issues
             all_issue_weeks += new_year_issues
         else:
             for i in range(int(issue_bounds[0]), int(issue_bounds[1])+1):
-                all_issue_weeks.append(time.strptime("1/%s/%s" %
-                                                     (i, year),
-                                                     "%w/%W/%Y"))
+                to_append = issue_week_strings_to_times(['%s/%s' % (i, year),])[0]
+                all_issue_weeks.append(to_append)
     elif len(issue_bounds) == 1:
-        all_issue_weeks.append(time.strptime("1/%s/%s" %
-                                             (issue_bounds[0], year),
-                                             "%w/%W/%Y"))
+        to_append = issue_week_strings_to_times(['%s/%s' %
+                                                 (issue_bounds[0], year),])[0]
+        all_issue_weeks.append(to_append)
     else:
         return False
     
@@ -310,6 +305,10 @@ def get_next_journal_issues(current_issue_time, journal_name,
     """
     Returns the <number> next issue numbers from the current_issue_time.
     """
+    #now = '%s-%s-%s 00:00:00' % (int(time.strftime("%Y", current_issue_time)),
+    #                                     int(time.strftime("%m", current_issue_time)),
+    #                                     int(time.strftime("%d", current_issue_time)))
+    #
     now = datetime.date(int(time.strftime("%Y", current_issue_time)),
                         int(time.strftime("%m", current_issue_time)),
                         int(time.strftime("%d", current_issue_time)))
@@ -318,17 +317,109 @@ def get_next_journal_issues(current_issue_time, journal_name,
     next_issues = []
     for i in range(1, number+1):
         date = date + week_counter
+        #date = run_sql("SELECT %s + INTERVAL 1 WEEK", (date,))[0][0]
+        #date_formated = time.strptime(date, "%Y-%m-%d %H:%M:%S")
+        #raise '%s  %s' % (repr(now), repr(date_formated))
         next_issues.append(date.timetuple())
+        #next_issues.append(date_formated)
     return next_issues
 
 def issue_times_to_week_strings(issue_times, language=cdslang):
     """
-    Converts a list of python time to a list of strings in format WW/YYYY.
+    Function that approaches a correct python time to MySQL time week string
+    conversion by looking up and down the time horizon and always rechecking
+    the python time with the mysql result until a week string match is found.
     """
     issue_strings = []
     for issue in issue_times:
-        issue_strings.append(time.strftime("%W/%Y", issue))
+        # do the initial pythonic week view
+        week = time.strftime("%W/%Y", issue)
+        week += " Monday" 
+        Limit = 5
+        counter = 0
+        success = False
+        # try going up 5
+        while success == False and counter <= Limit:
+            counter += 1
+            success = get_consistent_issue_week(issue, week)
+            if success == False:
+                week = count_week_string_up(week)
+            else:
+                break
+        # try going down 5
+        counter = 0
+        while success == False and counter <= Limit:
+            counter += 1
+            success = get_consistent_issue_week(issue, week)
+            if success == False:
+                week = count_week_string_down(week)
+            else:
+                break
+            
+        from webjournal_config import InvenioWebJournalReleaseDBError
+        if success == False:
+            raise InvenioWebJournalReleaseDBError(lang)
+
+        #check_for_time = run_sql("SELECT STR_TO_DATE(%s, %s)",
+        #                     (week, conversion_rule))[0][0]
+        #while (issue != check_for_time.timetuple()):
+        #    week = str(int(week.split("/")[0]) + 1) + "/" + week.split("/")[1] 
+        #    if week[1] == "/":
+        #        week = "0" + week
+        #    #raise repr(week)
+        #    check_for_time = run_sql("SELECT STR_TO_DATE(%s, %s)",
+        #                     (week, conversion_rule))[0][0]
+        issue_strings.append(week.split(" ")[0])
     return issue_strings
+
+def count_week_string_up(week):
+    """
+    Function that takes a week string representation and counts it up by one.
+    """
+    week_nr = week.split("/")[0]
+    year = week.split("/")[1]
+    if week_nr == "53":
+        week_nr = "01"
+        year = str(int(year) + 1)
+    else:
+        week_nr = str(int(week_nr) + 1)
+        if len(week_nr) == 1:
+            week_nr = "0" + week_nr
+    return "%s/%s" % (week_nr, year)        
+
+def count_week_string_down(week):
+    """
+    Function that takes a week string representation and counts it down by one.
+    """
+    week_nr = week.split("/")[0]
+    year = week.split("/")[1]
+    if week_nr == "01":
+        week_nr = "53"
+        year = str(int(year)-1)
+    else:
+        week_nr = str(int(week_nr)-1)
+        if len(week_nr) == 1:
+            week_nr = "0" + week_nr
+    return "%s/%s" % (week_nr, year)
+        
+def get_consistent_issue_week(issue_time, issue_week):
+    """
+    This is the central consistency function between our Python and MySQL dates.
+    We use mysql times because of a bug in Scientific Linux that does not allow
+    us to reconvert a week number to a timetuple.
+    The function takes a week string, e.g. "02/2008" and its according timetuple
+    from our functions. Then it retrieves the mysql timetuple for this week and
+    compares the two times. If they are equal our times are consistent, if not,
+    we return False and some function should try to approach a consisten result
+    (see example in issue_times_to_week_strings()).
+    """
+    conversion_rule = '%v/%x %W'
+    mysql_repr = run_sql("SELECT STR_TO_DATE(%s, %s)",
+                             (issue_week, conversion_rule))[0][0]
+    if mysql_repr.timetuple() == issue_time:
+        return issue_week
+    else:
+        return False
 
 def issue_week_strings_to_times(issue_weeks, language=cdslang):
     """
@@ -336,8 +427,13 @@ def issue_week_strings_to_times(issue_weeks, language=cdslang):
     """
     issue_times = []
     for issue in issue_weeks:
-        issue_times.append(time.strptime("1/%s" % issue,
-                                         "%w/%W/%Y"))
+        week_number = issue.split("/")[0]
+        year = issue.split("/")[1]
+        to_convert = '%s/%s Monday' % (year, week_number)
+        conversion_rule = '%x/%v %W'
+        result = run_sql("SELECT STR_TO_DATE(%s, %s)",
+                         (to_convert, conversion_rule))[0][0]
+        issue_times.append(result.timetuple())
     return issue_times
 
 def release_journal_update(update_issue, journal_name, language=cdslang):
@@ -350,13 +446,28 @@ def release_journal_update(update_issue, journal_name, language=cdslang):
                 AND id_jrnJOURNAL=%s", (update_issue,
                                         journal_id))
 
+def sort_by_week_number(x, y):
+    """
+    Sorts a list of week numbers.
+    """
+    year_x = x.split("/")[1]
+    year_y = y.split("/")[1]
+    if cmp(year_x, year_y) != 0:
+        return cmp(year_x, year_y)
+    else:
+        week_x = x.split("/")[0]
+        week_y = y.split("/")[0]
+        return cmp(week_x, week_y)
+
 def release_journal_issue(publish_issues, journal_name, language=cdslang):
     """
+    Releases a new issue.
     """
     journal_id = get_journal_id(journal_name, language)
     if len(publish_issues) > 1:
-        low_bound = min(publish_issues)
-        high_bound = max(publish_issues)
+        publish_issues.sort(sort_by_week_number)
+        low_bound = publish_issues[0]
+        high_bound = publish_issues[-1]
         issue_display = '%s-%s/%s' % (low_bound.split("/")[0],
                                       high_bound.split("/")[0],
                                       high_bound.split("/")[1])
@@ -370,7 +481,107 @@ def release_journal_issue(publish_issues, journal_name, language=cdslang):
                                       publish_issue,
                                       issue_display))
     # set first issue to published
-    release_journal_update(min(publish_issues), journal_name, language)
+    release_journal_update(publish_issues[0], journal_name, language)
+
+def delete_journal_issue(issue, journal_name, language=cdslang):
+    """
+    Deletes an issue from the DB.
+    """
+    journal_id = get_journal_id(journal_name, language)
+    run_sql("DELETE FROM jrnISSUE WHERE issue_number=%s \
+            AND id_jrnJOURNAL=%s",(issue, journal_id))
+    
+def was_alert_sent_for_issue(issue, journal_name, language):
+    """
+    """
+    journal_id = get_journal_id(journal_name, language)
+    date_announced = run_sql("SELECT date_announced FROM jrnISSUE \
+                                WHERE issue_number=%s \
+                                AND id_jrnJOURNAL=%s", (issue, journal_id))[0][0]
+    if date_announced == None:
+        return False
+    else:
+        return date_announced.timetuple()
+    
+def update_DB_for_alert(issue, journal_name, language):
+    """
+    """
+    journal_id = get_journal_id(journal_name, language)
+    run_sql("UPDATE jrnISSUE set date_announced=NOW() \
+                WHERE issue_number=%s \
+                AND id_jrnJOURNAL=%s", (issue,
+                                        journal_id))
+    
+def get_number_of_articles_for_issue(issue, journal_name, language=cdslang):
+    """
+    Function that returns a dictionary with all categories and number of
+    articles in each category.
+    """
+    config_strings = get_xml_from_config(["rule",], journal_name)
+    rule_list = config_strings["rule"]
+    all_articles = {}
+    for rule in rule_list:
+        category_name = rule.split(",")[0]
+        all_records_of_a_type = list(search_pattern(p='65017a:"%s" and 773__n:%s' %
+                                      (category_name, issue),
+                                      f="&action_search=Search"))
+        all_articles[category_name] = len(all_records_of_a_type)
+    return all_articles
+
+def get_list_of_issues_for_publication(publication):
+    """
+    Takes a publication string, e.g. 23-24/2008 and splits it down to a list
+    of single issues.
+    """
+    year = publication.split("/")[1]
+    issues_string = publication.split("/")[0]
+    low_bound = issues_string.split("-")[0]
+    high_bound = issues_string.split("-")[1]
+    issues = []
+    if int(low_bound) < int(high_bound):
+        for i in range(int(low_bound), int(high_bound)+1):
+            issue_nr = str(i)
+            if len(issue_nr) == 1:
+                issue_nr = "0" + issue_nr
+            issues.append("%s/%s" % (issue_nr, year))
+    else:
+        for i in range(int(low_bound), 53+1):
+            issue_nr = str(i)
+            if len(issue_nr) == 1:
+                issue_nr = "0" + issue_nr
+            issues.append("%s/%s" % (issue_nr, year))
+        for i in range(1, int(high_bound) + 1):
+            issue_nr = str(i)
+            if len(issue_nr) == 1:
+                issue_nr = "0" + issue_nr
+            issues.append("%s/%s" % (issue_nr, year))
+    return issues
+
+def get_release_time(issue, journal_name, language=cdslang):
+    """
+    Gets the date at which an issue was released from the DB.
+    """
+    journal_id = get_journal_id(journal_name, language)
+    release_date = run_sql("SELECT date_released FROM jrnISSUE \
+                           WHERE issue_number=%s AND id_jrnJOURNAL=%s",
+                            (issue, journal_id))[0][0]
+    if release_date == None:
+        return False
+    else:
+        return release_date.timetuple()
+    
+def get_announcement_time(issue, journal_name, language=cdslang):
+    """
+    Get the date at which an issue was announced through the alert system.
+    """
+    journal_id = get_journal_id(journal_name, language)
+    announce_date = run_sql("SELECT date_announced FROM jrnISSUE \
+                           WHERE issue_number=%s AND id_jrnJOURNAL=%s",
+                            (issue, journal_id))[0][0]
+    if announce_date == None:
+        return False
+    else:
+        return announce_date.timetuple()
 
 ######################## GET DEFAULTS FUNCTIONS ###############################
 
@@ -422,6 +633,17 @@ def get_current_issue(language, journal_name):
                                       current_issue))
     return current_issue
 
+def get_current_publication(journal_name, current_issue, language=cdslang):
+    """
+    Returns the current publication string (current issue + updates).
+    """
+    journal_id = get_journal_id(journal_name, language)
+    current_publication =  run_sql("SELECT issue_display FROM jrnISSUE \
+                                   WHERE issue_number=%s AND \
+                                    id_jrnJOURNAL=%s",
+                                    (current_issue, journal_id))[0][0]
+    return current_publication
+    
 def get_xml_from_config(xpath_list, journal_name):
     """
     wrapper for minidom.getElementsByTagName()

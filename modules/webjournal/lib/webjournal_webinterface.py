@@ -69,7 +69,8 @@ from invenio.webjournal import perform_request_index, \
                                 perform_request_article, \
                                 perform_request_alert, \
                                 perform_request_issue_control, \
-                                perform_request_popup
+                                perform_request_popup, \
+                                perform_request_administrate
 from invenio.webjournal_templates import tmpl_webjournal_regenerate_success, \
                                 tmpl_webjournal_regenerate_error, \
                                 tmpl_webjournal_feature_record_interface, \
@@ -83,7 +84,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     """Defines the set of /journal pages."""
 
     _exports = ['', 'article', 'issue_control', 'edit_article', 'alert',
-                'feature_record', 'popup', 'regenerate']
+                'feature_record', 'popup', 'regenerate', 'administrate']
     # profiler
     #def index(self, req, form):
     #    import hotshot
@@ -168,6 +169,10 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         except InvenioWebJournalNoArticleNumberError, e:
             register_exception(req=req)
             return e.user_box()
+        # automatically make all logged in users of cfgwebjournal editors
+        if acc_authorize_action(getUid(req), 'cfgwebjournal',
+                                name="%s" % journal_name)[0] == 0:
+            editor = "True"
         # the journal_defaults will be used by format elements that have no
         # direct access to the params here, no more checking needed
         req.journal_defaults = {"name" : journal_name,
@@ -176,7 +181,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                 "category" : category,
                                 "editor" : editor,
                                 "number" : number}
-        
+            
         html = perform_request_article(req, journal_name, issue_number,
                                        language, category, number, editor)
         return html
@@ -210,7 +215,26 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
 
     def administrate(self, req, form):
         """Index page."""
-        return "Not implemented yet."
+        argd = wash_urlargd(form, {'name': (str, ""),
+                                    'ln': (str, "")
+                                    })
+        try:
+            language = wash_journal_language(argd['ln'])
+            journal_name = wash_journal_name(language, argd['name'])
+        except InvenioWebJournalNoJournalOnServerError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalNoNameError, e:
+            register_exception(req=req)
+            return e.user_box()
+        # check for user rights
+        if acc_authorize_action(getUid(req), 'cfgwebjournal',
+                                name="%s" % journal_name)[0] != 0:
+            return please_login(req, journal_name,
+                                backlink='%s/journal/feature_record?name=%s'
+                                % (weburl, journal_name))
+        
+        return perform_request_administrate(journal_name, language)
     
     def feature_record(self, req, form):
         """
@@ -307,7 +331,8 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                     'recipients': (str, ""),
                                     'subject': (str, ""),
                                     'ln': (str, ""),
-                                    'issue': (str, "")})
+                                    'issue': (str, ""),
+                                    'force': (str, "False")})
         try:
             language = wash_journal_language(argd['ln'])
             journal_name = wash_journal_name(language, argd['name'])
@@ -318,6 +343,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             recipients = argd['recipients']
             subject = argd['subject']
             sent = argd['sent']
+            force = argd['force']
         except InvenioWebJournalNoJournalOnServerError, e:
             register_exception(req=req)
             return e.user_box()
@@ -339,9 +365,8 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         
         html = perform_request_alert(req, journal_name, issue_number, language,
                               sent, plain_text, subject, recipients,
-                              html_mail)
+                              html_mail, force)
         return html
-    
     
     def issue_control(self, req, form):
         """
