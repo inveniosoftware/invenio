@@ -1906,15 +1906,19 @@ class Template:
         This version does not pay attention to locale.  See
         tmpl_nice_number_via_locale().
         """
-        chars_in = list(str(number))
-        number = len(chars_in)
-        chars_out = []
-        for i in range(0, number):
-            if i % 3 == 0 and i != 0:
-                chars_out.append(thousands_separator)
-            chars_out.append(chars_in[number-i-1])
-        chars_out.reverse()
-        return ''.join(chars_out)
+        if type(number) is float:
+            int_part, frac_part = str(number).split('.')
+            return '%s.%s' % (self.tmpl_nice_number(int(int_part), ln, thousands_separator), frac_part)
+        else:
+            chars_in = list(str(number))
+            number = len(chars_in)
+            chars_out = []
+            for i in range(0, number):
+                if i % 3 == 0 and i != 0:
+                    chars_out.append(thousands_separator)
+                chars_out.append(chars_in[number-i-1])
+            chars_out.reverse()
+            return ''.join(chars_out)
 
     def tmpl_nice_number_via_locale(self, number, ln=cdslang):
         """
@@ -2595,7 +2599,7 @@ class Template:
 
           - 'ln' *string* - The language to display
 
-          - citinglist *list* - a list of tuples [(x1,y1),(x2,y2),..] where x is doc id and y is number of citations 
+          - citinglist *list* - a list of tuples [(x1,y1),(x2,y2),..] where x is doc id and y is number of citations
 
           - citationhistory *string* - citationhistory box
 
@@ -2637,7 +2641,7 @@ class Template:
 		sc_scorelist.append(tmp)
             scite = self.tmpl_print_record_list_for_similarity_boxen (
                 _(".. of which self-citations: %s records") % len (selfcited), sc_scorelist, ln)
-            out += '<tr><td>'+scite+'</td></tr>' 
+            out += '<tr><td>'+scite+'</td></tr>'
 
         if CFG_BIBRANK_SHOW_CITATION_STATS and cociting is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen (
