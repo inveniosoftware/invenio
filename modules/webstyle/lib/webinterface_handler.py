@@ -301,17 +301,20 @@ def wash_urlargd(form, content):
     content. Content is a dictionary containing the field names as a
     key, and a tuple (type, default) as value.
 
-    'type' can be list, str, int, tuple, dict or mod_python.util.Field
-    (for file uploads).
+    'type' can be list, str, int, tuple, or mod_python.util.Field (for
+    file uploads).
 
     The specification automatically includes the 'ln' field, which is
     common to all queries.
 
     Arguments that are not defined in 'content' are discarded.
 
-    @Return: a dictionary that can be used for passing function
-    parameters by keywords.
+    Note that in case {list,tuple} were asked for, we assume that
+    {list,tuple} of strings is to be returned.  Therefore beware when
+    you want to use wash_urlargd() for multiple file upload forms.
 
+    @Return: argd dictionary that can be used for passing function
+    parameters by keywords.
     """
 
     result = {}
@@ -349,6 +352,8 @@ def wash_urlargd(form, content):
             result[k] = value
             continue
 
+        # Since we got here, 'value' is sure to be a single symbol,
+        # not a list kind of structure anymore.
         if dst_type in (str, int):
             try:
                 result[k] = dst_type(value)
@@ -356,13 +361,10 @@ def wash_urlargd(form, content):
                 result[k] = default
 
         elif dst_type is tuple:
-            result[k] = (value,)
+            result[k] = (str(value),)
 
         elif dst_type is list:
-            result[k] = [value]
-
-        elif dst_type is dict:
-            result[k] = {0: str(value)}
+            result[k] = [str(value)]
 
         else:
             raise ValueError('cannot cast form into type %r' % dst_type)
