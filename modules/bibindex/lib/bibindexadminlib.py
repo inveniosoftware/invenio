@@ -227,7 +227,7 @@ def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
         idx_fld = get_idx_fld(idxID)
         fld = ""
         for row in idx_fld:
-            fld += row[1] + ", "
+            fld += row[3] + ", "
         if fld.endswith(", "):
             fld = fld[:-2]
         if len(fld) == 0:
