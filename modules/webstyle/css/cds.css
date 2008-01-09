@@ -209,10 +209,13 @@ th.searchboxheader a:hover {
 }
 .headermoduleboxbody {
    color: #000;
-   background: #36c;
+   background: #fff;
    font-size: x-small;
    font-weight: bold;
    text-align: center;
+   border-left: 2px solid #36c;
+   border-right: 2px solid #36c;
+   border-top: 2px solid #36c;
    margin: 0px;
    padding: 0px;
    width: 75px;
@@ -224,55 +227,52 @@ th.searchboxheader a:hover {
 }
 .headermoduleboxbodyselected {
    color: #000;
-   background: #fff;
+   background: #36c;
    font-size: x-small;
    font-weight: bold;
    text-align: center;
-   border-left: 2px solid #36c;
-   border-right: 2px solid #36c;
-   border-top: 2px solid #36c;
    margin: 5px;
    padding: 0px;
    width: 75px;
 }
 a.header:link {
-   color: #fff;
-   background: #36c;
+   color: #36c;
+   background: #fff;
    text-decoration: none;
 }
 a.header:visited {
-   color: #fff;
-   background: #36c;
+   color: #36c;
+   background: #fff;
    text-decoration: none;
 }
 a.header:active {
-   color: #fff;
-   background: #36c;
+   color: #36c;
+   background: #fff;
    text-decoration: none;
 }
 a.header:hover {
+   color: #36c;
+   background: #fff;
+   text-decoration: none;
+}
+a.headerselected:link {
    color: #fff;
    background: #36c;
    text-decoration: none;
 }
-a.headerselected:link {
-   color: #36c;
-   background: #fff;
-   text-decoration: none;
-}
 a.headerselected:visited {
-   color: #36c;
-   background: #fff;
+   color: #fff;
+   background: #36c;
    text-decoration: none;
 }
 a.headerselected:active {
-   color: #36c;
-   background: #fff;
+   color: #fff;
+   background: #36c;
    text-decoration: none;
 }
 a.headerselected:hover {
-   color: #36c;
-   background: #fff;
+   color: #fff;
+   background: #36c;
    text-decoration: none;
 }
 .navtrailbox {
