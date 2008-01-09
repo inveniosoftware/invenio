@@ -238,6 +238,15 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             write_message("   Failed: error during update_bibfmt_format",
                         verbose=1, stream=sys.stderr)
             return (1, int(rec_id))
+        # archive MARCXML format of this record for version history purposes:
+        if opt_mode != 'format':
+            error = archive_marcxml_for_history(rec_id)
+            if error == 1:
+                write_message("   Failed to archive MARCXML for history",
+                              verbose=1, stream=sys.stderr)
+                return (1, int(rec_id))
+            else:
+                write_message("   -Archived MARCXML for history : DONE", verbose=2)
         write_message("   -Stage COMPLETED", verbose=2)
 
     # Update the database MetaData
@@ -1113,14 +1122,13 @@ def update_bibfmt_format(id_bibrec, format_value, format_name):
     """Update the format in the table bibfmt"""
     # We check if the format is already in bibFmt
     nb_found = find_record_format(id_bibrec, format_name)
-
     if nb_found == 1:
-        # Update the format
+        # we are going to update the format
         # get the current time
         now = convert_datestruct_to_datetext(time.localtime())
         # compress the format_value value
         pickled_format_value =  compress(format_value)
-
+        # update the format:
         query = """UPDATE bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s"""
         params = (now, pickled_format_value, id_bibrec, format_name)
         try:
@@ -1146,6 +1154,27 @@ def update_bibfmt_format(id_bibrec, format_value, format_name):
         else:
             write_message("   -Insert the format %s in bibfmt : DONE" % format_name , verbose=2)
             return 0
+
+def archive_marcxml_for_history(recID):
+    """
+    Archive current MARCXML format of record RECID from BIBFMT table
+    into hstRECORD table.  Useful to keep MARCXML history of records.
+
+    Return 0 if everything went fine.  Return 1 otherwise.
+    """
+    try:
+        res = run_sql("SELECT id_bibrec, value, last_updated FROM bibfmt WHERE format='xm' AND id_bibrec=%s",
+                      (recID,))
+        if res:
+            run_sql("""INSERT INTO hstRECORD (id_bibrec, marcxml, job_id, job_name, job_person, job_date, job_details)
+                                      VALUES (%s,%s,%s,%s,%s,%s,%s)""",
+                    (res[0][0], res[0][1], task_get_option('task'), 'bibupload', task_get_option('user'), res[0][2],
+                     'mode: ' + task_get_option('mode') + '; file: ' + task_get_option("file_path") + '.'))
+    except Error, error:
+        write_message("   Error during archive_marcxml_for_history: %s " % error,
+                      verbose=1, stream=sys.stderr)
+        return 1
+    return 0
 
 def update_database_with_metadata(record, rec_id):
     """Update the database tables with the record and the record id given in parameter"""
