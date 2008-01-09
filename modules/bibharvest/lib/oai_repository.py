@@ -42,24 +42,37 @@ from invenio.config import \
      supportemail, \
      weburl
 
-from invenio.oai_repository_config import *
 from invenio.dbquery import run_sql
 from invenio.search_engine import record_exists, perform_request_search
 from invenio.bibformat_dblayer import get_preformatted_record
 from invenio.bibformat import format_record
 
-verbs = {
-    "Identify"            : [""],
-    "ListSets"            : ["resumptionToken"],
-    "ListMetadataFormats" : ["resumptionToken"],
-    "ListRecords"         : ["resumptionToken"],
-    "ListIdentifiers"     : ["resumptionToken"],
-    "GetRecord"	          : [""]
-}
+## verbs = {
+##     "Identify"            : [""],
+##     "ListSets"            : ["resumptionToken"],
+##     "ListMetadataFormats" : ["resumptionToken"],
+##     "ListRecords"         : ["resumptionToken"],
+##     "ListIdentifiers"     : ["resumptionToken"],
+##     "GetRecord"	          : [""]
+## }
 
+verbs = {
+    'GetRecord'          : ['identifier', 'metadataPrefix'],
+    'Identify'           : [],
+    'ListIdentifiers'    : ['from', 'until',
+                            'metadataPrefix',
+                            'set',
+                            'resumptionToken'],
+    'ListMetadataFormats': ['identifier'],
+    'ListRecords'        : ['from', 'until',
+                            'metadataPrefix',
+                            'set',
+                            'resumptionToken'],
+    'ListSets'           : ['resumptionToken']
+    }
 params = {
     "verb" : ["Identify","ListIdentifiers","ListSets","ListMetadataFormats","ListRecords","GetRecord"],
-    "metadataPrefix" : ["","oai_dc","marcxml"],
+    "metadataPrefix" : ["oai_dc","marcxml"],
     "from" :[""],
     "until":[""],
     "set" :[""],
@@ -526,7 +539,7 @@ def oailistrecords(args):
                     if res:
                         out += res
 
-    if i >= CFG_OAI_LOAD:
+    if resumptionToken_printed:
         oaicacheclean()
         sysno.append(arg['metadataPrefix'])
         oaicachein(arg['resumptionToken'], sysno)
@@ -647,7 +660,7 @@ def oailistidentifiers(args):
                                 out = "%s      <setSpec>%s</setSpec>\n" % (out, set)
                         out = out + "    </header>\n"
 
-    if i >= CFG_OAI_LOAD:
+    if resumptionToken_printed:
         oaicacheclean() # clean cache from expired resumptionTokens
         oaicachein(arg['resumptionToken'], sysno)
 
@@ -823,13 +836,13 @@ def parse_args(args=""):
     "Parse input args"
 
     out_args = {
-        "verb"             : "",
-        "metadataPrefix"   : "",
-        "from"             : "",
-        "until"            : "",
-        "set"              : "",
-        "identifier"       : "",
-        "resumptionToken"  : ""
+       "verb"             : "",
+       "metadataPrefix"   : "",
+       "from"             : "",
+       "until"            : "",
+       "set"              : "",
+       "identifier"       : "",
+       "resumptionToken"  : ""
     }
 
     if args == "" or args is None:
@@ -856,16 +869,6 @@ def parse_args(args=""):
 def check_args(arguments):
     "Check OAI arguments"
 
-    out_args = {
-        "verb"             : "",
-        "metadataPrefix"   : "",
-        "from"             : "",
-        "until"            : "",
-        "set"              : "",
-        "identifier"       : "",
-        "resumptionToken"  : ""
-    }
-
     out = ""
 
 ## principal argument required
@@ -880,80 +883,89 @@ def check_args(arguments):
 #
 #
     for param in arguments.keys():
-        if out_args.has_key(param):
-            pass
-        else:
+        if not param in verbs.get(arguments['verb'], []) and param != 'verb':
             out = out + oai_error("badArgument", "The request includes illegal arguments")
-
-## unique args
-#
-#
-    for param in arguments.keys():
-        if (arguments[param] == "Error"):
-            out = out + oai_error("badArgument", "The request includes illegal arguments")
+            break # Indicate only once
 
 ## resumptionToken exclusive
 #
 #
-    if ((arguments['from'] != "" or arguments['until'] != "" or arguments['metadataPrefix'] != "" or arguments['identifier'] != "" or arguments['set'] != "") and arguments['resumptionToken'] != ""):
-
-        out = out + oai_error("badArgument", "The request includes illegal arguments")
+    if arguments.get('resumptionToken', '') != "" and \
+           len(arguments.keys()) != 2:
+        out = out + oai_error("badArgument",
+                              "The request includes illegal arguments")
 
 ## datestamp formats
 #
 #
-    if arguments['from'] != "":
+    if arguments.has_key('from') and \
+           'from' in verbs.get(arguments['verb'], []):
         from_length = len(arguments['from'])
         if check_date(arguments['from']) == "":
-            out = out + oai_error("badArgument", "Bad datestamp format in from")
+            out = out + oai_error("badArgument",
+                                  "Bad datestamp format in from")
     else:
         from_length = 0
 
-    if arguments['until'] != "":
+    if arguments.has_key('until') and \
+           'until' in verbs.get(arguments['verb'], []):
         until_length = len(arguments['until'])
         if check_date(arguments['until']) == "":
-            out = out + oai_error("badArgument", "Bad datestamp format in until")
+            out = out + oai_error("badArgument",
+                                  "Bad datestamp format in until")
     else:
         until_length = 0
 
     if from_length != 0:
         if until_length != 0:
             if from_length != until_length:
-                out = out + oai_error("badArgument", "Bad datestamp format")
+                out = out + oai_error("badArgument",
+                                      "Bad datestamp format")
 
-    if arguments['from'] != "" and arguments['until'] != "" and arguments['from'] > arguments['until']:
+    if arguments.has_key('from') and arguments.has_key('until') \
+           and arguments['from'] > arguments['until'] and \
+           'from' in verbs.get(arguments['verb'], []) and \
+           'until' in verbs.get(arguments['verb'], []):
         out = out + oai_error("badArgument", "Wrong date")
 
 ## Identify exclusive
 #
 #
-    if (arguments['verb'] =="Identify" and (arguments['metadataPrefix'] != "" or arguments['identifier'] != "" or arguments['set'] != "" or arguments['from'] != "" or arguments['until'] != "" or arguments['resumptionToken'] != "")):
-        out = out + oai_error("badArgument", "The request includes illegal arguments")
+    if arguments['verb'] == "Identify" and \
+           len(arguments.keys()) != 1:
+        if not 'The request includes illegal arguments' in out: # Do not repeat this error
+            out = out + oai_error("badArgument",
+                                  "The request includes illegal arguments")
 
 ## parameters for GetRecord
 #
 #
-    if arguments['verb'] =="GetRecord" and arguments['identifier'] == "":
-        out = out + oai_error("badArgument", "Record identifier missing")
+    if arguments['verb'] == "GetRecord" and \
+           not arguments.has_key('identifier'):
+        out = out + oai_error("badArgument",
+                              "Record identifier missing")
 
-    if arguments['verb'] =="GetRecord" and arguments['metadataPrefix'] == "":
-        out = out + oai_error("badArgument", "Missing metadataPrefix")
+    if arguments['verb'] == "GetRecord" and \
+           not arguments.has_key('metadataPrefix'):
+        out = out + oai_error("badArgument",
+                              "Missing metadataPrefix")
 
 
 ## parameters for ListRecords and ListIdentifiers
 #
 #
-    if (arguments['verb'] =="ListRecords" or arguments['verb'] =="ListIdentifiers") and (arguments['metadataPrefix'] == "" and arguments['resumptionToken'] == ""):
+    if (arguments['verb'] == "ListRecords" or arguments['verb'] == "ListIdentifiers") and \
+           (not arguments.has_key('resumptionToken') and not arguments.has_key('metadataPrefix')):
         out = out + oai_error("badArgument", "Missing metadataPrefix")
 
-## Metadata prefix defined
+## Metadata prefix defined and valid
 #
 #
-    if arguments.has_key('metadataPrefix'):
-        if ((arguments['metadataPrefix'] in params['metadataPrefix']) or (params['metadataPrefix'] == "")):
-            pass
-        else:
-            out = out + oai_error("badArgument", "Missing metadataPrefix")
+    if arguments.has_key('metadataPrefix') and \
+           not arguments['metadataPrefix'] in params['metadataPrefix']:
+        out = out + oai_error("cannotDisseminateFormat", "Chosen format is not supported")
+
+
 
     return out
 

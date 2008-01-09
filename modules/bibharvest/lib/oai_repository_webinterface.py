@@ -22,13 +22,10 @@
 __revision__ = "$Id$"
 
 import os
-import sys
 import urllib
 import time
 from mod_python import apache
 
-from invenio.dbquery import run_sql
-from invenio.oai_repository_config import *
 from invenio import oai_repository
 from invenio.config import cachedir, CFG_OAI_SLEEP
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
@@ -41,6 +38,11 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
     def __call__(self, req, form):
         "OAI repository interface"
 
+        # FIXME: wash_urlargd will clean cases where the same
+        # arguments is specified several times. Eg:
+        # oai2d?verb=ListIdentifiers&metadataPrefix=marcxml&metadataPrefix=marcxml
+        # This is not good since we would like to be able to raise an
+        # error. Once fixed, update the unit tests.
         argd = wash_urlargd(form, {'verb': (str, ""),
                                    'metadataPrefix': (str, ""),
                                    'from': (str, ""),
@@ -50,10 +52,19 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
                                    'resumptionToken': (str, ""),
                                    })
 
-        ## oai_repository business logic does not like to see the
-        ## language parameter, so take it out now:        
-        if argd['ln']:
-            del argd['ln']
+        ## wash_urlargd(..) function cleaned everything, but also added
+        ## unwanted parameters. Remove them now
+        for param in argd.keys():
+            if not param in form and param != 'verb':
+                del argd[param]
+
+        ## wash_urlargd(..) function also removed unknown parameters
+        ## that we would like to keep in order to send back an error
+        ## as required by the protocol. But we do not need that value,
+        ## so set it to empty string
+        for param in form.keys():
+            if param not in argd.keys():
+                argd[param] = ''
 
         ## construct args (argd string equivalent) for the
         ## oai_repository business logic (later it may be good if it
@@ -70,7 +81,7 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
                 req.err_headers_out["Retry-After"] = "%d" % (CFG_OAI_SLEEP - time_gap)
                 req.status = apache.HTTP_SERVICE_UNAVAILABLE
                 return "Retry after %d seconds" % (CFG_OAI_SLEEP - time_gap)
-        command = "touch %s/RTdata/RTdata" % cachedir   
+        command = "touch %s/RTdata/RTdata" % cachedir
         os.system(command)
 
         ## check request for OAI compliancy
@@ -85,7 +96,7 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
 
         if oai_error == "":
 
-            ## OAI Identify 
+            ## OAI Identify
 
             if argd['verb']   == "Identify":
                 req.write(oai_repository.oaiidentify(args))
@@ -105,13 +116,13 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
 
             ## OAI ListRecords
 
-            elif argd['verb'] == "ListRecords":  
+            elif argd['verb'] == "ListRecords":
                 req.write(oai_repository.oailistrecords(args))
 
 
             ## OAI GetRecord
 
-            elif argd['verb'] == "GetRecord": 
+            elif argd['verb'] == "GetRecord":
                 req.write(oai_repository.oaigetrecord(args))
 
 
@@ -129,7 +140,7 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
 
         ## OAI error
 
-        else: 
+        else:
             req.write(oai_repository.oai_header(args,""))
             req.write(oai_error)
             req.write(oai_repository.oai_footer(""))
