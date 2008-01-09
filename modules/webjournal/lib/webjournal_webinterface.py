@@ -231,7 +231,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         if acc_authorize_action(getUid(req), 'cfgwebjournal',
                                 name="%s" % journal_name)[0] != 0:
             return please_login(req, journal_name,
-                                backlink='%s/journal/feature_record?name=%s'
+                                backlink='%s/journal/administrate?name=%s'
                                 % (weburl, journal_name))
         
         return perform_request_administrate(journal_name, language)
