@@ -2636,27 +2636,26 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                     elif tab == 'citations':
                         citinglist = None
                         citationhistory = None
-			rid = recIDs[irec]
-			selfcited = get_self_cited_by(rid)
-
-                        r = calculate_cited_by_list(rid)
+                        recid = recIDs[irec]                       
+                        selfcited = get_self_cited_by(recid)
+                        r = calculate_cited_by_list(recid)
                         if r:
                             citinglist = r
-                            citationhistory = create_citation_history_graph_and_box(rid, ln)
+                            citationhistory = create_citation_history_graph_and_box(recid, ln)
 
-                        r = calculate_co_cited_with_list(rid)
+                        r = calculate_co_cited_with_list(recid)
                         cociting = None
                         if r:
                             cociting = r
 
-                        content = websearch_templates.tmpl_detailed_record_citations(rid,
+                        content = websearch_templates.tmpl_detailed_record_citations(recid,
                                                                                      ln,
                                                                                      citinglist=citinglist,
                                                                                      citationhistory=citationhistory,
                                                                                      cociting=cociting,
 										     selfcited=selfcited)
                         req.write(webstyle_templates.detailed_record_container(content,
-                                                                               rid,
+                                                                               recid,
                                                                                tabs,
                                                                                ln))
                     elif tab == 'references':

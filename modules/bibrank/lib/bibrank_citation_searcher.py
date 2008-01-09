@@ -69,11 +69,11 @@ def get_cited_by_list(recordlist):
     if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
         citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
     rdic = {} #return this, based on values in citation_dic
-    for rid in recordlist:
-	if citation_dic  and citation_dic.has_key(rid) and citation_dic[rid]:
-            tmp = [rid, citation_dic[rid]]
+    for recid in recordlist:
+	if citation_dic  and citation_dic.has_key(recid) and citation_dic[recid]:
+            tmp = [recid, citation_dic[recid]]
 	else:
-            tmp = [rid, 0]
+            tmp = [recid, 0]
         result.append(tmp)
     return result
 	
