@@ -522,7 +522,7 @@ def get_number_of_articles_for_issue(issue, journal_name, language=cdslang):
     all_articles = {}
     for rule in rule_list:
         category_name = rule.split(",")[0]
-        if issue[0] == "0" and len(issue) == 2:
+        if issue[0] == "0" and len(issue) == 7:
             all_records_of_a_type = list(search_pattern(p='65017a:"%s" and 773__n:%s' %
                                       (category_name, issue),
                                       f="&action_search=Search"))
