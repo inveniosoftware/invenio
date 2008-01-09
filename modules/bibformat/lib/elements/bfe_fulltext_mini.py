@@ -28,7 +28,7 @@ from cgi import escape
 
 def format(bfo, style, separator='; ', show_icons='no'):
     """
-    This is the format for formatting fulltext reference in the mini panel.
+    This is the format for formatting fulltext links in the mini panel.
     @param separator the separator between urls.
     @param style CSS class of the link
     @param show_icons if 'yes', print icons for fulltexts
@@ -52,11 +52,11 @@ def format(bfo, style, separator='; ', show_icons='no'):
 
     additional_str = ''
     if additionals:
-        additional_str = ' <small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">additional files</a>)</small>'
+        additional_str = separator + '<small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">additional files</a>)</small>'
 
     versions_str = ''
     if old_versions:
-        versions_str = ' <small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">older versions</a>)</small>'
+        versions_str = separator + '<small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">older versions</a>)</small>'
 
     if main_urls:
         # Put a big file icon if only one file
@@ -72,7 +72,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
 
         last_name = ""
         for descr, urls in main_urls.items():
-            out += "<small>%s:</small> " % descr
+            out += '<small class="detailedRecordActions">%s:</small> ' % descr
             url_list = []
             urls.sort(lambda (url1, name1, format1), (url2, name2, format2): url1 < url2 and -1 or url1 > url2 and 1 or 0)
 
@@ -83,7 +83,8 @@ def format(bfo, style, separator='; ', show_icons='no'):
                     print_name = ""
                 last_name = name
                 url_list.append(print_name + '<a '+style+' href="'+escape(url)+'">'+file_icon+format.upper()+'</a>')
-            out += separator.join(url_list) + additional_str + versions_str + '<br />'
+            out += separator + separator.join(url_list) + \
+                   additional_str + versions_str + '</div>'
 
     if CFG_CERN_SITE and cern_urls:
         # Put a big file icon if only one file
@@ -98,7 +99,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
             file_icon = ''
 
         link_word = len(cern_urls) == 1 and 'link' or 'links'
-        out += '<small>(CERN %s)</small><br />' % link_word
+        out += '<small class="detailedRecordActions">(CERN %s)</small><br />' % link_word
         url_list = []
         for url, descr in cern_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
@@ -115,7 +116,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
         else:
             file_icon = ''
         link_word = len(others_urls) == 1 and 'link' or 'links'
-        out += '<small>(external %s)</small>:%s' % (link_word, separator)
+        out += '<small class="detailedRecordActions">(external %s)</small>%s' % (link_word, separator)
         url_list = []
         for url, descr in others_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
