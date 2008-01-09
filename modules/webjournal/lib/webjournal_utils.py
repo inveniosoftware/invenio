@@ -1097,25 +1097,36 @@ def get_recid_from_order_CERNBulletin(order, rule, issue_number):
     if recid_dict.has_key(order):
         recid = recid_dict[order]
         return recid
-    
+    alternative_issue_number = "00/0000"
     # get the id list
-    all_records = list(search_pattern(p="%s and 773__n:%s" %
+    if issue_number[0] == "0":
+        alternative_issue_number = issue_number[1:]
+        all_records = list(search_pattern(p="%s and 773__n:%s" %
                                       (rule, issue_number),
                                       f="&action_search=Search"))
+        all_records += list(search_pattern(p="%s and 773__n:%s" %
+                                      (rule, alternative_issue_number),
+                                      f="&action_search=Search"))
+    else:
+        all_records = list(search_pattern(p="%s and 773__n:%s" %
+                                      (rule, issue_number),
+                                      f="&action_search=Search"))
+    #raise repr(all_records)
     ordered_records = {}
     new_addition_records = []
     for record in all_records:
         temp_rec = BibFormatObject(record)  # todo: refactor with get_fieldValues from search_engine
         issue_numbers = temp_rec.fields('773__n')
         order_number = temp_rec.fields('773__c')
+        #raise "%s:%s" % (repr(issue_numbers), repr(order_number))
         # todo: fields for issue number and order number have to become generic
         n = 0
         for temp_issue in issue_numbers:
-            if temp_issue == issue_number:
+            if temp_issue == issue_number or temp_issue == alternative_issue_number:
                 try:
                     order_number = int(order_number[n])
                 except:
-                    register_exception(stream="warning", verbose_description="There \
+                    register_exception(stream="warning", suffix="There \
                         was an article in the journal that does not support \
                         a numbering scheme")
                     order_number = -1000
@@ -1128,7 +1139,7 @@ def get_recid_from_order_CERNBulletin(order, rule, issue_number):
             try:
                 ordered_records[order_number] = record
             except:
-                register_exception(stream='warning', verbose_description="There \
+                register_exception(stream='warning', suffix="There \
                         were double entries for an order in this journal.")
             
     # process the CERN Bulletin specific new additions
