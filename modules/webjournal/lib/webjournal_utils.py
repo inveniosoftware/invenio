@@ -525,7 +525,8 @@ def get_number_of_articles_for_issue(issue, journal_name, language=cdslang):
         if issue[0] == "0" and len(issue) == 7:
             week_nr = issue.split("/")[0]
             year = issue.split("/")[1]
-            issue_nr_alternative = week_nr[1] + year
+            issue_nr_alternative = "%s/%s" % (week_nr[1], year)
+            
             all_records_of_a_type = list(search_pattern(p='65017a:"%s" and 773__n:%s' %
                                       (category_name, issue),
                                       f="&action_search=Search"))
