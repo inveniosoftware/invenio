@@ -41,12 +41,10 @@ from invenio.config import \
      CFG_BIBINDEX_MIN_WORD_LENGTH, \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
      CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
-     CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE, \
-     CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES, \
      weburl, tmpdir
 from invenio.bibindex_engine_config import *
 from invenio.bibdocfile import bibdocfile_url_to_fullpath, bibdocfile_url_p, decompose_bibdocfile_url
-from invenio.search_engine import perform_request_search, strip_accents, wash_index_term
+from invenio.search_engine import perform_request_search, strip_accents, wash_index_term, get_index_stemming_language
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine_stemmer import stem
@@ -75,7 +73,6 @@ re_datetime_shift = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
-wordTables = []
 base_process_size = 4500 # process base size
 _last_word_table = None
 
@@ -298,7 +295,7 @@ def get_words_from_local_fulltext(path, ext=''):
     if bingo:
         tmp_name_txt_file = open(tmp_dst_name)
         for phrase in tmp_name_txt_file.xreadlines():
-            for word in get_words_from_phrase(phrase):
+            for word in get_words_from_phrase(phrase, stemming_language):
                 if not words.has_key(word):
                     words[word] = 1
         tmp_name_txt_file.close()
@@ -317,7 +314,7 @@ def get_words_from_local_fulltext(path, ext=''):
 
 
 def get_words_from_fulltext(url_direct_or_indirect,
-                            force_file_extension=None):
+                            force_file_extension=None, stemming_language=None):
     """Returns all the words contained in the document specified by
        URL_DIRECT_OR_INDIRECT with the words being split by various
        SRE_SEPARATORS regexp set earlier.  If FORCE_FILE_EXTENSION is
@@ -481,7 +478,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
         if bingo:
             tmp_name_txt_file = open(tmp_dst_name)
             for phrase in tmp_name_txt_file.xreadlines():
-                for word in get_words_from_phrase(phrase):
+                for word in get_words_from_phrase(phrase, stemming_language):
                     if not words.has_key(word):
                         words[word] = 1
             tmp_name_txt_file.close()
@@ -516,12 +513,12 @@ def remove_latex_markup(phrase):
     return ret_phrase
 
 
-# tagToFunctions mapping. It offers an indirection level necesary for
+# tagToFunctions mapping. It offers an indirection level necessary for
 # indexing fulltext. The default is get_words_from_phrase
-tagToWordsFunctions = {'8564_u':get_words_from_fulltext}
+tagToWordsFunctions = {'8564_u' : get_words_from_fulltext}
 
 latex_formula_re = re.compile(r'\$.*?\$')
-def get_words_from_phrase(phrase, stemming=True):
+def get_words_from_phrase(phrase, stemming_language=None):
     """Return list of words found in PHRASE.  Note that the phrase is
        split into groups depending on the alphanumeric characters and
        punctuation characters definition present in the config file.
@@ -540,31 +537,31 @@ def get_words_from_phrase(phrase, stemming=True):
         block = re_block_punctuation_begin.sub("", block)
         block = re_block_punctuation_end.sub("", block)
         if block:
-            if stemming:
-                block = apply_stemming_and_stopwords_and_length_check(block)
+            if stemming_language:
+                block = apply_stemming_and_stopwords_and_length_check(block, stemming_language)
             if block:
                 words[block] = 1
             # 3rd break each block into subblocks according to punctuation and add subblocks:
             for subblock in re_punctuation.split(block):
-                if stemming:
-                    subblock = apply_stemming_and_stopwords_and_length_check(subblock)
+                if stemming_language:
+                    subblock = apply_stemming_and_stopwords_and_length_check(subblock, stemming_language)
                 if subblock:
                     words[subblock] = 1
                     # 4th break each subblock into alphanumeric groups and add groups:
                     for alphanumeric_group in re_separators.split(subblock):
-                        if stemming:
-                            alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group)
+                        if stemming_language:
+                            alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group, stemming_language)
                         if alphanumeric_group:
                             words[alphanumeric_group] = 1
     return words.keys()
 
-def apply_stemming_and_stopwords_and_length_check(word):
+def apply_stemming_and_stopwords_and_length_check(word, stemming_language):
     """Return WORD after applying stemming and stopword and length checks.
        See the config file in order to influence these.
     """
     # stem word, when configured so:
-    if CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE != "":
-        word = stem(word, CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE)
+    if stemming_language:
+        word = stem(word, stemming_language)
     # now check against stopwords:
     if is_stopword(word):
         return ""
@@ -577,13 +574,17 @@ def remove_subfields(s):
     "Removes subfields from string, e.g. 'foo $$c bar' becomes 'foo bar'."
     return re_subfields.sub(' ', s)
 
-def get_index_id(indexname):
+def get_index_id_from_table_name(table_name):
+    """Returns the index id given the table name as in idxWORD05F -> 5"""
+    return int(table_name[7:9])
+
+def get_index_id_from_index_name(index_name):
     """Returns the words/phrase index id for INDEXNAME.
        Returns empty string in case there is no words table for this index.
        Example: field='author', output=4."""
     out = 0
     query = """SELECT w.id FROM idxINDEX AS w
-                WHERE w.name='%s' LIMIT 1""" % indexname
+                WHERE w.name='%s' LIMIT 1""" % index_name
     res = run_sql(query, None, 1)
     if res:
         out = res[0][0]
@@ -632,11 +633,11 @@ def split_ranges(parse_string):
     return recIDs
 
 def get_word_tables(tables):
-    global wordTables
+    wordTables = []
     if tables:
         indexes = tables.split(",")
         for index in indexes:
-            index_id = get_index_id(index)
+            index_id = get_index_id_from_index_name(index)
             if index_id:
                 wordTables.append({"idxWORD%02dF" % index_id: \
                                    get_index_tags(index)})
@@ -644,20 +645,10 @@ def get_word_tables(tables):
                 write_message("Error: There is no %s words table." % index, sys.stderr)
     else:
         for index in get_all_indexes():
-            index_id = get_index_id(index)
+            index_id = get_index_id_index_name(index)
             wordTables.append({"idxWORD%02dF" % index_id: \
                                get_index_tags(index)})
     return wordTables
-
-def get_not_stemmed_tables():
-    """Returns the name of the tables for which stemming is not enabled."""
-    ret = []
-    for index in CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES:
-        index_id = get_index_id(index)
-        if index_id:
-            ret.append("idxWORD%02dF" % index_id)
-            ret.append("rnkWORD%02dF" % index_id)
-    return ret
 
 def get_date_range(var):
     "Returns the two dates contained as a low,high tuple"
@@ -708,7 +699,7 @@ def beautify_range_list(range_list):
 
 def truncate_index_table(index_name):
     """Properly truncate the given index."""
-    index_id = get_index_id(index_name)
+    index_id = get_index_id_from_index_name(index_name)
     if index_id:
         write_message('Truncating %s index table in order to reindex.' % index_name, verbose=2)
         run_sql("UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00' WHERE id=%s", (index_id,))
@@ -718,16 +709,16 @@ def truncate_index_table(index_name):
 class WordTable:
     "A class to hold the words table."
 
-    def __init__(self, tablename, fields_to_index, separators="[^\s]", stemming=True):
+    def __init__(self, tablename, fields_to_index, separators="[^\s]", stemming_language=None):
         "Creates words table instance."
         self.tablename = tablename
         self.recIDs_in_mem = []
         self.fields_to_index = fields_to_index
         self.separators = separators
         self.value = {}
-        self.stemming = stemming
-        if stemming and CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE:
-            write_message('Stemming is enabled for table %s' % tablename)
+        self.stemming_language = stemming_language
+        if stemming_language:
+            write_message('Stemming(%s) is enabled for table %s' % (stemming_language, tablename))
         else:
             write_message('Stemming is disabled for table %s' % tablename)
 
@@ -1007,13 +998,7 @@ class WordTable:
         self.recIDs_in_mem.append([recID1,recID2])
         # secondly fetch all needed tags:
         for tag in self.fields_to_index:
-            if tag in tagToWordsFunctions.keys():
-                get_words_function = tagToWordsFunctions[tag]
-            else:
-                if self.stemming:
-                    get_words_function = get_words_from_phrase
-                else:
-                    get_words_function = lambda phrase: get_words_from_phrase(phrase, False)
+            get_words_function = tagToWordsFunctions.get(tag, get_words_from_phrase)
             bibXXx = "bib" + tag[0] + tag[1] + "x"
             bibrec_bibXXx = "bibrec_" + bibXXx
             query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
@@ -1037,11 +1022,11 @@ class WordTable:
                     filename = get_associated_subfield_value(recID,'8564_u', phrase, 'y')
                     filename_extension = filename.split('.')[-1].lower()
                     if filename_extension in CONV_PROGRAMS.keys():
-                        new_words = get_words_function(phrase, force_file_extension=filename_extension) # ,self.separators
+                        new_words = get_words_function(phrase, force_file_extension=filename_extension, stemming_language=self.stemming_language) # ,self.separators
                     else:
-                        new_words = get_words_function(phrase) # ,self.separators
+                        new_words = get_words_function(phrase, stemming_language=self.stemming_language) # ,self.separators
                 else:
-                    new_words = get_words_function(phrase) # ,self.separators
+                    new_words = get_words_function(phrase, stemming_language=self.stemming_language) # ,self.separators
                 wlist[recID] = list_union(new_words,wlist[recID])
 
         # were there some words for these recIDs found?
@@ -1440,11 +1425,10 @@ def task_run_core():
     messages on stderr.
     Return 1 in case of success and 0 in case of failure."""
     global _last_word_table
-    not_stemmed_tables = get_not_stemmed_tables()
 
     if task_get_option("cmd") == "check":
         for table in get_word_tables(task_get_option("windex")):
-            wordTable = WordTable(table.keys()[0], table.values()[0], table.keys()[0] not in not_stemmed_tables)
+            wordTable = WordTable(table.keys()[0], table.values()[0], stemming_language=get_index_stemming_language(get_index_id_from_table_name(table.keys()[0])))
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
         _last_word_table = None
@@ -1455,8 +1439,7 @@ def task_run_core():
             truncate_index_table(index_name)
 
     for table in get_word_tables(task_get_option("windex")):
-        write_message('Not stemmed tables are %s and this table is %s' % (not_stemmed_tables, table.keys()[0]), verbose=8)
-        wordTable = WordTable(table.keys()[0], table.values()[0], stemming=table.keys()[0] not in not_stemmed_tables)
+        wordTable = WordTable(table.keys()[0], table.values()[0], stemming_language=get_index_stemming_language(get_index_id_from_table_name(table.keys()[0])))
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
         try:

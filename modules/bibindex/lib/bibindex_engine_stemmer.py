@@ -24,7 +24,6 @@ BibIndex stemmer facility based on the Porter Stemming Algorithm.
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE
 from thread import get_ident
 
 _stemmers = {}
@@ -47,7 +46,6 @@ try:
         'swedish' : 'sv'
     }
 
-
     def is_stemmer_available_for_language(lang):
         """Return true if stemmer for language LANG is available.
         Return false otherwise.
@@ -57,12 +55,21 @@ try:
             _stemmers[thread_ident] = _create_stemmers()
         return _stemmers[thread_ident].has_key(lang)
 
-    def stem(word, lang=CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE):
+    def stem(word, lang):
         """Return WORD stemmed according to language LANG (e.g. 'en')."""
         if lang and is_stemmer_available_for_language(lang):
             return _stemmers[get_ident()][lang].stemWord(word)
         else:
             return word
+
+    def get_stemming_language_map():
+        """Return a diction of code language, language name for all the available
+        languages."""
+        ret = {}
+        for language_name, language_code in _lang_map.iteritems():
+            if is_stemmer_available_for_language(language_code):
+                ret[language_name] = language_code
+        return ret
 
     def _create_stemmers():
         """Create stemmers dictionary for all possible languages."""
@@ -424,12 +431,18 @@ except ImportError:
         """
         return lang == 'en'
 
-    def stem(word, lang=CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE):
+    def stem(word, lang):
         """Return WORD stemmed according to language LANG (e.g. 'en')."""
         if lang == 'en':
             return _stemmers[get_ident()].stem(word, 0, len(word)-1)
         else:
             return word
+
+    def get_stemming_language_map():
+        """Return a diction of code language, language name for all the available
+        languages."""
+        return {'english' : 'en'}
+
 
 if __name__ == '__main__':
     # when invoked via CLI, simply stem the arguments:

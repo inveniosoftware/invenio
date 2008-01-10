@@ -63,7 +63,6 @@ class MyFancyURLopener(urllib.FancyURLopener):
 
 nb_char_in_line = 50  # for verbose pretty printing
 chunksize = 1000 # default size of chunks that the records will be treated by
-wordTables = []
 base_process_size = 4500 # process base size
 
 ## Dictionary merging functions
@@ -750,7 +749,7 @@ def word_index(run):
         print "Warning: Psyco", e
         pass
 
-    global wordTables, languages
+    global languages
 
     max_recid = int(run_sql("SELECT max(id) FROM bibrec")[0][0])
 

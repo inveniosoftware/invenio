@@ -32,11 +32,13 @@ from zlib import compress,decompress
 from invenio.config import \
      cdslang, \
      version, \
-     weburl
+     weburl, \
+     bindir
 from invenio.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
 from invenio.dbquery import run_sql, get_table_status_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly, adderrorbox
 from invenio.webuser import getUid, get_email
+from invenio.bibindex_engine_stemmer import get_stemming_language_map
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 
@@ -184,10 +186,11 @@ def perform_editindex(idxID, ln=cdslang, mtype='', content='', callback='yes', c
     <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyindex">Modify index name / descriptor</a></small></td>
     <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyindextranslations">Modify translations</a></small></td>
     <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyindexfields">Modify index fields</a></small></td>
-    <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_deleteindex">Delete index</a></small></td>
+    <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_modifyindexstemming">Modify index stemming language</a></small></td>
+    <td>5.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_deleteindex">Delete index</a></small></td>
     </tr>
     </table>
-    """ % (weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln)
+    """ % (weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln)
 
     if mtype == "perform_modifyindex" and content:
         fin_output += content
@@ -204,6 +207,11 @@ def perform_editindex(idxID, ln=cdslang, mtype='', content='', callback='yes', c
     elif mtype == "perform_modifyindexfields" or not mtype:
         fin_output += perform_modifyindexfields(idxID, ln, callback='')
 
+    if mtype == "perform_modifyindexstemming" and content:
+        fin_output += content
+    elif mtype == "perform_modifyindexstemming" or not mtype:
+        fin_output += perform_modifyindexstemming(idxID, ln, callback='')
+
     if mtype == "perform_deleteindex" and content:
         fin_output += content
     elif mtype == "perform_deleteindex" or not mtype:
@@ -214,11 +222,14 @@ def perform_editindex(idxID, ln=cdslang, mtype='', content='', callback='yes', c
 def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
     subtitle = """<a name="1"></a>1. Overview of indexes"""
     output = """<table cellpadding="3" border="1">"""
-    output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("ID", "Name", "Fwd.Idx Size", "Rev.Idx Size", "Fwd.Idx Words", "Rev.Idx Records", "Last updated", "Fields", "Translations")
+    output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("ID", "Name", "Fwd.Idx Size", "Rev.Idx Size", "Fwd.Idx Words", "Rev.Idx Records", "Last updated", "Fields", "Translations", "Stemming Language")
     idx = get_idx()
     idx_dict = dict(get_def_name('', "idxINDEX"))
 
-    for idxID, idxNAME, idxDESC,idxUPD in idx:
+    stemming_language_map = get_stemming_language_map()
+    stemming_language_map_reversed = dict([(elem[1], elem[0]) for elem in stemming_language_map.iteritems()])
+
+    for idxID, idxNAME, idxDESC, idxUPD, idxSTEM in idx:
         forward_table_status_info = get_table_status_info('idxWORD%sF' % (idxID < 10 and '0%s' % idxID or idxID))
         reverse_table_status_info = get_table_status_info('idxWORD%sR' % (idxID < 10 and '0%s' % idxID or idxID))
         if str(idxUPD)[-3:] == ".00":
@@ -231,28 +242,32 @@ def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
         if fld.endswith(", "):
             fld = fld[:-2]
         if len(fld) == 0:
-            fld = """<b><span class="info">None</span></b>"""
-        date = (idxUPD and idxUPD or """<b><span class="info">Not updated</span></b>""")
+            fld = """<strong><span class="info">None</span></strong>"""
+        date = (idxUPD and idxUPD or """<strong><span class="info">Not updated</span></strong>""")
 
+        stemming_lang = stemming_language_map_reversed.get(idxSTEM, None)
+        if not stemming_lang:
+            stemming_lang = """<strong><span class="info">None</span></strong>"""
 
         if forward_table_status_info and reverse_table_status_info:
-            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
+            output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
                        """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s" title="%s">%s</A>""" % (weburl, idxID, ln, idxDESC, idx_dict.get(idxID, idxNAME)),
-                       "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0),
-                       "%s MB" % websearch_templates.tmpl_nice_number(reverse_table_status_info['Data_length'] / 1048576.0),
+                       "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
+                       "%s MB" % websearch_templates.tmpl_nice_number(reverse_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
                        websearch_templates.tmpl_nice_number(forward_table_status_info['Rows']),
-                       websearch_templates.tmpl_nice_number(reverse_table_status_info['Rows']),
+                       websearch_templates.tmpl_nice_number(reverse_table_status_info['Rows'], max_ndigits_after_dot=3),
                        date,
                        fld,
-                       lang)
+                       lang,
+                       stemming_lang)
         elif not forward_table_status_info:
             output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
                        """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)),
-                       "Error", "%s MB" % websearch_templates.tmpl_nice_number(reverse_table_status_info['Data_length'] / 1048576.0),
+                       "Error", "%s MB" % websearch_templates.tmpl_nice_number(reverse_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
                        "Error",
-                       websearch_templates.tmpl_nice_number(reverse_table_status_info['Rows']),
+                       websearch_templates.tmpl_nice_number(reverse_table_status_info['Rows'], max_ndigits_after_dot=3),
                        date,
                        "",
                        lang)
@@ -260,8 +275,8 @@ def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
             output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
                        """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)),
-                       "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0),
-                       "Error", websearch_templates.tmpl_nice_number(forward_table_status_info['Rows']),
+                       "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
+                       "Error", websearch_templates.tmpl_nice_number(forward_table_status_info['Rows'], max_ndigits_after_dot=3),
                        "Error",
                        date,
                        "",
@@ -289,7 +304,7 @@ def perform_editindexes(ln=cdslang, callback='yes', content='', confirm=-1):
         <select name="idxID" class="admin_w200">
         <option value="-1">- Select a index -</option>
         """
-        for (idxID, idxNAME, idxDESC, idxUPD) in idx:
+        for (idxID, idxNAME, idxDESC, idxUPD, idxSTEM) in idx:
             text += """<option value="%s">%s</option>""" % (idxID, idxNAME)
         text += """</select>"""
 
@@ -686,7 +701,7 @@ def perform_deleteindex(idxID, ln=cdslang, callback='yes', confirm=0):
     """
 
     if idxID:
-        subtitle = """<a name="4"></a>4. Delete the index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % weburl
+        subtitle = """<a name="5"></a>5. Delete the index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % weburl
         output  = ""
 
         if confirm in ["0", 0]:
@@ -790,6 +805,78 @@ def perform_modifyindex(idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes
         return perform_editindex(idxID, ln, "perform_modifyindex", addadminbox(subtitle, body))
     else:
         return addadminbox(subtitle, body)
+
+def perform_modifyindexstemming(idxID, ln=cdslang, idxSTEM='', callback='yes', confirm=-1):
+    """form to modify an index name.
+    idxID - the index name to change.
+    idxSTEM - new stemming language code"""
+
+    subtitle  = ""
+    output  = ""
+
+    stemming_language_map = get_stemming_language_map()
+    stemming_language_map['None'] = ''
+
+    if idxID not in [-1, "-1"]:
+        subtitle = """<a name="4"></a>4. Modify index stemming language.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % weburl
+        if confirm in [-1, "-1"]:
+            idx = get_idx(idxID)
+            idxSTEM = idx[0][4]
+        if not idxSTEM:
+            idxSTEM = ''
+
+        language_html_element = """<select name="idxSTEM" class="admin_w200">"""
+        languages = stemming_language_map.keys()
+        languages.sort()
+        for language in languages:
+            if stemming_language_map[language] == idxSTEM:
+                selected = 'selected="selected"'
+            else:
+                selected = ""
+            language_html_element += """<option value="%s" %s>%s</option>""" % (stemming_language_map[language], selected, language)
+        language_html_element += """</select>"""
+
+        text = """
+        <span class="adminlabel">Index stemming language</span>
+        """ + language_html_element
+
+        output += createhiddenform(action="modifyindexstemming#4",
+                                   text=text,
+                                   button="Modify",
+                                   idxID=idxID,
+                                   ln=ln,
+                                   confirm=0)
+
+        if confirm in [0, "0"] and get_idx(idxID)[0][4] == idxSTEM:
+            output += """<span class="info">Stemming language has not been changed</span>"""
+        elif confirm in [0, "0"]:
+            text = """
+            <span class="important">You are going to change the stemming language for this index. Please note you should not enable stemming for structured-data indexes like "report number", "year", "author" or "collection". On the contrary, it is advisable to enable stemming for indexes like "fulltext", "abstract", "title", etc. since this would improve retrieval quality. <br /> Beware that after changing the stemming language of an index you will have to reindex it. It is a good idea to change the stemming language and to reindex during low usage hours of your service, since searching will be not functional until the reindexing will be completed</span>.<br /> <strong>Are you sure you want to change the stemming language of this index?</strong>"""
+            output += createhiddenform(action="modifyindexstemming#4",
+                                   text=text,
+                                   button="Modify",
+                                   idxID=idxID,
+                                   idxSTEM=idxSTEM,
+                                   ln=ln,
+                                   confirm=1)
+        elif idxID > -1 and confirm in [1, "1"]:
+            res = modify_idx_stemming(idxID, idxSTEM)
+            output += write_outcome(res)
+            output += """<br /><span class="info">Please note you must run as soon as possible:
+            <pre>$> %s/bibindex --reindex -w %s</pre></span>
+            """ % (bindir, get_idx(idxID)[0][1])
+        elif confirm in [1, "1"]:
+            output += """<br><b><span class="info">Please give a name for the index.</span></b>"""
+    else:
+        output  = """No index to modify."""
+
+    body = [output]
+
+    if callback:
+        return perform_editindex(idxID, ln, "perform_modifyindexstemming", addadminbox(subtitle, body))
+    else:
+        return addadminbox(subtitle, body)
+
 
 def perform_modifyfield(fldID, ln=cdslang, code='', callback='yes', confirm=-1):
     """form to modify a field.
@@ -1226,7 +1313,7 @@ def get_col_fld(colID=-1, type = '', id_field=''):
         return ""
 
 def get_idx(idxID=''):
-    sql = "SELECT id,name,description,last_updated FROM idxINDEX"
+    sql = "SELECT id,name,description,last_updated,stemming_language FROM idxINDEX"
     try:
         if idxID:
             sql += " WHERE id=%s" % idxID
@@ -1545,6 +1632,16 @@ def modify_idx(idxID, idxNAME, idxDESC):
         return (1, "")
     except StandardError, e:
         return (0, e)
+
+def modify_idx_stemming(idxID, idxSTEM):
+    """Modify the index stemming language in idxINDEX table"""
+
+    try:
+        res = run_sql("UPDATE idxINDEX SET stemming_language=%s WHERE ID=%s", (idxSTEM, idxID))
+        return (1, "")
+    except StandardError, e:
+        return (0, e)
+
 
 def modify_fld(fldID, code):
     """Modify the code of field

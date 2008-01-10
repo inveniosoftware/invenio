@@ -113,18 +113,9 @@ word "information" will be stemmed to "inform"; or "looking", "looks",
 and "looked" will be all stemmed to "look", thus giving more hits to each
 word.
 
-<p>Currently only stemming in a single language  is supported.  All searches will
-also be stemmed based on this same language. For documents in other
-languages, there will be no difference if stemmer is used or not.
-
-<p>To set up the stemmer, change the variable
-<b>CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE</b> in the general config
-file.  To disable use of stemmer, set the value to empty string.
-
-<p>You will also have to properly configure the indexes you don't want to
-have stem (e.g. collection, for properly work of collection management, author,
-since it indexes proper names...). You can do this by properly setting the variable
-<b>CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES</b> in the general config file.
+<p>Currently you can configure the stemming language on a per-index basis. All
+searches referring a stemmed index will also be stemmed based on the same
+language.
 
 <a name="3.5"></a><h3>3.5 Configure Word Length</h3>
 

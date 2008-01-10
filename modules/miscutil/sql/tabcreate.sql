@@ -1746,6 +1746,7 @@ CREATE TABLE IF NOT EXISTS idxINDEX (
   name varchar(50) NOT NULL default '',
   description varchar(255) NOT NULL default '',
   last_updated datetime NOT NULL default '0000-00-00 00:00:00',
+  stemming_language varchar(10) NOT NULL default '',
   PRIMARY KEY  (id),
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
@@ -2139,7 +2140,7 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
   id mediumint(8) unsigned default NULL,
   object_name varchar(255) NOT NULL,
   object_value longblob,
-  last_updated datetime NOT NULL default '0000-00-00'  
+  last_updated datetime NOT NULL default '0000-00-00'
 ) TYPE=MyISAM;
 
 -- tables for collections and collection tree:

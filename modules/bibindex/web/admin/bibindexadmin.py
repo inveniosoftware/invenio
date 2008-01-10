@@ -254,6 +254,31 @@ def modifyindex(req, idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes', 
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
+def modifyindexstemming(req, idxID, ln=cdslang, idxSTEM='', callback='yes', confirm=-1):
+    navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/index">Manage Indexes</a> """ % (weburl)
+
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return error_page(req)
+
+    auth = bic.check_user(req,'cfgbibindex')
+    if not auth[0]:
+        return page(title="Edit Index",
+                    body=bic.perform_modifyindexstemming(idxID=idxID,
+                                                 ln=ln,
+                                                 idxSTEM=idxSTEM,
+                                                 callback=callback,
+                                                 confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
 def modifytag(req, fldID, tagID, ln=cdslang, name='', value='', callback='yes', confirm=-1):
     navtrail_previous_links = bic.getnavtrail() + """&gt; <a class=navtrail href="%s/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a> """ % (weburl)
 

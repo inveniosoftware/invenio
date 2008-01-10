@@ -48,7 +48,6 @@ from invenio.config import \
      CFG_WEBSEARCH_SEARCH_CACHE_SIZE, \
      CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
-     CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES, \
      cdslang, \
      cdsname, \
      logdir, \
@@ -186,6 +185,29 @@ try:
 except Exception:
     restricted_collection_cache = RestrictedCollectionDataCacher()
 
+class IndexStemmingDataCacher(DataCacher):
+    def __init__(self):
+        def cache_filler():
+            try:
+                res = run_sql("""SELECT id, stemming_language FROM idxINDEX""")
+            except DatabaseError:
+                # database problems, return empty cache
+                return {}
+            return dict(res)
+
+        def timestamp_getter():
+            return get_table_update_time('idxINDEX')
+
+        DataCacher.__init__(self, cache_filler, timestamp_getter)
+
+def get_index_stemming_language(index_id):
+    cache = index_stemming_cache.get_cache()
+    return cache[index_id]
+
+try:
+    index_stemming_cache.is_ok_p
+except Exception:
+    index_stemming_cache = IndexStemmingDataCacher()
 
 class FieldI18nNameDataCacher(DataCacher):
     def __init__(self):
@@ -342,7 +364,7 @@ def get_nicely_ordered_collection_list(collid=1, level=0, ln=cdslang):
         colls_nicely_ordered  = colls_nicely_ordered + get_nicely_ordered_collection_list(cid, level+1, ln=ln)
     return colls_nicely_ordered
 
-def get_index_id(field):
+def get_index_id_from_field(field):
     """Returns first index id where the field code FIELD is indexed.
        Returns zero in case there is no table for this index.
        Example: field='author', output=4."""
@@ -493,7 +515,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 elif fi and str(fi[0]).isdigit() and str(fi[0]).isdigit():
                     # B3b - fi exists and starts by two digits => do ACC search
                     opfts.append([oi, pi, fi, 'a'])
-                elif fi and not get_index_id(fi):
+                elif fi and not get_index_id_from_field(fi):
                     # B3c - fi exists but there is no words table for fi => try ACC search
                     opfts.append([oi, pi, fi, 'a'])
                 elif fi and pi.startswith('/') and pi.endswith('/'):
@@ -1646,13 +1668,13 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
     set = HitSet() # will hold output result set
     set_used = 0 # not-yet-used flag, to be able to circumvent set operations
     # deduce into which bibwordsX table we will search:
-    apply_stemming = not "anyfield" in CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES
-    bibwordsX = "idxWORD%02dF" % get_index_id("anyfield")
+    stemming_language = get_index_stemming_language(get_index_id_from_field("anyfield"))
+    bibwordsX = "idxWORD%02dF" % get_index_id_from_field("anyfield")
     if f:
-        index_id = get_index_id(f)
+        index_id = get_index_id_from_field(f)
         if index_id:
             bibwordsX = "idxWORD%02dF" % index_id
-            apply_stemming = not f in CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES
+            stemming_language = get_index_stemming_language(index_id)
         else:
             return HitSet() # word index f does not exist
 
@@ -1662,15 +1684,15 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
     if len(words) == 2:
         word0 = re_word.sub('', words[0])
         word1 = re_word.sub('', words[1])
-        if apply_stemming:
-            word0 = stem(word0)
-            word1 = stem(word1)
+        if stemming_language:
+            word0 = stem(word0, stemming_language)
+            word1 = stem(word1, stemming_language)
         res = run_sql("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
                       (wash_index_term(word0), wash_index_term(word1)))
     else:
         word = re_word.sub('', word)
-        if apply_stemming:
-            word = stem(word)
+        if stemming_language:
+            word = stem(word, stemming_language)
         if string.find(word, '%') >= 0: # do we have wildcard in the word?
             res = run_sql("SELECT term,hitlist FROM %s WHERE term LIKE %%s" % bibwordsX,
                           (wash_index_term(word),))
@@ -1968,9 +1990,9 @@ def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
     """Return list of +n -n nearest terms to word `p' in index for field `f'."""
     nearest_words = [] # will hold the (sorted) list of nearest words to return
     # deduce into which bibwordsX table we will search:
-    bibwordsX = "idxWORD%02dF" % get_index_id("anyfield")
+    bibwordsX = "idxWORD%02dF" % get_index_id_from_field("anyfield")
     if f:
-        index_id = get_index_id(f)
+        index_id = get_index_id_from_field(f)
         if index_id:
             bibwordsX = "idxWORD%02dF" % index_id
         else:
@@ -2064,9 +2086,9 @@ def get_nbhits_in_bibwords(word, f):
     """Return number of hits for word 'word' inside words index for field 'f'."""
     out = 0
     # deduce into which bibwordsX table we will search:
-    bibwordsX = "idxWORD%02dF" % get_index_id("anyfield")
+    bibwordsX = "idxWORD%02dF" % get_index_id_from_field("anyfield")
     if f:
-        index_id = get_index_id(f)
+        index_id = get_index_id_from_field(f)
         if index_id:
             bibwordsX = "idxWORD%02dF" % index_id
         else:
@@ -2644,7 +2666,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                     elif tab == 'citations':
                         citinglist = None
                         citationhistory = None
-                        recid = recIDs[irec]                       
+                        recid = recIDs[irec]
                         selfcited = get_self_cited_by(recid)
                         r = calculate_cited_by_list(recid)
                         if r:

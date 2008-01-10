@@ -683,24 +683,6 @@ atlantis.cern.ch
 0
 </define-tag>
 
-## CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE -- when indexing, do you want to use
-## stemming?  If so, according to which language do we stem?  Use '' for
-## no stemming, 'en' for English, or one of the languages supported by
-## Snowball's Stemmer: 'da', 'nl', 'en', 'fi', 'de', 'it', 'no', 'pt',
-## 'ru', 'es', 'sv'.
-##  (example: 'en')
-<define-tag CFG_BIBINDEX_STEMMER_DEFAULT_LANGUAGE whitespace=delete>
-</define-tag>
-
-## CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES -- contains a list index names
-## for which applying stemming would lead to wrong behaviour.
-## e.g. collection definitions would be wrong with truncated names, and
-## it's semantically wrong to stem proper names such as in authors index.
-##  (example: ["collection", "author", "year", "reference", "reportnumber"])
-<define-tag CFG_BIBINDEX_DISABLE_STEMMING_FOR_INDEXES whitespace=delete>
-["collection", "author", "year", "reference", "reportnumber"]
-</define-tag>
-
 ## CFG_BIBINDEX_REMOVE_STOPWORDS -- when indexing, do we want to remove
 ## stopwords?  Use "0" to say "no" and "1" to say "yes".
 ##  (example: "0")

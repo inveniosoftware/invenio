@@ -649,16 +649,16 @@ INSERT INTO tag VALUES (115,'url','8564_u');
 INSERT INTO tag VALUES (116,'experiment','909C0e');
 INSERT INTO tag VALUES (117,'record ID','001');
 
-INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00');
-INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00');
-INSERT INTO idxINDEX VALUES (3,'abstract','This index contains words/phrases from abstract fields.','0000-00-00 00:00:00');
-INSERT INTO idxINDEX VALUES (4,'author','This index contains words/phrases from author fields.','0000-00-00 00:00:00');
-INSERT INTO idxINDEX VALUES (5,'keyword','This index contains words/phrases from keyword fields.','0000-00-00 00:00:00');
-INSERT INTO idxINDEX VALUES (6,'reference','This index contains words/phrases from references fields.','0000-00-00 00:00:00');
-INSERT INTO idxINDEX VALUES (7,'reportnumber','This index contains words/phrases from report numbers fields.','0000-00-00 00:00:00');
-INSERT INTO idxINDEX VALUES (8,'title','This index contains words/phrases from title fields.','0000-00-00 00:00:00');
-INSERT INTO idxINDEX VALUES (9,'fulltext','This index contains words/phrases from fulltext fields.','0000-00-00 00:00:00');
-INSERT INTO idxINDEX VALUES (10,'year','This index contains words/phrases from year fields.','0000-00-00 00:00:00');
+INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (3,'abstract','This index contains words/phrases from abstract fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (4,'author','This index contains words/phrases from author fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (5,'keyword','This index contains words/phrases from keyword fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (6,'reference','This index contains words/phrases from references fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (7,'reportnumber','This index contains words/phrases from report numbers fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (8,'title','This index contains words/phrases from title fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (9,'fulltext','This index contains words/phrases from fulltext fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (10,'year','This index contains words/phrases from year fields.','0000-00-00 00:00:00', '');
 
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (2,10);

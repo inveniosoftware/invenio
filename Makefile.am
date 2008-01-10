@@ -269,6 +269,7 @@ update-v0.92.1-tables: local-dbexec
 	echo "INSERT INTO rnkCITATIONDATA VALUES (1,'citationdict','','');" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO rnkCITATIONDATA VALUES (2,'reversedict','','');" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO rnkCITATIONDATA VALUES (3,'selfcitdict','','');" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE idxINDEX ADD COLUMN stemming_language VARCHAR(10) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 
 drop-tables: local-dbexec
 	@if [ "$(FORCE)" != "yes" ]; then \

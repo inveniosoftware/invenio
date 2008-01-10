@@ -431,7 +431,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
 
     return (reclist[:len(reclist)], methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
 
-def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance,verbose):
+def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance, verbose):
     """Ranking a records containing specified words and returns a sorted list.
     input:
     rank_method_code - the code of the method, from the name field in rnkMETHOD
