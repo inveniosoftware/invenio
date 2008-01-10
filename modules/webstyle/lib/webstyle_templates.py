@@ -663,7 +663,7 @@ URI: http://%(host)s%(page)s
     def detailed_record_container(self, content, recid, tabs, ln=cdslang,
                                   show_similar_rec_p=True,
                                   creationdate=None,
-                                  modifydate=None, show_notice_p=True):
+                                  modifydate=None, show_short_rec_p=True):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
            Parameters:
@@ -675,7 +675,7 @@ URI: http://%(host)s%(page)s
          - show_similar_rec_p *bool* print 'similar records' link in the box
          - creationdate *string* - the creation date of the displayed record
          - modifydate *string* - the last modification date of the displayed record
-         - show_notice_p *boolean* - prints a very short bibl. notice of the record
+         - show_short_rec_p *boolean* - prints a very short version of the record as reminder.
         """
         # load the right message language
         _ = gettext_set_language(ln)
@@ -715,8 +715,8 @@ URI: http://%(host)s%(page)s
         </div>''' % out_tabs
 
 
-        # Add the clip icon and the brief record notice if necessary
-        if show_notice_p:
+        # Add the clip icon and the brief record reminder if necessary
+        if show_short_rec_p:
             record_details = format_record(recID=recid, of='hs', ln=ln)
             content = '''<div id="commentHB">
                              <div id="clip">&nbsp;</div>

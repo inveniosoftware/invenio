@@ -2698,7 +2698,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                                                                ln=ln,
                                                                                creationdate=creationdate,
                                                                                modifydate=modifydate,
-                                                                               show_notice_p=False))
+                                                                               show_short_rec_p=False))
 
                         if len(tabs) > 0:
                             # Add the mini box at bottom of the page
