@@ -43,8 +43,7 @@ pylib_DATA = __init__.py \
              intbitset_tests.py
 
 noinst_DATA = testimport.py \
-              kwalitee.py \
-              api_migration_kit.sh
+              kwalitee.py
 
 EXTRA_DIST = __init__.py \
              errorlib.py \
@@ -69,8 +68,6 @@ EXTRA_DIST = __init__.py \
              w3c_validator.py \
              testimport.py \
              kwalitee.py \
-             api_migration_kit.sh \
-             updateapi.data.sed \
              intbitset.pyx \
              intbitset.c \
              intbitset.h \
