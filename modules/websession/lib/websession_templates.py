@@ -1045,7 +1045,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """<img src="%s/img/user-icon-1-20x20.gif" border="0" alt=""/>""" % weburl
+        out = """<img src="%s/img/user-icon-1-20x20.gif" border="0" alt=""/> """ % weburl
         if guest:
             out += """%(guest_msg)s ::
                    <a class="userinfo" href="%(sweburl)s/youraccount/login?ln=%(ln)s%(referer)s">%(login)s</a>""" % {
