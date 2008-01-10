@@ -1949,6 +1949,7 @@ class Template:
         tmpl_nice_number_via_locale().
         """
         if type(number) is float:
+            number = round(number, 3)
             int_part, frac_part = str(number).split('.')
             return '%s.%s' % (self.tmpl_nice_number(int(int_part), ln, thousands_separator), frac_part)
         else:
