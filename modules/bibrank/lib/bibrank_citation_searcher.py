@@ -53,7 +53,10 @@ def get_cited_by(recordid):
     query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"	
     compressed_citation_dic = run_sql(query)
     if compressed_citation_dic and compressed_citation_dic[0]:
-        citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
+        try: 
+            citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
+        except error:
+            citation_dic = {}  
     ret = [] #empty list
     if citation_dic.has_key(recordid):
         ret = citation_dic[recordid]
