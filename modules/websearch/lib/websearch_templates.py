@@ -39,6 +39,7 @@ from invenio.config import \
      CFG_BIBRANK_SHOW_CITATION_LINKS, \
      CFG_BIBRANK_SHOW_CITATION_STATS, \
      CFG_BIBRANK_SHOW_CITATION_GRAPHS, \
+     CFG_WEBSEARCH_RSS_TTL, \
      cdslang, \
      cdsname, \
      cdsnameintl, \
@@ -50,6 +51,7 @@ from invenio.messages import gettext_set_language
 #from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
 from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
 from invenio.htmlutils import nmtoken_from_string
+from invenio.webinterface_handler import wash_urlargd
 
 from invenio.websearch_external_collections import external_collection_get_state
 
@@ -138,6 +140,23 @@ class Template:
         'as': (int, 0),
         'verbose': (int, 0)}
 
+    # ...and for RSS feeds
+    rss_default_urlargd = {'c'  : (list, []),
+                           'cc' : (str, ""),
+                           'p'  : (str, ""),
+                           'f'  : (str, ""),
+                           'p1' : (str, ""),
+                           'f1' : (str, ""),
+                           'm1' : (str, ""),
+                           'op1': (str, ""),
+                           'p2' : (str, ""),
+                           'f2' : (str, ""),
+                           'm2' : (str, ""),
+                           'op2': (str, ""),
+                           'p3' : (str, ""),
+                           'f3' : (str, ""),
+                           'm3' : (str, "")}
+
     def build_search_url(self, known_parameters={}, **kargs):
         """ Helper for generating a canonical search
         url. 'known_parameters' is the list of query parameters you
@@ -181,6 +200,29 @@ class Template:
         else:
             base = weburl
         return create_url(base, drop_default_urlargd(parameters, self.search_results_default_urlargd))
+
+    def build_rss_url(self, known_parameters,  **kargs):
+        """Helper for generating a canonical RSS URL"""
+
+        parameters = {}
+        parameters.update(known_parameters)
+        parameters.update(kargs)
+
+        # Keep only interesting parameters
+        argd = wash_urlargd(parameters, self.rss_default_urlargd)
+
+        if argd:
+            # Handle 'c' differently since it is a list
+            c = argd.get('c', [])
+            del argd['c']
+            # Create query, and drop empty params
+            args = make_canonical_urlargd(argd, self.rss_default_urlargd)
+            if c != []:
+                # Add collections
+                c = [urllib.quote(coll) for coll in c]
+                args += '&amp;c=' + '&amp;c='.join(c)
+
+        return weburl + '/rss' + args
 
     def tmpl_record_page_header_content(self, req, recid, ln):
         """ Provide extra information in the header of /record pages """
@@ -2395,7 +2437,7 @@ class Template:
         <category></category>
         <generator>CDS Invenio %(version)s</generator>
         <webMaster>%(supportemail)s</webMaster>
-        <ttl>1440</ttl>
+        <ttl>%(timetolive)s</ttl>
         <image>
             <url>%(weburl)s/img/cds.png</url>
             <title>%(cdsname)s</title>
@@ -2413,6 +2455,7 @@ class Template:
                'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()),
                'version': version,
                'supportemail': supportemail,
+               'timetolive': CFG_WEBSEARCH_RSS_TTL
                }
         return out
 
@@ -2491,12 +2534,11 @@ class Template:
 
         # get query arguments:
         res = run_sql("SELECT urlargs FROM query WHERE id=%s", (id_query,))
+        argd = {}
         if res:
-            rssurl = weburl + '/search?of=xr&amp;' + cgi.escape(res[0][0])
-        else:
-            # cannot detect query arguments, use generic RSS URL
-            rssurl = weburl + '/rss/'
+            argd = cgi.parse_qs(res[0][0])
 
+        rssurl = self.build_rss_url(argd)
         alerturl = weburl + '/youralerts/input?ln=%s&amp;idq=%s' % (ln, id_query)
 
         out = '''<a name="googlebox"></a>

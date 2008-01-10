@@ -66,6 +66,8 @@ from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.intbitset import intbitset as HitSet
+from invenio.webinterface_handler import wash_urlargd
+from invenio.urlutils import make_canonical_urlargd
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -563,6 +565,8 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
         if not keywords:
             keywords = "%s, WebSearch, %s" % (get_coll_i18nname(cdsname, ln), get_coll_i18nname(cc, ln))
 
+        rssurl = websearch_templates.build_rss_url(cgi.parse_qs(req.args))
+
         navtrail = create_navtrail_links(cc, as, ln)
         navtrail_append_title_p = 1
 
@@ -606,7 +610,8 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
                                  language=ln,
                                  navmenuid='search',
                                  navtrail_append_title_p=\
-                                 navtrail_append_title_p))
+                                 navtrail_append_title_p,
+                                 rssurl=rssurl))
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
     #else:
     #    req.send_http_header()
@@ -3365,6 +3370,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             return page_end(req, of, ln)
         elif of == "id":
             return []
+        elif of.startswith("x"):
+            # Print empty, but valid XML
+            print_records_prologue(req, of)
+            print_records_epilogue(req, of)
         else:
             return page_end(req, of, ln)
 
@@ -3430,8 +3439,13 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         else: # record does not exist
             if of == "id":
                 return []
+            elif of.startswith("x"):
+                # Print empty, but valid XML
+                print_records_prologue(req, of)
+                print_records_epilogue(req, of)
             elif of.startswith("h"):
                 print_warning(req, "Requested record does not seem to exist.")
+
     elif action == "browse":
         ## 2 - browse needed
         page_start(req, of, cc, as, ln, uid, _("Browse"))
@@ -3448,6 +3462,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         except:
             if of.startswith("h"):
                 req.write(create_error_box(req, verbose=verbose, ln=ln))
+            elif of.startswith("x"):
+                # Print empty, but valid XML
+                print_records_prologue(req, of)
+                print_records_epilogue(req, of)
             return page_end(req, of, ln)
 
     elif rm and p.startswith("recid:"):
@@ -3462,6 +3480,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 print_warning(req, "Requested record does not seem to exist.")
             if of == "id":
                 return []
+            elif of.startswith("x"):
+                # Print empty, but valid XML
+                print_records_prologue(req, of)
+                print_records_epilogue(req, of)
         else:
             # record well exists, so find similar ones to it
             t1 = os.times()[4]
@@ -3480,6 +3502,9 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                                   results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, search_pattern=p, verbose=verbose)
                 elif of=="id":
                     return results_similar_recIDs
+                elif of.startswith("x"):
+                    print_records(req, results_similar_recIDs, jrec, rg, of, ot, ln,
+                                  results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, search_pattern=p, verbose=verbose)
             else:
                 # rank_records failed and returned some error message to display:
                 if of.startswith("h"):
@@ -3488,6 +3513,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                     print_warning(req, results_similar_comments)
                 if of == "id":
                     return []
+                elif of.startswith("x"):
+                    # Print empty, but valid XML
+                    print_records_prologue(req, of)
+                    print_records_epilogue(req, of)
 
     elif p.startswith("cocitedwith:"):  #WAS EXPERIMENTAL
         ## 3-terter - cited by search needed
@@ -3502,6 +3531,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 print_warning(req, "Requested record does not seem to exist.")
             if of == "id":
                 return []
+            elif of.startswith("x"):
+                # Print empty, but valid XML
+                print_records_prologue(req, of)
+                print_records_epilogue(req, of)
         else:
             # record well exists, so find co-cited ones:
             t1 = os.times()[4]
@@ -3517,12 +3550,19 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                     print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose)
                 elif of=="id":
                     return results_cocited_recIDs
+                elif of.startswith("x"):
+                    print_records(req, results_cocited_recIDs, jrec, rg, of, ot, ln, search_pattern=p, verbose=verbose)
+
             else:
                 # cited rank_records failed and returned some error message to display:
                 if of.startswith("h"):
                     print_warning(req, "nothing found")
                 if of == "id":
                     return []
+                elif of.startswith("x"):
+                    # Print empty, but valid XML
+                    print_records_prologue(req, of)
+                    print_records_epilogue(req, of)
     else:
         ## 3 - common search needed
         page_start(req, of, cc, as, ln, uid, _("Search Results"))
@@ -3538,6 +3578,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 if len(results_in_any_collection) == 0:
                     if of.startswith("h"):
                         perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                    elif of.startswith("x"):
+                        # Print empty, but valid XML
+                        print_records_prologue(req, of)
+                        print_records_epilogue(req, of)
                     return page_end(req, of, ln)
                 if p2:
                     results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln)
@@ -3553,6 +3597,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                     if len(results_in_any_collection) == 0:
                         if of.startswith("h"):
                             perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                        elif of.startswith("x"):
+                            # Print empty, but valid XML
+                            print_records_prologue(req, of)
+                            print_records_epilogue(req, of)
                         return page_end(req, of, ln)
                 if p3:
                     results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln)
@@ -3569,6 +3617,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                elif of.startswith("x"):
+                    # Print empty, but valid XML
+                    print_records_prologue(req, of)
+                    print_records_epilogue(req, of)
+
                 return page_end(req, of, ln)
         else:
             ## 3B - simple search
@@ -3583,6 +3636,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         if len(results_in_any_collection) == 0:
             if of.startswith("h"):
                 perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+            elif of.startswith("x"):
+                # Print empty, but valid XML
+                print_records_prologue(req, of)
+                print_records_epilogue(req, of)
             return page_end(req, of, ln)
 
 #             search_cache_key = p+"@"+f+"@"+string.join(colls_to_search,",")
@@ -3606,6 +3663,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         if results_final == {}:
             if of.startswith("h"):
                 perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+            if of.startswith("x"):
+                # Print empty, but valid XML
+                print_records_prologue(req, of)
+                print_records_epilogue(req, of)
             return page_end(req, of, ln)
 
         # search stage 5: apply search option limits and restrictions:
@@ -3652,6 +3713,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             if results_final == {}:
                 if of.startswith("h"):
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+                if of.startswith("x"):
+                    # Print empty, but valid XML
+                    print_records_prologue(req, of)
+                    print_records_epilogue(req, of)
                 return page_end(req, of, ln)
 
         t2 = os.times()[4]
@@ -3685,6 +3750,10 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
         if results_final_nb_total == 0:
             if of.startswith('h'):
                 print_warning(req, "No match found, please enter different search terms.")
+            elif of.startswith("x"):
+                # Print empty, but valid XML
+                print_records_prologue(req, of)
+                print_records_epilogue(req, of)
         else:
             # yes, some hits found: good!
             # collection list may have changed due to not-exact-match-found policy so check it out:
@@ -3713,7 +3782,6 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             # print records:
             if len(colls_to_search)>1:
                 cpu_time = -1 # we do not want to have search time printed on each collection
-
             print_records_prologue(req, of)
             for coll in colls_to_search:
                 if results_final.has_key(coll) and len(results_final[coll]):

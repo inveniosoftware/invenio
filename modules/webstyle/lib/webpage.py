@@ -29,7 +29,8 @@ from invenio.config import \
      CFG_WEBSTYLE_CDSPAGEFOOTER, \
      CFG_WEBSTYLE_CDSPAGEHEADER, \
      cdslang, \
-     supportemail
+     supportemail, \
+     weburl
 from invenio.messages import gettext_set_language
 from invenio.webuser import create_userinfobox_body
 from invenio.errorlib import get_msgs_for_code_list, register_errors
@@ -65,7 +66,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
          cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
          language=cdslang, verbose=1, titleprologue="",
          titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], navmenuid="admin",
-         navtrail_append_title_p=1, of=""):
+         navtrail_append_title_p=1, of="", rssurl=weburl+"/rss"):
 
     """page(): display CDS web page
         input: title of the page
@@ -90,6 +91,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                navmenuid the section of the website this page belongs (search, submit, baskets, etc.)
                navtrail_append_title_p is 0 or 1 and tells whether page title is appended to navtrail
                of is an output format (use xx for xml output (e.g. AJAX))
+               rssfeed is the url of the RSS feed for this page
        output: the final cds page with header, footer, etc.
     """
 
@@ -168,13 +170,15 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                           # pagefooter = CFG_WEBSTYLE_CDSPAGEFOOTER,
                           lastupdated = lastupdated,
                           pagefooteradd = cdspagefooteradd,
-                          navmenuid = navmenuid)
+                          navmenuid = navmenuid,
+                          rssurl = rssurl)
 
 
 def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
                    cdspageheaderadd="", language=cdslang, req=None,
                    secure_page_p=0, verbose=1, navmenuid="admin",
-                   navtrail_append_title_p=1, metaheaderadd="", ):
+                   navtrail_append_title_p=1, metaheaderadd="",
+                   rssurl=weburl+"/rss"):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
 
@@ -193,7 +197,8 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
                       secure_page_p = secure_page_p,
                       # pageheader = CFG_WEBSTYLE_CDSPAGEHEADER,
                       pageheaderadd = cdspageheaderadd,
-                      navmenuid = navmenuid)
+                      navmenuid = navmenuid,
+                      rssurl = rssurl)
 
 def pagefooteronly(cdspagefooteradd="", lastupdated="",
                    language=cdslang, req=None, verbose=1):

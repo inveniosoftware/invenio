@@ -434,6 +434,20 @@ default
 10
 </define-tag>
 
+## CFG_NB_LATEST_ADDITIONS_RSS -- the number of records to display in
+## the RSS feed
+##  (example: "25")
+<define-tag CFG_NB_LATEST_ADDITIONS_RSS whitespace=delete>
+25
+</define-tag>
+
+## CFG_RSS_TIME_TO_LIVE -- number of minutes that indicates how long a
+## feed cache is valid
+##  (example: "360")
+<define-tag CFG_RSS_TIME_TO_LIVE whitespace=delete>
+360
+</define-tag>
+
 ## CFG_AUTHOR_ET_AL_THRESHOLD -- up to how many author names to print
 ## explicitely; for more print "et al".  Note that this is used in
 ## default formatting that is seldomly used, as usually BibFormat

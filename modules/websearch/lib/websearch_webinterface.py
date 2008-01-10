@@ -22,10 +22,20 @@
 __revision__ = "$Id$"
 
 import cgi
+import os
+import datetime
 from urllib import quote
 from mod_python import apache
 
-from invenio.config import weburl, cdsname, cachedir, cdslang, adminemail, sweburl
+from invenio.config import \
+     weburl, \
+     cdsname, \
+     cachedir, \
+     cdslang, \
+     adminemail, \
+     sweburl, \
+     CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
+     CFG_WEBSEARCH_RSS_TTL
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
@@ -40,6 +50,8 @@ from invenio.search_engine import get_colID, get_coll_i18nname, collection_restr
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
+from invenio.bibformat import format_records
+from invenio.websearch_webcoll import mymkdir
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -533,7 +545,11 @@ def display_collection(req, c, as, verbose, ln):
         filedesc = open("%s/collections/%d/last-updated-ln=%s.html" % (cachedir, colID, ln), "r")
         c_last_updated = filedesc.read()
         filedesc.close()
+
         title = get_coll_i18nname(c, ln)
+        rssurl = weburl + '/rss'
+        if c != cdsname:
+            rssurl += '?cc=' + quote(c)
 
         return page(title=title,
                     body=c_body,
@@ -548,7 +564,8 @@ def display_collection(req, c, as, verbose, ln):
                     titleprologue=c_portalbox_tp,
                     titleepilogue=c_portalbox_te,
                     lastupdated=c_last_updated,
-                    navmenuid='search')
+                    navmenuid='search',
+                    rssurl=rssurl)
     except:
         if verbose >= 9:
             req.write("<br>c=%s" % c)
@@ -572,8 +589,60 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """RSS 2.0 feed service."""
-        # FIXME: currently searching live, should put cache in place via webcoll
-        return search_engine.perform_request_search(req, of="xr")
+
+        # Keep only interesting parameters for the search
+        argd = wash_urlargd(form, websearch_templates.rss_default_urlargd)
+
+        # Create a standard filename with these parameters
+        args = websearch_templates.build_rss_url(argd).split('/')[-1]
+
+        req.content_type = "application/rss+xml"
+        req.send_http_header()
+        try:
+            # Try to read from cache
+            path = "%s/rss/%s.xml" % (cachedir, args)
+            filedesc = open(path, "r")
+            # Check if cache needs refresh
+            last_update_time = datetime.datetime.fromtimestamp(os.stat(os.path.abspath(path)).st_mtime)
+            assert(datetime.datetime.now() < last_update_time + datetime.timedelta(minutes=CFG_WEBSEARCH_RSS_TTL))
+            c_rss = filedesc.read()
+            filedesc.close()
+            req.write(c_rss)
+            return
+        except Exception, e:
+            # do it live and cache
+            rss_prologue = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
+                           websearch_templates.tmpl_xml_rss_prologue() + '\n'
+            req.write(rss_prologue)
+
+            recIDs = search_engine.perform_request_search(req, of="id",
+                                                          c=argd['c'], cc=argd['cc'],
+                                                          p=argd['p'], f=argd['f'],
+                                                          p1=argd['p1'], f1=argd['f1'],
+                                                          m1=argd['m1'], op1=argd['op1'],
+                                                          p2=argd['p2'], f2=argd['f2'],
+                                                          m2=argd['m2'], op2=argd['op2'],
+                                                          p3=argd['p3'], f3=argd['f3'],
+                                                          m3=argd['m3'])[:-(CFG_WEBSEARCH_INSTANT_BROWSE_RSS+1):-1]
+            rss_body = format_records(recIDs,
+                                      of='xr',
+                                      record_separator="\n",
+                                      req=req, epilogue="\n")
+            rss_epilogue = websearch_templates.tmpl_xml_rss_epilogue() + '\n'
+            req.write(rss_epilogue)
+
+            # update cache
+            dirname = "%s/rss" % (cachedir)
+            mymkdir(dirname)
+            fullfilename = "%s/rss/%s.xml" % (cachedir, args)
+            try:
+                os.umask(022)
+                f = open(fullfilename, "w")
+            except IOError, v:
+                raise v
+
+            f.write(rss_prologue + rss_body + rss_epilogue)
+            f.close()
 
     index = __call__
 
