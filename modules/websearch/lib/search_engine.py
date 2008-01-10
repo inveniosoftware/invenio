@@ -565,7 +565,10 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
         if not keywords:
             keywords = "%s, WebSearch, %s" % (get_coll_i18nname(cdsname, ln), get_coll_i18nname(cc, ln))
 
-        rssurl = websearch_templates.build_rss_url(cgi.parse_qs(req.args))
+        argd = {}
+        if req.args:
+            argd = cgi.parse_qs(req.args)
+        rssurl = websearch_templates.build_rss_url(argd)
 
         navtrail = create_navtrail_links(cc, as, ln)
         navtrail_append_title_p = 1
