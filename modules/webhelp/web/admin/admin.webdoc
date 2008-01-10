@@ -219,7 +219,7 @@ engine.
   can force reindexing of the fulltext index, etc.
 </td>
 <td>
-  <a href="<WEBURL>/admin/bibindex/bibindexadmin.py">BibIndex Admin Interface</a>
+  <a href="<WEBURL>/admin/bibindex/bibindexadmin.py">Manage indexes</a>
   <p>
   <a href="<WEBURL>/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a>
 </td>
