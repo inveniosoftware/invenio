@@ -184,7 +184,6 @@ th.searchboxheader a:hover {
    margin-top: 0px;
    margin-bottom: 0px;
    border-collapse: collapse;
-   border-bottom: 2px solid #3366cc;
 }
 .headerboxbody {
    color: #000;
@@ -199,6 +198,8 @@ th.searchboxheader a:hover {
    font-weight: bold;
    font-variant: small-caps;
    letter-spacing: 6px;
+   padding-bottom:2px;
+/*   border-bottom: 2px solid #36c;*/
 }
 .headermodulebox {
    color: #fff;
@@ -211,28 +212,39 @@ th.searchboxheader a:hover {
    color: #000;
    background: #fff;
    font-size: x-small;
-   font-weight: bold;
    text-align: center;
-   border-left: 2px solid #36c;
-   border-right: 2px solid #36c;
-   border-top: 2px solid #36c;
+   border-left: 2px solid #79d;
+   border-right: 2px solid #79d;
+   border-top: 2px solid #79d;
    margin: 0px;
-   padding: 0px;
+   padding: 2px 10px;
    width: 75px;
+   border-bottom: 2px solid #36c;
 }
 .headermoduleboxbodyblank {
    width: 12px;
+   padding: 2px 5px;
+   margin: 0px;
+   border-bottom: 2px solid #36c;
+}
+.headermoduleboxbodyblanklast {
    padding: 0px;
    margin: 0px;
+   width:100%;
+   border-bottom: 2px solid #36c;
 }
 .headermoduleboxbodyselected {
-   color: #000;
-   background: #36c;
+   color: #36c;
+   background: #fff;
    font-size: x-small;
    font-weight: bold;
    text-align: center;
+/*   border-bottom: 2px solid #fff;*/
+   border-left: 2px solid #36c;
+   border-right: 2px solid #36c;
+   border-top: 2px solid #36c;
    margin: 5px;
-   padding: 0px;
+   padding: 2px 10px;
    width: 75px;
 }
 a.header:link {
@@ -253,27 +265,31 @@ a.header:active {
 a.header:hover {
    color: #36c;
    background: #fff;
-   text-decoration: none;
+   text-decoration: underline;
 }
 a.headerselected:link {
-   color: #fff;
-   background: #36c;
+   color: #36c;
+   background: #fff;
    text-decoration: none;
+   font-weight: bold;
 }
 a.headerselected:visited {
-   color: #fff;
-   background: #36c;
+   color: #36c;
+   background: #fff;
    text-decoration: none;
+   font-weight: bold;
 }
 a.headerselected:active {
-   color: #fff;
-   background: #36c;
+   color: #36c;
+   background: #fff;
    text-decoration: none;
+   font-weight: bold;
 }
 a.headerselected:hover {
-   color: #fff;
-   background: #36c;
+   color: #36c;
+   background: #fff;
    text-decoration: none;
+   font-weight: bold;
 }
 .navtrailbox {
    color: #36c;
@@ -835,7 +851,7 @@ a.nearesttermsselected:hover {
 }
 .userinfoboxbody {
    color: #039;
-   padding: 0px 5px 2px 0px;
+   padding: 5px 5px 2px 0px;
    font-size: x-small;
    font-weight: normal;
 }

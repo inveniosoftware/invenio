@@ -100,7 +100,8 @@ class Template:
                   boxrightbottom="", boxrightbottomadd="",
                   titleprologue="", title="", titleepilogue="",
                   body="", lastupdated=None, pagefooteradd="", uid=0,
-                  secure_page_p=0, navmenuid="", metaheaderadd=""):
+                  secure_page_p=0, navmenuid="", metaheaderadd="",
+                  rssurl=weburl+"/rss"):
 
         """Creates a complete page
 
@@ -160,6 +161,8 @@ class Template:
 
           - 'navmenuid' *string* - the id of the navigation item to highlight for this page
 
+          - 'rssurl' *string* - the url of the RSS feed for this page
+
            Output:
 
           - HTML code of the page
@@ -178,7 +181,8 @@ class Template:
                                    navtrailbox = navtrailbox,
                                    pageheaderadd = pageheaderadd,
                                    secure_page_p = secure_page_p,
-                                   navmenuid=navmenuid) + """
+                                   navmenuid=navmenuid,
+                                   rssurl=rssurl) + """
 <div class="pagebody">
   <div class="pagebodystripeleft">
     <div class="pageboxlefttop">%(boxlefttop)s</div>
@@ -226,7 +230,8 @@ class Template:
     def tmpl_pageheader(self, req, ln=cdslang, headertitle="",
                         description="", keywords="", userinfobox="",
                         navtrailbox="", pageheaderadd="", uid=0,
-                        secure_page_p=0, navmenuid="admin", metaheaderadd=""):
+                        secure_page_p=0, navmenuid="admin", metaheaderadd="",
+                        rssurl=weburl+"/rss"):
 
         """Creates a page header
 
@@ -260,6 +265,8 @@ class Template:
 
           - 'navmenuid' *string* - the id of the navigation item to highlight for this page
 
+          - 'rssurl' *string* - the url of the RSS feed for this page
+
            Output:
 
           - HTML code of the page headers
@@ -279,7 +286,7 @@ class Template:
  <title>%(sitename)s: %(headertitle)s</title>
  <link rev="made" href="mailto:%(supportemail)s" />
  <link rel="stylesheet" href="%(cssurl)s/img/cds.css" type="text/css" />
- <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(weburl)s/rss" />
+ <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
  <meta name="description" content="%(description)s" />
  <meta name="keywords" content="%(keywords)s" />
@@ -291,14 +298,17 @@ class Template:
 <div style="background-image: url(%(cssurl)s/img/header_background.gif);">
 <table class="headerbox">
  <tr>
-  <td rowspan="2" class="headerboxbodylogo">
+  <td class="headerboxbodylogo">
    %(sitename)s
   </td>
-  <td align="right" class="userinfoboxbody">
+  <td align="right" valign="top" class="userinfoboxbody">
    %(userinfobox)s
   </td>
  </tr>
  <tr>
+  <td class="headerboxbody" valign="bottom" align="left">
+   <table class="headermodulebox" width="100%%"><tr><td class="headermoduleboxbodyblanklast">&nbsp;</td></tr></table>
+  </td>
   <td class="headerboxbody" valign="bottom" align="left">
    <table class="headermodulebox">
      <tr>
@@ -329,7 +339,7 @@ class Template:
        <td class="headermoduleboxbody%(help_selected)s">
              <a class="header%(help_selected)s" href="%(weburl)s/help/%(langlink)s">%(msg_help)s</a>
        </td>
-       <td class="headermoduleboxbodyblank">
+       <td class="headermoduleboxbodyblanklast">
              &nbsp;
        </td>
      </tr>
@@ -352,6 +362,7 @@ class Template:
           'weburl' : weburl,
           'sweburl' : sweburl,
           'cssurl' : secure_page_p and sweburl or weburl,
+          'rssurl': rssurl,
           'ln' : ln,
           'langlink': ln != cdslang and '?ln=' + ln or '',
 
