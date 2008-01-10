@@ -260,22 +260,20 @@ You may optionally want to reindex the word ranking tables:
 </pre>
 </blockquote>
 
-<p>Secondly, if you have been using custom indexes in addition to (or
-instead of) provided demo ones, you have to truncate them too:
+<p>Secondly, if you have been using custom ranking methods using new
+rnkWORD* tables (most probably you have not), you would have to
+truncate them too:
 
 <blockquote>
 <pre>
-&nbsp; # find out which custom indexes were added:
-&nbsp; $ echo "SELECT id FROM idxINDEX" | /opt/cds-invenio/bin/dbexec
-&nbsp; id
-&nbsp; 55
-&nbsp; [...]
-&nbsp;
-&nbsp; # for every index id, truncate corresponding ranking tables:
+&nbsp; # find out which custom ranking indexes were added:
 &nbsp; $ echo "SELECT id FROM rnkMETHOD" | /opt/cds-invenio/bin/dbexec
 &nbsp; id
 &nbsp; 66
 &nbsp; 67
+&nbsp; [...]
+&nbsp;
+&nbsp; # for every ranking index id, truncate corresponding ranking tables:
 &nbsp; $ echo "TRUNCATE rnkWORD66F" | /opt/cds-invenio/bin/dbexec
 &nbsp; $ echo "TRUNCATE rnkWORD66R" | /opt/cds-invenio/bin/dbexec
 &nbsp; $ echo "TRUNCATE rnkWORD67F" | /opt/cds-invenio/bin/dbexec
@@ -295,9 +293,9 @@ instead of) provided demo ones, you have to truncate them too:
 
 and we are done.
 
-<p>In the future CDS Invenio should ideally run indexing into invisible
-tables that would be switched against the production ones once the
-indexing process is successfully over.  For the time being, if
-reindexing takes several hours in your installation (e.g. if you have
-500,000 records), you may want to mysqlhotcopy your tables and run
-reindexing on those copies yourself.
+<p>In the future CDS Invenio should ideally run indexing into
+invisible tables that would be switched against the production ones
+once the indexing process is successfully over.  For the time being,
+if reindexing takes several hours in your installation (e.g. if you
+have 1,000,000 records), you may want to mysqlhotcopy your tables and
+run reindexing on those copies yourself.
