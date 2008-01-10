@@ -199,7 +199,6 @@ th.searchboxheader a:hover {
    font-variant: small-caps;
    letter-spacing: 6px;
    padding-bottom:2px;
-/*   border-bottom: 2px solid #36c;*/
 }
 .headermodulebox {
    color: #fff;
@@ -212,6 +211,7 @@ th.searchboxheader a:hover {
    color: #000;
    background: #fff;
    font-size: x-small;
+   font-weight: bold;
    text-align: center;
    border-left: 2px solid #79d;
    border-right: 2px solid #79d;
@@ -239,7 +239,6 @@ th.searchboxheader a:hover {
    font-size: x-small;
    font-weight: bold;
    text-align: center;
-/*   border-bottom: 2px solid #fff;*/
    border-left: 2px solid #36c;
    border-right: 2px solid #36c;
    border-top: 2px solid #36c;
@@ -248,17 +247,17 @@ th.searchboxheader a:hover {
    width: 75px;
 }
 a.header:link {
-   color: #36c;
+   color: #79d;
    background: #fff;
    text-decoration: none;
 }
 a.header:visited {
-   color: #36c;
+   color: #79d;
    background: #fff;
    text-decoration: none;
 }
 a.header:active {
-   color: #36c;
+   color: #79d;
    background: #fff;
    text-decoration: none;
 }
