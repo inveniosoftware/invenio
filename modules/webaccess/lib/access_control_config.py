@@ -133,6 +133,7 @@ DEF_ACTIONS = (
                ('runbibedit',         'run BibEdit',       '',              'no'),
                ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
                ('viewrestrdoc', 'view restricted document', 'status', 'no'),
+               ('cfgoairepository', 'configure OAI Repository', '', 'no')
               )
 
 # authorizations
@@ -157,6 +158,7 @@ DEF_AUTHS = (
              (SUPERADMINROLE,    'cfgwebcomment',            -1,      0,       {}),
              (SUPERADMINROLE,    'runoaiarchive',            -1,      0,       {}),
              (SUPERADMINROLE,    'runbibedit',            -1,      0,       {}),
+             (SUPERADMINROLE,    'cfgoairepository', -1, 0, {})
             )
 
 
