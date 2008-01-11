@@ -1375,7 +1375,7 @@ def acc_find_user_role_actions(user_info):
             if acc_firerole_check_user(user_info,
                 deserialize(role_definition)):
                 res4.append((role_name, action_name))
-        return list(Set(res2) or Set(res4))
+        return list(Set(res2) | Set(res4))
     else:
         return res2
 
