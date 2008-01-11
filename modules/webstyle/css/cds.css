@@ -1468,9 +1468,6 @@ div.mini-panel{
 .notopgap    { margin: 0; height:0;}
 .nobottomgap { margin-bottom: 0; height:0;}
 
-div.detailed hr {
-   color:#36c;
-   
 }
 /* Detailed record box */
 .top-left-folded {
@@ -1504,7 +1501,7 @@ ul.tabs{
    text-decoration:underline;
 }
 .tabs li.on a{
-   background-color: #58e;
+   background-color: #36c;/*#58e;*/
    color: #FFF
 }
 .tabs li.on a:hover, .tabs li.disabled a:hover{
