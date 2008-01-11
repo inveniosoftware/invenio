@@ -156,6 +156,185 @@ class Template:
                            'f3' : (str, ""),
                            'm3' : (str, "")}
 
+    tmpl_openurl_accepted_args = {
+            'genre' : (str, ''),
+            'aulast' : (str, ''),
+            'aufirst' : (str, ''),
+            'auinit' : (str, ''),
+            'auinit1' : (str, ''),
+            'auinitm' : (str, ''),
+            'issn' : (str, ''),
+            'eissn' : (str, ''),
+            'coden' : (str, ''),
+            'isbn' : (str, ''),
+            'sici' : (str, ''),
+            'bici' : (str, ''),
+            'title' : (str, ''),
+            'stitle' : (str, ''),
+            'atitle' : (str, ''),
+            'volume' : (str, ''),
+            'part' : (str, ''),
+            'issue' : (str, ''),
+            'spage' : (str, ''),
+            'epage' : (str, ''),
+            'pages' : (str, ''),
+            'artnum' : (str, ''),
+            'date' : (str, ''),
+            'ssn' : (str, ''),
+            'quarter' : (str, ''),
+            'url_ver' : (str, ''),
+            'ctx_ver' : (str, ''),
+            'rft_val_fmt' : (str, ''),
+            'rfr_id' : (str, ''),
+            'rft.atitle' : (str, ''),
+            'rft.title' : (str, ''),
+            'rft.jtitle' : (str, ''),
+            'rft.stitle' : (str, ''),
+            'rft.date' : (str, ''),
+            'rft.volume' : (str, ''),
+            'rft.issue' : (str, ''),
+            'rft.spage' : (str, ''),
+            'rft.epage' : (str, ''),
+            'rft.pages' : (str, ''),
+            'rft.artnumber' : (str, ''),
+            'rft.issn' : (str, ''),
+            'rft.eissn' : (str, ''),
+            'rft.aulast' : (str, ''),
+            'rft.aufirst' : (str, ''),
+            'rft.auinit' : (str, ''),
+            'rft.auinit1' : (str, ''),
+            'rft.auinitm' : (str, ''),
+            'rft.ausuffix' : (str, ''),
+            'rft.au' : (list, []),
+            'rft.aucorp' : (str, ''),
+            'rft.isbn' : (str, ''),
+            'rft.coden' : (str, ''),
+            'rft.sici' : (str, ''),
+            'rft.genre' : (str, 'unknown'),
+            'rft.chron' : (str, ''),
+            'rft.ssn' : (str, ''),
+            'rft.quarter' : (int, ''),
+            'rft.part' : (str, ''),
+            'rft.btitle' : (str, ''),
+            'rft.isbn' : (str, ''),
+            'rft.atitle' : (str, ''),
+            'rft.place' : (str, ''),
+            'rft.pub' : (str, ''),
+            'rft.edition' : (str, ''),
+            'rft.tpages' : (str, ''),
+            'rft.series' : (str, ''),
+    }
+
+    def tmpl_openurl2invenio(self, openurl_data):
+        """ Return an Invenio url corresponding to a search with the data
+        included in the openurl form map.
+        """
+
+        from invenio.search_engine import perform_request_search
+
+        aulast = openurl_data['rft.aulast'] or openurl_data['aulast']
+        aufirst = openurl_data['rft.aufirst'] or openurl_data['aufirst']
+        auinit = openurl_data['rft.auinit'] or \
+                 openurl_data['auinit'] or \
+                 openurl_data['rft.auinit1'] + ' ' + openurl_data['rft.auinitm'] or \
+                 openurl_data['auinit1'] + ' ' + openurl_data['auinitm'] or  aufirst[:1]
+        auinit = auinit.upper()
+
+        if aulast and aufirst:
+            author_query = 'author:"%s, %s" or author:"%s, %s"' % (aulast, aufirst, aulast, auinit)
+        elif aulast and auinit:
+            author_query = 'author:"%s, %s"' % (aulast, auinit)
+        else:
+            author_query = ''
+
+        title = openurl_data['rft.atitle'] or \
+                openurl_data['atitle'] or \
+                openurl_data['rft.btitle'] or \
+                openurl_data['rft.title'] or \
+                openurl_data['title']
+
+        if title:
+            title_query = 'title:"%s"' % title
+        else:
+            title_query = ''
+
+        jtitle = openurl_data['rft.stitle'] or \
+                 openurl_data['stitle'] or \
+                 openurl_data['rft.jtitle'] or \
+                 openurl_data['title']
+
+        if jtitle:
+            journal_query = 'journal:"%s"' % jtitle
+        else:
+            journal_query = ''
+
+        isbn = openurl_data['rft.isbn'] or \
+               openurl_data['isbn']
+
+        if isbn:
+            isbn_query = '020__a:"%s"' % isbn
+        else:
+            isbn_query = ''
+
+        issn = openurl_data['rft.eissn'] or \
+               openurl_data['eissn'] or \
+               openurl_data['rft.issn'] or \
+               openurl_data['issn']
+
+        if issn:
+            issn_query = '022__a:"%s"' % issn
+        else:
+            issn_query = ''
+
+        coden = openurl_data['rft.coden'] or openurl_data['coden']
+
+        if coden:
+            coden_query = '030__a:"%s"' % coden
+        else:
+            coden_query = ''
+
+        if openurl_data['rfr_id'].startswith('info:doi/'):
+            doi_query = '773__a:"%s"' % openurl_data['rfr_id'][len('info:doi/'):]
+        else:
+            doi_query = ''
+
+        if doi_query:
+            if perform_request_search(p=doi_query):
+                return '%s/search%s' % (weburl, make_canonical_urlargd({
+                    'p' : doi_query,
+                    'sc' : 1,
+                    'of' : 'hd'}, {}))
+        if isbn_query:
+            if perform_request_search(p=isbn_query):
+                return '%s/search%s' % (weburl, make_canonical_urlargd({
+                    'p' : isbn_query,
+                    'sc' : 1,
+                    'of' : 'hd'}, {}))
+        if coden_query:
+            if perform_request_search(p=coden_query):
+                return '%s/search%s' % (weburl, make_canonical_urlargd({
+                    'p' : coden_query,
+                    'sc' : 1,
+                    'of' : 'hd'}, {}))
+        if author_query and title_query:
+            if perform_request_search(p='%s and %s' % (title_query, author_query)):
+                return '%s/search%s' % (weburl, make_canonical_urlargd({
+                    'p' : '%s and %s' % (title_query, author_query),
+                    'sc' : 1,
+                    'of' : 'hd'}, {}))
+        if title_query:
+            if perform_request_search(p=title_query):
+                return '%s/search%s' % (weburl, make_canonical_urlargd({
+                    'p' : title_query,
+                    'sc' : 1,
+                    'of' : 'hb'}, {}))
+        if title:
+            return '%s/search%s' % (weburl, make_canonical_urlargd({
+                    'p' : title,
+                    'sc' : 1,
+                    'of' : 'hb'}, {}))
+        return ''
+
     def build_search_url(self, known_parameters={}, **kargs):
         """ Helper for generating a canonical search
         url. 'known_parameters' is the list of query parameters you

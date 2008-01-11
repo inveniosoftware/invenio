@@ -346,9 +346,22 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
     _exports = [('index.py', 'legacy_collection'),
                 ('', 'legacy_collection'),
                 ('search.py', 'legacy_search'),
-                'search']
+                'search', 'openurl', 'testsso']
 
     search = WebInterfaceSearchResultsPages()
+
+    def testsso(self, req, form):
+        req.add_common_vars()
+        sso_env = {}
+        for var, value in req.subprocess_env.iteritems():
+            if var.startswith('HTTP_ADFS_'):
+                sso_env[var] = value
+        out = "<HTML><HEAD><TITLE>SSO test</TITLE</HEAD>"
+        out += "<BODY><TABLE>"
+        for var, value in sso_env.iteritems():
+            out += "<TR><TD><STRONG>%s</STRONG></TD><TD>%s</TD></TR>" % (var, value)
+        out += "</TABLE></BODY></HTML>"
+        return out
 
     def _lookup(self, component, path):
         """ This handler is invoked for the dynamic URLs (for
@@ -422,6 +435,15 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 return WebInterfaceRecordPages(recid, tab, format), path[1:]
 
         return None, []
+
+    def openurl(self, req, form):
+        """ OpenURL Handler."""
+        argd = wash_urlargd(form, websearch_templates.tmpl_openurl_accepted_args)
+        ret_url = websearch_templates.tmpl_openurl2invenio(argd)
+        if ret_url:
+            return redirect_to_url(req, ret_url)
+        else:
+            return redirect_to_url(req, weburl)
 
     def legacy_collection(self, req, form):
         """Collection URL backward compatibility handling."""
