@@ -88,7 +88,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                     language=argd['ln'],
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='youraccount')
+                    navmenuid='youralerts')
 
     def input(left, req, form):
 
