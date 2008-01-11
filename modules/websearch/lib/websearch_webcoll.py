@@ -34,6 +34,7 @@ from invenio.config import \
      CFG_CERN_SITE, \
      CFG_WEBSEARCH_INSTANT_BROWSE, \
      CFG_WEBSEARCH_NARROW_SEARCH_SHOW_GRANDSONS, \
+     CFG_WEBSEARCH_I18N_LATEST_ADDITIONS, \
      cachedir, \
      cdslang, \
      cdsname, \
@@ -254,7 +255,7 @@ class Collection:
 
         ## precalculate latest additions for non-aggregate
         ## collections (the info is ln and as independent)
-        if self.dbquery:
+        if self.dbquery and not CFG_WEBSEARCH_I18N_LATEST_ADDITIONS:
             self.create_latest_additions_info()
 
         ## do this for each language:
@@ -262,6 +263,9 @@ class Collection:
 
             # but only if some concrete language was not chosen only:
             if task_get_option("language", lang) == lang:
+
+                if self.dbquery and CFG_WEBSEARCH_I18N_LATEST_ADDITIONS:
+                    self.create_latest_additions_info(ln=lang)
 
                 # load the right message language
                 _ = gettext_set_language(lang)
@@ -369,7 +373,7 @@ class Collection:
 
         return websearch_templates.tmpl_searchalso(ln, engines_list, self.id)
 
-    def create_latest_additions_info(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE):
+    def create_latest_additions_info(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, ln=cdslang):
         """
         Create info about latest additions that will be used for
         create_instant_browse() later.
@@ -392,7 +396,7 @@ class Collection:
             for idx in range(total-1, total-to_display-1, -1):
                 recid = recIDs[idx]
                 self.latest_additions_info.append({'id': recid,
-                                                   'format': format_record(recid, "hb"),
+                                                   'format': format_record(recid, "hb", ln=ln),
                                                    'date': get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")})
         return
 

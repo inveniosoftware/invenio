@@ -427,6 +427,17 @@ default
 0
 </define-tag>
 
+## CFG_INTERNATIONALIZE_LATEST_ADDITIONS_RECORDS -- Put "1" if you
+## want the "Latest Additions" in the web collection pages to show
+## internationalized records.  Useful only if your brief BibFormat
+## templates contains internationalized strings. Otherwise put "0"
+## in order not to slow down the creation of latest additions by
+## WebColl.
+##  (example: "0")
+<define-tag CFG_INTERNATIONALIZE_LATEST_ADDITIONS_RECORDS whitespace=delete>
+0
+</define-tag>
+
 ## CFG_NB_LATEST_ADDITIONS -- the number of records to display under
 ## 'Latest Additions' in the web collection pages
 ##  (example: "10")
