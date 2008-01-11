@@ -1009,15 +1009,15 @@ class Template:
                 if action == "cfgbibrank":
                     out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibRank"))
                 if action == "cfgwebaccess":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebAccess"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/webaccessadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebAccess"))
                 if action == "cfgwebcomment":
                     out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webcomment/webcommentadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebComment"))
                 if action == "cfgwebsearch":
                     out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSearch"))
                 if action == "cfgwebsubmit":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSubmit"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/websubmitadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSubmit"))
         out += "<br />" + _("For more admin-level activities, see the complete %(x_url_open)sAdmin Area%(x_url_close)s.") %\
-            {'x_url_open': '<a href="' + weburl + '/admin/index.' + ln + '.html">',
+            {'x_url_open': '<a href="' + weburl + '/help/admin?ln=' + ln + '">',
              'x_url_close': '</a>'}
         return out
 

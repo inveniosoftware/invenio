@@ -167,10 +167,10 @@ CFG_ACC_ACTIVITIES_URLS = {
     'cfgbibharvest' : (_("Configure BibHarvest"), "%s/admin/bibharvest/?ln=%%s" % weburl),
     'cfgbibindex' : (_("Configure BibIndex"), "%s/admin/bibindex/bibindexadmin.py?ln=%%s" % weburl),
     'cfgbibrank' : (_("Configure BibRank"), "%s/admin/bibrank/bibrankadmin.py?ln=%%s" % weburl),
-    'cfgwebaccess' : (_("Configure WebAccess"), "%s/admin/webaccess/?ln=%%s" % weburl),
+    'cfgwebaccess' : (_("Configure WebAccess"), "%s/admin/webaccess/webaccessadmin.py?ln=%%s" % weburl),
     'cfgwebcomment' : (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % weburl),
     'cfgwebsearch' : (_("Configure WebSearch"), "%s/admin/websearch/websearchadmin.py?ln=%%s" % weburl),
-    'cfgwebsubmit' : (_("Configure BibIndex"), "%s/admin/websubmit?ln=%%s" % weburl),
+    'cfgwebsubmit' : (_("Configure WebSubmit"), "%s/admin/websubmit/websubmitadmin.py?ln=%%s" % weburl),
 }
 
 CFG_WEBACCESS_MSGS = {
