@@ -1454,7 +1454,7 @@ div.detailed img, div.mini-panel img{
     border:none;
 }
 div.detailed div.content {
-   border: 1px solid #36c;
+   border: 2px solid #36c;
    padding-bottom:3px;
 }
 div.mini-panel {
@@ -1468,6 +1468,10 @@ div.mini-panel{
 .notopgap    { margin: 0; height:0;}
 .nobottomgap { margin-bottom: 0; height:0;}
 
+div.detailed hr {
+   color:#36c;
+   
+}
 /* Detailed record box */
 .top-left-folded {
    height: 10px;
@@ -1483,10 +1487,10 @@ ul.tabs{
 .tabs li{
    display:inline;
 }
-.tabs li a, .tabs li a:hover{
-   border-top: 1px solid #36c;
-   border-right: 1px solid #36c;
-   border-bottom: 1px solid #36c;
+.tabs li a{
+   border-top: 2px solid #36c;
+   border-right: 2px solid #36c;
+   border-bottom: 2px solid #36c;
    border-left: none;
    background-color: #FFF;
    padding:4px;
@@ -1496,16 +1500,22 @@ ul.tabs{
    text-decoration:none;
    zoom:100%; /*We loose CSS validity here, but necessary because of ie7*/
 }
-.tabs li.on a, .tabs li.on a:hover{
-   background-color: #36c;
+.tabs li a:hover{
+   text-decoration:underline;
+}
+.tabs li.on a{
+   background-color: #58e;
    color: #FFF
+}
+.tabs li.on a:hover, .tabs li.disabled a:hover{
+   text-decoration:none;
 }
 .tabs li.disabled a{
    color:#ccf;
    cursor:default;
 }
-.tabs li.first a, .tabs li.first a:hover{
-   border-left: 1px solid #36c;
+.tabs li.first a{
+   border-left: 2px solid #36c;
 }
 
 /* Actions in mini-box in detailed view */
