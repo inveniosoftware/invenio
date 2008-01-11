@@ -1003,7 +1003,9 @@ class Template:
                 if action == "cfgbibformat":
                     out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibFormat"))
                 if action == "cfgbibharvest":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/">%s</a>""" % (weburl, _("Configure BibHarvest"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/bibharvestadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibHarvest"))
+                if action == "cfgoairepository":
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/oaiarchiveadmin.py?ln=%s">%s</a>""" % (weburl, ln,  _("Configure OAI Repository"))
                 if action == "cfgbibindex":
                     out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibIndex"))
                 if action == "cfgbibrank":

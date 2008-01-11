@@ -45,7 +45,7 @@ def index(req, ln=cdslang):
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(req,'cfgbibharvest')
+    auth = bhc.check_user(req,'cfgoairepository')
     if not auth[0]:
 
         return page(title="OAI Repository Admin Interface",
@@ -73,7 +73,7 @@ def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(req,'cfgbibharvest')
+    auth = bhc.check_user(req,'cfgoairepository')
     if not auth[0]:
         return page(title="Add new OAI Set",
                 body=bhc.perform_request_addset(oai_set_name=oai_set_name,
@@ -118,7 +118,7 @@ def delset(req, oai_set_id=None, ln=cdslang, func=0):
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(req,'cfgbibharvest')
+    auth = bhc.check_user(req,'cfgoairepository')
     if not auth[0]:
         return page(title="Delete OAI Set",
                     body=bhc.perform_request_delset(oai_set_id=oai_set_id,
@@ -147,7 +147,7 @@ def editset(req, oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_coll
                     lastupdated=__lastupdated__,
                     req=req)
 
-    auth = bhc.check_user(req,'cfgbibharvest')
+    auth = bhc.check_user(req,'cfgoairepository')
     if not auth[0]:
         return page(title="Edit OAI Set",
                     body=bhc.perform_request_editset(oai_set_id=oai_set_id,
