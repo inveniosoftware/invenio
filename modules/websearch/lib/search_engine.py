@@ -67,6 +67,7 @@ from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.intbitset import intbitset as HitSet
 from invenio.webinterface_handler import wash_urlargd
 from invenio.urlutils import make_canonical_urlargd
+from invenio.dbquery import DatabaseError
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
