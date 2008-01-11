@@ -101,7 +101,6 @@ class Template:
         }
     tmpl_default_locale = "en_US" # which locale to use by default, useful in case of failure
 
-
     # Type of the allowed parameters for the web interface for search results
     search_results_default_urlargd = {
         'cc': (str, cdsname),
@@ -1940,16 +1939,20 @@ class Template:
         out += "</form>"
         return out
 
-    def tmpl_nice_number(self, number, ln=cdslang, thousands_separator=','):
+    def tmpl_nice_number(self, number, ln=cdslang, thousands_separator=',', max_ndigits_after_dot=None):
         """
         Return nicely printed number NUMBER in language LN using
         given THOUSANDS_SEPARATOR character.
+        If max_ndigits_after_dot is specified and the number is float, the
+        number is rounded by taking in consideration up to max_ndigits_after_dot
+        digit after the dot.
 
         This version does not pay attention to locale.  See
         tmpl_nice_number_via_locale().
         """
         if type(number) is float:
-            number = round(number, 3)
+            if max_ndigits_after_dot is not None:
+                number = round(number, max_ndigits_after_dot)
             int_part, frac_part = str(number).split('.')
             return '%s.%s' % (self.tmpl_nice_number(int(int_part), ln, thousands_separator), frac_part)
         else:
