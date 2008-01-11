@@ -1387,6 +1387,8 @@ def print_function_calls (req, doctype, action, step, form, start_time, ln=cdsla
                         ## There was an unexpected behaviour during the execution.
                         ## Log the message into function's log and go to next function
                         log_function(curdir, "***Warning*** from %s: %s" % (function_name, str(err)), start_time)
+                        ## Reset "func_returnval" to None:
+                        func_returnval = None
                     log_function(curdir, "End %s" % function_name, start_time)
                     if func_returnval is not None:
                         ## Append the returned value as a string:
