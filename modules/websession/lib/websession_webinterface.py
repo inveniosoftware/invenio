@@ -450,7 +450,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../youraccount/lost",
-                                               navmenuid='login')
+                                               navmenuid='youraccount')
 
         return page(title=_("Lost your password?"),
                     body=webaccount.perform_lost(args['ln']),
@@ -462,7 +462,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__,
-                    navmenuid='login')
+                    navmenuid='youraccount')
 
 
     def send_email(self, req, form):
@@ -475,7 +475,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../youraccount/send_email",
-                                               navmenuid='login')
+                                               navmenuid='youraccount')
 
         user_prefs = webuser.get_user_preferences(webuser.emailUnique(args['p_email']))
         if user_prefs:
@@ -490,7 +490,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             secure_page_p = 1,
                             language=args['ln'],
                             lastupdated=__lastupdated__,
-                            navmenuid='login')
+                            navmenuid='youraccount')
 
         try:
             reset_key = mail_cookie_create_pw_reset(args['p_email'], cookie_timeout=timedelta(days=CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS))
@@ -506,7 +506,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         secure_page_p = 1,
                         language=args['ln'],
                         lastupdated=__lastupdated__,
-                        navmenuid='login')
+                        navmenuid='youraccount')
 
         ip_address = req.connection.remote_host or req.connection.remote_ip
 
@@ -525,7 +525,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         secure_page_p = 1,
                         language=args['ln'],
                         lastupdated=__lastupdated__,
-                        navmenuid='login')
+                        navmenuid='youraccount')
         return page(title=_("Reset password link sent"),
                     body=webaccount.perform_emailSent(args['p_email'], args['ln']),
                     description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
@@ -534,7 +534,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__,
-                    navmenuid='login')
+                    navmenuid='youraccount')
 
     def youradminactivities(self, req, form):
         args = wash_urlargd(form, {})
@@ -569,7 +569,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../youraccount/delete",
-                                               navmenuid='login')
+                                               navmenuid='youraccount')
 
         return page(title=_("Delete Account"),
                     body=webaccount.perform_delete(args['ln']),
@@ -581,7 +581,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__,
-                    navmenuid='login')
+                    navmenuid='youraccount')
 
     def logout(self, req, form):
         args = wash_urlargd(form, {})
@@ -592,7 +592,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return webuser.page_not_authorized(req, "../youraccount/logout",
-                                               navmenuid='login')
+                                               navmenuid='youraccount')
 
         if CFG_EXTERNAL_AUTH_USING_SSO:
             return redirect_to_url(req, CFG_EXTERNAL_AUTH_LOGOUT_SSO)
@@ -607,7 +607,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__,
-                    navmenuid='login')
+                    navmenuid='youraccount')
 
     def login(self, req, form):
         args = wash_urlargd(form, {
@@ -624,7 +624,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
             return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'],
-                                               navmenuid='login')
+                                               navmenuid='youraccount')
 
         uid = webuser.getUid(req)
 
@@ -660,7 +660,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                             secure_page_p = 1,
                             language=args['ln'],
                             lastupdated=__lastupdated__,
-                            navmenuid='login')
+                            navmenuid='youraccount')
             (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, args['p_un'], args['p_pw'], args['login_method'])
         else:
             # Fake parameters for p_un & p_pw because SSO takes them from the environment
@@ -671,7 +671,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             if uid2 == -1:
                 webuser.logoutUser(req)
                 return webuser.page_not_authorized(req, "../youraccount/login?ln=%s" % args['ln'], uid=uid,
-                                                    navmenuid='login')
+                                                    navmenuid='youraccount')
 
             # login successful!
             if args['referer']:
@@ -695,7 +695,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         secure_page_p = 1,
                         language=args['ln'],
                         lastupdated=__lastupdated__,
-                        navmenuid='login')
+                        navmenuid='youraccount')
 
     def register(self, req, form):
         args = wash_urlargd(form, {
@@ -708,7 +708,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE > 0:
             return webuser.page_not_authorized(req, "../youraccount/register?ln=%s" % args['ln'],
-                                               navmenuid='login')
+                                               navmenuid='youraccount')
 
         uid = webuser.getUid(req)
 
@@ -726,7 +726,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                          secure_page_p = 1,
                          language=args['ln'],
                          lastupdated=__lastupdated__,
-                         navmenuid='login')
+                         navmenuid='youraccount')
 
         mess = ""
         act = ""
@@ -797,7 +797,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     secure_page_p = 1,
                     language=args['ln'],
                     lastupdated=__lastupdated__,
-                    navmenuid='login')
+                    navmenuid='youraccount')
 
 
 class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
