@@ -17,9 +17,11 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import time
 import re
 from invenio.webjournal_config import InvenioWebJournalIssueNumberBadlyFormedError, \
-                                    InvenioWebJournalNoArticleNumberError
+                                    InvenioWebJournalNoArticleNumberError, \
+                                    InvenioWebJournalArchiveDateWronglyFormedError
 from invenio.webjournal_utils import get_current_issue, \
                                     guess_journal_name
 
@@ -107,3 +109,16 @@ def wash_popup_record(language, record, journal_name):
         raise InvenioWebJournalNoPopupRecordError(language, journal_name,
                                                   record)
     return record
+
+def wash_archive_date(language, journal_name, archive_date):
+    """
+    Washes an archive date to the form dd/mm/yyyy or empty.
+    """
+    if archive_date == "":
+        return ""
+    try:
+        time.strptime(archive_date, "%d/%m/%Y")
+    except:
+        raise InvenioWebJournalArchiveDateWronglyFormedError(language,
+                                                             archive_date)
+    return archive_date

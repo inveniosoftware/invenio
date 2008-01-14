@@ -98,6 +98,38 @@ class InvenioWebJournalNoArticleTemplateError(Exception):
         this journal under the tag <format_template><index>...\
         </index></format_template>') % escape_html(self.journal))
     
+class InvenioWebJournalNoSearchTemplateError(Exception):
+    """
+    Exception if an article was called without its order number.
+    """
+    def __init__(self, journal_name, language=cdslang):
+        """
+        Initialisation.
+        """
+        self.journal = journal_name
+        self.language = language
+        
+    def __str__(self):
+        """
+        String representation.
+        """
+        return 'Admin did not provide a template for the search page view page of journal: %s. \
+        The path to such a file should be given in the config.xml of this journal \
+        under the tag <format_template><search>...</search></format_template>' % repr(self.journal)
+    
+    def user_box(self):
+        """
+        user-friendly error message with formatting.
+        """
+        _ = gettext_set_language(self.language)  
+        return tmpl_webjournal_error_box(self.language,
+            _('Internal Configuration Error'),
+            _('There is no format configured for this journals search page'),
+            _('Admin did not provide a template for the search page of journal: %s. \
+        The path to such a file should be given in the config.xml of\
+        this journal under the tag <format_template><search>...\
+        </search></format_template>') % escape_html(self.journal))
+    
 class InvenioWebJournalNoPopupTemplateError(Exception):
     """
     Exception if an article was called without its order number.
@@ -360,6 +392,36 @@ class InvenioWebJournalIssueNumberBadlyFormedError(Exception):
                     e.g. 50/2007. You provided the issue number like so: \
                     %s.') % escape_html(self.issue))
     
+class InvenioWebJournalArchiveDateWronglyFormedError (Exception):
+    """
+    """
+    def __init__(self, language, date):
+        """
+        Initialisation.
+        """
+        self.language = language
+        self.date = date
+    
+    def __str__(self):
+        """
+        String representation.
+        """
+        return 'The archive date was badly formed. If this comes from the \
+        user it is no problem.'
+    
+    def user_box(self):
+        """
+        user-friendly message with formatting.
+        """
+        _ = gettext_set_language(self.language)
+        return tmpl_webjournal_error_box(self.language,
+                    _('Archive Date Badly formed'),
+                    _('We could not read the archive date you provided'),
+                    _('The archive date you provided in the form seems to be badly\
+                    formed. Archive dates have to be in the form of dd/mm/YYYY, so\
+                    e.g. 02/12/2007. You provided the archive date like so: \
+                    %s.') % escape_html(self.date))
+   
 class IvenioWebJournalNoPopupTypeError(Exception):
     """
     Exception that is thrown if a popup is requested without specifying the

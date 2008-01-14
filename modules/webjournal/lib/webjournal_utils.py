@@ -300,6 +300,19 @@ def get_all_issue_weeks(issue_time, journal_name, language):
     
     return all_issue_weeks
 
+def count_down_to_monday(current_time):
+    """
+    Takes a timetuple and counts it down to the next monday and returns
+    this time.
+    """
+    next_monday = datetime.date(int(time.strftime("%Y", current_time)),
+                        int(time.strftime("%m", current_time)),
+                        int(time.strftime("%d", current_time)))
+    counter = datetime.timedelta(days=-1)
+    while next_monday.weekday() != 0:
+        next_monday = next_monday + counter
+    return next_monday.timetuple()
+
 def get_next_journal_issues(current_issue_time, journal_name,
                             language=cdslang, number=2):
     """
@@ -358,7 +371,7 @@ def issue_times_to_week_strings(issue_times, language=cdslang):
             
         from webjournal_config import InvenioWebJournalReleaseDBError
         if success == False:
-            raise InvenioWebJournalReleaseDBError(lang)
+            raise InvenioWebJournalReleaseDBError(language)
 
         #check_for_time = run_sql("SELECT STR_TO_DATE(%s, %s)",
         #                     (week, conversion_rule))[0][0]

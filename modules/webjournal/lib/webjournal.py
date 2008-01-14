@@ -27,6 +27,7 @@ from invenio.bibformat_engine import BibFormatObject, \
 from invenio.errorlib import register_exception
 from invenio.webpage import page
 from invenio.config import weburl, etcdir
+from invenio.urlutils import redirect_to_url
 
 from invenio.webjournal_config import InvenioWebJournalNoIndexTemplateError, \
                                       InvenioWebJournalNoIssueNumberTagError, \
@@ -35,7 +36,8 @@ from invenio.webjournal_config import InvenioWebJournalNoIndexTemplateError, \
                                       InvenioWebJournalNoPopupTemplateError, \
                                       InvenioWebJournalReleaseUpdateError, \
                                       InvenioWebJournalIssueNotFoundDBError, \
-                                      InvenioWebJournalJournalIdNotFoundDBError
+                                      InvenioWebJournalJournalIdNotFoundDBError, \
+                                      InvenioWebJournalArchiveDateWronglyFormedError
 from invenio.webjournal_utils import get_xml_from_config
 from invenio.webjournal_utils import get_recid_from_order_CERNBulletin, \
                                     get_article_page_from_cache, \
@@ -54,7 +56,8 @@ from invenio.webjournal_utils import get_recid_from_order_CERNBulletin, \
                                     update_DB_for_alert, \
                                     get_current_issue, \
                                     get_current_publication, \
-                                    get_list_of_issues_for_publication
+                                    get_list_of_issues_for_publication, \
+                                    count_down_to_monday
 from invenio.webjournal_templates import tmpl_webjournal_alert_success_msg, \
                                 tmpl_webjournal_alert_subject_CERNBulletin, \
                                 tmpl_webjournal_alert_plain_text_CERNBulletin, \
@@ -376,3 +379,41 @@ def perform_request_popup(req, language, journal_name, type, record):
     html = format_with_format_template(popup_page_template_path, bfo)[0]
 
     return html
+
+def perform_request_search(journal_name, language, req,
+                            archive_year, archive_issue, archive_select,
+                            archive_date, archive_search):
+    """
+    """
+    config_strings = get_xml_from_config(["search", "issue_number", "rule"],
+        journal_name)
+    try:
+        try:    
+            search_page_template = config_strings["search"][0]
+        except:
+            raise InvenioWebJournalNoSearchTemplateError(journal_name, language)
+    except InvenioWebJournalNoSearchTemplateError, e:
+        register_exception(req=req)
+        return e.user_box()
+    search_page_template_path = 'webjournal/%s' % (search_page_template)
+    # just an empty buffer record, since all values are in req.journal_defaults
+    
+    if archive_select == "False" and archive_search == "False":
+        temp_marc = '''<record>
+                            <controlfield tag="001">0</controlfield>
+                        </record>'''
+                        
+        bfo = BibFormatObject(0, ln=language, xml_record=temp_marc, req=req)
+        html = format_with_format_template(search_page_template_path, bfo)[0]
+        return html
+    elif archive_select == "Go":
+        redirect_to_url(req, "%s/journal/?name=%s&issue=%s" % (weburl,
+                                                               journal_name,
+                                                               archive_issue))
+    elif archive_search == "Go":
+        archive_issue_time = time.strptime(archive_date, "%d/%m/%Y")
+        archive_issue_time = count_down_to_monday(archive_issue_time)
+        archive_issue = issue_times_to_week_strings([archive_issue_time,])[0]
+        redirect_to_url(req, "%s/journal/?name=%s&issue=%s" % (weburl,
+                                                               journal_name,
+                                                               archive_issue))

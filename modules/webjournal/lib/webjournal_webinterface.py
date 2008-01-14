@@ -64,13 +64,15 @@ from invenio.webjournal_washer import wash_category, \
                                         wash_journal_language, \
                                         wash_article_number, \
                                         wash_popup_type, \
-                                        wash_popup_record
+                                        wash_popup_record, \
+                                        wash_archive_date
 from invenio.webjournal import perform_request_index, \
                                 perform_request_article, \
                                 perform_request_alert, \
                                 perform_request_issue_control, \
                                 perform_request_popup, \
-                                perform_request_administrate
+                                perform_request_administrate, \
+                                perform_request_search
 from invenio.webjournal_templates import tmpl_webjournal_regenerate_success, \
                                 tmpl_webjournal_regenerate_error, \
                                 tmpl_webjournal_feature_record_interface, \
@@ -83,7 +85,7 @@ from invenio.webjournal_templates import tmpl_webjournal_regenerate_success, \
 class WebInterfaceJournalPages(WebInterfaceDirectory):
     """Defines the set of /journal pages."""
 
-    _exports = ['', 'article', 'issue_control', 'edit_article', 'alert',
+    _exports = ['', 'article', 'issue_control', 'edit_article', 'alert', 'search',
                 'feature_record', 'popup', 'regenerate', 'administrate']
     # profiler
     #def index(self, req, form):
@@ -445,33 +447,74 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         
         
         
-#def search(self, req, form):
-    #    """
-    #    Creates a temporary record containing all the information needed for
-    #    the search, meaning list of issue_numbers (timeframe), list of keywords,
-    #    list of categories to search in. In this way everything can be configured
-    #    globally in the config for the given webjournal and we can reuse the bibformat
-    #    for whatever search we want.
-    #    """
-    #    argd = wash_urlargd(form, {'name': (str, ""),
-    #                                'category': (list, []),
-    #                                'issue': (list, []),
-    #                                'keyword': (str, ""),
-    #                                'ln': (str, cdslang)})
-    #    if argd['name'] == "":
-    #        register_exception(stream='warning',
-    #                           suffix="User tried to search without providing a journal name.")
-    #        return webjournal_missing_info_box(req, title="Journal not found",
-    #                                      msg_title="We don't know which journal you are looking for",
-    #                                      msg='''You were looking for a journal without providing a name.
-    #                Unfortunately we cannot know which journal you are looking for.
-    #                Below you have a selection of journals that are available on this server.
-    #                If you should find your journal there, just click the link,
-    #                otherwise please contact the server admin and ask for existence
-    #                of the journal you are looking for.''')
-    #    else:
-    #        journal_name = argd['name']
-    #        
+    def search(self, req, form):
+        """
+        Creates a temporary record containing all the information needed for
+        the search, meaning list of issue_numbers (timeframe), list of keywords,
+        list of categories to search in. In this way everything can be configured
+        globally in the config for the given webjournal and we can reuse the bibformat
+        for whatever search we want.
+        """
+        argd = wash_urlargd(form, {'name': (str, ""),
+                                    'archive_year': (str, ""),
+                                    'archive_issue': (str, ""),
+                                    'archive_select': (str, "False"),
+                                    'archive_date': (str, ""),
+                                    'archive_search': (str, "False"),
+                                    'ln': (str, cdslang)})
+        try:
+            language = wash_journal_language(argd['ln'])
+            journal_name = wash_journal_name(language, argd['name'])
+            archive_issue = wash_issue_number(language, journal_name,
+                                              argd['archive_issue'])
+            archive_date = wash_archive_date(language, journal_name,
+                                             argd['archive_date'])
+            archive_year = argd['archive_year']
+            archive_select = argd['archive_select']
+            archive_search = argd['archive_search']
+        except InvenioWebJournalNoJournalOnServerError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalNoNameError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalNoCurrentIssueError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalIssueNumberBadlyFormedError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalArchiveDateWronglyFormedError, e:
+            register_exception(req=req)
+            return e.user_box()
+        req.journal_defaults = {"name" : journal_name,
+                                "archive_year" : archive_year,
+                                "archive_issue" : archive_issue,
+                                "archive_select" : archive_select,
+                                "archive_date" : archive_date,
+                                "archive_search" : archive_search,
+                                "language" : language,
+                                }
+        
+        html = perform_request_search(journal_name, language, req,
+                                      archive_year, archive_issue,
+                                      archive_select, archive_date, archive_search)
+        return html
+        
+        #if argd['name'] == "":
+        #    register_exception(stream='warning',
+        #                       suffix="User tried to search without providing a journal name.")
+        #    return webjournal_missing_info_box(req, title="Journal not found",
+        #                                  msg_title="We don't know which journal you are looking for",
+        #                                  msg='''You were looking for a journal without providing a name.
+        #            Unfortunately we cannot know which journal you are looking for.
+        #            Below you have a selection of journals that are available on this server.
+        #            If you should find your journal there, just click the link,
+        #            otherwise please contact the server admin and ask for existence
+        #            of the journal you are looking for.''')
+        #else:
+        #    journal_name = argd['name']
+            
     #    config_strings = get_xml_from_config(["search", "issue_number", "rule"], journal_name)
     #    try:
     #        try:    
