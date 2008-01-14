@@ -60,13 +60,13 @@ CFG_DELETED_BIBDOC_MAXLIFE = 365*10
 def gc_exec_command(command):
     """ Exec the command logging in appropriate way its output."""
     write_message('  %s' % command, verbose=9)
-    (dontcare, output, errors) = os.popen3(command)
+    (dummy, output, errors) = os.popen3(command)
     write_messages(errors.read())
     write_messages(output.read())
 
 def clean_logs():
     """ Clean the logs from obsolete files. """
-    write_message("""LOGS CLEANING STARTED""")
+    write_message("""CLEANING OF LOG FILES STARTED""")
     write_message("- deleting/gzipping bibsched empty/old err/log "
             "BibSched files")
     vstr = task_get_option('verbose') > 1 and '-v' or ''
@@ -109,13 +109,45 @@ def clean_logs():
     gc_exec_command('find %s -name "oai_archive*"'
         ' -atime +%s -exec rm %s -f {} \;' \
             % (tmpdir, CFG_MAX_ATIME_RM_OAI, vstr))
-    write_message("""LOGS CLEANING FINISHED""")
+    write_message("""CLEANING OF LOG FILES FINISHED""")
+
+def clean_bibxxx():
+    """
+    Clean unreferenced bibliographic values from bibXXx tables.
+    This is useful to prettify browse results, as it removes
+    old, no longer used values.
+
+    WARNING: this function must be run only when no bibupload is
+    running and/or sleeping.
+    """
+    write_message("""CLEANING OF UNREFERENCED bibXXx VALUES STARTED""")
+    for xx in range(0, 100):
+        bibxxx = 'bib%02dx' % xx
+        bibrec_bibxxx = 'bibrec_bib%02dx' % xx
+        if task_get_option('verbose') >= 9:
+            num_unref_values = run_sql("""SELECT COUNT(*) FROM %(bibxxx)s
+                     LEFT JOIN %(bibrec_bibxxx)s
+                            ON %(bibxxx)s.id=%(bibrec_bibxxx)s.id_bibxxx
+                     WHERE %(bibrec_bibxxx)s.id_bibrec IS NULL""" % \
+                        {'bibxxx': bibxxx,
+                         'bibrec_bibxxx': bibrec_bibxxx,})[0][0]
+        run_sql("""DELETE %(bibxxx)s FROM %(bibxxx)s
+                     LEFT JOIN %(bibrec_bibxxx)s
+                            ON %(bibxxx)s.id=%(bibrec_bibxxx)s.id_bibxxx
+                     WHERE %(bibrec_bibxxx)s.id_bibrec IS NULL""" % \
+                        {'bibxxx': bibxxx,
+                         'bibrec_bibxxx': bibrec_bibxxx,})
+        if task_get_option('verbose') >= 9:
+            write_message(""" - %d unreferenced %s values cleaned""" % \
+                          (num_unref_values, bibxxx))
+    write_message("""CLEANING OF UNREFERENCED bibXXx VALUES FINISHED""")
+    pass
 
 def clean_documents():
     """Delete all the bibdocs that have been set as deleted and have not been
     modified since CFG_DELETED_BIBDOC_MAXLIFE days. Returns the number of
     bibdocs involved."""
-    write_message("""OBSOLETED DELETED DOCUMENTS CLEANING STARTED""")
+    write_message("""CLEANING OF OBSOLETED DELETED DOCUMENTS STARTED""")
     write_message("select id from bibdoc where status='DELETED' and NOW()>ADDTIME(modification_date, '%s 0:0:0')" % CFG_DELETED_BIBDOC_MAXLIFE, verbose=9)
     records = run_sql("select id from bibdoc where status='DELETED' and NOW()>ADDTIME(modification_date, '%s 0:0:0')" % CFG_DELETED_BIBDOC_MAXLIFE)
     for record in records:
@@ -123,8 +155,8 @@ def clean_documents():
         bibdoc.expunge()
         write_message("DELETE FROM bibdoc WHERE id=%i" % int(record[0]), verbose=9)
         run_sql("DELETE FROM bibdoc WHERE id=%s", (record[0], ))
-    write_message("""%s Obsoleted deleted documents cleaned""" % len(records))
-    write_message("""OBSOLETED DELETED DOCUMENTS CLEANING FINISHED""")
+    write_message("""%s obsoleted deleted documents cleaned""" % len(records))
+    write_message("""CLEANING OF OBSOLETED DELETED DOCUMENTS FINISHED""")
     return len(records)
 
 def guest_user_garbage_collector():
@@ -161,8 +193,7 @@ def guest_user_garbage_collector():
                 'email_addresses': 0,
                 'role_membership' : 0}
 
-    write_message("GUEST USER SESSIONS GARBAGE"
-        " COLLECTOR STARTED")
+    write_message("CLEANING OF GUEST SESSIONS STARTED")
 
     # 1 - DELETE EXPIRED SESSIONS
     write_message("- deleting expired sessions")
@@ -308,22 +339,22 @@ def guest_user_garbage_collector():
 
     # print STATISTICS
 
-    write_message("""STATISTICS - DELETED DATA: """)
-    write_message("""- %7s sessions.""" % (delcount['session'], ))
-    write_message("""- %7s users.""" % (delcount['user'], ))
-    write_message("""- %7s user_queries.""" % (delcount['user_query'], ))
-    write_message("""- %7s queries.""" % (delcount['query'], ))
-    write_message("""- %7s baskets.""" % (delcount['bskBASKET'], ))
-    write_message("""- %7s user_baskets.""" % (delcount['user_bskBASKET'], ))
-    write_message("""- %7s basket_records.""" % (delcount['bskREC'], ))
-    write_message("""- %7s basket_external_records.""" % (delcount['bskEXTREC'], ))
-    write_message("""- %7s basket_external_formats.""" % (delcount['bskEXTFMT'], ))
-    write_message("""- %7s basket_comments.""" % (delcount['bskRECORDCOMMENT'], ))
-    write_message("""- %7s user_query_baskets.""" % (delcount['user_query_basket'], ))
-    write_message("""- %7s mail_cookies.""" % (delcount['mail_cookie'], ))
-    write_message("""- %7s non confirmed email addresses.""" % delcount['email_addresses'])
-    write_message("""- %7s role_memberships.""" % (delcount['role_membership'], ))
-    write_message("""GUEST USER SESSIONS GARBAGE COLLECTOR FINISHED""")
+    write_message("""- statistics about deleted data: """)
+    write_message("""  %7s sessions.""" % (delcount['session'], ))
+    write_message("""  %7s users.""" % (delcount['user'], ))
+    write_message("""  %7s user_queries.""" % (delcount['user_query'], ))
+    write_message("""  %7s queries.""" % (delcount['query'], ))
+    write_message("""  %7s baskets.""" % (delcount['bskBASKET'], ))
+    write_message("""  %7s user_baskets.""" % (delcount['user_bskBASKET'], ))
+    write_message("""  %7s basket_records.""" % (delcount['bskREC'], ))
+    write_message("""  %7s basket_external_records.""" % (delcount['bskEXTREC'], ))
+    write_message("""  %7s basket_external_formats.""" % (delcount['bskEXTFMT'], ))
+    write_message("""  %7s basket_comments.""" % (delcount['bskRECORDCOMMENT'], ))
+    write_message("""  %7s user_query_baskets.""" % (delcount['user_query_basket'], ))
+    write_message("""  %7s mail_cookies.""" % (delcount['mail_cookie'], ))
+    write_message("""  %7s non confirmed email addresses.""" % delcount['email_addresses'])
+    write_message("""  %7s role_memberships.""" % (delcount['role_membership'], ))
+    write_message("""CLEANING OF GUEST SESSIONS FINISHED""")
 
     return
 
@@ -331,16 +362,17 @@ def main():
     """Main that construct all the bibtask."""
     task_set_option('logs', False)
     task_set_option('guests', False)
+    task_set_option('bibxxx', False)
     task_set_option('documents', False)
     task_init(authorization_action='runsessiongc',
             authorization_msg="InvenioGC Task Submission",
-            help_specific_usage="  -l, --logs\t\tClean up/compress old"
-                " logs and temporary files.\n" \
-                "  -g, --guests\t\tClean up expired guest user related information. (default if nothing is specified)\n" \
-                "  -d, --documents\tClean up deleted documents and revisions older than %s days\n" \
-                "  -a, --all\t\tCalls every cleaning action.\n" % CFG_DELETED_BIBDOC_MAXLIFE,
+            help_specific_usage="  -l, --logs\t\tClean old logs and temporary files.\n" \
+                "  -g, --guests\t\tClean expired guest user related information. [default action]\n" \
+                "  -b, --bibxxx\t\tClean unreferenced bibliographic values in bibXXx tables.\n" \
+                "  -d, --documents\tClean deleted documents and revisions older than %s days.\n" \
+                "  -a, --all\t\tClean all of the above.\n" % CFG_DELETED_BIBDOC_MAXLIFE,
             version=__revision__,
-            specific_params=("lgda", ["logs", "guests", "documents", "all"]),
+            specific_params=("lgbda", ["logs", "guests", "bibxxx", "documents", "all"]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_submit_check_options_fnc=task_submit_check_options,
             task_run_fnc=task_run_core)
@@ -348,6 +380,7 @@ def main():
 def task_submit_check_options():
     if not task_get_option('logs') and \
        not task_get_option('guests') and \
+       not task_get_option('bibxxx') and \
        not task_get_option('documents'):
         task_set_option('sessions', True)
     return True
@@ -369,12 +402,16 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ('-g', '--guests'):
         task_set_option('guests', True)
         return True
+    elif key in ('-b', '--bibxxx'):
+        task_set_option('bibxxx', True)
+        return True
     elif key in ('-d', '--documents'):
         task_set_option('documents', True)
         return True
     elif key in ('-a', '--all'):
         task_set_option('logs', True)
         task_set_option('guests', True)
+        task_set_option('bibxxx', True)
         task_set_option('documents', True)
         return True
     return False
@@ -385,6 +422,8 @@ def task_run_core():
         guest_user_garbage_collector()
     if task_get_option('logs'):
         clean_logs()
+    if task_get_option('bibxxx'):
+        clean_bibxxx()
     if task_get_option('documents'):
         clean_documents()
     return True
