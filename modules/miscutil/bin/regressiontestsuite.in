@@ -14,7 +14,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -44,7 +44,7 @@ def usage():
 if __name__ == "__main__":
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hV", ["help", "version"])
+        opts, args = getopt.getopt(sys.argv[1:], "hV", ["help", "version", "yes-i-know"])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -60,7 +60,7 @@ if __name__ == "__main__":
     ## Okay, go on and harvest all the modules whose name ends in
     ## 'regression_tests', and build up a complete suite to run from
     ## that list, and run it.
-            
+
     test_modules = []
 
     for candidate in os.listdir(os.path.dirname(invenio.__file__)):
