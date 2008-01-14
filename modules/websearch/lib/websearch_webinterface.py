@@ -90,27 +90,6 @@ def wash_search_urlargd(form):
 
     return argd
 
-
-class WebInterfaceAuthorPage(WebInterfaceDirectory):
-    """ Handle /author/Doe%2C+John etc """
-    
-    _exports = ['author']
-
-    authorname = '' #filled in lookup
-
-    def __init__(self):
-	return
-
-    def __call__(self, req, form):
-	#raise "we are here" # we never get here..
-	return
-
-    def _lookup(self, component, path):
-	authorname = str(component)
-	#this works, we get authorname as the string, like Doe,+John
-	#FIXME: instead of None, return a callable
-	return None,[]
-
 class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /record/<recid> URL fragment """
 
