@@ -370,13 +370,16 @@ def tmpl_webjournal_updated_issue_msg(language, update_issue, journal_name):
 
 def tmpl_webjournal_admin_interface(journal_name, current_issue,
                                 current_publication, issue_list,
-                                language=cdslang):
+                                next_issue_number, language=cdslang):
     """
+    Returns an administration interface that shows the current publication and
+    supports links to all important actions.
     """
     _ = gettext_set_language(language)
     title = _('Webjournal Administration Interface')
     # format the issues
     issue_boxes = []
+    issue_list.append(next_issue_number)
     for issue in issue_list:
         articles = get_number_of_articles_for_issue(issue,
                                                     journal_name,
@@ -404,7 +407,7 @@ def tmpl_webjournal_admin_interface(journal_name, current_issue,
             <tr>
         ''' % ((issue==current_issue) and "background:#00FF00;" or "background:#F1F1F1;",
             
-                issue, current_publication,
+                issue, (issue==next_issue_number) and "?" or current_publication,
                 
                 "\n".join(['<p>%s : %s <a href="%s/journal/?name=%s&issue=%s&category=%s">&gt;edit</a></p>' %
                            (item[0], item[1],

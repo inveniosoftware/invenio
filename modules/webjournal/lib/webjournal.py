@@ -57,7 +57,8 @@ from invenio.webjournal_utils import get_recid_from_order_CERNBulletin, \
                                     get_current_issue, \
                                     get_current_publication, \
                                     get_list_of_issues_for_publication, \
-                                    count_down_to_monday
+                                    count_down_to_monday, \
+                                    count_week_string_up
 from invenio.webjournal_templates import tmpl_webjournal_alert_success_msg, \
                                 tmpl_webjournal_alert_subject_CERNBulletin, \
                                 tmpl_webjournal_alert_plain_text_CERNBulletin, \
@@ -216,8 +217,10 @@ def perform_request_administrate(journal_name, language):
                                                   current_issue,
                                                   language)
     issue_list = get_list_of_issues_for_publication(current_publication)
+    next_issue_number = count_week_string_up(max(issue_list))
     return tmpl_webjournal_admin_interface(journal_name, current_issue,
-                                current_publication, issue_list, language)
+                                current_publication, issue_list,
+                                next_issue_number, language)
     
 
 def perform_request_alert(req, journal_name, issue_number, language,
@@ -384,6 +387,7 @@ def perform_request_search(journal_name, language, req, issue,
                             archive_year, archive_issue, archive_select,
                             archive_date, archive_search):
     """
+    Logic for the search / archive page.
     """
     config_strings = get_xml_from_config(["search", "issue_number", "rule"],
         journal_name)
