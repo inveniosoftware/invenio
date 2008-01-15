@@ -128,7 +128,7 @@ def kill_sleepy_mysql_threads(max_threads=CFG_MAX_MYSQL_THREADS, thread_timeout=
     res = run_sql("SHOW FULL PROCESSLIST")
     if len(res) > max_threads:
         for row in res:
-            r_id, dummy, dummy, dummy, r_command, r_time, dummy, dontcare = row
+            r_id, dummy, dummy, dummy, r_command, r_time, dummy, dummy = row
             if r_command == "Sleep" and int(r_time) > thread_timeout:
                 run_sql("KILL %s", (r_id,))
                 write_message("WARNING: too many DB threads, killing thread %s" % r_id, verbose=1)
@@ -313,8 +313,7 @@ def get_words_from_local_fulltext(path, ext=''):
     return words.keys()
 
 
-def get_words_from_fulltext(url_direct_or_indirect,
-                            force_file_extension=None, stemming_language=None):
+def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
     """Returns all the words contained in the document specified by
        URL_DIRECT_OR_INDIRECT with the words being split by various
        SRE_SEPARATORS regexp set earlier.  If FORCE_FILE_EXTENSION is
@@ -340,7 +339,7 @@ def get_words_from_fulltext(url_direct_or_indirect,
         if ext[0] == '.':
             ext = ext[1:].lower()
         fulltext_urls = [(ext, url_direct_or_indirect)]
-    elif not force_file_extension:
+    else:
         # check for direct link in url
         url_direct_or_indirect_ext = url_direct_or_indirect.split(".")[-1].lower()
 
@@ -358,8 +357,6 @@ def get_words_from_fulltext(url_direct_or_indirect,
                 return []
             fulltext_urls = get_fulltext_urls_from_html_page(htmlpagebody)
             write_message("... fulltext_urls = %s" % fulltext_urls, verbose=9)
-    else:
-        fulltext_urls = [(force_file_extension, url_direct_or_indirect)]
 
     write_message('... data to elaborate: %s' % fulltext_urls, verbose=9)
 
@@ -404,12 +401,12 @@ def get_words_from_fulltext(url_direct_or_indirect,
 
         tmp_dst_name = tempfile.mkstemp('invenio.tmp.txt', dir=tmpdir)[1]
 
-        # try all available conversion programs according to their order:
         bingo = 0
+        # try all available conversion programs according to their order:
         for conv_program in CONV_PROGRAMS.get(ext, []):
             if os.path.exists(conv_program):
                 # intelligence on how to run various conversion programs:
-                cmd = ""  # wil keep command to run
+                cmd = ""  # will keep command to run
                 bingo = 0 # had we success?
                 if os.path.basename(conv_program) == "pdftotext":
                     cmd = "%s -enc UTF-8 %s %s" % (conv_program, tmp_name, tmp_dst_name)
@@ -512,24 +509,26 @@ def remove_latex_markup(phrase):
     ret_phrase += phrase[index:]
     return ret_phrase
 
+def get_nothing_from_phrase(phrase, stemming_language=None):
+    """ A dump implementation of get_words_from_phrase to be used when
+    when a tag should not be indexed (such as when trying to extract phrases from
+    8564_u)."""
+    return []
 
-# tagToFunctions mapping. It offers an indirection level necessary for
-# indexing fulltext. The default is get_words_from_phrase
-tagToWordsFunctions = {'8564_u' : get_words_from_fulltext}
-
-latex_formula_re = re.compile(r'\$.*?\$')
+latex_formula_re = re.compile(r'\$.*?\$|\\\[.*?\\\]')
 def get_words_from_phrase(phrase, stemming_language=None):
     """Return list of words found in PHRASE.  Note that the phrase is
        split into groups depending on the alphanumeric characters and
        punctuation characters definition present in the config file.
     """
     words = {}
+    formulas = []
     if CFG_BIBINDEX_REMOVE_HTML_MARKUP and phrase.find("</") > -1:
         phrase = re_html.sub(' ', phrase)
     if CFG_BIBINDEX_REMOVE_LATEX_MARKUP:
-        phrase = remove_latex_markup(phrase)
         formulas = latex_formula_re.findall(phrase)
-        blocks = strip_accents(latex_formula_re.sub(' ', phrase)).split()
+        phrase = remove_latex_markup(phrase)
+        phrase = latex_formula_re.sub(' ', phrase)
     phrase = phrase.lower()
     # 1st split phrase into blocks according to whitespace
     for block in strip_accents(phrase).split():
@@ -553,30 +552,57 @@ def get_words_from_phrase(phrase, stemming_language=None):
                             alphanumeric_group = apply_stemming_and_stopwords_and_length_check(alphanumeric_group, stemming_language)
                         if alphanumeric_group:
                             words[alphanumeric_group] = 1
+    for block in formulas:
+        words[block] = 1
     return words.keys()
+
+phrase_delimiter_re = re.compile(r'[\.:;\?\!]')
+space_cleaner_re = re.compile(r'\s+')
+def get_phrases_from_phrase(phrase, stemming_language=None):
+    """Return list of phrases found in PHRASE.  Note that the phrase is
+       split into groups depending on the alphanumeric characters and
+       punctuation characters definition present in the config file.
+    """
+    words = {}
+    phrase = strip_accents(phrase)
+    # 1st split phrase into blocks according to whitespace
+    for block1 in phrase_delimiter_re.split(strip_accents(phrase)):
+        block1 = block1.strip()
+        if block1 and stemming_language:
+            new_words = []
+            for block2 in re_punctuation.split(block1):
+                block2 = block2.strip()
+                if block2:
+                    for block3 in block2.split():
+                        block3 = block3.strip()
+                        if block3:
+                            block3 = apply_stemming_and_stopwords_and_length_check(block3, stemming_language)
+                            if block3:
+                                new_words.append(block3)
+            block1 = ' '.join(new_words)
+        if block1:
+            words[block1] = 1
+    return words.keys()
+
 
 def apply_stemming_and_stopwords_and_length_check(word, stemming_language):
     """Return WORD after applying stemming and stopword and length checks.
        See the config file in order to influence these.
     """
-    # stem word, when configured so:
-    if stemming_language:
-        word = stem(word, stemming_language)
     # now check against stopwords:
     if is_stopword(word):
         return ""
     # finally check the word length:
     if len(word) < CFG_BIBINDEX_MIN_WORD_LENGTH:
         return ""
+    # stem word, when configured so:
+    if stemming_language:
+        word = stem(word, stemming_language)
     return word
 
 def remove_subfields(s):
     "Removes subfields from string, e.g. 'foo $$c bar' becomes 'foo bar'."
     return re_subfields.sub(' ', s)
-
-def get_index_id_from_table_name(table_name):
-    """Returns the index id given the table name as in idxWORD05F -> 5"""
-    return int(table_name[7:9])
 
 def get_index_id_from_index_name(index_name):
     """Returns the words/phrase index id for INDEXNAME.
@@ -633,21 +659,21 @@ def split_ranges(parse_string):
     return recIDs
 
 def get_word_tables(tables):
-    wordTables = []
+    """ Given a list of table names it return a dictionary of index_id : index_tags.
+    if tables is empty it returns the whole dictionary."""
+    wordTables = {}
     if tables:
         indexes = tables.split(",")
         for index in indexes:
             index_id = get_index_id_from_index_name(index)
             if index_id:
-                wordTables.append({"idxWORD%02dF" % index_id: \
-                                   get_index_tags(index)})
+                wordTables[index_id] = get_index_tags(index)
             else:
                 write_message("Error: There is no %s words table." % index, sys.stderr)
     else:
         for index in get_all_indexes():
             index_id = get_index_id_index_name(index)
-            wordTables.append({"idxWORD%02dF" % index_id: \
-                               get_index_tags(index)})
+            wordTables[index_id] = get_index_tags(index)
     return wordTables
 
 def get_date_range(var):
@@ -705,22 +731,38 @@ def truncate_index_table(index_name):
         run_sql("UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00' WHERE id=%s", (index_id,))
         run_sql("TRUNCATE idxWORD%02dF" % index_id)
         run_sql("TRUNCATE idxWORD%02dR" % index_id)
+        run_sql("TRUNCATE idxPHRASE%02dF" % index_id)
+        run_sql("TRUNCATE idxPHRASE%02dR" % index_id)
 
 class WordTable:
     "A class to hold the words table."
 
-    def __init__(self, tablename, fields_to_index, separators="[^\s]", stemming_language=None):
-        "Creates words table instance."
-        self.tablename = tablename
+    def __init__(self, index_id, fields_to_index, table_name_pattern, default_get_words_fnc, tag_to_words_fnc_map):
+        """Creates words table instance.
+        @param index_id  the index integer identificator
+        @param fields_to_index a list of fields to index
+        @param table_name_pattern i.e. idxWORD%02dF or idxPHRASE%02dF
+        @parm default_get_words_fnc the default function called to extract
+        words from a metadata
+        @param tag_to_words_fnc_map a mapping to specify particular function to
+        extract words from particular metdata (such as 8564_u)
+        """
+        self.index_id = index_id
+        self.tablename = table_name_pattern % index_id
         self.recIDs_in_mem = []
         self.fields_to_index = fields_to_index
-        self.separators = separators
         self.value = {}
-        self.stemming_language = stemming_language
-        if stemming_language:
-            write_message('Stemming(%s) is enabled for table %s' % (stemming_language, tablename))
+        self.stemming_language = get_index_stemming_language(index_id)
+
+        # tagToFunctions mapping. It offers an indirection level necessary for
+        # indexing fulltext. The default is get_words_from_phrase
+        self.tag_to_words_fnc_map = tag_to_words_fnc_map
+        self.default_get_words_fnc = default_get_words_fnc
+
+        if self.stemming_language:
+            write_message('Stemming(%s) is enabled for table %s' % (self.stemming_language, self.tablename))
         else:
-            write_message('Stemming is disabled for table %s' % tablename)
+            write_message('Stemming is disabled for table %s' % self.tablename)
 
     def get_field(self, recID, tag):
         """Returns list of values of the MARC-21 'tag' fields for the
@@ -998,7 +1040,7 @@ class WordTable:
         self.recIDs_in_mem.append([recID1,recID2])
         # secondly fetch all needed tags:
         for tag in self.fields_to_index:
-            get_words_function = tagToWordsFunctions.get(tag, get_words_from_phrase)
+            get_words_function = self.tag_to_words_fnc_map.get(tag, self.default_get_words_fnc)
             bibXXx = "bib" + tag[0] + tag[1] + "x"
             bibrec_bibXXx = "bibrec_" + bibXXx
             query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
@@ -1007,27 +1049,10 @@ class WordTable:
             res = run_sql(query)
             for row in res:
                 recID,phrase = row
-                if not wlist.has_key(recID): wlist[recID] = []
-                if tag == "8564_u":
-                    # Special treatment for fulltext indexing. 8564
-                    # $$u contains URL, and $$y link name.  If $$y is
-                    # actually a file name, that is if it ends with
-                    # something like .pdf or .ppt, then $$u is treated
-                    # as direct URL to the PDF file, and is indexed as
-                    # such.  This is useful to index Indico files.
-                    # FIXME: this is a quick fix only.  We should
-                    # rather download all 856 $$u files and analyze
-                    # content in order to decide how to index them
-                    # (directly for Indico, indirectly for Setlink).
-                    filename = get_associated_subfield_value(recID,'8564_u', phrase, 'y')
-                    filename_extension = filename.split('.')[-1].lower()
-                    if filename_extension in CONV_PROGRAMS.keys():
-                        new_words = get_words_function(phrase, force_file_extension=filename_extension, stemming_language=self.stemming_language) # ,self.separators
-                    else:
-                        new_words = get_words_function(phrase, stemming_language=self.stemming_language) # ,self.separators
-                else:
-                    new_words = get_words_function(phrase, stemming_language=self.stemming_language) # ,self.separators
-                wlist[recID] = list_union(new_words,wlist[recID])
+                if not wlist.has_key(recID):
+                    wlist[recID] = []
+                new_words = get_words_function(phrase, stemming_language=self.stemming_language) # ,self.separators
+                wlist[recID] = list_union(new_words, wlist[recID])
 
         # were there some words for these recIDs found?
         if len(wlist) == 0: return 0
@@ -1313,12 +1338,6 @@ def test_fulltext_indexing():
     print get_words_from_fulltext("http://doc.cern.ch/cgi-bin/setlink?base=preprint&categ=cern&id=lhc-project-report-601") # PDF
     sys.exit(0)
 
-def test_word_separators(phrase="hep-th/0101001"):
-    """Tests word separating policy on various input."""
-    print "%s:" % phrase
-    for word in get_words_from_phrase(phrase):
-        print "\t-> %s" % word
-
 def main():
     """Main that construct all the bibtask."""
     task_set_option('cmd', 'add')
@@ -1427,8 +1446,18 @@ def task_run_core():
     global _last_word_table
 
     if task_get_option("cmd") == "check":
-        for table in get_word_tables(task_get_option("windex")):
-            wordTable = WordTable(table.keys()[0], table.values()[0], stemming_language=get_index_stemming_language(get_index_id_from_table_name(table.keys()[0])))
+        wordTables = get_word_tables(task_get_option("windex"))
+        for index_id, index_tags in wordTables.iteritems():
+            wordTable = WordTable(index_id, index_tags, 'idxWORD%02dF', get_words_from_phrase, {'8564_u': get_words_from_fulltext})
+            _last_word_table = wordTable
+            wordTable.report_on_table_consistency()
+        _last_word_table = None
+        return True
+
+    if task_get_option("cmd") == "check":
+        wordTables = get_word_tables(task_get_option("windex"))
+        for index_id, index_tags in wordTables.iteritems():
+            wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase})
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
         _last_word_table = None
@@ -1438,8 +1467,63 @@ def task_run_core():
         for index_name in task_get_option("windex").split(','):
             truncate_index_table(index_name)
 
-    for table in get_word_tables(task_get_option("windex")):
-        wordTable = WordTable(table.keys()[0], table.values()[0], stemming_language=get_index_stemming_language(get_index_id_from_table_name(table.keys()[0])))
+    # Let's work on single words!
+    wordTables = get_word_tables(task_get_option("windex"))
+    for index_id, index_tags in wordTables.iteritems():
+        wordTable = WordTable(index_id, index_tags, 'idxWORD%02dF', get_words_from_phrase, {'8564_u': get_words_from_fulltext})
+        _last_word_table = wordTable
+        wordTable.report_on_table_consistency()
+        try:
+            if task_get_option("cmd") == "del":
+                if task_get_option("id"):
+                    wordTable.del_recIDs(task_get_option("id"))
+                elif task_get_option("collection"):
+                    l_of_colls = task_get_option("collection").split(",")
+                    recIDs = perform_request_search(c=l_of_colls)
+                    recIDs_range = []
+                    for recID in recIDs:
+                        recIDs_range.append([recID,recID])
+                    wordTable.del_recIDs(recIDs_range)
+                else:
+                    write_message("Missing IDs of records to delete from index %s." % wordTable.tablename,
+                                sys.stderr)
+                    raise StandardError
+            elif task_get_option("cmd") == "add":
+                if task_get_option("id"):
+                    wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
+                elif task_get_option("collection"):
+                    l_of_colls = task_get_option("collection").split(",")
+                    recIDs = perform_request_search(c=l_of_colls)
+                    recIDs_range = []
+                    for recID in recIDs:
+                        recIDs_range.append([recID,recID])
+                    wordTable.add_recIDs(recIDs_range, task_get_option("flush"))
+                else:
+                    wordTable.add_recIDs_by_date(task_get_option("modified"), task_get_option("flush"))
+                    # only update last_updated if run via automatic mode:
+                    #wordTable.update_last_updated(task_get_task_param('task_starting_time'))
+            elif task_get_option("cmd") == "repair":
+                wordTable.repair(task_get_option("flush"))
+            else:
+                write_message("Invalid command found processing %s" % \
+                    wordTable.tablename, sys.stderr)
+                raise StandardError
+        except StandardError, e:
+            write_message("Exception caught: %s" % e, sys.stderr)
+            if task_get_option("verbose") >= 8:
+                traceback.print_tb(sys.exc_info()[2])
+            task_update_status("ERROR")
+            if _last_word_table:
+                _last_word_table.put_into_db()
+            sys.exit(1)
+
+        wordTable.report_on_table_consistency()
+
+
+    # Let's work on phrases now
+    wordTables = get_word_tables(task_get_option("windex"))
+    for index_id, index_tags in wordTables.iteritems():
+        wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase})
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
         try:
@@ -1487,6 +1571,7 @@ def task_run_core():
             sys.exit(1)
 
         wordTable.report_on_table_consistency()
+
     _last_word_table = None
     return True
 

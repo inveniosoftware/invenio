@@ -1919,10 +1919,10 @@ CREATE TABLE IF NOT EXISTS idxWORD10R (
 
 CREATE TABLE IF NOT EXISTS idxPHRASE01F (
   id mediumint(9) unsigned NOT NULL auto_increment,
-  term varchar(50) default NULL,
+  term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term)
+  UNIQUE KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE01R (
@@ -1934,10 +1934,10 @@ CREATE TABLE IF NOT EXISTS idxPHRASE01R (
 
 CREATE TABLE IF NOT EXISTS idxPHRASE02F (
   id mediumint(9) unsigned NOT NULL auto_increment,
-  term varchar(50) default NULL,
+  term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term)
+  UNIQUE KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE02R (
@@ -1949,10 +1949,10 @@ CREATE TABLE IF NOT EXISTS idxPHRASE02R (
 
 CREATE TABLE IF NOT EXISTS idxPHRASE03F (
   id mediumint(9) unsigned NOT NULL auto_increment,
-  term varchar(50) default NULL,
+  term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term)
+  UNIQUE KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE03R (
@@ -1964,10 +1964,10 @@ CREATE TABLE IF NOT EXISTS idxPHRASE03R (
 
 CREATE TABLE IF NOT EXISTS idxPHRASE04F (
   id mediumint(9) unsigned NOT NULL auto_increment,
-  term varchar(50) default NULL,
+  term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term)
+  UNIQUE KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE04R (
@@ -1979,10 +1979,10 @@ CREATE TABLE IF NOT EXISTS idxPHRASE04R (
 
 CREATE TABLE IF NOT EXISTS idxPHRASE05F (
   id mediumint(9) unsigned NOT NULL auto_increment,
-  term varchar(50) default NULL,
+  term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term)
+  UNIQUE KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE05R (
@@ -1994,10 +1994,10 @@ CREATE TABLE IF NOT EXISTS idxPHRASE05R (
 
 CREATE TABLE IF NOT EXISTS idxPHRASE06F (
   id mediumint(9) unsigned NOT NULL auto_increment,
-  term varchar(50) default NULL,
+  term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term)
+  UNIQUE KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE06R (
@@ -2009,10 +2009,10 @@ CREATE TABLE IF NOT EXISTS idxPHRASE06R (
 
 CREATE TABLE IF NOT EXISTS idxPHRASE07F (
   id mediumint(9) unsigned NOT NULL auto_increment,
-  term varchar(50) default NULL,
+  term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term)
+  UNIQUE KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE07R (
@@ -2024,10 +2024,10 @@ CREATE TABLE IF NOT EXISTS idxPHRASE07R (
 
 CREATE TABLE IF NOT EXISTS idxPHRASE08F (
   id mediumint(9) unsigned NOT NULL auto_increment,
-  term varchar(50) default NULL,
+  term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term)
+  UNIQUE KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE08R (
@@ -2039,10 +2039,10 @@ CREATE TABLE IF NOT EXISTS idxPHRASE08R (
 
 CREATE TABLE IF NOT EXISTS idxPHRASE09F (
   id mediumint(9) unsigned NOT NULL auto_increment,
-  term varchar(50) default NULL,
+  term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term)
+  UNIQUE KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE09R (
@@ -2054,10 +2054,10 @@ CREATE TABLE IF NOT EXISTS idxPHRASE09R (
 
 CREATE TABLE IF NOT EXISTS idxPHRASE10F (
   id mediumint(9) unsigned NOT NULL auto_increment,
-  term varchar(50) default NULL,
+  term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term)
+  UNIQUE KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE10R (

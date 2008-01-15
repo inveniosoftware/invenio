@@ -1541,10 +1541,10 @@ def add_idx(idxNAME):
 
         res = run_sql("""CREATE TABLE `idxPHRASE%sF` (
                          `id` mediumint(9) unsigned NOT NULL auto_increment,
-                         `term` varchar(50) default NULL,
+                         `term` text default NULL,
                          `hitlist` longblob,
                          PRIMARY KEY  (`id`),
-                         UNIQUE KEY `term` (`term`)
+                         UNIQUE KEY `term` (`term`(50))
                          ) TYPE=MyISAM""" % (idxID < 10 and "0%s" % idxID or idxID))
 
         res = run_sql("""CREATE TABLE `idxPHRASE%sR` (
