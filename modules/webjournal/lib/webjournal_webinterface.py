@@ -456,6 +456,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         for whatever search we want.
         """
         argd = wash_urlargd(form, {'name': (str, ""),
+                                    'issue': (str, ""),
                                     'archive_year': (str, ""),
                                     'archive_issue': (str, ""),
                                     'archive_select': (str, "False"),
@@ -469,6 +470,8 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                               argd['archive_issue'])
             archive_date = wash_archive_date(language, journal_name,
                                              argd['archive_date'])
+            issue_number = wash_issue_number(language, journal_name,
+                                             argd['issue'])
             archive_year = argd['archive_year']
             archive_select = argd['archive_select']
             archive_search = argd['archive_search']
@@ -488,6 +491,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
         req.journal_defaults = {"name" : journal_name,
+                                "issue" : issue_number,
                                 "archive_year" : archive_year,
                                 "archive_issue" : archive_issue,
                                 "archive_select" : archive_select,
@@ -496,7 +500,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                 "language" : language,
                                 }
         
-        html = perform_request_search(journal_name, language, req,
+        html = perform_request_search(journal_name, language, req, issue_number,
                                       archive_year, archive_issue,
                                       archive_select, archive_date, archive_search)
         return html

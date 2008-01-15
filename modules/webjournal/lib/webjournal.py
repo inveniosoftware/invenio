@@ -380,7 +380,7 @@ def perform_request_popup(req, language, journal_name, type, record):
 
     return html
 
-def perform_request_search(journal_name, language, req,
+def perform_request_search(journal_name, language, req, issue,
                             archive_year, archive_issue, archive_select,
                             archive_date, archive_search):
     """
