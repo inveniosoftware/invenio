@@ -591,9 +591,12 @@ def get_release_time(issue, journal_name, language=cdslang):
     Gets the date at which an issue was released from the DB.
     """
     journal_id = get_journal_id(journal_name, language)
-    release_date = run_sql("SELECT date_released FROM jrnISSUE \
+    try:
+        release_date = run_sql("SELECT date_released FROM jrnISSUE \
                            WHERE issue_number=%s AND id_jrnJOURNAL=%s",
                             (issue, journal_id))[0][0]
+    except:
+        return False
     if release_date == None:
         return False
     else:
@@ -604,9 +607,12 @@ def get_announcement_time(issue, journal_name, language=cdslang):
     Get the date at which an issue was announced through the alert system.
     """
     journal_id = get_journal_id(journal_name, language)
-    announce_date = run_sql("SELECT date_announced FROM jrnISSUE \
+    try:
+        announce_date = run_sql("SELECT date_announced FROM jrnISSUE \
                            WHERE issue_number=%s AND id_jrnJOURNAL=%s",
                             (issue, journal_id))[0][0]
+    except:
+        return False
     if announce_date == None:
         return False
     else:
