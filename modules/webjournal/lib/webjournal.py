@@ -407,13 +407,15 @@ def perform_request_search(journal_name, language, req, issue,
         html = format_with_format_template(search_page_template_path, bfo)[0]
         return html
     elif archive_select == "Go":
-        redirect_to_url(req, "%s/journal/?name=%s&issue=%s" % (weburl,
+        redirect_to_url(req, "%s/journal/?name=%s&issue=%s&ln=%s" % (weburl,
                                                                journal_name,
-                                                               archive_issue))
+                                                               archive_issue,
+                                                               language))
     elif archive_search == "Go":
         archive_issue_time = time.strptime(archive_date, "%d/%m/%Y")
         archive_issue_time = count_down_to_monday(archive_issue_time)
         archive_issue = issue_times_to_week_strings([archive_issue_time,])[0]
-        redirect_to_url(req, "%s/journal/?name=%s&issue=%s" % (weburl,
+        redirect_to_url(req, "%s/journal/?name=%s&issue=%s&ln=%s" % (weburl,
                                                                journal_name,
-                                                               archive_issue))
+                                                               archive_issue,
+                                                               language))
