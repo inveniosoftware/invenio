@@ -19,7 +19,7 @@
 
 __revision__ = "$Id$"
 
-from os
+import os
 from invenio.bibdocfile import BibRecDocs, decompose_file, normalize_format
 
 def Move_Files_Archive(parameters, curdir, form):
@@ -32,7 +32,7 @@ def Move_Files_Archive(parameters, curdir, form):
             files = os.listdir(dir)
             files.sort()
             for file in files:
-                dontcare, filename, extension = decompose_file(file)
+                dummy, filename, extension = decompose_file(file)
                 if not formats.has_key(filename):
                     formats[filename] = []
                 formats[filename].append(normalize_format(extension))

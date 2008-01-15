@@ -154,7 +154,7 @@ def getFiles(bfo):
     for complete_url in urls:
         if complete_url.has_key('u'):
             url = complete_url['u']
-            (dontcare, host, path, dontcare, dontcare, dontcare) = urlparse(url)
+            (dummy, host, path, dummy, dummy, dummy) = urlparse(url)
             filename = basename(path)
             name = file_strip_ext(filename)
             format = filename[len(name):]

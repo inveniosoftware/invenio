@@ -1214,7 +1214,7 @@ def bibdocfile_url_to_bibdoc(url):
 def bibdocfile_url_to_bibdocfile(url):
     """Given a url in the form (s)weburl/record/xxx/files/... it returns
     a BibDocFile object for the corresponding recid/docname/format."""
-    dontcare, docname, format = decompose_bibdocfile_url(url)
+    dummy, docname, format = decompose_bibdocfile_url(url)
     return bibdocfile_url_to_bibdoc(url).get_file(format)
 
 def bibdocfile_url_to_fullpath(url):
