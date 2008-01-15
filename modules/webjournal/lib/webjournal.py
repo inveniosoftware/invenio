@@ -232,8 +232,10 @@ def perform_request_alert(req, journal_name, issue_number, language,
     Mails can be edited by an interface form.
     Sent in HTML/PlainText or only PlainText if wished so.
     """
-    subject = tmpl_webjournal_alert_subject_CERNBulletin(issue_number)
-    plain_text = tmpl_webjournal_alert_plain_text_CERNBulletin(language,
+    subject = tmpl_webjournal_alert_subject_CERNBulletin(journal_name,
+                                                         issue_number)
+    plain_text = tmpl_webjournal_alert_plain_text_CERNBulletin(journal_name,
+                                                               language,
                                                                issue_number)
     plain_text = plain_text.encode('utf-8')
     

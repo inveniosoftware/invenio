@@ -23,7 +23,8 @@ from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webjournal_utils import get_number_of_articles_for_issue, \
                                     get_release_time, \
-                                    get_announcement_time
+                                    get_announcement_time, \
+                                    get_current_publication
 
 def tmpl_webjournal_missing_info_box(language, title, msg_title, msg):
     """
@@ -155,11 +156,12 @@ def tmpl_webjournal_feature_record_success(language, journal_name, recid):
                                                         journal_name)
     return page(title = title, body = msg)
 
-def tmpl_webjournal_alert_plain_text_CERNBulletin(language, issue):
+def tmpl_webjournal_alert_plain_text_CERNBulletin(journal_name, language, issue):
     """
     Plain Text message for alert of CERN Bulletin. No multilanguage since the
     message should always be in two languages.
     """
+    current_publication = get_current_publication(journal_name, issue)
     plain_text = u'''Dear Subscriber,
                     
 The latest issue of the CERN Bulletin, no. %s, has been released.
@@ -178,14 +180,15 @@ http://www.bulletin.cern.ch/fre
 
 Bonne lecture,
 L'équipe du Bulletin du CERN
-''' % (issue, issue)
+''' % (current_publication, current_publication)
     return plain_text 
 
-def tmpl_webjournal_alert_subject_CERNBulletin(issue):
+def tmpl_webjournal_alert_subject_CERNBulletin(journal_name, issue):
     """
     Subject text for the CERN Bulletin release.
     """
-    return "CERN bulletin %s released" % issue
+    return "CERN bulletin %s released" % get_current_publication(journal_name,
+                                                                 issue)
 
 def tmpl_webjournal_alert_interface(language, journal_name, subject,
                                     plain_text):
@@ -197,7 +200,7 @@ def tmpl_webjournal_alert_interface(language, journal_name, subject,
     <form action="%s/journal/alert" name="alert" method="POST">
         <input type="hidden" name="name" value="%s"/>
         <p>Recipients:</p>
-        <input type="text" name="recipients" value="gabriel.hase@cern.ch" />
+        <input type="text" name="recipients" value="bulletin-alert-eng@cern.ch,bulletin-alert-fre@cern.ch,cern-staff@cern.ch,cern-fellows@cern.ch" />
         <p>Subject:</p>
         <input type="text" name="subject" value="%s" />
         <p>Plain Text Message:</p>
