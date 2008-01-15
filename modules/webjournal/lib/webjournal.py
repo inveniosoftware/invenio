@@ -217,7 +217,7 @@ def perform_request_administrate(journal_name, language):
                                                   current_issue,
                                                   language)
     issue_list = get_list_of_issues_for_publication(current_publication)
-    next_issue_number = count_week_string_up(max(issue_list))
+    next_issue_number = count_week_string_up(issue_list[-1])
     return tmpl_webjournal_admin_interface(journal_name, current_issue,
                                 current_publication, issue_list,
                                 next_issue_number, language)
