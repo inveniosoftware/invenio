@@ -34,17 +34,15 @@ class AsyncDownloadTest(unittest.TestCase):
     def test_async_download(self):
         """websearch_external_collections_getter - asynchronous download"""
 
-        ## Test varius cases for the async_download function:
-        ##   - test 2 workings pages : google, kernel.org
-        ##   - test 1 unresolvable name : rjfreijoiregjreoijgoirg.fr
-        ##   - test 1 bad ip : 1.2.3.4
+        ## Test various cases for the async_download function:
+        ##   - test 1 working page: cdsware
+        ##   - test 1 unresolvable name: rjfreijoiregjreoijgoirg.fr
+        ##   - test 1 bad IP: 1.2.3.4
         ## Return the list of errors.
-        # {'url': 'http://public.web.cern.ch/public/', 'content': "<title>CERN - The world's largest particle physics laboratory</title>"},
         checks = [
             {'url': 'http://cdsware.cern.ch/invenio/index.html', 'content': '<title>CDS Invenio: Overview</title>'},
-                    {'url': 'http://cdsware.cern.ch/invenio/index.html', 'content': '<title>CDS Invenio: Overview</title>'},
-                    {'url': 'http://rjfreijoiregjreoijgoirg.fr'},
-                    {'url': 'http://1.2.3.4/'} ]
+            {'url': 'http://rjfreijoiregjreoijgoirg.fr'},
+            {'url': 'http://1.2.3.4/'} ]
 
         def finished(pagegetter, check, current_time):
             """Function called when a page is received."""
