@@ -74,6 +74,7 @@ def normalize_format(format):
     format = format.lower()
     if format and format[0] != '.':
         format = '.' + format
+    format = format.replace('.jpg', '.jpeg')
     return format
 
 _docname_re = re.compile(r'[^-\w.]*')
