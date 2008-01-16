@@ -262,7 +262,7 @@ semantic of the metadata upload:
 <td>   insert  </td><td>     insert new record; must not exist     </td><td>          insert new files; must not exist </td>
 </tr>
 <tr>
-<td>   append  </td><td>     append new tag instances for the given tag XXX, regardless of existing tag instances</td><td>          append new files, if filename not already present </td>
+<td>   append  </td><td>     append new tag instances for the given tag XXX, regardless of existing tag instances</td><td>          append new files, if filename (i.e. new format) not already present </td>
 </tr>
 <tr>
 <td>   correct  </td><td>    correct tag instances for the given tag XXX; delete existing ones and replace with given ones    </td><td>     correct files with the given filename; add new revision or delete file</td>
@@ -289,10 +289,10 @@ and $t DELETE as the special keyword.
 
 <p>In order to expunge (i.e. remove completely, also from the filesystem) all existing versions of a file, making it
 effectively disappear, please use the correct mode with $n filename
-and $t DELETE as the special keyword.
+and $t EXPUNGE as the special keyword.
 </p>
 
-<p>In order to preserve previous comments and descriptions when correcting, pleas use the KEEP-OLD-VALUE special keyword with the desired $d and $z subfield.
+<p>In order to preserve previous comments and descriptions when correcting, please use the KEEP-OLD-VALUE special keyword with the desired $d and $z subfield.
 </p>
 
 <p>In order to add an icon representing a document, you must use a $x subfields. All the FFT for different format of the document must have then the same $x subfield. You can use KEEP-OLD-VALUE in order to keep the previous icon when correcting.
