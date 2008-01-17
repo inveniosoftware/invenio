@@ -1922,7 +1922,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE01F (
   term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term(50))
+  KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE01R (
@@ -1937,7 +1937,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE02F (
   term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term(50))
+  KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE02R (
@@ -1952,7 +1952,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE03F (
   term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term(50))
+  KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE03R (
@@ -1967,7 +1967,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE04F (
   term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term(50))
+  KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE04R (
@@ -1982,7 +1982,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE05F (
   term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term(50))
+  KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE05R (
@@ -1997,7 +1997,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE06F (
   term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term(50))
+  KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE06R (
@@ -2012,7 +2012,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE07F (
   term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term(50))
+  KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE07R (
@@ -2027,7 +2027,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE08F (
   term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term(50))
+  KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE08R (
@@ -2042,7 +2042,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE09F (
   term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term(50))
+  KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE09R (
@@ -2057,7 +2057,7 @@ CREATE TABLE IF NOT EXISTS idxPHRASE10F (
   term text default NULL,
   hitlist longblob,
   PRIMARY KEY  (id),
-  UNIQUE KEY term (term(50))
+  KEY term (term(50))
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS idxPHRASE10R (
