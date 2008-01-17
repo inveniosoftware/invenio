@@ -20,11 +20,21 @@
 
 #from invenio.messages import gettext_set_language
 
-def format(bfo):
+CFG_TWO_TO_THREE_LETTER_MAPPING = {}
+CFG_TWO_TO_THREE_LETTER_MAPPING["en"] = "eng"
+CFG_TWO_TO_THREE_LETTER_MAPPING["fr"] = "fre"
+
+def format(bfo, letters="2"):
     """
     just returns the language string of the object.
     """
-    return bfo.lang
+    if letters == "3":
+        try:
+            return CFG_TWO_TO_THREE_LETTER_MAPPING(bfo.lang)
+        except:
+            return bfo.lang
+    else:
+        return bfo.lang
 
 def escape_values(bfo):
     """
