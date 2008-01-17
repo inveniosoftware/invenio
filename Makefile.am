@@ -278,7 +278,7 @@ drop-tables: local-dbexec
 	    echo "***********************************************************************"; \
 	    echo "** WARNING: You are going to destroy your database tables!           **"; \
 	    echo "** Press Ctrl-C if you want to abort this action.                    **"; \
-	    echo "** Press any other key to proceed with destroying your database.     **"; \
+	    echo "** Press ENTER to proceed to destroy your tables.                    **"; \
 	    echo "***********************************************************************"; \
 	    read; \
 	fi
@@ -348,7 +348,7 @@ drop-demo-site:
 	    echo "***********************************************************************"; \
 	    echo "** WARNING: You are going to destroy your site and documents!        **"; \
 	    echo "** Press Ctrl-C if you want to abort this action.                    **"; \
-	    echo "** Press any other key to proceed with destroying your site.         **"; \
+	    echo "** Press ENTER to proceed to destroy your site.                      **"; \
 	    echo "***********************************************************************"; \
 	    read; \
 	fi
@@ -369,7 +369,7 @@ remove-demo-records:
 	    echo "***********************************************************************"; \
 	    echo "** WARNING: You are going to destroy your records and documents!     **"; \
 	    echo "** Press Ctrl-C if you want to abort this action.                    **"; \
-	    echo "** Press any other key to proceed with destroying your records.      **"; \
+	    echo "** Press ENTER to proceed to destroy your records.                   **"; \
 	    echo "***********************************************************************"; \
 	    read; \
 	fi
