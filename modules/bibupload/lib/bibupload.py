@@ -1168,8 +1168,8 @@ def archive_marcxml_for_history(recID):
         if res:
             run_sql("""INSERT INTO hstRECORD (id_bibrec, marcxml, job_id, job_name, job_person, job_date, job_details)
                                       VALUES (%s,%s,%s,%s,%s,%s,%s)""",
-                    (res[0][0], res[0][1], task_get_option('task'), 'bibupload', task_get_option('user'), res[0][2],
-                     'mode: ' + task_get_option('mode') + '; file: ' + task_get_option("file_path") + '.'))
+                    (res[0][0], res[0][1], task_get_option('task', 0), 'bibupload', task_get_option('user','UNKNOWN'), res[0][2],
+                     'mode: ' + task_get_option('mode','UNKNOWN') + '; file: ' + task_get_option('file_path','UNKNOWN') + '.'))
     except Error, error:
         write_message("   Error during archive_marcxml_for_history: %s " % error,
                       verbose=1, stream=sys.stderr)
