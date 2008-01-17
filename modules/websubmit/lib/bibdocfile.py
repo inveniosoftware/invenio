@@ -35,6 +35,7 @@ from invenio.config import cdslang, images, weburl, webdir, filedir, filedirsize
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
+websearch_templates = invenio.template.load('websearch')
 
 try:
     from mod_python import apache
@@ -71,16 +72,17 @@ def file_strip_ext(file):
 
 def normalize_format(format):
     """Normalize the format."""
-    format = format.lower()
+    #format = format.lower()
     if format and format[0] != '.':
         format = '.' + format
-    format = format.replace('.jpg', '.jpeg')
+    #format = format.replace('.jpg', '.jpeg')
     return format
 
 _docname_re = re.compile(r'[^-\w.]*')
 def normalize_docname(docname):
     """Normalize the docname (only digit and alphabetic letters and underscore are allowed)"""
-    return _docname_re.sub('', docname)
+    #return _docname_re.sub('', docname)
+    return docname
 
 def normalize_version(version):
     """Normalize the version."""
@@ -126,6 +128,33 @@ class BibRecDocs:
         self.id = recid
         self.bibdocs = []
         self.build_bibdoc_list()
+
+    def __repr__(self):
+        return 'BibRecDocs(%s)' % self.id
+
+    def __str__(self):
+        out = 'Bibrec %i is connected with %i bibdoc(s)\n' % (self.id, len(self.bibdocs))
+        for bibdoc in self.bibdocs:
+            out += '%s\n' % bibdoc
+        out += 'Total size of latest version files is %s\n' % nice_size(self.get_total_size_latest_version())
+        out += 'Total size of all the files is %s\n' % nice_size(self.get_total_size())
+        return out
+
+    def get_total_size_latest_version(self):
+        """Return the total size used on disk of all the files belonging
+        to this record and corresponding to the latest version."""
+        size = 0
+        for bibdoc in self.bibdocs:
+            size += bibdoc.get_total_size_latest_version()
+        return size
+
+    def get_total_size(self):
+        """Return the total size used on disk of all the files belonging
+        to this record of any version."""
+        size = 0
+        for bibdoc in self.bibdocs:
+            size += bibdoc.get_total_size()
+        return size
 
     def build_bibdoc_list(self):
         """This function must be called everytime a bibdoc connected to this
@@ -511,6 +540,28 @@ class BibDoc:
         # link with related_files
         self._build_related_file_list()
 
+    def __repr__(self):
+        return 'BibDoc(%i, %i, %s, %s)' % (self.id, self.recid, repr(self.docname), repr(self.doctype))
+
+    def __str__(self):
+        out = 'BidDoc \'%s\' (%i) with doctype \'%s\'' % (self.docname, self.id, self.doctype)
+        if self.recid:
+            out += 'connected to recid %i' % self.recid
+        out += '\n'
+        out += 'status: %s\n' % self.status
+        out += 'basedir: %s\n' % self.basedir
+        out += 'creation date: %s\n' % self.cd
+        out += 'modification date: %s\n' % self.md
+        out += '%i files are attached:\n' % len(self.docfiles)
+        for docfile in self.docfiles:
+            out += str(docfile)
+        icon = self.get_icon()
+        if icon:
+            out += 'Related icon is %s' % self.get_icon()
+        out += 'Total size of latest version files is %s\n' % nice_size(self.get_total_size_latest_version())
+        out += 'Total size of all files is %s\n' % nice_size(self.get_total_size())
+        return out
+
     def get_status(self):
         """Retrieve the status."""
         return self.status
@@ -874,6 +925,22 @@ class BibDoc:
                 cur_doc = BibDoc(docid=docid)
                 self.related_files[doctype].append(cur_doc)
 
+    def get_total_size_latest_version(self):
+        """Return the total size used on disk of all the files belonging
+        to this bibdoc and corresponding to the latest version."""
+        ret = 0
+        for bibdocfile in self.list_latest_files():
+            ret += bibdocfile.get_size()
+        return ret
+
+    def get_total_size(self):
+        """Return the total size used on disk of all the files belonging
+        to this bibdoc."""
+        ret = 0
+        for bibdocfile in self.list_all_files():
+            ret += bibdocfile.get_size()
+        return ret
+
     def list_all_files(self):
         """Returns all the docfiles linked with the given bibdoc."""
         return self.docfiles
@@ -953,6 +1020,28 @@ class BibDocFile:
             (self.mime, self.encoding) = _mimes.guess_type(self.fullname)
             if self.mime is None:
                 self.mime = "text/plain"
+
+    def __repr__(self):
+        return ('BibDocFile(%s, %s, %i, %s, %s, %i, %i, %s, %s)' % (repr(self.fullpath), repr(self.doctype), self.version, repr(self.name), repr(self.format), self.recid, self.docid, repr(self.status), repr(self.checksum)))
+
+    def __str__(self):
+        out = '%s\n' % self.fullpath
+        out += '\tdoctype: %s\n' % self.doctype
+        out += '\tdocid: %i\n' % self.docid
+        out += '\trecid: %i\n' % self.recid
+        out += '\tversion: %i\n' % self.version
+        out += '\tstatus: %s\n' % self.status
+        out += '\tchecksum: %s\n' % self.checksum
+        out += '\tsize: %s\n' % nice_size(self.size)
+        out += '\tcreation time: %s\n' % self.cd
+        out += '\tmodification time: %s\n' % self.md
+        out += '\tname: %s\n' % self.name
+        out += '\tformat: %s\n' % self.format
+        out += '\tdir: %s\n' % self.dir
+        out += '\tmime: %s\n' % self.mime
+        out += '\tencoding: %s\n' % self.encoding
+        out += '\tfullname: %s\n' % self.fullname
+        return out
 
     def display(self, ln = cdslang):
         """Returns a formatted representation of this docfile."""
@@ -1243,3 +1332,17 @@ def decompose_bibdocfile_url(url):
     recid_file = recid_file.replace('/files/', '/')
     recid, docname, format = decompose_file(recid_file)
     return (int(recid), docname, format)
+
+def nice_size(size):
+    """Return a nicely printed size in kilo."""
+    unit = 'B'
+    if size > 1024:
+        size /= 1024.0
+        unit = 'KB'
+        if size > 1024:
+            size /= 1024.0
+            unit = 'MB'
+            if size > 1024:
+                size /= 1024.0
+                unit = 'GB'
+    return '%s %s' % (websearch_templates.tmpl_nice_number(size, max_ndigits_after_dot=3), unit)
