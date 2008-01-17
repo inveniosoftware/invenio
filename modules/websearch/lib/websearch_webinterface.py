@@ -90,6 +90,30 @@ def wash_search_urlargd(form):
 
     return argd
 
+
+class WebInterfaceAuthorPage(WebInterfaceDirectory):
+    """ Handle /author/Doe%2C+John etc """
+
+    _exports = ['author']
+
+    def __init__(self, authorname=''):
+        """Constructor."""
+        self.authorname = authorname
+
+    def _lookup(self, component, path):
+        """This handler parses dynamic URLs (/author/John+Doe)."""
+        return WebInterfaceAuthorPage(component), path
+
+    def __call__(self, req, form):
+        """Serve the page in the given language."""
+        argd = wash_urlargd(form, {'ln': (str, cdslang)})
+	req.argd = argd #needed since perform_req_search 
+			#wants to check it in case of no results
+	search_engine.perform_request_search(req=req, p=self.authorname, f="author", of="hb") 	
+
+    index = __call__
+
+
 class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /record/<recid> URL fragment """
 
@@ -351,6 +375,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
     search = WebInterfaceSearchResultsPages()
 
     def testsso(self, req, form):
+        """ For testing single sign-on """
         req.add_common_vars()
         sso_env = {}
         for var, value in req.subprocess_env.iteritems():

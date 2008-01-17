@@ -33,6 +33,7 @@ from invenio.config import cdslang
 from invenio.messages import gettext_set_language
 from invenio.dateutils import datetext_default, get_datetext
 from invenio.htmlutils import escape_html
+from invenio.webpage import create_error_box
 from invenio.webuser import list_users_in_roles
 try:
     import invenio.template

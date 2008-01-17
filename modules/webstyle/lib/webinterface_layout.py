@@ -31,7 +31,7 @@ __revision__ = \
 from invenio.webinterface_handler import create_handler
 
 from invenio.websearch_webinterface import WebInterfaceSearchInterfacePages, \
-     WebInterfaceRSSFeedServicePages
+     WebInterfaceAuthorPage, WebInterfaceRSSFeedServicePages
 from invenio.websubmit_webinterface import websubmit_legacy_getfile, \
      WebInterfaceSubmitPages
 from invenio.websession_webinterface import WebInterfaceYourAccountPages, \
@@ -47,14 +47,15 @@ from invenio.webstat_webinterface import WebInterfaceStatsPages
 try:
     from invenio.webjournal_webinterface import WebInterfaceJournalPages
 except:
-    WebInterfaceJournalPages=WebInterfaceErrorPages
+    WebInterfaceJournalPages = WebInterfaceErrorPages
 from invenio.webdoc_webinterface import WebInterfaceDocumentationPages
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     """ The global URL layout is composed of the search API plus all
     the other modules."""
 
-    _exports = WebInterfaceSearchInterfacePages._exports + [
+    _exports = WebInterfaceSearchInterfacePages._exports + \
+        WebInterfaceAuthorPage._exports + [
         'youraccount',
         'youralerts',
         'yourbaskets',
@@ -74,6 +75,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     def __init__(self):
         self.getfile = websubmit_legacy_getfile
         return
+
+    author = WebInterfaceAuthorPage()
 
     submit = WebInterfaceSubmitPages()
 
