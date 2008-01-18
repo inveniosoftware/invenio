@@ -109,6 +109,7 @@ class WebInterfaceAuthorPage(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'ln': (str, cdslang)})
 	req.argd = argd #needed since perform_req_search 
 			#wants to check it in case of no results
+	self.authorname = self.authorname.replace("+"," ")
 	search_engine.perform_request_search(req=req, p=self.authorname, f="author", of="hb") 	
 
     index = __call__
