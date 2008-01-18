@@ -5034,7 +5034,8 @@ def usage(wmsg="", err_code=0):
     """
     if wmsg != "":
         wmsg = wmsg.strip() + "\n"
-    msg = """Usage: refextract [options] recid:file1 [recid:file2 ...]
+    msg = """  Usage: refextract [options] recid:file1 [recid:file2 ...]
+
   refextract tries to extract the reference section from a full-text document.
   Extracted reference lines are processed and any recognised citations are
   marked up using MARC XML. Results are output to the standard output stream.
