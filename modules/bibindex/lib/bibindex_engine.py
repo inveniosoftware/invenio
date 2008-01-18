@@ -737,7 +737,7 @@ def truncate_index_table(index_name):
 class WordTable:
     "A class to hold the words table."
 
-    def __init__(self, index_id, fields_to_index, table_name_pattern, default_get_words_fnc, tag_to_words_fnc_map):
+    def __init__(self, index_id, fields_to_index, table_name_pattern, default_get_words_fnc, tag_to_words_fnc_map, wash_index_terms=True):
         """Creates words table instance.
         @param index_id  the index integer identificator
         @param fields_to_index a list of fields to index
@@ -753,6 +753,7 @@ class WordTable:
         self.fields_to_index = fields_to_index
         self.value = {}
         self.stemming_language = get_index_stemming_language(index_id)
+        self.wash_index_terms = wash_index_terms
 
         # tagToFunctions mapping. It offers an indirection level necessary for
         # indexing fulltext. The default is get_words_from_phrase
@@ -1105,7 +1106,8 @@ class WordTable:
     def put(self, recID, word, sign):
         "Adds/deletes a word to the word list."
         try:
-            word = wash_index_term(word)
+            if self.wash_index_terms:
+                word = wash_index_term(word)
             if self.value.has_key(word):
                 # the word 'word' exist already: update sign
                 self.value[word][recID] = sign
@@ -1457,7 +1459,7 @@ def task_run_core():
     if task_get_option("cmd") == "check":
         wordTables = get_word_tables(task_get_option("windex"))
         for index_id, index_tags in wordTables.iteritems():
-            wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase})
+            wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
         _last_word_table = None
@@ -1523,7 +1525,7 @@ def task_run_core():
     # Let's work on phrases now
     wordTables = get_word_tables(task_get_option("windex"))
     for index_id, index_tags in wordTables.iteritems():
-        wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase})
+        wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
         try:
