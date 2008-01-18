@@ -360,9 +360,9 @@ def find_citations(rank_method_code, recID, hitset, verbose):
     #voutput = voutput + str(ret)
 
     if ret:
-        return (ret,"(", ")", "Warning: citation search functionality is experimental.")
+        return (ret,"(", ")", "")
     else:
-        return ((),"", "", "Warning: citation search functionality is experimental.")
+        return ((),"", "", "")
 
 def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     """Finding terms to use for calculating similarity. Terms are taken from the recid given, returns a list of recids's and relevance,
