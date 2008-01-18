@@ -1544,7 +1544,7 @@ def add_idx(idxNAME):
                          `term` text default NULL,
                          `hitlist` longblob,
                          PRIMARY KEY  (`id`),
-                         UNIQUE KEY `term` (`term`(50))
+                         KEY `term` (`term`(50))
                          ) TYPE=MyISAM""" % (idxID < 10 and "0%s" % idxID or idxID))
 
         res = run_sql("""CREATE TABLE `idxPHRASE%sR` (
