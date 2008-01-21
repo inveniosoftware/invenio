@@ -423,7 +423,7 @@ def tmpl_webjournal_admin_interface(journal_name, current_issue,
                 
                 (announced_on==False)
                 and '<em>not announced</em><br/><a href="%s/journal/alert?name=%s&issue=%s">&gt;announce now</a>' % (weburl, journal_name, issue) or
-                'announced on: %s' % time.strftime("%d.%m.%Y", announced_on),
+                'announced on: %s <br/><a href="%s/journal/alert?name=%s&issue=%s">&gt;re-announce</a>' % (time.strftime("%d.%m.%Y", announced_on), weburl, journal_name, issue),
                 
                 weburl, journal_name, issue
             ))
