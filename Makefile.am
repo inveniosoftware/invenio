@@ -96,7 +96,7 @@ etags:
 install-data-local:
 	for d in / /cache /log /tmp /data /run ; do	\
 		mkdir -p $(localstatedir)$$d &&		\
-		chmod ug=rwx $(localstatedir)$$d ;	\
+		if (chmod -f ug=rwx $(localstatedir)$$d); then echo ok > /dev/null else; echo no > /dev/null; fi ;	\
 	done
 	@echo "************************************************************"
 	@echo "** CDS Invenio has been successfully installed!           **"
