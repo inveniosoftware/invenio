@@ -36,17 +36,18 @@ from invenio.config import cdslang, \
                            sweburl, \
                            CFG_WEBCOMMENT_ALLOW_COMMENTS,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS
-from invenio.webuser import getUid, page_not_authorized, isGuestUser
+from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
      guess_primary_collection_of_a_record, \
-     get_colID
+     get_colID, check_user_authorized_to_record
 from invenio.urlutils import get_client_ip_address, \
                              redirect_to_url, \
-                             wash_url_argument
+                             wash_url_argument, make_canonical_urlargd
 from invenio.messages import wash_language, gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs
+from invenio.access_control_config import VIEWRESTRCOLL
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
@@ -102,20 +103,32 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
+
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
+        if auth_code and user_info['email'] == 'guest':
+            target = '/youraccount/login' + \
+                    make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
+                    weburl + user_info['uri']}, {})
+            return redirect_to_url(req, target)
+        elif auth_code:
+            return page_not_authorized(req, "../", \
+                text = auth_msg)
+
         check_warnings = []
 
         (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln'])
         if ok:
             (body, errors, warnings) = perform_request_display_comments_or_remarks(recID=self.recid,
-                                                                                   display_order=argd['do'],
-                                                                                   display_since=argd['ds'],
-                                                                                   nb_per_page=argd['nb'],
-                                                                                   page=argd['p'],
-                                                                                   ln=argd['ln'],
-                                                                                   voted=argd['voted'],
-                                                                                   reported=argd['reported'],
-                                                                                   reviews=self.discussion,
-                                                                                   uid=uid)
+                display_order=argd['do'],
+                display_since=argd['ds'],
+                nb_per_page=argd['nb'],
+                page=argd['p'],
+                ln=argd['ln'],
+                voted=argd['voted'],
+                reported=argd['reported'],
+                reviews=self.discussion,
+                uid=uid)
 
             unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
                                                     self.recid,
@@ -195,6 +208,18 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         actions = ['DISPLAY', 'REPLY', 'SUBMIT']
         uid = getUid(req)
+
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
+        if auth_code and user_info['email'] == 'guest':
+            target = '/youraccount/login' + \
+                    make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
+                    weburl + user_info['uri']}, {})
+            return redirect_to_url(req, target)
+        elif auth_code:
+            return page_not_authorized(req, "../", \
+                text = auth_msg)
+
         client_ip_address = get_client_ip_address(req)
         check_warnings = []
         (ok, problem) = check_recID_is_in_range(self.recid, check_warnings, argd['ln'])
@@ -315,6 +340,18 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         client_ip_address = get_client_ip_address(req)
         uid = getUid(req)
+
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
+        if auth_code and user_info['email'] == 'guest':
+            target = '/youraccount/login' + \
+                    make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
+                    weburl + user_info['uri']}, {})
+            return redirect_to_url(req, target)
+        elif auth_code:
+            return page_not_authorized(req, "../", \
+                text = auth_msg)
+
         success = perform_request_vote(argd['comid'], client_ip_address, argd['com_value'], uid)
         if argd['referer']:
             argd['referer'] += "?ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;voted=%s&amp;" % (argd['ln'],
@@ -365,6 +402,18 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         client_ip_address = get_client_ip_address(req)
         uid = getUid(req)
+
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
+        if auth_code and user_info['email'] == 'guest':
+            target = '/youraccount/login' + \
+                    make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
+                    weburl + user_info['uri']}, {})
+            return redirect_to_url(req, target)
+        elif auth_code:
+            return page_not_authorized(req, "../", \
+                text = auth_msg)
+
         success = perform_request_report(argd['comid'], client_ip_address, uid)
         if argd['referer']:
             argd['referer'] += "?ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;reported=%s&amp;" % (argd['ln'],

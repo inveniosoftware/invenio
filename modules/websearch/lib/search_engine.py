@@ -68,6 +68,7 @@ from invenio.intbitset import intbitset as HitSet
 from invenio.webinterface_handler import wash_urlargd
 from invenio.urlutils import make_canonical_urlargd
 from invenio.dbquery import DatabaseError
+from invenio.access_control_engine import acc_authorize_action
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -77,15 +78,14 @@ from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
 from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time, Error
+from invenio.webuser import getUid
+from invenio.webpage import page, pageheaderonly, pagefooteronly, create_error_box
+from invenio.messages import gettext_set_language
+
 try:
     from mod_python import apache
-    from invenio.webuser import getUid
-    from invenio.webpage import page, pageheaderonly, pagefooteronly, create_error_box
-
 except ImportError, e:
     pass # ignore user personalisation, needed e.g. for command-line
-
-from invenio.messages import gettext_set_language
 
 try:
     import invenio.template
@@ -185,6 +185,26 @@ try:
     restricted_collection_cache.is_ok_p
 except Exception:
     restricted_collection_cache = RestrictedCollectionDataCacher()
+
+def is_user_submitter_of_recid(user_info, recid):
+    """Return True if the user have submitted the given record."""
+    submitter_email = get_fieldvalues(recid, '8560_f')
+    if submitter_email:
+        submitter_email = submitter_email[0].strip().lower()
+        return user_info['email'].strip().lower() == submitter_email
+    return False
+
+def check_user_authorized_to_record(user_info, recid):
+    """Check if the user is authorized to view the given recid.."""
+    record_primary_collection = guess_primary_collection_of_a_record(recid)
+    if collection_restricted_p(record_primary_collection):
+        (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
+        if auth_code == 0 or is_user_submitter_of_recid(user_info, recid):
+            return (0, '')
+        else:
+            return (auth_code, auth_msg)
+    else:
+        return (0, '')
 
 class IndexStemmingDataCacher(DataCacher):
     def __init__(self):

@@ -1102,6 +1102,11 @@ class BibDocFile:
         """Returns the recid connected with the bibdoc of this file."""
         return self.recid
 
+    def get_status(self):
+        """Returns the status of the file, i.e. either '', 'DELETED' or a
+        restriction keyword."""
+        return self.status
+
     def stream(self, req):
         """Stream the file."""
         if self.status:

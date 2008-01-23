@@ -46,7 +46,8 @@ from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.webpage import page, create_error_box
 from invenio.messages import gettext_set_language
-from invenio.search_engine import get_colID, get_coll_i18nname, collection_restricted_p
+from invenio.search_engine import get_colID, get_coll_i18nname, \
+    check_user_authorized_to_record, collection_restricted_p
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
@@ -107,10 +108,10 @@ class WebInterfaceAuthorPage(WebInterfaceDirectory):
     def __call__(self, req, form):
         """Serve the page in the given language."""
         argd = wash_urlargd(form, {'ln': (str, cdslang)})
-	req.argd = argd #needed since perform_req_search 
+	req.argd = argd #needed since perform_req_search
 			#wants to check it in case of no results
 	self.authorname = self.authorname.replace("+"," ")
-	search_engine.perform_request_search(req=req, p=self.authorname, f="author", of="hb") 	
+	search_engine.perform_request_search(req=req, p=self.authorname, f="author", of="hb")
 
     index = __call__
 
@@ -159,27 +160,19 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
             except (KeyError, ValueError):
                 pass
 
-        # Check if the record belongs to a restricted primary
-        # collection.  If yes, redirect to the authenticated URL.
-        record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
-        if collection_restricted_p(record_primary_collection):
-            user_info = collect_user_info(req)
-            (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
-            if auth_code and user_info['email'] == 'guest':
-                target = '/youraccount/login' + \
-                        make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
-                        weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
-                        search_results_default_urlargd)}, {'ln' : cdslang})
-                return redirect_to_url(req, target)
-            elif auth_code:
-                return page_not_authorized(req, "../", \
-                    text = auth_msg,\
-                    navmenuid='search')
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
 
-            #del argd['recid'] # not wanted argument for detailed record page
-            #target = '/record-restricted/' + str(self.recid) + '/' + \
-                     #make_canonical_urlargd(argd, search_results_default_urlargd)
-            #return redirect_to_url(req, target)
+        if auth_code and user_info['email'] == 'guest':
+            target = '/youraccount/login' + \
+                    make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
+                    weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
+                    search_results_default_urlargd)}, {'ln' : cdslang})
+            return redirect_to_url(req, target)
+        elif auth_code:
+            return page_not_authorized(req, "../", \
+                text = auth_msg,\
+                navmenuid='search')
 
         # mod_python does not like to return [] in case when of=id:
         out = search_engine.perform_request_search(req, **argd)
@@ -456,10 +449,10 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 # Keep normal url if tabs is not specified
                 pass
 
-            if component == 'record-restricted':
-                return WebInterfaceRecordRestrictedPages(recid, tab, format), path[1:]
-            else:
-                return WebInterfaceRecordPages(recid, tab, format), path[1:]
+            #if component == 'record-restricted':
+                #return WebInterfaceRecordRestrictedPages(recid, tab, format), path[1:]
+            #else:
+            return WebInterfaceRecordPages(recid, tab, format), path[1:]
 
         return None, []
 
@@ -526,7 +519,8 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
 
 def display_collection(req, c, as, verbose, ln):
-    "Display search interface page for collection c by looking in the collection cache."
+    """Display search interface page for collection c by looking
+    in the collection cache."""
 
     _ = gettext_set_language(ln)
 
@@ -731,26 +725,19 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
 
         # Check if the record belongs to a restricted primary
         # collection.  If yes, redirect to the authenticated URL.
-        record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
-        if collection_restricted_p(record_primary_collection):
-            user_info = collect_user_info(req)
-            (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
-            if auth_code and user_info['email'] == 'guest':
-                cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
-                target = '/youraccount/login' + \
-                        make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                        weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
-                        search_results_default_urlargd)}, {'ln' : cdslang})
-                return redirect_to_url(req, target)
-            elif auth_code:
-                return page_not_authorized(req, "../", \
-                    text = auth_msg,\
-                    navmenuid='search')
-
-            #del argd['recid'] # not wanted argument for detailed record page
-            #target = '/record-restricted/' + str(self.recid) + '/' + \
-                     #make_canonical_urlargd(argd, search_results_default_urlargd)
-            #return redirect_to_url(req, target)
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
+        if auth_code and user_info['email'] == 'guest':
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
+            target = '/youraccount/login' + \
+                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+                    weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
+                    search_results_default_urlargd)}, {'ln' : cdslang})
+            return redirect_to_url(req, target)
+        elif auth_code:
+            return page_not_authorized(req, "../", \
+                text = auth_msg,\
+                navmenuid='search')
 
         # mod_python does not like to return [] in case when of=id:
         out = search_engine.perform_request_search(req, **argd)

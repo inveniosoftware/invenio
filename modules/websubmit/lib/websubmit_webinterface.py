@@ -44,11 +44,12 @@ from invenio.config import \
      version, \
      weburl
 from invenio.dbquery import run_sql, Error
+from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box, pageheaderonly, \
     pagefooteronly
-from invenio.webuser import getUid, get_email, page_not_authorized
+from invenio.webuser import getUid, get_email, page_not_authorized, collect_user_info
 from invenio.websubmit_config import *
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url
@@ -56,7 +57,7 @@ from invenio.messages import gettext_set_language
 from invenio.search_engine import \
      guess_primary_collection_of_a_record, \
      get_colID, \
-     create_navtrail_links
+     create_navtrail_links, check_user_authorized_to_record
 from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioWebSubmitFileError
 from invenio.errorlib import register_exception
@@ -85,9 +86,21 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             _ = gettext_set_language(ln)
 
             uid = getUid(req)
+            user_info = collect_user_info(req)
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE > 1:
                 return page_not_authorized(req, "../getfile.py/index",
                                            navmenuid='submit')
+
+            (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
+            if auth_code and user_info['email'] == 'guest':
+                target = '/youraccount/login' + \
+                        make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : ln, 'referer' : \
+                        weburl + user_info['uri']}, {})
+                return redirect_to_url(req, target)
+            elif auth_code:
+                return page_not_authorized(req, "../", \
+                    text = auth_msg)
+
 
             readonly = CFG_ACCESS_CONTROL_LEVEL_SITE == 1
 
@@ -143,9 +156,18 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             register_exception(req=req)
                             return errorMsg(msg, req, cdsname, ln)
 
-                        (auth_code, auth_message) = docfile.is_restricted(req)
-                        if auth_code != 0:
-                            return warningMsg(_("This file is restricted: ") + auth_message, req, cdsname, ln)
+                        if docfile.get_status() == '':
+                            # The file is not resticted, let's check for
+                            # collection restriction then.
+                            (auth_code, auth_message) = check_user_authorized_to_record(user_info, self.recid)
+                            if auth_code:
+                                return warningMsg(_("The collection to which this file belong is restricted: ") + auth_message, req, cdsname, ln)
+                        else:
+                            # The file is probably restricted on its own.
+                            # Let's check for proper authorization then
+                            (auth_code, auth_message) = docfile.is_restricted(req)
+                            if auth_code != 0:
+                                return warningMsg(_("This file is restricted: ") + auth_message, req, cdsname, ln)
 
                         if not readonly:
                             ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
@@ -164,10 +186,18 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             register_exception(req=req)
                             return errorMsg(msg, req, cdsname, ln)
 
-                        (auth_code, auth_message) = iconfile.is_restricted(req)
-                        if auth_code != 0:
-                            return stream_restricted_icon(req)
-                            #return warningMsg(_("This Icon is restricted: ") + auth_message, req, cdsname, ln)
+                        if iconfile.get_status() == '':
+                            # The file is not resticted, let's check for
+                            # collection restriction then.
+                            (auth_code, auth_message) = check_user_authorized_to_record(user_info, self.recid)
+                            if auth_code:
+                                return stream_restricted_icon(req)
+                        else:
+                            # The file is probably restricted on its own.
+                            # Let's check for proper authorization then
+                            (auth_code, auth_message) = iconfile.is_restricted(req)
+                            if auth_code != 0:
+                                return stream_restricted_icon(req)
 
                         if not readonly:
                             ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
