@@ -290,8 +290,8 @@ def perform_userarea(req, email_user_pattern=''):
                             button="search for users")
 
     if email_user_pattern:
-        users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' '
-            'ORDER BY email LIMIT %s""" % (email_user_pattern, MAXPAGEUSERS+1))
+        users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s
+            ORDER BY email LIMIT %s""", (email_user_pattern, MAXPAGEUSERS+1))
 
         if not users1:
             output += '<p>no matching users</p>'
@@ -703,7 +703,7 @@ def perform_modifyaccountstatus(req, userID, email_user_pattern, limit_to, maxpa
     output = ""
     if res:
         if res[0][2] in [0, "0", None]:
-            res2 = run_sql("UPDATE user SET note=1 WHERE id=%s" % userID)
+            res2 = run_sql("UPDATE user SET note=1 WHERE id=%s", (userID, ))
             output += """<b><span class="info">The account '%s' has been activated.</span></b>""" % res[0][1]
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION == 1:
                 password = int(random.random() * 1000000)
@@ -716,7 +716,7 @@ def perform_modifyaccountstatus(req, userID, email_user_pattern, limit_to, maxpa
                     output += """<br><b><span class="info">Could not send an email to the owner of the account.</span></b>"""
 
         elif res[0][2] in [1, "1"]:
-            res2 = run_sql("UPDATE user SET note=0 WHERE id=%s" % userID)
+            res2 = run_sql("UPDATE user SET note=0 WHERE id=%s", (userID, ))
             output += """<b><span class="info">The account '%s' has been set inactive.</span></b>""" % res[0][1]
     else:
         output += '<b><span class="info">The account id given does not exist.</span></b>'
@@ -738,7 +738,7 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    res = run_sql("SELECT id, email FROM user WHERE id=%s" % userID)
+    res = run_sql("SELECT id, email FROM user WHERE id=%s", (userID, ))
     if not res:
         if mtype == "perform_deleteaccount":
             text = """<b><span class="info">The selected account has been deleted, to continue editing, go back to 'Manage Accounts'.</span></b>"""
@@ -851,7 +851,7 @@ def perform_modifylogindata(req, userID, email='', password='', callback='yes', 
 
     subtitle = """<a name="1"></a>1. Edit login-data.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
 
-    res = run_sql("SELECT id, email FROM user WHERE id=%s" % userID)
+    res = run_sql("SELECT id, email FROM user WHERE id=%s", (userID, ))
     output = ""
     if res:
         if not email and not password:
@@ -991,7 +991,7 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
                                     button="Delete")
 
         elif confirm in [1, "1"]:
-            res2 = run_sql("DELETE FROM user WHERE id=%s" % userID)
+            res2 = run_sql("DELETE FROM user WHERE id=%s", (userID, ))
             output += '<b><span class="info">Account deleted.</span></b>'
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION == 1:
                 emailsent = sendAccountDeletedMessage(res[0][1], res[0][1])
@@ -1011,11 +1011,11 @@ def perform_rejectaccount(req, userID, email_user_pattern, limit_to, maxpage, pa
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    res = run_sql("SELECT id, email, note FROM user WHERE id=%s" % userID)
+    res = run_sql("SELECT id, email, note FROM user WHERE id=%s", (userID, ))
     output = ""
     subtitle = ""
     if res:
-        res2 = run_sql("DELETE FROM user WHERE id=%s" % userID)
+        res2 = run_sql("DELETE FROM user WHERE id=%s", (userID, ))
         output += '<b><span class="info">Account rejected and deleted.</span></b>'
         if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION == 1:
             if not res[0][2] or res[0][2] == "0":
@@ -1363,12 +1363,12 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
             # pattern is entered
             if email_user_pattern:
                 # users with matching email-address
-                users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' ORDER BY email """ % (email_user_pattern, ))
+                users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s ORDER BY email """, (email_user_pattern, ))
                 # users that are connected
                 users2 = run_sql("""SELECT DISTINCT u.id, u.email
                 FROM user u LEFT JOIN user_accROLE ur ON u.id = ur.id_user
-                WHERE ur.id_accROLE = '%s' AND u.email RLIKE '%s'
-                ORDER BY u.email """ % (id_role, email_user_pattern))
+                WHERE ur.id_accROLE = %s AND u.email RLIKE %s
+                ORDER BY u.email """,  (id_role, email_user_pattern))
 
                 # no users that match the pattern
                 if not (users1 or users2):
@@ -2142,12 +2142,12 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
         # pattern is entered
         if email_user_pattern:
             # users with matching email-address
-            users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' ORDER BY email """ % (email_user_pattern, ))
+            users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s ORDER BY email """, (email_user_pattern, ))
             # users that are connected
             users2 = run_sql("""SELECT DISTINCT u.id, u.email
             FROM user u LEFT JOIN user_accROLE ur ON u.id = ur.id_user
-            WHERE ur.id_accROLE = '%s' AND u.email RLIKE '%s'
-            ORDER BY u.email """ % (id_role, email_user_pattern))
+            WHERE ur.id_accROLE = %s AND u.email RLIKE %s
+            ORDER BY u.email """, (id_role, email_user_pattern))
 
             # no users that match the pattern
             if not (users1 or users2):
@@ -2263,7 +2263,7 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
     if email_user_pattern:
         subtitle = 'step 2 - select user'
 
-        users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE '%s' ORDER BY email """ % (email_user_pattern, ))
+        users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s ORDER BY email """, (email_user_pattern, ))
         users = []
         for (id, email) in users1: users.append([id, email, ''])
 
@@ -2291,7 +2291,7 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
                 all_roles = acca.acc_get_all_roles()
 
                 # sort the roles in connected and not connected roles
-                for (id, name, description) in all_roles:
+                for (id, name, description, dummy, dummy) in all_roles:
                     if (id, ) in role_ids: con_roles.append([-id, name, description])
                     else: not_roles.append([id, name, description])
 
@@ -2425,7 +2425,7 @@ def perform_deleteuserrole(req, id_role='0', id_user='0', reverse=0, confirm=0):
                 role_ids = acca.acc_get_user_roles(id_user=id_user)
                 all_roles = acca.acc_get_all_roles()
                 roles = []
-                for (id, name, desc) in all_roles:
+                for (id, name, desc, dummy, dummy) in all_roles:
                     if (id, ) in role_ids: roles.append([id, name, desc])
 
                 output += createroleselect(id_role=id_role,
@@ -3235,8 +3235,7 @@ def headeritalic(**ids):
             output += ' %s <i>%s</i>' % (key, ids[key])
             continue
 
-        res = run_sql("""SELECT %s FROM %s WHERE id = %s""" \
-            % (value, table, ids[key]))
+        res = run_sql("""SELECT %%s FROM %s WHERE id = %%s""" % table, (value, ids[key]))
 
         if res:
             if output: output += ' and '
@@ -3270,8 +3269,7 @@ def headerstrong(query=1, **ids):
             continue
 
         if query:
-            res = run_sql("""SELECT %s FROM %s WHERE id = %s""" \
-                % (value, table, ids[key]))
+            res = run_sql("""SELECT %%s FROM %s WHERE id = %%s""" % table, (value, ids[key]))
             if res:
                 if output: output += ' and '
                 output += ' %s <strong>%s</strong>' % (key, res[0][0])
