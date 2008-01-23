@@ -290,7 +290,10 @@ def get_self_citations(citationdic,config):
 					if (ca in authorlist):
 						if selfcites.has_key(k):
 							val = selfcites[k]
-							val.append(c)
+							#add only if not there already
+							if val:
+								if not c in val:
+									val.append(c)
 							selfcites[k] = val
 						else:
 							selfcites[k] = [c]
