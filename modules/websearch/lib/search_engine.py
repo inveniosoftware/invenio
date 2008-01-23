@@ -2665,7 +2665,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                                                                tabs,
                                                                                ln))
                     elif tab == 'citations':
-                        citinglist = None
+                        citinglist = []
                         citationhistory = None
                         recid = recIDs[irec]
                         selfcited = get_self_cited_by(recid)
