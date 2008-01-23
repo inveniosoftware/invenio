@@ -62,7 +62,8 @@ from invenio.bibrank_downloads_grapher import create_download_history_graph_and_
 from invenio.data_cacher import DataCacher
 from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
 from invenio.access_control_admin import acc_get_action_id
-from invenio.access_control_config import VIEWRESTRCOLL
+from invenio.access_control_config import VIEWRESTRCOLL, \
+    CFG_ACC_EMAILS_IN_TAGS_AUTHORIZED_TO_VIEW_RECORD
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.intbitset import intbitset as HitSet
 from invenio.webinterface_handler import wash_urlargd
@@ -186,12 +187,15 @@ try:
 except Exception:
     restricted_collection_cache = RestrictedCollectionDataCacher()
 
-def is_user_submitter_of_recid(user_info, recid):
+def is_user_in_authorized_list_for_recid(user_info, recid):
     """Return True if the user have submitted the given record."""
-    submitter_email = get_fieldvalues(recid, '8560_f')
-    if submitter_email:
-        submitter_email = submitter_email[0].strip().lower()
-        return user_info['email'].strip().lower() == submitter_email
+    authorized_emails = []
+    for tag in CFG_ACC_EMAILS_IN_TAGS_AUTHORIZED_TO_VIEW_RECORD:
+        authorized_emails.extend(get_fieldvalues(recid, tag))
+    for email in authorized_emails:
+        email = email.strip().lower()
+        if user_info['email'].strip().lower() == email:
+            return True
     return False
 
 def check_user_authorized_to_record(user_info, recid):
@@ -199,7 +203,7 @@ def check_user_authorized_to_record(user_info, recid):
     record_primary_collection = guess_primary_collection_of_a_record(recid)
     if collection_restricted_p(record_primary_collection):
         (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
-        if auth_code == 0 or is_user_submitter_of_recid(user_info, recid):
+        if auth_code == 0 or is_user_in_authorized_list_for_recid(user_info, recid):
             return (0, '')
         else:
             return (auth_code, auth_msg)

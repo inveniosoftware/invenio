@@ -67,6 +67,12 @@ CFG_ACC_EMPTY_ROLE_DEFINITION_SER=compress(cPickle.dumps((False, False, ()), -1)
 CFG_ACC_EMPTY_ROLE_DEFINITION_SRC='deny any'
 
 
+# List of tags containing (multiple) emails of users who should authorize
+# to access the corresponding record regardless of collection restrictions.
+if CFG_CERN_SITE:
+    CFG_ACC_EMAILS_IN_TAGS_AUTHORIZED_TO_VIEW_RECORD=['859__f', '270__m']
+else:
+    CFG_ACC_EMAILS_IN_TAGS_AUTHORIZED_TO_VIEW_RECORD=['8560_f']
 
 # Use external source for access control?
 # Atleast one must be added
