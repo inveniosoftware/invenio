@@ -459,6 +459,13 @@ default
 360
 </define-tag>
 
+## CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS -- maximum number of request kept
+## in cache. If the cache is filled, following request are not cached.
+##  (example: "1000")
+<define-tag CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS whitespace=delete>
+1000
+</define-tag>
+
 ## CFG_AUTHOR_ET_AL_THRESHOLD -- up to how many author names to print
 ## explicitely; for more print "et al".  Note that this is used in
 ## default formatting that is seldomly used, as usually BibFormat
@@ -739,7 +746,7 @@ atlantis.cern.ch
 ## (e.g. in abstracts), use 0 otherwise.
 ##  (example: "0")
 <define-tag CFG_BIBINDEX_REMOVE_LATEX_MARKUP whitespace=delete>
-1
+0
 </define-tag>
 
 ## CFG_BIBINDEX_MIN_WORD_LENGTH -- minimum word length allowed to be added to

@@ -26,16 +26,18 @@ Invenio garbage collector.
 __revision__ = "$Id$"
 
 import sys
+import datetime
+import time
+import os
 try:
     from invenio.dbquery import run_sql
-    from invenio.config import logdir, tmpdir
+    from invenio.config import logdir, tmpdir, cachedir, \
+        CFG_WEBSEARCH_RSS_TTL
     from invenio.websession_config import CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
     from invenio.bibtask import task_init, task_set_option, task_get_option, \
         write_message, write_messages
     from invenio.access_control_mailcookie import mail_cookie_gc
     from invenio.bibdocfile import BibDoc
-    import time
-    import os
 except ImportError, e:
     print "Error: %s" % (e, )
     sys.exit(1)
@@ -56,6 +58,9 @@ CFG_MAX_ATIME_RM_OAI = 28
 CFG_MAX_ATIME_ZIP_OAI = 7
 # After how many days to remove deleted bibdocs
 CFG_DELETED_BIBDOC_MAXLIFE = 365*10
+# AFter how many day to remove old cached webjournal files
+CFG_WEBJOURNAL_TTL = 7
+
 
 def gc_exec_command(command):
     """ Exec the command logging in appropriate way its output."""
@@ -111,6 +116,47 @@ def clean_logs():
             % (tmpdir, CFG_MAX_ATIME_RM_OAI, vstr))
     write_message("""CLEANING OF LOG FILES FINISHED""")
 
+def clean_cache():
+    """Clean the cache for expired and old files."""
+    write_message("""CLEANING OF OLD CACHED RSS REQUEST STARTED""")
+    rss_cache_dir = "%s/rss/" % cachedir
+    try:
+        filenames = os.listdir(rss_cache_dir)
+    except OSError:
+        filenames = []
+    count = 0
+    for filename in filenames:
+        filename = os.path.join(rss_cache_dir, filename)
+        last_update_time = datetime.datetime.fromtimestamp(os.stat(os.path.abspath(filename)).st_mtime)
+        if not (datetime.datetime.now() < last_update_time + datetime.timedelta(minutes=CFG_WEBSEARCH_RSS_TTL)):
+            try:
+                os.remove(filename)
+                count += 1
+            except OSError, e:
+                write_message("Error: %s" % e)
+    write_message("""%s rss cache file pruned out of %s.""" % (count, len(filenames)))
+    write_message("""CLEANING OF OLD CACHED RSS REQUEST FINISHED""")
+
+    write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES STARTED""")
+    webjournal_cache_dir = "%s/webjournal/" % cachedir
+    try:
+        filenames = os.listdir(webjournal_cache_dir)
+    except OSError:
+        filenames = []
+    count = 0
+    for filename in filenames:
+        filename = os.path.join(webjournal_cache_dir, filename)
+        last_update_time = datetime.datetime.fromtimestamp(os.stat(os.path.abspath(filename)).st_mtime)
+        if not (datetime.datetime.now() < last_update_time + datetime.timedelta(days=CFG_WEBJOURNAL_TTL)):
+            try:
+                os.remove(filename)
+                count += 1
+            except OSError, e:
+                write_message("Error: %s" % e)
+    write_message("""%s webjournal cache file pruned out of %s.""" % (count, len(filenames)))
+    write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES FINISHED""")
+
+
 def clean_bibxxx():
     """
     Clean unreferenced bibliographic values from bibXXx tables.
@@ -141,7 +187,6 @@ def clean_bibxxx():
             write_message(""" - %d unreferenced %s values cleaned""" % \
                           (num_unref_values, bibxxx))
     write_message("""CLEANING OF UNREFERENCED bibXXx VALUES FINISHED""")
-    pass
 
 def clean_documents():
     """Delete all the bibdocs that have been set as deleted and have not been
@@ -338,7 +383,6 @@ def guest_user_garbage_collector():
     delcount['role_membership'] = run_sql("""DELETE FROM user_accROLE WHERE expiration<NOW()""")
 
     # print STATISTICS
-
     write_message("""- statistics about deleted data: """)
     write_message("""  %7s sessions.""" % (delcount['session'], ))
     write_message("""  %7s users.""" % (delcount['user'], ))
@@ -356,23 +400,23 @@ def guest_user_garbage_collector():
     write_message("""  %7s role_memberships.""" % (delcount['role_membership'], ))
     write_message("""CLEANING OF GUEST SESSIONS FINISHED""")
 
-    return
-
 def main():
     """Main that construct all the bibtask."""
     task_set_option('logs', False)
     task_set_option('guests', False)
     task_set_option('bibxxx', False)
     task_set_option('documents', False)
+    task_set_option('cache', False)
     task_init(authorization_action='runsessiongc',
             authorization_msg="InvenioGC Task Submission",
             help_specific_usage="  -l, --logs\t\tClean old logs and temporary files.\n" \
                 "  -g, --guests\t\tClean expired guest user related information. [default action]\n" \
                 "  -b, --bibxxx\t\tClean unreferenced bibliographic values in bibXXx tables.\n" \
+                "  -c, --cache\t\tClean cache by removing old files.\n" \
                 "  -d, --documents\tClean deleted documents and revisions older than %s days.\n" \
                 "  -a, --all\t\tClean all of the above.\n" % CFG_DELETED_BIBDOC_MAXLIFE,
             version=__revision__,
-            specific_params=("lgbda", ["logs", "guests", "bibxxx", "documents", "all"]),
+            specific_params=("lgbdac", ["logs", "guests", "bibxxx", "documents", "all", "cache"]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_submit_check_options_fnc=task_submit_check_options,
             task_run_fnc=task_run_core)
@@ -381,7 +425,8 @@ def task_submit_check_options():
     if not task_get_option('logs') and \
        not task_get_option('guests') and \
        not task_get_option('bibxxx') and \
-       not task_get_option('documents'):
+       not task_get_option('documents') and \
+       not task_get_option('cache'):
         task_set_option('sessions', True)
     return True
 
@@ -408,11 +453,15 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ('-d', '--documents'):
         task_set_option('documents', True)
         return True
+    elif key in ('-c', '--cache'):
+        task_set_option('cache', True)
+        return True
     elif key in ('-a', '--all'):
         task_set_option('logs', True)
         task_set_option('guests', True)
         task_set_option('bibxxx', True)
         task_set_option('documents', True)
+        task_set_option('cache', True)
         return True
     return False
 
@@ -426,6 +475,8 @@ def task_run_core():
         clean_bibxxx()
     if task_get_option('documents'):
         clean_documents()
+    if task_get_option('cache'):
+        clean_cache()
     return True
 
 if __name__ == '__main__':
