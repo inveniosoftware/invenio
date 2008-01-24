@@ -27,6 +27,11 @@ import datetime
 from urllib import quote
 from mod_python import apache
 
+try:
+    Set = set
+except NameError:
+    from sets import Set
+
 from invenio.config import \
      weburl, \
      cdsname, \
@@ -35,7 +40,8 @@ from invenio.config import \
      adminemail, \
      sweburl, \
      CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
-     CFG_WEBSEARCH_RSS_TTL
+     CFG_WEBSEARCH_RSS_TTL, \
+     CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
@@ -47,7 +53,7 @@ from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.webpage import page, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine import get_colID, get_coll_i18nname, \
-    check_user_authorized_to_record, collection_restricted_p
+    check_user_can_view_record, collection_restricted_p
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
@@ -108,10 +114,10 @@ class WebInterfaceAuthorPage(WebInterfaceDirectory):
     def __call__(self, req, form):
         """Serve the page in the given language."""
         argd = wash_urlargd(form, {'ln': (str, cdslang)})
-	req.argd = argd #needed since perform_req_search
-			#wants to check it in case of no results
-	self.authorname = self.authorname.replace("+"," ")
-	search_engine.perform_request_search(req=req, p=self.authorname, f="author", of="hb")
+        req.argd = argd #needed since perform_req_search
+        #wants to check it in case of no results
+        self.authorname = self.authorname.replace("+"," ")
+        search_engine.perform_request_search(req=req, p=self.authorname, f="author", of="hb")
 
     index = __call__
 
@@ -161,11 +167,12 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
                 pass
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
+        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
 
-        if auth_code and user_info['email'] == 'guest':
+        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
-                    make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
+                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                     weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
                     search_results_default_urlargd)}, {'ln' : cdslang})
             return redirect_to_url(req, target)
@@ -278,9 +285,17 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             except (KeyError, ValueError):
                 pass
 
+        involved_collections = Set()
+        if argd['recid'] > 0:
+            if argd['recidb'] > argd['recid']:
+                for recid in xrange(argd['recid'], argd['recidb']):
+                    involved_collections.add(search_engine.guess_primary_collection_of_a_record(recid))
+            else:
+                involved_collections.add(search_engine.guess_primary_collection_of_a_record(argd['recid']))
+
         # If any of the collection requires authentication, redirect
         # to the authentication form.
-        for coll in argd['c'] + [argd['cc']]:
+        for coll in argd['c'] + [argd['cc']] + list(involved_collections):
             if collection_restricted_p(coll):
                 (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
                 if auth_code and user_info['email'] == 'guest':
@@ -636,6 +651,20 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
         # Keep only interesting parameters for the search
         argd = wash_urlargd(form, websearch_templates.rss_default_urlargd)
 
+        for coll in argd['c'] + [argd['cc']]:
+            if collection_restricted_p(coll):
+                #user_info = collect_user_info(req)
+                #(auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
+                #if auth_code and user_info['email'] == 'guest':
+                    #cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
+                    #target = '/youraccount/login' + \
+                    #make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : \
+                    #weburl + user_info['uri']}, {})
+                    #return redirect_to_url(req, target)
+                #elif auth_code:
+                    #raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED
+                raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED
+
         # Create a standard filename with these parameters
         args = websearch_templates.build_rss_url(argd).split('/')[-1]
 
@@ -644,8 +673,8 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
         try:
             # Try to read from cache
             path = "%s/rss/%s.xml" % (cachedir, args)
-            filedesc = open(path, "r")
             # Check if cache needs refresh
+            filedesc = open(path, "r")
             last_update_time = datetime.datetime.fromtimestamp(os.stat(os.path.abspath(path)).st_mtime)
             assert(datetime.datetime.now() < last_update_time + datetime.timedelta(minutes=CFG_WEBSEARCH_RSS_TTL))
             c_rss = filedesc.read()
@@ -679,13 +708,22 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
             mymkdir(dirname)
             fullfilename = "%s/rss/%s.xml" % (cachedir, args)
             try:
-                os.umask(022)
-                f = open(fullfilename, "w")
-            except IOError, v:
-                raise v
+                # Remove the file just in case it already existed
+                # so that a bit of space is created
+                os.remove(fullfilename)
+            except OSError:
+                pass
 
-            f.write(rss_prologue + rss_body + rss_epilogue)
-            f.close()
+            # Check if there's enough space to cache the request.
+            if len(os.listdir(dirname)) < CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS:
+                try:
+                    os.umask(022)
+                    f = open(fullfilename, "w")
+                except IOError, v:
+                    raise v
+
+                f.write(rss_prologue + rss_body + rss_epilogue)
+                f.close()
 
     index = __call__
 
@@ -726,9 +764,9 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
         # Check if the record belongs to a restricted primary
         # collection.  If yes, redirect to the authenticated URL.
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest':
-            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
+        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                     weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \

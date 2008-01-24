@@ -40,7 +40,7 @@ from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_us
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
      guess_primary_collection_of_a_record, \
-     get_colID, check_user_authorized_to_record
+     get_colID, check_user_can_view_record
 from invenio.urlutils import get_client_ip_address, \
                              redirect_to_url, \
                              wash_url_argument, make_canonical_urlargd
@@ -48,6 +48,7 @@ from invenio.messages import wash_language, gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_config import VIEWRESTRCOLL
+from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
@@ -105,11 +106,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest':
+        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
-                    make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
-                    weburl + user_info['uri']}, {})
+                make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+                weburl + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -210,11 +212,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest':
+        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
-                    make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
-                    weburl + user_info['uri']}, {})
+                make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+                weburl + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -342,11 +345,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest':
+        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
-                    make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
-                    weburl + user_info['uri']}, {})
+                make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+                weburl + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -404,11 +408,12 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest':
+        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
-                    make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : argd['ln'], 'referer' : \
-                    weburl + user_info['uri']}, {})
+                make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+                weburl + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \

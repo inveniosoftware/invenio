@@ -45,6 +45,7 @@ from invenio.config import \
      weburl
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_config import VIEWRESTRCOLL
+from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box, pageheaderonly, \
@@ -57,7 +58,7 @@ from invenio.messages import gettext_set_language
 from invenio.search_engine import \
      guess_primary_collection_of_a_record, \
      get_colID, \
-     create_navtrail_links, check_user_authorized_to_record
+     create_navtrail_links, check_user_can_view_record
 from invenio.bibdocfile import BibRecDocs, normalize_format, file_strip_ext, \
     stream_restricted_icon, BibDoc, InvenioWebSubmitFileError
 from invenio.errorlib import register_exception
@@ -91,11 +92,12 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 return page_not_authorized(req, "../getfile.py/index",
                                            navmenuid='submit')
 
-            (auth_code, auth_msg) = check_user_authorized_to_record(user_info, self.recid)
-            if auth_code and user_info['email'] == 'guest':
+            (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+            if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+                cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
                 target = '/youraccount/login' + \
-                        make_canonical_urlargd({'action': VIEWRESTRCOLL, 'ln' : ln, 'referer' : \
-                        weburl + user_info['uri']}, {})
+                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+                    weburl + user_info['uri']}, {})
                 return redirect_to_url(req, target)
             elif auth_code:
                 return page_not_authorized(req, "../", \
@@ -159,7 +161,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         if docfile.get_status() == '':
                             # The file is not resticted, let's check for
                             # collection restriction then.
-                            (auth_code, auth_message) = check_user_authorized_to_record(user_info, self.recid)
+                            (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
                             if auth_code:
                                 return warningMsg(_("The collection to which this file belong is restricted: ") + auth_message, req, cdsname, ln)
                         else:
@@ -189,7 +191,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         if iconfile.get_status() == '':
                             # The file is not resticted, let's check for
                             # collection restriction then.
-                            (auth_code, auth_message) = check_user_authorized_to_record(user_info, self.recid)
+                            (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
                             if auth_code:
                                 return stream_restricted_icon(req)
                         else:

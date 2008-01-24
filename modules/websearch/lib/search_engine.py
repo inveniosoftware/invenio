@@ -187,23 +187,29 @@ try:
 except Exception:
     restricted_collection_cache = RestrictedCollectionDataCacher()
 
-def is_user_in_authorized_list_for_recid(user_info, recid):
-    """Return True if the user have submitted the given record."""
-    authorized_emails = []
-    for tag in CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS:
-        authorized_emails.extend(get_fieldvalues(recid, tag))
-    for email in authorized_emails:
-        email = email.strip().lower()
-        if user_info['email'].strip().lower() == email:
-            return True
-    return False
 
-def check_user_authorized_to_record(user_info, recid):
-    """Check if the user is authorized to view the given recid.."""
+def check_user_can_view_record(user_info, recid):
+    """Check if the user is authorized to view the given recid. The function
+    grants access in two cases: either user has author rights on ths record,
+    or he has view rights to the primary collection this record belongs to.
+    Returns the same type as acc_authorize_action
+    """
+
+    def _is_user_in_authorized_author_list_for_recid(user_info, recid):
+        """Return True if the user have submitted the given record."""
+        authorized_emails = []
+        for tag in CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS:
+            authorized_emails.extend(get_fieldvalues(recid, tag))
+        for email in authorized_emails:
+            email = email.strip().lower()
+            if user_info['email'].strip().lower() == email:
+                return True
+        return False
+
     record_primary_collection = guess_primary_collection_of_a_record(recid)
     if collection_restricted_p(record_primary_collection):
         (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=record_primary_collection)
-        if auth_code == 0 or is_user_in_authorized_list_for_recid(user_info, recid):
+        if auth_code == 0 or _is_user_in_authorized_author_list_for_recid(user_info, recid):
             return (0, '')
         else:
             return (auth_code, auth_msg)
