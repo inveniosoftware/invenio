@@ -19,6 +19,11 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Invenio mail sending utilities.  send_email() is the main API function
+people should be using; just check out its docstring.
+"""
+
 __revision__ = "$Id$"
 
 import sys
@@ -63,7 +68,8 @@ def send_email(fromaddr,
                attempt_times=1,
                attempt_sleeptime=10,
                debug_level=0,
-               ln=cdslang
+               ln=cdslang,
+               charset='utf-8'
                ):
     """Send an forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
     header and footer.
@@ -82,6 +88,7 @@ def send_email(fromaddr,
     @attempt_sleeptime: [int] seconds in between tries
     @debug_level: [int] debug level
     @ln: [string] invenio language
+    @param charset: which charset to use in message ('utf-8' by default)
 
     If sending fails, try to send it ATTEMPT_TIMES, and wait for
     ATTEMPT_SLEEPTIME seconds in between tries.
@@ -98,7 +105,7 @@ def send_email(fromaddr,
             toaddr += ",%s" % (adminemail,)
         else:
             toaddr = adminemail
-    body = forge_email(fromaddr, toaddr, subject, content, html_content, html_images, usebcc, header, footer, html_header, html_footer, ln)
+    body = forge_email(fromaddr, toaddr, subject, content, html_content, html_images, usebcc, header, footer, html_header, html_footer, ln, charset)
     toaddr = toaddr.split(",")
     if attempt_times < 1 or len(toaddr[0]) == 0:
         log('ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL', fromaddr, toaddr, body)
@@ -111,7 +118,7 @@ def send_email(fromaddr,
             server.set_debuglevel(0)
         server.sendmail(fromaddr, toaddr, body)
         server.quit()
-    except (smtplib.SMTPException, socket.error), e:
+    except (smtplib.SMTPException, socket.error):
         if attempt_times > 1:
             if (debug_level > 1):
                 log('ERR_MISCUTIL_CONNECTION_SMTP', attempt_sleeptime, sys.exc_info()[0], fromaddr, toaddr, body)
@@ -120,7 +127,7 @@ def send_email(fromaddr,
         else:
             log('ERR_MISCUTIL_SENDING_EMAIL', fromaddr, toaddr, body)
             return False
-    except Exception, e:
+    except Exception:
         register_exception()
         return False
     return True
@@ -193,7 +200,10 @@ def email_html_footer(ln=cdslang):
     return out
 
 
-def forge_email(fromaddr, toaddr, subject, content, html_content='', html_images={}, usebcc=False, header=None, footer=None, html_header=None, html_footer=None, ln=cdslang):
+def forge_email(fromaddr, toaddr, subject, content, html_content='',
+                html_images={}, usebcc=False, header=None, footer=None,
+                html_header=None, html_footer=None, ln=cdslang,
+                charset='utf-8'):
     """Prepare email. Add header and footer if needed.
     @param fromaddr: [string] sender
     @param toaddr: [string] receivers separated by ,
@@ -205,6 +215,7 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='', html_images
     @param header: [string] None for the default header
     @param footer: [string] None for the default footer
     @param ln: language
+    @param charset: which charset to use in message ('utf-8' by default)
     @return forged email as a string"""
     if header is None:
         content = email_header(ln) + content
@@ -224,50 +235,49 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='', html_images
         else:
             html_content += html_footer
 
-        msgRoot = MIMEMultipart('related')
-        msgRoot['Subject'] = Header(subject, 'utf-8')
-        msgRoot['From'] = fromaddr
+        msg_root = MIMEMultipart('related')
+        msg_root['Subject'] = Header(subject, charset)
+        msg_root['From'] = fromaddr
         if usebcc:
-            msgRoot['Bcc'] = toaddr
+            msg_root['Bcc'] = toaddr
         else:
-            msgRoot['To'] = toaddr
-        msgRoot.preamble = 'This is a multi-part message in MIME format.'
+            msg_root['To'] = toaddr
+        msg_root.preamble = 'This is a multi-part message in MIME format.'
 
-        msgAlternative = MIMEMultipart('alternative')
-        msgRoot.attach(msgAlternative)
+        msg_alternative = MIMEMultipart('alternative')
+        msg_root.attach(msg_alternative)
 
-        msgText = MIMEText(content, _charset='utf-8')
-        msgAlternative.attach(msgText)
+        msg_text = MIMEText(content, _charset=charset)
+        msg_alternative.attach(msg_text)
 
-        msgText = MIMEText(html_content, 'html', _charset='utf-8')
-        msgAlternative.attach(msgText)
+        msg_text = MIMEText(html_content, 'html', _charset=charset)
+        msg_alternative.attach(msg_text)
 
         for image_id, image_path in html_images.iteritems():
-            msgImage = MIMEImage(open(image_path, 'rb').read())
-            msgImage.add_header('Content-ID', '<%s>' % image_id)
-            msgImage.add_header('Content-Disposition', 'attachment', filename=os.path.split(image_path)[1])
-            msgRoot.attach(msgImage)
+            msg_image = MIMEImage(open(image_path, 'rb').read())
+            msg_image.add_header('Content-ID', '<%s>' % image_id)
+            msg_image.add_header('Content-Disposition', 'attachment', filename=os.path.split(image_path)[1])
+            msg_root.attach(msg_image)
     else:
-        msgRoot = MIMEText(content, _charset='utf-8')
-        msgRoot['From'] = fromaddr
+        msg_root = MIMEText(content, _charset=charset)
+        msg_root['From'] = fromaddr
         if usebcc:
-            msgRoot['Bcc'] = toaddr
+            msg_root['Bcc'] = toaddr
         else:
-            msgRoot['To'] = toaddr
-        msgRoot['Subject'] = Header(subject, 'utf-8')
-    msgRoot.add_header('User-Agent', 'CDS Invenio %s' % version)
-    return msgRoot.as_string()
+            msg_root['To'] = toaddr
+        msg_root['Subject'] = Header(subject, charset)
+    msg_root.add_header('User-Agent', 'CDS Invenio %s' % version)
+    return msg_root.as_string()
 
-newlines_re = re.compile(r'<br\s*/?>|</p>', re.I)
-spaces_re = re.compile(r'\s+')
-words_boundary_re = re.compile(r'\b')
-html_tags_re = re.compile(r'<.+?>')
+RE_NEWLINES = re.compile(r'<br\s*/?>|</p>', re.I)
+RE_SPACES = re.compile(r'\s+')
+RE_HTML_TAGS = re.compile(r'<.+?>')
 
 def email_strip_html(html_content):
     """Strip html tags from html_content, trying to respect formatting."""
-    html_content = spaces_re.sub(' ', html_content)
-    html_content = newlines_re.sub('\n', html_content)
-    html_content = html_tags_re.sub('', html_content)
+    html_content = RE_SPACES.sub(' ', html_content)
+    html_content = RE_NEWLINES.sub('\n', html_content)
+    html_content = RE_HTML_TAGS.sub('', html_content)
     html_content = html_content.split('\n')
     out = StringIO()
     out_format = AbstractFormatter(DumbWriter(out))
