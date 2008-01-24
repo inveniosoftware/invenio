@@ -166,7 +166,7 @@ def tmpl_webjournal_alert_plain_text_CERNBulletin(journal_name, language, issue)
                     
 The latest issue of the CERN Bulletin, no. %s, has been released.
 You can access it at the following URL:
-http://www.bulletin.cern.ch/
+http://bulletin.cern.ch/
 
 Best Wishes,
 CERN Bulletin team
@@ -176,7 +176,7 @@ Cher Abonné,
 
 Le nouveau numéro du CERN Bulletin, no. %s, vient de paraître.
 Vous pouvez y accéder à cette adresse :
-http://www.bulletin.cern.ch/fre
+http://bulletin.cern.ch/fre
 
 Bonne lecture,
 L'équipe du Bulletin du CERN
