@@ -63,7 +63,7 @@ from invenio.data_cacher import DataCacher
 from invenio.websearch_external_collections import print_external_results_overview, perform_external_collection_search
 from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL, \
-    CFG_ACC_EMAILS_IN_TAGS_AUTHORIZED_TO_VIEW_RECORD
+    CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.intbitset import intbitset as HitSet
 from invenio.webinterface_handler import wash_urlargd
@@ -190,7 +190,7 @@ except Exception:
 def is_user_in_authorized_list_for_recid(user_info, recid):
     """Return True if the user have submitted the given record."""
     authorized_emails = []
-    for tag in CFG_ACC_EMAILS_IN_TAGS_AUTHORIZED_TO_VIEW_RECORD:
+    for tag in CFG_ACC_GRANT_AUTHOR_RIGHTS_TO_EMAILS_IN_TAGS:
         authorized_emails.extend(get_fieldvalues(recid, tag))
     for email in authorized_emails:
         email = email.strip().lower()
@@ -2708,7 +2708,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                                                                      citinglist=citinglist,
                                                                                      citationhistory=citationhistory,
                                                                                      cociting=cociting,
-										     selfcited=selfcited)
+                                             selfcited=selfcited)
                         req.write(webstyle_templates.detailed_record_container(content,
                                                                                recid,
                                                                                tabs,
