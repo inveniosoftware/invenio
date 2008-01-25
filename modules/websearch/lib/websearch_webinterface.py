@@ -53,12 +53,14 @@ from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.webpage import page, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine import get_colID, get_coll_i18nname, \
-    check_user_can_view_record, collection_restricted_p
+    check_user_can_view_record, collection_restricted_p, restricted_collection_cache
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
 from invenio.bibformat import format_records
-from invenio.websearch_webcoll import mymkdir
+from invenio.websearch_webcoll import mymkdir, get_collection
+from invenio.intbitset import intbitset
+from invenio.bibupload import find_record_from_sysno
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -286,19 +288,55 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 pass
 
         involved_collections = Set()
+        involved_collections.update(argd['c'])
+        involved_collections.add(argd['cc'])
+
+        if argd['id'] > 0:
+            argd['recid'] = argd['id']
+        if argd['idb'] > 0:
+            argd['recidb'] = argd['idb']
+        if argd['sysno']:
+            tmp_recid = find_record_from_sysno(argd['sysno'])
+            if tmp_recid:
+                argd['recid'] = tmp_recid
+        if argd['sysnb']:
+            tmp_recid = find_record_from_sysno(argd['sysnb'])
+            if tmp_recid:
+                argd['recidb'] = tmp_recid
+
         if argd['recid'] > 0:
             if argd['recidb'] > argd['recid']:
-                for recid in xrange(argd['recid'], argd['recidb']):
-                    involved_collections.add(search_engine.guess_primary_collection_of_a_record(recid))
+                # Hack to check if among the restricted collections
+                # at least a record of the range is there and
+                # then if the user is not authorized for that
+                # collection.
+                recids = intbitset(xrange(argd['recid'], argd['recidb']))
+                restricted_colls = restricted_collection_cache.get_cache()
+                for collname in restricted_colls:
+                    (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collname)
+                    if auth_code:
+                        coll_recids = get_collection(collname).reclist
+                        if coll_recids & recids:
+                            if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+                                cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : collname})
+                                target = '/youraccount/login' + \
+                                make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : \
+                                weburl + '/search' + make_canonical_urlargd(argd, \
+                                search_results_default_urlargd)}, {'ln' : cdslang})
+                                return redirect_to_url(req, target)
+                            else:
+                                return page_not_authorized(req, "../", \
+                                    text = auth_msg,\
+                                    navmenuid='search')
             else:
                 involved_collections.add(search_engine.guess_primary_collection_of_a_record(argd['recid']))
 
         # If any of the collection requires authentication, redirect
         # to the authentication form.
-        for coll in argd['c'] + [argd['cc']] + list(involved_collections):
+        for coll in involved_collections:
             if collection_restricted_p(coll):
                 (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
-                if auth_code and user_info['email'] == 'guest':
+                if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = '/youraccount/login' + \
                     make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : \
