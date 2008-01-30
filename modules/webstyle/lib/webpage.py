@@ -26,8 +26,6 @@ from invenio.config import \
      CFG_WEBSTYLE_CDSPAGEBOXLEFTTOP, \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM, \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP, \
-     CFG_WEBSTYLE_CDSPAGEFOOTER, \
-     CFG_WEBSTYLE_CDSPAGEHEADER, \
      cdslang, \
      supportemail, \
      weburl
@@ -153,7 +151,6 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                                                                 language=language),
                           uid = uid,
                           secure_page_p = secure_page_p,
-                          # pageheader = CFG_WEBSTYLE_CDSPAGEHEADER,
                           pageheaderadd = cdspageheaderadd,
                           boxlefttop = CFG_WEBSTYLE_CDSPAGEBOXLEFTTOP,
                           boxlefttopadd = cdspageboxlefttopadd,
@@ -167,7 +164,6 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
                           title = title,
                           titleepilogue = titleepilogue,
                           body = body,
-                          # pagefooter = CFG_WEBSTYLE_CDSPAGEFOOTER,
                           lastupdated = lastupdated,
                           pagefooteradd = cdspagefooteradd,
                           navmenuid = navmenuid,
@@ -195,7 +191,6 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
                                                             language=language),
                       uid = uid,
                       secure_page_p = secure_page_p,
-                      # pageheader = CFG_WEBSTYLE_CDSPAGEHEADER,
                       pageheaderadd = cdspageheaderadd,
                       navmenuid = navmenuid,
                       rssurl = rssurl)
