@@ -37,7 +37,7 @@ Contents
               apache2-mpm-prefork mysql-server-4.1 mysql-client-4.1 \
               python2.3-mysqldb python2.3-4suite \
               python2.3-xml python2.3-libxml2 python2.3-libxslt1 \
-              rxp wml gnuplot xpdf-utils gs-common antiword catdoc \
+              rxp gnuplot xpdf-utils gs-common antiword catdoc \
               wv html2text ppthtml xlhtml clisp gettext
 
         You can also install the following packages:
@@ -105,17 +105,11 @@ Contents
         problems with MySQL connectivity in our experience.
           <http://www.modpython.org/>
 
-     f) WML - Website META Language.  Tested mainly with versions
-        2.0.8 and 2.0.9.  Note that on Red Hat Linux 9 the WML 2.0.9
-        compiled with Perl 5.8.0 exhibits problems, so you better use
-        downgraded/upgraded Perl for compiling WML on that platform.       
-          <http://www.engelschall.com/sw/wml/>
-
-     g) If you want to be able to extract references from PDF fulltext
+     f) If you want to be able to extract references from PDF fulltext
         files, then you need to install pdftotext version 3 at least.
           <http://www.foolabs.com/xpdf/home.html> 
 
-     h) If you want to be able to search for words in the fulltext files 
+     g) If you want to be able to search for words in the fulltext files 
         (i.e. to have fulltext indexing), then you need as well to install 
         some of the following tools: 
           - for PDF files: pdftotext or pstotext
@@ -134,7 +128,7 @@ Contents
               <http://chicago.sourceforge.net/xlhtml/>
               <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>
 
-     i) If you have chosen to install fast XML MARC Python processors 
+     h) If you have chosen to install fast XML MARC Python processors 
         in the step d) above, then you have to install the parsers
         themselves:
           - (optional) RXP: 
@@ -142,7 +136,7 @@ Contents
           - (optional) 4suite:
              <http://4suite.org/>
 
-     j) (recommended) Gnuplot, the command-line driven interactive
+     i) (recommended) Gnuplot, the command-line driven interactive
         plotting program.  It is used to display download and citation
         history graphs on the Detailed record pages on the web
         interface.  Note that Gnuplot must be compiled with PNG output
@@ -150,7 +144,7 @@ Contents
         is not required, only recommended.  
           <http://www.gnuplot.info/>
 
-     k) (recommended) A Common Lisp implementation, such as CLISP,
+     j) (recommended) A Common Lisp implementation, such as CLISP,
         SBCL or CMUCL.  It is used for the web server log analysing
         tool and the metadata checking program.  Note that any of the
         three implementations CLISP, SBCL, or CMUCL will do.  CMUCL
@@ -161,7 +155,7 @@ Contents
           <http://www.cons.org/cmucl/>
           <http://sbcl.sourceforge.net/>     
 
-     l) GNU Gettext, a set of tools that makes it possible to
+     k) GNU gettext, a set of tools that makes it possible to
 	translate the application in multiple languages. 
            <http://www.gnu.org/software/gettext/>
 	This is available by default on many systems.
@@ -191,10 +185,11 @@ Contents
                     --with-dbuser=cdsinvenio \
                     --with-dbpass=my123pass \
                     --with-python=/opt/python/bin/python2.3
-      $ vi ./config/config.wml      ## optional, but strongly recommended
+      $ vi ./config/invenio.conf    ## optional, but strongly recommended
       $ make
       $ make check-custom-templates ## optional, only when upgrading
       $ make install
+      $ make create-tables
       $ make install-jsmath-plugin  ## optional
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
       $ sudo /path/to/apache/bin/apachectl graceful
@@ -332,7 +327,7 @@ Contents
           FIXME: this is not working right now as per the introduction
           of intbitset_setup.py.)
 
-      $ vi ./config/config.wml  ## optional, but strongly recommended
+      $ vi ./config/invenio.conf  ## optional, but strongly recommended
 
           Optionally, customize your CDS Invenio installation.  We
           strongly recommend you to edit at least the top of this file
@@ -340,18 +335,7 @@ Contents
           parameters like the name of your CDS Invenio document server
           (look for CDSNAME and CDSNAMEINTL) or the email address of
           the local CDS Invenio administrator (look for SUPPORTEMAIL
-          and ADMINEMAIL).  The latter is needed if you want to use
-          administration modules, and you will certainly do.
-
-          The rest of the "config.wml" file enables you to change the
-          CDS Invenio web page look and feel, and otherwise to
-          influence its behaviour and default parameters.  CDS Invenio
-          HTML pages will be pre-generated using the values set in the
-          config.wml file.
-
-          This configuration step is optional, but strongly
-          recommended.  If you change some values in config.wml, you
-          should restart the installation from here.
+          and ADMINEMAIL).
 
       $ make
 
@@ -384,67 +368,39 @@ Contents
           needed for runtime into the respective directories, as
           specified earlier by the configure command.
 
-          Note that the "make install" step checks for potential
-          problems such as the database connection rights and may ask
-          you to perform some more administrative steps in case it
-          detects a problem.  Notably, it may ask you to:
+          Note that if you are installing CDS Invenio for the first
+          time, you will be asked to create a symbolic link for the
+          "invenio" Python module from Python's site-packages
+          directory to instruct Python where to find CDS Invenio's
+          Python files.  The process will hint you at the exact
+          command to use based on the values you have used in the
+          configure line.
 
-              a) Set up database access permissions, e.g.:
-
-                   $ mysql -h sqlserver.domain.com -u root -p mysql
-                   mysql> CREATE DATABASE cdsinvenio DEFAULT CHARACTER SET utf8;
-                   mysql> GRANT ALL PRIVILEGES ON cdsinvenio.* \
-                                TO cdsinvenio@webserver.domain.com \
-                                IDENTIFIED BY 'myp1ss';
-                 
-                 If you are installing CDS Invenio for the first time,
-                 you have to create a dedicated database on your MySQL
-                 server that the CDS Invenio can use for its purposes.
-                 Please contact your MySQL administrator and ask him
-                 to execute the above commands that create the
-                 "cdsinvenio" database, a user called "cdsinvenio"
-                 with password "myp1ss", and that will grant all
-                 rights on the "cdsinvenio" database to the
-                 "cdsinvenio" user.  The credential values should be
-                 the ones you have chosen during the configure command
-                 executed before.  
-
-                 Note that the "make install" process will hint you at
-                 the exact command to use based on the values you have
-                 used in the configure line.
-
-              b) Set up database tables:         
-
-                   $ make create-tables
+          (Note also that on some operating systems you might need to
+          create another symlink manually for lib64:
              
-                 If you are installing CDS Invenio for the first time,
-                 you have to create the database tables by launching
-                 the above command.
+              $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
+                           /usr/local/lib64/python2.3/site-packages/invenio
 
-              c) Set up symbolic Python "invenio" module link:
+          if you happen to encounter some troubles finding intbitset
+          libraries.)
 
-                   $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
-                                /usr/local/lib/python2.3/site-packages/invenio
-             
-                 If you are installing CDS Invenio for the first time,
-                 you have to create a symbolic link from Python's
-                 site-packages directory that would indicate to Python
-                 where to find CDS Invenio's Python files.
-             
-                 Note that the exact symlink target location depends
-                 on the --prefix location (prefix/lib/python/invenio)
-                 and the exact symlink source location depends on the
-                 Python version you are using.
+      $ make create-tables
 
-                 Note that the "make install" process will hint you at
-                 the exact command to use based on the values you have
-                 used in the configure line.
+          If you are installing CDS Invenio for the first time, you
+          have to create database tables.  
 
-                 Note also that on some system architectures you may
-                 also need to create later another symlink for lib64:
-             
-                   $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
-                                /usr/local/lib64/python2.3/site-packages/invenio
+          Note that this step checks for potential problems such as
+          the database connection rights and may ask you to perform
+          some more administrative steps in case it detects a problem.
+          Notably, it may ask you to set up database access
+          permissions, based on your configure values.
+
+          If you are installing CDS Invenio for the first time, you
+          have to create a dedicated database on your MySQL server
+          that the CDS Invenio can use for its purposes.  Please
+          contact your MySQL administrator and ask him to execute the
+          commands this step proposes you.
 
           At this point you should now have successfully completed the
           "make install" process.  We continue by setting up the
@@ -452,12 +408,14 @@ Contents
 
       $ sudo make install-jsmath-plugin  ## optional
 
-          This will automatically download and install in the proper place
-          jsMath, a Javascript library to render LaTeX formulas in the client 
-          browser.
-          In order to enable the rendering you have to set the variable 
-          CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS in the config.wml to a suitable 
-          list of output format codes like in "['hd', 'hb']".
+          This will automatically download and install in the proper
+          place jsMath, a Javascript library to render LaTeX formulas
+          in the client browser.
+
+          In order to enable the rendering you have to set the
+          variable CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS in the
+          invenio.conf to a suitable list of output format codes like
+          in "['hd', 'hb']".
 
       $ sudo vi /path/to/apache/conf/httpd.conf
 

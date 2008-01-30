@@ -20,8 +20,8 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.93.50.20071218, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20071218)
+AC_INIT(cds-invenio, 0.93.50.20080128, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080128)
 
 ## Check for install:
 AC_PROG_INSTALL
@@ -78,17 +78,6 @@ fi
 ## Check for gettext support
 AM_GNU_GETTEXT(external)
 AM_GNU_GETTEXT_VERSION(0.14.4)
-
-## Check for WML:
-AC_PATH_PROG(WML, wml)
-if test -z "$WML"; then
-   AC_MSG_ERROR([
-   WML (Website META Language) was not found in your PATH.  Please install it first.
-   Available from <http://www.engelschall.com/sw/wml/>.])
-fi
-
-## Set option -c in WML so that it can work from a separate build tree
-WML="${WML} -c"
 
 ## Check for MySQL client:
 AC_PATH_PROG(MYSQL, mysql)
@@ -403,7 +392,6 @@ fi
 
 ## Substitute variables:
 AC_SUBST(VERSION)
-AC_SUBST(WML)
 AC_SUBST(MYSQL)
 AC_SUBST(PHP)
 AC_SUBST(PYTHON)
@@ -444,7 +432,7 @@ AC_CONFIG_FILES([config.nice  \
 	  Makefile \
           po/Makefile.in \
 	  config/Makefile \
-	  config/configbis.wml \
+	  config/invenio-autotools.conf \
 	  modules/Makefile \
 	  modules/bibconvert/Makefile \
 	  modules/bibconvert/bin/Makefile \
@@ -562,6 +550,8 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/miscutil/bin/dbtest \
 	  modules/miscutil/bin/testsuite \
 	  modules/miscutil/bin/regressiontestsuite \
+	  modules/miscutil/bin/inveniogc \
+	  modules/miscutil/bin/inveniocfg \
 	  modules/miscutil/lib/Makefile \
 	  modules/miscutil/lib/dbquery.py \
 	  modules/miscutil/demo/Makefile \
@@ -674,12 +664,6 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/websubmit/web/admin/Makefile \
 	  ])
 
-AC_CONFIG_COMMANDS(.wmlrc, [
-cat<<EOF>.wmlrc
--Iconfig -I${srcdir}/config
-EOF
-])
-
 ## Finally, write output files:
 AC_OUTPUT
 
@@ -699,7 +683,7 @@ AC_MSG_RESULT([**   - CLISP executable: $CLISP])
 AC_MSG_RESULT([**   - CMUCL executable: $CMUCL])
 AC_MSG_RESULT([**   - SBCL executable: $SBCL])
 AC_MSG_RESULT([** Here are the steps to continue the building process:                   **])
-AC_MSG_RESULT([**   1) Customize self-explanatory config file './config/config.wml'.     **])
+AC_MSG_RESULT([**   1) Customize self-explanatory config file './config/invenio.conf'.   **])
 AC_MSG_RESULT([**   2) Type 'make' to build your customized CDS Invenio installation.    **])
 AC_MSG_RESULT([**   3) Type 'make create-tables' if you have not created tables before.  **])
 AC_MSG_RESULT([**   4) Type 'make install' to install the system.                        **])

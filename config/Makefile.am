@@ -17,12 +17,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-noinst_SCRIPTS = configbis.wml
+noinst_SCRIPTS = invenio-autotools.conf
 
-wmlincludedir = $(libdir)/wml/invenio
+confdir = $(sysconfdir)
 
-wmlinclude_DATA = config.wml configbis.wml
+conf_DATA = invenio.conf invenio-autotools.conf
 
-EXTRA_DIST = config.wml configbis.wml.in
+EXTRA_DIST = invenio.conf invenio-autotools.conf.in
 
 CLEANFILES = *~

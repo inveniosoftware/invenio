@@ -99,16 +99,13 @@ install-data-local:
 		if (chmod -f ug=rwx $(localstatedir)$$d); then echo ok > /dev/null else; echo no > /dev/null; fi ;	\
 	done
 	@echo "************************************************************"
-	@echo "** CDS Invenio has been successfully installed!           **"
+	@echo "** CDS Invenio software has been successfully installed!  **"
 	@echo "**                                                        **"
-	@echo "** If you are installing CDS Invenio for the first time,  **"
-	@echo "** please continue with the Apache httpd configuration    **"
-	@echo "** step, as described in the INSTALL file.                **"
-	@echo "** Afterwards you may want to run 'make create-demo-site' **"
-	@echo "** to test your new installation.                         **"
+	@echo "** You may now want to run 'make create-tables' in order  **"
+	@echo "** to set up and populate your tables.                    **"
 	@echo "**                                                        **"
 	@echo "** If you are reinstalling CDS Invenio because you have   **"
-	@echo "** edited CDS Invenio sources or its WML configuration,   **"
+	@echo "** edited CDS Invenio sources or its configuration,       **"
 	@echo "** you may want to restart your Apache server now by      **"
 	@echo "** running 'sudo apachectl restart'.                      **"
 	@echo "************************************************************"
@@ -143,12 +140,22 @@ uninstall-jsmath-plugin:
 	@echo "** The jsMath plugin was successfully removed.           **"
 	@echo "***********************************************************"
 
-create-tables: local-dbexec local-tabfill
-	./modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
-	@echo "**************************************************************"
-	@echo "** The database tables were successfully created.           **"
-	@echo "**************************************************************"
+create-tables: local-dbexec
+	$(top_srcdir)/modules/miscutil/bin/dbtest
+	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
+	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabfill.sql
+	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg.py --reset-cdsname $(top_srcdir)/config/invenio.conf
+	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg.py --reset-adminemail $(top_srcdir)/config/invenio.conf
+	@echo "************************************************************"
+	@echo "** The database tables were successfully created.         **"
+	@echo "**                                                        **"
+	@echo "** If you are installing CDS Invenio for the first time,  **"
+	@echo "** please continue with the Apache httpd configuration    **"
+	@echo "** step, as described in the INSTALL file.                **"
+	@echo "**                                                        **"
+	@echo "** Afterwards you may want to run 'make create-demo-site' **"
+	@echo "** to test your new installation.                         **"
+	@echo "************************************************************"
 
 update-v0.3.0-tables update-v0.3.1-tables: local-dbexec
 	echo "ALTER TABLE idxINDEXNAME CHANGE id_idxINDEX id_idxINDEX mediumint(9) unsigned NOT NULL FIRST;" | ./modules/miscutil/bin/dbexec
@@ -288,9 +295,6 @@ drop-tables: local-dbexec
 local-dbexec:
 	(cd ./modules/miscutil/bin; make)
 
-local-tabfill: $(srcdir)/modules/miscutil/sql/tabfill.sql.wml
-	(cd ./modules/miscutil/sql; make)
-
 create-demo-site:
 # 	for f in $(sbmdat); do \
 # 	    if [ ! -e $(sbmdir)/$$f.shtml ]; then \
@@ -351,9 +355,11 @@ drop-demo-site:
 	    read; \
 	fi
 	rm -rf ${prefix}/var/data/files/*
-	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
-	./modules/miscutil/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabcreate.sql
-	./modules/miscutil/bin/dbexec < ./modules/miscutil/sql/tabfill.sql
+	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabdrop.sql
+	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
+	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabfill.sql
+	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg.py --reset-cdsname $(top_srcdir)/config/invenio.conf
+	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg.py --reset-adminemail $(top_srcdir)/config/invenio.conf
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec
 	${prefix}/bin/webcoll -uadmin
 	${prefix}/bin/webcoll 1
