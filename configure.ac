@@ -550,7 +550,6 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/miscutil/bin/dbtest \
 	  modules/miscutil/bin/testsuite \
 	  modules/miscutil/bin/regressiontestsuite \
-	  modules/miscutil/bin/inveniogc \
 	  modules/miscutil/bin/inveniocfg \
 	  modules/miscutil/lib/Makefile \
 	  modules/miscutil/lib/dbquery.py \
