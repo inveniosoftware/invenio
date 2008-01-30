@@ -73,20 +73,15 @@ except MySQLdb.Error, e:
 ## execute test query:
 try:
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM collection")
+    cursor.execute("SHOW TABLES")
     row = cursor.fetchone()
 except MySQLdb.Error, e:
     print """
     ******************************************************
     ** DATABASE QUERY ERROR %(errcode)d: %(errmsg)s.
     ******************************************************
-    ** Perhaps you need to create the tables?           **
-    **                                                  **
-    ** If yes, then please run 'make create-tables' now **
-    ** and continue with the 'make install' afterwards. **
-    **                                                  **
-    ** If not, then please inspect the above error      **
-    ** message and fix the problem before continuing.   **
+    ** Please inspect the above error message and       **
+    ** please fix the problem before continuing.        **
     ******************************************************
     """ % {'errcode': e.args[0],
            'errmsg': e.args[1],
