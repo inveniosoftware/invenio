@@ -1,5 +1,7 @@
+#!@PYTHON@
+##
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 ##
@@ -17,16 +19,17 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = dbexec testsuite regressiontestsuite inveniocfg
+"""
+Invenio configuration CLI tool.
+"""
 
-noinst_SCRIPTS = dbtest
+__revision__ = "$Id$"
 
-EXTRA_DIST = dbexec.in testsuite.in dbtest.in regressiontestsuite.in inveniocfg.in
+try:
+    from invenio.inveniocfg import main
+except ImportError, e:
+    print "Error: %s" % e
+    import sys
+    sys.exit(1)
 
-all:
-	chmod u+x ./dbtest ./dbexec
-
-install-data-local:
-	chmod u+x ./dbtest ./dbexec
-
-CLEANFILES = *~ *.tmp
+main()

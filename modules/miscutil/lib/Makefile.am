@@ -40,7 +40,8 @@ pylib_DATA = __init__.py \
              testutils_regression_tests.py \
              urlutils.py \
              w3c_validator.py \
-             intbitset_tests.py
+             intbitset_tests.py \
+             inveniocfg.py
 
 noinst_DATA = testimport.py \
               kwalitee.py
@@ -50,7 +51,6 @@ EXTRA_DIST = __init__.py \
              errorlib_tests.py \
              errorlib_webinterface.py \
              errorlib_regression_tests.py \
-             config.py.wml \
              data_cacher.py \
              dbquery.py.in \
              dbquery_tests.py \
@@ -74,7 +74,8 @@ EXTRA_DIST = __init__.py \
              intbitset_impl.c \
              intbitset_setup.py \
              intbitset_tests.py \
-             intbitset.pyx
+             intbitset.pyx \
+             inveniocfg.py
 
 all:
 	$(PYTHON) $(srcdir)/intbitset_setup.py build_ext
@@ -88,5 +89,5 @@ CLEANFILES = config.py *~ *.tmp *.pyc
 clean-local:
 	rm -rf build
 
-config.py: config.py.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml
-	$(WML) -o $@ $<
+config.py: inveniocfg.py $(top_srcdir)/config/invenio.conf $(top_builddir)/config/invenio-autotools.conf
+	$(PYTHON) inveniocfg.py --generate-config-py $(top_srcdir)/config/invenio.conf $(top_builddir)/config/invenio-autotools.conf > config.py
