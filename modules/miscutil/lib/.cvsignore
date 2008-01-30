@@ -3,10 +3,8 @@ Makefile.in
 z_*
 *.O
 *~
-messages.py
-dbquery.py
 config.py
-mailutils.py
+dbquery.py
 *.pyc
 *.shtml
 *.php
