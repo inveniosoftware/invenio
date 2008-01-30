@@ -1,62 +1,24 @@
-## -*- mode: sql; coding: utf-8; -*-
-## $Id$
-## Fills configuration tables with defaults.
+-- $Id$
 
-## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
-##
-## CDS Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## CDS Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+-- This file is part of CDS Invenio.
+-- Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+--
+-- CDS Invenio is free software; you can redistribute it and/or
+-- modify it under the terms of the GNU General Public License as
+-- published by the Free Software Foundation; either version 2 of the
+-- License, or (at your option) any later version.
+--
+-- CDS Invenio is distributed in the hope that it will be useful, but
+-- WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-- General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+-- 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-## read config variables:
-#include "config.wml"
-#include "configbis.wml"
+-- Fill Invenio configuration tables with defaults suitable for any site.
 
-## local defaults, i.e. WML config variables are to be used:
-INSERT INTO collection VALUES (1,"<CDSNAME>",NULL,NULL,NULL,NULL);
-<en>INSERT INTO collectionname VALUES (1,'en','ln',"<CDSNAMEINTL>");</en>
-<fr>INSERT INTO collectionname VALUES (1,'fr','ln',"<CDSNAMEINTL>");</fr>
-<de>INSERT INTO collectionname VALUES (1,'de','ln',"<CDSNAMEINTL>");</de>
-<es>INSERT INTO collectionname VALUES (1,'es','ln',"<CDSNAMEINTL>");</es>
-<ca>INSERT INTO collectionname VALUES (1,'ca','ln',"<CDSNAMEINTL>");</ca>
-<pl>INSERT INTO collectionname VALUES (1,'pl','ln',"<CDSNAMEINTL>");</pl>
-<pt>INSERT INTO collectionname VALUES (1,'pt','ln',"<CDSNAMEINTL>");</pt>
-<it>INSERT INTO collectionname VALUES (1,'it','ln',"<CDSNAMEINTL>");</it>
-<ja>INSERT INTO collectionname VALUES (1,'ja','ln',"<CDSNAMEINTL>");</ja>
-<ru>INSERT INTO collectionname VALUES (1,'ru','ln',"<CDSNAMEINTL>");</ru>
-<sk>INSERT INTO collectionname VALUES (1,'sk','ln',"<CDSNAMEINTL>");</sk>
-<cs>INSERT INTO collectionname VALUES (1,'cs','ln',"<CDSNAMEINTL>");</cs>
-<no>INSERT INTO collectionname VALUES (1,'no','ln',"<CDSNAMEINTL>");</no>
-<sv>INSERT INTO collectionname VALUES (1,'sv','ln',"<CDSNAMEINTL>");</sv>
-<el>INSERT INTO collectionname VALUES (1,'el','ln',"<CDSNAMEINTL>");</el>
-<uk>INSERT INTO collectionname VALUES (1,'uk','ln',"<CDSNAMEINTL>");</uk>
-<bg>INSERT INTO collectionname VALUES (1,'bg','ln',"<CDSNAMEINTL>");</bg>
-<lang:hr>INSERT INTO collectionname VALUES (1,'hr','ln',"<CDSNAMEINTL>");</lang:hr>
-<zh_CN>INSERT INTO collectionname VALUES (1,'zh_CN','ln',"<CDSNAMEINTL>");</zh_CN>
-<zh_TW>INSERT INTO collectionname VALUES (1,'zh_TW','ln',"<CDSNAMEINTL>");</zh_TW>
-
-INSERT INTO user VALUES (1, "<ADMINEMAIL>", AES_ENCRYPT(email, ''), 1, NULL, 'admin', '');
-INSERT INTO flxLINKTYPES VALUES ('AUTHOR_SEARCH','N','EXT','','');
-INSERT INTO flxLINKTYPES VALUES ('KEYWORD_SEARCH','N','EXT','','');
-INSERT INTO flxLINKTYPECONDITIONS VALUES ('AUTHOR_SEARCH',0,' \"\"=\"\"	','\"/search?f=author&p=\" urlencode($author)','EXT','','');
-INSERT INTO flxLINKTYPECONDITIONS VALUES ('KEYWORD_SEARCH',0,' \"\"=\"\"	','\"/search?f=keyword&p=\" urlencode($keyword)','EXT','','');
-INSERT INTO flxLINKTYPECONDITIONSACTIONS VALUES ('AUTHOR_SEARCH',0,0,'\"/search?f=author&p=\" urlencode($author)');
-INSERT INTO flxLINKTYPECONDITIONSACTIONS VALUES ('KEYWORD_SEARCH',0,0,'\"/search?f=keyword&p=\" urlencode($keyword)');
-INSERT INTO flxLINKTYPEPARAMS VALUES ('AUTHOR_SEARCH','AUTHOR',0);
-INSERT INTO flxLINKTYPEPARAMS VALUES ('KEYWORD_SEARCH','KEYWORD',0);
-
-## generally suitable defaults:
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (1,'wrd','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,1,100);
 INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'en','ln','word similarity');
@@ -85,7 +47,6 @@ INSERT INTO rnkCITATIONDATA VALUES (2,'reversedict','','');
 INSERT INTO rnkCITATIONDATA VALUES (3,'selfcitdict','','');
 INSERT INTO rnkCITATIONDATA VALUES (4,'selfcitedbydict','','');
 
-<protect>
 INSERT INTO field VALUES (1,'any field','anyfield');
 INSERT INTO field VALUES (2,'title','title');
 INSERT INTO field VALUES (3,'author','author');
@@ -1200,6 +1161,15 @@ INSERT INTO flxUDFPARAMS VALUES ('SPLIT_LINE','split_str',0);
 INSERT INTO flxUDFPARAMS VALUES ('SPLIT_LINE','str_len',1);
 INSERT INTO flxUSERS VALUES (1);
 
+INSERT INTO flxLINKTYPES VALUES ('AUTHOR_SEARCH','N','EXT','','');
+INSERT INTO flxLINKTYPES VALUES ('KEYWORD_SEARCH','N','EXT','','');
+INSERT INTO flxLINKTYPECONDITIONS VALUES ('AUTHOR_SEARCH',0,' \"\"=\"\"	','\"/search?f=author&p=\" urlencode($author)','EXT','','');
+INSERT INTO flxLINKTYPECONDITIONS VALUES ('KEYWORD_SEARCH',0,' \"\"=\"\"	','\"/search?f=keyword&p=\" urlencode($keyword)','EXT','','');
+INSERT INTO flxLINKTYPECONDITIONSACTIONS VALUES ('AUTHOR_SEARCH',0,0,'\"/search?f=author&p=\" urlencode($author)');
+INSERT INTO flxLINKTYPECONDITIONSACTIONS VALUES ('KEYWORD_SEARCH',0,0,'\"/search?f=keyword&p=\" urlencode($keyword)');
+INSERT INTO flxLINKTYPEPARAMS VALUES ('AUTHOR_SEARCH','AUTHOR',0);
+INSERT INTO flxLINKTYPEPARAMS VALUES ('KEYWORD_SEARCH','KEYWORD',0);
+
 INSERT INTO oaiARCHIVE VALUES (1,'','global','','','',NULL,'','','','','','','','','');
 
 INSERT INTO sbmACTION VALUES ('Submit New Record','SBI','running','1998-08-17','2001-08-08','','Submit New Record');
@@ -1239,7 +1209,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Update_Approval_DB',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Upload_Files','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Move_Files_to_Storage','');
 
-INSERT INTO sbmCHECKS VALUES ('AUCheck','function AUCheck(txt) {\r\n	var res=1;\r\n	tmp=txt.indexOf(\"\\015\");\r\n	while (tmp != -1) {\r\n		left=txt.substring(0,tmp);\r\n		right=txt.substring(tmp+2,txt.length);\r\n		txt=left + \"\\012\" + right;\r\n		tmp=txt.indexOf(\"\\015\");\r\n	}\r\n	tmp=txt.indexOf(\"\\012\");\r\n	if (tmp==-1){\r\n		line=txt;\r\n		txt=\'\';}\r\n	else{\r\n		line=txt.substring(0,tmp);\r\n		txt=txt.substring(tmp+1,txt.length);}\r\n	while (line != \"\"){\r\n		coma=line.indexOf(\",\");\r\n		left=line.substring(0,coma);\r\n		right=line.substring(coma+1,line.length);\r\n		coma2=right.indexOf(\",\");\r\n		space=right.indexOf(\" \");\r\n		if ((coma==-1)||(left==\"\")||(right==\"\")||(space!=0)||(coma2!=-1)){\r\n			res=0;\r\n			error_log=line;\r\n		}\r\n		tmp=txt.indexOf(\"\\012\");\r\n		if (tmp==-1){\r\n			line=txt;\r\n			txt=\'\';}\r\n		else{\r\n			line=txt.substring(0,tmp-1);\r\n			txt=txt.substring(tmp+1,txt.length);}\r\n	}\r\n	if (res == 0){\r\n		alert(\"This author name cannot be managed \\: \\012\\012\" + error_log + \" \\012\\012It is not in the required format!\\012Put one author per line and a comma (,) between the name and the firstname initial letters. \\012The name is going first, followed by the firstname initial letters.\\012Don\'t forget the whitespace after the comma!!!\\012\\012Example \\: Put\\012\\012Le Meur, J Y \\012Baron, T \\012\\012for\\012\\012Le Meur Jean-Yves & Baron Thomas.\");\r\n		return 0;\r\n	}	\r\n	return 1;	\r\n}','1998-08-18','0000-00-00','','');
+INSERT INTO sbmCHECKS VALUES ('AUCheck','function AUCheck(txt) {\r\n	var res=1;\r\n	tmp=txt.indexOf(\"\\015\");\r\n	while (tmp != -1) {\r\n		left=txt.substring(0,tmp);\r\n		right=txt.substring(tmp+2,txt.length);\r\n		txt=left + \"\\012\" + right;\r\n		tmp=txt.indexOf(\"\\015\");\r\n	}\r\n	tmp=txt.indexOf(\"\\012\");\r\n	if (tmp==-1){\r\n		line=txt;\r\n		txt=\'\';}\r\n	else{\r\n		line=txt.substring(0,tmp);\r\n		txt=txt.substring(tmp+1,txt.length);}\r\n	while (line != \"\"){\r\n		coma=line.indexOf(\",\");\r\n		left=line.substring(0,coma);\r\n		right=line.substring(coma+1,line.length);\r\n		coma2=right.indexOf(\",\");\r\n		space=right.indexOf(\" \");\r\n		if ((coma==-1)||(left==\"\")||(right==\"\")||(space!=0)||(coma2!=-1)){\r\n			res=0;\r\n			error_log=line;\r\n		}\r\n		tmp=txt.indexOf(\"\\012\");\r\n		if (tmp==-1){\r\n			line=txt;\r\n			txt=\'\';}\r\n		else{\r\n			line=txt.substring(0,tmp-1);\r\n			txt=txt.substring(tmp+1,txt.length);}\r\n	}\r\n	if (res == 0){\r\n		alert(\"This author name cannot be managed \\: \\012\\012\" + error_log + \" \\012\\012It is not in the required format!\\012Put one author per line and a comma (,) between the name and the firstname initial letters. \\012The name is going first, followed by the firstname initial letters.\\012Do not forget the whitespace after the comma!!!\\012\\012Example \\: Put\\012\\012Le Meur, J Y \\012Baron, T \\012\\012for\\012\\012Le Meur Jean-Yves & Baron Thomas.\");\r\n		return 0;\r\n	}	\r\n	return 1;	\r\n}','1998-08-18','0000-00-00','','');
 INSERT INTO sbmCHECKS VALUES ('DatCheckNew','function DatCheckNew(txt) {\r\n	var res=1;\r\n	if (txt.length != 10){res=0;}\r\n	if (txt.indexOf(\"/\") != 2){res=0;}\r\n	if (txt.lastIndexOf(\"/\") != 5){res=0;}\r\n	tmp=parseInt(txt.substring(0,2),10);\r\n	if ((tmp > 31)||(tmp < 1)||(isNaN(tmp))){res=0;}\r\n	tmp=parseInt(txt.substring(3,5),10);\r\n	if ((tmp > 12)||(tmp < 1)||(isNaN(tmp))){res=0;}\r\n	tmp=parseInt(txt.substring(6,10),10);\r\n	if ((tmp < 1)||(isNaN(tmp))){res=0;}\r\n	if (txt.length  == 0){res=1;}\r\n	if (res == 0){\r\n		alert(\"Please enter a correct Date \\012Format: dd/mm/yyyy\");\r\n		return 0;\r\n	}\r\n	return 1;	\r\n}','0000-00-00','0000-00-00','','');
 
 INSERT INTO sbmFORMATEXTENSION VALUES ('WORD','.doc');
@@ -1371,4 +1341,5 @@ INSERT INTO collectiondetailedpagetabs VALUES (8, 'statistics;comments;metadata'
 INSERT INTO collectiondetailedpagetabs VALUES (19, 'statistics;comments;metadata');
 INSERT INTO collectiondetailedpagetabs VALUES (18, 'statistics;comments;metadata');
 INSERT INTO collectiondetailedpagetabs VALUES (17, 'statistics;comments;metadata');
-</protect>
+
+-- end of file
