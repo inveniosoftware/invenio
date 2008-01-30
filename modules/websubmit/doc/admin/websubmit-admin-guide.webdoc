@@ -875,7 +875,7 @@
             &nbsp;<span class="guideheader">T</span>he treatment is organised in a succession of functions, each of
             which has its own input and output.<br/><br/>
             &nbsp;<span class="guideheader">T</span>he functions themselves are stored in separate files (one per
-            function) in the <LIBDIR>/python/invenio/websubmit_functions directory. A file containing a function MUST
+            function) in the /opt/cds-invenio/lib/python/invenio/websubmit_functions directory. A file containing a function MUST
             be named after the function name itself. For example, a function called "Move_to_Done" MUST be stored in a
             file called Move_to_Done.py. The case is important here.<br/><br/>
             &nbsp;<span class="guideheader">F</span>or a description of what should be inside the file, have a look to
@@ -913,9 +913,9 @@
             &nbsp;<span class="guideheader">Y</span>ou will then reach a page where you can add parameters to your
             new function.<br/><br/>
             &nbsp;<span class="guideheader">D</span>on't forget to add the function file inside the
-            <LIBDIR>/python/invenio/websubmit_functions directory and to name the file after the function. Functions must
+            /opt/cds-invenio/lib/python/invenio/websubmit_functions directory and to name the file after the function. Functions must
             be written in Python. Here is an example implementation of a function:<br/><br/>
-            <LIBDIR>/python/invenio/websubmit_functions/Get_Report_Number.py:</small>
+            /opt/cds-invenio/lib/python/invenio/websubmit_functions/Get_Report_Number.py:</small>
             <table border=0 width=75% bgcolor="eeeeff"><tr><td><small><pre><br/>
 def Get_Report_Number (parameters,curdir,form):
     global rn
@@ -2189,7 +2189,7 @@ def Get_Report_Number (parameters,curdir,form):
         function.
         <li>all running and completed submissions are stored here: /opt/cds-invenio/var/data/submit/storage.
         <li>all the document files attached to records are stored here: /opt/cds-invenio/var/data/files.
-        <li>all python functions used by webSubmit are stored here: <LIBDIR>/python/invenio/websubmit_functions
+        <li>all python functions used by webSubmit are stored here: /opt/cds-invenio/lib/python/invenio/websubmit_functions
     </blockquote>
     <a name="Q3"></a>
     <i>&nbsp;<span class="guideheader">Q</span>3. How is the documents archive organised?
