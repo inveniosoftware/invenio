@@ -17,12 +17,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-noinst_DATA=tabfill.sql
+sqldir = $(libdir)/sql/invenio
 
-FILESWML   = $(wildcard $(srcdir)/*.wml)
-EXTRA_DIST = $(FILESWML:$(srcdir)/%=%) tabcreate.sql tabdrop.sql tabbibclean.sql
+sql_DATA = tabcreate.sql tabdrop.sql tabfill.sql tabbibclean.sql
 
-CLEANFILES = $(noinst_DATA) *~ *.tmp tabfill.sql
+FILESWML   = $(sql_DATA)
 
-%: %.wml $(top_srcdir)/config/config.wml $(top_builddir)/config/configbis.wml 
-	$(WML) -o $@ $<
+EXTRA_DIST = $(sql_DATA)
+
+CLEANFILES = *~ *.tmp
