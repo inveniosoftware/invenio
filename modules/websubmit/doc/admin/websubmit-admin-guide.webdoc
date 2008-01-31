@@ -2177,7 +2177,7 @@ def Get_Report_Number (parameters,curdir,form):
     action is made through the manager. Is this possible?
     </i>
     <blockquote>
-        Yes, it is. Edit the config.wml file in CDS Invenio distribution, find the "ADMINEMAIL" definition and set it to your email
+        Yes, it is. Edit the invenio.conf file in CDS Invenio distribution, find the "ADMINEMAIL" definition and set it to your email
         address. You will then receive all the warning emails issued by the manager.
     </blockquote>
     <a name="Q2"></a>
@@ -2203,7 +2203,7 @@ def Get_Report_Number (parameters,curdir,form):
         The document id is used to determine where the files are stored. For example the files of document #14 will be
         stored here: /opt/cds-invenio/var/data/files/g0/14<br/><br/>
         The subdirectory g0 is used to split the documents accross the filesystem.  The CFG_FILE_DIR_SIZE variable from
-        config.wml determines how many documents will be stored under one subdirectory.<br/><br/>
+        invenio.conf determines how many documents will be stored under one subdirectory.<br/><br/>
         Several files may be stored under the same document directory: they are the different formats and versions of the
         same document. Versions are indicated by a string of the form ";1.0" concatenated to the name of the file.
     </blockquote>

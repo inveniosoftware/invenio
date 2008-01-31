@@ -329,7 +329,7 @@ shown the collection name in the default language of this
 installation.
 
 <p>Note also that the list of available languages depends on the
-compile-time configuration (see the general <code>config.wml</code>
+compile-time configuration (see the general <code>invenio.conf</code>
 file).
 
 <a name="3.4"></a><h3>3.4 Delete collection</h3>

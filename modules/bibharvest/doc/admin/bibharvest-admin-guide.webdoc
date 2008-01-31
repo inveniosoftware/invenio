@@ -264,7 +264,7 @@ Please note that the <code>oaiarchive</code> script can be scheduled via <code>B
 
 <p>
 
-Please see also config.wml for more fine configurations of the OAI Repository.
+Please see also invenio.conf for more fine configurations of the OAI Repository.
 
 
 <a name="3.2.2"></a><h4>3.2.2 Exposing entire metadata database</h4>
