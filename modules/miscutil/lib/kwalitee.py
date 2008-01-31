@@ -48,12 +48,7 @@ def get_list_of_python_code_files(modulesdir, modulename):
                                     (modulesdir, modulename))
     out.extend([filename.strip() for filename in pipe.readlines()])
     pipe.close()
-    # secondly, find out *.py.wml files:
-    (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name '*.py.wml'" % \
-                                     (modulesdir, modulename))
-    out.extend([filename.strip() for filename in pipe.readlines()])
-    pipe.close()
-    # thirdly, find out bin/*.in files:
+    # secondly, find out bin/*.in files:
     (dummy, pipe, dummy) = os.popen3("find %s/%s/bin/ -name '*.in'" % \
                                      (modulesdir, modulename))
     out.extend([filename.strip() for filename in pipe.readlines()])
