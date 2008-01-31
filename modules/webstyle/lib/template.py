@@ -53,8 +53,8 @@ CFG_WEBSTYLE_DEPRECATED_PARAMETERS = {}
 def load(module=''):
     """ Load and returns a template class, given a module name (like
         'websearch', 'webbasket',...).  The module corresponding to
-        the currently selected template model (see config.wml,
-        variable CFG_TEMPLATE_SKIN) is tried first. In case it does
+        the currently selected template model (see invenio.conf,
+        variable CFG_WEBSTYLE_TEMPLATE_SKIN) is tried first. In case it does
         not exist, it returns the default template for that module.
     """
     local = {}

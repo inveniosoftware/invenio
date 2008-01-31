@@ -86,7 +86,7 @@ pattern_tag = r'''
     (\s*-->)            #end tag
     '''
 
-# List of available tags in wml, and the pattern to find it
+# List of available tags in webdoc, and the pattern to find it
 pattern_tags = {'WebDoc-Page-Title': '',
                 'WebDoc-Page-Navtrail': '',
                 'WebDoc-Page-Description': '',
