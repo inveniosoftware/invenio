@@ -21,8 +21,6 @@ sqldir = $(libdir)/sql/invenio
 
 sql_DATA = tabcreate.sql tabdrop.sql tabfill.sql tabbibclean.sql
 
-FILESWML   = $(sql_DATA)
-
 EXTRA_DIST = $(sql_DATA)
 
 CLEANFILES = *~ *.tmp
