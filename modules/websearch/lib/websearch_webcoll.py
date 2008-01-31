@@ -779,7 +779,7 @@ def main():
             authorization_msg="WebColl Task Submission",
             description="""Description: webcoll updates the collection cache
     (record universe for a given collection plus web page elements)
-    based on WML and DB configuration parameters.
+    based on invenio.conf and DB configuration parameters.
     If the collection name is passed as the second argument, it'll update
     this collection only.  If the collection name is immediately followed
     by a plus sign, it will also update all its desdendants.  The
