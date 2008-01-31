@@ -3,4 +3,4 @@ Makefile.in
 z_*
 *.O
 *~
-configbis.wml
+config/invenio-autotools.conf
