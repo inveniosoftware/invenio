@@ -39,8 +39,8 @@ class WebSessionYourSettingsTest(unittest.TestCase):
     """Check WebSession web pages whether they are up or not."""
 
     def tearDown(self):
-        run_sql('DELETE FROM user WHERE email="foo@bar.org"')
-        run_sql('DELETE FROM user WHERE email="FOO@bar.org"')
+        run_sql('DELETE FROM user WHERE email="foo@cds.cern.ch"')
+        run_sql('DELETE FROM user WHERE email="FOO@cds.cern.ch"')
 
     def test_password_setting(self):
         """webuser - check password settings"""
@@ -124,7 +124,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
         browser = Browser()
         browser.open(sweburl + "/youraccount/register")
         browser.select_form(nr=0)
-        browser['p_email'] = 'foo@bar.org'
+        browser['p_email'] = 'foo@cds.cern.ch'
         browser['p_nickname'] = 'foobar'
         browser['p_pw'] = ''
         browser['p_pw2'] = ''
@@ -142,7 +142,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
         browser = Browser()
         browser.open(sweburl + "/youraccount/register")
         browser.select_form(nr=0)
-        browser['p_email'] = 'foo@bar.org'
+        browser['p_email'] = 'foo@cds.cern.ch'
         browser['p_nickname'] = 'foobar2'
         browser['p_pw'] = ''
         browser['p_pw2'] = ''
@@ -159,7 +159,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
         browser = Browser()
         browser.open(sweburl + "/youraccount/register")
         browser.select_form(nr=0)
-        browser['p_email'] = 'FOO@bar.org'
+        browser['p_email'] = 'FOO@cds.cern.ch'
         browser['p_nickname'] = 'foobar2'
         browser['p_pw'] = ''
         browser['p_pw2'] = ''
