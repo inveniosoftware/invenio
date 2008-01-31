@@ -17,7 +17,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Creates CDS Invenio collection specific pages, using WML and MySQL configuration tables."""
+"""Create CDS Invenio collection cache."""
 
 __revision__ = "$Id$"
 
