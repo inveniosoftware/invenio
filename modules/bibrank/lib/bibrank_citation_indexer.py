@@ -319,11 +319,18 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
             p = refnumber
             f = 'reportnumber'
             rec_id = get_recids_matching_query(p, f)
-            if rec_id:
+            if rec_id and rec_id[0]:
                 if result.has_key(rec_id[0]):
                     result[rec_id[0]] += 1
-                citation_list[rec_id[0]].append(recid)
-                reference_list[recid].append(rec_id[0])
+                # Citation list should have rec_id[0] but check anyway
+                if citation_list.has_key(rec_id[0]):
+                    citation_list[rec_id[0]].append(recid)
+                else:
+                    citation_list[rec_id[0]] = [recid]
+		if reference_list.has_key(recid):
+	            reference_list[recid].append(rec_id[0])
+                else:
+		    reference_list[recid] = [rec_id[0]]
     t2 = os.times()[4]
     for recid, refss in d_references_s.iteritems():
         for refs in refss:
@@ -342,9 +349,13 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
             recid_list = get_recids_matching_query(p, pubrefntag)
             if recid_list:
                 for recid in recid_list:
+		    if not citation_list.has_key(rec_id):
+			citation_list[rec_id] = []
                     if not recid in citation_list[rec_id]:
                         result[rec_id] += 1
                         citation_list[rec_id].append(recid)
+		    if not reference_list.has_key(recid):
+			reference_list[recid] = []
                     if not rec_id in reference_list[recid]:
                         reference_list[recid].append(rec_id)
     t4 = os.times()[4]
