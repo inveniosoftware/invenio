@@ -2609,7 +2609,8 @@ CREATE TABLE IF NOT EXISTS user_msgMESSAGE (
   KEY id_msgMESSAGE (id_msgMESSAGE)
 ) TYPE=MyISAM;
 
---tables for WebComment
+-- tables for WebComment
+
 CREATE TABLE IF NOT EXISTS cmtRECORDCOMMENT (
   id int(15) unsigned NOT NULL auto_increment,
   id_bibrec int(15) unsigned NOT NULL default '0',
