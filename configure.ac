@@ -3,7 +3,7 @@
 ## Note: If you change this file, please run "autoreconf" to regenerate the "configure" script.
 
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
