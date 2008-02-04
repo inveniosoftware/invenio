@@ -27,7 +27,7 @@ __revision__ = \
 __lastupdated__ = """$Date$"""
 
 import cgi
-from invenio.config import weburl, cdslang, cdsname, cdsnameintl
+from invenio.config import weburl, cdslang, cdsname, cdsnameintl, cdslangs
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid
@@ -42,6 +42,11 @@ class WebInterfaceDocumentationPages(WebInterfaceDirectory):
         """Constructor."""
         self.webdocname = webdocname
         self.categ = categ
+        self.legacy_urls_mappings = {'tips': 'search-tips',
+                                     'guide': 'search-guide',
+                                     'submit': 'submit-guide',
+                                     'index': '',
+                                     '': ''}
 
     def _lookup(self, component, path):
         """This handler parses dynamic URLs (/help/component)."""
@@ -55,24 +60,61 @@ class WebInterfaceDocumentationPages(WebInterfaceDirectory):
                 webdocname = 'hacking' # /help/hacking/ use
                                        # hacking.webdoc
             return WebInterfaceDocumentationPages(webdocname, component), []
-        elif len(path) == 0:
-            # Accept any other 'leaf' pages ('help' pages)
+        elif len(path) == 0 and \
+                 component != 'search' and \
+                 component != 'submit':
+            # Accept any other 'leaf' pages ('help' pages),
+            # excepted /help/search/ and /help/submit/ which are legacy urls
             if component == '':
                 component = 'help-central'
             return WebInterfaceDocumentationPages(component), []
         else:
-            # This is a wrong url eg. /help/help-central/foo
+            # This is maybe a wrong url eg. /help/help-central/foo
+            # or a legacy url eg. /help/search/tips.en.html
+            #                     /help/search/
+            if ((component == 'submit' or \
+                   component == 'search') and path[0] == '') or \
+                   path[0].endswith('.html'):
+                # Legacy url?
+                return WebInterfaceDocumentationPages(), []
+            # Wrong url
             return None, []
 
     def __call__(self, req, form):
         """Serve webdoc page in the given language."""
         argd = wash_urlargd(form, {'ln': (str, cdslang)})
         if self.webdocname in ['admin', 'hacking', ''] and \
-               self.categ == 'help':
+               self.categ == 'help' and \
+               not (req.uri.endswith('.html') or \
+                    req.uri.endswith('/help/search/') or \
+                    req.uri.endswith('/help/submit/')):
             # Eg. /help/hacking -> /help/hacking/
             #     /help         -> /help/
             ln_link = (argd['ln'] != cdslang and '?ln=' + argd['ln']) or ''
             redirect_to_url(req, req.uri + "/" + ln_link)
+        elif req.uri.endswith('.html') or \
+                 req.uri.endswith('/help/search/') or \
+                 req.uri.endswith('/help/submit/'):
+            # Legacy urls
+            path = req.uri.split('/')
+            parts = path[-1].split('.')
+            title = parts[0]
+            ln = cdslang
+            if len(parts) > 1 and parts[1] in cdslangs:
+                ln = parts[1]
+            category = path[-2]
+            webdocname = self.legacy_urls_mappings.get(title, '')
+            if category == 'submit':
+                webdocname = 'submit-guide'
+                category = ''
+            elif category == 'help' or category == 'search':
+                category = ''
+            if category != '':
+                category += '/'
+
+            url = weburl + '/help/' + category  + webdocname
+            ln_link = (ln != cdslang and '?ln=' + ln) or ''
+            redirect_to_url(req, url + ln_link)
         else:
             return display_webdoc_page(self.webdocname, categ=self.categ, ln=argd['ln'], req=req)
 
