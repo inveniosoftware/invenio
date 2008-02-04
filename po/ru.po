@@ -1906,7 +1906,7 @@ msgstr "Представить корзины"
 #: modules/websession/lib/websession_templates.py:409
 #: modules/websession/lib/websession_templates.py:548
 msgid "Your Baskets"
-msgstr "Вашы корзины"
+msgstr "Ваши корзины"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:327
 msgid "Add records to baskets"
@@ -2421,7 +2421,7 @@ msgstr ""
 #: modules/webmessage/lib/webmessage_webinterface.py:280
 #: modules/websession/lib/websession_templates.py:547
 msgid "Your Messages"
-msgstr "Вашы сообщения"
+msgstr "Ваши сообщения"
 
 #: modules/webmessage/lib/webmessage_templates.py:88
 msgid "Subject"
@@ -3262,7 +3262,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:396
 #: modules/websession/lib/websession_webinterface.py:123
 msgid "Your Settings"
-msgstr "Вашы настройки"
+msgstr "Ваши настройки"
 
 #: modules/websession/lib/websession_templates.py:397
 msgid ""
@@ -3273,7 +3273,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:407
 #: modules/websession/lib/websession_templates.py:550
 msgid "Your Searches"
-msgstr "Вашы поиски"
+msgstr "Ваши поиски"
 
 #: modules/websession/lib/websession_templates.py:408
 msgid "View all the searches you performed during the last 30 days."
@@ -3287,7 +3287,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:418
 msgid "Your Alerts"
-msgstr "Вашы тревоги"
+msgstr "Ваши тревоги"
 
 #: modules/websession/lib/websession_templates.py:419
 msgid ""
@@ -3297,7 +3297,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:428
 msgid "Your Loans"
-msgstr "Вашы ссуды"
+msgstr "Ваши ссуды"
 
 #: modules/websession/lib/websession_templates.py:429
 msgid ""
@@ -3321,7 +3321,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:549
 msgid "Your Alert Searches"
-msgstr "Поиск вашых тревог"
+msgstr "Поиск ваших тревог"
 
 #: modules/websession/lib/websession_templates.py:551
 #, python-format
@@ -3334,7 +3334,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:1941
 #: modules/websession/lib/websession_webinterface.py:673
 msgid "Your Groups"
-msgstr "Вашы группы"
+msgstr "Ваши группы"
 
 #: modules/websession/lib/websession_templates.py:555
 #, python-format
@@ -3346,7 +3346,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:558
 #: modules/websubmit/web/yoursubmissions.py:175
 msgid "Your Submissions"
-msgstr "Вашы подачи"
+msgstr "Ваши подачи"
 
 #: modules/websession/lib/websession_templates.py:559
 #, python-format
@@ -3358,7 +3358,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:562
 #: modules/websubmit/web/yourapprovals.py:94
 msgid "Your Approvals"
-msgstr "Вашы одобрения"
+msgstr "Ваши одобрения"
 
 #: modules/websession/lib/websession_templates.py:563
 #: modules/websession/lib/websession_webinterface.py:422
@@ -4852,7 +4852,7 @@ msgstr ""
 #~ msgstr "подробный список"
 
 #~ msgid "your searches"
-#~ msgstr "Вашы поиски"
+#~ msgstr "Ваши поиски"
 
 #~ msgid "%i personal baskets"
 #~ msgstr "%i персональных корзин"
