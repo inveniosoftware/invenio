@@ -37,11 +37,12 @@ except ImportError:
 # Eg. {'webstyle': {'tmpl_records_format_other':"Replaced by .."}}
 CFG_WEBSTYLE_DEPRECATED_FUNCTIONS = {'webstyle': \
                             {'tmpl_records_format_other': "Replaced by " + \
-                             "tmpl_detailed_record_metadata(..), " + \
-                             "tmpl_detailed_record_references(..), " + \
-                             "tmpl_get_comments(..), " + \
-                             "tmpl_detailed_record_statistics(..), " + \
-                             "tmpl_filelist(..), tmpl_mini_review(..)," + \
+                             "websearch_templates.tmpl_detailed_record_metadata(..), " + \
+                             "websearch_templates.tmpl_detailed_record_references(..), " + \
+                             "websearch_templates.tmpl_detailed_record_statistics(..), " + \
+                             "webcomment_templates.tmpl_get_comments(..), " + \
+                             "webcomment_templates.tmpl_mini_review(..)," + \
+                             "websubmit_templates.tmpl_filelist(..) and " + \
                              "HDFILE + HDACT + HDREF output formats"
                              }
                             }
