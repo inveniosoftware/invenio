@@ -556,4 +556,4 @@ $ ./bibrankgkb -v9
 </pre>
 
 <a name="ainf"></a><h2>7. Additional Information</h2>
-<a href="<WEBURL>/hacking/bibrank/">BibRank Internals</a>
+<a href="<WEBURL>/help/hacking/bibrank-internals">BibRank Internals</a>
