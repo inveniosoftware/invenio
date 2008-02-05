@@ -1103,14 +1103,14 @@ def wash_index_term(term, max_char_length=50):
     Note that MAX_CHAR_LENGTH corresponds to the length of the term
     column in idxINDEX* tables.
     """
-    washed_term = term.lower()
+    washed_term = unicode(term, 'utf-8').lower()
     if len(washed_term) <= max_char_length:
         # no need to truncate the term, because it will fit
         # nicely even if it uses four-byte UTF-8 characters
-        return washed_term
+        return washed_term.encode('utf-8')
     else:
         # truncate the term in a safe position:
-        return unicode(washed_term, 'utf-8')[:max_char_length].encode('utf-8')
+        return washed_term[:max_char_length].encode('utf-8')
 
 def wash_pattern(p):
     """Wash pattern passed by URL. Check for sanity of the wildcard by
