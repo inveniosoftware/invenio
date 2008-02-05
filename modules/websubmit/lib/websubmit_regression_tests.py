@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -33,12 +33,12 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
     """Check WebSubmit web pages whether they are up or not."""
 
     def test_submission_pages_availability(self):
-        """websubmit - availability of submission pages""" 
+        """websubmit - availability of submission pages"""
 
         baseurl = weburl + '/submit/'
 
         _exports = ['', 'direct']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -47,13 +47,13 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
         return
 
     def test_publiline_pages_availability(self):
-        """websubmit - availability of approval pages""" 
+        """websubmit - availability of approval pages"""
 
         baseurl = weburl
 
-        _exports = ['/approve.py', '/publiline.py', 
+        _exports = ['/approve.py', '/publiline.py',
                     '/yourapprovals.py']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -62,12 +62,12 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
         return
 
     def test_your_submissions_pages_availability(self):
-        """websubmit - availability of Your Submissions pages""" 
+        """websubmit - availability of Your Submissions pages"""
 
         baseurl = weburl
 
         _exports = ['/yoursubmissions.py']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -75,7 +75,32 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-test_suite = make_test_suite(WebSubmitWebPagesAvailabilityTest)
+    def test_help_page_availability(self):
+        """websubmit - availability of WebSubmit help page"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/help/submit-guide',
+                                               expected_text="Submit Guide"))
+
+class WebSubmitTestLegacyURLs(unittest.TestCase):
+    """ Check that the application still responds to legacy URLs"""
+
+    def test_legacy_help_page_link(self):
+        """websubmit - legacy Submit Guide page link"""
+	self.assertEqual([],
+                         test_web_page_content(weburl + '/help/submit',
+                                               expected_text="Submit Guide"))
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/help/submit/',
+                                               expected_text="Submit Guide"))
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/help/submit/index.en.html',
+                                              expected_text="Submit Guide"))
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/help/submit/access.en.html',
+                                              expected_text="Submit Guide"))
+
+test_suite = make_test_suite(WebSubmitWebPagesAvailabilityTest,
+                             WebSubmitTestLegacyURLs)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
