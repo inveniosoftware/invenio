@@ -73,7 +73,7 @@ class WebInterfaceDocumentationPages(WebInterfaceDirectory):
             # or a legacy url eg. /help/search/tips.en.html
             #                     /help/search/
             if ((component == 'submit' or \
-                   component == 'search') and path[0] == '') or \
+                   component == 'search') and (len(path) == 0 or path[0] == '')) or \
                    path[0].endswith('.html'):
                 # Legacy url?
                 return WebInterfaceDocumentationPages(), []
