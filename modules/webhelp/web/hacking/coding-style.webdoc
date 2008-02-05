@@ -62,7 +62,7 @@ A brief description of things we strive at, more or less unsuccessfully.
    the existing code surely do not fulfil them here and there.
    The code indentation is done via spaces only, please do not use
    tabs.  One tab counts as four spaces.  Emacs users can look into
-   our <a href="cdsware.el">cdsware.el</a> for inspiration.
+   our <a href="<WEBURL>/hacking/cdsware.el">cdsware.el</a> for inspiration.
 
    All the Python code should be extensively documented via
    docstrings, so you can always run pydoc file.py to peruse the
