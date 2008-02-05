@@ -1337,9 +1337,9 @@ INSERT INTO accROLE_accACTION_accARGUMENT VALUES (2,5, 1, 1);
 INSERT INTO accROLE_accACTION_accARGUMENT VALUES (3,7, 0, 0);
 INSERT INTO accROLE_accACTION_accARGUMENT VALUES (1,9, 0, 0);
 
-INSERT INTO collectiondetailedpagetabs VALUES (8, 'statistics;comments;metadata');
-INSERT INTO collectiondetailedpagetabs VALUES (19, 'statistics;comments;metadata');
-INSERT INTO collectiondetailedpagetabs VALUES (18, 'statistics;comments;metadata');
-INSERT INTO collectiondetailedpagetabs VALUES (17, 'statistics;comments;metadata');
+INSERT INTO collectiondetailedpagetabs VALUES (8, 'usage;comments;metadata');
+INSERT INTO collectiondetailedpagetabs VALUES (19, 'usage;comments;metadata');
+INSERT INTO collectiondetailedpagetabs VALUES (18, 'usage;comments;metadata');
+INSERT INTO collectiondetailedpagetabs VALUES (17, 'usage;comments;metadata');
 
 -- end of file
