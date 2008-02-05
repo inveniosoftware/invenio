@@ -42,7 +42,7 @@ recurrence of specific terms, taken from a controlled vocabulary. A
 controlled vocabulary is a thesaurus of all the terms that are
 relevant in a specific context.  When a context is defined by a
 discipline or branch of knowledge then the vocabulary is said to be a
-<em>subject thesaurus</em>. Various existing subject thesauri can be found <a href="http://www.lub.lu.se/metadata/subject-help.html">here</a>.</p>
+<em>subject thesaurus</em>. Various existing subject thesauri can be found <a href="http://www.fbi.fh-koeln.de/institut/labor/Bir/thesauri_new/thesen.htm">here</a>.</p>
 
 <p> A subject thesarus can be expressed in several different
 formats. Different institutions/disciplines have developed different
@@ -108,7 +108,7 @@ aid the building of a semantic thesaurus can be found at the <a href="http://www
 website</a>. Furthermore, BibClassify can function on top
 of an extended version of SKOS, which includes special elements such
 as keychains, composite keywords and special annotations. The
-extension of the SKOS language is documented in the <a href="<WEBURL>/hacking/bibclassify/">hacking guide</a>.</p>
+extension of the SKOS language is documented in the <a href="<WEBURL>/help/hacking/bibclassify/">hacking guide</a>.</p>
 
 <a name="1.2"></a><h3>1.1 Keyword extraction</h3>
 
@@ -126,7 +126,7 @@ described in 1.1, has been retained only for historical and
 demonstrative reasons.</p>
 
 <p> A detailed account of the phrase matching mechanisms used by
-BibClassify is included in the <a href="<WEBURL>/hacking/bibclassify/">hacking guide</a>.</p>
+BibClassify is included in the <a href="<WEBURL>/help/hacking/bibclassify/">hacking guide</a>.</p>
 
 
 <a name="2"></a><h2>2. Running BibClassify</h2>
@@ -182,7 +182,7 @@ This parameter sets the number of output (single) keywords that will be output (
 This parameter sets the maximum number of single keywords that will make part of
 the pool of composite candidates, i.e. the single keywords that occur in the vicinity creating sequences of keywords.
 (default is 70). Tweaking with this value can have drastic effects on
-the generated results. Please check the <a href="<WEBURL>/hacking/bibclassify/">hacking guide</a> to find out more.</li>
+the generated results. Please check the <a href="<WEBURL>/help/hacking/bibclassify/">hacking guide</a> to find out more.</li>
 </ul>
 
 

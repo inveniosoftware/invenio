@@ -735,7 +735,7 @@ Notice that the call uses (almost) the filename of your element. To find out whi
 <li><code>kb(kb, string, default="")</code>: Returns the value of the <code>string</code> in the knowledge base <code>kb</code>. If kb does not exist or string does not exist in kb, returns <code>default</code> string.</li>
 </ul>
 You can also get access to other information through <code>bfo</code>, such as the language in which the formatting should occur with <code>bfo.lang</code>. To learn more
-about the possibilities offered by the <code>bfo</code>, read the <a href="<WEBURL>//hacking/bibformat/api.html">BibFormat APIs</a>
+about the possibilities offered by the <code>bfo</code>, read the <a href="<WEBURL>/help/hacking/bibformat-api">BibFormat APIs</a>
 </p>
         <p><b>Method 2: Use module <code>BibRecord</code></b>:<br/>
 
@@ -946,7 +946,7 @@ launch:
 it will process all the records that have been modified since the last
 run of BibReformat, as well as all newly inputted records. This is
 suitable for running BibReformat in a periodical daemon mode via
-BibSched. See our <a href="http://pcdh23.cern.ch/admin/howto/run.html">HOWTO Run
+BibSched. See our <a href="<WEBURL>/help/admin/howto-run">HOWTO Run
 Your CDS Invenio Installation</a> guide for more information.</p>
 
 <h2><a name="Appendix">7. Appendix</a></h2>
