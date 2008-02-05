@@ -3201,7 +3201,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=cdslang):
             'references': {'label': _('References'),       'visible': False, 'enabled': True, 'order': 2},
             'citations' : {'label': _('Citations'),        'visible': False, 'enabled': True, 'order': 3},
             'comments'  : {'label': _('Discussion'),       'visible': False, 'enabled': True, 'order': 4},
-            'statistics': {'label': _('Usage statistics'), 'visible': False, 'enabled': True, 'order': 5},
+            'usage'     : {'label': _('Usage statistics'), 'visible': False, 'enabled': True, 'order': 5},
             'files'     : {'label': _('Fulltext'),         'visible': False, 'enabled': True, 'order': 6}
             }
 

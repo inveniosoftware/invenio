@@ -651,7 +651,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
                 navtrail += ' &gt; <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
                             (weburl, recID, title_message, format_name)
             else:
-                # Discussion, statistics, etc. tabs
+                # Discussion, citations, etc. tabs
                 tab_label = get_detailed_page_tabs(cc, ln=ln)[tab]['label']
                 navtrail += ' &gt; <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
                             (weburl, recID, title_message, _(tab_label))
@@ -2673,7 +2673,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
 
                     content = ''
                     # load content
-                    if tab == 'statistics':
+                    if tab == 'usage':
                         r = calculate_reading_similarity_list(recIDs[irec], "downloads")
                         downloadsimilarity = None
                         downloadhistory = None

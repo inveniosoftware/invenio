@@ -127,7 +127,7 @@ class WebInterfaceAuthorPage(WebInterfaceDirectory):
 class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /record/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'statistics',
+    _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations']
 
     #_exports.extend(output_formats)
@@ -141,7 +141,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.files = WebInterfaceFilesPages(self.recid)
         self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
         self.comments = WebInterfaceCommentsPages(self.recid)
-        self.statistics = self
+        self.usage = self
         self.references = self
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
@@ -196,7 +196,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'statistics',
+    _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations']
 
     #_exports.extend(output_formats)
@@ -209,7 +209,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.files = WebInterfaceFilesPages(self.recid)
         self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
         self.comments = WebInterfaceCommentsPages(self.recid)
-        self.statistics = self
+        self.usage = self
         self.references = self
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
@@ -484,7 +484,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             tab = ''
             try:
                 if path[1] in ['', 'files', 'reviews', 'comments',
-                               'statistics', 'references', 'citations']:
+                               'usage', 'references', 'citations']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''
