@@ -21265,10 +21265,6 @@
       <subfield code="v">14</subfield>
       <subfield code="y">1999</subfield>
    </datafield>
-   <datafield tag="856" ind1="4" ind2="">
-      <subfield code="u">http://preprints.cern.ch/cgi-bin/setlink?base=preprint&amp;categ=hep-th&amp;id=9809057</subfield>
-      <subfield code="y">Access to fulltext document</subfield>
-   </datafield>
    <datafield tag="859" ind1="" ind2="">
       <subfield code="f">polyakov@puhep1.princeton.edu</subfield>
    </datafield>
@@ -21293,6 +21289,9 @@
    </datafield>
    <datafield tag="980" ind1="" ind2="">
       <subfield code="a">ARTICLE</subfield>
+   </datafield>
+   <datafield tag="FFT" ind1=" " ind2=" ">
+       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/9809/9809057.pdf</subfield>
    </datafield>
 </record>
 
