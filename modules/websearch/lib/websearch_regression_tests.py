@@ -1026,7 +1026,7 @@ class WebSearchUnicodeQueryTest(unittest.TestCase):
         """websearch - Unicode word query, not found term"""
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=title%3A%CE%99%CE%B8',
-                                               expected_text="Ιθάκη"))
+                                               expected_text="ιθάκη"))
 
     def test_unicode_exact_phrase_query(self):
         """websearch - Unicode exact phrase query"""
