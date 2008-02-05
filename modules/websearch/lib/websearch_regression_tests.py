@@ -894,7 +894,7 @@ class WebSearchSortResultsTest(unittest.TestCase):
         """websearch - search results sorting, default method"""
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=cern&rg=1',
-                                               expected_text="[hep-th/9611103]"))
+                                               expected_text="[hep-th/9809057]"))
 
     def test_sort_results_ascending(self):
         """websearch - search results sorting, ascending field"""
