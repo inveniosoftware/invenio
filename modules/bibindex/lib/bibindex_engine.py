@@ -1456,14 +1456,15 @@ def task_run_core():
         _last_word_table = None
         return True
 
-    if task_get_option("cmd") == "check":
-        wordTables = get_word_tables(task_get_option("windex"))
-        for index_id, index_tags in wordTables.iteritems():
-            wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
-            _last_word_table = wordTable
-            wordTable.report_on_table_consistency()
-        _last_word_table = None
-        return True
+    if False: # FIXME: remove when idxPHRASE will be plugged to search_engine
+        if task_get_option("cmd") == "check":
+            wordTables = get_word_tables(task_get_option("windex"))
+            for index_id, index_tags in wordTables.iteritems():
+                wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
+                _last_word_table = wordTable
+                wordTable.report_on_table_consistency()
+            _last_word_table = None
+            return True
 
     if task_get_option("reindex"):
         for index_name in task_get_option("windex").split(','):
@@ -1522,57 +1523,58 @@ def task_run_core():
         wordTable.report_on_table_consistency()
 
 
-    # Let's work on phrases now
-    wordTables = get_word_tables(task_get_option("windex"))
-    for index_id, index_tags in wordTables.iteritems():
-        wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
-        _last_word_table = wordTable
-        wordTable.report_on_table_consistency()
-        try:
-            if task_get_option("cmd") == "del":
-                if task_get_option("id"):
-                    wordTable.del_recIDs(task_get_option("id"))
-                elif task_get_option("collection"):
-                    l_of_colls = task_get_option("collection").split(",")
-                    recIDs = perform_request_search(c=l_of_colls)
-                    recIDs_range = []
-                    for recID in recIDs:
-                        recIDs_range.append([recID,recID])
-                    wordTable.del_recIDs(recIDs_range)
+    if False: # FIXME: remove when idxPHRASE will be plugged to search_engine
+        # Let's work on phrases now
+        wordTables = get_word_tables(task_get_option("windex"))
+        for index_id, index_tags in wordTables.iteritems():
+            wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
+            _last_word_table = wordTable
+            wordTable.report_on_table_consistency()
+            try:
+                if task_get_option("cmd") == "del":
+                    if task_get_option("id"):
+                        wordTable.del_recIDs(task_get_option("id"))
+                    elif task_get_option("collection"):
+                        l_of_colls = task_get_option("collection").split(",")
+                        recIDs = perform_request_search(c=l_of_colls)
+                        recIDs_range = []
+                        for recID in recIDs:
+                            recIDs_range.append([recID,recID])
+                        wordTable.del_recIDs(recIDs_range)
+                    else:
+                        write_message("Missing IDs of records to delete from index %s." % wordTable.tablename,
+                                    sys.stderr)
+                        raise StandardError
+                elif task_get_option("cmd") == "add":
+                    if task_get_option("id"):
+                        wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
+                    elif task_get_option("collection"):
+                        l_of_colls = task_get_option("collection").split(",")
+                        recIDs = perform_request_search(c=l_of_colls)
+                        recIDs_range = []
+                        for recID in recIDs:
+                            recIDs_range.append([recID,recID])
+                        wordTable.add_recIDs(recIDs_range, task_get_option("flush"))
+                    else:
+                        wordTable.add_recIDs_by_date(task_get_option("modified"), task_get_option("flush"))
+                        # only update last_updated if run via automatic mode:
+                        wordTable.update_last_updated(task_get_task_param('task_starting_time'))
+                elif task_get_option("cmd") == "repair":
+                    wordTable.repair(task_get_option("flush"))
                 else:
-                    write_message("Missing IDs of records to delete from index %s." % wordTable.tablename,
-                                sys.stderr)
+                    write_message("Invalid command found processing %s" % \
+                        wordTable.tablename, sys.stderr)
                     raise StandardError
-            elif task_get_option("cmd") == "add":
-                if task_get_option("id"):
-                    wordTable.add_recIDs(task_get_option("id"), task_get_option("flush"))
-                elif task_get_option("collection"):
-                    l_of_colls = task_get_option("collection").split(",")
-                    recIDs = perform_request_search(c=l_of_colls)
-                    recIDs_range = []
-                    for recID in recIDs:
-                        recIDs_range.append([recID,recID])
-                    wordTable.add_recIDs(recIDs_range, task_get_option("flush"))
-                else:
-                    wordTable.add_recIDs_by_date(task_get_option("modified"), task_get_option("flush"))
-                    # only update last_updated if run via automatic mode:
-                    wordTable.update_last_updated(task_get_task_param('task_starting_time'))
-            elif task_get_option("cmd") == "repair":
-                wordTable.repair(task_get_option("flush"))
-            else:
-                write_message("Invalid command found processing %s" % \
-                    wordTable.tablename, sys.stderr)
-                raise StandardError
-        except StandardError, e:
-            write_message("Exception caught: %s" % e, sys.stderr)
-            if task_get_option("verbose") >= 9:
-                traceback.print_tb(sys.exc_info()[2])
-            task_update_status("ERROR")
-            if _last_word_table:
-                _last_word_table.put_into_db()
-            sys.exit(1)
+            except StandardError, e:
+                write_message("Exception caught: %s" % e, sys.stderr)
+                if task_get_option("verbose") >= 9:
+                    traceback.print_tb(sys.exc_info()[2])
+                task_update_status("ERROR")
+                if _last_word_table:
+                    _last_word_table.put_into_db()
+                sys.exit(1)
 
-        wordTable.report_on_table_consistency()
+            wordTable.report_on_table_consistency()
 
     _last_word_table = None
     return True
