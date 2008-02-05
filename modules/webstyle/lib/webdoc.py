@@ -206,9 +206,51 @@ def get_webdoc_parts(webdoc,
                 webdoc_cached_part_path = get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, 'en', part)
 
             if webdoc_cached_part_path is not None:
-                webdoc_cached_part = file(webdoc_cached_part_path, 'r').read()
-                html_parts[part] = webdoc_cached_part
+                try:
+                    webdoc_cached_part = file(webdoc_cached_part_path, 'r').read()
+                    html_parts[part] = webdoc_cached_part
+                except IOError:
+                    # Could not read cache file. Generate on-the-fly
+                    (webdoc_source_path, \
+                     webdoc_cache_dir, \
+                     webdoc_name,\
+                     webdoc_source_modification_date, \
+                     webdoc_cache_modification_date) = get_webdoc_info(webdoc)
+                    webdoc_source = file(webdoc_source_path, 'r').read()
+                    htmls = transform(webdoc_source, languages=[ln])
+                    (lang, body, title, keywords, \
+                     navtrail, lastupdated, description) = htmls[-1]
+                    html_parts =  {'body': body or '',
+                                   'title': title or '',
+                                   'keywords': keywords or '',
+                                   'navtrail': navtrail or '',
+                                   'lastupdated': lastupdated or '',
+                                   'description': description or ''}
                 break
+            else:
+                # Could not find/read the folder where cache should
+                # be. Generate on-the-fly
+                (webdoc_source_path, \
+                 webdoc_cache_dir, \
+                 webdoc_name,\
+                 webdoc_source_modification_date, \
+                 webdoc_cache_modification_date) = get_webdoc_info(webdoc)
+                if webdoc_source_path is not None:
+                    try:
+                        webdoc_source = file(webdoc_source_path, 'r').read()
+                        htmls = transform(webdoc_source, languages=[ln])
+                        (lang, body, title, keywords, \
+                         navtrail, lastupdated, description) = htmls[-1]
+                        html_parts =  {'body': body or '',
+                                       'title': title or '',
+                                       'keywords': keywords or '',
+                                       'navtrail': navtrail or '',
+                                       'lastupdated': lastupdated or '',
+                                       'description': description or ''}
+                        break
+                    except IOError:
+                        # Nothing we can do..
+                        continue
 
     return html_parts
 
@@ -238,7 +280,7 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=cdslangs):
         if mode == 1 and \
                webdoc_source_modification_date < webdoc_cache_modification_date and \
                get_mo_last_modification() < webdoc_cache_modification_date:
-            # Cache was update after source. No need to update
+            # Cache was updated after source. No need to update
             return
         (webdoc_source, \
          webdoc_cache_dir, \
@@ -370,7 +412,10 @@ def read_webdoc_source(webdoc):
      webdoc_cache_modification_date) = get_webdoc_info(webdoc)
 
     if webdoc_source_path is not None:
-        webdoc_source = file(webdoc_source_path, 'r').read()
+        try:
+            webdoc_source = file(webdoc_source_path, 'r').read()
+        except IOError:
+            webdoc_source = None
     else:
         webdoc_source = None
 
