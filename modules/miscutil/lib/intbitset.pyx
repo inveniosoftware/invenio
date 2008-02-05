@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
-__apilevel__ = 1.01
+__apilevel__ = 1.02
 
 """
 Defines an intbitset data object to hold unordered sets of unsigned
@@ -44,6 +44,8 @@ and then commit generated intbitset.c to CVS.
 import zlib
 from array import array
 from invenio.config import CFG_INTBITSET_ENABLE_SANITY_CHECKS
+
+__all__ = ['intbitset']
 
 cdef extern from "intbitset.h":
     ctypedef int Py_ssize_t
