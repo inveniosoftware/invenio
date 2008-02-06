@@ -38,7 +38,7 @@ from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *
 from invenio.webpage import page, create_error_box
-from invenio.webuser import getUid, get_email, list_registered_users
+from invenio.webuser import getUid, get_email, list_registered_users, page_not_authorized
 from invenio.messages import wash_language
 from invenio.websubmit_config import *
 
@@ -52,7 +52,9 @@ def index(req,c=cdsname,ln=cdslang,todo="",id="",doctype="",categ="",addusers=""
         return errorMsg(e.value,req)
     (auth_code, auth_message) = acc_authorize_action(req, "cfgwebsubmit",verbose=0)
     if auth_code != 0:
-        return errorMsg(auth_message, req, uid)
+        ## user is not authorised to use WebSubmit Admin:
+        return page_not_authorized(req=req, text=auth_message)
+
     # request for deleting a user
     if todo == "deleteuser":
         acc_delete_user_role(id,name_role=role)
@@ -108,7 +110,8 @@ def index(req,c=cdsname,ln=cdslang,todo="",id="",doctype="",categ="",addusers=""
 
 def displayRefereesPage(doctype,warningText):
     t=""
-    if doctype == "*":
+    if doctype in ['', '*']:
+        doctype = '*'
         docname = "all catalogues"
     else:
         res = run_sql("SELECT * FROM sbmDOCTYPE WHERE sdocname=%s", (doctype,))
@@ -130,11 +133,14 @@ def displayRefereesPage(doctype,warningText):
     <TD valign=top>"""
     # call the function to display the form allowing the manager to add new users
     t+=displayAddUser(doctype)
+    end_url = "%s/admin/websubmit/websubmitadmin.py/doctypeconfigure?doctype=%s" % (weburl, doctype)
+    if doctype in ['', '*']:
+        end_url = "%s/admin/websubmit/websubmitadmin.py/" % weburl
     t+= """
     </TD></TR></TABLE>
 <!-- End submissionuser rule -->
-    <a href="%s/admin/websubmit/websubmitadmin.py/doctypeconfigure?doctype=%s">Finished</a>
-    </FORM>""" % (weburl, doctype)
+    <a href="%s">Finished</a>
+    </FORM>""" % end_url
     return t
 
 def displayUserTable(doctype):
