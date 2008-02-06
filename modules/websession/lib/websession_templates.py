@@ -135,7 +135,10 @@ class Template:
                       %(nickname_label)s:</strong><br />
                       <small class="important">(%(mandatory)s)</small>
                     </td><td valign="top">
-                      %(nickname_prefix)s%(nickname)s%(nickname_suffix)s
+                      %(nickname_prefix)s%(nickname)s%(nickname_suffix)s<br />
+                      <small><span class="quicknote">%(note)s:</span>
+                       %(fixed_nickname_note)s
+                      </small>
                     </td>
                   </tr>
                   <tr><td align="right"><strong>
@@ -169,6 +172,7 @@ class Template:
                 'email' : email,
                 'email_disabled' : email_disabled and "readonly" or "",
                 'sweburl': sweburl,
+                'fixed_nickname_note' : _('Since this is considered as a signature for comments and reviews, once set it can not be changed.')
             }
 
         if not password_disabled and not CFG_EXTERNAL_AUTH_USING_SSO:

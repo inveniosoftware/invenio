@@ -466,7 +466,7 @@ define a common look and feel of CDS Invenio web pages.
   <a href="<WEBURL>/admin/webaccess/webaccessadmin.py/delegate_startarea">Delegate Rights - With Restrictions</a>
    <br><small>Delegate your rights for some roles.</small>
   <p>
-  <a href="<WEBURL>/admin/webaccess/webaccessadmin.py/delegate_startarea">Manage Accounts</a>
+  <a href="<WEBURL>/admin/webaccess/webaccessadmin.py/manageaccounts">Manage Accounts</a>
    <br><small>Enable, disable, and modify accounts.</small>
 </td>
 <td>

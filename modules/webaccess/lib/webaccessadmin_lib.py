@@ -667,7 +667,7 @@ def perform_createaccount(req, email='', password='', callback='yes', confirm=0)
         if not res:
             res = run_sql("INSERT INTO user (email,password, note) values(%s,AES_ENCRYPT(email,%s), '1')", (email, password))
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
-                emailsent = sendNewUserAccountWarning(email, email, password)
+                emailsent = sendNewUserAccountWarning(email, email, password) == 0
             if password:
                 output += '<b><span class="info">Account created with password and activated.</span></b>'
             else:
@@ -843,7 +843,7 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
     #else:
         #return addadminbox(subtitle, body)
 
-def perform_modifylogindata(req, userID, email='', password='', callback='yes', confirm=0):
+def perform_modifylogindata(req, userID, nickname='', email='', password='', callback='yes', confirm=0):
     """modify email and password of an account"""
 
     (auth_code, auth_message) = is_adminuser(req)
@@ -851,13 +851,15 @@ def perform_modifylogindata(req, userID, email='', password='', callback='yes', 
 
     subtitle = """<a name="1"></a>1. Edit login-data.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
 
-    res = run_sql("SELECT id, email FROM user WHERE id=%s", (userID, ))
+    res = run_sql("SELECT id, email, nickname FROM user WHERE id=%s", (userID, ))
     output = ""
     if res:
         if not email and not password:
             email = res[0][1]
-            #password = res[0][2]
+            nickname = res[0][2]
         text =  ' <span class="adminlabel">Account id:</span>%s<br>\n' % userID
+        text =  ' <span class="adminlabel">Nickname:</span>\n'
+        text += ' <input class="admin_wvar" type="text" name="nickname" value="%s" /><br>' % (nickname, )
         text += ' <span class="adminlabel">Email:</span>\n'
         text += ' <input class="admin_wvar" type="text" name="email" value="%s" /><br>' % (email, )
         text += ' <span class="adminlabel">Password:</span>\n'
@@ -869,9 +871,17 @@ def perform_modifylogindata(req, userID, email='', password='', callback='yes', 
                                 confirm=1,
                                 button="Modify")
         if confirm in [1, "1"] and email and email_valid_p(email):
-            res = run_sql("UPDATE user SET email=%s WHERE id=%s", (email, userID))
-            res = run_sql("UPDATE user SET password=AES_ENCRYPT(email,%s) WHERE id=%s", (password, userID))
-            output += '<b><span class="info">Email and/or password modified.</span></b>'
+            res = run_sql("SELECT nickname FROM user WHERE nickname=%s AND id<>%s", (nickname, userID))
+            if res:
+                output += '<b><span class="info">Sorry, the specified nickname is already used.</span></b>'
+            else:
+                res = run_sql("UPDATE user SET email=%s WHERE id=%s", (email, userID))
+                if password:
+                    res = run_sql("UPDATE user SET password=AES_ENCRYPT(email,%s) WHERE id=%s", (password, userID))
+                else:
+                    output += '<b><span class="info">Password not modified.</span></b> '
+                res = run_sql("UPDATE user SET nickname=%s WHERE id=%s", (nickname, userID))
+                output += '<b><span class="info">Nickname/email and/or password  modified.</span></b>'
         elif confirm in [1, "1"]:
             output += '<b><span class="info">Please specify an valid email-address.</span></b>'
     else:
@@ -931,7 +941,7 @@ def perform_modifypreferences(req, userID, login_method='', callback='yes', conf
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="4"></a>4. Modify preferences.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="2"></a>2. Modify preferences.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
 
     res = run_sql("SELECT id, email FROM user WHERE id=%s", (userID, ))
     output = ""
@@ -977,7 +987,7 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="5"></a>5. Delete account.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="3"></a>3. Delete account.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
 
     res = run_sql("SELECT id, email FROM user WHERE id=%s", (userID, ))
     output = ""
@@ -3294,14 +3304,14 @@ def startpage():
 <tr>
 <td>
     <dl>
-    <dt><a href="webaccessadmin.py/rolearea">Role Area</a>
-    <dd>main area to configure administration rights and authorization rules.
-    <dt><a href="webaccessadmin.py/actionarea">Action Area</a>
-    <dd>configure administration rights with the actions as starting point.
-    <dt><a href="webaccessadmin.py/userarea">User Area</a>
-    <dd>configure administration rights with the users as starting point.
-    <dt><a href="webaccessadmin.py/resetarea">Reset Area</a>
-    <dd>reset roles, actions and authorizations.
+    <dt><a href="webaccessadmin.py/rolearea">Role Area</a></dt>
+    <dd>main area to configure administration rights and authorization rules.</dd>
+    <dt><a href="webaccessadmin.py/actionarea">Action Area</a></dt>
+    <dd>configure administration rights with the actions as starting point.</dd>
+    <dt><a href="webaccessadmin.py/userarea">User Area</a></dt>
+    <dd>configure administration rights with the users as starting point.</dd>
+    <dt><a href="webaccessadmin.py/resetarea">Reset Area</a></dt>
+    <dd>reset roles, actions and authorizations.</dd>
     </dl>
 </td>
 </tr>

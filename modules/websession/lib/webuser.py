@@ -648,62 +648,25 @@ def update_Uid(req, p_email):
 def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
     """Send an email to the address given by sendTo about the new account newAccountEmail."""
     _ = gettext_set_language(ln)
-    fromaddr = "From: %s" % supportemail
-    toaddrs  = "To: %s" % sendTo
-    to = toaddrs + "\n"
-    sub = "Subject: New account on '%s'" % cdsname
+    sub = _("New account on") + " '%s'" % cdsname
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
-        sub += " - PLEASE ACTIVATE"
-    sub += "\n\n"
-    body = "A new account has been created on '%s'" % cdsname
+        sub += " - " + _("PLEASE ACTIVATE")
+    body = _("A new account has been created on") + " '%s'" % cdsname
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
-        body += " and is awaiting activation"
+        body += _(" and is awaiting activation")
     body += ":\n\n"
-    body += "   Username/Email: %s\n\n" % newAccountEmail
-    body += "You can approve or reject this account request at: %s/admin/webaccess/webaccessadmin.py/manageaccounts\n" % weburl
-    body += "\n---------------------------------"
-    body += "\n%s" % cdsname
-    body += "\nContact: %s" % supportemail
-    msg = to + sub + body
-
-    server = smtplib.SMTP('localhost')
-    server.set_debuglevel(1)
-
-    try:
-        server.sendmail(fromaddr, toaddrs, msg)
-    except smtplib.SMTPRecipientsRefused:
-        return 0
-
-    server.quit()
-    return 1
+    body += _("   Username/Email") + ": %s\n\n" % newAccountEmail
+    body += _("You can approve or reject this account request at") + ": %s/admin/webaccess/webaccessadmin.py/manageaccounts\n" % weburl
+    return send_email(supportemail, sendTo, subject=sub, content=body)
 
 def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
     """Send an email to the address given by sendTo about the new account newAccountEmail."""
     _ = gettext_set_language(ln)
-    fromaddr = "From: %s" % supportemail
-    toaddrs  = "To: %s" % sendTo
-    to = toaddrs + "\n"
-    sub = "Subject: Your account created on '%s'\n\n" % cdsname
-    body = "You have created a new account on '%s':\n\n" % cdsname
-    body += "   Username/Email: %s\n" % newAccountEmail
-    body += "   Password: %s\n\n" % ("*" * len(password))
-    if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 1:
-        body += "This account is awaiting approval by the site administrators and therefore cannot be used as of yet.\nYou will receive an email notification as soon as your account request has been processed.\n"
-    body += "\n---------------------------------"
-    body += "\n%s" % cdsname
-    body += "\nContact: %s" % supportemail
-    msg = to + sub + body
-
-    server = smtplib.SMTP('localhost')
-    server.set_debuglevel(1)
-
-    try:
-        server.sendmail(fromaddr, toaddrs, msg)
-    except smtplib.SMTPRecipientsRefused:
-        return 0
-
-    server.quit()
-    return 1
+    sub = _("Your account created on") + " '%s'" % cdsname
+    body = _("You have created a new account on") + " '%s'\n\n" % cdsname
+    body += _("   Username/Email:") + " %s\n" % newAccountEmail
+    body += _("   Password:") + " %s\n\n" % ("*" * len(password))
+    return send_email(supportemail, sendTo, subject=sub, content=body)
 
 def get_email(uid):
     """Return email address of the user uid.  Return string 'guest' in case

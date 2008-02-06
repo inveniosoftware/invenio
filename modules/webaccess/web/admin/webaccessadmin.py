@@ -85,10 +85,10 @@ def modifypreferences(req, userID, login_method='', callback='yes', confirm=0):
 
     return wal.perform_modifypreferences(req=req, userID=userID, login_method=login_method, callback=callback, confirm=confirm)
 
-def modifylogindata(req, userID, email='', password='', callback='yes', confirm=0):
+def modifylogindata(req, userID, nickname='', email='', password='', callback='yes', confirm=0):
     """modify the email/password of an account"""
 
-    return wal.perform_modifylogindata(req=req, userID=userID, email=email, password=password, callback=callback, confirm=confirm)
+    return wal.perform_modifylogindata(req=req, userID=userID, nickname=nickname, email=email, password=password, callback=callback, confirm=confirm)
 
 def rejectaccount(req, userID, email_user_pattern='', limit_to=-1, maxpage=25, page=1, callback='yes', confirm=0):
     """Set account inactive, delete it and send email to the owner."""
