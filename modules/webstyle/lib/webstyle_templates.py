@@ -617,14 +617,14 @@ URI: http://%(host)s%(page)s
                       <form action="%(weburl)s/error/send" method="post">
                         %(send_error_label)s
                         <input class="adminbutton" type="submit" value="%(send_label)s" />
-                        <input type="hidden" name="header" value="%(title)s %(sys1)s %(sys2)s" />
+                        <input type="hidden" name="header" value="%(esc_title)s %(esc_sys1)s %(esc_sys2)s" />
                         <input type="hidden" name="url" value="URI: http://%(host)s%(page)s" />
                         <input type="hidden" name="time" value="Time: %(time)s" />
                         <input type="hidden" name="browser" value="%(browser)s" />
                         <input type="hidden" name="client" value="Client: %(client)s" />
-                        <input type="hidden" name="error" value="%(error)s" />
+                        <input type="hidden" name="error" value="%(esc_error)s" />
                         <input type="hidden" name="sys_error" value="%(sys_error)s" />
-                        <input type="hidden" name="traceback" value="%(traceback)s" />
+                        <input type="hidden" name="traceback" value="%(esc_traceback)s" />
                         <input type="hidden" name="referer" value="%(referer)s" />
                       </form>
                     </td>
@@ -633,6 +633,7 @@ URI: http://%(host)s%(page)s
               </table>
               """ % {
                 'title'     : title,
+                'esc_title' : title.replace('"', '&quot;'),
                 'time_label': _("Time"),
                 'client_label': _("Client"),
                 'send_error_label': \
@@ -640,6 +641,8 @@ URI: http://%(host)s%(page)s
                 'send_label': _("Send error report"),
                 'sys1'      : sys.exc_info()[0] or '',
                 'sys2'      : sys.exc_info()[1] or '',
+                'esc_sys1'  : (sys.exc_info()[0] or '').replace('"', '&quot;"'),
+                'esc_sys2'  : (sys.exc_info()[1] or '').replace('"', '&quot;"'),
                 'contact'   : \
                    _("Please contact %s quoting the following information:") % \
                      '<a href="mailto:' + urllib.quote(supportemail) +'">' + \
@@ -649,8 +652,10 @@ URI: http://%(host)s%(page)s
                 'time'      : time.strftime("%d/%b/%Y:%H:%M:%S %z"),
                 'browser'   : browser_s,
                 'client'    : client_s,
-                'error'     : error_s,
+                'esc_error' : error_s,
+                'error'     : error_s.replace('"', '&quot;"'),
                 'traceback' : traceback_s,
+                'esc_traceback' : traceback_s.replace('"', '&quot;"'),
                 'sys_error' : sys_error_s,
                 'weburl'    : weburl,
                 'referer'   : page_s!=info_not_available and \
