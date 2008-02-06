@@ -645,8 +645,8 @@ URI: http://%(host)s%(page)s
                 'esc_sys2'  : (sys.exc_info()[1] or '').replace('"', '&quot;"'),
                 'contact'   : \
                    _("Please contact %s quoting the following information:") % \
-                     '<a href="mailto:' + urllib.quote(supportemail) +'">' + \
-                       supportemail + '</a>',
+                     ('<a href="mailto:' + urllib.quote(supportemail) +'">' + \
+                       supportemail + '</a>'),
                 'host'      : host_s,
                 'page'      : page_s,
                 'time'      : time.strftime("%d/%b/%Y:%H:%M:%S %z"),
