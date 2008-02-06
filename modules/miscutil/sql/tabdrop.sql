@@ -371,7 +371,7 @@ DROP TABLE IF EXISTS user_bskBASKET;
 DROP TABLE IF EXISTS usergroup_bskBASKET;
 DROP TABLE IF EXISTS collection_externalcollection;
 DROP TABLE IF EXISTS externalcollection;
-DROP TABLE IF EXISTS collectiondetailedpagetabs;
+DROP TABLE IF EXISTS collectiondetailedrecordpagetabs;
 DROP TABLE IF EXISTS staEVENT;
 DROP TABLE IF EXISTS clsMETHOD;
 DROP TABLE IF EXISTS jrnJOURNAL;

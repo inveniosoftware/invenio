@@ -2275,7 +2275,7 @@ CREATE TABLE IF NOT EXISTS formatname (
 
 -- tables for collection detailed page options
 
-CREATE TABLE IF NOT EXISTS collectiondetailedpagetabs (
+CREATE TABLE IF NOT EXISTS collectiondetailedrecordpagetabs (
   id_collection mediumint(9) unsigned NOT NULL,
   tabs varchar(255) NOT NULL default '',
   PRIMARY KEY (id_collection)

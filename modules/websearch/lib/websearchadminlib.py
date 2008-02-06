@@ -1776,11 +1776,11 @@ def perform_update_detailed_record_options(colID, ln, tabs, recurse):
         tabs.append('metadata')
 
     def update_settings(colID, tabs, recurse):
-        run_sql("DELETE FROM collectiondetailedpagetabs WHERE id_collection='%s'" % colID)
-        run_sql("REPLACE INTO collectiondetailedpagetabs" + \
+        run_sql("DELETE FROM collectiondetailedrecordpagetabs WHERE id_collection='%s'" % colID)
+        run_sql("REPLACE INTO collectiondetailedrecordpagetabs" + \
                 " SET id_collection='%s', tabs='%s'" % (colID, ';'.join(tabs)))
  ##        for enabled_tab in tabs:
-##             run_sql("REPLACE INTO collectiondetailedpagetabs" + \
+##             run_sql("REPLACE INTO collectiondetailedrecordpagetabs" + \
 ##                 " SET id_collection='%s', tabs='%s'" % (colID, ';'.join(tabs)))
         if recurse:
             for descendant_id in get_collection_descendants(colID):
@@ -1788,9 +1788,9 @@ def perform_update_detailed_record_options(colID, ln, tabs, recurse):
 
     update_settings(colID, tabs, recurse)
 ##     for colID in colIDs:
-##         run_sql("DELETE FROM collectiondetailedpagetabs WHERE id_collection='%s'" % colID)
+##         run_sql("DELETE FROM collectiondetailedrecordpagetabs WHERE id_collection='%s'" % colID)
 ##         for enabled_tab in tabs:
-##             run_sql("REPLACE INTO collectiondetailedpagetabs" + \
+##             run_sql("REPLACE INTO collectiondetailedrecordpagetabs" + \
 ##                 " SET id_collection='%s', tabs='%s'" % (colID, ';'.join(tabs)))
 
     #if callback:
@@ -3205,7 +3205,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=cdslang):
             'files'     : {'label': _('Fulltext'),         'visible': False, 'enabled': True, 'order': 6}
             }
 
-    res = run_sql("SELECT tabs FROM collectiondetailedpagetabs " + \
+    res = run_sql("SELECT tabs FROM collectiondetailedrecordpagetabs " + \
                   "WHERE id_collection='%s'" % colID)
 
     if len(res) > 0:
