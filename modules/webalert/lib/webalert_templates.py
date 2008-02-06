@@ -297,7 +297,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = '<p>' + _("Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %(x_url2_open)spopular_searches%(x_url2_close)s, or the input form.") + '</p>'
+        out = '<p>' + _("Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %(x_url2_open)spopular searches%(x_url2_close)s, or the input form.") + '</p>'
         out %= {'x_url1_open': '<a href="display?ln=' + ln + '">',
                 'x_url1_close': '</a>',
                 'x_url2_open': '<a href="display?ln=' + ln + '&amp;p=y">',
