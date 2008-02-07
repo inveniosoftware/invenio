@@ -61,27 +61,6 @@ class Template:
             </table>
             ''' % {'warnings': '<br/>'.join(warnings)}
 
-        comment_on_php_admin_interface = ''
-        if CFG_PATH_PHP:
-            # If PHP enabled, old bibformat can still run
-            comment_on_php_admin_interface = '''
-            <p>For some time the old BibFormat will still run along the new one, so that you can transition smoothly (See old Admin Interface further below).</p>
-            '''
-
-        out += '''
-        <table width="66%%" class="errorbox" style="margin-left: auto; margin-right: auto;">
-        <tr>
-        <th class="errorboxheader">
-        <big>BibFormat has changed!</big>
-        <p>You will need to migrate your old formats if you are not a new user. You can read the <a href="%(weburl)s/help/admin/bibformat-admin-guide">documentation</a> to learn how to write
-        formats, or use the <a href="%(weburl)s/admin/bibformat/bibformat_migration_kit_assistant.py">migration assistant</a>.</p>
-        %(comment_on_php_admin_interface)s
-        </th>
-        </tr>
-        </table>
-        ''' % {'weburl':weburl,
-               'comment_on_php_admin_interface':comment_on_php_admin_interface}
-
         out += '''
         <p>
          This is where you can edit the formatting styles available for the records. '''
@@ -102,14 +81,14 @@ class Template:
         <dd>Define which template is applied to which record for a given output.</dd>
         </dl>
         <dl>
-        <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%(ln)s">Format Elements Documentation</a></dt>
-        <dd>Documentation of the format elements to be used inside format templates.</dd>
-        </dl>
-        <dl>
         <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%(ln)s">Manage Knowledge Bases</a></dt>
         <dd>Define mappings of values, for standardizing records or declaring often used values.</dd>
         </dl>
         <br/>
+        <dl>
+        <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%(ln)s">Format Elements Documentation</a></dt>
+        <dd>Documentation of the format elements to be used inside format templates.</dd>
+        </dl>
         <dl>
         <dt><a href="%(weburl)s/help/admin/bibformat-admin-guide">BibFormat Admin Guide</a></dt>
         <dd>Documentation about BibFormat administration</dd>
