@@ -194,7 +194,7 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
         """websearch - legacy Search Help page link"""
 	self.assertEqual([],
                          test_web_page_content(weburl + '/help/search/index.en.html',
-                                               expected_text="Search Help"))
+                                               expected_text="Help Central"))
 
     def test_legacy_search_tips_link(self):
         """websearch - legacy Search Tips page link"""

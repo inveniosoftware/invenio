@@ -74,15 +74,6 @@ class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
                                                expected_text="WebComment Admin Guide"))
         return
 
-    def test_legacy_webcomment_admin_guide_availability(self):
-        """webcomment - legacy availability of WebComment Admin Guide"""
-
-        url = weburl + '/admin/webcomment/guide.html'
-        error_messages = test_web_page_content(url)
-        if error_messages:
-            self.fail(merge_error_messages(error_messages))
-        return
-
     def test_webcomment_mini_review_availability(self):
         """webcomment - availability of mini-review panel on detailed record page"""
         url = weburl + '/record/12'

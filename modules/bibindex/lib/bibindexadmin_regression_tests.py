@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -33,21 +33,21 @@ class BibIndexAdminWebPagesAvailabilityTest(unittest.TestCase):
     """Check BibIndex Admin web pages whether they are up or not."""
 
     def test_bibindex_admin_interface_pages_availability(self):
-        """bibindexadmin - availability of BibIndex Admin interface pages""" 
+        """bibindexadmin - availability of BibIndex Admin interface pages"""
 
         baseurl = weburl + '/admin/bibindex/bibindexadmin.py/'
 
         _exports = ['',
                     'index',
-                    'index?mtype=perform_showindexoverview', 
+                    'index?mtype=perform_showindexoverview',
                     'index?mtype=perform_editindexes',
                     'index?mtype=perform_addindex',
                     'field',
                     'field?mtype=perform_showfieldoverview',
                     'field?mtype=perform_editfields',
-                    'field?mtype=perform_addfield',                                       
-                    ]                    
-        
+                    'field?mtype=perform_addfield',
+                    ]
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             # first try as guest:
@@ -65,7 +65,7 @@ class BibIndexAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_bibindex_admin_guide_availability(self):
         """bibindexadmin - availability of BibIndex Admin guide pages"""
 
-        url = weburl + '/admin/bibindex/guide.html'
+        url = weburl + '/help/admin/bibindex-admin-guide'
         error_messages = test_web_page_content(url)
         if error_messages:
             self.fail(merge_error_messages(error_messages))

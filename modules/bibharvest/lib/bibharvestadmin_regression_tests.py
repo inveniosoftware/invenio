@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -33,12 +33,12 @@ class BibHarvestAdminWebPagesAvailabilityTest(unittest.TestCase):
     """Check BibHarvest Admin web pages whether they are up or not."""
 
     def test_bibharvest_admin_interface_pages_availability(self):
-        """bibharvestadmin - availability of BibHarvest Admin interface pages""" 
+        """bibharvestadmin - availability of BibHarvest Admin interface pages"""
 
         baseurl = weburl + '/admin/bibharvest/bibharvestadmin.py/'
 
         _exports = ['', 'editsource', 'addsource', 'delsource']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             # first try as guest:
@@ -56,7 +56,7 @@ class BibHarvestAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_bibharvest_admin_guide_availability(self):
         """bibharvestadmin - availability of BibHarvest Admin guide pages"""
 
-        url = weburl + '/admin/bibharvest/guide.html'
+        url = weburl + '/help/admin/bibharvest-admin-guide'
         error_messages = test_web_page_content(url)
         if error_messages:
             self.fail(merge_error_messages(error_messages))

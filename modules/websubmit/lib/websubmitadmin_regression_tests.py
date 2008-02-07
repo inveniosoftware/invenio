@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -33,14 +33,14 @@ class WebSubmitAdminWebPagesAvailabilityTest(unittest.TestCase):
     """Check WebSubmit Admin web pages whether they are up or not."""
 
     def test_websubmit_admin_interface_pages_availability(self):
-        """websubmitadmin - availability of WebSubmit Admin interface pages""" 
+        """websubmitadmin - availability of WebSubmit Admin interface pages"""
 
         baseurl = weburl + '/admin/websubmit/websubmitadmin.py/'
 
         _exports = ['', 'showall', 'doctypelist', 'doctypeadd',
                     'doctyperemove', 'actionlist', 'jschecklist',
                     'elementlist', 'functionlist']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             # first try as guest:
@@ -58,7 +58,7 @@ class WebSubmitAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_websubmit_admin_guide_availability(self):
         """websubmitadmin - availability of WebSubmit Admin guide pages"""
 
-        url = weburl + '/admin/websubmit/guide.html'
+        url = weburl + '/help/admin/websubmit-admin-guide'
         error_messages = test_web_page_content(url)
         if error_messages:
             self.fail(merge_error_messages(error_messages))

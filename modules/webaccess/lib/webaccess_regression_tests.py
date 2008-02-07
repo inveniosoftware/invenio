@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -33,12 +33,12 @@ class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
     """Check WebAccess web pages whether they are up or not."""
 
     def test_webaccess_admin_interface_availability(self):
-        """webaccess - availability of WebAccess Admin interface pages""" 
+        """webaccess - availability of WebAccess Admin interface pages"""
 
         baseurl = weburl + '/admin/webaccess/webaccessadmin.py/'
 
         _exports = ['', 'delegate_startarea', 'manageaccounts']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             # first try as guest:
@@ -56,7 +56,7 @@ class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
     def test_webaccess_admin_guide_availability(self):
         """webaccess - availability of WebAccess Admin guide pages"""
 
-        url = weburl + '/admin/webaccess/guide.html'
+        url = weburl + '/help/admin/webaccess-admin-guide'
         error_messages = test_web_page_content(url)
         if error_messages:
             self.fail(merge_error_messages(error_messages))
