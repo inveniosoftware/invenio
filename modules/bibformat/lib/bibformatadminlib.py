@@ -61,10 +61,6 @@ def perform_request_index(ln=cdslang, warnings=None, is_admin=False):
     """
     Returns the main BibFormat admin page.
 
-
-    This is the only page where the code needs to be cleaned
-    when the migration kit will be removed. #TODO: remove when removing migration_kit
-
     @param ln language
     @param warnings a list of messages to display at top of the page, that prevents writability in etc
     @param is_admin indicate if user is authorized to use BibFormat

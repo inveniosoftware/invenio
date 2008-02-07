@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -23,9 +23,7 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibformat_config.py bibformat_templates.py \
              bibformatadminlib.py bibformat_engine.py bibformat_dblayer.py \
-	     bibformat_utils.py bibformat_migration_kit_dblayer.py bibformat_migration_kit.py \
-	     bibformat_migration_kit_templates.py  bibformat.py \
-	     bibformat_migration_kit_assistant_lib.py \
+	     bibformat_utils.py bibformat.py \
              bibformatadmin_regression_tests.py bibformat_engine_tests.py \
              bibformat_bfx_engine.py bibformat_bfx_engine_config.py\
              bibformat_regression_tests.py bibformat_xslt_engine.py bibreformat.py
