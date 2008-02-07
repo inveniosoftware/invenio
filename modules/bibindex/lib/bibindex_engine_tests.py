@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -21,7 +21,8 @@
 
 """Unit tests for the indexing engine."""
 
-__revision__ = "$Id$"
+__revision__ = \
+    "$Id$"
 
 import unittest
 
@@ -32,11 +33,37 @@ class TestListSetOperations(unittest.TestCase):
 
     def test_list_union(self):
         """bibindex engine - list union"""
-        self.assertEqual([1,2,3,4], bibindex_engine.list_union([1,2,3],[1,3,4]))
+        self.assertEqual([1, 2, 3, 4],
+                         bibindex_engine.list_union([1, 2, 3],
+                                                    [1, 3, 4]))
+
+class TestWashIndexTerm(unittest.TestCase):
+    """Test for washing index terms, useful for both searching and indexing."""
+
+    def test_wash_index_term_short(self):
+        """bibindex engine - wash index term, short word"""
+        self.assertEqual("ellis",
+                         bibindex_engine.wash_index_term("ellis"))
+
+    def test_wash_index_term_long(self):
+        """bibindex engine - wash index term, long word"""
+        self.assertEqual(50*"e",
+                         bibindex_engine.wash_index_term(1234*"e"))
+
+    def test_wash_index_term_case(self):
+        """bibindex engine - wash index term, lower the case"""
+        self.assertEqual("ellis",
+                         bibindex_engine.wash_index_term("Ellis"))
+
+    def test_wash_index_term_unicode(self):
+        """bibindex engine - wash index term, unicode"""
+        self.assertEqual("ελληνικό αλφάβητο",
+                         bibindex_engine.wash_index_term("Ελληνικό αλφάβητο"))
 
 def create_test_suite():
     """Return test suite for the indexing engine."""
-    return unittest.TestSuite((unittest.makeSuite(TestListSetOperations,'test'),))
+    return unittest.TestSuite((unittest.makeSuite(TestListSetOperations,'test'),
+                               unittest.makeSuite(TestWashIndexTerm, 'test'),))
 
 if __name__ == "__main__":
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
