@@ -4533,3 +4533,7 @@ msgstr "Godkännande har inte begärts för detta dokument."
 msgid "Unable to display document."
 msgstr "Kunde inte visa dokumentet."
 
+#: modules/websearch/lib/websearch_templates.py:2868
+msgid ".. of which self-citations: %s records"
+msgstr "av vilka själv-citationer: %s journaler"
+

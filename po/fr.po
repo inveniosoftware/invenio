@@ -887,7 +887,7 @@ msgstr "validation effectuée"
 msgid "does not seem to be a OAI-compliant baseURL"
 msgstr "ne semble pas être une URL de base compatible OAI"
 
-#: modules/bibrank/lib/bibrank_citation_grapher.py:120
+#: modules/bibrank/lib/bibrank_citation_grapher.py:122
 msgid "Citation history"
 msgstr "Historique des citations"
 
@@ -4716,6 +4716,10 @@ msgstr "Ce document n'a jamais été soumis pour approbation."
 #: modules/websubmit/web/publiline.py:200
 msgid "Unable to display document."
 msgstr "Ce document ne peut pas être affiché."
+
+#: modules/websearch/lib/websearch_templates.py:2868
+msgid ".. of which self-citations: %s records"
+msgstr "parmi lesquelles auto-citations: %s notices"
 
 #~ msgid "Cannot find submission directory."
 #~ msgstr "Impossible de trouver le répertoire des soumissions."
