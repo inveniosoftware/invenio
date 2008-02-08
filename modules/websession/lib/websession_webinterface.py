@@ -94,8 +94,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     return page(title=_("Role authorization request"), req=req, body=_("This request for an authorization has already been authorized."), uid=webuser.getUid(req), navmenuid='youraccount', language=args['ln'])
                 return page(title=title,
                 body=webaccount.perform_back(
-                    _("You have successfully obtained an authorization as %(role)s! "
-                    "This authorization will last until %(expiration)s and until "
+                    _("You have successfully obtained an authorization as %(x_role)s! "
+                    "This authorization will last until %(x_expiration)s and until "
                     "you close your browser if you are a guest user.") %
                     {'role' : '<strong>%s</strong>' % role_name,
                     'expiration' : '<em>%s</em>' % expiration.strftime("%Y-%m-%d %H:%M:%S")},
@@ -206,7 +206,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if webuser.isGuestUser(uid):
             return page(title=_("Your Account"),
                         body=webaccount.perform_info(req, args['ln']),
-                        description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
+                        description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
                         keywords=_("%s, personalize") % cdsnameintl.get(args['ln'], cdsname),
                         uid=uid,
                         req=req,
@@ -223,7 +223,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         grps = webgroup.account_group(uid, ln=args['ln'])
         return page(title=_("Your Account"),
                     body=webaccount.perform_display_account(req,username,bask,aler,sear,msgs,grps,args['ln']),
-                    description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
+                    description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
                     keywords=_("%s, personalize") % cdsnameintl.get(args['ln'], cdsname),
                     uid=uid,
                     req=req,
@@ -308,12 +308,11 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     webgroup_dblayer.drop_external_groups(uid)
                     prefs['login_method'] = args['login_method']
                     webuser.set_user_preferences(uid, prefs)
-                    mess = _("<p>Switched to internal login method. ")
-                    mess += _("""Please note, that if this is the first time that
-                        you are using this account with the internal method
-                        then the system has set for you a random generated password
-                        which you can obtain via email clicking on the following
-                        button:</p>""")
+                    mess = "<p>" + _("Switched to internal login method.") + " "
+                    mess += _("Please note that if this is the first time that you are using this account "
+                              "with the internal login method then the system has set for you "
+                              "a randomly generated password which you can obtain via email "
+                              "by clicking on the following button:") + '</p>'
                     mess += """<p><form  method="post" action="../youraccount/send_email">
                         <input type="hidden" name="p_email" value="%s">
                         <input class="formbutton" type="submit" value="%s">
@@ -432,7 +431,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         return page(title=title,
                     body=webaccount.perform_back(mess, act, linkname, args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
-                    description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
+                    description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
                     keywords=_("%s, personalize") % cdsnameintl.get(args['ln'], cdsname),
                     uid=uid,
                     req=req,
@@ -455,7 +454,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         return page(title=_("Lost your password?"),
                     body=webaccount.perform_lost(args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
-                    description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
+                    description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
                     keywords=_("%s, personalize") % cdsnameintl.get(args['ln'], cdsname),
                     uid=uid,
                     req=req,
@@ -484,7 +483,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 eMsg = _("Cannot send password by email since you are using external authentication system.")
                 return page(title=_("Your Account"),
                             body=webaccount.perform_emailMessage(eMsg, args['ln']),
-                            description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
+                            description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
                             keywords=_("%s, personalize" % cdsnameintl.get(args['ln'], cdsname)),
                             uid=uid, req=req,
                             secure_page_p = 1,
@@ -500,7 +499,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             eMsg = _("The entered email address does not exist in the database.")
             return page(title=_("Your Account"),
                         body=webaccount.perform_emailMessage(eMsg, args['ln']),
-                        description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
+                        description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
                         keywords=_("%s, personalize") % cdsnameintl.get(args['ln'], cdsname),
                         uid=uid, req=req,
                         secure_page_p = 1,
@@ -518,7 +517,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             eMsg = _("The entered email address is incorrect, please check that it is written correctly (e.g. johndoe@example.com).")
             return page(title=_("Incorrect email address"),
                         body=webaccount.perform_emailMessage(eMsg, args['ln']),
-                        description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
+                        description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
                         keywords=_("%s, personalize") % cdsnameintl.get(args['ln'], cdsname),
                         uid=uid,
                         req=req,
@@ -528,7 +527,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                         navmenuid='youraccount')
         return page(title=_("Reset password link sent"),
                     body=webaccount.perform_emailSent(args['p_email'], args['ln']),
-                    description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
+                    description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
                     keywords=_("%s, personalize") % cdsnameintl.get(args['ln'], cdsname),
                     uid=uid, req=req,
                     secure_page_p = 1,
@@ -551,7 +550,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         return page(title=_("Your Administrative Activities"),
                     body=webaccount.perform_youradminactivities(user_info, args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
-                    description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
+                    description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
                     keywords=_("%s, personalize") % cdsnameintl.get(args['ln'], cdsname),
                     uid=uid,
                     req=req,
@@ -574,7 +573,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         return page(title=_("Delete Account"),
                     body=webaccount.perform_delete(args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
-                    description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
+                    description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
                     keywords=_("%s, personalize") % cdsnameintl.get(args['ln'], cdsname),
                     uid=uid,
                     req=req,
@@ -600,7 +599,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         return page(title=_("Logout"),
                     body=webaccount.perform_logout(req, args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
-                    description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
+                    description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
                     keywords=_("%s, personalize") % cdsnameintl.get(args['ln'], cdsname),
                     uid=uid,
                     req=req,
@@ -653,8 +652,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 return page(title=_("Login"),
                             body=webaccount.create_login_page_box(args['referer'], apache_msg, args['ln']),
                             navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
-                            description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
-                            keywords=_("%s , personalize") % cdsnameintl.get(args['ln'], cdsname),
+                            description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
+                            keywords="%s , personalize" % cdsnameintl.get(args['ln'], cdsname),
                             uid=uid,
                             req=req,
                             secure_page_p = 1,
@@ -688,8 +687,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             return page(title=_("Login"),
                         body=webaccount.perform_back(mess, act, _("login"), args['ln']),
                         navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
-                        description=_("%s Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
-                        keywords=_("%s , personalize") % cdsnameintl.get(args['ln'], cdsname),
+                        description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
+                        keywords="%s , personalize" % cdsnameintl.get(args['ln'], cdsname),
                         uid=uid,
                         req=req,
                         secure_page_p = 1,
@@ -720,7 +719,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                          body=webaccount.create_register_page_box(args['referer'], args['ln']),
                          navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                          description=_("%s  Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
-                         keywords=_("%s , personalize") % cdsnameintl.get(args['ln'], cdsname),
+                         keywords="%s , personalize" % cdsnameintl.get(args['ln'], cdsname),
                          uid=uid,
                          req=req,
                          secure_page_p = 1,
@@ -791,7 +790,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     body=webaccount.perform_back(mess,act, (act == 'register' and _("register") or ""), args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
                     description=_("%s  Personalize, Main page") % cdsnameintl.get(args['ln'], cdsname),
-                    keywords=_("%s , personalize") % cdsnameintl.get(args['ln'], cdsname),
+                    keywords="%s , personalize" % cdsnameintl.get(args['ln'], cdsname),
                     uid=uid,
                     req=req,
                     secure_page_p = 1,
