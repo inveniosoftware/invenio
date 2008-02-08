@@ -97,8 +97,8 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     _("You have successfully obtained an authorization as %(x_role)s! "
                     "This authorization will last until %(x_expiration)s and until "
                     "you close your browser if you are a guest user.") %
-                    {'role' : '<strong>%s</strong>' % role_name,
-                    'expiration' : '<em>%s</em>' % expiration.strftime("%Y-%m-%d %H:%M:%S")},
+                    {'x_role' : '<strong>%s</strong>' % role_name,
+                     'x_expiration' : '<em>%s</em>' % expiration.strftime("%Y-%m-%d %H:%M:%S")},
                     'login', _('login'), args['ln']),
                 req=req,
                 uid=webuser.getUid(req),
