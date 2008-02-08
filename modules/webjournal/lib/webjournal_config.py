@@ -52,19 +52,19 @@ class InvenioWebJournalNoIndexTemplateError(Exception):
         The path to such a file should be given in the config.xml of\
         this journal under the tag <format_template><index>...\
         </index></format_template>' % repr(self.journal)
-    
+
     def user_box(self):
         """
         user-friendly error message with formatting.
         """
         _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-        _('Internal Configuration Error'),
+        _('Internal configuration error'),
         _('There is no format configured for this journals index page'),
-        _('Admin did not provide a template for the index page of journal: %s. \
+        'Admin did not provide a template for the index page of journal: %s. \
         The path to such a file should be given in the config.xml of\
         this journal under the tag <format_template><index>...\
-        </index></format_template>') % escape_html(self.journal))
+        </index></format_template>' % escape_html(self.journal))
 
 class InvenioWebJournalNoArticleTemplateError(Exception):
     """
@@ -76,7 +76,7 @@ class InvenioWebJournalNoArticleTemplateError(Exception):
         """
         self.journal = journal_name
         self.language = language
-        
+
     def __str__(self):
         """
         String representation.
@@ -84,20 +84,20 @@ class InvenioWebJournalNoArticleTemplateError(Exception):
         return 'Admin did not provide a template for the article view page of journal: %s. \
         The path to such a file should be given in the config.xml of this journal \
         under the tag <format_template><detailed>...</detailed></format_template>' % repr(self.journal)
-    
+
     def user_box(self):
         """
         user-friendly error message with formatting.
         """
-        _ = gettext_set_language(self.language)  
+        _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-            _('Internal Configuration Error'),
+            _('Internal configuration error'),
             _('There is no format configured for this journals index page'),
-            _('Admin did not provide a template for the index page of journal: %s. \
+            'Admin did not provide a template for the index page of journal: %s. \
         The path to such a file should be given in the config.xml of\
         this journal under the tag <format_template><index>...\
-        </index></format_template>') % escape_html(self.journal))
-    
+        </index></format_template>' % escape_html(self.journal))
+
 class InvenioWebJournalNoSearchTemplateError(Exception):
     """
     Exception if an article was called without its order number.
@@ -108,7 +108,7 @@ class InvenioWebJournalNoSearchTemplateError(Exception):
         """
         self.journal = journal_name
         self.language = language
-        
+
     def __str__(self):
         """
         String representation.
@@ -116,20 +116,20 @@ class InvenioWebJournalNoSearchTemplateError(Exception):
         return 'Admin did not provide a template for the search page view page of journal: %s. \
         The path to such a file should be given in the config.xml of this journal \
         under the tag <format_template><search>...</search></format_template>' % repr(self.journal)
-    
+
     def user_box(self):
         """
         user-friendly error message with formatting.
         """
-        _ = gettext_set_language(self.language)  
+        _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-            _('Internal Configuration Error'),
+            _('Internal configuration error'),
             _('There is no format configured for this journals search page'),
-            _('Admin did not provide a template for the search page of journal: %s. \
+            'Admin did not provide a template for the search page of journal: %s. \
         The path to such a file should be given in the config.xml of\
         this journal under the tag <format_template><search>...\
-        </search></format_template>') % escape_html(self.journal))
-    
+        </search></format_template>' % escape_html(self.journal))
+
 class InvenioWebJournalNoPopupTemplateError(Exception):
     """
     Exception if an article was called without its order number.
@@ -140,7 +140,7 @@ class InvenioWebJournalNoPopupTemplateError(Exception):
         """
         self.journal = journal_name
         self.language = language
-        
+
     def __str__(self):
         """
         String representation.
@@ -151,20 +151,20 @@ class InvenioWebJournalNoPopupTemplateError(Exception):
         journal under the tag \
         <format_template><popup>...</popup></format_template>' % repr(
             self.journal)
-    
+
     def user_box(self):
         """
         user-friendly error message with formatting.
         """
-        _ = gettext_set_language(self.language)  
+        _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-        _('Internal Configuration Error'),
+        _('Internal configuration error'),
         _('There is no format configured for this journals popup page'),
-        _('Admin did not provide a template for the popup page of journal: %s. \
+        'Admin did not provide a template for the popup page of journal: %s. \
         The path to such a file should be given in the config.xml of\
         this journal under the tag <format_template><popup>...\
-        </popup></format_template>') % escape_html(self.journal))
-    
+        </popup></format_template>' % escape_html(self.journal))
+
 class InvenioWebJournalNoArticleRuleError(Exception):
     """
     Exception if there are no article type rules defined.
@@ -184,24 +184,24 @@ class InvenioWebJournalNoArticleRuleError(Exception):
         your Invenio installation to navigable article types. A rule should \
         have the form of <rule>NameOfArticleType, \
         marc_tag:ExpectedContentOfMarcTag' % escape_html(self.journal)
-        
+
     def user_box(self):
         """
         user-friendly error message with formatting.
         """
         _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-            _("No Articles"),
+            _("No journal articles"),
             _("Problem with the configuration of this journal"),
-            _("The system couldn't find the definitions for different article \
-            kinds (e.g. News, Sports, etc.). If there is nothing defined, \
+            "The system couldn't find the definitions for different article \
+            kinds (e.g. News, Sports, etc). If there is nothing defined, \
             nothing can be shown and it thus indicates that there is either a \
             problem with the setup of this journal or in the Software itself.\
             There is nothing you can do at this moment. If you wish you can \
             send an inquiry to the responsible developers. We apologize \
-            for the inconvenience."))
-        
-    
+            for the inconvenience.")
+
+
 class InvenioWebJournalNoIssueNumberTagError(Exception):
     """
     Exception if there is no marc tag for issue number defined.
@@ -212,7 +212,7 @@ class InvenioWebJournalNoIssueNumberTagError(Exception):
         """
         self.journal = journal_name
         self.language = language
-        
+
     def __str__(self):
         """
         String representation.
@@ -222,24 +222,24 @@ class InvenioWebJournalNoIssueNumberTagError(Exception):
         system, meaning you have to give some form of numbering system in a \
         dedicated marc tag, so the system can see which is the active journal \
         publication of the date.' % repr(self.journal)
-    
+
     def user_box(self):
         """
         user-friendly error message with formatting.
         """
-        _ = gettext_set_language(self.language)    
+        _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-                _("No Issues"),
+                _("No journal issues"),
                 _("Problem with the configuration of this journal"),
-                _("The system couldn't find a definition for an issue \
+                "The system couldn't find a definition for an issue \
                     numbering system. Issue numbers conrol the date of the \
                     publication you are seing. This indicates that there is an \
                     error in the setup of this journal or the Software itself. \
                     There is nothing you can do at the moment. If you wish you \
                     can send an inquiry to the responsible developers. We \
-                    apologize for the inconvenience."))
-        
-    
+                    apologize for the inconvenience.")
+
+
 class InvenioWebJournalNoArticleNumberError(Exception):
     """
     Exception if an article was called without its order number.
@@ -250,7 +250,7 @@ class InvenioWebJournalNoArticleNumberError(Exception):
         """
         self.journal = journal_name
         self.language = language
-        
+
     def __str__(self):
         """
         String representation.
@@ -259,22 +259,22 @@ class InvenioWebJournalNoArticleNumberError(Exception):
         of this article in the issue. This parameter is mandatory and should be \
         provided by internal links in any case. Maybe this was a bad direct url \
         hack. Check where the request came from.' % repr(self.journal)
-    
+
     def user_box(self):
         """
         user-friendly error message with formatting.
         """
-        _ = gettext_set_language(self.language)  
+        _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-            _('Article Error'),
+            _('Journal article error'),
             _('We could not know which article you were looking for'),
-            _('The url you passed did not provide an article number or the \
+            'The url you passed did not provide an article number or the \
               article number was badly formed. If you \
               came to this page through some link on the journal page, please \
               report this to the admin. If you got this link through some \
               external resource, e.g. an email, you can try to put in a number \
               for the article in the url by hand or just visit the front \
-              page at %s/journal/?name=%s') % (weburl, self.journal))
+              page at %s/journal/?name=%s' % (weburl, self.journal))
 
 class InvenioWebJournalNoJournalOnServerError(Exception):
     """
@@ -285,7 +285,7 @@ class InvenioWebJournalNoJournalOnServerError(Exception):
         Initialisation.
         """
         self.language = language
-    
+
     def __str__(self):
         """
         String representation.
@@ -293,18 +293,18 @@ class InvenioWebJournalNoJournalOnServerError(Exception):
         return 'Apparently there are no journals configured on this \
         installation of CDS Invenio. You can try to use the sample Invenio \
         Atlantis Journal for testing.'
-    
+
     def user_box(self):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-                        _('No Journals available'),
+                        _('No journals available'),
                         _('We could not provide you any journals'),
-                        _('It seems that there are no journals on this server. \
-                        Please contact support if this is not right.'))
-    
+                        _('It seems that there are no journals defined on this server. '
+                          'Please contact support if this is not right.'))
+
 class InvenioWebJournalNoNameError(Exception):
     """
     """
@@ -313,26 +313,25 @@ class InvenioWebJournalNoNameError(Exception):
         Initialisation.
         """
         self.language = language
-    
+
     def __str__(self):
         """
         String representation.
         """
         return 'User probably forgot to add the name parameter for the journal\
         Maybe you also want to check if dns mappings are configured correctly.'
-    
+
     def user_box(self):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.language)
         return webjournal_missing_info_box(self.language,
-                        _("Select a Journal on this server"),
+                        _("Select a journal on this server"),
                         _("We couldn't guess which journal you are looking for"),
-                        _("You did not provide an argument for a journal name, \
-                        please select the journal you want to read in the list \
-                        below."))
-                                           
+                        _("You did not provide an argument for a journal name. "
+                          "Please select the journal you want to read in the list below."))
+
 class InvenioWebJournalNoCurrentIssueError(Exception):
     """
     """
@@ -341,7 +340,7 @@ class InvenioWebJournalNoCurrentIssueError(Exception):
         Initialisation.
         """
         self.language = language
-    
+
     def __str__(self):
         """
         String representation.
@@ -349,18 +348,18 @@ class InvenioWebJournalNoCurrentIssueError(Exception):
         return 'There seems to be no current issue number stored for this \
         journal. Is this the first time you use the journal? Otherwise, check\
         configuration.'
-    
+
     def user_box(self):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.language)
         return webjournal_error_box(self.language,
-                    _('No current Issue'),
+                    _('No current issue'),
                     _('We could not find any informtion on the current issue'),
-                    _('The configuration for the current issue seems to be empty.\
-                    Try providing an issue number or check with support.'))
-    
+                    _('The configuration for the current issue seems to be empty. '
+                      'Try providing an issue number or check with support.'))
+
 
 class InvenioWebJournalIssueNumberBadlyFormedError(Exception):
     """
@@ -371,27 +370,27 @@ class InvenioWebJournalIssueNumberBadlyFormedError(Exception):
         """
         self.language = language
         self.issue = issue
-    
+
     def __str__(self):
         """
         String representation.
         """
         return 'The issue number was badly formed. If this comes from the \
         user it is no problem.'
-    
+
     def user_box(self):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-                    _('Issue Number Badly formed'),
+                    _('Issue number badly formed'),
                     _('We could not read the issue number you provided'),
-                    _('The issue number you provided in the url seems to be badly\
+                    'The issue number you provided in the url seems to be badly\
                     formed. Issue numbers have to be in the form of ww/YYYY, so\
                     e.g. 50/2007. You provided the issue number like so: \
-                    %s.') % escape_html(self.issue))
-    
+                    %s.' % escape_html(self.issue))
+
 class InvenioWebJournalArchiveDateWronglyFormedError (Exception):
     """
     """
@@ -401,27 +400,27 @@ class InvenioWebJournalArchiveDateWronglyFormedError (Exception):
         """
         self.language = language
         self.date = date
-    
+
     def __str__(self):
         """
         String representation.
         """
         return 'The archive date was badly formed. If this comes from the \
         user it is no problem.'
-    
+
     def user_box(self):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-                    _('Archive Date Badly formed'),
+                    _('Archive date badly formed'),
                     _('We could not read the archive date you provided'),
-                    _('The archive date you provided in the form seems to be badly\
+                    'The archive date you provided in the form seems to be badly\
                     formed. Archive dates have to be in the form of dd/mm/YYYY, so\
                     e.g. 02/12/2007. You provided the archive date like so: \
-                    %s.') % escape_html(self.date))
-   
+                    %s.' % escape_html(self.date))
+
 class IvenioWebJournalNoPopupTypeError(Exception):
     """
     Exception that is thrown if a popup is requested without specifying the
@@ -433,27 +432,27 @@ class IvenioWebJournalNoPopupTypeError(Exception):
         """
         self.language = language
         self.journal_name
-    
+
     def __str__(self):
         """
         String representation.
         """
         return 'There was no popup type provided for a popup window on \
         journal %s.' % repr(self.journal_name)
-    
+
     def user_box(self):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-                    _('No Popup Type'),
+                    _('No popup type'),
                     _('We could not know what kind of popup you requested'),
-                    _('You called a popup window on CDS Invenio without \
+                    'You called a popup window on CDS Invenio without \
                       specifying the type of the popup. Does this link come \
                       from a CDS Invenio Journal? If so, please contact \
-                      support.'))
-    
+                      support.')
+
 class InvenioWebJournalNoPopupRecordError(Exception):
     """
     Exception that is thrown if a popup is requested without specifying the
@@ -466,27 +465,27 @@ class InvenioWebJournalNoPopupRecordError(Exception):
         self.language = language
         self.journal_name
         self.recid = recid
-    
+
     def __str__(self):
         """
         String representation.
         """
         return 'There was no recid provided to the popup system of webjournal \
         or the recid was badly formed. The recid was %s' % repr(self.recid)
-    
+
     def user_box(self):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-                    _('No Popup Record'),
+                    _('No popup record'),
                     _('We could not deduce the popup article you requested'),
-                    _('You called a popup window on CDS Invenio without \
+                    'You called a popup window on CDS Invenio without \
                       specifying a record in which you are interested or the \
                       record was badly formed. Does this link come \
                       from a CDS Invenio Journal? If so, please contact \
-                      support.'))
+                      support.')
 
 class InvenioWebJournalReleaseUpdateError(Exception):
     """
@@ -498,27 +497,27 @@ class InvenioWebJournalReleaseUpdateError(Exception):
         """
         self.language = language
         self.journal_name = journal_name
-    
+
     def __str__(self):
         """
         String representation.
         """
         return 'There were no updates submitted on a click on the update button.\
          This should never happen and must be due to an internal error.'
-    
+
     def user_box(self):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-                    _('Update Error'),
+                    _('Update error'),
                     _('There was an internal error'),
-                    _('We encountered an internal error trying to update the \
+                    'We encountered an internal error trying to update the \
                       journal issue. You can try to launch the update again or \
                       contact the Administrator. We apologize for the \
-                      inconvenience.'))
-    
+                      inconvenience.')
+
 class InvenioWebJournalReleaseDBError(Exception):
     """
     Exception that is thrown if an update release was not successful.
@@ -528,7 +527,7 @@ class InvenioWebJournalReleaseDBError(Exception):
         Initialisation.
         """
         self.language = language
-        
+
     def __str__(self):
         """
         String representation.
@@ -536,20 +535,20 @@ class InvenioWebJournalReleaseDBError(Exception):
         return 'There was an error in synchronizing DB times with the actual \
         python time objects. Debug the code in: \
         webjournal_utils.issue_times_to_week_strings'
-    
+
     def user_box(self):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-                    _('Publish DB Error'),
+                    _('Journal publishing DB error'),
                     _('There was an internal error'),
-                    _('We encountered an internal error trying to publish the \
+                    'We encountered an internal error trying to publish the \
                       journal issue. You can try to launch the publish interface \
                       again or contact the Administrator. We apologize for the \
-                      inconvenience.'))
-    
+                      inconvenience.')
+
 class InvenioWebJournalIssueNotFoundDBError(Exception):
     """
     Exception that is thrown if there was an issue number not found in the
@@ -561,27 +560,27 @@ class InvenioWebJournalIssueNotFoundDBError(Exception):
         self.language = language
         self.journal_name = journal_name
         sefl.issue_number = issue_number
-    
+
     def __str__(self):
         """
         String representation.
         """
         return 'The issue %s could not be found in the DB for journal %s.' % (self.issue_number,
                                                                               self.journal_name)
-    
+
     def user_box(self):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-                    _('Publish Interface Error'),
+                    _('Journal issue error'),
                     _('We could not find a current issue in the Database'),
-                    _('We encountered an internal error trying to get an issue \
+                    'We encountered an internal error trying to get an issue \
                       number. You can try to refresh the page or \
                       contact the Administrator. We apologize for the \
-                      inconvenience.'))
-    
+                      inconvenience.')
+
 class InvenioWebJournalJournalIdNotFoundDBError(Exception):
     """
     Exception that is thrown if there was an issue number not found in the
@@ -592,27 +591,27 @@ class InvenioWebJournalJournalIdNotFoundDBError(Exception):
         """
         self.language = language
         self.journal_name = journal_name
-    
+
     def __str__(self):
         """
         String representation.
         """
         return 'The id for journal %s was not found in the Database. Make \
         sure the entry exists!' % (self.journal_name)
-    
+
     def user_box(self):
         """
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.language)
         return tmpl_webjournal_error_box(self.language,
-                    _('Journal ID Error'),
+                    _('Journal ID error'),
                     _('We could not find the id for this journal in the Database'),
-                    _('We encountered an internal error trying to get the id \
+                    'We encountered an internal error trying to get the id \
                       for this journal. You can try to refresh the page or \
                       contact the Administrator. We apologize for the \
-                      inconvenience.'))
-    
+                      inconvenience.')
+
 #!!! depreceated !!!#
 def webjournal_missing_info_box(language, title, msg_title, msg):
     """
@@ -628,7 +627,7 @@ def webjournal_missing_info_box(language, title, msg_title, msg):
     title = _(title)
     box_title = _(msg_title)
     box_text = _(msg)
-    box_list_title = _("Available Journals")
+    box_list_title = _("Available journals")
     find_journals = lambda path: [entry for entry in os.listdir(str(path)) if os.path.isdir(str(path)+str(entry))]
     try:
         all_journals = find_journals('%s/webjournal/' % etcdir)
@@ -678,4 +677,4 @@ def webjournal_error_box(language, title, title_msg, msg):
             </div>
             ''' % (weburl, title_msg, msg, supportemail)
     return page(title=title, body=box)
-    
+
