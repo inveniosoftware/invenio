@@ -382,7 +382,7 @@ della ricerca.</it>
 <lang>
   <en>Type <em>2003</em> and select the <em>_(year)_</em> field.</en>
   <fr>Saisissez <em>2003</em> and sélectionnez le champ <em>_(year)_</em>.</fr>
-  <it>Digita <em>2003</em> e seleziona il campo <em>_(year)_</em>.<it>
+  <it>Digita <em>2003</em> e seleziona il campo <em>_(year)_</em>.</it>
 </lang>
 </td>
 </tr>
@@ -400,7 +400,7 @@ della ricerca.</it>
 </td>
 <td width="50%">
 <lang>
-  <en>Alternatively, type <code>'year:'</code> followed by value.</en>
+  <en>Alternatively, type <code>'_(year)_:'</code> followed by value.</en>
   <fr>Alternativement, saisissez <code>'_(year)_:'</code> suivi de l'année.</fr>
   <it>In alternativa, digita <code>'_(year)_:'</code> seguito dall'anno.</it>
 </lang>
@@ -485,9 +485,9 @@ della ricerca.</it>
       _(author)_ field.</en>
   <fr>Pour de meilleurs résultats, inscrire le nom accompagné d'une
       virgule et de l'initiale du prénom, puis sélectionner le champ de
-      recherche _(autore)_.</fr>
+      recherche _(author)_.</fr>
   <it>Per migliorare i risultati della ricerca, digita il cognome seguito dalla
-  virgola, seguita dalla(e) iniziale(i) e seleziona il campo _(author)_.
+  virgola, seguita dalla(e) iniziale(i) e seleziona il campo _(author)_.</it>
 </lang>
 </td>
 </tr>
