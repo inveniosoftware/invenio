@@ -1063,7 +1063,7 @@ class Template:
                      'alerts' : _("alerts"),
                      'baskets' : _("baskets"),
                      'login' : _("login"),
-                     'referer' : url_referer and ('&referer=%s' % urllib.quote(url_referer)) or '',
+                     'referer' : url_referer and ('&amp;referer=%s' % urllib.quote(url_referer)) or '',
                    }
         else:
             out += """%(username)s ::
