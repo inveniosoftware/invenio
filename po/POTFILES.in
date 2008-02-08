@@ -1,17 +1,36 @@
+## $Id$
+##
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
 # List of source files which contain translatable strings.
-config/cdspage.wml
-config/cdswmllib.wml
-modules/bibclassify/doc/admin/index.html.wml
-modules/bibclassify/doc/admin/guide.html.wml
+#
+modules/webhelp/web/help-central.webdoc
+modules/webhelp/web/admin/admin.webdoc
+modules/websearch/doc/search-tips.webdoc
+modules/websearch/doc/search-guide.webdoc
+modules/websearch/doc/admin/websearch-admin-guide.webdoc
+modules/websubmit/doc/submit-guide.webdoc
+modules/websubmit/doc/admin/websubmit-admin-guide.webdoc
 modules/bibconvert/bin/bibconvert.in
-modules/bibconvert/doc/admin/guide.html.wml
-modules/bibconvert/doc/admin/index.html.wml
 modules/bibconvert/lib/bibconvert.py
 modules/bibconvert/lib/bibconvert_tests.py
 modules/bibedit/bin/refextract.in
 modules/bibedit/bin/xmlmarclint.in
-modules/bibedit/doc/admin/guide.html.wml
-modules/bibedit/doc/admin/index.html.wml
 modules/bibedit/lib/bibedit_templates.py
 modules/bibedit/lib/bibrecord_config.py
 modules/bibedit/lib/bibrecord.py
@@ -21,35 +40,13 @@ modules/bibedit/lib/refextract.py
 modules/bibedit/web/admin/bibeditadmin.py
 modules/bibformat/bin/bibformat.in
 modules/bibformat/bin/bibreformat.in
-modules/bibformat/lib/bibformat_migration_kit_assistant_lib.py
 modules/bibformat/lib/bibformat_templates.py
 modules/bibformat/lib/bibformatadminlib.py
 modules/bibformat/lib/elements/bfe_authors.py
-modules/bibformat/doc/admin/guide.html.wml
 modules/bibformat/web/admin/bibformat_migration_kit_assistant.py
 modules/bibformat/web/admin/bibformatadmin.py
-modules/bibformat/web/admin/BEH_ACTION_add.php.wml
-modules/bibformat/web/admin/BEH_ACTION_edit.php.wml
-modules/bibformat/web/admin/BEH_COND_edit.php.wml
-modules/bibformat/web/admin/BEH_OTYPE_del.php.wml
-modules/bibformat/web/admin/BEH_OTYPE_showone.php.wml
-modules/bibformat/web/admin/BEH_display.php.wml
-modules/bibformat/web/admin/BIBREFORMAT_display.php.wml
-modules/bibformat/web/admin/BIBREFORMAT_hand.php.wml
-modules/bibformat/web/admin/BIBREFORMAT_tree.php.wml
-modules/bibformat/web/admin/FORMAT_display.php.wml
-modules/bibformat/web/admin/KB_display.php.wml
-modules/bibformat/web/admin/LINK_FORMAT_display.php.wml
-modules/bibformat/web/admin/LINK_display.php.wml
-modules/bibformat/web/admin/OAIER_SF_add.php.wml
-modules/bibformat/web/admin/OAIER_display.php.wml
-modules/bibformat/web/admin/UDF_display.php.wml
-modules/bibformat/web/admin/index.php.wml
-modules/bibformat/web/admin/test.php.wml
 modules/bibharvest/bin/bibharvest.in
 modules/bibharvest/bin/oaiharvest.in
-modules/bibharvest/doc/admin/guide.html.wml
-modules/bibharvest/doc/admin/index.html.wml
 modules/bibharvest/lib/bibharvestadminlib.py
 modules/bibharvest/lib/bibharvest_templates.py
 modules/bibharvest/lib/oaiharvestlib.py
@@ -59,8 +56,6 @@ modules/bibharvest/lib/oai_repository_tests.py
 modules/bibharvest/web/admin/bibharvestadmin.py
 modules/bibindex/bin/bibindex.in
 modules/bibindex/bin/bibstat.in
-modules/bibindex/doc/admin/index.html.wml
-modules/bibindex/doc/admin/guide.html.wml
 modules/bibindex/lib/bibindexadminlib.py
 modules/bibindex/lib/bibindex_engine_config.py
 modules/bibindex/lib/bibindex_engine.py
@@ -69,17 +64,8 @@ modules/bibindex/lib/bibindex_engine_stemmer_tests.py
 modules/bibindex/lib/bibindex_engine_stopwords.py
 modules/bibindex/lib/bibindex_engine_tests.py
 modules/bibindex/web/admin/bibindexadmin.py
-modules/bibmatch/doc/admin/index.html.wml
-modules/bibmatch/doc/admin/guide.html.wml
 modules/bibrank/bin/bibrankgkb.in
 modules/bibrank/bin/bibrank.in
-modules/bibrank/doc/admin/index.html.wml
-modules/bibrank/doc/admin/guide.html.wml
-modules/bibrank/doc/hacking/api.html.wml
-modules/bibrank/doc/hacking/bibrankgkb.html.wml
-modules/bibrank/doc/hacking/index.html.wml
-modules/bibrank/doc/hacking/single_tag_rank.html.wml
-modules/bibrank/doc/hacking/word_similarity.html.wml
 modules/bibrank/lib/bibrankadminlib.py
 modules/bibrank/lib/bibrank_citation_grapher.py
 modules/bibrank/lib/bibrank_citation_indexer.py
@@ -99,13 +85,7 @@ modules/bibrank/lib/bibrank_word_indexer.py
 modules/bibrank/web/admin/bibrankadmin.py
 modules/bibsched/bin/bibsched.in
 modules/bibsched/bin/bibtaskex.in
-modules/bibsched/doc/admin/guide.html.wml
-modules/bibsched/doc/admin/index.html.wml
-modules/bibupload/doc/admin/guide.html.wml
-modules/bibupload/doc/admin/index.html.wml
 modules/elmsubmit/bin/elmsubmit.in
-modules/elmsubmit/doc/admin/guide.html.wml
-modules/elmsubmit/doc/admin/index.html.wml
 modules/elmsubmit/lib/elmsubmit_enriched2txt.py
 modules/elmsubmit/lib/elmsubmit_EZArchive.py
 modules/elmsubmit/lib/elmsubmit_EZEmail.py
@@ -122,26 +102,17 @@ modules/elmsubmit/lib/myhtmlentitydefs.py
 modules/miscutil/bin/dbexec.in
 modules/miscutil/bin/dbtest.in
 modules/miscutil/bin/testsuite.in
-modules/miscutil/demo/democfgdata.sql.wml
-modules/miscutil/lib/config.py.wml
 modules/miscutil/lib/dateutils.py
-modules/miscutil/lib/dbquery.py.wml
 modules/miscutil/lib/errorlib.py
 modules/miscutil/lib/errorlib_tests.py
 modules/miscutil/lib/errorlib_webinterface.py
 modules/miscutil/lib/__init__.py
 modules/miscutil/lib/miscutil_config.py
 modules/miscutil/lib/mailutils.py
-modules/miscutil/lib/messages.py.wml
+modules/miscutil/lib/messages.py
 modules/miscutil/lib/textutils.py
-modules/miscutil/sql/tabfill.sql.wml
 modules/webaccess/bin/authaction.in
 modules/webaccess/bin/webaccessadmin.in
-modules/webaccess/doc/admin/guide.html.wml
-modules/webaccess/doc/hacking/admin-internals.html.wml
-modules/webaccess/doc/hacking/api.html.wml
-modules/webaccess/doc/hacking/index.html.wml
-modules/webaccess/doc/hacking/table-structure.html.wml
 modules/webaccess/lib/access_control_admin.py
 modules/webaccess/lib/access_control_config.py
 modules/webaccess/lib/access_control_engine.py
@@ -149,21 +120,15 @@ modules/webaccess/lib/external_authentication.py
 modules/webaccess/lib/webaccessadmin_lib.py
 modules/webaccess/web/admin/webaccessadmin.py
 modules/webalert/bin/alertengine.in
-modules/webalert/doc/admin/guide.html.wml
-modules/webalert/doc/admin/index.html.wml
 modules/webalert/lib/alert_engine.py
 modules/webalert/lib/htmlparser.py
 modules/webalert/lib/webalert.py
 modules/webalert/lib/webalert_templates.py
 modules/webalert/lib/webalert_webinterface.py
-modules/webbasket/doc/admin/guide.html.wml
-modules/webbasket/doc/admin/index.html.wml
 modules/webbasket/lib/webbasket.py
 modules/webbasket/lib/webbasket_config.py
 modules/webbasket/lib/webbasket_templates.py
 modules/webbasket/lib/webbasket_webinterface.py
-modules/webcomment/doc/admin/index.html.wml
-modules/webcomment/doc/admin/guide.html.wml
 modules/webcomment/lib/webcommentadminlib.py
 modules/webcomment/lib/webcomment_config.py
 modules/webcomment/lib/webcomment.py
@@ -171,22 +136,7 @@ modules/webcomment/lib/webcomment_templates.py
 modules/webcomment/lib/webcomment_tests.py
 modules/webcomment/lib/webcomment_webinterface.py
 modules/webcomment/web/admin/webcommentadmin.py
-modules/webhelp/web/admin/howto/index.html.wml
-modules/webhelp/web/admin/howto/marc.html.wml
-modules/webhelp/web/admin/howto/migrate.html.wml
-modules/webhelp/web/admin/howto/run.html.wml
-modules/webhelp/web/admin/index.html.wml
-modules/webhelp/web/hacking/concepts.html.wml
-modules/webhelp/web/hacking/directory.html.wml
-modules/webhelp/web/hacking/index.html.wml
-modules/webhelp/web/hacking/modules.html.wml
-modules/webhelp/web/hacking/releases.html.wml
-modules/webhelp/web/hacking/style.html.wml
-modules/webhelp/web/hacking/testsuite.html.wml
-modules/webhelp/web/index.html.wml
 modules/webmessage/bin/webmessageadmin.in
-modules/webmessage/doc/admin/guide.html.wml
-modules/webmessage/doc/admin/index.html.wml
 modules/webmessage/lib/webmessage_config.py
 modules/webmessage/lib/webmessage_dblayer.py
 modules/webmessage/lib/webmessage_mailutils.py
@@ -194,14 +144,6 @@ modules/webmessage/lib/webmessage.py
 modules/webmessage/lib/webmessage_templates.py
 modules/webmessage/lib/webmessage_webinterface.py
 modules/websearch/bin/webcoll.in
-modules/websearch/doc/admin/index.html.wml
-modules/websearch/doc/admin/guide.html.wml
-modules/websearch/doc/guide.html.wml
-modules/websearch/doc/hacking/api.html.wml
-modules/websearch/doc/hacking/index.html.wml
-modules/websearch/doc/hacking/stages.html.wml
-modules/websearch/doc/index.html.wml
-modules/websearch/doc/tips.html.wml
 modules/websearch/lib/search_engine_config.py
 modules/websearch/lib/search_engine.py
 modules/websearch/lib/search_engine_tests.py
@@ -212,9 +154,7 @@ modules/websearch/lib/websearch_external_collections.py
 modules/websearch/lib/websearch_external_collections_templates.py
 modules/websearch/lib/websearch_webcoll.py
 modules/websearch/web/admin/websearchadmin.py
-modules/websession/bin/sessiongc.in
-modules/websession/doc/admin/guide.html.wml
-modules/websession/doc/admin/index.html.wml
+modules/websession/bin/inveniogc.in
 modules/websession/lib/session.py
 modules/websession/lib/webaccount.py
 modules/websession/lib/websession.py
@@ -225,32 +165,12 @@ modules/websession/lib/webgroup_dblayer.py
 modules/websession/lib/webgroup.py
 modules/websession/lib/websession_config.py
 modules/webstat/bin/webstat.in
-modules/webstat/doc/admin/guide.html.wml
-modules/webstat/doc/admin/index.html.wml
-modules/webstyle/doc/admin/guide.html.wml
-modules/webstyle/doc/admin/index.html.wml
 modules/webstyle/lib/template.py
 modules/webstyle/lib/webpage.py
 modules/webstyle/lib/webstyle_templates.py
+modules/webstyle/lib/webdoc.py
+modules/webstyle/lib/webdoc_webinterface.py
 modules/websubmit/bin/thumbmaker.in
-modules/websubmit/doc/access.html.wml
-modules/websubmit/doc/actions.html.wml
-modules/websubmit/doc/admin/index.html.wml
-modules/websubmit/doc/admin/guide.html.wml
-modules/websubmit/doc/approval.html.wml
-modules/websubmit/doc/approvals.html.wml
-modules/websubmit/doc/bibliographic_fields.html.wml
-modules/websubmit/doc/description.html.wml
-modules/websubmit/doc/file_transfer.html.wml
-modules/websubmit/doc/index.html.wml
-modules/websubmit/doc/introduction.html.wml
-modules/websubmit/doc/login.html.wml
-modules/websubmit/doc/modification.html.wml
-modules/websubmit/doc/password.html.wml
-modules/websubmit/doc/pending.html.wml
-modules/websubmit/doc/revised_version.html.wml
-modules/websubmit/doc/submission.html.wml
-modules/websubmit/doc/subnumber.html.wml
 modules/websubmit/lib/file.py
 modules/websubmit/lib/functions/Add_Files.py
 modules/websubmit/lib/functions/CaseEDS.py
@@ -298,3 +218,6 @@ modules/websubmit/web/publiline.py
 modules/websubmit/web/yourapprovals.py
 modules/websubmit/web/yoursubmissions.py
 modules/websubmit/web/admin/websubmitadmin.py
+modules/webjournal/lib/webjournal_utils.py
+modules/webjournal/lib/webjournal_templates.py
+modules/webjournal/lib/webjournal_config.py
