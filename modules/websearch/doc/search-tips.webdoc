@@ -22,283 +22,661 @@
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/<lang:link/>">_(Help Central)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
-<h5>How to find any value in any field:</h5>
+<h5><lang>
+<en>How to find any value in any field:</en>
+<fr>Comment chercher n'importe quel mot dans n'importe quel champ:</fr>
+</lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
     <input size="20" type="text" name="p" value="" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Empty search box returns all records in the database.
+<lang>
+  <en>Empty search box returns all records in the database.</en>
+  <fr>Une recherche vide retourne toutes les entrées de la base de donnée.</fr>
+</lang>
 </td>
 </tr>
 </table>
 
-<h5>How to find documents in a particular collection:</h5>
+
+<h5><lang>
+<en>How to find documents in a particular collection:</en>
+<fr>Comment trouver un document classé dans une collection spécifique:</fr>
+</lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
-<td width="50%" nowrap>
+<td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     <p>
-    Narrow by collection:
+    _(Narrow by collection:)_
     <br />
-    <input type="checkbox" name="c" value="Preprints" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Preprints">Preprints</a>
+    <input type="checkbox" name="c" value="Preprints" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Preprints<lang:link />">Preprints</a>
     <br />
-    <input type="checkbox" name="c" value="Theses" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Theses">Theses</a>
-    </form>
+    <input type="checkbox" name="c" value="Theses" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Theses<lang:link />">Theses</a>
     </p>
+    </form>
+
 </td>
 <td width="50%">
-Click on a link below the search box to see and select subcollections
-such as Preprints or Theses, or select/deselect the tick boxes next to a
-particular collection before doing the search.
+<lang>
+  <en>Click on a link below the search box to see and select
+      subcollections such as Preprints or Theses, or select/deselect
+      the tick boxes next to a particular collection before doing the
+      search.</en>
+  <fr>Avant de lancer votre recherche, cliquez sur un des liens de
+      l'arborescence située en dessous de la boite de recherche pour
+      afficher une sous-collection telle que "Preprints" ou "Thèses",
+      ou sélectionner la case à cocher située à gauche d'une
+      collection ou du type de document souhaité.</fr>
+</lang>
 </td>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="NA60" />
-    <select name="f"><option value="">any field<option>title</option><option>author</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     <p>
-    Narrow by collection:
+    _(Narrow by collection:)_
     <br />
-    <input type="checkbox" name="c" value="Preprints" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Preprints">Preprints</a>
+    <input type="checkbox" name="c" value="Preprints" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Preprints<lang:link />">Preprints</a>
     <br />
-    <input type="checkbox" name="c" value="Theses" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Theses">Theses</a>
-    </form>
+    <input type="checkbox" name="c" value="Theses" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Theses<lang:link />">Theses</a>
     </p>
+    </form>
 </td>
 <td width="50%">
-If you want documents from a 'collection' not proposed by default,
-such as NA60 documents, then enter it as a search term.
+<lang>
+<en>If you want documents from a 'collection' not proposed by default,
+    such as NA60 documents, then enter it as a search term.</en>
+<fr>Pour les documents appartenant à une collection qui n'est pas
+    proposée par défaut, tels que les documents NA60, entrez le nom de
+    la collection dans la requête.</fr>
+</lang>
 </td>
 </tr>
 </table>
-<div align="right"><small><a href="search-guide<lang:link/>#howto-choose-terms">more on how to wisely choose your search terms...</a></small></div>
+<div align="right"><small><a href="search-guide<lang:link/>#howto-choose-terms">
+<lang>
+  <en>more on how to wisely choose your search terms...</en>
+  <fr>plus d'informations sur le choix des termes de recherche...</fr>
+</lang></a></small></div>
 
-<h5>How to search for words/phrases (within titles, abstracts, etc):</h5>
+<h5><lang>
+<en>How to search for words/phrases (within titles, abstracts, etc):</en>
+<fr>Comment chercher un ou plusieurs mots, une phrase (dans le titre, l'abstract, etc.):</fr>
+</lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="higgs boson" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Returns records containing words <em>higgs</em> and <em>boson</em>.
+<lang>
+  <en>Returns records containing words <em>higgs</em> and
+      <em>boson</em>.</en>
+  <fr>Retourne les notices contenant les mots <em>higgs</em> et
+      <em>boson</em>.</fr>
+</lang>
 </td>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="'higgs boson'" />
-    <select name="f"><option value="">any field</option><option selected="selected">title</option><option>author</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option selected="selected"><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Returns records containing phrase <em>'higgs boson'</em> in title.
+<lang>
+  <en>Returns records containing phrase <em>'higgs boson'</em> in
+      title.</en>
+  <fr>Retourne les notices contenant la phrase <em>'higgs boson'</em>
+      dans le titre.</fr>
+</lang>
+
 </td>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="&quot;higgs boson&quot;" />
-    <select name="f"><option value="">any field</option><option selected="selected">title</option><option>author</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option selected="selected"><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Returns records entitled exactly <em>"Higgs boson"</em> but not records such as
-<em>"Overview of Higgs boson production"</em>.
+<lang>
+
+  <en>Returns records entitled exactly <em>"Higgs boson"</em> but not
+      records such as <em>"Overview of Higgs boson
+      production"</em>.</en>
+  <fr>Retourne les notices dont le titre est exactement <em>"Higgs
+      boson"</em>, mais pas les notices telles que <em>"Overview of
+      Higgs boson production"</em></fr>
+</lang>
+
 </td>
 </tr>
 </table>
-<div align="right"><small><a href="search-guide<lang:link/>#words-vs-phrases">more on word and phrase searches...</a></small></div>
+<div align="right"><small><a href="search-guide<lang:link/>#words-vs-phrases">
+<lang>
+   <en>more on word and phrase searches...</en>
+   <fr>plus d'informations sur la recherche de mots ou de
+       phrases...</fr>
+</lang>
+</a></small></div>
 
-<h5>How to use truncation:</h5>
+<h5><lang>
+<en>How to use truncation:</en>
+<fr>Comment utiliser la troncature:</fr>
+</lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon*" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Returns records containing words <em>muon</em>, <em>muons</em>, <em>muonic</em>, etc.
+<lang>
+  <en>Returns records containing words <em>muon</em>, <em>muons</em>,
+      <em>muonic</em>, etc.</en>
+  <fr>Retourne les notices contenant les mots <em>muon</em>,
+      <em>muons</em>, <em>muonic</em>, etc.</fr>
+</lang>
 </td>
 </tr>
 </table>
-<div align="right"><small><a href="search-guide<lang:link/>#wildcard">more on truncation...</a></small></div>
+<div align="right"><small><a href="search-guide<lang:link/>#wildcard">
+<lang>
+  <en>more on truncation...</en>
+  <fr>plus d'informations au sujet de la troncature ...</fr>
+</lang>
+</a></small></div>
 
-<h5>How to use boolean operators:</h5>
+<h5><lang>
+<en>How to use boolean operators:</en>
+<fr>Comment utiliser les opérateurs booléens:</fr>
+</lang></h5>
+
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon kaon" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
-    or:
+    <lang><en>or</en><fr>ou</fr></lang>:
     <br />
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon AND kaon" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Returns records containing both <em>muon</em> and <em>kaon</em>.
+<lang>
+  <en>Returns records containing both <em>muon</em> and <em>kaon</em>.</en>
+  <fr>Retourne les notices contenant à la fois <em>muon</em> et <em>kaon</em>.</fr>
+</lang>
 </td>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon OR kaon" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Returns records containing either <em>muon</em> or <em>kaon</em>.
+<lang>
+  <en>Returns records containing either <em>muon</em> or <em>kaon</em>.</en>
+  <fr>Retourne les notices contenant soit <em>muon</em>, soit <em>kaon</em>.</fr>
+</lang>
 </td>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon NOT kaon" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Returns records containing <em>muon</em> but not <em>kaon</em>.
+<lang>
+  <en>Returns records containing <em>muon</em> but not <em>kaon</em>.</en>
+  <fr>Retourne les notices contenant <em>muon</em>, mais pas <em>kaon</em>.</fr>
+</lang>
 </td>
 </tr>
 </table>
-<div align="right"><small><a href="search-guide<lang:link/>#boolean">more on Boolean queries...</a></small></div>
+<div align="right"><small><a href="search-guide<lang:link/>#boolean">
+<lang>
+  <en>more on Boolean queries...</en>
+  <fr>plus d'informations au sujet des requêtes booléennes...</fr>
+</lang>
+</a></small></div>
 
-<h5>How to find documents from a certain period:</h5>
+
+<h5><lang>
+<en>How to find documents from a certain period:</en>
+<fr>Comment chercher un document d'une certaine période:</fr>
+</lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="2003" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option selected="selected">year</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+                     <option selected="selected" value="year"><lang>
+                             <en>year</en>
+                             <fr>année</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Type 2003 and select the year field.
+<lang>
+  <en>Type <em>2003</em> and select the <em>year</em> field.</en>
+  <fr>Saisissez <em>2003</em> and sélectionnez le champ <em>année</em>.</fr>
+</lang>
 </td>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="year:2003" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Alternatively, type field name colon value.
+<lang>
+  <en>Alternatively, type field name colon value.</en>
+  <fr>Alternativement, saisissez <code>'year:'</code> suivi de l'année.</fr>
+</lang>
 </td>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="year:2003->2004" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-You can enter specific year range.
+<lang>
+  <en>You can enter specific year range.</en>
+  <fr>Vous pouvez également définir un intervalle temporel.</fr>
+</lang>
 </td>
 </tr>
 </table>
-<div align="right"><small><a href="search-guide<lang:link/>#span">more on span queries...</a></small></div>
+<div align="right"><small><a href="search-guide<lang:link/>#span">
+<lang>
+  <en>more on span queries...</en>
+  <fr>plus d'informations au sujet des requêtes par périodes...</fr>
+</lang>
+</a></small></div>
 
-<h5>How to search for authors:</h5>
-
+<h5><lang>
+<en>How to search for authors:</en>
+<fr>Comment chercher un document par auteur:</fr>
+</lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="Ellis" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Some authors have unique names and
-their publications can be retrieved by searching for
-the surname in any field.
+<lang>
+  <en>Some authors have unique names and their publications can be
+      retrieved by searching for the surname in any field.</en>
+  <fr>Les noms uniques peuvent être recherchés dans n'importe quel
+      champ.</fr>
+</lang>
 </td>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="Ellis, J R" />
-    <select name="f"><option value="">any field</option><option>title</option><option selected="selected">author</option><option>year</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option selected="selected" value="author"><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-For better results, type surname comma initial(s) and select the author field.
+<lang>
+  <en>For better results, type surname comma initial(s) and select the
+      author field.</en>
+  <fr>Pour de meilleurs résultats, inscrire le nom accompagné d'une
+      virgule et de l'initiale du prénom, puis sélectionner le champ de
+      recherche auteur.</fr>
+</lang>
 </td>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="Ellis, John Rolfe" />
-    <select name="f"><option value="">any field</option><option>title</option><option selected="selected">author</option><option>year</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option selected="selected" value="author"><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Sometimes authors are indexed with their full name.
+<lang>
+  <en>Sometimes authors are indexed with their full name.</en>
+  <fr>Parfois, les auteurs peuvent être inscrits avec leur prénom
+  complet.</fr>
+</lang>
 </td>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="author:&quot;Ellis, J*&quot; year:1990->1993" />
-    <select name="f"><option value="">any field</option><option>title</option><option>author</option><option>year</option></select>
-    <input class="formbutton" type="submit" name="action" value="SEARCH" />
+    <select name="f"><option value=""><lang>
+                                      <en>any field</en>
+                                      <fr>tous les champs</fr>
+                                      </lang></option>
+                     <option><lang>
+                             <en>title</en>
+                             <fr>titre</fr>
+                             </lang></option>
+                     <option><lang>
+                             <en>author</en>
+                             <fr>auteur</fr>
+                             </lang></option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
 </td>
 <td width="50%">
-Find papers by J.Ellis written from 1990 until 1993, using truncation
-to match all first names beginning with J.
+<lang>
+  <en>Find papers by J.Ellis written from 1990 until 1993, using
+      truncation to match all first names beginning with J.</en>
+  <fr>Rechercher toutes les notices de J.Ellis publiées entre 1990 et
+      1993, en utilisant la troncature permettant de retrouver tous
+      les prénoms commençant par J.</fr>
+</lang>
 </td>
 </tr>
 </table>
-<div align="right"><small><a href="search-guide<lang:link/>#howto-search-for-author">more on author searches...</a></small></div>
+<div align="right"><small><a href="search-guide<lang:link/>#howto-search-for-author">
+<lang>
+  <en>more on author searches...</en>
+  <fr>plus d'informations au sujet de la recherche par auteur...</fr>
+</lang>
+</a></small></div>
 
+<h5><lang>
+<en>More information:</en>
+<fr></fr>
+</lang></h5>
 
-<h5>More information:</h5>
+<lang>
+  <en>Special characters, regular expressions, fulltext searching,
+    citation searching, and other capabilities are fully explained in
+    the complete <a href="search-guide<lang:link/>">Search
+    Guide</a>.</en>
 
-Special characters, regular expressions, fulltext searching, citation
-searching, and other capabilities are fully explained in the complete
-<a href="search-guide<lang:link/>">Search Guide</a>.
+  <fr>Des explications additionnelles concernant les caractères
+      spéciaux, les expressions régulières, la recherche dans le
+      contenu des fichiers, des citations, ainsi que d'autres
+      fonctionnalités sont disponibles dans le <a
+      href="search-guide<lang:link/>">Guide de Recherche</a>.</fr>
+</lang>
