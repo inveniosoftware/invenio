@@ -16,6 +16,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import os
 import time
 
 from invenio.config import adminemail, supportemail, etcdir, weburl, cdslang
@@ -32,9 +33,8 @@ def tmpl_webjournal_missing_info_box(language, title, msg_title, msg):
     server, leaving the opportunity to select an existing journal from a list.
     """
     _ = gettext_set_language(language)
-    #title = _(title)
-    #box_title = _(msg_title)
-    #box_text = _(msg)
+    box_title = msg_title
+    box_text = msg
     box_list_title = _("Available Journals")
     # todo: move to DB call
     find_journals = lambda path: [entry for entry in os.listdir(str(path)) if os.path.isdir(str(path)+str(entry))]
@@ -80,7 +80,7 @@ def tmpl_webjournal_error_box(language, title, title_msg, msg):
     title = _(title)
     title_msg = _(title_msg)
     msg = _(msg)
-    mail_msg = _("Mail %(x_url_open)s the developers%(x_url_close)s") % {'x_url_open' :
+    mail_msg = _("Mail %(x_url_open)sdevelopers%(x_url_close)s") % {'x_url_open' :
         '<a href="mailto:%s">' % supportemail,
         'x_url_close' : '</a>'}
     box = '''
@@ -108,11 +108,11 @@ def tmpl_webjournal_regenerate_success(language, journal_name, issue_number):
     _ = gettext_set_language(language)
     return page(
         title=_("Issue regenerated"),
-        body = _('''
+        body = '''
     The issue number %s for the journal %s has been successfully
     regenerated.
     Look at your changes: >> <a href="%s/journal/?name=%s"> %s </a>
-    ''') % (issue_number, journal_name, weburl, journal_name, journal_name))
+    ''' % (issue_number, journal_name, weburl, journal_name, journal_name))
 
 def tmpl_webjournal_regenerate_error(language, journal_name, issue_number):
     """
@@ -121,27 +121,25 @@ def tmpl_webjournal_regenerate_error(language, journal_name, issue_number):
     _ = gettext_set_language(language)
     return page(
         title=_("Regeneration Error"),
-        body = _('''
-        The issue could not be correctly regenerated. Please contact
-        your administrator.
-        '''))
+        body = _("The issue could not be correctly regenerated. "
+                 "Please contact your administrator."))
 
 def tmpl_webjournal_feature_record_interface(language, journal_name):
     """
     Draws an interface form to feature a specific record from CDS Invenio.
     """
     _ = gettext_set_language(language)
-    interface = _('''
+    interface = '''
     <form action="%s/journal/feature_record" name="alert">
         <input type="hidden" name="name" value="%s"/>
-        <p>Featured Record's ID:</p>
+        <p>Featured Record ID:</p>
         <input type="text" name="recid" value="" />
         <p>Link to the picture that should be displayed</p>
         <input type="text" name="url" value="" />
         <br/>
         <input class="formbutton" type="submit" value="feature" name="featured"/>
     </form>
-    ''') % (weburl, journal_name)
+    ''' % (weburl, journal_name)
     return page(title=_("Feature a record"), body=interface)
 
 def tmpl_webjournal_feature_record_success(language, journal_name, recid):
@@ -149,11 +147,11 @@ def tmpl_webjournal_feature_record_success(language, journal_name, recid):
     Draw a success message for featuring a record and a backlink to the journal
     """
     _ = gettext_set_language(language)
-    title = _("Successfully featured record: %s") % recid
-    msg = _('''Return to your Journal here >>
-            <a href="%s/journal/?name=%s">%s</a>''') % (weburl,
-                                                         journal_name,
-                                                        journal_name)
+    title = "Successfully featured record: %s" % recid
+    msg = '''Return to your journal here >>
+            <a href="%s/journal/?name=%s">%s</a>''' % (weburl,
+                                                       journal_name,
+                                                       journal_name)
     return page(title = title, body = msg)
 
 def tmpl_webjournal_alert_plain_text_CERNBulletin(journal_name, language, issue):
@@ -163,7 +161,7 @@ def tmpl_webjournal_alert_plain_text_CERNBulletin(journal_name, language, issue)
     """
     current_publication = get_current_publication(journal_name, issue)
     plain_text = u'''Dear Subscriber,
-                    
+
 The latest issue of the CERN Bulletin, no. %s, has been released.
 You can access it at the following URL:
 http://bulletin.cern.ch/
@@ -181,7 +179,7 @@ http://bulletin.cern.ch/fre
 Bonne lecture,
 L'équipe du Bulletin du CERN
 ''' % (current_publication, current_publication)
-    return plain_text 
+    return plain_text
 
 def tmpl_webjournal_alert_subject_CERNBulletin(journal_name, issue):
     """
@@ -196,7 +194,7 @@ def tmpl_webjournal_alert_interface(language, journal_name, subject,
     Alert eMail interface.
     """
     _ = gettext_set_language(language)
-    interface = _('''
+    interface = '''
     <form action="%s/journal/alert" name="alert" method="POST">
         <input type="hidden" name="name" value="%s"/>
         <p>Recipients:</p>
@@ -210,17 +208,16 @@ def tmpl_webjournal_alert_interface(language, journal_name, subject,
         </p>
         <br/>
         <input class="formbutton" type="submit" value="alert" name="sent"/>
-    </form>
-            ''') % (weburl, journal_name, subject, plain_text)
+    </form>''' % (weburl, journal_name, subject, plain_text)
     return interface
-    
+
 def tmpl_webjournal_alert_was_already_sent(language, journal_name,
                                            subject, plain_text, recipients,
                                            html_mail, issue):
     """
     """
     _ = gettext_set_language(language)
-    interface = _('''
+    interface = '''
     <form action="%s/journal/alert" name="alert" method="POST">
         <input type="hidden" name="name" value="%s"/>
         <input type="hidden" name="recipients" value="%s" />
@@ -230,7 +227,7 @@ def tmpl_webjournal_alert_was_already_sent(language, journal_name,
         <input type="hidden" name="force" value="True" />
         <p><em>ATTENTION! </em>The alert email for the issue %s has already been
         sent. Are you absolutely sure you want to resend it?</p>
-        <p>Maybe you forgot to release an update issue? If so, please do this 
+        <p>Maybe you forgot to release an update issue? If so, please do this
         first <a href="%s/journal/issue_control?name=%s&issue=%s">here</a>.</p>
         <p>Be aware, if you go on with this, the whole configured mailing list
         will receive this message a second time. Only proceed if you know what
@@ -238,19 +235,19 @@ def tmpl_webjournal_alert_was_already_sent(language, journal_name,
         <br/>
         <input class="formbutton" type="submit" value="I really want this!" name="sent"/>
     </form>
-            ''') % (weburl, journal_name, recipients, 
-                    subject, plain_text, html_mail, issue, weburl, journal_name,
-                    issue)
+            ''' % (weburl, journal_name, recipients,
+                   subject, plain_text, html_mail, issue, weburl, journal_name,
+                   issue)
     return page(title="Confirmation Required", body=interface)
-    
+
 def tmpl_webjournal_alert_success_msg(language, journal_name):
     """
     Success messge for the alert system.
     """
     _ = gettext_set_language(language)
     title = _("Alert sent successfully!")
-    body = _('Return to your journal here: >> \
-             <a href="%s/journal/?name=%s"> %s </a>') % (weburl, journal_name,
+    body = 'Return to your journal here: >> \
+             <a href="%s/journal/?name=%s"> %s </a>' % (weburl, journal_name,
                                                          journal_name)
     return page(title=title, body=body)
 
@@ -259,7 +256,7 @@ def tmpl_webjournal_issue_control_interface(language, journal_name,
     """
     """
     _ = gettext_set_language(language)
-    interface = _('''
+    interface = '''
     <div align="center">
         <h2>Publishing Interface</h2>
         <p>This interface gives you the possibilite to create
@@ -287,12 +284,12 @@ def tmpl_webjournal_issue_control_interface(language, journal_name,
             <input class="formbutton" type="submit" value="Publish" name="action_publish"/>
         </form>
     </div>
-        ''') % (weburl,
+        ''' % (weburl,
                journal_name,
                "".join(['<li><input type="checkbox" name="issue_number" value="%s" CHECKED>&nbsp;%s</input></li>'
                         % (issue, issue) for issue in active_issues]),
                )
-    
+
     return interface
 
 def tmpl_webjournal_issue_control_success_msg(language,
@@ -301,8 +298,8 @@ def tmpl_webjournal_issue_control_success_msg(language,
     """
     _ = gettext_set_language(language)
     issue_string = "".join([" - %s" % issue for issue in active_issues])
-    title = _('<h2>Bulletin %s created successfully!</h2>' % issue_string)
-    body = _('<p>Now you can:</p> \
+    title = '<h2>Bulletin %s created successfully!</h2>' % issue_string
+    body = '<p>Now you can:</p> \
              <p>Return to your journal here: >> \
              <a href="%s/journal/?name=%s"> %s </a>\
              </p>\
@@ -311,9 +308,9 @@ def tmpl_webjournal_issue_control_success_msg(language,
             </p>\
             <p>Send an alert email here: >> \
             <a href="%s/journal/alert?name=%s"> Send an alert</a> \
-            </p>') % (weburl, journal_name,
-                                              journal_name, weburl,
-                                              journal_name, weburl, journal_name)
+            </p>' % (weburl, journal_name,
+                     journal_name, weburl,
+                     journal_name, weburl, journal_name)
     return title + body
 
 def tmpl_webjournal_update_an_issue(language, journal_name, next_issue,
@@ -328,8 +325,8 @@ def tmpl_webjournal_update_an_issue(language, journal_name, next_issue,
     next_articles = get_number_of_articles_for_issue(next_issue,
                                                         journal_name,
                                                         language)
-    
-    html = _('''
+
+    html = '''
     <p>The Issue that was released on week %s has pending updates scheduled. The
     next update for this issue is %s.</p>
     <p><em>Note: If you want to make a new release, please click through all the
@@ -343,12 +340,12 @@ def tmpl_webjournal_update_an_issue(language, journal_name, next_issue,
         <input type="hidden" name="issue_number" value="%s"/>
         <input class="formbutton" type="submit" value="Update" name="action_publish"/>
     </form>
-    ''') % (current_issue, next_issue,
-            current_issue,
-            ",".join(["%s : %s" % (item[0], item[1]) for item in current_articles.iteritems()]),
-            next_issue,
-            ",".join(["%s : %s" % (item[0], item[1]) for item in next_articles.iteritems()]),
-            weburl, journal_name, next_issue)
+    ''' % (current_issue, next_issue,
+           current_issue,
+           ",".join(["%s : %s" % (item[0], item[1]) for item in current_articles.iteritems()]),
+           next_issue,
+           ",".join(["%s : %s" % (item[0], item[1]) for item in next_articles.iteritems()]),
+           weburl, journal_name, next_issue)
     return html
 
 def tmpl_webjournal_updated_issue_msg(language, update_issue, journal_name):
@@ -356,9 +353,8 @@ def tmpl_webjournal_updated_issue_msg(language, update_issue, journal_name):
     Prints a success message for the Update release of a journal.
     """
     _ = gettext_set_language(language)
-    title = _('<h2>Journal Update %s published successfully!</h2>' %
-              update_issue)
-    body = _('<p>Now you can:</p> \
+    title = '<h2>Journal update %s published successfully!</h2>' % update_issue
+    body = '<p>Now you can:</p> \
              <p>Return to your journal here: >> \
              <a href="%s/journal/?name=%s"> %s </a>\
              </p>\
@@ -367,7 +363,7 @@ def tmpl_webjournal_updated_issue_msg(language, update_issue, journal_name):
              </p>\
              <p>Send an alert email here: >> \
              <a href="%s/journal/alert?name=%s"> Send an alert</a> \
-             </p>') % (weburl, journal_name, journal_name,
+             </p>' % (weburl, journal_name, journal_name,
                       weburl, journal_name, weburl, journal_name)
     return title + body
 
@@ -389,7 +385,7 @@ def tmpl_webjournal_admin_interface(journal_name, current_issue,
                                                     language)
         released_on = get_release_time(issue, journal_name, language)
         announced_on = get_announcement_time(issue, journal_name, language)
-        issue_box = _('''
+        issue_box = '''
             <tr style="%s">
                 <td class="admintdright" style="vertical-align: middle;"></td>
                 <td class="admintdleft" style="white-space: nowrap; vertical-align: middle;">
@@ -409,26 +405,26 @@ def tmpl_webjournal_admin_interface(journal_name, current_issue,
                 </td>
             <tr>
         ''' % ((issue==current_issue) and "background:#00FF00;" or "background:#F1F1F1;",
-            
+
                 issue, (issue==next_issue_number) and "?" or current_publication,
-                
+
                 "\n".join(['<p>%s : %s <a href="%s/journal/?name=%s&issue=%s&category=%s">&gt;edit</a></p>' %
                            (item[0], item[1],
                             weburl, journal_name,
                             issue, item[0]) for item in articles.iteritems()]),
-                
+
                 (released_on==False) and
                 '<em>not released</em><br/><a href="%s/journal/issue_control?name=%s">&gt;release now</a>' % (weburl, journal_name) or
                 'released on: %s' % time.strftime("%d.%m.%Y", released_on),
-                
+
                 (announced_on==False)
                 and '<em>not announced</em><br/><a href="%s/journal/alert?name=%s&issue=%s">&gt;announce now</a>' % (weburl, journal_name, issue) or
                 'announced on: %s <br/><a href="%s/journal/alert?name=%s&issue=%s">&gt;re-announce</a>' % (time.strftime("%d.%m.%Y", announced_on), weburl, journal_name, issue),
-                
+
                 weburl, journal_name, issue
-            ))
+            )
         issue_boxes.append(issue_box)
-    body = _('''
+    body = '''
              <table class="admin_wvar" width="95%%" cellspacing="0">
                 <tbody>
                     <tr>
@@ -441,11 +437,11 @@ def tmpl_webjournal_admin_interface(journal_name, current_issue,
                     %s
                 </tbody>
              </table>
-             
+
              <p><a href="%s/submit?doctype=BULBN">Submit a Breaking News</a></p>
              <p><a href="%s/journal/feature_record?name=%s">Feature a Record</a></p>
              <p align="right"><a href="%s/journal/?name=%s">&gt;Go to the Journal</a></p>
              ''' % ("\n".join([issue_box for issue_box in issue_boxes]),
-                weburl, weburl, journal_name, weburl, journal_name))
-    
+                weburl, weburl, journal_name, weburl, journal_name)
+
     return page(title=title, body=body)
