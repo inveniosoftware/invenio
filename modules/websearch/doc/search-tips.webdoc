@@ -32,18 +32,9 @@
 <td width="50%" style="white-space: nowrap">
     <form action="<WEBURL>/search" method="get">
     <input size="20" type="text" name="p" value="" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -69,18 +60,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     <p>
@@ -112,18 +94,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="NA60" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     <p>
@@ -163,18 +136,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="higgs boson" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -193,18 +157,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="'higgs boson'" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option selected="selected"><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option selected="selected">_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -224,18 +179,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="&quot;higgs boson&quot;" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option selected="selected"><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option selected="selected">_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -273,18 +219,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon*" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -318,38 +255,20 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon kaon" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
-    <lang><en>or</en><fr>ou</fr></lang>:
+    _(or)_:
     <br />
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon AND kaon" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -366,18 +285,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon OR kaon" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -394,18 +304,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon NOT kaon" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -437,22 +338,10 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="2003" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
-                     <option selected="selected" value="year"><lang>
-                             <en>year</en>
-                             <fr>année</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
+                     <option selected="selected" value="year">_(year)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -469,18 +358,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="year:2003" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -497,18 +377,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="year:2003->2004" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -539,18 +410,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="Ellis" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -569,18 +431,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="Ellis, J R" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option selected="selected" value="author"><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option selected="selected" value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -600,18 +453,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="Ellis, John Rolfe" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option selected="selected" value="author"><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option selected="selected" value="author">_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
@@ -629,18 +473,9 @@
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="author:&quot;Ellis, J*&quot; year:1990->1993" />
-    <select name="f"><option value=""><lang>
-                                      <en>any field</en>
-                                      <fr>tous les champs</fr>
-                                      </lang></option>
-                     <option><lang>
-                             <en>title</en>
-                             <fr>titre</fr>
-                             </lang></option>
-                     <option><lang>
-                             <en>author</en>
-                             <fr>auteur</fr>
-                             </lang></option>
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
     </select>
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </form>
