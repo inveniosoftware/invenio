@@ -32,7 +32,7 @@ __revision__ = "$Id$"
 
 ### IMPORT INTERESTING MODULES AND XML PARSERS
 
-import re
+import re, sys
 try:
     import psyco
     psycho_available  = 1
@@ -171,7 +171,8 @@ def create_record(xmltext,
             (rec, er) = (None, "ERROR: No usable XML parsers found.")
         errs = warnings(er)
     except Exception, e:
-        print e
+        sys.stderr.write("%s" % e)
+        sys.stderr.flush()
         errs = warnings(concat(err))
         return (None, 0, errs)
 
