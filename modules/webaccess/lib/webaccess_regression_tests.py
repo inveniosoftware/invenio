@@ -57,7 +57,8 @@ class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
         """webaccess - availability of WebAccess Admin guide pages"""
 
         url = weburl + '/help/admin/webaccess-admin-guide'
-        error_messages = test_web_page_content(url)
+        error_messages = test_web_page_content(url,
+                                               expected_text="WebAccess Admin Guide")
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return

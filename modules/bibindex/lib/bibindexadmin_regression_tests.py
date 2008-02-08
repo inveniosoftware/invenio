@@ -66,7 +66,8 @@ class BibIndexAdminWebPagesAvailabilityTest(unittest.TestCase):
         """bibindexadmin - availability of BibIndex Admin guide pages"""
 
         url = weburl + '/help/admin/bibindex-admin-guide'
-        error_messages = test_web_page_content(url)
+        error_messages = test_web_page_content(url,
+                                               expected_text="BibIndex Admin Guide")
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return

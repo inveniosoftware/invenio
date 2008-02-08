@@ -59,7 +59,8 @@ class BibRankAdminWebPagesAvailabilityTest(unittest.TestCase):
         """bibrankadmin - availability of BibRank Admin guide pages"""
 
         url = weburl + '/help/admin/bibrank-admin-guide'
-        error_messages = test_web_page_content(url)
+        error_messages = test_web_page_content(url,
+                                               expected_text="BibRank Admin Guide")
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return

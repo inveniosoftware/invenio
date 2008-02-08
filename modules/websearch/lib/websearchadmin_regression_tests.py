@@ -63,7 +63,8 @@ class WebSearchAdminWebPagesAvailabilityTest(unittest.TestCase):
         """websearchadmin - availability of WebSearch Admin guide pages"""
 
         url = weburl + '/help/admin/websearch-admin-guide'
-        error_messages = test_web_page_content(url)
+        error_messages = test_web_page_content(url,
+                                               expected_text="WebSearch Admin Guide")
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return
