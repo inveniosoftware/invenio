@@ -27,7 +27,7 @@ of high energy physics (HEP) terms for a long time. The thesaurus is
 currently used as a subject controlled vocabulary by HEP institutes
 worldwide. The need to convert the HEP <a
 href="http://www-library.desy.de/schlagw2.html">text
-thesaurus</a> to a more complex <a href="http://cdswebdev.cern.ch/bibclassify/HEP.rdf">taxonomy</a>, with richer structure
+thesaurus</a> to a more complex taxonomy (in <code>/opt/cds-invenio/etc/bibclassify/HEP.rdf</code>), with richer structure
 and semantics, was mainly driven by the needs of the BibClassify system.
 The current taxonomy oh high energy physics is expressed in the <a href="http://www.w3.org/2004/02/skos/">SKOS</a>
 syntax. SKOS is a dialect of RDF and it is especially intended for the

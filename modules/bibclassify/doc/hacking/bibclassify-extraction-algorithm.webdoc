@@ -75,14 +75,14 @@ store.parse(dictfile)
 
 <p><span class="adminbox">&nbsp;<b>NB.</b> RDFLib provides very handy
 libraries for RDF manipulation, however when dealing with large RDF
-files, loading and parsing are by far the principal
-factor affecting the performance of BibClassify. For example, when
-loading the <a href="http://cdswebdev.cern.ch/bibclassify/HEP.rdf">HEP taxonomy</a> (7.4 MB, 16000 Concepts) on an Intel(R)
-Xeon(TM) CPU 3.06GHz the two lines of code above take a total of <b>26
-seconds</b> to complete (over two thirds of the total execution time - 36 seconds).
-If performance is your main concern, consider a faster library or
-working on a pre-loaded RDF store.
-</span>
+files, loading and parsing are by far the principal factor affecting
+the performance of BibClassify. For example, when loading the HEP
+taxonomy (in <code>/opt/cds-invenio/etc/bibclassify/HEP.rdf</code>:
+7.4 MB, 16000 Concepts) on an Intel(R) Xeon(TM) CPU 3.06GHz the two
+lines of code above take a total of <b>26 seconds</b> to complete
+(over two thirds of the total execution time - 36 seconds).  If
+performance is your main concern, consider a faster library or working
+on a pre-loaded RDF store.  </span>
 </p>
 
 <p>At this point, the fulltext of the document is converted from text
