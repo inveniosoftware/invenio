@@ -25,6 +25,7 @@
 <h5><lang>
 <en>How to find any value in any field:</en>
 <fr>Comment chercher n'importe quel mot dans n'importe quel champ:</fr>
+<it>Come cercare dei termini in qualsiasi campo:</it>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -43,6 +44,8 @@
 <lang>
   <en>Empty search box returns all records in the database.</en>
   <fr>Une recherche vide retourne toutes les entrées de la base de donnée.</fr>
+  <it>Non specificando alcun termine per la ricerca vengono riportati tutti i
+  record del database.</it>
 </lang>
 </td>
 </tr>
@@ -52,6 +55,7 @@
 <h5><lang>
 <en>How to find documents in a particular collection:</en>
 <fr>Comment trouver un document classé dans une collection spécifique:</fr>
+<it>Come trovare documenti appartenenti ad una particolare collezione:</it>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -86,6 +90,10 @@
       afficher une sous-collection telle que "Preprints" ou "Thèses",
       ou sélectionner la case à cocher située à gauche d'une
       collection ou du type de document souhaité.</fr>
+  <it>Fai clic su uno dei collegamenti al di sotto della casella di ricerca
+  e seleziona delle sotto-collezioni come Preprints o Thesis o
+  seleziona/deseleziona le caselle di selezione accanto alle collezioni
+  desiderate prima di effettuare la ricerca.</it>
 </lang>
 </td>
 </tr>
@@ -115,6 +123,9 @@
 <fr>Pour les documents appartenant à une collection qui n'est pas
     proposée par défaut, tels que les documents NA60, entrez le nom de
     la collection dans la requête.</fr>
+<it>Se desideri dei documenti appartenenti a una 'collezione' non proposta
+in maniera predefinita, come i documenti NA60, inseriscila come un termine
+della ricerca.</it>
 </lang>
 </td>
 </tr>
@@ -123,11 +134,14 @@
 <lang>
   <en>more on how to wisely choose your search terms...</en>
   <fr>plus d'informations sur le choix des termes de recherche...</fr>
+  <it>maggiori informazioni riguardo a come scegliere in maniera appropriata
+  i termini di rcerca...</it>
 </lang></a></small></div>
 
 <h5><lang>
 <en>How to search for words/phrases (within titles, abstracts, etc):</en>
 <fr>Comment chercher un ou plusieurs mots, une phrase (dans le titre, l'abstract, etc.):</fr>
+<it>Come effettuare una ricerca di parole/frasi (all'interno di titoli, abstract, ecc.)</it>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -149,6 +163,8 @@
       <em>boson</em>.</en>
   <fr>Retourne les notices contenant les mots <em>higgs</em> et
       <em>boson</em>.</fr>
+  <it>Restituisce i record contenenti le parole <em>higgs</em> e
+      <em>boson</em>.</it>
 </lang>
 </td>
 </tr>
@@ -170,6 +186,8 @@
       title.</en>
   <fr>Retourne les notices contenant la phrase <em>'higgs boson'</em>
       dans le titre.</fr>
+  <it>Restituisce i record contenenti la frase <em>'higgs boson'</em> nel
+      titolo.</it>
 </lang>
 
 </td>
@@ -195,6 +213,9 @@
   <fr>Retourne les notices dont le titre est exactement <em>"Higgs
       boson"</em>, mais pas les notices telles que <em>"Overview of
       Higgs boson production"</em></fr>
+  <it>Restituisce i record il cui titolo è esattamente <em>"Higgs boson"</em>
+      ma non i record quali <em>"Overview of Higgs boson
+      production"</em>.</it>
 </lang>
 
 </td>
@@ -205,12 +226,14 @@
    <en>more on word and phrase searches...</en>
    <fr>plus d'informations sur la recherche de mots ou de
        phrases...</fr>
+   <it>maggiori informazioni sulla ricerca per parole e frasi...</it>
 </lang>
 </a></small></div>
 
 <h5><lang>
 <en>How to use truncation:</en>
 <fr>Comment utiliser la troncature:</fr>
+<it>Come utilizzare la troncatura</it>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -232,6 +255,8 @@
       <em>muonic</em>, etc.</en>
   <fr>Retourne les notices contenant les mots <em>muon</em>,
       <em>muons</em>, <em>muonic</em>, etc.</fr>
+  <it>Restituisce i record contenenti le parole <em>muon</em>, <em>muons</em>,
+      <em>muonic</em>, ecc.</it>
 </lang>
 </td>
 </tr>
@@ -240,12 +265,14 @@
 <lang>
   <en>more on truncation...</en>
   <fr>plus d'informations au sujet de la troncature ...</fr>
+  <it>maggiori informazioni sulla troncatura...</it>
 </lang>
 </a></small></div>
 
 <h5><lang>
 <en>How to use boolean operators:</en>
 <fr>Comment utiliser les opérateurs booléens:</fr>
+<it>Come utilizzare gli operatori booleani:</it>
 </lang></h5>
 
 
@@ -277,6 +304,7 @@
 <lang>
   <en>Returns records containing both <em>muon</em> and <em>kaon</em>.</en>
   <fr>Retourne les notices contenant à la fois <em>muon</em> et <em>kaon</em>.</fr>
+  <it>Restituisce i record contenenti sia <em>muon</em> che <em>kaon</em>.</it>
 </lang>
 </td>
 </tr>
@@ -296,6 +324,7 @@
 <lang>
   <en>Returns records containing either <em>muon</em> or <em>kaon</em>.</en>
   <fr>Retourne les notices contenant soit <em>muon</em>, soit <em>kaon</em>.</fr>
+  <it>Restituisce i record contenenti <em>muon</em> e/o <em>kaon</em>.</it>
 </lang>
 </td>
 </tr>
@@ -315,6 +344,7 @@
 <lang>
   <en>Returns records containing <em>muon</em> but not <em>kaon</em>.</en>
   <fr>Retourne les notices contenant <em>muon</em>, mais pas <em>kaon</em>.</fr>
+  <it>Restituisce i record contenenti <em>muon</em> ma non <em>kaon</em>.</it>
 </lang>
 </td>
 </tr>
@@ -323,6 +353,7 @@
 <lang>
   <en>more on Boolean queries...</en>
   <fr>plus d'informations au sujet des requêtes booléennes...</fr>
+  <it>maggiori informazioni sulle richieste di ricerca booleane...</it>
 </lang>
 </a></small></div>
 
@@ -330,6 +361,7 @@
 <h5><lang>
 <en>How to find documents from a certain period:</en>
 <fr>Comment chercher un document d'une certaine période:</fr>
+<it>Come cercare i documenti a partire da un certo periodo:</it>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -348,8 +380,9 @@
 </td>
 <td width="50%">
 <lang>
-  <en>Type <em>2003</em> and select the <em>year</em> field.</en>
-  <fr>Saisissez <em>2003</em> and sélectionnez le champ <em>année</em>.</fr>
+  <en>Type <em>2003</em> and select the <em>_(year)_</em> field.</en>
+  <fr>Saisissez <em>2003</em> and sélectionnez le champ <em>_(year)_</em>.</fr>
+  <it>Digita <em>2003</em> e seleziona il campo <em>_(year)_</em>.<it>
 </lang>
 </td>
 </tr>
@@ -367,8 +400,9 @@
 </td>
 <td width="50%">
 <lang>
-  <en>Alternatively, type field name colon value.</en>
-  <fr>Alternativement, saisissez <code>'year:'</code> suivi de l'année.</fr>
+  <en>Alternatively, type <code>'year:'</code> followed by value.</en>
+  <fr>Alternativement, saisissez <code>'_(year)_:'</code> suivi de l'année.</fr>
+  <it>In alternativa, digita <code>'_(year)_:'</code> seguito dall'anno.</it>
 </lang>
 </td>
 </tr>
@@ -388,6 +422,7 @@
 <lang>
   <en>You can enter specific year range.</en>
   <fr>Vous pouvez également définir un intervalle temporel.</fr>
+  <it>Puoi inserire specifici intervalli di anni.</it>
 </lang>
 </td>
 </tr>
@@ -396,12 +431,14 @@
 <lang>
   <en>more on span queries...</en>
   <fr>plus d'informations au sujet des requêtes par périodes...</fr>
+  <it>maggiori informazioni sulle ricerche tramite intervalli di tempo...</it>
 </lang>
 </a></small></div>
 
 <h5><lang>
 <en>How to search for authors:</en>
 <fr>Comment chercher un document par auteur:</fr>
+<it>Come effettuare ricerche su autori:</it>
 </lang></h5>
 
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
@@ -420,9 +457,13 @@
 <td width="50%">
 <lang>
   <en>Some authors have unique names and their publications can be
-      retrieved by searching for the surname in any field.</en>
-  <fr>Les noms uniques peuvent être recherchés dans n'importe quel
-      champ.</fr>
+      retrieved by searching for the surname in the
+      <code>_(any field)_</code> field.</en>
+  <fr>Les noms uniques peuvent être recherchés dans le champ
+  <code>_(any field)_</code>.</fr>
+  <it>Alcuni autori hanno dei nomi univoci e le loro pubblicazioni possono
+      essere recuperate ricercando il cognome nel campo
+      <code>_(any field)_</code>.</it>
 </lang>
 </td>
 </tr>
@@ -441,10 +482,12 @@
 <td width="50%">
 <lang>
   <en>For better results, type surname comma initial(s) and select the
-      author field.</en>
+      _(author)_ field.</en>
   <fr>Pour de meilleurs résultats, inscrire le nom accompagné d'une
       virgule et de l'initiale du prénom, puis sélectionner le champ de
-      recherche auteur.</fr>
+      recherche _(autore)_.</fr>
+  <it>Per migliorare i risultati della ricerca, digita il cognome seguito dalla
+  virgola, seguita dalla(e) iniziale(i) e seleziona il campo _(author)_.
 </lang>
 </td>
 </tr>
@@ -465,6 +508,7 @@
   <en>Sometimes authors are indexed with their full name.</en>
   <fr>Parfois, les auteurs peuvent être inscrits avec leur prénom
   complet.</fr>
+  <it>A volte gli autori sono indicizzati tramite il loro nome completo.</it>
 </lang>
 </td>
 </tr>
@@ -487,6 +531,9 @@
   <fr>Rechercher toutes les notices de J.Ellis publiées entre 1990 et
       1993, en utilisant la troncature permettant de retrouver tous
       les prénoms commençant par J.</fr>
+  <it>Come ricercare i tutti gli articoli di J.Ellis scritti tra il 1990 e il
+  1993, utilizzando la troncatura per ricuperare tutti i nomi di battesimo
+  che cominciano con J.</it>
 </lang>
 </td>
 </tr>
@@ -495,12 +542,14 @@
 <lang>
   <en>more on author searches...</en>
   <fr>plus d'informations au sujet de la recherche par auteur...</fr>
+  <it>maggiori informazioni sulla ricerca tramite nome dell'autore...</it>
 </lang>
 </a></small></div>
 
 <h5><lang>
 <en>More information:</en>
-<fr></fr>
+<fr>Plus d'informations:</fr>
+<it>Ulteriori informazioni:</it>
 </lang></h5>
 
 <lang>
@@ -508,10 +557,13 @@
     citation searching, and other capabilities are fully explained in
     the complete <a href="search-guide<lang:link/>">Search
     Guide</a>.</en>
-
   <fr>Des explications additionnelles concernant les caractères
       spéciaux, les expressions régulières, la recherche dans le
       contenu des fichiers, des citations, ainsi que d'autres
       fonctionnalités sont disponibles dans le <a
       href="search-guide<lang:link/>">Guide de Recherche</a>.</fr>
+  <it>Nella <a href="search-guide<lang:link/>">Guida di Ricerca</a> completa sono
+      spiegate in maniera estesa ulteriori funzionalità quali caratteri speciali,
+      espressioni regolari, ricerca nel testo integrale,
+      ricerca tramite citazioni.</it>
 </lang>
