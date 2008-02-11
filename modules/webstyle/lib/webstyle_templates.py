@@ -641,8 +641,8 @@ URI: http://%(host)s%(page)s
                 'send_label': _("Send error report"),
                 'sys1'      : sys.exc_info()[0] or '',
                 'sys2'      : sys.exc_info()[1] or '',
-                'esc_sys1'  : (sys.exc_info()[0] or '').replace('"', '&quot;"'),
-                'esc_sys2'  : (sys.exc_info()[1] or '').replace('"', '&quot;"'),
+                'esc_sys1'  : str((sys.exc_info()[0] or '')).replace('"', '&quot;"'),
+                'esc_sys2'  : str((sys.exc_info()[1] or '')).replace('"', '&quot;"'),
                 'contact'   : \
                    _("Please contact %s quoting the following information:") % \
                      ('<a href="mailto:' + urllib.quote(supportemail) +'">' + \
