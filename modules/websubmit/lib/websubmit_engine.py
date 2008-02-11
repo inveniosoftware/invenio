@@ -1344,7 +1344,7 @@ def action_details (doctype, action):
 def print_function_calls (req, doctype, action, step, form, start_time, ln=cdslang):
     # Calls the functions required by an "action" action on a "doctype" document
     # In supervisor mode, a table of the function calls is produced
-    global htdocsdir,storage,access,pylibdir,dismode,user_info
+    global htdocsdir,storage,access,pylibdir,dismode
     user_info = collect_user_info(req)
     # load the right message language
     _ = gettext_set_language(ln)
@@ -1382,11 +1382,60 @@ def print_function_calls (req, doctype, action, step, form, start_time, ln=cdsla
                     # Call function:
                     log_function(curdir, "Start %s" % function_name, start_time)
                     try:
-                        func_returnval = function(parameters, curdir, form)
+                        try:
+                            ## Attempt to call the function with 4 arguments:
+                            ## ("parameters", "curdir" and "form" as usual),
+                            ## and "user_info" - the dictionary of user
+                            ## information:
+                            ##
+                            ## Note: The function should always be called with
+                            ## these keyword arguments because the "TypeError"
+                            ## except clause checks for a specific mention of
+                            ## the 'user_info' keyword argument when a legacy
+                            ## function (one that accepts only 'parameters',
+                            ## 'curdir' and 'form') has been called and if
+                            ## the error string doesn't contain this,
+                            ## the TypeError will be considered as a something
+                            ## that was incorrectly handled in the function and
+                            ## will be propagated as an
+                            ## InvenioWebSubmitFunctionError instead of the
+                            ## function being called again with the legacy 3
+                            ## arguments.
+                            func_returnval = function(parameters=parameters, \
+                                                      curdir=curdir, \
+                                                      form=form, \
+                                                      user_info=user_info)
+                        except TypeError, err:
+                            ## If the error contains the string "got an
+                            ## unexpected keyword argument", it means that the
+                            ## function doesn't accept the "user_info"
+                            ## argument. Test for this:
+                            if "got an unexpected keyword argument 'user_info'" in \
+                               str(err).lower():
+                                ## As expected, the function doesn't accept
+                                ## the user_info keyword argument. Call it
+                                ## again with the legacy 3 arguments
+                                ## (parameters, curdir, form):
+                                func_returnval = \
+                                               function(parameters=parameters, \
+                                                        curdir=curdir, \
+                                                        form=form)
+                            else:
+                                ## An unexpected "TypeError" was caught.
+                                ## It looks as though the function itself didn't
+                                ## handle something correctly.
+                                ## Convert this error into an
+                                ## InvenioWebSubmitFunctionError and raise it:
+                                msg = "Unhandled TypeError caught when " \
+                                      "calling [%s] WebSubmit function: " \
+                                      "[%s]" % (function_name, str(err))
+                                raise InvenioWebSubmitFunctionError(msg)
                     except InvenioWebSubmitFunctionWarning, err:
-                        ## There was an unexpected behaviour during the execution.
-                        ## Log the message into function's log and go to next function
-                        log_function(curdir, "***Warning*** from %s: %s" % (function_name, str(err)), start_time)
+                        ## There was an unexpected behaviour during the
+                        ## execution. Log the message into function's log
+                        ## and go to next function
+                        log_function(curdir, "***Warning*** from %s: %s" \
+                                     % (function_name, str(err)), start_time)
                         ## Reset "func_returnval" to None:
                         func_returnval = None
                     log_function(curdir, "End %s" % function_name, start_time)
