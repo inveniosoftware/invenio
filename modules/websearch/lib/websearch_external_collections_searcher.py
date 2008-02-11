@@ -216,7 +216,7 @@ class CERNEDMSSearchEngine(SortedFieldsSearchEngine):
             if reportnumber != "":
                 url_parts.append('p_document_id=' + reportnumber)
             if len(url_parts) == 0:
-                return None 
+                return None
             return self.search_url + "&".join(url_parts)
 
     def bind_fields(self, fieldname_list):
@@ -304,7 +304,7 @@ class GoogleScholarSearchEngine(GoogleSearchEngine):
 # Kiss
 
 class KissSearchEngine(SortedFieldsSearchEngine):
-    """Search interface for KEK Information Service System. 
+    """Search interface for KEK Information Service System.
        Not to be used directly but with Kiss*SearchEngine. """
 
     def __init__(self, configuration):
@@ -343,10 +343,13 @@ class KissSearchEngine(SortedFieldsSearchEngine):
         """Handle an author unit. """
         if author_name.find(",") >= 0 and unit_type != "p":
             (lastname, firstname) = author_name.split(",", 1)
-            self.fields_content["author"].append("'%s, %c'" % (lastname, firstname[0]))
+            if firstname:
+                self.fields_content["author"].append("'%s, %c'" % (lastname, firstname[0]))
+            else:
+                self.fields_content["author"].append("'%s'" % (lastname))
         else:
             self.fields_content["author"].append("'" + author_name + "'")
-            
+
 class KissForPreprintsSearchEngine(KissSearchEngine):
     """Interface for seaching on Kiss for Preprints"""
 
@@ -481,7 +484,7 @@ class INSPECSearchEngine(ExternalSearchEngine):
         self.base_url = "http://www.datastarweb.com/cern/"
         self.search_url = "http://www.datastarweb.com/cern/?dblabel=inzz&query="
         self.combiner = " AND "
-        
+
     def build_search_unit_unit(self, basic):
         """Build a search string from a search unit. This is the base
         version that just keep keywords with "+". """
