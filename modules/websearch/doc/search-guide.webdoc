@@ -31,7 +31,7 @@ searching differs from that of a web page searching, though.  We
 provide many extensions to enable a complex and precise structured
 search, including an combined metadata, fulltext and reference search
 in one go.  This page lists several tips and tricks that you may find
-useful to this effect.
+useful to this effect.</p>
 </en>
 <fr>
 
@@ -43,8 +43,7 @@ web. Nous proposons donc des extensions permettant des recherches
 structurées complexes et précises, dont une recherche combinée
 s'effectuant sur les metadonnées, le contenu des fichiers et les
 références de chaque notice.  Cette page répertorie les trucs et
-astuces pouvant vous être utiles.
-</p>
+astuces pouvant vous être utiles.</p>
 </fr>
 <de>
 <p>Unsere Suchmaschine bietet den heutigen Stand der Web-Such
@@ -55,7 +54,7 @@ Web-Suche. Wir bieten mehrere Erweiterungen an, damit eine komplexe
 und genau strukturierte Suche möglich wird, inklusiv einer
 kombinierten Metadatensuche, Volltextsuche und Referenzsuche. Diese
 Seite stellt Tipps und Tricks vor, die für eine effektive Suche
-nützlich sind.
+nützlich sind.</p>
 </de>
 <es>
 <p> El motor de búsqueda de este sistema trata de ofrecer la
@@ -67,7 +66,7 @@ es la de proporcionar numerosas extensiones que hagan
 posible búsquedas de estructura compleja y precisa, incluso combinando
 metadatos, texto completo y citas bibliográficas en una misma
 consulta.  Esta página ofrece una serie consejos útiles para conseguir
-una búsqueda más eficaz.
+una búsqueda más eficaz.</p>
 </es>
 <ca>
 <p> El motor de cerca d'aquest sistema tracta d'oferir la tecnologia
@@ -79,7 +78,7 @@ nombroses extensions que permetin cerques d'estructura complexa i
 precisa, inclosa la combinació de metadades, text complet i
 referències bibliogràfiques a una mateixa cerca.  Aquesta pàgina
 ofereix una sèrie de consells útils per aconseguir una cerca més
-eficaç.
+eficaç.</p>
 </ca>
 </lang>
 
@@ -207,7 +206,7 @@ query, followed by a possibility to choose one of the common indexes
 to search within.  You would usually simply type the keywords you are
 interested in and hit return.  For example, if you are interested in
 documents on <em>standard model</em> that are written by (or mention)
-<em>Ellis</em>, you would type:
+<em>Ellis</em>, you would type:</p>
 
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -219,9 +218,9 @@ documents on <em>standard model</em> that are written by (or mention)
     <input class="formbutton" type="submit" name="action" value="_(Search)_" />
     </blockquote>
     </form>
-and on the search results page you could further add/remove keywords
+<p>and on the search results page you could further add/remove keywords
 to get more precisely at what you are looking for, as is mentioned <a
-href="#boolean">below</a>.
+href="#boolean">below</a>.</p>
 </en>
 <fr>
 <p>Le mode de recherche par défaut est la <strong>recherche
@@ -230,8 +229,8 @@ lequel vous pouvez saisir votre requête. Vous avez également la
 possibilité de restreindre la recherche à un champ spécifique. Dans la
 majorité des cas, vous n'aurez qu'à saisir les mots-clés qui vous
 intéressent et lancer la recherche. Si, par exemple, vous souhaitez
-trouver des documents relatifs au <en>standard model</em> écrits (ou
-mentionnés) par <em>Ellis</em>, votre requête doit être la suivante:
+trouver des documents relatifs au <em>standard model</em> écrits (ou
+mentionnés) par <em>Ellis</em>, votre requête doit être la suivante:</p>
 
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -244,9 +243,9 @@ mentionnés) par <em>Ellis</em>, votre requête doit être la suivante:
     </blockquote>
     </form>
 
-Depuis la page des résultats vous pourrez également
+<p>Depuis la page des résultats vous pourrez également
 ajouter/supprimer des mots-clefs afin de parfaire votre recherche,
-comme expliqué <a href="#boolean">plus loin</a>.
+comme expliqué <a href="#boolean">plus loin</a>.</p>
 </fr>
 <es>
 <p>El modo de búsqueda por defecto es la <strong>búsqueda
@@ -257,7 +256,7 @@ consulta.  Se introducen las palabras clave a buscar y se acciona la
 consulta mediante la tecla de retorno (o intro).  Por ejemplo, si
 interesa recuperar documentos sobre <em>modelos estándar</em> que han
 sido escritos por (o que mencionan a) <em>Ellis</em>, debemos
-escribir:
+escribir:</p>
 
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -270,9 +269,9 @@ escribir:
     </blockquote>
     </form>
 
-y en la página de resultados de la búsqueda podemos volver a añadir o
+<p>y en la página de resultados de la búsqueda podemos volver a añadir o
 quitar palabras clave para obtener mayor precisión en los resultados,
-tal y como se especifica en más <a href="#boolean">adelante</a>.
+tal y como se especifica en más <a href="#boolean">adelante</a>.</p>
 </es>
 <ca>
 <p>La cerca per defecte és la <strong>cerca simple</strong>, que
@@ -282,7 +281,7 @@ que realitzar la consulta.  S'introdueixen les paraules clau a buscar
 i s'acciona la consulta mitjançant la tecla de retorn (intro).  Per
 exemple, si interessa recuperar documents sobre <em>models
 estàndard</em> que han estat escrits per (o que fan esment a)
-<em>Ellis</em>, haurem d'escriure:
+<em>Ellis</em>, haurem d'escriure:</p>
 
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -295,9 +294,9 @@ estàndard</em> que han estat escrits per (o que fan esment a)
     </blockquote>
     </form>
 
-i a la pàgina dels resultats de la cerca podem tornar a afegir o
+<p>i a la pàgina dels resultats de la cerca podem tornar a afegir o
 treure paraules clau per tal d'obtenir més precisió als resultats, tal
-i com s'especifica més <a href="#boolean">endavant</a>.
+i com s'especifica més <a href="#boolean">endavant</a>.</p>
 </ca>
 </lang>
 
@@ -310,7 +309,7 @@ can use boolean queries in several indexes, etc.  For example, to find
 all the documents written by <em>Ellis, J</em> spelled exactly that
 way that contain either of the words <em>muon</em> or
 <em>neutrino</em> in the title and that were published in
-<em>2001</em>, you would type:
+<em>2001</em>, you would type:</p>
 
 <blockquote>
 <form action="<WEBURL>/search" method="get">
@@ -428,11 +427,11 @@ functionality, if you make use of special syntax that is explained in
 the text below.  The simple-versus-advanced does not refer to the
 functionality that is being provided but rather to the amount of
 parametrization you can "tweak".  We conform to the common
-use of the simple/advanced terms as found in other search engines.
+use of the simple/advanced terms as found in other search engines.</p>
 
 <p>Much of what follows will deal with a question on "how a power user
 would use the simple search interface".  Recall that you can always go
-to the Advanced Search for more query assistance.
+to the Advanced Search for more query assistance.</p>
 </en>
 
 <fr>
@@ -442,7 +441,7 @@ expression régulière, phrase partielle); vous pouvez effectuer des
 recherches booléennes dans différents index, etc. Par exemple pour
 trouver tous les documents écrits par <em>Ellis, J</em> (écrit
 exactement ainsi), qui contiennent les mots <em>muon</em> ou
-<em>neutrino</em> dans le titre et qui ont été publiés en 2001, saisissez:
+<em>neutrino</em> dans le titre et qui ont été publiés en 2001, saisissez:</p>
 
 <blockquote>
 <form action="<WEBURL>/search" method="get">
@@ -561,13 +560,13 @@ différence entre la recherche simple et la recherche avancée ne se
 fait pas sur les fonctionnalités offertes mais plutôt sur le nombre de
 paramètres qu'il vous est possible de combiner.  Nous nous conformons
 en ce sens aux modèles de recherches simples/avancées que l'on trouve
-dans d'autre moteurs de recherche.
+dans d'autre moteurs de recherche.</p>
 
 <p>Ce qui suit explique principalement la syntaxe qu'un utilisateur
 expérimenté peut utiliser dans le mode de recherche simple.
 Rappelez-vous que vous pouvez toujours utiliser la recherche
 avancée pour parvenir à des résultats ciblés sans avoir à utiliser
-de syntaxe particulière.
+de syntaxe particulière.</p>
 </fr>
 
 <es>
@@ -577,9 +576,9 @@ cambiar el tipo de búsqueda por defecto (de alguna palabra a todas,
 buscar por frase exacta, por expresión regular, etc.); nos permite
 utilizar las expresiones booleanas combinando varios índices, etc.
 Por ejemplo, para recuperar todos los documentos escritos por
-EM>Ellis, J</em> -transcrito exactamente de ese modo- y también las
+<em>Ellis, J</em> -transcrito exactamente de ese modo- y también las
 palabras <em>muons</em> o <em>neutrino</em> en el título de la
-publicación y <em>2001</em> en el año, escribiremos lo siguiente:
+publicación y <em>2001</em> en el año, escribiremos lo siguiente:</p>
 
 <blockquote>
 <form action="<WEBURL>/search" method="get">
@@ -699,13 +698,13 @@ apartado de búsqueda simple-versus-avanzada no se refiere tanto a las
 funcionalidades disponibles, sino a la forma de búsqueda que podemos
 configurar mediante pequeñas modificaciones. El sistema se ha adaptado
 al uso común de los términos de simple/avanzado que podemos encontrar
-en otros motores de búsqueda.
+en otros motores de búsqueda.</p>
 
 <p>En realidad, gran parte de la explicación que sigue a continuación,
 responde a la cuestión de "cómo un usuario avanzado puede utilizar la
 interficie de búsqueda simple".  Recordamos que en cualquier momento
 es posible recurrir a la ayuda de la búsqueda avanzada para conseguir
-más asistencia.
+más asistencia.</p>
 </es>
 
 <ca>
@@ -714,10 +713,10 @@ específiques amb les que configurar la cerca: podem canviar el tipus
 de cerca a realitzar per defecte (d'alguna paraula a totes les
 paraules, cerca per frase exacta, per expressió regular, etc.); ens
 permet emprar la combinació booleana a nombrosos índexs, etc.  Per
-exemple, per localitzar tots els documents escrits per EM>Ellis,
+exemple, per localitzar tots els documents escrits per <em>Ellis,
 J</em> -transcrit exactament d'aquesta manera- i també les paraules
 <em>muon</em> o <em>neutrino</em> al títol de la publicació i
-<em>2001</em> a l'any, escriurem:
+<em>2001</em> a l'any, escriurem:</p>
 
 <blockquote>
 <form action="<WEBURL>/search" method="get">
@@ -837,13 +836,13 @@ de cerca simple-versus-avançada no es refereix tant a les
 funcionalitats disponibles, com a la forma de cerca que podem
 configurar mitjançant petites modificacions.  El sistema s'ha adaptat
 a l'ús comú dels termes simple/avançat que podem trobar a altres
-motors de cerca.
+motors de cerca.</p>
 
 <p>En realitat, gran part de l'explicació que segueix a continuació,
 respòn a la qüestió de "com un usuari avançat pot utilitzar la
 interficie de cerca simple".  Recordem que en qualsevol moment és
 posible recòrrer a l'ajuda de la cerca avanzada per aconseguir més
-assistència.
+assistència.</p>
 </ca>
 </lang>
 
@@ -862,7 +861,7 @@ assistència.
 <p>After you submit your query, the search engine will analyze it and
 will try to always guide you in case no exact match could be found.
 For example, it would print you a list of closest indexed terms in
-case of spelling troubles:
+case of spelling troubles:</p>
 
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -879,12 +878,13 @@ case of spelling troubles:
 will similarly warn you when your search terms could not be
 found, or when they could but your boolean query couldn't be met.  The
 search engine will also silently try to search for alternative forms
-(e.g. remove punctuation), etc.
+(e.g. remove punctuation), etc.</p>
+
 <p>Thanks to multiple search stages and the guidance provided at each
 stage, it is usually sufficient to simple type what you are looking
 for and see what the system says in return.  If you aren't satisfied,
 you would then add/remove words from your query until the satisfactory
-reply.
+reply.</p>
 </en>
 
 <fr>
@@ -908,7 +908,9 @@ plus proches en cas d'orthographe approximative:</p>
 <p>Les alternatives sont affichées en rouge. Similairement, le moteur
 de recherche vous avertit lorsque votre requête ne peut aboutir, ou
 lorsque les éléments de recherche existent mais ne correspondent pas à
-votre requête booléenne. Le moteur de recherche essaie également de trouver des formes alternatives (suppression de la ponctuation, etc.) en arrière-plan.</p>
+votre requête booléenne. Le moteur de recherche essaie également de
+trouver des formes alternatives (suppression de la ponctuation, etc.)
+en arrière-plan.</p>
 
 <p>Grâce aux multiples étapes de la recherche et à l'assistance
 fournie à chaque stade, il suffit généralement de saisir les éléments
@@ -923,14 +925,14 @@ que se proporciona en cada una de estas etapas, por lo general resulta
 suficiente escribir la palabra de búsqueda y revisar los resultados
 qué nos devuelve el sistema.  Si los resultados no son pertinentes, o
 son excesivos o insuficientes, es posible añadir o quitar palabras de
-la consulta hasta conseguir resultados más satisfactorios.
+la consulta hasta conseguir resultados más satisfactorios.</p>
 
 <p> Después de recibir una consulta, el motor de búsqueda la analiza
 y, en caso de no localizar ninguna coincidencia en la base de datos,
 el sistema tratará de guiar al usuario.  Un ejemplo de ello son las
 listas de los términos indexados que se encuentran más cercanos al
 término introducido, en caso de que se produzacan errores ortográficos
-o de transcripción al efectuar la consulta:
+o de transcripción al efectuar la consulta:</p>
 
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -949,7 +951,7 @@ búsqueda no se encuentran, o cuando detecta que sí que existen pero la
 fórmula de consulta booleana utilizada no puede localizarlos.  Así
 mismo, el motor de búsqueda también realiza de forma oculta acciones
 alternativas para mejorar los resultados, como por ejemplo eliminar
-puntuación, etc.
+puntuación, etc.</p>
 </es>
 
 <ca>
@@ -957,15 +959,14 @@ puntuación, etc.
 va proporcionant a cadascuna d'aquestes etapes, pel general resulta
 suficient teclejar l'objetcte de cerca i observar que ens retorna el
 sistema. Si no quedem satisfets, podem afegir/treure paraules de la
-nostra consulta fins aconseguir uns resultats satisfactoris.
+nostra consulta fins aconseguir uns resultats satisfactoris.</p>
 
 <p> Després de rebre una consulta, el motor de cerca l'analizarà i
 tractarà sempre de guiar a l'usuari en cas de que no localitzi cap
 coincidència a la base de dades.  Un exemple d'això son les llistes
-
 dels termes indexats que es troben més propers al terme introduït a la
 consulta en cas que no es trobin coincidències per errors ortogràfics
-o de transcripció:
+o de transcripció:</p>
 
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -984,7 +985,7 @@ troben, o quan detecta que si que existeixen però la fórmula de
 consulta booleana emprada no aconsegueix localitzar-los.  Així mateix,
 el motor de cerca també realitza de forma oculta accions alternatives
 per a millorar els resultat,s com, per exemple, eliminar puntuació,
-etc.
+etc.</p>
 </ca>
 </lang>
 
@@ -1005,7 +1006,7 @@ means that any whitespace you type is not significant, but is rather
 interpreted to mean "add an automatic boolean AND between words", like
 Google does.  For example, to find all records that contain both the
 word <em>ellis</em> and the word <em>muon</em> anywhere in the record,
-type:
+type:</p>
 
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -1039,7 +1040,7 @@ There are two phrase searching modes:
       <input class="formbutton" type="submit" name="action" value="_(Search)_" />
       </blockquote>
       </form>
-
+</li>
 <li>The single quotes instruct the search engine to <strong>search for
     partial phrase</strong>.  Unlike the exact phrase search, this
     mode allows for an extra text appearing before/after given
@@ -1052,7 +1053,7 @@ There are two phrase searching modes:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="'muon decay'">
+      <input size="40" type="text" name="p" value="'muon decay'"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1068,7 +1069,7 @@ There are two phrase searching modes:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="'Ellis, J'">
+      <input size="40" type="text" name="p" value="'Ellis, J'" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -1078,14 +1079,14 @@ There are two phrase searching modes:
 
     (See also our specific <a href="#howto-search-for-author">author
     searching tips</a>.)
-
+</li>
 </ol>
 
 <p>The difference between exact and partial phrase searching modes may
 not be obvious upon first look.  While the latter is more similar to
 what ``phrase search'' usually means in the context of web page search
 engines, the former one is usually an order of magnitude faster if you
-know the precise values you are looking for.
+know the precise values you are looking for.</p>
 
 <p>Another interesting searching mode besides the word and phrase
 searches is the <strong>regular expression search</strong>, introduced
@@ -1094,7 +1095,7 @@ query <code>'muon decay'</code> is fully equivalent to the regular
 expression query <code>/muon decay/</code>.  The regular expression
 syntax is very powerful and permits you to construct very complex
 queries.  For more information, please consult the <a
-href="#regexp">regular expression</a> section of this guide.
+href="#regexp">regular expression</a> section of this guide.</p>
 </en>
 
 <fr>
@@ -1103,12 +1104,12 @@ mots</strong>.  Cela signifie que les espaces entre les mots sont
 ignorés. Ils sont interpretés dans le sens "ajouter
 automatiquement un booléen AND (=<em>ET</em>) entre les mots", à la manière de
 Google. Par exemple, pour trouver toutes les notices qui contiennent à la fois le mot
-<em>ellis</em> et le mot <em>muon</em>, saisissez:
+<em>ellis</em> et le mot <em>muon</em>, saisissez:</p>
 
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
-    <input size="40" type="text" name="p" value="ellis muon">
+    <input size="40" type="text" name="p" value="ellis muon" />
     <select name="f"><option value="">_(any field)_</option>
                      <option value="title">_(title)_</option>
                      <option value="author">_(author)_</option></select>
@@ -1131,14 +1132,14 @@ Il existe également deux modes de recherche de phrases:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="&quot;Ellis, J&quot;">
+      <input size="40" type="text" name="p" value="&quot;Ellis, J&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
       <input class="formbutton" type="submit" name="action" value="_(Search)_" />
       </blockquote>
       </form>
-
+</li>
 <li> Les guillemets simples sont utilisés pour la <strong>recherche
      de phrases partielles</strong>.  Contrairement à la recherche
      de phrases exactes, ce mode permet de trouver une phrase même
@@ -1152,7 +1153,7 @@ Il existe également deux modes de recherche de phrases:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="'muon decay'">
+      <input size="40" type="text" name="p" value="'muon decay'" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title" selected="selected">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1167,7 +1168,7 @@ Il existe également deux modes de recherche de phrases:
       <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input type="hidden" name="ln" value="<lang:current />" />
-      <input size="40" type="text" name="p" value="'Ellis, J'">
+      <input size="40" type="text" name="p" value="'Ellis, J'"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -1177,7 +1178,7 @@ Il existe également deux modes de recherche de phrases:
 
     (Reportez-vous également la section dédiée à
     la <a href="#howto-search-for-author">recherche d'auteurs</a>.)
-
+</li>
 </ol>
 
 <p>La différence entre les modes de recherche de phrases exactes et
@@ -1188,7 +1189,7 @@ pages Web, le premier mode est habituellement bien plus rapide si vous
 connaissez la valeur précise de ce que vous cherchez.</p>
 
 <p>Il existe également un autre mode de recherche, celui de
-la <stronf>recherche d'expressions régulières</strong>, introduit par
+la <strong>recherche d'expressions régulières</strong>, introduit par
 des barres obliques ('/') à la place des guillemets.  Par
 exemple, la requête <code>'muon decay'</code> ci-dessus est
 totalement équivalente à la requête par expression
@@ -1206,12 +1207,12 @@ defecto como "añade automáticamente una Y booleana entre las palabras
 introducidas", del mismo modo que hace Google.  Por ejemplo, para
 recuperar todos los registros que contengan tanto la palabra
 <em>ellis</em> como <em>muon</em> en cualquier parte del
-registro, debemos escribir:
+registro, debemos escribir:</p>
 
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
-    <input size="40" type="text" name="p" value="ellis muon">
+    <input size="40" type="text" name="p" value="ellis muon" />
     <select name="f"><option value="">_(any field)_</option>
                      <option value="title">_(title)_</option>
                      <option value="author">_(author)_</option></select>
@@ -1236,14 +1237,14 @@ por frases:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="&quot;Ellis, J&quot;">
+      <input size="40" type="text" name="p" value="&quot;Ellis, J&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
       <input class="formbutton" type="submit" name="action" value="_(Search)_" />
       </blockquote>
       </form>
-
+</li>
 <li>La introducción de comillas simples le indica al motor de búsqueda
     <strong>buscar alguna parte de la frase</strong>.  A diferencia de
     la búsqueda de frase exacta este método permite que exista texto
@@ -1257,7 +1258,7 @@ por frases:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="'muon decay'">
+      <input size="40" type="text" name="p" value="'muon decay'" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title" selected="selected">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1273,7 +1274,7 @@ por frases:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="'Ellis, J'">
+      <input size="40" type="text" name="p" value="'Ellis, J'" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -1283,7 +1284,7 @@ por frases:
 
     (Para más información, se recomienda ver también la búsqueda
     específica por <a href="#howto-search-for-author">autor</a>.)
-
+</li>
 </ol>
 
 <p>La diferencia entre buscar por frase exacta o buscar en parte de la
@@ -1291,7 +1292,7 @@ frase puede parecer poco obvia en un primer momento. Sin embargo,
 mientras que la búsqueda en parte de la frase se asemeja a la búsqueda
 por frase que suele utilizarse en el contexto de los buscadores web,
 el uso de la búsqueda por frase exacta resulta mucho más efectiva y
-rápida cuanto más se conocen y especifican los valores a recuperar.
+rápida cuanto más se conocen y especifican los valores a recuperar.</p>
 
 
 <p>Otro interesante modo de búsqueda aparte de la búsqueda por palabra
@@ -1302,7 +1303,7 @@ modo de en parte de la frase <code>'muon decay'</code> es equivalente a
 la expresión regular<code>/muon decay/</code>.  La sintaxis de las
 expresiones regulares es muy potente, y permite construir búsquedas
 muy complejas.  Para obtener más información, recomendamos la consulta
-de la sección <a href="#regexp">expresión regular</a> de esta guia.
+de la sección <a href="#regexp">expresión regular</a> de esta guia.</p>
 </es>
 
 <ca>
@@ -1313,12 +1314,12 @@ a "afegeis automàticament una I booleana entre les paraules
 introduïdes", de la mateixa forma que fa Google.  Per exemple, per
 recuperar tots els registres que continguin tant la paraula
 <em>ellis</em> com <em>muon</em> a qualsevol part del registre,
-haurem d'escriure:
+haurem d'escriure:</p>
 
     <form action="<WEBURL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
-    <input size="40" type="text" name="p" value="ellis muon">
+    <input size="40" type="text" name="p" value="ellis muon" />
     <select name="f"><option value="">_(any field)_</option>
                      <option value="title">_(title)_</option>
                      <option value="author">_(author)_</option></select>
@@ -1341,7 +1342,7 @@ exactament d'aquesta manera, hem d'escriure:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="&quot;Ellis, J&quot;">
+      <input size="40" type="text" name="p" value="&quot;Ellis, J&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -1349,7 +1350,7 @@ exactament d'aquesta manera, hem d'escriure:
       </blockquote>
 
       </form>
-
+</li>
 <li>La introducció de comentes simples indica al motor de cerca
 l'acció de <strong>cercar a alguna part de la frase</strong>.  A
 diferència de la cerca per frase exacta aquest mètode permet que
@@ -1363,7 +1364,7 @@ aquesta ocupi dins el títol, escriurem:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="'muon decay'">
+      <input size="40" type="text" name="p" value="'muon decay'" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title" selected="selected">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1379,7 +1380,7 @@ aquesta ocupi dins el títol, escriurem:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="'Ellis, J'">
+      <input size="40" type="text" name="p" value="'Ellis, J'" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -1389,7 +1390,7 @@ aquesta ocupi dins el títol, escriurem:
 
     (Per més informació, es recomana veure també la cerca específica
     per <a href="#howto-search-for-author">autor</a>.)
-
+</li>
 </ol>
 
 <p>La diferència entre cercar per frase exacta o cercar per part de la
@@ -1397,8 +1398,7 @@ frase Pot semblar poc evident a primera vista.  Ara bé, mentre que la
 cerca per part de la frase s’equipara a la cerca per frase que
 acostuma a aplicar-se dins el context dels cercadors web, l’ús de la
 cerca per frase exacta resulta molt més efectiva i ràpida com més es
-coneguin i especifiquin els valors a recuperar.
-
+coneguin i especifiquin els valors a recuperar.</p>
 
 <p>Un altra interessant forma de cerca apart de la cerca per paraula o
 frase, és l’ús de la <strong>expressió regular de cerca</strong>, que
@@ -1408,7 +1408,7 @@ l’expressió <code>'muon decay'</code> és equivalent a l’expressió
 regular<code>/muon decay/</code>.  La sintaxi de les expressions
 regulars és molt potent, i permet construir cerques molt complexes.
 Per obtenir més informació, recomanem la consulta de la secció <a
-href="#regexp">expressió regular</a> d’aquesta guia.
+href="#regexp">expressió regular</a> d’aquesta guia.</p>
 </ca>
 </lang>
 
@@ -1584,9 +1584,9 @@ Ya hemos visto como la inclusión de un espacio en blanco es
 equivalente a la adición de un operador booleano en la búsqueda por
 palabras. El resto de operadores booleanos son:
 <blockquote>
-<table BORDER="1" cellpadding="10">
+<table border="1" cellpadding="10">
 <tr>
-<TD rowspan="3" align="center">
+<td rowspan="3" align="center">
 <strong>+<br/>AND</strong>
 </td>
 <td>
@@ -1614,7 +1614,7 @@ palabras. El resto de operadores booleanos son:
 </td>
 </tr>
 <tr>
-<TD rowspan="2" align="center">
+<td rowspan="2" align="center">
 <strong>-<br/>NOT</strong>
 </td>
 <td>
@@ -1634,7 +1634,7 @@ ditto, "syntactic sugar"
 </td>
 </tr>
 <tr>
-<TD rowspan="2" align="center">
+<td rowspan="2" align="center">
 <strong>|<br/>OR</strong>
 </td>
 <td>
@@ -1665,9 +1665,9 @@ Hem vist com la inclusió d’un espai en blanc és equivalent a l’adició
 d’un operador booleà a la cerca per paraules.  La resta d’operadors
 booleans són:
 <blockquote>
-<table BORDER="1" cellpadding="10">
+<table border="1" cellpadding="10">
 <tr>
-<TD rowspan="3" align="center">
+<td rowspan="3" align="center">
 <strong>+<br/>AND</strong>
 </td>
 <td>
@@ -1695,7 +1695,7 @@ booleans són:
 </td>
 </tr>
 <tr>
-<TD rowspan="2" align="center">
+<td rowspan="2" align="center">
 <strong>-<br/>NOT</strong>
 </td>
 <td>
@@ -1714,7 +1714,7 @@ recupera tots els registres que contenen la paraula <em>ellis</em> però que no 
 </td>
 </tr>
 <tr>
-<TD rowspan="2" align="center">
+<td rowspan="2" align="center">
 <strong>|<br/>OR</strong>
 </td>
 <td>
@@ -1745,12 +1745,12 @@ emprada en anglès per a descriure "altre forma similar de cridar una funció"</
 <en>
 <p>Logical operations are automatically chained from left to right.
 For example, if you want to search for documents written by Ellis on
-muons or kaons, write:
+muons or kaons, write:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon or kaon and ellis">
+      <input size="40" type="text" name="p" value="muon or kaon and ellis"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1764,7 +1764,7 @@ gives different results from:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="ellis and muon or kaon">
+      <input size="40" type="text" name="p" value="ellis and muon or kaon"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1777,12 +1777,12 @@ which would search for <code>(ellis and muon) or kaon</code>.
 <p>The left-to-right chaining behaviour permits you to easily refine
 your search by adding/removing words with and/not or +/- operators.
 For example, to exclude the documents on decay from the above search,
-append <code>-decay</code>:
+append <code>-decay</code>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon or kaon and ellis -decay">
+      <input size="40" type="text" name="p" value="muon or kaon and ellis -decay" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1796,12 +1796,12 @@ satisfied.
 <fr>
 <p>Les opérations logiques sont chaînées de gauche à droite.
 Par exemple, si vous cherchez les documents écrits par Ellis sur les muons
-ou les kaons, écrivez:
+ou les kaons, écrivez:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon or kaon and ellis">
+      <input size="40" type="text" name="p" value="muon or kaon and ellis"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1814,7 +1814,7 @@ qui recherche pour <code>(muon or kaon) and ellis</code>. Notez que cela donne u
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="ellis and muon or kaon">
+      <input size="40" type="text" name="p" value="ellis and muon or kaon"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1827,12 +1827,12 @@ qui cherche pour <code>(ellis and muon) or kaon</code>
 <p>Ce chaînage de gauche à droite permet de facilement améliorer votre
 recherche en ajoutant/supprimant des mots avec les opérateurs and/not ou
 +/-. Par exemple, pour exclure les documents sur le "decay" de la
-recherche ci-dessus, ajoutez <code>-decay</code>:
+recherche ci-dessus, ajoutez <code>-decay</code>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon or kaon and ellis -decay">
+      <input size="40" type="text" name="p" value="muon or kaon and ellis -decay" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1847,12 +1847,12 @@ pour obtenir une liste plus précise. Ajoutez/supprimez d'autres termes jusqu'à
 <p>Los operadores lógicos se disponen de forma automática de izquierda
 a derecha.  Logical operations are automatically chained from left to
 right.  Por ejemplo, si queremos buscar documentos escritos por Ellis
-sobre muon o kaon, escribiremos:
+sobre muon o kaon, escribiremos:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon or kaon and ellis">
+      <input size="40" type="text" name="p" value="muon or kaon and ellis"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1867,7 +1867,7 @@ resultados diferentes si introducimos
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="ellis and muon or kaon">
+      <input size="40" type="text" name="p" value="ellis and muon or kaon"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1880,14 +1880,13 @@ que si introducimos <code>(ellis AND muon) OR kaon</code>.
 <p>La disposición de los elementos de izquierda a derecha permite
 refinar fácilmente una búsqueda añadiendo o quitando palabras
 utilizanto los operadores AND/NOT +/-.
-
 Por ejemplo, para excluir los documentos sobre desintegración en la
-búsqueda anterior, sólo hay que añadir <code>-decay</code>:
+búsqueda anterior, sólo hay que añadir <code>-decay</code>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon or kaon and ellis -decay">
+      <input size="40" type="text" name="p" value="muon or kaon and ellis -decay" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1905,12 +1904,12 @@ precisión en la búsqueda.
 
 <p>Els operadors lògics es disposen de forma automàtica d’esquerre
 a dreta.  Per exemple, si es volen recuperar documents escrits per Ellis
-sobre muon o kaon, escriurem:
+sobre muon o kaon, escriurem:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon or kaon and ellis">
+      <input size="40" type="text" name="p" value="muon or kaon and ellis"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1925,7 +1924,7 @@ s’introdueix
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="ellis and muon or kaon">
+      <input size="40" type="text" name="p" value="ellis and muon or kaon"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1938,14 +1937,13 @@ que si s’introdueix <code>(ellis AND muon) OR kaon</code>.
 <p>La disposició dels elements d’esquerre a dreta permet refinar
 fàcilment una cerca afegint o traient paraules utilitzant els
 operadors AND/NOT +/-.
-
 Per exemple, per excloure els documents sobre desintegració a la cerca
-anterior, només cal afegir <code>-decay</code>:
+anterior, només cal afegir <code>-decay</code>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon or kaon and ellis -decay">
+      <input size="40" type="text" name="p" value="muon or kaon and ellis -decay" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -1972,12 +1970,12 @@ precisió a la cerca.  </ca>
 <en>
 <p>When indexing words, an attention is paid to index it both with and
    without punctuation, so that you should be able to search for terms
-   containing special characters, such as <em>C++</em>, verbatim:
+   containing special characters, such as <em>C++</em>, verbatim:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="C++">
+      <input size="40" type="text" name="p" value="C++" />
       <select name="f"><option value="">_(any field)_</option>
                      <option value="title">_(title)_</option>
                      <option value="author">_(author)_</option></select>
@@ -1988,7 +1986,7 @@ precisió a la cerca.  </ca>
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="O'Shea">
+      <input size="40" type="text" name="p" value="O'Shea"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -2002,7 +2000,7 @@ precisió a la cerca.  </ca>
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="$e^{+}e^{-}$">
+      <input size="40" type="text" name="p" value="$e^{+}e^{-}$" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title" selected="selected">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2016,7 +2014,7 @@ precisió a la cerca.  </ca>
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="hep-ph/0204133">
+      <input size="40" type="text" name="p" value="hep-ph/0204133" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2029,7 +2027,7 @@ precisió a la cerca.  </ca>
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="BlaCK hOlEs">
+      <input size="40" type="text" name="p" value="BlaCK hOlEs" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2040,12 +2038,12 @@ precisió a la cerca.  </ca>
 <fr>
 <p>Lors de l'indexation des mots, nous veillons à les saisir avec et
 sans ponctuation, afin qu'il soit possible de rechercher des termes
-contenant des caractères spéciaux, comme dans <em>C++</em>:
+contenant des caractères spéciaux, comme dans <em>C++</em>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="C++">
+      <input size="40" type="text" name="p" value="C++" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2056,7 +2054,7 @@ contenant des caractères spéciaux, comme dans <em>C++</em>:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="O'Shea">
+      <input size="40" type="text" name="p" value="O'Shea"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -2070,7 +2068,7 @@ contenant des caractères spéciaux, comme dans <em>C++</em>:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="$e^{+}e^{-}$">
+      <input size="40" type="text" name="p" value="$e^{+}e^{-}$" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title" selected="selected">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2084,7 +2082,7 @@ contenant des caractères spéciaux, comme dans <em>C++</em>:
       <form action="<WEBURL>/search" method="get">
       <blockquote>
       <input type="hidden" name="ln" value="<lang:current />" />
-      <input size="40" type="text" name="p" value="hep-ph/0204133">
+      <input size="40" type="text" name="p" value="hep-ph/0204133" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2097,7 +2095,7 @@ contenant des caractères spéciaux, comme dans <em>C++</em>:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="BlaCK hOlEs">
+      <input size="40" type="text" name="p" value="BlaCK hOlEs" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2108,12 +2106,12 @@ contenant des caractères spéciaux, comme dans <em>C++</em>:
 <es>
 <p>Cuando se indexan las palabras, se pone especial atención en indexarlas
 con y sin puntuación.  Ello hace posible la búsqueda de términos que contienen
-caracteres especiales, como por ejemplo <em>C++</em>, textualmente:
+caracteres especiales, como por ejemplo <em>C++</em>, textualmente:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="C++">
+      <input size="40" type="text" name="p" value="C++" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2124,7 +2122,7 @@ caracteres especiales, como por ejemplo <em>C++</em>, textualmente:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="O'Shea">
+      <input size="40" type="text" name="p" value="O'Shea"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -2138,7 +2136,7 @@ caracteres especiales, como por ejemplo <em>C++</em>, textualmente:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="$e^{+}e^{-}$">
+      <input size="40" type="text" name="p" value="$e^{+}e^{-}$" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title" selected="selected">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2152,7 +2150,7 @@ caracteres especiales, como por ejemplo <em>C++</em>, textualmente:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="hep-ph/0204133">
+      <input size="40" type="text" name="p" value="hep-ph/0204133" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2165,7 +2163,7 @@ caracteres especiales, como por ejemplo <em>C++</em>, textualmente:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="AguJeros NEgRos">
+      <input size="40" type="text" name="p" value="AguJeros NEgRos" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2178,12 +2176,12 @@ caracteres especiales, como por ejemplo <em>C++</em>, textualmente:
 <p>Quan s’indexen les paraules, es posa especial atenció en que siguin
 indexades amb i sense puntuació.  Això fa possible la cerca de termes
 que contenen caràcters especials, com per exemple <em>C++</em>,
-textualment:
+textualment:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="C++">
+      <input size="40" type="text" name="p" value="C++" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2194,7 +2192,7 @@ textualment:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="O'Shea">
+      <input size="40" type="text" name="p" value="O'Shea"/>
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -2208,7 +2206,7 @@ textualment:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="$e^{+}e^{-}$">
+      <input size="40" type="text" name="p" value="$e^{+}e^{-}$" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title" selected="selected">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2222,7 +2220,7 @@ textualment:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="hep-ph/0204133">
+      <input size="40" type="text" name="p" value="hep-ph/0204133" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2235,7 +2233,7 @@ textualment:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="ForaTs NEgRes">
+      <input size="40" type="text" name="p" value="ForaTs NEgRes" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2259,12 +2257,12 @@ textualment:
 <en>
 <p>The search engine works with Unicode UTF-8 so you can type your
    query strings in any language stored in the database.  For
-   example, to find the documents written by (or on) Пушкин, type:
+   example, to find the documents written by (or on) Пушкин, type:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="пушкин">
+      <input size="40" type="text" name="p" value="пушкин" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2278,7 +2276,7 @@ textualment:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="Lemaitre">
+      <input size="40" type="text" name="p" value="Lemaitre" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -2286,7 +2284,7 @@ textualment:
       </blockquote>
       </form>
 
-   <p><table class="errorbox">
+   <table class="errorbox">
    <thead>
    <tr>
    <th class="errorboxheader">
@@ -2308,12 +2306,12 @@ textualment:
 <p> Le moteur de recherche prend en compte les caractères Unicode
 UTF-8, afin de rendre possible la recherche dans n'importe quelle
 langue. Par exemple, pour trouver les documents écrits par (ou
-concernant) Пушкин, saisissez:
+concernant) Пушкин, saisissez:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="пушкин">
+      <input size="40" type="text" name="p" value="пушкин" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2326,7 +2324,7 @@ Notez que les accents sont optionnels. Par exemple, saisissez <code>Lemaitre</co
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="Lemaitre">
+      <input size="40" type="text" name="p" value="Lemaitre" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -2334,7 +2332,7 @@ Notez que les accents sont optionnels. Par exemple, saisissez <code>Lemaitre</co
       </blockquote>
       </form>
 
-   <p><table class="errorbox">
+   <table class="errorbox">
    <thead>
    <tr>
    <th class="errorboxheader">
@@ -2356,12 +2354,12 @@ Notez que les accents sont optionnels. Par exemple, saisissez <code>Lemaitre</co
 <p>El motor de búsqueda se basa en el estandar Unicode UTF-8, lo que
 hace posible introducir cadenas de búsqueda en cualquier idioma que se
 encuentre en la base de datos.  Por ejemplo, para recuperar documentos
-escritos por (o sobre) Пушкин, debemos escribir:
+escritos por (o sobre) Пушкин, debemos escribir:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="пушкин">
+      <input size="40" type="text" name="p" value="пушкин" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2375,7 +2373,7 @@ escritos por (o sobre) Пушкин, debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="Lemaitre">
+      <input size="40" type="text" name="p" value="Lemaitre" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -2383,12 +2381,12 @@ escritos por (o sobre) Пушкин, debemos escribir:
       </blockquote>
       </form>
 
-   <p><table CLASS="errorbox">
+   <table class="errorbox">
    <thead>
    <tr>
-   <TH CLASS="errorboxheader">
+   <th class="errorboxheader">
    NOTA IMPORTANTE
-   </TH>
+   </th>
    </tr>
    </thead>
    <tbody>
@@ -2398,7 +2396,7 @@ En estos momentos, las palabras que incluyen caracteres acentuados sólo pueden
 recuperarse entrando los caracteres acentuados en la consulta.
    </td>
    </tr>
-   </TBODY>
+   </tbody>
    </table>
 </es>
 
@@ -2406,12 +2404,12 @@ recuperarse entrando los caracteres acentuados en la consulta.
 <p>El motor de cerca es basa en l’estàndard Unicode UTF-8, lo que fa
 possible introduir cadenes de cerca en qualsevol llengua que es trobi
 a la base de dades.  Per exemple, per recuperar documents escrits per
-(o sobre) Пушкин, cal escriure:
+(o sobre) Пушкин, cal escriure:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="пушкин">
+      <input size="40" type="text" name="p" value="пушкин" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2425,7 +2423,7 @@ que contenen paraules accentuades.  Per exemple, escriurem <code>Lemaitre</code>
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="Lemaitre">
+      <input size="40" type="text" name="p" value="Lemaitre" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -2433,12 +2431,12 @@ que contenen paraules accentuades.  Per exemple, escriurem <code>Lemaitre</code>
       </blockquote>
       </form>
 
-   <p><table CLASS="errorbox">
+   <table class="errorbox">
    <thead>
    <tr>
-   <TH CLASS="errorboxheader">
+   <th class="errorboxheader">
    NOTA IMPORTANT
-   </TH>
+   </th>
    </tr>
    </thead>
    <tbody>
@@ -2448,7 +2446,7 @@ En aquests moments, les paraules que inclouen caràcters accentuats només es po
 recuperar entrant els caràcters accentuats a la consulta.
    </td>
    </tr>
-   </TBODY>
+   </tbody>
    </table>
 </ca>
 </lang>
@@ -2469,12 +2467,12 @@ recuperar entrant els caràcters accentuats a la consulta.
    character.  The wildcard instructs the search engine to match any
    number of characters in that place.  For example, to find records
    that contain words <em>muon</em>, <em>muons</em>, <em>muonic</em>
-   etc, type:
+   etc, type:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon*">
+      <input size="40" type="text" name="p" value="muon*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2489,7 +2487,7 @@ recuperar entrant els caràcters accentuats a la consulta.
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="CERN-TH*31">
+      <input size="40" type="text" name="p" value="CERN-TH*31" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2503,7 +2501,7 @@ recuperar entrant els caràcters accentuats a la consulta.
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="a*">
+      <input size="40" type="text" name="p" value="a*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2518,7 +2516,7 @@ recuperar entrant els caràcters accentuats a la consulta.
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="&quot;Neutrino mass*&quot;">
+      <input size="40" type="text" name="p" value="&quot;Neutrino mass*&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title" selected="selected">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2541,12 +2539,12 @@ recuperar entrant els caràcters accentuats a la consulta.
    indique au moteur de recherche que le caractère à cet emplacement
    peut être de n'importe quel type. Par exemple, pour trouver les
    résultats contenant les
-   mots <em>muon</em>, <em>muons</em>, <em>muonic</em> etc, saisissez:
+   mots <em>muon</em>, <em>muons</em>, <em>muonic</em> etc, saisissez:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon*">
+      <input size="40" type="text" name="p" value="muon*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2561,7 +2559,7 @@ recuperar entrant els caràcters accentuats a la consulta.
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="CERN-TH*31">
+      <input size="40" type="text" name="p" value="CERN-TH*31" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2575,7 +2573,7 @@ recuperar entrant els caràcters accentuats a la consulta.
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="a*">
+      <input size="40" type="text" name="p" value="a*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2591,7 +2589,7 @@ recuperar entrant els caràcters accentuats a la consulta.
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="&quot;Neutrino mass*&quot;">
+      <input size="40" type="text" name="p" value="&quot;Neutrino mass*&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title" selected="selected">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2618,12 +2616,12 @@ recuperar entrant els caràcters accentuats a la consulta.
    retorne cualquier número de carácteres en su lugar.  Por ejemplo,
    para recuperar registros que contengan las palabras
    <em>muon</em>, <em>muonic</em>, <em>muons</em>
-   etc, debemos escribir:
+   etc, debemos escribir:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon*">
+      <input size="40" type="text" name="p" value="muon*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2639,7 +2637,7 @@ recuperar entrant els caràcters accentuats a la consulta.
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="CERN-TH*31">
+      <input size="40" type="text" name="p" value="CERN-TH*31" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2653,7 +2651,7 @@ recuperar entrant els caràcters accentuats a la consulta.
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="a*">
+      <input size="40" type="text" name="p" value="a*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2668,7 +2666,7 @@ comience con "Neutrino mass", debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="&quot;Neutrino mass*&quot;">
+      <input size="40" type="text" name="p" value="&quot;Neutrino mass*&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title" selected="selected">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2694,12 +2692,12 @@ comience con "Neutrino mass", debemos escribir:
   asterisc (*).  Aquest comodí indica al motor de cerca que retorni
   qualsevol número de caràcters en el seu lloc.  Per exemple, per
   recuperar registres que continguin les paraules <em>astronomia</em>,
-  <em>astrònoms</em>, <em>astronòmics</em> etc, cal escriure:
+  <em>astrònoms</em>, <em>astronòmics</em> etc, cal escriure:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="astronom*">
+      <input size="40" type="text" name="p" value="astronom*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2715,7 +2713,7 @@ comience con "Neutrino mass", debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="CERN-TH*31">
+      <input size="40" type="text" name="p" value="CERN-TH*31" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2729,7 +2727,7 @@ comience con "Neutrino mass", debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="a*">
+      <input size="40" type="text" name="p" value="a*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2744,7 +2742,7 @@ comience con "Neutrino mass", debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="&quot;Neutrino mass*&quot;">
+      <input size="40" type="text" name="p" value="&quot;Neutrino mass*&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title" selected="selected">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2781,12 +2779,12 @@ comience con "Neutrino mass", debemos escribir:
    If a search term is preceded by a field name and a colon, then the
    term is searched for inside this field only.  For example, to find
    documents containing the word <em>ellis</em> within author index,
-   type:
+   type:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:ellis">
+      <input size="40" type="text" name="p" value="author:ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2801,7 +2799,7 @@ comience con "Neutrino mass", debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:ellis title:muon*">
+      <input size="40" type="text" name="p" value="author:ellis title:muon*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2815,7 +2813,7 @@ comience con "Neutrino mass", debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="experiment:NA60 year:2001">
+      <input size="40" type="text" name="p" value="experiment:NA60 year:2001" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2835,12 +2833,12 @@ comience con "Neutrino mass", debemos escribir:
    de Google. Si un élément de recherche est précédé d'un nom de champ
    et de deux points, le terme n'est recherché que dans le champ
    donné. Par exemple, pour trouver les documents contenant le mot
-   <em>ellis</em> dans l'index des auteurs, saisissez:
+   <em>ellis</em> dans l'index des auteurs, saisissez:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:ellis">
+      <input size="40" type="text" name="p" value="author:ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2855,7 +2853,7 @@ comience con "Neutrino mass", debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:ellis title:muon*">
+      <input size="40" type="text" name="p" value="author:ellis title:muon*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2869,7 +2867,7 @@ comience con "Neutrino mass", debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="experiment:NA60 year:2001">
+      <input size="40" type="text" name="p" value="experiment:NA60 year:2001" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2893,12 +2891,12 @@ comience con "Neutrino mass", debemos escribir:
    un nombre de campo seguido por dos puntos este término se buscará
    únicamente en el campo especificado.  Por ejemplo, para recuperar
    documentos que contienen la palabra <em>ellis</em> dentro del
-   índice de autores, debemos escribir:
+   índice de autores, debemos escribir:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:ellis">
+      <input size="40" type="text" name="p" value="author:ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2913,7 +2911,7 @@ comience con "Neutrino mass", debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:ellis title:muon*">
+      <input size="40" type="text" name="p" value="author:ellis title:muon*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2927,7 +2925,7 @@ comience con "Neutrino mass", debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="experiment:NA60 year:2001">
+      <input size="40" type="text" name="p" value="experiment:NA60 year:2001" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2950,12 +2948,12 @@ l’emprada per Google en les Seves cerques tipus <code>"site:"</code>.
 Si un terme de cerca es precedit per un nom de camp seguit per dos
 punts aquest terme es cerca únicament dins el camp especificat.  Per
 exemple, per recuperar documents que contenen la paraula
-<em>ellis</em> dins l’índex d’autors, cal escriure:
+<em>ellis</em> dins l’índex d’autors, cal escriure:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:ellis">
+      <input size="40" type="text" name="p" value="author:ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2970,7 +2968,7 @@ exemple, per recuperar documents que contenen la paraula
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:ellis title:muon*">
+      <input size="40" type="text" name="p" value="author:ellis title:muon*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -2983,7 +2981,7 @@ exemple, per recuperar documents que contenen la paraula
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="experiment:NA60 year:2001">
+      <input size="40" type="text" name="p" value="experiment:NA60 year:2001" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3013,12 +3011,12 @@ exemple, per recuperar documents que contenen la paraula
 <p>The regular expression searching mode is mostly for the power users
 acquainted with the traditional Unix/POSIX regexp syntax.  In the
 Simple Search interface you can trigger it by using slashes instead of
-quotes:
+quotes:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="title:/^E.*s$/">
+      <input size="40" type="text" name="p" value="title:/^E.*s$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3035,12 +3033,12 @@ by any number of any characters, and end by the letter <em>s</em>.
 <p>Les expressions régulières sont réservées à l'usage des
    utilisateurs avancés, familiers de la syntaxe des regexp
    Unix/POSIX. Dans le mode de Recherche Simple, on définit une
-   expression régulière en substituant le signe / aux guillemets:
+   expression régulière en substituant le signe / aux guillemets:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="title:/^E.*s$/">
+      <input size="40" type="text" name="p" value="title:/^E.*s$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3059,12 +3057,12 @@ by any number of any characters, and end by the letter <em>s</em>.
 <p>El uso del modo de búsqueda por expresión regular está dirigida
 sobre todo a usuarios avanzados que conocen la sintaxis tradicional
 Unix/POSIX regexp.  En el interfaz de consulta simple se puede forzar
-este modo usando barras inclinadas en lugar de comillas:
+este modo usando barras inclinadas en lugar de comillas:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="title:/^E.*s$/">
+      <input size="40" type="text" name="p" value="title:/^E.*s$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3083,12 +3081,12 @@ cualquier carácter, y que terminen por la letra <em>s</em>.
 <p>L’ ús del mode de cerca per expressió regular està dirigida
 sobretot a usuaris avançats que coneixen la sintaxi tradicional
 Unix/POSIX regexp.  A l’interficie de consulta simple es pot forçar
-aquest mode utilitzant les Barres inclinades enlloc de comentes:
+aquest mode utilitzant les Barres inclinades enlloc de comentes:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="title:/^E.*s$/">
+      <input size="40" type="text" name="p" value="title:/^E.*s$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3107,12 +3105,12 @@ lletra <em>s</em>.
 <lang>
 <en>
 <p>Another example could be an author search for an author expressed
-in the database as either <em>Ellis, J</em> or <em>Ellis, John</em>:
+in the database as either <em>Ellis, J</em> or <em>Ellis, John</em>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/">
+      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3122,12 +3120,12 @@ in the database as either <em>Ellis, J</em> or <em>Ellis, John</em>:
 </en>
 <fr>
 <p>Autre exemple: la recherche d'un auteur dont le prénom peut être
-   abrégé ou entier, comme <em>Ellis, J</em> ou <em>Ellis, John</em>:
+   abrégé ou entier, comme <em>Ellis, J</em> ou <em>Ellis, John</em>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/">
+      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3138,12 +3136,12 @@ in the database as either <em>Ellis, J</em> or <em>Ellis, John</em>:
 <es>
 <p>Otro ejemplo similar es el de la búsqueda por autor de un autor que
 se ha introducido en la base de datos como <em>Ellis, J</em> o bien
-como <em>Ellis, John</em>:
+como <em>Ellis, John</em>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/">
+      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3155,12 +3153,12 @@ como <em>Ellis, John</em>:
 <ca>
 <p>Un altre exemple similar és el de la cerca per autor d’un autor que
 ha estat introduït a la base de dades com <em>Ellis, J</em> o bé com
-<em>Ellis, John</em>:
+<em>Ellis, John</em>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/">
+      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3175,12 +3173,12 @@ ha estat introduït a la base de dades com <em>Ellis, J</em> o bé com
 <p>The regular expression search enables you to formulate very
 specific word proximity queries.  For example, let us find all titles
 containing words <em>dense</em> and <em>matter</em> that are separated
-by at most one word that doesn't contain the letter <em>l</em>:
+by at most one word that doesn't contain the letter <em>l</em>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="title:/dense ([^ l]* )?matter/">
+      <input size="40" type="text" name="p" value="title:/dense ([^ l]* )?matter/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3192,13 +3190,13 @@ by at most one word that doesn't contain the letter <em>l</em>:
 <p>Une expression régulière vous permet de définir des paramètres de
    proximité entre plusieurs termes. Par exemple, rechercher tous les
    titres contenant les mots <em>dense</em> et <em>matter</em> séparés
-   par un seul mot ne contenant pas la lettre <em>l</em>:
+   par un seul mot ne contenant pas la lettre <em>l</em>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="title:/dense ([^ l]* )?matter/">
+      <input size="40" type="text" name="p" value="title:/dense ([^ l]* )?matter/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3211,12 +3209,12 @@ by at most one word that doesn't contain the letter <em>l</em>:
 palabras muy específicas por su proximidad.  Por ejemplo, permite
 recuperar registros cuyos títulos contienen las palabras
 <em>dense</em> y <em>matter</em> y que estén separadas al menos por
-una palabra que no contenga la letra <em>l</em>:
+una palabra que no contenga la letra <em>l</em>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="title:/dense ([^ l]* )?matter/">
+      <input size="40" type="text" name="p" value="title:/dense ([^ l]* )?matter/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3230,12 +3228,12 @@ una palabra que no contenga la letra <em>l</em>:
 paraules Molt específiques per proximitat.  Per exemple, permet
 recuperar registres Els títols dels quals contenen les paraules
 <em>dense</em> i <em>matter</em> i que estiguin separades, al menys,
-per una paraula que no contingui la lletra <em>l</em>:
+per una paraula que no contingui la lletra <em>l</em>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="title:/dense ([^ l]* )?matter/">
+      <input size="40" type="text" name="p" value="title:/dense ([^ l]* )?matter/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3251,12 +3249,12 @@ per una paraula que no contingui la lletra <em>l</em>:
 <code>[a-k]</code> and occurrence counts such as <code>{3}</code>.
 For example, let us find all preprints that do not follow the year
 cataloguing policy, that is <em>YYYY</em> to denote year, optionally
-followed by <em>?</em> or by another <em>-YYYY</em>:
+followed by <em>?</em> or by another <em>-YYYY</em>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/">
+      <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3270,7 +3268,7 @@ that the above query is equivalent to:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <protect><input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/"></protect>
+      <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3285,12 +3283,12 @@ du mot, <code>{3}</code> p.ex., chercher l'ensemble des "Preprints"
 dont la date ne suit pas la règle de catalogage, soit <em>YYYY</em>
 pour spécifier une l'année de publication, éventuellement suivi
 par <em>?</em> ou une autre année <em>-YYYY</em> (p.ex. 2003-2004 sera
-exclus) :
+exclus) :</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/">
+      <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3305,7 +3303,7 @@ requête ci-dessus est équivalente à:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <protect><input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/"></protect>
+      <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3319,12 +3317,12 @@ como <code>[a-k]</code> y contadores de ocurrencia como
 <code>{3}</code>.  Por ejemplo, podemos recuperar todos los pre-prints
 que no se corresponden con la política de catalogación <em>AAAA</em>
 para describir los años, opcionalmente seguida por <em>?</em> o por
-otro <em>-AAAA</em>:
+otro <em>-AAAA</em>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/">
+      <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3339,7 +3337,7 @@ equivalente a:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <protect><input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/"></protect>
+      <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3354,12 +3352,12 @@ equivalente a:
 Per ejemple, podem recuperar tots els pre-prints que no es
 corresponguin amb la política de catalogació <em>AAAA</em> per
 descriure anys, opcionalment seguida per <em>?</em> o per altre
-<em>-AAAA</em>:
+<em>-AAAA</em>:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/">
+      <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3374,7 +3372,7 @@ equivalent a:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <protect><input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/"></protect>
+      <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3390,13 +3388,13 @@ equivalent a:
 <a href="http://en.wikipedia.org/wiki/Regular_expression">Wikipedia
 regexp article</a> and the <a
 href="http://dev.mysql.com/doc/mysql/en/Regexp.html">MySQL regexp
-documentation</a>.
+documentation</a>.</p>
 </en>
 <fr>
-Pour plus d'informations sur les expressions régulières, voir les articles de
+<p>Pour plus d'informations sur les expressions régulières, voir les articles de
 <a href="http://en.wikipedia.org/wiki/Regular_expression">Wikipedia</a>
 et <a href="http://dev.mysql.com/doc/mysql/fr/Regexp.html">MySQL</a> à
-ce sujet.
+ce sujet.</p>
 </fr>
 <es>
 <p>Para conocer más acerca de las expresiones regulares POSIX, se
@@ -3404,7 +3402,7 @@ recomienda la consulta de <a
 href="http://en.wikipedia.org/wiki/Regular_expression">Wikipedia
 regexp article</a> y <a
 href="http://dev.mysql.com/doc/mysql/en/Regexp.html">MySQL regexp
-documentation</a>.
+documentation</a>.</p>
 </es>
 
 <ca>
@@ -3413,7 +3411,7 @@ la Consulta de <a
 href="http://en.wikipedia.org/wiki/Regular_expression">Wikipedia
 regexp article</a> i <a
 href="http://dev.mysql.com/doc/mysql/en/Regexp.html">MySQL regexp
-documentation</a>.
+documentation</a>.</p>
 </ca>
 </lang>
 
@@ -3431,12 +3429,12 @@ documentation</a>.
 <en>
 <p>The span query is provided via a <code>-></code> sign.  For
 example, to search for all documents on <em>muon decay</em> published
-between <em>1983</em> and <em>1992</em>, type:
+between <em>1983</em> and <em>1992</em>, type:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="muon decay year:1983->1992">
+      <input size="30" type="text" name="p" value="muon decay year:1983->1992" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3450,7 +3448,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
+      <input size="30" type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3462,12 +3460,12 @@ J</em> to <em>Ellis, Qqq</em>, type:
 <fr>
 <p>La requête de plages est disponible via le signe ->. Par exemple,
    pour rechercher tous les documents relatifs au <em>muon decay</em>
-   publiés entre 1983 et 1992, saisissez:
+   publiés entre 1983 et 1992, saisissez:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="muon decay year:1983->1992">
+      <input size="30" type="text" name="p" value="muon decay year:1983->1992" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3480,7 +3478,7 @@ J</em> to <em>Ellis, Qqq</em>, saisissez:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
+      <input size="30" type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3493,12 +3491,12 @@ J</em> to <em>Ellis, Qqq</em>, saisissez:
 <p>La consulta por rango se realiza a través del signo
 <code>-></code>.  Por ejemplo, para recuperar todos los documentos
 sobre <em>par motor</em> publicados entre <em>1983</em> y
-<em>1992</em>, debemos escribir:
+<em>1992</em>, debemos escribir:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="destintegraci&oacute;n muon a&ntilde;o:1983->1992">
+      <input size="30" type="text" name="p" value="destintegraci&oacute;n muon a&ntilde;o:1983->1992" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3513,7 +3511,7 @@ debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
+      <input size="30" type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3526,12 +3524,12 @@ debemos escribir:
 <p>La consulta por rang es realitza a través del signe
 <code>-></code>.  Per exemple, per recuperar tots els documents sobre
 <em>par motor</em> publicats entre <em>1983</em> i <em>1992</em>, cal
-escriure:
+escriure:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="destintegraci&oacute; muon any:1983->1992">
+      <input size="30" type="text" name="p" value="destintegraci&oacute; muon any:1983->1992" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3546,7 +3544,7 @@ cal escriure:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="30" type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;">
+      <input size="30" type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3574,12 +3572,12 @@ cal escriure:
    <em>muon</em>, 'muonic' etc in any field, that contain the phrase
    (or the substring, to be more precise) 'dense quark matter' inside
    abstract fields, and that were published in year starting by digits
-   '200', type:
+   '200', type:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*">
+      <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3595,7 +3593,7 @@ cal escriure:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs">
+      <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3612,7 +3610,7 @@ cal escriure:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;">
+      <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3627,12 +3625,12 @@ cal escriure:
    champs ne contient des mots tels que <em>muon</em>, 'muonic'
    etc. et dont le champ de résumé contient l'expression (ou
    sous-chaîne, pour être plus précis) 'dense quark matter', et qui
-   ont été publiés dans les années 2000 et plus, saisissez:
+   ont été publiés dans les années 2000 et plus, saisissez:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*">
+      <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3646,7 +3644,7 @@ cal escriure:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs">
+      <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3664,7 +3662,7 @@ cal escriure:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;">
+      <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3680,12 +3678,12 @@ palabras como <em>muon</em>, 'muonic', etc., en ningún otro
 campo, y que contienen (o subcadena de palabras, para ser más
 precisos) ‘dense quark matter’ dentro del campo de resumen, y que han sido
 publicados dentro de los años que comienzan por los dígitos '200',
-debe escribirse:
+debe escribirse:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*">
+      <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3704,7 +3702,7 @@ los metadatos, las citas o el texto completo, debe escribirse:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs">
+      <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3722,7 +3720,7 @@ escribirse:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;">
+      <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3739,12 +3737,12 @@ la paraula <em>ellis</em> dins el camp d’autor, i que no contenen
 paraules com <em>muon</em>, 'muonic', etc., a cap altre
 camp, i que contenen la frase (o subcadena de paraules, per ser més
 precisos) ‘dense quark matter’ dins el camp de resum, i que han estat
-publicats dins els anys que comencen pels dígits '200', cal escriure:
+publicats dins els anys que comencen pels dígits '200', cal escriure:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*">
+      <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3763,7 +3761,7 @@ les metadades, les referències o el text complet, cal escriure:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs">
+      <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3780,7 +3778,7 @@ les metadades, les referències o el text complet, cal escriure:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;">
+      <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3810,70 +3808,68 @@ les metadades, les referències o el text complet, cal escriure:
 <ca>Escollir correctament els térmes de cerca (speed-wise)</ca>
 </lang>
 </a></h4>
-<p>
 
 <lang>
 <en>
 <ul>
 <li>Whenever possible, prefer word searches instead of phrase searches.
-    Search rather for <code>black hole</code> than for <code>"black hole"</code>.
-<li>Avoid common terms such as <code>and</code>, <code>of</code>, or <code>CERN</code>.
+    Search rather for <code>black hole</code> than for <code>"black hole"</code>.</li>
+<li>Avoid common terms such as <code>and</code>, <code>of</code>, or <code>CERN</code>.</li>
 <li>If you are searching for a specific metadata information, such
-    as a <em>report number</em>, choose corresponding index.
+    as a <em>report number</em>, choose corresponding index.</li>
 <li>If you are looking for a specific document collection, such
     as <em>Theses</em>, choose the
-    <a href="<WEBURL>/?c=Theses">Theses</a> collection first, and start your search from there.
+    <a href="<WEBURL>/?c=Theses">Theses</a> collection first, and start your search from there.</li>
 </ul>
 </en>
 <fr>
 <ul>
 <li>Dans la mesure du possible, recherchez plutôt des termes que des
     phrases. Recherchez plutôt <code>black hole</code>
-    que <code>"black hole"</code>.
+    que <code>"black hole"</code>.</li>
 <li>Evitez des termes courants tels
-    que <code>et</code>, <code>de</code> ou <code>CERN</code>.
+    que <code>et</code>, <code>de</code> ou <code>CERN</code>.</li>
 <li>Si vous recherchez une information spécifique au niveau des
     métadonnées, telle qu'un numéro de rapport, sélectionnez l'index
-    correspondant.
+    correspondant.</li>
 <li>Si vous recherchez une collection spécifique de documents
     (Thèses, par exemple), commencez la recherche dans la collection
-    <a href="<WEBURL>/?c=Theses&amp;ln=fr">Thèses</s>.
+    <a href="<WEBURL>/?c=Theses&amp;ln=fr">Thèses</a>.</li>
 </ul>
 </fr>
+
 <es>
-<p>
 <ul>
 <li>Siempre que sea posible, es preferible realizar búsquedas por
 palabra antes que por frase.  Es preferible buscar por <code>agujero
-negro</code> que por <code>"agujero negro"</code>.
+negro</code> que por <code>"agujero negro"</code>.</li>
 <li>Se aconseja evitar vocablos comunes tales como <code>y</code>,
-<code>de</code>, o siglas como <code>CERN</code>.
+<code>de</code>, o siglas como <code>CERN</code>.</li>
 <li>Si la búsqueda versa sobre información específica en los
 metadatos, como por ejemplo, <em>número de registro</em>, seleccionar
-el índice correspondiente.
+el índice correspondiente.</li>
 <li>Si la búsqueda versa sobre una colección específica de documentos,
 como por ejemplo, <em>Tesis</em>, elegir en primer lugar la colección
 <a href="<WEBURL>/?c=Theses">Tesis</a>, e iniciar la búsqueda a partir
-de aquí.  </ul>
+de aquí.</li>
+</ul>
 </es>
 
 <ca>
-<p>
-
 <ul>
 <li>Sempre que sigui possible, es preferible realitzar cerques per
 paraula abans que per frase.  Es preferible una cerca per <code>forat
-negre</code> que per <code>"forat negre"</code>.
+negre</code> que per <code>"forat negre"</code>.</li>
 <li>S’aconsella evitar mots comuns tals com les
 preposicions<code>i</code>, <code>de</code>, o sigles com
-<code>CERN</code>.
+<code>CERN</code>.</li>
 <li>Si la cerca versa sobre informació específica a les metadades, com
 per exemple, <em>número de registre</em>, cal seleccionar l’índex
-corresponent.
+corresponent.</li>
 <li>Si la cerca versa sobre una col•lecció específica de documents,
 com per exemple, <em>Tesis</em>, cal escollir en primer lloc la
 col•lecció <a href="<WEBURL>/?c=Theses">Tesis</a>, e iniciar la cerca
-a partir de aquí.
+a partir de aquí.</li>
 </ul>
 </ca>
 </lang>
@@ -3891,10 +3887,9 @@ a partir de aquí.
 <lang>
 <en>
 <p>You can search for an author in many ways, each having its own
-advantages and disadvantages.
+advantages and disadvantages.</p>
 
 <ol>
-
 <li>First of all, note that searching for words isn't usually what you
 would want here.  If you choose to search for the words <code>Ellis
  J</code> within the author index, it means that two queries (for the
@@ -3904,7 +3899,7 @@ boolean AND is performed next:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="Ellis J">
+      <input size="40" type="text" name="p" value="Ellis J" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -3919,7 +3914,8 @@ would have found the results for the author you were looking for, such
 a technique could have returned you many false positives, as the one
 cited above.  Instead of searching for words, a more suitable
 technique to apply in this case is to search for phrases which will
-permit you to achieve higher search precisions.
+permit you to achieve higher search precisions.</p>
+</li>
 
 <li>The author names are usually stored in a form containing initials
 only, such as <em>Ellis, J</em>.  To get the list of publications of
@@ -3928,7 +3924,7 @@ an author whose name is spelled exactly that way, type:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;">
+      <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3936,12 +3932,12 @@ an author whose name is spelled exactly that way, type:
       </blockquote>
       </form>
 </en>
+
 <fr>
 <p>Il existe différentes méthodes de recherche d'un auteur. Chaque
-méthode a ses avantages et ses inconvénients.
+méthode a ses avantages et ses inconvénients.</p>
 
 <ol>
-
 <li>Tout d'abord, notez que les recherches basées sur des termes ne
 sont généralement pas adaptées. Si vous recherchez les mots
 <code>Ellis J</code> dans le champ de l'auteur, deux requêtes (pour
@@ -3951,7 +3947,7 @@ effectuées. Le booléen ET n'est utilisé que par la suite:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="Ellis J">
+      <input size="40" type="text" name="p" value="Ellis J" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -3967,17 +3963,17 @@ résultats correspondant à l'auteur recherché. Il est néanmoins
 également possible qu'une telle technique vous renvoie de nombreuses
 réponses incorrectes, comme celle susmentionnée. Dans un tel cas, il
 est plus adapté de rechercher des phrases plutôt que des
-termes. Vous pouvez ainsi affiner votre recherche.
-
+termes. Vous pouvez ainsi affiner votre recherche.</p>
+</li>
 <li>Les noms d'auteurs sont généralement stockés sous une forme
 contenant uniquement des initiales, telle que <em>Ellis, J</em>. Pour
 obtenir la liste des publications d'un auteur dont le nom est
-orthographié de cette manière, saisissez:</p>
+orthographié de cette manière, saisissez:
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;">
+      <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -3985,12 +3981,12 @@ orthographié de cette manière, saisissez:</p>
       </blockquote>
       </form>
 </fr>
+
 <es>
 <p>La búsqueda por autor puede realizarse de diversas formas, cada una
-de las cuales presenta sus ventajas y desventajas.
+de las cuales presenta sus ventajas y desventajas.</p>
 
 <ol>
-
 <li>En primer lugar, es necesario anotar que el modo de búsqueda por
 palabras no es el que más adecuado en este tipo de búsqueda.  Si se
 selecciona la búsqueda por palabras <code>Ellis J</code> dentro del
@@ -4001,7 +3997,7 @@ primer lugar, y una booleana Y que se realizará después.
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="Ellis J">
+      <input size="40" type="text" name="p" value="Ellis J" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -4017,8 +4013,8 @@ registros sobre el autor requerido, sin embargo, los resultados
 recuperados siguiendo este método pueden no ser pertinentes, tal y
 como ocurre en el ejemplo citado anteriormente. En lugar de buscar por
 palabras, la técnica más conveniente que debe aplicarse en este caso
-es la búsquda por frase, que permite conseguir mayor precisión.
-
+es la búsquda por frase, que permite conseguir mayor precisión.</p>
+</li>
 <li>Es habitual que los nombres de autores que se introducen a través
 de los formularios contengan únicamente la inicial del nombre, como
 por ejemplo, <em>Ellis, J</em>.  Para obtener un listado de las
@@ -4028,7 +4024,7 @@ modo, debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;">
+      <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4039,7 +4035,7 @@ modo, debemos escribir:
 
 <ca>
 <p>La cerca per autor es pot realitzar de diverses formes, cadascuna
-de les quals presenta els seus avantatges i les seves desavantatges.
+de les quals presenta els seus avantatges i les seves desavantatges.</p>
 
 <ol>
 
@@ -4053,7 +4049,7 @@ després.
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="Ellis J">
+      <input size="40" type="text" name="p" value="Ellis J" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -4069,8 +4065,8 @@ sobre l’autor requerit, ara bé, els resultats obtinguts seguint aquest
 métode poden no ser pertinents, tal i com passa a l’exemple citat
 anteriorment.  En lloc de cercar per paraules, la tècnica més
 convenient que s’ha d’aplicar en aquests casos és la cerca per frase,
-que permet aconseguir major grau de precisió.
-
+que permet aconseguir major grau de precisió.</p>
+</li>
 <li>Es habitual que els noms d’autors que s’introdueixen a través dels
 formularis continguin únicament la inicial del nom, com per exemple,
 <em>Ellis, J</em>.  Per obtenir un llistat de les publicacions de tal
@@ -4079,13 +4075,14 @@ autor amb el nom escrit exactament d’aquesta manera, cal escriure:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;">
+      <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
       <input class="formbutton" type="submit" name="action" value="_(Search)_" />
       </blockquote>
       </form>
+
 </ca>
 </lang>
 
@@ -4094,7 +4091,8 @@ autor amb el nom escrit exactament d’aquesta manera, cal escriure:
 <p>This way of searching gives you the highest precision and no false
 positives.  (Assuming there are no other authors whose names are
 spelled <em>Ellis, J</em>, an assumption that is often false<a
-href="#author-full-names"><sup>*</sup></a>.)  The search is very fast.
+href="#author-full-names"><sup>*</sup></a>.)  The search is very fast.</p>
+</li>
 
 <li> Sometimes an author's first name may be spelled abbreviated on
 some documents (such as <em>Ellis, J</em>) and sometimes full on
@@ -4106,7 +4104,7 @@ query:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
+      <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4118,15 +4116,15 @@ query:
 false positives.  (Assuming there are no other authors whose names are
 spelled <em>Ellis, J</em> or <em>Ellis, John</em>, an assumption that
 is often false<a href="#author-full-names"><sup>*</sup></a>.)  The search is
-fast.
-
+fast.</p>
+</li>
 <li>To match all of the above forms in a single search term, you can
 try to use a wildcard query:
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:&quot;Ellis, J*&quot;">
+      <input size="40" type="text" name="p" value="author:&quot;Ellis, J*&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4137,20 +4135,20 @@ try to use a wildcard query:
 <p>It would match all author names that start by the text
 <code>Ellis, J</code>, i.e. not only the wanted forms <em>Ellis,
 J</em> and <em>Ellis, John</em>, but also <em>Ellis, Jim</em>, or
-<em>Ellis, John Rolfe</em>, or <em>Ellis, Jonathan Richard</em>.
+<em>Ellis, John Rolfe</em>, or <em>Ellis, Jonathan Richard</em>.</p>
 
 <p>This way of searching returns you more results, which may be
 suitable in case you don't know how the names are spelled in the
 database.  But you also risk the eventuality of getting false
-positives.  The search is relatively fast.
-
+positives.  The search is relatively fast.</p>
+</li>
 <li>Yet another, the most general alternative is to use a partial
 phrase matching:
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:'Ellis, J'">
+      <input size="40" type="text" name="p" value="author:'Ellis, J'" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4162,13 +4160,13 @@ phrase matching:
 the ones whose names contain the expression <code>Ellis, J</code>
 anywhere inside the name, such as <em>De Lellis, Jim</em>.  It thus
 gives you the largest possible number of hits at the largest risk of
-false positives.  The search is relatively slow.
+false positives.  The search is relatively slow.</p>
 
 <p>(Note though that this way of searching may be very handy in case
 of compound family names such <em>Pepe-Altarelli, M</em> or <em>'t
 Hooft, G</em> where a casual user query for <em>Hooft, G</em> would
-match the wanted author, unlike the methods mentioned above.)
-
+match the wanted author, unlike the methods mentioned above.)</p>
+</li>
 <li>Finally, let us note that you can use the <a href="#regexp">regular
 expression syntax</a> to construct any complex author query.  A simple
 example is to search for an author expressed in the database as either
@@ -4177,7 +4175,7 @@ example is to search for an author expressed in the database as either
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/">
+      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -4187,7 +4185,7 @@ example is to search for an author expressed in the database as either
 
 Please consult <a href="#regexp">regular expression searching tips</a>
 to know more about regular expression search possibilities.
-
+</li>
 </ol>
 
 <p><a name="author-full-names"><strong><sup>*</sup>NOTE:</strong></a>
@@ -4198,15 +4196,15 @@ authors with the same abbreviation, please contact the <a
 href="mailto:<ADMINEMAIL>">administrators</a> of <CDSNAMEINTL> so that
 they could work with you on inputting a consistently spelled and
 properly formatted first name everywhere.  Only the consistent
-database content will ensure a proper author searching behaviour.
+database content will ensure a proper author searching behaviour.</p>
 </en>
 <fr>
 <p>Cette méthode de recherche vous permet de procéder à une recherche
 très précise et d'éviter les réponses incorrectes (si l'on part du
 principe, souvent erroné, qu'aucun autre auteur dont le nom est
 orthographié <em>Ellis, J</em> existe dans la base de données). La
-recherche est très rapide.
-
+recherche est très rapide.</p>
+</li>
 <li> Il arrive que le prénom de l'auteur soit abrégé sur certains
 documents (<em>Ellis, J</em>) et complet sur d'autres (<em>Ellis,
 John</em>), éventuellement accompagné d'un second prénom (<em>Ellis,
@@ -4217,7 +4215,7 @@ OU:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
+      <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4229,14 +4227,16 @@ OU:
 recherche très précise et d'éviter les réponses incorrectes (si l'on
 part du principe, souvent erroné, qu'aucun autre auteur dont le nom
 est orthographié <em>Ellis, J</em> ou <em>Ellis, John</em> existe dans la base de
-données <a href="#author-full-names"><sup>*</sup></a>). La recherche est rapide.
-
-<li>Pour rassembler l'ensemble des formes susmentionnées dans une seule recherche de termes, vous pouvez baser la requête sur un caractère de remplacement:
+données <a href="#author-full-names"><sup>*</sup></a>). La recherche est rapide.</p>
+</li>
+<li>Pour rassembler l'ensemble des formes susmentionnées dans une
+seule recherche de termes, vous pouvez baser la requête sur un
+caractère de remplacement:
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:&quot;Ellis, J*&quot;">
+      <input size="40" type="text" name="p" value="author:&quot;Ellis, J*&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4247,20 +4247,20 @@ données <a href="#author-full-names"><sup>*</sup></a>). La recherche est rapide
 <p>L'ensemble des noms d'auteurs qui commencent par
 <code>Ellis, J</code>, i.e. non seulement les formes recherchées <em>Ellis,
 J</em> et <em>Ellis, John</em>, mais aussi <em>Ellis, Jim</em>, ou
-<em>Ellis, John Rolfe</em>, ou <em>Ellis, Jonathan Richard</em> est affiché.
+<em>Ellis, John Rolfe</em>, ou <em>Ellis, Jonathan Richard</em> est affiché.</p>
 
 <p>Ce mode de recherche permet d'obtenir plus de résultats. Il peut
 être utile lorsque vous ne connaissez pas l'orthographe des noms dans
 la base de données. Vous risquez néanmoins d'obtenir des réponses
-incorrectes. La recherche est relativement rapide.
-
+incorrectes. La recherche est relativement rapide.</p>
+</li>
 <li>L'alternative la plus fréquemment utilisée reste néanmoins la
 recherche de phrases partielles:
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:'Ellis, J'">
+      <input size="40" type="text" name="p" value="author:'Ellis, J'" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4273,14 +4273,14 @@ ci-dessus mais également ceux contenant l'expression <code>Ellis,
 J</code> au sein du nom, tels que <em>De Lellis, Jim</em>. Vous
 disposez ainsi du plus grand nombre possible de résultats. Le risque
 de réponses incorrectes est néanmoins très élevé. La recherche est
-relativement lente.
+relativement lente.</p>
 
 <p>(Notez que cette méthode de recherche peut néanmoins s'avérer très
 utile lors de la recherche de noms de famille composés tels que
 <em>Pepe-Altarelli, M</em> or <em>'t Hooft, G</em>, où une requête
 normale pour <em>Hooft, G</em> permet de trouver l'auteur recherché,
-contrairement aux méthodes susmentionnées).
-
+contrairement aux méthodes susmentionnées).</p>
+</li>
 <li>Finalement, notez que vous pouvez utiliser
 les <a href="#regexp">expressions régulières</a> pour construire
 n'importe quelle recherche d'auteur, même complexe. Un exemple simple
@@ -4290,7 +4290,7 @@ que <em>Ellis, J</em> ou <em>Ellis, John</em>:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/">
+      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -4301,7 +4301,7 @@ que <em>Ellis, J</em> ou <em>Ellis, John</em>:
    Consultez les astuces sur les <a href="#regexp">expressions
    régulières</a> pour en apprendre plus sur les possibilités qu'elles
    offrent.
-
+</li>
 </ol>
 
 <p><a
@@ -4314,7 +4314,7 @@ veuillez <a href="mailto:<ADMINEMAIL>">contacter les
 administrateurs</a> de <CDSNAMEINTL> de manière à ce qu'ils vous aident
 à saisir les prénoms de manière correcte et cohérente dans l'ensemble
 de la base de données. Une base de données au contenu cohérent
-garantit des résultats satisfaisants lors de la recherche d'auteurs.
+garantit des résultats satisfaisants lors de la recherche d'auteurs.</p>
 </fr>
 <es>
 <p>Esta técnica de búsqueda confiere mayor precisión y evita falsos
@@ -4322,8 +4322,8 @@ resultados aparentemente positivos.  (La presunción de que no existen
 otros autores cuyo nombre se escriba como <em>Ellis, J</em>, en
 ocasiones puede no ser cierta<a
 href="#author-full-names"><sup>*</sup></a>.)  La búsqueda se realizará
-con mucha rapidez.
-
+con mucha rapidez.</p>
+</li>
 <li> Algunas veces, en algunos documentos, el nombre propio de un
 autor se escribe de forma abreviada, (como <em>Ellis, J</em>) y otras
 de forma completa (como <em>Ellis, John</em>; y en algunas ocasiones
@@ -4334,7 +4334,7 @@ una misma búsqueda, se puede utilizar el operador booleano O:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
+      <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4346,9 +4346,9 @@ una misma búsqueda, se puede utilizar el operador booleano O:
 resultados positivos (o no pertinentes).  (La presunción de que no hay
 más autores que se escriban como <em>Ellis, J</em> O <em>Ellis,
 John</em>, en ocasiones puede no ser cierta <a
-href="#author-full-names"><sup>*</SUP></a>.)  La búsqueda es muy
-rápida.
-
+href="#author-full-names"><sup>*</sup></a>.)  La búsqueda es muy
+rápida.</p>
+</li>
 <li>Para localizar todas las formas introducidas en el ejemplo
 anterior con un único término de búsqueda, podemos probar de utilizar
 una búsqueda con comodín:
@@ -4356,7 +4356,7 @@ una búsqueda con comodín:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:&quot;Ellis, J*&quot;">
+      <input size="40" type="text" name="p" value="author:&quot;Ellis, J*&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4368,20 +4368,20 @@ una búsqueda con comodín:
 texto <code>Ellis, J</code>, no sólo con las formas requeridas en el
 ejemplo <em>Ellis, J</em> y <em>Ellis, John</em>, sino también
 <em>Ellis, Jim</em>, o <em>Ellis, John Rolfe</em>, o <em>Ellis,
-Jonathan Richard</em>.
+Jonathan Richard</em>.</p>
 
 <p>Esta búsqueda retornará muchos más resultados, pero puede resultar
 conveniente en el caso en que se desconozca la forma de introducción
 de los nombres en la base de datos.  Sin embargo, aumenta el riesgo de
-obtener resultados poco pertinentes.  La búsqueda es relativamente rápida.
-
+obtener resultados poco pertinentes.  La búsqueda es relativamente rápida.</p>
+</li>
 <li>Aparte de esta última, la alternativa general más utilizada es el
 uso de una búsqueda por parte de la frase:
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:'Ellis, J'">
+      <input size="40" type="text" name="p" value="author:'Ellis, J'" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4394,14 +4394,14 @@ también todos aquellos cuyos nombres contengan la expresión
 <code>Ellis, J</code> en cualquier parte de su nombre, como por
 ejemplo <em>De Lellis, Jim</em>.  Ello aumenta enormemente las
 posibilidades de obtener registros con un alto riesgo de ser poco
-pertinentes.  La búsqueda es relativamente lenta.
+pertinentes.  La búsqueda es relativamente lenta.</p>
 
 <p>(Obsérvese que este modo de búsqueda puede resultar muy práctico
 para apellidos compuestos tales como <em>Pepe-Altarelli, M</em> o
 <em>'t Hooft, G</em> en la que una consulta puntual de usuario por
 <em>Hooft, G</em> recuperará el autor requerido, a diferencia de los
-métodos mencionados anteriormente.)
-
+métodos mencionados anteriormente.)</p>
+</li>
 <li>Finalmente, anotar que es posible utilizar la <a
 href="#regexp">sintaxis de expresión regular</a> para construir
 consultas complejas para buscar por autor.  Un ejemplo sencillo es la
@@ -4411,7 +4411,7 @@ búsqueda de un autor introducido en la base de datos tanto como
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/">
+      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -4422,8 +4422,8 @@ búsqueda de un autor introducido en la base de datos tanto como
 Se recomienda la consulta de <a href="#regexp">búsqueda por
 expresiones regulares</a> para conocer más acerca de las posibilidades
 de este modo de búsqueda.
-
-</OL>
+</li>
+</ol>
 
 <p><a name="author-full-names"><strong><sup>*</sup>NOTA:</strong></a>
 Si es autor de su propia lista de publicaciones y detecta que algunas
@@ -4434,7 +4434,7 @@ href="mailto:<ADMINEMAIL>">administradores</a> de <CDSNAMEINTL> que
 trataran de trabajar conjuntamente para implementar una forma
 consistente y normalizada de introducción de su nombre en toda la base
 de datos.  Sólo una base de datos con contenido consistente puede
-garantizar una búqueda por autores exitosa.
+garantizar una búqueda por autores exitosa.</p>
 </es>
 
 
@@ -4444,8 +4444,8 @@ resultats aparentement positius.  (La presumpció de que no existeixen
 altres autores els noms dels quals s’escrigui com <em>Ellis, J</em>, en
 ocasions pot no ser certa<a
 href="#author-full-names"><sup>*</sup></a>.)  La cerca es realitzarà
-con amb molta rapidesa.
-
+con amb molta rapidesa.</p>
+</li>
 <li> Algunes vegadess, en alguns documents, el nom propi d’un
 autor s’escriu de forma abreujada, (com <em>Ellis, J</em>) i altres
 de forma completa (com <em>Ellis, John</em>; i en altres ocasions
@@ -4456,7 +4456,7 @@ una mateixa cerca, es pot utilitzar l’operador booleà O:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;">
+      <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4468,8 +4468,8 @@ una mateixa cerca, es pot utilitzar l’operador booleà O:
 evita falsos resultats positius (o no pertinents).  (La presumpció de
 que no hi ha més autors que s’escriguin com <em>Ellis, J</em> O
 <em>Ellis, John</em>, en ocasions pot no ser certa <a
-href="#author-full-names"><sup>*</SUP></a>.)  La cerca és molt ràpida.
-
+href="#author-full-names"><sup>*</sup></a>.)  La cerca és molt ràpida.</p>
+</li>
 <li>Per localitzar totes les formes introduïdes a l’exemple anterior
 amb un únic terme de cerca, podem provar d’emprar una cerca amb
 comodí:
@@ -4477,7 +4477,7 @@ comodí:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:&quot;Ellis, J*&quot;">
+      <input size="40" type="text" name="p" value="author:&quot;Ellis, J*&quot;" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4489,20 +4489,20 @@ comodí:
 <code>Ellis, J</code>, no només amb les formes requerides a l’exemple
 <em>Ellis, J</em> i <em>Ellis, John</em>, sinó també <em>Ellis,
 Jim</em>, o <em>Ellis, John Rolfe</em>, o <em>Ellis,Jonathan
-Richard</em>.
+Richard</em>.</p>
 
 <p>Aquesta cerca retornarà molts més resultats, però pot resultar
 convenient en el cas que es desconegui la forma d’introducció dels
 noms a la base de dades.  Ara bé, augmenta el risc d’obtenir resultats
-poc pertinents. La cerca és relativament ràpida.
-
+poc pertinents. La cerca és relativament ràpida.</p>
+</li>
 <li>Apart d’aquesta darrera, l’alternativa general més emprada és la
 cerca per part de la frase:
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:'Ellis, J'">
+      <input size="40" type="text" name="p" value="author:'Ellis, J'" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4515,14 +4515,14 @@ també tots aquells els noms dels quals continguin l’expresió
 <code>Ellis, J</code> a qualsevol part del seu nom, com per exemple
 <em>De Lellis, Jim</em>.  Això augmenta enormement les possibilitats
 d’obtenir registres amb un alt risc de ser poc pertinents.  La cerca
-és relativament lenta.
+és relativament lenta.</p>
 
 <p>(Observis que aquest mode de cerca pot resultar molt pràctic per a
 cognoms compostos, tals com <em>Pepe-Altarelli, M</em> o <em>'t Hooft,
 G</em> en els que una consulta d’una consulta puntual de usuario por
 <em>Hooft, G</em> recuperarà l’autor requerit, a diferència dels
-mètodes mencionats anteriorment.)
-
+mètodes mencionats anteriorment.)</p>
+</li>
 <li>Finalment, anotar que es possible emprar la <a
 href="#regexp">sintaxi de expressió regular</a> per construir
 consultes complexes per fer cerques per autor.  Un exemple senzill és
@@ -4532,7 +4532,7 @@ J</em> com per <em>Ellis, John</em>:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/">
+      <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author" selected="selected">_(author)_</option></select>
@@ -4542,7 +4542,9 @@ J</em> com per <em>Ellis, John</em>:
 
 Es recomana la consulta de <a href="#regexp">cerca per expressions
 regulars</a> per conèixer més sobre les possibilitats d’aquest mode de
-cerca.  </ol>
+cerca.
+</li>
+</ol>
 
 <p><a name="author-full-names"><strong><sup>*</sup>NOTA:</strong></a>
 Si es autor de la seva pròpia llista de publicacions i detecta que
@@ -4553,7 +4555,7 @@ els <a href="mailto:<ADMINEMAIL>">administradors</a> de <CDSNAMEINTL>
 que tractaran de treballar-hi conjuntament per implementar una forma
 consistent i normalitzada d’introducció del seu nom a tota la base de
 dades.  Només una base de dades amb contingut consistent pot garantir
-una cerca per autors exitosa.
+una cerca per autors exitosa.</p>
 </ca>
 </lang>
 
@@ -4583,7 +4585,7 @@ una cerca per autors exitosa.
    <em>hep-ph</em> number, sometimes under its <em>CERN</em> number,
    depending on whether you produce a list of CERN or hep-ph
    publications.  How can you influence the search engine to prefer
-   one report number rather than the other?
+   one report number rather than the other?</p>
 
    <p>In other words, the search engine by default answers a query
    like "sort by first author" or "sort by first report number", but
@@ -4599,10 +4601,10 @@ una cerca per autors exitosa.
    sorted by their CERN-TH numbers, you would search for
    <code>CERN-TH-2001*</code> within <code>reportnumber</code> index,
    and on the search results page, being satisfied with the results,
-   you would add <code>&sp=CERN-TH</code> to the URL to sort the
+   you would add <code>&amp;sp=CERN-TH</code> to the URL to sort the
    results preferentially by CERN-TH report numbers, to get a <a
-   href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&sf=reportnumber&so=a&sp=CERN-TH">nicely
-   sorted list</a> of all CERN-TH 2001 publications.
+   href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH">nicely
+   sorted list</a> of all CERN-TH 2001 publications.</p>
 </en>
 <fr>
 <p>Il est possible de sélectionner le critère d'après lequel les
@@ -4620,7 +4622,7 @@ una cerca per autors exitosa.
    référence <em>hep-ph</em>, et d'autres fois selon la
    référence <em>CERN</em>, selon que l'on veuille produire une liste
    des publications CERN ou hep-ph. Comment demander au moteur de
-   recherche d'utiliser un des numéros plutôt que les autres?
+   recherche d'utiliser un des numéros plutôt que les autres?</p>
 
    <p>En d'autres termes, par défaut le moteur de recherche répond à
       une requête "trier par le premier auteur" ou "trier par le
@@ -4639,10 +4641,10 @@ una cerca per autors exitosa.
       chercher <code>CERN-TH-2001*</code> dans
       l'index <code>reportnumber</code>, et sur la page des résultats
       (une fois que ceux-ci sont satisfaisants), ajouter
-      <code>&sp=CERN-TH</code> à l'URL pour obtenir
+      <code>&amp;sp=CERN-TH</code> à l'URL pour obtenir
       la <a
-      href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&sf=reportnumber&so=a&sp=CERN-TH&ln=fr">liste
-      triée</a> selon ce paramètre.
+      href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH&amp;ln=fr">liste
+      triée</a> selon ce paramètre.</p>
 
 </fr>
 <es>
@@ -4661,7 +4663,7 @@ una cerca per autors exitosa.
    determinado código de referencia <em> hep-ph </em>, u otro <em>
    CERN> </em> según si se ha publicado en una colección de
    publicaciones de CERN o hep-ph. ¿Como se puede influir en el motor
-   de búsqueda para priorizar un código antes que otro?
+   de búsqueda para priorizar un código antes que otro?</p>
 
    <p>En otras palabras, el motor de búsqueda responde por defecto a
    una pregunta similar a “ordena por el primer autor” u “ordena por
@@ -4675,16 +4677,16 @@ una cerca per autors exitosa.
    interfaz de búsqueda, sino que debe ser añadido manualmente en el
    URL de la búsqueda.
 
-Por ejemplo, para recuperar todas las publicaciones del CERN-TH del
-año 2001 ordenados por su código, debe buscarse por
-<code>CERN-TH-2001*</code> dentro del índice <code>código de
-informe</code>, y en la página de resultados de búsqueda, cuando esté
-satisfecho con los resultados obtenidos, añadir
-<code>&sp=CERN-TH</code> en el URL a fin de ordenar los resultados
-sgún los códigos de informe CERN-TH, y conseguir una correcta <a
-href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&sf=reportnumber&so=a&sp=CERN-TH">
-ordenación del listado</a> de todas las publicaciones CERN-TH del
-2001.
+   Por ejemplo, para recuperar todas las publicaciones del CERN-TH del
+   año 2001 ordenados por su código, debe buscarse por
+   <code>CERN-TH-2001*</code> dentro del índice <code>código de
+   informe</code>, y en la página de resultados de búsqueda, cuando
+   esté satisfecho con los resultados obtenidos, añadir
+   <code>&amp;sp=CERN-TH</code> en el URL a fin de ordenar los resultados
+   sgún los códigos de informe CERN-TH, y conseguir una correcta <a
+   href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH">
+   ordenación del listado</a> de todas las publicaciones CERN-TH del
+   2001.</p>
 </es>
 
 <ca>
@@ -4703,7 +4705,7 @@ ordenación del listado</a> de todas las publicaciones CERN-TH del
    referència <em> hep-ph </em>, o altre <em> CERN> </em> segons si ha
    estat publicat a una col•lecció de publicacions CERN o hep-ph. Com
    es pot influir en el motor de cerca per prioritzar un codi abans de
-   l’altre?
+   l’altre?</p>
 
    <p>En altres paraules, el motor de cerca respon per defecte a una
    pregunta semblant a “ordena pel primer autor” o “ordena pel primer
@@ -4716,16 +4718,16 @@ ordenación del listado</a> de todas las publicaciones CERN-TH del
    “invisible” des del punt de vista que no és present a l’interfície
    de cerca, sinó que ha d’afegir-se manualment a la URL de cerca.
 
-Per exemple, per recuperar totes les publicacions del CERN-TH de l’any
-2001 ordenats pel seu codi, cal cercar per <code>CERN-TH-2001*</code>
-dins l’índex de <code>códi d’informe</code>, i a la pàgina de
-resultats de cerca, quan s’estigui satisfet amb els resultats
-obtinguts, afegir <code>&sp=CERN-TH</code> a la URL per tal d’ordenar
-els resultats segons els codis d’informe CERN-TH, i aconseguir una
-correcta <a
-href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&sf=reportnumber&so=a&sp=CERN-TH">
-ordenació de la llista </a> de totes les publicacions CERN-TH del
-2001.
+   Per exemple, per recuperar totes les publicacions del CERN-TH de
+   l’any 2001 ordenats pel seu codi, cal cercar per
+   <code>CERN-TH-2001*</code> dins l’índex de <code>códi
+   d’informe</code>, i a la pàgina de resultats de cerca, quan
+   s’estigui satisfet amb els resultats obtinguts, afegir
+   <code>&amp;sp=CERN-TH</code> a la URL per tal d’ordenar els resultats
+   segons els codis d’informe CERN-TH, i aconseguir una correcta <a
+   href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH">
+   ordenació de la llista </a> de totes les publicacions CERN-TH del
+   2001.</p>
 </ca>
 </lang>
 
@@ -4747,22 +4749,25 @@ href="http://www.slac.stanford.edu/spires/hep/">SPIRES</a> or <a
 href="http://www-lib.kek.jp/KISS/kiss_prepri.html">KEK</a> are
 automatically proposed in a box entitled "Try your search on".  You
 can simply click on the proposed links to run your query on these
-search engines.
+search engines.</p>
 
 <p>Note that the links aren't printed if the search engine doesn't
 support it.  For example, SPIRES or KEK cannot search for terms within
-"any field", so we don't link to them in these cases.
+"any field", so we don't link to them in these cases.</p>
 
 </en>
 <fr>
-<p>Sur la page des résultats, des liens vers d'autres serveurs tels que <a
-href="http://google.com/">Google</a>, <a
+<p>Sur la page des résultats, des liens vers d'autres serveurs tels
+que <a href="http://google.com/">Google</a>, <a
 href="http://www.slac.stanford.edu/spires/hep/">SPIRES</a> ou <a
-href="http://www-lib.kek.jp/KISS/kiss_prepri.html">KEK</a> sont automatiquement proposés dans une zone appelée "Essayez votre requête sur&nbsp;...". Il suffit de cliquer sur ces liens pour obtenir les réponses de ces moteurs.
+href="http://www-lib.kek.jp/KISS/kiss_prepri.html">KEK</a> sont
+automatiquement proposés dans une zone appelée "Essayez votre requête
+sur&nbsp;...". Il suffit de cliquer sur ces liens pour obtenir les
+réponses de ces moteurs.</p>
 
 <p>Notez que ces liens ne sont pas toujours imprimés pour tous les
    moteurs de recherche.  Par exemple, SPIRES et KEK ne supportent pas
-   la recherche par mot dans "tous les champs".
+   la recherche par mot dans "tous les champs".</p>
 </fr>
 <ca>
 <p>A la pàgina de resultats de cerca, s'ofereixen automàticament
@@ -4772,9 +4777,12 @@ href="http://www.slac.stanford.edu/spires/hep/">SPIRES</a> o <a
 href="http://www-lib.kek.jp/KISS/kiss_prepri.html">KEK</a> sota el nom
 de "Proveu la vostra cerca a...".  Amb un simple clic sobre els
 enllaços proposats es pot enviar la cerca realitzada en aquests
-cercadors.
+cercadors.</p>
 
-<p>Observis que els enllaços a altres cercadors no es mostren si el cercador no suporta la cerca.  Per exemple, SPIRES o KEK no poden cercar termes dintre del camp "qualsevol camp", de forma que en aquests casos, el sistema no els enllaçarà.
+<p>Observis que els enllaços a altres cercadors no es mostren si el
+cercador no suporta la cerca.  Per exemple, SPIRES o KEK no poden
+cercar termes dintre del camp "qualsevol camp", de forma que en
+aquests casos, el sistema no els enllaçarà.</p>
 
 </ca>
 
@@ -4786,12 +4794,12 @@ href="http://www.slac.stanford.edu/spires/hep/">SPIRES</a> o <a
 href="http://www-lib.kek.jp/KISS/kiss_prepri.html">KEK</a> bajo el
 nombre de "Intentar la búsqueda en...".  Con un simple cic sobre los
 enlaces propuestos se puede enviar la búsqueda realizada en dichos
-buscadores.
+buscadores.</p>
 
 <p>Obsérvese que los enlaces a otros cercadores no se muestran si el
 buscador no soporta el tipo de búsqueda.  Por ejemplo, SPIRES o KEK no
 pueden buscar términos dentro del campo "cualquier campo", de forma
-que en estos casos, el sistema no los enlazará.
+que en estos casos, el sistema no los enlazará.</p>
 
 </es>
 </lang>
@@ -4811,12 +4819,12 @@ que en estos casos, el sistema no los enlazará.
 <p>If a metadata record contains some associated fulltext files, <CDSNAMEINTL>
 tries to extract the textual information from the files and index it into a separate <code>fulltext</code> index.
 To search for all records that contain the term <em>e-</em> in their fulltext files,
-type:
+type:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="fulltext:e-">
+      <input size="40" type="text" name="p" value="fulltext:e-" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4832,7 +4840,7 @@ metadata or in the fulltext, type:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis">
+      <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4847,12 +4855,12 @@ metadata or in the fulltext, type:
 <p>Si une notice a des fichiers associés, <CDSNAMEINTL> tente d'en
 extraire les informations textuelles et de les indexer dans l'index
 "fulltext". Pour chercher toutes les notices qui contiennent le
-terme <em>e-</em> dans leur fichiers, saisissez:
+terme <em>e-</em> dans leur fichiers, saisissez:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="fulltext:e-">
+      <input size="40" type="text" name="p" value="fulltext:e-" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4871,7 +4879,7 @@ saisissez:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis">
+      <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4887,12 +4895,12 @@ saisissez:
 <CDSNAMEINTL> tractarà de extraure la informació textual dels arxius e
 indexar-la a un índex de <code>text complet</code>separat.  Per
 recuperar tots els documents que contenen el terme <em>e-</em>al text
-complet dels seus documents associats, cal escriure:
+complet dels seus documents associats, cal escriure:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="fulltext:e-">
+      <input size="40" type="text" name="p" value="fulltext:e-" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4910,7 +4918,7 @@ metadades como all text complet, cal escriure:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis">
+      <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4926,12 +4934,12 @@ asociados, <CDSNAMEINTL> tratará de extraer la información textual de
 los archivos e indexarla en un índice de <code>texto
 completo</code>separado.  Para recuperar todos los documentos que
 contienen el término <em>e-</em> en el texto completo de sus
-documentos asociados, debemos escribir:
+documentos asociados, debemos escribir:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="fulltext:e-">
+      <input size="40" type="text" name="p" value="fulltext:e-" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4949,7 +4957,7 @@ tanto en los metadatos como en el texto completo, debemos escribir:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis">
+      <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4977,12 +4985,12 @@ tanto en los metadatos como en el texto completo, debemos escribir:
 tries to extract references automatically from that file and index
 them into a separate <code>reference</code> index.  To search for
 all records that cite <em>Ellis</em> in their reference lists,
-type:
+type:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="reference:Ellis">
+      <input size="40" type="text" name="p" value="reference:Ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -4996,7 +5004,7 @@ in their reference lists, type:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="reference:hep-ph/0103062">
+      <input size="40" type="text" name="p" value="reference:hep-ph/0103062" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5004,13 +5012,14 @@ in their reference lists, type:
       </blockquote>
       </form>
 
-To search for all records that cite an article from <em>Giddings</em> and <em>Ross</em> published in
-<em>Physical Review D</em> in volume <em>61</em> in year <em>2000</em>, type:
+To search for all records that cite an article from <em>Giddings</em>
+and <em>Ross</em> published in <em>Physical Review D</em> in volume
+<em>61</em> in year <em>2000</em>, type:
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000">
+      <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5026,7 +5035,7 @@ For example, to find all articles on <em>standard model</em> that aren't written
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="standard model -author:ellis reference:ellis">
+      <input size="40" type="text" name="p" value="standard model -author:ellis reference:ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5040,12 +5049,12 @@ For example, to find all articles on <em>standard model</em> that aren't written
 <p>Si les métadonnées d'une notice contiennent un texte complet
    associé, <CDSNAMEINTL> tente d'en extraire automatiquement les
    références et les indexe dans l'index <code>references</code>. Pour
-   chercher tous les documents qui citent <em>Ellis</em>, saisissez:
+   chercher tous les documents qui citent <em>Ellis</em>, saisissez:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="reference:Ellis">
+      <input size="40" type="text" name="p" value="reference:Ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5059,7 +5068,7 @@ preprint <em>hep-ph/0103062</em>, saisissez:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="reference:hep-ph/0103062">
+      <input size="40" type="text" name="p" value="reference:hep-ph/0103062" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5075,7 +5084,7 @@ de <em>Giddings</em> et <em>Ross</em> publié dans
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000">
+      <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5086,13 +5095,14 @@ de <em>Giddings</em> et <em>Ross</em> publié dans
 Rappelez-vous que les citations ne sont pas incluses dans l'index
 global ``tous les champs'', mais qu'il vous est possible de combiner
 librement la recherche des citations avec la recherche dans les
-métadonnées.  Par exemple, pour trouver tous les articles sur le <em>standard model</em> qui n'ont pas été écrits par
-<em>Ellis</em> mais qui le citent, saisissez:
+métadonnées.  Par exemple, pour trouver tous les articles sur le
+<em>standard model</em> qui n'ont pas été écrits par <em>Ellis</em>
+mais qui le citent, saisissez:
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="standard model -author:ellis reference:ellis">
+      <input size="40" type="text" name="p" value="standard model -author:ellis reference:ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5106,12 +5116,12 @@ métadonnées.  Par exemple, pour trouver tous les articles sur le <em>standard 
 <CDSNAMEINTL> trata de extraer las citas automaticamente del fichero e
 indexarlas en un índice separado de <code>citas</code>.  Para
 recuperar todos los registros que citan a <em>Ellis</em> en sus
-listados de citas bibliogáficas, escribiremos:
+listados de citas bibliogáficas, escribiremos:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="reference:Ellis">
+      <input size="40" type="text" name="p" value="reference:Ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5126,7 +5136,7 @@ escribiremos:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="reference:hep-ph/0103062">
+      <input size="40" type="text" name="p" value="reference:hep-ph/0103062" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5141,7 +5151,7 @@ D</em> volumen <em>61</em> y en el año <em>2000</em>, escribiremos:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:20000">
+      <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:20000" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5159,7 +5169,7 @@ artículos sobre <em>modelo estándar</em> que no han sido escritos por
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="standard model -author:ellis reference:ellis">
+      <input size="40" type="text" name="p" value="standard model -author:ellis reference:ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5174,12 +5184,12 @@ artículos sobre <em>modelo estándar</em> que no han sido escritos por
 <CDSNAMEINTL> tracta de extraure les referències automàticament del
 fitxer e indexar-les a un índex separat de <code>referències</code>.
 Para recuperar tots els registres que citen a <em>Ellis</em> en els
-seus llistats de referències bibliogràfiques, escriurem:
+seus llistats de referències bibliogràfiques, escriurem:</p>
 
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="reference:Ellis">
+      <input size="40" type="text" name="p" value="reference:Ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5194,7 +5204,7 @@ bibliogràfiques, escriurem:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="reference:hep-ph/0103062">
+      <input size="40" type="text" name="p" value="reference:hep-ph/0103062" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5209,7 +5219,7 @@ volum <em>61</em> i a l’any <em>2000</em>, escriurem:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000">
+      <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
@@ -5229,7 +5239,7 @@ citen, escriurem:
       <form action="<WEBURL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
-      <input size="40" type="text" name="p" value="standard model -author:ellis reference:ellis">
+      <input size="40" type="text" name="p" value="standard model -author:ellis reference:ellis" />
       <select name="f"><option value="">_(any field)_</option>
                        <option value="title">_(title)_</option>
                        <option value="author">_(author)_</option></select>
