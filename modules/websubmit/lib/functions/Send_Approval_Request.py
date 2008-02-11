@@ -45,7 +45,7 @@ from invenio.access_control_admin import acc_get_role_users,acc_get_role_id
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 
-def Send_Approval_Request (parameters,curdir,form):
+def Send_Approval_Request (parameters, curdir, form, user_info=None):
     global rn,sysno
     # variables declaration
     doctype = re.search(".*/([^/]*)/([^/]*)/[^/]*$",curdir).group(2)

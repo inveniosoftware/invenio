@@ -42,7 +42,7 @@ from invenio.config import \
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 
-def Send_Modify_Mail (parameters,curdir,form):
+def Send_Modify_Mail (parameters, curdir, form, user_info=None):
     FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     global sysno,rn
     if parameters['emailFile'] is not None and parameters['emailFile']!= "" and os.path.exists("%s/%s" % (curdir,parameters['emailFile'])):

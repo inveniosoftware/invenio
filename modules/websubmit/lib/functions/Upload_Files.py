@@ -32,7 +32,7 @@ import re
 from invenio.bibdocfile import BibRecDocs, list_versions_from_array, list_types_from_array
 from invenio.websubmit_functions.Shared_Functions import createRelatedFormats, createIcon
 
-def Upload_Files(parameters,curdir,form):
+def Upload_Files(parameters, curdir, form, user_info=None):
     global doctype,access,act,dir
     minsize=parameters['minsize']
     maxsize=parameters['maxsize']

@@ -25,7 +25,7 @@ __revision__ = "$Id$"
    ## Author:         T.Baron
    ## PARAMETERS:    -
 
-def Print_Success_SRV(parameters,curdir,form): 
+def Print_Success_SRV(parameters, curdir, form, user_info=None): 
     global rn
     t="<br><br><b>Document %s was successfully revised.</b>" % rn
     return t

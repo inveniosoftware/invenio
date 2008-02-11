@@ -29,7 +29,7 @@ import os
 
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
-def Print_Success_APP(parameters,curdir,form):
+def Print_Success_APP(parameters, curdir, form, user_info=None):
     global rn
     # the field containing the decision of the referee must be called "decision".
     if not os.path.exists("%s/decision" % curdir):

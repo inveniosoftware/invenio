@@ -29,7 +29,7 @@ import time
 from invenio.config import counters
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
-def Report_Number_Generation(parameters, curdir, form):
+def Report_Number_Generation(parameters, curdir, form, user_info=None):
     """Description:   function Report_Number_Generation
                       This function creates a reference for the submitted 
                       document and saves it in the specified file.

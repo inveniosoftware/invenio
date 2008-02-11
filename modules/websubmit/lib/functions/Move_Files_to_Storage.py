@@ -28,7 +28,7 @@ from invenio.websubmit_functions.Shared_Functions import get_dictionary_from_str
      createRelatedFormats, \
      createIcon
 
-def Move_Files_to_Storage(parameters, curdir, form):
+def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
     """
     The function moves files received from the standard submission's form through
     file input element(s).

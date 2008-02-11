@@ -31,7 +31,7 @@ import os
 from invenio.config import storage
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
-def Move_to_Pending(parameters,curdir,form):
+def Move_to_Pending(parameters, curdir, form, user_info=None):
     global rn
     doctype = form['doctype']
     PENDIR = "%s/pending/%s" % (storage,doctype)

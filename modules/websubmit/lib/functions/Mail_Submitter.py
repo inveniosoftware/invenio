@@ -50,7 +50,7 @@ from invenio.config import \
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 
-def Mail_Submitter (parameters,curdir,form):
+def Mail_Submitter (parameters, curdir, form, user_info=None):
     FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     # retrieve report number
     edsrn = parameters['edsrn']

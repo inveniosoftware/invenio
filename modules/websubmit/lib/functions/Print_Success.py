@@ -24,7 +24,7 @@ from invenio.config import cdsname
 
 # FIXME: cannot import Request_Print(), is defined in websubmit_engine.py
 
-def Print_Success(parameters,curdir,form): 
+def Print_Success(parameters, curdir, form, user_info=None): 
     t=""
     edsrn = parameters['edsrn']
     newrnin = parameters['newrnin']

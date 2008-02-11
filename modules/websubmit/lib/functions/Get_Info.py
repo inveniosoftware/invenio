@@ -41,7 +41,7 @@ titlevalue = ""
 emailvalue = ""
 authorvalue = ""
 
-def Get_Info(parameters,curdir,form):
+def Get_Info(parameters, curdir, form, user_info=None):
     global titlevalue,emailvalue,authorvalue,rn
     doctype = form['doctype']
     titlefile = parameters["titleFile"]

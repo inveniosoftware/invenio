@@ -32,7 +32,7 @@ import time
 
 from invenio.dbquery import run_sql
 
-def Update_Approval_DB(parameters,curdir,form):
+def Update_Approval_DB(parameters, curdir, form, user_info=None):
     global rn
     doctype = form['doctype']
     act = form['act']

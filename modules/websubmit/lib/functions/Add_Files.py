@@ -21,7 +21,7 @@ __revision__ = "$Id$"
 
 from invenio.bibdocfile import BibRecDocs
 
-def Add_Files(parameters, curdir, form):
+def Add_Files(parameters, curdir, form, user_info=None):
     if os.path.exists("%s/files" % curdir):
         bibrecdocs = BibRecDocs(sysno)
         for file in os.listdir("%s/files" % curdir):

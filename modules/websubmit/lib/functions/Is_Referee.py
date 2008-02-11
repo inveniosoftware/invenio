@@ -24,8 +24,8 @@ from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
 from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 
-def Is_Referee(parameters,curdir,form):
-    global uid_email,sysno,rn,uid,user_info
+def Is_Referee(parameters, curdir, form, user_info=None):
+    global uid_email,sysno,rn,uid
     doctype = form['doctype']
     # Get document category
     res = run_sql("SELECT categ FROM sbmAPPROVAL WHERE rn=%s", (rn,))

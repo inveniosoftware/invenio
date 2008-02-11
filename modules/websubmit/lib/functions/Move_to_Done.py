@@ -35,7 +35,7 @@ from invenio.config import \
      storage
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
-def Move_to_Done(parameters,curdir,form):
+def Move_to_Done(parameters, curdir, form, user_info=None):
     global rn
     data = re.search(".*/([^/]*)/([^/]*)/[^/]*$",curdir)
     dir = data.group(1)

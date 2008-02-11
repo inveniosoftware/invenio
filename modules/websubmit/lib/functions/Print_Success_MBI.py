@@ -28,7 +28,7 @@ from invenio.config import \
    ## Author:         T.Baron
    ## PARAMETERS:    -
 
-def Print_Success_MBI(parameters,curdir,form):
+def Print_Success_MBI(parameters, curdir, form, user_info=None):
     global rn
     t="<B>Modification completed!</B><br><BR>"
     t+="These modifications on document %s will be processed as quickly as possible and made <br>available on the %s Server</b>" % (rn,cdsname)

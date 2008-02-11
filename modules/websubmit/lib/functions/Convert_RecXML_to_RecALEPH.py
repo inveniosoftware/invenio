@@ -28,7 +28,7 @@ from os import access, R_OK, W_OK
 from invenio.config import xmlmarc2textmarc
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
-def Convert_RecXML_to_RecALEPH(parameters, curdir, form):
+def Convert_RecXML_to_RecALEPH(parameters, curdir, form, user_info=None):
     """Function to create an ALEPH 500 MARC record from a MARC XML record.
        This function depends upon the following:
          * "recmysql" is a file that already exists in the working

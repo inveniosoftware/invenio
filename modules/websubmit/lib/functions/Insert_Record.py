@@ -28,7 +28,7 @@ from invenio.config import \
      tmpdir
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
-def Insert_Record(parameters,curdir,form):
+def Insert_Record(parameters, curdir, form, user_info=None):
     global rn
     if os.path.exists("%s/recmysql" % curdir):
         recfile = "recmysql"

@@ -32,7 +32,7 @@ __revision__ = "$Id$"
 import os
 import re
 
-def Get_Report_Number (parameters,curdir,form): 
+def Get_Report_Number(parameters, curdir, form, user_info=None):
     global rn
 
     #Path of file containing report number

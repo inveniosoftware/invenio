@@ -32,7 +32,7 @@ import time
 
 from invenio.dbquery import run_sql
 
-def Create_Cplx_Approval(parameters,curdir,form):
+def Create_Cplx_Approval(parameters, curdir, form, user_info=None):
     global rn
     doctype = form['doctype']
     act = form['act']

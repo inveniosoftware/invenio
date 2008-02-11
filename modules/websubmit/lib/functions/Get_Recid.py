@@ -53,7 +53,7 @@ alert('Multiple documents with the report number [%s] have been found.\\n""" \
 """minutes.');\n</script>"""
 
 
-def Get_Recid(parameters, curdir, form):
+def Get_Recid(parameters, curdir, form, user_info=None):
     """Given the report number of a notice (the global "rn"), retrieve the
        "recid" (001).
        The function first of all checks for the existence of the file "SN" in

@@ -35,7 +35,7 @@ from invenio.config import \
      bibconvertconf
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
-def Make_Record(parameters,curdir,form): 
+def Make_Record(parameters, curdir, form, user_info=None): 
     # Get rid of "invisible" white spaces
     source = parameters['sourceTemplate'].replace(" ","")
     create = parameters['createTemplate'].replace(" ","")

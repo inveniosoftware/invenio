@@ -22,6 +22,6 @@ import os
 
 from invenio.config import bibformat
 
-def Format_Record(parameters,curdir,form):
+def Format_Record(parameters, curdir, form, user_info=None):
     os.system("%s < %s/recmysql > %s/recmysqlfmt" % (bibformat,curdir,curdir))
     return ""

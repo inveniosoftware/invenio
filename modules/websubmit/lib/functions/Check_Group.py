@@ -33,7 +33,7 @@ import time
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 
-def Check_Group(parameters,curdir,form):
+def Check_Group(parameters, curdir, form, user_info=None):
     #Path of file containing group
     if os.path.exists("%s/%s" % (curdir,'Group')):
         fp = open("%s/%s" % (curdir,'Group'),"r")

@@ -30,7 +30,7 @@ __revision__ = "$Id$"
    ## OUTPUT: HTML
    ##
 
-def Finish_Submission(parameters,curdir,form):
+def Finish_Submission(parameters, curdir, form, user_info=None):
     global last_step,action_score
     last_step = 1
     action_score = "-1"

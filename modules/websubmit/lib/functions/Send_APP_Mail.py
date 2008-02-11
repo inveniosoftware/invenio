@@ -45,7 +45,7 @@ from invenio.dbquery import run_sql
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 
-def Send_APP_Mail (parameters,curdir,form):
+def Send_APP_Mail (parameters, curdir, form, user_info=None):
     global emailvalue,titlevalue,authorvalue,sysno,rn
     FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
     doctype = form['doctype']

@@ -29,7 +29,7 @@ import os
 
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
-def Print_Success_CPLX(parameters,curdir,form):
+def Print_Success_CPLX(parameters, curdir, form, user_info=None):
     global rn
     act = form['act']
     t="<br><br><B>Your request has been taken into account!</B><br><BR>"

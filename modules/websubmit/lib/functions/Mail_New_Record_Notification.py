@@ -33,7 +33,7 @@ from invenio.mailutils import send_email
 
 CFG_EMAIL_FROM_ADDRESS = '%s Submission Engine <%s>' % (cdsname, supportemail)
 
-def Mail_New_Record_Notification(parameters, curdir, form):
+def Mail_New_Record_Notification(parameters, curdir, form, user_info=None):
     """This function sends a mail giving notification about the submission
        of a new item to the relevant recipients, including:
          + The record's Submitter(s);

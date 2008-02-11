@@ -38,8 +38,8 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.websubmit_config import InvenioWebSubmitFunctionStop
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
 
-def Is_Original_Submitter(parameters,curdir,form):
-    global uid_email,sysno,uid,user_info
+def Is_Original_Submitter(parameters, curdir, form, user_info=None):
+    global uid_email,sysno,uid
     doctype = form['doctype']
     act = form['act']
     email = Get_Field("8560_f",sysno)

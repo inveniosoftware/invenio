@@ -93,7 +93,7 @@ def Create_Modify_Interface_transform_date(fld_val):
     return fld_val
 
 
-def Create_Modify_Interface(parameters, curdir, form):
+def Create_Modify_Interface(parameters, curdir, form, user_info=None):
     """Create an interface for the modification of a document, based on the fields that the user has
        chosen to modify
     """

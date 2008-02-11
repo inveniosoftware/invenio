@@ -28,7 +28,7 @@ from invenio.websubmit_config import \
      InvenioWebSubmitFunctionStop, \
      InvenioWebSubmitFunctionError
 
-def CaseEDS(parameters, curdir, form):
+def CaseEDS(parameters, curdir, form, user_info=None):
     """This function compares the content of a file to different values and
        directly goes to a different step in the action according to the value.
        @param parameters: (dictionary) of parameters (relating to the given
