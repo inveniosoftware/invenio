@@ -2129,7 +2129,7 @@ CREATE TABLE IF NOT EXISTS rnkDOWNLOADS (
   id_user int(15) unsigned default NULL,
   id_bibdoc mediumint(9) unsigned default NULL,
   file_version smallint(2) unsigned default NULL,
-  file_format text,
+  file_format varchar(10) NULL default NULL,
   KEY download_time (download_time),
   KEY id_bibrec (id_bibrec)
 ) TYPE=MyISAM;
@@ -2140,7 +2140,8 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
   id mediumint(8) unsigned default NULL,
   object_name varchar(255) NOT NULL,
   object_value longblob,
-  last_updated datetime NOT NULL default '0000-00-00'
+  last_updated datetime NOT NULL default '0000-00-00',
+  PRIMARY KEY object_name (object_name)
 ) TYPE=MyISAM;
 
 -- tables for collections and collection tree:
@@ -2425,8 +2426,8 @@ CREATE TABLE IF NOT EXISTS accROLE (
   id int(15) unsigned NOT NULL auto_increment,
   name varchar(32),
   description varchar(255),
-  firerole_def_ser tinyblob NULL,
-  firerole_def_src tinytext NULL,
+  firerole_def_ser blob NULL,
+  firerole_def_src text NULL,
   PRIMARY KEY (id),
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;

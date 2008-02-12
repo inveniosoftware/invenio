@@ -259,24 +259,28 @@ update-v0.92.1-tables: local-dbexec
 	echo "ALTER TABLE oaiHARVEST CHANGE postprocess postprocess varchar(20) NOT NULL default 'h';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE oaiHARVEST ADD COLUMN bibfilterprogram varchar(255) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE idxINDEXNAME CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE idxINDEX ADD COLUMN stemming_language VARCHAR(10) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE rnkMETHODNAME CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE rnkDOWNLOADS CHANGE id_bibdoc id_bibdoc mediumint(9) unsigned default NULL;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE rnkDOWNLOADS CHANGE file_format file_format varchar(10) NULL default NULL;" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE collectionname CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE collection_portalbox CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE format ADD COLUMN visibility TINYINT NOT NULL default 1;" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE formatname CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
 	echo "ALTER TABLE fieldname CHANGE ln ln char(5) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_ser tinyblob NULL;" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_src tinytext NULL;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_ser blob NULL;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_src text NULL;" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user_accROLE ADD COLUMN expiration datetime NOT NULL default '9999-12-31 23:59:59';" | ./modules/miscutil/bin/dbexec
+	echo "ALTER TABLE user DROP INDEX id, ADD PRIMARY KEY id (id);" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO accACTION VALUES (NULL,'accrestrcoll','view restricted collection','collection','no');" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO accACTION VALUES (NULL,'runsessiongc','run SessionGC','','no');" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO accACTION VALUES (NULL,'viewrestrcoll','view restricted document','status','no');" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE user_accROLE ADD COLUMN expiration datetime NOT NULL default '9999-12-31 23:59:59';" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE user DROP INDEX id, ADD PRIMARY KEY id (id);" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE format ADD COLUMN visibility TINYINT NOT NULL default 1;" | ./modules/miscutil/bin/dbexec
+	echo "INSERT INTO accACTION VALUES (NULL,'cfgoairepository','Configure OAI Repository','','no');" | ./modules/miscutil/bin/dbexec
+	echo -e 'from invenio.dbquery import run_sql;\
+	map(lambda index_id: run_sql("ALTER TABLE idxPHRASE%02dF CHANGE term term TEXT NULL DEFAULT NULL, DROP INDEX term, ADD INDEX term (term (50))" % index_id[0]), run_sql("select id from idxINDEX"))' | $(PYTHON)
 	echo "INSERT INTO rnkCITATIONDATA VALUES (1,'citationdict','','');" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO rnkCITATIONDATA VALUES (2,'reversedict','','');" | ./modules/miscutil/bin/dbexec
 	echo "INSERT INTO rnkCITATIONDATA VALUES (3,'selfcitdict','','');" | ./modules/miscutil/bin/dbexec
-	echo "ALTER TABLE idxINDEX ADD COLUMN stemming_language VARCHAR(10) NOT NULL default '';" | ./modules/miscutil/bin/dbexec
-	echo "INSERT INTO accACTION VALUES (NULL,'cfgoairepository','Configure OAI Repository','','no');" | ./modules/miscutil/bin/dbexec
 
 drop-tables: local-dbexec
 	@if [ "$(FORCE)" != "yes" ]; then \
