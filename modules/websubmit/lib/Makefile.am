@@ -35,6 +35,6 @@ pylib_DATA = websubmit_config.py websubmit_engine.py file.py	\
 
 noinst_DATA = fulltext_files_migration_kit.py
 
-EXTRA_DIST = $(pylib_DATA)
+EXTRA_DIST = $(pylib_DATA) $(noinst_DATA)
 
 CLEANFILES = *~ *.tmp
