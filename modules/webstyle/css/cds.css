@@ -1446,15 +1446,27 @@ div.detailed, div.mini-panel {
     position:relative;
     max-width: 1280px;
 }
-div.detailed div.content {
-   position:relative;
-   top:1em;
-}
 div.detailed img, div.mini-panel img{
-    border:none;
+   border:none;
 }
-div.detailed div.content {
-   border: 2px solid #36c;
+div.tabs{
+   border-bottom: 2px solid #36c;
+   position:relative;
+}
+div.tabs div {
+   width:100%;
+   margin:0 auto;
+   position:relative;
+   z-index:1;
+   width:100%;
+   padding:0;
+   bottom:-2px;
+}
+div.detailed div.content{
+   border-bottom: 2px solid #36c;
+   border-right: 2px solid #36c;
+   border-left: 2px solid #36c;
+   padding-top:1px;
    padding-bottom:3px;
 }
 div.mini-panel {
@@ -1468,7 +1480,6 @@ div.mini-panel{
 .notopgap    { margin: 0; height:0;}
 .nobottomgap { margin-bottom: 0; height:0;}
 
-}
 /* Detailed record box */
 .top-left-folded {
    height: 10px;
@@ -1476,33 +1487,44 @@ div.mini-panel{
 
 /* tabs as used in detailed record pages */
 ul.tabs{
-   margin-top:5px;
-   margin-bottom:5px;
+   margin-top:0px;
+   margin-bottom:0px;
    list-style-type:none;
+   margin-left:0;
+   padding-left:0;
+   width:100%;
    text-align:center;
 }
 .tabs li{
-   display:inline;
+   display:block;
+   margin:0;
+   float: left;
 }
 .tabs li a{
-   border-top: 2px solid #36c;
-   border-right: 2px solid #36c;
+   border-top: 2px solid #79D;
+   border-right: 2px solid #79D;
    border-bottom: 2px solid #36c;
-   border-left: none;
+   border-left: 2px solid #79D;
+   margin-right:10px;
    background-color: #FFF;
    padding:4px;
    color:#36c;
    font-size:x-small;
    font-weight:bold;
    text-decoration:none;
+   position:relative;
+   display:block;
+   height:100%;
    zoom:100%; /*We loose CSS validity here, but necessary because of ie7*/
 }
 .tabs li a:hover{
    text-decoration:underline;
 }
 .tabs li.on a{
-   background-color: #36c;/*#58e;*/
-   color: #FFF
+   border-bottom: 2px solid #fff;
+   border-top: 2px solid #36c;
+   border-right: 2px solid #36c;
+   border-left: 2px solid #36c;
 }
 .tabs li.on a:hover, .tabs li.disabled a:hover{
    text-decoration:none;
@@ -1512,6 +1534,9 @@ ul.tabs{
    cursor:default;
 }
 .tabs li.first a{
+   border-left: 2px solid #79d;
+}
+.tabs li.first.on a{
    border-left: 2px solid #36c;
 }
 

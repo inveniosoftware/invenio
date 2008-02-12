@@ -713,10 +713,10 @@ URI: http://%(host)s%(page)s
                                  'url':url,
                                  'label':label}
         if out_tabs != '':
-            out_tabs = '''        <div style="position:absolute;z-index:1;width:100%%;top:0;">
-            <div style="width:100%%;margin:0 auto;">
+            out_tabs = '''        <div class="tabs">
+            <div>
                 <ul class="tabs">%s</ul>
-            </div>
+            <div style="clear:both;height:00px">&nbsp;</div></div>
         </div>''' % out_tabs
 
 
