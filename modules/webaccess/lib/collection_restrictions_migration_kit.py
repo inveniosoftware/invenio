@@ -18,8 +18,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-This script will migrate restricted collection to previous Apache only
-method to enhanced FireRole/WebAccess aware mode.
+This script will migrate collection restriction rules from previous
+Apache-only method (column restricted in the collection table) to
+enhanced FireRole/WebAccess aware mode.
 """
 
 from invenio.dbquery import run_sql
