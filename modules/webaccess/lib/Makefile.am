@@ -36,6 +36,6 @@ pylib_DATA = access_control_engine.py \
 
 noinst_DATA = collection_restrictions_migration_kit.py
 
-EXTRA_DIST = $(pylib_DATA)
+EXTRA_DIST = $(pylib_DATA) $(noinst_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc
