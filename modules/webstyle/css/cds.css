@@ -1440,20 +1440,20 @@ input.hyperlinkformSubmitButton {
 
 /* Start 'detailed record' boxes*/
 
-div.detailed, div.mini-panel {
+div.detailedrecordbox, div.detailedrecordminipanel {
     width:90%;
     margin:auto;
     position:relative;
     max-width: 1280px;
 }
-div.detailed img, div.mini-panel img{
+div.detailedrecordbox img, div.detailedrecordminipanel img{
    border:none;
 }
-div.tabs{
+div.detailedrecordtabs{
    border-bottom: 2px solid #36c;
    position:relative;
 }
-div.tabs div {
+div.detailedrecordtabs div {
    width:100%;
    margin:0 auto;
    position:relative;
@@ -1462,31 +1462,29 @@ div.tabs div {
    padding:0;
    bottom:-2px;
 }
-div.detailed div.content{
+div.detailedrecordbox div.detailedrecordboxcontent{
    border-bottom: 2px solid #36c;
    border-right: 2px solid #36c;
    border-left: 2px solid #36c;
    padding-top:1px;
    padding-bottom:3px;
 }
-div.mini-panel {
+div.detailedrecordminipanel{
    border: 1px solid #ddd;
    padding-top:3px;
    padding-bottom:3px;
 }
-div.mini-panel{
+div.detailedrecordminipanel{
    background-color:#f7f7f7;
 }
 .notopgap    { margin: 0; height:0;}
 .nobottomgap { margin-bottom: 0; height:0;}
-
-/* Detailed record box */
 .top-left-folded {
    height: 10px;
 }
 
 /* tabs as used in detailed record pages */
-ul.tabs{
+ul.detailedrecordtabs{
    margin-top:0px;
    margin-bottom:0px;
    list-style-type:none;
@@ -1495,12 +1493,12 @@ ul.tabs{
    width:100%;
    text-align:center;
 }
-.tabs li{
+.detailedrecordtabs li{
    display:block;
    margin:0;
    float: left;
 }
-.tabs li a{
+.detailedrecordtabs li a{
    border-top: 2px solid #79D;
    border-right: 2px solid #79D;
    border-bottom: 2px solid #36c;
@@ -1517,51 +1515,51 @@ ul.tabs{
    height:100%;
    zoom:100%; /*We loose CSS validity here, but necessary because of ie7*/
 }
-.tabs li a:hover{
+.detailedrecordtabs li a:hover{
    text-decoration:underline;
 }
-.tabs li.on a{
+.detailedrecordtabs li.on a{
    border-bottom: 2px solid #fff;
    border-top: 2px solid #36c;
    border-right: 2px solid #36c;
    border-left: 2px solid #36c;
 }
-.tabs li.on a:hover, .tabs li.disabled a:hover{
+.detailedrecordtabs li.on a:hover, .detailedrecordtabs li.disabled a:hover{
    text-decoration:none;
 }
-.tabs li.disabled a{
+.detailedrecordtabs li.disabled a{
    color:#ccf;
    cursor:default;
 }
-.tabs li.first a{
+.detailedrecordtabs li.first a{
    border-left: 2px solid #79d;
 }
-.tabs li.first.on a{
+.detailedrecordtabs li.first.on a{
    border-left: 2px solid #36c;
 }
 
-/* Actions in mini-box in detailed view */
-ul.detailedRecordActions{
+/* Actions in mini-panel of detailed record view*/
+ul.detailedrecordactions{
    list-style-image: url(arrow_link-icon-15x11-right.gif) ;
    padding-left: 1em;
    text-align:left;
    margin:0.05em;
 }
-.detailedRecordActions, .detailedRecordActions a{
+.detailedrecordactions, .detailedrecordactions a{
    text-decoration:none;
    color:#555;
    font-weight:700;
    font-size:small;
 }
 
-/* Grading stars for mini-panel in detailed view*/
-#miniReview div.star a{
+/* Grading stars for mini-panel in detailed record view*/
+#detailedrecordminipanelreview div.star a{
    text-indent:-9000px; /*Hide text*/
    height:30px;
    width:30px;
    float:left;
 }
-#miniReview div.star{
+#detailedrecordminipanelreview div.star{
    height:30px !important;
    float:left;
    clear:none;
@@ -1569,21 +1567,21 @@ ul.detailedRecordActions{
    text-align:left;
    background:url(star_empty-icon-30x30.gif) no-repeat;
 }
-#miniReview div.star:hover{
+#detailedrecordminipanelreview div.star:hover{
    background-image:url(star-icon-30x30.gif) !important;
 }
-#miniReview:hover div.full, #miniReview:hover div.half{
+#detailedrecordminipanelreview:hover div.full, #detailedrecordminipanelreview:hover div.half{
    background-image:url(star_empty-icon-30x30.gif) ;
 }
-#miniReview div.full{
+#detailedrecordminipanelreview div.full{
    background-image:url(star-icon-30x30.gif) ;
 }
-#miniReview div.half{
+#detailedrecordminipanelreview div.half{
    background-image:url(star_half-icon-30x30.gif) ;
 }
 
-/* Short bib notice displayed as sheet of paper in detailed record pages */
-#commentHB {
+/* Short reminder displayed as sheet of paper in detailed record pages */
+#detailedrecordshortreminder {
    background: #fff url(paper-texture-128x128.gif) repeat top left;
    margin: 10px 10px 0px 10px;
    padding:4px;
@@ -1592,7 +1590,7 @@ ul.detailedRecordActions{
    border-top: 1px solid #DDD;
    border-left: 1px solid #DDD;
 }
-#commentHB #clip {
+#detailedrecordshortreminder #clip {
    position:relative;
    clear:none;
    float:left;
@@ -1602,7 +1600,7 @@ ul.detailedRecordActions{
    width:72px;
    background: transparent url(paper_clip-72x72.gif) no-repeat top left;
 }
-#commentHB #HB{
+#detailedrecordshortreminder #HB{
    position:relative;
    left: -50px;
 }

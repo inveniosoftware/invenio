@@ -713,9 +713,9 @@ URI: http://%(host)s%(page)s
                                  'url':url,
                                  'label':label}
         if out_tabs != '':
-            out_tabs = '''        <div class="tabs">
+            out_tabs = '''        <div class="detailedrecordtabs">
             <div>
-                <ul class="tabs">%s</ul>
+                <ul class="detailedrecordtabs">%s</ul>
             <div style="clear:both;height:00px">&nbsp;</div></div>
         </div>''' % out_tabs
 
@@ -723,7 +723,7 @@ URI: http://%(host)s%(page)s
         # Add the clip icon and the brief record reminder if necessary
         if show_short_rec_p:
             record_details = format_record(recID=recid, of='hs', ln=ln)
-            content = '''<div id="commentHB">
+            content = '''<div id="detailedrecordshortreminder">
                              <div id="clip">&nbsp;</div>
                              <div id="HB">
                                  %(record_details)s
@@ -736,9 +736,9 @@ URI: http://%(host)s%(page)s
 
         # Print the content
         out = """
-    <div class="detailed">
+    <div class="detailedrecordbox">
         %(tabs)s
-        <div class="content">
+        <div class="detailedrecordboxcontent">
             <div class="top-left-folded"></div>
             <div class="top-right-folded"></div>
             <div class="inside">
@@ -792,17 +792,17 @@ URI: http://%(host)s%(page)s
 
         out = """
         <br />
-<div class="mini-panel">
+<div class="detailedrecordminipanel">
 <div class="top-left"></div><div class="top-right"></div>
 		<div class="inside">
 
-        <div id="miniFile" style="width:33%%;float:left;text-align:center;margin-top:0">
+        <div id="detailedrecordminipanelfile" style="width:33%%;float:left;text-align:center;margin-top:0">
              %(files)s
         </div>
-	<div id="miniReview" style="width:33%%;float:left;text-align:center">
+	<div id="detailedrecordminipanelreview" style="width:33%%;float:left;text-align:center">
              %(reviews)s
 	</div>
-	<div id="miniActions" style="width:33%%;float:right;text-align:right;">
+	<div id="detailedrecordminipanelactions" style="width:33%%;float:right;text-align:right;">
              %(actions)s
 	</div>
 	<div style="clear:both;margin-bottom: 0;"></div>
