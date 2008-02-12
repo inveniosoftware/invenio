@@ -23,6 +23,6 @@ webdoclib_DATA = \
 	bibformat-internals.webdoc \
 	bibformat-api.webdoc
 
-EXTRA_DIST = $(webdoclibdir_DATA)
+EXTRA_DIST = $(webdoclib_DATA)
 
 CLEANFILES = *~ *.tmp
