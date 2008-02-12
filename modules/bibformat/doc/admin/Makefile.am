@@ -17,19 +17,19 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 imgdir = $(localstatedir)/www/img/admin/
-img_DATA = bibformat-guide-output_format_attributes_tutorial.png \
-           bibformat-guide-output_format_check_dependencies.png \
-           bibformat-guide-output_format_edit_rule.png \
-           bibformat-guide-output_format_edit_rule2.png \
-           bibformat-guide-output_format_hb_migrate.png \
-           bibformat-guide-output_format_hd_rules.png \
-           bibformat-guide-output_formats_manage_tutorial.png \
-           bibformat-guide-rules_editor_tutorial.png \
-           bibformat-guide-template_attributes_tutorial.png \
-           bibformat-guide-template_editor.png \
-           bibformat-guide-template_editor_tutorial.png \
-           bibformat-guide-template_preview.png \
-           bibformat-guide-templates_manage_tutorial.png \
+img_DATA = bibformat-guide-bfo_attributes.png \
+           bibformat-guide-bfo_check_deps.png \
+           bibformat-guide-bfo_edit_rule.png \
+           bibformat-guide-bfo_edit_rule2.png \
+           bibformat-guide-bfo_hb_migrate.png \
+           bibformat-guide-bfo_hd_rules.png \
+           bibformat-guide-bfo_manage.png \
+           bibformat-guide-bfo_rules.png \
+           bibformat-guide-bft_attributes.png \
+           bibformat-guide-bft_editor.png \
+           bibformat-guide-bft_editor2.png \
+           bibformat-guide-bft_preview.png \
+           bibformat-guide-bft_manage.png \
            bibformat-guide-url_bar.png \
            bibformat-guide-bfe.gif
 
