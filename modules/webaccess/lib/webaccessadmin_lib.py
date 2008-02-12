@@ -290,7 +290,7 @@ def perform_userarea(req, email_user_pattern=''):
                             button="search for users")
 
     if email_user_pattern:
-        users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s
+        users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s
             ORDER BY email LIMIT %s""", (email_user_pattern, MAXPAGEUSERS+1))
 
         if not users1:
@@ -1373,7 +1373,7 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
             # pattern is entered
             if email_user_pattern:
                 # users with matching email-address
-                users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+                users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s ORDER BY email """, (email_user_pattern, ))
                 # users that are connected
                 users2 = run_sql("""SELECT DISTINCT u.id, u.email
                 FROM user u LEFT JOIN user_accROLE ur ON u.id = ur.id_user
@@ -2152,7 +2152,7 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
         # pattern is entered
         if email_user_pattern:
             # users with matching email-address
-            users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+            users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s ORDER BY email """, (email_user_pattern, ))
             # users that are connected
             users2 = run_sql("""SELECT DISTINCT u.id, u.email
             FROM user u LEFT JOIN user_accROLE ur ON u.id = ur.id_user
@@ -2273,7 +2273,7 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
     if email_user_pattern:
         subtitle = 'step 2 - select user'
 
-        users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+        users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s ORDER BY email """, (email_user_pattern, ))
         users = []
         for (id, email) in users1: users.append([id, email, ''])
 
