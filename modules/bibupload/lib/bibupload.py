@@ -950,14 +950,9 @@ def elaborate_fft_tags(record, rec_id, mode):
         # Preprocessed data elaboration
         bibrecdocs = BibRecDocs(rec_id)
 
-        if mode == 'replace': # First we erase previous bibdocs
-            for bibdoc in bibrecdocs.list_bibdocs():
-                bibdoc.delete()
-            bibrecdocs.build_bibdoc_list()
-
         for docname, (doctype, newname, restriction, icon, urls) in docs.iteritems():
             write_message("Elaborating olddocname: '%s', newdocname: '%s', doctype: '%s', restriction: '%s', icon: '%s', urls: '%s', mode: '%s'" % (docname, newname, doctype, restriction, icon, urls, mode), verbose=9, stream=sys.stderr)
-            if mode in ('insert', 'replace'): # new bibdocs, new docnames, new marc
+            if mode == 'insert': # new bibdocs, new docnames, new marc
                 if newname in bibrecdocs.get_bibdoc_names(doctype):
                     write_message("('%s', '%s', '%s') not inserted because docname already exists." % (doctype, newname, urls), stream=sys.stderr)
                     break
@@ -971,7 +966,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                     _add_new_format(bibdoc, url, format, docname, doctype, newname)
                 if icon and not icon == 'KEEP-OLD-VALUE':
                     _add_new_icon(bibdoc, icon, restriction)
-            elif mode == 'replace_or_insert': # more like correct_or_insert
+            elif mode in ('replace_or_insert', 'replace'): # more like correct_or_insert
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == docname:
                         if doctype not in ('PURGE', 'DELETE', 'EXPUNGE'):
