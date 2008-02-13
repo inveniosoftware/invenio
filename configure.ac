@@ -80,11 +80,18 @@ AM_GNU_GETTEXT(external)
 AM_GNU_GETTEXT_VERSION(0.14.4)
 
 ## Check for MySQL client:
-AC_PATH_PROG(MYSQL, mysql)
-if test -z "$MYSQL"; then
-   AC_MSG_ERROR([
-   MySQL command-line client was not found in your PATH.  Please install it first.
-   Available from <http://mysql.com/>.])
+AC_MSG_CHECKING(for mysql)
+AC_ARG_WITH(mysql, AC_HELP_STRING([--with-mysql], [path to a specific MySQL binary (optional)]), MYSQL=${withval})
+if test -n "$MYSQL"; then
+   AC_MSG_RESULT($MYSQL)
+else
+   AC_PATH_PROG(MYSQL, mysql)
+   if test -z "$MYSQL"; then
+      AC_MSG_ERROR([
+      MySQL command-line client was not found in your PATH.  
+      Please install it first.
+      Available from <http://mysql.com/>.])
+   fi
 fi
 
 ## Check for Python:
@@ -678,6 +685,7 @@ AC_MSG_RESULT([**   - DB name: $DBNAME])
 AC_MSG_RESULT([**   - DB username: $DBUSER])
 AC_MSG_RESULT([**   - DB password: $DBPASS])
 AC_MSG_RESULT([**   - Python executable: $PYTHON])
+AC_MSG_RESULT([**   - MySQL client executable: $MYSQL])
 AC_MSG_RESULT([**   - CLISP executable: $CLISP])
 AC_MSG_RESULT([**   - CMUCL executable: $CMUCL])
 AC_MSG_RESULT([**   - SBCL executable: $SBCL])
