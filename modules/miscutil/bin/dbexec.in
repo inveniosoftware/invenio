@@ -22,11 +22,11 @@
 
 ## fill config variables:
 VERSION='$Id$'
-MYSQL="@MYSQL@"
-DBHOST="@DBHOST@"
-DBNAME="@DBNAME@"
-DBUSER="@DBUSER@"
-DBPASS="@DBPASS@"
+MYSQL='@MYSQL@'
+DBHOST='@DBHOST@'
+DBNAME='@DBNAME@'
+DBUSER='@DBUSER@'
+DBPASS='@DBPASS@'
 
 # is help called?
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
