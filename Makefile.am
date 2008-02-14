@@ -94,6 +94,7 @@ etags:
 	(cd $(top_srcdir) && find $(top_srcdir) -name "*.py" -print | xargs etags)
 
 install-data-local:
+	${prefix}/bin/inveniocfg --generate-config-py
 	for d in / /cache /log /tmp /data /run ; do	\
 		mkdir -p $(localstatedir)$$d &&		\
 		if (chmod -f ug=rwx $(localstatedir)$$d); then echo ok > /dev/null else; echo no > /dev/null; fi ;	\
@@ -144,8 +145,8 @@ create-tables: local-dbexec
 	$(top_srcdir)/modules/miscutil/bin/dbtest
 	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabfill.sql
-	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg.py --reset-cdsname $(top_srcdir)/config/invenio.conf
-	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg.py --reset-adminemail $(top_srcdir)/config/invenio.conf
+	${prefix}/bin/inveniocfg --reset-cdsname
+	${prefix}/bin/inveniocfg --reset-adminemail
 	@echo "************************************************************"
 	@echo "** The database tables were successfully created.         **"
 	@echo "**                                                        **"
@@ -362,8 +363,8 @@ drop-demo-site:
 	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabdrop.sql
 	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabfill.sql
-	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg.py --reset-cdsname $(top_srcdir)/config/invenio.conf
-	$(PYTHON) $(top_srcdir)/modules/miscutil/lib/inveniocfg.py --reset-adminemail $(top_srcdir)/config/invenio.conf
+	${prefix}/bin/inveniocfg --reset-cdsname
+	${prefix}/bin/inveniocfg --reset-adminemail
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec
 	${prefix}/bin/webcoll -uadmin
 	${prefix}/bin/webcoll 1
