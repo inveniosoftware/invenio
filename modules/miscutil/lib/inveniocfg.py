@@ -115,7 +115,7 @@ def convert_conf_option(option_name, option_value):
     ## 4) finally, return output line:
     return '%s = %s' % (option_name, option_value)
 
-def generate_config_py(config):
+def generate_config_py(conf):
     """Generate config.py from conf options."""
 
     ## generate preamble:
@@ -128,14 +128,14 @@ def generate_config_py(config):
 
     ## special treatment for CDSNAMEINTL options:
     print 'cdsnameintl = {}'
-    for lang in config.get("Essential parameters", "cdslangs").split(","):
-        print "cdsnameintl['%s'] = \"%s\"" % (lang, config.get("Essential parameters",
-                                                               "cdsnameintl_" + lang))
+    for lang in conf.get("Essential parameters", "cdslangs").split(","):
+        print "cdsnameintl['%s'] = \"%s\"" % (lang, conf.get("Essential parameters",
+                                                             "cdsnameintl_" + lang))
 
     ## process all the options normally:
-    for section in config.sections():
-        for option in config.options(section):
-            line_out = convert_conf_option(option, config.get(section, option))
+    for section in conf.sections():
+        for option in conf.options(section):
+            line_out = convert_conf_option(option, conf.get(section, option))
             if line_out:
                 print line_out
 
@@ -143,48 +143,36 @@ def generate_config_py(config):
     print ""
     print "### END OF FILE"
 
-def reset_cdsname(config):
+def reset_cdsname(conf):
     """
     Reset collection-related tables with new CDSNAME and
-    CDSNAMEINTL read from config files.
+    CDSNAMEINTL read from conf files.
     """
-    from invenio.dbquery import run_sql
+    from invenio.dbquery import run_sql, IntegrityError
     # reset CDSNAME:
-    cdsname = config.get("Essential parameters", "cdsname")
-    res = run_sql("DELETE FROM collection WHERE id=1")
-    res = run_sql("""INSERT INTO collection (id, name, dbquery, reclist, restricted) VALUES
-                                            (1,%s,NULL,NULL,NULL)""",
-                  (cdsname,))
+    cdsname = conf.get("Essential parameters", "cdsname")
+    try:
+        run_sql("""INSERT INTO collection (id, name, dbquery, reclist, restricted) VALUES
+                                          (1,%s,NULL,NULL,NULL)""", (cdsname,))
+    except IntegrityError:
+        run_sql("""UPDATE collection SET name=%s WHERE id=1""", (cdsname,))
     # reset CDSNAMEINTL:
-    res = run_sql("DELETE FROM collectionname WHERE id_collection=1")
+    for lang in conf.get("Essential parameters", "cdslangs").split(","):
+        cdsname_lang = conf.get("Essential parameters", "cdsnameintl_" + lang)
+        try:
+            run_sql("""INSERT INTO collectionname (id_collection, ln, type, value) VALUES
+                         (%s,%s,%s,%s)""", (1, lang, 'ln', cdsname_lang))
+        except IntegrityError:
+            run_sql("""UPDATE collectionname SET value=%s
+                        WHERE ln=%s AND id_collection=1 AND type='ln'""",
+                    (cdsname_lang, lang))
 
-## <en>INSERT INTO collectionname VALUES (1,'en','ln',"<CDSNAMEINTL>");</en>
-## <fr>INSERT INTO collectionname VALUES (1,'fr','ln',"<CDSNAMEINTL>");</fr>
-## <de>INSERT INTO collectionname VALUES (1,'de','ln',"<CDSNAMEINTL>");</de>
-## <es>INSERT INTO collectionname VALUES (1,'es','ln',"<CDSNAMEINTL>");</es>
-## <ca>INSERT INTO collectionname VALUES (1,'ca','ln',"<CDSNAMEINTL>");</ca>
-## <pl>INSERT INTO collectionname VALUES (1,'pl','ln',"<CDSNAMEINTL>");</pl>
-## <pt>INSERT INTO collectionname VALUES (1,'pt','ln',"<CDSNAMEINTL>");</pt>
-## <it>INSERT INTO collectionname VALUES (1,'it','ln',"<CDSNAMEINTL>");</it>
-## <ja>INSERT INTO collectionname VALUES (1,'ja','ln',"<CDSNAMEINTL>");</ja>
-## <ru>INSERT INTO collectionname VALUES (1,'ru','ln',"<CDSNAMEINTL>");</ru>
-## <sk>INSERT INTO collectionname VALUES (1,'sk','ln',"<CDSNAMEINTL>");</sk>
-## <cs>INSERT INTO collectionname VALUES (1,'cs','ln',"<CDSNAMEINTL>");</cs>
-## <no>INSERT INTO collectionname VALUES (1,'no','ln',"<CDSNAMEINTL>");</no>
-## <sv>INSERT INTO collectionname VALUES (1,'sv','ln',"<CDSNAMEINTL>");</sv>
-## <el>INSERT INTO collectionname VALUES (1,'el','ln',"<CDSNAMEINTL>");</el>
-## <uk>INSERT INTO collectionname VALUES (1,'uk','ln',"<CDSNAMEINTL>");</uk>
-## <bg>INSERT INTO collectionname VALUES (1,'bg','ln',"<CDSNAMEINTL>");</bg>
-## <lang:hr>INSERT INTO collectionname VALUES (1,'hr','ln',"<CDSNAMEINTL>");</lang:hr>
-## <zh_CN>INSERT INTO collectionname VALUES (1,'zh_CN','ln',"<CDSNAMEINTL>");</zh_CN>
-## <zh_TW>INSERT INTO collectionname VALUES (1,'zh_TW','ln',"<CDSNAMEINTL>");</zh_TW>
-
-def reset_adminemail(config):
+def reset_adminemail(conf):
     """
-    Reset user-related tables with new ADMINEMAIL read from config files.
+    Reset user-related tables with new ADMINEMAIL read from conf files.
     """
     from invenio.dbquery import run_sql
-    adminemail = config.get("Essential parameters", "adminemail")
+    adminemail = conf.get("Essential parameters", "adminemail")
     res = run_sql("DELETE FROM user WHERE id=1")
     res = run_sql("""INSERT INTO user (id, email, password, note, nickname) VALUES
                         (1, %s, AES_ENCRYPT(email, ''), 1, 'admin')""",
@@ -192,7 +180,7 @@ def reset_adminemail(config):
 
 def main():
     """Main entry point."""
-    config = ConfigParser()
+    conf = ConfigParser()
     if '--help' in sys.argv or \
        '-h' in sys.argv:
         print_usage()
@@ -200,12 +188,12 @@ def main():
          '-V' in sys.argv:
         print_version()
     else:
-        ## read config files:
+        ## read conf files:
         success = False
         for conffile in sys.argv:
             if conffile.endswith(".conf"):
                 if os.path.exists(conffile):
-                    config.read(conffile)
+                    conf.read(conffile)
                     success = True
                 else:
                     print "ERROR: cannot read %s." % conffile
@@ -214,11 +202,11 @@ def main():
             sys.exit(1)
         ## decide what to do:
         if '--generate-config-py' in sys.argv:
-            generate_config_py(config)
+            generate_config_py(conf)
         elif '--reset-cdsname' in sys.argv:
-            reset_cdsname(config)
+            reset_cdsname(conf)
         elif '--reset-adminemail' in sys.argv:
-            reset_adminemail(config)
+            reset_adminemail(conf)
         else:
             print """ERROR: Please specify a command.  Please see '--help'."""
             sys.exit(1)
