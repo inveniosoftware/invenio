@@ -503,8 +503,9 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
         if not topics.has_key(category):
             topics[category] = []
         # Build list of tuples(webdoc_name, webdoc_date, webdoc_url)
-
-        for webdocfile in os.listdir(source_path):
+        for webdocfile in [path for path in \
+                           os.listdir(source_path) \
+                           if path.endswith('.webdoc')]:
             webdoc_name = webdocfile[:-7]
             webdoc_url = weburl + "/help/" + \
                          ((category != 'help' and category + '/') or '') + \
