@@ -207,7 +207,7 @@ semantic:
         $f  ...  format (optional; if not set, deduced from $a)
         $z  ...  comment (optional)
         $r  ...  restriction (optional, see below)
-        $v  ...  version (used only with RECOVER, see below)
+        $v  ...  version (used only with REVERT, see below)
         $x  ...  url/path for an icon (optional)
 </pre>
 </p>
@@ -293,9 +293,9 @@ effectively disappear, please use the correct mode with $n docname
 and $t EXPUNGE as the special keyword.
 </p>
 
-<p>In order to recover a previous revision (i.e. creating a new revision with
-the same content of a previous given one), please use the correct mode with
-$n docname, $t RECOVER as the special keyword and $v the number corresponding
+<p>In order to revert to a previous file revision (i.e. to create a new revision with
+the same content as some previous revision had), please use the correct mode with
+$n docname, $t REVERT as the special keyword and $v the number corresponding
 to the desired version.</p>
 
 <p>In order to preserve previous comments and descriptions when correcting, please use the KEEP-OLD-VALUE special keyword with the desired $d and $z subfield.
