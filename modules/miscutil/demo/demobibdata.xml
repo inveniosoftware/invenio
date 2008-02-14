@@ -15947,6 +15947,7 @@
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Mück, W</subfield>
     <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Napoli</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">An improved correspondence formula for AdS/CFT with multi-trace operators</subfield>
@@ -17816,6 +17817,7 @@
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Girardello, L</subfield>
     <subfield code="u">INFN</subfield>
+    <subfield code="u">Universita di Milano-Bicocca</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">3-D Interacting CFTs and Generalized Higgs Phenomenon in Higher Spin Theories on AdS</subfield>
