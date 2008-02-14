@@ -498,6 +498,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Efstathiou, G P</subfield>
+            <subfield code="u">Cambridge University</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Constraints on $\Omega_{\Lambda}$ and $\Omega_{m}$from Distant Type 1a Supernovae and Cosmic Microwave Background Anisotropies</subfield>
@@ -790,6 +791,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Ellis, J</subfield>
+            <subfield code="u">University of Oxford</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Grand unification with large supersymmetry breaking</subfield>
@@ -851,6 +853,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Heister, A</subfield>
+            <subfield code="u">Aachen, Tech. Hochsch.</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Search for R-Parity Violating Production of Single Sneutrinos in $e^{+}e^{-}$ Collisions at $\sqrt{s}$ = 189-209 GeV</subfield>
@@ -2100,6 +2103,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Gray, M E</subfield>
+            <subfield code="u">Cambridge University</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Infrared constraints on the dark mass concentration observed in the cluster Abell 1942</subfield>
@@ -2231,6 +2235,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Mangano, M L</subfield>
+            <subfield code="u">CERN</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Physics at the front-end of a neutrino factory : a quantitative appraisal</subfield>
@@ -4703,6 +4708,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Nason, P</subfield>
+            <subfield code="u">Brookhaven Nat. Lab.</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">The total cross section for the production of heavy quarks in hadronic collisions</subfield>
@@ -4758,6 +4764,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Ellis, J</subfield>
+            <subfield code="u">CERN</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">From the standard model to grand unification</subfield>
@@ -4813,6 +4820,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Dev, A</subfield>
+            <subfield code="u">Delhi University</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Cosmic equation of state, Gravitational Lensing Statistics and Merging of Galaxies</subfield>
@@ -5492,6 +5500,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Abbott, R B</subfield>
+	    <subfield code="u">Washington U. Seattle</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Cosmological perturbations in Kaluza-Klein models</subfield>
@@ -5546,6 +5555,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Albajar, C</subfield>
+            <subfield code="u">CERN</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Multifractal analysis of minimum bias events in \Sqrt s = 630 GeV $\overline{p}$p collisions</subfield>
@@ -5888,6 +5898,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Ellis, J</subfield>
+            <subfield code="u">CERN</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Non-compact supergravity solves problems</subfield>
@@ -5974,6 +5985,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Whang, K</subfield>
+            <subfield code="u">Stanford University</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Separability as a physical database design methodology</subfield>
@@ -6031,6 +6043,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Arje, J</subfield>
+            <subfield code="u">University of Jyvaskyla</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Charge creation and reset mechanisms in an ion guide isotope separator (IGIS)</subfield>
@@ -6079,6 +6092,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Lindley, Dennis Victor</subfield>
+            <subfield code="u">University College London</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Bayesian statistics</subfield>
@@ -6131,6 +6145,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Hamilton, Donald R</subfield>
+            <subfield code="u">MIT</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Klystrons and microwave triodes</subfield>
@@ -6415,6 +6430,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Fry, Thornton C</subfield>
+            <subfield code="u">Bell Teleph Labs</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Probability</subfield>
@@ -6460,6 +6476,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Kleene, Stephen Cole</subfield>
+            <subfield code="u">University of Wisconsin</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Introduction to metamathematics</subfield>
@@ -6555,6 +6572,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Burford, Roger L</subfield>
+            <subfield code="u">Indiana University</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Statistics</subfield>
@@ -6718,6 +6736,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Tavanapong, W</subfield>
+            <subfield code="u">University of Central Florida</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">A High-performance Video Browsing System</subfield>
@@ -6793,6 +6812,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Teshome, D</subfield>
+            <subfield code="u">California State Univ</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Neural Networks For Speech Recognition Of A Phonetic Language</subfield>
@@ -6864,6 +6884,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Topcuoglu, H R</subfield>
+            <subfield code="u">Syracuse Univ.</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Scheduling Task Graphs In Heterogeneous Computing Environments</subfield>
@@ -6939,6 +6960,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Trespalacios-Mantilla, J H</subfield>
+            <subfield code="u">Puerto Rico Univ.</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Software De Apoyo Educativo Al Concepto De Funcion En Precalculo I (spanish Text)</subfield>
@@ -7017,6 +7039,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Troudi, N</subfield>
+            <subfield code="u">Laval Univ.</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Systeme Multiagent Pour Les Environnements Riches En Informations (french Text)</subfield>
@@ -7095,6 +7118,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Manes, J L</subfield>
+            <subfield code="u">Calif. Univ. Berkeley</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Anomalies in quantum field theory and differential geometry</subfield>
@@ -7156,6 +7180,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Ingermanson, R</subfield>
+            <subfield code="u">Calif. Univ. Berkeley</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Accelerating the loop expansion</subfield>
@@ -7217,6 +7242,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Bertsche, K J</subfield>
+            <subfield code="u">Calif. Univ. Berkeley</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">A small low energy cyclotron for radioisotope measurements</subfield>
@@ -7274,6 +7300,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Khalatnikov, I M</subfield>
+	    <subfield code="u">L D Landau Institute for Theoretical Physics of Russian Academy of Sciences</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Comment about quasiisotropic solution of Einstein equations near cosmological singularity</subfield>
@@ -7406,6 +7433,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Bento, M C</subfield>
+            <subfield code="u">CERN</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Supergravity Inflation on the Brane</subfield>
@@ -7474,6 +7502,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Alhaidari, A D</subfield>
+            <subfield code="u">King Fadh University</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Reply to 'Comment on "Solution of the Relativistic Dirac-Morse Problem"'</subfield>
@@ -7534,6 +7563,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Easther, R</subfield>
+            <subfield code="u">Columbia Univ.</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Cosmological String Gas on Orbifolds</subfield>
@@ -7756,6 +7786,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Shovkovy, I A</subfield>
+            <subfield code="u">Minnesota Univ.</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Thermal conductivity of dense quark matter and cooling of stars</subfield>
@@ -8222,6 +8253,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Gomez, M E</subfield>
+            <subfield code="u">CFIF</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Lepton-Flavour Violation in SUSY with and without R-parity</subfield>
@@ -8653,6 +8685,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Dzuba, V A</subfield>
+            <subfield code="u">University of New South Wales</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Precise calculation of parity nonconservation in cesium and test of the standard model</subfield>
@@ -9139,6 +9172,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Bertin, V</subfield>
+            <subfield code="u">Universite Blaise Pascal</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Neutrino Indirect Detection of Neutralino Dark Matter in the CMSSM</subfield>
@@ -9214,6 +9248,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Branco, G C</subfield>
+            <subfield code="u">FCIF</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Supersymmetry and a rationale for small CP violating phases</subfield>
@@ -9798,6 +9833,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Paschos, E A</subfield>
+            <subfield code="u">Univ. Dortmund</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Leptogenesis with Majorana neutrinos</subfield>
@@ -10099,6 +10135,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Paschos, E A</subfield>
+            <subfield code="u">Univ. Dortmund</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Neutrino Interactions at Low and Medium Energies</subfield>
@@ -10345,6 +10382,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Van Beveren, E</subfield>
+            <subfield code="u">University of Coimbra</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Remarks on the f_0(400-1200) scalar meson as the dynamically generated chiral partner of the pion</subfield>
@@ -10690,6 +10728,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Aglietti, U</subfield>
+            <subfield code="u">CERN</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">A new model-independent way of extracting |V_ub/V_cb|</subfield>
@@ -11343,6 +11382,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Appelquist, T</subfield>
+            <subfield code="u">Yale University</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Neutrino Masses in Theories with Dynamical Electroweak Symmetry Breaking</subfield>
@@ -11739,6 +11779,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Gaillard, M K</subfield>
+            <subfield code="u">University of California, Berkeley</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Modular Invariant Anomalous U(1) Breaking</subfield>
@@ -12058,6 +12099,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Chacko, Z</subfield>
+            <subfield code="u">University of California, Berkeley</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Fine Structure Constant Variation from a Late Phase Transition</subfield>
@@ -12551,6 +12593,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Domin, P</subfield>
+            <subfield code="u">Comenius University</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Phenomenological Study of Solar-Neutrino Induced Double Beta Decay of Mo100</subfield>
@@ -12793,6 +12836,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Nishino, H</subfield>
+            <subfield code="u">California State University</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Axisymmetric Gravitational Solutions as Possible Classical Backgrounds around Closed String Mass Distributions</subfield>
@@ -13121,6 +13165,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Bo-Yu, H</subfield>
+	    <subfield code="u">Northwest University, China</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Soliton on Noncommutative Orbifold $ T^2/Z_k $</subfield>
@@ -13399,6 +13444,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Page, P R</subfield>
+            <subfield code="u">Los Alamos Sci. Lab.</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Hybrid Baryons</subfield>
@@ -13469,6 +13515,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Amos, K</subfield>
+            <subfield code="u">The University of Melbourne</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">A simple functional form for proton-nucleus total reaction cross sections</subfield>
@@ -13532,6 +13579,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Oyamatsu, K</subfield>
+            <subfield code="u">Aichi Shukutoku Univ</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Saturation of nuclear matter and radii of unstable nuclei</subfield>
@@ -13890,6 +13938,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Bozek, P</subfield>
+	    <subfield code="u">Institute of Nuclear Physics, Cracow, Poland</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Nuclear matter with off-shell propagation</subfield>
@@ -13950,6 +13999,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Contogouris, A P</subfield>
+	    <subfield code="u">University of Athens</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">One loop corrections for certain reactions initiated by 5-parton subprocesses via helicity amplitudes</subfield>
@@ -14022,6 +14072,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Bryman, D A</subfield>
+	    <subfield code="u">University of British Columbia</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Exotic muon decay mu --> e + x</subfield>
@@ -14087,6 +14138,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Costa, M S</subfield>
+            <subfield code="u">Princeton University</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">A Test of the AdS/CFT Duality on the Coulomb Branch</subfield>
@@ -14615,6 +14667,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Bollen, G</subfield>
+	    <subfield code="u">Institut fur Physic, Universitat Mainz</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">ISOLTRAP : a tandem penning trap system for accurate on-line mass determination of short-lived isotopes</subfield>
@@ -14701,6 +14754,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">McInnes, B</subfield>
+            <subfield code="u">National University of Singapore</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">AdS/CFT For Non-Boundary Manifolds</subfield>
@@ -14777,6 +14831,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Emi, K</subfield>
+            <subfield code="u">KEK</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Study of a dE/dx measurement and the gas-gain saturation by a prototype drift chamber for the BELLE-CDC</subfield>
@@ -14892,6 +14947,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Smailagic, A</subfield>
+            <subfield code="u">University of Osijek</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Higher Dimensional Schwinger-like Anomalous Effective Action</subfield>
@@ -15094,6 +15150,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Matsubara, K</subfield>
+            <subfield code="u">Uppsala University</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Restrictions on Gauge Groups in Noncommutative Gauge Theory</subfield>
@@ -15204,6 +15261,7 @@
         </datafield>
         <datafield tag="100" ind1=" " ind2=" ">
             <subfield code="a">Wang, B</subfield>
+            <subfield code="u">Fudan University</subfield>
         </datafield>
         <datafield tag="245" ind1=" " ind2=" ">
             <subfield code="a">Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes</subfield>
@@ -15617,6 +15675,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Klebanov, Igor R</subfield>
+    <subfield code="u">Princeton University</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">AdS Dual of the Critical O(N) Vector Model</subfield>
@@ -15887,6 +15946,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Mück, W</subfield>
+    <subfield code="u">INFN</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">An improved correspondence formula for AdS/CFT with multi-trace operators</subfield>
@@ -16038,6 +16098,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Martelli, D</subfield>
+    <subfield code="u">University of London</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Holographic Renormalization and Ward Identities with the Hamilton-Jacobi Method</subfield>
@@ -16328,6 +16389,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Ramgoolam, S</subfield>
+    <subfield code="u">Brown University</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Higher dimensional geometries related to fuzzy odd-dimensional spheres</subfield>
@@ -16619,6 +16681,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Adams, A</subfield>
+    <subfield code="u">Stanford University</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Decapitating Tadpoles</subfield>
@@ -16915,6 +16978,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Berkooz, M</subfield>
+    <subfield code="u">The Weizmann Inst. of Science</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Double Trace Deformations, Infinite Extra Dimensions and Supersymmetry Breaking</subfield>
@@ -17297,6 +17361,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Borunda, M</subfield>
+    <subfield code="u">INFN</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">On the quantum stability of IIB orbifolds and orientifolds with Scherk-Schwarz SUSY breaking</subfield>
@@ -17642,6 +17707,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Gubser, S S</subfield>
+    <subfield code="u">Princeton University</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">A universal result on central charges in the presence of double-trace deformations</subfield>
@@ -17749,6 +17815,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Girardello, L</subfield>
+    <subfield code="u">INFN</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">3-D Interacting CFTs and Generalized Higgs Phenomenon in Higher Spin Theories on AdS</subfield>
@@ -18006,6 +18073,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Fukuma, M</subfield>
+    <subfield code="u">Kyoto University</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Holographic Renormalization Group</subfield>
@@ -18856,6 +18924,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Barvinsky, A O</subfield>
+    <subfield code="u">Lebedev Physics Institute</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Nonlocal action for long-distance modifications of gravity theory</subfield>
@@ -19124,6 +19193,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Witten, Edward</subfield>
+    <subfield code="u">Princeton University</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">SL(2,Z) Action On Three-Dimensional Conformal Field Theories With Abelian Symmetry</subfield>
@@ -19457,6 +19527,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Dvali, G</subfield>
+    <subfield code="u">New York University</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Filtering Gravity: Modification at Large Distances?</subfield>
@@ -19732,6 +19803,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Durin, B</subfield>
+    <subfield code="u">LPTHE</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Closed strings in Misner space: a toy model for a Big Bounce ?</subfield>
@@ -20156,6 +20228,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Papadimitriou, I</subfield>
+    <subfield code="u">DESY</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Non-Supersymmetric Membrane Flows from Fake Supergravity and Multi-Trace Deformations</subfield>
@@ -20581,6 +20654,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Koutsoumbas, G</subfield>
+    <subfield code="u">National Technical University of Athens</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Quasi-normal Modes of Electromagnetic Perturbations of Four-Dimensional Topological Black Holes with Scalar Hair</subfield>
@@ -20953,6 +21027,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Alexander, S</subfield>
+    <subfield code="u">The Pennsylvania State University</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">A new PPN parameter to test Chern-Simons gravity</subfield>
@@ -21146,6 +21221,7 @@
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Periwal, V</subfield>
+    <subfield code="u">Princeton University</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Matrices on a point as the theory of everything</subfield>
@@ -21233,6 +21309,7 @@
    </datafield>
    <datafield tag="100" ind1="" ind2="">
       <subfield code="a">Polyakov, A M</subfield>
+    <subfield code="u">Princeton University</subfield>
    </datafield>
    <datafield tag="245" ind1="" ind2="">
       <subfield code="a">The wall of the cave</subfield>
