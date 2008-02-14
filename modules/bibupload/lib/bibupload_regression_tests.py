@@ -29,6 +29,7 @@ import re
 import unittest
 import time
 from urllib2 import urlopen
+from md5 import md5
 
 from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, weburl
 from invenio import bibupload
@@ -40,7 +41,7 @@ from invenio.dbquery import run_sql
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run
 from invenio.bibtask import task_set_option
-
+from invenio.bibdocfile import BibRecDocs
 
 # helper functions:
 
@@ -98,21 +99,7 @@ def compare_hmbuffers(hmbuffer1, hmbuffer2):
     hmbuffer1 = re.sub(r'(^|\n)\s+', '', hmbuffer1)
     hmbuffer2 = re.sub(r'(^|\n)\s+', '', hmbuffer2)
 
-    split_hmbuffer1 = hmbuffer1.split('\n')
-    split_hmbuffer2 = hmbuffer1.split('\n')
-
-    compare_hmbuffers = True
-    for row in split_hmbuffer1:
-        if row:
-            if row not in split_hmbuffer2:
-                compare_hmbuffers = False
-                break
-    if compare_hmbuffers:
-        for row in split_hmbuffer2:
-            if row:
-                if row not in split_hmbuffer1:
-                    compare_hmbuffers = False
-                    break
+    compare_hmbuffers = hmbuffer1 == hmbuffer2
 
     if not compare_hmbuffers:
         print "\n=" + hmbuffer1 + "=\n"
@@ -1898,6 +1885,41 @@ class BibUploadFFTModeTest(unittest.TestCase):
         self.failUnless(try_url_download(testrec_expected_url))
         bibupload.wipe_out_record_from_all_tables(recid)
 
+    def test_fft_check_md5_through_bibrecdoc_str(self):
+        """bibupload - simple FFT insert, check md5 through BibRecDocs.str()"""
+        # define the test case:
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%s/img/head.gif</subfield>
+         </datafield>
+        </record>
+        """ % weburl
+        # insert test record:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+
+        original_md5 = md5(urlopen('%s/img/head.gif' % weburl).read()).hexdigest()
+
+        bibrec_str = str(BibRecDocs(int(recid)))
+
+        md5_found = False
+        for row in bibrec_str.split('\n'):
+            if 'checksum' in row:
+                if original_md5 in row:
+                    md5_found = True
+
+        self.failUnless(md5_found)
+
+        bibupload.wipe_out_record_from_all_tables(recid)
+
+
     def test_detailed_fft_insert(self):
         """bibupload - detailed FFT insert"""
         # define the test case:
@@ -2162,16 +2184,16 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/head.gif</subfield>
+          <subfield code="u">%(weburl)s/record/123456789/files/0101001.pdf</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
           <subfield code="u">%(weburl)s/record/123456789/files/demobibdata.xml</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/0101001.pdf</subfield>
-         </datafield>
-         <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(weburl)s/record/123456789/files/head.gif</subfield>
          </datafield>
         </record>
         """ % { 'weburl': weburl}
@@ -2179,10 +2201,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/head.gif
-        8564_ $$u%(weburl)s/record/123456789/files/demobibdata.xml
         8564_ $$u%(weburl)s/record/123456789/files/0101001.pdf
         8564_ $$u%(weburl)s/record/123456789/files/cds.gif
+        8564_ $$u%(weburl)s/record/123456789/files/demobibdata.xml
+        8564_ $$u%(weburl)s/record/123456789/files/head.gif
         """ % { 'weburl': weburl}
         # insert test record:
         testrec_expected_urls = []
@@ -2766,6 +2788,208 @@ class BibUploadFFTModeTest(unittest.TestCase):
 
         self._test_bibdoc_status(recid, 'cds', '')
         self._test_bibdoc_status(recid, 'head', '')
+
+        #print "\nRecid: " + str(recid) + "\n"
+        #print testrec_expected_hm + "\n"
+        #print print_record(recid, 'hm') + "\n"
+
+        bibupload.wipe_out_record_from_all_tables(recid)
+
+    def test_revert_fft_correct(self):
+        """bibupload - revert FFT correct"""
+        # define the test case:
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%s/img/iconpen.gif</subfield>
+          <subfield code="n">cds</subfield>
+         </datafield>
+        </record>
+        """ % weburl
+        test_to_correct = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%s/img/head.gif</subfield>
+          <subfield code="n">cds</subfield>
+         </datafield>
+        </record>
+        """ % weburl
+        test_to_revert = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="n">cds</subfield>
+          <subfield code="t">REVERT</subfield>
+          <subfield code="v">1</subfield>
+         </datafield>
+        </record>
+        """
+
+        testrec_expected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
+         </datafield>
+        </record>
+        """ % { 'weburl': weburl}
+        testrec_expected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        8564_ $$u%(weburl)s/record/123456789/files/cds.gif
+        """ % { 'weburl': weburl}
+        testrec_expected_url = "%(weburl)s/record/123456789/files/cds.gif" % { 'weburl': weburl}
+
+        # insert test record:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_xm = testrec_expected_xm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_hm = testrec_expected_hm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
+        test_to_correct = test_to_correct.replace('123456789',
+                                                          str(recid))
+        test_to_revert = test_to_revert.replace('123456789',
+                                                          str(recid))
+        # correct test record with new FFT:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_correct)
+        bibupload.bibupload(recs[0], opt_mode='correct')
+
+        # revert test record with new FFT:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_revert)
+        bibupload.bibupload(recs[0], opt_mode='correct')
+
+
+        # compare expected results:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.failUnless(try_url_download(testrec_expected_url))
+        self.failUnless(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm))
+        self.failUnless(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm))
+
+        self._test_bibdoc_status(recid, 'cds', '')
+
+        expected_content_version1 = urlopen('%s/img/iconpen.gif' % weburl).read()
+        expected_content_version2 = urlopen('%s/img/head.gif' % weburl).read()
+        expected_content_version3 = expected_content_version1
+
+        content_version1 = urlopen('%s/record/%s/files/cds.gif?version=1' % (weburl, recid)).read()
+        content_version2 = urlopen('%s/record/%s/files/cds.gif?version=2' % (weburl, recid)).read()
+        content_version3 = urlopen('%s/record/%s/files/cds.gif?version=3' % (weburl, recid)).read()
+
+        self.assertEqual(expected_content_version1, content_version1)
+        self.assertEqual(expected_content_version2, content_version2)
+        self.assertEqual(expected_content_version3, content_version3)
+
+        #print "\nRecid: " + str(recid) + "\n"
+        #print testrec_expected_hm + "\n"
+        #print print_record(recid, 'hm') + "\n"
+
+        bibupload.wipe_out_record_from_all_tables(recid)
+
+    def test_simple_fft_replace(self):
+        """bibupload - simple FFT replace"""
+        # define the test case:
+        test_to_upload = """
+        <record>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%s/img/iconpen.gif</subfield>
+          <subfield code="n">cds</subfield>
+         </datafield>
+        </record>
+        """ % weburl
+        test_to_replace = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="FFT" ind1=" " ind2=" ">
+          <subfield code="a">%s/img/head.gif</subfield>
+         </datafield>
+        </record>
+        """ % weburl
+
+        testrec_expected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, John</subfield>
+          <subfield code="u">Test University</subfield>
+         </datafield>
+         <datafield tag="856" ind1="4" ind2=" ">
+          <subfield code="u">%(weburl)s/record/123456789/files/head.gif</subfield>
+         </datafield>
+        </record>
+        """ % { 'weburl': weburl}
+        testrec_expected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, John$$uTest University
+        8564_ $$u%(weburl)s/record/123456789/files/head.gif
+        """ % { 'weburl': weburl}
+        testrec_expected_url = "%(weburl)s/record/123456789/files/head.gif" % { 'weburl': weburl}
+
+        # insert test record:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_upload)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recid of inserted test record:
+        testrec_expected_xm = testrec_expected_xm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_hm = testrec_expected_hm.replace('123456789',
+                                                          str(recid))
+        testrec_expected_url = testrec_expected_url.replace('123456789',
+                                                          str(recid))
+        test_to_replace = test_to_replace.replace('123456789',
+                                                          str(recid))
+        # replace test record with new FFT:
+        task_set_option('verbose', 0)
+        recs = bibupload.xml_marc_to_records(test_to_replace)
+        bibupload.bibupload(recs[0], opt_mode='replace')
+
+        # compare expected results:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.failUnless(try_url_download(testrec_expected_url))
+        self.failUnless(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm))
+        self.failUnless(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm))
+
+        expected_content_version = urlopen('%s/img/head.gif' % weburl).read()
+
+        content_version = urlopen('%s/record/%s/files/head.gif' % (weburl, recid)).read()
+
+        self.assertEqual(expected_content_version, content_version)
 
         #print "\nRecid: " + str(recid) + "\n"
         #print testrec_expected_hm + "\n"

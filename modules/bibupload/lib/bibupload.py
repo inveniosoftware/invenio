@@ -913,8 +913,14 @@ def elaborate_fft_tags(record, rec_id, mode):
             else:
                 restriction = ''
 
+            version = field_get_subfield_values(fft, 'v')
+            if version:
+                version = version[0]
+            else:
+                version = ''
+
             if docs.has_key(name): # new format considered
-                (doctype2, newname2, restriction2, icon2, urls) = docs[name]
+                (doctype2, newname2, restriction2, icon2, version2, urls) = docs[name]
                 if doctype2 != doctype:
                     write_message("fft '%s' specifies a different doctype from previous fft with docname '%s'" % (str(fft), name), stream=sys.stderr)
                     break
@@ -927,6 +933,9 @@ def elaborate_fft_tags(record, rec_id, mode):
                 if icon2 != icon:
                     write_message("fft '%x' specifies a different icon than the previous fft with docname '%s'" % (str(fft), name), stream=sys.stderr)
                     break
+                if version2 != version:
+                    write_message("fft '%x' specifies a different version than the previous fft with docname '%s'" % (str(fft), name), stream=sys.stderr)
+                    break
                 for (url2, format2) in urls:
                     if format == format2:
                         write_message("fft '%s' specifies a second file '%s' with the same format '%s' from previous fft with docname '%s'" % (str(fft), url, format, name), stream=sys.stderr)
@@ -934,9 +943,9 @@ def elaborate_fft_tags(record, rec_id, mode):
                     urls.append((url, format))
             else:
                 if url:
-                    docs[name] = (doctype, newname, restriction, icon, [(url, format)])
+                    docs[name] = (doctype, newname, restriction, icon, version, [(url, format)])
                 else:
-                    docs[name] = (doctype, newname, restriction, icon, [])
+                    docs[name] = (doctype, newname, restriction, icon, version, [])
             comments['%s/record/%s/files/%s%s' % (weburl, rec_id, newname, format)] = comment
             descriptions['%s/record/%s/files/%s%s' % (weburl, rec_id, newname, format)] = description
             if newname != name:
@@ -950,9 +959,14 @@ def elaborate_fft_tags(record, rec_id, mode):
         # Preprocessed data elaboration
         bibrecdocs = BibRecDocs(rec_id)
 
-        for docname, (doctype, newname, restriction, icon, urls) in docs.iteritems():
+        if mode == 'replace': # First we erase previous bibdocs
+            for bibdoc in bibrecdocs.list_bibdocs():
+                bibdoc.delete()
+            bibrecdocs.build_bibdoc_list()
+
+        for docname, (doctype, newname, restriction, icon, version, urls) in docs.iteritems():
             write_message("Elaborating olddocname: '%s', newdocname: '%s', doctype: '%s', restriction: '%s', icon: '%s', urls: '%s', mode: '%s'" % (docname, newname, doctype, restriction, icon, urls, mode), verbose=9, stream=sys.stderr)
-            if mode == 'insert': # new bibdocs, new docnames, new marc
+            if mode in ('insert', 'replace'): # new bibdocs, new docnames, new marc
                 if newname in bibrecdocs.get_bibdoc_names(doctype):
                     write_message("('%s', '%s', '%s') not inserted because docname already exists." % (doctype, newname, urls), stream=sys.stderr)
                     break
@@ -966,10 +980,10 @@ def elaborate_fft_tags(record, rec_id, mode):
                     _add_new_format(bibdoc, url, format, docname, doctype, newname)
                 if icon and not icon == 'KEEP-OLD-VALUE':
                     _add_new_icon(bibdoc, icon, restriction)
-            elif mode in ('replace_or_insert', 'replace'): # more like correct_or_insert
+            elif mode == 'replace_or_insert': # to be thought as correct_or_insert
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == docname:
-                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE'):
+                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT'):
                             if newname != docname:
                                 try:
                                     bibdoc.change_name(newname)
@@ -986,6 +1000,11 @@ def elaborate_fft_tags(record, rec_id, mode):
                             bibdoc.delete()
                         elif doctype == 'EXPUNGE':
                             bibdoc.expunge()
+                        elif doctype == 'REVERT':
+                            try:
+                                bibdoc.revert(version)
+                            except Exception, e:
+                                write_message('(%s, %s) not correctly reverted: %s' (newname, version, e))
                         else:
                             if restriction != 'KEEP-OLD-VALUE':
                                 bibdoc.set_status(restriction)
@@ -1010,7 +1029,7 @@ def elaborate_fft_tags(record, rec_id, mode):
             elif mode == 'correct':
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == docname:
-                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE'):
+                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT'):
                             if newname != docname:
                                 try:
                                     bibdoc.change_name(newname)
@@ -1027,6 +1046,11 @@ def elaborate_fft_tags(record, rec_id, mode):
                             bibdoc.delete()
                         elif doctype == 'EXPUNGE':
                             bibdoc.expunge()
+                        elif doctype == 'REVERT':
+                            try:
+                                bibdoc.revert(version)
+                            except Exception, e:
+                                write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e))
                         else:
                             if restriction != 'KEEP-OLD-VALUE':
                                 bibdoc.set_status(restriction)

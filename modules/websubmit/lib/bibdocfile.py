@@ -25,6 +25,7 @@ import shutil
 import md5
 import filecmp
 import time
+from datetime import datetime
 from xml.sax.saxutils import quoteattr
 from mimetypes import MimeTypes
 
@@ -133,11 +134,11 @@ class BibRecDocs:
         return 'BibRecDocs(%s)' % self.id
 
     def __str__(self):
-        out = 'Bibrec %i is connected with %i bibdoc(s)\n' % (self.id, len(self.bibdocs))
+        out = '%i::::total bibdocs attached=%i\n' % (self.id, len(self.bibdocs))
+        out += '%i::::total size latest version=%s\n' % (self.id, nice_size(self.get_total_size_latest_version()))
+        out += '%i::::total size all files=%s\n' % (self.id, nice_size(self.get_total_size()))
         for bibdoc in self.bibdocs:
-            out += '%s\n' % bibdoc
-        out += 'Total size of latest version files is %s\n' % nice_size(self.get_total_size_latest_version())
-        out += 'Total size of all the files is %s\n' % nice_size(self.get_total_size())
+            out += str(bibdoc)
         return out
 
     def get_total_size_latest_version(self):
@@ -161,8 +162,9 @@ class BibRecDocs:
         recid is added, removed or modified.
         """
         self.bibdocs = []
-        res = run_sql("select id_bibdoc,type,status from bibrec_bibdoc,bibdoc "
-            "where id=id_bibdoc and id_bibrec=%s and status<>'DELETED'", (self.id,))
+        res = run_sql("""SELECT id_bibdoc, type, status FROM bibrec_bibdoc JOIN
+                         bibdoc ON id=id_bibdoc WHERE id_bibrec=%s AND
+                         status<>'DELETED' ORDER BY docname ASC""", (self.id,))
         for row in res:
             cur_doc = BibDoc(docid=row[0], recid=self.id, doctype=row[1])
             self.bibdocs.append(cur_doc)
@@ -327,8 +329,7 @@ class BibRecDocs:
         """
         docfiles = []
         for bibdoc in self.list_bibdocs(doctype):
-            for docfile in bibdoc.list_latest_files():
-                docfiles.append(docfile)
+            docfiles += bibdoc.list_latest_files()
         return docfiles
 
     def display(self, docname="", version="", doctype="", ln=cdslang):
@@ -544,22 +545,20 @@ class BibDoc:
         return 'BibDoc(%i, %i, %s, %s)' % (self.id, self.recid, repr(self.docname), repr(self.doctype))
 
     def __str__(self):
-        out = 'BidDoc \'%s\' (%i) with doctype \'%s\'' % (self.docname, self.id, self.doctype)
-        if self.recid:
-            out += 'connected to recid %i' % self.recid
-        out += '\n'
-        out += 'status: %s\n' % self.status
-        out += 'basedir: %s\n' % self.basedir
-        out += 'creation date: %s\n' % self.cd
-        out += 'modification date: %s\n' % self.md
-        out += '%i files are attached:\n' % len(self.docfiles)
+        out = '%s:%i:::docname=%s\n' % (self.recid or '', self.id, self.docname)
+        out += '%s:%i:::doctype=%s\n' % (self.recid or '', self.id, self.doctype)
+        out += '%s:%i:::status=%s\n' % (self.recid or '', self.id, self.status)
+        out += '%s:%i:::basedir=%s\n' % (self.recid or '', self.id, self.basedir)
+        out += '%s:%i:::creation date=%s\n' % (self.recid or '', self.id, self.cd)
+        out += '%s:%i:::modification date=%s\n' % (self.recid or '', self.id, self.md)
+        out += '%s:%i:::total file attached=%s\n' % (self.recid or '', self.id, len(self.docfiles))
+        out += '%s:%i:::total size latest version=%s\n' % (self.recid or '', self.id, nice_size(self.get_total_size_latest_version()))
+        out += '%s:%i:::total size all files=%s\n' % (self.recid or '', self.id, nice_size(self.get_total_size()))
         for docfile in self.docfiles:
             out += str(docfile)
         icon = self.get_icon()
         if icon:
-            out += 'Related icon is %s' % self.get_icon()
-        out += 'Total size of latest version files is %s\n' % nice_size(self.get_total_size_latest_version())
-        out += 'Total size of all files is %s\n' % nice_size(self.get_total_size())
+            out += str(self.get_icon())
         return out
 
     def get_status(self):
@@ -626,6 +625,27 @@ class BibDoc:
         Md5Folder(self.basedir).update()
         self.touch()
         self._build_file_list()
+
+    def revert(self, version):
+        """Revert to a given version by copying its differnt formats to a new
+        version."""
+        try:
+            version = int(version)
+            new_version = self.get_latest_version() + 1
+            for docfile in self.list_version_files(version):
+                destination = "%s/%s%s;%i" % (self.basedir, self.docname, docfile.get_format(), new_version)
+                if os.path.exists(destination):
+                    raise InvenioWebSubmitFileError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, format)
+                try:
+                    shutil.copyfile(docfile.get_full_path(), destination)
+                    os.chmod(destination, 0644)
+                except Exception, e:
+                    register_exception()
+                    raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (file, destination, e)
+        finally:
+            Md5Folder(self.basedir).update()
+            self.touch()
+            self._build_file_list()
 
     def add_file_new_format(self, filename, version=""):
         """add a new format of a file to an archive"""
@@ -806,6 +826,7 @@ class BibDoc:
     def delete(self):
         """delete the current bibdoc instance"""
         try:
+            self.change_name('DELETED-%s-%s' % (datetime.today().strftime('%Y%m%d%H%M%S'), self.docname))
             run_sql("UPDATE bibdoc SET status='DELETED' WHERE id=%s", (self.id,))
         except Exception, e:
             register_exception()
@@ -820,6 +841,16 @@ class BibDoc:
         except Exception, e:
             register_exception()
             raise InvenioWebSubmitFileError, "It's impossible to undelete bibdoc %s: %s" % (self.id, e)
+        if self.docname.startswith('DELETED-'):
+            try:
+                # Let's remove DELETED-20080214144322- in front of the docname
+                original_name = '-'.join(self.docname.split('-')[2:])
+                self.change_name(original_name)
+            except Exception, e:
+                register_exception()
+                raise InvenioWebSubmitFileError, "It's impossible to restore the previous docname %s. %s kept as docname because:" % (original_name, self.docname, e)
+        else:
+            raise InvenioWebSubmitFileError, "Strange just undeleted docname isn't called DELETED-somedate-docname but %s" % self.docname
 
     def _build_file_list(self, context=''):
         """Lists all files attached to the bibdoc. This function should be
@@ -875,7 +906,9 @@ class BibDoc:
         self.docfiles = []
         if os.path.exists(self.basedir):
             self.md5s = Md5Folder(self.basedir)
-            for fil in os.listdir(self.basedir):
+            files = os.listdir(self.basedir)
+            files.sort()
+            for fil in files:
                 if not fil.startswith('.'):
                     try:
                         filepath = "%s/%s" % (self.basedir, fil)
@@ -913,8 +946,8 @@ class BibDoc:
         called everytime the bibdoc is modified within e.g. its icon.
         """
         self.related_files = {}
-        res = run_sql("select ln.id_bibdoc2,ln.type,bibdoc.status from "
-            "bibdoc_bibdoc as ln,bibdoc where id=ln.id_bibdoc2 and "
+        res = run_sql("SELECT ln.id_bibdoc2,ln.type,bibdoc.status FROM "
+            "bibdoc_bibdoc AS ln,bibdoc WHERE id=ln.id_bibdoc2 AND "
             "ln.id_bibdoc1=%s", (self.id,))
         for row in res:
             docid = row[0]
@@ -952,11 +985,7 @@ class BibDoc:
     def list_version_files(self, version):
         """Return all the docfiles of a particular version."""
         version = int(version)
-        tmp = []
-        for docfile in self.docfiles:
-            if docfile.get_version() == version:
-                tmp.append(docfile)
-        return tmp
+        return [docfile for docfile in self.docfiles if docfile.get_version() == version]
 
     def get_latest_version(self):
         """ Returns the latest existing version number for the given bibdoc.
@@ -1025,22 +1054,15 @@ class BibDocFile:
         return ('BibDocFile(%s, %s, %i, %s, %s, %i, %i, %s, %s)' % (repr(self.fullpath), repr(self.doctype), self.version, repr(self.name), repr(self.format), self.recid, self.docid, repr(self.status), repr(self.checksum)))
 
     def __str__(self):
-        out = '%s\n' % self.fullpath
-        out += '\tdoctype: %s\n' % self.doctype
-        out += '\tdocid: %i\n' % self.docid
-        out += '\trecid: %i\n' % self.recid
-        out += '\tversion: %i\n' % self.version
-        out += '\tstatus: %s\n' % self.status
-        out += '\tchecksum: %s\n' % self.checksum
-        out += '\tsize: %s\n' % nice_size(self.size)
-        out += '\tcreation time: %s\n' % self.cd
-        out += '\tmodification time: %s\n' % self.md
-        out += '\tname: %s\n' % self.name
-        out += '\tformat: %s\n' % self.format
-        out += '\tdir: %s\n' % self.dir
-        out += '\tmime: %s\n' % self.mime
-        out += '\tencoding: %s\n' % self.encoding
-        out += '\tfullname: %s\n' % self.fullname
+        out = '%s:%s:%s:%s:fullpath=%s\n' % (self.recid, self.docid, self.version, self.format, self.fullpath)
+        out += '%s:%s:%s:%s:fullname=%s\n' % (self.recid, self.docid, self.version, self.format, self.fullname)
+        out += '%s:%s:%s:%s:name=%s\n' % (self.recid, self.docid, self.version, self.format, self.name)
+        out += '%s:%s:%s:%s:status=%s\n' % (self.recid, self.docid, self.version, self.format, self.status)
+        out += '%s:%s:%s:%s:checksum=%s\n' % (self.recid, self.docid, self.version, self.format, self.checksum)
+        out += '%s:%s:%s:%s:size=%s\n' % (self.recid, self.docid, self.version, self.format, nice_size(self.size))
+        out += '%s:%s:%s:%s:creation time=%s\n' % (self.recid, self.docid, self.version, self.format, self.cd)
+        out += '%s:%s:%s:%s:modification time=%s\n' % (self.recid, self.docid, self.version, self.format, self.md)
+        out += '%s:%s:%s:%s:encoding=%s\n' % (self.recid, self.docid, self.version, self.format, self.encoding)
         return out
 
     def display(self, ln = cdslang):

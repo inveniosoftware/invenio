@@ -207,6 +207,7 @@ semantic:
         $f  ...  format (optional; if not set, deduced from $a)
         $z  ...  comment (optional)
         $r  ...  restriction (optional, see below)
+        $v  ...  version (used only with RECOVER, see below)
         $x  ...  url/path for an icon (optional)
 </pre>
 </p>
@@ -279,18 +280,23 @@ semantic of the metadata upload:
 
 <p>In order to purge previous file revisions (i.e. in order to keep
 only the latest file version), please use the correct mode with $n
-filename and $t PURGE as the special keyword.
+docname and $t PURGE as the special keyword.
 </p>
 
 <p>In order to delete all existing versions of a file, making it
-effectively hidden, please use the correct mode with $n filename
+effectively hidden, please use the correct mode with $n docname
 and $t DELETE as the special keyword.
 </p>
 
 <p>In order to expunge (i.e. remove completely, also from the filesystem) all existing versions of a file, making it
-effectively disappear, please use the correct mode with $n filename
+effectively disappear, please use the correct mode with $n docname
 and $t EXPUNGE as the special keyword.
 </p>
+
+<p>In order to recover a previous revision (i.e. creating a new revision with
+the same content of a previous given one), please use the correct mode with
+$n docname, $t RECOVER as the special keyword and $v the number corresponding
+to the desired version.</p>
 
 <p>In order to preserve previous comments and descriptions when correcting, please use the KEEP-OLD-VALUE special keyword with the desired $d and $z subfield.
 </p>

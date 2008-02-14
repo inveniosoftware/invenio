@@ -156,7 +156,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             docfile = doc.get_file(format, version)
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req)
-                            return errorMsg(msg, req, cdsname, ln)
+                            return errorMsg(str(msg), req, cdsname, ln)
 
                         if docfile.get_status() == '':
                             # The file is not resticted, let's check for
@@ -178,7 +178,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             return docfile.stream(req)
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req)
-                            return errorMsg(msg, req, cdsname, ln)
+                            return errorMsg(str(msg), req, cdsname, ln)
 
                     elif doc.get_icon() is not None and doc.get_icon().docname in filename:
                         icon = doc.get_icon()
