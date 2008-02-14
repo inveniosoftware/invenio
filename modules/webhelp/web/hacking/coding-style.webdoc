@@ -194,18 +194,32 @@ A brief description of things we strive at, more or less unsuccessfully.
 
       - "rnk*": rnk is the table name prefix used by BibRank
 
-      - "flx*": flx is the table name prefix used by FlexElink (also known as
-         BibFormat)
+      - "fmt*": fmt is the table name prefix used by BibFormat
 
       - "sbm*": sbm is the table name prefix used by WebSubmit
 
       - "sch*": sch is the table name prefix used by BibSched
+
+      - "acc*": acc is the table name prefix used by WebAccess
+
+      - "bsk*": acc is the table name prefix used by WebBasket
+
+      - "msg*": acc is the table name prefix used by WebMessage
+
+      - "cls*": acc is the table name prefix used by BibClassify
+
+      - "sta*": acc is the table name prefix used by WebStat
+
+      - "jrn*": acc is the table name prefix used by WebJournal
 
       - "collection*": many tables to describe collections and search
         interface pages
 
       - "user*" : many tables to describe personal features (baskets,
         alerts)
+
+      - "hst*": tables related to historical versions of metadata and
+        fulltext files
 
 - end of file -
 
