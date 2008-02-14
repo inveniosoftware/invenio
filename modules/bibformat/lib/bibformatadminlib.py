@@ -95,7 +95,13 @@ def perform_request_format_templates_management(ln=cdslang, checking=0):
             attrs['name'] += ' (XSL)'
         attrs['editable'] = can_write_format_template(filename)
         path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
-        attrs['last_mod_date'] = time.ctime(os.stat(path)[stat.ST_MTIME])
+        try:
+            attrs['last_mod_date'] = time.ctime(os.stat(path)[stat.ST_MTIME])
+        except OSError:
+            # File does not exist. Happens with temporary files
+            # created by editors.
+            continue
+
         status = check_format_template(filename, checking)
         if len(status) > 1 or (len(status)==1 and status[0][0] != 'ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE'):
             status = '''
@@ -418,7 +424,12 @@ def perform_request_output_formats_management(ln=cdslang, sortby="code"):
         code = output_format['attrs']['code']
         path = CFG_BIBFORMAT_OUTPUTS_PATH + os.sep + filename
         output_format['editable'] = can_write_output_format(code)
-        output_format['last_mod_date'] = time.ctime(os.stat(path)[stat.ST_MTIME])
+        try:
+            output_format['last_mod_date'] = time.ctime(os.stat(path)[stat.ST_MTIME])
+        except OSError:
+            # File does not exist. Happens with temporary files
+            # created by editors.
+            continue
         # Validate the output format
         status = check_output_format(code)
         # If there is an error but the error is just 'format is not writable', do not display as error
