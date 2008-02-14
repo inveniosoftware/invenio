@@ -24,7 +24,6 @@ pylib_DATA = __init__.py \
              errorlib_tests.py \
              errorlib_webinterface.py \
              errorlib_regression_tests.py \
-             config.py \
              data_cacher.py \
              dbquery.py \
              dbquery_tests.py \
@@ -84,10 +83,7 @@ install-data-hook:
 	$(PYTHON) $(srcdir)/testimport.py ${prefix}
 	$(PYTHON) $(srcdir)/intbitset_setup.py install
 
-CLEANFILES = config.py *~ *.tmp *.pyc
+CLEANFILES = *~ *.tmp *.pyc
 
 clean-local:
 	rm -rf build
-
-config.py: inveniocfg.py $(top_srcdir)/config/invenio.conf $(top_builddir)/config/invenio-autotools.conf
-	$(PYTHON) inveniocfg.py --generate-config-py $(top_srcdir)/config/invenio.conf $(top_builddir)/config/invenio-autotools.conf > config.py
