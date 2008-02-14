@@ -49,12 +49,6 @@ def index(req, ln=config.cdslang):
     """
     warnings = []
 
-    #FIXME Remove when removing Migration Kit
-    from invenio.bibformat_migration_kit_assistant_lib \
-         import can_write_migration_status_file
-    if not can_write_migration_status_file():
-        warnings.append(("WRN_BIBFORMAT_CANNOT_WRITE_MIGRATION_STATUS"))
-
     if not bibformatadminlib.can_write_etc_bibformat_dir():
         warnings.append(("WRN_BIBFORMAT_CANNOT_WRITE_IN_ETC_BIBFORMAT"))
 
