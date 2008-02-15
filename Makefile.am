@@ -124,8 +124,8 @@ install-jsmath-plugin:
 	(cd $(top_srcdir)/modules/webstyle/etc && make install)
 	@echo "***********************************************************"
 	@echo "** The jsMath plugin was successfully installed.         **"
-	@echo "** Please do not forget to properly set the              **"
-	@echo "** CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS in invenio.conf.   **"
+	@echo "** Please do not forget to properly set the option       **"
+	@echo "** CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS in invenio.conf. **"
 	@echo "***********************************************************"
 
 uninstall-jsmath-plugin:
