@@ -906,7 +906,7 @@ class WebSearchSortResultsTest(unittest.TestCase):
         """websearch - search results sorting, descending field"""
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=cern&rg=1&sf=reportnumber&so=d',
-                                               expected_text="SCAN-9605071"))
+                                               expected_text="9809057"))
 
     def test_sort_results_sort_pattern(self):
         """websearch - search results sorting, preferential sort pattern"""
