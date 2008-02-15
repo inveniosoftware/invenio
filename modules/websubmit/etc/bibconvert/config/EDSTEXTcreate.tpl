@@ -12,6 +12,6 @@ START::DEFP()---<record>
 6531x---<datafield tag="653" ind1="1" ind2=" "><subfield code="a"><:KW*::KW:></subfield></datafield>
 700::RANGE(2,1000)::MINLW(82)---<datafield tag="700" ind1=" " ind2=" "><subfield code="a"><:AU*::AU:></subfield><:AF*::AF::IF(,,<subfield code="u">):><:AF*::AF:><:AF*::AF::IF(,,</subfield>):></datafield>
 8560x---<datafield tag="856" ind1="0" ind2=" "><subfield code="f"><:SuE::SuE:></subfield></datafield>
-8564x---<datafield tag="856" ind1="4" ind2=" "><subfield code="u">@WEBURL@/record/<:SN::SN:>/files/</subfield><subfield code="z">Access to Fulltext</subfield></datafield>
+8564x---<datafield tag="856" ind1="4" ind2=" "><subfield code="u">http://unconfigured/record/<:SN::SN:>/files/</subfield><subfield code="z">Access to Fulltext</subfield></datafield>
 980---<datafield tag="980" ind1=" " ind2=" "><subfield code="a"><:comboTEXT::comboTEXT:></subfield></datafield>
 END::DEFP()---</record>

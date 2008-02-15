@@ -19,12 +19,10 @@
 
 etcdir = $(sysconfdir)/bibconvert/config
 
-etc_DATA = DEMOPIC.tpl DEMOPICmodify.tpl \
-           EDSRTEXT.tpl EDSRTEXTmodify.tpl EDSTEXT.tpl EDSTEXTmodify.tpl \
-           EDSRTEXTcreate.tpl EDSTEXTcreate.tpl DEMOPICcreate.tpl
+etc_DATA = DEMOPIC.tpl DEMOPICcreate.tpl DEMOPICmodify.tpl \
+           EDSRTEXT.tpl EDSRTEXTcreate.tpl EDSRTEXTmodify.tpl \
+           EDSTEXT.tpl EDSTEXTcreate.tpl  EDSTEXTmodify.tpl
 
-EXTRA_DIST = DEMOPIC.tpl DEMOPICmodify.tpl \
-             EDSRTEXT.tpl EDSRTEXTmodify.tpl EDSTEXT.tpl EDSTEXTmodify.tpl \
-             EDSRTEXTcreate.tpl.in EDSTEXTcreate.tpl.in DEMOPICcreate.tpl.in
+EXTRA_DIST = $(etc_DATA)
 
 CLEANFILES = *~ *.tmp

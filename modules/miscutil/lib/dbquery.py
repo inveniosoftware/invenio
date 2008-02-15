@@ -59,13 +59,16 @@ if CFG_MISCUTIL_USE_SQLALCHEMY:
 else:
     from MySQLdb import connect
 
-## Configured MySQL credentials are read here and not in config.py in
-## order to prevent them from appearing elsewhere, as no-one should
-## know DB credentials but us.
-dbhost = "@DBHOST@"
-dbname = "@DBNAME@"
-dbuser = "@DBUSER@"
-dbpass = "@DBPASS@"
+## DB config variables.  These variables are to be set in invenio.conf
+## by admins and then replaced in situ in this file by calling
+## "inveniocfg --update-dbexec".
+## Note that they are defined here and not in config.py in order to
+## prevent them from being exported accidentally elsewhere, as no-one
+## should know DB credentials but this file.
+CFG_DATABASE_HOST = 'unconfigured'
+CFG_DATABASE_NAME = 'unconfigured'
+CFG_DATABASE_USER = 'unconfigured'
+CFG_DATABASE_PASS = 'unconfigured'
 
 _DB_CONN = {}
 
@@ -84,21 +87,26 @@ def _db_login(relogin = 0):
     ## upgrade to more recent versions anyway.
 
     if CFG_MISCUTIL_USE_SQLALCHEMY:
-        return connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass,
+        return connect(host=CFG_DATABASE_HOST, db=CFG_DATABASE_NAME,
+                       user=CFG_DATABASE_USER, passwd=CFG_DATABASE_PASS,
                        use_unicode=False, charset='utf8')
     else:
         thread_ident = get_ident()
     if relogin:
-        _DB_CONN[thread_ident] = connect(host=dbhost, db=dbname,
-                                         user=dbuser, passwd=dbpass,
+        _DB_CONN[thread_ident] = connect(host=CFG_DATABASE_HOST,
+                                         db=CFG_DATABASE_NAME,
+                                         user=CFG_DATABASE_USER,
+                                         passwd=CFG_DATABASE_PASS,
                                          use_unicode=False, charset='utf8')
         return _DB_CONN[thread_ident]
     else:
         if _DB_CONN.has_key(thread_ident):
             return _DB_CONN[thread_ident]
         else:
-            _DB_CONN[thread_ident] = connect(host=dbhost, db=dbname,
-                                             user=dbuser, passwd=dbpass,
+            _DB_CONN[thread_ident] = connect(host=CFG_DATABASE_HOST,
+                                             db=CFG_DATABASE_NAME,
+                                             user=CFG_DATABASE_USER,
+                                             passwd=CFG_DATABASE_PASS,
                                              use_unicode=False, charset='utf8')
             return _DB_CONN[thread_ident]
 

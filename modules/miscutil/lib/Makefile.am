@@ -45,26 +45,7 @@ pylib_DATA = __init__.py \
 noinst_DATA = testimport.py \
               kwalitee.py
 
-EXTRA_DIST = __init__.py \
-             errorlib.py \
-             errorlib_tests.py \
-             errorlib_webinterface.py \
-             errorlib_regression_tests.py \
-             data_cacher.py \
-             dbquery.py.in \
-             dbquery_tests.py \
-             mailutils.py \
-             miscutil_config.py \
-             messages.py \
-             textutils.py \
-             dateutils.py \
-             dateutils_tests.py \
-             htmlutils.py \
-             htmlutils_tests.py \
-             testutils.py \
-             testutils_regression_tests.py \
-             urlutils.py \
-             w3c_validator.py \
+EXTRA_DIST = $(pylib_DATA) \
              testimport.py \
              kwalitee.py \
              intbitset.pyx \
@@ -72,9 +53,7 @@ EXTRA_DIST = __init__.py \
              intbitset.h \
              intbitset_impl.c \
              intbitset_setup.py \
-             intbitset_tests.py \
-             intbitset.pyx \
-             inveniocfg.py
+             intbitset.pyx
 
 all:
 	$(PYTHON) $(srcdir)/intbitset_setup.py build_ext

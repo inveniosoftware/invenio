@@ -19,14 +19,12 @@
 
 bin_SCRIPTS = dbexec testsuite regressiontestsuite inveniocfg
 
-noinst_SCRIPTS = dbtest
-
-EXTRA_DIST = dbexec.in testsuite.in dbtest.in regressiontestsuite.in inveniocfg.in
+EXTRA_DIST = dbexec.in testsuite.in regressiontestsuite.in inveniocfg.in
 
 all:
-	chmod u+x ./dbtest ./dbexec
+	chmod u+x ./dbexec
 
 install-data-local:
-	chmod u+x ./dbtest ./dbexec
+	chmod u+x ./dbexec
 
 CLEANFILES = *~ *.tmp

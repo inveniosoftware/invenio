@@ -41,7 +41,7 @@ bad_email:
 
 bad_submission: 
  The submission data that you have provided could not be parsed
- correctly. Please visit <@WEBURL@> for a
+ correctly. Please visit Invenio home URL for a
  description of the correct format.
 
 missing_type: 

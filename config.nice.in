@@ -1,12 +1,6 @@
 #!/bin/sh
 # Automatically created during the building process.  Do not edit.
 ./configure --prefix=@prefix@ \
-            --with-weburl=@WEBURL@ \
-            --with-sweburl=@SWEBURL@ \
-            --with-dbhost=@DBHOST@ \
-            --with-dbname=@DBNAME@ \
-            --with-dbuser=@DBUSER@ \
-            --with-dbpass='@DBPASS@' \
             --with-python=@PYTHON@ \
             --with-mysql=@MYSQL@ \
             --with-clisp=@CLISP@ \

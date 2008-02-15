@@ -180,15 +180,9 @@ Contents
       $ tar xvfz cds-invenio-0.92.1.tar.gz
       $ cd cds-invenio-0.92.1
       $ ./configure --prefix=/opt/cds-invenio \
-                    --with-weburl=http://webserver.domain.com \
-                    --with-sweburl=https://webserver.domain.com \
-                    --with-dbhost=sqlserver.domain.com \
-                    --with-dbname=cdsinvenio \
-                    --with-dbuser=cdsinvenio \
-                    --with-dbpass='my123p$ss' \
                     --with-python=/opt/python/bin/python2.3 \
                     --with-mysql=/opt/mysql/bin/mysql
-      $ vi ./config/invenio.conf    ## optional, but strongly recommended
+      $ vi ./config/invenio.conf
       $ make
       $ make check-custom-templates ## optional, only when upgrading
       $ make install
@@ -254,12 +248,6 @@ Contents
           Go to the source directory.
 
       $ ./configure --prefix=/opt/cds-invenio \
-                    --with-weburl=http://webserver.domain.com \
-                    --with-sweburl=https://webserver.domain.com \
-                    --with-dbhost=sqlserver.domain.com \
-                    --with-dbname=cdsinvenio \
-                    --with-dbuser=cdsinvenio \
-                    --with-dbpass='my123p$ss' \
                     --with-python=/opt/python/bin/python2.3 \
                     --with-mysql=/opt/mysql/bin/mysql
 
@@ -279,34 +267,6 @@ Contents
                  htdocs tree, since only one its subdirectory
                  (prefix/var/www) is to be accessible directly via the
                  Web (see below).
-
-              --with-weburl=http://webserver.domain.com
-
-                 The URL denoting the home URL of your CDS Invenio
-                 installation.  The files served by this URL will be
-                 located in `prefix/var/www', so later on in your
-                 Apache config file you would map `weburl' to
-                 `prefix/var/www' (see below).
-
-              --with-sweburl=https://webserver.domain.com
-
-                 The URL denoting the HTTPS-secure equivalent of the
-                 home URL.  The secure home URL will be used for
-                 personalization pages, such as user login and
-                 registration page.  You must run SSL-enabled Apache
-                 in order to use this feature.  If you don't run
-                 SSL-enabled Apache, then the user authentication will
-                 be done via standard HTTP protocol, user credentials
-                 travelling in clear text across the net.  The
-                 --with-sweburl option is optional.
-
-              --with-dbhost=sqlserver.domain.com
-              --with-dbname=cdsinvenio
-              --with-dbuser=cdsinvenio
-              --with-dbpass=myp1ss 
-
-                 The database server host, the database name, and the
-                 database user credentials.
 
               --with-python=/opt/python/bin/python2.3
 
@@ -340,15 +300,16 @@ Contents
           FIXME: this is not working right now as per the introduction
           of intbitset_setup.py.)
 
-      $ vi ./config/invenio.conf  ## optional, but strongly recommended
+      $ vi ./config/invenio.conf
 
-          Optionally, customize your CDS Invenio installation.  We
-          strongly recommend you to edit at least the top of this file
-          where you can define some very essential CDS Invenio
-          parameters like the name of your CDS Invenio document server
-          (look for CDSNAME and CDSNAMEINTL) or the email address of
-          the local CDS Invenio administrator (look for SUPPORTEMAIL
-          and ADMINEMAIL).
+          Customize your CDS Invenio installation.  You should edit at
+          least the top of this file where you can define some very
+          essential runtime parameters such as the visible URL of your
+          document server (look for WEBURL and SWEBURL), the database
+          credentials (look for CFG_DATABASE_*), the name of your
+          document server (look for CDSNAME and CDSNAMEINTL), or the
+          email address of the local CDS Invenio administrator (look
+          for SUPPORTEMAIL and ADMINEMAIL).
 
       $ make
 
@@ -364,7 +325,7 @@ Contents
           Note that on systems such as FreeBSD or Mac OS X you have to
           use GNU make ("gmake") instead of "make".
 
-      $ make check-custom-templates ## Optional, only when upgrading
+      $ make check-custom-templates ## optional, only when upgrading
 
           Check if your customized page templates (see WebStyle Admin
           guide) still conform to the default templates.

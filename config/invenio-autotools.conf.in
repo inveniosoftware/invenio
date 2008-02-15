@@ -35,8 +35,6 @@ LOCALEDIR = @prefix@/share/locale
 TMPDIR = @localstatedir@/tmp
 CACHEDIR = @localstatedir@/cache
 WEBDIR = @localstatedir@/www
-WEBURL = @WEBURL@
-SWEBURL = @SWEBURL@
 CFG_PATH_ACROREAD = @ACROREAD@
 CFG_PATH_GZIP = @GZIP@
 CFG_PATH_GUNZIP = @GUNZIP@
@@ -68,15 +66,11 @@ CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE = @prefix@/etc/bibrank/stopwords.kb
 counters = @localstatedir@/data/submit/counters
 storage = @localstatedir@/data/submit/storage
 filedir = @localstatedir@/data/files
-images = @WEBURL@/img
-urlpath = @WEBURL@
-accessurl = @WEBURL@/search
 xmlmarc2textmarc = @prefix@/bin/xmlmarc2textmarc
 bibupload = @prefix@/bin/bibupload
 bibformat = @prefix@/bin/bibformat
 bibwords = @prefix@/bin/bibwords
 bibconvert = @prefix@/bin/bibconvert
 bibconvertconf = @prefix@/etc/bibconvert/config
-htdocsurl = @WEBURL@
 
 ## - end of file -

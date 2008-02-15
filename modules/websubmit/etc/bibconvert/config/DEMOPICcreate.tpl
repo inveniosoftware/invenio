@@ -10,8 +10,8 @@ START::DEFP()---<record>
 6531a::REPL(EOL,)---<datafield tag="653" ind1="1" ind2=" "><subfield code="a"><:DEMOPIC_KW*::DEMOPIC_KW:></subfield></datafield>
 700::REPL(EOL,)::RANGE(2,1000)::MINLW(82)---<datafield tag="700" ind1=" " ind2=" "><subfield code="a"><:DEMOPIC_PHOTOG*::DEMOPIC_PHOTOG:></subfield></datafield>
 856f::REPL(EOL,)---<datafield tag="856" ind1="0" ind2=" "><subfield code="f"><:SuE::SuE:></subfield></datafield>
-8564q::REPL(EOL,)---<datafield tag="856" ind1="4" ind2=" "><subfield code="q">@WEBURL@/record/<:SN::SN:>/files/<:DEMOPIC_FILE_ICON::DEMOPIC_FILE_ICON:></subfield><subfield code="x">icon</subfield></datafield>
-8564u::REPL(EOL,)---<datafield tag="856" ind1="4" ind2=" "><subfield code="u">@WEBURL@/record/<:SN::SN:>/files/<:DEMOPIC_FILE_RENAMED::DEMOPIC_FILE_RENAMED:></subfield><subfield code="z">Access to files</subfield></datafield>
+8564q::REPL(EOL,)---<datafield tag="856" ind1="4" ind2=" "><subfield code="q">http://unconfigured/record/<:SN::SN:>/files/<:DEMOPIC_FILE_ICON::DEMOPIC_FILE_ICON:></subfield><subfield code="x">icon</subfield></datafield>
+8564u::REPL(EOL,)---<datafield tag="856" ind1="4" ind2=" "><subfield code="u">http://unconfigured/record/<:SN::SN:>/files/<:DEMOPIC_FILE_RENAMED::DEMOPIC_FILE_RENAMED:></subfield><subfield code="z">Access to files</subfield></datafield>
 980::DEFP()---<datafield tag="980" ind1=" " ind2=" "><subfield code="a">PICTURE</subfield></datafield>
 END::DEFP()---</record>
 

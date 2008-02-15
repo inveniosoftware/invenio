@@ -1,4 +1,3 @@
-#!@PYTHON@
 # -*- coding: utf-8 -*-
 ##
 ## $Id$
@@ -20,11 +19,14 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-## fill config variables:
-dbhost = "@DBHOST@"
-dbname = "@DBNAME@"
-dbuser = "@DBUSER@"
-dbpass = "@DBPASS@"
+"""
+Invenio tests to be called after 'make install'.  The script checks
+whether the database is accessible, and if not, it advises on how to
+setup connection rights.
+"""
+
+from invenio.dbquery import CFG_DATABASE_HOST, CFG_DATABASE_NAME, \
+     CFG_DATABASE_USER, CFG_DATABASE_PASS
 
 ## import modules:
 try:
@@ -38,7 +40,7 @@ except ImportError, e:
 
 ## try to connect to the DB server:
 try:
-    db = MySQLdb.connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass)
+    db = MySQLdb.connect(host=CFG_DATABASE_HOST, db=CFG_DATABASE_NAME, user=CFG_DATABASE_USER, passwd=CFG_DATABASE_PASS)
 except MySQLdb.Error, e:
     print """
     ******************************************************
@@ -46,27 +48,29 @@ except MySQLdb.Error, e:
     ******************************************************
     ** Perhaps you need to set up connection rights?    **
     **                                                  **
-    ** If yes, then please login as MySQL admin (root)  **
-    ** user and run the following commands now:         **
+    ** If yes, then please login as MySQL admin user    **
+    ** and run the following commands now:              **
     **
     **  $ mysql -h %(dbhost)s -u root -p mysql
     **    mysql> CREATE DATABASE %(dbname)s DEFAULT CHARACTER SET utf8;
     **    mysql> GRANT ALL PRIVILEGES ON %(dbname)s.* TO %(dbuser)s@%(webhost)s IDENTIFIED BY '%(dbpass)s';
     **    mysql> QUIT
     **
-    ** After this continue with 'make install' again.   **
+    ** The values printed above were detected from your **
+    ** invenio.conf file.  If they are not right, then  **
+    ** please edit the conf file and rerun inveniocfg.  **
     **                                                  **
-    ** (If the problem is not the connection rights,    **
+    ** If the problem is not with the connection rights **
     ** then please inspect the above error message and  **
-    ** fix the problem before continuing.)              **
+    ** fix the problem before continuing.               **
     ******************************************************
     """ % {'errcode': e.args[0],
            'errmsg': e.args[1],
-           'dbname': dbname,
-           'dbhost': dbhost,
-           'dbuser': dbuser,
-           'dbpass': dbpass,
-           'webhost': dbhost == 'localhost' and 'localhost' or os.popen('hostname -f', 'r').read().strip(),
+           'dbname': CFG_DATABASE_NAME,
+           'dbhost': CFG_DATABASE_HOST,
+           'dbuser': CFG_DATABASE_USER,
+           'dbpass': CFG_DATABASE_PASS,
+           'webhost': CFG_DATABASE_HOST == 'localhost' and 'localhost' or os.popen('hostname -f', 'r').read().strip(),
            }
     sys.exit(1)
 
@@ -92,7 +96,7 @@ except MySQLdb.Error, e:
 ## Python/MySQL/MySQLdb mis-setup:
 try:
     db.close()
-    db = MySQLdb.connect(host=dbhost, db=dbname, user=dbuser, passwd=dbpass,
+    db = MySQLdb.connect(host=CFG_DATABASE_HOST, db=CFG_DATABASE_NAME, user=CFG_DATABASE_USER, passwd=CFG_DATABASE_PASS,
                          use_unicode=False, charset='utf8')
     cursor = db.cursor()
     x = "β" # Greek beta in UTF-8 is 0xCEB2

@@ -20,13 +20,16 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-## fill config variables:
 VERSION='$Id$'
 MYSQL='@MYSQL@'
-DBHOST='@DBHOST@'
-DBNAME='@DBNAME@'
-DBUSER='@DBUSER@'
-DBPASS='@DBPASS@'
+
+## DB config variables.  These variables are to be set in invenio.conf
+## by admins and then replaced in situ in this file by calling
+## "inveniocfg --update-dbexec".
+CFG_DATABASE_HOST='unconfigured'
+CFG_DATABASE_NAME='unconfigured'
+CFG_DATABASE_USER='unconfigured'
+CFG_DATABASE_PASS='unconfigured'
 
 # is help called?
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
@@ -44,4 +47,4 @@ if [ "$1" = "-V" ] || [ "$1" = "--version" ]; then
 fi 
  
 ## okay, call MySQL client:
-$MYSQL -B --host="$DBHOST" --user="$DBUSER" --password="$DBPASS" $DBNAME
+$MYSQL -B --host="$CFG_DATABASE_HOST" --user="$CFG_DATABASE_USER" --password="$CFG_DATABASE_PASS" $CFG_DATABASE_NAME

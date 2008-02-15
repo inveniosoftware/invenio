@@ -20,60 +20,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.93.50.20080212, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080212)
+AC_INIT(cds-invenio, 0.93.50.20080215, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080215)
 
 ## Check for install:
 AC_PROG_INSTALL
-
-## Define WEBURL URL:
-AC_ARG_WITH(weburl, AC_HELP_STRING([--with-weburl], [specify URL where web files will be reached (e.g. http://webserver.domain.com)]), WEBURL=${withval})
-if test -z "$WEBURL"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-weburl" argument that should define the corresponding URL where the site will be reached.
-   Example: "--with-weburl=http://webserver.domain.com".])
-fi
-
-AC_ARG_WITH(sweburl, AC_HELP_STRING([--with-sweburl], [specify URL where HTTPS files will be reached (e.g. https://webserver.domain.com)]), SWEBURL=${withval})
-if test -z "${SWEBURL}"; then
-   SWEBURL="${WEBURL}"
-   AC_MSG_WARN([
-   You have not specified secure URL for accessing the site (--with-sweburl).
-   User authentication will be done in clear text across the network.
-   ])
-fi
-
-## Define DBHOST database host:
-AC_ARG_WITH(dbhost, AC_HELP_STRING([--with-dbhost], [specify DB server (e.g. sqlserver.domain.com)]), DBHOST=${withval})
-if test -z "$DBHOST"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-dbhost" argument that should define which DB server to use.
-   Example: "--with-dbhost=sqlserver.domain.com".])
-fi
-
-## Define DBNAME database name:
-AC_ARG_WITH(dbname, AC_HELP_STRING([--with-dbname], [specify DB name (e.g. cdsinvenio)]), DBNAME=${withval})
-if test -z "$DBNAME"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-dbname" argument that should define DB name.
-   Example: "--with-dbname=cdsinvenio".])
-fi
-
-## Define DBUSER user name:
-AC_ARG_WITH(dbuser, AC_HELP_STRING([--with-dbuser], [specify DB user name (e.g. cdsinvenio)]), DBUSER=${withval})
-if test -z "$DBUSER"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-dbuser" argument that should define DB user name.
-   Example: "--with-dbuser=cdsinvenio".])
-fi
-
-## Define DBPASS user password:
-AC_ARG_WITH(dbpass, AC_HELP_STRING([--with-dbpass], [specify DB user password (e.g. myp1ss)]), DBPASS=${withval})
-if test -z "$DBPASS"; then
-   AC_MSG_ERROR([
-   You have not used the "--with-dbpass" argument that should define DB user password.
-   Example: "--with-dbpass=myp1ss".])
-fi
 
 ## Check for gettext support
 AM_GNU_GETTEXT(external)
@@ -403,12 +354,6 @@ AC_SUBST(MYSQL)
 AC_SUBST(PHP)
 AC_SUBST(PYTHON)
 AC_SUBST(CLIDIR)
-AC_SUBST(WEBURL)
-AC_SUBST(SWEBURL)
-AC_SUBST(DBHOST)
-AC_SUBST(DBNAME)
-AC_SUBST(DBUSER)
-AC_SUBST(DBPASS)
 AC_SUBST(PDFTOTEXT)
 AC_SUBST(PSTOTEXT)
 AC_SUBST(PSTOASCII)
@@ -554,12 +499,10 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/miscutil/Makefile \
 	  modules/miscutil/bin/Makefile \
 	  modules/miscutil/bin/dbexec \
-	  modules/miscutil/bin/dbtest \
 	  modules/miscutil/bin/testsuite \
 	  modules/miscutil/bin/regressiontestsuite \
 	  modules/miscutil/bin/inveniocfg \
 	  modules/miscutil/lib/Makefile \
-	  modules/miscutil/lib/dbquery.py \
 	  modules/miscutil/demo/Makefile \
 	  modules/miscutil/sql/Makefile \
 	  modules/miscutil/web/Makefile \
@@ -658,9 +601,6 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/websubmit/etc/bibconvert/Makefile \
 	  modules/websubmit/etc/bibconvert/KB/Makefile \
 	  modules/websubmit/etc/bibconvert/config/Makefile \
-	  modules/websubmit/etc/bibconvert/config/DEMOPICcreate.tpl \
-	  modules/websubmit/etc/bibconvert/config/EDSTEXTcreate.tpl \
-	  modules/websubmit/etc/bibconvert/config/EDSRTEXTcreate.tpl \
 	  modules/websubmit/doc/Makefile \
 	  modules/websubmit/doc/admin/Makefile \
 	  modules/websubmit/doc/hacking/Makefile \
@@ -678,12 +618,6 @@ AC_MSG_RESULT([*****************************************************************
 AC_MSG_RESULT([** Your CDS Invenio installation is now ready for building.               **])
 AC_MSG_RESULT([** You have entered the following parameters:                             **])
 AC_MSG_RESULT([**   - CDS Invenio main install directory: ${prefix}])
-AC_MSG_RESULT([**   - Web home URL: $WEBURL])
-AC_MSG_RESULT([**   - Secure web home URL: $SWEBURL])
-AC_MSG_RESULT([**   - DB server: $DBHOST])
-AC_MSG_RESULT([**   - DB name: $DBNAME])
-AC_MSG_RESULT([**   - DB username: $DBUSER])
-AC_MSG_RESULT([**   - DB password: $DBPASS])
 AC_MSG_RESULT([**   - Python executable: $PYTHON])
 AC_MSG_RESULT([**   - MySQL client executable: $MYSQL])
 AC_MSG_RESULT([**   - CLISP executable: $CLISP])
@@ -692,8 +626,8 @@ AC_MSG_RESULT([**   - SBCL executable: $SBCL])
 AC_MSG_RESULT([** Here are the steps to continue the building process:                   **])
 AC_MSG_RESULT([**   1) Customize self-explanatory config file './config/invenio.conf'.   **])
 AC_MSG_RESULT([**   2) Type 'make' to build your customized CDS Invenio installation.    **])
-AC_MSG_RESULT([**   3) Type 'make create-tables' if you have not created tables before.  **])
-AC_MSG_RESULT([**   4) Type 'make install' to install the system.                        **])
+AC_MSG_RESULT([**   3) Type 'make install' to install the system.                        **])
+AC_MSG_RESULT([**   4) Type 'make create-tables' if you have not created tables before.  **])
 AC_MSG_RESULT([**   5) Type 'make create-demo-site' to install and test the demo site.   **])
 AC_MSG_RESULT([** Good luck, and thanks for choosing CDS Invenio.                        **])
 AC_MSG_RESULT([**              -- CDS Development Group <cds.support@cern.ch>            **])
