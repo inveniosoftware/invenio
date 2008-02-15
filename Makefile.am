@@ -125,7 +125,7 @@ install-jsmath-plugin:
 	@echo "***********************************************************"
 	@echo "** The jsMath plugin was successfully installed.         **"
 	@echo "** Please do not forget to properly set the              **"
-	@echo "** CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS in config.wml.   **"
+	@echo "** CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS in invenio.conf.   **"
 	@echo "***********************************************************"
 
 uninstall-jsmath-plugin:
@@ -134,7 +134,7 @@ uninstall-jsmath-plugin:
 	@echo "** The jsMath plugin was successfully removed.           **"
 	@echo "***********************************************************"
 
-create-tables: ${prefix}/bin/dbexec 
+create-tables: ${prefix}/bin/dbexec
 	$(PYTHON) ./install-tests.py
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabfill.sql
@@ -150,7 +150,7 @@ create-tables: ${prefix}/bin/dbexec
 	@echo "** to test your new installation.                         **"
 	@echo "************************************************************"
 
-update-v0.3.0-tables update-v0.3.1-tables: 
+update-v0.3.0-tables update-v0.3.1-tables:
 	echo "ALTER TABLE idxINDEXNAME CHANGE id_idxINDEX id_idxINDEX mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE rnkMETHODNAME CHANGE id_rnkMETHOD id_rnkMETHOD mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE collectionname CHANGE id_collection id_collection mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
@@ -159,10 +159,10 @@ update-v0.3.0-tables update-v0.3.1-tables:
 	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'runbibrank','run BibRank','','no');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibrank','configure BibRank','','no');" | ${prefix}/bin/dbexec
 
-update-v0.3.2-tables: 
+update-v0.3.2-tables:
 	echo "ALTER TABLE sbmCOLLECTION_sbmDOCTYPE CHANGE id_son id_son char(10) NOT NULL default '0';" | ${prefix}/bin/dbexec
 
-update-v0.3.3-tables: 
+update-v0.3.3-tables:
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "ALTER TABLE flxLINKTYPEPARAMS CHANGE pname pname varchar(78) NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE rnkMETHOD DROP star_category_ranges;" | ${prefix}/bin/dbexec
@@ -170,7 +170,7 @@ update-v0.3.3-tables:
 	echo "ALTER TABLE schTASK CHANGE arguments arguments LONGTEXT;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE status status varchar(50);" | ${prefix}/bin/dbexec
 
-update-v0.5.0-tables: 
+update-v0.5.0-tables:
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "ALTER TABLE session ADD INDEX uid (uid);" | ${prefix}/bin/dbexec
 	echo "UPDATE idxINDEXNAME SET ln='cs' WHERE ln='cz';" | ${prefix}/bin/dbexec
@@ -186,7 +186,7 @@ update-v0.5.0-tables:
 	echo "UPDATE formatname SET ln='sv' WHERE ln='se';" | ${prefix}/bin/dbexec
 	echo "UPDATE fieldname SET ln='sv' WHERE ln='se';" | ${prefix}/bin/dbexec
 
-update-v0.7.1-tables: 
+update-v0.7.1-tables:
 	echo "DROP TABLE oaiHARVEST;" | ${prefix}/bin/dbexec
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "INSERT INTO accACTION (id,name,description,allowedkeywords,optional) VALUES (NULL,'cfgbibharvest','configure BibHarvest','','no');" | ${prefix}/bin/dbexec
@@ -207,12 +207,12 @@ update-v0.7.1-tables:
 	@echo "**********************************************************"
 	@echo "INSERT INTO oaiARCHIVE (id, setName, setSpec, setDescription, setDefinition, setRecList) SELECT id, setName, setSpec, CONCAT_WS('', setDescription), setDefinition, setRecList FROM oaiSET;"
 
-update-v0.90.0-tables: 
+update-v0.90.0-tables:
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "ALTER TABLE format ADD COLUMN (description varchar(255) default '');" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE format ADD COLUMN (content_type varchar(255) default '');" | ${prefix}/bin/dbexec
 
-update-v0.90.1-tables: 
+update-v0.90.1-tables:
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "ALTER TABLE schTASK ADD INDEX status (status);" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK ADD INDEX runtime (runtime);" | ${prefix}/bin/dbexec
@@ -233,7 +233,7 @@ update-v0.90.1-tables:
 	echo "UPDATE bibdoc SET status=0 WHERE status='';" | ${prefix}/bin/dbexec
 	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ${prefix}/bin/dbexec
 
-update-v0.92.0-tables: 
+update-v0.92.0-tables:
 	echo "UPDATE bibdoc SET status=0 WHERE status='';" | ${prefix}/bin/dbexec
 	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE arguments arguments mediumblob;" | ${prefix}/bin/dbexec
@@ -244,7 +244,7 @@ update-v0.92.0-tables:
 	echo "ALTER TABLE user CHANGE settings settings blob default NULL;" | ${prefix}/bin/dbexec
 	echo "INSERT INTO sbmALLFUNCDESCR VALUES ('Get_Recid', 'This function gets the recid for a document with a given report-number (as stored in the global variable rn).');" | ${prefix}/bin/dbexec
 
-update-v0.92.1-tables: 
+update-v0.92.1-tables:
 	echo "DROP TABLE rnkCITATIONDATA;" | ${prefix}/bin/dbexec
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "UPDATE bibdoc SET status='DELETED' WHERE status='1';" | ${prefix}/bin/dbexec
@@ -275,7 +275,7 @@ update-v0.92.1-tables:
 	echo "INSERT INTO rnkCITATIONDATA VALUES (2,'reversedict','','');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO rnkCITATIONDATA VALUES (3,'selfcitdict','','');" | ${prefix}/bin/dbexec
 
-drop-tables: 
+drop-tables:
 	@if [ "$(FORCE)" != "yes" ]; then \
 	    echo "***********************************************************************"; \
 	    echo "** WARNING: You are going to destroy your database tables!           **"; \
@@ -344,9 +344,9 @@ drop-demo-site:
 	    read; \
 	fi
 	rm -rf ${prefix}/var/data/files/*
-	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabdrop.sql
-	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	$(top_srcdir)/modules/miscutil/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabfill.sql
+	$(prefix)/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabdrop.sql
+	$(prefix)/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
+	$(prefix)/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabfill.sql
 	${prefix}/bin/inveniocfg --reset-cdsname --reset-adminemail
 	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec
 	${prefix}/bin/webcoll -uadmin
