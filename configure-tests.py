@@ -36,6 +36,7 @@ import sys
 import getpass
 
 def wait_for_user(msg):
+    """Print MSG and prompt user for confirmation."""
     try:
         raw_input(msg)
     except KeyboardInterrupt:
@@ -78,14 +79,13 @@ try:
     import md5
     import os
     import signal
-    import string
     import tempfile
     import time
     import traceback
     import unicodedata
     import urllib
     import zlib
-except ImportError, e:
+except ImportError, msg:
     print """
     *************************************************
     ** IMPORT ERROR %s
@@ -95,13 +95,13 @@ except ImportError, e:
     ** at our INSTALL file for more details and    **
     ** fix the problem before continuing!          **
     *************************************************
-    """ % e
+    """ % msg
     sys.exit(1)
 
 ## 3) check for recommended modules:
 try:
     import psyco
-except ImportError, e:
+except ImportError, msg:
     print """
     *****************************************************
     ** IMPORT WARNING %s
@@ -114,13 +114,13 @@ except ImportError, e:
     ** even after your CDS Invenio installation is put **
     ** into production.)                               **
     *****************************************************
-    """ % e
+    """ % msg
 
     wait_for_user("Press ENTER to continue the installation...")
 
 try:
     import rdflib
-except ImportError, e:
+except ImportError, msg:
     print """
     *****************************************************
     ** IMPORT WARNING %s
@@ -134,12 +134,12 @@ except ImportError, e:
     ** even after your CDS Invenio installation is put **
     ** into production.)                               **
     *****************************************************
-    """ % e
+    """ % msg
     wait_for_user("Press ENTER to continue the installation...")
 
 try:
     import pyRXP
-except ImportError, e:
+except ImportError, msg:
     print """
     *****************************************************
     ** IMPORT WARNING %s
@@ -152,12 +152,12 @@ except ImportError, e:
     ** even after your CDS Invenio installation is put **
     ** into production.)                               **
     *****************************************************
-    """ % e
+    """ % msg
     wait_for_user("Press ENTER to continue the installation...")
 
 try:
     import libxml2
-except ImportError, e:
+except ImportError, msg:
     print """
     *****************************************************
     ** IMPORT WARNING %s
@@ -171,12 +171,12 @@ except ImportError, e:
     ** even after your CDS Invenio installation is put **
     ** into production.)                               **
     *****************************************************
-    """ % e
+    """ % msg
     wait_for_user("Press ENTER to continue the installation...")
 
 try:
     import libxslt
-except ImportError, e:
+except ImportError, msg:
     print """
     *****************************************************
     ** IMPORT WARNING %s
@@ -189,12 +189,12 @@ except ImportError, e:
     ** even after your CDS Invenio installation is put **
     ** into production.)                               **
     *****************************************************
-    """ % e
+    """ % msg
     wait_for_user("Press ENTER to continue the installation...")
 
 try:
     import Gnuplot
-except ImportError, e:
+except ImportError, msg:
     print """
     *****************************************************
     ** IMPORT WARNING %s
@@ -209,20 +209,41 @@ except ImportError, e:
     ** even after your CDS Invenio installation is put **
     ** into production.)                               **
     *****************************************************
-    """ % e
+    """ % msg
     wait_for_user("Press ENTER to continue the installation...")
 
 ## 4) check for versions of some important modules:
 if MySQLdb.__version__ < cfg_min_mysqldb_version:
     print """
     *****************************************************
-    ** WARNING: PYTHON MODULE MYSQLDB %s DETECTED
+    ** ERROR: PYTHON MODULE MYSQLDB %s DETECTED
     *****************************************************
-    ** We strongly recommend you to upgrade MySQLdb    **
-    ** to at least version %s.  See the INSTALL     **
-    ** file for more details.                          **
+    ** You have to upgrade your MySQLdb to at least    **
+    ** version %s.  You must fix this problem    **
+    ** before continuing.  Please see the INSTALL file **
+    ** for more details.                               **
     *****************************************************
     """ % (MySQLdb.__version__, cfg_min_mysqldb_version)
+    sys.exit(1)
 
-    wait_for_user("Press ENTER to continue the installation anyhow...")
+try:
+    import Stemmer
+    try:
+        from Stemmer import algorithms
+    except ImportError, msg:
+        print """
+        *****************************************************
+        ** ERROR: STEMMER MODULE PROBLEM %s
+        *****************************************************
+        ** Perhaps you are using an old Stemmer version?   **
+        ** You must either remove your old Stemmer or else **
+        ** upgrade to Snowball Stemmer
+        **   <http://snowball.tartarus.org/wrappers/PyStemmer-1.0.1.tar.gz>
+        ** before continuing.  Please see INSTALL file for **
+        ** more details.                                   **
+        *****************************************************
+        """ % (msg)
+        sys.exit(1)
+except ImportError:
+    pass # no prob, Stemmer is optional
 
