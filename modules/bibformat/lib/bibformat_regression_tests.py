@@ -93,7 +93,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
 
         self.record_74_hd_title = '''<center><big><big><strong>Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes</strong></big></big></center>'''
 
-        self.record_74_hd_authors = '''<a href="%(weburl)s/search?f=author&amp;p=Wang%%2C%%20B&amp;ln=%(lang)s">Wang, B</a> ; <a href="%(weburl)s/search?f=author&amp;p=Lin%%2C%%20C%%20Y&amp;ln=%(lang)s">Lin, C Y</a> ; <a href="%(weburl)s/search?f=author&amp;p=Abdalla%%2C%%20E&amp;ln=%(lang)s">Abdalla, E</a><br />'''% \
+        self.record_74_hd_authors = '''<a href="%(weburl)s/search?f=author&amp;p=Wang%%2C%%20B&amp;ln=%(lang)s">Wang, B</a><small> (Fudan University)</small> ; <a href="%(weburl)s/search?f=author&amp;p=Lin%%2C%%20C%%20Y&amp;ln=%(lang)s">Lin, C Y</a> ; <a href="%(weburl)s/search?f=author&amp;p=Abdalla%%2C%%20E&amp;ln=%(lang)s">Abdalla, E</a><br />'''% \
                                      {'weburl' : weburl,
                                       'lang': cdslang}
 
@@ -202,6 +202,9 @@ class BibFormatNLMTest(unittest.TestCase):
             <surname>McInnes</surname>
             <given-names>B</given-names>
           </name>
+          <aff>
+            <institution>National University of Singapore</institution>
+          </aff>
         </contrib>
       </contrib-group>
       <pub-date pub-type="pub">
@@ -278,6 +281,7 @@ class BibFormatMARCXMLTest(unittest.TestCase):
  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Ellis, J</subfield>
+    <subfield code="u">University of Oxford</subfield>
  </datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Grand unification with large supersymmetry breaking</subfield>
@@ -346,7 +350,7 @@ class BibFormatMARCTest(unittest.TestCase):
         self.record_29_hm = '''000000029 001__ 29
 000000029 041__ $$aeng
 000000029 080__ $$a517.11
-000000029 100__ $$aKleene, Stephen Cole
+000000029 100__ $$aKleene, Stephen Cole$$uUniversity of Wisconsin
 000000029 245__ $$aIntroduction to metamathematics
 000000029 260__ $$aAmsterdam$$bNorth-Holland$$c1952 (repr.1964.)
 000000029 300__ $$a560 p
