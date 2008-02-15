@@ -100,7 +100,6 @@ modules/elmsubmit/lib/magic/compile_magic.py
 modules/elmsubmit/lib/magic/__init__.py
 modules/elmsubmit/lib/myhtmlentitydefs.py
 modules/miscutil/bin/dbexec.in
-modules/miscutil/bin/dbtest.in
 modules/miscutil/bin/testsuite.in
 modules/miscutil/lib/dateutils.py
 modules/miscutil/lib/errorlib.py
