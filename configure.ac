@@ -23,10 +23,13 @@
 AC_INIT(cds-invenio, 0.93.50.20080215, cds.support@cern.ch)
 AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080215)
 
+## By default we shall install into /opt/cds-invenio:
+AC_PREFIX_DEFAULT(/opt/cds-invenio)
+
 ## Check for install:
 AC_PROG_INSTALL
 
-## Check for gettext support
+## Check for gettext support:
 AM_GNU_GETTEXT(external)
 AM_GNU_GETTEXT_VERSION(0.14.4)
 
@@ -68,7 +71,7 @@ if test $? -ne 0; then
 fi
 AC_MSG_RESULT(found)
 
-## Check for PHP
+## Check for PHP:
 AC_PATH_PROG(PHP, php)
 
 ## Check for Acrobat Reader:
