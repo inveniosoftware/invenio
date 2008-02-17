@@ -24,10 +24,10 @@ Contents
    start installing CDS Invenio:
 
      a) Unix-like operating system.  The main development and
-        production platform for CDS Invenio at CERN is Debian
-        GNU/Linux, but we actively develop also on FreeBSD and 
-        Mac OS X.  Basically any Unix system supporting the software
-        listed below should do.
+        production platforms for CDS Invenio at CERN are GNU/Linux
+        distributions SLC (RHEL), Debian, and Gentoo, but we also
+        develop on FreeBSD and Mac OS X.  Basically any Unix system
+        supporting the software listed below should do.
 
         Note that if you are using Debian "Sarge" GNU/Linux, you can
         install most of the below-mentioned prerequisites and
@@ -47,6 +47,10 @@ Contents
         The last three packages are not available on all Debian
         "Sarge" GNU/Linux architectures (e.g. not on AMD64), but they
         are only recommended so you can safely continue without them.
+
+        Note that you can consult CDS Invenio wiki pages at
+        <https://twiki.cern.ch/twiki/bin/view/CDS/Invenio> for more
+        system-specific notes.
 
         Note that the web application server should run a Message
         Transfer Agent (MTA) such as Postfix so that CDS Invenio can
@@ -179,9 +183,7 @@ Contents
       $ gpg --verify cds-invenio-0.92.1.tar.gz.sig cds-invenio-0.92.1.tar.gz
       $ tar xvfz cds-invenio-0.92.1.tar.gz
       $ cd cds-invenio-0.92.1
-      $ ./configure --prefix=/opt/cds-invenio \
-                    --with-python=/opt/python/bin/python2.3 \
-                    --with-mysql=/opt/mysql/bin/mysql
+      $ ./configure
       $ vi ./config/invenio.conf
       $ make
       $ make check-custom-templates ## optional, only when upgrading
@@ -247,26 +249,29 @@ Contents
    
           Go to the source directory.
 
-      $ ./configure --prefix=/opt/cds-invenio \
-                    --with-python=/opt/python/bin/python2.3 \
-                    --with-mysql=/opt/mysql/bin/mysql
+      $ ./configure 
 
-          Configure essential CDS Invenio parameters, with the following
-          signification:
+          Configure CDS Invenio software for building for this
+          specific platform.  You can use the following parameters:
 
-              --prefix=/opt/cds-invenio 
+              --prefix=/opt/cds-invenio
 
-                 CDS Invenio general installation directory, used to
-                 hold command-line binaries and program libraries
-                 containing the core CDS Invenio functionality, but
-                 also to store web pages, runtime log and cache
-                 information, etc.  Several subdirs like `bin', `lib',
-                 and `var' will be created inside the --prefix
-                 directory to this effect.  Note that the --prefix
-                 directory should be chosen outside of the Apache
-                 htdocs tree, since only one its subdirectory
-                 (prefix/var/www) is to be accessible directly via the
-                 Web (see below).
+                 Optionally, specify the CDS Invenio general
+                 installation directory (default is /opt/cds-invenio).
+                 It will contain command-line binaries and program
+                 libraries containing the core CDS Invenio
+                 functionality, but also store web pages, runtime log
+                 and cache information, document data files, etc.
+                 Several subdirs like `bin', `etc', `lib', or `var'
+                 will be created inside the prefix directory to this
+                 effect.  Note that the prefix directory should be
+                 chosen outside of the Apache htdocs tree, since only
+                 one its subdirectory (prefix/var/www) is to be
+                 accessible directly via the Web (see below).
+
+                 Note that CDS Invenio won't install to any other
+                 directory but to the prefix mentioned in this
+                 configuration line.
 
               --with-python=/opt/python/bin/python2.3
 
@@ -285,11 +290,29 @@ Contents
                  executable that will be found in your PATH will be
                  chosen for running CDS Invenio.
 
-          CDS Invenio won't install to any other directory but to the
-          one mentioned in this configuration line.  
+              --with-clisp=/opt/clisp/bin/clisp
 
-          Do not use trailing slashes when specifying any of the above
-          values.
+                 Optionally, specify a path to CLISP executable.  This
+                 is useful if you have more than one CLISP
+                 installation on your system.  If you don't set this
+                 option, then the first executable that will be found
+                 in your PATH will be chosen for running CDS Invenio.
+ 
+              --with-cmucl=/opt/cmucl/bin/lisp
+
+                 Optionally, specify a path to CMUCL executable.  This
+                 is useful if you have more than one CMUCL
+                 installation on your system.  If you don't set this
+                 option, then the first executable that will be found
+                 in your PATH will be chosen for running CDS Invenio.
+                 
+              --with-sbcl=/opt/sbcl/bin/sbcl
+
+                 Optionally, specify a path to SBCL executable.  This
+                 is useful if you have more than one SBCL
+                 installation on your system.  If you don't set this
+                 option, then the first executable that will be found
+                 in your PATH will be chosen for running CDS Invenio.
 
           This configuration step is mandatory.  Usually, you do this
           step only once.
@@ -327,14 +350,15 @@ Contents
 
       $ make check-custom-templates ## optional, only when upgrading
 
-          Check if your customized page templates (see WebStyle Admin
-          guide) still conform to the default templates.
-          This gives you a chance to fix your templates before running
+          Check if your customized page templates (see the WebStyle
+          Admin Guide) still conform to the default templates.  This
+          gives you a chance to fix your templates before running
           'make install', by providing a list of incompatibilities of
-          your custom templates with the new versions of the templates.
+          your custom templates with the new versions of the
+          templates.
 
-          This step is only useful if you are upgrading and you have
-          previously customized page templates.
+          This step is only useful if you are upgrading and if you
+          have previously customized default page templates.
 
       $ make install
 
