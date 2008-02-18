@@ -26,6 +26,9 @@ AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080215)
 ## By default we shall install into /opt/cds-invenio:
 AC_PREFIX_DEFAULT(/opt/cds-invenio)
 
+## ...but also test prefix explicitly so that the localstatedir hack below works:
+test "${prefix}" = NONE && prefix=/opt/cds-invenio
+
 ## Check for install:
 AC_PROG_INSTALL
 
