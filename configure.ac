@@ -1,6 +1,4 @@
 ## $Id$
-## Purpose: CDS Invenio main configure.ac file.
-## Note: If you change this file, please run "autoreconf" to regenerate the "configure" script.
 
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
@@ -19,14 +17,17 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+## This is CDS Invenio main configure.ac file.  If you change this
+## file, then please run "autoreconf" to regenerate the "configure"
+## script.
+
 ## Initialize autoconf and automake:
 AC_INIT(cds-invenio, 0.93.50.20080215, cds.support@cern.ch)
 AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080215)
 
-## By default we shall install into /opt/cds-invenio:
-AC_PREFIX_DEFAULT(/opt/cds-invenio)
-
-## ...but also test prefix explicitly so that the localstatedir hack below works:
+## By default we shall install into /opt/cds-invenio.  (Do not use
+## AC_PREFIX_DEFAULT for this, because it would not work well with
+## the localstatedir hack below.)
 test "${prefix}" = NONE && prefix=/opt/cds-invenio
 
 ## Check for install:
