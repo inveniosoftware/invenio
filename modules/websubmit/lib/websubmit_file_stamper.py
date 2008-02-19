@@ -48,7 +48,7 @@ CFG_PATH_GFILE = "/usr/bin/file"
 
 
 
-class InvenioStampFileError(Exception):
+class InvenioWebSubmitFileStamperError(Exception):
     """This exception should be raised when an error is encoutered that
        prevents a file from being stamped.
        When caught, this exception should be used to stop processing with a
@@ -68,66 +68,8 @@ class InvenioStampFileError(Exception):
         return str(self.value)
 
 
-
-def get_dictionary_from_string(dict_string):
-    """Given a string version of a "dictionary", split the string into a
-       python dictionary.
-       For example, given the following string:
-        {'TITLE' : 'EX_TITLE', 'AUTHOR' : 'EX_AUTHOR', 'REPORTNUMBER' : 'EX_RN'}
-       A dictionary in the following format will be returned:
-        {
-           'TITLE'        : 'EX_TITLE',
-           'AUTHOR'       : 'EX_AUTHOR',
-           'REPORTNUMBER' : 'EX_RN',
-        }
-       @param dict_string: (string) - the string version of the dictionary.
-       @return: (dictionary) - the dictionary build from the string.
-    """
-    ## First, strip off the leading and trailing spaces and braces:
-    dict_string = dict_string.strip(" {}")
-    
-    ## Next, split the string on commas (,) that have not been escaped
-    ## So, the following string: """'hello' : 'world', 'click' : 'here'"""
-    ## will be split into the following list:
-    ##   ["'hello' : 'world'", " 'click' : 'here'"]
-    ##
-    ## However, the string """'hello\, world' : '!', 'click' : 'here'"""
-    ## will be split into: ["'hello\, world' : '!'", " 'click' : 'here'"]
-    ## I.e. the comma that was escaped in the string has been kept.
-    ##
-    ## So basically, split on unescaped parameters at first:
-    key_vals = re.split(r'(?<!\\),', dict_string)
-
-    ## Now we should have a list of "key" : "value" terms. For each of them,
-    ## check it is OK. If not in the format "Key" : "Value" (quotes are
-    ## optional), discard it. As with the comma separator in the previous
-    ## splitting, this one splits on any colon (:) that is not escaped by a
-    ## backslash.
-    final_dictionary = {}
-    for key_value_string in key_vals:
-        ## Split the pair apart, based on ":":
-        key_value_pair = re.split(r'(?<!\\):', key_value_string)
-        ## check that the length of the new list is 2:
-        if len(key_value_pair) != 2:
-            ## There was a problem with the splitting - pass this pair
-            continue
-        ## The split was made.
-        ## strip white-space, single-quotes and double-quotes from around the
-        ## key and value pairs:
-        key_term   = key_value_pair[0].strip(" '\"")
-        value_term = key_value_pair[1].strip(" '\"")
-
-        ## Is the left-side (key) term empty?
-        if len(key_term) == 0:
-            continue
-
-        ## Now, add the search-replace pair to the dictionary of
-        ## search-replace terms:
-        final_dictionary[key_term] = value_term
-    return final_dictionary
-
-
-def copy_template_files_to_stampdir(path_workingdir, tpl_name):
+## ***** Functions related to the creation of the PDF Stamp file: *****
+def copy_template_files_to_stampdir(path_workingdir, latex_template):
     """In order to stamp a PDF fulltext file, LaTeX is used to create a
        "stamp" page that is then merged with the fulltext PDF.
        The stamp page is created in a temporary stamp "working directory".
@@ -153,11 +95,11 @@ def copy_template_files_to_stampdir(path_workingdir, tpl_name):
        
        @param path_workingdir: (string) - the working directory into which the
         latex templates should be copied.
-       @param tpl_name: (string) - the name of the LaTeX template to copy
+       @param latex_template: (string) - the name of the LaTeX template to copy
         to the working dir.
     """
     ## Get the "base name" of the latex template:
-    (template_path, template_name) = os.path.split(tpl_name)
+    (template_path, template_name) = os.path.split(latex_template)
     if template_path != "":
         ## A full path to the template was provided. We look for it there.
         ## Test to see whether the template is a real file and is readable:
@@ -172,14 +114,14 @@ def copy_template_files_to_stampdir(path_workingdir, tpl_name):
                 msg = """Error: Unable to copy LaTeX file [%s/%s] to """ \
                       """working directory for stamping [%s].""" \
                       % (template_path, template_name, path_workingdir)
-                raise InvenioStampFileError(msg)
+                raise InvenioWebSubmitFileStamperError(msg)
         else:
             ## Unable to read the template file:
             msg = """Error: Unable to copy LaTeX file [%s/%s] to """ \
                   """working directory for stamping [%s]. (File not """ \
                   """readable.)""" \
                   % (template_path, template_name, path_workingdir)
-            raise InvenioStampFileError(msg)
+            raise InvenioWebSubmitFileStamperError(msg)
     else:
         ## There is no path to the template file.
         ## Look for it first in the current working directory, then in
@@ -197,7 +139,7 @@ def copy_template_files_to_stampdir(path_workingdir, tpl_name):
                 msg = """Error: Unable to copy LaTeX file [%s] to """ \
                       """working directory for stamping [%s].""" \
                       % (template_name, path_workingdir)
-                raise InvenioStampFileError(msg)
+                raise InvenioWebSubmitFileStamperError(msg)
         elif os.access("%s/%s" % (CFG_WEBSUBMIT_LATEX_TEMPLATES_DIR, \
                                   template_name), os.F_OK):
             ## The template has been found in WebSubmit's latex templates
@@ -213,7 +155,7 @@ def copy_template_files_to_stampdir(path_workingdir, tpl_name):
                       """working directory for stamping [%s].""" \
                       % (CFG_WEBSUBMIT_LATEX_TEMPLATES_DIR, \
                          template_name, path_workingdir)
-                raise InvenioStampFileError(msg)
+                raise InvenioWebSubmitFileStamperError(msg)
             else:
                 ## Now that the template has been found, set the "template
                 ## path" to the WebSubmit latex templates directory:
@@ -221,7 +163,7 @@ def copy_template_files_to_stampdir(path_workingdir, tpl_name):
         else:
             ## Unable to locate the latex template.
             msg = """Error: Unable to locate LaTeX file [%s].""" % template_name
-            raise InvenioStampFileError(msg)
+            raise InvenioWebSubmitFileStamperError(msg)
 
     ## Now that the LaTeX template file has been copied locally, extract
     ## the names of graphics files to be included in the resulting
@@ -242,7 +184,7 @@ def copy_template_files_to_stampdir(path_workingdir, tpl_name):
         msg = """Unable to stamp file. There was """ \
               """a problem when trying to obtain details of images """ \
               """included by the LaTeX template."""
-        raise InvenioStampFileError(msg)
+        raise InvenioWebSubmitFileStamperError(msg)
 
     ## Copy each include-graphic extracted from the template
     ## into the working stamp directory:
@@ -270,12 +212,12 @@ def copy_template_files_to_stampdir(path_workingdir, tpl_name):
                               """[%s/%s] included by the LaTeX template""" \
                               """ [%s].""" \
                               % (graphic_path, graphic_name, template_name)
-                        raise InvenioStampFileError(msg)
+                        raise InvenioWebSubmitFileStamperError(msg)
                 else:
                     msg = """Unable to locate an image [%s/%s] included""" \
                           """ by the LaTeX template file [%s].""" \
                           % (graphic_path, graphic_name, template_name)
-                    raise InvenioStampFileError(msg)
+                    raise InvenioWebSubmitFileStamperError(msg)
             else:
                 ## The graphic is included from a relative path. Try to obtain
                 ## it from the same directory that the latex template file was
@@ -296,12 +238,12 @@ def copy_template_files_to_stampdir(path_workingdir, tpl_name):
                             msg = """Unable to stamp file. There was """ \
                                   """a problem when trying to copy images """ \
                                   """included by the LaTeX template."""
-                            raise InvenioStampFileError(msg)
+                            raise InvenioWebSubmitFileStamperError(msg)
                     else:
                         msg = """Unable to locate an image [%s] included""" \
                               """ by the LaTeX template file [%s].""" \
                               % (graphic_name, template_name)
-                        raise InvenioStampFileError(msg)
+                        raise InvenioWebSubmitFileStamperError(msg)
                 else:
                     ## There is no template path. Try to get the images from
                     ## current dir:
@@ -316,29 +258,29 @@ def copy_template_files_to_stampdir(path_workingdir, tpl_name):
                             msg = """Unable to stamp file. There was """ \
                                   """a problem when trying to copy images """ \
                                   """included by the LaTeX template."""
-                            raise InvenioStampFileError(msg)
+                            raise InvenioWebSubmitFileStamperError(msg)
                     else:
                         msg = """Unable to locate an image [%s] included""" \
                               """ by the LaTeX template file [%s].""" \
                               % (graphic_name, template_name)
-                        raise InvenioStampFileError(msg)
+                        raise InvenioWebSubmitFileStamperError(msg)
     ## Return the basename of the template so that it can be used to create
     ## the PDF stamp file:
     return template_name
 
 
 def create_final_latex_template(working_dirname, \
-                                template_name, \
-                                tpl_replacements):
+                                latex_template, \
+                                latex_template_var):
     """In the working directory, create a copy of the the orginal
        latex template with all the possible xxx--xxx in the template
        replaced with the values identified by the keywords in the
-       tpl_replacements dictionary.
+       latex_template_var dictionary.
        @param working_dirname: (string) the working directory used for the
         creation of the PDF stamp file.
        @latex_template: (string) name of the latex template before it has
         been parsed for replacements.
-       @tpl_replacements: (dict) dictionnary whose keys are the string to
+       @latex_template_var: (dict) dictionnary whose keys are the string to
         replace in latex_template and values are the replacement content
        @return name of the final latex template (after replacements)
     """
@@ -353,10 +295,10 @@ def create_final_latex_template(working_dirname, \
     try:
         ## Open the original latex template for reading:
         fpread  = open("%s/%s" \
-                       % (working_dirname, template_name), "r")
+                       % (working_dirname, latex_template), "r")
         ## Open a file to contain the "parsed" latex template:
         fpwrite = open("%s/create%s" \
-                       % (working_dirname, template_name), "w")
+                       % (working_dirname, latex_template), "w")
         for line in fpread.readlines():
             ## For each line in the template file, test for
             ## substitution-markers:
@@ -368,7 +310,14 @@ def create_final_latex_template(working_dirname, \
                 try:
                     ## Get the replacement-term for this match
                     ## from the dictionary
-                    replacement_term = tpl_replacements[search_term]
+                    replacement_term = latex_template_var[search_term]
+                except KeyError:
+                    ## This search-term was not in the list of replacements
+                    ## to be made. It should be replaced with an empty string
+                    ## in the template:
+                    line = line[0:replacement_marker.start()] + \
+                           line[replacement_marker.end():]
+                else:
                     ## Is the replacement term of the form date(XXXX)? If yes,
                     ## take it literally and generate a pythonic date with it:
                     if replacement_term.find("date(") == 0 \
@@ -394,38 +343,32 @@ def create_final_latex_template(working_dirname, \
                     ## Now substitute replacement into the line of the template:
                     line = line[0:replacement_marker.start()] + replacement \
                            + line[replacement_marker.end():]
-                except KeyError:
-                    ## This search-term was not in the list of replacements
-                    ## to be made. It should be replaced with an empty string
-                    ## in the template:
-                    line = line[0:replacement_marker.start()] + \
-                           line[replacement_marker.end():]
+
             ## Write the modified line to the new template:
             fpwrite.write(line)
             fpwrite.flush()
         ## Close up the template files and unlink the original:
         fpread.close()
         fpwrite.close()
-#        os.unlink("%s/%s" % (working_dirname, template_name))
     except IOError:
         msg = "Unable to read LaTeX template [%s/%s]. Cannot Stamp File" \
-              % (working_dirname, template_name)
-        raise InvenioStampFileError(msg)
+              % (working_dirname, latex_template)
+        raise InvenioWebSubmitFileStamperError(msg)
 
     ## Return the name of the LaTeX template to be used:
-    return "create%s" % template_name
+    return "create%s" % latex_template
 
 
-def create_pdf_stamp(path_workingdir, tpl_replacements, latex_template):
+def create_pdf_stamp(path_workingdir, latex_template, latex_template_var):
     """Retrieve the LaTeX (and associated) files and use them to create a
        PDF "Stamp" file that can be merged with the main file.
        The PDF stamp is created in a temporary working directory.
        @param path_workingdir: (string) the path to the working directory
         that should be used for creating the PDF stamp file.
-       @param tpl_replacements: (dictionary) - key-value pairs of strings
-        to be sought and replaced within the latex template.
        @param latex_template: (string) - the name of the latex template
         to be used for the creation of the stamp.
+       @param latex_template_var: (dictionary) - key-value pairs of strings
+        to be sought and replaced within the latex template.
        @return: (string) - the name of the PDF stamp file.
     """
     ## Copy the LaTeX (and helper) files should be copied into the working dir:
@@ -436,7 +379,10 @@ def create_pdf_stamp(path_workingdir, tpl_replacements, latex_template):
     ## the Stamp PDF can be created.
     final_template = create_final_latex_template(path_workingdir, \
                                                  template_name, \
-                                                 tpl_replacements)
+                                                 latex_template_var)
+
+    ## The name that will be givem to the PDF stamp file:
+    pdf_stamp_name = "%s.pdf" % os.path.splitext(final_template)[0]
 
     ## Now, build the Stamp PDF from the LaTeX template:
     cmd_latex = """cd %(workingdir)s; /usr/bin/pdflatex """ \
@@ -448,23 +394,296 @@ def create_pdf_stamp(path_workingdir, tpl_replacements, latex_template):
     ## Log the latex command
     os.system("""echo '%s' > latex_cmd""" % cmd_latex)
     ## Run the latex command
-    error_latex = os.system(cmd_latex)
-    
-    if error_latex != 0:
-        ## there was a problem creating the PDF from the LaTeX template
-        msg = """Error: Unable to create stamp file for document"""
-        raise InvenioStampFileError(msg)
+    fh_latex = os.popen("%s" % cmd_latex, "r")
+    errcode_latex = fh_latex.close()
+
+    ## Was the PDF stamp file successfully created?
+    if errcode_latex is not None or \
+         not  os.access("%s/%s" % (path_workingdir, pdf_stamp_name), os.F_OK):
+        ## It was not possible to create the PDF stamp file. Fail.
+        msg = """Error: Unable to create a PDF stamp file."""
+        raise InvenioWebSubmitFileStamperError(msg)
 
     ## Return the name of the PDF stamp file:
-    pdf_stamp_name = "%s.pdf" % os.path.splitext(final_template)[0]
     return pdf_stamp_name
 
 
-def merge_stamp_with_subject_file(stamping_mode,
-                                  working_dir,
-                                  stamp_file,
-                                  subject_file,
-                                  output_file):
+## ***** Functions related to the actual stamping of the file: *****
+
+def stamp_file_cover_page(path_workingdir, \
+                          stamp_file, \
+                          subject_file, \
+                          output_file):
+    """Carry out the stamping:
+       This function adds a cover-page to the file.
+       @param path_workingdir: (string) - the path to the working directory
+        that contains all of the files needed for the stamping process to be
+        carried out.
+       @param stamp_file: (string) - the name of the PDF stamp file (i.e. the
+        cover-page itself).
+       @param subject_file: (string) - the name of the file to be stamped.
+       @param output_file: (string) - the name of the final "stamped" file (i.e.
+        that with the cover page added) that will be written in the working
+        directory after the function has ended.
+    """
+    ## Build the stamping command:
+    cmd_add_cover_page = \
+                """%(pdftk)s %(working-dir)s/%(cover-page)s """ \
+                """%(working-dir)s/%(file-to-stamp)s """ \
+                """cat output %(working-dir)s/%(stamped-file)s """ \
+                """2>/dev/null"""% \
+                  { 'pdftk'         : CFG_PATH_PDFTK,
+                    'working-dir'   : path_workingdir,
+                    'cover-page'    : stamp_file,
+                    'file-to-stamp' : subject_file,
+                    'stamped-file'  : output_file,
+                  }
+    ## Execute the stamping command:
+    fh_add_cover_page = os.popen(cmd_add_cover_page, "r")
+    errcode_add_cover_page = fh_add_cover_page.close()
+
+    ## Was the PDF merged with the coverpage without error?
+    if errcode_add_cover_page is not None:
+        ## There was a problem:
+        msg = "Error: Unable to stamp file [%s/%s]. There was an error when " \
+              "trying to add the cover page [%s/%s] to the file. Stamping " \
+              "has failed." \
+              % (path_workingdir, subject_file, path_workingdir, stamp_file)
+        raise InvenioWebSubmitFileStamperError(msg)
+
+
+def stamp_file_first_page(path_workingdir, \
+                          stamp_file, \
+                          subject_file, \
+                          output_file):
+    """Carry out the stamping:
+       This function adds a stamp to the first page of the file.
+       @param path_workingdir: (string) - the path to the working directory
+        that contains all of the files needed for the stamping process to be
+        carried out.
+       @param stamp_file: (string) - the name of the PDF stamp file (i.e. the
+        stamp itself).
+       @param subject_file: (string) - the name of the file to be stamped.
+       @param output_file: (string) - the name of the final "stamped" file that
+        will be written in the working directory after the function has ended.
+    """
+    ## Since only the first page of the subject file is to be stamped,
+    ## it's safest to separate this into its own temporary file, stamp
+    ## it, then re-merge it with the remaining pages of the original
+    ## document.  In this way, the PDF to be stamped will probably be
+    ## simpler (pages with complex figures and tables will probably be
+    ## avoided) and the process will hopefully have a smaller chance of
+    ## failure.
+    ##
+    ## First of all, separate the first page of the subject file into a
+    ## temporary document:
+    ##
+    ## Name to be given to the first page of the document:
+    output_file_first_page = "p1-%s" % output_file
+    ## Name to be given to the first page of the document once it has
+    ## been stamped:
+    stamped_output_file_first_page = "stamped-%s" % output_file_first_page
+
+    ## Perform the separation:
+    cmd_get_first_page = \
+             "%(pdftk)s A=%(working-dir)s/%(file-to-stamp)s " \
+             "cat A1 output %(working-dir)s/%(first-page)s " \
+             "2>/dev/null" \
+             % { 'pdftk'         : CFG_PATH_PDFTK,
+                 'working-dir'   : path_workingdir,
+                 'file-to-stamp' : subject_file,
+                 'first-page'    : output_file_first_page,
+               }
+    fh_get_first_page = os.popen(cmd_get_first_page, "r")
+    errcode_get_first_page = fh_get_first_page.close()
+    ## Check that the separation was successful:
+    if errcode_get_first_page is not None or \
+           not os.access("%s/%s" % (path_workingdir, \
+                                    output_file_first_page), os.F_OK):
+        ## Separation was unsuccessful. Fail.
+        msg = "Error: Unable to stamp file [%s/%s] - it wasn't possible to " \
+              "separate the first page from the rest of the document. " \
+              "Stamping has failed." \
+              % (path_workingdir, subject_file)
+        raise InvenioWebSubmitFileStamperError(msg)
+
+    ## Now stamp the first page:
+    cmd_stamp_first_page = \
+             "%(pdftk)s %(working-dir)s/%(first-page)s background " \
+             "%(working-dir)s/%(stamp-file)s output " \
+             "%(working-dir)s/%(stamped-first-page)s 2>/dev/null" \
+             % { 'pdftk'              : CFG_PATH_PDFTK,
+                 'working-dir'        : path_workingdir,
+                 'stamp-file'         : stamp_file,
+                 'first-page'         : output_file_first_page,
+                 'stamped-first-page' : stamped_output_file_first_page,
+               }
+    fh_stamp_first_page = os.popen(cmd_stamp_first_page, "r")
+    ## Check that the first page was stamped successfully:
+    errcode_stamp_first_page = fh_get_first_page.close()
+    if errcode_stamp_first_page is not None or \
+           not os.access("%s/%s" % (path_workingdir, \
+                                    stamped_output_file_first_page), os.F_OK):
+        ## Unable to stamp the first page. Fail.
+        msg = "Error: Unable to stamp the file [%s/%s] - it was not possible " \
+              "to add the stamp to the first page. Stamping has failed." \
+              % (path_workingdir, subject_file)
+        raise InvenioWebSubmitFileStamperError(msg)
+
+    ## Now that the first page has been stamped successfully, merge it with
+    ## the remaining pages of the original file:
+    cmd_merge_stamped_and_original_files = \
+             "%(pdftk)s A=%(working-dir)s/%(stamped-first-page)s  " \
+             "B=%(working-dir)s/%(original-file)s cat A1 B2-end output " \
+             "%(working-dir)s/%(stamped-file)s 2>/dev/null" \
+             % { 'pdftk'              : CFG_PATH_PDFTK,
+                 'working-dir'        : path_workingdir,
+                 'stamped-first-page' : stamped_output_file_first_page,
+                 'original-file'      : subject_file,
+                 'stamped-file'       : output_file,
+               }
+    fh_merge_stamped_and_original_files = \
+                   os.popen(cmd_merge_stamped_and_original_files, "r")
+    errcode_merge_stamped_and_original_files = \
+                           fh_merge_stamped_and_original_files.close()
+    ## Check to see whether the command exited with an error:
+    if errcode_merge_stamped_and_original_files is not None:
+        ## There was an error when trying to merge the stamped first-page
+        ## with pages 2 onwards of the original file. One possible
+        ## explanation for this could be that the original file only had
+        ## one page (in which case trying to reference pages 2-end would
+        ## cause an error because they don't exist.
+        ##
+        ## Try to get the number of pages in the original PDF. If it only
+        ## has 1 page, the stamped first page file can become the final
+        ## stamped PDF. If it has more than 1 page, there really was an
+        ## error when merging the stamped first page with the rest of the
+        ## pages and stamping can be considered to have failed.
+        cmd_find_number_pages = \
+           """%(pdftk)s %(working-dir)s/%(original-file)s dump_data | """ \
+           """grep NumberOfPages | """ \
+           """sed -n 's/^NumberOfPages: \\([0-9]\\{1,\\}\\)$/\\1/p'""" \
+             % { 'pdftk'         : CFG_PATH_PDFTK,
+                 'working-dir'   : path_workingdir,
+                 'original-file' : subject_file,
+               }
+        fh_find_number_pages = os.popen(cmd_find_number_pages, "r")
+        match_number_pages = fh_find_number_pages.read()
+        errcode_find_number_pages = fh_find_number_pages.close()
+
+        if errcode_find_number_pages is not None:
+            ## There was an error while checking for the number of pages.
+            ## Fail.
+            msg = "Error: Unable to stamp file [%s/%s]. There was an error " \
+                  "when attempting to merge the file containing the " \
+                  "first page of the stamped file with the remaining " \
+                  "pages of the original file and when an attempt was " \
+                  "made to count the number of pages in the file, an " \
+                  "error was also encountered. Stamping has failed." \
+                  % (path_workingdir, subject_file)
+            raise InvenioWebSubmitFileStamperError(msg)
+        else:
+            try:
+                number_pages_in_subject_file = int(match_number_pages)
+            except ValueError:
+                ## Unable to get the number of pages in the original file.
+                ## Fail.
+                msg = "Error: Unable to stamp file [%s/%s]. There was an " \
+                      "error when attempting to merge the file containing the" \
+                      " first page of the stamped file with the remaining " \
+                      "pages of the original file and when an attempt was " \
+                      "made to count the number of pages in the file, an " \
+                      "error was also encountered. Stamping has failed." \
+                      % (path_workingdir, subject_file)
+                raise InvenioWebSubmitFileStamperError(msg)
+            else:
+                ## Do we have just one page?
+                if number_pages_in_subject_file == 1:
+                    ## There was only one page in the subject file. 
+                    ## copy the version that was stamped on the first page to
+                    ## the output_file filename:
+                    try:
+                        shutil.copyfile("%s/%s" \
+                                         % (path_workingdir, \
+                                         stamped_output_file_first_page), \
+                                        "%s/%s" \
+                                         % (path_workingdir, output_file))
+                    except IOError:
+                        ## Unable to copy the file that was stamped on page 1
+                        ## Stamping has failed.
+                        msg = "Error: It was not possible to copy the " \
+                              "temporary file that was stamped on the " \
+                              "first page [%s/%s] to the final stamped " \
+                              "file [%s/%s]. Stamping has failed." \
+                              % (path_workingdir, \
+                                 stamped_output_file_first_page, \
+                                 path_workingdir, \
+                                 output_file)
+                        raise InvenioWebSubmitFileStamperError(msg)
+                else:
+                    ## Despite the fact that there was NOT only one page
+                    ## in the original file, there was an error when trying
+                    ## to merge it with the file that was stamped on the
+                    ## first page. Fail.
+                    msg = "Error: Unable to stamp file [%s/%s]. There " \
+                          "was an error when attempting to merge the " \
+                          "file containing the first page of the " \
+                          "stamped file with the remaining pages of the " \
+                          "original file. Stamping has failed." \
+                          % (path_workingdir, subject_file)
+                    raise InvenioWebSubmitFileStamperError(msg)
+    elif not os.access("%s/%s" % (path_workingdir, output_file), os.F_OK):
+        ## A final version of the stamped file was NOT created even though
+        ## no error signal was encountered during the merging process.
+        ## Fail.
+        msg = "Error: Unable to stamp file [%s/%s]. When attempting to " \
+              "merge the file containing the first page of the stamped " \
+              "file with the remaining pages of the original file, no " \
+              "final file was created.  Stamping has failed." \
+              % (path_workingdir, subject_file)
+        raise InvenioWebSubmitFileStamperError(msg)
+
+
+def stamp_file_all_pages(path_workingdir, \
+                         stamp_file, \
+                         subject_file, \
+                         output_file):
+    """Carry out the stamping:
+       This function adds a stamp to all pages of the file.
+       @param path_workingdir: (string) - the path to the working directory
+        that contains all of the files needed for the stamping process to be
+        carried out.
+       @param stamp_file: (string) - the name of the PDF stamp file (i.e. the
+        stamp itself).
+       @param subject_file: (string) - the name of the file to be stamped.
+       @param output_file: (string) - the name of the final "stamped" file that
+        will be written in the working directory after the function has ended.
+    """
+    stamp_cmd_stamp_allpages = \
+             "%(pdftk)s %(working-dir)s/%(file-to-stamp)s background " \
+             "%(working-dir)s/%(stamp-file)s output " \
+             "%(working-dir)s/%(stamped-file-all-pages)s 2>/dev/null" \
+             % { 'pdftk'                  : CFG_PATH_PDFTK,
+                 'working-dir'            : path_workingdir,
+                 'stamp-file'             : stamp_file,
+                 'file-to-stamp'          : subject_file,
+                 'stamped-file-all-pages' : output_file,
+               }
+    fh_stampall = os.popen(stamp_cmd_stamp_allpages, "r")
+    errcode_stampall = fh_stampall.close()
+    if errcode_stampall is not None or \
+           not os.access("%s/%s" % (path_workingdir, output_file), os.F_OK):
+        ## There was a problem stamping the document. Fail.
+        msg = "Error: Unable to stamp file [%s/%s]. Stamping has failed." \
+              % (path_workingdir, subject_file)
+        raise InvenioWebSubmitFileStamperError(msg)
+
+
+def stamp_subject_file(path_workingdir,
+                       stamp_type,
+                       stamp_file,
+                       subject_file,
+                       output_file):
     ## Stamping is performed on PDF files. We therefore need to test for the
     ## type of the subject file before attempting to stamp it:
     ##
@@ -474,7 +693,7 @@ def merge_stamp_with_subject_file(stamping_mode,
     ## Using the file command, test for the file-type of "subject_file":
     gfile_cmd = "%(gfile)s %(working-dir)s/%(file-to-stamp)s 2> /dev/null" \
                 % { 'gfile'         : CFG_PATH_GFILE,
-                    'working-dir'   : working_dir,
+                    'working-dir'   : path_workingdir,
                     'file-to-stamp' : subject_file,
                   }
     ## Execute the file command:
@@ -509,7 +728,7 @@ def merge_stamp_with_subject_file(stamping_mode,
         ## unable to process file.
         msg = """Error: Input file [%s] is not PDF or PS. - unable to """ \
               """perform stamping.""" % subject_file
-        raise InvenioStampFileError(msg)
+        raise InvenioWebSubmitFileStamperError(msg)
 
     if subject_filetype == "ps":
         ## Convert the subject file from PostScript to PDF:
@@ -537,7 +756,7 @@ def merge_stamp_with_subject_file(stamping_mode,
         distill_cmd = """%(distiller)s %(working-dir)s/%(ps-file)s """ \
                       """%(working-dir)s/%(pdf-file)s 2>/dev/null""" % \
                       { 'distiller' : CFG_PATH_DISTILLER, \
-                        'working-dir' : working_dir,
+                        'working-dir' : path_workingdir,
                         'ps-file' : subject_file,
                         'pdf-file' : created_pdfname,
                       }
@@ -547,12 +766,12 @@ def merge_stamp_with_subject_file(stamping_mode,
 
         ## Test to see whether the PS was distilled into a PDF without error:
         if errcode_distill is not None or \
-           not os.access("%s/%s" % (working_dir, created_pdfname), os.F_OK):
+           not os.access("%s/%s" % (path_workingdir, created_pdfname), os.F_OK):
             ## The PDF file was not correctly created in the working directory.
             ## Unable to continue with the stamping process.
             msg = "Error: Unable to correctly convert PostScript file [%s] to" \
                   " PDF. Cannot stamp file." % subject_file
-            raise InvenioStampFileError(msg)
+            raise InvenioWebSubmitFileStamperError(msg)
         
         ## Now assign the name of the created PDF file to subject_file:
         subject_file = created_pdfname
@@ -580,110 +799,32 @@ def merge_stamp_with_subject_file(stamping_mode,
             ## No extension - use the original name with a .pdf suffix:
             output_file = "%s.pdf" % output_file
 
-    if stamping_mode == 'cover-page':
+    if stamp_type == 'coverpage':
         ## The stamp to be applied to the document is in fact a "cover page".
         ## This means that the entire PDF "stamp" that was created from the
         ## LaTeX template is to be appended to the subject file as the first
         ## page (i.e. a cover-page).
-
-        ## Build the stamping command:
-        stamp_cmd = """%(pdftk)s %(working-dir)s/%(cover-page)s """ \
-                    """%(working-dir)s/%(file-to-stamp)s """ \
-                    """cat output %(working-dir)s/%(stamped-file)s """ \
-                    """2>/dev/null"""% \
-                      { 'pdftk'         : CFG_PATH_PDFTK,
-                        'working-dir'   : working_dir,
-                        'cover-page'    : stamp_file,
-                        'file-to-stamp' : subject_file,
-                        'stamped-file'  : output_file,
-                      }
-        ## Execute the stamping command:
-        fh_stamp = os.popen(stamp_cmd, "r")
-        errcode_stamping = fh_stamp.close()
-
-        ## Was the PDF merged with the coverpage without error?
-        if errcode_stamping is not None:
-            ## There was a problem:
-            msg = "Error: Could not merge cover page [%s] with stamp file " \
-                  "[%s]. Stamping failed." % (stamp_file, subject_file)
-            raise InvenioStampFileError(msg)            
-    elif stamping_mode == 'stamp':
-        ## The stamp to be applied to the document is a simple stamp
-        ## that is to be merged with the FIRST PAGE of the full-text
-        ## PDF document.
-
-        ## First create a backgroung using the stamp file on
-        ## every page of the original file.
-        ## The name of a temporary file with a stamp on every page:
-        output_file_bg = "background-%s" % output_file
-
-        ## The following command is used to apply the stamp as a background
-        ## mark to every page of the subject file:
-        stamp_cmd_stamp_allpages = \
-                 "%(pdftk)s %(working-dir)s/%(file-to-stamp)s background " \
-                 "%(working-dir)s/%(stamp-file)s output " \
-                 "%(working-dir)s/%(stamped-file-all-pages)s 2>/dev/null" \
-                 % { 'pdftk'                  : CFG_PATH_PDFTK,
-                     'working-dir'            : working_dir,
-                     'stamp-file'             : stamp_file,
-                     'file-to-stamp'          : subject_file,
-                     'stamped-file-all-pages' : output_file_bg,
-                   }
-        fh_stampall = os.popen(stamp_cmd_stamp_allpages, "r")
-        errcode_stampall = fh_stampall.close()
-        if errcode_stampall is not None or \
-               not os.access("%s/%s" % (working_dir, output_file_bg), os.F_OK):
-            ## There was a problem adding the stamp.
-            msg = "Error: Could not apply stamp [%s] to the subject file " \
-                  "[%s]. Stamping failed." % (stamp_file, subject_file)
-            raise InvenioStampFileError(msg)
-        ## Now take the first page from the file that was stamped, and merge
-        ## that with the 2nd page onwards of the original PDF subject file.
-        ## This will give a PDF file that is stamped on the first page:
-        ## selected the first page of the stamped document and
-        ## concatenate with the original one without the first page 
-        ## -NB: pdftk doesn't allow to redirect the output to an input
-        ## file so here we need to create a temporary document
-        ## -If the original document contains only one page the
-        ## temporary document is not created
-        stamp_cmd_keep_stamp_only_on_first_page = \
-                 "%(pdftk)s A=%(working-dir)s/%(stamped-file-all-pages)s  " \
-                 "B=%(working-dir)s/%(original-file)s cat A1 B2-end output " \
-                 "%(working-dir)s/%(stamped-file)s 2>/dev/null" \
-                 % { 'pdftk' : CFG_PATH_PDFTK,
-                     'working-dir' : working_dir,
-                     'stamped-file-all-pages' : output_file_bg,
-                     'original-file' : subject_file,
-                     'stamped-file'  : output_file,
-                   }
-        fh_keep_stamp_only_on_first_page = \
-                       os.popen(stamp_cmd_keep_stamp_only_on_first_page, "r")
-        fh_keep_stamp_only_on_first_page.close()
-        ## NOTE: We don't check for an error in the command's execution because
-        ## if the original file only had one page, trying to concatenate it with
-        ## the stamped version, from page 2 onwards will cause an error.
-        ##
-        ## So, was a final version of stamped_file created?
-        if not os.access("%s/%s" % (working_dir, output_file), os.F_OK):
-            ## The fact that there is no final version of the file tells us
-            ## that the PDF was probably only 1 page long. We therefore
-            ## rename the version that was stamped on "all" pages to the
-            ## output_file filename:
-            try:
-                shutil.move("%s/%s" % (working_dir, output_file_bg),  \
-                            "%s/%s" % (working_dir, output_file))
-            except IOError:
-                ## Oops - unable to rename the file to the final file.
-                ## Stamping has failed.
-                msg = "Error: Could not rename temporary stamped file [%s] to" \
-                      " final stamped file [%s]. Stamping failed." \
-                      % (output_file_bg, output_file)
-                raise InvenioStampFileError(msg)
+        stamp_file_cover_page(path_workingdir, \
+                              stamp_file, \
+                              subject_file, \
+                              output_file)
+    elif stamp_type == "first":
+        stamp_file_first_page(path_workingdir, \
+                              stamp_file, \
+                              subject_file, \
+                              output_file)
+    elif stamp_type == 'all':
+        ## The stamp to be applied to the document is a simple that that should
+        ## be applied to ALL pages of the document (i.e. merged onto each page.)
+        stamp_file_all_pages(path_workingdir, \
+                             stamp_file, \
+                             subject_file, \
+                             output_file)
     else:
         ## Unexpcted stamping mode.
         msg = """Error: Unexpected stamping mode [%s] - cannot stamp file.""" \
-              % stamping_mode
-        raise InvenioStampFileError(msg)
+              % stamp_type
+        raise InvenioWebSubmitFileStamperError(msg)
 
     ## Finally, if the original subject file was a PS, convert the stamped
     ## PDF back to PS:
@@ -710,15 +851,15 @@ def merge_stamp_with_subject_file(stamping_mode,
 
         ## Build the conversion command:
         cmd_pdf2ps = "%s %s/%s %s/%s 2>/dev/null" % (CFG_PDF_TO_PS,
-                                                     working_dir,
+                                                     path_workingdir,
                                                      output_file,
-                                                     working_dir,
+                                                     path_workingdir,
                                                      stamped_psname)
         fh_pdf2ps = os.popen(cmd_pdf2ps, "r")
         errcode_pdf2ps = fh_pdf2ps.close()
         ## Check to see that the command executed OK:
         if errcode_pdf2ps is None and \
-           os.access("%s/%s" % (working_dir, stamped_psname), os.F_OK):
+           os.access("%s/%s" % (path_workingdir, stamped_psname), os.F_OK):
             ## No problem converting the PDF to PS.
             output_file = stamped_psname
     ## Return the name of the "stamped" file:
@@ -726,6 +867,104 @@ def merge_stamp_with_subject_file(stamping_mode,
 
 
 
+
+
+
+
+def copy_subject_file_to_working_directory(path_workingdir, input_file):
+    """Attempt to copy the subject file (that which is to be stamped) to the
+       current working directory, returning the name of the subject file if
+       successful.
+       @param path_workingdir: (string) - the path to the working directory
+        for the current stamping session.
+       @param input_file: (string) - the path to the subject file (that which
+        is to be stamped).
+       @return: (string) - the name of the subject file, which has been copied
+        to the current working directory.
+       @Exceptions raised: (InvenioWebSubmitFileStamperError) - upon failure
+        to successfully copy the subject file to the working directory.
+    """
+    ## Divide the input file's name into path and basename:
+    (dummy, name_input_file) = os.path.split(input_file)
+    if name_input_file == "":
+        ## The input file is just a path - not a valid filename. Fail.
+        msg = """Error: unable to determine the name of the file to be """ \
+              """stamped."""
+        raise InvenioWebSubmitFileStamperError(msg)
+
+    ## Test to see whether the stamping subject file is a real file and
+    ## is readable:
+    if os.access("%s" % input_file, os.R_OK):
+        ## File is readable. Copy it locally to the working directory:
+        try:
+            shutil.copyfile("%s" % input_file, \
+                            "%s/%s" % (path_workingdir, name_input_file))
+        except IOError:
+            ## Unable to copy the stamping subject file to the
+            ## working directory. Fail.
+            msg = """Error: Unable to copy stamping file [%s] to """ \
+                  """working directory for stamping [%s].""" \
+                  % (input_file, path_workingdir)
+            raise InvenioWebSubmitFileStamperError(msg)
+    else:
+        ## Unable to read the subject file. Fail.
+        msg = """Error: Unable to copy stamping file [%s] to """ \
+              """working directory [%s]. (File not readable.)""" \
+              % (input_file, path_workingdir)
+        raise InvenioWebSubmitFileStamperError(msg)
+
+    ## Now that the stamping file has been successfully copied to the working
+    ## directory, return its base name:
+    return name_input_file
+
+def create_working_directory(working_dirname):
+    """Create the stamping "working directory" from a given directory name
+       and return its full path.
+       The working directory will be created in ~invenio/var/tmp or failing
+       this, /tmp. If it cannot be created in either of these locations,
+       an exception (InvenioWebSubmitFileStamperError) will be raised.
+       @param working_dirname: (string) - the name to be given to the
+        working directory used in this stamping session.
+       @return: (string) - the full path to the working directory.
+       @Exceptions raised: InvenioWebSubmitFileStamperError.
+    """
+    ## Create the temporary directory in which to place the LaTeX template
+    ## and its helper files.
+    ## Try first in ~invenio/var/tmp:
+    path_workingdir = None
+    try:
+        os.mkdir("%s/%s" % (tmpdir, working_dirname))
+    except OSError:
+        ## Unable to create the temporary directory in ~invenio/var/tmp
+        pass
+    else:
+        ## record the full path to the working directory:
+        path_workingdir = "%s/%s" % (tmpdir, working_dirname)
+
+    ## Now if it wasn't possible to create the working directory in
+    ## ~invenio/var/tmp, try to create it in /tmp:
+    if path_workingdir is None:
+        try:
+            os.mkdir("/tmp/%s" % working_dirname)
+        except OSError:
+            ## Unable to create the temporary directory in /tmp
+            pass
+        else:
+            ## record the full path to the working directory:
+            path_workingdir = "/tmp/%s" % working_dirname
+
+    ## If it wasn't possible to create the temporary directory in /tmp,
+    ## fail and exit.
+    if path_workingdir is None:
+        msg = """Error: Unable to create working directory [%] in either [%s] """ \
+              """or [/tmp]. Cannot stamp file.""" % (working_dirname, tmpdir)
+        raise InvenioWebSubmitFileStamperError(msg)
+
+    ## return the path to the working-directory:
+    return path_workingdir
+
+
+## ***** Functions Specific to CLI calling of the program: *****
 
 def usage(wmsg="", err_code=0):
     """Print a "usage" message (along with an optional additional warning/error
@@ -778,155 +1017,93 @@ def usage(wmsg="", err_code=0):
     sys.exit(err_code)
 
 
-## def get_names_of_stamping_subject_files(filenames):
-##     """From a list of filenames, extract the path to the "input file" (that
-##        which is to be stamped), and the output file (the name that the
-##        stamped file is to be given.)
-##        @param filenames: (list) - contains the paths/names of the files to
-##         be worked with.
-##        @return: tuple - the path to the input file and the name of the output
-##         file (None if no output file was provided.)
-##     """
-##     ## Take the names of the input and output files:
-##     try:
-##         ## Get the name of the input file (that which is to be stamped):
-##         path_infile = filenames[0]
-##     except IndexError:
-##         ## Oops, no input file name provided.
-##         msg = """Error: unable to determine the name of the file to be stamped."""
-##         raise InvenioStampFileError(msg)
-##     ## If the name of an output file was specified, remove any leading path and 
-##     try:
-##         ## Get the name of the output file:
-##         path_outfile = filenames[1]
-##     except IndexError:
-##         ## No output filename given.
-##         name_outfile = None
-##     else:
-##         ## We only want to have the name of the output file, not a path to it.
-##         (path_outfile, name_outfile) = os.path.split(path_outfile)
-##         if name_outfile == "":
-##             ## out_filepath was a pat, not a filename:
-##             name_outfile = None
-
-##     ## Return the names of the input and output files:
-##     return (path_infile, name_outfile)
-
-def copy_stampingfile_to_working_directory(path_workingdir, infile):
-    (dummy, name_infile) = os.path.split(infile)
-    if name_infile == "":
-        ## Error: infile is just a path.
-        msg = """Error: unable to determine the name of the file to be """ \
-              """stamped."""
-        raise InvenioStampFileError(msg)
-
-    ## Test to see whether the stamping subject file is a real file and
-    ## is readable:
-    if os.access("%s" % infile, os.R_OK):
-        ## File is readable. Copy it locally to the working directory:
-        try:
-            shutil.copyfile("%s" % infile, \
-                            "%s/%s" % (path_workingdir, name_infile))
-        except IOError:
-            ## Unable to copy the stamping subject file to the
-            ## working directory:
-            msg = """Error: Unable to copy stamping file [%s] to """ \
-                  """working directory for stamping [%s].""" \
-                  % (infile, path_workingdir)
-            raise InvenioStampFileError(msg)
-    else:
-        ## Unable to read the template file:
-        msg = """Error: Unable to copy stamping file [%s] to """ \
-              """working directory [%s]. (File not readable.)""" \
-              % (infile, path_workingdir)
-        raise InvenioStampFileError(msg)
-
-    ## Now that the stamping file has been successfully copied to the working
-    ## directory, return its base name:
-    return name_infile
-
-def create_working_directory(working_dirname):
-    """Create the stamping "working directory" from a given directory name
-       and return its full path.
-       The working directory will be created in ~invenio/var/tmp or failing
-       this, /tmp. If it cannot be created in either of these locations,
-       an exception (InvenioStampFileError) will be raised.
-       @param working_dirname: (string) - the name to be given to the
-        working directory used in this stamping session.
-       @return: (string) - the full path to the working directory.
-       @Exceptions raised: InvenioStampFileError.
-    """
-    ## Create the temporary directory in which to place the LaTeX template
-    ## and its helper files.
-    ## Try first in ~invenio/var/tmp:
-    path_workingdir = None
-    try:
-        os.mkdir("%s/%s" % (tmpdir, working_dirname))
-    except OSError:
-        ## Unable to create the temporary directory in ~invenio/var/tmp
-        pass
-    else:
-        ## record the full path to the working directory:
-        path_workingdir = "%s/%s" % (tmpdir, working_dirname)
-
-    ## Now if it wasn't possible to create the working directory in
-    ## ~invenio/var/tmp, try to create it in /tmp:
-    if path_workingdir is None:
-        try:
-            os.mkdir("/tmp/%s" % working_dirname)
-        except OSError:
-            ## Unable to create the temporary directory in /tmp
-            pass
-        else:
-            ## record the full path to the working directory:
-            path_workingdir = "/tmp/%s" % working_dirname
-
-    ## If it wasn't possible to create the temporary directory in /tmp,
-    ## fail and exit.
-    if path_workingdir is None:
-        msg = """Error: Unable to create working directory [%] in either [%s] """ \
-              """or [/tmp]. Cannot stamp file.""" % (working_dirname, tmpdir)
-        raise InvenioStampFileError(msg)
-
-    ## return the path to the working-directory:
-    return path_workingdir
-
-
-
-
 def get_cli_options():
-    """Get the various arguments and options from the command line and populate
-       a dictionary of cli_options.
+    """From the options and arguments supplied by the user via the CLI,
+       build a dictionary of options to drive websubmit-file-stamper.
+       For reference, the CLI options available to the user are as follows:
+
+         -h, --help                 -> Display help/usage message and exit;
+         -V, --version              -> Display version information and exit;
+         -v, --verbose=             -> Set verbosity level (integer in the
+                                       range 0-9);
+         -t, --latex-template=      -> Path to the LaTeX template file that
+                                       should be used for the creation of the
+                                       PDF stamp. (Note, if it's just a
+                                       basename, it will be sought first in the
+                                       current working directory, and then in
+                                       the invenio file-stamper templates
+                                       directory; If there is a qualifying
+                                       path to the template name, it will be
+                                       sought only in that location);
+         -c, --latex-template-var=  -> A variable that should be
+                                       replaced in the LaTeX template file
+                                       with its corresponding value. Of the
+                                       following format:
+                                           varname=value
+                                       This option is repeatable - one for each
+                                       template variable;
+         -s, --stamp=                  The type of stamp to be applied to the
+                                       subject file. Must be one of 3 values:
+                                        + "first" - stamp only the first page;
+                                        + "all"   - stamp all pages;
+                                        + "coverpage" - add a cover page to the
+                                          document;
+                                       The default value is "first";
+         -o, --output-file=         -> The optional name to be given to the
+                                       finished (stamped) file. If this is
+                                       omitted, the stamped file will be
+                                       given the same name as the input file,
+                                       but will be prefixed by "stamped-";
+
        @return: (dictionary) of input options and flags, set as
-        appropriate. The input options (dictionary keys) are:
-         latex_template: The path to the latex template to be used for stamping;
-         input_file: The file to be stamped;
-         output_file: The name of the "stamped" file that is to be created;
-         stamping_mode: either "cover-page" or "stamp" - effectively the
-          type of stamp to be applied to the document;
-         tpl_replacements: a set of key-value items, effectively search strings
-          to be replaced in the latex template, and the values with which they
-          should be replaced. This allows the stamp to contain custom strings;
-         verbosity: an integer representing verbosity level;
+        appropriate. The dictionary has the following structure:
+           + latex-template: (string) - the path to the LaTeX template to be
+              used for the creation of the stamp itself;
+           + latex-template-var: (dictionary) - This dictionary contains
+              variables that should be sought in the LaTeX template file, and
+              the values that should be substituted in their place. E.g.:
+                    { "TITLE" : "An Introduction to CDS Invenio" }
+           + input-file: (string) - the path to the input file (i.e. that
+              which is to be stamped;
+           + output-file: (string) - the name of the stamped file that should
+              be created by the program. This is optional - if not provided,
+              a default name will be applied to a file instead;
+           + stamp: (string) - the type of stamp that is to be applied to the
+              input file. It must take one of 3 values:
+                    - "first": Stamp only the first page of the document;
+                    - "all": Apply the stamp to all pages of the document;
+                    - "coverpage": Add a "cover page" to the document;
+           + verbosity: (integer) - the verbosity level under which the program
+              is to run;
+        So, an example of the returned dictionary would be something like:
+              { 'latex-template'      : "cern-standard-stamp-left.tex",
+                'latex-template-var' : { "REPORTNUMBER" : "TEST-2008-001",
+                                         "DATE"         : "15/02/2008",
+                                       },
+                'input-file'          : "test-doc.pdf",
+                'output-file'         : "",
+                'stamp'               : "first",
+                'verbosity'           : 0,
+              } 
     """
     ## dictionary of important values relating to cli call of program:
-    options = { 'latex_template'   : "",
-                'input_file'       : "",
-                'output_file'      : "",
-                'stamping_mode'    : "cover-page",
-                'tpl_replacements' : "",
-                'verbosity'        : 0,
+    options = { 'latex-template'     : "",
+                'latex-template-var' : {},
+                'input-file'         : "",
+                'output-file'        : "",
+                'stamp'              : "first",
+                'verbosity'          : 0,
               }
 
     ## Get the options and arguments provided by the user via the CLI:
     try:
-        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:t:m:r:o:", \
+        myoptions, myargs = getopt.getopt(sys.argv[1:], "hVv:t:c:s:o:", \
                                           ["help",
                                            "version",
-                                           "verbose=",
+                                           "verbosity=",
                                            "latex-template=",
-                                           "stamp-mode=",
-                                           "latex-template-vars=",
+                                           "latex-template-var=",
+                                           "stamp=",
                                            "output-file="])
     except getopt.GetoptError, err:
         ## Invalid option provided - usage message
@@ -935,7 +1112,7 @@ def get_cli_options():
     ## Get the input file from the arguments list (it should be the
     ## first argument):
     if len(myargs) > 0:
-        options["input_file"] = myargs[0]
+        options["input-file"] = myargs[0]
 
     ## Extract the details of the options:
     for opt in myoptions:
@@ -947,7 +1124,7 @@ def get_cli_options():
         elif opt[0] in ("-h","--help"):
             ## help message and exit
             usage()
-        elif opt[0] in ("-v", "--verbose"):
+        elif opt[0] in ("-v", "--verbosity"):
             ## Get verbosity level:
             if not opt[1].isdigit():
                 options['verbosity'] = 0
@@ -958,55 +1135,91 @@ def get_cli_options():
         elif opt[0] in ("-o", "--output-file"):
             ## Get the name of the "output file" that is to be created after
             ## stamping (i.e. the "stamped file"):
-            options["output_file"] = opt[1]
+            options["output-file"] = opt[1]
         elif opt[0] in ("-t", "--latex-template"):
-            ## Get the path to the latex template:
-            options["latex_template"] = opt[1]
-        elif opt[0] in ("-m", "--stamp-mode"):
-            ## Get the stamping mode to be used:
-            if str(opt[1].lower()) in ("cover-page", "stamp"):
-                ## if the user supplied the string cover-page or stamp,
-                ## accept it.
-                options["stamping_mode"] = str(opt[1]).lower()
+            ## Get the path to the latex template to be used for the creation
+            ## of the stamp file:
+            options["latex-template"] = opt[1]
+        elif opt[0] in ("-m", "--stamp"):
+            ## The type of stamp that is to be applied to the document:
+            ## Options are coverpage, first, all:
+            if str(opt[1].lower()) in ("coverpage", "first", "all"):
+                ## Valid stamp type, accept it;
+                options["stamp"] = str(opt[1]).lower()
             else:
-                ## An illegal value was supplied for stamp-mode. Print the usage
-                ## message and quit.
+                ## Invalid stamp type. Print usage message and quit.
                 usage()
-        elif opt[0] in ("-r", "--tpl-replacements"):
-            ## The user has provided a string of replacement strings that
-            ## should be substituted for their values in the latex template.
-            options["tpl_replacements"] = opt[1]
+        elif opt[0] in ("-r", "--latex-template-var"):
+            ## This is a variable to be replaced in the LaTeX template.
+            ## It should take the following form:
+            ##    varname=value
+            ## We can therefore split it on the first "=" sign - anything to
+            ## left will be considered to be the name of the variable to search
+            ## for; anything to the right will be considered as the value that
+            ## should replace the variable in the LaTeX template.
+            ## Note: If the user supplies the same variable name more than once,
+            ## the latter occurrence will be kept and the previous value will be
+            ## overwritten.
+            ## Note also that if the variable string does not take the
+            ## expected format a=b, it will be ignored.
+            ##
+            ## Get the complete string:
+            varstring = str(opt[1])
+            ## Split into 2 string based on the first "=":
+            split_varstring = varstring.split("=", 1)
+            if len(split_varstring) == 2:
+                ## Split based on equals sign was successful:
+                if split_varstring[0] != "":
+                    ## The variable name was not empty - keep it:
+                    options["latex-template-var"]["%s" % split_varstring[0]] = \
+                        "%s" % split_varstring[1]
+                
 
     ## Return the input options:
     return options
 
 
-def perform_request_stamping(latex_template="",
-                             input_file="",
-                             output_file="",
-                             tpl_replacements="",
-                             stamping_mode="cover-page",
-                             verbosity=0):
-    """
-    """
+def perform_request_stamping(options):
     ## SANITY CHECKS:
+    ## Does the options dictionary contain all expected keys?
+    ## 
+    ## A list of the names of the expected options:
+    expected_option_names = ["latex-template", \
+                             "latex-template-var", \
+                             "input-file", \
+                             "output-file", \
+                             "stamp", \
+                             "verbosity"]
+    expected_option_names.sort()
+    ## A list of the option names that have been received:
+    received_option_names = options.keys()
+    received_option_names.sort()
+ 
+    if expected_option_names != received_option_names:
+        ## Error: he dictionary of options had an illegal structure:
+        msg = """Error: Unexpected value received for "options" parameter."""
+        raise TypeError(msg)
+
     ## Do we have an input file to work on?
-    if input_file in (None, ""):
+    if options["input-file"] in (None, ""):
         ## No input file - stop the stamping:
         msg = "Error: unable to determine the name of the file to be stamped."
-        raise InvenioStampFileError(msg)
+        raise InvenioWebSubmitFileStamperError(msg)
+
     ## Do we have a LaTeX file for creation of the stamp?
-    if latex_template in (None, ""):
+    if options["latex-template"] in (None, ""):
         ## No latex stamp file - stop the stamping:
         msg = "Error: unable to determine the name of the LaTeX template " \
               "file to be used for stamp creation."
-        raise InvenioStampFileError(msg)
+        raise InvenioWebSubmitFileStamperError(msg)
 
+    ## OK - begin the document stamping process:
+    ## 
     ## Get the output file:
-    (path_outfile, name_outfile) = os.path.split(output_file)
+    (dummy, name_outfile) = os.path.split(options["output-file"])
     if name_outfile != "":
         ## Take just the basename component of outfile:
-        output_file = name_outfile
+        options["output-file"] = name_outfile
 
     ## From the PID and the current timestamp, create the name of a temporary
     ## directory in which to store the latex/PDF files for stamping.
@@ -1017,29 +1230,27 @@ def perform_request_stamping(latex_template="",
                                               my_pid,
                                               current_timestamp)
 
-    ## From the string passed via the "--tpl-replacements" option, get a
-    ## dictionary of keywords/values to be replaced in the stamping template:
-    replacements = get_dictionary_from_string(tpl_replacements)
-
     ## Create the working directory and get the full path to it:
     path_workingdir = create_working_directory(working_dirname)
 
     ## Copy the file to be stamped into the working directory:
-    basename_infile = \
-            copy_stampingfile_to_working_directory(path_workingdir, input_file)
+    basename_input_file = \
+            copy_subject_file_to_working_directory(path_workingdir, \
+                                                   options["input-file"])
 
     ## Now import the LaTeX (and associated) files into a temporary directory
     ## and use them to create the "stamp" PDF:
-    pdf_stamp_name = \
-            create_pdf_stamp(path_workingdir, replacements, latex_template)
+    pdf_stamp_name = create_pdf_stamp(path_workingdir, \
+                                      options["latex-template"], \
+                                      options["latex-template-var"])
 
     ## Everything is now ready to merge the "stamping subject" file with the
     ## PDF "stamp" file that has been created:
-    name_stamped_file = merge_stamp_with_subject_file(stamping_mode, \
-                                                      path_workingdir, \
-                                                      pdf_stamp_name, \
-                                                      basename_infile, \
-                                                      output_file)
+    name_stamped_file = stamp_subject_file(path_workingdir, \
+                                           options["stamp"], \
+                                           pdf_stamp_name, \
+                                           basename_input_file, \
+                                           options["output-file"])
 
     ## Return a tuple containing the working directory and the name of the
     ## stamped file to the caller:
@@ -1056,21 +1267,9 @@ def main():
     ## Stamp the file and obtain the working directory in which the stamped file
     ## is situated and the name of the stamped file:
     try:
-        (working_dir, stamped_file) = \
-           perform_request_stamping(latex_template=\
-                                     input_options["latex_template"],
-                                    input_file=\
-                                     input_options["input_file"],
-                                    output_file=\
-                                     input_options["output_file"],
-                                    tpl_replacements=\
-                                     input_options["tpl_replacements"],
-                                    stamping_mode=\
-                                     input_options["stamping_mode"],
-                                    verbosity=\
-                                     input_options["verbosity"])
-    except InvenioStampFileError, err:
-        ## Oops. Something went wrong:
+        (working_dir, stamped_file) = perform_request_stamping(input_options)
+    except InvenioWebSubmitFileStamperError, err:
+        ## Something went wrong:
         sys.stderr.write("Stamping failed: [%s]\n" % str(err))
         sys.stderr.flush()
         sys.exit(1)
