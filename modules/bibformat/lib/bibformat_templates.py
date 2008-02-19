@@ -524,8 +524,6 @@ class Template:
 
         function prepareLayout(){
             resizeViews();
-            //getByID("shortDocFrame").style.height="91%%";
-            // TODO : Find a way to resize shortDocFrame
         }
 
         function resizeViews(){
@@ -554,6 +552,12 @@ class Template:
             }
 
             getByID("previewiframe").style.height=200;
+
+            // Resize documentation
+            var height = document.documentElement.clientHeight;
+            height -= getByID('shortDocFrame').offsetTop
+            //height -= 20;
+            getByID('shortDocFrame').style.height = height +"px";
         }
 
         </script>
