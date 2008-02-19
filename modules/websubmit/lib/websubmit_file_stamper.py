@@ -32,7 +32,7 @@
 __revision__ = "$Id$"
 
 
-import getopt, sys, re, os, time, shutil
+import getopt, sys, re, os, time, shutil, tempfile
 from invenio.config import CFG_PATH_DISTILLER
 
 ## from invenio.config import tmpdir
@@ -410,17 +410,17 @@ def create_pdf_stamp(path_workingdir, latex_template, latex_template_var):
 
 ## ***** Functions related to the actual stamping of the file: *****
 
-def stamp_file_cover_page(path_workingdir, \
-                          stamp_file, \
-                          subject_file, \
-                          output_file):
+def apply_stamp_cover_page(path_workingdir, \
+                           stamp_file_name, \
+                           subject_file, \
+                           output_file):
     """Carry out the stamping:
        This function adds a cover-page to the file.
        @param path_workingdir: (string) - the path to the working directory
         that contains all of the files needed for the stamping process to be
         carried out.
-       @param stamp_file: (string) - the name of the PDF stamp file (i.e. the
-        cover-page itself).
+       @param stamp_file_name: (string) - the name of the PDF stamp file (i.e.
+        the cover-page itself).
        @param subject_file: (string) - the name of the file to be stamped.
        @param output_file: (string) - the name of the final "stamped" file (i.e.
         that with the cover page added) that will be written in the working
@@ -434,7 +434,7 @@ def stamp_file_cover_page(path_workingdir, \
                 """2>/dev/null"""% \
                   { 'pdftk'         : CFG_PATH_PDFTK,
                     'working-dir'   : path_workingdir,
-                    'cover-page'    : stamp_file,
+                    'cover-page'    : stamp_file_name,
                     'file-to-stamp' : subject_file,
                     'stamped-file'  : output_file,
                   }
@@ -448,21 +448,24 @@ def stamp_file_cover_page(path_workingdir, \
         msg = "Error: Unable to stamp file [%s/%s]. There was an error when " \
               "trying to add the cover page [%s/%s] to the file. Stamping " \
               "has failed." \
-              % (path_workingdir, subject_file, path_workingdir, stamp_file)
+              % (path_workingdir, \
+                 subject_file, \
+                 path_workingdir, \
+                 stamp_file_name)
         raise InvenioWebSubmitFileStamperError(msg)
 
 
-def stamp_file_first_page(path_workingdir, \
-                          stamp_file, \
-                          subject_file, \
-                          output_file):
+def apply_stamp_first_page(path_workingdir, \
+                           stamp_file_name, \
+                           subject_file, \
+                           output_file):
     """Carry out the stamping:
        This function adds a stamp to the first page of the file.
        @param path_workingdir: (string) - the path to the working directory
         that contains all of the files needed for the stamping process to be
         carried out.
-       @param stamp_file: (string) - the name of the PDF stamp file (i.e. the
-        stamp itself).
+       @param stamp_file_name: (string) - the name of the PDF stamp file (i.e.
+        the stamp itself).
        @param subject_file: (string) - the name of the file to be stamped.
        @param output_file: (string) - the name of the final "stamped" file that
         will be written in the working directory after the function has ended.
@@ -514,7 +517,7 @@ def stamp_file_first_page(path_workingdir, \
              "%(working-dir)s/%(stamped-first-page)s 2>/dev/null" \
              % { 'pdftk'              : CFG_PATH_PDFTK,
                  'working-dir'        : path_workingdir,
-                 'stamp-file'         : stamp_file,
+                 'stamp-file'         : stamp_file_name,
                  'first-page'         : output_file_first_page,
                  'stamped-first-page' : stamped_output_file_first_page,
                }
@@ -644,17 +647,17 @@ def stamp_file_first_page(path_workingdir, \
         raise InvenioWebSubmitFileStamperError(msg)
 
 
-def stamp_file_all_pages(path_workingdir, \
-                         stamp_file, \
-                         subject_file, \
-                         output_file):
+def apply_stamp_all_pages(path_workingdir, \
+                          stamp_file_name, \
+                          subject_file, \
+                          output_file):
     """Carry out the stamping:
        This function adds a stamp to all pages of the file.
        @param path_workingdir: (string) - the path to the working directory
         that contains all of the files needed for the stamping process to be
         carried out.
-       @param stamp_file: (string) - the name of the PDF stamp file (i.e. the
-        stamp itself).
+       @param stamp_file_name: (string) - the name of the PDF stamp file (i.e.
+        the stamp itself).
        @param subject_file: (string) - the name of the file to be stamped.
        @param output_file: (string) - the name of the final "stamped" file that
         will be written in the working directory after the function has ended.
@@ -665,7 +668,7 @@ def stamp_file_all_pages(path_workingdir, \
              "%(working-dir)s/%(stamped-file-all-pages)s 2>/dev/null" \
              % { 'pdftk'                  : CFG_PATH_PDFTK,
                  'working-dir'            : path_workingdir,
-                 'stamp-file'             : stamp_file,
+                 'stamp-file'             : stamp_file_name,
                  'file-to-stamp'          : subject_file,
                  'stamped-file-all-pages' : output_file,
                }
@@ -679,11 +682,11 @@ def stamp_file_all_pages(path_workingdir, \
         raise InvenioWebSubmitFileStamperError(msg)
 
 
-def stamp_subject_file(path_workingdir,
-                       stamp_type,
-                       stamp_file,
-                       subject_file,
-                       output_file):
+def apply_stamp_to_file(path_workingdir,
+                        stamp_type,
+                        stamp_file_name,
+                        subject_file,
+                        output_file):
     ## Stamping is performed on PDF files. We therefore need to test for the
     ## type of the subject file before attempting to stamp it:
     ##
@@ -691,17 +694,17 @@ def stamp_subject_file(path_workingdir,
     subject_filetype = ""
 
     ## Using the file command, test for the file-type of "subject_file":
-    gfile_cmd = "%(gfile)s %(working-dir)s/%(file-to-stamp)s 2> /dev/null" \
+    cmd_gfile = "%(gfile)s %(working-dir)s/%(file-to-stamp)s 2> /dev/null" \
                 % { 'gfile'         : CFG_PATH_GFILE,
                     'working-dir'   : path_workingdir,
                     'file-to-stamp' : subject_file,
                   }
     ## Execute the file command:
-    fh_gfilepipe = os.popen(gfile_cmd, "r")
+    fh_gfile = os.popen(cmd_gfile, "r")
     ## Read the results string output by gfile:
-    output_gfile = fh_gfilepipe.read()
+    output_gfile = fh_gfile.read()
     ## Close the pipe and capture its error code:
-    errcode_gfile = fh_gfilepipe.close()
+    errcode_gfile = fh_gfile.close()
 
     ## If a result was obtained from gfile, scan it for an acceptable file-type:
     if errcode_gfile is None and output_gfile != "":
@@ -804,25 +807,25 @@ def stamp_subject_file(path_workingdir,
         ## This means that the entire PDF "stamp" that was created from the
         ## LaTeX template is to be appended to the subject file as the first
         ## page (i.e. a cover-page).
-        stamp_file_cover_page(path_workingdir, \
-                              stamp_file, \
-                              subject_file, \
-                              output_file)
+        apply_stamp_cover_page(path_workingdir, \
+                               stamp_file_name, \
+                               subject_file, \
+                               output_file)
     elif stamp_type == "first":
-        stamp_file_first_page(path_workingdir, \
-                              stamp_file, \
-                              subject_file, \
-                              output_file)
+        apply_stamp_first_page(path_workingdir, \
+                               stamp_file_name, \
+                               subject_file, \
+                               output_file)
     elif stamp_type == 'all':
         ## The stamp to be applied to the document is a simple that that should
         ## be applied to ALL pages of the document (i.e. merged onto each page.)
-        stamp_file_all_pages(path_workingdir, \
-                             stamp_file, \
-                             subject_file, \
-                             output_file)
+        apply_stamp_all_pages(path_workingdir, \
+                              stamp_file_name, \
+                              subject_file, \
+                              output_file)
     else:
         ## Unexpcted stamping mode.
-        msg = """Error: Unexpected stamping mode [%s] - cannot stamp file.""" \
+        msg = """Error: Unexpected stamping mode [%s]. Stamping has failed.""" \
               % stamp_type
         raise InvenioWebSubmitFileStamperError(msg)
 
@@ -917,49 +920,31 @@ def copy_subject_file_to_working_directory(path_workingdir, input_file):
     ## directory, return its base name:
     return name_input_file
 
-def create_working_directory(working_dirname):
-    """Create the stamping "working directory" from a given directory name
-       and return its full path.
-       The working directory will be created in ~invenio/var/tmp or failing
-       this, /tmp. If it cannot be created in either of these locations,
-       an exception (InvenioWebSubmitFileStamperError) will be raised.
-       @param working_dirname: (string) - the name to be given to the
-        working directory used in this stamping session.
+def create_working_directory():
+    """Create a "working directory" in which the files related to the stamping
+       process can be stored, and return the full path to it.
+       The working directory will be created in ~invenio/var/tmp.
+       If it cannot be created there, an exception
+       (InvenioWebSubmitFileStamperError) will be raised.
+       The working directory will have the prefix
+       "websubmit_file_stamper_", and could be given a name something like:
+                 - websubmit_file_stamperTzs3St
        @return: (string) - the full path to the working directory.
        @Exceptions raised: InvenioWebSubmitFileStamperError.
     """
     ## Create the temporary directory in which to place the LaTeX template
-    ## and its helper files.
-    ## Try first in ~invenio/var/tmp:
+    ## and its helper files in ~invenio/var/tmp:
     path_workingdir = None
     try:
-        os.mkdir("%s/%s" % (tmpdir, working_dirname))
-    except OSError:
+        path_workingdir = tempfile.mkdtemp(prefix="websubmit_file_stamper_", \
+                                           dir="%s" % tmpdir)
+    except OSError, err:
         ## Unable to create the temporary directory in ~invenio/var/tmp
-        pass
-    else:
-        ## record the full path to the working directory:
-        path_workingdir = "%s/%s" % (tmpdir, working_dirname)
-
-    ## Now if it wasn't possible to create the working directory in
-    ## ~invenio/var/tmp, try to create it in /tmp:
-    if path_workingdir is None:
-        try:
-            os.mkdir("/tmp/%s" % working_dirname)
-        except OSError:
-            ## Unable to create the temporary directory in /tmp
-            pass
-        else:
-            ## record the full path to the working directory:
-            path_workingdir = "/tmp/%s" % working_dirname
-
-    ## If it wasn't possible to create the temporary directory in /tmp,
-    ## fail and exit.
-    if path_workingdir is None:
-        msg = """Error: Unable to create working directory [%] in either [%s] """ \
-              """or [/tmp]. Cannot stamp file.""" % (working_dirname, tmpdir)
+        msg = "Error: Unable to create a temporary working directory in " \
+              "which to carry out the stamping process. An attempt was made " \
+              "to create the directory in [%s]; the error encountered was " \
+              "<%s>. Stamping has failed." % (tmpdir, str(err))
         raise InvenioWebSubmitFileStamperError(msg)
-
     ## return the path to the working-directory:
     return path_workingdir
 
@@ -1084,7 +1069,7 @@ def get_cli_options():
                 'output-file'         : "",
                 'stamp'               : "first",
                 'verbosity'           : 0,
-              } 
+              }
     """
     ## dictionary of important values relating to cli call of program:
     options = { 'latex-template'     : "",
@@ -1179,7 +1164,50 @@ def get_cli_options():
     return options
 
 
-def perform_request_stamping(options):
+def stamp_file(options):
+    """The driver for the stamping process. This is effectively the function
+       that is responsible for coordinating the stamping of a file.
+       @param options: (dictionary) - a dictionary of options that are required
+        by the function in order to carry out the stamping process.
+
+        The dictionary must have the following structure:
+           + latex-template: (string) - the path to the LaTeX template to be
+              used for the creation of the stamp itself;
+           + latex-template-var: (dictionary) - This dictionary contains
+              variables that should be sought in the LaTeX template file, and
+              the values that should be substituted in their place. E.g.:
+                    { "TITLE" : "An Introduction to CDS Invenio" }
+           + input-file: (string) - the path to the input file (i.e. that
+              which is to be stamped;
+           + output-file: (string) - the name of the stamped file that should
+              be created by the program. This is optional - if not provided,
+              a default name will be applied to a file instead;
+           + stamp: (string) - the type of stamp that is to be applied to the
+              input file. It must take one of 3 values:
+                    - "first": Stamp only the first page of the document;
+                    - "all": Apply the stamp to all pages of the document;
+                    - "coverpage": Add a "cover page" to the document;
+           + verbosity: (integer) - the verbosity level under which the program
+              is to run;
+        So, an example of the returned dictionary would be something like:
+              { 'latex-template'      : "cern-standard-stamp-left.tex",
+                'latex-template-var'  : { "REPORTNUMBER" : "TEST-2008-001",
+                                         "DATE"         : "15/02/2008",
+                                       },
+                'input-file'          : "test-doc.pdf",
+                'output-file'         : "",
+                'stamp'               : "first",
+                'verbosity'           : 0,
+              }
+
+       @return: (tuple) - consisting of two strings:
+          1. the path to the working directory in which all stamping-related
+              files are stored;
+          2. The name of the "stamped" file;
+       @Exceptions raised: (InvenioWebSubmitFileStamperError) exceptions may
+        be raised or propagated by this function when the stamping process
+        fails for one reason or another.
+    """
     ## SANITY CHECKS:
     ## Does the options dictionary contain all expected keys?
     ## 
@@ -1223,15 +1251,8 @@ def perform_request_stamping(options):
 
     ## From the PID and the current timestamp, create the name of a temporary
     ## directory in which to store the latex/PDF files for stamping.
-    current_time = time.strftime("%Y%m%d%H%M%S")
-    my_pid = "%s" % os.getpid()
-    current_timestamp = "%f" % time.time()
-    working_dirname = "%s_stampfile_%s_%s" % (current_time,
-                                              my_pid,
-                                              current_timestamp)
-
     ## Create the working directory and get the full path to it:
-    path_workingdir = create_working_directory(working_dirname)
+    path_workingdir = create_working_directory()
 
     ## Copy the file to be stamped into the working directory:
     basename_input_file = \
@@ -1246,20 +1267,26 @@ def perform_request_stamping(options):
 
     ## Everything is now ready to merge the "stamping subject" file with the
     ## PDF "stamp" file that has been created:
-    name_stamped_file = stamp_subject_file(path_workingdir, \
-                                           options["stamp"], \
-                                           pdf_stamp_name, \
-                                           basename_input_file, \
-                                           options["output-file"])
+    name_stamped_file = apply_stamp_to_file(path_workingdir, \
+                                            options["stamp"], \
+                                            pdf_stamp_name, \
+                                            basename_input_file, \
+                                            options["output-file"])
 
     ## Return a tuple containing the working directory and the name of the
     ## stamped file to the caller:
     return (path_workingdir, name_stamped_file)
-    
 
 
-def main():
-    """Main function.
+
+def stamp_file_cli():
+    """The function responsible for triggering the stamping process when called
+       via the CLI.
+       This function will effectively get the CLI options, then pass them to
+       function that is responsible for coordinating the stamping process
+       itself.
+       Once stamping has been completed, an attempt will be made to copy the
+       stamped file to the current working directory.
     """
     ## Get CLI options and arguments:
     input_options = get_cli_options()
@@ -1267,7 +1294,7 @@ def main():
     ## Stamp the file and obtain the working directory in which the stamped file
     ## is situated and the name of the stamped file:
     try:
-        (working_dir, stamped_file) = perform_request_stamping(input_options)
+        (working_dir, stamped_file) = stamp_file(input_options)
     except InvenioWebSubmitFileStamperError, err:
         ## Something went wrong:
         sys.stderr.write("Stamping failed: [%s]\n" % str(err))
@@ -1301,4 +1328,4 @@ def main():
 
 ## Start proceedings for CLI calls:
 if __name__ == "__main__":
-    main()
+    stamp_file_cli()
