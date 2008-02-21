@@ -20,9 +20,9 @@
 
 """Library of functions for the xmlmarc2textmarc utility."""
 
-__revision__ = "$Id$"
-
 from __future__ import generators
+
+__revision__ = "$Id$"
 
 from invenio.bibrecord import \
      create_records, \
