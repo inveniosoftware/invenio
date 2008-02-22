@@ -25,8 +25,10 @@ compatible with file.py structure, but the viceversa is not true).
 """
 
 import sys
+from invenio.config import logdir, supportemail
 from invenio.dbquery import run_sql, OperationalError
 from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
+from datetime import datetime
 
 def retrieve_fulltext_recids():
     """Returns the list of all the recid number linked with at least a fulltext
@@ -34,10 +36,13 @@ def retrieve_fulltext_recids():
     res = run_sql('SELECT DISTINCT id_bibrec FROM bibrec_bibdoc')
     return [recid[0] for recid in res]
 
-def fix_recid(recid):
+def fix_recid(recid, logfile):
     """Fix a given recid."""
     print "Fixing record %s ->" % recid,
+    print >> logfile, "Fixing record %s:" % recid
+
     bibrec = BibRecDocs(recid)
+    print >> logfile, bibrec
     docnames = bibrec.get_bibdoc_names()
     try:
         for docname in docnames:
@@ -46,10 +51,15 @@ def fix_recid(recid):
             new_bibdocnames = [bibdoc.get_docname() for bibdoc in new_bibdocs]
             if new_bibdocnames:
                 print "(created bibdocs: '%s')" % "', '".join(new_bibdocnames),
+                print >> logfile, "(created bibdocs: '%s')" % "', '".join(new_bibdocnames)
     except InvenioWebSubmitFileError, e:
+        print >> logfile, BibRecDocs(recid)
         print "%s -> ERROR", e
+        return False
     else:
+        print >> logfile, BibRecDocs(recid)
         print "-> OK"
+        return True
 
 def backup_tables(drop=False):
     """This function create a backup of bibrec_bibdoc, bibdoc and bibdoc_bibdoc tables. Returns False in case dropping of previous table is needed."""
@@ -122,8 +132,18 @@ def main():
         print e
         sys.exit(1)
 
+    logfilename = '%s/fulltext_files_migration_kit-%s.log' % (logdir, datetime.today().strftime('%Y%m%d%H%M%S'))
+    logfile = open(logfilename, 'w')
+    print "Created a complete log file into %s" % logfilename
     for recid in recids:
-        fix_recid(recid)
+        if not fix_recid(recid, logfile):
+            print "-" * 40
+            print "INTERRUPTED BECAUSE OF ERROR!"
+            print "Please see the log file %s for what was the status of " % logfilename
+            print "record %s prior to the error." % recid
+            print "Contact %s in case of problems, attaching the log." % supportemail
+            logfile.close()
+            sys.exit(1)
     print "-" * 40
     print "DONE"
 

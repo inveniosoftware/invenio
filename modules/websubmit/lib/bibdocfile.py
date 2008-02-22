@@ -367,8 +367,7 @@ class BibRecDocs:
     def fix(self, docname):
         """Algorithm that transform an a broken/old bibdoc into a coherent one:
         i.e. the corresponding folder will have files named after the bibdoc
-        name. All extensions will be lowercase. Proper .recid, .type,
-        .md5 files will be created/updated.
+        name. Proper .recid, .type, .md5 files will be created/updated.
         In case of more than one file with the same format revision a new bibdoc
         will be created in order to put does files.
         Returns the list of newly created bibdocs if any.
@@ -384,7 +383,12 @@ class BibRecDocs:
             for filename in os.listdir(bibdoc.basedir):
                 if filename[0] != '.' and ';' in filename:
                     name, version = filename.split(';')
-                    version = int(version)
+                    try:
+                        version = int(version)
+                    except ValueError:
+                        # Strange name, let's skip it...
+                        register_exception()
+                        continue
                     if version == 0:
                         zero_version_bug = True
                     format = name[len(file_strip_ext(name)):]
@@ -569,7 +573,7 @@ class BibDoc:
         """Update the modification time of the bibdoc."""
         run_sql('UPDATE bibdoc SET modification_date=NOW() WHERE id=%s', (self.id, ))
         if self.recid:
-            run_sql('UPDATE bibrec SET modification_date=NOW() WHERE id=%s', (self.recid))
+            run_sql('UPDATE bibrec SET modification_date=NOW() WHERE id=%s', (self.recid, ))
 
     def set_status(self, new_status):
         """Set a new status."""
