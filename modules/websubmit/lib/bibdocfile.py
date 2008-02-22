@@ -568,11 +568,14 @@ class BibDoc:
     def touch(self):
         """Update the modification time of the bibdoc."""
         run_sql('UPDATE bibdoc SET modification_date=NOW() WHERE id=%s', (self.id, ))
+        if self.recid:
+            run_sql('UPDATE bibrec SET modification_date=NOW() WHERE id=%s', (self.recid))
 
     def set_status(self, new_status):
         """Set a new status."""
         run_sql('UPDATE bibdoc SET status=%s WHERE id=%s', (new_status, self.id))
         self.status = new_status
+        self.touch()
         self._build_file_list()
         self._build_related_file_list()
 
