@@ -25,6 +25,10 @@
 
 __revision__ = "$Id$"
 
+
+from formatter import AbstractFormatter, DumbWriter
+from cStringIO import StringIO
+
 def indent_text(text,
                 nb_tabs=0,
                 tab_str="  ",
@@ -45,3 +49,49 @@ def indent_text(text,
     for line in lines:
         output += tabs + line + linebreak_output
     return output
+
+def wrap_in_a_box(msg, title=''):
+    """Return a nicely formatted hello! as:
+    ******************
+    **  some title  **
+    **--------------**
+    **    hello!    **
+    ******************
+    """
+    ret = ''
+    out = StringIO()
+    tool = AbstractFormatter(DumbWriter(out, maxcol=72))
+    for row in msg.split('\n'):
+        tool.add_flowing_data(row)
+        tool.end_paragraph(1)
+    msg_rows = out.getvalue().split('\n')[:-2]
+
+    out = StringIO()
+    tool = AbstractFormatter(DumbWriter(out, maxcol=72))
+    tool.add_flowing_data(title)
+    title_rows = out.getvalue().split('\n')
+
+    max_len = max([len(row) for row in title_rows + msg_rows]) + 6
+    ret += '*' * max_len + '\n'
+    if title:
+        for row in title_rows:
+            ret += '** %s%s **\n' % (row, ' ' * (max_len - len(row) - 6))
+        ret += '**' + '-' * (max_len - 4) + '**\n'
+    for row in msg_rows:
+        ret += '** %s%s **\n' % (row, ' ' * (max_len - len(row) - 6))
+    ret += '*' * max_len + '\n'
+    return ret
+
+def make_conclusion(text):
+    """Return:
+    --------------
+    text text text
+    """
+    out = StringIO()
+    tool = AbstractFormatter(DumbWriter(out, maxcol=78))
+    tool.add_flowing_data(text)
+    text = out.getvalue().split('\n')
+
+    max_len = max([len(row) for row in text])
+
+    return '%s\n%s\n' % ('-' * max_len, '\n'.join(text))
