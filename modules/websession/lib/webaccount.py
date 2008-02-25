@@ -33,7 +33,7 @@ from invenio.config import \
      sweburl, \
      version, \
      weburl
-from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION
+from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, SUPERADMINROLE
 from invenio.webpage import page
 from invenio.dbquery import run_sql
 from invenio.webuser import getUid,isGuestUser, get_user_preferences, \
@@ -87,7 +87,7 @@ def perform_youradminactivities(user_info, ln):
         if action not in your_admin_activities:
             your_admin_activities.append(action)
 
-    if "superadmin" in your_roles:
+    if SUPERADMINROLE in your_roles:
         for action in ["runbibedit", "cfgbibformat", "cfgbibharvest", "cfgoairepository", "cfgbibrank", "cfgbibindex", "cfgwebaccess", "cfgwebcomment", "cfgwebsearch", "cfgwebsubmit"]:
             if action not in your_admin_activities:
                 your_admin_activities.append(action)
