@@ -29,27 +29,27 @@ btn_edit_url   = weburl + "/img/iconpen.gif"
 weburl_bibedit = "%s/admin/bibedit/bibeditadmin.py" % weburl
 
 class Template:
-    
+
     def tmpl_table_header(self, ln, type_table, recid, temp="false", format_tag='marc',
-                          tag='', num_field=None, add=0):        
+                          tag='', num_field=None, add=0):
         """ Return the Header of table. """
 
         _ = gettext_set_language(ln)
 
         (tag, ind1, ind2, junk) = marc_to_split_tag(tag)
         tag = tag + ind1 + ind2 + "%"
-        
+
         if type_table != "record":
 
             if add == 1:
                 print_input_add_form = self.tmpl_input('hidden', 2, 'add')
             else:
                 print_input_add_form = ''
-                
+
             print_action_add_subfield = print_input_add_form + self.tmpl_input('hidden', str(num_field), 'num_field')
 
-            print_action_edit_100 = print_input_add_form + self.tmpl_input('hidden', str(num_field), 'num_field')            
-                                            
+            print_action_edit_100 = print_input_add_form + self.tmpl_input('hidden', str(num_field), 'num_field')
+
             if add != 1:
                 link_add_subfields = self.tmpl_link(ln, _("Add Subfield"), weburl_bibedit, 'edit',
                                                     {'recid'      : str(recid),
@@ -73,25 +73,25 @@ class Template:
                                  'format_tag' : format_tag,
                                  'temp'       : 'true',
                                  'add'        : 1})
-                            print_action_edit_100 = """ %(field)s: 
+                            print_action_edit_100 = """ %(field)s:
                                                         %(link_edit_100)s
                                                         """ % {'field'              : _("Field"),
                                                                'link_edit_100' : link_edit_100}
-                    
 
-                
-                print_action_add_subfield = """ %(field)s: 
+
+
+                print_action_add_subfield = """ %(field)s:
                                                 %(link_add_subfields)s
 
                                             """ % {'field'              : _("Field"),
                                                    'link_add_subfields' : link_add_subfields}
 
-                
+
             if add == 1:
                 link_form = "edit"
             else:
                 link_form = "index"
-                
+
             result = """ <form action="%(weburl_bibedit)s/%(link_form)s" method="POST">
                            %(input_recid)s
                            %(input_temp)s
@@ -115,36 +115,36 @@ class Template:
                                                   'format_tag' : format_tag,
                                                   'temp'       : 'true',
                                                   'add'        : 3}, 'add') + " | "
-            
+
             link_diplay_verbose = self.tmpl_link(ln, _("Verbose"), weburl_bibedit, 'index',
                                                  {'recid'      : str(recid),
                                                   'format_tag' : 's',
                                                   'temp'       : temp})
-            
+
             link_diplay_marc    = self.tmpl_link(ln, "MARC", weburl_bibedit, 'index',
                                                  {'recid'      : str(recid),
                                                   'format_tag' : 'marc',
-                                                  'temp'       : temp})                              
-                                                     
+                                                  'temp'       : temp})
+
             if temp != "false" and add != 3:
                 link_submit = self.tmpl_link(ln, _("Submit"), weburl_bibedit, 'submit', {'recid' : str(recid)}) + " | "
-                
+
             if add == 3:
                 link_add_field = ''
                 result = ''
             else:
-                link_cancel = self.tmpl_link(ln, _("Cancel"), weburl_bibedit, 'index', {'cancel' : str(recid)}) 
+                link_cancel = self.tmpl_link(ln, _("Cancel"), weburl_bibedit, 'index', {'cancel' : str(recid)})
                 link_delete = self.tmpl_link(ln, _("Delete"), weburl_bibedit, 'index', {'delete' : str(recid),
                                                                                         'confirm_delete' :1,
                                                                                         'temp' : temp})
-                
+
                 result = """ <div class="bibEditCellRight" style="font-weight: normal">
                                  &nbsp;%(action)s: %(link_submit)s%(link_cancel)s
-                                 
+
                                  &nbsp;%(record)s: %(link_add_field)s%(link_delete)s
-                                 
+
                                  &nbsp;%(display)s: %(link_diplay_verbose)s | %(link_diplay_marc)s
-                                 
+
                              </div> """  % {'action'              : _("Action"),
                                             'record'              : _("Record"),
                                             'display'             : _("Display"),
@@ -154,7 +154,7 @@ class Template:
                                             'link_diplay_marc'    : link_diplay_marc,
                                             'link_cancel'         : link_cancel,
                                             'link_delete'         : link_delete}
-                                        
+
         return """ <table class="bibEditTable">
                      <tr>
                        <th colspan="6">
@@ -167,10 +167,10 @@ class Template:
                                   'result' : result,
                                   'num_field': self.tmpl_input('hidden', str(num_field), 'num_field')}
 
-        
-    def tmpl_table_value(self, ln, recid, tag, field, format_tag, type_table, add, form_add=0):        
+
+    def tmpl_table_value(self, ln, recid, tag, field, format_tag, type_table, add, form_add=0):
         """ Return a field to print in table. """
-        
+
         if form_add == 0:
             subfields = field[0]
             num_field = field[4]
@@ -180,7 +180,7 @@ class Template:
             else:
                 tag_field = tag_field[:-1] + '%'
                 if get_name_tag(tag_field) != tag_field:
-                    print_tag_field = get_name_tag(tag_field)   
+                    print_tag_field = get_name_tag(tag_field)
                 else:
                     print_tag_field = tag_field[:-1]
             len_subfields = len(subfields)
@@ -228,7 +228,7 @@ class Template:
             if add == 1:
                 result += """ <tr>
                                 %s
-                              </tr> """ % self.tmpl_subfields(ln, add=add)      
+                              </tr> """ % self.tmpl_subfields(ln, add=add)
         else:
             #click on "add field" link on the top of index page.
             result = """ <td class="bibEditCellTag">
@@ -252,37 +252,37 @@ class Template:
                                       'input_ln'       : self.tmpl_input('hidden', ln, 'ln'),
                                       'recid'          : str(recid),
                                       'ln'             : ln}
-            
+
             result += "%s" % self.tmpl_subfields(ln, add=add)
-            
-        return """ <tr><td></td></tr>                   
+
+        return """ <tr><td></td></tr>
                    <tr>
                      %s
                    </tr> """ % result
 
-        
-    def tmpl_table_footer(self, ln, type_table, add=0):        
+
+    def tmpl_table_footer(self, ln, type_table, add=0):
         """ Return a footer of table. """
 
         _ = gettext_set_language(ln)
 
         button  = _("Done")
-            
+
         if type_table != "record" or add == 3:
             form = self.tmpl_input('submit', button, class_css='formbutton') + "</form>"
         else:
             form = ''
-            
+
         return """   <tr>
                        <td align="right" colspan="6">
                          %(form)s
                        </td>
                      </tr>
                    </table> """ % {'form' : form}
-    
+
 
     def tmpl_subfields(self, ln, recid='', tag_subfield='', value='', tag_field='', format_tag='marc',
-                       type_table='', num_value='', num_field='', len_subfields='', add=0):        
+                       type_table='', num_value='', num_field='', len_subfields='', add=0):
         """ This function return the content of subfield. """
         _ = gettext_set_language(ln)
         if add == 1 or add == 3:
@@ -292,41 +292,41 @@ class Template:
                 print_tag_subfield = " $$ " + self.tmpl_input('text', tag_subfield,
                                                                     'subcode%s' % str(num_value),
                                                                     1, 1)
-                
+
             elif format_tag != 's':
                 print_tag_subfield = "$$%s" % tag_subfield
             else:
                 print_tag_subfield = "%s%s" % (tag_field[:-1], tag_subfield)
-                
+
                 if get_name_tag(print_tag_subfield) != print_tag_subfield:
                     print_tag_subfield = get_name_tag(print_tag_subfield)
                 else:
                     print_tag_subfield = "$$%s" % tag_subfield
-                
+
         value = self.tmpl_clean_value(value, "record")
-        
+
         print_value       = ''
         print_old_value   = ''
         print_btn         = ''
         print_bgcolor     = ''
         print_old_subcode = ''
-        
+
         if type_table != "record" or add == 3:
-                
+
             if add == 1 or add == 3:
-                print_value = self.tmpl_input('text', '', 'add_value', size="115%c" % '%')                
+                print_value = self.tmpl_input('text', '', 'add_value', size="115%c" % '%')
             else:
-                print_old_subcode = self.tmpl_input('hidden', tag_subfield, 'old_subcode%s' % str(num_value))             
+                print_old_subcode = self.tmpl_input('hidden', tag_subfield, 'old_subcode%s' % str(num_value))
                 print_old_value   = self.tmpl_input('hidden', value, 'old_value%s' % str(num_value))
-                
+
                 if len(value) < 75:
                     print_value = self.tmpl_input('text', value, 'value%s' % str(num_value),
                                                   style="width:100%;")
                 else:
-                    print_value = '<textarea name="value%(num_value)s" cols="70" rows="5" style="width:100%%;">%(value)s</textarea>' 
+                    print_value = '<textarea name="value%(num_value)s" cols="70" rows="5" style="width:100%%;">%(value)s</textarea>'
                     print_value %= {'num_value'   : str(num_value),
                                     'value'       : value}
-                    
+
                 if len_subfields > 1:
 
                     print_btn = "<td>%s</td>" \
@@ -338,12 +338,12 @@ class Template:
                                                  'format_tag'   : format_tag,
                                                  'temp'         : 'true',
                                                  'del_subfield' : 1,
-                                                 'num_subfield' : num_value})           
-                
+                                                 'num_subfield' : num_value})
+
         else:
             print_value = value
             print_bgcolor = " background: #FFF;"
-            
+
         return """ <td style="background: #F5F5F5" class="admintdright">
                      %(print_tag_subfield)s
                      %(print_old_subcode)s
@@ -354,7 +354,7 @@ class Template:
                      </span>
                        %(print_old_value)s
                    </td>
-                   %(print_btn)s  
+                   %(print_btn)s
                    <td></td> """ % {'print_tag_subfield' : print_tag_subfield,
                                     'print_old_subcode'  : print_old_subcode,
                                     'print_bgcolor'      : print_bgcolor,
@@ -363,7 +363,7 @@ class Template:
                                     'print_btn'          : print_btn}
 
 
-    def tmpl_link_function(self, ln, len_subfields, recid, tag, num_field, format_tag):        
+    def tmpl_link_function(self, ln, len_subfields, recid, tag, num_field, format_tag):
         """ Print button function to edit and delete information. """
         _ = gettext_set_language(ln)
         btn_edit = self.tmpl_link(ln, '<img style="border:0px" src="%s" alt="%s" />' % (btn_edit_url, _("Edit")),
@@ -381,7 +381,7 @@ class Template:
                                      'num_field'  : num_field,
                                      'format_tag' : format_tag,
                                      'temp'       : 'true'})
-                                    
+
         return """ <td rowspan="%(len_subfields)s" style="text-align:center;vertical-align:top;">
                      %(btn_edit)s
                    </td>
@@ -392,44 +392,44 @@ class Template:
                       'btn_edit'      : btn_edit,
                       'btn_delete'    : btn_delete}
 
-    def tmpl_clean_value(self, value, format):        
+    def tmpl_clean_value(self, value, format):
         """ This function clean value for HTML interface and inverse. """
-        
+
         if format != "html":
             value = value.replace('"', '&quot;')
             value = value.replace('<', '&lt;')
             value = value.replace('>', '&gt;')
-            
+
         else:
             value = value.replace('&quot;', '"')
             value = value.replace('&lt;', '<')
             value = value.replace('&gt;', '>')
-            
+
         return value
 
 
-    def tmpl_warning_temp_file(self, ln):        
+    def tmpl_warning_temp_file(self, ln):
         """ Return a warning message for user who use a temp file. """
 
         _ = gettext_set_language(ln)
-        
+
         return """ <span style="color: #000;
                                  background: #fcc;
                                  padding: 1px;
                                  font-weight: bold;
                                  border-spacing: 3px;
                                  border: 2px solid #900;">
-                      %(message1)s %(message2)s  
+                      %(message1)s %(message2)s
                    </span><br/><br/>
                """ % {'message1' : _("Your changes are TEMPORARY."),
                       'message2' : _("To save this record, please click on submit.")}
 
 
-    def tmpl_record_choice_box(self, ln, message):        
+    def tmpl_record_choice_box(self, ln, message):
         """ Return a little for; for choice a record to edit. """
 
         _ = gettext_set_language(ln)
-        
+
         if message == 1:
             result = """ <span class="errorbox">
                             <b>
@@ -438,7 +438,7 @@ class Template:
                          </span><br/><br/>
                      """ % {'message1' : _("This record does not exist."),
                             'message2' : _("Please try another record ID.")}
-            
+
         elif message == 2:
             result = """ <span class="errorbox">
                              <b>
@@ -454,10 +454,10 @@ class Template:
                              </b>
                           </span><br/><br/>
                       """ % {'message1' : _("Cannot edit deleted record.")}
-                
+
         else:
             result = ''
-            
+
         result += """ <form action="%(weburl_bibedit)s/index"  method="POST">
                         %(input_ln)s
                         <span style="background-color: #ddd; padding: 5px;">
@@ -469,7 +469,7 @@ class Template:
                                      'input_recid'    : self.tmpl_input('text'  , '', 'recid'),
                                      'input_button'   : self.tmpl_input('submit', _("Edit"),
                                                                         class_css='formbutton')}
-        
+
         return result
 
     def tmpl_submit(self, ln):
@@ -477,10 +477,10 @@ class Template:
 
         _ = gettext_set_language(ln)
         out =  _("Your modifications have now been submitted. They will be processed as soon as the task queue is empty.") + '<br /><br />'
-        link_open = '<a href="' + weburl + '/admin/bibedit/index?ln=' + ln + '">'
-        out += _("You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s.") % {'x_url_open': link_open, 'x_url_close': '</a>'}
+        out += '<h2>' + _("Edit another record") + '</h2>'
+        out += self.tmpl_record_choice_box(ln=ln, message=0)
         return out
-    
+
     def tmpl_deleted(self, ln, message='', recid='', temp='', format_tag=''):
         """ Return a deleted message of Bibedit. """
         _ = gettext_set_language(ln)
@@ -506,13 +506,13 @@ class Template:
                           'input_button_no'  : self.tmpl_input('submit', _("No"),  class_css='formbutton'),
                           'temp'             : temp,
                           'format_tag'       : format_tag}
-        
-        else:    
+
+        else:
             out =   _("The record will be deleted as soon as the task queue is empty.") + '<br /><br />'
-            link_open = '<a href="' + weburl + '/admin/bibedit/index?ln=' + ln + '">'
-            out += _("You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s.") % {'x_url_open': link_open, 'x_url_close': '</a>'}
+            out += '<h2>' + _("Edit another record") + '</h2>'
+            out += self.tmpl_record_choice_box(ln=ln, message=0)
             return out
-                       
+
     def tmpl_link(self, ln, text, url, dest, dict_args='', ancre=''):
         """ Return a link. """
 
@@ -523,12 +523,12 @@ class Template:
             list_args = dict_args.items()
             for arg in list_args:
                 link_args += "%(name)s=%(value)s&amp;" % {'name'  : str(arg[0]),
-                                                          'value' : str(arg[1])} 
+                                                          'value' : str(arg[1])}
             link_args += "ln=%s" % ln
-            
+
         if ancre != '':
             ancre = '#' + ancre
-            
+
         return  '<a href="%(url)s/%(dest)s%(args)s%(ancre)s">%(text)s</a>' % {'text'  : text,
                        'url'   : url,
                        'dest'  : dest,
@@ -539,7 +539,7 @@ class Template:
         """ Return a input form. """
 
         if value     != '':
-            value     = 'value="%s"'     % str(value) 
+            value     = 'value="%s"'     % str(value)
         if name      != '':
             name      = 'name="%s"'      % str(name)
         if maxlength != '':
@@ -550,7 +550,7 @@ class Template:
             class_css = 'class="%s"'     % str(class_css)
         if style     != '':
             style     = 'style="%s"'     % str(style)
-        
+
         out = '<input type="%(type)s" %(name)s %(value)s %(size)s %(maxlength)s %(class_css)s %(style)s />'
         out %= {'type'      : type_input,
                 'value'     : value,
