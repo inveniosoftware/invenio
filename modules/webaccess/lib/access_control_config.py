@@ -107,8 +107,12 @@ if CFG_CERN_SITE:
 # roles
 #           name          description          definition
 DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
-             ('photoadmin',   'Photo collection administrator', 'deny any'),
-             (WEBACCESSADMINROLE,     'WebAccess administrator', 'deny any'))
+             (WEBACCESSADMINROLE, 'WebAccess administrator', 'deny any'))
+
+DEF_DEMO_ROLES = (('photoadmin', 'Photo collection administrator', 'deny any'),
+                  ('thesesviewer', 'Theses viewer', 'allow group "Theses viewers"\nallow apache_group "theses"'))
+
+DEF_DEMO_USER_ROLES = (('jekyll@cern.ch', 'thesesviewer'), )
 
 # users
 # list of e-mail addresses
@@ -117,54 +121,41 @@ DEF_USERS = []
 # actions
 #            name                  desc     allowedkeywords   optional
 DEF_ACTIONS = (
-               ('cfgwebsearch',         'configure WebSearch',       '',              'no'),
-               ('cfgbibformat',         'configure BibFormat',       '',              'no'),
-               ('cfgwebsubmit',         'configure WebSubmit',       '',              'no'),
-               ('runbibindex',          'run BibIndex',       '',              'no'),
-               ('runbibupload',         'run BibUpload',       '',              'no'),
-               ('runwebcoll',           'run webcoll',       'collection',    'yes'),
-               ('runbibformat',         'run BibFormat',       'format',        'yes'),
-               (WEBACCESSACTION,        'configure WebAccess',       '',              'no'),
-               (DELEGATEADDUSERROLE,    'delegate subroles inside WebAccess',       'role',          'no'),
-               (VIEWRESTRCOLL, 'view restricted collection', 'collection', 'no'),
-               ('runbibtaskex',         'run BibTaskEx example',       '',              'no'),
-               ('referee',                  'referee document type doctype/category categ', 'doctype,categ',    'yes'),
-               ('submit',                   'use webSubmit',    'doctype,act',  'yes'),
-               ('runbibrank',         'run BibRank',       '',              'no'),
-               ('cfgbibrank',         'configure BibRank',       '',              'no'),
-               ('cfgbibharvest',         'configure BibHarvest',       '',              'no'),
-               ('runoaiharvest',         'run oaiharvest task',       '',              'no'),
-               ('cfgwebcomment',         'configure WebComment',       '',              'no'),
-               ('runoaiarchive',         'run oaiarchive task',       '',              'no'),
-               ('runbibedit',         'run BibEdit',       '',              'no'),
+               ('cfgwebsearch', 'configure WebSearch', '', 'no'),
+               ('cfgbibformat', 'configure BibFormat', '', 'no'),
+               ('cfgwebsubmit', 'configure WebSubmit', '', 'no'),
+               ('cfgbibrank', 'configure BibRank', '', 'no'),
+               ('cfgwebcomment', 'configure WebComment', '', 'no'),
+               ('cfgbibharvest', 'configure BibHarvest', '', 'no'),
+               ('cfgoairepository', 'configure OAI Repository', '', 'no'),
+               ('cfgbibindex', 'configure BibIndex', '', 'no'),
+               ('runbibindex', 'run BibIndex', '', 'no'),
+               ('runbibupload', 'run BibUpload', '', 'no'),
+               ('runwebcoll', 'run webcoll', 'collection', 'yes'),
+               ('runbibformat', 'run BibFormat', 'format', 'yes'),
+               ('runbibclassify', 'run BibClassify', 'taxonomy', 'yes'),
+               ('runbibtaskex', 'run BibTaskEx example', '', 'no'),
+               ('runbibrank', 'run BibRank', '', 'no'),
+               ('runoaiharvest', 'run oaiharvest task', '', 'no'),
+               ('runoaiarchive', 'run oaiarchive task', '', 'no'),
+               ('runbibedit', 'run BibEdit', '', 'no'),
                ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
+               ('runinveniogc', 'run InvenioGC', '', 'no'),
+               ('referee', 'referee document type doctype/category categ', 'doctype,categ',    'yes'),
+               ('submit', 'use webSubmit', 'doctype,act', 'yes'),
                ('viewrestrdoc', 'view restricted document', 'status', 'no'),
-               ('cfgoairepository', 'configure OAI Repository', '', 'no')
+               (WEBACCESSACTION, 'configure WebAccess', '', 'no'),
+               (DELEGATEADDUSERROLE, 'delegate subroles inside WebAccess', 'role',          'no'),
+               (VIEWRESTRCOLL, 'view restricted collection', 'collection', 'no'),
               )
 
-# authorizations
-#          role              action          arglistid  optional   arguments
-DEF_AUTHS = (
-             (SUPERADMINROLE,    'cfgwebsearch',         -1,      0,       {}),
-             (SUPERADMINROLE,    'cfgbibformat',         -1,      0,       {}),
-             (SUPERADMINROLE,    'cfgwebsubmit',         -1,      0,       {}),
-             (SUPERADMINROLE,    'runbibindex',          -1,      0,       {}),
-             (SUPERADMINROLE,    'runbibupload',         -1,      0,       {}),
-             (SUPERADMINROLE,    'runbibformat',         -1,      1,       {}),
-             (SUPERADMINROLE,    WEBACCESSACTION,        -1,      0,       {}),
-             ('photoadmin',      'runwebcoll',           -1,      0,       {'collection': 'Pictures'}),
-             (WEBACCESSADMINROLE,WEBACCESSACTION,        -1,      0,       {}),
-             (SUPERADMINROLE,    'runtaskex',            -1,      0,       {}),
-             (SUPERADMINROLE,    'referee',         -1,      1,       {}),
-             (SUPERADMINROLE,    'submit',         -1,      1,       {}),
-             (SUPERADMINROLE,    'runbibrank',           -1,      0,       {}),
-             (SUPERADMINROLE,    'cfgbibrank',           -1,      0,       {}),
-             (SUPERADMINROLE,    'cfgbibharvest',           -1,      0,       {}),
-             (SUPERADMINROLE,    'runoaiharvest',            -1,      0,       {}),
-             (SUPERADMINROLE,    'cfgwebcomment',            -1,      0,       {}),
-             (SUPERADMINROLE,    'runoaiarchive',            -1,      0,       {}),
-             (SUPERADMINROLE,    'runbibedit',            -1,      0,       {}),
-             (SUPERADMINROLE,    'cfgoairepository', -1, 0, {})
+
+# Demo site authorizations
+#              role          action       arglistid  optional arguments
+DEF_DEMO_AUTHS = (
+             ('photoadmin', 'runwebcoll', -1, 0, {'collection': 'Pictures'}),
+             ('thesesviewer', 'viewrestrdoc', -1, 0, {'status' : 'restrdoc'}),
+             ('thesesviewer', VIEWRESTRCOLL, -1, 0, {'collection' : 'Theses'})
             )
 
 
