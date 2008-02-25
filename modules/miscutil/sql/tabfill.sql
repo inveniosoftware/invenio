@@ -757,50 +757,6 @@ INSERT INTO sbmGFILERESULT VALUES ('Tarred Tex (.tar)','tar archive');
 INSERT INTO sbmGFILERESULT VALUES ('JPEG','JPEG image');
 INSERT INTO sbmGFILERESULT VALUES ('GIF','GIF');
 
-INSERT INTO accROLE VALUES (1,'superadmin','superuser with all rights', NULL, NULL);
-INSERT INTO accROLE VALUES (2,'photoadmin','Photo collection administrator', NULL, NULL);
-INSERT INTO accROLE VALUES (3,'webaccessadmin','WebAccess administrator', NULL, NULL);
-
-INSERT INTO user_accROLE VALUES (1,1,'9999-12-31 23:59:59');
-INSERT INTO user_accROLE VALUES (1,3,'9999-12-31 23:59:59');
-
-INSERT INTO accACTION VALUES (1,'cfgwebsearch','configure WebSearch','','no');
-INSERT INTO accACTION VALUES (2,'cfgbibformat','configure BibFormat','','no');
-INSERT INTO accACTION VALUES (3,'runbibindex','run BibIndex','','no');
-INSERT INTO accACTION VALUES (4,'runbibupload','run BibUpload','','no');
-INSERT INTO accACTION VALUES (5,'runwebcoll','run webcoll','collection','yes');
-INSERT INTO accACTION VALUES (6,'runbibformat','run BibFormat','format','yes');
-INSERT INTO accACTION VALUES (7,'cfgwebaccess','configure WebAccess','','no');
-INSERT INTO accACTION VALUES (8,'accdelegaterole','delegate subroles inside WebAccess','role','no');
-INSERT INTO accACTION VALUES (9,'runbibtaskex','run BibTaskEx example', '','no');
-INSERT INTO accACTION VALUES (11,'submit','use webSubmit','doctype,act','no');
-INSERT INTO accACTION VALUES (12,'cfgwebsubmit','configure webSubmit','','no');
-INSERT INTO accACTION VALUES (13,'referee','referee document type doctype','doctype,categ','yes');
-INSERT INTO accACTION VALUES (14,'runbibrank','run BibRank','','no');
-INSERT INTO accACTION VALUES (15,'cfgbibrank','configure BibRank','','no');
-INSERT INTO accACTION VALUES (16,'cfgbibindex','configure BibIndex','','no');
-INSERT INTO accACTION VALUES (17,'cfgbibharvest','configure BibHarvest','','no');
-INSERT INTO accACTION VALUES (18,'runoaiharvest','run BibHarvest oaiharvest','','no');
-INSERT INTO accACTION VALUES (19,'cfgwebcomment','configure WebComment','','no');
-INSERT INTO accACTION VALUES (20,'runoaiarchive','run BibHarvest oaiarchive','','no');
-INSERT INTO accACTION VALUES (21,'runbibedit','run BibEdit','','no');
-INSERT INTO accACTION VALUES (22,'accrestrcoll','view restricted collection','collection','no');
-INSERT INTO accACTION VALUES (23,'runsessiongc','run SessionGC','','no');
-INSERT INTO accACTION VALUES (24,'viewrestrdoc','view restricted document','status','no');
-INSERT INTO accACTION VALUES (25,'cfgoairepository','Configure OAI Repository','','no');
-
-INSERT INTO accARGUMENT VALUES (1,'collection','Pictures');
-
-INSERT INTO accROLE_accACTION_accARGUMENT VALUES (1,1, 0, 0);
-INSERT INTO accROLE_accACTION_accARGUMENT VALUES (1,2, 0, 0);
-INSERT INTO accROLE_accACTION_accARGUMENT VALUES (1,3, 0, 0);
-INSERT INTO accROLE_accACTION_accARGUMENT VALUES (1,4, 0, 0);
-INSERT INTO accROLE_accACTION_accARGUMENT VALUES (1,6,-1,-1);
-INSERT INTO accROLE_accACTION_accARGUMENT VALUES (1,7, 0, 0);
-INSERT INTO accROLE_accACTION_accARGUMENT VALUES (2,5, 1, 1);
-INSERT INTO accROLE_accACTION_accARGUMENT VALUES (3,7, 0, 0);
-INSERT INTO accROLE_accACTION_accARGUMENT VALUES (1,9, 0, 0);
-
 INSERT INTO collectiondetailedrecordpagetabs VALUES (8, 'usage;comments;metadata');
 INSERT INTO collectiondetailedrecordpagetabs VALUES (19, 'usage;comments;metadata');
 INSERT INTO collectiondetailedrecordpagetabs VALUES (18, 'usage;comments;metadata');
