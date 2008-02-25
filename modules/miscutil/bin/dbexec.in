@@ -26,10 +26,10 @@ MYSQL='@MYSQL@'
 ## DB config variables.  These variables are to be set in invenio.conf
 ## by admins and then replaced in situ in this file by calling
 ## "inveniocfg --update-dbexec".
-CFG_DATABASE_HOST='unconfigured'
-CFG_DATABASE_NAME='unconfigured'
-CFG_DATABASE_USER='unconfigured'
-CFG_DATABASE_PASS='unconfigured'
+CFG_DATABASE_HOST='localhost'
+CFG_DATABASE_NAME='cdsinvenio'
+CFG_DATABASE_USER='cdsinvenio'
+CFG_DATABASE_PASS='my123p$ss'
 
 # is help called?
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then

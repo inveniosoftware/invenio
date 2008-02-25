@@ -65,10 +65,10 @@ else:
 ## Note that they are defined here and not in config.py in order to
 ## prevent them from being exported accidentally elsewhere, as no-one
 ## should know DB credentials but this file.
-CFG_DATABASE_HOST = 'unconfigured'
-CFG_DATABASE_NAME = 'unconfigured'
-CFG_DATABASE_USER = 'unconfigured'
-CFG_DATABASE_PASS = 'unconfigured'
+CFG_DATABASE_HOST = 'localhost'
+CFG_DATABASE_NAME = 'cdsinvenio'
+CFG_DATABASE_USER = 'cdsinvenio'
+CFG_DATABASE_PASS = 'my123p$ss'
 
 _DB_CONN = {}
 
