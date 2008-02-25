@@ -31,30 +31,11 @@ JSMATH = jsMath-$(JSMV).zip
 JSMATHFONTS = jsMath-fonts-$(JSMFV).zip
 
 all:
-	@echo "**************************************************************"
-	@echo "** CDS Invenio has been successfully built.                 **"
-	@echo "**                                                          **"
-	@echo "** If you are upgrading and you have previously customized  **"
-	@echo "** page templates (see WebStyle Admin guide), please        **"
-	@echo "** run now 'make check-custom-templates' in order to ensure **"
-	@echo "** that they are still valid.                               **"
-	@echo "**                                                          **"
-	@echo "** Otherwise you can proceed to do 'make install' now.      **"
-	@echo "**************************************************************"
-
-test:
-	@if [ -e @prefix@/bin/testsuite ]; then \
-	    @prefix@/bin/testsuite ; \
-	else \
-	    echo "Hmm, testsuite does not seem to be installed.  Please do 'make install' first."; \
-	fi
-
-regression-test:
-	@if [ -e @prefix@/bin/regressiontestsuite ]; then \
-	    @prefix@/bin/regressiontestsuite ; \
-	else \
-	    echo "Hmm, regressiontestsuite does not seem to be installed.  Please do 'make install' first."; \
-	fi
+	@echo "****************************************************"
+	@echo "** CDS Invenio has been successfully built.       **"
+	@echo "**                                                **"
+	@echo "** You may proceed to 'make install' now.         **"
+	@echo "****************************************************"
 
 check-custom-templates:
 	$(PYTHON) $(top_srcdir)/modules/webstyle/lib/template.py --check-custom-templates $(top_srcdir)
@@ -87,21 +68,13 @@ etags:
 	(cd $(top_srcdir) && find $(top_srcdir) -name "*.py" -print | xargs etags)
 
 install-data-local:
-	${prefix}/bin/inveniocfg --generate-config-py --update-dbquery-py --update-dbexec --update-bibconvert-tpl
 	for d in / /cache /log /tmp /data /run ; do	\
-		mkdir -p $(localstatedir)$$d &&		\
-		if (chmod -f ug=rwx $(localstatedir)$$d); then echo ok > /dev/null else; echo no > /dev/null; fi ;	\
+		mkdir -p $(localstatedir)$$d ;		\
 	done
 	@echo "************************************************************"
 	@echo "** CDS Invenio software has been successfully installed!  **"
 	@echo "**                                                        **"
-	@echo "** You may now want to run 'make create-tables' in order  **"
-	@echo "** to set up and populate your tables.                    **"
-	@echo "**                                                        **"
-	@echo "** If you are reinstalling CDS Invenio because you have   **"
-	@echo "** edited CDS Invenio sources or its configuration,       **"
-	@echo "** you may want to restart your Apache server now by      **"
-	@echo "** running 'sudo apachectl restart'.                      **"
+	@echo "** You may proceed to customizing your installation now.  **"
 	@echo "************************************************************"
 
 install-jsmath-plugin:
@@ -133,22 +106,6 @@ uninstall-jsmath-plugin:
 	@echo "***********************************************************"
 	@echo "** The jsMath plugin was successfully removed.           **"
 	@echo "***********************************************************"
-
-create-tables: ${prefix}/bin/dbexec
-	$(PYTHON) ./install-tests.py
-	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabfill.sql
-	${prefix}/bin/inveniocfg --reset-cdsname --reset-adminemail
-	@echo "************************************************************"
-	@echo "** The database tables were successfully created.         **"
-	@echo "**                                                        **"
-	@echo "** If you are installing CDS Invenio for the first time,  **"
-	@echo "** please continue with the Apache httpd configuration    **"
-	@echo "** step, as described in the INSTALL file.                **"
-	@echo "**                                                        **"
-	@echo "** Afterwards you may want to run 'make create-demo-site' **"
-	@echo "** to test your new installation.                         **"
-	@echo "************************************************************"
 
 update-v0.3.0-tables update-v0.3.1-tables:
 	echo "ALTER TABLE idxINDEXNAME CHANGE id_idxINDEX id_idxINDEX mediumint(9) unsigned NOT NULL FIRST;" | ${prefix}/bin/dbexec
@@ -274,108 +231,5 @@ update-v0.92.1-tables:
 	echo "INSERT INTO rnkCITATIONDATA VALUES (1,'citationdict','','');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO rnkCITATIONDATA VALUES (2,'reversedict','','');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO rnkCITATIONDATA VALUES (3,'selfcitdict','','');" | ${prefix}/bin/dbexec
-
-drop-tables:
-	@if [ "$(FORCE)" != "yes" ]; then \
-	    echo "***********************************************************************"; \
-	    echo "** WARNING: You are going to destroy your database tables!           **"; \
-	    echo "** Press Ctrl-C if you want to abort this action.                    **"; \
-	    echo "** Press ENTER to proceed to destroy your tables.                    **"; \
-	    echo "***********************************************************************"; \
-	    read; \
-	fi
-	${prefix}/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabdrop.sql
-	@echo "**************************************************************"
-	@echo "** The database tables were successfully dropped.           **"
-	@echo "**************************************************************"
-
-create-demo-site:
-	$(PYTHON) ./install-tests.py
-	${prefix}/bin/dbexec < ./modules/miscutil/demo/democfgdata.sql
-	./modules/webaccess/bin/webaccessadmin -u admin -c
-	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec
-	${prefix}/bin/webcoll -uadmin
-	${prefix}/bin/webcoll 1
-	@echo "***********************************************************************"
-	@echo "** The demo site has been successfully created.                      **"
-	@echo "**                                                                   **"
-	@echo "** Please point your browser to the home URL you have specified.     **"
-	@echo "** It should ressemble our 'Atlantis Institute of Fictive Science'   **"
-	@echo "** demo site that is available at <http://cdsware.cern.ch:8000/>,    **"
-	@echo "** with the exception that no demo records have been loaded yet.     **"
-	@echo "**                                                                   **"
-	@echo "** To load demo records, you can run 'make load-demo-records'.       **"
-	@echo "** To drop the demo site, you can run 'make drop-demo-site'.         **"
-	@echo "***********************************************************************"
-
-load-demo-records:
-	$(PYTHON) ./install-tests.py
-	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec
-	${prefix}/bin/bibupload -i $(srcdir)/modules/miscutil/demo/demobibdata.xml
-	${prefix}/bin/bibupload 1
-	${prefix}/bin/bibindex -uadmin
-	${prefix}/bin/bibindex 2
-	${prefix}/bin/bibreformat -uadmin -oHB
-	${prefix}/bin/bibreformat 3
-	${prefix}/bin/bibupload 4
-	${prefix}/bin/webcoll -uadmin
-	${prefix}/bin/webcoll 5
-	${prefix}/bin/bibrank -uadmin
-	${prefix}/bin/bibrank 6
-	@echo "***********************************************************************"
-	@echo "** The demo records have been successfully loaded.                   **"
-	@echo "**                                                                   **"
-	@echo "** Please point your browser to the home URL you have specified.     **"
-	@echo "** It should ressemble our 'Atlantis Institute of Fictive Science'   **"
-	@echo "** demo site that is available at <http://cdsware.cern.ch:8000/>.    **"
-	@echo "**                                                                   **"
-	@echo "** To remove demo records, you can run 'make remove-demo-records'.   **"
-	@echo "** To drop also the demo site collection etc configurations,         **"
-	@echo "** you can run 'make drop-demo-site'.                                **"
-	@echo "***********************************************************************"
-
-drop-demo-site:
-	@if [ "$(FORCE)" != "yes" ]; then \
-	    echo "***********************************************************************"; \
-	    echo "** WARNING: You are going to destroy your site and documents!        **"; \
-	    echo "** Press Ctrl-C if you want to abort this action.                    **"; \
-	    echo "** Press ENTER to proceed to destroy your site.                      **"; \
-	    echo "***********************************************************************"; \
-	    read; \
-	fi
-	rm -rf ${prefix}/var/data/files/*
-	$(prefix)/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabdrop.sql
-	$(prefix)/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
-	$(prefix)/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabfill.sql
-	${prefix}/bin/inveniocfg --reset-cdsname --reset-adminemail
-	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec
-	${prefix}/bin/webcoll -uadmin
-	${prefix}/bin/webcoll 1
-	@echo "***************************************************************"
-	@echo "** The demo site and records have been successfully dropped. **"
-	@echo "***************************************************************"
-
-remove-demo-records: install
-	@if [ "$(FORCE)" != "yes" ]; then \
-	    echo "***********************************************************************"; \
-	    echo "** WARNING: You are going to destroy your records and documents!     **"; \
-	    echo "** Press Ctrl-C if you want to abort this action.                    **"; \
-	    echo "** Press ENTER to proceed to destroy your records.                   **"; \
-	    echo "***********************************************************************"; \
-	    read; \
-	fi
-	rm -rf ${prefix}/var/data/files/*
-	${prefix}/bin/dbexec < $(srcdir)/modules/miscutil/sql/tabbibclean.sql
-	echo "TRUNCATE schTASK;" | ${prefix}/bin/dbexec
-	${prefix}/bin/webcoll -uadmin
-	${prefix}/bin/webcoll 1
-	@echo "**********************************************************"
-	@echo "** The demo records have been successfully removed.     **"
-	@echo "** The demo collection and submit configurations        **"
-	@echo "** have been preserved.                                 **"
-	@echo "**                                                      **"
-	@echo "** Note that you can run 'make drop-demo-site' to drop  **"
-	@echo "** the demo site fully.                                 **"
-	@echo "**********************************************************"
 
 CLEANFILES = *~
