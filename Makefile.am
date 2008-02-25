@@ -206,6 +206,11 @@ update-v0.92.1-tables:
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "UPDATE bibdoc SET status='DELETED' WHERE status='1';" | ${prefix}/bin/dbexec
 	echo "UPDATE bibdoc SET status='' WHERE status='0';" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bibrec ADD KEY creation_date (creation_date);" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bibrec ADD KEY modification_date (modification_date);" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bibdoc ADD KEY creation_date (creation_date);" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bibdoc ADD KEY modification_date (modification_date);" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE bibdoc ADD KEY docname (docname);" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE oaiHARVEST CHANGE postprocess postprocess varchar(20) NOT NULL default 'h';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE oaiHARVEST ADD COLUMN bibfilterprogram varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE idxINDEXNAME CHANGE ln ln char(5) NOT NULL default '';" | ${prefix}/bin/dbexec
@@ -222,10 +227,6 @@ update-v0.92.1-tables:
 	echo "ALTER TABLE accROLE ADD COLUMN firerole_def_src text NULL;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE user_accROLE ADD COLUMN expiration datetime NOT NULL default '9999-12-31 23:59:59';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE user DROP INDEX id, ADD PRIMARY KEY id (id);" | ${prefix}/bin/dbexec
-	echo "INSERT INTO accACTION VALUES (NULL,'accrestrcoll','view restricted collection','collection','no');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO accACTION VALUES (NULL,'runsessiongc','run SessionGC','','no');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO accACTION VALUES (NULL,'viewrestrcoll','view restricted document','status','no');" | ${prefix}/bin/dbexec
-	echo "INSERT INTO accACTION VALUES (NULL,'cfgoairepository','Configure OAI Repository','','no');" | ${prefix}/bin/dbexec
 	echo -e 'from invenio.dbquery import run_sql;\
 	map(lambda index_id: run_sql("ALTER TABLE idxPHRASE%02dF CHANGE term term TEXT NULL DEFAULT NULL, DROP INDEX term, ADD INDEX term (term (50))" % index_id[0]), run_sql("select id from idxINDEX"))' | $(PYTHON)
 	echo "INSERT INTO rnkCITATIONDATA VALUES (1,'citationdict','','');" | ${prefix}/bin/dbexec
