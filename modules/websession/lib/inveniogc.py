@@ -407,7 +407,7 @@ def main():
     task_set_option('bibxxx', False)
     task_set_option('documents', False)
     task_set_option('cache', False)
-    task_init(authorization_action='runsessiongc',
+    task_init(authorization_action='runinveniogc',
             authorization_msg="InvenioGC Task Submission",
             help_specific_usage="  -l, --logs\t\tClean old logs and temporary files.\n" \
                 "  -g, --guests\t\tClean expired guest user related information. [default action]\n" \
