@@ -23,7 +23,9 @@ CREATE TABLE IF NOT EXISTS bibrec (
   id mediumint(8) unsigned NOT NULL auto_increment,
   creation_date datetime NOT NULL default '0000-00-00',
   modification_date datetime NOT NULL default '0000-00-00',
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (id),
+  KEY creation_date (creation_date),
+  KEY modification_date (modification_date)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib00x (
@@ -2341,7 +2343,10 @@ CREATE TABLE IF NOT EXISTS bibdoc (
   docname varchar(250) NOT NULL default 'file',
   creation_date datetime NOT NULL default '0000-00-00',
   modification_date datetime NOT NULL default '0000-00-00',
-  PRIMARY KEY  (id)
+  PRIMARY KEY  (id),
+  KEY docname (docname),
+  KEY creation_date (creation_date),
+  KEY modification_date (modification_date)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bibrec_bibdoc (
@@ -2962,6 +2967,12 @@ CREATE TABLE IF NOT EXISTS clsMETHOD (
   last_updated datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (id),
   UNIQUE KEY name (name)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS collection_clsMETHOD (
+  id_collection mediumint(9) unsigned NOT NULL,
+  id_clsMETHOD mediumint(9) unsigned NOT NULL,
+  PRIMARY KEY  (id_collection, id_clsMETHOD)
 ) TYPE=MyISAM;
 
 -- WebJournal tables:
