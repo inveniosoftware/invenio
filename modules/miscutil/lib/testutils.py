@@ -62,10 +62,9 @@ def warn_user_about_tests():
 ** The regression test suite needs to be run on a clean demo site   **
 ** that you can obtain by doing:                                    **
 **                                                                  **
-**    $ make drop-tables                                            **
-**    $ make create-tables                                          **
-**    $ make create-demo-site                                       **
-**    $ make load-demo-records                                      **
+**    $ inveniocfg --drop-demo-site \                               **
+**                 --create-demo-site \                             **
+**                 --load-demo-records                              **
 **                                                                  **
 ** Note that DOING THE ABOVE WILL ERASE YOUR ENTIRE DATABASE.       **
 **                                                                  **
