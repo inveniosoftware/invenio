@@ -136,6 +136,20 @@ following steps:
 
         $ make update-v0.92.0-tables
 
+   - Check your custom page templates:
+
+        $ make check-custom-templates
+
+          Check if your customized page templates (see the WebStyle
+          Admin Guide) still conform to the default templates.  This
+          gives you a chance to fix your templates before running
+          'make install', by providing a list of incompatibilities of
+          your custom templates with the new versions of the
+          templates.
+
+          This step is only useful if you are upgrading and if you
+          have previously customized default page templates.
+
    - Re-enable write access to the site if you have disabled it before
      in the previous steps and restart your Apache server.
 
