@@ -17,13 +17,14 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-noinst_DATA = democfgdata.sql
+sqldir = $(libdir)/sql/invenio
+sql_DATA = democfgdata.sql
 
 tmpdir = $(prefix)/var/tmp
 tmp_DATA = demobibdata.xml \
            demo-site-apache-user-passwords \
            demo-site-apache-user-groups 
 
-EXTRA_DIST = $(noinst_DATA) $(tmp_DATA)
+EXTRA_DIST = $(sql_DATA) $(tmp_DATA)
 
 CLEANFILES = *~ *.tmp
