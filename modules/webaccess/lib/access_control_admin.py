@@ -31,7 +31,7 @@ from invenio.messages import gettext_set_language
 from invenio.config import supportemail, cdslang
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DELEGATEADDUSERROLE, SUPERADMINROLE, \
-    DEF_USERS, DEF_ROLES, DEF_ACTIONS, DEF_AUTHS, CFG_ACC_ACTIVITIES_URLS
+    DEF_USERS, DEF_ROLES, DEF_ACTIONS, CFG_ACC_ACTIVITIES_URLS
 from invenio.dbquery import run_sql, ProgrammingError, run_sql_cached
 from invenio.access_control_firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize
@@ -231,7 +231,7 @@ def acc_add_role(name_role, description,
 
 def acc_is_role(name_action, **arguments):
     """ check whether the role which allows action name_action  on arguments
-    exists
+    exists (different from SUPERADMINROLE)
 
     action_name - name of the action
 
@@ -338,10 +338,16 @@ def acc_delete_role(id_role=0, name_role=0):
 
       id_role - id of role to be deleted, prefered variable
 
-    name_role - this is used if id_role is not given """
+    name_role - this is used if id_role is not given
+
+    note: you can't delete the SUPERADMINROLE
+    """
 
     count = 0
     id_role = id_role or acc_get_role_id(name_role=name_role)
+
+    if SUPERADMINROLE == acc_get_role_name(id_role):
+        return 0
 
     # try to delete
     if run_sql("""DELETE FROM accROLE WHERE id = %s  """ % (id_role, )):
@@ -1128,33 +1134,29 @@ def acc_get_action_optional(id_action=0):
 def acc_get_action_details(id_action=0):
     """get all the fields for an action."""
 
-    details = []
     try:
         result = run_sql("""SELECT * FROM accACTION WHERE id = %s""",
         (id_action, ))[0]
     except IndexError:
-        return details
+        return []
 
     if result:
-        for r in result:
-            details.append(r)
-
-    return details
+        return list(result)
+    else:
+        return []
 
 
 def acc_get_all_actions():
     """returns all entries in accACTION."""
-    return run_sql("""SELECT a.id, a.name, a.description
-        FROM accACTION a ORDER BY a.name""")
-
+    return run_sql_cached("""SELECT id, name, description
+        FROM accACTION ORDER BY name""", affected_tables=['accACTION'])
 
 def acc_get_action_roles(id_action):
     """Returns all the roles connected with an action."""
-    return run_sql("""SELECT DISTINCT(r.id), r.name, r.description
-        FROM accROLE_accACTION_accARGUMENT raa LEFT JOIN accROLE r
-        ON raa.id_accROLE = r.id
-        WHERE raa.id_accACTION = %s
-        ORDER BY r.name """, (id_action, ))
+    return run_sql_cached("""SELECT DISTINCT(r.id), r.name, r.description
+        FROM accROLE_accACTION_accARGUMENT raa, accROLE r
+        WHERE (raa.id_accROLE = r.id AND raa.id_accACTION = %s) OR r.name = %s
+        ORDER BY r.name """, (id_action, SUPERADMINROLE), affected_tables=['accROLE_accACTION_accARGUMENT', 'accROLE'])
 
 
 # ROLE RELATED
@@ -1186,44 +1188,44 @@ def acc_get_role_definition(id_role=0):
     except IndexError:
         return ''
 
-
 def acc_get_role_details(id_role=0):
-    """get all the fields for an action."""
+    """get all the fields for a role."""
 
-    details = []
     try:
         result = run_sql("""SELECT id, name, description, firerole_def_src
         FROM accROLE WHERE id = %s """, (id_role, ))[0]
     except IndexError:
-        return details
+        return []
 
     if result:
-        for r in result:
-            details.append(r)
-
-    return details
-
+        return list(result)
+    else:
+        return []
 
 def acc_get_all_roles():
     """get all entries in accROLE."""
 
-    return run_sql("""SELECT r.id, r.name, r.description,
-        r.firerole_def_ser, r.firerole_def_src
-        FROM accROLE r ORDER BY r.name""")
+    return run_sql_cached("""SELECT id, name, description,
+        firerole_def_ser, firerole_def_src
+        FROM accROLE ORDER BY name""", affected_tables=['accROLE'])
 
 
 def acc_get_role_actions(id_role):
     """get all actions connected to a role. """
-
-    return run_sql("""SELECT DISTINCT(a.id), a.name, a.description
-        FROM accROLE_accACTION_accARGUMENT raa, accACTION a
-        WHERE raa.id_accROLE = %s and
-            raa.id_accACTION = a.id
-        ORDER BY a.name """, (id_role, ))
+    if acc_get_role_name(id_role) == SUPERADMINROLE:
+        return run_sql_cached("""SELECT id, name, description
+            FROM accACTION
+            ORDER BY name """, affected_tables=['accACTION'])
+    else:
+        return run_sql_cached("""SELECT DISTINCT(a.id), a.name, a.description
+            FROM accROLE_accACTION_accARGUMENT raa, accACTION a
+            WHERE raa.id_accROLE = %s and
+                raa.id_accACTION = a.id
+            ORDER BY a.name""", (id_role, ), affected_tables=['accACTION', 'accROLE_accACTION_accARGUMENT'])
 
 
 def acc_get_role_users(id_role):
-    """get all users that have access to a role. """
+    """get all users that have direct access to a role. """
 
     return run_sql("""SELECT DISTINCT(u.id), u.email, u.settings
         FROM user_accROLE ur, user u
@@ -1271,7 +1273,7 @@ def acc_get_user_id(email=''):
 
 
 def acc_get_user_roles(id_user=0):
-    """get all roles a user is connected to."""
+    """get all roles a user is directly connected to."""
 
     res = run_sql("""SELECT ur.id_accROLE
         FROM user_accROLE ur
@@ -1328,7 +1330,7 @@ def acc_find_possible_activities(user_info, ln=cdslang):
     for (role, action) in your_role_actions:
         if CFG_ACC_ACTIVITIES_URLS.has_key(action):
             your_admin_activities[action] = CFG_ACC_ACTIVITIES_URLS[action]
-        if role == "superadmin":
+        if role == SUPERADMINROLE:
             your_admin_activities = dict(CFG_ACC_ACTIVITIES_URLS)
             break
 
@@ -1346,6 +1348,11 @@ def acc_find_user_role_actions(user_info):
         uid = user_info
     else:
         uid = user_info['uid']
+
+    # Let's check if user is superadmin
+    id_superadmin = acc_get_role_id(SUPERADMINROLE)
+    if (id_superadmin, ) in acc_get_user_roles(uid):
+        return [(SUPERADMINROLE, action[1]) for action in acc_get_all_actions()]
 
     query = """SELECT DISTINCT r.name, a.name
         FROM user_accROLE ur, accROLE_accACTION_accARGUMENT raa, accACTION a,
@@ -1374,6 +1381,9 @@ def acc_find_user_role_actions(user_info):
         for role_name, action_name, role_definition in res3:
             if acc_firerole_check_user(user_info,
                 deserialize(role_definition)):
+                if role_name == SUPERADMINROLE:
+                    # Ok, every action. There's no need to go on :-)
+                    return [(id_superadmin, action[0]) for action in acc_get_all_actions()]
                 res4.append((role_name, action_name))
         return list(Set(res2) | Set(res4))
     else:
@@ -1426,6 +1436,8 @@ def acc_find_possible_roles(name_action, arguments):
     """Find all the possible roles that are enabled to action_name with
     given arguments. roles is a list of role_id"""
 
+    id_superadmin = acc_get_role_id(SUPERADMINROLE)
+
     query1 = """select a.id, a.allowedkeywords, a.optional
                 from accACTION a
                 where a.name = '%s'""" % (name_action)
@@ -1447,7 +1459,7 @@ def acc_find_possible_roles(name_action, arguments):
             WHERE id_accACTION = %s""", (id_action, ), affected_tables=['accROLE_accACTION_accARGUMENT'])
 
     if not roles:
-        return []
+        return [id_superadmin]
 
     # create role string (add default value? roles='(raa.id_accROLE='def' or ')
     str_roles = ''
@@ -1530,7 +1542,10 @@ def acc_find_possible_roles(name_action, arguments):
         # set keyword qualified for the action, (whatever result of the test)
         booldict[keyword] = 1
 
-    return results[1:]
+    if id_superadmin not in results[1:]:
+        return results[1:].append(id_superadmin)
+    else:
+        return results[1:]
 
 def acc_find_possible_actions_user(id_user, id_action):
     """user based function to find all action combination for a given
@@ -1584,14 +1599,18 @@ def acc_find_possible_actions(id_role, id_action):
     id_action - id of the action in the database
 
     returns a list with all the combinations.
-    first row is used for header."""
+    first row is used for header.
+
+    if SUPERADMINROLE, nothing is returned since an infinte number of
+    combination are possible.
+    """
 
     # query to find all entries for user and action
-    res1 = run_sql(""" SELECT raa.argumentlistid, ar.keyword, ar.value
+    res1 = run_sql_cached(""" SELECT raa.argumentlistid, ar.keyword, ar.value
         FROM accROLE_accACTION_accARGUMENT raa, accARGUMENT ar
         WHERE raa.id_accROLE = %s and
         raa.id_accACTION = %s and
-        raa.id_accARGUMENT = ar.id """, (id_role, id_action))
+        raa.id_accARGUMENT = ar.id """, (id_role, id_action), affected_tables=['accROLE_accACTION_accARGUMENT', 'accARGUMENT'])
 
     # find needed keywords, create header
     keywords = acc_get_action_keywords(id_action=id_action)
@@ -1599,9 +1618,9 @@ def acc_find_possible_actions(id_role, id_action):
 
     if not keywords:
         # action without arguments
-        if run_sql("""SELECT * FROM accROLE_accACTION_accARGUMENT
+        if run_sql_cached("""SELECT * FROM accROLE_accACTION_accARGUMENT
             WHERE id_accROLE = %s AND id_accACTION = %s AND id_accARGUMENT = 0
-            AND argumentlistid = 0""", (id_role, id_action)):
+            AND argumentlistid = 0""", (id_role, id_action), affected_tables=['accROLE_accACTION_accARGUMENT']):
             return [['#', 'argument keyword'],
                     ['0', 'action without arguments']]
 
@@ -1765,13 +1784,26 @@ def acc_merge_argument_groups(id_role=0, id_action=0, arglistids=[]):
                                       id_arguments=ids)
 
 
-def acc_reset_default_settings(superusers=[]):
+def acc_reset_default_settings(superusers=[],
+        additional_def_user_roles=(),
+        additional_def_roles=(),
+        additional_def_auths=()):
     """reset to default by deleting everything and adding default.
 
-    superusers - list of superuser emails """
+    superusers - list of superuser emails
+
+    additional_def_user_roles - additional list of pair email, rolename
+        (see DEF_DEMO_USER_ROLES in access_control_config.py)
+
+    additional_def_roles - additional list of default list of roles
+        (see DEF_DEMO_ROLES in access_control_config.py)
+
+    additional_def_auths - additional list of default authorizations
+        (see DEF_DEMO_AUTHS in access_control_config.py)
+"""
 
     remove = acc_delete_all_settings()
-    add = acc_add_default_settings(superusers=superusers)
+    add = acc_add_default_settings(superusers, additional_def_user_roles, additional_def_roles, additional_def_auths)
 
     return remove, add
 
@@ -1788,10 +1820,23 @@ def acc_delete_all_settings():
     return 1
 
 
-def acc_add_default_settings(superusers=[]):
+def acc_add_default_settings(superusers=[],
+        additional_def_user_roles=(),
+        additional_def_roles=(),
+        additional_def_auths=()):
     """add the default settings if they don't exist.
 
-    superusers - list of superuser emails """
+    superusers - list of superuser emails
+
+    additional_def_user_roles - additional list of pair email, rolename
+        (see DEF_DEMO_USER_ROLES in access_control_config.py)
+
+    additional_def_roles - additional list of default list of roles
+        (see DEF_DEMO_ROLES in access_control_config.py)
+
+    additional_def_auths - additional list of default authorizations
+        (see DEF_DEMO_AUTHS in access_control_config.py)
+    """
 
     # from superusers: allow input formats ['email1', 'email2'] and
     # [['email1'], ['email2']] and [['email1', id], ['email2', id]]
@@ -1806,7 +1851,9 @@ def acc_add_default_settings(superusers=[]):
 
     # add roles
     insroles = []
-    for (name, description, firerole_def_src) in DEF_ROLES:
+    if additional_def_roles:
+        def_roles = list(DEF_ROLES) + list(additional_def_roles)
+    for (name, description, firerole_def_src) in def_roles:
         # try to add, don't care if description is different
         role_id = acc_add_role(name_role=name,
                          description=description, firerole_def_ser=serialize(
@@ -1825,6 +1872,9 @@ def acc_add_default_settings(superusers=[]):
         insuserroles.append(acc_add_user_role(email=user,
                                             name_role=SUPERADMINROLE))
 
+    for user, role in additional_def_user_roles:
+        insuserroles.append(acc_add_user_role(email=user, name_role=role))
+
     # add actions
     insactions = []
     for (name, description, allkeys, optional) in DEF_ACTIONS:
@@ -1842,7 +1892,11 @@ def acc_add_default_settings(superusers=[]):
 
     # add authorizations
     insauths = []
-    for (name_role, name_action, arglistid, optional, args) in DEF_AUTHS:
+    if additional_def_auths:
+        # Since DEF_AUTHS don't exist
+        #def_auths = list(DEF_AUTHS) + list(additional_def_auths)
+        def_auths = list(additional_def_auths)
+    for (name_role, name_action, arglistid, optional, args) in def_auths:
         # add the authorization
         acc_add_role_action_arguments_names(name_role=name_role,
                                          name_action=name_action,
