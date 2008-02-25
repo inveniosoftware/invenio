@@ -20,7 +20,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Invenio configuration CLI tool.
+Invenio configuration and administration CLI tool.
 
 Usage: inveniocfg [options]
 
@@ -28,15 +28,33 @@ General options:
    -h, --help               print this help
    -V, --version            print version number
 
+Options to finish your installation:
+   --create-tables          create DB tables for Invenio
+   --drop-tables            drop DB tables of Invenio
+
+Options to set up and test a demo site:
+   --create-demo-site       create demo site
+   --load-demo-records      load demo records
+   --remove-demo-records    remove demo records, keeping demo site
+   --drop-demo-site         drop demo site configurations too
+   --run-unit-tests         run unit test suite (need DB connectivity)
+   --run-regression-tests   run regression test suite (need demo site)
+
 Options to update config files in situ:
-   --generate-config-py     regenerate config.py file from invenio.conf file
+   --update-all             perform all the update options
+   --update-config-py       update config.py file from invenio.conf file
    --update-dbquery-py      update dbquery.py with DB credentials from invenio.conf
    --update-dbexec          update dbexec with DB credentials from invenio.conf
    --update-bibconvert-tpl  update bibconvert templates with WEBURL from invenio.conf
 
 Options to update DB tables:
+   --reset-all              perform all the reset options
    --reset-cdsname          reset tables to take account of new CDSNAME and CDSNAMEINTL
    --reset-adminemail       reset tables to take account of new ADMINEMAIL
+   --reset-fieldnames       reset tables to take account of new I18N names from PO files
+
+Options to help the work:
+   --conf-dir /some/path    path to directory where invenio*.conf files are [optional]
 """
 
 __revision__ = "$Id$"
@@ -119,12 +137,13 @@ def convert_conf_option(option_name, option_value):
     ## 4) finally, return output line:
     return '%s = %s' % (option_name, option_value)
 
-def generate_config_py(conf):
+def update_config_py(conf):
     """
-    Generate new config.py from conf options, keeping previous
+    Update new config.py from conf options, keeping previous
     config.py in a backup copy.
     """
-    ## detect where config.py is:
+    print ">>> Going to update config.py..."
+    ## location where config.py is:
     configpyfile = conf.get("Autotools detections", "pylibdir") + \
                    os.sep + 'invenio' + os.sep + 'config.py'
     ## backup current config.py file:
@@ -159,6 +178,7 @@ def generate_config_py(conf):
     fdesc.write("# END OF GENERATED FILE")
     ## we are done:
     fdesc.close()
+    print ">>> config.py updated successfully."
 
 def update_dbquery_py(conf):
     """
@@ -166,7 +186,8 @@ def update_dbquery_py(conf):
     Note: this edits dbquery.py in situ, taking a backup first.
     Use only when you know what you are doing.
     """
-    ## detect where dbquery.py is:
+    print ">>> Going to update dbquery.py..."
+    ## location where dbquery.py is:
     dbquerypyfile = conf.get("Autotools detections", "pylibdir") + \
                     os.sep + 'invenio' + os.sep + 'dbquery.py'
     ## backup current dbquery.py file:
@@ -185,6 +206,7 @@ def update_dbquery_py(conf):
     fdesc = open(dbquerypyfile, 'w')
     fdesc.write(out)
     fdesc.close()
+    print ">>> dbquery.py updated successfully."
 
 def update_dbexec(conf):
     """
@@ -192,7 +214,8 @@ def update_dbexec(conf):
     Note: this edits dbexec in situ, taking a backup first.
     Use only when you know what you are doing.
     """
-    ## detect where dbexec is:
+    print ">>> Going to update dbexec..."
+    ## location where dbexec is:
     dbexecfile = conf.get("Autotools detections", "bindir") + \
                     os.sep + 'dbexec'
     ## backup current dbexec file:
@@ -211,6 +234,7 @@ def update_dbexec(conf):
     fdesc = open(dbexecfile, 'w')
     fdesc.write(out)
     fdesc.close()
+    print ">>> dbexec updated successfully."
 
 def update_bibconvert_templates(conf):
     """
@@ -219,8 +243,10 @@ def update_bibconvert_templates(conf):
     conf file.  Note: this edits tpl files in situ, taking a
     backup first.  Use only when you know what you are doing.
     """
-    ## detect bibconvert/config/*.tpl dir:
-    tpldir = re.sub(r'/bin$', '/etc/bibconvert/config', sys.path[0])
+    print ">>> Going to update bibconvert templates..."
+    ## location where bibconvert/config/*.tpl are:
+    tpldir = conf.get("Autotools detections", 'ETCDIR') + \
+             os.sep + 'bibconvert' + os.sep + 'config'
     ## find all *.tpl files:
     for tplfilename in os.listdir(tpldir):
         if tplfilename.endswith(".tpl"):
@@ -239,12 +265,14 @@ def update_bibconvert_templates(conf):
             fdesc = open(tplfile, 'w')
             fdesc.write(out)
             fdesc.close()
+    print ">>> bibconvert templates updated successfully."
 
 def reset_cdsname(conf):
     """
     Reset collection-related tables with new CDSNAME and
     CDSNAMEINTL read from conf files.
     """
+    print ">>> Going to reset CDSNAME and CDSNAMEINTL..."
     from invenio.dbquery import run_sql, IntegrityError
     # reset CDSNAME:
     cdsname = conf.get("Essential parameters", "cdsname")
@@ -263,17 +291,171 @@ def reset_cdsname(conf):
             run_sql("""UPDATE collectionname SET value=%s
                         WHERE ln=%s AND id_collection=1 AND type='ln'""",
                     (cdsname_lang, lang))
+    print ">>> CDSNAME and CDSNAMEINTL reset successfully."
 
 def reset_adminemail(conf):
     """
     Reset user-related tables with new ADMINEMAIL read from conf files.
     """
+    print ">>> Going to reset ADMINEMAIL..."
     from invenio.dbquery import run_sql
     adminemail = conf.get("Essential parameters", "adminemail")
     res = run_sql("DELETE FROM user WHERE id=1")
     res = run_sql("""INSERT INTO user (id, email, password, note, nickname) VALUES
                         (1, %s, AES_ENCRYPT(email, ''), 1, 'admin')""",
                   (adminemail,))
+    print ">>> ADMINEMAIL reset successfully."
+
+def reset_fieldnames(conf):
+    """
+    Reset I18N field names such as author, title, etc and other I18N
+    ranking method names such as word similarity.  Their translations
+    are taken from the PO files.
+    """
+    print ">>> Going to reset I18N field names..."
+    from invenio.messages import gettext_set_language, language_list_long
+
+    for lang, lang_fullname in language_list_long():
+        _ = gettext_set_language(lang)
+
+        ## this list is put here in order for PO system to pick names
+        ## suitable for translation
+        fields = [_("any field"),
+                  _("title"),
+                  _("author"),
+                  _("abstract"),
+                  _("keyword"),
+                  _("report number"),
+                  _("subject"),
+                  _("reference"),
+                  _("fulltext"),
+                  _("collection"),
+                  _("division"),
+                  _("year"),
+                  _("experiment"),
+                  _("record ID"),]
+
+        ranking_methods = [_("word similarity"),
+                           _("journal impact factor"),]
+
+        ## update I18N field names for every language:
+        # FIXME
+    print ">>> I18N field names reset successfully."
+
+def create_tables(conf):
+    """Create Invenio DB tables.  Useful for the installation process."""
+    print ">>> Going to create tables..."
+    from invenio.config import CFG_PREFIX
+    for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/tabcreate.sql" % (CFG_PREFIX, CFG_PREFIX),
+                "%s/bin/dbexec < %s/lib/sql/invenio/tabfill.sql" % (CFG_PREFIX, CFG_PREFIX)]:
+        if os.system(cmd):
+            print "ERROR: failed execution of", cmd
+            sys.exit(1)
+    reset_cdsname(conf)
+    reset_adminemail(conf)
+    reset_fieldnames(conf)
+    print ">>> Tables created successfully."
+
+def drop_tables(conf):
+    """Drop Invenio DB tables.  Useful for the uninstallation process."""
+    print ">>> Going to drop tables..."
+    from invenio.config import CFG_PREFIX
+    from invenio.textutils import wrap_text_in_a_box, wait_for_user
+    if '--yes-i-know' not in sys.argv:
+        wait_for_user(wrap_text_in_a_box(title="WARNING: You are going to destroy your database tables!",
+                                         body="""Press Ctrl-C if you want to abort this action.
+                                         Press ENTER to proceed with this action."""))
+    cmd = "%s/bin/dbexec < %s/lib/sql/invenio/tabdrop.sql" % (CFG_PREFIX, CFG_PREFIX)
+    if os.system(cmd):
+        print "ERROR: failed execution of", cmd
+        sys.exit(1)
+    print ">>> Tables dropped successfully."
+
+def create_demo_site(conf):
+    """Create demo site.  Useful for testing purposes."""
+    print ">>> Going to create demo site..."
+    from invenio.config import CFG_PREFIX
+    from invenio.dbquery import run_sql
+    run_sql("TRUNCATE schTASK")
+    for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/democfgdata.sql" % (CFG_PREFIX, CFG_PREFIX),
+                "%s/bin/webaccessadmin -u admin -c" % CFG_PREFIX,
+                "%s/bin/webcoll -u admin" % CFG_PREFIX,
+                "%s/bin/webcoll 1" % CFG_PREFIX,]:
+        if os.system(cmd):
+            print "ERROR: failed execution of", cmd
+            sys.exit(1)
+    print ">>> Demo site created successfully."
+
+# FIXME: plug install-tests.py eventually somewhere (everywhere)
+
+def load_demo_records(conf):
+    """Load demo records.  Useful for testing purposes."""
+    from invenio.config import CFG_PREFIX
+    from invenio.dbquery import run_sql
+    print ">>> Going to load demo records..."
+    run_sql("TRUNCATE schTASK")
+    for cmd in ["%s/bin/bibupload -i %s/var/tmp/demobibdata.xml" % (CFG_PREFIX, CFG_PREFIX),
+                "%s/bin/bibupload 1" % CFG_PREFIX,
+                "%s/bin/bibindex -u admin" % CFG_PREFIX,
+                "%s/bin/bibindex 2" % CFG_PREFIX,
+                "%s/bin/bibreformat -u admin -o HB" % CFG_PREFIX,
+                "%s/bin/bibreformat 3" % CFG_PREFIX,
+                "%s/bin/bibupload 4" % CFG_PREFIX,
+                "%s/bin/webcoll -u admin" % CFG_PREFIX,
+                "%s/bin/webcoll 5" % CFG_PREFIX,
+                "%s/bin/bibrank -u admin" % CFG_PREFIX,
+                "%s/bin/bibrank 6" % CFG_PREFIX,]:
+        if os.system(cmd):
+            print "ERROR: failed execution of", cmd
+            sys.exit(1)
+    print ">>> Demo records loaded successfully."
+
+def remove_demo_records(conf):
+    """Remove demo records.  Useful when you are finished testing."""
+    print ">>> Going to remove demo records..."
+    from invenio.config import CFG_PREFIX
+    from invenio.dbquery import run_sql
+    from invenio.textutils import wrap_text_in_a_box, wait_for_user
+    if '--yes-i-know' not in sys.argv:
+        wait_for_user(wrap_text_in_a_box(title="WARNING: You are going to destroy your records and documents!",
+                                         body="""Press Ctrl-C if you want to abort this action.
+                                         Press ENTER to proceed with this action."""))
+    if os.path.exists(CFG_PREFIX + os.sep + 'var' + os.sep + 'data' + os.sep + 'files'):
+        shutil.rmtree(CFG_PREFIX + os.sep + 'var' + os.sep + 'data' + os.sep + 'files')
+    run_sql("TRUNCATE schTASK")
+    for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/tabbibclean.sql" % (CFG_PREFIX, CFG_PREFIX),
+                "%s/bin/webcoll -u admin" % CFG_PREFIX,
+                "%s/bin/webcoll 1" % CFG_PREFIX,]:
+        if os.system(cmd):
+            print "ERROR: failed execution of", cmd
+            sys.exit(1)
+    print ">>> Demo records removed successfully."
+
+def drop_demo_site(conf):
+    """Drop demo site completely.  Useful when you are finished testing."""
+    print ">>> Going to drop demo site..."
+    from invenio.textutils import wrap_text_in_a_box, wait_for_user
+    if '--yes-i-know' not in sys.argv:
+        wait_for_user(wrap_text_in_a_box(title="WARNING: You are going to destroy your site and documents!",
+                                         body="""Press Ctrl-C if you want to abort this action.
+                                         Press ENTER to proceed with this action."""))
+    drop_tables(conf)
+    create_tables(conf)
+    remove_demo_records(conf)
+    print ">>> Demo site dropped successfully."
+
+def run_unit_tests(conf):
+    """Run unit tests, usually on the working demo site."""
+    from invenio.config import CFG_PREFIX
+    os.system("%s/bin/testsuite" % CFG_PREFIX)
+
+def run_regression_tests(conf):
+    """Run regression tests, usually on the working demo site."""
+    from invenio.config import CFG_PREFIX
+    if '--yes-i-know' in sys.argv:
+        os.system("%s/bin/regressiontestsuite --yes-i-know" % CFG_PREFIX)
+    else:
+        os.system("%s/bin/regressiontestsuite" % CFG_PREFIX)
 
 def main():
     """Main entry point."""
@@ -285,36 +467,86 @@ def main():
          '-V' in sys.argv:
         print_version()
     else:
-        ## detect path to conf dir (relative to this bin dir):
-        confdir = re.sub(r'/bin$', '/etc', sys.path[0])
+        confdir = None
+        if '--conf-dir' in sys.argv:
+            try:
+                confdir = sys.argv[sys.argv.index('--conf-dir') + 1]
+            except IndexError:
+                pass # missing --conf-dir argument value
+        else:
+            ## try to detect path to conf dir (relative to this bin dir):
+            confdir = re.sub(r'/bin$', '/etc', sys.path[0])
         ## read conf files:
         for conffile in [confdir + os.sep + 'invenio.conf',
                          confdir + os.sep + 'invenio-autotools.conf']:
             if os.path.exists(conffile):
                 conf.read(conffile)
             else:
-                print "ERROR: Cannot find %s.  Please see '--help'." % conffile
+                print "ERROR: Badly guessed conf file location", conffile
+                print "(Please use --conf-dir option.)"
                 sys.exit(1)
         ## decide what to do:
         done = False
-        if '--generate-config-py' in sys.argv:
-            generate_config_py(conf)
-            done = True
-        if '--update-dbquery-py' in sys.argv:
-            update_dbquery_py(conf)
-            done = True
-        if '--update-dbexec' in sys.argv:
-            update_dbexec(conf)
-            done = True
-        if '--update-bibconvert-tpl' in sys.argv:
-            update_bibconvert_templates(conf)
-            done = True
-        if '--reset-cdsname' in sys.argv:
-            reset_cdsname(conf)
-            done = True
-        if '--reset-adminemail' in sys.argv:
-            reset_adminemail(conf)
-            done = True
+        for opt in sys.argv:
+            if opt == '--drop-tables':
+                drop_tables(conf)
+                done = True
+            elif opt == '--create-tables':
+                create_tables(conf)
+                done = True
+            elif opt == '--create-demo-site':
+                create_demo_site(conf)
+                done = True
+            elif opt == '--load-demo-records':
+                load_demo_records(conf)
+                done = True
+            elif opt == '--remove-demo-records':
+                remove_demo_records(conf)
+                done = True
+            elif opt == '--drop-demo-site':
+                drop_demo_site(conf)
+                done = True
+            elif opt == '--run-unit-tests':
+                run_unit_tests(conf)
+                done = True
+            elif opt == '--run-regression-tests':
+                run_regression_tests(conf)
+                done = True
+            elif opt == '--update-all':
+                update_config_py(conf)
+                update_dbquery_py(conf)
+                update_dbexec(conf)
+                update_bibconvert_templates(conf)
+                done = True
+            elif opt == '--update-config-py':
+                update_config_py(conf)
+                done = True
+            elif opt == '--update-dbquery-py':
+                update_dbquery_py(conf)
+                done = True
+            elif opt == '--update-dbexec':
+                update_dbexec(conf)
+                done = True
+            elif opt == '--update-bibconvert-tpl':
+                update_bibconvert_templates(conf)
+                done = True
+            elif opt == '--reset-all':
+                reset_cdsname(conf)
+                reset_adminemail(conf)
+                reset_fieldnames(conf)
+                done = True
+            elif opt == '--reset-cdsname':
+                reset_cdsname(conf)
+                done = True
+            elif opt == '--reset-adminemail':
+                reset_adminemail(conf)
+                done = True
+            elif opt == '--reset-fieldnames':
+                reset_fieldnames(conf)
+                done = True
+            elif opt.startswith("-") and opt != '--yes-i-know':
+                print "ERROR: unknown option", opt
+                sys.exit(1)
         if not done:
             print """ERROR: Please specify a command.  Please see '--help'."""
             sys.exit(1)
