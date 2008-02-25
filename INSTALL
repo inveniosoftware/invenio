@@ -175,6 +175,9 @@ Contents
 1. Quick instructions for the impatient CDS Invenio admin
 =========================================================
 
+1a. Installation
+----------------
+
       $ cd /usr/local/src/
       $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz
       $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz.md5
@@ -184,31 +187,38 @@ Contents
       $ tar xvfz cds-invenio-0.92.1.tar.gz
       $ cd cds-invenio-0.92.1
       $ ./configure
-      $ vi ./config/invenio.conf
       $ make
-      $ make check-custom-templates ## optional, only when upgrading
       $ make install
-      $ make create-tables
       $ make install-jsmath-plugin  ## optional
+
+1b. Configuration
+-----------------
+
+      $ vi ./config/invenio.conf
+      $ /opt/cds-invenio/bin/inveniocfg --update-all
+      $ /opt/cds-invenio/bin/inveniocfg --create-tables
       $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
       $ sudo /path/to/apache/bin/apachectl graceful
       $ sudo chgrp -R www-data /opt/cds-invenio
       $ sudo chmod -R g+r /opt/cds-invenio
       $ sudo chmod -R g+rw /opt/cds-invenio/var
       $ sudo find /opt/cds-invenio -type d -exec chmod g+rxw {} \;
-      $ make create-demo-site       ## optional
-      $ make load-demo-records      ## optional
-      $ make test                   ## optional
-      $ make regression-test        ## optional
-      $ make remove-demo-records    ## optional
-      $ make drop-demo-site         ## optional
-      $ firefox http://webserver.domain.com/admin/ ## optional
+      $ /opt/cds-invenio/bin/inveniocfg --create-demo-site
+      $ /opt/cds-invenio/bin/inveniocfg --load-demo-records
+      $ /opt/cds-invenio/bin/inveniocfg --run-unit-tests
+      $ /opt/cds-invenio/bin/inveniocfg --run-regression-tests
+      $ /opt/cds-invenio/bin/inveniocfg --remove-demo-records
+      $ /opt/cds-invenio/bin/inveniocfg --drop-demo-site
+      $ firefox http://webserver.domain.com/admin/
 
 2. Detailed instructions for the patient CDS Invenio admin
 ==========================================================
 
-   The CDS Invenio uses standard GNU autoconf method to build and
-   install its files.  This means that you proceed as follows:
+2a. Installation
+----------------
+
+    The CDS Invenio uses standard GNU autoconf method to build and
+    install its files.  This means that you proceed as follows:
 
       $ cd /usr/local/src/
  
@@ -251,8 +261,8 @@ Contents
 
       $ ./configure 
 
-          Configure CDS Invenio software for building for this
-          specific platform.  You can use the following parameters:
+          Configure CDS Invenio software for building on this specific
+          platform.  You can use the following optional parameters:
 
               --prefix=/opt/cds-invenio
 
@@ -323,17 +333,6 @@ Contents
           FIXME: this is not working right now as per the introduction
           of intbitset_setup.py.)
 
-      $ vi ./config/invenio.conf
-
-          Customize your CDS Invenio installation.  You should edit at
-          least the top of this file where you can define some very
-          essential runtime parameters such as the visible URL of your
-          document server (look for WEBURL and SWEBURL), the database
-          credentials (look for CFG_DATABASE_*), the name of your
-          document server (look for CDSNAME and CDSNAMEINTL), or the
-          email address of the local CDS Invenio administrator (look
-          for SUPPORTEMAIL and ADMINEMAIL).
-
       $ make
 
           Launch the CDS Invenio build.  Since many messages are printed
@@ -347,18 +346,6 @@ Contents
 
           Note that on systems such as FreeBSD or Mac OS X you have to
           use GNU make ("gmake") instead of "make".
-
-      $ make check-custom-templates ## optional, only when upgrading
-
-          Check if your customized page templates (see the WebStyle
-          Admin Guide) still conform to the default templates.  This
-          gives you a chance to fix your templates before running
-          'make install', by providing a list of incompatibilities of
-          your custom templates with the new versions of the
-          templates.
-
-          This step is only useful if you are upgrading and if you
-          have previously customized default page templates.
 
       $ make install
 
@@ -383,7 +370,41 @@ Contents
           if you happen to encounter some troubles finding intbitset
           libraries.)
 
-      $ make create-tables
+      $ sudo make install-jsmath-plugin  ## optional
+
+          This will automatically download and install in the proper
+          place jsMath, a Javascript library to render LaTeX formulas
+          in the client browser.
+
+          Note that in order to enable the rendering you will have to
+          set later the variable CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS
+          in the invenio.conf to a suitable list of output format
+          codes like in "['hd', 'hb']".
+
+2b. Configuration
+-----------------
+
+    Once the basic software installation is done, we proceed by
+    configuring your Invenio system.
+          
+      $ vi ./config/invenio.conf
+
+          Customize your CDS Invenio installation.  You should edit at
+          least the top of this file where you can define some very
+          essential runtime parameters such as the visible URL of your
+          document server (look for WEBURL and SWEBURL), the database
+          credentials (look for CFG_DATABASE_*), the name of your
+          document server (look for CDSNAME and CDSNAMEINTL), or the
+          email address of the local CDS Invenio administrator (look
+          for SUPPORTEMAIL and ADMINEMAIL).
+
+      $ /opt/cds-invenio/bin/inveniocfg --update-all
+
+          Make the rest of the Invenio system aware of your
+          invenio.conf changes.  This step is mandatory each time you
+          edit your conf file.
+
+      $ /opt/cds-invenio/bin/inveniocfg --create-tables
 
           If you are installing CDS Invenio for the first time, you
           have to create database tables.  
@@ -403,17 +424,6 @@ Contents
           At this point you should now have successfully completed the
           "make install" process.  We continue by setting up the
           Apache web server.
-
-      $ sudo make install-jsmath-plugin  ## optional
-
-          This will automatically download and install in the proper
-          place jsMath, a Javascript library to render LaTeX formulas
-          in the client browser.
-
-          In order to enable the rendering you have to set the
-          variable CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS in the
-          invenio.conf to a suitable list of output format codes like
-          in "['hd', 'hb']".
 
       $ sudo vi /path/to/apache/conf/httpd.conf
 
@@ -541,27 +551,27 @@ Contents
           After these admin-level tasks to be performed as root, let's
           now go back to finish the installation of the CDS Invenio.
 
-      $ make create-demo-site  ## optional
+      $ /opt/cds-invenio/bin/inveniocfg --create-demo-site
 
           This step is recommended to test your local CDS Invenio
           installation.  It should give you our "Atlantis Institute of
           Science" demo installation, exactly as you see it at
           <http://cdsware.cern.ch:8000/>.
 
-      $ make load-demo-records  ## optional
+      $ /opt/cds-invenio/bin/inveniocfg --load-demo-records
 
           Optionally, load some demo records to be able to test
           indexing and searching of your local CDS Invenio demo
           installation.
 
-      $ make test               ## optional
+      $ /opt/cds-invenio/bin/inveniocfg --run-unit-tests
 
           Optionally, you can run the unit test suite to verify the
           unit behaviour of your local CDS Invenio installation.  Note
           that this command should be run only after you have
           installed the whole system via `make install'.
 
-      $ make regression-test     ## optional
+      $ /opt/cds-invenio/bin/inveniocfg --run-regression-tests
 
            Optionally, you can run the full regression test suite to
            verify the functional behaviour of your local CDS Invenio
@@ -571,20 +581,22 @@ Contents
            database content with junk data, so that rebuilding the
            demo site is strongly recommended afterwards.
 
-      $ make remove-demo-records ## optional
+      $ /opt/cds-invenio/bin/inveniocfg --remove-demo-records
 
           Optionally, remove the demo records loaded in the previous
           step, but keeping otherwise the demo collection, submission,
           format, and other configurations that you may reuse and
           modify for your own production purposes.
 
-      $ make drop-demo-site ## optional
+      $ /opt/cds-invenio/bin/inveniocfg --drop-demo-site
 
           Optionally, drop also all the demo configuration so that
-          you'll end up with a completely blank CDS Invenio system for
-          your own production purposes.
+          you'll end up with a completely blank CDS Invenio system.
+          However, you may want to find it more practical not to drop
+          the demo site configuration but to start customizing from
+          there.
 
-      $ firefox http://webserver.domain.com/admin/ ## optional
+      $ firefox http://webserver.domain.com/admin/
 
           Optionally, do further runtime configurations of CDS
           Invenio, like definition of data collections, document
