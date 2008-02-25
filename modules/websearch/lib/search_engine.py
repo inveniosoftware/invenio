@@ -2840,7 +2840,16 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
         if record_exist_p == -1 and get_output_format_content_type(format) == 'text/html':
             # HTML output displays a default value for deleted records.
             # Other format have to deal with it.
-            out += _("The record has been deleted.")
+            if CFG_CERN_SITE:
+                # CERN-only dirty hack for making base 29 dummy
+                # records visible to library approvers:
+                from invenio.webgroup_dblayer import get_external_groups
+                if 'cds-approve-theses-open [CERN]' in [name for (dummy1, name, dummy2) in get_external_groups(uid)]:
+                    out += call_bibformat(recID, format, ln, search_pattern=search_pattern, uid=uid)
+                else:
+                    out += _("The record has been deleted.")
+            else:
+                out += _("The record has been deleted.")
         else:
             out += call_bibformat(recID, format, ln, search_pattern=search_pattern,
                                   uid=uid, verbose=verbose)
