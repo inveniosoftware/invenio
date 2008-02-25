@@ -27,6 +27,7 @@ __lastupdated__ = """$Date$"""
 ## fill config variables:
 
 import re
+import os
 import random
 import smtplib
 import getopt
@@ -58,7 +59,7 @@ from invenio.webpage import page
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webuser import email_valid_p, get_user_preferences, \
     set_user_preferences
-from invenio.bibtask import authenticate
+from invenio.bibtask import authenticate, _task_params
 from cgi import escape
 
 
@@ -3656,20 +3657,23 @@ def sendAccountDeletedMessage(newAccountEmail, sendTo, ln=cdslang):
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
     if msg:
-        sys.stderr.write("Error: %s.\n" % msg)
-    sys.stderr.write("Usage: %s [options]\n" % sys.argv[0])
-    sys.stderr.write("Command options:\n")
-    sys.stderr.write("  -a, --add\t\t add default settings\n")
-    sys.stderr.write("  -c, --compile\t\t compile role definitions\n")
-    sys.stderr.write("  -h, --help\t\t Print this help.\n")
-    sys.stderr.write("  -r, --reset\t\t reset default settings\n")
-    sys.stderr.write("  -u, --user=USER\t User name to submit the task as, "
-        "password needed.\n")
-    sys.stderr.write("  -V, --version\t\t Print version information.\n")
-    sys.stderr.write("""Description: %s is used to reset the access settings,
-or to just add default values, or to compile firewall like
-role definition manually set in the accROLE table in the
-firerole_def_src field.\n""" % sys.argv[0])
+        print >> sys.stderr, "Error: %s." % msg
+        print >> sys.stderr
+    print >> sys.stderr, """Usage: %s [options]
+
+General options:
+  -h, --help\t\tprint this help
+  -V, --version\t\tprint version number
+
+Authentication options:
+  -u, --user=USER\tUser name needed to perform the administrative task
+
+Option to administrate authorizations:
+  -a, --add\t\tadd default authorization settings
+  -c, --compile\t\tcompile firewall like role definitions (FireRole)
+  -r, --reset\t\treset to default settings
+  -D, --demo\t\tto be used with -a or -r in order to consider Demo Site authorizationss
+""" % sys.argv[0]
     sys.exit(exitcode)
 
 
@@ -3679,38 +3683,53 @@ def main():
 
     ## parse command line:
     # set user-defined options:
-    options = {'user' : '', 'reset' : 0, 'compile' : 0, 'add' : 0}
+    global _task_params
+
+    # Small trick to let bibtask.authenticate framework to work for non tasks.
+    _task_params["task_name"] = os.path.basename(sys.argv[0])
+
+    options = {'user' : '', 'reset' : 0, 'compile' : 0, 'add' : 0, 'demo' : 0}
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVu:rac",
+        opts, args = getopt.getopt(sys.argv[1:], "hVu:racD",
                                     ["help", "version", "user=",
-                                    "reset", "add", "compile"])
+                                    "reset", "add", "compile", "demo"])
     except getopt.GetoptError, err:
         usage(1, err)
     try:
         for opt in opts:
-            if opt[0] in ["-h", "--help"]:
+            if opt[0] in ("-h", "--help"):
                 usage(0)
-            elif opt[0] in ["-V", "--version"]:
+            elif opt[0] in ("-V", "--version"):
                 print __revision__
                 sys.exit(0)
-            elif opt[0] in ["-u", "--user"]:
+            elif opt[0] in ("-u", "--user"):
                 options["user"] = opt[1]
-            elif opt[0] in ["-r", "--reset"]:
+            elif opt[0] in ("-r", "--reset"):
                 options["reset"] = 1
-            elif opt[0] in ["-a", "--add"]:
+            elif opt[0] in ("-a", "--add"):
                 options["add"] = 1
-            elif opt[0] in ["-c", "--compile"]:
+            elif opt[0] in ("-c", "--compile"):
                 options["compile"] = 1
+            elif opt[0] in ("-D", "--demo"):
+                options["demo"] = 1
             else:
                 usage(1)
         if options['add'] or options['reset'] or options['compile']:
-            options['user'] = authenticate(options['user'],
-                authorization_msg="WebAccess Administration",
-                authorization_action="cfgwebaccess")
-            if options['reset']:
+            if acca.acc_get_action_id('cfgwebaccess'):
+                # Action exists hence authentication works :-)
+                options['user'] = authenticate(options['user'],
+                    authorization_msg="WebAccess Administration",
+                    authorization_action="cfgwebaccess")
+            if options['reset'] and options['demo']:
+                acca.acc_reset_default_settings([supportemail], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
+                print "Reset default Demo Site settings."
+            elif options['reset']:
                 acca.acc_reset_default_settings([supportemail])
                 print "Reset default settings."
-            if options['add']:
+            if options['add'] and options['demo']:
+                acca.acc_add_default_settings([supportemail], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
+                print "Added default Demo Site settings."
+            elif options['add']:
                 acca.acc_add_default_settings([supportemail])
                 print "Added default settings."
             if options['compile']:
