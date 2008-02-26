@@ -29,9 +29,9 @@ General options:
    -V, --version            print version number
 
 Options to finish your installation:
+   --create-apache-conf     create Apache configuration files
    --create-tables          create DB tables for Invenio
    --drop-tables            drop DB tables of Invenio
-   --generate-apache-conf   generate Apache configuration files
 
 Options to set up and test a demo site:
    --create-demo-site       create demo site
@@ -529,12 +529,12 @@ def run_regression_tests(conf):
     else:
         os.system("%s/bin/regressiontestsuite" % CFG_PREFIX)
 
-def generate_apache_conf(conf):
+def create_apache_conf(conf):
     """
-    Generate Apache conf files for this site, keeping previous
+    Create Apache conf files for this site, keeping previous
     files in a backup copy.
     """
-    print ">>> Going to generate Apache conf files..."
+    print ">>> Going to create Apache conf files..."
     from invenio.textutils import wrap_text_in_a_box
     apache_conf_dir = conf.get("Autotools detections", 'ETCDIR') + \
                       os.sep + 'apache'
@@ -661,7 +661,7 @@ in your httpd.conf:
   Include %s
   Include %s
     """ % (apache_vhost_file, apache_vhost_ssl_file))
-    print ">>> Apache conf files generated."
+    print ">>> Apache conf files created."
 
 def main():
     """Main entry point."""
@@ -750,8 +750,8 @@ def main():
             elif opt == '--reset-fieldnames':
                 reset_fieldnames(conf)
                 done = True
-            elif opt == '--generate-apache-conf':
-                generate_apache_conf(conf)
+            elif opt == '--create-apache-conf':
+                create_apache_conf(conf)
                 done = True
             elif opt.startswith("-") and opt != '--yes-i-know':
                 print "ERROR: unknown option", opt
