@@ -3,27 +3,27 @@ CDS Invenio THANKS
 
 Revision: $Id$
 
-Several people outside the CDS Invenio Development Team 
+Several people outside the CDS Invenio Development Team
 contributed to the project:
 
   - Thierry Thomas <thierry@FreeBSD.org>
     Patches for compiling old CDSware 0.3.x sources on FreeBSD.
-  
+
   - Guido Pelzer <guido.pelzer@web.de>
     Contributions to the German translation.  German stopword list.
-  
+
   - Valerio Gracco <valerio.gracco@cern.ch>
     Contributions to the Italian translation.
-  
+
   - Tullio Basaglia <tullio.basaglia@cern.ch>
     Contributions to the Italian translation.
-  
+
   - Flavio C. Coelho <fccoelho@fiocruz.br>
     Contributions to the Portuguese translation.
-    
+
   - Lyuba Vasilevskaya <lyubov.vassilevskaya@cern.ch>
     Contributions to the Russian translation.
-  
+
   - Maria Gomez Marti <maria.gomez.marti@cern.ch>
     Contributions to the Spanish translation.
 
@@ -40,7 +40,7 @@ contributed to the project:
     Contributions to the Greek translation, Greek stopword list.
 
   - Vasyl Ostrovskyi <vo@imath.kiev.ua>
-    Contributions to the Ukrainian translation.   
+    Contributions to the Ukrainian translation.
 
   - Ferran Jorba <Ferran.Jorba@uab.cat>
     Contributions to the Catalan and Spanish translations.  Cleanup of
@@ -62,7 +62,7 @@ contributed to the project:
     Contributions to the Croatian translation.
 
   - Kam-ming Ku <kmku@hkusua.hku.hk>
-    Contributions to the Chinese translations (zh_CN, zh_TW). 
+    Contributions to the Chinese translations (zh_CN, zh_TW).
 
   - Benedikt Koeppel <be.public@gmail.com>
     Contributions to the German translation.
@@ -74,17 +74,17 @@ contributed to the project:
     Several minor patches and suggestions.
 
   - Zbigniew Szklarz <zszklarz@student.agh.edu.pl>
-    Contributions to the Polish translation.    
+    Contributions to the Polish translation.
 
   - Iaroslav Gaponenko <adrahil@gmail.com>
-    Contributions to the Russian translation.    
+    Contributions to the Russian translation.
 
   - Yana Osborne <ianna.osborne@cern.ch>
-    Contributions to the Russian translation.    
+    Contributions to the Russian translation.
 
   - Zbigniew Leonowicz <leonowicz@ieee.org>
-    Contributions to the Polish translation.    
-    
+    Contributions to the Polish translation.
+
 The web session management and the URL handler were inspired by the
 Quixote Web Framework which is ``Copyright (c) 2004 Corporation for
 National Research Initiatives; All Rights Reserved''.
@@ -92,15 +92,20 @@ National Research Initiatives; All Rights Reserved''.
 
 Javascript Quicktags scripts from Alex King are used to provide
 additional capabilities to the edition of BibFormat templates through
-the web admin interface.  
+the web admin interface.
 <http://www.alexking.org>
 
 The indexer engine uses the Martin Porter Stemming Algorithm and its
 Vivake Gupta free Python implementation.
 <http://tartarus.org/~martin/PorterStemmer/>
 
-The CSS style for rounded corners box used in detailed record pages 
+The CSS style for rounded corners box used in detailed record pages
 adapted from Francky Lleyneman liquidcorners CSS.
 <http://home.tiscali.nl/developerscorner/liquidcorners/liquidcorners.htm>
+
+The nasa-instruments.rdf and nasa-subjects.rdf files are kindly provided for
+free re-use by the American National Aeronautics and Space Administration
+(NASA).
+<http://nasataxonomy.jpl.nasa.gov/fordevelopers/>
 
 - end of file -
