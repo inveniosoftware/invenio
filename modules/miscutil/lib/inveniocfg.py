@@ -31,6 +31,7 @@ General options:
 Options to finish your installation:
    --create-tables          create DB tables for Invenio
    --drop-tables            drop DB tables of Invenio
+   --generate-apache-conf   generate Apache configuration files
 
 Options to set up and test a demo site:
    --create-demo-site       create demo site
@@ -528,6 +529,140 @@ def run_regression_tests(conf):
     else:
         os.system("%s/bin/regressiontestsuite" % CFG_PREFIX)
 
+def generate_apache_conf(conf):
+    """
+    Generate Apache conf files for this site, keeping previous
+    files in a backup copy.
+    """
+    print ">>> Going to generate Apache conf files..."
+    from invenio.textutils import wrap_text_in_a_box
+    apache_conf_dir = conf.get("Autotools detections", 'ETCDIR') + \
+                      os.sep + 'apache'
+    if not os.path.exists(apache_conf_dir):
+        os.mkdir(apache_conf_dir)
+    apache_vhost_file = apache_conf_dir + os.sep + \
+                            'invenio-apache-vhost.conf'
+    apache_vhost_ssl_file = apache_conf_dir + os.sep + \
+                             'invenio-apache-vhost-ssl.conf'
+    apache_vhost_body = """\
+AddDefaultCharset UTF-8
+ServerSignature Off
+ServerTokens Prod
+NameVirtualHost *:80
+<Files *.pyc>
+   deny from all
+</Files>
+<Files *~>
+   deny from all
+</Files>
+<VirtualHost *:80>
+        ServerName %(servername)s
+        ServerAlias %(serveralias)s
+        ServerAdmin %(serveradmin)s
+        DocumentRoot %(webdir)s
+        <Directory %(webdir)s>
+           Options FollowSymLinks MultiViews
+           AllowOverride None
+           Order allow,deny
+           allow from all
+        </Directory>
+        ErrorLog %(logdir)s/apache.err
+        LogLevel warn
+        CustomLog %(logdir)s/apache.log combined
+        DirectoryIndex index.en.html index.html
+        <LocationMatch "^(/+$|/index|/collection|/record|/author|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss|/help|/journal|/openurl)">
+           SetHandler python-program
+           PythonHandler invenio.webinterface_layout
+           PythonDebug On
+        </LocationMatch>
+        <Directory %(webdir)s>
+           AddHandler python-program .py
+           PythonHandler mod_python.publisher
+           PythonDebug On
+        </Directory>
+</VirtualHost>
+""" % {'servername': conf.get('Essential parameters', 'WEBURL').replace("http://", ""),
+       'serveralias': conf.get('Essential parameters', 'WEBURL').replace("http://", "").split('.')[0],
+       'serveradmin': conf.get('Essential parameters', 'ADMINEMAIL'),
+       'webdir': conf.get('Autotools detections', 'WEBDIR'),
+       'logdir': conf.get('Autotools detections', 'LOGDIR'),
+       }
+    apache_vhost_ssl_body = """\
+ServerSignature Off
+ServerTokens Prod
+NameVirtualHost *:443
+#SSLCertificateFile /etc/apache2/ssl/apache.pem
+SSLCertificateFile /etc/apache2/ssl/server.crt
+SSLCertificateKeyFile /etc/apache2/ssl/server.key
+<Files *.pyc>
+   deny from all
+</Files>
+<Files *~>
+   deny from all
+</Files>
+<VirtualHost *:443>
+        ServerName %(servername)s
+        ServerAlias %(serveralias)s
+        ServerAdmin %(serveradmin)s
+        SSLEngine on
+        DocumentRoot %(webdir)s
+        <Directory %(webdir)s>
+           Options FollowSymLinks MultiViews
+           AllowOverride None
+           Order allow,deny
+           allow from all
+        </Directory>
+        ErrorLog %(logdir)s/apache-ssl.err
+        LogLevel warn
+        CustomLog %(logdir)s/apache-ssl.log combined
+        DirectoryIndex index.en.html index.html
+        <LocationMatch "^(/+$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss|/help|/journal|/openurl)">
+           SetHandler python-program
+           PythonHandler invenio.webinterface_layout
+           PythonDebug On
+        </LocationMatch>
+        <Directory %(webdir)s>
+           AddHandler python-program .py
+           PythonHandler mod_python.publisher
+           PythonDebug On
+        </Directory>
+</VirtualHost>
+""" % {'servername': conf.get('Essential parameters', 'SWEBURL').replace("http://", ""),
+       'serveralias': conf.get('Essential parameters', 'SWEBURL').replace("http://", "").split('.')[0],
+       'serveradmin': conf.get('Essential parameters', 'ADMINEMAIL'),
+       'webdir': conf.get('Autotools detections', 'WEBDIR'),
+       'logdir': conf.get('Autotools detections', 'LOGDIR'),
+       }
+    # write HTTP vhost snippet:
+    if os.path.exists(apache_vhost_file):
+        shutil.copy(apache_vhost_file,
+                    apache_vhost_file + '.OLD')
+    fdesc = open(apache_vhost_file, 'w')
+    fdesc.write(apache_vhost_body)
+    fdesc.close()
+    print "Created file", apache_vhost_file
+    # write HTTPS vhost snippet:
+    if conf.get('Essential parameters', 'SWEBURL') != \
+       conf.get('Essential parameters', 'WEBURL'):
+        if os.path.exists(apache_vhost_ssl_file):
+            shutil.copy(apache_vhost_ssl_file,
+                        apache_vhost_ssl_file + '.OLD')
+        fdesc = open(apache_vhost_ssl_file, 'w')
+        fdesc.write(apache_vhost_ssl_body)
+        fdesc.close()
+        print "Created file", apache_vhost_ssl_file
+
+    print ""
+    print wrap_text_in_a_box(body="""\
+Apache virtual host configurations for your site have been created.
+You can check created files and put the following include statements
+in your httpd.conf:
+
+  Include %s
+  Include %s
+    """ % (apache_vhost_file, apache_vhost_ssl_file))
+    print ">>> Apache conf files generated."
+
 def main():
     """Main entry point."""
     conf = ConfigParser()
@@ -614,6 +749,9 @@ def main():
                 done = True
             elif opt == '--reset-fieldnames':
                 reset_fieldnames(conf)
+                done = True
+            elif opt == '--generate-apache-conf':
+                generate_apache_conf(conf)
                 done = True
             elif opt.startswith("-") and opt != '--yes-i-know':
                 print "ERROR: unknown option", opt
