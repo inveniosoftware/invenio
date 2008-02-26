@@ -342,10 +342,77 @@ def reset_fieldnames(conf):
         # FIXME
     print ">>> I18N field names reset successfully."
 
+def test_db_connection():
+    """
+    Test DB connection, and if fails, advise user how to set it up.
+    Useful to be called during table creation.
+    """
+    print "Testing DB connection...",
+    from invenio.textutils import wrap_text_in_a_box
+    from invenio.dbquery import run_sql, Error
+
+    ## first, test connection to the DB server:
+    try:
+        run_sql("SHOW TABLES")
+    except Error, e:
+        from invenio.dbquery import CFG_DATABASE_HOST, CFG_DATABASE_NAME, \
+             CFG_DATABASE_USER, CFG_DATABASE_PASS
+        print wrap_text_in_a_box(title="DATABASE CONNECTIVITY ERROR %d: %s." % \
+                                 (e.args[0], e.args[1]),
+                                 body="""\
+Perhaps you need to set up database and connection rights?  If yes,
+then please login as MySQL admin user and run the following commands
+now:
+
+ $ mysql -h %(dbhost)s -u root -p mysql
+   mysql> CREATE DATABASE %(dbname)s DEFAULT CHARACTER SET utf8;
+   mysql> GRANT ALL PRIVILEGES ON %(dbname)s.* TO %(dbuser)s@%(webhost)s IDENTIFIED BY '%(dbpass)s';
+   mysql> QUIT
+
+The values printed above were detected from your configuration.  If
+they are not right, then please edit your invenio.conf file and rerun
+'inveniocfg --update-all' first.
+
+If the problem is of different nature, then please inspect
+the above error message and fix the problem before continuing.""" % \
+                                 {'dbname': CFG_DATABASE_NAME,
+                                  'dbhost': CFG_DATABASE_HOST,
+                                  'dbuser': CFG_DATABASE_USER,
+                                  'dbpass': CFG_DATABASE_PASS,
+                                  'webhost': CFG_DATABASE_HOST == 'localhost' and 'localhost' or os.popen('hostname -f', 'r').read().strip(),
+                                  })
+        sys.exit(1)
+    print "ok"
+
+    ## second, test insert/select of a Unicode string to detect
+    ## possible Python/MySQL/MySQLdb mis-setup:
+    print "Testing Python/MySQL/MySQLdb UTF-8 chain...",
+    try:
+        x = "β" # Greek beta in UTF-8 is 0xCEB2
+        run_sql("CREATE TEMPORARY TABLE test__invenio__utf8 (x char(1), y varbinary(2)) DEFAULT CHARACTER SET utf8")
+        run_sql("INSERT INTO test__invenio__utf8 VALUES (%s,%s)", (x, x))
+        res = run_sql("SELECT x,y,HEX(x),HEX(y),LENGTH(x),LENGTH(y),CHAR_LENGTH(x),CHAR_LENGTH(y) FROM test__invenio__utf8")
+        assert res[0] == ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L)
+        run_sql("DROP TEMPORARY TABLE test__invenio__utf8")
+    except Exception, e:
+        print wrap_text_in_a_box(title="DATABASE RELATED ERROR",
+                                 body="""\
+A problem was detected with the UTF-8 treatment in the chain between
+the Python application, the MySQLdb connector, and the MySQL database.
+You may perhaps have installed older versions of some prerequisite
+packages?
+
+Please check the INSTALL file and please fix this problem before
+continuing.""")
+
+        sys.exit(1)
+    print "ok"
+
 def create_tables(conf):
     """Create and fill Invenio DB tables.  Useful for the installation process."""
     print ">>> Going to create and fill tables..."
     from invenio.config import CFG_PREFIX
+    test_db_connection()
     for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/tabcreate.sql" % (CFG_PREFIX, CFG_PREFIX),
                 "%s/bin/dbexec < %s/lib/sql/invenio/tabfill.sql" % (CFG_PREFIX, CFG_PREFIX)]:
         if os.system(cmd):
@@ -389,8 +456,6 @@ def create_demo_site(conf):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
     print ">>> Demo site created successfully."
-
-# FIXME: plug install-tests.py eventually somewhere (everywhere)
 
 def load_demo_records(conf):
     """Load demo records.  Useful for testing purposes."""
