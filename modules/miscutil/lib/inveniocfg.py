@@ -343,8 +343,8 @@ def reset_fieldnames(conf):
     print ">>> I18N field names reset successfully."
 
 def create_tables(conf):
-    """Create Invenio DB tables.  Useful for the installation process."""
-    print ">>> Going to create tables..."
+    """Create and fill Invenio DB tables.  Useful for the installation process."""
+    print ">>> Going to create and fill tables..."
     from invenio.config import CFG_PREFIX
     for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/tabcreate.sql" % (CFG_PREFIX, CFG_PREFIX),
                 "%s/bin/dbexec < %s/lib/sql/invenio/tabfill.sql" % (CFG_PREFIX, CFG_PREFIX)]:
@@ -354,7 +354,11 @@ def create_tables(conf):
     reset_cdsname(conf)
     reset_adminemail(conf)
     reset_fieldnames(conf)
-    print ">>> Tables created successfully."
+    for cmd in ["%s/bin/webaccessadmin -u admin -c -a" % CFG_PREFIX,]:
+        if os.system(cmd):
+            print "ERROR: failed execution of", cmd
+            sys.exit(1)
+    print ">>> Tables created and filled successfully."
 
 def drop_tables(conf):
     """Drop Invenio DB tables.  Useful for the uninstallation process."""
@@ -378,7 +382,7 @@ def create_demo_site(conf):
     from invenio.dbquery import run_sql
     run_sql("TRUNCATE schTASK")
     for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/democfgdata.sql" % (CFG_PREFIX, CFG_PREFIX),
-                "%s/bin/webaccessadmin -u admin -c" % CFG_PREFIX,
+                "%s/bin/webaccessadmin -u admin -c -r -D" % CFG_PREFIX,
                 "%s/bin/webcoll -u admin" % CFG_PREFIX,
                 "%s/bin/webcoll 1" % CFG_PREFIX,]:
         if os.system(cmd):
