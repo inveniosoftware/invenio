@@ -31,26 +31,13 @@ import sys
 import time
 import copy
 import shelve
+from invenio.bibtask import write_message
 
 # Please point the following variables to the correct paths if using standalone (Invenio-independent) version
 TMPDIR_STANDALONE = "/tmp"
 PDFTOTEXT_STANDALONE = "/usr/bin/pdftotext"
 
 fontSize = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
-
-def write_message(msg, stream=sys.stdout):
-    """Write message and flush output stream (may be sys.stdout or sys.stderr)."""
-    if stream == sys.stdout or stream == sys.stderr:
-        stream.write("BibClassify Message:  ")
-        try:
-            stream.write("%s\n" % msg)
-        except UnicodeEncodeError:
-            stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
-        stream.flush()
-    else:
-        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
-    return
-
 
 def usage(code, msg=''):
     "Prints usage for this module."
@@ -185,7 +172,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
         safe_keys = ""
 
     if safe_keys != "":
-        print "Author keyword string detected: " + safe_keys
+        write_message("Author keyword string detected: %s" % safe_keys, verbose=8)
 
     # Here we start the big for loop around all concepts in the RDF ontology
     if not reusing_compiled_ontology_p:
@@ -309,12 +296,12 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
                 outlist.append(keylist[i])
 
         except:
-            print "Problem with composites.. : " + keylist[i][1]
+            write_message("Problem with composites.. : %s" % keylist[i][1])
 
     for s_CompositeOf in composites:
 
         if len(composites.get(s_CompositeOf)) > 2:
-            print s_CompositeOf + " - Sorry! Only composite combinations of max 2 keywords are supported at the moment."
+            write_message("%s - Sorry! Only composite combinations of max 2 keywords are supported at the moment." % s_CompositeOf)
         elif len(composites.get(s_CompositeOf)) > 1:
             # We have a composite match. Need to look for composite1 near composite2
             comp_one = compositesIDX[composites.get(s_CompositeOf)[0]][2]
@@ -458,8 +445,7 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
 
     if output == 0:
         # Output some text
-        print text_out
-
+        return text_out
     elif output == 2:
         # return marc xml output.
         xml = ""
@@ -469,16 +455,14 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
               <subfield code="a">%s</subfield>
               <subfield code="9">BibClassify/%s</subfield>
             </datafield>""" % (key[1],os.path.splitext(os.path.basename(ontology))[0])
-        print xml
+        return xml
     else:
         # Output some HTML
         html_out.sort()
         html_out.reverse()
-        makeTagCloud(html_out)
+        return make_tag_cloud(html_out)
 
-    return 0
-
-def makeTagCloud(entries):
+def make_tag_cloud(entries):
     """Using the counts for each of the tags, write a simple HTML page to
     standard output containing a tag cloud representation. The CSS
     describes ten levels, each of which has differing font-size's,
@@ -486,33 +470,33 @@ def makeTagCloud(entries):
     """
 
     max_occurrence = int(entries[0][0])
-    print "<html>"
-    print "<head>"
-    print "<title>Keyword Cloud</title>"
-    print "<style type=\"text/css\">"
-    print "<!--"
-    print 'a{color:#003DF5; text-decoration:none;}'
-    print 'a:hover{color:#f1f1f1; text-decoration:none; background-color:#003DF5;}'
-    print '.pagebox {color: #000;   margin-left: 1em;   margin-bottom: 1em;    border: 1px solid #000;    padding: 1em;    background-color: #f1f1f1;    font-family: arial, sans-serif;   max-width: 700px;   margin: 10px;   padding-left: 10px;   float: left;}'
-    print '.pagebox1 {color: #B5B5B5;   margin-left: 1em;   margin-bottom: 1em;    border: 1px dotted #B5B5B5;    padding: 1em;    background-color: #f2f2f2;    font-family: arial, sans-serif;   max-width: 300px;   margin: 10px;   padding-left: 10px;   float: left;}'
-    print '.pagebox2 {color: #000;   margin-left: 1em;   margin-bottom: 1em;    border: 0px solid #000;    padding: 1em;    fond-size: x-small, font-family: arial, sans-serif;   margin: 10px;   padding-left: 10px;   float: left;}'
+    ret = "<html>\n"
+    ret += "<head>\n"
+    ret += "<title>Keyword Cloud</title>\n"
+    ret += "<style type=\"text/css\">\n"
+    ret += "<!--"
+    ret += 'a{color:#003DF5; text-decoration:none;}\n'
+    ret += 'a:hover{color:#f1f1f1; text-decoration:none; background-color:#003DF5;}\n'
+    ret += '.pagebox {color: #000;   margin-left: 1em;   margin-bottom: 1em;    border: 1px solid #000;    padding: 1em;    background-color: #f1f1f1;    font-family: arial, sans-serif;   max-width: 700px;   margin: 10px;   padding-left: 10px;   float: left;}\n'
+    ret += '.pagebox1 {color: #B5B5B5;   margin-left: 1em;   margin-bottom: 1em;    border: 1px dotted #B5B5B5;    padding: 1em;    background-color: #f2f2f2;    font-family: arial, sans-serif;   max-width: 300px;   margin: 10px;   padding-left: 10px;   float: left;}\n'
+    ret += '.pagebox2 {color: #000;   margin-left: 1em;   margin-bottom: 1em;    border: 0px solid #000;    padding: 1em;    fond-size: x-small, font-family: arial, sans-serif;   margin: 10px;   padding-left: 10px;   float: left;}\n'
 
     for i in range(0, 10):
-        print ".level%d" % i
-        print "{  color:#003DF5;"
-        print "  font-size:%dpx;" % fontSize[i]
-        print "  line-height:%dpx;" % (fontSize[i] + 5)
+        ret += ".level%d\n" % i
+        ret += "{  color:#003DF5;\n"
+        ret += "  font-size:%dpx;\n" % fontSize[i]
+        ret += "  line-height:%dpx;\n" % (fontSize[i] + 5)
 
         if i > 5:
-            print "  font-weight:bold;"
+            ret += "  font-weight:bold;\n"
 
-        print "}"
+        ret += "}\n"
 
-    print "-->"
-    print "</style>"
-    print "</head>"
-    print "<body>"
-    print "<table>"
+    ret += "-->\n"
+    ret += "</style>\n"
+    ret += "</head>\n"
+    ret += "<body>\n"
+    ret += "<table>\n"
 
     cloud = ""
     cloud_list = []
@@ -552,9 +536,11 @@ def makeTagCloud(entries):
         cloud += '><a href=""> %s </a></span>' % cloud_list[i][0]
     cloud += '</div></tr>'
 
-    print cloud
-    print "</table></body>"
-    print "</html>"
+    ret += cloud + '\n'
+    ret += "</table></body>\n"
+    ret += "</html>\n"
+
+    return ret
 
 
 def makeCompPattern(candidates, modes):
