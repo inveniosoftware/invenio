@@ -49,7 +49,7 @@ def indent_text(text,
         output += tabs + line + linebreak_output
     return output
 
-def wrap_text_in_a_box(title='', body='', char_sep=' ', max_col=72):
+def wrap_text_in_a_box(title='', body='', char_sep=' ', max_col=72, nb_tabs=1, tab_str="  "):
     """Return a nicely formatted text box:
 
        ******************
@@ -57,14 +57,24 @@ def wrap_text_in_a_box(title='', body='', char_sep=' ', max_col=72):
        **--------------**
        **  body        **
        ******************
+
+    if no title is specified it will return:
+       *************
+       ** body     *
+       *************
+
+    The width of the box will be set in order to fit in max_col columns
+    considering tab characters if they are requested.
     """
+    max_col = max_col - len(tab_str) * nb_tabs
+    tabs = tab_str * nb_tabs
     ret = ''
     out = StringIO()
     tool = AbstractFormatter(DumbWriter(out, maxcol=max_col))
     for row in body.split('\n'):
         tool.add_flowing_data(row)
-        tool.end_paragraph(1)
-    body_rows = out.getvalue().split('\n')[:-2]
+        tool.end_paragraph(0)
+    body_rows = out.getvalue().split('\n')[:-1]
 
     out = StringIO()
     tool = AbstractFormatter(DumbWriter(out, maxcol=max_col))
@@ -72,30 +82,40 @@ def wrap_text_in_a_box(title='', body='', char_sep=' ', max_col=72):
     title_rows = out.getvalue().split('\n')
 
     max_len = max([len(row) for row in title_rows + body_rows]) + 6
-    ret += '*' * max_len + '\n'
+    ret += tabs + '*' * max_len + '\n'
     if title:
         for row in title_rows:
-            ret += '** %s%s **\n' % (row, ' ' * (max_len - len(row) - 6))
-        ret += '**' + char_sep * (max_len - 4) + '**\n'
+            ret += tabs + '** %s%s **\n' % (row, ' ' * (max_len - len(row) - 6))
+        ret += tabs + '**' + char_sep * (max_len - 4) + '**\n'
     for row in body_rows:
-        ret += '** %s%s **\n' % (row, ' ' * (max_len - len(row) - 6))
-    ret += '*' * max_len + '\n'
+        ret += tabs + '** %s%s **\n' % (row, ' ' * (max_len - len(row) - 6))
+    ret += tabs + '*' * max_len + '\n'
 
     return ret
 
-def make_conclusion(text):
+def prefix_text(text, max_col=72, prefix_str="-", nb_tabs=0, tab_str="  "):
     """Return:
     --------------
     text text text
     """
+    max_col = max_col - len(tab_str) * nb_tabs
+    tabs = tab_str * nb_tabs
+
     out = StringIO()
-    tool = AbstractFormatter(DumbWriter(out, maxcol=78))
-    tool.add_flowing_data(text)
-    text = out.getvalue().split('\n')
+    tool = AbstractFormatter(DumbWriter(out, maxcol=max_col))
+    for row in text.split('\n'):
+        tool.add_flowing_data(row)
+        tool.end_paragraph(0)
+    text = out.getvalue().split('\n')[:-1]
 
     max_len = max([len(row) for row in text])
 
-    return '%s\n%s\n' % ('-' * max_len, '\n'.join(text))
+    ret = tabs + '%s\n' % (prefix_str * max_len)[:max_len] # Just in case prefix_str is longer
+                                           # than one character
+    for row in text:
+        ret += tabs + row + '\n'
+
+    return ret
 
 def wait_for_user(msg):
     """Print MSG and prompt user for confirmation."""
