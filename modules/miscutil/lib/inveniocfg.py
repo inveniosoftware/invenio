@@ -357,6 +357,7 @@ def test_db_connection():
     except Error, e:
         from invenio.dbquery import CFG_DATABASE_HOST, CFG_DATABASE_NAME, \
              CFG_DATABASE_USER, CFG_DATABASE_PASS
+        print "\n"
         print wrap_text_in_a_box(title="DATABASE CONNECTIVITY ERROR %d: %s." % \
                                  (e.args[0], e.args[1]),
                                  body="""\
@@ -395,7 +396,8 @@ the above error message and fix the problem before continuing.""" % \
         assert res[0] == ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L)
         run_sql("DROP TEMPORARY TABLE test__invenio__utf8")
     except Exception, e:
-        print wrap_text_in_a_box(title="DATABASE RELATED ERROR",
+        print "\n"
+        print wrap_text_in_a_box(title="DATABASE RELATED ERROR %s" % e,
                                  body="""\
 A problem was detected with the UTF-8 treatment in the chain between
 the Python application, the MySQLdb connector, and the MySQL database.
