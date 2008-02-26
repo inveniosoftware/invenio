@@ -45,7 +45,7 @@ class IntBitSetTest(unittest.TestCase):
             [1000],
             [10000],
             [23, 45, 67, 89, 110, 130, 174, 1002, 2132, 23434],
-            [700, 2000]
+            [700, 2000],
         ]
         self.fncs_list = [
             (intbitset.__and__, set.__and__, int.__and__, False),
@@ -296,6 +296,15 @@ class IntBitSetTest(unittest.TestCase):
                     self.fail()
                 count += 1
             self.assertEqual(tot, len(set1))
+
+    def test_tuple_of_tuples(self):
+        """intbitset - support tuple of tuples"""
+        for set1 in self.sets + [[]]:
+            tmp_tuple = tuple([(elem, ) for elem in set1])
+            self.assertEqual(list(intbitset(set1)), list(intbitset(tmp_tuple)))
+        for set1 in self.sets + [[]]:
+            tmp_tuple = tuple([(elem, ) for elem in set1])
+            self.assertEqual(intbitset(set1, trailing_bits=True), intbitset(tmp_tuple, trailing_bits=True))
 
     def test_marshalling(self):
         """intbitset - marshalling"""

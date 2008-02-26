@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
-__apilevel__ = 1.02
+__apilevel__ = 1.03
 
 """
 Defines an intbitset data object to hold unordered sets of unsigned
@@ -37,7 +37,7 @@ you will receive unpredictable results.
 
 Note to Invenio developers: If you make modification to this file you
 have to manually regenerate intbitset.c by running:
-  $ pyrexc intbitset.pyx
+  $ cython intbitset.pyx
 and then commit generated intbitset.c to CVS.
 """
 
@@ -106,7 +106,30 @@ cdef class intbitset:
     so may have issues with endianness if you transport serialized
     bitsets between various machine architectures.
 
+    The constructor accept the following parameters:
+        rhs=0, int preallocate=-1, int trailing_bits=0,
+        bint sanity_checks=CFG_INTBITSET_ENABLE_SANITY_CHECKS,
+        int no_allocate=0:
 
+    where:
+        * rhs can be:
+            - int/long for creating allocating empty intbitset that will hold at least
+            rhs elements, before being resized
+            - intbitset for cloning
+            - str for retrieving an intbitset that was dumped into a string
+            - array for retrieving an intbitset that was dumped into a string stored
+            in an array
+            - sequence made of integers for copying all the elements from the
+            sequence. If minsize is specified than it is initially allocated
+            enough space to hold up to minsize integers, otherwise the biggest
+            element of the sequence will be used.
+            - sequence made of tuples: then the first element of each tuple
+            is considered as an integer (as in the sequence made of integers).
+        * preallocate is a suggested initial upper bound on the numbers that will be
+            stored, by looking at rhs a sequence of number.
+        * trailing_bits is 1, then the set will contain "all" the positive integers
+        * no_allocate is used internally and should never be set.
+        after the biggest one added with rhs.
     """
     cdef IntBitSet *bitset
     cdef bint sanity_checks
@@ -137,6 +160,7 @@ cdef class intbitset:
         cdef int i
         cdef int last
         cdef int remelem
+        cdef bint tuple_of_tuples
         self.sanity_checks = sanity_checks
         msg = "Error"
         self.bitset = NULL
@@ -160,9 +184,10 @@ cdef class intbitset:
             except Exception, msg:
                 raise ValueError, "rhs is corrupted: %s" % msg
         elif hasattr(rhs, '__iter__'):
+            tuple_of_tuples = rhs and type(rhs[0]) is tuple
             try:
                 if preallocate < 0:
-                    if rhs:
+                    if rhs and type(rhs[0]) is int:
                         preallocate = max(rhs)
                     else:
                         preallocate = 0
@@ -173,31 +198,63 @@ cdef class intbitset:
                 if trailing_bits:
                     last = 0
                     if self.sanity_checks:
-                        for elem in rhs:
-                            if elem < 0:
-                                raise ValueError, "Negative numbers, not allowed"
-                            elif elem > maxelem:
-                                raise OverflowError, "Elements must be <= %s" % maxelem
-                            for remelem from last <= remelem < elem:
-                                intBitSetDelElem(self.bitset, remelem)
-                            last = elem + 1
+                        if tuple_of_tuples:
+                            for tmp_tuple in rhs:
+                                elem = tmp_tuple[0]
+                                if elem < 0:
+                                    raise ValueError, "Negative numbers, not allowed"
+                                elif elem > maxelem:
+                                    raise OverflowError, "Elements must be <= %s" % maxelem
+                                for remelem from last <= remelem < elem:
+                                    intBitSetDelElem(self.bitset, remelem)
+                                last = elem + 1
+                        else:
+                            for elem in rhs:
+                                if elem < 0:
+                                    raise ValueError, "Negative numbers, not allowed"
+                                elif elem > maxelem:
+                                    raise OverflowError, "Elements must be <= %s" % maxelem
+                                for remelem from last <= remelem < elem:
+                                    intBitSetDelElem(self.bitset, remelem)
+                                last = elem + 1
                     else:
-                        for elem in rhs:
-                            for remelem from last <= remelem < elem:
-                                intBitSetDelElem(self.bitset, remelem)
-                            last = elem + 1
+                        if tuple_of_tuples:
+                            for tmp_tuple in rhs:
+                                elem = tmp_tuple[0]
+                                for remelem from last <= remelem < elem:
+                                    intBitSetDelElem(self.bitset, remelem)
+                                last = elem + 1
+                        else:
+                            for elem in rhs:
+                                for remelem from last <= remelem < elem:
+                                    intBitSetDelElem(self.bitset, remelem)
+                                last = elem + 1
 
                 else:
                     if self.sanity_checks:
-                        for elem in rhs:
-                            if elem < 0:
-                                raise ValueError, "Negative numbers, not allowed"
-                            elif elem > maxelem:
-                                raise OverflowError, "Elements must be <= %s" % maxelem
-                            intBitSetAddElem(self.bitset, elem)
+                        if tuple_of_tuples:
+                            for tmp_tuple in rhs:
+                                elem = tmp_tuple[0]
+                                if elem < 0:
+                                    raise ValueError, "Negative numbers, not allowed"
+                                elif elem > maxelem:
+                                    raise OverflowError, "Elements must be <= %s" % maxelem
+                                intBitSetAddElem(self.bitset, elem)
+                        else:
+                            for elem in rhs:
+                                if elem < 0:
+                                    raise ValueError, "Negative numbers, not allowed"
+                                elif elem > maxelem:
+                                    raise OverflowError, "Elements must be <= %s" % maxelem
+                                intBitSetAddElem(self.bitset, elem)
                     else:
-                        for elem in rhs:
-                            intBitSetAddElem(self.bitset, elem)
+                        if tuple_of_tuples:
+                            for tmp_tuple in rhs:
+                                elem = tmp_tuple[0]
+                                intBitSetAddElem(self.bitset, elem)
+                        else:
+                            for elem in rhs:
+                                intBitSetAddElem(self.bitset, elem)
             except Exception, msg:
                 raise ValueError, "retrieving integers from rhs is impossible: %s" % msg
         else:
@@ -358,7 +415,7 @@ cdef class intbitset:
             while last >= -1:
                 last = intBitSetGetNext(self.bitset, last)
                 ret = ret + '%i, ' % last
-            ret = ret[:-len('-2, ')]
+            ret = ret[:-4] # -len('-2, ')
             if ret.endswith(', '):
                 ret = ret[:-2]
             ret = ret + '])'
