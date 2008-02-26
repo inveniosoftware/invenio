@@ -109,6 +109,7 @@ if CFG_CERN_SITE:
 DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
              (WEBACCESSADMINROLE, 'WebAccess administrator', 'deny any'))
 
+# Demo site roles
 DEF_DEMO_ROLES = (('photoadmin', 'Photo collection administrator', 'deny any'),
                   ('thesesviewer', 'Theses viewer', 'allow group "Theses viewers"\nallow apache_group "theses"'))
 
@@ -149,6 +150,9 @@ DEF_ACTIONS = (
                (VIEWRESTRCOLL, 'view restricted collection', 'collection', 'no'),
               )
 
+# Default authorizations
+#              role          action       arglistid  optional arguments
+DEF_AUTHS = ()
 
 # Demo site authorizations
 #              role          action       arglistid  optional arguments

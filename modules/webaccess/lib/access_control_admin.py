@@ -31,7 +31,7 @@ from invenio.messages import gettext_set_language
 from invenio.config import supportemail, cdslang
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DELEGATEADDUSERROLE, SUPERADMINROLE, \
-    DEF_USERS, DEF_ROLES, DEF_ACTIONS, CFG_ACC_ACTIVITIES_URLS
+    DEF_USERS, DEF_ROLES, DEF_AUTHS, DEF_ACTIONS, CFG_ACC_ACTIVITIES_URLS
 from invenio.dbquery import run_sql, ProgrammingError, run_sql_cached
 from invenio.access_control_firerole import compile_role_definition, \
     acc_firerole_check_user, serialize, deserialize
@@ -1851,8 +1851,7 @@ def acc_add_default_settings(superusers=[],
 
     # add roles
     insroles = []
-    if additional_def_roles:
-        def_roles = list(DEF_ROLES) + list(additional_def_roles)
+    def_roles = list(DEF_ROLES) + list(additional_def_roles)
     for (name, description, firerole_def_src) in def_roles:
         # try to add, don't care if description is different
         role_id = acc_add_role(name_role=name,
@@ -1892,10 +1891,7 @@ def acc_add_default_settings(superusers=[],
 
     # add authorizations
     insauths = []
-    if additional_def_auths:
-        # Since DEF_AUTHS don't exist
-        #def_auths = list(DEF_AUTHS) + list(additional_def_auths)
-        def_auths = list(additional_def_auths)
+    def_auths = list(DEF_AUTHS) + list(additional_def_auths)
     for (name_role, name_action, arglistid, optional, args) in def_auths:
         # add the authorization
         acc_add_role_action_arguments_names(name_role=name_role,

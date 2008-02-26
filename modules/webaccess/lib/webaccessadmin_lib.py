@@ -3726,7 +3726,7 @@ def main():
             elif options['reset']:
                 acca.acc_reset_default_settings([supportemail])
                 print "Reset default settings."
-            if options['add'] and options['demo']:
+            elif options['add'] and options['demo']:
                 acca.acc_add_default_settings([supportemail], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
                 print "Added default Demo Site settings."
             elif options['add']:
