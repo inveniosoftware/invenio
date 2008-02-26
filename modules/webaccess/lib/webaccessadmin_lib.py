@@ -59,7 +59,7 @@ from invenio.webpage import page
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webuser import email_valid_p, get_user_preferences, \
     set_user_preferences
-from invenio.bibtask import authenticate, _task_params
+from invenio.bibtask import authenticate
 from cgi import escape
 
 
@@ -3683,11 +3683,6 @@ def main():
 
     ## parse command line:
     # set user-defined options:
-    global _task_params
-
-    # Small trick to let bibtask.authenticate framework to work for non tasks.
-    _task_params["task_name"] = os.path.basename(sys.argv[0])
-
     options = {'user' : '', 'reset' : 0, 'compile' : 0, 'add' : 0, 'demo' : 0}
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hVu:racD",

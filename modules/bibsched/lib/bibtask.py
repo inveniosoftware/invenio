@@ -47,7 +47,8 @@ cfg_valid_processes_no_auth_needed = ("bibupload")
 
 # Global variables
 _options = {'verbose' : 1, 'name' : ''}
-_task_params = {}
+_task_params = {"task_name" : os.path.basename(sys.argv[0])
+}
 
 
 def task_init(
@@ -83,7 +84,6 @@ def task_init(
     _options["sleeptime"] = ""
     _options["verbose"] = 1
     _options["version"] = version
-    _task_params["task_name"] = os.path.basename(sys.argv[0])
     _task_params["task_stop_helper_fnc"] = task_stop_helper_fnc
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
         ## A - run the task
