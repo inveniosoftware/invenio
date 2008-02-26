@@ -122,7 +122,7 @@ def wait_for_user(msg):
     try:
         raw_input(msg)
     except KeyboardInterrupt:
-        print "\n\nInstallation aborted."
+        print "\n\nAborted."
         sys.exit(1)
     except EOFError:
         print " (continuing in batch mode)"
