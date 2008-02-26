@@ -1,0 +1,629 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<rdf:RDF
+    xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+    xmlns:rdfs='http://www.w3.org/2000/01/rdf-schema#'
+    xmlns:skos='http://www.w3.org/2004/02/skos/core#'
+    xmlns:nt2='http://nasataxonomy.jpl.nasa.gov/cvFields#'
+    xmlns:dcterms='http://purl.org/dc/terms/'
+    xmlns:dc='http://purl.org/dc/elements/1.1/'>
+ <skos:Concept rdf:about='inst:8'>
+  <skos:prefLabel>Cameras</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <skos:narrower rdf:resource='inst:9'/>
+  <skos:narrower rdf:resource='inst:10'/>
+  <skos:narrower rdf:resource='inst:11'/>
+  <skos:narrower rdf:resource='inst:12'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>8</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:43'>
+  <skos:prefLabel>Imaging Spectrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:25'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>43</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:15'>
+  <skos:prefLabel>Dosimeters</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>15</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:32'>
+  <skos:prefLabel>Nephelometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>32</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:5'>
+  <skos:prefLabel>Antennae</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>5</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:9'>
+  <skos:prefLabel>CCD Cameras</skos:prefLabel>
+  <skos:broader rdf:resource='inst:8'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>9</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:51'>
+  <skos:prefLabel>Ultraviolet Spectrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:25'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>51</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:47'>
+  <skos:prefLabel>Plasma Wave Spectrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:25'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>47</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:12'>
+  <skos:prefLabel>Vidicon Camera</skos:prefLabel>
+  <skos:broader rdf:resource='inst:8'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>12</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:6'>
+  <skos:prefLabel>Barometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>6</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:18'>
+  <skos:prefLabel>Faraday Cups</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>18</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:33'>
+  <skos:prefLabel>Optical Spectrographs</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>33</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:7'>
+  <skos:prefLabel>Beta Detectors</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>7</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:48'>
+  <skos:prefLabel>Quadrupole Mass Spectrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:25'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>48</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:31'>
+  <skos:prefLabel>Low-Frequency Radio Arrays</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>31</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:54'>
+  <skos:prefLabel>Optical Telescopes</skos:prefLabel>
+  <skos:broader rdf:resource='inst:53'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>54</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:34'>
+  <skos:prefLabel>Particle Counters</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>34</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:11'>
+  <skos:prefLabel>Imaging Cameras</skos:prefLabel>
+  <skos:broader rdf:resource='inst:8'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>11</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:39'>
+  <skos:prefLabel>Polarimeters</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>39</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:55'>
+  <skos:prefLabel>Thermistors</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>55</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:45'>
+  <skos:prefLabel>Ion Mass Spectrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:25'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>45</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:28'>
+  <skos:prefLabel>Infrared Polarimeters</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>28</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:36'>
+  <skos:prefLabel>Photopolarimeters</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <skos:narrower rdf:resource='inst:37'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>36</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:27'>
+  <skos:prefLabel>Infrared Photometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>27</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:38'>
+  <skos:prefLabel>Radiometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <skos:narrower rdf:resource='inst:37'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>38</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:22'>
+  <skos:prefLabel>Hygrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>22</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:40'>
+  <skos:prefLabel>Radar</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>40</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:2'>
+  <skos:prefLabel>Accelerometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>2</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:19'>
+  <skos:prefLabel>Fluxgate Magnetometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>19</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:30'>
+  <skos:prefLabel>Laser Rangefinders</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>30</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:56'>
+  <skos:prefLabel>Thermometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>56</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:14'>
+  <skos:prefLabel>Cosmic Dust Analyzers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>14</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:37'>
+  <skos:prefLabel>Photopolarimeter Radiometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:36'/>
+  <skos:broader rdf:resource='inst:38'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>37</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:23'>
+  <skos:prefLabel>Infrared Imaging Devices</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <skos:narrower rdf:resource='inst:24'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>23</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:35'>
+  <skos:prefLabel>Photometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>35</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:3'>
+  <skos:prefLabel>Acoustic Sensors</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>3</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:21'>
+  <skos:prefLabel>Gas Detectors</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>21</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:42'>
+  <skos:prefLabel>Spectrographs</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>42</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:44'>
+  <skos:prefLabel>Infrared Spectrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:25'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>44</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:50'>
+  <skos:prefLabel>Thermal Infrared Spectrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:25'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>50</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:52'>
+  <skos:prefLabel>Visible Spectrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:25'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>52</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:53'>
+  <skos:prefLabel>Telescopes</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <skos:narrower rdf:resource='inst:54'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>53</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:4'>
+  <skos:prefLabel>Anemometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>4</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:17'>
+  <skos:prefLabel>Electrostatic Analyzers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>17</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:26'>
+  <skos:prefLabel>Infrared Interferometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>26</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:46'>
+  <skos:prefLabel>Mass Spectrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:25'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>46</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:41'>
+  <skos:prefLabel>Radio Telescopes</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>41</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:25'>
+  <skos:prefLabel>Spectrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <skos:narrower rdf:resource='inst:43'/>
+  <skos:narrower rdf:resource='inst:24'/>
+  <skos:narrower rdf:resource='inst:44'/>
+  <skos:narrower rdf:resource='inst:45'/>
+  <skos:narrower rdf:resource='inst:46'/>
+  <skos:narrower rdf:resource='inst:47'/>
+  <skos:narrower rdf:resource='inst:48'/>
+  <skos:narrower rdf:resource='inst:49'/>
+  <skos:narrower rdf:resource='inst:50'/>
+  <skos:narrower rdf:resource='inst:51'/>
+  <skos:narrower rdf:resource='inst:52'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>25</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:13'>
+  <skos:prefLabel>Charged Particle Analyzers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>13</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:20'>
+  <skos:prefLabel>Gamma-Ray Burst Detectors</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>20</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:10'>
+  <skos:prefLabel>Framing Cameras</skos:prefLabel>
+  <skos:broader rdf:resource='inst:8'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>10</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:16'>
+  <skos:prefLabel>Dust Impact Detectors</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>16</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:49'>
+  <skos:prefLabel>Radio Spectrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:25'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>49</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:24'>
+  <skos:prefLabel>Infrared Imaging Spectrometers</skos:prefLabel>
+  <skos:broader rdf:resource='inst:23'/>
+  <skos:broader rdf:resource='inst:25'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>24</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:29'>
+  <skos:prefLabel>Laser Altimeters</skos:prefLabel>
+  <skos:broader rdf:resource='inst:1'/>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>29</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+ <skos:Concept rdf:about='inst:1'>
+  <skos:prefLabel>Instruments</skos:prefLabel>
+  <skos:narrower rdf:resource='inst:2'/>
+  <skos:narrower rdf:resource='inst:3'/>
+  <skos:narrower rdf:resource='inst:4'/>
+  <skos:narrower rdf:resource='inst:5'/>
+  <skos:narrower rdf:resource='inst:6'/>
+  <skos:narrower rdf:resource='inst:7'/>
+  <skos:narrower rdf:resource='inst:8'/>
+  <skos:narrower rdf:resource='inst:13'/>
+  <skos:narrower rdf:resource='inst:14'/>
+  <skos:narrower rdf:resource='inst:15'/>
+  <skos:narrower rdf:resource='inst:16'/>
+  <skos:narrower rdf:resource='inst:17'/>
+  <skos:narrower rdf:resource='inst:18'/>
+  <skos:narrower rdf:resource='inst:19'/>
+  <skos:narrower rdf:resource='inst:20'/>
+  <skos:narrower rdf:resource='inst:21'/>
+  <skos:narrower rdf:resource='inst:22'/>
+  <skos:narrower rdf:resource='inst:23'/>
+  <skos:narrower rdf:resource='inst:26'/>
+  <skos:narrower rdf:resource='inst:27'/>
+  <skos:narrower rdf:resource='inst:28'/>
+  <skos:narrower rdf:resource='inst:29'/>
+  <skos:narrower rdf:resource='inst:30'/>
+  <skos:narrower rdf:resource='inst:31'/>
+  <skos:narrower rdf:resource='inst:32'/>
+  <skos:narrower rdf:resource='inst:33'/>
+  <skos:narrower rdf:resource='inst:34'/>
+  <skos:narrower rdf:resource='inst:35'/>
+  <skos:narrower rdf:resource='inst:36'/>
+  <skos:narrower rdf:resource='inst:39'/>
+  <skos:narrower rdf:resource='inst:40'/>
+  <skos:narrower rdf:resource='inst:41'/>
+  <skos:narrower rdf:resource='inst:38'/>
+  <skos:narrower rdf:resource='inst:42'/>
+  <skos:narrower rdf:resource='inst:25'/>
+  <skos:narrower rdf:resource='inst:53'/>
+  <skos:narrower rdf:resource='inst:55'/>
+  <skos:narrower rdf:resource='inst:56'/>
+  <skos:scopeNote>"Based on PDS Instrument class hierarchy. For more detailed instrumentation, see: GCMD Instruments list."
+  </skos:scopeNote>
+  <nt2:status>Approved</nt2:status>
+  <nt2:type>Descriptor</nt2:type>
+  <nt2:code>1</nt2:code>
+  <nt2:inputdate>2004-05-01</nt2:inputdate>
+  <dcterms:dateAccepted>2004-06-11</dcterms:dateAccepted>
+  <dcterms:modified>2004-06-11</dcterms:modified>
+ </skos:Concept>
+</rdf:RDF>
