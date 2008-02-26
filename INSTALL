@@ -197,7 +197,7 @@ Contents
       $ vi ./config/invenio.conf
       $ /opt/cds-invenio/bin/inveniocfg --update-all
       $ /opt/cds-invenio/bin/inveniocfg --create-tables
-      $ sudo vi /path/to/apache/conf/httpd.conf ## see below in part 2
+      $ /opt/cds-invenio/bin/inveniocfg --create-apache-conf
       $ sudo /path/to/apache/bin/apachectl graceful
       $ sudo chgrp -R www-data /opt/cds-invenio
       $ sudo chmod -R g+r /opt/cds-invenio
@@ -425,105 +425,17 @@ Contents
           "make install" process.  We continue by setting up the
           Apache web server.
 
-      $ sudo vi /path/to/apache/conf/httpd.conf
+      $ /opt/cds-invenio/bin/inveniocfg --create-apache-conf
 
-          Please ask your webserver administrator to put the following
-          line in your "httpd.conf" configuration file:
+          Running this command will generate Apache virtual host
+          configurations matching your installation.  You will be
+          instructed to check created files (usually they are located
+          under /opt/cds-invenio/etc/apache/) and edit your httpd.conf
+          to put the following include statements:
 
-              AddDefaultCharset UTF-8
+             Include /opt/cds-invenio/etc/apache/invenio-apache-vhost.conf
+             Include /opt/cds-invenio/etc/apache/invenio-apache-vhost-ssl.conf
 
-          This is to ensure that the browsers will get UTF-8 as the
-          default page encoding.
-
-          As mentioned above, the web pages will get installed into
-          the `prefix/var/www' directory.  Therefore you should
-          specify something along the lines of:
-
-              ServerSignature Off
-              ServerTokens Prod
-              NameVirtualHost *:80
-              <Files *.pyc>
-                 deny from all
-              </Files>
-              <Files *~>
-                 deny from all
-              </Files>              
-              <VirtualHost *:80>
-                      ServerName webserver.domain.com
-                      ServerAlias webserver
-                      ServerAdmin cds.support@cern.ch
-                      DocumentRoot /opt/cds-invenio/var/www
-                      <Directory /opt/cds-invenio/var/www>
-                         Options FollowSymLinks MultiViews
-                         AllowOverride None
-                         Order allow,deny
-                         allow from all
-                      </Directory>
-                      ErrorLog /opt/cds-invenio/var/log/apache.err
-                      LogLevel warn
-                      CustomLog /opt/cds-invenio/var/log/apache.log combined
-                      DirectoryIndex index.en.html index.html
-                      <LocationMatch
-                      "^(/+$|/index|/collection|/record|/author|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss|/help|/journal|/openurl)">
-                         SetHandler python-program
-                         PythonHandler invenio.webinterface_layout
-                         PythonDebug On
-                      </LocationMatch>  
-                      <Directory /opt/cds-invenio/var/www>
-                         AddHandler python-program .py
-                         PythonHandler mod_python.publisher
-                         PythonDebug On
-                      </Directory>
-              </VirtualHost>
-             
-          This will tell Apache where to find the files, how to
-          interpret .py files, which files to serve as indexes, etc.
-
-          If you have configured the system to use secure URL for
-          login (see above), then you have to specify secure site too,
-          such as:
-
-              ServerSignature Off
-              ServerTokens Prod
-              NameVirtualHost *:443
-              #SSLCertificateFile /etc/apache2/ssl/apache.pem
-              SSLCertificateFile /etc/apache2/ssl/server.crt
-              SSLCertificateKeyFile /etc/apache2/ssl/server.key
-              <Files *.pyc>
-                 deny from all
-              </Files>
-              <Files *~>
-                 deny from all
-              </Files>              
-              <VirtualHost *:443>
-                      ServerName webserver.domain.com
-                      ServerAlias webserver
-                      ServerAdmin cds.support@cern.ch
-                      SSLEngine on
-                      DocumentRoot /opt/cds-invenio/var/www
-                      <Directory /opt/cds-invenio/var/www>
-                         Options FollowSymLinks MultiViews
-                         AllowOverride None
-                         Order allow,deny
-                         allow from all
-                      </Directory>
-                      ErrorLog /opt/cds-invenio/var/log/apache-ssl.err
-                      LogLevel warn
-                      CustomLog /opt/cds-invenio/var/log/apache-ssl.log combined
-                      DirectoryIndex index.en.html index.html
-                      <LocationMatch
-                      "^(/+$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss|/help|/journal|/openurl)">
-                         SetHandler python-program
-                         PythonHandler invenio.webinterface_layout
-                         PythonDebug On
-                      </LocationMatch>  
-                      <Directory /opt/cds-invenio/var/www>
-                         AddHandler python-program .py
-                         PythonHandler mod_python.publisher
-                         PythonDebug On
-                      </Directory>
-              </VirtualHost>
-                                
       $ sudo /path/to/apache/bin/apachectl graceful
 
           Please ask your webserver administrator to restart the
