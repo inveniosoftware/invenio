@@ -106,6 +106,7 @@ modules/miscutil/lib/errorlib.py
 modules/miscutil/lib/errorlib_tests.py
 modules/miscutil/lib/errorlib_webinterface.py
 modules/miscutil/lib/__init__.py
+modules/miscutil/lib/inveniocfg.py
 modules/miscutil/lib/miscutil_config.py
 modules/miscutil/lib/mailutils.py
 modules/miscutil/lib/messages.py
