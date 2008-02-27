@@ -25,8 +25,44 @@ Functions useful for text handling.
 __revision__ = "$Id$"
 
 import sys
-from formatter import AbstractFormatter, DumbWriter
-from cStringIO import StringIO
+import re
+from textwrap import wrap
+
+CFG_WRAP_STYLES = {
+    'DEFAULT' : {
+        'horiz_sep' : '*',
+        'max_col' : 72,
+        'tab_str' : '    ',
+        'tab_num' : 0,
+        'border' : ('**', '*', '**', '** ', ' **', '**', '*', '**'),
+        'prefix' : '\n',
+        'suffix' : '\n',
+        'force_horiz' : False
+    },
+    'fancy' : {
+        'horiz_sep' : '-',
+        'border' : ('/', '-', '\\', '| ', ' |', '\\', '-', '/')
+    },
+    'double_sharp' : {
+        'horiz_sep' : '#',
+        'border' : ('##', '#', '##', '## ', ' ##', '##', '#', '##')
+    },
+    'single_sharp' : {
+        'horiz_sep' : '#',
+        'border' : ('#', '#', '#', '# ', ' #', '#', '#', '#')
+    },
+    'single_star' : {
+        'border' : ('*', '*', '*', '* ', ' *', '*', '*', '*',)
+    },
+    'double_star' : {
+    },
+    'no_border' : {
+        'horiz_sep' : '',
+        'border' : ('', '', '', '', '', '', '', ''),
+        'prefix' : '',
+        'suffix' : ''
+    }
+}
 
 def indent_text(text,
                 nb_tabs=0,
@@ -42,80 +78,101 @@ def indent_text(text,
     @param linebreak_output: linebreak on output
     @return indented text as string
     """
-    lines = text.split(linebreak_input)
-    tabs = nb_tabs*tab_str
-    output = ""
-    for line in lines:
-        output += tabs + line + linebreak_output
-    return output
+    return wrap_text_in_a_box(body=text, style='no_border', tab_str=tab_str, tab_num=nb_tabs)
 
-def wrap_text_in_a_box(title='', body='', char_sep=' ', max_col=72, nb_tabs=1, tab_str="  "):
+_beginning_space_re = re.compile('^\s*')
+def wrap_text_in_a_box(body='', title='', **args):
     """Return a nicely formatted text box:
-
+        e.g.
        ******************
        **  title       **
        **--------------**
        **  body        **
        ******************
 
-    if no title is specified it will return:
-       *************
-       ** body     *
-       *************
+    Indentation and newline are respected.
+    @param body the main text
+    @param title an optional title
+    @param horiz_sep a string that is repeated in order to produce a
+        separator row between the title and the body (if needed)
+    @param max_col the maximum number of coulmns used by the box (including
+        indentation)
+    @param tab_str a string to represent indentation
+    @param tab_num the number of leveles of indentations
+    @param border a tuple of 8 element in the form (tl, t, tr, l, r, bl, b, br)
+        of strings that represent the different corners and sides of the box
+    @param prefix a prefix string added before the box
+    @param suffix a suffix string added after the box
+    @param force_horiz True in order to print the horizontal line even when
+        there is no title
+    @param style the name of one of the style in CFG_WRAP_STYLES. By default
+        is set to DEFAULT.
+    a part from body and title, if you don't specify anything, the DEFAULT
+    style is applied. If style is specified it overwrite the DEFAULT one.
+    If any other parameter is specified it will overwrite the specific
+    parameter of the chosen style.
 
-    The width of the box will be set in order to fit in max_col columns
-    considering tab characters if they are requested.
+    e.g.:
+    print wrap_text_in_a_box(title='prova', body='  123 prova.\n    Vediamo come si indenta', horiz_sep='-', style='no_border', max_col=20, tab_num=1)
+
+
+        prova
+        ----------------
+        123 prova.
+            Vediamo come
+            si indenta
+
     """
-    max_col = max_col - len(tab_str) * nb_tabs
-    tabs = tab_str * nb_tabs
+
+    def wrap_row(row, max_col):
+        """Wrap a single row"""
+        spaces = _beginning_space_re.match(row).group()
+        row = row[len(spaces):]
+        return wrap(row, initial_indent=spaces, subsequent_indent=spaces, width=max_col)
+
+    style = CFG_WRAP_STYLES['DEFAULT']
+    if args.has_key('style'):
+        style.update(CFG_WRAP_STYLES[args['style']])
+    style.update(args)
+
+    horiz_sep = style['horiz_sep']
+    border = style['border']
+    tab_str = style['tab_str'] * style['tab_num']
+    max_col = style['max_col'] - len(border[3]) - len(border[4]) - len(tab_str)
+    prefix = style['prefix']
+    suffix = style['suffix']
+    force_horiz = style['force_horiz']
+
+    tmp_rows = [wrap_row(row, max_col) for row in body.split('\n')]
+    body_rows = []
+    for rows in tmp_rows:
+        body_rows += rows
+    tmp_rows = [wrap_row(row, max_col) for row in title.split('\n')]
+    title_rows = []
+    for rows in tmp_rows:
+        title_rows += rows
+
+    max_col = max([len(row) for row in body_rows + title_rows])
+
+    mid_top_border_len = max_col + len(border[3]) + len(border[4]) - len(border[0]) - len(border[2])
+    mid_bottom_border_len = max_col + len(border[3]) + len(border[4]) - len(border[5]) - len(border[7])
+    top_border = border[0] + (border[1] * mid_top_border_len)[:mid_top_border_len] + border[2]
+    bottom_border = border[5] + (border[6] * mid_bottom_border_len)[:mid_bottom_border_len] + border[7]
+    horiz_line = border[3] + (horiz_sep * max_col)[:max_col] + border[4]
+
+    title_rows = [tab_str + border[3] + row + ' ' * (max_col - len(row)) + border[4] for row in title_rows]
+    body_rows = [tab_str + border[3] + row + ' ' * (max_col - len(row)) + border[4] for row in body_rows]
+
     ret = ''
-    out = StringIO()
-    tool = AbstractFormatter(DumbWriter(out, maxcol=max_col))
-    for row in body.split('\n'):
-        tool.add_flowing_data(row)
-        tool.end_paragraph(0)
-    body_rows = out.getvalue().split('\n')[:-1]
-
-    out = StringIO()
-    tool = AbstractFormatter(DumbWriter(out, maxcol=max_col))
-    tool.add_flowing_data(title)
-    title_rows = out.getvalue().split('\n')
-
-    max_len = max([len(row) for row in title_rows + body_rows]) + 6
-    ret += tabs + '*' * max_len + '\n'
-    if title:
-        for row in title_rows:
-            ret += tabs + '** %s%s **\n' % (row, ' ' * (max_len - len(row) - 6))
-        ret += tabs + '**' + char_sep * (max_len - 4) + '**\n'
-    for row in body_rows:
-        ret += tabs + '** %s%s **\n' % (row, ' ' * (max_len - len(row) - 6))
-    ret += tabs + '*' * max_len + '\n'
-
-    return ret
-
-def prefix_text(text, max_col=72, prefix_str="-", nb_tabs=0, tab_str="  "):
-    """Return:
-    --------------
-    text text text
-    """
-    max_col = max_col - len(tab_str) * nb_tabs
-    tabs = tab_str * nb_tabs
-
-    out = StringIO()
-    tool = AbstractFormatter(DumbWriter(out, maxcol=max_col))
-    for row in text.split('\n'):
-        tool.add_flowing_data(row)
-        tool.end_paragraph(0)
-    text = out.getvalue().split('\n')[:-1]
-
-    max_len = max([len(row) for row in text])
-
-    ret = tabs + '%s\n' % (prefix_str * max_len)[:max_len] # Just in case prefix_str is longer
-                                           # than one character
-    for row in text:
-        ret += tabs + row + '\n'
-
-    return ret
+    if top_border:
+        ret += [tab_str + top_border]
+    ret += title_rows
+    if title_rows or force_horiz:
+        ret += [tab_str + horiz_line]
+    ret += body_rows
+    if bottom_border:
+        ret += [tab_str + bottom_border]
+    return prefix + '\n'.join(ret) + suffix
 
 def wait_for_user(msg):
     """Print MSG and prompt user for confirmation."""
