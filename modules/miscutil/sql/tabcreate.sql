@@ -2963,6 +2963,7 @@ CREATE TABLE IF NOT EXISTS staEVENT (
 CREATE TABLE IF NOT EXISTS clsMETHOD (
   id mediumint(9) unsigned NOT NULL,
   name varchar(50) NOT NULL default '',
+  location varchar(255) NOT NULL default '',
   description varchar(255) NOT NULL default '',
   last_updated datetime NOT NULL default '0000-00-00 00:00:00',
   PRIMARY KEY  (id),

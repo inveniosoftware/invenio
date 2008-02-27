@@ -103,9 +103,9 @@ The CSS style for rounded corners box used in detailed record pages
 adapted from Francky Lleyneman liquidcorners CSS.
 <http://home.tiscali.nl/developerscorner/liquidcorners/liquidcorners.htm>
 
-The nasa-instruments.rdf and nasa-subjects.rdf files are kindly provided for
-free re-use by the American National Aeronautics and Space Administration
-(NASA).
+The NASA_Subjects.rdf files has been retrieved from the American National
+Aeronautics and Space Administration (NASA) who kindly provide this for
+free re-use.
 <http://nasataxonomy.jpl.nasa.gov/fordevelopers/>
 
 - end of file -

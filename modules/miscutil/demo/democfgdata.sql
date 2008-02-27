@@ -20,8 +20,8 @@ INSERT INTO collection VALUES (16,'Books & Reports',NULL,NULL,NULL,NULL);
 INSERT INTO collection VALUES (17,'Multimedia & Arts',NULL,NULL,NULL,NULL);
 INSERT INTO collection VALUES (18,'Poetry','collection:POETRY',NULL,NULL,NULL);
 
-INSERT INTO clsMETHOD VALUES (1,'HEP','High Energy Physics Taxonomy','0000-00-00 00:00:00');
-INSERT INTO clsMETHOD VALUES (2,'nasa-subjects','NASA Subjects','0000-00-00 00:00:00');
+INSERT INTO clsMETHOD VALUES (1,'HEP','','High Energy Physics Taxonomy','0000-00-00 00:00:00');
+INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','','NASA Subjects','0000-00-00 00:00:00');
 
 INSERT INTO collection_clsMETHOD VALUES (2,1);
 INSERT INTO collection_clsMETHOD VALUES (12,2);

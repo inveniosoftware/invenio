@@ -96,7 +96,6 @@ def task_run_core():
         if errcode != 0:
             write_message("WARNING, %s failed, error code is %s" % (cmd,errcode))
             return 0
-    time_now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     update_date_of_last_run()
     return 1
 

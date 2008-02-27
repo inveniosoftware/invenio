@@ -19,7 +19,7 @@
 
 etcdir = $(sysconfdir)/bibclassify
 
-etc_DATA = HEP.rdf nasa-instruments.rdf nasa-subjects.rdf
+etc_DATA = HEP.rdf NASA-subjects.rdf
 
 EXTRA_DIST = $(etc_DATA)
 
