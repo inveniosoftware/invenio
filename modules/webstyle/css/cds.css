@@ -1514,7 +1514,7 @@ ul.detailedrecordtabs{
    margin-right:10px;
    background-color: #FFF;
    padding:4px;
-   color:#36c;
+   color: #79d;
    font-size:x-small;
    font-weight:bold;
    text-decoration:none;
@@ -1527,6 +1527,7 @@ ul.detailedrecordtabs{
    text-decoration:underline;
 }
 .detailedrecordtabs li.on a{
+   color:#36c;
    border-bottom: 2px solid #fff;
    border-top: 2px solid #36c;
    border-right: 2px solid #36c;
@@ -1538,6 +1539,9 @@ ul.detailedrecordtabs{
 .detailedrecordtabs li.disabled a{
    color:#ccf;
    cursor:default;
+   border-top: 2px solid #ccf;
+   border-right: 2px solid #ccf;
+   border-left: 2px solid #ccf;
 }
 .detailedrecordtabs li.first a{
    border-left: 2px solid #79d;
