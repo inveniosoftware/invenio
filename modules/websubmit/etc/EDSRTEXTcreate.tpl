@@ -1,3 +1,4 @@
+## $Id$
 START::DEFP()---<record>
 001---<controlfield tag="001"><:SN::SN:></controlfield>
 037---<datafield tag="037" ind1=" " ind2=" "><subfield code="a"><:RNTEST2::RNTEST2:></subfield></datafield>

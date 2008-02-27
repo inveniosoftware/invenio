@@ -1,3 +1,4 @@
+## $Id$
 START::DEFP()---<record>
 001::REPL(EOL,)---<controlfield tag="001"><:SN::SN:></controlfield>
 037::REPL(EOL,)---<datafield tag="037" ind1=" " ind2=" "><subfield code="a"><:DEMOPIC_RN::DEMOPIC_RN:></subfield></datafield>
@@ -14,4 +15,3 @@ START::DEFP()---<record>
 8564u::REPL(EOL,)---<datafield tag="856" ind1="4" ind2=" "><subfield code="u">http://localhost/record/<:SN::SN:>/files/<:DEMOPIC_FILE_RENAMED::DEMOPIC_FILE_RENAMED:></subfield><subfield code="z">Access to files</subfield></datafield>
 980::DEFP()---<datafield tag="980" ind1=" " ind2=" "><subfield code="a">PICTURE</subfield></datafield>
 END::DEFP()---</record>
-
