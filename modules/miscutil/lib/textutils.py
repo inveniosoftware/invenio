@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Functions useful for text handling.
+Functions useful for text wrapping (in a box) and indenting.
 """
 
 __revision__ = "$Id$"
@@ -28,7 +28,7 @@ import sys
 import re
 from textwrap import wrap
 
-CFG_WRAP_STYLES = {
+CFG_WRAP_TEXT_IN_A_BOX_STYLES = {
     'DEFAULT' : {
         'horiz_sep' : '*',
         'max_col' : 72,
@@ -39,9 +39,9 @@ CFG_WRAP_STYLES = {
         'suffix' : '\n',
         'force_horiz' : False
     },
-    'fancy' : {
+    'squared' : {
         'horiz_sep' : '-',
-        'border' : ('/', '-', '\\', '| ', ' |', '\\', '-', '/')
+        'border' : ('+', '-', '+', '| ', ' |', '+', '-', '+')
     },
     'double_sharp' : {
         'horiz_sep' : '#',
@@ -61,6 +61,11 @@ CFG_WRAP_STYLES = {
         'border' : ('', '', '', '', '', '', '', ''),
         'prefix' : '',
         'suffix' : ''
+    },
+    'conclusion' : {
+        'border' : ('', '', '', '', '', '', '', ''),
+        'prefix' : '',
+        'force_horiz' : True,
     }
 }
 
@@ -80,8 +85,8 @@ def indent_text(text,
     """
     return wrap_text_in_a_box(body=text, style='no_border', tab_str=tab_str, tab_num=nb_tabs)
 
-_beginning_space_re = re.compile('^\s*')
-def wrap_text_in_a_box(body='', title='', **args):
+_RE_BEGINNING_SPACES = re.compile('^\s*')
+def wrap_text_in_a_box(body='', title='', style_name='DEFAULT', **args):
     """Return a nicely formatted text box:
         e.g.
        ******************
@@ -93,28 +98,26 @@ def wrap_text_in_a_box(body='', title='', **args):
     Indentation and newline are respected.
     @param body the main text
     @param title an optional title
-    @param horiz_sep a string that is repeated in order to produce a
-        separator row between the title and the body (if needed)
-    @param max_col the maximum number of coulmns used by the box (including
-        indentation)
-    @param tab_str a string to represent indentation
-    @param tab_num the number of leveles of indentations
-    @param border a tuple of 8 element in the form (tl, t, tr, l, r, bl, b, br)
-        of strings that represent the different corners and sides of the box
-    @param prefix a prefix string added before the box
-    @param suffix a suffix string added after the box
-    @param force_horiz True in order to print the horizontal line even when
-        there is no title
-    @param style the name of one of the style in CFG_WRAP_STYLES. By default
+    @param style_name the name of one of the style in CFG_WRAP_STYLES. By default
         is set to DEFAULT.
-    a part from body and title, if you don't specify anything, the DEFAULT
-    style is applied. If style is specified it overwrite the DEFAULT one.
-    If any other parameter is specified it will overwrite the specific
-    parameter of the chosen style.
+
+    You can further tune the desired style by setting various optional
+    parameters:
+        @param horiz_sep a string that is repeated in order to produce a
+            separator row between the title and the body (if needed)
+        @param max_col the maximum number of coulmns used by the box (including
+            indentation)
+        @param tab_str a string to represent indentation
+        @param tab_num the number of leveles of indentations
+        @param border a tuple of 8 element in the form (tl, t, tr, l, r, bl, b, br)
+            of strings that represent the different corners and sides of the box
+        @param prefix a prefix string added before the box
+        @param suffix a suffix string added after the box
+        @param force_horiz True in order to print the horizontal line even when
+            there is no title
 
     e.g.:
-    print wrap_text_in_a_box(title='prova', body='  123 prova.\n    Vediamo come si indenta', horiz_sep='-', style='no_border', max_col=20, tab_num=1)
-
+    print wrap_text_in_a_box(title='prova', body='  123 prova.\n    Vediamo come si indenta', horiz_sep='-', style_name='no_border', max_col=20, tab_num=1)
 
         prova
         ----------------
@@ -124,15 +127,15 @@ def wrap_text_in_a_box(body='', title='', **args):
 
     """
 
-    def wrap_row(row, max_col):
+    def _wrap_row(row, max_col):
         """Wrap a single row"""
-        spaces = _beginning_space_re.match(row).group()
+        spaces = _RE_BEGINNING_SPACES.match(row).group()
         row = row[len(spaces):]
         return wrap(row, initial_indent=spaces, subsequent_indent=spaces, width=max_col)
 
-    style = CFG_WRAP_STYLES['DEFAULT']
-    if args.has_key('style'):
-        style.update(CFG_WRAP_STYLES[args['style']])
+    style = CFG_WRAP_TEXT_IN_A_BOX_STYLES['DEFAULT']
+    if CFG_WRAP_TEXT_IN_A_BOX_STYLES.has_key(style_name):
+        style.update(CFG_WRAP_TEXT_IN_A_BOX_STYLES[style_name])
     style.update(args)
 
     horiz_sep = style['horiz_sep']
@@ -143,11 +146,11 @@ def wrap_text_in_a_box(body='', title='', **args):
     suffix = style['suffix']
     force_horiz = style['force_horiz']
 
-    tmp_rows = [wrap_row(row, max_col) for row in body.split('\n')]
+    tmp_rows = [_wrap_row(row, max_col) for row in body.split('\n')]
     body_rows = []
     for rows in tmp_rows:
         body_rows += rows
-    tmp_rows = [wrap_row(row, max_col) for row in title.split('\n')]
+    tmp_rows = [_wrap_row(row, max_col) for row in title.split('\n')]
     title_rows = []
     for rows in tmp_rows:
         title_rows += rows
@@ -163,7 +166,7 @@ def wrap_text_in_a_box(body='', title='', **args):
     title_rows = [tab_str + border[3] + row + ' ' * (max_col - len(row)) + border[4] for row in title_rows]
     body_rows = [tab_str + border[3] + row + ' ' * (max_col - len(row)) + border[4] for row in body_rows]
 
-    ret = ''
+    ret = []
     if top_border:
         ret += [tab_str + top_border]
     ret += title_rows
