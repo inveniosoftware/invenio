@@ -71,7 +71,7 @@ def update_date_of_last_run():
     """
     Update bibclassify daemon table information about last run time.
     """
-    run_sql("UPDATE clsMETHOD SET last_updated=NOW()"
+    run_sql("UPDATE clsMETHOD SET last_updated=NOW()")
 
 def task_run_core():
     """Runs anayse_documents for each ontology,collection,record ids set."""
