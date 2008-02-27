@@ -394,11 +394,10 @@ def create_pdf_stamp(path_workingdir, latex_template, latex_template_var):
     ## Log the latex command
     os.system("""echo '%s' > latex_cmd""" % cmd_latex)
     ## Run the latex command
-    fh_latex = os.popen("%s" % cmd_latex, "r")
-    errcode_latex = fh_latex.close()
+    errcode_latex = os.system("%s" % cmd_latex)
 
     ## Was the PDF stamp file successfully created?
-    if errcode_latex is not None or \
+    if errcode_latex or \
          not  os.access("%s/%s" % (path_workingdir, pdf_stamp_name), os.F_OK):
         ## It was not possible to create the PDF stamp file. Fail.
         msg = """Error: Unable to create a PDF stamp file."""
@@ -439,11 +438,10 @@ def apply_stamp_cover_page(path_workingdir, \
                     'stamped-file'  : output_file,
                   }
     ## Execute the stamping command:
-    fh_add_cover_page = os.popen(cmd_add_cover_page, "r")
-    errcode_add_cover_page = fh_add_cover_page.close()
+    errcode_add_cover_page = os.system(cmd_add_cover_page)
 
     ## Was the PDF merged with the coverpage without error?
-    if errcode_add_cover_page is not None:
+    if errcode_add_cover_page:
         ## There was a problem:
         msg = "Error: Unable to stamp file [%s/%s]. There was an error when " \
               "trying to add the cover page [%s/%s] to the file. Stamping " \
@@ -497,10 +495,9 @@ def apply_stamp_first_page(path_workingdir, \
                  'file-to-stamp' : subject_file,
                  'first-page'    : output_file_first_page,
                }
-    fh_get_first_page = os.popen(cmd_get_first_page, "r")
-    errcode_get_first_page = fh_get_first_page.close()
+    errcode_get_first_page = os.system(cmd_get_first_page)
     ## Check that the separation was successful:
-    if errcode_get_first_page is not None or \
+    if errcode_get_first_page or \
            not os.access("%s/%s" % (path_workingdir, \
                                     output_file_first_page), os.F_OK):
         ## Separation was unsuccessful. Fail.
@@ -521,10 +518,9 @@ def apply_stamp_first_page(path_workingdir, \
                  'first-page'         : output_file_first_page,
                  'stamped-first-page' : stamped_output_file_first_page,
                }
-    fh_stamp_first_page = os.popen(cmd_stamp_first_page, "r")
+    errcode_stamp_first_page = os.system(cmd_stamp_first_page)
     ## Check that the first page was stamped successfully:
-    errcode_stamp_first_page = fh_get_first_page.close()
-    if errcode_stamp_first_page is not None or \
+    if errcode_stamp_first_page or \
            not os.access("%s/%s" % (path_workingdir, \
                                     stamped_output_file_first_page), os.F_OK):
         ## Unable to stamp the first page. Fail.
@@ -545,12 +541,10 @@ def apply_stamp_first_page(path_workingdir, \
                  'original-file'      : subject_file,
                  'stamped-file'       : output_file,
                }
-    fh_merge_stamped_and_original_files = \
-                   os.popen(cmd_merge_stamped_and_original_files, "r")
     errcode_merge_stamped_and_original_files = \
-                           fh_merge_stamped_and_original_files.close()
+                   os.system(cmd_merge_stamped_and_original_files)
     ## Check to see whether the command exited with an error:
-    if errcode_merge_stamped_and_original_files is not None:
+    if errcode_merge_stamped_and_original_files:
         ## There was an error when trying to merge the stamped first-page
         ## with pages 2 onwards of the original file. One possible
         ## explanation for this could be that the original file only had
@@ -662,7 +656,7 @@ def apply_stamp_all_pages(path_workingdir, \
        @param output_file: (string) - the name of the final "stamped" file that
         will be written in the working directory after the function has ended.
     """
-    stamp_cmd_stamp_allpages = \
+    cmd_stamp_all_pages = \
              "%(pdftk)s %(working-dir)s/%(file-to-stamp)s background " \
              "%(working-dir)s/%(stamp-file)s output " \
              "%(working-dir)s/%(stamped-file-all-pages)s 2>/dev/null" \
@@ -672,9 +666,8 @@ def apply_stamp_all_pages(path_workingdir, \
                  'file-to-stamp'          : subject_file,
                  'stamped-file-all-pages' : output_file,
                }
-    fh_stampall = os.popen(stamp_cmd_stamp_allpages, "r")
-    errcode_stampall = fh_stampall.close()
-    if errcode_stampall is not None or \
+    errcode_stamp_all_pages = os.system(cmd_stamp_all_pages)
+    if errcode_stamp_all_pages or \
            not os.access("%s/%s" % (path_workingdir, output_file), os.F_OK):
         ## There was a problem stamping the document. Fail.
         msg = "Error: Unable to stamp file [%s/%s]. Stamping has failed." \
@@ -756,7 +749,7 @@ def apply_stamp_to_file(path_workingdir,
             created_pdfname = "%s.pdf" % subject_file
 
         ## Build the distilling command:
-        distill_cmd = """%(distiller)s %(working-dir)s/%(ps-file)s """ \
+        cmd_distill = """%(distiller)s %(working-dir)s/%(ps-file)s """ \
                       """%(working-dir)s/%(pdf-file)s 2>/dev/null""" % \
                       { 'distiller' : CFG_PATH_DISTILLER, \
                         'working-dir' : path_workingdir,
@@ -764,11 +757,10 @@ def apply_stamp_to_file(path_workingdir,
                         'pdf-file' : created_pdfname,
                       }
         ## Distill the PS into a PDF:
-        fh_distill = os.popen(distill_cmd, "r")
-        errcode_distill = fh_distill.close()
+        errcode_distill = os.system(cmd_distill)
 
         ## Test to see whether the PS was distilled into a PDF without error:
-        if errcode_distill is not None or \
+        if errcode_distill or \
            not os.access("%s/%s" % (path_workingdir, created_pdfname), os.F_OK):
             ## The PDF file was not correctly created in the working directory.
             ## Unable to continue with the stamping process.
@@ -858,20 +850,14 @@ def apply_stamp_to_file(path_workingdir,
                                                      output_file,
                                                      path_workingdir,
                                                      stamped_psname)
-        fh_pdf2ps = os.popen(cmd_pdf2ps, "r")
-        errcode_pdf2ps = fh_pdf2ps.close()
+        errcode_pdf2ps = os.system(cmd_pdf2ps)
         ## Check to see that the command executed OK:
-        if errcode_pdf2ps is None and \
+        if not errcode_pdf2ps and \
            os.access("%s/%s" % (path_workingdir, stamped_psname), os.F_OK):
             ## No problem converting the PDF to PS.
             output_file = stamped_psname
     ## Return the name of the "stamped" file:
     return output_file
-
-
-
-
-
 
 
 def copy_subject_file_to_working_directory(path_workingdir, input_file):
@@ -887,7 +873,7 @@ def copy_subject_file_to_working_directory(path_workingdir, input_file):
        @Exceptions raised: (InvenioWebSubmitFileStamperError) - upon failure
         to successfully copy the subject file to the working directory.
     """
-    ## Divide the input file's name into path and basename:
+    ## Divide the input filename into path and basename:
     (dummy, name_input_file) = os.path.split(input_file)
     if name_input_file == "":
         ## The input file is just a path - not a valid filename. Fail.
@@ -1193,7 +1179,7 @@ def stamp_file(options):
               { 'latex-template'      : "cern-standard-stamp-left.tex",
                 'latex-template-var'  : { "REPORTNUMBER" : "TEST-2008-001",
                                          "DATE"         : "15/02/2008",
-                                       },
+                                        },
                 'input-file'          : "test-doc.pdf",
                 'output-file'         : "",
                 'stamp'               : "first",
