@@ -115,9 +115,13 @@ Contents
         files, then you need to install pdftotext version 3 at least.
           <http://www.foolabs.com/xpdf/home.html> 
 
-     g) If you want to be able to search for words in the fulltext files 
-        (i.e. to have fulltext indexing), then you need as well to install 
-        some of the following tools: 
+     g) If you want to be able to search for words in the fulltext
+        files (i.e. to have fulltext indexing) or to stamp submitted
+        files, then you need as well to install some of the following
+        tools:
+          - for PDF file stamping: pdftk, pdf2ps
+              <http://www.accesspdf.com/pdftk/>
+              <http://www.cs.wisc.edu/~ghost/doc/AFPL/>
           - for PDF files: pdftotext or pstotext
               <http://www.foolabs.com/xpdf/home.html> 
               <http://www.cs.wisc.edu/~ghost/doc/AFPL/>
