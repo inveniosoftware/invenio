@@ -22,8 +22,8 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.93.50.20080215, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080215)
+AC_INIT(cds-invenio, 0.93.50.20080227, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080227)
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with
@@ -135,8 +135,8 @@ if test -z "$PS2PDF"; then
    the WebSubmit module to convert submitted PostScripts into PDF.
    You can continue without it but you will miss some CDS Invenio
    functionality.  We recommend you to install it first and to rerun
-   the configure script.  PS2PDF is available from
-   <http://www.cs.wisc.edu/~ghost/doc/AFPL/6.50/Ps2pdf.htm>.])
+   the configure script.  ps2pdf is available from
+   <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.])
 fi
 
 ## Check for pdftotext:
@@ -149,6 +149,29 @@ if test -z "$PDFTOTEXT"; then
    of CDS Invenio.  We recomend you to install it first and to rerun the configure
    script.  pdftotext is available from <http://www.foolabs.com/xpdf/home.html>.
    ])
+fi
+
+## Check for pdftk:
+AC_PATH_PROG(PDFTK, pdftk)
+if test -z "$PDFTK"; then
+   AC_MSG_WARN([
+   pdftk was not found in your PATH.  It is used for the fulltext file stamping.
+   You can continue without it but you may miss this feature of CDS Invenio.  
+   We recomend you to install it first and to rerun the configure
+   script.  pdftk is available from <http://www.accesspdf.com/pdftk/>.
+   ])
+fi
+
+## Check for pdf2ps:
+AC_PATH_PROG(PDF2PS, pdf2ps)
+if test -z "$PDF2PS"; then
+   AC_MSG_WARN([
+   pdf2ps was not found in your PATH.  It is used in
+   the WebSubmit module to convert submitted PDFs into PostScript.
+   You can continue without it but you will miss some CDS Invenio
+   functionality.  We recommend you to install it first and to rerun
+   the configure script.  pdf2ps is available from
+   <http://www.cs.wisc.edu/~ghost/doc/AFPL/>.])
 fi
 
 ## Check for pstotext:
@@ -362,6 +385,8 @@ AC_SUBST(PHP)
 AC_SUBST(PYTHON)
 AC_SUBST(CLIDIR)
 AC_SUBST(PDFTOTEXT)
+AC_SUBST(PDFTK)
+AC_SUBST(PDF2PS)
 AC_SUBST(PSTOTEXT)
 AC_SUBST(PSTOASCII)
 AC_SUBST(ANTIWORD)
