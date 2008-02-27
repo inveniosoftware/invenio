@@ -17,4 +17,14 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bibconvert file_stamper_templates
+submission_templatesdir = $(sysconfdir)/bibconvert/config
+submission_templates_DATA = DEMOPIC.tpl DEMOPICcreate.tpl DEMOPICmodify.tpl \
+           EDSRTEXT.tpl EDSRTEXTcreate.tpl EDSRTEXTmodify.tpl \
+           EDSTEXT.tpl EDSTEXTcreate.tpl  EDSTEXTmodify.tpl
+
+stamper_templatesdir = $(sysconfdir)/websubmit/file_stamper_templates
+stamper_templates_DATA = demo-stamp-left.tex demo-stamp-left-logo.png
+
+EXTRA_DIST = $(submission_templates_DATA) $(stamper_templates_DATA)
+
+CLEANFILES = *~ *.tmp

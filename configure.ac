@@ -605,8 +605,6 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/websubmit/bin/Makefile \
 	  modules/websubmit/bin/thumbmaker \
 	  modules/websubmit/etc/Makefile \
-	  modules/websubmit/etc/bibconvert/Makefile \
-	  modules/websubmit/etc/bibconvert/config/Makefile \
 	  modules/websubmit/doc/Makefile \
 	  modules/websubmit/doc/admin/Makefile \
 	  modules/websubmit/doc/hacking/Makefile \
