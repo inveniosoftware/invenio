@@ -29,7 +29,7 @@ import re
 from textwrap import wrap
 
 CFG_WRAP_TEXT_IN_A_BOX_STYLES = {
-    'DEFAULT' : {
+    '__DEFAULT' : {
         'horiz_sep' : '*',
         'max_col' : 72,
         'tab_str' : '    ',
@@ -86,7 +86,7 @@ def indent_text(text,
     return wrap_text_in_a_box(body=text, style='no_border', tab_str=tab_str, tab_num=nb_tabs)
 
 _RE_BEGINNING_SPACES = re.compile('^\s*')
-def wrap_text_in_a_box(body='', title='', style_name='DEFAULT', **args):
+def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     """Return a nicely formatted text box:
         e.g.
        ******************
@@ -98,8 +98,8 @@ def wrap_text_in_a_box(body='', title='', style_name='DEFAULT', **args):
     Indentation and newline are respected.
     @param body the main text
     @param title an optional title
-    @param style_name the name of one of the style in CFG_WRAP_STYLES. By default
-        is set to DEFAULT.
+    @param style the name of one of the style in CFG_WRAP_STYLES. By default
+        the double_star style is used.
 
     You can further tune the desired style by setting various optional
     parameters:
@@ -117,7 +117,7 @@ def wrap_text_in_a_box(body='', title='', style_name='DEFAULT', **args):
             there is no title
 
     e.g.:
-    print wrap_text_in_a_box(title='prova', body='  123 prova.\n    Vediamo come si indenta', horiz_sep='-', style_name='no_border', max_col=20, tab_num=1)
+    print wrap_text_in_a_box(title='prova', body='  123 prova.\n    Vediamo come si indenta', horiz_sep='-', style='no_border', max_col=20, tab_num=1)
 
         prova
         ----------------
@@ -133,18 +133,18 @@ def wrap_text_in_a_box(body='', title='', style_name='DEFAULT', **args):
         row = row[len(spaces):]
         return wrap(row, initial_indent=spaces, subsequent_indent=spaces, width=max_col)
 
-    style = CFG_WRAP_TEXT_IN_A_BOX_STYLES['DEFAULT']
-    if CFG_WRAP_TEXT_IN_A_BOX_STYLES.has_key(style_name):
-        style.update(CFG_WRAP_TEXT_IN_A_BOX_STYLES[style_name])
-    style.update(args)
+    astyle = CFG_WRAP_TEXT_IN_A_BOX_STYLES['__DEFAULT']
+    if CFG_WRAP_TEXT_IN_A_BOX_STYLES.has_key(style):
+        astyle.update(CFG_WRAP_TEXT_IN_A_BOX_STYLES[style])
+    astyle.update(args)
 
-    horiz_sep = style['horiz_sep']
-    border = style['border']
-    tab_str = style['tab_str'] * style['tab_num']
-    max_col = style['max_col'] - len(border[3]) - len(border[4]) - len(tab_str)
-    prefix = style['prefix']
-    suffix = style['suffix']
-    force_horiz = style['force_horiz']
+    horiz_sep = astyle['horiz_sep']
+    border = astyle['border']
+    tab_str = astyle['tab_str'] * astyle['tab_num']
+    max_col = astyle['max_col'] - len(border[3]) - len(border[4]) - len(tab_str)
+    prefix = astyle['prefix']
+    suffix = astyle['suffix']
+    force_horiz = astyle['force_horiz']
 
     tmp_rows = [_wrap_row(row, max_col) for row in body.split('\n')]
     body_rows = []
