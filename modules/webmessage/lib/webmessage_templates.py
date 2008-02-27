@@ -570,7 +570,8 @@ class Template:
 %(quota_label)s<br />
 <div class="quotabox">
   <div class="quotabar" style="width:%(width)ipx"></div>
-</div>""" %{'quota_label' : _("Quota used: %i messages out of max. %i")%(nb_messages, CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES),
+</div>""" %{'quota_label' : _("Quota used: %(x_nb_used)i messages out of max. %(x_nb_total)i") % {'x_nb_used': nb_messages,
+                                                                                                  'x_nb_total': CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES},
             'width' : int(ratio * 200)
             }
 
@@ -679,13 +680,13 @@ class Template:
         return: html output.
         """
         _ = gettext_set_language(ln)
-        out = _("You have %s new messages out of %s messages")
-        out %= ('<b>' + str(nb_new_mail) + '</b>',
-                create_html_link(weburl + '/yourmessages/',
-                                 {'ln': ln},
-                                 str(total_mail),
-                                 {},
-                                 False, False))
+        out = _("You have %(x_nb_new)s new messages out of %(x_nb_total)s messages") % \
+              {'x_nb_new': '<b>' + str(nb_new_mail) + '</b>',
+               'x_nb_total': create_html_link(weburl + '/yourmessages/',
+                                              {'ln': ln},
+                                              str(total_mail),
+                                              {},
+                                              False, False)}
         return out + '.'
 
 
