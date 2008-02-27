@@ -19,33 +19,35 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""This is the main body of stamp_file. This tool is used to create a stamped
-   version of a PDF file.
+"""This is websubmit_file_stamper.py
+   This tool is used to create a stamped version of a PDF file.
 
-   Python API: please see perform_request_stamping().
+   + Python API:
+      Please see stamp_file().
 
-   CLI API:
-    $ python ./websubmit_file_stamper.py -t foo.text
-                                         -r BAR,baq
+   + CLI API:
+    $ python ~invenio/lib/python/invenio/websubmit_file_stamper.py \\
+              --latex-template=demo-stamp-left.tex \\
+              --latex-template-var='REPORTNUMBER=TEST-THESIS-2008-019' \\
+              --latex-template-var='DATE=27/02/2008' \\
+              --stamp='first' \\
+              --output-file=testfile_stamped.pdf \\
+              testfile.pdf
 """
 
 __revision__ = "$Id$"
 
 
 import getopt, sys, re, os, time, shutil, tempfile
-from invenio.config import CFG_PATH_DISTILLER
+from invenio.config import CFG_PATH_DISTILLER, CFG_PATH_GFILE
 
-## from invenio.config import tmpdir
-tmpdir = "/home/invenio/var/tmp"
-## from invenio.config import etcdir
-etcdir = "/home/invenio/etc"
+from invenio.config import tmpdir
+from invenio.config import etcdir
 
-CFG_WEBSUBMIT_LATEX_TEMPLATES_DIR = "%s/websubmit/latex" % etcdir
-CFG_PATH_PDFTK = "pdftk"
-CFG_PDF_TO_PS = "/usr/bin/pdf2ps"
-CFG_PATH_GFILE = "/usr/bin/file"
-
-
+CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR = \
+                        "%s/websubmit/file_stamper_templates" % etcdir
+from invenio.config import CFG_PATH_PDFTK
+from invenio.config import CFG_PATH_PDF2PS
 
 
 class InvenioWebSubmitFileStamperError(Exception):
@@ -140,12 +142,12 @@ def copy_template_files_to_stampdir(path_workingdir, latex_template):
                       """working directory for stamping [%s].""" \
                       % (template_name, path_workingdir)
                 raise InvenioWebSubmitFileStamperError(msg)
-        elif os.access("%s/%s" % (CFG_WEBSUBMIT_LATEX_TEMPLATES_DIR, \
+        elif os.access("%s/%s" % (CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR, \
                                   template_name), os.F_OK):
             ## The template has been found in WebSubmit's latex templates
             ## directory. Copy it locally to the stamping working directory:
             try:
-                shutil.copyfile("%s/%s" % (CFG_WEBSUBMIT_LATEX_TEMPLATES_DIR, \
+                shutil.copyfile("%s/%s" % (CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR, \
                                            template_name), \
                                 "%s/%s" % (path_workingdir, template_name))
             except IOError:
@@ -153,13 +155,13 @@ def copy_template_files_to_stampdir(path_workingdir, latex_template):
                 ## working stamping directory:
                 msg = """Error: Unable to copy LaTeX file [%s/%s] to """ \
                       """working directory for stamping [%s].""" \
-                      % (CFG_WEBSUBMIT_LATEX_TEMPLATES_DIR, \
+                      % (CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR, \
                          template_name, path_workingdir)
                 raise InvenioWebSubmitFileStamperError(msg)
             else:
                 ## Now that the template has been found, set the "template
                 ## path" to the WebSubmit latex templates directory:
-                template_path = CFG_WEBSUBMIT_LATEX_TEMPLATES_DIR
+                template_path = CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR
         else:
             ## Unable to locate the latex template.
             msg = """Error: Unable to locate LaTeX file [%s].""" % template_name
@@ -845,7 +847,7 @@ def apply_stamp_to_file(path_workingdir,
             stamped_psname = "%s.ps" % output_file
 
         ## Build the conversion command:
-        cmd_pdf2ps = "%s %s/%s %s/%s 2>/dev/null" % (CFG_PDF_TO_PS,
+        cmd_pdf2ps = "%s %s/%s %s/%s 2>/dev/null" % (CFG_PATH_PDF2PS,
                                                      path_workingdir,
                                                      output_file,
                                                      path_workingdir,
@@ -950,39 +952,59 @@ def usage(wmsg="", err_code=0):
         wmsg = wmsg.strip() + "\n"
 
     ## The usage message:
-    msg = """  Usage: stampfile [options] input-file.pdf [output-file.pdf]
+    msg = """  Usage:
+                 python ~invenio/lib/python/invenio/websubmit_file_stamper.py \\
+                           [options] input-file.pdf
 
-  stampfile is used to add a "stamp" to a PDF file.
+  websubmit_file_stamper.py  is used to add a "stamp" to a PDF file.
   A LaTeX template is used to create the stamp and this stamp is then
   concatenated with the original PDF file.
   The stamp can take the form of either a separate "cover page" that is
-  appended to the document; or a "mark" that is applied somewhere on the
-  document's first page.
+  appended to the document; or a "mark" that is applied somewhere either
+  on the document's first page or on all of its pages.
 
   Options:
-   -h, --help             print this help
-   -V, --version          print version information
-   -v, --verbose          verbosity level (##NOT IMPLEMENTED##)
-   -t, --latex-template   The path to the LaTeX template that should be used
-                          for the stamping.
-   -m, --stamp-mode       The stamping mode. Must be either "cover-page" or
-                          "stamp".  Will default to "cover-page".
-   -r, --tpl-replacements A quoted string of quoted key-value pairs. The "key"
-                          components will be sought in the template file and
-                          replaced with the "value" strings. Pairs should be
-                          separated by commas and should a comma be present in
-                          value, it must be escaped (e.g. \\,).
-                          Note: the entire string should be enclosed within
-                          single quotes.
+   -h, --help                Print this help.
+   -V, --version             Print version information.
+   -v, --verbose=LEVEL       Verbose level (0=min, 1=default, 9=max).
+                              [NOT IMPLEMENTED]
+   -t, --latex-template=PATH
+                             Path to the LaTeX template file that should be used
+                             for the creation of the PDF stamp. (Note, if it's
+                             just a basename, it will be sought first in the
+                             current working directory, and then in the invenio
+                             file-stamper templates directory; If there is a
+                             qualifying path to the template name, it will be
+                             sought only in that location);
+   -c, --latex-template-var='VARNAME=VALUE'
+                             A variable that should be replaced in the LaTeX
+                             template file with its corresponding value. Of the
+                             following format:
+                                 VARNAME=VALUE
+                             This option is repeatable - one for each template
+                             variable;
+   -s, --stamp=STAMP-TYPE
+                             The type of stamp to be applied to the subject
+                             file. Must be one of 3 values:
+                              + "first" - stamp only the first page;
+                              + "all"   - stamp all pages;
+                              + "coverpage" - add a cover page to the
+                                document;
+                             The default value is "first";
+   -o, --output-file=XYZ
+                             The optional name to be given to the finished
+                             (stamped) file. If this is omitted, the stamped
+                             file will be given the same name as the input
+                             file, but will be prefixed by "stamped-";
 
-  Example: stampfile --latex-template=/home/foo/cern-stamp.tex \\
-            --stamp-mode=stamp \\
-            --tpl_replacements='"REPORTNUMBER":"DEMOTEST-ARTICLE-2008-001","DATE":"20 January 2008"' \\
-            testfile.pdf
-
-  The resulting stamped file will be written to a file called
-  testfile-STAMPED.pdf.
-
+  Example:
+    python ~invenio/lib/python/invenio/websubmit_file_stamper.py \\
+              --latex-template=demo-stamp-left.tex \\
+              --latex-template-var='REPORTNUMBER=TEST-THESIS-2008-019' \\
+              --latex-template-var='DATE=27/02/2008' \\
+              --stamp='first' \\
+              --output-file=testfile_stamped.pdf \\
+              testfile.pdf
 """
     sys.stderr.write(wmsg + msg)
     sys.exit(err_code)
@@ -995,8 +1017,8 @@ def get_cli_options():
 
          -h, --help                 -> Display help/usage message and exit;
          -V, --version              -> Display version information and exit;
-         -v, --verbose=             -> Set verbosity level (integer in the
-                                       range 0-9);
+         -v, --verbose=             -> Set verbosity level (0=min, 1=default,
+                                       9=max).
          -t, --latex-template=      -> Path to the LaTeX template file that
                                        should be used for the creation of the
                                        PDF stamp. (Note, if it's just a
@@ -1047,10 +1069,10 @@ def get_cli_options():
            + verbosity: (integer) - the verbosity level under which the program
               is to run;
         So, an example of the returned dictionary would be something like:
-              { 'latex-template'      : "cern-standard-stamp-left.tex",
-                'latex-template-var' : { "REPORTNUMBER" : "TEST-2008-001",
-                                         "DATE"         : "15/02/2008",
-                                       },
+              { 'latex-template'      : "demo-stamp-left.tex",
+                'latex-template-var'  : { "REPORTNUMBER" : "TEST-2008-001",
+                                          "DATE"         : "15/02/2008",
+                                        },
                 'input-file'          : "test-doc.pdf",
                 'output-file'         : "",
                 'stamp'               : "first",
@@ -1176,9 +1198,9 @@ def stamp_file(options):
            + verbosity: (integer) - the verbosity level under which the program
               is to run;
         So, an example of the returned dictionary would be something like:
-              { 'latex-template'      : "cern-standard-stamp-left.tex",
+              { 'latex-template'      : "demo-stamp-left.tex",
                 'latex-template-var'  : { "REPORTNUMBER" : "TEST-2008-001",
-                                         "DATE"         : "15/02/2008",
+                                          "DATE"         : "15/02/2008",
                                         },
                 'input-file'          : "test-doc.pdf",
                 'output-file'         : "",
