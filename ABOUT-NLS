@@ -218,32 +218,11 @@ some dynamic elements that aren't located in PO files.
 The development team can edit the respective files ourself, if the
 translator sends over the following translations by email:
  
-   - server name:
+   - demo server name, from invenio.conf:
  
         Atlantis Institute of Fictive Science
  
-   - field names, usually loaded from tabfill.sql:
- 
-        any field
-        title
-        author
-        abstract
-        keyword
-        report number
-        subject  
-        reference
-        fulltext
-        collection
-        division
-        year
-        experiment
-        record ID
-
-   - miscellaneous terms loaded from tabfill.sql:
- 
-        word similarity
-
-   - collection names, usually loaded from democfgdata.sql:
+   - demo collection names, from democfgdata.sql:
  
         Preprints
         Books
@@ -260,11 +239,7 @@ translator sends over the following translations by email:
         Multimedia & Arts
         Poetry
  
-   - miscellaneus terms loaded from democfgdata.sql:
-
-        journal impact factor
- 
-   - the right-hand-side portalbox:
+   - demo right-hand-side portalbox, from democfgdata.sql:
  
         ABOUT THIS SITE
         Welcome to the demo site of the CDS Invenio, a free document server
