@@ -1,3 +1,22 @@
+-- $Id$
+
+-- This file is part of CDS Invenio.
+-- Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+--
+-- CDS Invenio is free software; you can redistribute it and/or
+-- modify it under the terms of the GNU General Public License as
+-- published by the Free Software Foundation; either version 2 of the
+-- License, or (at your option) any later version.
+--
+-- CDS Invenio is distributed in the hope that it will be useful, but
+-- WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+-- General Public License for more details.
+--
+-- You should have received a copy of the GNU General Public License
+-- along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+-- 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
 INSERT INTO user VALUES (2,'jekyll@cern.ch',AES_ENCRYPT(email,'j123ekyll'),'1',NULL,'jekyll','');
 INSERT INTO user VALUES (3,'hyde@cern.ch',AES_ENCRYPT(email,'h123yde'),'1',NULL,'hyde','');
 INSERT INTO usergroup VALUES (1,'Theses viewers','Theses viewers internal group','VO','INTERNAL');
@@ -1094,45 +1113,9 @@ INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','yeargen','AUTO');
 
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (2,'demo_jif','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,2,90);
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'en','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'fr','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'de','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'es','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'ca','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'pt','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'it','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'ru','ln','фактор воздействия журнала');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'sk','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'cs','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'no','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'sv','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'uk','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'ja','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'bg','ln','journal impact factor');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'hr','ln','faktor utjecaja časopisa');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'zh_CN','ln','期刊影响系数');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'zh_TW','ln','期刊影響系數');
 
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (3,'citation','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,3,90);
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'en','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'fr','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'de','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'es','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'ca','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'pt','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'it','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'ru','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'sk','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'cs','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'no','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'sv','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'uk','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'ja','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'bg','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'hr','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'zh_CN','ln','citation');
-INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'zh_TW','ln','citation');
 
 INSERT INTO externalcollection (id, name) VALUES (1, 'Amazon');
 INSERT INTO externalcollection (id, name) VALUES (2, 'CERN EDMS');
@@ -1840,3 +1823,5 @@ INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES
 INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES ('BOOK','book', '3');
 INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES ('THESIS','phdthesis', '3');
 INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES ('POETRY','unpublished', '3');
+
+-- end of file
