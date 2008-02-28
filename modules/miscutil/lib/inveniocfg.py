@@ -344,6 +344,10 @@ def reset_fieldnames(conf):
 
 # FIXME
 
+# INSERT INTO fieldname VALUES (1,'en','ln','any field');
+# INSERT INTO fieldname VALUES (1,'fr','ln','tous les champs');
+# [...]
+
 # INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'en','ln','word similarity');
 # INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'fr','ln','similarité de mots');
 
