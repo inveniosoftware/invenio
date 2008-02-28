@@ -1454,6 +1454,10 @@ def browse_pattern(req, colls, p, f, rg, ln=cdslang):
     if not f:
         return browse_in_bibwords(req, p, f)
 
+    ## is p enclosed in quotes? (coming from exact search)
+    if p.startswith('"') and p.endswith('"'):
+        p = p[1:-1]
+
     p_orig = p
     ## okay, "real browse" follows:
     browsed_phrases = get_nearest_terms_in_bibxxx(p, f, rg, 1)
