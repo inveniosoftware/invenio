@@ -140,7 +140,7 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
         spaces = spaces.expandtabs()
         return wrap(row, initial_indent=spaces, subsequent_indent=spaces, width=max_col)
 
-    astyle = CFG_WRAP_TEXT_IN_A_BOX_STYLES['__DEFAULT']
+    astyle = dict(CFG_WRAP_TEXT_IN_A_BOX_STYLES['__DEFAULT'])
     if CFG_WRAP_TEXT_IN_A_BOX_STYLES.has_key(style):
         astyle.update(CFG_WRAP_TEXT_IN_A_BOX_STYLES[style])
     astyle.update(args)
