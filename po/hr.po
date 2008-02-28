@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.93.50.20080212\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2008-02-12 14:32+0100\n"
-"PO-Revision-Date: 2006-12-13 17:21+0100\n"
+"POT-Creation-Date: 2008-02-28 19:06+0100\n"
+"PO-Revision-Date: 2008-02-28 18:09+0100\n"
 "Last-Translator: Alen Vodopijevec <alen@irb.hr>\n"
 "Language-Team: HR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -46,7 +46,7 @@ msgstr "AND NOT"
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:22
 #: modules/websubmit/doc/admin/websubmit-admin-guide.webdoc:22
 #: modules/bibformat/lib/bibformatadminlib.py:56
-#: modules/bibformat/web/admin/bibformatadmin.py:77
+#: modules/bibformat/web/admin/bibformatadmin.py:71
 #: modules/webcomment/lib/webcommentadminlib.py:38
 #: modules/webstyle/lib/webdoc_webinterface.py:155
 msgid "Admin Area"
@@ -56,15 +56,15 @@ msgstr "Administracija"
 #: modules/websearch/doc/search-guide.webdoc:550
 #: modules/websearch/doc/search-guide.webdoc:687
 #: modules/websearch/doc/search-guide.webdoc:825
-#: modules/websearch/lib/search_engine.py:3507
+#: modules/websearch/lib/search_engine.py:3512
 #: modules/websearch/lib/websearch_templates.py:575
 #: modules/websearch/lib/websearch_templates.py:703
-#: modules/websearch/lib/websearch_templates.py:1583
-#: modules/websearch/lib/websearch_templates.py:1674
-#: modules/websearch/lib/websearch_templates.py:1731
-#: modules/websearch/lib/websearch_templates.py:1767
-#: modules/websearch/lib/websearch_templates.py:1790
-#: modules/websearch/lib/websearch_templates.py:1821
+#: modules/websearch/lib/websearch_templates.py:1585
+#: modules/websearch/lib/websearch_templates.py:1676
+#: modules/websearch/lib/websearch_templates.py:1733
+#: modules/websearch/lib/websearch_templates.py:1769
+#: modules/websearch/lib/websearch_templates.py:1792
+#: modules/websearch/lib/websearch_templates.py:1823
 msgid "Browse"
 msgstr "Pregledaj"
 
@@ -72,8 +72,8 @@ msgstr "Pregledaj"
 #: modules/websearch/doc/search-tips.webdoc:21
 #: modules/websearch/lib/websearch_templates.py:576
 #: modules/websearch/lib/websearch_templates.py:704
-#: modules/websearch/lib/websearch_templates.py:1678
-#: modules/websearch/lib/websearch_templates.py:1735
+#: modules/websearch/lib/websearch_templates.py:1680
+#: modules/websearch/lib/websearch_templates.py:1737
 msgid "Search Tips"
 msgstr "Savjeti za pretraživanje"
 
@@ -89,6 +89,7 @@ msgstr "Savjeti za pretraživanje"
 #: modules/websearch/doc/search-guide.webdoc:741
 #: modules/websearch/doc/search-guide.webdoc:776
 #: modules/websearch/doc/search-guide.webdoc:811
+#: modules/miscutil/lib/inveniocfg.py:327
 msgid "abstract"
 msgstr ""
 
@@ -104,6 +105,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:746
 #: modules/websearch/doc/search-guide.webdoc:781
 #: modules/websearch/doc/search-guide.webdoc:816
+#: modules/miscutil/lib/inveniocfg.py:332
 #, fuzzy
 msgid "fulltext"
 msgstr "Bilten"
@@ -154,6 +156,7 @@ msgstr "Sve riječi:"
 #: modules/websearch/doc/search-guide.webdoc:749
 #: modules/websearch/doc/search-guide.webdoc:784
 #: modules/websearch/doc/search-guide.webdoc:819
+#: modules/miscutil/lib/inveniocfg.py:329
 #, fuzzy
 msgid "report number"
 msgstr "Broj izvještaja"
@@ -177,6 +180,7 @@ msgstr "Broj izvještaja"
 #: modules/websearch/doc/search-guide.webdoc:752
 #: modules/websearch/doc/search-guide.webdoc:787
 #: modules/websearch/doc/search-guide.webdoc:822
+#: modules/miscutil/lib/inveniocfg.py:335
 #, fuzzy
 msgid "year"
 msgstr "Godina"
@@ -193,6 +197,7 @@ msgstr "Godina"
 #: modules/websearch/doc/search-guide.webdoc:750
 #: modules/websearch/doc/search-guide.webdoc:785
 #: modules/websearch/doc/search-guide.webdoc:820
+#: modules/miscutil/lib/inveniocfg.py:330
 #, fuzzy
 msgid "subject"
 msgstr "Naslov (# tema)"
@@ -226,6 +231,7 @@ msgstr "Dio fraze:"
 #: modules/websearch/doc/search-guide.webdoc:748
 #: modules/websearch/doc/search-guide.webdoc:783
 #: modules/websearch/doc/search-guide.webdoc:818
+#: modules/miscutil/lib/inveniocfg.py:331
 #, fuzzy
 msgid "reference"
 msgstr "Referenca"
@@ -443,10 +449,12 @@ msgstr "Referenca"
 #: modules/websearch/doc/search-guide.webdoc:5210
 #: modules/websearch/doc/search-guide.webdoc:5225
 #: modules/websearch/doc/search-guide.webdoc:5245
+#: modules/miscutil/lib/inveniocfg.py:326
 #, fuzzy
 msgid "author"
 msgstr "Autor:"
 
+#: modules/webhelp/web/help-central.webdoc:94
 #: modules/websearch/doc/search-guide.webdoc:21
 #, fuzzy
 msgid "Search Guide"
@@ -464,6 +472,7 @@ msgstr "Pogledajte vodič"
 #: modules/websearch/doc/search-guide.webdoc:745
 #: modules/websearch/doc/search-guide.webdoc:780
 #: modules/websearch/doc/search-guide.webdoc:815
+#: modules/miscutil/lib/inveniocfg.py:336
 msgid "experiment"
 msgstr ""
 
@@ -496,6 +505,7 @@ msgstr "Bilo koja riječ:"
 #: modules/websearch/doc/search-guide.webdoc:744
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
+#: modules/miscutil/lib/inveniocfg.py:334
 #, fuzzy
 msgid "division"
 msgstr "verzija"
@@ -704,9 +714,9 @@ msgstr "verzija"
 #: modules/websearch/doc/search-guide.webdoc:5246
 #: modules/websearch/lib/websearch_templates.py:574
 #: modules/websearch/lib/websearch_templates.py:702
-#: modules/websearch/lib/websearch_templates.py:1580
-#: modules/websearch/lib/websearch_templates.py:1673
-#: modules/websearch/lib/websearch_templates.py:1730
+#: modules/websearch/lib/websearch_templates.py:1582
+#: modules/websearch/lib/websearch_templates.py:1675
+#: modules/websearch/lib/websearch_templates.py:1732
 #: modules/webstyle/lib/webstyle_templates.py:388
 #: modules/webstyle/lib/webstyle_templates.py:466
 msgid "Search"
@@ -925,9 +935,9 @@ msgstr "Pretraži"
 #: modules/websearch/doc/search-guide.webdoc:5208
 #: modules/websearch/doc/search-guide.webdoc:5223
 #: modules/websearch/doc/search-guide.webdoc:5243
-#, fuzzy
+#: modules/miscutil/lib/inveniocfg.py:324
 msgid "any field"
-msgstr "bilo koji dan"
+msgstr "bilo koje polje"
 
 #: modules/webhelp/web/help-central.webdoc:21
 #: modules/webhelp/web/help-central.webdoc:26
@@ -969,6 +979,7 @@ msgstr "Pomoć"
 #: modules/websearch/doc/search-guide.webdoc:743
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
+#: modules/miscutil/lib/inveniocfg.py:333
 #, fuzzy
 msgid "collection"
 msgstr "kolekcije"
@@ -994,7 +1005,7 @@ msgstr ""
 msgid "Exact phrase:"
 msgstr "Točna fraza:"
 
-#: modules/webhelp/web/help-central.webdoc:111
+#: modules/webhelp/web/help-central.webdoc:104
 #: modules/websubmit/doc/submit-guide.webdoc:21
 #, fuzzy
 msgid "Submit Guide"
@@ -1040,6 +1051,7 @@ msgstr "AND"
 #: modules/websearch/doc/search-guide.webdoc:747
 #: modules/websearch/doc/search-guide.webdoc:782
 #: modules/websearch/doc/search-guide.webdoc:817
+#: modules/miscutil/lib/inveniocfg.py:328
 #, fuzzy
 msgid "keyword"
 msgstr "Unos"
@@ -1254,6 +1266,7 @@ msgstr "Unos"
 #: modules/websearch/doc/search-guide.webdoc:5209
 #: modules/websearch/doc/search-guide.webdoc:5224
 #: modules/websearch/doc/search-guide.webdoc:5244
+#: modules/miscutil/lib/inveniocfg.py:325
 #, fuzzy
 msgid "title"
 msgstr "Naslov"
@@ -1307,9 +1320,9 @@ msgid "Submit"
 msgstr "Prihvati"
 
 #: modules/bibedit/lib/bibedit_templates.py:136
-#: modules/bibformat/web/admin/bibformatadmin.py:398
-#: modules/bibformat/web/admin/bibformatadmin.py:679
-#: modules/bibformat/web/admin/bibformatadmin.py:1318
+#: modules/bibformat/web/admin/bibformatadmin.py:392
+#: modules/bibformat/web/admin/bibformatadmin.py:673
+#: modules/bibformat/web/admin/bibformatadmin.py:1312
 #: modules/webbasket/lib/webbasket_templates.py:1237
 #: modules/webbasket/lib/webbasket_templates.py:1342
 #: modules/webbasket/lib/webbasket_templates.py:1442
@@ -1327,20 +1340,20 @@ msgstr "Odustani"
 #: modules/bibedit/lib/bibedit_templates.py:137
 #: modules/bibedit/lib/bibedit_templates.py:333
 #: modules/bibedit/lib/bibedit_templates.py:377
-#: modules/bibformat/lib/bibformat_templates.py:983
-#: modules/bibformat/web/admin/bibformatadmin.py:398
-#: modules/bibformat/web/admin/bibformatadmin.py:400
-#: modules/bibformat/web/admin/bibformatadmin.py:679
-#: modules/bibformat/web/admin/bibformatadmin.py:681
-#: modules/bibformat/web/admin/bibformatadmin.py:1318
-#: modules/bibformat/web/admin/bibformatadmin.py:1320
+#: modules/bibformat/lib/bibformat_templates.py:987
+#: modules/bibformat/web/admin/bibformatadmin.py:392
+#: modules/bibformat/web/admin/bibformatadmin.py:394
+#: modules/bibformat/web/admin/bibformatadmin.py:673
+#: modules/bibformat/web/admin/bibformatadmin.py:675
+#: modules/bibformat/web/admin/bibformatadmin.py:1312
+#: modules/bibformat/web/admin/bibformatadmin.py:1314
 #: modules/webmessage/lib/webmessage_templates.py:117
 msgid "Delete"
 msgstr "Briši"
 
 #: modules/bibedit/lib/bibedit_templates.py:148
-#: modules/bibformat/lib/bibformat_templates.py:926
-#: modules/bibformat/lib/bibformat_templates.py:1052
+#: modules/bibformat/lib/bibformat_templates.py:930
+#: modules/bibformat/lib/bibformat_templates.py:1056
 #: modules/webalert/lib/webalert_templates.py:326
 #: modules/webalert/lib/webalert_templates.py:446
 #: modules/webmessage/lib/webmessage_templates.py:91
@@ -1412,14 +1425,11 @@ msgstr ""
 "Vaše promjene su zaprimljene. Bit će obrađene čim se isprazni red čekanja "
 "zadataka."
 
-#: modules/bibedit/lib/bibedit_templates.py:481
-#: modules/bibedit/lib/bibedit_templates.py:513
-#, python-format
-msgid ""
-"You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s."
-msgstr ""
-"Sada se možete vratiti na %(x_url_open)sadministracijsko sučelje%"
-"(x_url_close)s."
+#: modules/bibedit/lib/bibedit_templates.py:480
+#: modules/bibedit/lib/bibedit_templates.py:512
+#, fuzzy
+msgid "Edit another record"
+msgstr "Molimo pokušajte drugi ID unosa"
 
 #: modules/bibedit/lib/bibedit_templates.py:501
 msgid "Do you really want to delete this record?"
@@ -1479,70 +1489,70 @@ msgstr "Prihvati i spremi zapis %s"
 
 #: modules/bibformat/lib/bibformat_templates.py:319
 #: modules/bibformat/lib/bibformat_templates.py:431
-#: modules/bibformat/lib/bibformat_templates.py:566
-#: modules/bibformat/lib/bibformat_templates.py:581
-#: modules/bibformat/lib/bibformat_templates.py:612
-#: modules/bibformat/lib/bibformat_templates.py:923
-#: modules/bibformat/lib/bibformat_templates.py:1058
-#: modules/bibformat/lib/bibformat_templates.py:1374
-#: modules/bibformat/lib/bibformat_templates.py:1478
-#: modules/bibformat/lib/bibformat_templates.py:1538
-#: modules/bibformat/lib/bibformat_templates.py:1800
-#: modules/bibformat/lib/bibformat_templates.py:1883
-#: modules/bibformat/lib/bibformat_templates.py:2046
-#: modules/bibformat/lib/bibformat_templates.py:2114
+#: modules/bibformat/lib/bibformat_templates.py:570
+#: modules/bibformat/lib/bibformat_templates.py:585
+#: modules/bibformat/lib/bibformat_templates.py:616
+#: modules/bibformat/lib/bibformat_templates.py:927
+#: modules/bibformat/lib/bibformat_templates.py:1062
+#: modules/bibformat/lib/bibformat_templates.py:1378
+#: modules/bibformat/lib/bibformat_templates.py:1482
+#: modules/bibformat/lib/bibformat_templates.py:1542
+#: modules/bibformat/lib/bibformat_templates.py:1804
+#: modules/bibformat/lib/bibformat_templates.py:1887
+#: modules/bibformat/lib/bibformat_templates.py:2050
+#: modules/bibformat/lib/bibformat_templates.py:2118
 #: modules/webcomment/lib/webcomment_templates.py:1034
 msgid "Menu"
 msgstr "Izbornik"
 
 #: modules/bibformat/lib/bibformat_templates.py:321
 #: modules/bibformat/lib/bibformat_templates.py:432
-#: modules/bibformat/lib/bibformat_templates.py:569
-#: modules/bibformat/lib/bibformat_templates.py:584
-#: modules/bibformat/lib/bibformat_templates.py:615
-#: modules/bibformat/lib/bibformat_templates.py:1879
-#: modules/bibformat/lib/bibformat_templates.py:2045
-#: modules/bibformat/lib/bibformat_templates.py:2113
+#: modules/bibformat/lib/bibformat_templates.py:573
+#: modules/bibformat/lib/bibformat_templates.py:588
+#: modules/bibformat/lib/bibformat_templates.py:619
+#: modules/bibformat/lib/bibformat_templates.py:1883
+#: modules/bibformat/lib/bibformat_templates.py:2049
+#: modules/bibformat/lib/bibformat_templates.py:2117
 msgid "Close Editor"
 msgstr "Zatvori uređivač"
 
 #: modules/bibformat/lib/bibformat_templates.py:322
 #: modules/bibformat/lib/bibformat_templates.py:433
-#: modules/bibformat/lib/bibformat_templates.py:570
-#: modules/bibformat/lib/bibformat_templates.py:585
-#: modules/bibformat/lib/bibformat_templates.py:616
+#: modules/bibformat/lib/bibformat_templates.py:574
+#: modules/bibformat/lib/bibformat_templates.py:589
+#: modules/bibformat/lib/bibformat_templates.py:620
 msgid "Modify Template Attributes"
 msgstr "Promijeni karakteristike predloška"
 
 #: modules/bibformat/lib/bibformat_templates.py:323
 #: modules/bibformat/lib/bibformat_templates.py:434
-#: modules/bibformat/lib/bibformat_templates.py:571
-#: modules/bibformat/lib/bibformat_templates.py:586
-#: modules/bibformat/lib/bibformat_templates.py:617
+#: modules/bibformat/lib/bibformat_templates.py:575
+#: modules/bibformat/lib/bibformat_templates.py:590
+#: modules/bibformat/lib/bibformat_templates.py:621
 msgid "Template Editor"
 msgstr "Uređivač predložaka"
 
 #: modules/bibformat/lib/bibformat_templates.py:324
 #: modules/bibformat/lib/bibformat_templates.py:435
-#: modules/bibformat/lib/bibformat_templates.py:572
-#: modules/bibformat/lib/bibformat_templates.py:587
-#: modules/bibformat/lib/bibformat_templates.py:618
-#: modules/bibformat/lib/bibformat_templates.py:1173
-#: modules/bibformat/lib/bibformat_templates.py:1373
-#: modules/bibformat/lib/bibformat_templates.py:1477
+#: modules/bibformat/lib/bibformat_templates.py:576
+#: modules/bibformat/lib/bibformat_templates.py:591
+#: modules/bibformat/lib/bibformat_templates.py:622
+#: modules/bibformat/lib/bibformat_templates.py:1177
+#: modules/bibformat/lib/bibformat_templates.py:1377
+#: modules/bibformat/lib/bibformat_templates.py:1481
 msgid "Check Dependencies"
 msgstr "Provjeri zavisnosti"
 
 #: modules/bibformat/lib/bibformat_templates.py:374
-#: modules/bibformat/lib/bibformat_templates.py:921
-#: modules/bibformat/lib/bibformat_templates.py:1048
+#: modules/bibformat/lib/bibformat_templates.py:925
+#: modules/bibformat/lib/bibformat_templates.py:1052
 #: modules/webalert/lib/webalert_templates.py:319
 msgid "Name"
 msgstr "Ime"
 
 #: modules/bibformat/lib/bibformat_templates.py:393
-#: modules/bibformat/lib/bibformat_templates.py:922
-#: modules/bibformat/lib/bibformat_templates.py:1049
+#: modules/bibformat/lib/bibformat_templates.py:926
+#: modules/bibformat/lib/bibformat_templates.py:1053
 #: modules/websession/lib/websession_templates.py:1253
 #: modules/websession/lib/websession_templates.py:1327
 #: modules/websession/lib/websession_templates.py:1390
@@ -1553,180 +1563,180 @@ msgstr "Opis"
 msgid "Update Format Attributes"
 msgstr "Osvježi atribute oblikovanja"
 
-#: modules/bibformat/lib/bibformat_templates.py:567
-#: modules/bibformat/lib/bibformat_templates.py:582
-#: modules/bibformat/lib/bibformat_templates.py:613
+#: modules/bibformat/lib/bibformat_templates.py:571
+#: modules/bibformat/lib/bibformat_templates.py:586
+#: modules/bibformat/lib/bibformat_templates.py:617
 msgid "Show Documentation"
 msgstr "Prikaži dokumentaciju"
 
-#: modules/bibformat/lib/bibformat_templates.py:568
-#: modules/bibformat/lib/bibformat_templates.py:583
-#: modules/bibformat/lib/bibformat_templates.py:614
-#: modules/bibformat/lib/bibformat_templates.py:665
+#: modules/bibformat/lib/bibformat_templates.py:572
+#: modules/bibformat/lib/bibformat_templates.py:587
+#: modules/bibformat/lib/bibformat_templates.py:618
+#: modules/bibformat/lib/bibformat_templates.py:669
 msgid "Hide Documentation"
 msgstr "Sakrij dokumentaciju"
 
-#: modules/bibformat/lib/bibformat_templates.py:924
-#: modules/bibformat/lib/bibformat_templates.py:1050
+#: modules/bibformat/lib/bibformat_templates.py:928
+#: modules/bibformat/lib/bibformat_templates.py:1054
 #: modules/websubmit/lib/websubmit_templates.py:1423
 msgid "Status"
 msgstr "Status"
 
-#: modules/bibformat/lib/bibformat_templates.py:925
-#: modules/bibformat/lib/bibformat_templates.py:1051
+#: modules/bibformat/lib/bibformat_templates.py:929
+#: modules/bibformat/lib/bibformat_templates.py:1055
 msgid "Last Modification Date"
 msgstr "Datum posljednje promjene"
 
-#: modules/bibformat/lib/bibformat_templates.py:928
-#: modules/bibformat/lib/bibformat_templates.py:1054
-#: modules/bibformat/lib/bibformat_templates.py:1539
-#: modules/bibformat/lib/bibformat_templates.py:1801
-#: modules/bibformat/web/admin/bibformatadmin.py:108
-#: modules/bibformat/web/admin/bibformatadmin.py:169
-#: modules/bibformat/web/admin/bibformatadmin.py:240
-#: modules/bibformat/web/admin/bibformatadmin.py:285
-#: modules/bibformat/web/admin/bibformatadmin.py:377
-#: modules/bibformat/web/admin/bibformatadmin.py:1357
+#: modules/bibformat/lib/bibformat_templates.py:932
+#: modules/bibformat/lib/bibformat_templates.py:1058
+#: modules/bibformat/lib/bibformat_templates.py:1543
+#: modules/bibformat/lib/bibformat_templates.py:1805
+#: modules/bibformat/web/admin/bibformatadmin.py:102
+#: modules/bibformat/web/admin/bibformatadmin.py:163
+#: modules/bibformat/web/admin/bibformatadmin.py:234
+#: modules/bibformat/web/admin/bibformatadmin.py:279
+#: modules/bibformat/web/admin/bibformatadmin.py:371
+#: modules/bibformat/web/admin/bibformatadmin.py:1351
 msgid "Manage Output Formats"
 msgstr "Uredi oblikovanje izlaznih podataka"
 
-#: modules/bibformat/lib/bibformat_templates.py:929
-#: modules/bibformat/lib/bibformat_templates.py:1055
-#: modules/bibformat/lib/bibformat_templates.py:1540
-#: modules/bibformat/lib/bibformat_templates.py:1802
-#: modules/bibformat/web/admin/bibformatadmin.py:444
-#: modules/bibformat/web/admin/bibformatadmin.py:477
-#: modules/bibformat/web/admin/bibformatadmin.py:548
-#: modules/bibformat/web/admin/bibformatadmin.py:593
-#: modules/bibformat/web/admin/bibformatadmin.py:659
-#: modules/bibformat/web/admin/bibformatadmin.py:1378
+#: modules/bibformat/lib/bibformat_templates.py:933
+#: modules/bibformat/lib/bibformat_templates.py:1059
+#: modules/bibformat/lib/bibformat_templates.py:1544
+#: modules/bibformat/lib/bibformat_templates.py:1806
+#: modules/bibformat/web/admin/bibformatadmin.py:438
+#: modules/bibformat/web/admin/bibformatadmin.py:471
+#: modules/bibformat/web/admin/bibformatadmin.py:542
+#: modules/bibformat/web/admin/bibformatadmin.py:587
+#: modules/bibformat/web/admin/bibformatadmin.py:653
+#: modules/bibformat/web/admin/bibformatadmin.py:1372
 msgid "Manage Format Templates"
 msgstr "Predlošci oblikovanja (#)"
 
-#: modules/bibformat/lib/bibformat_templates.py:930
-#: modules/bibformat/lib/bibformat_templates.py:1056
-#: modules/bibformat/lib/bibformat_templates.py:1541
-#: modules/bibformat/lib/bibformat_templates.py:1803
-#: modules/bibformat/web/admin/bibformatadmin.py:843
-#: modules/bibformat/web/admin/bibformatadmin.py:864
-#: modules/bibformat/web/admin/bibformatadmin.py:897
-#: modules/bibformat/web/admin/bibformatadmin.py:1396
+#: modules/bibformat/lib/bibformat_templates.py:934
+#: modules/bibformat/lib/bibformat_templates.py:1060
+#: modules/bibformat/lib/bibformat_templates.py:1545
+#: modules/bibformat/lib/bibformat_templates.py:1807
+#: modules/bibformat/web/admin/bibformatadmin.py:837
+#: modules/bibformat/web/admin/bibformatadmin.py:858
+#: modules/bibformat/web/admin/bibformatadmin.py:891
+#: modules/bibformat/web/admin/bibformatadmin.py:1390
 msgid "Format Elements Documentation"
 msgstr "Dokumentacija elemenata oblikovanja"
 
-#: modules/bibformat/lib/bibformat_templates.py:931
-#: modules/bibformat/lib/bibformat_templates.py:1057
-#: modules/bibformat/lib/bibformat_templates.py:1542
-#: modules/bibformat/lib/bibformat_templates.py:1804
-#: modules/bibformat/web/admin/bibformatadmin.py:938
-#: modules/bibformat/web/admin/bibformatadmin.py:964
-#: modules/bibformat/web/admin/bibformatadmin.py:1011
-#: modules/bibformat/web/admin/bibformatadmin.py:1056
-#: modules/bibformat/web/admin/bibformatadmin.py:1103
-#: modules/bibformat/web/admin/bibformatadmin.py:1154
-#: modules/bibformat/web/admin/bibformatadmin.py:1207
-#: modules/bibformat/web/admin/bibformatadmin.py:1262
-#: modules/bibformat/web/admin/bibformatadmin.py:1274
-#: modules/bibformat/web/admin/bibformatadmin.py:1289
-#: modules/bibformat/web/admin/bibformatadmin.py:1325
+#: modules/bibformat/lib/bibformat_templates.py:935
+#: modules/bibformat/lib/bibformat_templates.py:1061
+#: modules/bibformat/lib/bibformat_templates.py:1546
+#: modules/bibformat/lib/bibformat_templates.py:1808
+#: modules/bibformat/web/admin/bibformatadmin.py:932
+#: modules/bibformat/web/admin/bibformatadmin.py:958
+#: modules/bibformat/web/admin/bibformatadmin.py:1005
+#: modules/bibformat/web/admin/bibformatadmin.py:1050
+#: modules/bibformat/web/admin/bibformatadmin.py:1097
+#: modules/bibformat/web/admin/bibformatadmin.py:1148
+#: modules/bibformat/web/admin/bibformatadmin.py:1201
+#: modules/bibformat/web/admin/bibformatadmin.py:1256
+#: modules/bibformat/web/admin/bibformatadmin.py:1268
+#: modules/bibformat/web/admin/bibformatadmin.py:1283
+#: modules/bibformat/web/admin/bibformatadmin.py:1319
 msgid "Manage Knowledge Bases"
 msgstr "Upravljenje bazama znanja"
 
-#: modules/bibformat/lib/bibformat_templates.py:1006
+#: modules/bibformat/lib/bibformat_templates.py:1010
 msgid "Add New Format Template"
 msgstr "Dodaj novi predložak oblikovanja"
 
-#: modules/bibformat/lib/bibformat_templates.py:1007
+#: modules/bibformat/lib/bibformat_templates.py:1011
 msgid "Check Format Templates Extensively"
 msgstr "Provjeri predloške oblikovanja ekstenzivno"
 
-#: modules/bibformat/lib/bibformat_templates.py:1047
+#: modules/bibformat/lib/bibformat_templates.py:1051
 msgid "Code"
 msgstr "Kod"
 
-#: modules/bibformat/lib/bibformat_templates.py:1131
+#: modules/bibformat/lib/bibformat_templates.py:1135
 msgid "Add New Output Format"
 msgstr "Dodaj novi format prikaza"
 
-#: modules/bibformat/lib/bibformat_templates.py:1169
+#: modules/bibformat/lib/bibformat_templates.py:1173
 msgid "menu"
 msgstr "izbornik"
 
-#: modules/bibformat/lib/bibformat_templates.py:1170
-#: modules/bibformat/lib/bibformat_templates.py:1370
-#: modules/bibformat/lib/bibformat_templates.py:1474
+#: modules/bibformat/lib/bibformat_templates.py:1174
+#: modules/bibformat/lib/bibformat_templates.py:1374
+#: modules/bibformat/lib/bibformat_templates.py:1478
 msgid "Close Output Format"
 msgstr "Zatvori formatiranje izlaza (#)"
 
-#: modules/bibformat/lib/bibformat_templates.py:1171
-#: modules/bibformat/lib/bibformat_templates.py:1371
-#: modules/bibformat/lib/bibformat_templates.py:1475
+#: modules/bibformat/lib/bibformat_templates.py:1175
+#: modules/bibformat/lib/bibformat_templates.py:1375
+#: modules/bibformat/lib/bibformat_templates.py:1479
 msgid "Rules"
 msgstr "Pravila"
 
-#: modules/bibformat/lib/bibformat_templates.py:1172
-#: modules/bibformat/lib/bibformat_templates.py:1372
-#: modules/bibformat/lib/bibformat_templates.py:1476
+#: modules/bibformat/lib/bibformat_templates.py:1176
+#: modules/bibformat/lib/bibformat_templates.py:1376
+#: modules/bibformat/lib/bibformat_templates.py:1480
 msgid "Modify Output Format Attributes"
 msgstr "Promjeni atribute oblikovanja izlaznih podataka"
 
-#: modules/bibformat/lib/bibformat_templates.py:1271
-#: modules/bibformat/lib/bibformatadminlib.py:540
+#: modules/bibformat/lib/bibformat_templates.py:1275
+#: modules/bibformat/lib/bibformatadminlib.py:551
 msgid "Remove Rule"
 msgstr "Izbriši pravilo"
 
-#: modules/bibformat/lib/bibformat_templates.py:1324
-#: modules/bibformat/lib/bibformatadminlib.py:547
+#: modules/bibformat/lib/bibformat_templates.py:1328
+#: modules/bibformat/lib/bibformatadminlib.py:558
 msgid "Add New Rule"
 msgstr "Dodaj novo pravilo"
 
-#: modules/bibformat/lib/bibformat_templates.py:1325
-#: modules/bibformat/lib/bibformatadminlib.py:544
+#: modules/bibformat/lib/bibformat_templates.py:1329
+#: modules/bibformat/lib/bibformatadminlib.py:555
 msgid "Save Changes"
 msgstr "Spremi promjene"
 
-#: modules/bibformat/lib/bibformat_templates.py:1880
-#: modules/bibformat/lib/bibformat_templates.py:2047
-#: modules/bibformat/lib/bibformat_templates.py:2115
+#: modules/bibformat/lib/bibformat_templates.py:1884
+#: modules/bibformat/lib/bibformat_templates.py:2051
+#: modules/bibformat/lib/bibformat_templates.py:2119
 msgid "Knowledge Base Mappings"
 msgstr "Mapiranje baze znanja"
 
-#: modules/bibformat/lib/bibformat_templates.py:1881
-#: modules/bibformat/lib/bibformat_templates.py:2048
-#: modules/bibformat/lib/bibformat_templates.py:2116
+#: modules/bibformat/lib/bibformat_templates.py:1885
+#: modules/bibformat/lib/bibformat_templates.py:2052
+#: modules/bibformat/lib/bibformat_templates.py:2120
 msgid "Knowledge Base Attributes"
 msgstr "Atributi baze znanja"
 
-#: modules/bibformat/lib/bibformat_templates.py:1882
-#: modules/bibformat/lib/bibformat_templates.py:2049
-#: modules/bibformat/lib/bibformat_templates.py:2117
+#: modules/bibformat/lib/bibformat_templates.py:1886
+#: modules/bibformat/lib/bibformat_templates.py:2053
+#: modules/bibformat/lib/bibformat_templates.py:2121
 msgid "Knowledge Base Dependencies"
 msgstr "Zavisnosti baze znanje"
 
-#: modules/bibformat/lib/bibformat_templates.py:2262
+#: modules/bibformat/lib/bibformat_templates.py:2266
 msgid "No problem found with format"
 msgstr "Oblikovanje je u redu"
 
-#: modules/bibformat/lib/bibformat_templates.py:2264
+#: modules/bibformat/lib/bibformat_templates.py:2268
 msgid "An error has been found"
 msgstr "Pronađena je greška"
 
-#: modules/bibformat/lib/bibformat_templates.py:2266
+#: modules/bibformat/lib/bibformat_templates.py:2270
 msgid "The following errors have been found"
 msgstr "Pronađene su slijedeće greške"
 
 #: modules/bibformat/lib/bibformatadminlib.py:56
-#: modules/bibformat/web/admin/bibformatadmin.py:79
+#: modules/bibformat/web/admin/bibformatadmin.py:73
 msgid "BibFormat Admin"
 msgstr "BibFormat Admin"
 
-#: modules/bibformat/lib/bibformatadminlib.py:343
-#: modules/bibformat/lib/bibformatadminlib.py:382
-#: modules/bibformat/lib/bibformatadminlib.py:384
+#: modules/bibformat/lib/bibformatadminlib.py:349
+#: modules/bibformat/lib/bibformatadminlib.py:388
+#: modules/bibformat/lib/bibformatadminlib.py:390
 msgid "Test with record:"
 msgstr "Testiraj s unosom:"
 
-#: modules/bibformat/lib/bibformatadminlib.py:344
+#: modules/bibformat/lib/bibformatadminlib.py:350
 msgid "Enter a search query here."
 msgstr "Ovdje unesite vaš upit."
 
@@ -1774,122 +1784,122 @@ msgstr "Migriraj karakteristike"
 msgid "Migrate Formats"
 msgstr "Migriraj oblikovanja"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:184
-#: modules/bibformat/web/admin/bibformatadmin.py:252
-#: modules/bibformat/web/admin/bibformatadmin.py:297
-#: modules/bibformat/web/admin/bibformatadmin.py:1360
+#: modules/bibformat/web/admin/bibformatadmin.py:178
+#: modules/bibformat/web/admin/bibformatadmin.py:246
+#: modules/bibformat/web/admin/bibformatadmin.py:291
+#: modules/bibformat/web/admin/bibformatadmin.py:1354
 msgid "Restricted Output Format"
 msgstr "Ograničeno oblikovanje izlaznih podataka"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:210
-#: modules/bibformat/web/admin/bibformatadmin.py:511
-#: modules/bibformat/web/admin/bibformatadmin.py:1246
+#: modules/bibformat/web/admin/bibformatadmin.py:204
+#: modules/bibformat/web/admin/bibformatadmin.py:505
+#: modules/bibformat/web/admin/bibformatadmin.py:1240
 msgid "Ok"
 msgstr "U redu"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:212
+#: modules/bibformat/web/admin/bibformatadmin.py:206
 #, python-format
 msgid "Output Format %s Rules"
 msgstr "Pravila oblikovanja izlaza %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:265
+#: modules/bibformat/web/admin/bibformatadmin.py:259
 #, python-format
 msgid "Output Format %s Attributes"
 msgstr "Karakteristike oblikovanja izlaza %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:310
+#: modules/bibformat/web/admin/bibformatadmin.py:304
 #, python-format
 msgid "Output Format %s Dependencies"
 msgstr "Zavosnosti oblikovanja izlaza %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:377
+#: modules/bibformat/web/admin/bibformatadmin.py:371
 msgid "Delete Output Format"
 msgstr "Obriši oblikovanje izlaznih podataka"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:490
-#: modules/bibformat/web/admin/bibformatadmin.py:562
-#: modules/bibformat/web/admin/bibformatadmin.py:1381
+#: modules/bibformat/web/admin/bibformatadmin.py:484
+#: modules/bibformat/web/admin/bibformatadmin.py:556
+#: modules/bibformat/web/admin/bibformatadmin.py:1375
 msgid "Restricted Format Template"
 msgstr "Ograničeni predložak oblikovanja"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:516
+#: modules/bibformat/web/admin/bibformatadmin.py:510
 #, python-format
 msgid "Format Template %s"
 msgstr "Predložak oblikovanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:573
+#: modules/bibformat/web/admin/bibformatadmin.py:567
 #, python-format
 msgid "Format Template %s Attributes"
 msgstr "Atributi predlošaka oblikovanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:605
+#: modules/bibformat/web/admin/bibformatadmin.py:599
 #, fuzzy, python-format
 msgid "Format Template %s Dependencies"
 msgstr "Oblikuj datoteke vezane uz predložak %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:659
+#: modules/bibformat/web/admin/bibformatadmin.py:653
 msgid "Delete Format Template"
 msgstr "Izbriši predložak oblikovanja"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:873
+#: modules/bibformat/web/admin/bibformatadmin.py:867
 #, fuzzy, python-format
 msgid "Format Element %s Dependencies"
 msgstr "Oblikuj datoteke vezane uz element %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:906
+#: modules/bibformat/web/admin/bibformatadmin.py:900
 #, python-format
 msgid "Test Format Element %s"
 msgstr "Testiraj element oblikovanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:978
-#: modules/bibformat/web/admin/bibformatadmin.py:1025
-#: modules/bibformat/web/admin/bibformatadmin.py:1070
-#: modules/bibformat/web/admin/bibformatadmin.py:1117
-#: modules/bibformat/web/admin/bibformatadmin.py:1167
-#: modules/bibformat/web/admin/bibformatadmin.py:1226
-#: modules/bibformat/web/admin/bibformatadmin.py:1301
+#: modules/bibformat/web/admin/bibformatadmin.py:972
+#: modules/bibformat/web/admin/bibformatadmin.py:1019
+#: modules/bibformat/web/admin/bibformatadmin.py:1064
+#: modules/bibformat/web/admin/bibformatadmin.py:1111
+#: modules/bibformat/web/admin/bibformatadmin.py:1161
+#: modules/bibformat/web/admin/bibformatadmin.py:1220
+#: modules/bibformat/web/admin/bibformatadmin.py:1295
 msgid "Unknown Knowledge Base"
 msgstr "Nepoznata baza znanja"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:987
+#: modules/bibformat/web/admin/bibformatadmin.py:981
 #, python-format
 msgid "Knowledge Base %s"
 msgstr "Baza znanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1034
+#: modules/bibformat/web/admin/bibformatadmin.py:1028
 #, python-format
 msgid "Knowledge Base %s Attributes"
 msgstr "Karakteristike baze znanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1079
+#: modules/bibformat/web/admin/bibformatadmin.py:1073
 #, python-format
 msgid "Knowledge Base %s Dependencies"
 msgstr "Zavisnosti baze znanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1289
+#: modules/bibformat/web/admin/bibformatadmin.py:1283
 msgid "Delete Knowledge Base"
 msgstr "Izbriši bazu znanja"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1374
+#: modules/bibformat/web/admin/bibformatadmin.py:1368
 #, python-format
 msgid "Validation of Output Format %s"
 msgstr "Potvrda oblikovanja izlaznih podataka %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1392
+#: modules/bibformat/web/admin/bibformatadmin.py:1386
 #, python-format
 msgid "Validation of Format Template %s"
 msgstr "Potvrda predloška oblikovanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1400
+#: modules/bibformat/web/admin/bibformatadmin.py:1394
 msgid "Restricted Format Element"
 msgstr "Ograničeni element oblikovanja"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1408
+#: modules/bibformat/web/admin/bibformatadmin.py:1402
 #, python-format
 msgid "Validation of Format Element %s"
 msgstr "Potvrda elementa oblikovanja %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1411
+#: modules/bibformat/web/admin/bibformatadmin.py:1405
 msgid "Format Validation"
 msgstr "Potvrda oblikovanja"
 
@@ -1947,7 +1957,7 @@ msgstr "Povijest download-a"
 
 #: modules/miscutil/lib/dateutils.py:69 modules/miscutil/lib/dateutils.py:96
 #: modules/webbasket/lib/webbasket.py:170
-#: modules/webbasket/lib/webbasket.py:651
+#: modules/webbasket/lib/webbasket.py:652
 #: modules/websession/lib/webuser.py:272
 #: modules/webstyle/lib/webstyle_templates.py:544
 msgid "N/A"
@@ -2170,6 +2180,24 @@ msgstr ""
 msgid "Thank you!"
 msgstr "Hvala!"
 
+#: modules/miscutil/lib/inveniocfg.py:337
+#, fuzzy
+msgid "record ID"
+msgstr "zapis"
+
+#: modules/miscutil/lib/inveniocfg.py:339
+msgid "word similarity"
+msgstr "sličnost riječi"
+
+#: modules/miscutil/lib/inveniocfg.py:340
+msgid "journal impact factor"
+msgstr "faktor utjecaja časopisa"
+
+#: modules/miscutil/lib/inveniocfg.py:341
+#, fuzzy
+msgid "times cited"
+msgstr "Postavke su promijenjene"
+
 #: modules/miscutil/lib/mailutils.py:144 modules/miscutil/lib/mailutils.py:157
 #, fuzzy
 msgid "Hello:"
@@ -2183,53 +2211,53 @@ msgstr "Srdačno"
 msgid "Need human intervention?  Contact"
 msgstr "Trebate pomoć? Kontaktirajte nas"
 
-#: modules/webaccess/lib/access_control_config.py:173
+#: modules/webaccess/lib/access_control_config.py:168
 #: modules/websession/lib/websession_templates.py:1006
 msgid "Run BibEdit"
 msgstr "Pokreni BibEdit"
 
-#: modules/webaccess/lib/access_control_config.py:174
+#: modules/webaccess/lib/access_control_config.py:169
 #: modules/websession/lib/websession_templates.py:1008
 msgid "Configure BibFormat"
 msgstr "Konfiguriraj BibFormat"
 
-#: modules/webaccess/lib/access_control_config.py:175
+#: modules/webaccess/lib/access_control_config.py:170
 #: modules/websession/lib/websession_templates.py:1010
 msgid "Configure BibHarvest"
 msgstr "Konfiguriraj BibHarvest"
 
-#: modules/webaccess/lib/access_control_config.py:176
+#: modules/webaccess/lib/access_control_config.py:171
 #: modules/websession/lib/websession_templates.py:1012
 #, fuzzy
 msgid "Configure OAI Repository"
 msgstr "Konfiguriraj BibFormat"
 
-#: modules/webaccess/lib/access_control_config.py:177
+#: modules/webaccess/lib/access_control_config.py:172
 #: modules/websession/lib/websession_templates.py:1014
 msgid "Configure BibIndex"
 msgstr "Konfiguriraj BibIndex"
 
-#: modules/webaccess/lib/access_control_config.py:178
+#: modules/webaccess/lib/access_control_config.py:173
 #: modules/websession/lib/websession_templates.py:1016
 msgid "Configure BibRank"
 msgstr "Konfiguriraj BibRank"
 
-#: modules/webaccess/lib/access_control_config.py:179
+#: modules/webaccess/lib/access_control_config.py:174
 #: modules/websession/lib/websession_templates.py:1018
 msgid "Configure WebAccess"
 msgstr "Konfiguriraj WebAccess"
 
-#: modules/webaccess/lib/access_control_config.py:180
+#: modules/webaccess/lib/access_control_config.py:175
 #: modules/websession/lib/websession_templates.py:1020
 msgid "Configure WebComment"
 msgstr "Konfiguriraj WebComment"
 
-#: modules/webaccess/lib/access_control_config.py:181
+#: modules/webaccess/lib/access_control_config.py:176
 #: modules/websession/lib/websession_templates.py:1022
 msgid "Configure WebSearch"
 msgstr "Konfiguriraj WebSearch"
 
-#: modules/webaccess/lib/access_control_config.py:182
+#: modules/webaccess/lib/access_control_config.py:177
 #: modules/websession/lib/websession_templates.py:1024
 msgid "Configure WebSubmit"
 msgstr "Konfiguriraj WebSubmit"
@@ -2590,22 +2618,22 @@ msgstr "Prikaži upozorenja"
 msgid "Your comment has been successfully posted"
 msgstr "Vaš komentar je uspješno poslan"
 
-#: modules/webbasket/lib/webbasket.py:763
+#: modules/webbasket/lib/webbasket.py:764
 #: modules/webbasket/lib/webbasket_templates.py:98
 msgid "Personal baskets"
 msgstr "Osobne košarice"
 
-#: modules/webbasket/lib/webbasket.py:787
+#: modules/webbasket/lib/webbasket.py:788
 #: modules/webbasket/lib/webbasket_templates.py:105
 msgid "Group baskets"
 msgstr "Grupne košarice"
 
-#: modules/webbasket/lib/webbasket.py:813
+#: modules/webbasket/lib/webbasket.py:814
 #: modules/webbasket/lib/webbasket_templates.py:112
 msgid "Others' baskets"
 msgstr "Košarice drugih korisnika"
 
-#: modules/webbasket/lib/webbasket.py:851
+#: modules/webbasket/lib/webbasket.py:852
 #, python-format
 msgid ""
 "You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
@@ -3699,46 +3727,46 @@ msgid "Are you sure you want to empty your whole mailbox?"
 msgstr "Jeste li sigurni da želite isprazniti cijeli mailbox?"
 
 #: modules/webmessage/lib/webmessage_templates.py:573
-#, python-format
-msgid "Quota used: %i messages out of max. %i"
+#, fuzzy, python-format
+msgid "Quota used: %(x_nb_used)i messages out of max. %(x_nb_total)i"
 msgstr "Iskorištena quota: %i poruka od max %i"
 
-#: modules/webmessage/lib/webmessage_templates.py:590
+#: modules/webmessage/lib/webmessage_templates.py:591
 msgid "Please select one or more:"
 msgstr "Molimo odaberite jedan ili više:"
 
-#: modules/webmessage/lib/webmessage_templates.py:621
+#: modules/webmessage/lib/webmessage_templates.py:622
 msgid "Add to users"
 msgstr "Dodaj u korisnike"
 
-#: modules/webmessage/lib/webmessage_templates.py:623
+#: modules/webmessage/lib/webmessage_templates.py:624
 msgid "Add to groups"
 msgstr "Dodaj grupama"
 
-#: modules/webmessage/lib/webmessage_templates.py:626
+#: modules/webmessage/lib/webmessage_templates.py:627
 msgid "No matching user"
 msgstr "Nema takvog korisnika"
 
-#: modules/webmessage/lib/webmessage_templates.py:628
+#: modules/webmessage/lib/webmessage_templates.py:629
 #: modules/websession/lib/websession_templates.py:1568
 msgid "No matching group"
 msgstr "Nema takve grupe"
 
-#: modules/webmessage/lib/webmessage_templates.py:665
+#: modules/webmessage/lib/webmessage_templates.py:666
 msgid "Find users or groups:"
 msgstr "Traži korisnike ili grupe:"
 
-#: modules/webmessage/lib/webmessage_templates.py:666
+#: modules/webmessage/lib/webmessage_templates.py:667
 msgid "Find a user"
 msgstr "Pronađi korisnika"
 
-#: modules/webmessage/lib/webmessage_templates.py:667
+#: modules/webmessage/lib/webmessage_templates.py:668
 msgid "Find a group"
 msgstr "Pronađi grupu"
 
-#: modules/webmessage/lib/webmessage_templates.py:682
-#, python-format
-msgid "You have %s new messages out of %s messages"
+#: modules/webmessage/lib/webmessage_templates.py:683
+#, fuzzy, python-format
+msgid "You have %(x_nb_new)s new messages out of %(x_nb_total)s messages"
 msgstr "Imate %s novih od ukupno %s poruka "
 
 #: modules/webmessage/lib/webmessage_webinterface.py:364
@@ -3747,9 +3775,9 @@ msgstr "Prikaži poruku"
 
 #: modules/websearch/lib/search_engine.py:586
 #: modules/websearch/lib/search_engine.py:616
-#: modules/websearch/lib/search_engine.py:3529
-#: modules/websearch/lib/search_engine.py:3579
-#: modules/websearch/lib/search_engine.py:3624
+#: modules/websearch/lib/search_engine.py:3534
+#: modules/websearch/lib/search_engine.py:3584
+#: modules/websearch/lib/search_engine.py:3629
 msgid "Search Results"
 msgstr "Pretraži rezultate"
 
@@ -3791,17 +3819,17 @@ msgstr "poredaj po"
 msgid "HTML brief"
 msgstr "sažeti HTML"
 
-#: modules/websearch/lib/search_engine.py:1467
+#: modules/websearch/lib/search_engine.py:1471
 msgid "No values found."
 msgstr "Nema pronađenih vrijednosti"
 
-#: modules/websearch/lib/search_engine.py:1598
+#: modules/websearch/lib/search_engine.py:1603
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
 "Nema rezultata za %(x_query1)s, umjesto traženog koristi se %(x_query2)s..."
 
-#: modules/websearch/lib/search_engine.py:1852
+#: modules/websearch/lib/search_engine.py:1857
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -3810,7 +3838,7 @@ msgstr ""
 "Nije pronađeno u kolekciji %(x_collection)s. Pretraživanje drugih javnih "
 "kolekcija dalo je %(x_url_open)s%(x_nb_hits)d rezultate%(x_url_close)s."
 
-#: modules/websearch/lib/search_engine.py:1861
+#: modules/websearch/lib/search_engine.py:1866
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -3818,16 +3846,16 @@ msgstr ""
 "Vaš upit nije pronađen niti u jednoj javnoj kolekciji. Ako ste tražili "
 "privatni dokument, molimo prvo odaberite željenu ograničenu kolekciju."
 
-#: modules/websearch/lib/search_engine.py:1974
+#: modules/websearch/lib/search_engine.py:1979
 #, fuzzy
 msgid "No words index available for"
 msgstr "Indeks riječi nije dostupan za"
 
-#: modules/websearch/lib/search_engine.py:1978
+#: modules/websearch/lib/search_engine.py:1983
 msgid "No phrase index available for"
 msgstr "Indeks fraza nije dostupan za"
 
-#: modules/websearch/lib/search_engine.py:2010
+#: modules/websearch/lib/search_engine.py:2015
 #, fuzzy, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
@@ -3836,14 +3864,14 @@ msgstr ""
 "Traženi pojam %(x_term)s u popisu %(x_index)s nije pronađen. Najsličniji "
 "pojmovi u svim kolekcijama su:"
 
-#: modules/websearch/lib/search_engine.py:2014
+#: modules/websearch/lib/search_engine.py:2019
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
 msgstr ""
 "Traženi pojam %s nije pronađen. Najsličniji pojmovi u svim kolekcijama su:"
 
-#: modules/websearch/lib/search_engine.py:2470
+#: modules/websearch/lib/search_engine.py:2475
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -3852,7 +3880,7 @@ msgstr ""
 "Nažalost, sortiranje je dozvoljeno samo na skupovima od više od %d zapisa. "
 "Koristi se uobičajeno sortiranje."
 
-#: modules/websearch/lib/search_engine.py:2494
+#: modules/websearch/lib/search_engine.py:2499
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
@@ -3861,25 +3889,25 @@ msgstr ""
 "Nažalost, %s nije valjana opcija za sortiranje. Umjesto toga, izabrano je "
 "sortiranje prema naslovu."
 
-#: modules/websearch/lib/search_engine.py:2779
+#: modules/websearch/lib/search_engine.py:2784
 msgid "Use different search terms."
 msgstr "Koristite druge pojmove za pretragu."
 
-#: modules/websearch/lib/search_engine.py:2843
-#: modules/websearch/lib/search_engine.py:3009
-#: modules/websearch/lib/search_engine.py:3033
-#: modules/websearch/lib/search_engine.py:3041
-#: modules/websearch/lib/search_engine.py:3049
-#: modules/websearch/lib/search_engine.py:3095
+#: modules/websearch/lib/search_engine.py:2848
+#: modules/websearch/lib/search_engine.py:3014
+#: modules/websearch/lib/search_engine.py:3038
+#: modules/websearch/lib/search_engine.py:3046
+#: modules/websearch/lib/search_engine.py:3054
+#: modules/websearch/lib/search_engine.py:3100
 msgid "The record has been deleted."
 msgstr "Zapis je obrisan."
 
-#: modules/websearch/lib/search_engine.py:3737
+#: modules/websearch/lib/search_engine.py:3742
 #, fuzzy
 msgid "No match within your time limits, discarding this condition..."
 msgstr "Nema rezultata u traženim vremenskim okvirima, zahtjev je odbačen..."
 
-#: modules/websearch/lib/search_engine.py:3761
+#: modules/websearch/lib/search_engine.py:3766
 msgid "No match within your search limits, discarding this condition..."
 msgstr "Nema rezultata u traženim okvirima, zahtjev je odbačen..."
 
@@ -3918,7 +3946,7 @@ msgid "Search %s records for:"
 msgstr "Pretražite %s zapise za:"
 
 #: modules/websearch/lib/websearch_templates.py:571
-#: modules/websearch/lib/websearch_templates.py:1719
+#: modules/websearch/lib/websearch_templates.py:1721
 msgid "Advanced Search"
 msgstr "Napredno pretraživanje"
 
@@ -3928,7 +3956,7 @@ msgid "Search %s records for"
 msgstr "Pretražite %s zapise za"
 
 #: modules/websearch/lib/websearch_templates.py:688
-#: modules/websearch/lib/websearch_templates.py:1635
+#: modules/websearch/lib/websearch_templates.py:1637
 msgid "Simple Search"
 msgstr "Jednostavno pretraživanje"
 
@@ -3937,23 +3965,23 @@ msgid "Search options:"
 msgstr "Opcije za pretraživanje:"
 
 #: modules/websearch/lib/websearch_templates.py:768
-#: modules/websearch/lib/websearch_templates.py:1813
+#: modules/websearch/lib/websearch_templates.py:1815
 #, fuzzy
 msgid "Added/modified since:"
 msgstr "Dodano od:"
 
 #: modules/websearch/lib/websearch_templates.py:769
-#: modules/websearch/lib/websearch_templates.py:1814
+#: modules/websearch/lib/websearch_templates.py:1816
 msgid "until:"
 msgstr "do:"
 
 #: modules/websearch/lib/websearch_templates.py:775
-#: modules/websearch/lib/websearch_templates.py:1855
+#: modules/websearch/lib/websearch_templates.py:1857
 msgid "Display results:"
 msgstr "Prikaz rezultata:"
 
 #: modules/websearch/lib/websearch_templates.py:776
-#: modules/websearch/lib/websearch_templates.py:1856
+#: modules/websearch/lib/websearch_templates.py:1858
 msgid "Output format:"
 msgstr "Oblik izlaznih podataka:"
 
@@ -3987,9 +4015,9 @@ msgid "This collection does not contain any document yet."
 msgstr "Ova kolekcija još ne sadrži nijedan dokument."
 
 #: modules/websearch/lib/websearch_templates.py:1155
-#: modules/websearch/lib/websearch_templates.py:2800
-#: modules/websearch/lib/websearch_templates.py:2853
-#: modules/websearch/lib/websearch_templates.py:2880
+#: modules/websearch/lib/websearch_templates.py:2802
+#: modules/websearch/lib/websearch_templates.py:2855
+#: modules/websearch/lib/websearch_templates.py:2882
 msgid "more"
 msgstr "više"
 
@@ -3998,20 +4026,20 @@ msgid "Latest additions:"
 msgstr "Najnovije dodano:"
 
 #: modules/websearch/lib/websearch_templates.py:1259
-#: modules/websearch/lib/websearch_templates.py:2580
-#: modules/websearch/lib/websearch_templates.py:2586
-#: modules/websearch/lib/websearch_templates.py:2591
+#: modules/websearch/lib/websearch_templates.py:2582
+#: modules/websearch/lib/websearch_templates.py:2588
+#: modules/websearch/lib/websearch_templates.py:2593
 msgid "Detailed record"
 msgstr "Detaljnije"
 
 #: modules/websearch/lib/websearch_templates.py:1262
-#: modules/websearch/lib/websearch_templates.py:2598
+#: modules/websearch/lib/websearch_templates.py:2600
 #: modules/webstyle/lib/webstyle_templates.py:763
 msgid "Similar records"
 msgstr "Slični zapisi"
 
 #: modules/websearch/lib/websearch_templates.py:1268
-#: modules/websearch/lib/websearch_templates.py:2606
+#: modules/websearch/lib/websearch_templates.py:2608
 #, fuzzy
 msgid "Cited by"
 msgstr "Naveo/la"
@@ -4027,91 +4055,91 @@ msgstr ""
 msgid "Words nearest to %(x_word)s in any collection are:"
 msgstr "Riječi najsličnije %(x_word)s u svim kolekcijama su:"
 
-#: modules/websearch/lib/websearch_templates.py:1431
+#: modules/websearch/lib/websearch_templates.py:1433
 msgid "Hits"
 msgstr "Upute"
 
-#: modules/websearch/lib/websearch_templates.py:1496
-#: modules/websearch/lib/websearch_templates.py:2073
+#: modules/websearch/lib/websearch_templates.py:1498
+#: modules/websearch/lib/websearch_templates.py:2075
 msgid "next"
 msgstr "slijedeći"
 
-#: modules/websearch/lib/websearch_templates.py:1762
+#: modules/websearch/lib/websearch_templates.py:1764
 msgid "collections"
 msgstr "kolekcije"
 
-#: modules/websearch/lib/websearch_templates.py:1784
+#: modules/websearch/lib/websearch_templates.py:1786
 msgid "Limit to:"
 msgstr "Ograniči na:"
 
-#: modules/websearch/lib/websearch_templates.py:1825
+#: modules/websearch/lib/websearch_templates.py:1827
 #: modules/websearch/lib/websearch_webcoll.py:527
 msgid "results"
 msgstr "rezultati"
 
-#: modules/websearch/lib/websearch_templates.py:1854
+#: modules/websearch/lib/websearch_templates.py:1856
 #, fuzzy
 msgid "Sort :"
 msgstr "Sortiraj po:"
 
-#: modules/websearch/lib/websearch_templates.py:1860
+#: modules/websearch/lib/websearch_templates.py:1862
 #: modules/websearch/lib/websearch_webcoll.py:497
 msgid "asc."
 msgstr "u rastućem poretku"
 
-#: modules/websearch/lib/websearch_templates.py:1863
+#: modules/websearch/lib/websearch_templates.py:1865
 #: modules/websearch/lib/websearch_webcoll.py:498
 msgid "desc."
 msgstr "u padajućem poretku"
 
-#: modules/websearch/lib/websearch_templates.py:1869
+#: modules/websearch/lib/websearch_templates.py:1871
 #: modules/websearch/lib/websearch_webcoll.py:541
 msgid "single list"
 msgstr "jednostruka lista"
 
-#: modules/websearch/lib/websearch_templates.py:1872
+#: modules/websearch/lib/websearch_templates.py:1874
 #: modules/websearch/lib/websearch_webcoll.py:540
 msgid "split by collection"
 msgstr "razdijeli po kolekciji"
 
-#: modules/websearch/lib/websearch_templates.py:1907
+#: modules/websearch/lib/websearch_templates.py:1909
 msgid "MARC tag"
 msgstr "MARC tag"
 
-#: modules/websearch/lib/websearch_templates.py:2024
-#: modules/websearch/lib/websearch_templates.py:2029
-#: modules/websearch/lib/websearch_templates.py:2317
+#: modules/websearch/lib/websearch_templates.py:2026
+#: modules/websearch/lib/websearch_templates.py:2031
+#: modules/websearch/lib/websearch_templates.py:2319
 #, python-format
 msgid "%s records found"
 msgstr "Pronađeno je %s zapisa"
 
-#: modules/websearch/lib/websearch_templates.py:2056
+#: modules/websearch/lib/websearch_templates.py:2058
 msgid "begin"
 msgstr "početak"
 
-#: modules/websearch/lib/websearch_templates.py:2061
+#: modules/websearch/lib/websearch_templates.py:2063
 #: modules/websubmit/lib/websubmit_templates.py:1190
 msgid "previous"
 msgstr "prethodni"
 
-#: modules/websearch/lib/websearch_templates.py:2080
+#: modules/websearch/lib/websearch_templates.py:2082
 msgid "end"
 msgstr "kraj"
 
-#: modules/websearch/lib/websearch_templates.py:2100
+#: modules/websearch/lib/websearch_templates.py:2102
 msgid "jump to record:"
 msgstr "idi na zapis:"
 
-#: modules/websearch/lib/websearch_templates.py:2113
+#: modules/websearch/lib/websearch_templates.py:2115
 #, python-format
 msgid "Search took %s seconds."
 msgstr "Pretraživanje je potrajalo %s sekundi"
 
-#: modules/websearch/lib/websearch_templates.py:2215
+#: modules/websearch/lib/websearch_templates.py:2217
 msgid "ADD TO BASKET"
 msgstr "DODAJ U KOŠARICU"
 
-#: modules/websearch/lib/websearch_templates.py:2304
+#: modules/websearch/lib/websearch_templates.py:2306
 #, python-format
 msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
@@ -4120,39 +4148,39 @@ msgstr ""
 "%(x_fmt_open)sPrikaz rezultata:%(x_fmt_close)s Pronađeno %(x_nb_records)s "
 "zapisa u %(x_nb_seconds)s sekunda."
 
-#: modules/websearch/lib/websearch_templates.py:2344
+#: modules/websearch/lib/websearch_templates.py:2346
 msgid ""
 "Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
 "Logički upit nije dao rezultate. Molimo drugačije povežite tražene pojmove."
 
-#: modules/websearch/lib/websearch_templates.py:2376
+#: modules/websearch/lib/websearch_templates.py:2378
 msgid "See also: similar author names"
 msgstr "Također vidi: slična imena autora"
 
-#: modules/websearch/lib/websearch_templates.py:2688
+#: modules/websearch/lib/websearch_templates.py:2690
 #: modules/websearch/lib/websearch_webinterface.py:609
 #, python-format
 msgid "Collection %s Not Found"
 msgstr "Kolekcija %s nije pronađena"
 
-#: modules/websearch/lib/websearch_templates.py:2700
+#: modules/websearch/lib/websearch_templates.py:2702
 #: modules/websearch/lib/websearch_webinterface.py:607
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
 msgstr "Nažalost, kolekcija %s ne postoji."
 
-#: modules/websearch/lib/websearch_templates.py:2702
+#: modules/websearch/lib/websearch_templates.py:2704
 #: modules/websearch/lib/websearch_webinterface.py:608
 #, python-format
 msgid "You may want to start browsing from %s."
 msgstr "Započni pregledavanje od %s. "
 
-#: modules/websearch/lib/websearch_templates.py:2732
+#: modules/websearch/lib/websearch_templates.py:2734
 msgid "Interested in being notified about new results for this query?"
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:2733
+#: modules/websearch/lib/websearch_templates.py:2735
 #, python-format
 msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
@@ -4160,25 +4188,25 @@ msgid ""
 "%(x_url2_close)s."
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:2793
+#: modules/websearch/lib/websearch_templates.py:2795
 msgid "People who downloaded this document also downloaded:"
 msgstr "Korisnici koji su preuzeli ovaj dokument, također su preuzeli:"
 
-#: modules/websearch/lib/websearch_templates.py:2809
+#: modules/websearch/lib/websearch_templates.py:2811
 msgid "People who viewed this page also viewed:"
 msgstr "Korisnici koji su pogledalii ovaj dokument, također su pogledali:"
 
-#: modules/websearch/lib/websearch_templates.py:2842
+#: modules/websearch/lib/websearch_templates.py:2844
 #, python-format
 msgid "Cited by: %s records"
 msgstr "Naveo/la: %s zapisa"
 
-#: modules/websearch/lib/websearch_templates.py:2868
+#: modules/websearch/lib/websearch_templates.py:2870
 #, python-format
 msgid ".. of which self-citations: %s records"
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:2873
+#: modules/websearch/lib/websearch_templates.py:2875
 #, python-format
 msgid "Co-cited with: %s records"
 msgstr "Citirano zajedno sa: %s zapisa"
@@ -5641,7 +5669,7 @@ msgid ""
 msgstr ""
 "Zapis kreiran %(x_date_creation)s, zadnja izmjena %(x_date_modification)s"
 
-#: modules/webstyle/lib/webdoc.py:541
+#: modules/webstyle/lib/webdoc.py:542
 #, python-format
 msgid "%(category)s Pages"
 msgstr ""
@@ -6733,6 +6761,13 @@ msgstr ""
 #: modules/webjournal/lib/webjournal_config.py:630
 msgid "Available journals"
 msgstr ""
+
+#~ msgid ""
+#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)"
+#~ "s."
+#~ msgstr ""
+#~ "Sada se možete vratiti na %(x_url_open)sadministracijsko sučelje%"
+#~ "(x_url_close)s."
 
 #, fuzzy
 #~ msgid "No Articles"

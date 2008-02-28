@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.93.50.20080212\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2008-02-12 14:32+0100\n"
-"PO-Revision-Date: 2006-11-29 15:58+0100\n"
+"POT-Creation-Date: 2008-02-28 19:06+0100\n"
+"PO-Revision-Date: 2008-02-28 18:18+0100\n"
 "Last-Translator: Gregory Favre <gregory.favre@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -44,7 +44,7 @@ msgstr "ET NON PAS"
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:22
 #: modules/websubmit/doc/admin/websubmit-admin-guide.webdoc:22
 #: modules/bibformat/lib/bibformatadminlib.py:56
-#: modules/bibformat/web/admin/bibformatadmin.py:77
+#: modules/bibformat/web/admin/bibformatadmin.py:71
 #: modules/webcomment/lib/webcommentadminlib.py:38
 #: modules/webstyle/lib/webdoc_webinterface.py:155
 msgid "Admin Area"
@@ -54,15 +54,15 @@ msgstr "Zone d'administration"
 #: modules/websearch/doc/search-guide.webdoc:550
 #: modules/websearch/doc/search-guide.webdoc:687
 #: modules/websearch/doc/search-guide.webdoc:825
-#: modules/websearch/lib/search_engine.py:3507
+#: modules/websearch/lib/search_engine.py:3512
 #: modules/websearch/lib/websearch_templates.py:575
 #: modules/websearch/lib/websearch_templates.py:703
-#: modules/websearch/lib/websearch_templates.py:1583
-#: modules/websearch/lib/websearch_templates.py:1674
-#: modules/websearch/lib/websearch_templates.py:1731
-#: modules/websearch/lib/websearch_templates.py:1767
-#: modules/websearch/lib/websearch_templates.py:1790
-#: modules/websearch/lib/websearch_templates.py:1821
+#: modules/websearch/lib/websearch_templates.py:1585
+#: modules/websearch/lib/websearch_templates.py:1676
+#: modules/websearch/lib/websearch_templates.py:1733
+#: modules/websearch/lib/websearch_templates.py:1769
+#: modules/websearch/lib/websearch_templates.py:1792
+#: modules/websearch/lib/websearch_templates.py:1823
 msgid "Browse"
 msgstr "Liste"
 
@@ -70,8 +70,8 @@ msgstr "Liste"
 #: modules/websearch/doc/search-tips.webdoc:21
 #: modules/websearch/lib/websearch_templates.py:576
 #: modules/websearch/lib/websearch_templates.py:704
-#: modules/websearch/lib/websearch_templates.py:1678
-#: modules/websearch/lib/websearch_templates.py:1735
+#: modules/websearch/lib/websearch_templates.py:1680
+#: modules/websearch/lib/websearch_templates.py:1737
 msgid "Search Tips"
 msgstr "Conseils de recherche"
 
@@ -87,8 +87,9 @@ msgstr "Conseils de recherche"
 #: modules/websearch/doc/search-guide.webdoc:741
 #: modules/websearch/doc/search-guide.webdoc:776
 #: modules/websearch/doc/search-guide.webdoc:811
+#: modules/miscutil/lib/inveniocfg.py:327
 msgid "abstract"
-msgstr ""
+msgstr "abstract"
 
 #: modules/websearch/doc/search-guide.webdoc:339
 #: modules/websearch/doc/search-guide.webdoc:374
@@ -102,9 +103,9 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:746
 #: modules/websearch/doc/search-guide.webdoc:781
 #: modules/websearch/doc/search-guide.webdoc:816
-#, fuzzy
+#: modules/miscutil/lib/inveniocfg.py:332
 msgid "fulltext"
-msgstr "Bulletin"
+msgstr "plein texte"
 
 #: modules/websearch/doc/search-guide.webdoc:328
 #: modules/websearch/doc/search-guide.webdoc:364
@@ -152,9 +153,9 @@ msgstr "Tous les mots:"
 #: modules/websearch/doc/search-guide.webdoc:749
 #: modules/websearch/doc/search-guide.webdoc:784
 #: modules/websearch/doc/search-guide.webdoc:819
-#, fuzzy
+#: modules/miscutil/lib/inveniocfg.py:329
 msgid "report number"
-msgstr "Numéro de rapport"
+msgstr "numéro de rapport"
 
 #: modules/websearch/doc/search-tips.webdoc:376
 #: modules/websearch/doc/search-tips.webdoc:383
@@ -175,7 +176,7 @@ msgstr "Numéro de rapport"
 #: modules/websearch/doc/search-guide.webdoc:752
 #: modules/websearch/doc/search-guide.webdoc:787
 #: modules/websearch/doc/search-guide.webdoc:822
-#, fuzzy
+#: modules/miscutil/lib/inveniocfg.py:335
 msgid "year"
 msgstr "année"
 
@@ -191,9 +192,9 @@ msgstr "année"
 #: modules/websearch/doc/search-guide.webdoc:750
 #: modules/websearch/doc/search-guide.webdoc:785
 #: modules/websearch/doc/search-guide.webdoc:820
-#, fuzzy
+#: modules/miscutil/lib/inveniocfg.py:330
 msgid "subject"
-msgstr "Sujet"
+msgstr "sujet"
 
 #: modules/websearch/doc/search-guide.webdoc:327
 #: modules/websearch/doc/search-guide.webdoc:363
@@ -224,9 +225,9 @@ msgstr "Phrase partielle:"
 #: modules/websearch/doc/search-guide.webdoc:748
 #: modules/websearch/doc/search-guide.webdoc:783
 #: modules/websearch/doc/search-guide.webdoc:818
-#, fuzzy
+#: modules/miscutil/lib/inveniocfg.py:331
 msgid "reference"
-msgstr "Référence"
+msgstr "référence"
 
 #: modules/websearch/doc/search-tips.webdoc:38
 #: modules/websearch/doc/search-tips.webdoc:69
@@ -441,14 +442,14 @@ msgstr "Référence"
 #: modules/websearch/doc/search-guide.webdoc:5210
 #: modules/websearch/doc/search-guide.webdoc:5225
 #: modules/websearch/doc/search-guide.webdoc:5245
-#, fuzzy
+#: modules/miscutil/lib/inveniocfg.py:326
 msgid "author"
-msgstr "Auteur:"
+msgstr "auteur"
 
+#: modules/webhelp/web/help-central.webdoc:94
 #: modules/websearch/doc/search-guide.webdoc:21
-#, fuzzy
 msgid "Search Guide"
-msgstr "Voir le guide"
+msgstr "Guide de recherche"
 
 #: modules/websearch/doc/search-guide.webdoc:338
 #: modules/websearch/doc/search-guide.webdoc:373
@@ -462,8 +463,9 @@ msgstr "Voir le guide"
 #: modules/websearch/doc/search-guide.webdoc:745
 #: modules/websearch/doc/search-guide.webdoc:780
 #: modules/websearch/doc/search-guide.webdoc:815
+#: modules/miscutil/lib/inveniocfg.py:336
 msgid "experiment"
-msgstr ""
+msgstr "expérience"
 
 #: modules/websearch/doc/search-guide.webdoc:325
 #: modules/websearch/doc/search-guide.webdoc:361
@@ -494,9 +496,9 @@ msgstr "Au moins un des mots:"
 #: modules/websearch/doc/search-guide.webdoc:744
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
-#, fuzzy
+#: modules/miscutil/lib/inveniocfg.py:334
 msgid "division"
-msgstr "version"
+msgstr "division"
 
 #: modules/websearch/doc/search-tips.webdoc:40
 #: modules/websearch/doc/search-tips.webdoc:71
@@ -702,9 +704,9 @@ msgstr "version"
 #: modules/websearch/doc/search-guide.webdoc:5246
 #: modules/websearch/lib/websearch_templates.py:574
 #: modules/websearch/lib/websearch_templates.py:702
-#: modules/websearch/lib/websearch_templates.py:1580
-#: modules/websearch/lib/websearch_templates.py:1673
-#: modules/websearch/lib/websearch_templates.py:1730
+#: modules/websearch/lib/websearch_templates.py:1582
+#: modules/websearch/lib/websearch_templates.py:1675
+#: modules/websearch/lib/websearch_templates.py:1732
 #: modules/webstyle/lib/webstyle_templates.py:388
 #: modules/webstyle/lib/webstyle_templates.py:466
 msgid "Search"
@@ -923,9 +925,9 @@ msgstr "Recherche"
 #: modules/websearch/doc/search-guide.webdoc:5208
 #: modules/websearch/doc/search-guide.webdoc:5223
 #: modules/websearch/doc/search-guide.webdoc:5243
-#, fuzzy
+#: modules/miscutil/lib/inveniocfg.py:324
 msgid "any field"
-msgstr "tous les jours"
+msgstr "tous les champs"
 
 #: modules/webhelp/web/help-central.webdoc:21
 #: modules/webhelp/web/help-central.webdoc:26
@@ -967,9 +969,9 @@ msgstr "Centre d'aide"
 #: modules/websearch/doc/search-guide.webdoc:743
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
-#, fuzzy
+#: modules/miscutil/lib/inveniocfg.py:333
 msgid "collection"
-msgstr "collections"
+msgstr "collection"
 
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:21
 msgid "WebSearch Admin Guide"
@@ -992,7 +994,7 @@ msgstr ""
 msgid "Exact phrase:"
 msgstr "Phrase exacte:"
 
-#: modules/webhelp/web/help-central.webdoc:111
+#: modules/webhelp/web/help-central.webdoc:104
 #: modules/websubmit/doc/submit-guide.webdoc:21
 #, fuzzy
 msgid "Submit Guide"
@@ -1038,9 +1040,9 @@ msgstr "ET"
 #: modules/websearch/doc/search-guide.webdoc:747
 #: modules/websearch/doc/search-guide.webdoc:782
 #: modules/websearch/doc/search-guide.webdoc:817
-#, fuzzy
+#: modules/miscutil/lib/inveniocfg.py:328
 msgid "keyword"
-msgstr "Notice"
+msgstr "mot clé"
 
 #: modules/websearch/doc/search-tips.webdoc:37
 #: modules/websearch/doc/search-tips.webdoc:68
@@ -1252,9 +1254,9 @@ msgstr "Notice"
 #: modules/websearch/doc/search-guide.webdoc:5209
 #: modules/websearch/doc/search-guide.webdoc:5224
 #: modules/websearch/doc/search-guide.webdoc:5244
-#, fuzzy
+#: modules/miscutil/lib/inveniocfg.py:325
 msgid "title"
-msgstr "Titre"
+msgstr "titre"
 
 #: modules/websearch/doc/search-tips.webdoc:73
 #: modules/websearch/doc/search-tips.webdoc:111
@@ -1305,9 +1307,9 @@ msgid "Submit"
 msgstr "Soumission"
 
 #: modules/bibedit/lib/bibedit_templates.py:136
-#: modules/bibformat/web/admin/bibformatadmin.py:398
-#: modules/bibformat/web/admin/bibformatadmin.py:679
-#: modules/bibformat/web/admin/bibformatadmin.py:1318
+#: modules/bibformat/web/admin/bibformatadmin.py:392
+#: modules/bibformat/web/admin/bibformatadmin.py:673
+#: modules/bibformat/web/admin/bibformatadmin.py:1312
 #: modules/webbasket/lib/webbasket_templates.py:1237
 #: modules/webbasket/lib/webbasket_templates.py:1342
 #: modules/webbasket/lib/webbasket_templates.py:1442
@@ -1325,20 +1327,20 @@ msgstr "Annuler"
 #: modules/bibedit/lib/bibedit_templates.py:137
 #: modules/bibedit/lib/bibedit_templates.py:333
 #: modules/bibedit/lib/bibedit_templates.py:377
-#: modules/bibformat/lib/bibformat_templates.py:983
-#: modules/bibformat/web/admin/bibformatadmin.py:398
-#: modules/bibformat/web/admin/bibformatadmin.py:400
-#: modules/bibformat/web/admin/bibformatadmin.py:679
-#: modules/bibformat/web/admin/bibformatadmin.py:681
-#: modules/bibformat/web/admin/bibformatadmin.py:1318
-#: modules/bibformat/web/admin/bibformatadmin.py:1320
+#: modules/bibformat/lib/bibformat_templates.py:987
+#: modules/bibformat/web/admin/bibformatadmin.py:392
+#: modules/bibformat/web/admin/bibformatadmin.py:394
+#: modules/bibformat/web/admin/bibformatadmin.py:673
+#: modules/bibformat/web/admin/bibformatadmin.py:675
+#: modules/bibformat/web/admin/bibformatadmin.py:1312
+#: modules/bibformat/web/admin/bibformatadmin.py:1314
 #: modules/webmessage/lib/webmessage_templates.py:117
 msgid "Delete"
 msgstr "Supprimer"
 
 #: modules/bibedit/lib/bibedit_templates.py:148
-#: modules/bibformat/lib/bibformat_templates.py:926
-#: modules/bibformat/lib/bibformat_templates.py:1052
+#: modules/bibformat/lib/bibformat_templates.py:930
+#: modules/bibformat/lib/bibformat_templates.py:1056
 #: modules/webalert/lib/webalert_templates.py:326
 #: modules/webalert/lib/webalert_templates.py:446
 #: modules/webmessage/lib/webmessage_templates.py:91
@@ -1411,14 +1413,11 @@ msgstr ""
 "Vos modifications ont été soumises. Elles seront traitées dès que la liste "
 "de tâches sera vide."
 
-#: modules/bibedit/lib/bibedit_templates.py:481
-#: modules/bibedit/lib/bibedit_templates.py:513
-#, python-format
-msgid ""
-"You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)s."
-msgstr ""
-"Vous pouvez retoruner à %(x_url_open)sl'interface d'administration de BibEdit"
-"%(x_url_close)s."
+#: modules/bibedit/lib/bibedit_templates.py:480
+#: modules/bibedit/lib/bibedit_templates.py:512
+#, fuzzy
+msgid "Edit another record"
+msgstr "Veuillez essayer avec un autre identificateur de notice."
 
 #: modules/bibedit/lib/bibedit_templates.py:501
 msgid "Do you really want to delete this record?"
@@ -1479,70 +1478,70 @@ msgstr "Soumettre et enregistrer la notice %s"
 
 #: modules/bibformat/lib/bibformat_templates.py:319
 #: modules/bibformat/lib/bibformat_templates.py:431
-#: modules/bibformat/lib/bibformat_templates.py:566
-#: modules/bibformat/lib/bibformat_templates.py:581
-#: modules/bibformat/lib/bibformat_templates.py:612
-#: modules/bibformat/lib/bibformat_templates.py:923
-#: modules/bibformat/lib/bibformat_templates.py:1058
-#: modules/bibformat/lib/bibformat_templates.py:1374
-#: modules/bibformat/lib/bibformat_templates.py:1478
-#: modules/bibformat/lib/bibformat_templates.py:1538
-#: modules/bibformat/lib/bibformat_templates.py:1800
-#: modules/bibformat/lib/bibformat_templates.py:1883
-#: modules/bibformat/lib/bibformat_templates.py:2046
-#: modules/bibformat/lib/bibformat_templates.py:2114
+#: modules/bibformat/lib/bibformat_templates.py:570
+#: modules/bibformat/lib/bibformat_templates.py:585
+#: modules/bibformat/lib/bibformat_templates.py:616
+#: modules/bibformat/lib/bibformat_templates.py:927
+#: modules/bibformat/lib/bibformat_templates.py:1062
+#: modules/bibformat/lib/bibformat_templates.py:1378
+#: modules/bibformat/lib/bibformat_templates.py:1482
+#: modules/bibformat/lib/bibformat_templates.py:1542
+#: modules/bibformat/lib/bibformat_templates.py:1804
+#: modules/bibformat/lib/bibformat_templates.py:1887
+#: modules/bibformat/lib/bibformat_templates.py:2050
+#: modules/bibformat/lib/bibformat_templates.py:2118
 #: modules/webcomment/lib/webcomment_templates.py:1034
 msgid "Menu"
 msgstr "Menu"
 
 #: modules/bibformat/lib/bibformat_templates.py:321
 #: modules/bibformat/lib/bibformat_templates.py:432
-#: modules/bibformat/lib/bibformat_templates.py:569
-#: modules/bibformat/lib/bibformat_templates.py:584
-#: modules/bibformat/lib/bibformat_templates.py:615
-#: modules/bibformat/lib/bibformat_templates.py:1879
-#: modules/bibformat/lib/bibformat_templates.py:2045
-#: modules/bibformat/lib/bibformat_templates.py:2113
+#: modules/bibformat/lib/bibformat_templates.py:573
+#: modules/bibformat/lib/bibformat_templates.py:588
+#: modules/bibformat/lib/bibformat_templates.py:619
+#: modules/bibformat/lib/bibformat_templates.py:1883
+#: modules/bibformat/lib/bibformat_templates.py:2049
+#: modules/bibformat/lib/bibformat_templates.py:2117
 msgid "Close Editor"
 msgstr "Fermer l'éditeur"
 
 #: modules/bibformat/lib/bibformat_templates.py:322
 #: modules/bibformat/lib/bibformat_templates.py:433
-#: modules/bibformat/lib/bibformat_templates.py:570
-#: modules/bibformat/lib/bibformat_templates.py:585
-#: modules/bibformat/lib/bibformat_templates.py:616
+#: modules/bibformat/lib/bibformat_templates.py:574
+#: modules/bibformat/lib/bibformat_templates.py:589
+#: modules/bibformat/lib/bibformat_templates.py:620
 msgid "Modify Template Attributes"
 msgstr "Modifier les attributs du modèle"
 
 #: modules/bibformat/lib/bibformat_templates.py:323
 #: modules/bibformat/lib/bibformat_templates.py:434
-#: modules/bibformat/lib/bibformat_templates.py:571
-#: modules/bibformat/lib/bibformat_templates.py:586
-#: modules/bibformat/lib/bibformat_templates.py:617
+#: modules/bibformat/lib/bibformat_templates.py:575
+#: modules/bibformat/lib/bibformat_templates.py:590
+#: modules/bibformat/lib/bibformat_templates.py:621
 msgid "Template Editor"
 msgstr "Éditeur de modèles"
 
 #: modules/bibformat/lib/bibformat_templates.py:324
 #: modules/bibformat/lib/bibformat_templates.py:435
-#: modules/bibformat/lib/bibformat_templates.py:572
-#: modules/bibformat/lib/bibformat_templates.py:587
-#: modules/bibformat/lib/bibformat_templates.py:618
-#: modules/bibformat/lib/bibformat_templates.py:1173
-#: modules/bibformat/lib/bibformat_templates.py:1373
-#: modules/bibformat/lib/bibformat_templates.py:1477
+#: modules/bibformat/lib/bibformat_templates.py:576
+#: modules/bibformat/lib/bibformat_templates.py:591
+#: modules/bibformat/lib/bibformat_templates.py:622
+#: modules/bibformat/lib/bibformat_templates.py:1177
+#: modules/bibformat/lib/bibformat_templates.py:1377
+#: modules/bibformat/lib/bibformat_templates.py:1481
 msgid "Check Dependencies"
 msgstr "Vérifier les dépendances"
 
 #: modules/bibformat/lib/bibformat_templates.py:374
-#: modules/bibformat/lib/bibformat_templates.py:921
-#: modules/bibformat/lib/bibformat_templates.py:1048
+#: modules/bibformat/lib/bibformat_templates.py:925
+#: modules/bibformat/lib/bibformat_templates.py:1052
 #: modules/webalert/lib/webalert_templates.py:319
 msgid "Name"
 msgstr "Nom"
 
 #: modules/bibformat/lib/bibformat_templates.py:393
-#: modules/bibformat/lib/bibformat_templates.py:922
-#: modules/bibformat/lib/bibformat_templates.py:1049
+#: modules/bibformat/lib/bibformat_templates.py:926
+#: modules/bibformat/lib/bibformat_templates.py:1053
 #: modules/websession/lib/websession_templates.py:1253
 #: modules/websession/lib/websession_templates.py:1327
 #: modules/websession/lib/websession_templates.py:1390
@@ -1553,180 +1552,180 @@ msgstr "Description"
 msgid "Update Format Attributes"
 msgstr "Mettre à jour les attributs de format"
 
-#: modules/bibformat/lib/bibformat_templates.py:567
-#: modules/bibformat/lib/bibformat_templates.py:582
-#: modules/bibformat/lib/bibformat_templates.py:613
+#: modules/bibformat/lib/bibformat_templates.py:571
+#: modules/bibformat/lib/bibformat_templates.py:586
+#: modules/bibformat/lib/bibformat_templates.py:617
 msgid "Show Documentation"
 msgstr "Afficher la documentation"
 
-#: modules/bibformat/lib/bibformat_templates.py:568
-#: modules/bibformat/lib/bibformat_templates.py:583
-#: modules/bibformat/lib/bibformat_templates.py:614
-#: modules/bibformat/lib/bibformat_templates.py:665
+#: modules/bibformat/lib/bibformat_templates.py:572
+#: modules/bibformat/lib/bibformat_templates.py:587
+#: modules/bibformat/lib/bibformat_templates.py:618
+#: modules/bibformat/lib/bibformat_templates.py:669
 msgid "Hide Documentation"
 msgstr "Masquer la documentation"
 
-#: modules/bibformat/lib/bibformat_templates.py:924
-#: modules/bibformat/lib/bibformat_templates.py:1050
+#: modules/bibformat/lib/bibformat_templates.py:928
+#: modules/bibformat/lib/bibformat_templates.py:1054
 #: modules/websubmit/lib/websubmit_templates.py:1423
 msgid "Status"
 msgstr "Statut"
 
-#: modules/bibformat/lib/bibformat_templates.py:925
-#: modules/bibformat/lib/bibformat_templates.py:1051
+#: modules/bibformat/lib/bibformat_templates.py:929
+#: modules/bibformat/lib/bibformat_templates.py:1055
 msgid "Last Modification Date"
 msgstr "Dernière modification:"
 
-#: modules/bibformat/lib/bibformat_templates.py:928
-#: modules/bibformat/lib/bibformat_templates.py:1054
-#: modules/bibformat/lib/bibformat_templates.py:1539
-#: modules/bibformat/lib/bibformat_templates.py:1801
-#: modules/bibformat/web/admin/bibformatadmin.py:108
-#: modules/bibformat/web/admin/bibformatadmin.py:169
-#: modules/bibformat/web/admin/bibformatadmin.py:240
-#: modules/bibformat/web/admin/bibformatadmin.py:285
-#: modules/bibformat/web/admin/bibformatadmin.py:377
-#: modules/bibformat/web/admin/bibformatadmin.py:1357
+#: modules/bibformat/lib/bibformat_templates.py:932
+#: modules/bibformat/lib/bibformat_templates.py:1058
+#: modules/bibformat/lib/bibformat_templates.py:1543
+#: modules/bibformat/lib/bibformat_templates.py:1805
+#: modules/bibformat/web/admin/bibformatadmin.py:102
+#: modules/bibformat/web/admin/bibformatadmin.py:163
+#: modules/bibformat/web/admin/bibformatadmin.py:234
+#: modules/bibformat/web/admin/bibformatadmin.py:279
+#: modules/bibformat/web/admin/bibformatadmin.py:371
+#: modules/bibformat/web/admin/bibformatadmin.py:1351
 msgid "Manage Output Formats"
 msgstr "Gérer les formats de sortie"
 
-#: modules/bibformat/lib/bibformat_templates.py:929
-#: modules/bibformat/lib/bibformat_templates.py:1055
-#: modules/bibformat/lib/bibformat_templates.py:1540
-#: modules/bibformat/lib/bibformat_templates.py:1802
-#: modules/bibformat/web/admin/bibformatadmin.py:444
-#: modules/bibformat/web/admin/bibformatadmin.py:477
-#: modules/bibformat/web/admin/bibformatadmin.py:548
-#: modules/bibformat/web/admin/bibformatadmin.py:593
-#: modules/bibformat/web/admin/bibformatadmin.py:659
-#: modules/bibformat/web/admin/bibformatadmin.py:1378
+#: modules/bibformat/lib/bibformat_templates.py:933
+#: modules/bibformat/lib/bibformat_templates.py:1059
+#: modules/bibformat/lib/bibformat_templates.py:1544
+#: modules/bibformat/lib/bibformat_templates.py:1806
+#: modules/bibformat/web/admin/bibformatadmin.py:438
+#: modules/bibformat/web/admin/bibformatadmin.py:471
+#: modules/bibformat/web/admin/bibformatadmin.py:542
+#: modules/bibformat/web/admin/bibformatadmin.py:587
+#: modules/bibformat/web/admin/bibformatadmin.py:653
+#: modules/bibformat/web/admin/bibformatadmin.py:1372
 msgid "Manage Format Templates"
 msgstr "Gérer les modèles de formatage"
 
-#: modules/bibformat/lib/bibformat_templates.py:930
-#: modules/bibformat/lib/bibformat_templates.py:1056
-#: modules/bibformat/lib/bibformat_templates.py:1541
-#: modules/bibformat/lib/bibformat_templates.py:1803
-#: modules/bibformat/web/admin/bibformatadmin.py:843
-#: modules/bibformat/web/admin/bibformatadmin.py:864
-#: modules/bibformat/web/admin/bibformatadmin.py:897
-#: modules/bibformat/web/admin/bibformatadmin.py:1396
+#: modules/bibformat/lib/bibformat_templates.py:934
+#: modules/bibformat/lib/bibformat_templates.py:1060
+#: modules/bibformat/lib/bibformat_templates.py:1545
+#: modules/bibformat/lib/bibformat_templates.py:1807
+#: modules/bibformat/web/admin/bibformatadmin.py:837
+#: modules/bibformat/web/admin/bibformatadmin.py:858
+#: modules/bibformat/web/admin/bibformatadmin.py:891
+#: modules/bibformat/web/admin/bibformatadmin.py:1390
 msgid "Format Elements Documentation"
 msgstr "Documentation des éléments de formatage"
 
-#: modules/bibformat/lib/bibformat_templates.py:931
-#: modules/bibformat/lib/bibformat_templates.py:1057
-#: modules/bibformat/lib/bibformat_templates.py:1542
-#: modules/bibformat/lib/bibformat_templates.py:1804
-#: modules/bibformat/web/admin/bibformatadmin.py:938
-#: modules/bibformat/web/admin/bibformatadmin.py:964
-#: modules/bibformat/web/admin/bibformatadmin.py:1011
-#: modules/bibformat/web/admin/bibformatadmin.py:1056
-#: modules/bibformat/web/admin/bibformatadmin.py:1103
-#: modules/bibformat/web/admin/bibformatadmin.py:1154
-#: modules/bibformat/web/admin/bibformatadmin.py:1207
-#: modules/bibformat/web/admin/bibformatadmin.py:1262
-#: modules/bibformat/web/admin/bibformatadmin.py:1274
-#: modules/bibformat/web/admin/bibformatadmin.py:1289
-#: modules/bibformat/web/admin/bibformatadmin.py:1325
+#: modules/bibformat/lib/bibformat_templates.py:935
+#: modules/bibformat/lib/bibformat_templates.py:1061
+#: modules/bibformat/lib/bibformat_templates.py:1546
+#: modules/bibformat/lib/bibformat_templates.py:1808
+#: modules/bibformat/web/admin/bibformatadmin.py:932
+#: modules/bibformat/web/admin/bibformatadmin.py:958
+#: modules/bibformat/web/admin/bibformatadmin.py:1005
+#: modules/bibformat/web/admin/bibformatadmin.py:1050
+#: modules/bibformat/web/admin/bibformatadmin.py:1097
+#: modules/bibformat/web/admin/bibformatadmin.py:1148
+#: modules/bibformat/web/admin/bibformatadmin.py:1201
+#: modules/bibformat/web/admin/bibformatadmin.py:1256
+#: modules/bibformat/web/admin/bibformatadmin.py:1268
+#: modules/bibformat/web/admin/bibformatadmin.py:1283
+#: modules/bibformat/web/admin/bibformatadmin.py:1319
 msgid "Manage Knowledge Bases"
 msgstr "Gérer les bases de connaissances"
 
-#: modules/bibformat/lib/bibformat_templates.py:1006
+#: modules/bibformat/lib/bibformat_templates.py:1010
 msgid "Add New Format Template"
 msgstr "Ajouter un nouveau modèle de formatage"
 
-#: modules/bibformat/lib/bibformat_templates.py:1007
+#: modules/bibformat/lib/bibformat_templates.py:1011
 msgid "Check Format Templates Extensively"
 msgstr "Vérifier les modèles de formatage en détail"
 
-#: modules/bibformat/lib/bibformat_templates.py:1047
+#: modules/bibformat/lib/bibformat_templates.py:1051
 msgid "Code"
 msgstr "Code"
 
-#: modules/bibformat/lib/bibformat_templates.py:1131
+#: modules/bibformat/lib/bibformat_templates.py:1135
 msgid "Add New Output Format"
 msgstr "Ajouter un format de sortie"
 
-#: modules/bibformat/lib/bibformat_templates.py:1169
+#: modules/bibformat/lib/bibformat_templates.py:1173
 msgid "menu"
 msgstr "menu"
 
-#: modules/bibformat/lib/bibformat_templates.py:1170
-#: modules/bibformat/lib/bibformat_templates.py:1370
-#: modules/bibformat/lib/bibformat_templates.py:1474
+#: modules/bibformat/lib/bibformat_templates.py:1174
+#: modules/bibformat/lib/bibformat_templates.py:1374
+#: modules/bibformat/lib/bibformat_templates.py:1478
 msgid "Close Output Format"
 msgstr "Fermer le format"
 
-#: modules/bibformat/lib/bibformat_templates.py:1171
-#: modules/bibformat/lib/bibformat_templates.py:1371
-#: modules/bibformat/lib/bibformat_templates.py:1475
+#: modules/bibformat/lib/bibformat_templates.py:1175
+#: modules/bibformat/lib/bibformat_templates.py:1375
+#: modules/bibformat/lib/bibformat_templates.py:1479
 msgid "Rules"
 msgstr "Règles"
 
-#: modules/bibformat/lib/bibformat_templates.py:1172
-#: modules/bibformat/lib/bibformat_templates.py:1372
-#: modules/bibformat/lib/bibformat_templates.py:1476
+#: modules/bibformat/lib/bibformat_templates.py:1176
+#: modules/bibformat/lib/bibformat_templates.py:1376
+#: modules/bibformat/lib/bibformat_templates.py:1480
 msgid "Modify Output Format Attributes"
 msgstr "Modifier les attributs du format de sortie"
 
-#: modules/bibformat/lib/bibformat_templates.py:1271
-#: modules/bibformat/lib/bibformatadminlib.py:540
+#: modules/bibformat/lib/bibformat_templates.py:1275
+#: modules/bibformat/lib/bibformatadminlib.py:551
 msgid "Remove Rule"
 msgstr "Supprimer la règle"
 
-#: modules/bibformat/lib/bibformat_templates.py:1324
-#: modules/bibformat/lib/bibformatadminlib.py:547
+#: modules/bibformat/lib/bibformat_templates.py:1328
+#: modules/bibformat/lib/bibformatadminlib.py:558
 msgid "Add New Rule"
 msgstr "Ajouter une règle"
 
-#: modules/bibformat/lib/bibformat_templates.py:1325
-#: modules/bibformat/lib/bibformatadminlib.py:544
+#: modules/bibformat/lib/bibformat_templates.py:1329
+#: modules/bibformat/lib/bibformatadminlib.py:555
 msgid "Save Changes"
 msgstr "Enregistrer les modifications"
 
-#: modules/bibformat/lib/bibformat_templates.py:1880
-#: modules/bibformat/lib/bibformat_templates.py:2047
-#: modules/bibformat/lib/bibformat_templates.py:2115
+#: modules/bibformat/lib/bibformat_templates.py:1884
+#: modules/bibformat/lib/bibformat_templates.py:2051
+#: modules/bibformat/lib/bibformat_templates.py:2119
 msgid "Knowledge Base Mappings"
 msgstr "Relations de la base de connaissances"
 
-#: modules/bibformat/lib/bibformat_templates.py:1881
-#: modules/bibformat/lib/bibformat_templates.py:2048
-#: modules/bibformat/lib/bibformat_templates.py:2116
+#: modules/bibformat/lib/bibformat_templates.py:1885
+#: modules/bibformat/lib/bibformat_templates.py:2052
+#: modules/bibformat/lib/bibformat_templates.py:2120
 msgid "Knowledge Base Attributes"
 msgstr "Attributs de la base de connaissances"
 
-#: modules/bibformat/lib/bibformat_templates.py:1882
-#: modules/bibformat/lib/bibformat_templates.py:2049
-#: modules/bibformat/lib/bibformat_templates.py:2117
+#: modules/bibformat/lib/bibformat_templates.py:1886
+#: modules/bibformat/lib/bibformat_templates.py:2053
+#: modules/bibformat/lib/bibformat_templates.py:2121
 msgid "Knowledge Base Dependencies"
 msgstr "Dépendances de la base de connaissances"
 
-#: modules/bibformat/lib/bibformat_templates.py:2262
+#: modules/bibformat/lib/bibformat_templates.py:2266
 msgid "No problem found with format"
 msgstr "Aucun problème n'a été trouvé pour ce format"
 
-#: modules/bibformat/lib/bibformat_templates.py:2264
+#: modules/bibformat/lib/bibformat_templates.py:2268
 msgid "An error has been found"
 msgstr "Une erreur a été découverte"
 
-#: modules/bibformat/lib/bibformat_templates.py:2266
+#: modules/bibformat/lib/bibformat_templates.py:2270
 msgid "The following errors have been found"
 msgstr "Les erreurs suivantes ont été découvertes"
 
 #: modules/bibformat/lib/bibformatadminlib.py:56
-#: modules/bibformat/web/admin/bibformatadmin.py:79
+#: modules/bibformat/web/admin/bibformatadmin.py:73
 msgid "BibFormat Admin"
 msgstr "Administration de BibFormat"
 
-#: modules/bibformat/lib/bibformatadminlib.py:343
-#: modules/bibformat/lib/bibformatadminlib.py:382
-#: modules/bibformat/lib/bibformatadminlib.py:384
+#: modules/bibformat/lib/bibformatadminlib.py:349
+#: modules/bibformat/lib/bibformatadminlib.py:388
+#: modules/bibformat/lib/bibformatadminlib.py:390
 msgid "Test with record:"
 msgstr "Tester avec la notice:"
 
-#: modules/bibformat/lib/bibformatadminlib.py:344
+#: modules/bibformat/lib/bibformatadminlib.py:350
 msgid "Enter a search query here."
 msgstr "Entrez une requête de recherche ici."
 
@@ -1774,122 +1773,122 @@ msgstr "Migrer les comportements"
 msgid "Migrate Formats"
 msgstr "Migrer les formats"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:184
-#: modules/bibformat/web/admin/bibformatadmin.py:252
-#: modules/bibformat/web/admin/bibformatadmin.py:297
-#: modules/bibformat/web/admin/bibformatadmin.py:1360
+#: modules/bibformat/web/admin/bibformatadmin.py:178
+#: modules/bibformat/web/admin/bibformatadmin.py:246
+#: modules/bibformat/web/admin/bibformatadmin.py:291
+#: modules/bibformat/web/admin/bibformatadmin.py:1354
 msgid "Restricted Output Format"
 msgstr "Format de sortie à accès restreint"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:210
-#: modules/bibformat/web/admin/bibformatadmin.py:511
-#: modules/bibformat/web/admin/bibformatadmin.py:1246
+#: modules/bibformat/web/admin/bibformatadmin.py:204
+#: modules/bibformat/web/admin/bibformatadmin.py:505
+#: modules/bibformat/web/admin/bibformatadmin.py:1240
 msgid "Ok"
 msgstr "Ok"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:212
+#: modules/bibformat/web/admin/bibformatadmin.py:206
 #, python-format
 msgid "Output Format %s Rules"
 msgstr "Règles du format de sortie %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:265
+#: modules/bibformat/web/admin/bibformatadmin.py:259
 #, python-format
 msgid "Output Format %s Attributes"
 msgstr "Attributs du format de sortie %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:310
+#: modules/bibformat/web/admin/bibformatadmin.py:304
 #, python-format
 msgid "Output Format %s Dependencies"
 msgstr "Dépendances du format de sortie %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:377
+#: modules/bibformat/web/admin/bibformatadmin.py:371
 msgid "Delete Output Format"
 msgstr "Supprimer le format de sortie"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:490
-#: modules/bibformat/web/admin/bibformatadmin.py:562
-#: modules/bibformat/web/admin/bibformatadmin.py:1381
+#: modules/bibformat/web/admin/bibformatadmin.py:484
+#: modules/bibformat/web/admin/bibformatadmin.py:556
+#: modules/bibformat/web/admin/bibformatadmin.py:1375
 msgid "Restricted Format Template"
 msgstr "Modèle de formatage à accès restreint"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:516
+#: modules/bibformat/web/admin/bibformatadmin.py:510
 #, python-format
 msgid "Format Template %s"
 msgstr "Modèle de formatage %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:573
+#: modules/bibformat/web/admin/bibformatadmin.py:567
 #, python-format
 msgid "Format Template %s Attributes"
 msgstr "Attributs du modèle de formatage %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:605
+#: modules/bibformat/web/admin/bibformatadmin.py:599
 #, python-format
 msgid "Format Template %s Dependencies"
 msgstr "Dépendances du modèle de formatage %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:659
+#: modules/bibformat/web/admin/bibformatadmin.py:653
 msgid "Delete Format Template"
 msgstr "Supprimer le modèle de formatage"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:873
+#: modules/bibformat/web/admin/bibformatadmin.py:867
 #, python-format
 msgid "Format Element %s Dependencies"
 msgstr "Dépendances de l'élément de formatage %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:906
+#: modules/bibformat/web/admin/bibformatadmin.py:900
 #, python-format
 msgid "Test Format Element %s"
 msgstr "Tester l'élément de formatage %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:978
-#: modules/bibformat/web/admin/bibformatadmin.py:1025
-#: modules/bibformat/web/admin/bibformatadmin.py:1070
-#: modules/bibformat/web/admin/bibformatadmin.py:1117
-#: modules/bibformat/web/admin/bibformatadmin.py:1167
-#: modules/bibformat/web/admin/bibformatadmin.py:1226
-#: modules/bibformat/web/admin/bibformatadmin.py:1301
+#: modules/bibformat/web/admin/bibformatadmin.py:972
+#: modules/bibformat/web/admin/bibformatadmin.py:1019
+#: modules/bibformat/web/admin/bibformatadmin.py:1064
+#: modules/bibformat/web/admin/bibformatadmin.py:1111
+#: modules/bibformat/web/admin/bibformatadmin.py:1161
+#: modules/bibformat/web/admin/bibformatadmin.py:1220
+#: modules/bibformat/web/admin/bibformatadmin.py:1295
 msgid "Unknown Knowledge Base"
 msgstr "Base de connaissances inconnue"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:987
+#: modules/bibformat/web/admin/bibformatadmin.py:981
 #, python-format
 msgid "Knowledge Base %s"
 msgstr "Base de connaissances %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1034
+#: modules/bibformat/web/admin/bibformatadmin.py:1028
 #, python-format
 msgid "Knowledge Base %s Attributes"
 msgstr "Attributs de la base de connaissances %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1079
+#: modules/bibformat/web/admin/bibformatadmin.py:1073
 #, python-format
 msgid "Knowledge Base %s Dependencies"
 msgstr "Dépendances de la base de connaissances %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1289
+#: modules/bibformat/web/admin/bibformatadmin.py:1283
 msgid "Delete Knowledge Base"
 msgstr "Supprimer la base de connaissances"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1374
+#: modules/bibformat/web/admin/bibformatadmin.py:1368
 #, python-format
 msgid "Validation of Output Format %s"
 msgstr "Validation du format de sortie %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1392
+#: modules/bibformat/web/admin/bibformatadmin.py:1386
 #, python-format
 msgid "Validation of Format Template %s"
 msgstr "Validation du modèle de formatage %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1400
+#: modules/bibformat/web/admin/bibformatadmin.py:1394
 msgid "Restricted Format Element"
 msgstr "Élément de formatage à accès restreint"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1408
+#: modules/bibformat/web/admin/bibformatadmin.py:1402
 #, python-format
 msgid "Validation of Format Element %s"
 msgstr "Validation de l'élément de formatage %s"
 
-#: modules/bibformat/web/admin/bibformatadmin.py:1411
+#: modules/bibformat/web/admin/bibformatadmin.py:1405
 msgid "Format Validation"
 msgstr "Validation du format"
 
@@ -1947,7 +1946,7 @@ msgstr "Historique des téléchargements"
 
 #: modules/miscutil/lib/dateutils.py:69 modules/miscutil/lib/dateutils.py:96
 #: modules/webbasket/lib/webbasket.py:170
-#: modules/webbasket/lib/webbasket.py:651
+#: modules/webbasket/lib/webbasket.py:652
 #: modules/websession/lib/webuser.py:272
 #: modules/webstyle/lib/webstyle_templates.py:544
 msgid "N/A"
@@ -2171,6 +2170,23 @@ msgstr ""
 msgid "Thank you!"
 msgstr "Merci!"
 
+#: modules/miscutil/lib/inveniocfg.py:337
+msgid "record ID"
+msgstr "identificateur de notice"
+
+#: modules/miscutil/lib/inveniocfg.py:339
+msgid "word similarity"
+msgstr "similarité de mots"
+
+#: modules/miscutil/lib/inveniocfg.py:340
+msgid "journal impact factor"
+msgstr ""
+
+#: modules/miscutil/lib/inveniocfg.py:341
+#, fuzzy
+msgid "times cited"
+msgstr "Préférences modifiées"
+
 #: modules/miscutil/lib/mailutils.py:144 modules/miscutil/lib/mailutils.py:157
 #, fuzzy
 msgid "Hello:"
@@ -2184,53 +2200,53 @@ msgstr "Meilleures salutations"
 msgid "Need human intervention?  Contact"
 msgstr "Besoin d'une intervention humaine? Veuillez contacter"
 
-#: modules/webaccess/lib/access_control_config.py:173
+#: modules/webaccess/lib/access_control_config.py:168
 #: modules/websession/lib/websession_templates.py:1006
 msgid "Run BibEdit"
 msgstr "Lancer BibEdit"
 
-#: modules/webaccess/lib/access_control_config.py:174
+#: modules/webaccess/lib/access_control_config.py:169
 #: modules/websession/lib/websession_templates.py:1008
 msgid "Configure BibFormat"
 msgstr "Configuer BibFormat"
 
-#: modules/webaccess/lib/access_control_config.py:175
+#: modules/webaccess/lib/access_control_config.py:170
 #: modules/websession/lib/websession_templates.py:1010
 msgid "Configure BibHarvest"
 msgstr "Configurer BibHarvest"
 
-#: modules/webaccess/lib/access_control_config.py:176
+#: modules/webaccess/lib/access_control_config.py:171
 #: modules/websession/lib/websession_templates.py:1012
 #, fuzzy
 msgid "Configure OAI Repository"
 msgstr "Configuer BibFormat"
 
-#: modules/webaccess/lib/access_control_config.py:177
+#: modules/webaccess/lib/access_control_config.py:172
 #: modules/websession/lib/websession_templates.py:1014
 msgid "Configure BibIndex"
 msgstr "Configurer BibIndex"
 
-#: modules/webaccess/lib/access_control_config.py:178
+#: modules/webaccess/lib/access_control_config.py:173
 #: modules/websession/lib/websession_templates.py:1016
 msgid "Configure BibRank"
 msgstr "Configurer BibRank"
 
-#: modules/webaccess/lib/access_control_config.py:179
+#: modules/webaccess/lib/access_control_config.py:174
 #: modules/websession/lib/websession_templates.py:1018
 msgid "Configure WebAccess"
 msgstr "Configurer WebAccess"
 
-#: modules/webaccess/lib/access_control_config.py:180
+#: modules/webaccess/lib/access_control_config.py:175
 #: modules/websession/lib/websession_templates.py:1020
 msgid "Configure WebComment"
 msgstr "Configurer WebComment"
 
-#: modules/webaccess/lib/access_control_config.py:181
+#: modules/webaccess/lib/access_control_config.py:176
 #: modules/websession/lib/websession_templates.py:1022
 msgid "Configure WebSearch"
 msgstr "Configurer WebSearch"
 
-#: modules/webaccess/lib/access_control_config.py:182
+#: modules/webaccess/lib/access_control_config.py:177
 #: modules/websession/lib/websession_templates.py:1024
 msgid "Configure WebSubmit"
 msgstr "Configurer WebSubmit"
@@ -2594,22 +2610,22 @@ msgstr "Afficher les alertes"
 msgid "Your comment has been successfully posted"
 msgstr "Votre commentaire a été ajouté"
 
-#: modules/webbasket/lib/webbasket.py:763
+#: modules/webbasket/lib/webbasket.py:764
 #: modules/webbasket/lib/webbasket_templates.py:98
 msgid "Personal baskets"
 msgstr "Paniers personnels"
 
-#: modules/webbasket/lib/webbasket.py:787
+#: modules/webbasket/lib/webbasket.py:788
 #: modules/webbasket/lib/webbasket_templates.py:105
 msgid "Group baskets"
 msgstr "Paniers de groupes"
 
-#: modules/webbasket/lib/webbasket.py:813
+#: modules/webbasket/lib/webbasket.py:814
 #: modules/webbasket/lib/webbasket_templates.py:112
 msgid "Others' baskets"
 msgstr "Paniers des autres"
 
-#: modules/webbasket/lib/webbasket.py:851
+#: modules/webbasket/lib/webbasket.py:852
 #, python-format
 msgid ""
 "You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
@@ -3708,46 +3724,46 @@ msgstr ""
 "Êtes-vous sûr de vouloir effacer tout le contenu de votre boîte de réception?"
 
 #: modules/webmessage/lib/webmessage_templates.py:573
-#, python-format
-msgid "Quota used: %i messages out of max. %i"
+#, fuzzy, python-format
+msgid "Quota used: %(x_nb_used)i messages out of max. %(x_nb_total)i"
 msgstr "Quota utilisé: %i messages sur max. %i"
 
-#: modules/webmessage/lib/webmessage_templates.py:590
+#: modules/webmessage/lib/webmessage_templates.py:591
 msgid "Please select one or more:"
 msgstr "Veuillez choisir un ou plusieurs:"
 
-#: modules/webmessage/lib/webmessage_templates.py:621
+#: modules/webmessage/lib/webmessage_templates.py:622
 msgid "Add to users"
 msgstr "Ajouter aux utilisateurs"
 
-#: modules/webmessage/lib/webmessage_templates.py:623
+#: modules/webmessage/lib/webmessage_templates.py:624
 msgid "Add to groups"
 msgstr "Ajouter aux groupes"
 
-#: modules/webmessage/lib/webmessage_templates.py:626
+#: modules/webmessage/lib/webmessage_templates.py:627
 msgid "No matching user"
 msgstr "Pas d'utilisateur correspondant"
 
-#: modules/webmessage/lib/webmessage_templates.py:628
+#: modules/webmessage/lib/webmessage_templates.py:629
 #: modules/websession/lib/websession_templates.py:1568
 msgid "No matching group"
 msgstr "Pas de groupe correspondant"
 
-#: modules/webmessage/lib/webmessage_templates.py:665
+#: modules/webmessage/lib/webmessage_templates.py:666
 msgid "Find users or groups:"
 msgstr "Trouver des utilisateurs ou des groupes:"
 
-#: modules/webmessage/lib/webmessage_templates.py:666
+#: modules/webmessage/lib/webmessage_templates.py:667
 msgid "Find a user"
 msgstr "Trouver un utilisateur"
 
-#: modules/webmessage/lib/webmessage_templates.py:667
+#: modules/webmessage/lib/webmessage_templates.py:668
 msgid "Find a group"
 msgstr "Trouver un groupe"
 
-#: modules/webmessage/lib/webmessage_templates.py:682
-#, python-format
-msgid "You have %s new messages out of %s messages"
+#: modules/webmessage/lib/webmessage_templates.py:683
+#, fuzzy, python-format
+msgid "You have %(x_nb_new)s new messages out of %(x_nb_total)s messages"
 msgstr "Vous avez reçu %s nouveaux messages sur un total de %s messages"
 
 #: modules/webmessage/lib/webmessage_webinterface.py:364
@@ -3756,9 +3772,9 @@ msgstr "Lire un message"
 
 #: modules/websearch/lib/search_engine.py:586
 #: modules/websearch/lib/search_engine.py:616
-#: modules/websearch/lib/search_engine.py:3529
-#: modules/websearch/lib/search_engine.py:3579
-#: modules/websearch/lib/search_engine.py:3624
+#: modules/websearch/lib/search_engine.py:3534
+#: modules/websearch/lib/search_engine.py:3584
+#: modules/websearch/lib/search_engine.py:3629
 msgid "Search Results"
 msgstr "Résultats de la recherche"
 
@@ -3800,18 +3816,18 @@ msgstr "ordonner par"
 msgid "HTML brief"
 msgstr "HTML condensé"
 
-#: modules/websearch/lib/search_engine.py:1467
+#: modules/websearch/lib/search_engine.py:1471
 msgid "No values found."
 msgstr "Pas de résultat"
 
-#: modules/websearch/lib/search_engine.py:1598
+#: modules/websearch/lib/search_engine.py:1603
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
 "Aucun résultat précis pour %(x_query1)s n'a été trouvé, remplacement par %"
 "(x_query2)s..."
 
-#: modules/websearch/lib/search_engine.py:1852
+#: modules/websearch/lib/search_engine.py:1857
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -3821,7 +3837,7 @@ msgstr ""
 "autres collections publiques ont donné %(x_url_open)s%(x_nb_hits)d résultats%"
 "(x_url_close)s."
 
-#: modules/websearch/lib/search_engine.py:1861
+#: modules/websearch/lib/search_engine.py:1866
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -3829,15 +3845,15 @@ msgstr ""
 "Aucune collection publique ne satisfait votre requête. Si vous recherchez "
 "des documents non publics, veuillez d'abord choisir la collection restreinte."
 
-#: modules/websearch/lib/search_engine.py:1974
+#: modules/websearch/lib/search_engine.py:1979
 msgid "No words index available for"
 msgstr "Aucun mot indexé n'est disponible pour"
 
-#: modules/websearch/lib/search_engine.py:1978
+#: modules/websearch/lib/search_engine.py:1983
 msgid "No phrase index available for"
 msgstr "Aucune phrase indexée n'est disponible pour"
 
-#: modules/websearch/lib/search_engine.py:2010
+#: modules/websearch/lib/search_engine.py:2015
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
@@ -3846,7 +3862,7 @@ msgstr ""
 "Le terme de recherche %(x_term)s dans l'index %(x_index)s ne se trouve dans "
 "aucune notice. Les termes les plus proches parmi toutes les collections sont:"
 
-#: modules/websearch/lib/search_engine.py:2014
+#: modules/websearch/lib/search_engine.py:2019
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
@@ -3854,7 +3870,7 @@ msgstr ""
 "Le terme de recherche %s ne se trouve dans aucune notice. Les termes les "
 "plus proches parmi toutes les collections sont:"
 
-#: modules/websearch/lib/search_engine.py:2470
+#: modules/websearch/lib/search_engine.py:2475
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -3863,7 +3879,7 @@ msgstr ""
 "Désolé, le tri n'est pas autorisé sur un ensemble de plus de %d notices. Les "
 "notices les plus récentes sont affichées en premier."
 
-#: modules/websearch/lib/search_engine.py:2494
+#: modules/websearch/lib/search_engine.py:2499
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
@@ -3872,26 +3888,26 @@ msgstr ""
 "Désolé, %s n'est pas une option de tri valide. Le tri par titre est utilisé "
 "à la place."
 
-#: modules/websearch/lib/search_engine.py:2779
+#: modules/websearch/lib/search_engine.py:2784
 msgid "Use different search terms."
 msgstr "Utiliser différents termes de recherche"
 
-#: modules/websearch/lib/search_engine.py:2843
-#: modules/websearch/lib/search_engine.py:3009
-#: modules/websearch/lib/search_engine.py:3033
-#: modules/websearch/lib/search_engine.py:3041
-#: modules/websearch/lib/search_engine.py:3049
-#: modules/websearch/lib/search_engine.py:3095
+#: modules/websearch/lib/search_engine.py:2848
+#: modules/websearch/lib/search_engine.py:3014
+#: modules/websearch/lib/search_engine.py:3038
+#: modules/websearch/lib/search_engine.py:3046
+#: modules/websearch/lib/search_engine.py:3054
+#: modules/websearch/lib/search_engine.py:3100
 msgid "The record has been deleted."
 msgstr "La notice a été supprimée."
 
-#: modules/websearch/lib/search_engine.py:3737
+#: modules/websearch/lib/search_engine.py:3742
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Pas de résultat pour l'intervalle de temps spécifé, la condition n'est pas "
 "prise en compte..."
 
-#: modules/websearch/lib/search_engine.py:3761
+#: modules/websearch/lib/search_engine.py:3766
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Pas de résultat pour les limites spécifiées, la condition n'est pas prise en "
@@ -3922,9 +3938,8 @@ msgid "Usage statistics"
 msgstr ""
 
 #: modules/websearch/lib/websearchadminlib.py:3205
-#, fuzzy
 msgid "Fulltext"
-msgstr "Bulletin"
+msgstr "Plein texte"
 
 #: modules/websearch/lib/websearch_templates.py:537
 #, python-format
@@ -3932,7 +3947,7 @@ msgid "Search %s records for:"
 msgstr "Chercher dans %s notices:"
 
 #: modules/websearch/lib/websearch_templates.py:571
-#: modules/websearch/lib/websearch_templates.py:1719
+#: modules/websearch/lib/websearch_templates.py:1721
 msgid "Advanced Search"
 msgstr "Recherche avancée"
 
@@ -3942,7 +3957,7 @@ msgid "Search %s records for"
 msgstr "Chercher dans %s notices:"
 
 #: modules/websearch/lib/websearch_templates.py:688
-#: modules/websearch/lib/websearch_templates.py:1635
+#: modules/websearch/lib/websearch_templates.py:1637
 msgid "Simple Search"
 msgstr "Recherche simple"
 
@@ -3951,23 +3966,23 @@ msgid "Search options:"
 msgstr "Options de recherche:"
 
 #: modules/websearch/lib/websearch_templates.py:768
-#: modules/websearch/lib/websearch_templates.py:1813
+#: modules/websearch/lib/websearch_templates.py:1815
 #, fuzzy
 msgid "Added/modified since:"
 msgstr "Ajouté depuis:"
 
 #: modules/websearch/lib/websearch_templates.py:769
-#: modules/websearch/lib/websearch_templates.py:1814
+#: modules/websearch/lib/websearch_templates.py:1816
 msgid "until:"
 msgstr "jusqu'à:"
 
 #: modules/websearch/lib/websearch_templates.py:775
-#: modules/websearch/lib/websearch_templates.py:1855
+#: modules/websearch/lib/websearch_templates.py:1857
 msgid "Display results:"
 msgstr "Afficher:"
 
 #: modules/websearch/lib/websearch_templates.py:776
-#: modules/websearch/lib/websearch_templates.py:1856
+#: modules/websearch/lib/websearch_templates.py:1858
 msgid "Output format:"
 msgstr "Format de sortie:"
 
@@ -4001,9 +4016,9 @@ msgid "This collection does not contain any document yet."
 msgstr "Cette collection ne contient pas encore de document."
 
 #: modules/websearch/lib/websearch_templates.py:1155
-#: modules/websearch/lib/websearch_templates.py:2800
-#: modules/websearch/lib/websearch_templates.py:2853
-#: modules/websearch/lib/websearch_templates.py:2880
+#: modules/websearch/lib/websearch_templates.py:2802
+#: modules/websearch/lib/websearch_templates.py:2855
+#: modules/websearch/lib/websearch_templates.py:2882
 msgid "more"
 msgstr "davantage"
 
@@ -4012,20 +4027,20 @@ msgid "Latest additions:"
 msgstr "Derniers ajouts:"
 
 #: modules/websearch/lib/websearch_templates.py:1259
-#: modules/websearch/lib/websearch_templates.py:2580
-#: modules/websearch/lib/websearch_templates.py:2586
-#: modules/websearch/lib/websearch_templates.py:2591
+#: modules/websearch/lib/websearch_templates.py:2582
+#: modules/websearch/lib/websearch_templates.py:2588
+#: modules/websearch/lib/websearch_templates.py:2593
 msgid "Detailed record"
 msgstr "Notice détaillée"
 
 #: modules/websearch/lib/websearch_templates.py:1262
-#: modules/websearch/lib/websearch_templates.py:2598
+#: modules/websearch/lib/websearch_templates.py:2600
 #: modules/webstyle/lib/webstyle_templates.py:763
 msgid "Similar records"
 msgstr "Notices similaires"
 
 #: modules/websearch/lib/websearch_templates.py:1268
-#: modules/websearch/lib/websearch_templates.py:2606
+#: modules/websearch/lib/websearch_templates.py:2608
 msgid "Cited by"
 msgstr "Cité par"
 
@@ -4042,91 +4057,91 @@ msgid "Words nearest to %(x_word)s in any collection are:"
 msgstr ""
 "Les mots les plus proches de %(x_word)s parmi toutes les collections sont:"
 
-#: modules/websearch/lib/websearch_templates.py:1431
+#: modules/websearch/lib/websearch_templates.py:1433
 msgid "Hits"
 msgstr "Résultats"
 
-#: modules/websearch/lib/websearch_templates.py:1496
-#: modules/websearch/lib/websearch_templates.py:2073
+#: modules/websearch/lib/websearch_templates.py:1498
+#: modules/websearch/lib/websearch_templates.py:2075
 msgid "next"
 msgstr "suivant"
 
-#: modules/websearch/lib/websearch_templates.py:1762
+#: modules/websearch/lib/websearch_templates.py:1764
 msgid "collections"
 msgstr "collections"
 
-#: modules/websearch/lib/websearch_templates.py:1784
+#: modules/websearch/lib/websearch_templates.py:1786
 msgid "Limit to:"
 msgstr "Limiter à:"
 
-#: modules/websearch/lib/websearch_templates.py:1825
+#: modules/websearch/lib/websearch_templates.py:1827
 #: modules/websearch/lib/websearch_webcoll.py:527
 msgid "results"
 msgstr "résultats"
 
-#: modules/websearch/lib/websearch_templates.py:1854
+#: modules/websearch/lib/websearch_templates.py:1856
 #, fuzzy
 msgid "Sort :"
 msgstr "Trier par:"
 
-#: modules/websearch/lib/websearch_templates.py:1860
+#: modules/websearch/lib/websearch_templates.py:1862
 #: modules/websearch/lib/websearch_webcoll.py:497
 msgid "asc."
 msgstr "croissant"
 
-#: modules/websearch/lib/websearch_templates.py:1863
+#: modules/websearch/lib/websearch_templates.py:1865
 #: modules/websearch/lib/websearch_webcoll.py:498
 msgid "desc."
 msgstr "décroissant"
 
-#: modules/websearch/lib/websearch_templates.py:1869
+#: modules/websearch/lib/websearch_templates.py:1871
 #: modules/websearch/lib/websearch_webcoll.py:541
 msgid "single list"
 msgstr "liste unique"
 
-#: modules/websearch/lib/websearch_templates.py:1872
+#: modules/websearch/lib/websearch_templates.py:1874
 #: modules/websearch/lib/websearch_webcoll.py:540
 msgid "split by collection"
 msgstr "regrouper par collection"
 
-#: modules/websearch/lib/websearch_templates.py:1907
+#: modules/websearch/lib/websearch_templates.py:1909
 msgid "MARC tag"
 msgstr "Champ MARC"
 
-#: modules/websearch/lib/websearch_templates.py:2024
-#: modules/websearch/lib/websearch_templates.py:2029
-#: modules/websearch/lib/websearch_templates.py:2317
+#: modules/websearch/lib/websearch_templates.py:2026
+#: modules/websearch/lib/websearch_templates.py:2031
+#: modules/websearch/lib/websearch_templates.py:2319
 #, python-format
 msgid "%s records found"
 msgstr "%s notices trouvées"
 
-#: modules/websearch/lib/websearch_templates.py:2056
+#: modules/websearch/lib/websearch_templates.py:2058
 msgid "begin"
 msgstr "début"
 
-#: modules/websearch/lib/websearch_templates.py:2061
+#: modules/websearch/lib/websearch_templates.py:2063
 #: modules/websubmit/lib/websubmit_templates.py:1190
 msgid "previous"
 msgstr "précédent"
 
-#: modules/websearch/lib/websearch_templates.py:2080
+#: modules/websearch/lib/websearch_templates.py:2082
 msgid "end"
 msgstr "fin"
 
-#: modules/websearch/lib/websearch_templates.py:2100
+#: modules/websearch/lib/websearch_templates.py:2102
 msgid "jump to record:"
 msgstr "aller vers la notice:"
 
-#: modules/websearch/lib/websearch_templates.py:2113
+#: modules/websearch/lib/websearch_templates.py:2115
 #, python-format
 msgid "Search took %s seconds."
 msgstr "La recherche a duré %s secondes."
 
-#: modules/websearch/lib/websearch_templates.py:2215
+#: modules/websearch/lib/websearch_templates.py:2217
 msgid "ADD TO BASKET"
 msgstr "AJOUTER AU PANIER"
 
-#: modules/websearch/lib/websearch_templates.py:2304
+#: modules/websearch/lib/websearch_templates.py:2306
 #, python-format
 msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
@@ -4135,40 +4150,40 @@ msgstr ""
 "%(x_fmt_open)sVue d'ensemble sur les résultats:%(x_fmt_close)s Trouvé %"
 "(x_nb_records)s notices en %(x_nb_seconds)s secondes."
 
-#: modules/websearch/lib/websearch_templates.py:2344
+#: modules/websearch/lib/websearch_templates.py:2346
 msgid ""
 "Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
 "La requête booléenne n'a rien donné. Essayez de combiner les termes de "
 "recherche différemment."
 
-#: modules/websearch/lib/websearch_templates.py:2376
+#: modules/websearch/lib/websearch_templates.py:2378
 msgid "See also: similar author names"
 msgstr "Voir aussi: noms d'auteurs similaires"
 
-#: modules/websearch/lib/websearch_templates.py:2688
+#: modules/websearch/lib/websearch_templates.py:2690
 #: modules/websearch/lib/websearch_webinterface.py:609
 #, python-format
 msgid "Collection %s Not Found"
 msgstr "Collection %s introuvable"
 
-#: modules/websearch/lib/websearch_templates.py:2700
+#: modules/websearch/lib/websearch_templates.py:2702
 #: modules/websearch/lib/websearch_webinterface.py:607
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
 msgstr "Désolé, la collection %s n'existe pas."
 
-#: modules/websearch/lib/websearch_templates.py:2702
+#: modules/websearch/lib/websearch_templates.py:2704
 #: modules/websearch/lib/websearch_webinterface.py:608
 #, python-format
 msgid "You may want to start browsing from %s."
 msgstr "Vous pouvez recommencer à chercher depuis %s."
 
-#: modules/websearch/lib/websearch_templates.py:2732
+#: modules/websearch/lib/websearch_templates.py:2734
 msgid "Interested in being notified about new results for this query?"
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:2733
+#: modules/websearch/lib/websearch_templates.py:2735
 #, python-format
 msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
@@ -4176,25 +4191,25 @@ msgid ""
 "%(x_url2_close)s."
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:2793
+#: modules/websearch/lib/websearch_templates.py:2795
 msgid "People who downloaded this document also downloaded:"
 msgstr "Les utilisateurs qui ont téléchargé ce document ont aussi téléchargé:"
 
-#: modules/websearch/lib/websearch_templates.py:2809
+#: modules/websearch/lib/websearch_templates.py:2811
 msgid "People who viewed this page also viewed:"
 msgstr "Les utilisateurs qui ont vu cette page ont aussi vu:"
 
-#: modules/websearch/lib/websearch_templates.py:2842
+#: modules/websearch/lib/websearch_templates.py:2844
 #, python-format
 msgid "Cited by: %s records"
 msgstr "Cité par: %s notices"
 
-#: modules/websearch/lib/websearch_templates.py:2868
+#: modules/websearch/lib/websearch_templates.py:2870
 #, python-format
 msgid ".. of which self-citations: %s records"
 msgstr "parmi lesquelles auto-citations: %s notices"
 
-#: modules/websearch/lib/websearch_templates.py:2873
+#: modules/websearch/lib/websearch_templates.py:2875
 #, python-format
 msgid "Co-cited with: %s records"
 msgstr "Co-cité avec: %s notices"
@@ -5670,7 +5685,7 @@ msgid ""
 msgstr ""
 "Notice créée le %(x_date_creation)s, modifiée le %(x_date_modification)s"
 
-#: modules/webstyle/lib/webdoc.py:541
+#: modules/webstyle/lib/webdoc.py:542
 #, python-format
 msgid "%(category)s Pages"
 msgstr ""
@@ -6768,6 +6783,13 @@ msgstr ""
 #: modules/webjournal/lib/webjournal_config.py:630
 msgid "Available journals"
 msgstr ""
+
+#~ msgid ""
+#~ "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)"
+#~ "s."
+#~ msgstr ""
+#~ "Vous pouvez retoruner à %(x_url_open)sl'interface d'administration de "
+#~ "BibEdit%(x_url_close)s."
 
 #, fuzzy
 #~ msgid "No Articles"
