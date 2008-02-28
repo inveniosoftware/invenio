@@ -131,6 +131,7 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
         """Wrap a single row"""
         spaces = _RE_BEGINNING_SPACES.match(row).group()
         row = row[len(spaces):]
+        spaces = spaces.expandtabs()
         return wrap(row, initial_indent=spaces, subsequent_indent=spaces, width=max_col)
 
     astyle = CFG_WRAP_TEXT_IN_A_BOX_STYLES['__DEFAULT']
@@ -149,13 +150,29 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     tmp_rows = [_wrap_row(row, max_col) for row in body.split('\n')]
     body_rows = []
     for rows in tmp_rows:
-        body_rows += rows
+        if rows:
+            body_rows += rows
+        else:
+            body_rows.append('')
+    if not ''.join(body_rows).strip():
+        # Concrete empty body
+        body_rows = []
+
     tmp_rows = [_wrap_row(row, max_col) for row in title.split('\n')]
     title_rows = []
     for rows in tmp_rows:
-        title_rows += rows
+        if rows:
+            title_rows += rows
+        else:
+            title_rows.append('')
+    if not ''.join(title_rows).strip():
+        # Concrete empty title
+        title_rows = []
 
-    max_col = max([len(row) for row in body_rows + title_rows])
+    try:
+        max_col = max([len(row) for row in body_rows + title_rows])
+    except ValueError:
+        max_col = 0
 
     mid_top_border_len = max_col + len(border[3]) + len(border[4]) - len(border[0]) - len(border[2])
     mid_bottom_border_len = max_col + len(border[3]) + len(border[4]) - len(border[5]) - len(border[7])
