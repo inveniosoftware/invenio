@@ -337,10 +337,22 @@ def reset_fieldnames(conf):
                   _("record ID"),]
 
         ranking_methods = [_("word similarity"),
-                           _("journal impact factor"),]
+                           _("journal impact factor"),
+                           _("times cited"),]
 
         ## update I18N field names for every language:
-        # FIXME
+
+# FIXME
+
+# INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'en','ln','word similarity');
+# INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'fr','ln','similarité de mots');
+
+# INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'en','ln','journal impact factor');
+# INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'fr','ln','journal impact factor');
+
+# INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'en','ln','citation');
+# INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'fr','ln','citation');
+
     print ">>> I18N field names reset successfully."
 
 def test_db_connection():
@@ -684,7 +696,8 @@ def main():
             confdir = re.sub(r'/bin$', '/etc', sys.path[0])
         ## read conf files:
         for conffile in [confdir + os.sep + 'invenio.conf',
-                         confdir + os.sep + 'invenio-autotools.conf']:
+                         confdir + os.sep + 'invenio-autotools.conf',
+                         confdir + os.sep + 'invenio-local.conf',]:
             if os.path.exists(conffile):
                 conf.read(conffile)
             else:
