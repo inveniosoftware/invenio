@@ -1440,7 +1440,7 @@ class Template:
 
             query = {'c': colls,
                      'ln': ln,
-                     'p': '"%s"' % phrase,
+                     'p': phrase,
                      'f': f}
 
             out += """<tr>
@@ -1462,7 +1462,7 @@ class Template:
             for phrase, nbhits in browsed_phrases_in_colls[:-1]:
                 query = {'c': colls,
                          'ln': ln,
-                         'p': '"%s"' % phrase,
+                         'p': phrase,
                          'f': f}
 
                 out += """<tr>
