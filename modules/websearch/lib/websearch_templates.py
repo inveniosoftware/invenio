@@ -1393,13 +1393,15 @@ class Template:
         out += "</table>"
         return intro + "<blockquote>" + out + "</blockquote>"
 
-    def tmpl_browse_pattern(self, f, ln, browsed_phrases_in_colls, colls):
+    def tmpl_browse_pattern(self, f, fn, ln, browsed_phrases_in_colls, colls):
         """
           Displays the *Nearest search terms* box
 
         Parameters:
 
-          - 'f' *string* - a field name (i18nized)
+          - 'f' *string* - field (*not* i18nized)
+
+          - 'fn' *string* - field name (i18nized)
 
           - 'ln' *string* - The language to display
 
@@ -1416,20 +1418,20 @@ class Template:
         out = """<table class="searchresultsbox">
               <thead>
                <tr>
-                <th class="searchresultsboxheader" align="left">
+                <th class="searchresultsboxheader" style="text-align: right;">
                   %(hits)s
                 </th>
                 <th class="searchresultsboxheader" width="15">
                   &nbsp;
                 </th>
-                <th class="searchresultsboxheader" align="left">
-                  %(f)s
+                <th class="searchresultsboxheader" style="text-align: left;">
+                  %(fn)s
                 </th>
                </tr>
               </thead>
               <tbody>""" % {
                 'hits' : _("Hits"),
-                'f' : cgi.escape(f)
+                'fn' : cgi.escape(fn)
               }
 
         if len(browsed_phrases_in_colls) == 1:
@@ -1442,13 +1444,13 @@ class Template:
                      'f': f}
 
             out += """<tr>
-                       <td class="searchresultsboxbody" align="right">
+                       <td class="searchresultsboxbody" style="text-align: right;">
                         %(nbhits)s
                        </td>
                        <td class="searchresultsboxbody" width="15">
                         &nbsp;
                        </td>
-                       <td class="searchresultsboxbody" align="left">
+                       <td class="searchresultsboxbody" style="text-align: left;">
                         %(link)s
                        </td>
                       </tr>""" % {'nbhits': nbhits,
@@ -1464,13 +1466,13 @@ class Template:
                          'f': f}
 
                 out += """<tr>
-                           <td class="searchresultsboxbody" align="right">
+                           <td class="searchresultsboxbody" style="text-align: right;">
                             %(nbhits)s
                            </td>
                            <td class="searchresultsboxbody" width="15">
                             &nbsp;
                            </td>
-                           <td class="searchresultsboxbody" align="left">
+                           <td class="searchresultsboxbody" style="text-align: left;">
                             %(link)s
                            </td>
                           </tr>""" % {'nbhits' : nbhits,

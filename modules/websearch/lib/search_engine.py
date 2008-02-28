@@ -1490,7 +1490,8 @@ def browse_pattern(req, colls, p, f, rg, ln=cdslang):
 
     ## display results now:
     out = websearch_templates.tmpl_browse_pattern(
-            f=get_field_i18nname(f, ln),
+            f=f,
+            fn=get_field_i18nname(f, ln),
             ln=ln,
             browsed_phrases_in_colls=browsed_phrases_in_colls,
             colls=colls,
@@ -3510,11 +3511,11 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
         try:
             if as == 1 or (p1 or p2 or p3):
-                browse_pattern(req, colls_to_search, p1, f1, rg)
-                browse_pattern(req, colls_to_search, p2, f2, rg)
-                browse_pattern(req, colls_to_search, p3, f3, rg)
+                browse_pattern(req, colls_to_search, p1, f1, rg, ln)
+                browse_pattern(req, colls_to_search, p2, f2, rg, ln)
+                browse_pattern(req, colls_to_search, p3, f3, rg, ln)
             else:
-                browse_pattern(req, colls_to_search, p, f, rg)
+                browse_pattern(req, colls_to_search, p, f, rg, ln)
         except:
             if of.startswith("h"):
                 req.write(create_error_box(req, verbose=verbose, ln=ln))
