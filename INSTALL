@@ -198,7 +198,8 @@ Contents
 1b. Configuration
 -----------------
 
-      $ vi ./config/invenio.conf
+      $ emacs /opt/cds-invenio/etc/invenio.conf
+      $ emacs /opt/cds-invenio/etc/invenio-local.conf
       $ /opt/cds-invenio/bin/inveniocfg --update-all
       $ /opt/cds-invenio/bin/inveniocfg --create-tables
       $ /opt/cds-invenio/bin/inveniocfg --create-apache-conf
@@ -391,12 +392,36 @@ Contents
     Once the basic software installation is done, we proceed by
     configuring your Invenio system.
           
-      $ vi ./config/invenio.conf
+      $ emacs /opt/cds-invenio/etc/invenio.conf
+      $ emacs /opt/cds-invenio/etc/invenio-local.conf
 
-          Customize your CDS Invenio installation.  You should edit at
-          least the top of this file where you can define some very
-          essential runtime parameters such as the visible URL of your
-          document server (look for WEBURL and SWEBURL), the database
+          Customize your CDS Invenio installation.  The 'invenio.conf'
+          file contains the vanilla default configuration parameters
+          of a CDS Invenio installation, as coming from the
+          distribution.  You could in principle go ahead and change
+          the values according to your local needs.
+
+          However, you can also create a file named
+          'invenio-local.conf' in the same directory where
+          'invenio.conf' lives and put there only the localizations
+          you need to have different from the default ones.  For
+          example:
+
+             $ cat /opt/cds-invenio/etc/invenio-local.conf
+             [Essential parameters]
+             WEBURL = http://your.site.com
+             SWEBURL = https://your.site.com
+         
+          The Invenio system will then read both the default
+          invenio.conf file and your customized invenio-local.conf
+          file and it will override any default options with the ones
+          you have set in your local file.  This cascading of
+          configuration parameters will ease you future upgrades.
+
+          You should override at least the parameters from the top of
+          invenio.conf file in order to define some very essential
+          runtime parameters such as the visible URL of your document
+          server (look for WEBURL and SWEBURL), the database
           credentials (look for CFG_DATABASE_*), the name of your
           document server (look for CDSNAME and CDSNAMEINTL), or the
           email address of the local CDS Invenio administrator (look
