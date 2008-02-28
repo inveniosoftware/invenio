@@ -940,7 +940,7 @@ class WordTable:
             return None
         write_message("updating last_updated to %s...", starting_time, verbose=9)
         return run_sql("UPDATE idxINDEX SET last_updated=%s WHERE id=%s",
-                       (starting_time, self.tablename[-3:-1],))
+                       (starting_time, self.index_id,))
 
     def add_recIDs(self, recIDs, opt_flush):
         """Fetches records which id in the recIDs range list and adds
@@ -1504,7 +1504,7 @@ def task_run_core():
                 else:
                     wordTable.add_recIDs_by_date(task_get_option("modified"), task_get_option("flush"))
                     # only update last_updated if run via automatic mode:
-                    #wordTable.update_last_updated(task_get_task_param('task_starting_time'))
+                    wordTable.update_last_updated(task_get_task_param('task_starting_time'))
             elif task_get_option("cmd") == "repair":
                 wordTable.repair(task_get_option("flush"))
             else:
