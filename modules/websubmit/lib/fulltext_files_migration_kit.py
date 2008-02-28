@@ -25,6 +25,7 @@ compatible with file.py structure, but the viceversa is not true).
 """
 
 import sys
+from invenio.textutils import wrap_text_in_a_box
 from invenio.config import logdir, supportemail
 from invenio.dbquery import run_sql, OperationalError
 from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
@@ -38,8 +39,8 @@ def retrieve_fulltext_recids():
 
 def fix_recid(recid, logfile):
     """Fix a given recid."""
-    print "Fixing record %s ->" % recid,
-    print >> logfile, "Fixing record %s:" % recid
+    print "Upgrading record %s ->" % recid,
+    print >> logfile, "Upgrading record %s:" % recid
 
     bibrec = BibRecDocs(recid)
     print >> logfile, bibrec
@@ -82,54 +83,44 @@ def backup_tables(drop=False):
 
 def check_yes():
     """Return True if the user types 'yes'."""
-    return raw_input().strip() == 'yes'
+    try:
+        return raw_input().strip() == 'yes'
+    except KeyboardInterrupt:
+        return False
 
 def main():
     """Core loop."""
     recids = retrieve_fulltext_recids()
-    print "*******************************************************************"
-    print "* This script migrate the filesystem structure used to store      *"
-    print "* fulltext files to the new stricter structure.                   *"
-    print "* This script must not be run during normal Invenio operations.   *"
-    print "* It is safe to run this script. No file will be deleted.         *"
-    print "* Anyway it is recommended to run a backup of the filesystem      *"
-    print "* structure just in case.                                         *"
-    print "* A backup of the database tables involved will be automatically  *"
-    print "* performed.                                                      *"
-    print "*******************************************************************"
-    print
+    print wrap_text_in_a_box ("""This script migrate the filesystem structure used to store fulltext files to the new stricter structure.
+This script must not be run during normal Invenio operations.
+It is safe to run this script. No file will be deleted.
+Anyway it is recommended to run a backup of the filesystem structure just in case.
+A backup of the database tables involved will be automatically performed.""", style='important')
     print "%s records will be migrated/fixed." % len(recids)
     print "Please type yes if you want to go further:",
 
     if not check_yes():
         print "INTERRUPTED"
         sys.exit(1)
-    print "-" * 40
-    print "Backing up database tables",
+    print "Backing up database tables"
     try:
         if not backup_tables():
-            print
-            print "*******************************************************************"
-            print "* It appears that is not the first time that you run this script. *"
-            print "* Backup tables have been already created by a previous run.      *"
-            print "* In order for the script to go further they need to be removed.  *"
-            print "*******************************************************************"
-            print
+            print wrap_text_in_a_box("""It appears that is not the first time that you run this script.
+Backup tables have been already created by a previous run.
+In order for the script to go further they need to be removed.""", style='important')
+
             print "Please, type yes if you agree to remove them and go further:",
 
             if not check_yes():
-                print "INTERRUPTED"
+                wrap_text_in_a_box("INTERRUPTED", style='conclusion')
                 sys.exit(1)
-            print "-" * 40
             print "Backing up database tables (after dropping previous backup)",
             backup_tables()
             print "-> OK"
         else:
             print "-> OK"
     except Exception, e:
-        print
-        print "Unexpected error while backing up tables. Please, do your checks."
-        print e
+        wrap_text_in_a_box("Unexpected error while backing up tables. Please, do your checks: %s" % e, style='conclusion')
         sys.exit(1)
 
     logfilename = '%s/fulltext_files_migration_kit-%s.log' % (logdir, datetime.today().strftime('%Y%m%d%H%M%S'))
@@ -137,15 +128,11 @@ def main():
     print "Created a complete log file into %s" % logfilename
     for recid in recids:
         if not fix_recid(recid, logfile):
-            print "-" * 40
-            print "INTERRUPTED BECAUSE OF ERROR!"
-            print "Please see the log file %s for what was the status of " % logfilename
-            print "record %s prior to the error." % recid
-            print "Contact %s in case of problems, attaching the log." % supportemail
             logfile.close()
+            wrap_text_in_a_box(title="INTERRUPTED BECAUSE OF ERROR!", body="""Please see the log file %s for what was the status of " % logfilename record %s prior to the error. Contact %s in case of problems, attaching the log.""" % (logfilename, recid, supportemail),
+            style='conclusion')
             sys.exit(1)
-    print "-" * 40
-    print "DONE"
+    print wrap_text_in_a_box("DONE", style='conclusion')
 
 if __name__ == '__main__':
     main()

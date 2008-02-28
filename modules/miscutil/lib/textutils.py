@@ -32,12 +32,13 @@ CFG_WRAP_TEXT_IN_A_BOX_STYLES = {
     '__DEFAULT' : {
         'horiz_sep' : '*',
         'max_col' : 72,
+        'min_col' : 40,
         'tab_str' : '    ',
         'tab_num' : 0,
         'border' : ('**', '*', '**', '** ', ' **', '**', '*', '**'),
         'prefix' : '\n',
         'suffix' : '\n',
-        'force_horiz' : False
+        'force_horiz' : False,
     },
     'squared' : {
         'horiz_sep' : '-',
@@ -65,8 +66,12 @@ CFG_WRAP_TEXT_IN_A_BOX_STYLES = {
     'conclusion' : {
         'border' : ('', '', '', '', '', '', '', ''),
         'prefix' : '',
+        'horiz_sep' : '-',
         'force_horiz' : True,
-    }
+    },
+    'important' : {
+        'tab_num' : 1,
+    },
 }
 
 def indent_text(text,
@@ -107,6 +112,7 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
             separator row between the title and the body (if needed)
         @param max_col the maximum number of coulmns used by the box (including
             indentation)
+        @param min_col the symmetrical minimum number of columns
         @param tab_str a string to represent indentation
         @param tab_num the number of leveles of indentations
         @param border a tuple of 8 element in the form (tl, t, tr, l, r, bl, b, br)
@@ -143,6 +149,7 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     border = astyle['border']
     tab_str = astyle['tab_str'] * astyle['tab_num']
     max_col = astyle['max_col'] - len(border[3]) - len(border[4]) - len(tab_str)
+    min_col = astyle['min_col']
     prefix = astyle['prefix']
     suffix = astyle['suffix']
     force_horiz = astyle['force_horiz']
@@ -173,6 +180,8 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
         max_col = max([len(row) for row in body_rows + title_rows])
     except ValueError:
         max_col = 0
+
+    max_col = max(max_col, min_col)
 
     mid_top_border_len = max_col + len(border[3]) + len(border[4]) - len(border[0]) - len(border[2])
     mid_bottom_border_len = max_col + len(border[3]) + len(border[4]) - len(border[5]) - len(border[7])
