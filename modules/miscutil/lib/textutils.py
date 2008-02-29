@@ -38,6 +38,7 @@ CFG_WRAP_TEXT_IN_A_BOX_STYLES = {
         'border' : ('**', '*', '**', '** ', ' **', '**', '*', '**'),
         'prefix' : '\n',
         'suffix' : '\n',
+        'break_long' : False,
         'force_horiz' : False,
     },
     'squared' : {
@@ -132,6 +133,8 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
             different corners and sides of the box
         @param prefix a prefix string added before the box
         @param suffix a suffix string added after the box
+        @param break_long wethever to break long words in order to respect
+            max_col
         @param force_horiz True in order to print the horizontal line even when
             there is no title
 
@@ -148,13 +151,14 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
 
     """
 
-    def _wrap_row(row, max_col):
+    def _wrap_row(row, max_col, break_long):
         """Wrap a single row"""
         spaces = _RE_BEGINNING_SPACES.match(row).group()
         row = row[len(spaces):]
         spaces = spaces.expandtabs()
         return textwrap.wrap(row, initial_indent=spaces,
-            subsequent_indent=spaces, width=max_col)
+            subsequent_indent=spaces, width=max_col,
+            break_long_words=break_long)
 
     astyle = dict(CFG_WRAP_TEXT_IN_A_BOX_STYLES['__DEFAULT'])
     if CFG_WRAP_TEXT_IN_A_BOX_STYLES.has_key(style):
@@ -170,8 +174,10 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     prefix = astyle['prefix']
     suffix = astyle['suffix']
     force_horiz = astyle['force_horiz']
+    break_long = astyle['break_long']
 
-    tmp_rows = [_wrap_row(row, max_col) for row in body.split('\n')]
+    tmp_rows = [_wrap_row(row, max_col, break_long)
+                        for row in body.split('\n')]
     body_rows = []
     for rows in tmp_rows:
         if rows:
@@ -182,7 +188,8 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
         # Concrete empty body
         body_rows = []
 
-    tmp_rows = [_wrap_row(row, max_col) for row in title.split('\n')]
+    tmp_rows = [_wrap_row(row, max_col, break_long)
+                        for row in title.split('\n')]
     title_rows = []
     for rows in tmp_rows:
         if rows:

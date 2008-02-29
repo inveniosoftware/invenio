@@ -159,8 +159,8 @@ def create_record(xmltext,
             t = """<?xml version="1.0" encoding="UTF-8"?>
             <!DOCTYPE collection SYSTEM "file://%s">
             <collection>\n""" % CFG_MARC21_DTD
-            t = "%s%s" % (t, xmltext)
-            t = "%s</collection>" % t
+            t += str(xmltext)
+            t += "</collection>"
             xmltext = t
             (rec, er) = create_record_RXP(xmltext, verbose, correct)
         elif parser == 1:
@@ -571,7 +571,7 @@ def record_xml_output(rec, tags=[]):
         record_order_fields(fields)
         for field in fields:
             xmltext += str(field_xml_output(field[1], field[0]))
-    xmltext = "%s</record>" % xmltext
+    xmltext += "</record>"
     return xmltext
 
 def records_xml_output(listofrec):
@@ -581,8 +581,8 @@ def records_xml_output(listofrec):
     <collection>\n""" % CFG_MARC21_DTD
 
     for rec in listofrec:
-        xmltext = "%s%s" % (xmltext, record_xml_output(rec))
-    xmltext = "%s</collection>" % xmltext
+        xmltext += str(record_xml_output(rec))
+    xmltext += "</collection>"
     return xmltext
 
 def field_get_subfield_instances(field):
@@ -686,7 +686,7 @@ def create_record_RXP(xmltext,
         else:
             record[s] = [field]
 
-        ord = ord + 1
+        ord += 1
 
     for datafield in childs_datafield:
 
@@ -732,7 +732,7 @@ def create_record_RXP(xmltext,
         else:
             record[s] = [field]
 
-        ord = ord+1
+        ord += 1
 
     return (record, err)
 
@@ -778,7 +778,7 @@ def create_record_minidom(xmltext,
             record[s].append(field)
         else:
             record[s] = [field]
-        ord = ord + 1
+        ord += 1
 
     for datafield in get_childs_by_tag_name(root, "datafield"):
         subfields = []
@@ -804,7 +804,7 @@ def create_record_minidom(xmltext,
             record[s].append((subfields, ind1, ind2, "", ord))
         else:
             record[s] = [(subfields, ind1, ind2, "", ord)]
-        ord = ord + 1
+        ord += 1
 
     return (record, err)
 
@@ -853,7 +853,7 @@ def create_record_4suite(xmltext,
             record[s].append(field)
         else:
             record[s] = [field]
-        ord = ord + 1
+        ord += 1
 
     for datafield in get_childs_by_tag_name(root, "datafield"):
         subfields = []
@@ -880,7 +880,7 @@ def create_record_4suite(xmltext,
             record[s].append((subfields, ind1, ind2, "", ord))
         else:
             record[s] = [(subfields, ind1, ind2, "", ord)]
-        ord = ord + 1
+        ord += 1
 
     return (record, err)
 
@@ -916,12 +916,12 @@ def field_xml_output(field, tag):
     """generates the XML for field 'field' and returns it as a string"""
     xmltext = ""
     if field[3] != "":
-        xmltext = "%s  <controlfield tag=\"%s\">%s</controlfield>\n" % (xmltext, tag, encode_for_xml(field[3]))
+        xmltext += "  <controlfield tag=\"%s\">%s</controlfield>\n" % (tag, encode_for_xml(field[3]))
     else:
-        xmltext = "%s  <datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">\n" % (xmltext, tag, field[1], field[2])
+        xmltext += "  <datafield tag=\"%s\" ind1=\"%s\" ind2=\"%s\">\n" % (tag, field[1], field[2])
         for subfield in field[0]:
-            xmltext = "%s%s" % (xmltext, subfield_xml_output(subfield))
-        xmltext = "%s </datafield>\n" % xmltext
+            xmltext += str(subfield_xml_output(subfield))
+        xmltext += "  </datafield>\n"
     return xmltext
 
 def subfield_xml_output(subfield):

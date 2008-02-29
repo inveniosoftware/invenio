@@ -28,7 +28,6 @@ import cgi
 
 # Invenio imports
 from invenio.messages import gettext_set_language
-from invenio.textutils import indent_text
 from invenio.config import weburl, sweburl
 from invenio.messages import language_list_long
 from invenio.config import CFG_PATH_PHP

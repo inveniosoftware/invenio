@@ -88,7 +88,7 @@ def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order
     warnings = []
     nb_reviews = 0
     nb_comments = 0
-    
+
     # wash arguments
     recID = wash_url_argument(recID, 'int')
     ln = wash_language(ln)
@@ -115,7 +115,7 @@ def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order
     else:
         nb_reviews = len(res2)
         nb_comments = nb_res
-        
+
     # checking non vital arguemnts - will be set to default if wrong
     #if page <= 0 or page.lower() != 'all':
     if page < 0:
@@ -653,18 +653,18 @@ def count_comments(recID):
     Returns the number of comments made on a record.
     """
     recID = int(recID)
-    query = """SELECT count(id) FROM cmtRECORDCOMMENT 
+    query = """SELECT count(id) FROM cmtRECORDCOMMENT
                                 WHERE id_bibrec=%i AND star_score=0"""
-    return run_sql(query % recID)[0][0]  
+    return run_sql(query % recID)[0][0]
 
 def count_reviews(recID):
     """
     Returns the number of reviews made on a record.
     """
     recID = int(recID)
-    query = """SELECT count(id) FROM cmtRECORDCOMMENT 
+    query = """SELECT count(id) FROM cmtRECORDCOMMENT
                                 WHERE id_bibrec=%i AND star_score>0"""
-    return run_sql(query % recID)[0][0]  
+    return run_sql(query % recID)[0][0]
 
 def get_first_comments_or_remarks(recID=-1,
                                   ln=cdslang,

@@ -29,7 +29,6 @@ from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
                                       CFG_WEBMESSAGE_SEPARATOR, \
                                       CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
                                       CFG_WEBMESSAGE_RESULTS_FIELD
-from invenio.textutils import indent_text
 from invenio.dateutils import convert_datetext_to_dategui, \
                               datetext_default, \
                               create_day_selectbox, \
@@ -147,7 +146,7 @@ class Template:
                                             {'ln': ln}),
                'write_label': _("Write new message"),
                'delete_all_label': _("Delete All")}
-        return indent_text(inbox, 2)
+        return inbox
 
     def tmpl_write(self,
                    msg_to="", msg_to_group="",
@@ -237,7 +236,6 @@ class Template:
           <td class="mailboxlabel">%(message_label)s</td>
           <td>
             <textarea name="msg_body" rows="10" cols="50">"""
-        write_box = indent_text(write_box, 2)
         write_box_part2 = """
           </td>
         </tr>
@@ -262,8 +260,7 @@ class Template:
   </div>
 </form>
 """
-        write_box_part2 = indent_text(write_box_part2, 2)
-        write_box += "%(body)s" "</textarea>"+ write_box_part2
+        write_box += "%(body)s</textarea>" + write_box_part2
         day_field = create_day_selectbox('msg_send_day',
                                           msg_send_day, ln)
         month_field = create_month_selectbox('msg_send_month',
@@ -428,7 +425,7 @@ class Template:
             msg_from_display = get_user_info(msg_from_id, ln)[2]
             msg_from_nickname = msg_from_id
 
-        out = out % {'from_link': create_html_link(
+        return out % {'from_link': create_html_link(
                                         weburl + '/yourmessages/write',
                                         {'msg_to': msg_from_nickname,
                                          'ln': ln},
@@ -455,7 +452,6 @@ class Template:
                      'groups_label': _("Sent to groups:"),
                      'reply_but_label':_("REPLY"),
                      'delete_but_label': _("DELETE")}
-        return indent_text(out, 2)
 
     def tmpl_navtrail(self, ln=cdslang, title=""):
         """
@@ -512,7 +508,7 @@ class Template:
               'ln':ln,
               'yes_label': _("Yes"),
               'no_label': _("No")}
-        return indent_text(out, 2)
+        return out
 
     def tmpl_infobox(self, infos, ln=cdslang):
         """Display len(infos) information fields

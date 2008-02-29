@@ -36,7 +36,6 @@ from invenio.config import weburl, \
                            CFG_WEBCOMMENT_ALLOW_COMMENTS
 
 from invenio.messages import gettext_set_language
-from invenio.textutils import indent_text
 
 class Template:
     """templating class, refer to webcomment.py for examples of call"""
@@ -500,10 +499,10 @@ class Template:
             if not reviews:
                 report_link = '%(weburl)s/record/%(recID)s/comments/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(weburl)s/record/%(recID)s/comments/display' % useful_dict % {'comid':comment[c_id]}
                 reply_link = '%(weburl)s/record/%(recID)s/comments/add?ln=%(ln)s&amp;action=REPLY&amp;comid=%%(comid)s' % useful_dict % {'comid':comment[c_id]}
-                comments_rows += indent_text(self.tmpl_get_comment_without_ranking(ln, messaging_link, comment[c_date_creation], comment[c_body], reply_link, report_link), 2)
+                comments_rows += self.tmpl_get_comment_without_ranking(ln, messaging_link, comment[c_date_creation], comment[c_body], reply_link, report_link)
             else:
                 report_link = '%(weburl)s/record/%(recID)s/reviews/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(weburl)s/record/%(recID)s/reviews/display' % useful_dict % {'comid': comment[c_id]}
-                comments_rows += indent_text(self.tmpl_get_comment_with_ranking(ln, messaging_link, comment[c_date_creation], comment[c_body], comment[c_nb_votes_total], comment[c_nb_votes_yes], comment[c_star_score], comment[c_title]), 2)
+                comments_rows += self.tmpl_get_comment_with_ranking(ln, messaging_link, comment[c_date_creation], comment[c_body], comment[c_nb_votes_total], comment[c_nb_votes_yes], comment[c_star_score], comment[c_title])
                 helpful_label = _("Was this review helpful?")
                 report_abuse_label = "(" + _("Report abuse") + ")"
                 comments_rows += """
@@ -601,7 +600,7 @@ class Template:
             'total_label': total_label,
             'write_button_form' : write_button_form,
             'write_button_form_again' : total_nb_comments>3 and write_button_form or "",
-            'comments_rows'             : indent_text(comments_rows, 1),
+            'comments_rows'             : comments_rows,
             'total_nb_comments'         : total_nb_comments,
             'comments_or_reviews'       : reviews and _('review') or _('comment'),
             'comments_or_reviews_title' : reviews and _('Review') or _('Comment'),
@@ -778,6 +777,9 @@ class Template:
                         'arguments' : 'ln=%s&amp;action=%s' % (ln, 'SUBMIT'),
                         'recID'     : recID}
 
+        # FIXME a cleaner handling of nicknames is needed.
+        if not nickname:
+            (uid, nickname, display) = get_user_info(uid)
         if nickname:
             note = _("Note: Your nickname, %s, will be displayed as author of this comment") % ('<i>' + nickname + '</i>')
         else:
@@ -1104,7 +1106,6 @@ class Template:
                 review_row %= (utuple[u_nb_votes_yes],
                                utuple[u_nb_votes_total] - utuple[u_nb_votes_yes],
                                utuple[u_nb_votes_total])
-                review_row = indent_text(review_row, 1)
             else:
                 review_row = ''
             user_rows += """
@@ -1135,21 +1136,21 @@ class Template:
     <tr class="adminheaderleft">
       <th>"""
         out += _("Nickname") + '</th>\n'
-        out += indent_text('<th>' + _("Email") + '</th>\n', 3)
-        out += indent_text('<th>' + _("User ID") + '</th>\n', 3)
+        out += '<th>' + _("Email") + '</th>\n'
+        out += '<th>' + _("User ID") + '</th>\n'
         if CFG_WEBCOMMENT_ALLOW_REVIEWS > 0:
-            out += indent_text('<th>' + _("Number positive votes") + '</th>\n', 3)
-            out += indent_text('<th>' + _("Number negative votes") + '</th>\n', 3)
-            out += indent_text('<th>' + _("Total number votes") + '</th>\n', 3)
-        out += indent_text('<th>' + _("Total number of reports") + '</th>\n', 3)
-        out += indent_text('<th>' + _("View all user's reported comments/reviews") + '</th>\n', 3)
+            out += '<th>' + _("Number positive votes") + '</th>\n'
+            out += '<th>' + _("Number negative votes") + '</th>\n'
+            out += '<th>' + _("Total number votes") + '</th>\n'
+        out += '<th>' + _("Total number of reports") + '</th>\n'
+        out += '<th>' + _("View all user's reported comments/reviews") + '</th>\n'
         out += """
     </tr>
   </thead>
   <tbody>%s
   </tbody>
 </table>
-        """ % indent_text(user_rows, 2)
+        """ % user_rows
         return out
 
     def tmpl_admin_select_comment_checkbox(self, cmt_id):

@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -30,7 +30,6 @@ from invenio.webbasket_config import \
                        CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
 from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
 from invenio.config import weburl, sweburl, cdslang
-from invenio.textutils import indent_text
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
 
@@ -46,27 +45,27 @@ class Template:
                      nb_groups=0,
                      nb_external_baskets=0,
                      ln=cdslang):
-        """Generic display. takes already formatted baskets (list of formatted 
-        baskets), infobox and topicsbox, add tabs and returns complete 
+        """Generic display. takes already formatted baskets (list of formatted
+        baskets), infobox and topicsbox, add tabs and returns complete
         interface"""
         _ = gettext_set_language(ln)
         if type(baskets) not in (list, tuple):
             baskets = [baskets]
-        tabs = self.__create_tabs(selected_category, 
+        tabs = self.__create_tabs(selected_category,
                                   nb_groups, nb_external_baskets, ln)
         out = """
 <div id="bskcontainer">
   <div id="bsktabs">%s
   </div>
-  <div id="bskcontent">""" % indent_text(tabs, 2)
+  <div id="bskcontent">""" % tabs
         if topicsbox:
-            out += indent_text(topicsbox, 6)
+            out += topicsbox
         out += """
     <div id="bskbaskets">"""
         if baskets_infobox:
             out += """
       <div id="bskinfos">%s
-      </div>""" % indent_text(baskets_infobox, 5)
+      </div>""" % baskets_infobox
         for basket in baskets:
             out += basket
         out += """
@@ -74,13 +73,13 @@ class Template:
   </div>
 </div>"""
         return out
-    
+
     def __create_tabs(self,
                       selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                       nb_groups=0,
                       nb_external_baskets=0,
                       ln=cdslang):
-        """Private function, display tabs 
+        """Private function, display tabs
         (private baskets, group baskets, others' basket)."""
         _ = gettext_set_language(ln)
         selected = ' id="bsktab_selected"'
@@ -105,7 +104,7 @@ class Template:
                           'label': _("Group baskets"),
                           'cat': group,
                           'ln': ln}
-        if nb_external_baskets:            
+        if nb_external_baskets:
             out += tab % {'selected': selected_category == external and selected or '',
                           'url': weburl,
                           'img': 'webbasket_ws.png',
@@ -138,7 +137,7 @@ class Template:
                     out += cgi.escape(topic_label) + '</a>'
                 else:
                     out += cgi.escape(topic_label)
-                out += '</span> '    
+                out += '</span> '
                 i += 1
             out = """
 <table id="bsktopics">
@@ -149,21 +148,21 @@ class Template:
 </table>""" % out
         else:
             out = self.tmpl_create_basket(ln=ln)
-            
+
         return out
 
     def tmpl_group_selection(self,
                              groups_list=[],
                              selected_group_id=0,
                              ln=cdslang):
-        """Display the group selection area which appears on the top of group 
+        """Display the group selection area which appears on the top of group
         baskets category.
         @param groups_list: list of (group id, group name, number of baskets)
         @param selected_group id: id of group selected
         """
         out = ''
         category = CFG_WEBBASKET_CATEGORIES['GROUP']
-        if len(groups_list): 
+        if len(groups_list):
             for (group_id, group_name, number_of_baskets) in groups_list:
                 out += '<span class="bsktopic">'
                 group_label = group_name + ' (' + str(number_of_baskets) + ')'
@@ -185,12 +184,12 @@ class Template:
 </table>""" % out
         return out
 
-    def tmpl_baskets_infobox(self, basket_infos=[], create_link='', 
+    def tmpl_baskets_infobox(self, basket_infos=[], create_link='',
                              ln=cdslang):
         """
         displays infos about baskets.
         @param basket_infos: list of (bskid, bsk_name, bsk_last_update)
-        @param create_link: link for the creation of basket 
+        @param create_link: link for the creation of basket
                             (will appear next to descriptions)
         @param ln: language
         @return html as string
@@ -218,19 +217,19 @@ class Template:
   </tr>
 </table>""" % (label, basket_list, create_link)
         return out
-        
+
     def tmpl_display_public(self,
                              basket_infos,
                              bsk_items=[],
                              ln=cdslang):
         """
         Display public basketwith link to subscribe to it.
-        @param  basket_infos: 
-                    (bskid, bsk_name, bsk_date_modification, bsk_nb_views, 
-                     bsk_id_owner, bsk_owner_nickname, public rights on basket) 
+        @param  basket_infos:
+                    (bskid, bsk_name, bsk_date_modification, bsk_nb_views,
+                     bsk_id_owner, bsk_owner_nickname, public rights on basket)
         """
         _ = gettext_set_language(ln)
-        (bskid, bsk_name, bsk_date_modification, dummy, 
+        (bskid, bsk_name, bsk_date_modification, dummy,
          bsk_id_owner, bsk_owner_nickname, dummy) = basket_infos
         items_html = ''
         if not(len(bsk_items)):
@@ -241,24 +240,24 @@ class Template:
   </td>
 </tr>""" % _("Basket is empty")
         for item in bsk_items:
-            items_html += self.__tmpl_basket_item(bskid=bskid, 
+            items_html += self.__tmpl_basket_item(bskid=bskid,
                                                   item=item, ln=ln)
         if bsk_owner_nickname:
             display = bsk_owner_nickname
         else:
             (bsk_id_owner, bsk_owner_nickname, display) = get_user_info(\
                                                              bsk_id_owner)
-        messaging_link = self.__create_messaging_link(bsk_owner_nickname, 
+        messaging_link = self.__create_messaging_link(bsk_owner_nickname,
                                                       display, ln)
         link_subscribe = '<a href="%s/yourbaskets/subscribe?'\
                          'bskid=%i&amp;ln=%s">' % (weburl, bskid, ln)
         general_label = _("This basket belongs to %(x_name)s. You can freely "\
                           "%(x_url_open)ssubscribe%(x_url_close)s to it") % \
-                                {'x_name': messaging_link, 
-                                 'x_url_open': link_subscribe, 
-                                 'x_url_close': '</a>'}      
+                                {'x_name': messaging_link,
+                                 'x_url_open': link_subscribe,
+                                 'x_url_close': '</a>'}
         out = """
-%(general_label)s      
+%(general_label)s
 <table class="bskbasket">
   <thead class="bskbasketheader">
     <tr>
@@ -291,21 +290,21 @@ class Template:
                'link_subscribe': link_subscribe,
                'subscribe_label': _("Subscribe to this basket"),
                'items': items_html}
-        return out        
-     
-    def tmpl_display_list_public_baskets(self, baskets, inf_limit, 
-                                         total_baskets, order, asc, 
+        return out
+
+    def tmpl_display_list_public_baskets(self, baskets, inf_limit,
+                                         total_baskets, order, asc,
                                          ln=cdslang):
         """Display list of public baskets.
-        @param baskets: list of (bskid, name, nb_views, 
+        @param baskets: list of (bskid, name, nb_views,
                                  owner_id, owner_nickname)
         @param inf limit: inferior limit
         @param total baskets: nb of baskets in total (>len(baskets) generally)
-        @param order: 1: order by name, 
-                      2: order by nb of views, 
+        @param order: 1: order by name,
+                      2: order by nb of views,
                       3: order by owner
-        @param asc: 1 for ascending, 0 for descending  
-        """       
+        @param asc: 1 for ascending, 0 for descending
+        """
         _ = gettext_set_language(ln)
         name_label = _("Basket's name")
         nb_views_label = _("Number of views")
@@ -343,7 +342,7 @@ class Template:
                 display = owner_nickname
             else:
                 (owner_id, owner_nickname, display) = get_user_info(owner_id)
-            messaging_link = self.__create_messaging_link(owner_nickname, 
+            messaging_link = self.__create_messaging_link(owner_nickname,
                                                           display, ln)
             form_view = """
 <form action="%(weburl)s/yourbaskets/display_public" method="GET">
@@ -362,7 +361,7 @@ class Template:
 </form>""" % {'weburl': weburl,
               'ln': ln,
               'bskid': bskid,
-              'subscribe_label': _("Subscribe")}                      
+              'subscribe_label': _("Subscribe")}
 
             baskets_html += """
     <tr>
@@ -371,7 +370,7 @@ class Template:
       <td>%s</td>
       <td style="vertical-align: middle; text-align:center;">%s</td>
       <td style="vertical-align: middle">%s</td>
-    </tr>""" % (cgi.escape(name), nb_views, 
+    </tr>""" % (cgi.escape(name), nb_views,
                 messaging_link, form_view, form_subscribe)
         if not(len(baskets_html)):
             baskets_html = '<tr><td colspan="5">' + \
@@ -385,18 +384,18 @@ class Template:
         if inf_limit > (CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS * 2) - 1:
             footer += change_page % (0, weburl + '/img/sb.gif')
         if inf_limit > 0:
-            footer += change_page % (inf_limit - CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, 
+            footer += change_page % (inf_limit - CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS,
                                      weburl + '/img/sp.gif')
         footer += ' ' + _("Displaying baskets %(x_nb_begin)i-%(x_nb_end)i out of %(x_nb_total)i baskets in total.") %\
-            {'x_nb_begin': total_baskets!=0 and inf_limit+1 or 0, 
-             'x_nb_end': inf_limit + len(baskets), 
-             'x_nb_total': total_baskets} 
+            {'x_nb_begin': total_baskets!=0 and inf_limit+1 or 0,
+             'x_nb_end': inf_limit + len(baskets),
+             'x_nb_total': total_baskets}
         footer += ' '
         if inf_limit + len(baskets) < total_baskets:
-            footer += change_page % (inf_limit + CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, 
+            footer += change_page % (inf_limit + CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS,
                                      weburl + '/img/sn.gif')
         if inf_limit + len(baskets) < total_baskets - CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS:
-            footer += change_page % (total_baskets - CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, 
+            footer += change_page % (total_baskets - CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS,
                                      weburl + '/img/se.gif')
 
         out = """
@@ -418,21 +417,21 @@ class Template:
     %(baskets)s
   </tbody>
 </table>""" % {'name': name_label,
-               'nb_views': nb_views_label, 
-               'user': owner_label, 
+               'nb_views': nb_views_label,
+               'user': owner_label,
                'actions': _("Actions"),
                'baskets': baskets_html,
                'footer': footer}
         return out
-        
+
     ############################ Baskets ###################################
-    
+
     def tmpl_basket(self, bskid,
                     name,
                     date_modification,
                     nb_views,
                     nb_items, last_added,
-                    (user_can_view_content, user_can_edit_basket, 
+                    (user_can_view_content, user_can_edit_basket,
                     user_can_view_comments, user_can_add_item, user_can_delete_item),
                     nb_comments, last_comment,
                     group_sharing_level,
@@ -442,7 +441,7 @@ class Template:
                     ln=cdslang):
         """
         display a basket.
-        @param group_sharing_level: Indicate to which level a basket is shared 
+        @param group_sharing_level: Indicate to which level a basket is shared
                                     (None for nobody, 0 for everybody, any other positive int for group)
         @param items: list of (record id, nb of comments, last comment (date), body to display, score (int)) tuples
         """
@@ -462,7 +461,7 @@ class Template:
         if user_can_edit_basket:
             url = weburl + '/yourbaskets/edit?bskid=%i&amp;topic=%i&amp;ln=%s'
             url %= (bskid, selected_topic, ln)
-            logo = '<a href="%s">%s</a>' % (url, logo + '<br />' + _("Edit basket")) 
+            logo = '<a href="%s">%s</a>' % (url, logo + '<br />' + _("Edit basket"))
         actions += "<td>" + logo + "</td>"
         actions += "</tr></table>"
         if user_can_view_content:
@@ -520,7 +519,7 @@ class Template:
             comments_field = """
 %i %s<br/>
 %s %s""" % (nb_comments,  _("comments"), _("last comment:"), last_comment)
-        out = """       
+        out = """
 <table class="bskbasket">
   <thead class="bskbasketheader">
     <tr>
@@ -550,11 +549,11 @@ class Template:
                 'items': items_html,
                 'footer': footer}
         return out
-               
+
     def __tmpl_basket_item(self,
                          bskid,
                          item,
-                         uparrow=0, downarrow=0, copy_item=0, delete_item=0, 
+                         uparrow=0, downarrow=0, copy_item=0, delete_item=0,
                          view_comments=0,
                          selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                          selected_topic=0, selected_group=0,
@@ -562,12 +561,12 @@ class Template:
         """
         display a row in a basket (row is item description and actions).
         @param bskid: basket id (int)
-        @param item: (record id, nb of comments, last comment date, 
+        @param item: (record id, nb of comments, last comment date,
                       body to display, score) tuple
-        @param uparrow, 
-               downarrow, 
-               copy_item, 
-               delete_item, 
+        @param uparrow,
+               downarrow,
+               copy_item,
+               delete_item,
                view_comments: actions. set to 1 to display these actions.
         """
         _ = gettext_set_language(ln)
@@ -656,8 +655,8 @@ class Template:
                            content='',
                            ln=cdslang):
         """display footer of a basket.
-        @param group sharing level: None: basket is not shared, 
-                                    0: basket is publcly accessible, 
+        @param group sharing level: None: basket is not shared,
+                                    0: basket is publcly accessible,
                                     any positive int: basket is shared to groups"""
         _ = gettext_set_language(ln)
         public_infos = ''
@@ -669,7 +668,7 @@ class Template:
             content += '<br />'
         if not(content) and not(public_infos):
             content += '<br />'
-        out = """ 
+        out = """
 <tr>
   <td colspan="3" class="bskbasketfooter">
     <!-- Commented. Ready for next release
@@ -703,29 +702,29 @@ class Template:
         return out
 
     ######################## Display of items and commenting ###################
-   
+
     def tmpl_item(self,
-                  basket_infos, 
+                  basket_infos,
                   recid, record, comments,
                   group_sharing_level, rights_on_item,
                   selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                   selected_topic=0, selected_group_id=0, ln=cdslang):
-        """display a specific item inside a basket. 
-        @param basket_infos: (bskid, bsk_name, bsk_date_modification, 
+        """display a specific item inside a basket.
+        @param basket_infos: (bskid, bsk_name, bsk_date_modification,
                               nb_views, bsk_nb_records, id_owner)
                              as returned from db_layer: get_basket_general_infos
-        @param group sharing level: None: basket is not shared, 
-                                    0: basket is publcly accessible, 
+        @param group sharing level: None: basket is not shared,
+                                    0: basket is publcly accessible,
                                     any positive int: basket is shared to groups
         @param rights_on_item: tuple of booleans expressing capabilities :
                                 (view comments, add comment, delete comments)
         @param comments: list of comments  as string
         """
         _ = gettext_set_language(ln)
-        (bskid, bsk_name, bsk_date_modification, 
+        (bskid, bsk_name, bsk_date_modification,
         dummy, bsk_nb_records, dummy) = basket_infos
-        (user_can_view_comments, 
-        user_can_add_comment, 
+        (user_can_view_comments,
+        user_can_add_comment,
         user_can_delete_comment) = rights_on_item
         total_comments = len(comments)
         action = weburl + '/yourbaskets/write_comment?bskid=%i&amp;recid=%i'
@@ -733,14 +732,14 @@ class Template:
         action %= (bskid, recid, selected_category, selected_topic, selected_group_id, ln)
         back_url = weburl + '/yourbaskets/display?category=%s&amp;topic=%i&amp;group=%i'
         back_url %= (selected_category, selected_topic, selected_group_id)
-                
+
         def list_to_str(elt1, elt2):
             """return elt1 <br /> elt2"""
             return elt1 + "<br />\n" + elt2
         if comments and user_can_view_comments:
-            comments = [self.__tmpl_display_comment(bskid, recid, comment, 
-                                                    (user_can_add_comment, user_can_delete_comment), 
-                                                    selected_category, selected_topic, selected_group_id, 
+            comments = [self.__tmpl_display_comment(bskid, recid, comment,
+                                                    (user_can_add_comment, user_can_delete_comment),
+                                                    selected_category, selected_topic, selected_group_id,
                                                     ln)
                         for comment in comments]
             comments = reduce(list_to_str, comments)
@@ -790,7 +789,7 @@ class Template:
                                          group_sharing_level,
                                          content,
                                          ln)
-        out = """      
+        out = """
 <table class="bskbasket">
   <thead class="bskbasketheader">
     <tr>
@@ -828,7 +827,7 @@ class Template:
 <a href="%s">%s</a>""" % (back_url, _("Back to baskets"))
         return out
 
-    def __tmpl_display_comment(self, bskid, recid, 
+    def __tmpl_display_comment(self, bskid, recid,
                                (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, cmt_priority, cmtid),
                                (user_can_add_comment, user_can_delete_comment),
                                selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
@@ -849,7 +848,7 @@ class Template:
             out += '\n| <a href="%(url)s/yourbaskets/delete_comment?'\
                    'bskid=%(bskid)i&amp;recid=%(recid)i&amp;cmtid=%(cmtid)i'\
                    '&amp;category=%(category)s&amp;topic=%(topic)i&amp;'\
-                   'group=%(group_id)i&amp;ln=%(ln)s">%(delete_label)s</a>' 
+                   'group=%(group_id)i&amp;ln=%(ln)s">%(delete_label)s</a>'
         out += """
 </div>"""
         out %= {'title': cmt_title,
@@ -929,16 +928,16 @@ class Template:
              'cmt_body': cmt_body,
              'button_label': _("Add Comment")
             }
-                
+
         return out
-        
+
         ############################ Basket creation ###################################
-   
+
     def tmpl_create_basket_link(self, selected_topic=0, ln=cdslang):
         """ Create link to basket creation """
         _ = gettext_set_language(ln)
         url = weburl + '/yourbaskets/create_basket?topic_number=%i&amp;ln=%s'
-        url %= (selected_topic, ln) 
+        url %= (selected_topic, ln)
         image = '<img src="%s/img/webbasket_create_small.png" style="vertical-align: middle; margin-right: 5px" alt="Create basket"/>' % weburl
         out = """
 <div class="bsk_create_link">
@@ -947,7 +946,7 @@ class Template:
         return out
 
     def __tmpl_basket_box(self, img='', title='&nbsp;', subtitle='&nbsp;', body=''):
-        """ private function, display a basket/topic selection box """ 
+        """ private function, display a basket/topic selection box """
         out = """
 <table class="bskbasket">
   <thead class="bskbasketheader">
@@ -1019,7 +1018,7 @@ class Template:
     def tmpl_create_basket(self, new_basket_name='',
                            new_topic_name='', create_in_topic=None, topics=[],
                            ln=cdslang):
-        """Template for basket creation 
+        """Template for basket creation
         @param new_basket_name: prefilled value (string)
         @param new_topic_name: prefilled value (string)
         @param topics: list of topics (list of strings)
@@ -1043,9 +1042,9 @@ class Template:
               'label': _("Create new basket")}
         return out
 
-    
+
     ########################## functions on baskets #########################
-    
+
     def tmpl_add(self, recids,
                  personal_baskets,
                  group_baskets,
@@ -1074,7 +1073,7 @@ class Template:
                 baskets = map(lambda x: (x[0], x[1]),
                               filter(lambda x: x[2]==topic_name,
                                      personal_baskets))
-                baskets.insert(0, (-1, _("Select basket"))) 
+                baskets.insert(0, (-1, _("Select basket")))
                 personal_html += """<tr>
   <td>%s</td>
   <td>%s</td>
@@ -1084,7 +1083,7 @@ class Template:
             personal = self.__tmpl_basket_box(weburl + '/img/webbasket_user.png',
                                               _("Add to a personal basket"),
                                               _("%i baskets") % len(personal_baskets),
-                                              personal_html) 
+                                              personal_html)
         if group_baskets:
             group_names = {}
             map(group_names.setdefault, [row[2] for row in group_baskets])
@@ -1095,7 +1094,7 @@ class Template:
                 baskets = map(lambda x: (x[0], x[1]),
                               filter(lambda x: x[2]==group_name,
                                      group_baskets))
-                baskets.insert(0, (-1, _("Select basket"))) 
+                baskets.insert(0, (-1, _("Select basket")))
                 groups_html += """<tr>
   <td>%s</td>
   <td>%s</td>
@@ -1105,7 +1104,7 @@ class Template:
             group = self.__tmpl_basket_box(weburl + '/img/webbasket_usergroup.png',
                                            _("Add to a group-shared basket"),
                                            _("%i baskets") % len(group_baskets),
-                                           groups_html)    
+                                           groups_html)
         if external_baskets:
             external_html = """
 <tr>
@@ -1115,7 +1114,7 @@ class Template:
             for basket in external_baskets:
                 value = int(basket[0])
                 label = basket[1]
-                external_html += indent_text('<option value="%i">%s</option>'% (value, label), 3)
+                external_html += '<option value="%i">%s</option>'% (value, label)
             external_html += """
     </select>
   </td>
@@ -1129,7 +1128,7 @@ class Template:
         for recid in recids:
             out_hidden_recids += """<input type="hidden" name="recid" value="%s" />""" % recid
         fields = filter(lambda x: x != '', [personal, group, external, create])
-        while (len(fields) != 4): 
+        while (len(fields) != 4):
             fields.append('')
         out = """
 <form name="add_to_basket" action="%(action)s" method="post">
@@ -1171,8 +1170,8 @@ class Template:
         else:
             out = _("No records were added to the selected baskets.")
         return '<p>' + out + '</p>'
-    
-    
+
+
     def tmpl_confirm_delete(self, bskid,
                             (nb_users, nb_groups, nb_alerts),
                             category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
@@ -1255,7 +1254,7 @@ class Template:
   <td class="bskcontentcol"><input type="text" name="new_name" value="%s"/></td>
 </tr>""" % (_("Basket's name"), cgi.escape(bsk_name,1))
             topics_selection = zip(range(len(topics)), topics)
-            topics_selection.insert(0, (-1, _("Choose topic"))) 
+            topics_selection.insert(0, (-1, _("Choose topic")))
             topics_body = """
 <tr>
   <td style="padding: 10 5 0 5;">%s</td>
@@ -1264,8 +1263,8 @@ class Template:
 <tr>
   <td style="padding: 0 5 10 5;">%s</td>
   <td style="padding: 0 5 10 0;"><input type="text" name="new_topic_name" />
-</tr>""" %  (_("Choose topic"), 
-             indent_text(self.__create_select_menu('new_topic', topics_selection, topic), 2),
+</tr>""" %  (_("Choose topic"),
+             self.__create_select_menu('new_topic', topics_selection, topic),
              _("or create a new one"))
             general_body += topics_body
         general_box = self.__tmpl_basket_box(img=weburl + '/img/webbasket_user.png',
@@ -1329,21 +1328,21 @@ class Template:
       <td>%(delete_button)s</td>
     </tr>
   </table>
-      
+
 </form>""" % {'label': _('Editing basket') + ' ' + cgi.escape(bsk_name),
               'action': weburl + '/yourbaskets/edit',
               'ln': ln,
               'topic': topic,
               'bskid': bskid,
-              'general': indent_text(general_box, 1),
-              'groups': indent_text(groups_box, 1),
-              'external': indent_text(external_box, 1),
+              'general': general_box,
+              'groups': groups_box,
+              'external': external_box,
               'submit_label': _("Save changes"),
               'cancel_label': _("Cancel"),
               'delete_button': delete_button}
         return out
 
-    
+
     def __create_rights_selection_menu(self, name, current_rights, ln=cdslang):
         """Private function. create a drop down menu for selection of rights
         @param name: name of menu (for HTML name attribute)
@@ -1438,7 +1437,7 @@ class Template:
               'ln': ln,
               'topic': selected_topic,
               'bskid': bskid,
-              'groups': indent_text(groups_box, 4),
+              'groups': groups_box,
               'cancel_label': _("Cancel"),
               'submit_label': _("Add group")}
         return out
@@ -1473,7 +1472,7 @@ class Template:
     </tr>
 </table>"""
         return out % message
-          
+
     def tmpl_create_guest_forbidden_box(self, ln=cdslang):
         """return html warning box for non registered users"""
         _ = gettext_set_language(ln)
@@ -1490,25 +1489,25 @@ class Template:
   </thead>
 </table>"""
         return out % message
-      
+
 
     ############################ Utilities ###################################
-  
+
     def __create_select_menu(self, name, elements, selected_key=None):
         """ private function, returns a popup menu
         @param name: name of HTML control
         @param elements: list of (key, value)
         @param selected_key: item that should be selected (key of elements tuple)
         """
-        out = '<select name="%s">' % name         
+        out = '<select name="%s">' % name
         for (key, label) in elements:
             selected = ''
             if key == selected_key:
                 selected = ' selected="selected"'
-            out += indent_text('<option value="%s"%s>%s</option>'% (key, selected, cgi.escape(label)), 1)
+            out += '<option value="%s"%s>%s</option>'% (key, selected, cgi.escape(label))
         out += '</select>'
         return out
-     
+
     def tmpl_warnings(self, warnings=[], ln=cdslang):
         """ returns HTML for warnings """
         from invenio.errorlib import get_msgs_for_code_list
@@ -1518,9 +1517,9 @@ class Template:
         if len(warnings):
             warnings_parsed = get_msgs_for_code_list(warnings, 'warning', ln)
             for (warning_code, warning_text) in warnings_parsed:
-                out += '<div class="important" style="padding: 10px;">%s</div>' % warning_text 
+                out += '<div class="important" style="padding: 10px;">%s</div>' % warning_text
         return out
-    
+
     def tmpl_create_infobox(self, infos = []):
         """ returns html for general informations
         @param infos: list of strings to display"""
@@ -1531,7 +1530,7 @@ class Template:
                 out += info + '<br />'
             out += '</div>'
         return out
-         
+
 
     def tmpl_back_link(self, link, ln=cdslang):
         """ returns HTML for a link whose label should be
@@ -1541,7 +1540,7 @@ class Template:
         label = _("Back to search results")
         out = '<a href="%s">%s</a>' % (link, label)
         return out
-       
+
     def __create_messaging_link(self, to, display_name, ln=cdslang):
         """prints a link to the messaging system"""
         link = "%s/yourmessages/write?msg_to=%s&amp;ln=%s" % (weburl, to, ln)
@@ -1549,7 +1548,7 @@ class Template:
             return '<a href="%s" class="maillink">%s</a>' % (link, display_name)
         else:
             return display_name
-    
+
     def tmpl_xml_basket(self, items=[]):
         """Template for XML output of basket
         @param items: XML version of each item (list)"""

@@ -255,8 +255,8 @@ def log_sql_query_cached(key, result, hit_p):
     log_path = logdir + '/dbquery.log'
     date_of_log = convert_datestruct_to_datetext(time.localtime())
     message = date_of_log + '-->\n'
-    message += indent_text('Key:\n' + indent_text(str(key), 2), 2)
-    message += indent_text('Result:\n' + indent_text(str(result) + (hit_p and ' HIT' or ' MISS'), 2), 2)
+    message += indent_text('Key:\n' + indent_text(str(key), 2, wrap=True), 2)
+    message += indent_text('Result:\n' + indent_text(str(result) + (hit_p and ' HIT' or ' MISS'), 2, wrap=True), 2)
     message += 'Cached queries: %i\n\n' % len(_db_cache)
     try:
         log_file = open(log_path, 'a+')
@@ -277,8 +277,8 @@ def log_sql_query(sql, param=None):
     log_path = logdir + '/dbquery.log'
     date_of_log = convert_datestruct_to_datetext(time.localtime())
     message = date_of_log + '-->\n'
-    message += indent_text('Query:\n' + indent_text(str(sql), 2), 2)
-    message += indent_text('Params:\n' + indent_text(str(param), 2), 2)
+    message += indent_text('Query:\n' + indent_text(str(sql), 2, wrap=True), 2)
+    message += indent_text('Params:\n' + indent_text(str(param), 2, wrap=True), 2)
     message += '-----------------------------\n\n'
     try:
         log_file = open(log_path, 'a+')

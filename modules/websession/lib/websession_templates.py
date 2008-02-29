@@ -43,7 +43,6 @@ from invenio.websession_config import \
         CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS
 from invenio.urlutils import make_canonical_urlargd
 from invenio.messages import gettext_set_language
-from invenio.textutils import indent_text
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
 class Template:
     def tmpl_back_form(self, ln, message, act, link):
@@ -1296,7 +1295,7 @@ class Template:
 </table>""" % {'ln': ln,
                'write_label': _("Create new group"),
                }
-        return indent_text(out, 2)
+        return out
 
     def tmpl_display_member_groups(self, groups, ln=cdslang):
         """
@@ -1358,7 +1357,7 @@ class Template:
                'join_label': _("Join new group"),
                'leave_label':_("Leave group")
                }
-        return indent_text(group_text, 2)
+        return group_text
 
 
     def tmpl_display_external_groups(self, groups, ln=cdslang):
@@ -1406,7 +1405,7 @@ class Template:
   </tbody>
 </table>
  """
-        return indent_text(group_text, 2)
+        return group_text
 
     def tmpl_display_input_group_info(self,
                                       group_name,
@@ -1534,7 +1533,7 @@ class Template:
                                                                         join_policy,
                                                                         ln)
                }
-        return indent_text(out, 2)
+        return out
 
     def tmpl_display_input_join_group(self,
                                       group_list,
@@ -1639,7 +1638,7 @@ class Template:
                 'group_list' :self.__create_select_menu("grpID",group_list, _("Please select:")),
                 'search_content' : search_content
                }
-        return indent_text(out, 2)
+        return out
 
     def tmpl_display_manage_member(self,
                                    grpID,
@@ -1823,7 +1822,7 @@ class Template:
                 'cancel_label':_("Cancel"),
                 'ln':ln
                 }
-        return indent_text(out, 2)
+        return out
 
     def tmpl_display_input_leave_group(self,
                                        groups,
@@ -1907,7 +1906,7 @@ class Template:
                 'ln' :ln,
                 'submit' : submit
                 }
-        return indent_text(out, 2)
+        return out
 
 
     def tmpl_confirm_delete(self, grpID, ln=cdslang):
@@ -1947,7 +1946,7 @@ class Template:
               'grpID':grpID,
               'action': action
               }
-        return indent_text(out, 2)
+        return out
 
     def tmpl_confirm_leave(self, uid, grpID, ln=cdslang):
         """
@@ -1986,7 +1985,7 @@ class Template:
               'grpID':grpID,
               'action': action
               }
-        return indent_text(out, 2)
+        return out
 
     def __create_join_policy_selection_menu(self, name, current_join_policy, ln=cdslang):
         """Private function. create a drop down menu for selection of join policy
@@ -2012,12 +2011,12 @@ class Template:
 <select name="%s" multiple="multiple" style="width:100%%">"""% (name)
         else :
             out = """<select name="%s" style="width:100%%">""" % name
-        out += indent_text('<option value="-1">%s</option>' % (select_text))
+        out += '<option value="-1">%s</option>' % (select_text)
         for (key, label) in elements:
             selected = ''
             if key == selected_key:
                 selected = ' selected="selected"'
-            out += indent_text('<option value="%s"%s>%s</option>'% (key, selected, label), 1)
+            out += '<option value="%s"%s>%s</option>'% (key, selected, label)
         out += '</select>'
         return out
 

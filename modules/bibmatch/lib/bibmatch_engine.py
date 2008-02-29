@@ -142,7 +142,7 @@ class Querystring:
         for lett in operator:
             self.operator[i] = lett
             i += 1
-            
+
         return
 
     def default(self):
@@ -184,9 +184,9 @@ class Querystring:
                     else:
                         letter = "_"
                 i+=1
-                field__ = "%s%s" % (field__,letter)
+                field__ += str(letter)
             field_.append(field__)
-        self.field = field_    
+        self.field = field_
         return
 
 
@@ -202,7 +202,7 @@ def get_field_tags(field):
 
 def get_subfield(field, subfield):
     "Return subfield of a field."
-    
+
     for sbf in field:
         if(sbf[0][0][0] == subfield):
             return sbf[0][0][1]
@@ -247,7 +247,7 @@ def matched_records_max(recID_lists):
     "Analyze lists of matches. Ambiguous result is preferred if result is unmatched."
 
     max = 0
-    
+
     for recID_list in recID_lists:
         if(len(recID_list) == 1):
             return 1
@@ -267,7 +267,7 @@ def main():
     # By default the match is done on the title field.
     # Using advanced search only 3 fields can be queried concurrently
     # qrystr - querystring in the UpLoader format
-    
+
     try:
         opts, args = getopt.getopt(sys.argv[1:],"012hVm:f:q:c:nv:o:b:",
                  [
@@ -285,10 +285,10 @@ def main():
                    "operator=",
                    "batch-output="
                  ])
-    
+
     except getopt.GetoptError, e:
         usage()
-    
+
     recs_out    = []
     recID_list  = []
     recID_lists = []
@@ -308,10 +308,10 @@ def main():
     records     = []
     batch_output = ""
     predefined_fields = ["title", "author"]
-    
-    
+
+
     for opt, opt_value in opts:
-    
+
         if opt in ["-0", "--print-new"]:
             match_mode = 0
         if opt in ["-1", "--print-match"]:
@@ -336,7 +336,7 @@ def main():
             operator         = opt_value
         if opt in ["-b", "--batch-output"]:
             batch_output     = opt_value
-        if opt in ["-f", "--field"]: 
+        if opt in ["-f", "--field"]:
             alternate_querystring = []
             if opt_value in predefined_fields:
                 alternate_querystring = get_field_tags(opt_value)
@@ -351,15 +351,15 @@ def main():
                 tmp = string.split(line, "---")
                 if(tmp[0] == "QRYSTR"):
                     qrystrs.append(tmp[1])
-                    
+
     if verbose:
         sys.stderr.write("\nBibMatch: Parsing input file ... ")
-        
+
     for line_in in sys.stdin:
         file_read += line_in
-    
+
     records = create_records(file_read)
-    
+
     if len(records) == 0:
         if verbose:
             sys.stderr.write("\nBibMatch: Input file contains no records.\n")
@@ -368,70 +368,70 @@ def main():
         if verbose:
             sys.stderr.write("read %d records" % len(records))
             sys.stderr.write("\nBibMatch: Matching ...")
-    
+
     ### Prepare batch output
-    
+
         if (batch_output != ""):
             out_0 = []
             out_1 = []
             out_2 = []
-    
+
         for rec in records:
-    
+
     ### for each query-string
-    
+
             record_counter += 1
-    
+
             if (verbose > 1):
-                
+
                 sys.stderr.write("\n Processing record: #%d .." % record_counter)
-    
+
             recID_lists = []
-    
+
             if(len(qrystrs)==0):
                 qrystrs.append("")
-    
+
             more_detailed_info = ""
-    
+
             for qrystr in qrystrs:
-    
+
                 querystring = Querystring()
                 querystring.default()
-    
+
                 if(qrystr != ""):
                     querystring.from_qrystr(qrystr, perform_request_search_mode, operator)
                 else:
                     querystring.default()
-    
-    
+
+
     ### search engine qrystr encode
-    
+
                 querystring.search_engine_encode()
-    
+
     ### get field values
-    
+
                 inst = []
-    
+
                 ### get appropriate corresponding fields from database
-    
+
                 i = 0
                 for field in querystring.field:
-    
-    
+
+
                     ### use expanded tags
-                        
+
                     tag  = field[0:3]
                     ind1 = field[3:4]
                     ind2 = field[4:5]
                     code = field[5:6]
-    
+
                     if((ind1 == "_")or(ind1 == "%")):
                         ind1 = ""
                     if((ind2 == "_")or(ind2 == "%")):
                         ind2 = ""
                     if((code == "_")or(code == "%")):
                         code = "a"
-    
+
                     if(field != "001"):
                         sbf = get_subfield(record_get_field_instances(rec[0], tag, ind1, ind2), code)
                         inst.append(sbf)
@@ -441,17 +441,17 @@ def main():
                     else:
                         inst.append("")
                     i += 1
-    
+
     ### format acquired field values
-    
+
                 i = 0
                 for instance in inst:
                     for format in querystring.format[i]:
                         inst[i] = bibconvert.FormatField(inst[i],format)
                     i += 1
-    
+
     ### perform sensible request search only
-    
+
                 if(inst[0]!=""):
                     recID_list = perform_request_search(
                           p1=inst[0], f1=querystring.field[0], m1=querystring.mode[0], op1=querystring.operator[0],
@@ -463,64 +463,64 @@ def main():
                 recID_lists.append(recID_list)
 
     ### more detailed info ...
-    
+
                 if(verbose > 8):
                     more_detailed_info = "%s\n  Matched recIDs: %s" % (more_detailed_info, recID_lists)
                 if(verbose > 2):
                     more_detailed_info = "%s\n  On query: %s, %s, %s, %s\n            %s, %s, %s, %s\n            %s, %s, %s\n" % (more_detailed_info, inst[0], querystring.field[0], querystring.mode[0], querystring.operator[0], inst[1], querystring.field[1], querystring.mode[1], querystring.operator[1], inst[2], querystring.field[2], querystring.mode[2])
-    
+
 
     ### for multitagged fields (e.g. title), unmatched result corresponds to the item in extreme
             rec_match = matched_records_max(recID_lists)
-    
+
     ### print-new
-    
+
             if (rec_match==0):
                 result[0] += 1
                 if(match_mode==0):
                     recs_out.append(rec)
                 if (batch_output != ""):
                     out_0.append(rec)
-    
+
                 if verbose:
                     sys.stderr.write(".")
                 if (verbose > 1):
                     sys.stderr.write("NEW")
-    
+
     ### print-match
-    
+
             elif (rec_match <= level):
                 result[1] += 1
                 if(match_mode==1):
                     recs_out.append(rec)
                 if (batch_output != ""):
                     out_1.append(rec)
-    
+
                 if verbose:
                     sys.stderr.write(".")
                 if (verbose > 1):
                     sys.stderr.write("MATCH")
-    
-    
+
+
     ### print-ambiguous
-    
+
             elif(rec_match > level):
                 result[2] += 1
                 if(match_mode==2):
                     recs_out.append(rec)
                 if (batch_output != ""):
                     out_2.append(rec)
-    
+
                 if verbose:
                     sys.stderr.write(".")
                 if (verbose > 1):
                     sys.stderr.write("AMBIGUOUS")
-    
+
             else:
                 pass
-    
+
             sys.stderr.write(more_detailed_info)
-    
+
     if verbose:
         sys.stderr.write("\n\n Bibmatch report\n")
         sys.stderr.write("=" * 35)
@@ -529,13 +529,13 @@ def main():
         sys.stderr.write("\n Ambiguous records   : %d\n" % result[2])
         sys.stderr.write("=" * 35)
         sys.stderr.write("\n Total records       : %d\n" % record_counter)
-    
+
     if noprocess:
         pass
     else:
         for record in recs_out:
             print print_rec(record[0])
-    
+
         if (batch_output != ""):
             filename = "%s.0" % batch_output
             file_0 = open(filename,"w")
