@@ -78,7 +78,7 @@ def indent_text(text,
                 nb_tabs=0,
                 tab_str="  ",
                 linebreak_input="\n",
-                linebreak_output="\n"):
+                linebreak_output="\n", wrap=False):
     """
     add tabs to each line of text
     @param text: the text to indent
@@ -86,9 +86,18 @@ def indent_text(text,
     @param tab_str: type of tab (could be, for example "\t", default: 2 spaces
     @param linebreak_input: linebreak on input
     @param linebreak_output: linebreak on output
+    @param wrap wethever to apply smart text wrapping. (by means of wrap_text_in_a_box)
     @return indented text as string
     """
-    return wrap_text_in_a_box(body=text, style='no_border', tab_str=tab_str, tab_num=nb_tabs)
+    if not wrap:
+        lines = text.split(linebreak_input)
+        tabs = nb_tabs*tab_str
+        output = ""
+        for line in lines:
+            output += tabs + line + linebreak_output
+        return output
+    else:
+        return wrap_text_in_a_box(body=text, style='no_border', tab_str=tab_str, tab_num=nb_tabs)
 
 _RE_BEGINNING_SPACES = re.compile('^\s*')
 def wrap_text_in_a_box(body='', title='', style='double_star', **args):
