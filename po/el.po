@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.93.50.20080212\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-02-28 19:06+0100\n"
-"PO-Revision-Date: 2008-02-28 18:08+0100\n"
+"PO-Revision-Date: 2008-02-29 15:21+0100\n"
 "Last-Translator: Theodoropoulos Theodoros <theod@lib.auth.gr>\n"
 "Language-Team: EL <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -89,7 +89,7 @@ msgstr "Παραδείγματα αναζήτησης"
 #: modules/websearch/doc/search-guide.webdoc:811
 #: modules/miscutil/lib/inveniocfg.py:327
 msgid "abstract"
-msgstr ""
+msgstr "περίληψη"
 
 #: modules/websearch/doc/search-guide.webdoc:339
 #: modules/websearch/doc/search-guide.webdoc:374
@@ -104,9 +104,8 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:781
 #: modules/websearch/doc/search-guide.webdoc:816
 #: modules/miscutil/lib/inveniocfg.py:332
-#, fuzzy
 msgid "fulltext"
-msgstr "Πίνακας Ανακοινώσεων"
+msgstr "πλήρες κείμενο"
 
 #: modules/websearch/doc/search-guide.webdoc:328
 #: modules/websearch/doc/search-guide.webdoc:364
@@ -155,9 +154,8 @@ msgstr "Όλες οι λέξεις"
 #: modules/websearch/doc/search-guide.webdoc:784
 #: modules/websearch/doc/search-guide.webdoc:819
 #: modules/miscutil/lib/inveniocfg.py:329
-#, fuzzy
 msgid "report number"
-msgstr "Αριθμός αναφοράς"
+msgstr "αριθμός αναφοράς"
 
 #: modules/websearch/doc/search-tips.webdoc:376
 #: modules/websearch/doc/search-tips.webdoc:383
@@ -179,9 +177,8 @@ msgstr "Αριθμός αναφοράς"
 #: modules/websearch/doc/search-guide.webdoc:787
 #: modules/websearch/doc/search-guide.webdoc:822
 #: modules/miscutil/lib/inveniocfg.py:335
-#, fuzzy
 msgid "year"
-msgstr "Έτος"
+msgstr "έτος"
 
 #: modules/websearch/doc/search-guide.webdoc:343
 #: modules/websearch/doc/search-guide.webdoc:378
@@ -196,9 +193,8 @@ msgstr "Έτος"
 #: modules/websearch/doc/search-guide.webdoc:785
 #: modules/websearch/doc/search-guide.webdoc:820
 #: modules/miscutil/lib/inveniocfg.py:330
-#, fuzzy
 msgid "subject"
-msgstr "Θέμα"
+msgstr "θέμα"
 
 #: modules/websearch/doc/search-guide.webdoc:327
 #: modules/websearch/doc/search-guide.webdoc:363
@@ -230,9 +226,8 @@ msgstr "Επιμέρους φράση:"
 #: modules/websearch/doc/search-guide.webdoc:783
 #: modules/websearch/doc/search-guide.webdoc:818
 #: modules/miscutil/lib/inveniocfg.py:331
-#, fuzzy
 msgid "reference"
-msgstr "Αριθμός αναφοράς"
+msgstr "αναφορά"
 
 #: modules/websearch/doc/search-tips.webdoc:38
 #: modules/websearch/doc/search-tips.webdoc:69
@@ -448,9 +443,8 @@ msgstr "Αριθμός αναφοράς"
 #: modules/websearch/doc/search-guide.webdoc:5225
 #: modules/websearch/doc/search-guide.webdoc:5245
 #: modules/miscutil/lib/inveniocfg.py:326
-#, fuzzy
 msgid "author"
-msgstr "Συγγραφέας:"
+msgstr "συγγραφέας"
 
 #: modules/webhelp/web/help-central.webdoc:94
 #: modules/websearch/doc/search-guide.webdoc:21
@@ -472,7 +466,7 @@ msgstr "Οδηγός"
 #: modules/websearch/doc/search-guide.webdoc:815
 #: modules/miscutil/lib/inveniocfg.py:336
 msgid "experiment"
-msgstr ""
+msgstr "πείραμα"
 
 #: modules/websearch/doc/search-guide.webdoc:325
 #: modules/websearch/doc/search-guide.webdoc:361
@@ -504,9 +498,8 @@ msgstr "Οποιαδήποτε από τις λέξεις"
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
 #: modules/miscutil/lib/inveniocfg.py:334
-#, fuzzy
 msgid "division"
-msgstr "έκδοση"
+msgstr "τμήμα"
 
 #: modules/websearch/doc/search-tips.webdoc:40
 #: modules/websearch/doc/search-tips.webdoc:71
@@ -978,9 +971,8 @@ msgstr "Βοήθεια"
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
 #: modules/miscutil/lib/inveniocfg.py:333
-#, fuzzy
 msgid "collection"
-msgstr "συλλογές"
+msgstr "συλλογή"
 
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:21
 msgid "WebSearch Admin Guide"
@@ -1050,9 +1042,8 @@ msgstr "ΚΑΙ"
 #: modules/websearch/doc/search-guide.webdoc:782
 #: modules/websearch/doc/search-guide.webdoc:817
 #: modules/miscutil/lib/inveniocfg.py:328
-#, fuzzy
 msgid "keyword"
-msgstr "Εγγραφή"
+msgstr "λέξη κλειδί"
 
 #: modules/websearch/doc/search-tips.webdoc:37
 #: modules/websearch/doc/search-tips.webdoc:68
@@ -1265,9 +1256,8 @@ msgstr "Εγγραφή"
 #: modules/websearch/doc/search-guide.webdoc:5224
 #: modules/websearch/doc/search-guide.webdoc:5244
 #: modules/miscutil/lib/inveniocfg.py:325
-#, fuzzy
 msgid "title"
-msgstr "Τίτλο"
+msgstr "τίτλος"
 
 #: modules/websearch/doc/search-tips.webdoc:73
 #: modules/websearch/doc/search-tips.webdoc:111
@@ -3944,9 +3934,8 @@ msgid "Usage statistics"
 msgstr ""
 
 #: modules/websearch/lib/websearchadminlib.py:3205
-#, fuzzy
 msgid "Fulltext"
-msgstr "Πίνακας Ανακοινώσεων"
+msgstr "Πλήρες κείμενο"
 
 #: modules/websearch/lib/websearch_templates.py:537
 #, python-format

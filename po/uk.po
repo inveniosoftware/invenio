@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.93.50.20080212\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-02-28 19:06+0100\n"
-"PO-Revision-Date: 2008-02-28 18:08+0100\n"
+"PO-Revision-Date: 2008-02-29 15:25+0100\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: UK <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -89,7 +89,7 @@ msgstr "Вказівки для пошуку"
 #: modules/websearch/doc/search-guide.webdoc:811
 #: modules/miscutil/lib/inveniocfg.py:327
 msgid "abstract"
-msgstr ""
+msgstr "резюме"
 
 #: modules/websearch/doc/search-guide.webdoc:339
 #: modules/websearch/doc/search-guide.webdoc:374
@@ -104,9 +104,8 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:781
 #: modules/websearch/doc/search-guide.webdoc:816
 #: modules/miscutil/lib/inveniocfg.py:332
-#, fuzzy
 msgid "fulltext"
-msgstr "розділи"
+msgstr "повний текст"
 
 #: modules/websearch/doc/search-guide.webdoc:328
 #: modules/websearch/doc/search-guide.webdoc:364
@@ -155,9 +154,8 @@ msgstr "Всі слова"
 #: modules/websearch/doc/search-guide.webdoc:784
 #: modules/websearch/doc/search-guide.webdoc:819
 #: modules/miscutil/lib/inveniocfg.py:329
-#, fuzzy
 msgid "report number"
-msgstr "вересень"
+msgstr "номер документа"
 
 #: modules/websearch/doc/search-tips.webdoc:376
 #: modules/websearch/doc/search-tips.webdoc:383
@@ -179,9 +177,8 @@ msgstr "вересень"
 #: modules/websearch/doc/search-guide.webdoc:787
 #: modules/websearch/doc/search-guide.webdoc:822
 #: modules/miscutil/lib/inveniocfg.py:335
-#, fuzzy
 msgid "year"
-msgstr "Пошук"
+msgstr "рік"
 
 #: modules/websearch/doc/search-guide.webdoc:343
 #: modules/websearch/doc/search-guide.webdoc:378
@@ -196,9 +193,8 @@ msgstr "Пошук"
 #: modules/websearch/doc/search-guide.webdoc:785
 #: modules/websearch/doc/search-guide.webdoc:820
 #: modules/miscutil/lib/inveniocfg.py:330
-#, fuzzy
 msgid "subject"
-msgstr "Додати"
+msgstr "тема"
 
 #: modules/websearch/doc/search-guide.webdoc:327
 #: modules/websearch/doc/search-guide.webdoc:363
@@ -231,7 +227,7 @@ msgstr "Частина фрази:"
 #: modules/websearch/doc/search-guide.webdoc:818
 #: modules/miscutil/lib/inveniocfg.py:331
 msgid "reference"
-msgstr ""
+msgstr "посилання"
 
 #: modules/websearch/doc/search-tips.webdoc:38
 #: modules/websearch/doc/search-tips.webdoc:69
@@ -448,7 +444,7 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:5245
 #: modules/miscutil/lib/inveniocfg.py:326
 msgid "author"
-msgstr ""
+msgstr "автор"
 
 #: modules/webhelp/web/help-central.webdoc:94
 #: modules/websearch/doc/search-guide.webdoc:21
@@ -470,7 +466,7 @@ msgstr "Керівництво"
 #: modules/websearch/doc/search-guide.webdoc:815
 #: modules/miscutil/lib/inveniocfg.py:336
 msgid "experiment"
-msgstr ""
+msgstr "експеримент"
 
 #: modules/websearch/doc/search-guide.webdoc:325
 #: modules/websearch/doc/search-guide.webdoc:361
@@ -502,9 +498,8 @@ msgstr "Будь-яке з слів:"
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
 #: modules/miscutil/lib/inveniocfg.py:334
-#, fuzzy
 msgid "division"
-msgstr "сеанс"
+msgstr "підрозділ"
 
 #: modules/websearch/doc/search-tips.webdoc:40
 #: modules/websearch/doc/search-tips.webdoc:71
@@ -976,9 +971,8 @@ msgstr "Центр допомоги"
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
 #: modules/miscutil/lib/inveniocfg.py:333
-#, fuzzy
 msgid "collection"
-msgstr "розділи"
+msgstr "розділ"
 
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:21
 msgid "WebSearch Admin Guide"
@@ -1048,9 +1042,8 @@ msgstr "ТА"
 #: modules/websearch/doc/search-guide.webdoc:782
 #: modules/websearch/doc/search-guide.webdoc:817
 #: modules/miscutil/lib/inveniocfg.py:328
-#, fuzzy
 msgid "keyword"
-msgstr "Подібні записи"
+msgstr "ключеве слово"
 
 #: modules/websearch/doc/search-tips.webdoc:37
 #: modules/websearch/doc/search-tips.webdoc:68
@@ -1263,9 +1256,8 @@ msgstr "Подібні записи"
 #: modules/websearch/doc/search-guide.webdoc:5224
 #: modules/websearch/doc/search-guide.webdoc:5244
 #: modules/miscutil/lib/inveniocfg.py:325
-#, fuzzy
 msgid "title"
-msgstr "квітень"
+msgstr "назва"
 
 #: modules/websearch/doc/search-tips.webdoc:73
 #: modules/websearch/doc/search-tips.webdoc:111
@@ -2175,9 +2167,8 @@ msgid "Day"
 msgstr "травень"
 
 #: modules/miscutil/lib/dateutils.py:282
-#, fuzzy
 msgid "Year"
-msgstr "Пошук"
+msgstr "Рік"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:66
 #: modules/miscutil/lib/errorlib_webinterface.py:71
@@ -2213,9 +2204,8 @@ msgid "Thank you!"
 msgstr ""
 
 #: modules/miscutil/lib/inveniocfg.py:337
-#, fuzzy
 msgid "record ID"
-msgstr "Подібні записи"
+msgstr "номер запису"
 
 #: modules/miscutil/lib/inveniocfg.py:339
 msgid "word similarity"
@@ -4012,9 +4002,8 @@ msgid "Usage statistics"
 msgstr ""
 
 #: modules/websearch/lib/websearchadminlib.py:3205
-#, fuzzy
 msgid "Fulltext"
-msgstr "розділи"
+msgstr "Повний текст"
 
 #: modules/websearch/lib/websearch_templates.py:537
 #, fuzzy, python-format
@@ -6144,9 +6133,8 @@ msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:1972
 #: modules/websubmit/lib/websubmit_templates.py:2097
-#, fuzzy
 msgid "Report Number"
-msgstr "вересень"
+msgstr "Номер документа"
 
 #: modules/websubmit/lib/websubmit_templates.py:2061
 #, fuzzy
