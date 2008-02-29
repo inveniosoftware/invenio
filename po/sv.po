@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.93.50.20080212\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-02-28 19:06+0100\n"
-"PO-Revision-Date: 2008-02-28 18:08+0100\n"
+"PO-Revision-Date: 2008-02-29 14:47+0100\n"
 "Last-Translator: Marcus Johansson <Marcus.Johansson@cern.ch>\n"
 "Language-Team: SV <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -91,7 +91,7 @@ msgstr "Söktips"
 #: modules/websearch/doc/search-guide.webdoc:811
 #: modules/miscutil/lib/inveniocfg.py:327
 msgid "abstract"
-msgstr ""
+msgstr "sammanfattning"
 
 #: modules/websearch/doc/search-guide.webdoc:339
 #: modules/websearch/doc/search-guide.webdoc:374
@@ -106,9 +106,8 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:781
 #: modules/websearch/doc/search-guide.webdoc:816
 #: modules/miscutil/lib/inveniocfg.py:332
-#, fuzzy
 msgid "fulltext"
-msgstr "Anslagstavla"
+msgstr "fulltext"
 
 #: modules/websearch/doc/search-guide.webdoc:328
 #: modules/websearch/doc/search-guide.webdoc:364
@@ -157,9 +156,8 @@ msgstr "Samtliga ord:"
 #: modules/websearch/doc/search-guide.webdoc:784
 #: modules/websearch/doc/search-guide.webdoc:819
 #: modules/miscutil/lib/inveniocfg.py:329
-#, fuzzy
 msgid "report number"
-msgstr "Rapportnummer"
+msgstr "rapportnummer"
 
 #: modules/websearch/doc/search-tips.webdoc:376
 #: modules/websearch/doc/search-tips.webdoc:383
@@ -181,7 +179,6 @@ msgstr "Rapportnummer"
 #: modules/websearch/doc/search-guide.webdoc:787
 #: modules/websearch/doc/search-guide.webdoc:822
 #: modules/miscutil/lib/inveniocfg.py:335
-#, fuzzy
 msgid "year"
 msgstr "år"
 
@@ -232,7 +229,6 @@ msgstr "Partiell fras:"
 #: modules/websearch/doc/search-guide.webdoc:783
 #: modules/websearch/doc/search-guide.webdoc:818
 #: modules/miscutil/lib/inveniocfg.py:331
-#, fuzzy
 msgid "reference"
 msgstr "referens"
 
@@ -450,9 +446,8 @@ msgstr "referens"
 #: modules/websearch/doc/search-guide.webdoc:5225
 #: modules/websearch/doc/search-guide.webdoc:5245
 #: modules/miscutil/lib/inveniocfg.py:326
-#, fuzzy
 msgid "author"
-msgstr "Författare:"
+msgstr "författare"
 
 #: modules/webhelp/web/help-central.webdoc:94
 #: modules/websearch/doc/search-guide.webdoc:21
@@ -980,9 +975,8 @@ msgstr "Hjälpcentral"
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
 #: modules/miscutil/lib/inveniocfg.py:333
-#, fuzzy
 msgid "collection"
-msgstr "samlingar"
+msgstr "samlingen"
 
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:21
 msgid "WebSearch Admin Guide"
@@ -1052,9 +1046,8 @@ msgstr "OCH"
 #: modules/websearch/doc/search-guide.webdoc:782
 #: modules/websearch/doc/search-guide.webdoc:817
 #: modules/miscutil/lib/inveniocfg.py:328
-#, fuzzy
 msgid "keyword"
-msgstr "Spela in"
+msgstr "nyckelord"
 
 #: modules/websearch/doc/search-tips.webdoc:37
 #: modules/websearch/doc/search-tips.webdoc:68
@@ -1267,9 +1260,8 @@ msgstr "Spela in"
 #: modules/websearch/doc/search-guide.webdoc:5224
 #: modules/websearch/doc/search-guide.webdoc:5244
 #: modules/miscutil/lib/inveniocfg.py:325
-#, fuzzy
 msgid "title"
-msgstr "Titel"
+msgstr "titel"
 
 #: modules/websearch/doc/search-tips.webdoc:73
 #: modules/websearch/doc/search-tips.webdoc:111
@@ -2145,7 +2137,7 @@ msgstr "dag"
 
 #: modules/miscutil/lib/dateutils.py:282
 msgid "Year"
-msgstr "år"
+msgstr "År"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:66
 #: modules/miscutil/lib/errorlib_webinterface.py:71
@@ -3933,9 +3925,8 @@ msgid "Usage statistics"
 msgstr ""
 
 #: modules/websearch/lib/websearchadminlib.py:3205
-#, fuzzy
 msgid "Fulltext"
-msgstr "Anslagstavla"
+msgstr "Fulltext"
 
 #: modules/websearch/lib/websearch_templates.py:537
 #, python-format
