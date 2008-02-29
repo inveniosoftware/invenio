@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.93.50.20080212\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-02-28 19:06+0100\n"
-"PO-Revision-Date: 2008-02-28 18:09+0100\n"
+"PO-Revision-Date: 2008-02-29 15:28+0100\n"
 "Last-Translator: Toru Tsuboyama <toru.tsuboyama@kek.jp>\n"
 "Language-Team: JA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -88,7 +88,7 @@ msgstr "検索のヒント"
 #: modules/websearch/doc/search-guide.webdoc:811
 #: modules/miscutil/lib/inveniocfg.py:327
 msgid "abstract"
-msgstr ""
+msgstr "概要"
 
 #: modules/websearch/doc/search-guide.webdoc:339
 #: modules/websearch/doc/search-guide.webdoc:374
@@ -103,9 +103,8 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:781
 #: modules/websearch/doc/search-guide.webdoc:816
 #: modules/miscutil/lib/inveniocfg.py:332
-#, fuzzy
 msgid "fulltext"
-msgstr "コレクション"
+msgstr "フルテキスト"
 
 #: modules/websearch/doc/search-guide.webdoc:328
 #: modules/websearch/doc/search-guide.webdoc:364
@@ -154,9 +153,8 @@ msgstr "すべての単語:"
 #: modules/websearch/doc/search-guide.webdoc:784
 #: modules/websearch/doc/search-guide.webdoc:819
 #: modules/miscutil/lib/inveniocfg.py:329
-#, fuzzy
 msgid "report number"
-msgstr "リポート番号"
+msgstr "レポート数"
 
 #: modules/websearch/doc/search-tips.webdoc:376
 #: modules/websearch/doc/search-tips.webdoc:383
@@ -178,7 +176,6 @@ msgstr "リポート番号"
 #: modules/websearch/doc/search-guide.webdoc:787
 #: modules/websearch/doc/search-guide.webdoc:822
 #: modules/miscutil/lib/inveniocfg.py:335
-#, fuzzy
 msgid "year"
 msgstr "年"
 
@@ -195,9 +192,8 @@ msgstr "年"
 #: modules/websearch/doc/search-guide.webdoc:785
 #: modules/websearch/doc/search-guide.webdoc:820
 #: modules/miscutil/lib/inveniocfg.py:330
-#, fuzzy
 msgid "subject"
-msgstr "題名"
+msgstr "ﾂ 主題"
 
 #: modules/websearch/doc/search-guide.webdoc:327
 #: modules/websearch/doc/search-guide.webdoc:363
@@ -229,9 +225,8 @@ msgstr "部分的な句:"
 #: modules/websearch/doc/search-guide.webdoc:783
 #: modules/websearch/doc/search-guide.webdoc:818
 #: modules/miscutil/lib/inveniocfg.py:331
-#, fuzzy
 msgid "reference"
-msgstr "参照："
+msgstr "参照"
 
 #: modules/websearch/doc/search-tips.webdoc:38
 #: modules/websearch/doc/search-tips.webdoc:69
@@ -447,7 +442,6 @@ msgstr "参照："
 #: modules/websearch/doc/search-guide.webdoc:5225
 #: modules/websearch/doc/search-guide.webdoc:5245
 #: modules/miscutil/lib/inveniocfg.py:326
-#, fuzzy
 msgid "author"
 msgstr "著者"
 
@@ -471,7 +465,7 @@ msgstr "ガイドを見てください"
 #: modules/websearch/doc/search-guide.webdoc:815
 #: modules/miscutil/lib/inveniocfg.py:336
 msgid "experiment"
-msgstr ""
+msgstr "実験"
 
 #: modules/websearch/doc/search-guide.webdoc:325
 #: modules/websearch/doc/search-guide.webdoc:361
@@ -503,9 +497,8 @@ msgstr "どれかの単語:"
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
 #: modules/miscutil/lib/inveniocfg.py:334
-#, fuzzy
 msgid "division"
-msgstr "バージョン"
+msgstr "部"
 
 #: modules/websearch/doc/search-tips.webdoc:40
 #: modules/websearch/doc/search-tips.webdoc:71
@@ -977,7 +970,6 @@ msgstr "ヘルプ"
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
 #: modules/miscutil/lib/inveniocfg.py:333
-#, fuzzy
 msgid "collection"
 msgstr "コレクション"
 
@@ -1049,9 +1041,8 @@ msgstr "そして"
 #: modules/websearch/doc/search-guide.webdoc:782
 #: modules/websearch/doc/search-guide.webdoc:817
 #: modules/miscutil/lib/inveniocfg.py:328
-#, fuzzy
 msgid "keyword"
-msgstr "レコード"
+msgstr "キーワード"
 
 #: modules/websearch/doc/search-tips.webdoc:37
 #: modules/websearch/doc/search-tips.webdoc:68
@@ -1264,7 +1255,6 @@ msgstr "レコード"
 #: modules/websearch/doc/search-guide.webdoc:5224
 #: modules/websearch/doc/search-guide.webdoc:5244
 #: modules/miscutil/lib/inveniocfg.py:325
-#, fuzzy
 msgid "title"
 msgstr "タイトル"
 
@@ -2180,9 +2170,8 @@ msgid "Thank you!"
 msgstr "ありがとう！"
 
 #: modules/miscutil/lib/inveniocfg.py:337
-#, fuzzy
 msgid "record ID"
-msgstr "レコードＩＤ"
+msgstr "記録的なID"
 
 #: modules/miscutil/lib/inveniocfg.py:339
 msgid "word similarity"
@@ -3913,9 +3902,8 @@ msgid "Usage statistics"
 msgstr ""
 
 #: modules/websearch/lib/websearchadminlib.py:3205
-#, fuzzy
 msgid "Fulltext"
-msgstr "コレクション"
+msgstr "フルテキスト"
 
 #: modules/websearch/lib/websearch_templates.py:537
 #, python-format
