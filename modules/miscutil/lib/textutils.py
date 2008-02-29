@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 
 import sys
 import re
-from textwrap import wrap
+import textwrap
 
 CFG_WRAP_TEXT_IN_A_BOX_STYLES = {
     '__DEFAULT' : {
@@ -78,7 +78,8 @@ def indent_text(text,
                 nb_tabs=0,
                 tab_str="  ",
                 linebreak_input="\n",
-                linebreak_output="\n", wrap=False):
+                linebreak_output="\n",
+                wrap=False):
     """
     add tabs to each line of text
     @param text: the text to indent
@@ -86,7 +87,8 @@ def indent_text(text,
     @param tab_str: type of tab (could be, for example "\t", default: 2 spaces
     @param linebreak_input: linebreak on input
     @param linebreak_output: linebreak on output
-    @param wrap wethever to apply smart text wrapping. (by means of wrap_text_in_a_box)
+    @param wrap wethever to apply smart text wrapping.
+        (by means of wrap_text_in_a_box)
     @return indented text as string
     """
     if not wrap:
@@ -97,7 +99,8 @@ def indent_text(text,
             output += tabs + line + linebreak_output
         return output
     else:
-        return wrap_text_in_a_box(body=text, style='no_border', tab_str=tab_str, tab_num=nb_tabs)
+        return wrap_text_in_a_box(body=text, style='no_border',
+            tab_str=tab_str, tab_num=nb_tabs)
 
 _RE_BEGINNING_SPACES = re.compile('^\s*')
 def wrap_text_in_a_box(body='', title='', style='double_star', **args):
@@ -119,20 +122,23 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     parameters:
         @param horiz_sep a string that is repeated in order to produce a
             separator row between the title and the body (if needed)
-        @param max_col the maximum number of coulmns used by the box (including
-            indentation)
+        @param max_col the maximum number of coulmns used by the box
+            (including indentation)
         @param min_col the symmetrical minimum number of columns
         @param tab_str a string to represent indentation
         @param tab_num the number of leveles of indentations
-        @param border a tuple of 8 element in the form (tl, t, tr, l, r, bl, b, br)
-            of strings that represent the different corners and sides of the box
+        @param border a tuple of 8 element in the form
+            (tl, t, tr, l, r, bl, b, br) of strings that represent the
+            different corners and sides of the box
         @param prefix a prefix string added before the box
         @param suffix a suffix string added after the box
         @param force_horiz True in order to print the horizontal line even when
             there is no title
 
     e.g.:
-    print wrap_text_in_a_box(title='prova', body='  123 prova.\n    Vediamo come si indenta', horiz_sep='-', style='no_border', max_col=20, tab_num=1)
+    print wrap_text_in_a_box(title='prova',
+        body='  123 prova.\n    Vediamo come si indenta',
+        horiz_sep='-', style='no_border', max_col=20, tab_num=1)
 
         prova
         ----------------
@@ -147,7 +153,8 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
         spaces = _RE_BEGINNING_SPACES.match(row).group()
         row = row[len(spaces):]
         spaces = spaces.expandtabs()
-        return wrap(row, initial_indent=spaces, subsequent_indent=spaces, width=max_col)
+        return textwrap.wrap(row, initial_indent=spaces,
+            subsequent_indent=spaces, width=max_col)
 
     astyle = dict(CFG_WRAP_TEXT_IN_A_BOX_STYLES['__DEFAULT'])
     if CFG_WRAP_TEXT_IN_A_BOX_STYLES.has_key(style):
@@ -157,7 +164,8 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     horiz_sep = astyle['horiz_sep']
     border = astyle['border']
     tab_str = astyle['tab_str'] * astyle['tab_num']
-    max_col = astyle['max_col'] - len(border[3]) - len(border[4]) - len(tab_str)
+    max_col = astyle['max_col'] \
+        - len(border[3]) - len(border[4]) - len(tab_str)
     min_col = astyle['min_col']
     prefix = astyle['prefix']
     suffix = astyle['suffix']
@@ -185,21 +193,23 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
         # Concrete empty title
         title_rows = []
 
-    try:
-        max_col = max([len(row) for row in body_rows + title_rows])
-    except ValueError:
-        max_col = 0
+    max_col = max([len(row) for row in body_rows + title_rows] + [min_col])
 
-    max_col = max(max_col, min_col)
-
-    mid_top_border_len = max_col + len(border[3]) + len(border[4]) - len(border[0]) - len(border[2])
-    mid_bottom_border_len = max_col + len(border[3]) + len(border[4]) - len(border[5]) - len(border[7])
-    top_border = border[0] + (border[1] * mid_top_border_len)[:mid_top_border_len] + border[2]
-    bottom_border = border[5] + (border[6] * mid_bottom_border_len)[:mid_bottom_border_len] + border[7]
+    mid_top_border_len = max_col \
+        + len(border[3]) + len(border[4]) - len(border[0]) - len(border[2])
+    mid_bottom_border_len = max_col \
+        + len(border[3]) + len(border[4]) - len(border[5]) - len(border[7])
+    top_border = border[0] \
+        + (border[1] * mid_top_border_len)[:mid_top_border_len] + border[2]
+    bottom_border = border[5] \
+        + (border[6] * mid_bottom_border_len)[:mid_bottom_border_len] \
+        + border[7]
     horiz_line = border[3] + (horiz_sep * max_col)[:max_col] + border[4]
 
-    title_rows = [tab_str + border[3] + row + ' ' * (max_col - len(row)) + border[4] for row in title_rows]
-    body_rows = [tab_str + border[3] + row + ' ' * (max_col - len(row)) + border[4] for row in body_rows]
+    title_rows = [tab_str + border[3] + row
+        + ' ' * (max_col - len(row)) + border[4] for row in title_rows]
+    body_rows = [tab_str + border[3] + row
+        + ' ' * (max_col - len(row)) + border[4] for row in body_rows]
 
     ret = []
     if top_border:
