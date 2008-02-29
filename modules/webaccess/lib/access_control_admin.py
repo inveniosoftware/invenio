@@ -1543,7 +1543,7 @@ def acc_find_possible_roles(name_action, arguments):
         booldict[keyword] = 1
 
     if id_superadmin not in results[1:]:
-        return results[1:].append(id_superadmin)
+        return results[1:] + [id_superadmin]
     else:
         return results[1:]
 
