@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.93.50.20080212\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-02-28 19:06+0100\n"
-"PO-Revision-Date: 2008-02-28 18:06+0100\n"
+"PO-Revision-Date: 2008-02-29 14:21+0100\n"
 "Last-Translator: Samuele Kaplun <samuele.kaplun@cern.ch>\n"
 "Language-Team: IT <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -89,7 +89,7 @@ msgstr "Consigli per la Ricerca"
 #: modules/websearch/doc/search-guide.webdoc:811
 #: modules/miscutil/lib/inveniocfg.py:327
 msgid "abstract"
-msgstr ""
+msgstr "riassunto"
 
 #: modules/websearch/doc/search-guide.webdoc:339
 #: modules/websearch/doc/search-guide.webdoc:374
@@ -104,9 +104,8 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:781
 #: modules/websearch/doc/search-guide.webdoc:816
 #: modules/miscutil/lib/inveniocfg.py:332
-#, fuzzy
 msgid "fulltext"
-msgstr "Bollettino"
+msgstr "testo completo"
 
 #: modules/websearch/doc/search-guide.webdoc:328
 #: modules/websearch/doc/search-guide.webdoc:364
@@ -155,9 +154,8 @@ msgstr "Tutte le parole:"
 #: modules/websearch/doc/search-guide.webdoc:784
 #: modules/websearch/doc/search-guide.webdoc:819
 #: modules/miscutil/lib/inveniocfg.py:329
-#, fuzzy
 msgid "report number"
-msgstr "Numero di rapporto"
+msgstr "numero di rapporto"
 
 #: modules/websearch/doc/search-tips.webdoc:376
 #: modules/websearch/doc/search-tips.webdoc:383
@@ -179,9 +177,8 @@ msgstr "Numero di rapporto"
 #: modules/websearch/doc/search-guide.webdoc:787
 #: modules/websearch/doc/search-guide.webdoc:822
 #: modules/miscutil/lib/inveniocfg.py:335
-#, fuzzy
 msgid "year"
-msgstr "Anno"
+msgstr "anno"
 
 #: modules/websearch/doc/search-guide.webdoc:343
 #: modules/websearch/doc/search-guide.webdoc:378
@@ -196,9 +193,8 @@ msgstr "Anno"
 #: modules/websearch/doc/search-guide.webdoc:785
 #: modules/websearch/doc/search-guide.webdoc:820
 #: modules/miscutil/lib/inveniocfg.py:330
-#, fuzzy
 msgid "subject"
-msgstr "Oggetto"
+msgstr "soggetto"
 
 #: modules/websearch/doc/search-guide.webdoc:327
 #: modules/websearch/doc/search-guide.webdoc:363
@@ -230,9 +226,8 @@ msgstr "Parte di frase:"
 #: modules/websearch/doc/search-guide.webdoc:783
 #: modules/websearch/doc/search-guide.webdoc:818
 #: modules/miscutil/lib/inveniocfg.py:331
-#, fuzzy
 msgid "reference"
-msgstr "Riferimento"
+msgstr "referenza"
 
 #: modules/websearch/doc/search-tips.webdoc:38
 #: modules/websearch/doc/search-tips.webdoc:69
@@ -448,9 +443,8 @@ msgstr "Riferimento"
 #: modules/websearch/doc/search-guide.webdoc:5225
 #: modules/websearch/doc/search-guide.webdoc:5245
 #: modules/miscutil/lib/inveniocfg.py:326
-#, fuzzy
 msgid "author"
-msgstr "Autore:"
+msgstr "autore"
 
 #: modules/webhelp/web/help-central.webdoc:94
 #: modules/websearch/doc/search-guide.webdoc:21
@@ -472,7 +466,7 @@ msgstr "Vedi la documentazione"
 #: modules/websearch/doc/search-guide.webdoc:815
 #: modules/miscutil/lib/inveniocfg.py:336
 msgid "experiment"
-msgstr ""
+msgstr "esperimento"
 
 #: modules/websearch/doc/search-guide.webdoc:325
 #: modules/websearch/doc/search-guide.webdoc:361
@@ -504,9 +498,8 @@ msgstr "Almeno una parola:"
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
 #: modules/miscutil/lib/inveniocfg.py:334
-#, fuzzy
 msgid "division"
-msgstr "versione"
+msgstr "divisione"
 
 #: modules/websearch/doc/search-tips.webdoc:40
 #: modules/websearch/doc/search-tips.webdoc:71
@@ -978,9 +971,8 @@ msgstr "Aiuto"
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
 #: modules/miscutil/lib/inveniocfg.py:333
-#, fuzzy
 msgid "collection"
-msgstr "collezioni"
+msgstr "collezione"
 
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:21
 msgid "WebSearch Admin Guide"
@@ -1050,9 +1042,8 @@ msgstr "E"
 #: modules/websearch/doc/search-guide.webdoc:782
 #: modules/websearch/doc/search-guide.webdoc:817
 #: modules/miscutil/lib/inveniocfg.py:328
-#, fuzzy
 msgid "keyword"
-msgstr "Record"
+msgstr "parola chiave"
 
 #: modules/websearch/doc/search-tips.webdoc:37
 #: modules/websearch/doc/search-tips.webdoc:68
@@ -1265,9 +1256,8 @@ msgstr "Record"
 #: modules/websearch/doc/search-guide.webdoc:5224
 #: modules/websearch/doc/search-guide.webdoc:5244
 #: modules/miscutil/lib/inveniocfg.py:325
-#, fuzzy
 msgid "title"
-msgstr "Titolo"
+msgstr "titolo"
 
 #: modules/websearch/doc/search-tips.webdoc:73
 #: modules/websearch/doc/search-tips.webdoc:111
@@ -2179,9 +2169,8 @@ msgid "Thank you!"
 msgstr "Grazie!"
 
 #: modules/miscutil/lib/inveniocfg.py:337
-#, fuzzy
 msgid "record ID"
-msgstr "record"
+msgstr "ID della notizia"
 
 #: modules/miscutil/lib/inveniocfg.py:339
 msgid "word similarity"
@@ -3949,9 +3938,8 @@ msgid "Usage statistics"
 msgstr ""
 
 #: modules/websearch/lib/websearchadminlib.py:3205
-#, fuzzy
 msgid "Fulltext"
-msgstr "Bollettino"
+msgstr "Testo completo"
 
 #: modules/websearch/lib/websearch_templates.py:537
 #, python-format
