@@ -281,7 +281,7 @@ class Template:
 
             ''' % {'weburl':weburl, 'ln':ln}
 
-        return indent_text(out)
+        return out
 
     def tmpl_admin_format_template_show_attributes(self, ln, name, description, filename, editable,
 						   all_templates=[], new=False):
@@ -881,7 +881,7 @@ class Template:
 
 
         out += '''</body></html>'''
-        return indent_text(out)
+        return out
 
     def tmpl_admin_format_templates_management(self, ln, formats):
         """
@@ -1010,7 +1010,7 @@ class Template:
                'add_format_template':_("Add New Format Template"),
                'extensive_checking':_("Check Format Templates Extensively")}
 
-        return indent_text(out)
+        return out
 
     def tmpl_admin_output_formats_management(self, ln, output_formats):
         """
@@ -1134,7 +1134,7 @@ class Template:
         ''' % {'ln':ln,
                'add_output_format':_("Add New Output Format")}
 
-        return indent_text(out)
+        return out
 
     def tmpl_admin_output_format_show(self, ln, code, name, rules, default, format_templates, editable):
         """
@@ -1330,7 +1330,7 @@ class Template:
              'disabled':disabled
              }
 
-        return indent_text(out)
+        return out
 
     def tmpl_admin_output_format_show_attributes(self, ln,
                                                  name,
@@ -1582,7 +1582,7 @@ class Template:
         out += '''
         <table align="center" width="95%">
         </table>'''
-        return indent_text(out)
+        return out
 
     def tmpl_admin_print_format_element_documentation(self, ln, name, attributes, print_see_also=True):
         """
@@ -1851,7 +1851,7 @@ class Template:
         </tr>
         </table>''' % {'ln': ln}
 
-        return indent_text(out)
+        return out
 
     def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby):
         """
@@ -2017,8 +2017,7 @@ class Template:
         </script>
         '''
 
-        return indent_text(out)
-
+        return out
 
     def tmpl_admin_kb_show_attributes(self, ln, kb_id, kb_name, description, sortby):
         """
@@ -2087,7 +2086,7 @@ class Template:
                            'kb_description': description,
                            'kb_id':kb_id}
 
-        return indent_text(out)
+        return out
 
     def tmpl_admin_kb_show_dependencies(self, ln, kb_id, kb_name, sortby, format_elements):
         """
@@ -2141,7 +2140,7 @@ class Template:
         <b>*Note</b>: Some knowledge base usages might not be shown. Check manually.
         '''
 
-        return indent_text(out)
+        return out
 
     def tmpl_dreamweaver_floater(self, ln, format_elements):
         """
@@ -2272,7 +2271,7 @@ class Template:
         for error in errors:
             out += error + "<br/>"
 
-        return indent_text(out)
+        return out
 
     def tmpl_admin_dialog_box(self, url, ln, title, message, options):
         """
@@ -2300,4 +2299,4 @@ class Template:
             out += '''<input type="submit" class="adminbutton" name="chosen_option" value="%(value)s" />&nbsp;''' % {'value':option}
 
         out += '''</form></fieldset></div>'''
-        return indent_text(out)
+        return out
