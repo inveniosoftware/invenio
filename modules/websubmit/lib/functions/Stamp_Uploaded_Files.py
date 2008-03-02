@@ -45,6 +45,12 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
             should be stamped: This is a comma-separated list of directory
             names. E.g.:
                DEMOTHESIS_MAIN,DEMOTHESIS_ADDITIONAL
+         + stamp: (string) - the type of stamp to be applied to the files.
+            should be one of:
+              + first (only the first page is stamped);
+              + all (all pages are stamped);
+              + coverpage (a separate cover-page is added to the file as a
+                 first page);
        If all goes according to plan, for each directory in which files are to
        be stamped, the original, unstamped files should be found in a
        directory 'files_before_stamping/DIRNAME', and the stamped versions
