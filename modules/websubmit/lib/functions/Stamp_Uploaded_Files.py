@@ -248,7 +248,7 @@ def visit_for_stamping(visit_for_stamping_arguments, dirname, filenames):
 
         try:
             ## Try to stamp the file:
-            path_to_stamped_file = \
+            (stamped_file_path_only, stamped_file_name) = \
                     websubmit_file_stamper.stamp_file(file_stamper_options)
         except websubmit_file_stamper.InvenioWebSubmitFileStamperError:
             ## It wasn't possible to stamp this file.
@@ -261,6 +261,8 @@ def visit_for_stamping(visit_for_stamping_arguments, dirname, filenames):
             continue
         else:
             ## Stamping was successful.
+            path_to_stamped_file = "%s/%s" % (stamped_file_path_only, \
+                                              stamped_file_name)
             ## Move the unstamped file from the "files" directory into the
             ## "files_before_stamping" directory:
             try:
@@ -293,7 +295,7 @@ def visit_for_stamping(visit_for_stamping_arguments, dirname, filenames):
                 ## the files directory:
                 try:
                     shutil.copy(path_to_stamped_file, "%s/%s" \
-                                % (dirname_files_pre_stamping, file_to_stamp))
+                                % (dirname, file_to_stamp))
                 except IOError:
                     ## Even though the original, unstamped file was moved away
                     ## from the files directory, the stamped-version couldn't
