@@ -33,11 +33,11 @@ case something goes wrong.
 __revision__ = "$Id$"
 
 from invenio.dbquery import run_sql
+from invenio.textutils import wrap_text_in_a_box
 import sys
 
 def migrate_passwords():
-    print "Password migration kit (for CDS Invenio prior to v0.92.1)"
-    print "==============================="
+    print wrap_text_in_a_box(title="Password migration kit (for CDS Invenio prior to v0.92.1)", style='conclusion')
     print "Checking your installation..."
     if __check_update_possibility():
         print "Tables are OK."
@@ -172,15 +172,12 @@ def __restoring_from_backup():
     return True
 
 def __print_error(restore_backup=False):
-    print "The kit encountered errors in migrating password. Please contact"
-    print "The CDS Invenio developers in order to get support providing all"
-    print "the printed messages."
+    print wrap_text_in_a_box("The kit encountered errors in migrating passwords. Please contact The CDS Invenio developers in order to get support providing all the printed messages.")
     if restore_backup:
         if __restoring_from_backup():
-            print "Passwords were restored from the backup, but you still need to"
-            print "migrate them in order to use this version of CDS Invenio."
+            print wrap_text_in_a_box("Passwords were restored from the backup, but you still need to migrate them in order to use this version of CDS Invenio.")
         else:
-            print "The kit was't unable to restore passwords from the backup"
+            print wrap_text_in_a_box("The kit was't unable to restore passwords from the backup")
     sys.exit(1)
 
 if __name__ == '__main__':
