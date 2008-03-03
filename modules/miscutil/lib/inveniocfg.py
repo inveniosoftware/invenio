@@ -711,6 +711,9 @@ def main():
                 confdir = sys.argv[sys.argv.index('--conf-dir') + 1]
             except IndexError:
                 pass # missing --conf-dir argument value
+            if not os.path.exists(confdir):
+                print "ERROR: bad or missing --conf-dir option value."
+                sys.exit(1)
         else:
             ## try to detect path to conf dir (relative to this bin dir):
             confdir = re.sub(r'/bin$', '/etc', sys.path[0])
@@ -726,12 +729,19 @@ def main():
                 sys.exit(1)
         ## decide what to do:
         done = False
-        for opt in sys.argv:
-            if opt == '--get':
+        for opt_idx in range(0, len(sys.argv)):
+            opt = sys.argv[opt_idx]
+            if opt == '--conf-dir':
+                # already treated before, so skip silently:
+                pass
+            elif opt == '--get':
                 try:
-                    varname = sys.argv[sys.argv.index('--get') + 1]
+                    varname = sys.argv[opt_idx + 1]
                 except IndexError:
-                    print "ERROR: missing variable name."
+                    print "ERROR: bad or missing --get option value."
+                    sys.exit(1)
+                if varname.startswith('-'):
+                    print "ERROR: bad or missing --get option value."
                     sys.exit(1)
                 varvalue = get(conf, varname)
                 if varvalue is not None:
