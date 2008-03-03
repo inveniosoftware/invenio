@@ -373,29 +373,30 @@ def test_db_connection():
     ## first, test connection to the DB server:
     try:
         run_sql("SHOW TABLES")
-    except Error, e:
+    except Error, err:
         from invenio.dbquery import CFG_DATABASE_HOST, CFG_DATABASE_NAME, \
              CFG_DATABASE_USER, CFG_DATABASE_PASS
-        print "\n"
-        print wrap_text_in_a_box(title="DATABASE CONNECTIVITY ERROR %d: %s." % \
-                                 (e.args[0], e.args[1]),
-                                 body="""\
-Perhaps you need to set up database and connection rights?  If yes,
-then please login as MySQL admin user and run the following commands
-now:
+        print wrap_text_in_a_box("""\
+DATABASE CONNECTIVITY ERROR %(errno)d: %(errmsg)s.
+
+Perhaps you need to set up database and connection rights?
+If yes, then please login as MySQL admin user and run the
+following commands now:
 
  $ mysql -h %(dbhost)s -u root -p mysql
    mysql> CREATE DATABASE %(dbname)s DEFAULT CHARACTER SET utf8;
    mysql> GRANT ALL PRIVILEGES ON %(dbname)s.* TO %(dbuser)s@%(webhost)s IDENTIFIED BY '%(dbpass)s';
    mysql> QUIT
 
-The values printed above were detected from your configuration.  If
-they are not right, then please edit your invenio.conf file and rerun
-'inveniocfg --update-all' first.
+The values printed above were detected from your configuration.
+If they are not right, then please edit your invenio.conf file
+and rerun 'inveniocfg --update-all' first.
 
 If the problem is of different nature, then please inspect
 the above error message and fix the problem before continuing.""" % \
-                                 {'dbname': CFG_DATABASE_NAME,
+                                 {'errno': err.args[0],
+                                  'errmsg': err.args[1],
+                                  'dbname': CFG_DATABASE_NAME,
                                   'dbhost': CFG_DATABASE_HOST,
                                   'dbuser': CFG_DATABASE_USER,
                                   'dbpass': CFG_DATABASE_PASS,
@@ -414,17 +415,17 @@ the above error message and fix the problem before continuing.""" % \
         res = run_sql("SELECT x,y,HEX(x),HEX(y),LENGTH(x),LENGTH(y),CHAR_LENGTH(x),CHAR_LENGTH(y) FROM test__invenio__utf8")
         assert res[0] == ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L)
         run_sql("DROP TEMPORARY TABLE test__invenio__utf8")
-    except Exception, e:
-        print "\n"
-        print wrap_text_in_a_box(title="DATABASE RELATED ERROR %s" % e,
-                                 body="""\
-A problem was detected with the UTF-8 treatment in the chain between
-the Python application, the MySQLdb connector, and the MySQL database.
-You may perhaps have installed older versions of some prerequisite
-packages?
+    except Exception, err:
+        print wrap_text_in_a_box("""\
+DATABASE RELATED ERROR %s
 
-Please check the INSTALL file and please fix this problem before
-continuing.""")
+A problem was detected with the UTF-8 treatment in the chain
+between the Python application, the MySQLdb connector, and
+the MySQL database. You may perhaps have installed older
+versions of some prerequisite packages?
+
+Please check the INSTALL file and please fix this problem
+before continuing.""" % err)
 
         sys.exit(1)
     print "ok"
@@ -454,9 +455,11 @@ def drop_tables(conf):
     from invenio.config import CFG_PREFIX
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
     if '--yes-i-know' not in sys.argv:
-        wait_for_user(wrap_text_in_a_box(title="WARNING: You are going to destroy your database tables!",
-                                         body="""Press Ctrl-C if you want to abort this action.
-                                         Press ENTER to proceed with this action."""))
+        wait_for_user(wrap_text_in_a_box("""\
+WARNING: You are going to destroy your database tables!
+
+Press Ctrl-C if you want to abort this action.
+Press ENTER to proceed with this action."""))
     cmd = "%s/bin/dbexec < %s/lib/sql/invenio/tabdrop.sql" % (CFG_PREFIX, CFG_PREFIX)
     if os.system(cmd):
         print "ERROR: failed execution of", cmd
@@ -507,9 +510,11 @@ def remove_demo_records(conf):
     from invenio.dbquery import run_sql
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
     if '--yes-i-know' not in sys.argv:
-        wait_for_user(wrap_text_in_a_box(title="WARNING: You are going to destroy your records and documents!",
-                                         body="""Press Ctrl-C if you want to abort this action.
-                                         Press ENTER to proceed with this action."""))
+        wait_for_user(wrap_text_in_a_box("""\
+WARNING: You are going to destroy your records and documents!
+
+Press Ctrl-C if you want to abort this action.
+Press ENTER to proceed with this action."""))
     if os.path.exists(CFG_PREFIX + os.sep + 'var' + os.sep + 'data' + os.sep + 'files'):
         shutil.rmtree(CFG_PREFIX + os.sep + 'var' + os.sep + 'data' + os.sep + 'files')
     run_sql("TRUNCATE schTASK")
@@ -526,9 +531,11 @@ def drop_demo_site(conf):
     print ">>> Going to drop demo site..."
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
     if '--yes-i-know' not in sys.argv:
-        wait_for_user(wrap_text_in_a_box(title="WARNING: You are going to destroy your site and documents!",
-                                         body="""Press Ctrl-C if you want to abort this action.
-                                         Press ENTER to proceed with this action."""))
+        wait_for_user(wrap_text_in_a_box("""\
+WARNING: You are going to destroy your site and documents!
+
+Press Ctrl-C if you want to abort this action.
+Press ENTER to proceed with this action."""))
     drop_tables(conf)
     create_tables(conf)
     remove_demo_records(conf)
@@ -671,13 +678,13 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
         print "Created file", apache_vhost_ssl_file
 
     print ""
-    print wrap_text_in_a_box(body="""\
-Apache virtual host configurations for your site have been created.
-You can check created files and put the following include statements
-in your httpd.conf:
+    print wrap_text_in_a_box("""\
+Apache virtual host configurations for your site have been
+created. You can check created files and put the following
+include statements in your httpd.conf:
 
-  Include %s
-  Include %s
+Include %s
+Include %s
     """ % (apache_vhost_file, apache_vhost_ssl_file))
     print ">>> Apache conf files created."
 
