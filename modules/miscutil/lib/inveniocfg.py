@@ -55,7 +55,8 @@ Options to update DB tables:
    --reset-fieldnames       reset tables to take account of new I18N names from PO files
 
 Options to help the work:
-   --get <some-var>         get value of a given variable from conf files
+   --list                   print names and values of all options from conf files
+   --get <some-opt>         get value of a given option from conf files
    --conf-dir </some/path>  path to directory where invenio*.conf files are [optional]
 """
 
@@ -695,6 +696,14 @@ def get(conf, varname):
             all_options[option] = conf.get(section, option)
     return  all_options.get(varname, None)
 
+def list(conf):
+    """
+    Return list of all conf options and values from CONF.
+    """
+    for section in conf.sections():
+        for option in conf.options(section):
+            print option, '=', conf.get(section, option)
+
 def main():
     """Main entry point."""
     conf = ConfigParser()
@@ -748,6 +757,9 @@ def main():
                     print varvalue
                 else:
                     sys.exit(1)
+                done = True
+            elif opt == '--list':
+                list(conf)
                 done = True
             elif opt == '--create-tables':
                 create_tables(conf)
