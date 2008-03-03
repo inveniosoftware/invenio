@@ -698,7 +698,7 @@ def get(conf, varname):
 
 def list(conf):
     """
-    Return list of all conf options and values from CONF.
+    Print a list of all conf options and values from CONF.
     """
     for section in conf.sections():
         for option in conf.options(section):
