@@ -214,7 +214,7 @@ Contents
       $ /opt/cds-invenio/bin/inveniocfg --run-regression-tests
       $ /opt/cds-invenio/bin/inveniocfg --remove-demo-records
       $ /opt/cds-invenio/bin/inveniocfg --drop-demo-site
-      $ firefox http://webserver.domain.com/admin/
+      $ firefox http://your.site.com/help/admin/howto-run
 
 2. Detailed instructions for the patient CDS Invenio admin
 ==========================================================
@@ -389,7 +389,7 @@ Contents
 2b. Configuration
 -----------------
 
-    Once the basic software installation is done, we proceed by
+    Once the basic software installation is done, we proceed to
     configuring your Invenio system.
           
       $ emacs /opt/cds-invenio/etc/invenio.conf
@@ -431,7 +431,7 @@ Contents
 
           Make the rest of the Invenio system aware of your
           invenio.conf changes.  This step is mandatory each time you
-          edit your conf file.
+          edit your conf files.
 
       $ /opt/cds-invenio/bin/inveniocfg --create-tables
 
@@ -537,19 +537,15 @@ Contents
           the demo site configuration but to start customizing from
           there.
 
-      $ firefox http://webserver.domain.com/admin/
+      $ firefox http://your.site.com/help/admin/howto-run
 
-          Optionally, do further runtime configurations of CDS
-          Invenio, like definition of data collections, document
-          types, document formats, word file tables, etc.
-
-          This configuration step is optional but you will most
-          probably want to define specific data collections suited to
-          your setup, or to configure submit pages for fill your
-          collections, to define new output formats, etc.
-
-          This configuration step uses MySQL configuration tables and
-          can be done anytime during the production of your system.
+          In order to start using your CDS Invenio installation, you
+          can start indexing, formatting and other daemons as
+          indicated in the "HOWTO Run" guide on the above URL.  You
+          can also use the Admin Area web interfaces to perform
+          further runtime configurations such as the definition of
+          data collections, document types, document formats, word
+          indexes, etc.
 
 Good luck, and thanks for choosing CDS Invenio.
   
