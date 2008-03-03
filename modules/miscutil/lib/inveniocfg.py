@@ -55,7 +55,8 @@ Options to update DB tables:
    --reset-fieldnames       reset tables to take account of new I18N names from PO files
 
 Options to help the work:
-   --conf-dir /some/path    path to directory where invenio*.conf files are [optional]
+   --get <some-var>         get value of a given variable from conf files
+   --conf-dir </some/path>  path to directory where invenio*.conf files are [optional]
 """
 
 __revision__ = "$Id$"
@@ -679,6 +680,21 @@ in your httpd.conf:
     """ % (apache_vhost_file, apache_vhost_ssl_file))
     print ">>> Apache conf files created."
 
+def get(conf, varname):
+    """
+    Return value of VARNAME read from CONF files.  Useful for
+    third-party programs to access values of conf options such as
+    CFG_PREFIX.  Return None if VARNAME is not found.
+    """
+    # do not pay attention to upper/lower case:
+    varname = varname.lower()
+    # do not pay attention to section names yet:
+    all_options = {}
+    for section in conf.sections():
+        for option in conf.options(section):
+            all_options[option] = conf.get(section, option)
+    return  all_options.get(varname, None)
+
 def main():
     """Main entry point."""
     conf = ConfigParser()
@@ -711,11 +727,23 @@ def main():
         ## decide what to do:
         done = False
         for opt in sys.argv:
-            if opt == '--drop-tables':
-                drop_tables(conf)
+            if opt == '--get':
+                try:
+                    varname = sys.argv[sys.argv.index('--get') + 1]
+                except IndexError:
+                    print "ERROR: missing variable name."
+                    sys.exit(1)
+                varvalue = get(conf, varname)
+                if varvalue is not None:
+                    print varvalue
+                else:
+                    sys.exit(1)
                 done = True
             elif opt == '--create-tables':
                 create_tables(conf)
+                done = True
+            elif opt == '--drop-tables':
+                drop_tables(conf)
                 done = True
             elif opt == '--create-demo-site':
                 create_demo_site(conf)
