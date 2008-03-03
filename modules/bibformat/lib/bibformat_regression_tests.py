@@ -272,64 +272,64 @@ class BibFormatMARCXMLTest(unittest.TestCase):
   <controlfield tag="001">9</controlfield>
   <datafield tag="041" ind1=" " ind2=" ">
     <subfield code="a">eng</subfield>
-  </datafield>
+</datafield>
   <datafield tag="088" ind1=" " ind2=" ">
     <subfield code="a">PRE-25553</subfield>
-  </datafield>
+</datafield>
   <datafield tag="088" ind1=" " ind2=" ">
     <subfield code="a">RL-82-024</subfield>
-  </datafield>
+</datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="a">Ellis, J</subfield>
     <subfield code="u">University of Oxford</subfield>
-  </datafield>
+</datafield>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Grand unification with large supersymmetry breaking</subfield>
-  </datafield>
+</datafield>
   <datafield tag="260" ind1=" " ind2=" ">
     <subfield code="c">Mar 1982</subfield>
-  </datafield>
+</datafield>
   <datafield tag="300" ind1=" " ind2=" ">
     <subfield code="a">18 p</subfield>
-  </datafield>
+</datafield>
   <datafield tag="650" ind1="1" ind2="7">
     <subfield code="2">SzGeCERN</subfield>
     <subfield code="a">General Theoretical Physics</subfield>
-  </datafield>
+</datafield>
   <datafield tag="700" ind1=" " ind2=" ">
     <subfield code="a">Ibanez, L E</subfield>
-  </datafield>
+</datafield>
   <datafield tag="700" ind1=" " ind2=" ">
     <subfield code="a">Ross, G G</subfield>
-  </datafield>
+</datafield>
   <datafield tag="909" ind1="C" ind2="0">
     <subfield code="y">1982</subfield>
-  </datafield>
+</datafield>
   <datafield tag="909" ind1="C" ind2="0">
     <subfield code="b">11</subfield>
-  </datafield>
+</datafield>
   <datafield tag="909" ind1="C" ind2="1">
     <subfield code="u">Oxford Univ.</subfield>
-  </datafield>
+</datafield>
   <datafield tag="909" ind1="C" ind2="1">
     <subfield code="u">Univ. Auton. Madrid</subfield>
-  </datafield>
+</datafield>
   <datafield tag="909" ind1="C" ind2="1">
     <subfield code="u">Rutherford Lab.</subfield>
-  </datafield>
+</datafield>
   <datafield tag="909" ind1="C" ind2="1">
     <subfield code="c">1990-01-28</subfield>
     <subfield code="l">50</subfield>
     <subfield code="m">2002-01-04</subfield>
     <subfield code="o">BATCH</subfield>
-  </datafield>
+</datafield>
   <datafield tag="909" ind1="C" ind2="S">
     <subfield code="s">h</subfield>
     <subfield code="w">1982n</subfield>
-  </datafield>
+</datafield>
   <datafield tag="980" ind1=" " ind2=" ">
     <subfield code="a">PREPRINT</subfield>
-  </datafield>
+</datafield>
 </record>
 </collection>'''
 
