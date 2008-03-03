@@ -130,7 +130,7 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
                                                expected_text="Search Guide"))
 	self.assertEqual([],
                          test_web_page_content(weburl + '/help/search-guide?ln=fr',
-                                               expected_text="Guide de Recherche"))
+                                               expected_text="Guide de recherche"))
 
 class WebSearchTestLegacyURLs(unittest.TestCase):
 
@@ -894,7 +894,7 @@ class WebSearchSortResultsTest(unittest.TestCase):
         """websearch - search results sorting, default method"""
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=cern&rg=1',
-                                               expected_text="[hep-th/0703265]"))
+                                               expected_text="[hep-th/9809057]"))
 
     def test_sort_results_ascending(self):
         """websearch - search results sorting, ascending field"""
@@ -906,7 +906,7 @@ class WebSearchSortResultsTest(unittest.TestCase):
         """websearch - search results sorting, descending field"""
         self.assertEqual([],
                          test_web_page_content(weburl + '/search?p=cern&rg=1&sf=reportnumber&so=d',
-                                               expected_text="[hep-th/0703265]"))
+                                               expected_text="SCAN-9605071"))
 
     def test_sort_results_sort_pattern(self):
         """websearch - search results sorting, preferential sort pattern"""
