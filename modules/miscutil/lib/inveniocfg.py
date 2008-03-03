@@ -147,7 +147,7 @@ def update_config_py(conf):
     """
     print ">>> Going to update config.py..."
     ## location where config.py is:
-    configpyfile = conf.get("Autotools detections", "pylibdir") + \
+    configpyfile = conf.get("Invenio", "pylibdir") + \
                    os.sep + 'invenio' + os.sep + 'config.py'
     ## backup current config.py file:
     if os.path.exists(configpyfile):
@@ -161,18 +161,19 @@ def update_config_py(conf):
     fdesc.write("# " + " ".join(sys.argv) + "\n")
     ## special treatment for CDSNAMEINTL options:
     fdesc.write("cdsnameintl = {}\n")
-    for lang in conf.get("Essential parameters", "cdslangs").split(","):
-        fdesc.write("cdsnameintl['%s'] = \"%s\"\n" % (lang, conf.get("Essential parameters",
+    for lang in conf.get("Invenio", "cdslangs").split(","):
+        fdesc.write("cdsnameintl['%s'] = \"%s\"\n" % (lang, conf.get("Invenio",
                                                                    "cdsnameintl_" + lang)))
     ## special treatment for legacy WebSubmit options: (FIXME: phase them out)
-    fdesc.write("accessurl = '%s/search'\n" % conf.get("Essential parameters", "WEBURL"))
-    fdesc.write("urlpath = '%s'\n" % conf.get("Essential parameters", "WEBURL"))
-    fdesc.write("images = '%s/img'\n" % conf.get("Essential parameters", "WEBURL"))
-    fdesc.write("htdocsurl = '%s'\n" % conf.get("Essential parameters", "WEBURL"))
+    fdesc.write("accessurl = '%s/search'\n" % conf.get("Invenio", "WEBURL"))
+    fdesc.write("urlpath = '%s'\n" % conf.get("Invenio", "WEBURL"))
+    fdesc.write("images = '%s/img'\n" % conf.get("Invenio", "WEBURL"))
+    fdesc.write("htdocsurl = '%s'\n" % conf.get("Invenio", "WEBURL"))
     ## process all the options normally:
     for section in conf.sections():
-        if section != 'Database access': # do not put db credentials into config.py
-            for option in conf.options(section):
+        for option in conf.options(section):
+            if not option.startswith('CFG_DATABASE_'):
+                # put all options except for db credentials into config.py
                 line_out = convert_conf_option(option, conf.get(section, option))
                 if line_out:
                     fdesc.write(line_out + "\n")
@@ -191,7 +192,7 @@ def update_dbquery_py(conf):
     """
     print ">>> Going to update dbquery.py..."
     ## location where dbquery.py is:
-    dbquerypyfile = conf.get("Autotools detections", "pylibdir") + \
+    dbquerypyfile = conf.get("Invenio", "pylibdir") + \
                     os.sep + 'invenio' + os.sep + 'dbquery.py'
     ## backup current dbquery.py file:
     if os.path.exists(dbquerypyfile):
@@ -203,7 +204,7 @@ def update_dbquery_py(conf):
         if m:
             dbparam = 'CFG_DATABASE_' + m.group(1)
             out += "%s%s'%s'\n" % (dbparam, m.group(2),
-                                   conf.get("Database access", dbparam))
+                                   conf.get('Invenio', dbparam))
         else:
             out += line
     fdesc = open(dbquerypyfile, 'w')
@@ -219,7 +220,7 @@ def update_dbexec(conf):
     """
     print ">>> Going to update dbexec..."
     ## location where dbexec is:
-    dbexecfile = conf.get("Autotools detections", "bindir") + \
+    dbexecfile = conf.get("Invenio", "bindir") + \
                     os.sep + 'dbexec'
     ## backup current dbexec file:
     if os.path.exists(dbexecfile):
@@ -231,7 +232,7 @@ def update_dbexec(conf):
         if m:
             dbparam = 'CFG_DATABASE_' + m.group(1)
             out += "%s%s'%s'\n" % (dbparam, m.group(2),
-                                   conf.get("Database access", dbparam))
+                                   conf.get("Invenio", dbparam))
         else:
             out += line
     fdesc = open(dbexecfile, 'w')
@@ -248,7 +249,7 @@ def update_bibconvert_templates(conf):
     """
     print ">>> Going to update bibconvert templates..."
     ## location where bibconvert/config/*.tpl are:
-    tpldir = conf.get("Autotools detections", 'ETCDIR') + \
+    tpldir = conf.get("Invenio", 'ETCDIR') + \
              os.sep + 'bibconvert' + os.sep + 'config'
     ## find all *.tpl files:
     for tplfilename in os.listdir(tpldir):
@@ -261,7 +262,7 @@ def update_bibconvert_templates(conf):
                 m = re.search(r'^(.*)http://.*?/record/(.*)$', line)
                 if m:
                     out += "%s%s/record/%s\n" % (m.group(1),
-                                                 conf.get("Essential parameters", 'WEBURL'),
+                                                 conf.get("Invenio", 'WEBURL'),
                                                  m.group(2))
                 else:
                     out += line
@@ -278,15 +279,15 @@ def reset_cdsname(conf):
     print ">>> Going to reset CDSNAME and CDSNAMEINTL..."
     from invenio.dbquery import run_sql, IntegrityError
     # reset CDSNAME:
-    cdsname = conf.get("Essential parameters", "cdsname")
+    cdsname = conf.get("Invenio", "cdsname")
     try:
         run_sql("""INSERT INTO collection (id, name, dbquery, reclist, restricted) VALUES
                                           (1,%s,NULL,NULL,NULL)""", (cdsname,))
     except IntegrityError:
         run_sql("""UPDATE collection SET name=%s WHERE id=1""", (cdsname,))
     # reset CDSNAMEINTL:
-    for lang in conf.get("Essential parameters", "cdslangs").split(","):
-        cdsname_lang = conf.get("Essential parameters", "cdsnameintl_" + lang)
+    for lang in conf.get("Invenio", "cdslangs").split(","):
+        cdsname_lang = conf.get("Invenio", "cdsnameintl_" + lang)
         try:
             run_sql("""INSERT INTO collectionname (id_collection, ln, type, value) VALUES
                          (%s,%s,%s,%s)""", (1, lang, 'ln', cdsname_lang))
@@ -302,7 +303,7 @@ def reset_adminemail(conf):
     """
     print ">>> Going to reset ADMINEMAIL..."
     from invenio.dbquery import run_sql
-    adminemail = conf.get("Essential parameters", "adminemail")
+    adminemail = conf.get("Invenio", "adminemail")
     res = run_sql("DELETE FROM user WHERE id=1")
     res = run_sql("""INSERT INTO user (id, email, password, note, nickname) VALUES
                         (1, %s, AES_ENCRYPT(email, ''), 1, 'admin')""",
@@ -561,7 +562,7 @@ def create_apache_conf(conf):
     """
     print ">>> Going to create Apache conf files..."
     from invenio.textutils import wrap_text_in_a_box
-    apache_conf_dir = conf.get("Autotools detections", 'ETCDIR') + \
+    apache_conf_dir = conf.get("Invenio", 'ETCDIR') + \
                       os.sep + 'apache'
     if not os.path.exists(apache_conf_dir):
         os.mkdir(apache_conf_dir)
@@ -606,11 +607,11 @@ NameVirtualHost *:80
            PythonDebug On
         </Directory>
 </VirtualHost>
-""" % {'servername': conf.get('Essential parameters', 'WEBURL').replace("http://", ""),
-       'serveralias': conf.get('Essential parameters', 'WEBURL').replace("http://", "").split('.')[0],
-       'serveradmin': conf.get('Essential parameters', 'ADMINEMAIL'),
-       'webdir': conf.get('Autotools detections', 'WEBDIR'),
-       'logdir': conf.get('Autotools detections', 'LOGDIR'),
+""" % {'servername': conf.get('Invenio', 'WEBURL').replace("http://", ""),
+       'serveralias': conf.get('Invenio', 'WEBURL').replace("http://", "").split('.')[0],
+       'serveradmin': conf.get('Invenio', 'ADMINEMAIL'),
+       'webdir': conf.get('Invenio', 'WEBDIR'),
+       'logdir': conf.get('Invenio', 'LOGDIR'),
        }
     apache_vhost_ssl_body = """\
 ServerSignature Off
@@ -652,11 +653,11 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
            PythonDebug On
         </Directory>
 </VirtualHost>
-""" % {'servername': conf.get('Essential parameters', 'SWEBURL').replace("http://", ""),
-       'serveralias': conf.get('Essential parameters', 'SWEBURL').replace("http://", "").split('.')[0],
-       'serveradmin': conf.get('Essential parameters', 'ADMINEMAIL'),
-       'webdir': conf.get('Autotools detections', 'WEBDIR'),
-       'logdir': conf.get('Autotools detections', 'LOGDIR'),
+""" % {'servername': conf.get('Invenio', 'SWEBURL').replace("http://", ""),
+       'serveralias': conf.get('Invenio', 'SWEBURL').replace("http://", "").split('.')[0],
+       'serveradmin': conf.get('Invenio', 'ADMINEMAIL'),
+       'webdir': conf.get('Invenio', 'WEBDIR'),
+       'logdir': conf.get('Invenio', 'LOGDIR'),
        }
     # write HTTP vhost snippet:
     if os.path.exists(apache_vhost_file):
@@ -667,8 +668,8 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
     fdesc.close()
     print "Created file", apache_vhost_file
     # write HTTPS vhost snippet:
-    if conf.get('Essential parameters', 'SWEBURL') != \
-       conf.get('Essential parameters', 'WEBURL'):
+    if conf.get('Invenio', 'SWEBURL') != \
+       conf.get('Invenio', 'WEBURL'):
         if os.path.exists(apache_vhost_ssl_file):
             shutil.copy(apache_vhost_ssl_file,
                         apache_vhost_ssl_file + '.OLD')

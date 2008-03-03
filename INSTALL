@@ -408,7 +408,7 @@ Contents
           example:
 
              $ cat /opt/cds-invenio/etc/invenio-local.conf
-             [Essential parameters]
+             [Invenio]
              WEBURL = http://your.site.com
              SWEBURL = https://your.site.com
          
