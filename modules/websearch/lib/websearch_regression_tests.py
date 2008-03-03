@@ -1076,6 +1076,33 @@ class WebSearchMARCQueryTest(unittest.TestCase):
                          test_web_page_content(weburl + '/search?of=id&p=245%3A%2Fand%2F',
                                                expected_text="[]"))
 
+class WebSearchExtSysnoQueryTest(unittest.TestCase):
+    """Test of queries using external system numbers."""
+
+    def test_existing_sysno_html_output(self):
+        """websearch - external sysno query, existing sysno, HTML output"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?sysno=000289446CER',
+                                               expected_text="The wall of the cave"))
+
+    def test_existing_sysno_id_output(self):
+        """websearch - external sysno query, existing sysno, ID output"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?sysno=000289446CER&of=id',
+                                               expected_text="[95]"))
+
+
+    def test_nonexisting_sysno_html_output(self):
+        """websearch - external sysno query, non-existing sysno, HTML output"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?sysno=000289446CERRRR',
+                                               expected_text="Requested record does not seem to exist."))
+
+    def test_nonexisting_sysno_id_output(self):
+        """websearch - external sysno query, non-existing sysno, ID output"""
+        self.assertEqual([],
+                         test_web_page_content(weburl + '/search?sysno=000289446CERRRR&of=id',
+                                               expected_text="[]"))
 
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
@@ -1095,7 +1122,8 @@ test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSortResultsTest,
                              WebSearchSearchResultsXML,
                              WebSearchUnicodeQueryTest,
-                             WebSearchMARCQueryTest)
+                             WebSearchMARCQueryTest,
+                             WebSearchExtSysnoQueryTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
