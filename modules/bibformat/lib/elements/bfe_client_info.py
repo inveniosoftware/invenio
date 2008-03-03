@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -23,12 +23,16 @@ __revision__ = "$Id$"
 def format(bfo, var=''):
     '''
     Print several client specific variables.
-    @param var the name of the desired variable. Can be one of: ln, search_pattern, uid
+    @param var the name of the desired variable. Can be one of: ln, search_pattern, uid, referer, uri, nickname, email
            lang: the current language of the user
            search_pattern: the list of keywords used by the user
            uid: the current user id
+           referer: the url the user came from
+           uri: the current uri
+           nickname: the user nickname
+           email: the user email
     '''
-    
+
     if var == '':
         out =  ''
     elif var == 'ln':
@@ -36,8 +40,16 @@ def format(bfo, var=''):
     elif var == 'search_pattern':
         out = ' '.join(bfo.search_pattern)
     elif var == 'uid':
-        out = bfo.uid
+        out = bfo.user_info['uid']
+    elif var == 'referer':
+        out = bfo.user_info['referer']
+    elif var == 'uri':
+        out = bfo.user_info['uri']
+    elif var == 'nickname':
+        out = bfo.user_info['nickname']
+    elif var == 'email':
+        out = bfo.user_info['email']
     else:
         out = 'Unknown variable: %s' % (var)
-        
+
     return out

@@ -41,7 +41,7 @@ class BibFormatAPITest(unittest.TestCase):
                                verbose=0,
                                search_pattern=[],
                                xml_record=None,
-                               uid=None,
+                               user_info=None,
                                on_the_fly=True)
 
         pageurl = weburl + '/record/73?of=hx'

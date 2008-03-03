@@ -79,7 +79,7 @@ from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
 from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time, Error
-from invenio.webuser import getUid
+from invenio.webuser import getUid, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly, create_error_box
 from invenio.messages import gettext_set_language
 
@@ -2548,7 +2548,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
 def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True, print_records_epilogue_p=True, verbose=0, tab=''):
 
     """
-    Prints list of records 'recIDs' formatted accoding to 'format' in
+    Prints list of records 'recIDs' formatted according to 'format' in
     groups of 'rg' starting from 'jrec'.
 
     Assumes that the input list 'recIDs' is sorted in reverse order,
@@ -2571,8 +2571,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
     if req is None:
         return
 
-    # get user id (for formatting based on priviledge)
-    uid = getUid(req)
+    # get user_info (for formatting based on user)
+    user_info = collect_user_info(req)
 
     if len(recIDs):
         nb_found = len(recIDs)
@@ -2609,7 +2609,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                            ln=ln,
                            search_pattern=search_pattern,
                            record_separator="\n",
-                           uid=uid,
+                           user_info=user_info,
                            req=req)
             # print footer if needed
             if print_records_epilogue_p:
@@ -2619,7 +2619,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
             # we are doing plain text output:
             for irec in range(irec_max, irec_min, -1):
                 x = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
-                                 uid=uid, verbose=verbose)
+                                 user_info=user_info, verbose=verbose)
                 req.write(x)
                 if x:
                     req.write('\n')
@@ -2632,7 +2632,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                 # portfolio and on-the-fly formats:
                 for irec in range(irec_max, irec_min, -1):
                     req.write(print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
-                                           uid=uid, verbose=verbose))
+                                           user_info=user_info, verbose=verbose))
             elif format.startswith("hb"):
                 # HTML brief format:
                 req.write(websearch_templates.tmpl_record_format_htmlbrief_header(
@@ -2645,7 +2645,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                     else:
                         relevance = ''
                     record = print_record(recIDs[irec], format, ot, ln, search_pattern=search_pattern,
-                                                  uid=uid, verbose=verbose)
+                                                  user_info=user_info, verbose=verbose)
 
                     req.write(websearch_templates.tmpl_record_format_htmlbrief_body(
                         ln = ln,
@@ -2725,7 +2725,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                                                                tabs,
                                                                                ln))
                     elif tab == 'references':
-                        content = format_record(recIDs[irec], 'HDREF', ln=ln, uid=uid, verbose=verbose)
+                        content = format_record(recIDs[irec], 'HDREF', ln=ln, user_info=user_info, verbose=verbose)
                         req.write(webstyle_templates.detailed_record_container(content,
                                                                                recIDs[irec],
                                                                                tabs,
@@ -2734,7 +2734,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                         # Metadata tab
                         content = print_record(recIDs[irec], format, ot, ln,
                                                search_pattern=search_pattern,
-                                               uid=uid, verbose=verbose)
+                                               user_info=user_info, verbose=verbose)
 
                         creationdate = None
                         modifydate = None
@@ -2765,8 +2765,8 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                                 reviews = get_mini_reviews(recid = recIDs[irec], ln=ln)
                             else:
                                 reviews = ''
-                            actions = format_record(recIDs[irec], 'HDACT', ln=ln, uid=uid, verbose=verbose)
-                            files = format_record(recIDs[irec], 'HDFILE', ln=ln, uid=uid, verbose=verbose)
+                            actions = format_record(recIDs[irec], 'HDACT', ln=ln, user_info=user_info, verbose=verbose)
+                            files = format_record(recIDs[irec], 'HDFILE', ln=ln, user_info=user_info, verbose=verbose)
                             req.write(webstyle_templates.detailed_record_mini_panel(recIDs[irec],
                                                                                     ln,
                                                                                     format,
@@ -2778,7 +2778,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                 for irec in range(irec_max, irec_min, -1):
                     req.write(print_record(recIDs[irec], format, ot, ln,
                                            search_pattern=search_pattern,
-                                           uid=uid, verbose=verbose))
+                                           user_info=user_info, verbose=verbose))
 
     else:
         print_warning(req, _("Use different search terms."))
@@ -2816,7 +2816,7 @@ def print_records_epilogue(req, format):
     req.write(epilogue)
 
 def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompress,
-                 search_pattern=None, uid=None, verbose=0):
+                 search_pattern=None, user_info=None, verbose=0):
     """Prints record 'recID' formatted accoding to 'format'."""
 
     _ = gettext_set_language(ln)
@@ -2848,7 +2848,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
             out += _("The record has been deleted.")
         else:
             out += call_bibformat(recID, format, ln, search_pattern=search_pattern,
-                                  uid=uid, verbose=verbose)
+                                  user_info=user_info, verbose=verbose)
 
             # at the end of HTML brief mode, print the "Detailed record" functionality:
             if format.lower().startswith('hb') and \
@@ -3022,7 +3022,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
             else:
                 # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly or use default format:
                 out_record_in_format = call_bibformat(recID, format, ln, search_pattern=search_pattern,
-                                                      uid=uid, verbose=verbose)
+                                                      user_info=user_info, verbose=verbose)
                 if out_record_in_format:
                     out += out_record_in_format
                 else:
@@ -3038,7 +3038,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
             out += _("The record has been deleted.")
         else:
             out += call_bibformat(recID, format, ln, search_pattern=search_pattern,
-                                  uid=uid, verbose=verbose)
+                                  user_info=user_info, verbose=verbose)
 
     elif format.startswith("hx"):
         # BibTeX format, called on the fly:
@@ -3046,7 +3046,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
             out += _("The record has been deleted.")
         else:
             out += call_bibformat(recID, format, ln, search_pattern=search_pattern,
-                                  uid=uid, verbose=verbose)
+                                  user_info=user_info, verbose=verbose)
 
     elif format.startswith("hs"):
         # for citation/download similarity navigation links:
@@ -3108,7 +3108,7 @@ def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompre
                 # record 'recID' is not formatted in 'format', so try to call BibFormat on the fly: or use default format:
                 if CFG_WEBSEARCH_CALL_BIBFORMAT:
                     out_record_in_format = call_bibformat(recID, format, ln, search_pattern=search_pattern,
-                                                          uid=uid, verbose=verbose)
+                                                          user_info=user_info, verbose=verbose)
                     if out_record_in_format:
                         out += out_record_in_format
                     else:
@@ -3147,7 +3147,7 @@ def encode_for_xml(s):
     s = string.replace(s, '<', '&lt;')
     return s
 
-def call_bibformat(recID, format="HD", ln=cdslang, search_pattern=None, uid=None, verbose=0):
+def call_bibformat(recID, format="HD", ln=cdslang, search_pattern=None, user_info=None, verbose=0):
     """
     Calls BibFormat and returns formatted record.
 
@@ -3163,7 +3163,7 @@ def call_bibformat(recID, format="HD", ln=cdslang, search_pattern=None, uid=None
                          of=format,
                          ln=ln,
                          search_pattern=keywords,
-                         uid=uid,
+                         user_info=user_info,
                          verbose=verbose)
 
 def log_query(hostname, query_args, uid=-1):

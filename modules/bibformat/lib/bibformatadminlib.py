@@ -323,7 +323,7 @@ def perform_request_format_element_show_dependencies(bfe, ln=cdslang):
                                                                            format_templates,
                                                                            tags)
 
-def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, uid=None, req=None):
+def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, user_info=None):
     """
     Show the dependencies of the given format.
 
@@ -334,8 +334,7 @@ def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, uid=
     @param ln language
     @param bfe the name of the format element to show
     @param params the list of parameters to pass to element format function
-    @param uid the user id for this request
-    @param req the mod_python request object
+    @param user_info the user_info of this request
     """
     _ = gettext_set_language(ln)
     format_element = bibformat_engine.get_format_element(bfe, with_built_in_params=True)
@@ -390,7 +389,11 @@ def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, uid=
     del params[_("Test with record:")] # Caution keep in sync with same text above
 
     if len(recIDs) > 0:
-        bfo = bibformat_engine.BibFormatObject(recIDs[0], ln, search_pattern, None, uid, req)
+        bfo = bibformat_engine.BibFormatObject(recID = recIDs[0],
+                                               ln = ln,
+                                               search_pattern = search_pattern.split(' '),
+                                               xml_record = None,
+                                               user_info = user_info)
         (result, errors) = bibformat_engine.eval_format_element(format_element, bfo, params)
     else:
         result = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_RECORD_FOUND_FOR_PATTERN", search_pattern)],

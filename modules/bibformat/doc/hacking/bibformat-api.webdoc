@@ -46,7 +46,7 @@ Contents:
 The APIs of bibformat.py consists in these functions:
 
  def format_record(recID, of, ln=cdslang, verbose=0,
-                   search_pattern=None, xml_record=None, uid=None,
+                   search_pattern=None, xml_record=None, user_info=None,
                    on_the_fly=False):
      """
      Formats a record given its ID (or its XML representation)
@@ -58,8 +58,8 @@ The APIs of bibformat.py consists in these functions:
      applied.
 
      Parameters that allow contextual formatting (like 'search_pattern'
-     and 'uid') are useful only when doing on-the-fly formatting,
-     or when caching with care (e.g. caching all formatted
+     and 'user_info') are useful only when doing on-the-fly
+     formatting, or when caching with care (e.g. caching all formatted
      versions of a record for each possible 'ln').
 
      The arguments are as follows:
@@ -94,14 +94,14 @@ The APIs of bibformat.py consists in these functions:
                         format.  If it is specified, recID parameter is
                         ignored. The XML must be pasable by BibRecord.
 
-                 uid -  User ID of the user who will view the formatted
-                        record.  Useful to grant access to special
-                        functions on a page depending on user's
-                        priviledge.  Allows contextual formatting.
-                        Typically 'uid' is retrieved with webuser.getUid(req).
+           user_info - allows to grant access to some functionalities
+                       on a page depending on the user's
+                       priviledges. 'user_info' is the same structure
+                       as the one returned by webuser.collect_user_info(req),
+                       (that is a dictionary).
 
-          on_the_fly -  if False, try to return an already preformatted version
-                        of the record in the database.
+          on_the_fly - if False, try to return an already preformatted
+                       version of the record in the database.
 
      """
 
@@ -112,7 +112,7 @@ The APIs of bibformat.py consists in these functions:
 
 
  def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None,
-                    xml_records=None, uid=None, record_prefix=None,
+                    xml_records=None, user_info=None, record_prefix=None,
                     record_separator=None, record_suffix=None,
                     prologue="", epilogue="", req=None, on_the_fly=False):
      """
@@ -387,10 +387,29 @@ interface and the userID by directly getting the attribute from 'bfo':
     the record had to be formatted. Always returns a string.
     """
 
+    bfo.user_info
+    """
+    Returns a dictionary with information about current user.
+    The returned dictionary has the following structure:
+        user_info = {
+            'remote_ip' : '',
+            'remote_host' : '',
+            'referer' : '',
+            'uri' : '',
+            'agent' : '',
+            'apache_user' : '',
+            'apache_group' : [],
+            'uid' : -1,
+            'nickname' : '',
+            'email' : '',
+            'group' : [],
+            'guest' : '1'
+        }
+    """
+
     bfo.uid
     """
-    Returns the user ID of the user who shall view the formatted
-    record.
+    ! DEPRECATED: use bfo.user_info['uid'] instead
     """
 
     bfo.recID
@@ -400,7 +419,7 @@ interface and the userID by directly getting the attribute from 'bfo':
 
     bfo.req
     """
-    Returns the mod_python request object
+    ! DEPRECATED: use bfo.user_info instead
     """
 
     bfo.format

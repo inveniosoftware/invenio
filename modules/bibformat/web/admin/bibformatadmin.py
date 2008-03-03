@@ -32,7 +32,7 @@ from invenio import bibformatadminlib, \
 
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
-from invenio.webuser import getUid, page_not_authorized
+from invenio.webuser import getUid, page_not_authorized, collect_user_info
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument, redirect_to_url
 from invenio.search_engine import search_pattern, \
@@ -719,13 +719,10 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
 
-    try:
-        uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
-
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
+        user_info = collect_user_info(req)
+        uid = user_info['uid']
         bft = wash_url_argument(bft, 'str')
         if save_action is not None and code is not None:
             #save
@@ -765,11 +762,11 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
 
         units = create_basic_search_units(None, pattern_for_preview, None)
         keywords = [unit[1] for unit in units if unit[0] != '-']
-        bfo = bibformat_engine.BibFormatObject(recID,
-                                               ln_for_preview,
-                                               keywords,
-                                               None,
-                                               getUid(req), req=req)
+        bfo = bibformat_engine.BibFormatObject(recID = recID,
+                                               ln = ln_for_preview,
+                                               search_pattern = keywords,
+                                               xml_record = None,
+                                               user_info = user_info)
         (body, errors) = bibformat_engine.format_with_format_template(bft,
                                                                       bfo,
                                                                       verbose=7,
@@ -889,19 +886,17 @@ def format_element_test(req, bfe, ln=config.cdslang, param_values=None):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s">%s</a>''' %( config.weburl, ln , _("Format Elements Documentation")))
-    try:
-        uid = getUid(req)
-    except MySQLdb.Error, e:
-        return error_page(req)
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         bfe = wash_url_argument(bfe, 'str')
+        user_info = collect_user_info(req)
+        uid = user_info['uid']
         return page(title=_("Test Format Element %s" % bfe),
                 body=bibformatadminlib.perform_request_format_element_test(bfe=bfe,
                                                                            ln=ln,
                                                                            param_values=param_values,
-                                                                           uid=getUid(req), req=req),
+                                                                           user_info=user_info),
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,

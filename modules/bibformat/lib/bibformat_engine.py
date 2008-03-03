@@ -65,6 +65,7 @@ from invenio.bibformat_utils import \
      record_get_xml, \
      parse_tag
 from invenio.htmlutils import HTMLWasher
+from invenio.webuser import collect_user_info
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
     from xml.dom import minidom
@@ -261,19 +262,22 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
         return out
 
 def format_record(recID, of, ln=cdslang, verbose=0,
-                  search_pattern=[], xml_record=None, uid=None):
+                  search_pattern=[], xml_record=None, user_info=None):
     """
-    Formats a record given output format. Main entry function of bibformat engine.
+    Formats a record given output format. Main entry function of
+    bibformat engine.
 
-    Returns a formatted version of the record in
-    the specified language, search pattern, and with the specified output format.
+    Returns a formatted version of the record in the specified
+    language, search pattern, and with the specified output format.
     The function will define which format template must be applied.
 
-    You can either specify an record ID to format, or give its xml representation.
-    if 'xml_record' is not None, then use it instead of recID.
+    You can either specify an record ID to format, or give its xml
+    representation.  if 'xml_record' is not None, then use it instead
+    of recID.
 
-    'uid' allows to grant access to some functionalities on a page depending
-    on the user's priviledges.
+    'user_info' allows to grant access to some functionalities on a
+    page depending on the user's priviledges. 'user_info' is the same
+    object as the one returned by 'webuser.collect_user_info(req)'
 
     @param recID the ID of record to format
     @param of an output format code (or short identifier for the output format)
@@ -284,7 +288,7 @@ def format_record(recID, of, ln=cdslang, verbose=0,
                                                        9: errors and warnings, stop if error (debug mode ))
     @param search_pattern list of strings representing the user request in web interface
     @param xml_record an xml string representing the record to format
-    @param uid the user id of the person who will view the formatted page
+    @param user_info the information of the user who will view the formatted page
     @return formatted record
     """
     out = ""
@@ -294,7 +298,7 @@ def format_record(recID, of, ln=cdslang, verbose=0,
     # But if format not found for new BibFormat, then call old BibFormat
 
     #Create a BibFormat Object to pass that contain record and context
-    bfo = BibFormatObject(recID, ln, search_pattern, xml_record, uid, of)
+    bfo = BibFormatObject(recID, ln, search_pattern, xml_record, user_info, of)
 
     #Find out which format template to use based on record and output format.
     template = decide_format_template(bfo, of)
@@ -1683,48 +1687,62 @@ class BibFormatObject:
     # The id of the record
     recID = 0
 
-    # The user id of the person who will view the formatted page (if applicable)
-    # This allows for example to print a "edit record" link for people
-    # who have right to edit a record.
-    uid = None
+    uid = None # DEPRECATED: use bfo.user_info['uid'] instead
+
+    # The information about the user, as returned by
+    # 'webuser.collect_user_info(req)'
+    user_info = None
 
     # The format in which the record is being formatted
     format = ''
 
-    # The mod_python request object
-    req = None
+    req = None # DEPRECATED: use bfo.user_info instead
 
     def __init__(self, recID, ln=cdslang, search_pattern=[],
-                 xml_record=None, uid=None, format='', req=None):
+                 xml_record=None, user_info=None, format=''):
         """
         Creates a new bibformat object, with given record.
 
         You can either specify an record ID to format, or give its xml representation.
         if 'xml_record' is not None, use 'xml_record' instead of recID for the record.
 
-        'uid' allows to grant access to some functionalities on a page depending
-        on the user's priviledges.
+        'user_info' allows to grant access to some functionalities on
+        a page depending on the user's priviledges. It is a dictionary
+        in the following form:
+        user_info = {
+            'remote_ip' : '',
+            'remote_host' : '',
+            'referer' : '',
+            'uri' : '',
+            'agent' : '',
+            'apache_user' : '',
+            'apache_group' : [],
+            'uid' : -1,
+            'nickname' : '',
+            'email' : '',
+            'group' : [],
+            'guest' : '1'
+        }
 
         @param recID the id of a record
         @param ln the language in which the record has to be formatted
         @param search_pattern list of string representing the request used by the user in web interface
         @param xml_record a xml string of the record to format
-        @param uid the user id of the person who will view the formatted page
+        @param user_info the information of the user who will view the formatted page
         @param format the format used for formatting this record
         """
         if xml_record is not None:
             # If record is given as parameter
             self.record = create_record(xml_record)[0]
-           # raise repr(create_record(xml_record.decode('utf-8').encode('utf-8')))
-            recID = record_get_field_value(self.record,"001")
-
+            recID = record_get_field_value(self.record, "001")
 
         self.lang = wash_language(ln)
         self.search_pattern = search_pattern
         self.recID = recID
-        self.uid = uid
         self.format = format
-        self.req = req
+        self.user_info = user_info
+        if self.user_info is None:
+            self.user_info = collect_user_info(None)
 
     def get_record(self):
         """

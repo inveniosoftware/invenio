@@ -22,11 +22,13 @@
 """
 Format records using specified format.
 
-API functions: format_record, format_records, create_excel, get_output_format_content_type
+API functions: format_record, format_records, create_excel,
+               get_output_format_content_type
 
-Used to wrap the BibFormat engine and associated functions. This is also where
-special formatting of multiple records (that the engine does not handle, as it works
-on a single record basis) should be put, with name create_*.
+Used to wrap the BibFormat engine and associated functions. This is
+also where special formatting of multiple records (that the engine
+does not handle, as it works on a single record basis) should be put,
+with name create_*.
 
 SEE: bibformat_utils.py
 
@@ -53,20 +55,24 @@ import sys
 # Functions to format a single record
 ##
 
-def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_record=None, uid=None, on_the_fly=False):
+def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[],
+                  xml_record=None, user_info=None, on_the_fly=False):
     """
     Formats a record given output format.
 
-    Returns a formatted version of the record in
-    the specified language, search pattern, and with the specified output format.
+    Returns a formatted version of the record in the specified
+    language, search pattern, and with the specified output format.
     The function will define which format template must be applied.
 
-    The record to be formatted can be specified with its ID (with 'recID' parameter) or given
-    as XML representation(with 'xml_record' parameter). If both are specified 'recID' is ignored.
+    The record to be formatted can be specified with its ID (with
+    'recID' parameter) or given as XML representation(with
+    'xml_record' parameter). If both are specified 'recID' is ignored.
 
-    'uid' allows to grant access to some functionalities on a page depending
-    on the user's priviledges. Typically use webuser.getUid(req). This uid has sense
-    only in the case of on-the-fly formatting.
+    'user_info' allows to grant access to some functionalities on a
+    page depending on the user's priviledges. The 'user_info' object
+    makes sense only in the case of on-the-fly formatting. 'user_info'
+    is the same object as the one returned by
+    'webuser.collect_user_info(req)'
 
     @param recID the ID of record to format
     @param of an output format code (or short identifier for the output format)
@@ -77,7 +83,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
                                                        9: errors and warnings, stop if error (debug mode ))
     @param search_pattern list of strings representing the user request in web interface
     @param xml_record an xml string represention of the record to format
-    @param uid the user id of the person who will view the formatted page (if applicable)
+    @param user_info the information of the user who will view the formatted page (if applicable)
     @param on_the_fly if False, try to return an already preformatted version of the record in the database
     @return formatted record
     """
@@ -125,7 +131,7 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[], xml_recor
                                               verbose=verbose,
                                               search_pattern=search_pattern,
                                               xml_record=xml_record,
-                                              uid=uid)
+                                              user_info=user_info)
         return out
     except Exception, e:
         #Failsafe execution mode
@@ -180,30 +186,35 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
 # that relies on format_records to do the formatting.
 ##
 
-def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_records=None, uid=None,
-                   record_prefix=None, record_separator=None, record_suffix=None,
-                   prologue="", epilogue="", req=None, on_the_fly=False):
+def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None,
+                   xml_records=None, user_info=None, record_prefix=None,
+                   record_separator=None, record_suffix=None, prologue="",
+                   epilogue="", req=None, on_the_fly=False):
     """
-    Returns a list of formatted records given by a list of record IDs or a list of records as xml.
-    Adds a prefix before each record, a suffix after each record, plus a separator between records.
+    Returns a list of formatted records given by a list of record IDs
+    or a list of records as xml.  Adds a prefix before each record, a
+    suffix after each record, plus a separator between records.
 
-    Also add optional prologue and epilogue to the complete formatted list.
+    Also add optional prologue and epilogue to the complete formatted
+    list.
 
-    You can either specify a list of record IDs to format, or a list of xml records,
-    but not both (if both are specified recIDs is ignored).
+    You can either specify a list of record IDs to format, or a list
+    of xml records, but not both (if both are specified recIDs is
+    ignored).
 
-    'record_separator' is a function that returns a string as separator between records.
-    The function must take an integer as unique parameter, which is the index
-    in recIDs (or xml_records) of the record that has just been formatted. For example
-    separator(i) must return the separator between recID[i] and recID[i+1].
-    Alternatively separator can be a single string, which will be used to separate
-    all formatted records.
-    The same applies to 'record_prefix' and 'record_suffix'.
+    'record_separator' is a function that returns a string as
+    separator between records.  The function must take an integer as
+    unique parameter, which is the index in recIDs (or xml_records) of
+    the record that has just been formatted. For example separator(i)
+    must return the separator between recID[i] and recID[i+1].
+    Alternatively separator can be a single string, which will be used
+    to separate all formatted records.  The same applies to
+    'record_prefix' and 'record_suffix'.
 
     'req' is an optional parameter on which the result of the function
     are printed lively (prints records after records) if it is given.
-    Note that you should set 'req' content-type by yourself, and send http header before calling
-    this function as it will not do it.
+    Note that you should set 'req' content-type by yourself, and send
+    http header before calling this function as it will not do it.
 
     This function takes the same parameters as 'format_record' except for:
     @param recIDs a list of record IDs
@@ -243,7 +254,9 @@ def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None, xml_r
                     req.write(string_prefix)
 
         #Print formatted record
-        formatted_record = format_record(recIDs[i], of, ln, verbose, search_pattern, xml_records[i], uid, on_the_fly)
+        formatted_record = format_record(recIDs[i], of, ln, verbose, \
+                                         search_pattern, xml_records[i],\
+                                         user_info, on_the_fly)
         formatted_records += formatted_record
         if req is not None:
             req.write(formatted_record)

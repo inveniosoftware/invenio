@@ -28,6 +28,7 @@ from invenio.errorlib import register_exception
 from invenio.webpage import page
 from invenio.config import weburl, etcdir
 from invenio.urlutils import redirect_to_url
+from invenio.webuser import collect_user_info
 
 from invenio.webjournal_config import InvenioWebJournalNoIndexTemplateError, \
                                       InvenioWebJournalNoIssueNumberTagError, \
@@ -85,7 +86,7 @@ def perform_request_index(req, journal_name, issue_number, language, category):
     """
     # init all the values we need from config.xml
     config_strings = get_xml_from_config(["index", "rule", "issue_number"],
-        journal_name)        
+        journal_name)
     try:
         try:
             index_page_template = config_strings["index"][0]
@@ -98,8 +99,8 @@ def perform_request_index(req, journal_name, issue_number, language, category):
     rule_list = config_strings["rule"]
     try:
         if len(rule_list) == 0:
-            raise InvenioWebJournalNoArticleRuleError(language, journal_name) 
-    except InvenioWebJournalNoArticleRuleError, e:     
+            raise InvenioWebJournalNoArticleRuleError(language, journal_name)
+    except InvenioWebJournalNoArticleRuleError, e:
         register_exception(req=req)
         return e.user_box()
     try:
@@ -122,7 +123,7 @@ def perform_request_index(req, journal_name, issue_number, language, category):
     else:
         # add the first category to the url string as a default
         req.journal_defaults["category"] = rule_list[0].split(",")[0]
-    # get the important values for the category from the config file        
+    # get the important values for the category from the config file
     rule_string = rule_list[current_category_in_list].replace(" ", "")
     category = rule_string.split(",")[0]
     rule = rule_string.split(",")[1]
@@ -132,7 +133,7 @@ def perform_request_index(req, journal_name, issue_number, language, category):
     marc_ind1 = (str(marc_datafield[3]) == "_") and " " or marc_datafield[3]
     marc_ind2 = (str(marc_datafield[4]) == "_") and " " or marc_datafield[4]
     marc_subfield = marc_datafield[5]
-    # create a marc record, containing category and issue number    
+    # create a marc record, containing category and issue number
     temp_marc = '''<record>
                         <controlfield tag="001">0</controlfield>
                         <datafield tag="%s" ind1="%s" ind2="%s">
@@ -149,7 +150,9 @@ def perform_request_index(req, journal_name, issue_number, language, category):
                     marc_ind2, marc_subfield, rule_match)
     #temp_marc = temp_marc.decode('utf-8').encode('utf-8')
     # create a record and get HTML back from bibformat
-    bfo = BibFormatObject(0, ln=language, xml_record=temp_marc, req=req)
+    user_info = collect_user_info(req)
+    bfo = BibFormatObject(0, ln=language, xml_record=temp_marc, user_info=user_info)
+    bfo.req = req
     html = format_with_format_template(index_page_template_path, bfo)[0]
     return html
 
@@ -165,7 +168,7 @@ def perform_request_article(req, journal_name, issue_number, language,
     # init all the values we need from config.xml
     config_strings = get_xml_from_config(["detailed", "rule"], journal_name)
     try:
-        try:    
+        try:
             index_page_template = config_strings["detailed"][0]
         except:
             raise InvenioWebJournalNoArticleTemplateError(language,
@@ -177,8 +180,8 @@ def perform_request_article(req, journal_name, issue_number, language,
     rule_list = config_strings["rule"]
     try:
         if len(rule_list) == 0:
-            raise InvenioWebJournalNoArticleRuleError(language, journal_name) 
-    except InvenioWebJournalNoArticleRuleError, e:     
+            raise InvenioWebJournalNoArticleRuleError(language, journal_name)
+    except InvenioWebJournalNoArticleRuleError, e:
         register_exception(req=req)
         return e.user_box()
     # get the current category for index display
@@ -189,7 +192,7 @@ def perform_request_article(req, journal_name, issue_number, language,
             category_from_config = rule_string.split(",")[0]
             if category_from_config.lower() == category.lower():
                 current_category_in_list = i
-            i+=1     
+            i+=1
     rule_string = rule_list[current_category_in_list].replace(" ", "")
     rule = rule_string.split(",")[1]
     # try to get the page from the cache
@@ -199,14 +202,16 @@ def perform_request_article(req, journal_name, issue_number, language,
     if cached_html and editor == "False":
         return cached_html
     # create a record and get HTML back from bibformat
-    bfo = BibFormatObject(recid, ln=language, req=req)
+    user_info = collect_user_info(req)
+    bfo = BibFormatObject(recid, ln=language, user_info=user_info)
+    bfo.req = req
     html_out = format_with_format_template(index_page_template_path,
                                            bfo)[0]
     # cache if not in editor mode
     if editor == "False":
         cache_article_page(html_out, journal_name, category,
                            recid, issue_number, language)
-    
+
     return html_out
 
 def perform_request_administrate(journal_name, language):
@@ -221,7 +226,7 @@ def perform_request_administrate(journal_name, language):
     return tmpl_webjournal_admin_interface(journal_name, current_issue,
                                 current_publication, issue_list,
                                 next_issue_number, language)
-    
+
 
 def perform_request_alert(req, journal_name, issue_number, language,
                               sent, plain_text, subject, recipients,
@@ -238,7 +243,7 @@ def perform_request_alert(req, journal_name, issue_number, language,
                                                                language,
                                                                issue_number)
     plain_text = plain_text.encode('utf-8')
-    
+
     if sent == "False":
         interface = tmpl_webjournal_alert_interface(language, journal_name,
                                                     subject, plain_text)
@@ -251,23 +256,23 @@ def perform_request_alert(req, journal_name, issue_number, language,
                                                           subject, plain_text,
                                                           recipients,
                                                           html_mail, issue_number)
-        if html_mail == "html": 
+        if html_mail == "html":
             html_file = urlopen('%s/journal/?name=%s&ln=en'
-                                % (weburl, journal_name))    
+                                % (weburl, journal_name))
             html_string = html_file.read()
             html_file.close()
             html_string = put_css_in_file(html_string, journal_name)
         else:
             html_string = plain_text.replace("\n", "<br/>")
-        
+
         message = createhtmlmail(html_string, plain_text,
                                  subject, recipients)
         server = smtplib.SMTP("localhost", 25)
         server.sendmail('Bulletin-Support@cern.ch', recipients, message)
         # todo: has to go to some messages config
-        update_DB_for_alert(issue_number, journal_name, language)    
+        update_DB_for_alert(issue_number, journal_name, language)
         return tmpl_webjournal_alert_success_msg(language, journal_name)
-    
+
 def perform_request_issue_control(req, journal_name, issue_numbers,
                                       language, add, action):
     """
@@ -300,7 +305,7 @@ def perform_request_issue_control(req, journal_name, issue_numbers,
             output = tmpl_webjournal_update_an_issue(language,
                                     journal_name,
                                     issue_times_to_week_strings([next_issue_week,])[0],
-                                    issue_times_to_week_strings([current_issue_time,])[0])   
+                                    issue_times_to_week_strings([current_issue_time,])[0])
         else:
             # propose a release
             next_issues = get_next_journal_issues(current_issue_time,
@@ -346,11 +351,11 @@ def perform_request_issue_control(req, journal_name, issue_numbers,
                 return e.user_box()
         output = tmpl_webjournal_issue_control_success_msg(language,
                                               publish_issues, journal_name)
-        
+
     elif action == "Update":
         try:
             try:
-                update_issue = issue_numbers[0]    
+                update_issue = issue_numbers[0]
             except:
                 raise InvenioWebJournalReleaseUpdateError(language, journal_name)
         except InvenioWebJournalReleaseUpdateError, e:
@@ -363,13 +368,13 @@ def perform_request_issue_control(req, journal_name, issue_numbers,
                 return e.user_box()
         output = tmpl_webjournal_updated_issue_msg(language, update_issue,
                                                    journal_name)
- 
+
     return page(title="Publish System", body=output)
 
 def perform_request_popup(req, language, journal_name, type, record):
     """
     """
-    config_strings = get_xml_from_config(["popup"], journal_name)        
+    config_strings = get_xml_from_config(["popup"], journal_name)
     try:
         try:
             popup_page_template = config_strings["popup"][0]
@@ -378,9 +383,11 @@ def perform_request_popup(req, language, journal_name, type, record):
     except InvenioWebJournalNoPopupTemplateError, e:
         register_exception(req=req)
         return e.user_box()
-    
+
     popup_page_template_path = 'webjournal/%s' % popup_page_template
-    bfo = BibFormatObject(record, ln=language, req=req)
+    user_info = collect_user_info(req)
+    bfo = BibFormatObject(record, ln=language, user_info=user_info)
+    bfo.req = req
     html = format_with_format_template(popup_page_template_path, bfo)[0]
 
     return html
@@ -394,7 +401,7 @@ def perform_request_search(journal_name, language, req, issue,
     config_strings = get_xml_from_config(["search", "issue_number", "rule"],
         journal_name)
     try:
-        try:    
+        try:
             search_page_template = config_strings["search"][0]
         except:
             raise InvenioWebJournalNoSearchTemplateError(journal_name, language)
@@ -403,13 +410,15 @@ def perform_request_search(journal_name, language, req, issue,
         return e.user_box()
     search_page_template_path = 'webjournal/%s' % (search_page_template)
     # just an empty buffer record, since all values are in req.journal_defaults
-    
+
     if archive_select == "False" and archive_search == "False":
         temp_marc = '''<record>
                             <controlfield tag="001">0</controlfield>
                         </record>'''
-                        
-        bfo = BibFormatObject(0, ln=language, xml_record=temp_marc, req=req)
+
+        user_info = collect_user_info(req)
+        bfo = BibFormatObject(0, ln=language, xml_record=temp_marc, user_info=user_info)
+        bfo.req = req
         html = format_with_format_template(search_page_template_path, bfo)[0]
         return html
     elif archive_select == "Go":

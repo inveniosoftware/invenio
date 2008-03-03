@@ -33,23 +33,19 @@ def format(bfo, style):
 
     out = ""
 
-    uid = bfo.uid
-    req = bfo.req
-    if uid is not None:
-        if req:
-            (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit')
-        else:
-            (auth_code, auth_message) = acc_authorize_action(uid, 'runbibedit')
-        if auth_code == 0:
-            print_style = ''
-            if style != '':
-                print_style = 'style="' + style + '"'
+    user_info = bfo.user_info
+    (auth_code, auth_message) = acc_authorize_action(user_info['uid'], \
+                                                     'runbibedit')
+    if auth_code == 0:
+        print_style = ''
+        if style != '':
+            print_style = 'style="' + style + '"'
 
-            out += '<a href="'+weburl + \
-                   '/admin/bibedit/bibeditadmin.py/index?recid=' + \
-                   str(bfo.recID) + '&amp;ln=' + bfo.lang +'" ' + \
-                   print_style + \
-                   '>Edit This Record</a>'
+        out += '<a href="' + weburl + \
+               '/admin/bibedit/bibeditadmin.py/index?recid=' + \
+               str(bfo.recID) + '&amp;ln=' + bfo.lang +'" ' + \
+               print_style + \
+               '>Edit This Record</a>'
 
     return out
 
