@@ -352,6 +352,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Send_Approval_Request',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Send_APP_Mail','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Send_Modify_Mail',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Send_SRV_Mail',NULL);
+INSERT INTO sbmALLFUNCDESCR VALUES ('Stamp_Uploaded_Files','Stamp some of the files that were uploaded during a submission.');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Test_Status','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Update_Approval_DB',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Upload_Files','');
@@ -428,6 +429,10 @@ INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','documenttype');
 INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','iconsize');
 INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','paths_and_suffixes');
 INSERT INTO sbmFUNDESC VALUES ('Move_Files_to_Storage','rename');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','files_to_be_stamped');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','latex_template');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','latex_template_vars');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','stamp');
 
 INSERT INTO sbmGFILERESULT VALUES ('HTML','HTML document');
 INSERT INTO sbmGFILERESULT VALUES ('WORD','data');
