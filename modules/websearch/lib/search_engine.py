@@ -3469,6 +3469,8 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
     # deduce recid from sysno argument (if applicable):
     if sysno: # ALEPH SYS number was passed, so deduce DB recID for the record:
         recid = get_mysql_recid_from_aleph_sysno(sysno)
+        if recid is None:
+            recid = 0 # use recid 0 to indicate that this sysno does not exist
     # deduce collection we are in (if applicable):
     if recid > 0:
         cc = guess_primary_collection_of_a_record(recid)
@@ -3478,7 +3480,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
     except:
         uid = 0
     ## 0 - start output
-    if recid > 0:
+    if recid >= 0: # recid can be 0 if deduced from sysno and if such sysno does not exist
         ## 1 - detailed record display
         title, description, keywords = \
                websearch_templates.tmpl_record_page_header_content(req, recid, ln)
@@ -3505,7 +3507,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 print_records_prologue(req, of)
                 print_records_epilogue(req, of)
             elif of.startswith("h"):
-                print_warning(req, "Requested record does not seem to exist.")
+                print_warning(req, _("Requested record does not seem to exist."))
 
     elif action == "browse":
         ## 2 - browse needed
