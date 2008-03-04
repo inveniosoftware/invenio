@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import traceback
 import sys
 import time
+from cStringIO import StringIO
 
 from invenio.config import cdslang, logdir, alertengineemail, adminemail, supportemail, cdsname
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
@@ -87,7 +88,7 @@ def get_tracestack():
                 }
     return tracestack_pretty
 
-def register_exception(force_stack=False, stream='error', req=None, prefix='', suffix=''):
+def register_exception(force_stack=False, stream='error', req=None, prefix='', suffix='', alert_support=False):
     """
     log error exception to invenio.err and warning exception to invenio.log
     errors will be logged with client information (if req is given)
@@ -106,6 +107,8 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
     @param suffix a message to be printed before the exception in
     the log
 
+    @param alert_support wethever to send the exception to the support via email
+
     @return 1 if successfully wrote to stream, 0 if not
     """
     try:
@@ -115,7 +118,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 stream='err'
             else:
                 stream='log'
-            stream_to_write = open(logdir + '/invenio.' + stream, 'a')
+            stream_to_write = StringIO()
             # <type 'exceptions.StandardError'> -> exceptions.StandardError
             exc_name = str(exc_info[0])[7:-2]
             # exceptions.StandardError -> StandardError
@@ -146,7 +149,12 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             if suffix:
                 print >> stream_to_write, suffix
             print >> stream_to_write, '\n'
+            text = stream_to_write.getvalue()
             stream_to_write.close()
+            open(logdir + '/invenio.' + stream, 'a').write(text)
+            if alert_support:
+                from invenio.mailutils import send_email
+                send_email(adminemail, supportemail, subject='Registered exception', content=text)
             return 1
         else:
             return 0
