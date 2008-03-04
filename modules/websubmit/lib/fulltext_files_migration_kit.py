@@ -25,6 +25,7 @@ compatible with file.py structure, but the viceversa is not true).
 """
 
 import sys
+from invenio.intbitset import intbitset
 from invenio.textutils import wrap_text_in_a_box
 from invenio.config import logdir, supportemail
 from invenio.dbquery import run_sql, OperationalError
@@ -35,7 +36,7 @@ def retrieve_fulltext_recids():
     """Returns the list of all the recid number linked with at least a fulltext
     file."""
     res = run_sql('SELECT DISTINCT id_bibrec FROM bibrec_bibdoc')
-    return [recid[0] for recid in res]
+    return intbitset(res)
 
 def fix_recid(recid, logfile):
     """Fix a given recid."""
@@ -90,6 +91,13 @@ def check_yes():
 
 def main():
     """Core loop."""
+    logfilename = '%s/fulltext_files_migration_kit-%s.log' % (logdir, datetime.today().strftime('%Y%m%d%H%M%S'))
+    try:
+        logfile = open(logfilename, 'w')
+    except IOError, e:
+        print wrap_text_in_a_box('NOTE: it\'s impossible to create the log:\n\n  %s\n\nbecause of:\n\n  %s\n\nPlease run this migration kit as the same user who runs Invenio (e.g. Apache)' % (logfilename, e), style='conclusion', break_long=False)
+        sys.exit(1)
+
     recids = retrieve_fulltext_recids()
     print wrap_text_in_a_box ("""This script migrate the filesystem structure used to store fulltext files to the new stricter structure.
 This script must not be run during normal Invenio operations.
@@ -112,7 +120,7 @@ In order for the script to go further they need to be removed.""", style='import
             print "Please, type yes if you agree to remove them and go further:",
 
             if not check_yes():
-                wrap_text_in_a_box("INTERRUPTED", style='conclusion')
+                print wrap_text_in_a_box("INTERRUPTED", style='conclusion')
                 sys.exit(1)
             print "Backing up database tables (after dropping previous backup)",
             backup_tables()
@@ -120,16 +128,14 @@ In order for the script to go further they need to be removed.""", style='import
         else:
             print "-> OK"
     except Exception, e:
-        wrap_text_in_a_box("Unexpected error while backing up tables. Please, do your checks: %s" % e, style='conclusion')
+        print wrap_text_in_a_box("Unexpected error while backing up tables. Please, do your checks: %s" % e, style='conclusion')
         sys.exit(1)
 
-    logfilename = '%s/fulltext_files_migration_kit-%s.log' % (logdir, datetime.today().strftime('%Y%m%d%H%M%S'))
-    logfile = open(logfilename, 'w')
     print "Created a complete log file into %s" % logfilename
     for recid in recids:
         if not fix_recid(recid, logfile):
             logfile.close()
-            wrap_text_in_a_box(title="INTERRUPTED BECAUSE OF ERROR!", body="""Please see the log file %s for what was the status of " % logfilename record %s prior to the error. Contact %s in case of problems, attaching the log.""" % (logfilename, recid, supportemail),
+            print wrap_text_in_a_box(title="INTERRUPTED BECAUSE OF ERROR!", body="""Please see the log file %s for what was the status of record %s prior to the error. Contact %s in case of problems, attaching the log.""" % (logfilename, recid, supportemail),
             style='conclusion')
             sys.exit(1)
     print wrap_text_in_a_box("DONE", style='conclusion')
