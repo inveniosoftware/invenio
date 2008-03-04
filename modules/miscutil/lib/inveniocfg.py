@@ -67,7 +67,6 @@ import os
 import re
 import shutil
 import sys
-import time
 
 def print_usage():
     """Print help."""
@@ -140,7 +139,7 @@ def convert_conf_option(option_name, option_value):
     ## 4) finally, return output line:
     return '%s = %s' % (option_name, option_value)
 
-def update_config_py(conf):
+def cli_cmd_update_config_py(conf):
     """
     Update new config.py from conf options, keeping previous
     config.py in a backup copy.
@@ -184,7 +183,7 @@ def update_config_py(conf):
     fdesc.close()
     print ">>> config.py updated successfully."
 
-def update_dbquery_py(conf):
+def cli_cmd_update_dbquery_py(conf):
     """
     Update lib/dbquery.py file with DB parameters read from conf file.
     Note: this edits dbquery.py in situ, taking a backup first.
@@ -200,10 +199,10 @@ def update_dbquery_py(conf):
     ## replace db parameters:
     out = ''
     for line in open(dbquerypyfile, 'r').readlines():
-        m = re.search(r'^CFG_DATABASE_(HOST|NAME|USER|PASS)(\s*=\s*)\'.*\'$', line)
-        if m:
-            dbparam = 'CFG_DATABASE_' + m.group(1)
-            out += "%s%s'%s'\n" % (dbparam, m.group(2),
+        match = re.search(r'^CFG_DATABASE_(HOST|NAME|USER|PASS)(\s*=\s*)\'.*\'$', line)
+        if match:
+            dbparam = 'CFG_DATABASE_' + match.group(1)
+            out += "%s%s'%s'\n" % (dbparam, match.group(2),
                                    conf.get('Invenio', dbparam))
         else:
             out += line
@@ -212,7 +211,7 @@ def update_dbquery_py(conf):
     fdesc.close()
     print ">>> dbquery.py updated successfully."
 
-def update_dbexec(conf):
+def cli_cmd_update_dbexec(conf):
     """
     Update bin/dbexec file with DB parameters read from conf file.
     Note: this edits dbexec in situ, taking a backup first.
@@ -228,10 +227,10 @@ def update_dbexec(conf):
     ## replace db parameters via sed:
     out = ''
     for line in open(dbexecfile, 'r').readlines():
-        m = re.search(r'^CFG_DATABASE_(HOST|NAME|USER|PASS)(\s*=\s*)\'.*\'$', line)
-        if m:
-            dbparam = 'CFG_DATABASE_' + m.group(1)
-            out += "%s%s'%s'\n" % (dbparam, m.group(2),
+        match = re.search(r'^CFG_DATABASE_(HOST|NAME|USER|PASS)(\s*=\s*)\'.*\'$', line)
+        if match:
+            dbparam = 'CFG_DATABASE_' + match.group(1)
+            out += "%s%s'%s'\n" % (dbparam, match.group(2),
                                    conf.get("Invenio", dbparam))
         else:
             out += line
@@ -240,7 +239,7 @@ def update_dbexec(conf):
     fdesc.close()
     print ">>> dbexec updated successfully."
 
-def update_bibconvert_templates(conf):
+def cli_cmd_update_bibconvert_tpl(conf):
     """
     Update bibconvert/config/*.tpl files looking for 856
     http://.../record/ lines, replacing URL with CDSWEB taken from
@@ -259,11 +258,11 @@ def update_bibconvert_templates(conf):
             shutil.copy(tplfile, tplfile + '.OLD')
             out = ''
             for line in open(tplfile, 'r').readlines():
-                m = re.search(r'^(.*)http://.*?/record/(.*)$', line)
-                if m:
-                    out += "%s%s/record/%s\n" % (m.group(1),
+                match = re.search(r'^(.*)http://.*?/record/(.*)$', line)
+                if match:
+                    out += "%s%s/record/%s\n" % (match.group(1),
                                                  conf.get("Invenio", 'WEBURL'),
-                                                 m.group(2))
+                                                 match.group(2))
                 else:
                     out += line
             fdesc = open(tplfile, 'w')
@@ -271,7 +270,7 @@ def update_bibconvert_templates(conf):
             fdesc.close()
     print ">>> bibconvert templates updated successfully."
 
-def reset_cdsname(conf):
+def cli_cmd_reset_cdsname(conf):
     """
     Reset collection-related tables with new CDSNAME and
     CDSNAMEINTL read from conf files.
@@ -297,20 +296,20 @@ def reset_cdsname(conf):
                     (cdsname_lang, lang))
     print ">>> CDSNAME and CDSNAMEINTL reset successfully."
 
-def reset_adminemail(conf):
+def cli_cmd_reset_adminemail(conf):
     """
     Reset user-related tables with new ADMINEMAIL read from conf files.
     """
     print ">>> Going to reset ADMINEMAIL..."
     from invenio.dbquery import run_sql
     adminemail = conf.get("Invenio", "adminemail")
-    res = run_sql("DELETE FROM user WHERE id=1")
-    res = run_sql("""INSERT INTO user (id, email, password, note, nickname) VALUES
+    run_sql("DELETE FROM user WHERE id=1")
+    run_sql("""INSERT INTO user (id, email, password, note, nickname) VALUES
                         (1, %s, AES_ENCRYPT(email, ''), 1, 'admin')""",
-                  (adminemail,))
+            (adminemail,))
     print ">>> ADMINEMAIL reset successfully."
 
-def reset_fieldnames(conf):
+def cli_cmd_reset_fieldnames(conf):
     """
     Reset I18N field names such as author, title, etc and other I18N
     ranking method names such as word similarity.  Their translations
@@ -318,47 +317,54 @@ def reset_fieldnames(conf):
     """
     print ">>> Going to reset I18N field names..."
     from invenio.messages import gettext_set_language, language_list_long
+    from invenio.dbquery import run_sql, IntegrityError
 
-    for lang, lang_fullname in language_list_long():
+    ## get field id and name list:
+    field_id_name_list = run_sql("SELECT id, name FROM field")
+    ## get rankmethod id and name list:
+    rankmethod_id_name_list = run_sql("SELECT id, name FROM rnkMETHOD")
+    ## update names for every language:
+    for lang, dummy in language_list_long():
         _ = gettext_set_language(lang)
-
         ## this list is put here in order for PO system to pick names
         ## suitable for translation
-        fields = [_("any field"),
-                  _("title"),
-                  _("author"),
-                  _("abstract"),
-                  _("keyword"),
-                  _("report number"),
-                  _("subject"),
-                  _("reference"),
-                  _("fulltext"),
-                  _("collection"),
-                  _("division"),
-                  _("year"),
-                  _("experiment"),
-                  _("record ID"),]
-
-        ranking_methods = [_("word similarity"),
-                           _("journal impact factor"),
-                           _("times cited"),]
-
-        ## update I18N field names for every language:
-
-# FIXME
-
-# INSERT INTO fieldname VALUES (1,'en','ln','any field');
-# INSERT INTO fieldname VALUES (1,'fr','ln','tous les champs');
-# [...]
-
-# INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'en','ln','word similarity');
-# INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (1,'fr','ln','similarité de mots');
-
-# INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'en','ln','journal impact factor');
-# INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (2,'fr','ln','journal impact factor');
-
-# INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'en','ln','citation');
-# INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES (3,'fr','ln','citation');
+        field_name_names = {"any field": _("any field"),
+                            "title": _("title"),
+                            "author": _("author"),
+                            "abstract": _("abstract"),
+                            "keyword": _("keyword"),
+                            "report number": _("report number"),
+                            "subject": _("subject"),
+                            "reference": _("reference"),
+                            "fulltext": _("fulltext"),
+                            "collection": _("collection"),
+                            "division": _("division"),
+                            "year": _("year"),
+                            "experiment": _("experiment"),
+                            "record ID": _("record ID"),}
+        ## update I18N names for every language:
+        for (field_id, field_name) in field_id_name_list:
+            try:
+                run_sql("""INSERT INTO fieldname (id_field,ln,type,value) VALUES
+                            (%s,%s,%s,%s)""", (field_id, lang, 'ln',
+                                               field_name_names[field_name]))
+            except IntegrityError:
+                run_sql("""UPDATE fieldname SET value=%s
+                            WHERE id_field=%s AND ln=%s AND type=%s""",
+                        (field_name_names[field_name], field_id, lang, 'ln',))
+        ## ditto for rank methods:
+        rankmethod_name_names = {"wrd": _("word similarity"),
+                                 "demo_jif": _("journal impact factor"),
+                                 "citation": _("times cited"),}
+        for (rankmethod_id, rankmethod_name) in rankmethod_id_name_list:
+            try:
+                run_sql("""INSERT INTO rnkMETHODNAME (id_rnkMETHOD,ln,type,value) VALUES
+                            (%s,%s,%s,%s)""", (rankmethod_id, lang, 'ln',
+                                               rankmethod_name_names[rankmethod_name]))
+            except IntegrityError:
+                run_sql("""UPDATE rnkMETHODNAME SET value=%s
+                            WHERE id_rnkMETHOD=%s AND ln=%s AND type=%s""",
+                        (rankmethod_name_names[rankmethod_name], rankmethod_id, lang, 'ln',))
 
     print ">>> I18N field names reset successfully."
 
@@ -378,20 +384,23 @@ def test_db_connection():
         from invenio.dbquery import CFG_DATABASE_HOST, CFG_DATABASE_NAME, \
              CFG_DATABASE_USER, CFG_DATABASE_PASS
         print wrap_text_in_a_box("""\
-DATABASE CONNECTIVITY ERROR %(errno)d: %(errmsg)s.
+DATABASE CONNECTIVITY ERROR %(errno)d: %(errmsg)s.\n
 
 Perhaps you need to set up database and connection rights?
 If yes, then please login as MySQL admin user and run the
 following commands now:
+
 
  $ mysql -h %(dbhost)s -u root -p mysql
    mysql> CREATE DATABASE %(dbname)s DEFAULT CHARACTER SET utf8;
    mysql> GRANT ALL PRIVILEGES ON %(dbname)s.* TO %(dbuser)s@%(webhost)s IDENTIFIED BY '%(dbpass)s';
    mysql> QUIT
 
+
 The values printed above were detected from your configuration.
 If they are not right, then please edit your invenio.conf file
 and rerun 'inveniocfg --update-all' first.
+
 
 If the problem is of different nature, then please inspect
 the above error message and fix the problem before continuing.""" % \
@@ -410,20 +419,20 @@ the above error message and fix the problem before continuing.""" % \
     ## possible Python/MySQL/MySQLdb mis-setup:
     print "Testing Python/MySQL/MySQLdb UTF-8 chain...",
     try:
-        x = "β" # Greek beta in UTF-8 is 0xCEB2
+        beta_in_utf8 = "β" # Greek beta in UTF-8 is 0xCEB2
         run_sql("CREATE TEMPORARY TABLE test__invenio__utf8 (x char(1), y varbinary(2)) DEFAULT CHARACTER SET utf8")
-        run_sql("INSERT INTO test__invenio__utf8 VALUES (%s,%s)", (x, x))
+        run_sql("INSERT INTO test__invenio__utf8 (x, y) VALUES (%s, %s)", (beta_in_utf8, beta_in_utf8))
         res = run_sql("SELECT x,y,HEX(x),HEX(y),LENGTH(x),LENGTH(y),CHAR_LENGTH(x),CHAR_LENGTH(y) FROM test__invenio__utf8")
         assert res[0] == ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L)
         run_sql("DROP TEMPORARY TABLE test__invenio__utf8")
     except Exception, err:
         print wrap_text_in_a_box("""\
-DATABASE RELATED ERROR %s
+DATABASE RELATED ERROR %s\n
 
 A problem was detected with the UTF-8 treatment in the chain
 between the Python application, the MySQLdb connector, and
 the MySQL database. You may perhaps have installed older
-versions of some prerequisite packages?
+versions of some prerequisite packages?\n
 
 Please check the INSTALL file and please fix this problem
 before continuing.""" % err)
@@ -431,7 +440,7 @@ before continuing.""" % err)
         sys.exit(1)
     print "ok"
 
-def create_tables(conf):
+def cli_cmd_create_tables(conf):
     """Create and fill Invenio DB tables.  Useful for the installation process."""
     print ">>> Going to create and fill tables..."
     from invenio.config import CFG_PREFIX
@@ -441,25 +450,25 @@ def create_tables(conf):
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
-    reset_cdsname(conf)
-    reset_adminemail(conf)
-    reset_fieldnames(conf)
-    for cmd in ["%s/bin/webaccessadmin -u admin -c -a" % CFG_PREFIX,]:
+    cli_cmd_reset_cdsname(conf)
+    cli_cmd_reset_adminemail(conf)
+    cli_cmd_reset_fieldnames(conf)
+    for cmd in ["%s/bin/webaccessadmin -u admin -c -a" % CFG_PREFIX]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
     print ">>> Tables created and filled successfully."
 
-def drop_tables(conf):
+def cli_cmd_drop_tables(conf):
     """Drop Invenio DB tables.  Useful for the uninstallation process."""
     print ">>> Going to drop tables..."
     from invenio.config import CFG_PREFIX
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
     if '--yes-i-know' not in sys.argv:
         wait_for_user(wrap_text_in_a_box("""\
-WARNING: You are going to destroy your database tables!
+WARNING: You are going to destroy your database tables!\n
 
-Press Ctrl-C if you want to abort this action.
+Press Ctrl-C if you want to abort this action.\n
 Press ENTER to proceed with this action."""))
     cmd = "%s/bin/dbexec < %s/lib/sql/invenio/tabdrop.sql" % (CFG_PREFIX, CFG_PREFIX)
     if os.system(cmd):
@@ -467,7 +476,7 @@ Press ENTER to proceed with this action."""))
         sys.exit(1)
     print ">>> Tables dropped successfully."
 
-def create_demo_site(conf):
+def cli_cmd_create_demo_site(conf):
     """Create demo site.  Useful for testing purposes."""
     print ">>> Going to create demo site..."
     from invenio.config import CFG_PREFIX
@@ -482,7 +491,7 @@ def create_demo_site(conf):
             sys.exit(1)
     print ">>> Demo site created successfully."
 
-def load_demo_records(conf):
+def cli_cmd_load_demo_records(conf):
     """Load demo records.  Useful for testing purposes."""
     from invenio.config import CFG_PREFIX
     from invenio.dbquery import run_sql
@@ -504,7 +513,7 @@ def load_demo_records(conf):
             sys.exit(1)
     print ">>> Demo records loaded successfully."
 
-def remove_demo_records(conf):
+def cli_cmd_remove_demo_records(conf):
     """Remove demo records.  Useful when you are finished testing."""
     print ">>> Going to remove demo records..."
     from invenio.config import CFG_PREFIX
@@ -512,9 +521,9 @@ def remove_demo_records(conf):
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
     if '--yes-i-know' not in sys.argv:
         wait_for_user(wrap_text_in_a_box("""\
-WARNING: You are going to destroy your records and documents!
+WARNING: You are going to destroy your records and documents!\n
 
-Press Ctrl-C if you want to abort this action.
+Press Ctrl-C if you want to abort this action.\n
 Press ENTER to proceed with this action."""))
     if os.path.exists(CFG_PREFIX + os.sep + 'var' + os.sep + 'data' + os.sep + 'files'):
         shutil.rmtree(CFG_PREFIX + os.sep + 'var' + os.sep + 'data' + os.sep + 'files')
@@ -527,27 +536,27 @@ Press ENTER to proceed with this action."""))
             sys.exit(1)
     print ">>> Demo records removed successfully."
 
-def drop_demo_site(conf):
+def cli_cmd_drop_demo_site(conf):
     """Drop demo site completely.  Useful when you are finished testing."""
     print ">>> Going to drop demo site..."
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
     if '--yes-i-know' not in sys.argv:
         wait_for_user(wrap_text_in_a_box("""\
-WARNING: You are going to destroy your site and documents!
+WARNING: You are going to destroy your site and documents!\n
 
-Press Ctrl-C if you want to abort this action.
+Press Ctrl-C if you want to abort this action.\n
 Press ENTER to proceed with this action."""))
-    drop_tables(conf)
-    create_tables(conf)
-    remove_demo_records(conf)
+    cli_cmd_drop_tables(conf)
+    cli_cmd_create_tables(conf)
+    cli_cmd_remove_demo_records(conf)
     print ">>> Demo site dropped successfully."
 
-def run_unit_tests(conf):
+def cli_cmd_run_unit_tests(conf):
     """Run unit tests, usually on the working demo site."""
     from invenio.config import CFG_PREFIX
     os.system("%s/bin/testsuite" % CFG_PREFIX)
 
-def run_regression_tests(conf):
+def cli_cmd_run_regression_tests(conf):
     """Run regression tests, usually on the working demo site."""
     from invenio.config import CFG_PREFIX
     if '--yes-i-know' in sys.argv:
@@ -555,7 +564,7 @@ def run_regression_tests(conf):
     else:
         os.system("%s/bin/regressiontestsuite" % CFG_PREFIX)
 
-def create_apache_conf(conf):
+def cli_cmd_create_apache_conf(conf):
     """
     Create Apache conf files for this site, keeping previous
     files in a backup copy.
@@ -682,14 +691,14 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
     print wrap_text_in_a_box("""\
 Apache virtual host configurations for your site have been
 created. You can check created files and put the following
-include statements in your httpd.conf:
+include statements in your httpd.conf:\n
 
 Include %s
 Include %s
     """ % (apache_vhost_file, apache_vhost_ssl_file))
     print ">>> Apache conf files created."
 
-def get(conf, varname):
+def cli_cmd_get(conf, varname):
     """
     Return value of VARNAME read from CONF files.  Useful for
     third-party programs to access values of conf options such as
@@ -704,7 +713,7 @@ def get(conf, varname):
             all_options[option] = conf.get(section, option)
     return  all_options.get(varname, None)
 
-def list(conf):
+def cli_cmd_list(conf):
     """
     Print a list of all conf options and values from CONF.
     """
@@ -760,73 +769,73 @@ def main():
                 if varname.startswith('-'):
                     print "ERROR: bad or missing --get option value."
                     sys.exit(1)
-                varvalue = get(conf, varname)
+                varvalue = cli_cmd_get(conf, varname)
                 if varvalue is not None:
                     print varvalue
                 else:
                     sys.exit(1)
                 done = True
             elif opt == '--list':
-                list(conf)
+                cli_cmd_list(conf)
                 done = True
             elif opt == '--create-tables':
-                create_tables(conf)
+                cli_cmd_create_tables(conf)
                 done = True
             elif opt == '--drop-tables':
-                drop_tables(conf)
+                cli_cmd_drop_tables(conf)
                 done = True
             elif opt == '--create-demo-site':
-                create_demo_site(conf)
+                cli_cmd_create_demo_site(conf)
                 done = True
             elif opt == '--load-demo-records':
-                load_demo_records(conf)
+                cli_cmd_load_demo_records(conf)
                 done = True
             elif opt == '--remove-demo-records':
-                remove_demo_records(conf)
+                cli_cmd_remove_demo_records(conf)
                 done = True
             elif opt == '--drop-demo-site':
-                drop_demo_site(conf)
+                cli_cmd_drop_demo_site(conf)
                 done = True
             elif opt == '--run-unit-tests':
-                run_unit_tests(conf)
+                cli_cmd_run_unit_tests(conf)
                 done = True
             elif opt == '--run-regression-tests':
-                run_regression_tests(conf)
+                cli_cmd_run_regression_tests(conf)
                 done = True
             elif opt == '--update-all':
-                update_config_py(conf)
-                update_dbquery_py(conf)
-                update_dbexec(conf)
-                update_bibconvert_templates(conf)
+                cli_cmd_update_config_py(conf)
+                cli_cmd_update_dbquery_py(conf)
+                cli_cmd_update_dbexec(conf)
+                cli_cmd_update_bibconvert_tpl(conf)
                 done = True
             elif opt == '--update-config-py':
-                update_config_py(conf)
+                cli_cmd_update_config_py(conf)
                 done = True
             elif opt == '--update-dbquery-py':
-                update_dbquery_py(conf)
+                cli_cmd_update_dbquery_py(conf)
                 done = True
             elif opt == '--update-dbexec':
-                update_dbexec(conf)
+                cli_cmd_update_dbexec(conf)
                 done = True
             elif opt == '--update-bibconvert-tpl':
-                update_bibconvert_templates(conf)
+                cli_cmd_update_bibconvert_tpl(conf)
                 done = True
             elif opt == '--reset-all':
-                reset_cdsname(conf)
-                reset_adminemail(conf)
-                reset_fieldnames(conf)
+                cli_cmd_reset_cdsname(conf)
+                cli_cmd_reset_adminemail(conf)
+                cli_cmd_reset_fieldnames(conf)
                 done = True
             elif opt == '--reset-cdsname':
-                reset_cdsname(conf)
+                cli_cmd_reset_cdsname(conf)
                 done = True
             elif opt == '--reset-adminemail':
-                reset_adminemail(conf)
+                cli_cmd_reset_adminemail(conf)
                 done = True
             elif opt == '--reset-fieldnames':
-                reset_fieldnames(conf)
+                cli_cmd_reset_fieldnames(conf)
                 done = True
             elif opt == '--create-apache-conf':
-                create_apache_conf(conf)
+                cli_cmd_create_apache_conf(conf)
                 done = True
             elif opt.startswith("-") and opt != '--yes-i-know':
                 print "ERROR: unknown option", opt
