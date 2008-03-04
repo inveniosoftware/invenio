@@ -51,15 +51,17 @@ kwalitee-check-variables:
 
 kwalitee-check-sql-queries:
 	@echo "* Listing potentially dangerous SQL queries:"
-	@echo "* 1) SQL INSERT queries without explicit column list:"
+	@echo "** SQL SELECT queries without explicit column list:"
+	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'SELECT \* FROM' {} \; 2> /dev/null
+	@echo "** SQL INSERT queries without explicit column list:"
 	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'INSERT INTO ([[:alnum:]]|_)+[[:space:]]*VALUES' {} \; 2> /dev/null
 	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'INSERT INTO ([[:alnum:]]|_)+[[:space:]]*$$' {} \; 2> /dev/null
-	@echo "* 2) SQL queries using charset-ignorant escape_string():"
+	@echo "** SQL queries using charset-ignorant escape_string():"
 	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'escape_string' {} \; 2> /dev/null
-	@echo "* 3) SQL queries using literal '%s':"
+	@echo "** SQL queries using literal '%s':"
 	@find $(top_srcdir) -name '*.py' -exec grep -HEin "run_sql.*'%[dfis]'" {} \; 2> /dev/null
 	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'run_sql.*"%[dfis]"' {} \; 2> /dev/null
-	@echo "* 4) SQL queries with potentially unescaped arguments:"
+	@echo "** SQL queries with potentially unescaped arguments:"
 	@find $(top_srcdir) -name '*.py' -exec grep -HEin 'run_sql.* % ' {} \; 2> /dev/null
 	@echo "* Done."
 
