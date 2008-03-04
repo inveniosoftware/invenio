@@ -287,7 +287,10 @@ def create_handler(root):
 
         except TraversalError:
             return apache.HTTP_NOT_FOUND
-        except:
+        except apache.SERVER_RETURN:
+            ## This is one of mod_python way of communicating
+            raise
+        except Exception:
             register_exception(req=req, alert_admin=True)
             raise
 
