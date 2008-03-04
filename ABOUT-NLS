@@ -273,7 +273,7 @@ the meantime.  The goal is to integrate the contributions.
 Firstly, check whether the contributed file sk-CONTRIB.po was indeed
 prepared for different software release version:
         
-   $ msgcmp sk-CONTRIB.po cds-invenio.pot
+   $ msgcmp --use-fuzzy --use-untranslated sk-CONTRIB.po cds-invenio.pot
 
 If yes, then join its translations with the ones in the latest sk.po
 file:
