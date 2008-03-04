@@ -24,7 +24,7 @@ from distutils.extension import Extension
 
 setup(
     name = 'intbitset',
-    version = '$Revision$'[len('$Revision$')],
+    version = '$Revision$',
     description = """
     Defines an intbitset data object to hold unordered sets of
     unsigned integers with ultra fast set operations, implemented via
