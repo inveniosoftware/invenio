@@ -104,6 +104,7 @@ def indent_text(text,
             tab_str=tab_str, tab_num=nb_tabs)
 
 _RE_BEGINNING_SPACES = re.compile('^\s*')
+_RE_NEWLINES_CLEANER = re.compile('\n+')
 def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     """Return a nicely formatted text box:
         e.g.
@@ -160,6 +161,10 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
             subsequent_indent=spaces, width=max_col,
             break_long_words=break_long)
 
+    def _clean_newlines(text):
+        """Remove single new lines, decrement multiple newlines"""
+        return _RE_NEWLINES_CLEANER.sub(lambda x: x.group()[:-1], text)
+
     astyle = dict(CFG_WRAP_TEXT_IN_A_BOX_STYLES['__DEFAULT'])
     if CFG_WRAP_TEXT_IN_A_BOX_STYLES.has_key(style):
         astyle.update(CFG_WRAP_TEXT_IN_A_BOX_STYLES[style])
@@ -168,14 +173,15 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     horiz_sep = astyle['horiz_sep']
     border = astyle['border']
     tab_str = astyle['tab_str'] * astyle['tab_num']
-    max_col = astyle['max_col'] \
-        - len(border[3]) - len(border[4]) - len(tab_str)
+    max_col = max(astyle['max_col'] \
+        - len(border[3]) - len(border[4]) - len(tab_str), 1)
     min_col = astyle['min_col']
     prefix = astyle['prefix']
     suffix = astyle['suffix']
     force_horiz = astyle['force_horiz']
     break_long = astyle['break_long']
 
+    body = _clean_newlines(body)
     tmp_rows = [_wrap_row(row, max_col, break_long)
                         for row in body.split('\n')]
     body_rows = []
@@ -188,6 +194,7 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
         # Concrete empty body
         body_rows = []
 
+    title = _clean_newlines(title)
     tmp_rows = [_wrap_row(row, max_col, break_long)
                         for row in title.split('\n')]
     title_rows = []
