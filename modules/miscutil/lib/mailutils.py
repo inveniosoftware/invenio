@@ -96,7 +96,7 @@ def send_email(fromaddr,
     e.g.:
     send_email('foo.bar@cern.ch', 'bar.foo@cern.ch', 'Let\'s try!'', 'check 1234', '<strong>check</strong> <em>1234</em><img src="cid:image1">', {'image1': '/tmp/quantum.jpg'})
 
-    @return [int]: 0 if email was sent okay, 1 if it was not.
+    @return [bool]: True if email was sent okay, False if it was not.
     """
     toaddr = toaddr.strip()
     usebcc = ',' in toaddr # More than one address, let's use Bcc in place of To

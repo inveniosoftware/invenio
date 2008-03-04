@@ -24,11 +24,12 @@
 __revision__ = "$Id$"
 
 import traceback
+import os
 import sys
 import time
 from cStringIO import StringIO
 
-from invenio.config import cdslang, logdir, alertengineemail, adminemail, supportemail, cdsname
+from invenio.config import cdslang, logdir, alertengineemail, adminemail, supportemail, cdsname, weburl
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
@@ -112,28 +113,41 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
     @return 1 if successfully wrote to stream, 0 if not
     """
     try:
+        ## Let's extract exception information
         exc_info =  sys.exc_info()
         if exc_info[0]:
-            if stream=='error':
-                stream='err'
-            else:
-                stream='log'
+            ## We found an exception.
+
+            ## Preparing the exception dump
+            stream = stream=='error' and 'err' or 'log'
             stream_to_write = StringIO()
-            # <type 'exceptions.StandardError'> -> exceptions.StandardError
-            exc_name = str(exc_info[0])[7:-2]
-            # exceptions.StandardError -> StandardError
-            exc_name = exc_name.split('.')[-1]
+
+            ## We want to extract the name of the Exception
+            exc_name = exc_info[0].__name__
             exc_value = str(exc_info[1])
-            print >> stream_to_write, "%(time)s -> %(name)s %(value)s" % {
+
+            ## Let's record when and where and what
+            print >> stream_to_write, "%(time)s -> %(name)s: %(value)s" % {
                 'time' : time.strftime("%Y-%m-%d %H:%M:%S"),
                 'name' : exc_name,
                 'value' : exc_value
             }
+
+            ## If a prefix was requested let's print it
             if prefix:
                 print >> stream_to_write, prefix
-            print >> stream_to_write, get_pretty_wide_client_info(req)
+
+            ## Let's print contextual user related info, if any
+            try:
+                print >> stream_to_write, get_pretty_wide_client_info(req)
+            except Exception, e:
+                print >> stream_to_write, "Error in retrieving contextual information: %s" % e
+
+            ## Let's extract the traceback
             if not exc_name.startswith('Invenio') or force_stack:
-                tracestack = traceback.extract_stack()[-5:-2] #force traceback except for this call
+                ## We put a large traceback only if requested
+                ## or the Exception is not an Invenio one.
+                tracestack = traceback.extract_stack()[-5:-2]
                 tracestack_pretty = "%sForced traceback (most recent call last)" % (' '*4,)
                 for trace_tuple in tracestack:
                     tracestack_pretty += """
@@ -145,16 +159,29 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                             'text'      : trace_tuple[3] is not None and str(trace_tuple[3]) or ""
                         }
                 print >> stream_to_write, tracestack_pretty
+
+            ## Let's print the exception (and the traceback)
             traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, stream_to_write)
+
+            ## If a suffix was requested let's print it
             if suffix:
                 print >> stream_to_write, suffix
             print >> stream_to_write, '\n'
+
+            ## We now have the whole trace
             text = stream_to_write.getvalue()
             stream_to_write.close()
-            open(logdir + '/invenio.' + stream, 'a').write(text)
-            if alert_admin:
-                from invenio.mailutils import send_email
-                send_email(adminemail, adminemail, subject='Registered exception', content=text)
+            written_to_log = False
+            try:
+                ## Let's try to write into the log.
+                open(os.path.join(logdir, 'invenio.' + stream), 'a').write(text)
+                written_to_log = True
+            finally:
+                if alert_admin or not written_to_log:
+                    ## If requested or if it's impossible to write in the log
+                    from invenio.mailutils import send_email
+                    send_email(adminemail, adminemail, subject='Registered exception @ %s' % weburl, content=text)
+
             return 1
         else:
             return 0
@@ -211,7 +238,7 @@ def register_errors(errors_or_warnings_list, stream, req=None):
         error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
         errors_or_warnings_list.append((error, eval(CFG_MISCUTIL_ERROR_MESSAGES[error])% stream))
     # update log_errors
-    stream_location = logdir + '/invenio.' + stream
+    stream_location = os.path.join(logdir, '/invenio.' + stream)
     errors = ''
     for etuple in errors_or_warnings_list:
         try:
