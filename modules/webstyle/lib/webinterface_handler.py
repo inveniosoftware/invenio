@@ -48,6 +48,7 @@ except ImportError:
 from invenio.config import cdslang, weburl, sweburl, tmpdir
 from invenio.messages import wash_language
 from invenio.urlutils import redirect_to_url
+from invenio.errorlib import register_exception
 
 has_https_support = weburl != sweburl
 
@@ -286,6 +287,9 @@ def create_handler(root):
 
         except TraversalError:
             return apache.HTTP_NOT_FOUND
+        except:
+            register_exception(req=req, alert_support=True)
+            raise
 
         # Serve an error by default.
         return apache.HTTP_NOT_FOUND
