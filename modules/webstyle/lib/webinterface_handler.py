@@ -288,7 +288,7 @@ def create_handler(root):
         except TraversalError:
             return apache.HTTP_NOT_FOUND
         except:
-            register_exception(req=req, alert_support=True)
+            register_exception(req=req, alert_admin=True)
             raise
 
         # Serve an error by default.

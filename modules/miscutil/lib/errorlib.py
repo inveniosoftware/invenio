@@ -88,7 +88,7 @@ def get_tracestack():
                 }
     return tracestack_pretty
 
-def register_exception(force_stack=False, stream='error', req=None, prefix='', suffix='', alert_support=False):
+def register_exception(force_stack=False, stream='error', req=None, prefix='', suffix='', alert_admin=False):
     """
     log error exception to invenio.err and warning exception to invenio.log
     errors will be logged with client information (if req is given)
@@ -107,7 +107,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
     @param suffix a message to be printed before the exception in
     the log
 
-    @param alert_support wethever to send the exception to the support via email
+    @param alert_admin wethever to send the exception to the administrator via email
 
     @return 1 if successfully wrote to stream, 0 if not
     """
@@ -152,9 +152,9 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             text = stream_to_write.getvalue()
             stream_to_write.close()
             open(logdir + '/invenio.' + stream, 'a').write(text)
-            if alert_support:
+            if alert_admin:
                 from invenio.mailutils import send_email
-                send_email(adminemail, supportemail, subject='Registered exception', content=text)
+                send_email(adminemail, adminemail, subject='Registered exception', content=text)
             return 1
         else:
             return 0
