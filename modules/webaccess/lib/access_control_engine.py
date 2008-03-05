@@ -174,7 +174,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
     if verbose: print 'task 1 - is user %s' % (SUPERADMINROLE, )
 
     if check_only_uid_p:
-        if run_sql_cached("""SELECT *
+        if run_sql_cached("""SELECT r.id
                 FROM accROLE r LEFT JOIN user_accROLE ur
                 ON r.id = ur.id_accROLE
                 WHERE r.name = '%s' AND
@@ -233,7 +233,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
         if optional == 'no':
             if verbose: print ' - action with zero arguments'
             if check_only_uid_p:
-                connection = run_sql_cached("""SELECT * FROM accROLE_accACTION_accARGUMENT
+                connection = run_sql_cached("""SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT
                         WHERE id_accROLE IN (%s) AND
                         id_accACTION = %s AND
                         argumentlistid = 0 AND
@@ -266,7 +266,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
         if optional == 'yes':
             if verbose: print ' - action with optional arguments'
             if check_only_uid_p:
-                connection = run_sql_cached("""SELECT * FROM accROLE_accACTION_accARGUMENT
+                connection = run_sql_cached("""SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT
                         WHERE id_accROLE IN (%s) AND
                         id_accACTION = %s AND
                         id_accARGUMENT = -1 AND

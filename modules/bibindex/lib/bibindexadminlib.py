@@ -671,7 +671,7 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
     if fldID:
         fldID = int(fldID)
         if confirm in ["0", 0]:
-            check = run_sql("SELECT * from idxINDEX_field where id_field=%s" % fldID)
+            check = run_sql("SELECT id_field from idxINDEX_field where id_field=%s" % fldID)
             text = ""
             if check:
                 text += """<b><span class="info">This field is used in an index, deletion may cause problems.</span></b><br>"""
@@ -1613,12 +1613,12 @@ def add_idx_fld(idxID, fldID):
     """Add a field to an index"""
 
     try:
-        sql = "SELECT * FROM idxINDEX_field WHERE id_idxINDEX=%s and id_field=%s" % (idxID, fldID)
-        res = run_sql(sql)
+        sql = "SELECT id_idxINDEX FROM idxINDEX_field WHERE id_idxINDEX=%s and id_field=%s"
+        res = run_sql(sql, (idxID, fldID))
         if res:
             return (0, (0, "The field selected already exists for this index"))
-        sql = "INSERT INTO idxINDEX_field(id_idxINDEX, id_field) values (%s, %s)" % (idxID, fldID)
-        res = run_sql(sql)
+        sql = "INSERT INTO idxINDEX_field(id_idxINDEX, id_field) values (%s, %s)"
+        res = run_sql(sql,  (idxID, fldID))
         return (1, "")
     except StandardError, e:
         return (0, e)

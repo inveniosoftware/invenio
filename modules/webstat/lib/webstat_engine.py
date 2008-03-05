@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -23,8 +23,8 @@ __lastupdated__ = "$Date$"
 import calendar, commands, datetime, time, os, cPickle
 from invenio.config import tmpdir, weburl
 from invenio.urlutils import redirect_to_url
-from invenio.search_engine import perform_request_search 
-from invenio.dbquery import run_sql 
+from invenio.search_engine import perform_request_search
+from invenio.dbquery import run_sql
 
 WEBSTAT_SESSION_LENGTH = 48*60*60 # seconds
 WEBSTAT_GRAPH_TOKENS = '-=#+@$%&XOSKEHBC'
@@ -155,7 +155,7 @@ def get_keyevent_snapshot_uptime_cmd():
     @return: The std-out from the UNIX command 'uptime'.
     @type: str
     """
-    return _run_cmd('uptime').strip().replace('  ', ' ')    
+    return _run_cmd('uptime').strip().replace('  ', ' ')
 
 def get_keyevent_snapshot_apache_processes():
     """
@@ -210,7 +210,7 @@ def get_customevent_trend(args):
 
     @param args['id']: The event id
     @type args['id']: str
- 
+
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
 
@@ -234,7 +234,7 @@ def get_customevent_dump(args):
 
     @param args['id']: The event id
     @type args['id']: str
- 
+
     @param args['t_start']: Date and time of start point
     @type args['t_start']: str
 
@@ -254,7 +254,7 @@ def get_customevent_dump(args):
             "(event VARCHAR(255), creation_time TIMESTAMP, arguments VARCHAR(255)) "  + \
             "SELECT '%s' event, creation_time, arguments FROM %s"
              % (args['ids'][0], get_customevent_table(args['ids'][0])))
-             
+
     try:
         event_cols[args['ids'][0]] = cPickle.loads(run_sql("SELECT cols FROM staEVENT WHERE id = '%s'" % args['ids'][0])[0][0])
     except TypeError:
@@ -269,11 +269,11 @@ def get_customevent_dump(args):
         except TypeError:
             event_cols[id] = ["Unnamed"]
 
-    # Get a MySQL friendly date 
+    # Get a MySQL friendly date
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
 
-    sql = "SELECT * FROM staTEMP WHERE creation_time > '%s' " % lower + \
+    sql = "SELECT event,creation_time,arguments FROM staTEMP WHERE creation_time > '%s' " % lower + \
           "AND creation_time < '%s' ORDER BY creation_time DESC" % upper
 
     output = []
@@ -390,10 +390,10 @@ def create_graph_trend(trend, path, settings):
                     out_row += '-'*int(1.0*total*col_width)
                 except ZeroDivisionError:
                     break
- 
+
             # Print sentinel, and the total
             out += out_row + '>' + ' '*(xtic_max_len+4+width-len(out_row)) + str(total) + '\n'
-     
+
         # Write to destination file
         if path == '':
             print out
@@ -414,7 +414,7 @@ def create_graph_trend(trend, path, settings):
             g.xlabel(settings["xlabel"])
         if settings["ylabel"] != '':
             g.ylabel(settings["ylabel"])
-    
+
         if settings["xtic_format"] != '':
             xtics = 'set xtics ('
             xtics += ', '.join(['"%s" %d' %
@@ -441,7 +441,7 @@ def create_graph_trend(trend, path, settings):
 def create_graph_dump(dump, path, settings):
     """
     Creates a graph representation out of data produced from get_event_trend.
-    
+
     @param dump: The dump data
     @type dump: [(str|int,...)]
 
@@ -493,7 +493,7 @@ def export_to_python(data, req):
     Exports the data to Python code.
 
     @param data: The Python data that should be exported
-    @type data: [] 
+    @type data: []
 
     @param req: The Apache request object
     @type req:
@@ -505,7 +505,7 @@ def export_to_csv(data, req):
     Exports the data to CSV.
 
     @param data: The Python data that should be exported
-    @type data: [] 
+    @type data: []
 
     @param req: The Apache request object
     @type req:
@@ -540,7 +540,7 @@ def _get_trend_from_actions(action_dates, initial_value, t_start, t_end, granula
     @param t_start: Start time for the time domain in format %Y-%m-%d %H:%M:%S
     @type t_start: str
 
-    @param t_stop: End time for the time domain in format %Y-%m-%d %H:%M:%S 
+    @param t_stop: End time for the time domain in format %Y-%m-%d %H:%M:%S
     @type t_stop: str
 
     @param granularity: The granularity of the time domain, span between values.
@@ -594,17 +594,17 @@ def _get_trend_from_actions(action_dates, initial_value, t_start, t_end, granula
         # Make sure to stop the iteration at the end time
         if current > stop_at:
             break
-    
+
     # Remove the first bogus tuple, and return
     return vector[1:]
 
 def _get_datetime_iter(t_start, granularity='day', format='%Y-%m-%d %H:%M:%S'):
     """
     Returns an iterator over datetime elements starting at an arbitrary time,
-    with granularity of a [year,month,day,hour,minute,second]. 
+    with granularity of a [year,month,day,hour,minute,second].
 
     @param t_start: An arbitrary starting time in format %Y-%m-%d %H:%M:%S
-    @type t_start: str 
+    @type t_start: str
 
     @param granularity: The span between iterable elements, default is 'days'.
                         Possible values are [year,month,day,hour,minute,second].

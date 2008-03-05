@@ -289,7 +289,7 @@ def isGuestUser(uid):
 def isUserSubmitter(user_info):
     """Return True if the user is a submitter for something; False otherwise."""
     u_email = get_email(user_info['uid'])
-    res = run_sql("select * from sbmSUBMISSIONS where email=%s", (u_email,))
+    res = run_sql("select email from sbmSUBMISSIONS where email=%s", (u_email,))
     return len(res) > 0
 
 def isUserReferee(user_info):
@@ -392,7 +392,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
     _ = gettext_set_language(ln)
 
     # is email already taken?
-    res = run_sql("SELECT * FROM user WHERE email=%s", (email,))
+    res = run_sql("SELECT email FROM user WHERE email=%s", (email,))
     if len(res) > 0:
         return 3
 
@@ -404,7 +404,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
         if not nickname_valid_p(nickname):
             return 2
         # is nickname already taken?
-        res = run_sql("SELECT * FROM user WHERE nickname=%s", (nickname,))
+        res = run_sql("SELECT nickname FROM user WHERE nickname=%s", (nickname,))
         if len(res) > 0:
             return 4
 

@@ -258,7 +258,7 @@ def insert_new_member(uid,
 
 def get_group_infos(grpID):
     """Get group infos."""
-    query = """SELECT * FROM usergroup
+    query = """SELECT id,name,description,join_policy,login_method FROM usergroup
                 WHERE id = %s"""
     grpID = int(grpID)
     res = run_sql(query, (grpID, ))

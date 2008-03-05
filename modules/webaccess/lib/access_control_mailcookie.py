@@ -74,7 +74,7 @@ def mail_cookie_create_role(role_name, role_timeout=timedelta(hours=3), cookie_t
 def mail_cookie_create_pw_reset(email, cookie_timeout=timedelta(days=1)):
     """Create a unique url to be sent via email to reset the local password."""
     kind = 'pw_reset'
-    if (run_sql('SELECT * FROM user WHERE email=%s', (email, ))):
+    if (run_sql('SELECT email FROM user WHERE email=%s', (email, ))):
         params = email
         return mail_cookie_create_generic(kind, params, cookie_timeout, False)
     else:

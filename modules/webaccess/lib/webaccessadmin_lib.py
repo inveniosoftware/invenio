@@ -664,7 +664,7 @@ def perform_createaccount(req, email='', password='', callback='yes', confirm=0)
                                 button="Create")
 
     if confirm in [1, "1"] and email and email_valid_p(email):
-        res = run_sql("SELECT * FROM user WHERE email=%s", (email,))
+        res = run_sql("SELECT email FROM user WHERE email=%s", (email,))
         if not res:
             res = run_sql("INSERT INTO user (email,password, note) values(%s,AES_ENCRYPT(email,%s), '1')", (email, password))
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
