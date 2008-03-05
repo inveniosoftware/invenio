@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -24,8 +24,10 @@
 __revision__ = "$Id$"
 
 import unittest
+import os
 
-from invenio.config import weburl
+from invenio.errorlib import register_exception
+from invenio.config import weburl, logdir
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -33,12 +35,12 @@ class ErrorlibWebPagesAvailabilityTest(unittest.TestCase):
     """Check errorlib web pages whether they are up or not."""
 
     def test_your_baskets_pages_availability(self):
-        """errorlib - availability of error sending pages""" 
+        """errorlib - availability of error sending pages"""
 
         baseurl = weburl + '/error/'
 
         _exports = ['', 'send']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -46,7 +48,34 @@ class ErrorlibWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-test_suite = make_test_suite(ErrorlibWebPagesAvailabilityTest)
+class ErrorlibRegisterExceptionTest(unittest.TestCase):
+    """Check errorlib register_exception functionality."""
+
+    def test_simple_register_exception(self):
+        """errorlib - simple usage of register_exception"""
+        try:
+            raise Exception('test-exception')
+        except:
+            result = register_exception()
+        log_content = open(os.path.join(logdir, 'invenio.err')).read()
+        self.failUnless('test_simple_register_exception' in log_content)
+        self.failUnless('test-exception' in log_content)
+        self.assertEqual(1, result, "register_exception have not returned 1")
+
+    def test_alert_admin_register_exception(self):
+        """errorlib - alerting admin with register_exception"""
+        try:
+            raise Exception('test-exception')
+        except:
+            result = register_exception(alert_admin=True)
+        log_content = open(os.path.join(logdir, 'invenio.err')).read()
+        self.failUnless('test_alert_admin_register_exception' in log_content)
+        self.failUnless('test-exception' in log_content)
+        self.assertEqual(1, result, "register_exception have not returned 1")
+
+
+
+test_suite = make_test_suite(ErrorlibWebPagesAvailabilityTest, ErrorlibRegisterExceptionTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)

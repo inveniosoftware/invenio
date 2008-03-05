@@ -56,6 +56,7 @@ from invenio import dateutils_tests
 from invenio import htmlutils_tests
 from invenio import access_control_firerole_tests
 from invenio import intbitset_tests
+from invenio import textutils_tests
 
 def usage():
     """Print usage info on standard error output."""
@@ -91,6 +92,7 @@ def create_all_test_suites():
                                htmlutils_tests.create_test_suite(),
                                access_control_firerole_tests.create_test_suite(),
                                intbitset_tests.create_test_suite(),
+                               textutils_tests.create_test_suite(),
                                ))
 
 def print_info_line():
