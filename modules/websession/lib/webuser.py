@@ -846,6 +846,13 @@ def collect_user_info(req):
             uid = req
         elif type(req) is dict:
             ## req is by mistake already a user_info
+            try:
+                assert(req.has_key('uid'))
+                assert(req.has_key('email'))
+                assert(req.has_key('nickname'))
+            except AssertionError:
+                ## mmh... misuse of collect_user_info. Better warn the admin!
+                register_exception(alert_admin=True)
             user_info.update(req)
             return user_info
         else:
