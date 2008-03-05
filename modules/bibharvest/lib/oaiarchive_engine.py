@@ -54,30 +54,33 @@ def all_sets():
     Use parse_set_definition(setDefinition) instead.
     """
     sets = []
-    query = "select * from oaiARCHIVE"
+    query = """SELECT id, setName, setSpec, setCollection, setDescription,
+                      setDefinition, setRecList,
+                      p1, f1, m1, p2, f2, m2, p3, f3, m3
+               FROM oaiARCHIVE"""
     res = run_sql(query)
-    for row in res:
-        sets.append(list(row))
+    for (setID, setName, setSpec, setCollection, setDescription,
+         setDefinition, setRecList, p1, f1, m1, p2, f2, m2, p3, f3, m3) in res:
 
-        # Split setDefinition column in columns collection, p1, f1, m1,
-        # p2, f2, m2, p3, f3, m3
+        params = parse_set_definition(setDefinition)
+        set = [setID,
+               setName,
+               setSpec,
+               setCollection,
+               setDescription,
+               setDefinition,
+               setRecList,
+               params['p1'],
+               params['f1'],
+               params['m1'],
+               params['p2'],
+               params['f2'],
+               params['m2'],
+               params['p3'],
+               params['f3'],
+               params['m3']]
 
-        # Mapping between argument name and column number in sql table
-        arg_to_col_number = {'c': 3,
-                             'p1': 7,
-                             'f1': 8,
-                             'm1': 9,
-                             'p2': 10,
-                             'f2': 11,
-                             'm2': 12,
-                             'p3': 13,
-                             'f3': 14,
-                             'm3': 15}
-
-        params = parse_set_definition(row[5])
-        for arg, value in params.iteritems():
-            if arg_to_col_number.has_key(arg):
-                sets[-1][arg_to_col_number[arg]] = value
+        sets.append(set)
 
     return sets
 
@@ -113,36 +116,13 @@ def get_set_descriptions(setSpec):
 
     set_descriptions = []
 
-    query = "select * from oaiARCHIVE where setSpec=%s"
+    query = "select setName, setDefinition from oaiARCHIVE where setSpec=%s"
     res = run_sql(query, (setSpec, ))
 
-    for row in res:
-        params = parse_set_definition(row[5])
+    for (set_name, set_definition) in res:
+        params = parse_set_definition(set_definition)
         params['setSpec'] = setSpec
-        params['setName'] = row[1]
-        ## set_descriptions_item = []
-##         set_descriptions_item.append(setSpec)
-##         set_descriptions_item.append(setSpec)
-##         #set_descriptions_item.append(row[3])
-##         set_descriptions_item.append(params['c'])
-##         query_box = []
-##         #query_box.append(row[4])
-##         #query_box.append(row[5])
-##         #query_box.append(row[6])
-##         query_box.append(params['p1'])
-##         query_box.append(params['f1'])
-##         query_box.append(params['m1'])
-##         set_descriptions_item.append(query_box)
-##         query_box = []
-##         #query_box.append(row[7])
-##         query_box.append(params['p1'])
-##         #query_box.append(row[8])
-##         query_box.append(params['f1'])
-##         #query_box.append(row[9])
-##         query_box.append(params['m1'])
-##         set_descriptions_item.append(query_box)
-
-##        set_descriptions.append(set_descriptions_item)
+        params['setName'] = set_name
         set_descriptions.append(params)
     return set_descriptions
 
