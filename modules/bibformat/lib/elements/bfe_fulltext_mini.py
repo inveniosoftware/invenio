@@ -61,7 +61,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
     if main_urls:
         # Put a big file icon if only one file
         if len(main_urls.keys()) == 1 and len(main_urls.items()[0][1]) == 1 and \
-               (not CFG_CERN_SITE or len(cern_urls) == 0) and len(others_urls.keys()) == 0 and \
+               (not CFG_CERN_SITE or len(cern_urls) == 0) and len(others_urls) == 0 and \
                show_icons.lower() == 'yes':
             file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="Download fulltext" /><br />' % weburl
 
