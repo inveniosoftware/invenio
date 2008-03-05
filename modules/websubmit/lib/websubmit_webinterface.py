@@ -96,7 +96,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                 cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
                 target = '/youraccount/login' + \
-                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+                    make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
                     weburl + user_info['uri']}, {})
                 return redirect_to_url(req, target)
             elif auth_code:
