@@ -841,8 +841,13 @@ def collect_user_info(req):
     try:
         if req is None:
             uid = -1
-        elif type(req) in [type(1), type(1L)]:
+        elif type(req) in (type(1), type(1L)):
+            ## req is infact a user identification
             uid = req
+        elif type(req) is dict:
+            ## req is by mistake already a user_info
+            user_info.update(req)
+            return user_info
         else:
             uid = getUid(req)
             user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
