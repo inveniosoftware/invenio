@@ -12,7 +12,7 @@ START::DEFP()---<record>
 502::REPL(EOL,)::MINLW(144)---<datafield tag="502" ind1=" " ind2=" "><subfield code="a"><:DEMOTH_DIPL::DEMOTH_DIPL:></subfield><subfield code="b"><:DEMOTH_PLACE::DEMOTH_PLACE:>, <:DEMOTH_UNIV::DEMOTH_UNIV:></subfield><subfield code="c"><:DEMOTH_DATE::year:></subfield></datafield>
 520a::REP(EOL,)::MINLW(82)---<datafield tag="520" ind1=" " ind2=" "><subfield code="a"><:DEMOTH_ABSTRACT::DEMOTH_ABSTRACT:></subfield></datafield>
 700a::REP(EOL,)::RANGE(2,1999)::MINLW(82)---<datafield tag="700" ind1=" " ind2=" "><subfield code="a"><:DEMOTH_AU*::DEMOTH_AU:></subfield></datafield>
-700a::REP(EOL,)::MINLW(82)---<datafield tag="700" ind1=" " ind2=" "><subfield code="a"><:DEMOTH_SUPERV*::DEMOTH_SUPERV:></subfield><subfield code="e">dir.</subfield></datafield>
+700a::REP(EOL,)::MINLW(116)---<datafield tag="700" ind1=" " ind2=" "><subfield code="a"><:DEMOTH_SUPERV*::DEMOTH_SUPERV:></subfield><subfield code="e">dir.</subfield></datafield>
 856f::REPL(EOL,)---<datafield tag="856" ind1="0" ind2=" "><subfield code="f"><:SuE::SuE:></subfield></datafield>
 8564u::REPL(EOL,)---<datafield tag="856" ind1="4" ind2=" "><subfield code="u">http://localhost/record/<:SN::SN:>/files/<:DEMOTH_FILE_RENAMED::DEMOTH_FILE_RENAMED:></subfield><subfield code="z">Access to files</subfield></datafield>
 980::DEFP()---<datafield tag="980" ind1=" " ind2=" "><subfield code="a">THESIS</subfield></datafield>
