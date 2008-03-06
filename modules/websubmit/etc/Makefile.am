@@ -21,7 +21,7 @@ submission_templatesdir = $(sysconfdir)/bibconvert/config
 submission_templates_DATA = DEMOPIC.tpl DEMOPICcreate.tpl DEMOPICmodify.tpl \
            EDSRTEXT.tpl EDSRTEXTcreate.tpl EDSRTEXTmodify.tpl \
            EDSTEXT.tpl EDSTEXTcreate.tpl  EDSTEXTmodify.tpl \
-           DEMOTH.tpl DEMOTHcreate.tpl
+           DEMOTH.tpl DEMOTHcreate.tpl DEMOTHmodify.tpl
 
 stamper_templatesdir = $(sysconfdir)/websubmit/file_stamper_templates
 stamper_templates_DATA = demo-stamp-left.tex demo-stamp-left-logo.png
