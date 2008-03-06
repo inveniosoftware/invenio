@@ -798,8 +798,8 @@ INSERT INTO sbmCOLLECTION VALUES (36,'Document Types');
 
 INSERT INTO sbmCOLLECTION_sbmCOLLECTION VALUES (0,36,1);
 
-INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOPIC',1);
-INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOTHE',2);
+INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOTHE',1);
+INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOPIC',2);
 INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'TEXT',3);
 INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'RTEXT',4);
 
@@ -819,7 +819,7 @@ INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOPIC','EXP','E
 
 INSERT INTO sbmDOCTYPE VALUES ('textual document (Article, Preprint, etc) with simple refereeing','RTEXT','2002-05-06','2002-06-20','');
 INSERT INTO sbmDOCTYPE VALUES ('textual document (Article, Preprint, etc)','TEXT','2002-05-03','2002-06-21','This is a template for a text type of document with direct integration after submission\r\nUse it as a reference to create your new document types and submissions (clone).');
-INSERT INTO sbmDOCTYPE VALUES ('Demo Picture Submission','DEMOPIC','2007-09-13','2007-10-17','<br /><br />\r\n<div>This is an example of a submission that could be used to submit pictures into a CDS Invenio collection.</div>\r\n<br /><br />');
+INSERT INTO sbmDOCTYPE VALUES ('Demo Picture Submission','DEMOPIC','2007-09-13','2007-10-17','<br /><br />\r\nThe Demo Picture submission demonstrates a slightly more detailed submission type.<br />\r\nIt makes use of different categories (which in this case are used in the picture\'s reference number to better describe it) and creates icons for the submitted picture-files. Records created with this submission are inserted into the Pictures collection.\r\n<br /><br />\r\n');
 INSERT INTO sbmDOCTYPE VALUES ('Demo Thesis Submission','DEMOTHE','2008-03-02','2008-03-05','<br />\r\n<br />\r\nThe Demo Thesis submission demonstrates a very simple submission type.<br />\r\nIt has no categories, submits directly into the Theses collection and also stamps full-text files.\r\n<br /><br />\r\n');
 
 INSERT INTO sbmFIELD VALUES ('APPRTEXT',1,3,'COM','<br //>Enter here your additional comments:<br //>','O','comments','','2002-05-06','2002-05-28','','');
@@ -858,19 +858,19 @@ INSERT INTO sbmFIELD VALUES ('SBITEXT',1,1,'TI','Title:<br //>','M','Title','','
 INSERT INTO sbmFIELD VALUES ('SBITEXT',1,2,'AU','<br //><br //>ALL author(s) of paper: (one per line)<br //>(in the form: Name, Initial(s))<br //>','M','Author(s)','AUCheck','2002-05-03','2002-05-03','','');
 INSERT INTO sbmFIELD VALUES ('SRVTEXT',1,1,'RNTEST2','Please enter the number of the revised document: ','M','reference','','2002-05-03','2002-05-03','','');
 INSERT INTO sbmFIELD VALUES ('SRVTEXT',1,2,'EndButton2','<br //><br //>','O','','','2002-05-03','2004-02-02','','');
-INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,1,'DEMOPIC_TITLE','<table width=\"100%\" bgcolor=\"#D3E3E2\" align=\"center\" cellspacing=\"2\" cellpadding=\"2\" border=\"1\"><tr><td align=\"left\"><br /><b>Submit a picture:</b><br /><br />Picture Title <span style=\"color: red;\">*</span>:<br />','M','Picture Title','','2007-09-13','2007-10-04',NULL,NULL);
-INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,2,'DEMOPIC_PHOTOG','<br /><br />Picture Author(s) or Photographers(s)<br /><i>(Optional, <b>one per line</b>)</i>:<br />','O','Photographer(s)','','2007-09-13','2007-09-13',NULL,NULL);
-INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,3,'DEMOPIC_DATE','<br /><br />Picture Date (dd/mm/yyyy) <span style=\"color: red;\">*</span>:&nbsp;','M','Picture Date','DatCheckNew','2007-09-13','2007-10-04',NULL,NULL);
-INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,4,'DEMOPIC_KW','<br /><br />Keywords<br /><i>(Optional, <b>one keyword/key-phrase per line</b>)</i>:<br />','O','Picture Keywords','','2007-09-13','2007-09-13',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,1,'DEMOPIC_TITLE','<table width=\"100%\" bgcolor=\"#D3E3E2\" align=\"center\" cellspacing=\"2\" cellpadding=\"2\" border=\"1\"><tr><td align=\"left\"><br /><b>Submit an ATLANTIS picture:</b><br /><br /><span style=\"color: red;\">*</span>Picture Title:<br />','M','Picture Title','','2007-09-13','2007-10-04',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,2,'DEMOPIC_PHOTOG','<br /><br />Picture Author(s) or Photographers(s): <i>(one per line)</i><br />','O','Photographer(s)','','2007-09-13','2007-09-13',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,3,'DEMOPIC_DATE','<br /><br /><span style=\"color: red;\">*</span>Picture Date: <i>(dd/mm/yyyy)</i>&nbsp;','M','Picture Date','DatCheckNew','2007-09-13','2007-10-04',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,4,'DEMOPIC_KW','<br /><br />Keywords:<br /><i>(one keyword/key-phrase per line)</i><br />','O','Picture Keywords','','2007-09-13','2007-09-13',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,5,'DEMOPIC_DESCR','<br /><br />Picture Description:<br />','O','Picture Description','','2007-09-13','2007-09-13',NULL,NULL);
-INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,6,'DEMOPIC_ADD_RN','<br /><br />Your picture will be given a reference number automatically.<br /> However, if the picture has other reference numbers, please enter them here:<br />(one per line)<br />','O','Additional Reference Numbers','','2007-09-13','2007-09-13',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,6,'DEMOPIC_ADD_RN','<br /><br />Your picture will be given a reference number automatically.<br /> However, if the picture has other reference numbers, please enter them here:<br /><i>(one per line)</i><br />','O','Additional Reference Numbers','','2007-09-13','2007-09-13',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,7,'DEMOPIC_NOTE','<br /><br />Additional Comments or Notes about the Picture:<br />','O','Picture Notes or Comments','','2007-09-13','2007-09-13',NULL,NULL);
-INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,8,'DEMOPIC_FILE','<br /><br />Provide the path to the picture file to be uploaded <span style=\"color: red;\">*</span>:<br />','M','Picture File','','2007-09-13','2007-09-13',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,8,'DEMOPIC_FILE','<br /><br /><span style=\"color: red;\">*</span>Enter the full path to the source picture-file to upload:<br />','M','Picture File','','2007-09-13','2007-09-13',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOPIC',1,9,'DEMOPIC_FINISH','<br /><br /></td></tr></table>','O','','','2007-09-13','2007-09-13',NULL,NULL);
-INSERT INTO sbmFIELD VALUES ('MBIDEMOPIC',1,1,'DEMOPIC_RN','<table width=\"100%\" bgcolor=\"#D3E3E2\" align=\"center\" cellspacing=\"2\" cellpadding=\"2\" border=\"1\"><tr><td align=\"left\"><br /><b>Modify a picture\'s bibliographic information:</b><br /><br />Picture Reference Number <span style=\'color: red;\'>*</span>:&nbsp;&nbsp;','M','Reference Number','','2007-10-04','2007-10-04',NULL,NULL);
-INSERT INTO sbmFIELD VALUES ('MBIDEMOPIC',1,2,'DEMOPIC_CHANGE','<br /><br />Choose the fields to be modified <span style=\"color: red;\">*</span>:<br />','M','Fields to Modify','','2007-10-04','2007-10-04',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('MBIDEMOPIC',1,1,'DEMOPIC_RN','<table width=\"100%\" bgcolor=\"#D3E3E2\" align=\"center\" cellspacing=\"2\" cellpadding=\"2\" border=\"1\"><tr><td align=\"left\"><br /><b>Modify a picture\'s bibliographic information:</b><br /><br /><span style=\'color: red;\'>*</span>Picture Reference Number:&nbsp;&nbsp;','M','Reference Number','','2007-10-04','2007-10-04',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('MBIDEMOPIC',1,2,'DEMOPIC_CHANGE','<br /><br /><span style=\"color: red;\">*</span>Choose the fields to be modified:<br />','M','Fields to Modify','','2007-10-04','2007-10-04',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('MBIDEMOPIC',1,3,'DEMOPIC_CONT','<br /><br /></td></tr></table>','O','','','2007-10-04','2007-10-04',NULL,NULL);
-INSERT INTO sbmFIELD VALUES ('SBIDEMOTHE',1,1,'DEMOTHE_REP','<TABLE WIDTH=\"100%\" BGCOLOR=\"#D3E3E2\" ALIGN=\"center\" CELLSPACING=\"2\" CELLPADDING=\"2\" BORDER=\"1\"><TR><TD ALIGN=\"left\"><br /><b>Submit an ATLANTIS Thesis:</b><br /><br />If your thesis has other report numbers, please enter them here:<br /><i>(one per line)</i><br />','O','Other Report Numbers','','2008-03-02','2008-03-06',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOTHE',1,1,'DEMOTHE_REP','<TABLE WIDTH=\"100%\" BGCOLOR=\"#D3E3E2\" ALIGN=\"center\" CELLSPACING=\"2\" CELLPADDING=\"2\" BORDER=\"1\"><TR><TD ALIGN=\"left\"><br /><b>Submit an ATLANTIS Thesis:</b><br /><br />Your thesis will be given a reference number automatically.<br /> However, if it has other reference numbers, please enter them here:<br /><i>(one per line)</i><br />','O','Other Report Numbers','','2008-03-02','2008-03-06',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOTHE',1,2,'DEMOTHE_TITLE','<br /><br /><span style=\"color: red;\">*</span>Thesis Title:<br />','M','Title','','2008-03-02','2008-03-06',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOTHE',1,3,'DEMOTHE_SUBTTL','<br /><br />Thesis Subtitle <i>(if any)</i>:<br />','O','Subtitle','','2008-03-02','2008-03-06',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOTHE',1,4,'DEMOTHE_AU','<br /><br /><table width=\"100%\"><tr><td valign=\"top\"><span style=\"color: red;\">*</span>Author of the Thesis: <i>(one per line)</i><br />','M','Author(s)','','2008-03-02','2008-03-06',NULL,NULL);
@@ -887,7 +887,7 @@ INSERT INTO sbmFIELD VALUES ('SBIDEMOTHE',1,14,'DEMOTHE_PLACE','&nbsp;at <span s
 INSERT INTO sbmFIELD VALUES ('SBIDEMOTHE',1,15,'DEMOTHE_FILE','<br><br><span style=\"color: red;\">*</span>Enter the full path to the source file to upload:<br />','M','Source File','','2008-03-02','2008-03-06',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('SBIDEMOTHE',1,16,'DEMOTHE_END','<br /><br /></td></tr></table><br />','O','','','2008-03-02','2008-03-02',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('MBIDEMOTHE',1,1,'DEMOTHE_RN','<table width=\"100%\" bgcolor=\"#D3E3E2\" align=\"center\" cellspacing=\"2\" cellpadding=\"2\" border=\"1\"><tr><td align=\"left\"><br /><b>Modify a thesis\' bibliographic information:</b><br /><br /><span style=\'color: red;\'>*</span>Thesis Reference Number:&nbsp;&nbsp;','M','Reference Number','','2008-03-05','2008-03-05',NULL,NULL);
-INSERT INTO sbmFIELD VALUES ('MBIDEMOTHE',1,2,'DEMOTHE_CHANGE','<br /><br /><span style=\"color: red;\">*</span>Choose the fields to be modified:<br />','M','Fields to Change','','2008-03-05','2008-03-05',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('MBIDEMOTHE',1,2,'DEMOTHE_CHANGE','<br /><br /><span style=\"color: red;\">*</span>Choose the fields to be modified:<br />','M','Fields to Modify','','2008-03-05','2008-03-05',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('MBIDEMOTHE',1,3,'DEMOTHE_CONT','<br /><br /></td></tr></table>','O','','','2008-03-05','2008-03-05',NULL,NULL);
 
 INSERT INTO sbmFIELDDESC VALUES ('TI','TI','245__a','T',0,5,60,0,'','','1998-08-17','2002-06-11','<br //>Please correct the title:<br //>','',0);
@@ -917,7 +917,7 @@ INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_NOTE',NULL,'500__a','T',NULL,6,60,NULL
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_FILE',NULL,'','F',40,NULL,NULL,NULL,NULL,NULL,'2007-09-13','2007-09-13',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_FINISH',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<input type=\"button\" class=\"adminbutton\" width=\"400\" height=\"50\" name=\"endS\" value=\"finish submission\" onclick=\"finish();\" />\r\n</div>','2007-09-13','2007-09-13',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_CHANGE',NULL,'','S',NULL,NULL,NULL,NULL,NULL,'<select name=\"DEMOPIC_CHANGE[]\" size=\"8\" multiple>\r\n <option value=\"Select:\">Select:</option>\r\n <option value=\"DEMOPIC_TITLE\">Title</option>\r\n <option value=\"DEMOPIC_PHOTOG\">Photographer(s)</option>\r\n <option value=\"DEMOPIC_DATE\">Picture Date</option>\r\n <option value=\"DEMOPIC_KW\">Keywords</option>\r\n <option value=\"DEMOPIC_DESCR\">Picture Description</option>\r\n <option value=\"DEMOPIC_ADD_RN\">Picture Reference Numbers</option>\r\n <option value=\"DEMOPIC_NOTE\">Notes or Comments</option>\r\n</select>','2007-10-04','2007-10-04',NULL,NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_RN',NULL,'037__a','I',30,NULL,NULL,NULL,'DEMOPIC-<COMBO>-<YYYY>-???',NULL,'2007-10-04','2007-10-04',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_RN',NULL,'037__a','I',30,NULL,NULL,NULL,'DEMO-PICTURE-<COMBO>-<YYYY>-???',NULL,'2007-10-04','2007-10-04',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOPIC_CONT',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<input type=\"button\" class=\"adminbutton\" width=\"400\" height=\"50\" name=\"endS\" value=\"Continue\" onclick=\"finish();\" />\r\n</div>','2007-10-04','2007-10-04',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_REP',NULL,'088__a','T',NULL,4,30,NULL,NULL,NULL,'2008-03-02','2008-03-02','<br />Other Report Numbers (one per line):',NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_TITLE',NULL,'245__a','T',NULL,5,60,NULL,NULL,NULL,'2008-03-02','2008-03-02','<br />Title:<br />',NULL,0);
@@ -935,7 +935,7 @@ INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_UNIV',NULL,'502__b','I',30,NULL,NULL,N
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_PLACE',NULL,'','I',20,NULL,NULL,NULL,NULL,NULL,'2008-03-02','2008-03-02',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_FILE',NULL,'','F',60,NULL,NULL,NULL,NULL,NULL,'2008-03-02','2008-03-02',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_END',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<INPUT TYPE=\"button\" name=\"endS\" width=\"400\" height=\"50\" value=\"Finish Submission\" onclick=\"finish();\">\r\n</div>','2008-03-02','2008-03-02',NULL,NULL,0);
-INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_RN',NULL,'037__a','I',30,NULL,NULL,NULL,NULL,NULL,'2008-03-05','2008-03-05','DEMO-THESIS-<YYYY>-???',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_RN',NULL,'037__a','I',30,NULL,NULL,NULL,NULL,'DEMO-THESIS-<YYYY>-???','2008-03-05','2008-03-05',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_CHANGE',NULL,'','S',NULL,NULL,NULL,NULL,NULL,'<select name=\"DEMOTHE_CHANGE[]\" size=\"9\" multiple>\r\n <option value=\"Select:\">Select:</option>\r\n <option value=\"DEMOTHE_REP\">Other Report Numbers</option>\r\n <option value=\"DEMOTHE_TITLE\">Title</option>\r\n <option value=\"DEMOTHE_SUBTITLE\">Subtitle</option>\r\n <option value=\"DEMOTHE_AU\">Author(s)</option>\r\n <option value=\"DEMOTHE_SUPERV\">Supervisor(s)</option>\r\n <option value=\"DEMOTHE_ABSTRACT\">Abstract</option>\r\n <option value=\"DEMOTHE_NUMP\">Number of Pages</option>\r\n <option value=\"DEMOTHE_LANG\">Language</option>\r\n</select>','2008-03-05','2008-03-06',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOTHE_CONT',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<input type=\"button\" class=\"adminbutton\" width=\"400\" height=\"50\" name=\"endS\" value=\"Continue\" onclick=\"finish();\" />\r\n</div>','2008-03-05','2008-03-05',NULL,NULL,0);
 
@@ -1163,7 +1163,7 @@ INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','modifyTemplate','DEMOPICmodify.tpl'
 INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','newrnin','NEWRN');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','paths_and_suffixes','{\"DEMOPIC_FILE\":\"\"}');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','rename','<PA>file:DEMOPIC_RN</PA>');
-INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','rnformat','DEMOPIC-<PA>categ</PA>-<PA>yy</PA>');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','rnformat','DEMO-PICTURE-<PA>categ</PA>-<PA>yy</PA>');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','rnin','comboDEMOPIC');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','sourceDoc','photos');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOPIC','sourceTemplate','DEMOPIC.tpl');
