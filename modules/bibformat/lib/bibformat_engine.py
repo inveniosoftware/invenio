@@ -52,7 +52,8 @@ from invenio.bibformat_xslt_engine import format
 from invenio.dbquery import run_sql
 from invenio.messages import \
      language_list_long, \
-     wash_language
+     wash_language, \
+     gettext_set_language
 from invenio import bibformat_dblayer
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION, \
@@ -105,6 +106,10 @@ ln_pattern_text = ln_pattern_text.rstrip(r"|")
 ln_pattern_text += r")>(.*?)</\1>"
 
 ln_pattern =  re.compile(ln_pattern_text, re.IGNORECASE | re.DOTALL)
+
+# Regular expression for finding text to be translated
+translation_pattern = re.compile(r'_\((?P<word>.*?)\)_', \
+                                 re.IGNORECASE | re.DOTALL | re.VERBOSE)
 
 # Regular expression for finding <name> tag in format templates
 pattern_format_template_name = re.compile(r'''
@@ -399,6 +404,16 @@ def format_with_format_template(format_template_filename, bfo,
                                                        9: errors and warnings, stop if error (debug mode ))
     @return tuple (formatted text, errors)
     """
+    _ = gettext_set_language(bfo.lang)
+
+    def translate(match):
+        """
+        Translate matching values
+        """
+        word = match.group("word")
+        translated_word = _(word)
+        return translated_word
+
     errors_ = []
     if format_template_code is not None:
         format_content = str(format_template_code)
@@ -408,7 +423,9 @@ def format_with_format_template(format_template_filename, bfo,
     if format_template_filename is None or \
            format_template_filename.endswith("."+CFG_BIBFORMAT_FORMAT_TEMPLATE_EXTENSION):
         # .bft
-        localized_format = filter_languages(format_content, bfo.lang)
+        filtered_format = filter_languages(format_content, bfo.lang)
+        localized_format = translation_pattern.sub(translate, filtered_format)
+
         (evaluated_format, errors) = eval_format_template_elements(localized_format,
                                                                    bfo,
                                                                    verbose)

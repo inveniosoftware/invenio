@@ -2,8 +2,8 @@
 <description>Output the various actions available on a record</description>
 
 <ul class="detailedrecordactions">
-        <li><a href="<BFE_SERVER_INFO var='weburl'/>yourbaskets/add?ln=<BFE_SERVER_INFO var='lang'/>&amp;recid=<BFE_RECORD_ID/>">Add to personal basket</a></li>
-        <li>Export as
+        <li><a href="<BFE_SERVER_INFO var='weburl'/>yourbaskets/add?ln=<BFE_SERVER_INFO var='lang'/>&amp;recid=<BFE_RECORD_ID/>">_(Add to personal basket)_</a></li>
+        <li>_(Export as)_
             <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='weburl'/>record/<BFE_RECORD_ID/>/export/hx">BibTeX</a>,
             <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='weburl'/>record/<BFE_RECORD_ID/>/export/hm">MARC</a>,
             <a style="text-decoration:underline;font-weight:normal" href="<BFE_SERVER_INFO var='weburl'/>record/<BFE_RECORD_ID/>/export/xm">MARCXML</a>,
