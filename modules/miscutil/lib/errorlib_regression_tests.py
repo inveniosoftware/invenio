@@ -73,9 +73,8 @@ class ErrorlibRegisterExceptionTest(unittest.TestCase):
         self.failUnless('test-exception' in log_content)
         self.assertEqual(1, result, "register_exception have not returned 1")
 
-
-
-test_suite = make_test_suite(ErrorlibWebPagesAvailabilityTest, ErrorlibRegisterExceptionTest)
+test_suite = make_test_suite(ErrorlibWebPagesAvailabilityTest,
+                             ErrorlibRegisterExceptionTest)
 
 if __name__ == "__main__":
     warn_user_about_tests_and_run(test_suite)
