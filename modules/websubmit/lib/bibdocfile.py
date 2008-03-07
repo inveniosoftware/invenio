@@ -45,6 +45,8 @@ except ImportError:
 
 CFG_BIBDOCFILE_MD5_THRESHOLD = 256 * 1024
 CFG_BIBDOCFILE_MD5_BUFFER = 1024 * 1024
+CFG_BIBDOCFILE_MD5SUM_EXISTS = os.system('which md5sum 2>&1 > /dev/null') == 0
+
 
 _mimes = MimeTypes()
 _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
@@ -1292,7 +1294,8 @@ def calculate_md5_external(filename):
     try:
         md5_result = os.popen('md5sum --binary "%s"' % filename)
         ret = md5_result.read()[:32]
-        if md5_result.close():
+        md5_result.close()
+        if len(ret) != 32:
             # Error in running md5sum. Let's fallback to internal
             # algorithm.
             return calculate_md5(filename, force_internal=True)
@@ -1304,7 +1307,7 @@ def calculate_md5_external(filename):
 def calculate_md5(filename, force_internal=False):
     """Calculate the md5 of a physical file. This is suitable for files smaller
     than 256Kb."""
-    if force_internal or os.path.getsize(filename) < CFG_BIBDOCFILE_MD5_THRESHOLD:
+    if not CFG_BIBDOCFILE_MD5SUM_EXISTS or force_internal or os.path.getsize(filename) < CFG_BIBDOCFILE_MD5_THRESHOLD:
         try:
             to_be_read = open(filename, "rb")
             computed_md5 = md5.new()
