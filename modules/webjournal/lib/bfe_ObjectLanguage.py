@@ -30,7 +30,7 @@ def format(bfo, letters="2"):
     """
     if letters == "3":
         try:
-            return CFG_TWO_TO_THREE_LETTER_MAPPING(bfo.lang)
+            return CFG_TWO_TO_THREE_LETTER_MAPPING[bfo.lang]
         except:
             return bfo.lang
     else:
