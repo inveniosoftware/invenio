@@ -976,9 +976,8 @@ msgid "Help Central"
 msgstr "Βοήθεια"
 
 #: modules/bibformat/etc/format_templates/Default_HTML_actions.bft:6
-#, fuzzy
 msgid "Export as"
-msgstr "Αναφορά προσβλητικού περιεχομένου"
+msgstr "Εξαγωγή ως"
 
 #: modules/websearch/doc/search-guide.webdoc:336
 #: modules/websearch/doc/search-guide.webdoc:371
@@ -1287,18 +1286,16 @@ msgid "Narrow by collection:"
 msgstr "Περιορισμός με συλλογή:"
 
 #: modules/bibformat/etc/format_templates/Default_HTML_actions.bft:5
-#, fuzzy
 msgid "Add to personal basket"
-msgstr "Προσθήκη σε προσωπικό καλάθι"
+msgstr "Προσθήκη στο προσωπικό καλάθι"
 
 #: modules/websubmit/doc/admin/websubmit-admin-guide.webdoc:21
 msgid "WebSubmit Admin Guide"
 msgstr "Οδηγός διαχείρισης WebSubmit"
 
 #: modules/bibformat/etc/format_templates/Default_HTML_files.bft:4
-#, fuzzy
 msgid "No fulltext"
-msgstr "πλήρες κείμενο"
+msgstr "Δίχως πλήρες κείμενο"
 
 #: modules/websearch/doc/search-tips.webdoc:291
 #: modules/websubmit/lib/websubmit_templates.py:1078
@@ -3919,9 +3916,8 @@ msgid "The record has been deleted."
 msgstr "Η εγγραφή έχει διαγραφεί."
 
 #: modules/websearch/lib/search_engine.py:3510
-#, fuzzy
 msgid "Requested record does not seem to exist."
-msgstr "Λυπάμαι, η εγγραφή %s δεν υπάρχει."
+msgstr "Η εγγραφή που ζητήσατε δεν υπάρχει."
 
 #: modules/websearch/lib/search_engine.py:3744
 msgid "No match within your time limits, discarding this condition..."
