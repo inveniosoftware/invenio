@@ -40,6 +40,7 @@ pylib_DATA = __init__.py \
              Is_Referee.py \
              Mail_Submitter.py \
              Mail_New_Record_Notification.py \
+             Make_Dummy_MARC_XML_Record.py \
              Make_Modify_Record.py \
              Make_Record.py \
              Move_Files_Archive.py \
