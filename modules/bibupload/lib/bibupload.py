@@ -886,7 +886,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                 if url:
                     path = urllib2.urlparse.urlsplit(url)[2]
                     filename = os.path.split(path)[-1]
-                    format = filename[len(file_strip_ext(filename)):].lower()
+                    format = filename[len(file_strip_ext(filename)):]
                 else:
                     format = ''
 
