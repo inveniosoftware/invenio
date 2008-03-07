@@ -1,91 +1,22 @@
 --------------------------------------------------------------------
-CDS Invenio v0.92.1 is released
-February 20, 2007
+CDS Invenio v0.99.0 is released
+FIXME 20, 2008
 http://cdsware.cern.ch/invenio/news.html
 --------------------------------------------------------------------
 
-CDS Invenio v0.92.1 was released on February 20, 2007.
+CDS Invenio v0.99.0 was released on FIXME 20, 2008.
 
 What's new:
 -----------
 
- *) new support for external authentication systems (WebSession,
-    WebAccess)
-
- *) new support for external user groups (WebSession)
-
- *) new experimental version of the reference extraction program
-    (BibEdit)
-
- *) new optional Greek stopwords list, thanks to Theodoropoulos
-    Theodoros (BibIndex)
-
- *) new Get_Recid submission function (WebSubmit)
-
- *) new config variable governing the display of the download history
-    graph (BibRank)
-
- *) started deployment of user preferences (WebSession, WebSearch)
-
- *) split presentation style for "Narrow search", "Focus on" and
-    "Search also" search interface boxes (WebSearch, WebStyle)
-
- *) updated CERN Indico and KEK external collection searching facility
-    (WebSearch)
-
- *) fixed search interface portalbox and collection definition
-    escaping behaviour (WebSearch Admin)
-
- *) fixed problems with external system number and OAI ID matching
-    (BibUpload)
-
- *) fixed problem with case matching behaviour (BibUpload)
-
- *) fixed problems with basket record display and basket topic change
-    (WebBasket)
-
- *) fixed output format template attribution behaviour (BibFormat)
-
- *) improved language context propagation in output formats
-    (BibFormat)
-
- *) improved output format treatment of HTML-aware fields (BibFormat)
-
- *) improved BibFormat migration kit (BibFormat)
-
- *) improved speed and eliminated set duplication of the OAI
-    repository gateway (BibHarvest)
-
- *) fixed resumption token handling (BibHarvest)
-
- *) improved record editing interface (BibEdit)
-
- *) fixed problem with empty fields treatment (BibConvert)
-
- *) updated Report_Number_Generation submission function to be able to
-    easily generate report numbers from any submission information
-    (WebSubmit)
-
- *) fixed problem with submission field value escaping (WebSubmit)
-
- *) fixed problem with submission collection ordering (WebSubmit)
-
- *) fixed BibSched task signal handling inconsistency (BibSched)
-
- *) fixed TEXT versus BLOB database problems for some tables/columns
-
- *) minor updates to the HOWTO Migrate guide and several admin guides
-    (WebHelp, BibIndex, BibFormat)
-
- *) minor bugfixes to several modules; see ChangeLog for details and
-    credits
+ *) FIXME
 
 Download:
 ---------
 
-  <http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz>
-  <http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz.md5>
-  <http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz.sig>
+  <http://cdsware.cern.ch/download/cds-invenio-0.99.0.tar.gz>
+  <http://cdsware.cern.ch/download/cds-invenio-0.99.0.tar.gz.md5>
+  <http://cdsware.cern.ch/download/cds-invenio-0.99.0.tar.gz.sig>
 
 Installation notes:
 -------------------
@@ -95,129 +26,144 @@ Please follow the INSTALL file bundled in the distribution tarball.
 Upgrade notes:
 --------------
 
-If you are upgrading from CDS Invenio v0.92.0, then please follow the
+If you are upgrading from CDS Invenio v0.92.1, then please follow the
 following steps:
 
    - Launch the bibsched monitor and wait until all active bibsched
      tasks are finished.  Then put bibsched daemon into manual mode.
 
-   - Stop all submission procedures and other write operations: for
-     example, you may want to switch your site to read-only mode (set
-     CFG_ACCESS_CONTROL_LEVEL_SITE to 1 in access_control_config.py
-     and restart Apache) or you may want to stop Apache completely.
+   - Stop all submission procedures and other write operations.  For
+     example, you may want to stop Apache, edit httpd.conf to
+     introduce a global site redirect to a temporary splash page
+     saying that upgrade is in progress, and restart Apache.
 
-   - Optionally, you may want to backup your current MySQL database
-     and your CDS Invenio installation directory (@prefix@).  Note
-     that this step should not be really necessary for the v0.92.0 to
-     v0.92.1 upgrade, since the changes are of moderate nature only.
+   - Take a backup of your current MySQL database and your CDS Invenio
+     installation directory (usually /opt/cds-invenio).
 
-   - Untar new sources and rerun configure with old arguments.  Your
-     old configure line is available at
-     @prefix@/etc/build/config.nice.
+   - First of all, note that CDS Invenio v0.99.0 must use MySQL server
+     at least 4.1 and the database must be running in UTF-8 mode.  If
+     you have been running olderon MySQL server, or you have not
+     created your database and data in default charset UTF-8 but say
+     in Latin-1, then you must dump and reload all your tables.  In
+     order to check which version and charset you have been using, you
+     can run:
 
-   - Merge your old config.wml with the new one.  Your old config.wml
-     file is available at @prefix@/lib/wml/invenio/config.wml.  There
-     were no changes to this file in v0.92.1, so you may simply copy
-     your old version.
+        $ echo "SELECT VERSION()" | /opt/cds-invenio/bin/dbexec
+        $ echo "SHOW CREATE DATABASE cdsinvenio" | /opt/cds-invenio/bin/dbexec
+        $ echo "SHOW CREATE TABLE bib10x" | /opt/cds-invenio/bin/dbexec
 
-   - Run make.
+     FIXME: provide some more detailed instructions how to dump data,
+     alter table charset, and load data back.
 
-   - If you have customized your @prefix/etc/ files since the last
-     installation (for example to edit the stopwords list or configure
-     language stemmers), then make a backup copy of them now.
+     Note that the table definition and data charset altering process
+     may take some time.  If you have to upgrade your MySQL server as
+     well, you may want to prepare the migration on another server.
 
-   - Run make install.
+   - Second of all, you must upgrade some Python modules, namely your
+     MySQLdb module as indicated in the INSTALL file.  Note that this
+     will make your current site unusable, but we have stopped Apache
+     already anyway.  If you have been using Stemmer, you must upgrade
+     its version as indicated in the INSTALL file.  The version is not
+     backward-compatible.
 
-   - If you have backed up your old @prefix@/etc/ directory as
-     mentioned before, then restore your old files now, paying
-     attention to differences with the new versions.
+   - Untar new sources and rerun configure with old prefix argument
+     (your old configure line is available at
+     /opt/cds-invenio-BACKUP/etc/build/config.nice) and install CDS
+     Invenio (see INSTALL file, part 1a).
+
+   - CDS Invenio v0.99.0 uses a new INI-style of configuration.
+     Please see INSTALL file, part 1b on how to customize your
+     installation.  You will have to create 'invenio-local.conf' where
+     you have to merge your old config.wml values (they are available
+     at /opt/cds-invenio-BACKUP/lib/wml/invenio/config.wml).
+
+   - If you have previously customized your page header and footer via
+     WML, then you should now put your page customizations in a new
+     template skin (please see the WebStyle Admin Guide for more
+     information).  Also, if you have edited v0.92.1 CSS style sheet,
+     you may want to merge your changes into new elements of the
+     0.99.0 style sheet.
+
+   - If you have customized your /opt/cds-invenio/etc/ files in the
+     last installation (for example to edit the stopwords list or
+     configure language stemmers), then you have to restore your
+     changes into corresponding /opt/cds-invenio/etc files.
 
    - Update your database table structure:
 
-        $ make update-v0.92.0-tables
+        $ make update-v0.92.1-tables
 
-   - Check your custom page templates:
+     If you are upgrading from previous CDSware releases such as
+     v0.7.1, then you may need to run more update statements of this
+     kind, as indicated in previous RELEASE-NOTES files.  (You could
+     also start afresh, copying your old data into a fresh v0.99.0
+     installation.)
+
+   - If you have previously customized your page templates
+     (e.g. webbasket_templates.py), then check for changes the new
+     version brings:
 
         $ make check-custom-templates
 
-          Check if your customized page templates (see the WebStyle
-          Admin Guide) still conform to the default templates.  This
-          gives you a chance to fix your templates before running
-          'make install', by providing a list of incompatibilities of
-          your custom templates with the new versions of the
-          templates.
+          This script will check if your customized page templates
+          (see the WebStyle Admin Guide) still conform to the default
+          templates.  This gives you a chance to fix your templates
+          before running 'make install', by providing a list of
+          incompatibilities of your custom templates with the new
+          versions of the templates.
 
           This step is only useful if you are upgrading and if you
           have previously customized default page templates.
 
-   - Re-enable write access to the site if you have disabled it before
-     in the previous steps and restart your Apache server.
+   - You have also to run manually several migration scripts:
+
+        $ python ./modules/webaccess/lib/collection_restrictions_migration_kit.py
+
+           This script will migrate restricted collections that used
+           Apache user groups to a new firewall-like role definition
+           language.
+
+        $ python ./modules/websubmit/lib/fulltext_files_migration_kit.py
+
+           This script will check and update your fulltext file
+           storage system to the new style (e.g. unique document
+           names).
+
+        $ python ./modules/websession/lib/password_migration_kit.py
+
+           This script will update your local user table in order to
+           use encrypted passwords for more security.
+
+   - CDS Invenio v0.99.0 uses new, faster word indexer.  You will have
+     to reindex all your indexes by running:
+
+        $ /opt/cds-invenio/bin/bibindex -u admin -R
+
+   - You have to edit your httpd.conf in order to make Apache aware of
+     new URLs.  Please run:
+
+        $ /opt/cds-invenio/bin/inveniocfg --create-apache-conf
+
+     and check differences with your current setup and edit as
+     appropriate.
+
+   - Restart Apache and check whether everything is alright with your
+     system.  
+
+     Note that the detailed record pages (/record/10) have now a
+     tab-style look by default.  You may want to update your formats
+     to this style or else to disable this feature.  Please see the
+     WebStyle Admin Guide for more information.
 
    - Put the bibsched daemon back into the automatic mode.  You are
      done.
 
-If you are upgrading from CDSware v0.7.1, then please follow the
-following steps:
-
-   - We recommend you to install CDS Invenio into another @prefix@
-     directory and to use another database name, *not* CDSware's
-     values.
-
-   - Install CDS Invenio demo site to make sure that everything works
-     well on your setup.  Optionally run the unit and the regression
-     test suites too.
-
-   - Drop CDS Invenio tables containing the demo site and copy your
-     old CDSware tables over into the new CDS Invenio database.  (For
-     example, stop your MySQL server, copy all the CDSware database
-     directory files into the new CDS Invenio database directory, and
-     restart your MySQL server.)
-
-   - Run "make update-v0.7.1-tables".  This may take a while,
-     depending on the number of records you had.
-
-   - Run subsequent table update commands:  
-
-          $ make update-v0.90.0-tables -i
-          $ make update-v0.90.1-tables -i
-          $ make update-v0.92.0-tables -i
-
-     Use the "-i" option to ignore errors, as it is expected that some
-     of the ALTER TABLE commands would fail due to your skipping of
-     the intermediate version installation.
-
-   - Run "python ./modules/webbasket/lib/webbasket_migration_kit.py"
-     in order to migrate personal baskets.  You will be asked some
-     questions.  You can choose default answers when in doubt.  The
-     kit is fully automatic but it may ask you to fix some problems
-     manually if it cannot resolve them automatically.
-
-   - Rerun "webcoll".
-
-   - Delete all waiting tasks from the bibsched queue, and resubmit
-     periodical daemons anew, as indicated in the HOWTO Run guide.
-
-   - Adapt the look and feel of the dynamic Python pages.  (See the
-     WebStyle Admin Guide.)
-
-   - Adapt the output formatter.  (See above.)
-
-   - Put the bibsched daemon into the automatic mode.  You are done.
-
 Further notes and issues:
 -------------------------
 
- *) If you have been using external login method in your site, please
-    note that this release brings new support for advanced external
-    account and user group handling.  You may continue to use your old
-    external authentication classes, but we advise you to adapt to the
-    new style in order be able to fully profit from the new external
-    authentication and external group features.
-
- *) Several modules of this release (e.g. mail submission system,
-    citation ranking) are still experimental and not yet activated.
-    You may have a peek at what is planned, but please do not rely on
-    them.
+ *) Some modules of this release (e.g. mail submission system) are
+    still experimental and not yet activated.  You may have a peek at
+    what is planned, but please do not rely on them.
 
  *) The admin-level functionality of several modules is not fully
     developed or documented yet.
@@ -228,12 +174,8 @@ What's next:
  *) Improving the known issues mentioned above.  Strengthening the
     documentation towards v1.0 release.
 
- *) Removing submission field cookies.  Refactoring the WebSubmit
-    module.
+ *) Improving the record editing capabilities.
 
- *) Removing dependency on WML too, now that the dependency on PHP was
-    removed.
-
- *) Deploying the new URL schema for all pages (admin, help).
+ *) Deploying the new URL schema for all pages (admin).
 
 - end of file -
