@@ -1071,7 +1071,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                     if bibdoc.get_docname() == docname:
                         found_bibdoc = True
                         for (url, format) in urls:
-                            _add_new_format(bibdoc, first_url, first_format, docname, doctype, newname)
+                            _add_new_format(bibdoc, url, format, docname, doctype, newname)
                         if icon not in ('', 'KEEP-OLD-VALUE'):
                             _add_new_icon(bibdoc, icon, restriction)
                 if not found_bibdoc:
@@ -1079,7 +1079,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                         bibdoc = bibrecdocs.add_bibdoc(doctype, docname)
                         bibdoc.set_status(restriction)
                         for (url, format) in urls:
-                            _add_new_format(bibdoc, first_url, first_format, docname, doctype, newname)
+                            _add_new_format(bibdoc, url, format, docname, doctype, newname)
                         if icon and not icon == 'KEEP-OLD-VALUE':
                             _add_new_icon(bibdoc, icon, restriction)
                     except Exception, e:
