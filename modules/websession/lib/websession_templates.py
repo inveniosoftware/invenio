@@ -332,7 +332,7 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-        out = "<p>" + _("If you have lost password for your %(cdsname)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form in order to have a password reset link emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'cdsname' : cdsnameintl[ln]} + "</p>"
+        out = "<p>" + _("If you have lost the password for your %(cdsname)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form in order to have a password reset link emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'cdsname' : cdsnameintl[ln]} + "</p>"
 
         out += """
           <blockquote>
@@ -650,7 +650,7 @@ class Template:
 %(outro2)s""" % {
             'intro': _("Somebody (possibly you) coming from %(ip_address)s "
                 "has asked\nto register a new account at %(cdsname)s\nfor the "
-                "following email address \"%(email)s\"." % {
+                "email address \"%(email)s\"." % {
                     'cdsname' :cdsnameintl.get(ln, cdsname),
                     'email' : email,
                     'ip_address' : ip_address,
@@ -757,7 +757,7 @@ class Template:
                 }
 
             if CFG_CERN_SITE:
-                out += "<p>" + _("If you don't own a CERN account yet, you can register a %(x_url_open)snew CERN external account%(x_url_close)s.") % {'x_url_open' : '<a href="https://www.cern.ch/lightweightregistration/RegisterAccount.aspx">', 'x_url_close' : '</a>'} + "</p>"
+                out += "<p>" + _("If you don't own a CERN account yet, you can register a %(x_url_open)snew CERN lightweight account%(x_url_close)s.") % {'x_url_open' : '<a href="https://www.cern.ch/lightweightregistration/RegisterAccount.aspx">', 'x_url_close' : '</a>'} + "</p>"
             else:
                 if register_available:
                     out += "<p>"+_("If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)s an internal account.") %\

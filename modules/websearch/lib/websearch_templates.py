@@ -1853,7 +1853,7 @@ class Template:
                   </tr>
                  </tbody>
                 </table>""" % {
-                  'sort_by' : _("Sort :"),
+                  'sort_by' : _("Sort:"),
                   'display_res' : _("Display results:"),
                   'out_format' : _("Output format:"),
                   'select_sf' : self.tmpl_select(fieldname = 'sf', values = sort_fields, selected = sf, css_class = 'address'),

@@ -311,8 +311,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     mess = "<p>" + _("Switched to internal login method.") + " "
                     mess += _("Please note that if this is the first time that you are using this account "
                               "with the internal login method then the system has set for you "
-                              "a randomly generated password which you can obtain via email "
-                              "by clicking on the following button:") + '</p>'
+                              "a randomly generated password. Please clic the "
+                              "following button to obtain a password reset request "
+                              "link sent to you via email:") + '</p>'
                     mess += """<p><form  method="post" action="../youraccount/send_email">
                         <input type="hidden" name="p_email" value="%s">
                         <input class="formbutton" type="submit" value="%s">
@@ -480,7 +481,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if user_prefs:
             if CFG_EXTERNAL_AUTHENTICATION.has_key(user_prefs['login_method']) and \
                CFG_EXTERNAL_AUTHENTICATION[user_prefs['login_method']][0] is not None:
-                eMsg = _("Cannot send password by email since you are using external authentication system.")
+                eMsg = _("Cannot send password reset request since you are using external authentication system.")
                 return page(title=_("Your Account"),
                             body=webaccount.perform_emailMessage(eMsg, args['ln']),
                             description="%s Personalize, Main page" % cdsnameintl.get(args['ln'], cdsname),
