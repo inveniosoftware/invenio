@@ -66,6 +66,9 @@ project.  In an approximate decreasing chronological order:
      Ranking by downloads, for the BibRank and WebSubmit
      modules.  Group management for WebSession.
 
+ - Joël Vogt <joel.vogt@unifr.ch>
+     Contributions to the BibClassify module.
+
  - Marcus Johannson <marcus.johansson@cern.ch>
      Contributions to the WebStat module.
 
