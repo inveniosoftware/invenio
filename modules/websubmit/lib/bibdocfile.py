@@ -54,6 +54,7 @@ _extensions = _mimes.encodings_map.keys() + \
               _mimes.types_map[1].keys()
 _extensions.sort()
 _extensions.reverse()
+_extensions = [ext.lower() for ext in _extensions]
 
 class InvenioWebSubmitFileError(Exception):
     pass
