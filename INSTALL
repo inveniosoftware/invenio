@@ -183,13 +183,13 @@ Contents
 ----------------
 
       $ cd /usr/local/src/
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz.md5
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz.sig
-      $ md5sum -v -c cds-invenio-0.92.1.tar.gz.md5 
-      $ gpg --verify cds-invenio-0.92.1.tar.gz.sig cds-invenio-0.92.1.tar.gz
-      $ tar xvfz cds-invenio-0.92.1.tar.gz
-      $ cd cds-invenio-0.92.1
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.0.tar.gz
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.0.tar.gz.md5
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.0.tar.gz.sig
+      $ md5sum -v -c cds-invenio-0.99.0.tar.gz.md5 
+      $ gpg --verify cds-invenio-0.99.0.tar.gz.sig cds-invenio-0.99.0.tar.gz
+      $ tar xvfz cds-invenio-0.99.0.tar.gz
+      $ cd cds-invenio-0.99.0
       $ ./configure
       $ make
       $ make install
@@ -231,20 +231,20 @@ Contents
           CDS Invenio.  (The built files will be installed into
           different "target" directories later.)
 
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz.md5
-      $ wget http://cdsware.cern.ch/download/cds-invenio-0.92.1.tar.gz.sig
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.0.tar.gz
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.0.tar.gz.md5
+      $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.0.tar.gz.sig
 
           Fetch CDS Invenio source tarball from the CDS Software
           Consortium distribution server, together with MD5 checksum
           and GnuPG cryptographic signature files useful for verifying
           the integrity of the tarball.
 
-      $ md5sum -v -c cds-invenio-0.92.1.tar.gz.md5
+      $ md5sum -v -c cds-invenio-0.99.0.tar.gz.md5
 
           Verify MD5 checksum.
 
-      $ gpg --verify cds-invenio-0.92.1.tar.gz.sig cds-invenio-0.92.1.tar.gz
+      $ gpg --verify cds-invenio-0.99.0.tar.gz.sig cds-invenio-0.99.0.tar.gz
 
           Verify GnuPG cryptographic signature.  Note that you may
           first have to import my public key into your keyring, if you
@@ -256,11 +256,11 @@ Contents
           warning that may follow after the signature has been
           successfully verified.
 
-      $ tar xvfz cds-invenio-0.92.1.tar.gz
+      $ tar xvfz cds-invenio-0.99.0.tar.gz
 
           Untar the distribution tarball.    
 
-      $ cd cds-invenio-0.92.1
+      $ cd cds-invenio-0.99.0
    
           Go to the source directory.
 
