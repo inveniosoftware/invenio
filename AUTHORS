@@ -19,43 +19,59 @@ The CERN development group currently consists of:
      WebHelp, and more.
   
  - Nicholas Robinson <nicholas.robinson@cern.ch>
-     WebSubmit, reference extraction for the BibEdit module.
+     WebSubmit.  Reference extraction for the BibEdit module.
 
  - Martin Vesely <martin.vesely@cern.ch>
-     BibHarvest, BibConvert, BibMatch.
-
- - Diane Berkovits <diane.berkovits@cern.ch>
-     Ranking by downloads, for the BibRank and WebSubmit
-     modules.  Group management for WebSession.
-
- - Gregory Favre <gregory.favre@cern.ch>
-     WebBasket, WebMessage.  Improvements to WebComment.
+     BibHarvest, OAI daemon and admin interface. BibConvert
+     text-oriented mode. BibMatch.
 
  - Chris Montarbaud <christiane.montarbaud@cern.ch>
      Multimedia and photo management.
 
  - Jerome Caffaro <jerome.caffaro@cern.ch>
      BibFormat, redesign and rewrite in Python.  BibConvert
-     XML-oriented mode.  OAI harvester improvements.
+     XML-oriented mode.  OAI harvester improvements.  Improvements to
+     BibEdit.  WebDoc tool.
 
  - Samuele Kaplun <samuele.kaplun@cern.ch>
-     External authentication rewrite, user preferences and external
-     groups management.  Firewall-like access control RBAC system.
-     Fulltext file management rewrite.  Intbitset Python C extension 
-     for the indexer.
+     Authentication and user preferences rewrite and improvements.
+     Firewall-like access control RBAC system.  Fulltext file
+     management rewrite and upload feature.  Intbitset Python C
+     extension for the indexer.  Other contributions and
+     improvements.
 
- - Gabriel Hase <gabriel.hase@konnektiv.ch>
-     WebJournal module.
+ - Tony Osborne <tony.osborne@cern.ch>
+     Improvements to the reference extractor.
 
  - Marko Niinimaki <manzikki@gmail.com>
      Contributions to the BibRank citation module.
+
+ - Radoslav Ivanov <radoslav.ivanov@cern.ch>
+     Contributions to the WebBasket module test suite.
+
+The EPFL development group currently consists of:
+
+ - Gregory Favre <gregory.favre@cern.ch>
+     Rewrite of WebBasket.  WebMessage.  Improvements to WebComment.
+     Other contributions and improvements.
 
 Many former group members (CERN and EPFL staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project.  In an approximate decreasing chronological order:
 
+ - Gabriel Hase <gabriel.hase@konnektiv.ch>
+     WebJournal module.
+
+ - Diane Berkovits <diane.berkovits@cern.ch>
+     Ranking by downloads, for the BibRank and WebSubmit
+     modules.  Group management for WebSession.
+
+ - Marcus Johannson <marcus.johansson@cern.ch>
+     Contributions to the WebStat module.
+
  - Jan Brice Krause <jan.brice.krause@cern.ch>
-     Fulltext file transfer mode for BibUpload.
+     Original implementation of the fulltext file transfer mode for
+     BibUpload.
 
  - Axel Voitier <axel.voitier@gmail.com> 
      Complex approval and refereeing subsystem, for WebSubmit.
@@ -64,7 +80,7 @@ project.  In an approximate decreasing chronological order:
      BibClassify, BibHarvest Admin. 
 
  - Nikolay Dyankov <ndyankov@gmail.com>
-     XML-based formatting engine, for BibFormat.
+     XML-based BFX formatting engine, for BibFormat.
 
  - Olivier Serres <olivier.serres@gmail.com>
      External collections searching, for WebSearch.
