@@ -54,9 +54,14 @@ def Send_Approval_Request (parameters, curdir, form, user_info=None):
     categformat = parameters['categformatDAM']
     # retrieve category
     categformat = categformat.replace("<CATEG>","([^-]*)")
-    categs = re.match(categformat,rn)
-    if categs is not None:
-        category = categs.group(1)
+    m_categ_search = re.match(categformat, rn)
+    if m_categ_search is not None:
+        if len(m_categ_search.groups()) > 0:
+            ## Found a match for the category of this document. Get it:
+            category = m_categ_search.group(1)
+        else:
+            ## This document has no category.
+            category = "unknown"
     else:
         category = "unknown"
     # create TI

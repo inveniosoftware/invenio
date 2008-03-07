@@ -37,6 +37,12 @@ def Update_Approval_DB(parameters, curdir, form, user_info=None):
     doctype = form['doctype']
     act = form['act']
     categformat = parameters['categformatDAM']
+    ## Get the name of the decision file:
+    try:
+        decision_filename = parameters['decision_file']
+    except KeyError:
+        decision_filename = ""
+
     access = "%s%s" % (time.time(),os.getpid())
     if act != "APP":
         # retrieve category
@@ -52,7 +58,16 @@ def Update_Approval_DB(parameters, curdir, form, user_info=None):
             category = category.replace("\n","")
         else:
             categformat = categformat.replace("<CATEG>","([^-]*)")
-            category = re.match(categformat,rn).group(1)
+            m_categ_search = re.match(categformat, rn)
+            if m_categ_search is not None:
+                if len(m_categ_search.groups()) > 0:
+                    ## Found a match for the category of this document. Get it:
+                    category = m_categ_search.group(1)
+                else:
+                    ## This document has no category.
+                    category = ""
+            else:
+                category = ""
         if category == "":
             category = "unknown"
         sth = run_sql("SELECT status,dFirstReq,dLastReq,dAction FROM sbmAPPROVAL WHERE  doctype=%s and categ=%s and rn=%s", (doctype,category,rn,))
@@ -61,12 +76,30 @@ def Update_Approval_DB(parameters, curdir, form, user_info=None):
         else:
             run_sql("UPDATE sbmAPPROVAL SET dLastReq=NOW(), status='waiting' WHERE  doctype=%s and categ=%s and rn=%s", (doctype,category,rn,))
     else:
-        if os.path.exists("%s/decision" % curdir):
-            fp = open("%s/decision" % curdir, "r")
-            decision = fp.read()
-            fp.close()
+        ## Since this is the "APP" action, this call of the function must be
+        ## on behalf of the referee - in order to approve or reject an item.
+        ## We need to get the decision from the decision file:
+        if decision_filename in (None, "", "NULL"):
+            ## We don't have a name for the decision file.
+            ## For backward compatibility reasons, try to read the decision from
+            ## a file called 'decision' in curdir:
+            if os.path.exists("%s/decision" % curdir):
+                fp = open("%s/decision" % curdir, "r")
+                decision = fp.read()
+                fp.close()
+            else:
+                decision = ""
         else:
-            decision = ""
+            ## Try to read the decision from the decision file:
+            try:
+                fh_decision = open("%s/%s" % (curdir, decision_filename), "r")
+                decision = fp.read().strip()
+                fh_decision.close()
+            except IOError, err:
+                ## Oops, unable to open the decision file.
+                decision = ""
+        ## Either approve or reject the item, based upon the contents
+        ## of 'decision':
         if decision == "approve":
             run_sql("UPDATE sbmAPPROVAL SET dAction=NOW(),status='approved' WHERE  rn=%s", (rn,))
         else:
