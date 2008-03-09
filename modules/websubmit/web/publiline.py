@@ -60,7 +60,7 @@ from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, list_registered_users, page_not_authorized
 from invenio.messages import gettext_set_language, wash_language
 from invenio.websubmit_config import *
-from invenio.search_engine import search_pattern
+from invenio.search_engine import search_pattern, get_fieldvalues
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
 from invenio.mailutils import send_email
 from invenio.urlutils import wash_url_argument
@@ -73,11 +73,18 @@ import invenio.webbasket_dblayer as basketdb
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, CFG_WEBBASKET_CATEGORIES, CFG_WEBBASKET_SHARE_LEVELS_ORDERED
 from invenio.webbasket import perform_request_display_item, perform_request_save_comment
 from invenio.websubmit_functions.Retrieve_Data import Get_Field
+from invenio.errorlib import register_exception
+from invenio.bibrecord import create_records, record_get_field_value, record_get_field_values
 
 execfile("%s/invenio/websubmit_functions/Retrieve_Data.py" % pylibdir)
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
+
+CFG_WEBSUBMIT_PENDING_DIR = "%s/pending" % storage
+CFG_WEBSUBMIT_DUMMY_MARC_XML_REC = "dummy_marcxml_rec"
+CFG_WEBSUBMIT_MARC_XML_REC = "recmysql"
+
 
 def index(req,c=cdsname,ln=cdslang,doctype="",categ="",RN="",send="",flow="",apptype="", action="", email_user_pattern="", id_user="", id_user_remove="", validate="", id_user_val="", msg_subject="", msg_body=""):
     global uid
@@ -326,10 +333,30 @@ def displayDocument(req, doctype,categ,RN,send, ln = cdslang):
     else:
         return _("Approval has never been requested for this document.") + "<BR>&nbsp;"
 
-    try:
-        (authors,title,sysno,newrn) = getInfo(doctype,categ,RN)
-    except TypeError:
-        return _("Unable to display document.")
+    ## Get the details of the pending item:
+    item_details = get_pending_item_details(doctype, RN)
+    ## get_pending_item_details has returned either None or a dictionary
+    ## with the following structure:
+    ##   { 'title'            : '-', ## String - the item's title
+    ##     'recid'            : '',  ## String - recid
+    ##     'report-number'    : '',  ## String - the item's report number
+    ##     'authors'          : [],  ## List   - the item's authors
+    ##   }
+    if item_details is not None:
+        authors = ", ".join(item_details['authors'])
+        newrn = item_details['report-number']
+        title = item_details['title']
+        sysno = item_details['recid']
+    else:
+        ## FIXME!
+        ## For backward compatibility reasons, it we failed to find the item's
+        ## details, we will try the old way, which includes searching for files
+        ## like TI, TIF in the submission's working directory.
+        ## This is not nice and should be removed.
+        try:
+            (authors,title,sysno,newrn) = getInfo(doctype,categ,RN)
+        except TypeError:
+            return _("Unable to display document.")
 
     confirm_send = 0
     if send == _("Send Again"):
@@ -399,9 +426,28 @@ def displayCplxDocument(req, doctype,categ,RN,apptype, ln = cdslang):
     else:
         return _("Approval has never been requested for this document.") + "<BR>&nbsp;"
 
-    try:
-        (authors,title,sysno,newrn) = getInAlice(doctype,categ,RN)
-    except TypeError:
+## Removing call to deprecated "getInAlice" function and replacing it with
+## a call to the newer "get_brief_doc_details_from_repository" function:
+##     try:
+##         (authors,title,sysno,newrn) = getInAlice(doctype,categ,RN)
+##     except TypeError:
+##         return _("Unable to display document.")
+    item_details = get_brief_doc_details_from_repository(RN)
+    ## get_brief_doc_details_from_repository has returned either None
+    ## or a dictionary with the following structure:
+    ##   { 'title'            : '-', ## String - the item's title
+    ##     'recid'            : '',  ## String - recid
+    ##     'report-number'    : '',  ## String - the item's report number
+    ##     'authors'          : [],  ## List   - the item's authors
+    ##   }
+    if item_details is not None:
+        ## Details of the item were found in the CDS Invenio repository
+        authors = ", ".join(item_details['authors'])
+        newrn = item_details['report-number']
+        title = item_details['title']
+        sysno = item_details['recid']
+    else:
+        ## Can't find any document details.
         return _("Unable to display document.")
 
     if status == "waiting":
@@ -585,9 +631,29 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
     else:
         return _("Approval has never been requested for this document.") + "<br />&nbsp;"
 
-    try:
-        (authors,title,sysno,newrn) = getInAlice(doctype,categ,RN)
-    except TypeError:
+
+## Removing call to deprecated "getInAlice" function and replacing it with
+## a call to the newer "get_brief_doc_details_from_repository" function:
+##     try:
+##         (authors,title,sysno,newrn) = getInAlice(doctype,categ,RN)
+##     except TypeError:
+##         return _("Unable to display document.")
+    item_details = get_brief_doc_details_from_repository(RN)
+    ## get_brief_doc_details_from_repository has returned either None
+    ## or a dictionary with the following structure:
+    ##   { 'title'            : '-', ## String - the item's title
+    ##     'recid'            : '',  ## String - recid
+    ##     'report-number'    : '',  ## String - the item's report number
+    ##     'authors'          : [],  ## List   - the item's authors
+    ##   }
+    if item_details is not None:
+        ## Details of the item were found in the CDS Invenio repository
+        authors = ", ".join(item_details['authors'])
+        newrn = item_details['report-number']
+        title = item_details['title']
+        sysno = item_details['recid']
+    else:
+        ## Can't find any document details.
         return _("Unable to display document.")
 
     if (action == "EdBoardSel") and (apptype == "RPB"):
@@ -1114,8 +1180,272 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
 
     return t
 
+def get_pending_item_details(doctype, reportnumber):
+    """Given a doctype and reference number, try to retrieve an item's details.
+       The first place to search for them should be the WebSubmit pending
+       directory. If nothing is retrieved from there, and attempt is made
+       to retrieve them from the CDS Invenio repository itself.
+       @param doctype: (string) - the doctype of the item for which brief
+        details are to be retrieved.
+       @param reportnumber: (string) - the report number of the item
+        for which details are to be retrieved.
+       @return: (dictionary or None) - If details are found for the item,
+        they will be returned in a dictionary structured as follows:
+            { 'title'         : '-', ## String - the item's title
+              'recid'         : '',  ## String - recid taken from the SN file
+              'report-number' : '',  ## String - the item's report number
+              'authors'       : [],  ## List   - the item's authors
+            }
+        If no details were found a NoneType is returned.
+    """
+    ## First try to get the details of a document from the pending dir:
+    item_details = get_brief_doc_details_from_pending(doctype, \
+                                                      reportnumber)
+    if item_details is None:
+        item_details = get_brief_doc_details_from_repository(reportnumber)
+    ## Return the item details:
+    return item_details
+
+def get_brief_doc_details_from_pending(doctype, reportnumber):
+    """Try to get some brief details about the submission that is awaiting
+       the referee's decision.
+       Details sought are:
+        + title
+        + Authors
+        + recid (why?)
+        + report-number (why?)
+       This function searches for a MARC XML record in the pending submission's
+       working directory. It prefers the so-called 'dummy' record, but will
+       search for the final MARC XML record that would usually be passed to
+       bibupload (i.e. recmysql) if that is not present. If neither of these
+       records are present, no details will be found.
+       @param doctype: (string) - the WebSubmit document type of the item
+        to be refereed. It is used in order to locate the submission's
+        working directory in the WebSubmit pending directory.
+       @param reportnumber: (string) - the report number of the item for
+        which details are to be recovered. It is used in order to locate the
+        submission's working directory in the WebSubmit pending directory.
+       @return: (dictionary or None) - If details are found for the item,
+        they will be returned in a dictionary structured as follows:
+            { 'title'            : '-', ## String - the item's title
+              'recid'            : '',  ## String - recid taken from the SN file
+              'report-number'    : '',  ## String - the item's report number
+              'authors'          : [],  ## List   - the item's authors
+            }
+        If no details were found (i.e. no MARC XML files in the submission's
+        working directory), a NoneType is returned.
+    """
+    pending_doc_details = None
+    marcxml_rec_name = None
+    ## Check for a MARC XML record in the pending dir.
+    ## If it's there, we will use it to obtain certain bibliographic
+    ## information such as title, author(s), etc, which we will then
+    ## display to the referee.
+    ## We favour the "dummy" record (created with the WebSubmit function
+    ## "Make_Dummy_MARC_XML_Record"), because it was made for this
+    ## purpose. If it's not there though, we'll take the normal
+    ## (final) recmysql record that would generally be passed to bibupload.
+    if os.access("%s/%s/%s/%s" % (CFG_WEBSUBMIT_PENDING_DIR, \
+                                  doctype, \
+                                  reportnumber, \
+                                  CFG_WEBSUBMIT_DUMMY_MARC_XML_REC), \
+                 os.F_OK|os.R_OK):
+        ## Found the "dummy" marc xml record in the submission dir.
+        ## Use it:
+        marcxml_rec_name = CFG_WEBSUBMIT_DUMMY_MARC_XML_REC
+    elif os.access("%s/%s/%s/%s" % (CFG_WEBSUBMIT_PENDING_DIR, \
+                                    doctype, \
+                                    reportnumber, \
+                                    CFG_WEBSUBMIT_MARC_XML_REC), \
+                   os.F_OK|os.R_OK):
+        ## Although we didn't find the "dummy" marc xml record in the
+        ## submission dir, we did find the "real" one (that which would
+        ## normally be passed to bibupload). Use it:
+        marcxml_rec_name = CFG_WEBSUBMIT_MARC_XML_REC
+
+    ## If we have a MARC XML record in the pending submission's
+    ## working directory, go ahead and use it:
+    if marcxml_rec_name is not None:
+        try:
+            fh_marcxml_record = open("%s/%s/%s/%s" \
+                                     % (CFG_WEBSUBMIT_PENDING_DIR, \
+                                        doctype, \
+                                        reportnumber, \
+                                        marcxml_rec_name), "r")
+            xmltext = fh_marcxml_record.read()
+            fh_marcxml_record.close()
+        except IOError:
+            ## Unfortunately, it wasn't possible to read the details of the
+            ## MARC XML record. Register the exception.
+            exception_prefix = "Error: Publiline was unable to read the " \
+                               "MARC XML record [%s/%s/%s/%s] when trying to " \
+                               "use it to recover details about a pending " \
+                               "submission." % (CFG_WEBSUBMIT_PENDING_DIR, \
+                                                doctype, \
+                                                reportnumber, \
+                                                marcxml_rec_name)
+            register_exception(prefix=exception_prefix)
+        else:
+            ## Attempt to use bibrecord to create an internal representation
+            ## of the record, from which we can extract certain bibliographic
+            ## information:
+            records = create_records(xmltext, 1, 1)
+            try:
+                record = records[0][0]
+            except IndexError:
+                ## Bibrecord couldn't successfully represent the record
+                ## contained in the xmltext string. The record must have
+                ## been empty or badly formed (or something).
+                pass
+            else:
+                ## Dictionary to hold the interesting details of the
+                ## pending item:
+                pending_doc_details = { 'title'         : '-',
+                                        'recid'         : '',
+                                        'report-number' : '',
+                                        'authors'       : [],
+                                      }
+                ## Get the recid:
+                ## Note - the old "getInPending" function reads the "SN"
+                ## file from the submission's working directory and since
+                ## the "SN" file is currently "magic" and hardcoded
+                ## throughout WebSubmit, I'm going to stick to this model.
+                ## I could, however, have tried to get it from the MARC XML
+                ## record as so:
+                ## recid = record_get_field_value(rec=record, tag="001")
+                try:
+                    fh_recid = open("%s/%s/%s/SN" \
+                                    % (CFG_WEBSUBMIT_PENDING_DIR, \
+                                       doctype, \
+                                       reportnumber), "r")
+                    recid = fh_recid.read()
+                    fh_recid.close()
+                except IOError:
+                    ## Probably, there was no "SN" file in the submission's
+                    ## working directory.
+                    pending_doc_details['recid'] = ""
+                else:
+                    pending_doc_details['recid'] = recid.strip()
+                
+                ## Item report number (from record):
+                ## Note: I don't know what purpose this serves. It appears
+                ## to be used in the email that is sent to the author, but
+                ## it seems funny to me, since we already have the report
+                ## number (which is indeed used to find the submission's
+                ## working directory in pending). Perhaps it's used for
+                ## cases when the reportnumber is changed after approval?
+                ## To investigate when time allows:
+                finalrn = record_get_field_value(rec=record, \
+                                                 tag="037", \
+                                                 code="a")
+                if finalrn != "":
+                    pending_doc_details['report-number'] = finalrn
+
+                ## Item title:
+                title = record_get_field_value(rec=record, \
+                                               tag="245", \
+                                               code="a")
+                if title != "":
+                    pending_doc_details['title'] = title
+                else:
+                    ## Alternative title:
+                    alt_title = record_get_field_value(rec=record, \
+                                                       tag="246", \
+                                                       ind1="1", \
+                                                       code="a")
+                    if alt_title != "":
+                        pending_doc_details['title'] = alt_title
+                
+                ## Item first author:
+                first_author = record_get_field_value(rec=record, \
+                                                      tag="100", \
+                                                      code="a")
+                if first_author != "":
+                    pending_doc_details['authors'].append(first_author)
+                
+                ## Other Authors:
+                other_authors = record_get_field_values(rec=record, \
+                                                        tag="700", \
+                                                        code="a")
+                for author in other_authors:
+                    pending_doc_details['authors'].append(author)                
+
+    ## Return the details discovered about the pending document:
+    return pending_doc_details
+
+
+def get_brief_doc_details_from_repository(reportnumber):
+    """Try to get some brief details about the submission that is awaiting
+       the referee's decision.
+       Details sought are:
+        + title
+        + Authors
+        + recid (why?)
+        + report-number (why?)
+       This function searches in the CDS Invenio repository, based on
+       "reportnumber" for a record and then pulls the interesting fields
+       from it.
+       @param reportnumber: (string) - the report number of the item for
+        which details are to be recovered. It is used in the search.
+       @return: (dictionary or None) - If details are found for the item,
+        they will be returned in a dictionary structured as follows:
+            { 'title'            : '-', ## String - the item's title
+              'recid'            : '',  ## String - recid taken from the SN file
+              'report-number'    : '',  ## String - the item's report number
+              'authors'          : [],  ## List   - the item's authors
+            }
+        If no details were found a NoneType is returned.
+    """
+    ## Details of the pending document, as found in the repository:
+    pending_doc_details = None
+    ## Search for records matching this "report number"
+    found_record_ids = list(search_pattern(req=None, \
+                                           p=reportnumber, \
+                                           f="reportnumber", \
+                                           m="e"))
+    ## How many records were found?
+    if len(found_record_ids) == 1:
+        ## Found only 1 record. Get the fields of interest:
+        pending_doc_details = { 'title'         : '-',
+                                'recid'         : '',
+                                'report-number' : '',
+                                'authors'       : [],
+                              }
+        recid = found_record_ids[0]
+        ## Authors:
+        first_author  = get_fieldvalues(recid, "100__a")
+        for author in first_author:
+            pending_doc_details['authors'].append(author)
+        other_authors = get_fieldvalues(recid, "700__a")
+        for author in other_authors:
+            pending_doc_details['authors'].append(author)
+        ## Title:
+        title = get_fieldvalues(recid, "245__a")
+        if len(title) > 0:
+            pending_doc_details['title'] = title[0]
+        else:
+            ## There was no value for title - check for an alternative title:
+            alt_title = get_fieldvalues(recid, "2641_a")
+            if len(alt_title) > 0:
+                pending_doc_details['title'] = alt_title[0]
+        ## Record ID:
+        pending_doc_details['recid'] = recid
+        ## Report Number:
+        reptnum = get_fieldvalues(recid, "037__a")
+        if len(reptnum) > 0:
+            pending_doc_details['report-number'] = reptnum[0]
+    elif len(found_record_ids) > 1:
+        ## Oops. This is unexpected - there shouldn't be me multiple matches
+        ## for this item. The old "getInAlice" function would have simply
+        ## taken the first record in the list. That's not very nice though.
+        ## Some kind of warning or error should be raised here. FIXME.
+        pass
+    return pending_doc_details
+
+
 # Retrieve info about document
 def getInfo(doctype,categ,RN):
+    """FIXME: DEPRECATED!"""
     result = getInPending(doctype,categ,RN)
     if not result:
         result = getInAlice(doctype,categ,RN)
@@ -1123,6 +1453,7 @@ def getInfo(doctype,categ,RN):
 
 #seek info in pending directory
 def getInPending(doctype,categ,RN):
+    """FIXME: DEPRECATED!"""
     PENDIR="%s/pending" % storage
     if os.path.exists("%s/%s/%s/AU" % (PENDIR,doctype,RN)):
         fp = open("%s/%s/%s/AU" % (PENDIR,doctype,RN),"r")
@@ -1153,6 +1484,7 @@ def getInPending(doctype,categ,RN):
 
 #seek info in Alice database
 def getInAlice(doctype,categ,RN):
+    """FIXME: DEPRECATED!"""
     # initialize sysno variable
     sysno = ""
     searchresults = list(search_pattern(req=None, p=RN, f="reportnumber"))
