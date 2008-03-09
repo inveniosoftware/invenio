@@ -84,18 +84,18 @@ def Update_Approval_DB(parameters, curdir, form, user_info=None):
             ## For backward compatibility reasons, try to read the decision from
             ## a file called 'decision' in curdir:
             if os.path.exists("%s/decision" % curdir):
-                fp = open("%s/decision" % curdir, "r")
-                decision = fp.read()
-                fp.close()
+                fh_decision = open("%s/decision" % curdir, "r")
+                decision = fh_decision.read()
+                fh_decision.close()
             else:
                 decision = ""
         else:
             ## Try to read the decision from the decision file:
             try:
                 fh_decision = open("%s/%s" % (curdir, decision_filename), "r")
-                decision = fp.read().strip()
+                decision = fh_decision.read().strip()
                 fh_decision.close()
-            except IOError, err:
+            except IOError:
                 ## Oops, unable to open the decision file.
                 decision = ""
         ## Either approve or reject the item, based upon the contents
