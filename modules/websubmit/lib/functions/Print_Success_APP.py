@@ -17,29 +17,91 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""Return a message to the user's browser saying that their decision was taken
+   into account. Intended for use in an approval submission (the referee should
+   be the recipient of any message created by this function.)
+"""
+
 __revision__ = "$Id$"
 
-   ## Description:   function Print_Success_APP
-   ##                This function outputs a message telling the user his/her
-   ##             decision was taken into account.
-   ## Author:         T.Baron
-   ## PARAMETERS:    -
-
-import os
-
-from invenio.websubmit_config import InvenioWebSubmitFunctionError
+import os, cgi
+from invenio.errorlib import register_exception
 
 def Print_Success_APP(parameters, curdir, form, user_info=None):
-    global rn
-    # the field containing the decision of the referee must be called "decision".
-    if not os.path.exists("%s/decision" % curdir):
-        raise InvenioWebSubmitFunctionError("Could not find decision file")
-    else:
-        fp = open("%s/decision" % curdir,"r")
-        decision = fp.read()
-        fp.close()
-        t="<br><br><B>Your decision has been taken into account!</B><br><BR>"
-        if decision == "approve":
-            t+="The document will be soon available with the following reference: <b>%s</b><BR>" % rn
-    return t
+    """Return a message to be displayed by the referee's browser after (s)he
+       has refereed an item.
+       @param parameters: (dictionary) - parameters needed by this function.
+        Contains:
+          + decision_file: (string) - the name of the file in which the
+                           referee's decision is stored.
+       @param curdir: (string) - the current submission's working directory.
+       @param form: (dictionary) - submitted form values.
+       @param user_info: (dictionary) - information about the user.
+       @return: (string) - a message to be displayed by the user's browser.
+    """
+    global rn  ## Unfortunately, it's necessary to use the magic "rn" global:
+    ## Get the name of the decision file:
+    try:
+        decision_filename = parameters['decision_file']
+    except KeyError:
+        decision_filename = ""
 
+    ## Now try to read the decision from the decision_filename:
+    if decision_filename in (None, "", "NULL"):
+        ## We don't have a name for the decision file.
+        ## For backward compatibility reasons, try to read the decision from
+        ## a file called 'decision' in curdir:
+        if os.path.exists("%s/decision" % curdir):
+            try:
+                fh_decision = open("%s/decision" % curdir, "r")
+                decision = fh_decision.read()
+                fh_decision.close()
+            except IOError:
+                ## Unable to open the decision file
+                exception_prefix = "Error in WebSubmit function " \
+                                   "Print_Success_APP. Tried to open " \
+                                   "decision file [%s/decision] but was " \
+                                   "unable to." % curdir
+                register_exception(prefix=exception_prefix)
+                decision = ""
+            else:
+                decision = decision.strip()
+        else:
+            decision = ""
+    else:
+        ## Try to read the decision from the decision file:
+        try:
+            fh_decision = open("%s/%s" % (curdir, decision_filename), "r")
+            decision = fh_decision.read()
+            fh_decision.close()
+        except IOError:
+            ## Oops, unable to open the decision file.
+            decision = ""
+            exception_prefix = "Error in WebSubmit function " \
+                               "Print_Success_APP. Tried to open decision " \
+                               "file [%s/%s] but was unable to." \
+                               % (curdir, decision_filename)
+            register_exception(prefix=exception_prefix)
+        else:
+            decision = decision.strip()
+
+    ## Create the message:
+    if decision != "":
+        msg = "<br /><div>Your decision was: <b>%(decision)s</b>.<br />\n" \
+              "It has been taken into account.<br />\n" \
+              "%(additional-info)s</div><br />\n" \
+              % { 'decision'        : cgi.escape(decision),
+                  'additional-info' : ((decision == "approve" and \
+                                       "The item will now be integrated into " \
+                                        "the relevant collection with the " \
+                                        "reference number <b>%s</b>." \
+                                        % cgi.escape(rn)) \
+                                       or "")
+                }
+    else:
+        ## Since the decision could not be read from the decision file, we will
+        ## just display a generic "thank you for your decision" message.
+        ## FIXME: We should really report this to WebSubmit core.
+        msg = "<br /><div>Thank you for your decision.</div><br />\n"
+    ## Return the message to WebSubmit core.
+    return msg
