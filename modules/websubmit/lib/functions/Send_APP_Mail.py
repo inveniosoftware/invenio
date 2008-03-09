@@ -44,6 +44,7 @@ from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
+from invenio.errorlib import register_exception
 
 def Send_APP_Mail (parameters, curdir, form, user_info=None):
     global emailvalue,titlevalue,authorvalue,sysno,rn
@@ -56,19 +57,95 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
     categformat = parameters['categformatAPP']
     otheraddresses = parameters['addressesAPP']
     newrnpath = parameters['newrnin']
-    # retrieve values stored into files
-    if os.path.exists("%s/COM" % curdir):
-        fp = open("%s/COM" % curdir, "r")
-        comment = fp.read()
-        fp.close()
+    ## Get the name of the decision file:
+    try:
+        decision_filename = parameters['decision_file']
+    except KeyError:
+        decision_filename = ""
+    ## Get the name of the comments file:
+    try:
+        comments_filename = parameters['comments_file']
+    except KeyError:
+        comments_filename = ""
+
+    ## Now try to read the comments from the comments_filename:
+    if comments_filename in (None, "", "NULL"):
+        ## We don't have a name for the comments file.
+        ## For backward compatibility reasons, try to read the comments from
+        ## a file called 'COM' in curdir:
+        if os.path.exists("%s/COM" % curdir):
+            try:
+                fh_comments = open("%s/COM" % curdir, "r")
+                comment = fh_comments.read()
+                fh_comments.close()
+            except IOError:
+                ## Unable to open the comments file
+                exception_prefix = "Error in WebSubmit function " \
+                                   "Send_APP_Mail. Tried to open " \
+                                   "comments file [%s/COM] but was " \
+                                   "unable to." % curdir
+                register_exception(prefix=exception_prefix)
+                comment = ""
+            else:
+                comment = comment.strip()
+        else:
+            comment = ""
     else:
-        comment = ""
-    if os.path.exists("%s/decision" % curdir):
-        fp = open("%s/decision" % curdir,"r")
-        decision = fp.read()
-        fp.close()
+        ## Try to read the comments from the comments file:
+        try:
+            fh_comments = open("%s/%s" % (curdir, comments_filename), "r")
+            comment = fh_comments.read()
+            fh_comments.close()
+        except IOError:
+            ## Oops, unable to open the comments file.
+            comment = ""
+            exception_prefix = "Error in WebSubmit function " \
+                               "Send_APP_Mail. Tried to open comments " \
+                               "file [%s/%s] but was unable to." \
+                               % (curdir, comments_filename)
+            register_exception(prefix=exception_prefix)
+        else:
+            comment = comment.strip()
+
+    ## Now try to read the decision from the decision_filename:
+    if decision_filename in (None, "", "NULL"):
+        ## We don't have a name for the decision file.
+        ## For backward compatibility reasons, try to read the decision from
+        ## a file called 'decision' in curdir:
+        if os.path.exists("%s/decision" % curdir):
+            try:
+                fh_decision = open("%s/decision" % curdir, "r")
+                decision = fh_decision.read()
+                fh_decision.close()
+            except IOError:
+                ## Unable to open the decision file
+                exception_prefix = "Error in WebSubmit function " \
+                                   "Send_APP_Mail. Tried to open " \
+                                   "decision file [%s/decision] but was " \
+                                   "unable to." % curdir
+                register_exception(prefix=exception_prefix)
+                decision = ""
+            else:
+                decision = decision.strip()
+        else:
+            decision = ""
     else:
-        decision = ""
+        ## Try to read the decision from the decision file:
+        try:
+            fh_decision = open("%s/%s" % (curdir, decision_filename), "r")
+            decision = fh_decision.read()
+            fh_decision.close()
+        except IOError:
+            ## Oops, unable to open the decision file.
+            decision = ""
+            exception_prefix = "Error in WebSubmit function " \
+                               "Send_APP_Mail. Tried to open decision " \
+                               "file [%s/%s] but was unable to." \
+                               % (curdir, decision_filename)
+            register_exception(prefix=exception_prefix)
+        else:
+            decision = decision.strip()
+
     if os.path.exists("%s/%s" % (curdir,newrnpath)):
         fp = open("%s/%s" % (curdir,newrnpath) , "r")
         newrn = fp.read()
@@ -79,10 +156,15 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
     res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE sdocname=%s", (doctype,))
     docname = res[0][0]
     # retrieve category
-    categformat = categformat.replace("<CATEG>","([^-]*)")
-    categs = re.match(categformat,rn)
-    if categs is not None:
-        category = categs.group(1)
+    categformat = categformat.replace("<CATEG>", "([^-]*)")
+    m_categ_search = re.match(categformat, rn)
+    if m_categ_search is not None:
+        if len(m_categ_search.groups()) > 0:
+            ## Found a match for the category of this document. Get it:
+            category = m_categ_search.group(1)
+        else:
+            ## This document has no category.
+            category = "unknown"
     else:
         category = "unknown"
     # Build referee's email address
