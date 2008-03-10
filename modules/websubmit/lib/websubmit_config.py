@@ -119,6 +119,7 @@ class InvenioWebSubmitFunctionError(Exception):
            parameter.
            @param value: (string) - an error string to display to the user.
         """
+        Exception.__init__(self)
         self.value = value
     def __str__(self):
         """Return oneself as a string (actually, return the contents of
@@ -151,6 +152,7 @@ class InvenioWebSubmitFunctionStop(Exception):
            parameter.
            @param value: (string) - a string to display to the user.
         """
+        Exception.__init__(self)
         self.value = value
     def __str__(self):
         """Return oneself as a string (actually, return the contents of
@@ -168,12 +170,15 @@ class InvenioWebSubmitFunctionWarning(Exception):
        function was unable to perform its task, the event must be
        logged.
        Logging of the exception will be performed by WebSubmit.
+
+       Extends: Exception.
     """
     def __init__(self, value):
         """Set the internal "value" attribute to that of the passed "value"
            parameter.
            @param value: (string) - a string to write to the log.
         """
+        Exception.__init__(self)
         self.value = value
     def __str__(self):
         """Return oneself as a string (actually, return the contents of
@@ -182,3 +187,25 @@ class InvenioWebSubmitFunctionWarning(Exception):
         """
         return str(self.value)
 
+
+class InvenioWebSubmitFileStamperError(Exception):
+    """This exception should be raised by websubmit_file_stamper when an
+       error is encoutered that prevents a file from being stamped.
+       When caught, this exception should be used to stop processing with a
+       failure signal.
+
+       Extends: Exception.
+    """
+    def __init__(self, value):
+        """Set the internal "value" attribute to that of the passed "value"
+           parameter.
+           @param value: (string) - a string to write to the log.
+        """
+        Exception.__init__(self)
+        self.value = value
+    def __str__(self):
+        """Return oneself as a string (actually, return the contents of
+           self.value).
+           @return: (string)
+        """
+        return str(self.value)
