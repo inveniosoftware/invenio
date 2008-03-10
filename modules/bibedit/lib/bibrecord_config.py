@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -23,10 +23,10 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import etcdir
+from invenio.config import CFG_ETCDIR
 
 # location of the MARC21 DTD file:
-CFG_MARC21_DTD = "%s/bibedit/MARC21slim.dtd" % etcdir
+CFG_MARC21_DTD = "%s/bibedit/MARC21slim.dtd" % CFG_ETCDIR
 
 # pylint: disable-msg=C0301
 
@@ -43,7 +43,7 @@ CFG_BIBRECORD_WARNING_MSGS = {
     8: 'WARNING: empty datafield',
     98:'WARNING: problems importing invenio',
     99: 'Document not well formed'
-    } 
+    }
 
 # verbose level to be used when creating records from XML: (0=least, ..., 9=most)
 CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL = 0
@@ -52,4 +52,4 @@ CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL = 0
 CFG_BIBRECORD_DEFAULT_CORRECT = 0
 
 # XML parsers available: (0=minidom, 1=4suite, 2=PyRXP)
-CFG_BIBRECORD_PARSERS_AVAILABLE = [0, 1, 2]                                           
+CFG_BIBRECORD_PARSERS_AVAILABLE = [0, 1, 2]

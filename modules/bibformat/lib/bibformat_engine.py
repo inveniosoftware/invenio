@@ -38,7 +38,7 @@ import cgi
 
 from invenio.config import \
      CFG_PATH_PHP, \
-     bindir, \
+     CFG_BINDIR, \
      cdslang
 from invenio.errorlib import \
      register_errors, \
@@ -232,7 +232,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
 ##         if platform.python_compiler().find('Red Hat') > -1:
 ##             # use os.system
 ##             (result_code, result_path) = tempfile.mkstemp()
-##             command = "( %s/bibformat otype=%s )  > %s" % (bindir, format, result_path)
+##             command = "( %s/bibformat otype=%s )  > %s" % (CFG_BINDIR, format, result_path)
 ##             (xm_code, xm_path) = tempfile.mkstemp()
 ##             xm_file = open(xm_path, "w")
 ##             xm_file.write(xm_record)
@@ -246,7 +246,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
 ##             os.remove(xm_path)
 ##         else:
 ##             # use popen
-        pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % bindir,
+        pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % CFG_BINDIR,
                                                          "otype=%s" % format],
                                                         'rw')
         pipe_input.write(xm_record)

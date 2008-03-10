@@ -28,13 +28,12 @@ import locale
 
 from invenio.config import \
      CFG_CERN_SITE, \
-     bibformat, \
      cdslang, \
      cdsname, \
      cdsnameintl, \
      supportemail, \
      sweburl, \
-     version, \
+     CFG_VERSION, \
      weburl
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO

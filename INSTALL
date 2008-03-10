@@ -409,8 +409,10 @@ Contents
 
              $ cat /opt/cds-invenio/etc/invenio-local.conf
              [Invenio]
-             WEBURL = http://your.site.com
-             SWEBURL = https://your.site.com
+             CFG_SITE_URL = http://your.site.com
+             CFG_SITE_SECURE_URL = https://your.site.com
+             CFG_SITE_ADMIN_EMAIL = john.doe@your.site.com
+             CFG_SITE_SUPPORT_EMAIL = john.doe@your.site.com
          
           The Invenio system will then read both the default
           invenio.conf file and your customized invenio-local.conf
@@ -421,11 +423,12 @@ Contents
           You should override at least the parameters from the top of
           invenio.conf file in order to define some very essential
           runtime parameters such as the visible URL of your document
-          server (look for WEBURL and SWEBURL), the database
-          credentials (look for CFG_DATABASE_*), the name of your
-          document server (look for CDSNAME and CDSNAMEINTL), or the
-          email address of the local CDS Invenio administrator (look
-          for SUPPORTEMAIL and ADMINEMAIL).
+          server (look for CFG_SITE_URL and CFG_SITE_SECURE_URL), the
+          database credentials (look for CFG_DATABASE_*), the name of
+          your document server (look for CFG_SITE_NAME and
+          CFG_SITE_NAME_INTL_*), or the email address of the local CDS
+          Invenio administrator (look for CFG_SITE_SUPPORT_EMAIL and
+          CFG_SITE_ADMIN_EMAIL).
 
       $ /opt/cds-invenio/bin/inveniocfg --update-all
 

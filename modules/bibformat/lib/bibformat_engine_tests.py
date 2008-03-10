@@ -35,14 +35,14 @@ from invenio import bibformat_utils
 from invenio import bibformat_config
 from invenio import bibformatadminlib
 from invenio import bibrecord
-from invenio.config import tmpdir
+from invenio.config import CFG_TMPDIR
 
 #CFG_BIBFORMAT_OUTPUTS_PATH = "..%setc%soutput_formats" % (os.sep, os.sep)
 #CFG_BIBFORMAT_TEMPLATES_PATH = "..%setc%sformat_templates" % (os.sep, os.sep)
 #CFG_BIBFORMAT_ELEMENTS_PATH = "elements"
-CFG_BIBFORMAT_OUTPUTS_PATH = "%s" % (tmpdir)
-CFG_BIBFORMAT_TEMPLATES_PATH = "%s" % (tmpdir)
-CFG_BIBFORMAT_ELEMENTS_PATH = "%s%stests_bibformat_elements" % (tmpdir, os.sep)
+CFG_BIBFORMAT_OUTPUTS_PATH = "%s" % (CFG_TMPDIR)
+CFG_BIBFORMAT_TEMPLATES_PATH = "%s" % (CFG_TMPDIR)
+CFG_BIBFORMAT_ELEMENTS_PATH = "%s%stests_bibformat_elements" % (CFG_TMPDIR, os.sep)
 CFG_BIBFORMAT_ELEMENTS_IMPORT_PATH = "tests_bibformat_elements"
 
 class FormatTemplateTest(unittest.TestCase):
@@ -114,7 +114,7 @@ class FormatElementTest(unittest.TestCase):
     def setUp(self):
         # pylint: disable-msg=C0103
         """bibformat - setting python path to test elements"""
-        sys.path.append('%s' % tmpdir)
+        sys.path.append('%s' % CFG_TMPDIR)
 
     def test_resolve_format_element_filename(self):
         """bibformat - resolving format elements filename """

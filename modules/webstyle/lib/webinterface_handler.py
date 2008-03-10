@@ -45,7 +45,7 @@ try:
 except ImportError:
     pass
 
-from invenio.config import cdslang, weburl, sweburl, tmpdir
+from invenio.config import cdslang, weburl, sweburl, CFG_TMPDIR
 from invenio.messages import wash_language
 from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
@@ -217,7 +217,7 @@ def create_handler(root):
 
     def _profiler(req):
         """ This handler wrap the default handler with a profiler.
-        Profiling data is written into ${tmpdir}/invenio-profile-stats-datetime.raw, and
+        Profiling data is written into CFG_TMPDIR/invenio-profile-stats-datetime.raw, and
         is displayed at the bottom of the webpage.
         To use add profile=1 to your url. To change sorting algorithm you
         can provide profile=algorithm_name. You can add more than one
@@ -234,7 +234,7 @@ def create_handler(root):
                 return ret
             import datetime
             date = datetime.datetime.now().strftime('%Y%m%d%H%M%S')
-            filename = '%s/invenio-profile-stats-%s.raw' % (tmpdir, date)
+            filename = '%s/invenio-profile-stats-%s.raw' % (CFG_TMPDIR, date)
             existing_sorts = pstats.Stats.sort_arg_dict_default.keys()
             required_sorts = []
             profile_dump = []

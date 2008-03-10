@@ -19,7 +19,7 @@
 import os
 import time
 
-from invenio.config import adminemail, supportemail, etcdir, weburl, cdslang
+from invenio.config import adminemail, supportemail, CFG_ETCDIR, weburl, cdslang
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webjournal_utils import get_number_of_articles_for_issue, \
@@ -39,7 +39,7 @@ def tmpl_webjournal_missing_info_box(language, title, msg_title, msg):
     # todo: move to DB call
     find_journals = lambda path: [entry for entry in os.listdir(str(path)) if os.path.isdir(str(path)+str(entry))]
     try:
-        all_journals = find_journals('%s/webjournal/' % etcdir)
+        all_journals = find_journals('%s/webjournal/' % CFG_ETCDIR)
     except:
         all_journals = []
     box = '''

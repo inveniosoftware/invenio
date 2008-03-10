@@ -23,17 +23,17 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import version, etcdir, cdsname
+from invenio.config import CFG_VERSION, CFG_ETCDIR, cdsname
 
 # pylint: disable-msg=C0301
 
 # version number:
-CFG_REFEXTRACT_VERSION = "CDS Invenio/%s refextract/%s" % (version, version)
+CFG_REFEXTRACT_VERSION = "CDS Invenio/%s refextract/%s" % (CFG_VERSION, CFG_VERSION)
 
 # periodicals knowledge base:
-CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/bibedit/refextract-journal-titles.kb" % etcdir
+CFG_REFEXTRACT_KB_JOURNAL_TITLES = "%s/bibedit/refextract-journal-titles.kb" % CFG_ETCDIR
 # report numbers knowledge base:
-CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/bibedit/refextract-report-numbers.kb" % etcdir
+CFG_REFEXTRACT_KB_REPORT_NUMBERS = "%s/bibedit/refextract-report-numbers.kb" % CFG_ETCDIR
 
 
 ## MARC Fields and subfields used by refextract:

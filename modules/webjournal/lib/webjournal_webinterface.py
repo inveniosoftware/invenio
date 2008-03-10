@@ -35,7 +35,7 @@ from mod_python import apache
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import weburl, webdir, cdslang, etcdir
+from invenio.config import weburl, CFG_WEBDIR, cdslang, CFG_ETCDIR
 from invenio.webpage import page
 from invenio.webuser import getUid
 from invenio.urlutils import redirect_to_url
@@ -129,11 +129,11 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                 "issue": issue_number,
                                 "ln": language,
                                 "category": category}
-        
+
         html = perform_request_index(req, journal_name, issue_number, language,
                               category)
         return html
-    
+
     def article(self, req, form):
         """
         Article page.
@@ -183,11 +183,11 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                 "category" : category,
                                 "editor" : editor,
                                 "number" : number}
-            
+
         html = perform_request_article(req, journal_name, issue_number,
                                        language, category, number, editor)
         return html
-    
+
     def edit_article(self, req, form):
         """
         Simple url redirecter to toggle the edit mode on for article pages.
@@ -204,7 +204,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         except InvenioWebJournalNoNameError, e:
             register_exception(req=req)
             return e.user_box()
-        
+
         if acc_authorize_action(getUid(req), 'cfgwebjournal',
                                 name="%s" % journal_name)[0] != 0:
             return please_login(req, journal_name,
@@ -235,9 +235,9 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             return please_login(req, journal_name,
                                 backlink='%s/journal/administrate?name=%s'
                                 % (weburl, journal_name))
-        
+
         return perform_request_administrate(journal_name, language)
-    
+
     def feature_record(self, req, form):
         """
         Interface to feature a record. Will be saved in a flat file.
@@ -266,21 +266,21 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             return please_login(req, journal_name,
                                 backlink='%s/journal/feature_record?name=%s'
                                 % (weburl, journal_name))
-       
+
         if recid == "init":
             return tmpl_webjournal_feature_record_interface(language,
-                                                            journal_name)   
+                                                            journal_name)
         else:
             # todo: move to DB, maybe?
             fptr = open('%s/webjournal/%s/featured_record'
-                        % (etcdir, journal_name), "w")
+                        % (CFG_ETCDIR, journal_name), "w")
             fptr.write(recid)
             fptr.write('\n')
             fptr.write(argd['url'])
             fptr.close()
             return tmpl_webjournal_feature_record_success(language,
-                                                          journal_name, recid)    
-    
+                                                          journal_name, recid)
+
     def regenerate(self, req, form):
         """
         Clears the cache for the issue given.
@@ -319,7 +319,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         else:
             return tmpl_webjournal_regenerate_error(language, journal_name,
                                                     issue_number)
-        
+
     def alert(self, req, form):
         """
         Alert system.
@@ -364,12 +364,12 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             return please_login(req, journal_name,
                                 backlink='%s/journal/alert?name=%s'
                                 % (weburl, journal_name))
-        
+
         html = perform_request_alert(req, journal_name, issue_number, language,
                               sent, plain_text, subject, recipients,
                               html_mail, force)
         return html
-    
+
     def issue_control(self, req, form):
         """
         page that allows full control over creating, backtracing, adding to,
@@ -408,12 +408,12 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         if acc_authorize_action(getUid(req), 'cfgwebjournal',
                                 name="%s" % journal_name)[0] != 0:
             return please_login(req, journal_name)
-        
+
         html = perform_request_issue_control(req, journal_name, issue_numbers,
                                       language, add, action)
-        
+
         return html
-    
+
     def popup(self, req, form):
         """
         simple pass-through function that serves as a checker for popups.
@@ -440,13 +440,13 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         except InvenioWebJournalNoPopupRecordError, e:
             register_exception(req=req)
             return e.user_box()
-        
+
         html = perform_request_popup(req, language, journal_name, type, record)
-        
+
         return html
-        
-        
-        
+
+
+
     def search(self, req, form):
         """
         Creates a temporary record containing all the information needed for
@@ -499,12 +499,12 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                 "archive_search" : archive_search,
                                 "language" : language,
                                 }
-        
+
         html = perform_request_search(journal_name, language, req, issue_number,
                                       archive_year, archive_issue,
                                       archive_select, archive_date, archive_search)
         return html
-        
+
         #if argd['name'] == "":
         #    register_exception(stream='warning',
         #                       suffix="User tried to search without providing a journal name.")
@@ -518,10 +518,10 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         #            of the journal you are looking for.''')
         #else:
         #    journal_name = argd['name']
-            
+
     #    config_strings = get_xml_from_config(["search", "issue_number", "rule"], journal_name)
     #    try:
-    #        try:    
+    #        try:
     #            search_page_template = config_strings["search"][0]
     #        except:
     #            raise InvenioWebJournalNoArticleTemplateError(journal_name) # todo: new exception
@@ -546,8 +546,8 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     #    rule_list = config_strings["rule"]
     #    try:
     #        if len(rule_list) == 0:
-    #            raise InvenioWebJournalNoArticleRuleError() 
-    #    except InvenioWebJournalNoArticleRuleError, e:     
+    #            raise InvenioWebJournalNoArticleRuleError()
+    #    except InvenioWebJournalNoArticleRuleError, e:
     #        register_exception(req=req)
     #        return webjournal_error_box(req,
     #                                    "No searchable Articles",
@@ -581,17 +581,17 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     #            marc["marc_ind2"] = (marc_datafield[5] == "_") and " " or marc_datafield[5]
     #            marc["marc_subfield"] = marc_datafield[6]
     #            category_rules.append(marc)
-    #            
+    #
     #    category_fields = "\n".join(['''
     #                                <datafield tag="%s" ind1="%s" ind2="%s">
     #                                    <subfield code="%s">%s</subfield>
-    #                                </datafield> 
+    #                                </datafield>
     #                                 ''' % (marc["marc_tag"],
     #                                         marc["marc_ind1"],
     #                                         marc["marc_ind2"],
     #                                         marc["marc_subfield"],
     #                                         marc["rule_match"]) for marc in category_rules])
-    #    
+    #
     #    issue_number_fields = "\n".join(['''
     #                        <datafield tag="%s" ind1="%s" ind2="%s">
     #                            <subfield code="%s">%s</subfield>
@@ -601,7 +601,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     #           (issue_number_tag[4] == "_") and " " or issue_number_tag[4],
     #           issue_number_tag[5],
     #           issue_number) for issue_number in argd['issue']])
-    #    
+    #
     #    temp_marc = '''<record>
     #                        <controlfield tag="001">0</controlfield>
     #                        %s
@@ -612,7 +612,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     #    # create a record and get HTML back from bibformat
     #    bfo = BibFormatObject(0, ln=argd['ln'], xml_record=temp_marc, req=req) # pass 0 for rn, we don't need it
     #    html_out = format_with_format_template(search_page_template_path, bfo)[0]
-    #       
+    #
     #    #perform_request_search(cc="News Articles", p="families and 773__n:23/2007")
     #    #cc = argd['category']
     #    #p = keyword
@@ -620,7 +620,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     #    #    p += " and 773__n:%s" % issue_number
     #    ## todo: issue number tag generic from config
     #    #results = perform_request_search(cc=cc, p=p)
-    #    
+    #
     #    return html_out
 
 if __name__ == "__main__":

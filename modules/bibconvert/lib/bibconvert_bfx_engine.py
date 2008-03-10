@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -49,7 +49,7 @@ try:
 except ImportError:
     pass
 
-# TODO: Try to explicitely load 4suite Xpath 
+# TODO: Try to explicitely load 4suite Xpath
 # <http://4suite.org/docs/howto/UNIX.xml#PyXML>
 # From <http://uche.ogbuji.net/tech/akara/nodes/2003-01-01/basic-xpath>:
 ## 1. PyXML usage (do not use with 4Suite)
@@ -58,11 +58,11 @@ except ImportError:
 ## 2. 4Suite usage (use these imports)
 ##        * import Ft.Xml.XPath
 ##        * import Ft.Xml.Xslt
-    
-from invenio import bibformat_bfx_engine
-from invenio.config import etcdir
 
-CFG_BFX_TEMPLATES_PATH = "%s%sbibconvert%sconfig" % (etcdir, os.sep, os.sep)
+from invenio import bibformat_bfx_engine
+from invenio.config import CFG_ETCDIR
+
+CFG_BFX_TEMPLATES_PATH = "%s%sbibconvert%sconfig" % (CFG_ETCDIR, os.sep, os.sep)
 
 def convert(xmltext, template_filename=None, template_source=None):
     """
@@ -85,7 +85,7 @@ def convert(xmltext, template_filename=None, template_source=None):
     if processor_type == -1:
         # No XPath processor found
         raise "No XPath processor could be found"
-    
+
     # Retrieve template and read it
     if template_source:
         template = template_source
@@ -108,11 +108,11 @@ def convert(xmltext, template_filename=None, template_source=None):
         return None
 
     # Prepare some variables
-    out_file = StringIO() # Virtual file-like object to write result in 
+    out_file = StringIO() # Virtual file-like object to write result in
     trans = XML2XMLTranslator()
     trans.set_xml_source(xmltext)
     parser = bibformat_bfx_engine.BFXParser(trans)
-    
+
     # Load template
     # This might print some info. Redirect to stderr
     # but do no print on standard output
@@ -126,7 +126,7 @@ def convert(xmltext, template_filename=None, template_source=None):
 
     # Transform the source using loaded template
     parser.walk(template_tree, out_file)
-    output = out_file.getvalue()        
+    output = out_file.getvalue()
     return output
 
 class XML2XMLTranslator:
@@ -147,18 +147,18 @@ class XML2XMLTranslator:
         Check whether a variable is defined.
 
         Accept all names. get_value will return empty string if not exist
-        
+
         @param name the name of the variable
         '''
         return True
 ##         context = Context(self.current_node, processorNss=self.namespaces)
-       
+
 ##         results_list = Evaluate(name, context=context)
 ##         if results_list != []:
 ##             return True
 ##         else:
 ##             return False
-        
+
     def get_num_elements(self, name):
         '''
         An API function to get the number of elements for a variable.
@@ -172,7 +172,7 @@ class XML2XMLTranslator:
         '''
         The API function for quering the translator for values of a certain variable.
         Called in a loop will result in a different value each time.
-        
+
         @param name the name of the variable you want the value of
         @param display_type an optional value for the type of the desired output, one of: value, tag, ind1, ind2, code, fulltag;
                These can be easily added in the proper place of the code (display_value)
@@ -185,7 +185,7 @@ class XML2XMLTranslator:
         # and concatenate
         return ' '.join([node.childNodes[0].nodeValue.encode( "utf-8" )
                 for node in results_list])
-    
+
     def iterator(self, name):
         '''
         An iterator over the values of a certain name.
@@ -199,7 +199,7 @@ class XML2XMLTranslator:
             self.current_node = node
             yield node
         self.current_node = saved_node
-                    
+
     def call_function(self, function_name, parameters=None):
         '''
         Call an external element which is a Python file, using BibFormat
@@ -216,7 +216,7 @@ class XML2XMLTranslator:
 ##         #to do: check errors from function call
 ##        return value
         return ""
-    
+
     def set_xml_source(self, xmltext):
         """
         Specify the source XML for this transformer
@@ -257,7 +257,7 @@ def get_all_elements(node):
 def build_namespaces(dom):
     """
     Build the namespaces present in dom tree.
-    
+
     Necessary to use prior processing an XML file
     in order to execute XPath queries correctly.
 
@@ -268,7 +268,7 @@ def build_namespaces(dom):
     for elem in get_all_elements(dom):
         if elem.prefix is not None:
             namespaces[elem.prefix] = elem.namespaceURI
-            
+
         for attr in elem.attributes.values():
             if attr.prefix is not None:
                 namespaces[attr.prefix] = attr.namespaceURI
@@ -279,7 +279,7 @@ def bc_profile():
     Runs a benchmark
     """
     global xmltext
-    
+
     convert(xmltext, 'oaidc2marcxml.bfx')
     return
 
@@ -292,7 +292,7 @@ def benchmark():
     from invenio.bibformat import record_get_xml
 
     global xmltext
-    
+
     xmltext = record_get_xml(10, 'oai_dc')
     profile.run('bc_profile()', "bibconvert_xslt_profile")
     p = pstats.Stats("bibconvert_xslt_profile")

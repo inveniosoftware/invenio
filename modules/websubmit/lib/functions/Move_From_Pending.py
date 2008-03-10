@@ -28,13 +28,13 @@ __revision__ = "$Id$"
 
 import os
 
-from invenio.config import storage
+from invenio.config import CFG_WEBSUBMIT_STORAGEDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Move_From_Pending(parameters, curdir, form, user_info=None):
     global rn
     doctype = form['doctype']
-    srcdir = "%s/pending/%s/%s" % (storage,doctype,rn)
+    srcdir = "%s/pending/%s/%s" % (CFG_WEBSUBMIT_STORAGEDIR,doctype,rn)
     if os.path.exists(srcdir):
         if rn != "":
             files = os.listdir(srcdir)

@@ -14,7 +14,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -29,7 +29,7 @@ import re
 import os
 import os.path
 from string import expandtabs, replace
-from invenio.config import tmpdir
+from invenio.config import CFG_TMPDIR
 import invenio.elmsubmit_config as elmsubmit_config
 import xml.dom.minidom
 
@@ -40,7 +40,7 @@ class MarcTest(unittest.TestCase):
     def test_simple_marc(self):
         """elmsubmit - parsing simple email"""
         try:
-            f=open(os.path.join(tmpdir, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_1']),'r')
+            f=open(os.path.join(CFG_TMPDIR, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_1']),'r')
             email = f.read()
             f.close()
 
@@ -56,7 +56,7 @@ class MarcTest(unittest.TestCase):
             </datafield>
             </record>"""
 
-            # in order to properly compare the marc files we have to remove the FFT node, it includes a random generated file path 
+            # in order to properly compare the marc files we have to remove the FFT node, it includes a random generated file path
 
             dom_x = xml.dom.minidom.parseString(x)
             datafields = dom_x.getElementsByTagName("datafield")
@@ -90,8 +90,8 @@ class MarcTest(unittest.TestCase):
 
     def test_complex_marc(self):
         """elmsubmit - parsing complex email with multiple fields"""
-        try:        
-            f=open(os.path.join(tmpdir, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2']),'r')
+        try:
+            f=open(os.path.join(CFG_TMPDIR, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2']),'r')
             email = f.read()
             f.close()
 
@@ -148,7 +148,7 @@ class MarcTest(unittest.TestCase):
             </datafield>
             </record>"""
 
-            # in order to properly compare the marc files we have to remove the FFT node, it includes a random generated file path 
+            # in order to properly compare the marc files we have to remove the FFT node, it includes a random generated file path
 
             dom_x = xml.dom.minidom.parseString(x)
             datafields = dom_x.getElementsByTagName("datafield")
@@ -173,7 +173,7 @@ class MarcTest(unittest.TestCase):
 
             new_x = new_x.replace('\n','')
             new_y = new_y.replace('\n','')
-            
+
             # compare the two xml marcs
             self.assertEqual(new_x,new_y)
         except IOError:
@@ -184,8 +184,8 @@ class FileStorageTest(unittest.TestCase):
     def test_read_text_files(self):
         """elmsubmit - reading text files"""
         try:
-            
-            f=open(os.path.join(tmpdir, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2']),'r')
+
+            f=open(os.path.join(CFG_TMPDIR, elmsubmit_config.CFG_ELMSUBMIT_FILES['test_case_2']),'r')
             email = f.read()
             f.close()
 
@@ -227,7 +227,7 @@ class FileStorageTest(unittest.TestCase):
             self.assertEqual(x,y)
         except IOError:
             self.fail("WARNING: the test case file does not exist; test not run.")
-            
+
 def create_test_suite():
     """Return test suite for the elmsubmit module"""
     return unittest.TestSuite((unittest.makeSuite(MarcTest,'test'), unittest.makeSuite(FileStorageTest,'test')))
@@ -237,5 +237,5 @@ def create_test_suite():
 
 if __name__ == '__main__':
     unittest.TextTestRunner(verbosity=2).run(create_test_suite())
-  
+
 

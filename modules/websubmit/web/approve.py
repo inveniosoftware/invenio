@@ -33,7 +33,7 @@ from invenio.config import \
      cdslang, \
      cdsname, \
      urlpath, \
-     version
+     CFG_VERSION
 from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role

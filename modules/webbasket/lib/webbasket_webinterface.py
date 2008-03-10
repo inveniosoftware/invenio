@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 from mod_python import apache
 
-from invenio.config import weburl, webdir, cdslang, \
+from invenio.config import weburl, CFG_WEBDIR, cdslang, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.messages import gettext_set_language
 from invenio.webpage import page

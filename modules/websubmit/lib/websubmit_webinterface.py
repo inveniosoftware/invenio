@@ -39,9 +39,9 @@ from invenio.config import \
      cdslang, \
      cdsname, \
      images, \
-     storage, \
+     CFG_WEBSUBMIT_STORAGEDIR, \
      urlpath, \
-     version, \
+     CFG_VERSION, \
      weburl
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_config import VIEWRESTRCOLL
@@ -453,7 +453,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                                        navmenuid='submit')
 
         t=""
-        curdir  = "%s/%s/%s/%s" % (storage,args['indir'],args['doctype'],args['access'])
+        curdir  = "%s/%s/%s/%s" % (CFG_WEBSUBMIT_STORAGEDIR,args['indir'],args['doctype'],args['access'])
         subname = "%s%s" % (args['act'], args['doctype'])
 
         res = run_sql("select sdesc,fidesc,pagenb,level from sbmFIELD where subname=%s "

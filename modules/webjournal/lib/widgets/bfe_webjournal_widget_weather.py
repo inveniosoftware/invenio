@@ -20,7 +20,7 @@
 """
 """
 from invenio import errorlib
-from invenio.config import cachedir
+from invenio.config import CFG_CACHEDIR
 import feedparser
 import time
 from urllib2 import urlopen
@@ -81,19 +81,19 @@ def get_widget_HTML():
     weather forecast using Yahoo! Weather service
     we check and store the "expires" data from the rss feed to decide when
     an update is needed.
-    there always resides a cached version in cds cachedir along with a flat
+    there always resides a cached version in cds CFG_CACHEDIR along with a flat
     file that indicates the time when the feed expires.
     """
     try:
-        weather_feed = feedparser.parse('%s/%s' % (cachedir, Cached_Filename))
+        weather_feed = feedparser.parse('%s/%s' % (CFG_CACHEDIR, Cached_Filename))
     except:
         _update_feed()
-        weather_feed = feedparser.parse('%s/%s' % (cachedir, Cached_Filename))
-    
+        weather_feed = feedparser.parse('%s/%s' % (CFG_CACHEDIR, Cached_Filename))
+
     now_in_gmt = time.gmtime()
     now_time_string = time.strftime( "%a, %d %b %Y %H:%M:%S GMT", now_in_gmt)
     try:
-        expire_time_string = open('%s/%s' (cachedir, Expire_Time_Filename)).read()
+        expire_time_string = open('%s/%s' (CFG_CACHEDIR, Expire_Time_Filename)).read()
         expire_time = time.strptime(open(Expire_Time_Filename).read(), "%a, %d %b %Y %H:%M:%S %Z")
         #expire_time['tm_isdt'] = 0
         expire_in_seconds = time.mktime(expire_time)
@@ -103,26 +103,26 @@ def get_widget_HTML():
         diff = -1
     if diff < 0:
         _update_feed()
-        weather_feed = feedparser.parse('%s/%s' % (cachedir, Cached_Filename))
-    
+        weather_feed = feedparser.parse('%s/%s' % (CFG_CACHEDIR, Cached_Filename))
+
     # construct the HTML
     html = weather_feed.entries[0]['summary']
-    
+
     return html
-    
-    
+
+
 def _update_feed():
     """
     helper function that updates the feed by copying the new rss file to the
     cache dir and resetting the time string on the expireTime flat file
     """
     feed = urlopen(RSS_Feed)
-    cached_file = open('%s/%s' % (cachedir, Cached_Filename), 'w')
+    cached_file = open('%s/%s' % (CFG_CACHEDIR, Cached_Filename), 'w')
     cached_file.write(feed.read())
     cached_file.close()
     feed_data = feedparser.parse(RSS_Feed)
     expire_time = feed_data.headers['expires']
-    expire_file = open('%s/%s' % (cachedir, Expire_Time_Filename), 'w')
+    expire_file = open('%s/%s' % (CFG_CACHEDIR, Expire_Time_Filename), 'w')
     expire_file.write(expire_time)
     expire_file.close()
 

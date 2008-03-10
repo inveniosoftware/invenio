@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -45,7 +45,7 @@ import sys
 import os
 
 from invenio.config import \
-     etcdir, \
+     CFG_ETCDIR, \
      weburl
 from invenio.bibconvert import FormatField
 
@@ -77,7 +77,7 @@ if processor_type == -1:
     except ImportError:
         pass
 
-CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (etcdir, os.sep, os.sep)
+CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (CFG_ETCDIR, os.sep, os.sep)
 
 def bibconvert_function_libxslt(ctx, value, func):
     """
@@ -89,7 +89,7 @@ def bibconvert_function_libxslt(ctx, value, func):
     <xsl:value-of select="fn:format(., 'ADD(mypref,mysuff)')"/>
     (Adds strings 'mypref' and 'mysuff' as prefix/suffix to current node value,
     using BibConvert ADD function)
-    
+
     if value is int, value is converted to string
     if value is Node (PyCObj), first child node (text node) is taken as value
     """
@@ -107,7 +107,7 @@ def bibconvert_function_libxslt(ctx, value, func):
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
-        
+
     return ''
 
 
@@ -134,12 +134,12 @@ def bibconvert_function_4suite(ctx, value, func):
             string_value = str(value)
 
         return FormatField(string_value, func).rstrip('\n')
-    
+
     except Exception, err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
                          '\n')
-        
+
     return ''
 
 def convert(xmltext, template_filename=None, template_source=None):
@@ -164,7 +164,7 @@ def convert(xmltext, template_filename=None, template_source=None):
     if processor_type == -1:
         # No XSLT processor found
         raise "No XSLT processor could be found"
-    
+
     # Retrieve template and read it
     if template_source:
         template = template_source
@@ -189,7 +189,7 @@ def convert(xmltext, template_filename=None, template_source=None):
     result = ""
     if processor_type == 0:
         # libxml2 & libxslt
-        
+
         # Register BibConvert functions for use in XSL
         libxslt.registerExtModuleFunction("format",
                                           CFG_BIBCONVERT_FUNCTION_NS,
@@ -214,7 +214,7 @@ def convert(xmltext, template_filename=None, template_source=None):
 
         # Init
         processor = Processor.Processor()
-        
+
         # Register BibConvert functions for use in XSL
         processor.registerExtensionFunction(CFG_BIBCONVERT_FUNCTION_NS,
                                             "format",
@@ -231,7 +231,7 @@ def convert(xmltext, template_filename=None, template_source=None):
         result = processor.run(source)
     else:
         sys.stderr.write("No XSLT processor could be found")
-        
+
     return result
 
 ## def bc_profile():
@@ -252,12 +252,12 @@ def convert(xmltext, template_filename=None, template_source=None):
 ##     from invenio.bibformat import record_get_xml
 
 ##     global xmltext
-    
+
 ##     xmltext = record_get_xml(10, 'oai_dc')
 ##     profile.run('bc_profile()', "bibconvert_xslt_profile")
 ##     p = pstats.Stats("bibconvert_xslt_profile")
 ##     p.strip_dirs().sort_stats("cumulative").print_stats()
-    
+
 if __name__ == "__main__":
     pass
 

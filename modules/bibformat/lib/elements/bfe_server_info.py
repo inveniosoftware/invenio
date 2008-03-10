@@ -20,16 +20,18 @@
 """
 __revision__ = "$Id$"
 
-from invenio.config import accessurl, adminemail, cdslang, cdsname, weburl, version, cdsnameintl, supportemail
+from invenio.config import accessurl, adminemail, cdslang, cdsname, weburl, CFG_VERSION, cdsnameintl, supportemail
+
+# FIXME: new cfg variable names like CFG_VERSION
 
 def format(bfo, var=''):
     '''
     Print several server specific variables.
-    @param var the name of the desired variable. Can be one of: name, i18n_name, lang, version, admin_email, support_email, weburl, searchurl, recurl
+    @param var the name of the desired variable. Can be one of: name, i18n_name, lang, CFG_VERSION, admin_email, support_email, weburl, searchurl, recurl
            name: the name of the server
            i18n_name: internationalized name
            lang: the default language of the server
-           version: the software version
+           CFG_VERSION: the software version
            admin_email: the admin email
            support_email: the support email
            weburl: the base url for the server
@@ -45,8 +47,8 @@ def format(bfo, var=''):
         out = cdsnameintl.get(bfo.lang, cdsname)
     elif var == 'lang':
         out = cdslang
-    elif var == 'version':
-        out = 'CDS Invenio v' + str(version)
+    elif var == 'CFG_VERSION':
+        out = 'CDS Invenio v' + str(CFG_VERSION)
     elif var in ['email', 'admin_email']:
         out = adminemail
     elif var == 'support_email':

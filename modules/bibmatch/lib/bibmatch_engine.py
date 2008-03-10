@@ -28,8 +28,8 @@ import sys
 import getopt
 
 from invenio.config import \
-     bibconvert, \
-     version
+     CFG_BINDIR, \
+     CFG_VERSION
 from invenio.search_engine import perform_request_search
 from invenio.bibrecord import *
 from invenio import bibconvert

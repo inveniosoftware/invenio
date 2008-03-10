@@ -44,7 +44,7 @@ import urllib
 import re
 import ConfigParser
 
-from invenio.config import etcdir
+from invenio.config import CFG_ETCDIR
 from invenio.dbquery import run_sql
 
 opts_dict = {}
@@ -248,7 +248,7 @@ def command_line():
         usage(1)
     if args:
         usage(1)
-    opts_dict = {"input": "%s/bibrank/bibrankgkb.cfg" % etcdir, "output":"", "verbose":1}
+    opts_dict = {"input": "%s/bibrank/bibrankgkb.cfg" % CFG_ETCDIR, "output":"", "verbose":1}
     sched_time = time.strftime(format_string)
     user = ""
     try:

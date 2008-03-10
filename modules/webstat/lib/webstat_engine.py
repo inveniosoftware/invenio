@@ -21,7 +21,7 @@ __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
 import calendar, commands, datetime, time, os, cPickle
-from invenio.config import tmpdir, weburl
+from invenio.config import CFG_TMPDIR, weburl
 from invenio.urlutils import redirect_to_url
 from invenio.search_engine import perform_request_search
 from invenio.dbquery import run_sql
@@ -521,7 +521,7 @@ def _export(mime, content, req):
     temporary file in which the content is stored, then let
     redirect to the export web interface.
     """
-    filename = tmpdir + "/webstat_export_" + str(time.time()).replace('.', '')
+    filename = CFG_TMPDIR + "/webstat_export_" + str(time.time()).replace('.', '')
     open(filename, 'w').write(content)
     redirect_to_url(req, '%s/stats/export?filename=%s&mime=%s' % (weburl, os.path.basename(filename), mime))
 

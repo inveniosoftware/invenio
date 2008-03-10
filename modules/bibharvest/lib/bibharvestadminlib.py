@@ -32,10 +32,10 @@ import urllib
 from httplib import InvalidURL
 from invenio.config import \
      cdslang, \
-     tmpdir, \
-     version, \
+     CFG_TMPDIR, \
+     CFG_VERSION, \
      weburl,\
-     etcdir
+     CFG_ETCDIR
 from invenio.bibrankadminlib import \
      write_outcome,modify_translations,\
      get_def_name,\
@@ -57,7 +57,7 @@ from invenio.webuser import getUid, get_email
 import invenio.template
 bibharvest_templates = invenio.template.load('bibharvest')
 
-tmppath = tmpdir + '/bibharvestadmin.' + str(os.getpid())
+tmppath = CFG_TMPDIR + '/bibharvestadmin.' + str(os.getpid())
 guideurl = "help/admin/bibharvest-admin-guide"
 
 freqs = [[0, "never"], [24, "daily"], [168, "weekly"], [720, "monthly"] ]
@@ -523,7 +523,7 @@ def validate(oai_src_baseurl):
     except IOError, (errno, strerror):
         # Quick error handling for frequent error codes.
         if errno == 13:
-            return (3, "Please check permission on %s and retry" % tmpdir)
+            return (3, "Please check permission on %s and retry" % CFG_TMPDIR)
         elif errno == 2 or errno == 'socket error':
             return (2, "Could not connect with URL %s. Check URL or retry when server is available." % url)
         return (4, strerror)
@@ -538,7 +538,7 @@ def validatefile(oai_src_config):
      1 = file non existing
      """
 
-    CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (etcdir,
+    CFG_BIBCONVERT_XSL_PATH = "%s%sbibconvert%sconfig" % (CFG_ETCDIR,
                                                           os.sep,
                                                           os.sep)
     path_to_config = (CFG_BIBCONVERT_XSL_PATH + os.sep +

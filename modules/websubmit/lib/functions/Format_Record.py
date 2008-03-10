@@ -20,8 +20,8 @@ __revision__ = "$Id$"
 
 import os
 
-from invenio.config import bibformat
+from invenio.config import CFG_BINDIR
 
 def Format_Record(parameters, curdir, form, user_info=None):
-    os.system("%s < %s/recmysql > %s/recmysqlfmt" % (bibformat,curdir,curdir))
+    os.system("%s/bibformat < %s/recmysql > %s/recmysqlfmt" % (CFG_BINDIR,curdir,curdir))
     return ""

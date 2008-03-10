@@ -30,7 +30,7 @@ import random
 import time
 
 from invenio.config import \
-     cachedir, \
+     CFG_CACHEDIR, \
      cdslang, \
      cdsname, \
      weburl,\
@@ -2347,7 +2347,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     output += "Collection table last updated: %s<br>" % collection_table_update_time
 
     try:
-        file = open("%s/collections/last_updated" % cachedir)
+        file = open("%s/collections/last_updated" % CFG_CACHEDIR)
         collection_web_update_time = file.readline().strip()
         output += "Collection cache last updated: %s<br>" % collection_web_update_time
         file.close()

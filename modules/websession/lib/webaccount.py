@@ -31,7 +31,7 @@ from invenio.config import \
      cdsname, \
      supportemail, \
      sweburl, \
-     version, \
+     CFG_VERSION, \
      weburl
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, SUPERADMINROLE
 from invenio.webpage import page

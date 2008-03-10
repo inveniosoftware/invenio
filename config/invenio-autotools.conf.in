@@ -24,17 +24,22 @@
 
 [Invenio]
 
-VERSION = @VERSION@
-CFG_PATH_PHP = @PHP@
+## Invenio version:
+CFG_VERSION = @VERSION@
+
+## directories detected from 'configure --prefix ...' parameters:
 CFG_PREFIX = @prefix@
-BINDIR = @prefix@/bin
-PYLIBDIR = @prefix@/lib/python
-LOGDIR = @localstatedir@/log
-ETCDIR = @prefix@/etc
-LOCALEDIR = @prefix@/share/locale
-TMPDIR = @localstatedir@/tmp
-CACHEDIR = @localstatedir@/cache
-WEBDIR = @localstatedir@/www
+CFG_BINDIR = @prefix@/bin
+CFG_PYLIBDIR = @prefix@/lib/python
+CFG_LOGDIR = @localstatedir@/log
+CFG_ETCDIR = @prefix@/etc
+CFG_LOCALEDIR = @prefix@/share/locale
+CFG_TMPDIR = @localstatedir@/tmp
+CFG_CACHEDIR = @localstatedir@/cache
+CFG_WEBDIR = @localstatedir@/www
+
+## path to interesting programs:
+CFG_PATH_PHP = @PHP@
 CFG_PATH_ACROREAD = @ACROREAD@
 CFG_PATH_GZIP = @GZIP@
 CFG_PATH_GUNZIP = @GUNZIP@
@@ -61,18 +66,10 @@ CFG_PATH_HTMLTOTEXT = @HTMLTOTEXT@
 ## removal in the indexes is not used.
 CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE = @prefix@/etc/bibrank/stopwords.kb
 
-## Furthemore, here are some legacy config variables used by
-## WebSubmit.  FIXME: clean most of them away and rename existing ones
-## to fit the CFG_WEBSUBMIT_* naming schema.
-
-counters = @localstatedir@/data/submit/counters
-storage = @localstatedir@/data/submit/storage
-filedir = @localstatedir@/data/files
-xmlmarc2textmarc = @prefix@/bin/xmlmarc2textmarc
-bibupload = @prefix@/bin/bibupload
-bibformat = @prefix@/bin/bibformat
-bibwords = @prefix@/bin/bibwords
-bibconvert = @prefix@/bin/bibconvert
-bibconvertconf = @prefix@/etc/bibconvert/config
+## helper style of variables for WebSubmit:
+CFG_WEBSUBMIT_COUNTERSDIR = @localstatedir@/data/submit/counters
+CFG_WEBSUBMIT_STORAGEDIR = @localstatedir@/data/submit/storage
+CFG_WEBSUBMIT_FILEDIR = @localstatedir@/data/files
+CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR = @prefix@/etc/bibconvert/config
 
 ## - end of file -

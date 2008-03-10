@@ -31,7 +31,7 @@ import time
 import os
 try:
     from invenio.dbquery import run_sql
-    from invenio.config import logdir, tmpdir, cachedir, \
+    from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
         CFG_WEBSEARCH_RSS_TTL
     from invenio.websession_config import CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
     from invenio.bibtask import task_init, task_set_option, task_get_option, \
@@ -77,49 +77,49 @@ def clean_logs():
     vstr = task_get_option('verbose') > 1 and '-v' or ''
     gc_exec_command('find %s -name "bibsched_task_*"'
         ' -size 0c -exec rm %s -f {} \;' \
-            % (logdir, vstr))
+            % (CFG_LOGDIR, vstr))
     gc_exec_command('find %s -name "bibsched_task_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (logdir, CFG_MAX_ATIME_RM_LOG, vstr))
+            % (CFG_LOGDIR, CFG_MAX_ATIME_RM_LOG, vstr))
     gc_exec_command('find %s -name "bibsched_task_*"'
         ' -atime +%s -exec gzip %s -9 {} \;' \
-            % (logdir, CFG_MAX_ATIME_ZIP_LOG, vstr))
+            % (CFG_LOGDIR, CFG_MAX_ATIME_ZIP_LOG, vstr))
 
     write_message("- deleting/gzipping temporary empty/old "
             "BibReformat xml files")
     gc_exec_command('find %s -name "rec_fmt_*"'
         ' -size 0c -exec rm %s -f {} \;' \
-            % (tmpdir, vstr))
+            % (CFG_TMPDIR, vstr))
     gc_exec_command('find %s -name "rec_fmt_*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (tmpdir, CFG_MAX_ATIME_RM_FMT, vstr))
+            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_FMT, vstr))
     gc_exec_command('find %s -name "rec_fmt_*"'
         ' -atime +%s -exec gzip %s -9 {} \;' \
-            % (tmpdir, CFG_MAX_ATIME_ZIP_FMT, vstr))
+            % (CFG_TMPDIR, CFG_MAX_ATIME_ZIP_FMT, vstr))
 
     write_message("- deleting/gzipping temporary old "
             "BibHarvest xml files")
     gc_exec_command('find %s -name "bibharvestadmin.*"'
         ' -exec rm %s -f {} \;' \
-            % (tmpdir, vstr))
+            % (CFG_TMPDIR, vstr))
     gc_exec_command('find %s -name "bibconvertrun.*"'
         ' -exec rm %s -f {} \;' \
-            % (tmpdir, vstr))
+            % (CFG_TMPDIR, vstr))
     gc_exec_command('find %s -name "oaiharvest*"'
         ' -atime +%s -exec gzip %s -9 {} \;' \
-            % (tmpdir, CFG_MAX_ATIME_ZIP_OAI, vstr))
+            % (CFG_TMPDIR, CFG_MAX_ATIME_ZIP_OAI, vstr))
     gc_exec_command('find %s -name "oaiharvest*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (tmpdir, CFG_MAX_ATIME_RM_OAI, vstr))
+            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_OAI, vstr))
     gc_exec_command('find %s -name "oai_archive*"'
         ' -atime +%s -exec rm %s -f {} \;' \
-            % (tmpdir, CFG_MAX_ATIME_RM_OAI, vstr))
+            % (CFG_TMPDIR, CFG_MAX_ATIME_RM_OAI, vstr))
     write_message("""CLEANING OF LOG FILES FINISHED""")
 
 def clean_cache():
     """Clean the cache for expired and old files."""
     write_message("""CLEANING OF OLD CACHED RSS REQUEST STARTED""")
-    rss_cache_dir = "%s/rss/" % cachedir
+    rss_cache_dir = "%s/rss/" % CFG_CACHEDIR
     try:
         filenames = os.listdir(rss_cache_dir)
     except OSError:
@@ -138,7 +138,7 @@ def clean_cache():
     write_message("""CLEANING OF OLD CACHED RSS REQUEST FINISHED""")
 
     write_message("""CLEANING OF OLD CACHED WEBJOURNAL FILES STARTED""")
-    webjournal_cache_dir = "%s/webjournal/" % cachedir
+    webjournal_cache_dir = "%s/webjournal/" % CFG_CACHEDIR
     try:
         filenames = os.listdir(webjournal_cache_dir)
     except OSError:

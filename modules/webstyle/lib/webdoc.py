@@ -34,9 +34,9 @@ from invenio.config import \
      adminemail, \
      weburl, \
      sweburl, \
-     version, \
+     CFG_VERSION, \
      cdsnameintl, \
-     cachedir
+     CFG_CACHEDIR
 from invenio.dateutils import \
      convert_datestruct_to_datetext, \
      convert_datestruct_to_dategui, \
@@ -53,11 +53,11 @@ import time
 
 # List of (webdoc_source_dir, webdoc_cache_dir)
 webdoc_dirs = {'help':('%s/lib/webdoc/help' % CFG_PREFIX, \
-                       '%s/webdoc/help-pages' % cachedir),
+                       '%s/webdoc/help-pages' % CFG_CACHEDIR),
                'admin':('%s/lib/webdoc/admin' % CFG_PREFIX, \
-                        '%s/webdoc/admin-pages' % cachedir),
+                        '%s/webdoc/admin-pages' % CFG_CACHEDIR),
                'hacking':('%s/lib/webdoc/hacking' % CFG_PREFIX, \
-                          '%s/webdoc/hacking-pages' % cachedir)}
+                          '%s/webdoc/hacking-pages' % CFG_CACHEDIR)}
 
 # Regular expression for finding text to be translated
 translation_pattern = re.compile(r'_\((?P<word>.*?)\)_', \
@@ -131,7 +131,7 @@ defined_tags = {'<CDSNAME>': cdsname,
                 '<ADMINEMAIL>': adminemail,
                 '<WEBURL>': weburl,
                 '<SWEBURL>': sweburl,
-                '<VERSION>': version,
+                '<CFG_VERSION>': CFG_VERSION,
                 '<CDSNAMEINTL>': cdsnameintl}
 
 def get_webdoc_parts(webdoc,

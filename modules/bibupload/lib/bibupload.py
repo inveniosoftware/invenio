@@ -76,10 +76,10 @@ from invenio.bibrecord import create_records, \
                               field_get_subfield_values
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.bibformat import format_record
-from invenio.config import filedir, \
-                           filedirsize, \
+from invenio.config import CFG_WEBSUBMIT_FILEDIR, \
+                           CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, \
                            htdocsurl, \
-                           tmpdir, \
+                           CFG_TMPDIR, \
                            CFG_PREFIX
 from invenio.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
@@ -673,7 +673,7 @@ def download_url(url, format):
     """Download a url (if it corresponds to a remote file) and return a local url
     to it."""
     protocol = urllib2.urlparse.urlsplit(url)[0]
-    (tmp, tmppath) = tempfile.mkstemp(suffix=format, dir=tmpdir)
+    (tmp, tmppath) = tempfile.mkstemp(suffix=format, dir=CFG_TMPDIR)
     tmp = os.fdopen(tmp, 'w')
     try:
         if protocol in ('', 'file'):
@@ -1004,7 +1004,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                             try:
                                 bibdoc.revert(version)
                             except Exception, e:
-                                write_message('(%s, %s) not correctly reverted: %s' (newname, version, e))
+                                write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e))
                         else:
                             if restriction != 'KEEP-OLD-VALUE':
                                 bibdoc.set_status(restriction)

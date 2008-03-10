@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_OAI_LOAD, \
      CFG_OAI_SAMPLE_IDENTIFIER, \
      CFG_OAI_SET_FIELD, \
-     cachedir, \
+     CFG_CACHEDIR, \
      cdsname, \
      supportemail, \
      weburl
@@ -499,7 +499,7 @@ def oailistrecords(args):
     sysno  = []
     # check if the resumptionToken did not expire
     if arg['resumptionToken']:
-        filename = "%s/RTdata/%s" % (cachedir, arg['resumptionToken'])
+        filename = "%s/RTdata/%s" % (CFG_CACHEDIR, arg['resumptionToken'])
         if os.path.exists(filename) == 0:
             out = oai_error("badResumptionToken", "ResumptionToken expired")
             out = oai_error_header(args, "ListRecords") + out + oai_error_footer("ListRecords")
@@ -608,7 +608,7 @@ def oailistidentifiers(args):
     sysnos = []
 
     if arg['resumptionToken']:
-        filename = "%s/RTdata/%s" % (cachedir, arg['resumptionToken'])
+        filename = "%s/RTdata/%s" % (CFG_CACHEDIR, arg['resumptionToken'])
         if os.path.exists(filename) == 0:
             out = out + oai_error("badResumptionToken", "ResumptionToken expired")
             out = oai_error_header(args, "ListIdentifiers") + out + oai_error_footer("ListIdentifiers")
@@ -761,7 +761,7 @@ def oaigenresumptionToken():
 def oaicachein(resumptionToken, sysnos):
     "Stores or adds sysnos in cache.  Input is a string of sysnos separated by commas."
 
-    filename = "%s/RTdata/%s" % (cachedir, resumptionToken)
+    filename = "%s/RTdata/%s" % (CFG_CACHEDIR, resumptionToken)
 
     fil = open(filename, "w")
     cPickle.dump(sysnos, fil)
@@ -774,7 +774,7 @@ def oaicacheout(resumptionToken):
 
     sysnos = []
 
-    filename = "%s/RTdata/%s" % (cachedir, resumptionToken)
+    filename = "%s/RTdata/%s" % (CFG_CACHEDIR, resumptionToken)
 
     if oaicachestatus(resumptionToken):
         fil = open(filename, "r")
@@ -788,7 +788,7 @@ def oaicacheout(resumptionToken):
 def oaicacheclean():
     "Removes cached resumptionTokens older than specified"
 
-    directory = "%s/RTdata" % cachedir
+    directory = "%s/RTdata" % CFG_CACHEDIR
 
     files = os.listdir(directory)
 
@@ -804,7 +804,7 @@ def oaicacheclean():
 def oaicachestatus(resumptionToken):
     "Checks cache status.  Returns 0 for empty, 1 for full."
 
-    filename = "%s/RTdata/%s" % (cachedir, resumptionToken)
+    filename = "%s/RTdata/%s" % (CFG_CACHEDIR, resumptionToken)
 
     if os.path.exists(filename):
         if os.path.getsize(filename) > 0:

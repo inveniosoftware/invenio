@@ -32,7 +32,7 @@ import time
 from urllib2 import urlopen
 from md5 import md5
 
-from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, weburl, tmpdir
+from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, weburl, CFG_TMPDIR
 from invenio import bibupload
 from invenio.bibupload_config import CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
                              CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
@@ -1889,7 +1889,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
     def test_exotic_format_fft_append(self):
         """bibupload - exotic format FFT append"""
         # define the test case:
-        testfile = os.path.join(tmpdir, 'test.ps.Z')
+        testfile = os.path.join(CFG_TMPDIR, 'test.ps.Z')
         open(testfile, 'w').write('TEST')
         test_to_upload = """
         <record>

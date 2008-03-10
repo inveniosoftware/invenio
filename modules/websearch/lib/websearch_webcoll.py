@@ -35,7 +35,7 @@ from invenio.config import \
      CFG_WEBSEARCH_INSTANT_BROWSE, \
      CFG_WEBSEARCH_NARROW_SEARCH_SHOW_GRANDSONS, \
      CFG_WEBSEARCH_I18N_LATEST_ADDITIONS, \
-     cachedir, \
+     CFG_CACHEDIR, \
      cdslang, \
      cdsname, \
      weburl
@@ -68,7 +68,7 @@ cfg_cache_last_updated_timestamp_tolerance = 20
 
 # cfg_cache_last_updated_timestamp_file -- location of the cache
 # timestamp file:
-cfg_cache_last_updated_timestamp_file = "%s/collections/last_updated" % cachedir
+cfg_cache_last_updated_timestamp_file = "%s/collections/last_updated" % CFG_CACHEDIR
 
 def get_collection(colname):
     """Return collection object from the collection house for given colname.
@@ -227,7 +227,7 @@ class Collection:
     def write_cache_file(self, filename='', filebody=''):
         "Write a file inside collection cache."
         # open file:
-        dirname = "%s/collections/%d" % (cachedir, self.id)
+        dirname = "%s/collections/%d" % (CFG_CACHEDIR, self.id)
         mymkdir(dirname)
         fullfilename = dirname + "/%s.html" % filename
         try:

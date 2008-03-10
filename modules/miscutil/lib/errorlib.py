@@ -29,7 +29,7 @@ import sys
 import time
 from cStringIO import StringIO
 
-from invenio.config import cdslang, logdir, alertengineemail, adminemail, supportemail, cdsname, weburl
+from invenio.config import cdslang, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, adminemail, supportemail, cdsname, weburl
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
@@ -203,7 +203,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             written_to_log = False
             try:
                 ## Let's try to write into the log.
-                open(os.path.join(logdir, 'invenio.' + stream), 'a').write(log_text)
+                open(os.path.join(CFG_LOGDIR, 'invenio.' + stream), 'a').write(log_text)
                 written_to_log = True
             finally:
                 if alert_admin or not written_to_log:
@@ -214,7 +214,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
         else:
             return 0
     except Exception, e:
-        print >> sys.stderr, "Error in registering exception to '%s': '%s'" % (logdir + '/invenio.' + stream, e)
+        print >> sys.stderr, "Error in registering exception to '%s': '%s'" % (CFG_LOGDIR + '/invenio.' + stream, e)
         return 0
 
 def register_errors(errors_or_warnings_list, stream, req=None):
@@ -266,7 +266,7 @@ def register_errors(errors_or_warnings_list, stream, req=None):
         error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
         errors_or_warnings_list.append((error, eval(CFG_MISCUTIL_ERROR_MESSAGES[error])% stream))
     # update log_errors
-    stream_location = os.path.join(logdir, '/invenio.' + stream)
+    stream_location = os.path.join(CFG_LOGDIR, '/invenio.' + stream)
     errors = ''
     for etuple in errors_or_warnings_list:
         try:
@@ -411,7 +411,7 @@ def send_error_report_to_admin(header, url, time_msg,
     """
     Sends an email to the admin with client info and tracestack
     """
-    from_addr =  '%s Alert Engine <%s>' % (cdsname, alertengineemail)
+    from_addr =  '%s Alert Engine <%s>' % (cdsname, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
     to_addr = adminemail
     body = """
 The following error was seen by a user and sent to you.
@@ -436,7 +436,7 @@ Please see the %(logdir)s/invenio.err for traceback details.""" % \
             'error'     : error,
             'sys_error' : sys_error,
             'traceback' : traceback_msg,
-            'logdir'    : logdir,
+            'logdir'    : CFG_LOGDIR,
             'contact'   : "Please contact %s quoting the following information:"  % (supportemail,) #! is support email always cds?
         }
     from invenio.mailutils import send_email

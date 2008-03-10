@@ -35,7 +35,7 @@ except NameError:
 from invenio.config import \
      weburl, \
      cdsname, \
-     cachedir, \
+     CFG_CACHEDIR, \
      cdslang, \
      adminemail, \
      sweburl, \
@@ -616,29 +616,29 @@ def display_collection(req, c, as, verbose, ln):
                     navmenuid='search')
     # display collection interface page:
     try:
-        filedesc = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % (cachedir, colID, as, ln), "r")
+        filedesc = open("%s/collections/%d/navtrail-as=%d-ln=%s.html" % (CFG_CACHEDIR, colID, as, ln), "r")
         c_navtrail = filedesc.read()
         filedesc.close()
-        filedesc = open("%s/collections/%d/body-as=%d-ln=%s.html" % (cachedir, colID, as, ln), "r")
+        filedesc = open("%s/collections/%d/body-as=%d-ln=%s.html" % (CFG_CACHEDIR, colID, as, ln), "r")
         c_body = filedesc.read()
         filedesc.close()
-        filedesc = open("%s/collections/%d/portalbox-tp-ln=%s.html" % (cachedir, colID, ln), "r")
+        filedesc = open("%s/collections/%d/portalbox-tp-ln=%s.html" % (CFG_CACHEDIR, colID, ln), "r")
         c_portalbox_tp = filedesc.read()
         filedesc.close()
-        filedesc = open("%s/collections/%d/portalbox-te-ln=%s.html" % (cachedir, colID, ln), "r")
+        filedesc = open("%s/collections/%d/portalbox-te-ln=%s.html" % (CFG_CACHEDIR, colID, ln), "r")
         c_portalbox_te = filedesc.read()
         filedesc.close()
-        filedesc = open("%s/collections/%d/portalbox-lt-ln=%s.html" % (cachedir, colID, ln), "r")
+        filedesc = open("%s/collections/%d/portalbox-lt-ln=%s.html" % (CFG_CACHEDIR, colID, ln), "r")
         c_portalbox_lt = filedesc.read()
         filedesc.close()
         # show help boxes (usually located in "tr", "top right")
         # if users have not banned them in their preferences:
         c_portalbox_rt = ""
         if user_preferences.get('websearch_helpbox', 1) > 0:
-            filedesc = open("%s/collections/%d/portalbox-rt-ln=%s.html" % (cachedir, colID, ln), "r")
+            filedesc = open("%s/collections/%d/portalbox-rt-ln=%s.html" % (CFG_CACHEDIR, colID, ln), "r")
             c_portalbox_rt = filedesc.read()
             filedesc.close()
-        filedesc = open("%s/collections/%d/last-updated-ln=%s.html" % (cachedir, colID, ln), "r")
+        filedesc = open("%s/collections/%d/last-updated-ln=%s.html" % (CFG_CACHEDIR, colID, ln), "r")
         c_last_updated = filedesc.read()
         filedesc.close()
 
@@ -710,7 +710,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
         req.send_http_header()
         try:
             # Try to read from cache
-            path = "%s/rss/%s.xml" % (cachedir, args)
+            path = "%s/rss/%s.xml" % (CFG_CACHEDIR, args)
             # Check if cache needs refresh
             filedesc = open(path, "r")
             last_update_time = datetime.datetime.fromtimestamp(os.stat(os.path.abspath(path)).st_mtime)
@@ -742,9 +742,9 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
             req.write(rss_epilogue)
 
             # update cache
-            dirname = "%s/rss" % (cachedir)
+            dirname = "%s/rss" % (CFG_CACHEDIR)
             mymkdir(dirname)
-            fullfilename = "%s/rss/%s.xml" % (cachedir, args)
+            fullfilename = "%s/rss/%s.xml" % (CFG_CACHEDIR, args)
             try:
                 # Remove the file just in case it already existed
                 # so that a bit of space is created

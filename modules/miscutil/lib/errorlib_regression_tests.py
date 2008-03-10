@@ -27,7 +27,7 @@ import unittest
 import os
 
 from invenio.errorlib import register_exception
-from invenio.config import weburl, logdir
+from invenio.config import weburl, CFG_LOGDIR
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -57,7 +57,7 @@ class ErrorlibRegisterExceptionTest(unittest.TestCase):
             raise Exception('test-exception')
         except:
             result = register_exception()
-        log_content = open(os.path.join(logdir, 'invenio.err')).read()
+        log_content = open(os.path.join(CFG_LOGDIR, 'invenio.err')).read()
         self.failUnless('test_simple_register_exception' in log_content)
         self.failUnless('test-exception' in log_content)
         self.assertEqual(1, result, "register_exception have not returned 1")
@@ -68,7 +68,7 @@ class ErrorlibRegisterExceptionTest(unittest.TestCase):
             raise Exception('test-exception')
         except:
             result = register_exception(alert_admin=True)
-        log_content = open(os.path.join(logdir, 'invenio.err')).read()
+        log_content = open(os.path.join(CFG_LOGDIR, 'invenio.err')).read()
         self.failUnless('test_alert_admin_register_exception' in log_content)
         self.failUnless('test-exception' in log_content)
         self.assertEqual(1, result, "register_exception have not returned 1")

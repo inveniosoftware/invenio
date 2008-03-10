@@ -22,7 +22,7 @@ __lastupdated__ = "$Date$"
 
 import os
 
-from invenio.config import tmpdir, weburl, cdsname
+from invenio.config import CFG_TMPDIR, weburl, cdsname
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webpage import page
 from invenio import template
@@ -159,7 +159,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                                    "mime": (str, "")})
 
         # Check that the particular file exists and that it's OK to export
-        webstat_files = [x for x in os.listdir(tmpdir) if x.startswith("webstat")]
+        webstat_files = [x for x in os.listdir(CFG_TMPDIR) if x.startswith("webstat")]
         if argd["filename"] not in webstat_files:
             return "Bad file."
 
@@ -168,7 +168,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         req.send_http_header()
 
         # Rebuild path, send it to the user, and clean up.
-        filename = tmpdir + '/' +  argd["filename"]
+        filename = CFG_TMPDIR + '/' +  argd["filename"]
         req.sendfile(filename)
         os.remove(filename)
 

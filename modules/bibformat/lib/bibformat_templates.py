@@ -240,7 +240,7 @@ class Template:
             XML data file by this format.  (You would then continue the upload
             procedure by calling successively <a
             href="../bibupload/">BibUpload</a> and <a
-            href="../bibwords/">BibWords</a>.)
+            href="../bibindex/">BibIndex</a>.)
 
             <p>Now consider a different situation.  You would like to add a new
             possible format, say "HTML portfolio" and "HTML captions" in order to

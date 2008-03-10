@@ -35,9 +35,9 @@ from invenio.config import \
      CFG_OAI_ID_FIELD, \
      CFG_OAI_ID_PREFIX, \
      CFG_OAI_SET_FIELD, \
-     bindir, \
+     CFG_BINDIR, \
      cdsname, \
-     tmpdir
+     CFG_TMPDIR
 from invenio.search_engine import perform_request_search
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_get_option, task_set_option, write_message, \
@@ -270,11 +270,11 @@ def oaiarchive_task():
             task_update_progress("[%i/%i] Fetching records in %s." % \
                                  (set_number, len(sets), set))
             if mode == 1 or mode == 4:
-                filename = tmpdir + "/oai_archive_%s" % time.strftime(
+                filename = CFG_TMPDIR + "/oai_archive_%s" % time.strftime(
                     "%Y%m%d_%H%M%S", time.localtime())
                 oai_out = open(filename,"w")
             if mode == 2 or mode == 4:
-                filename2 = tmpdir + "/oai_archive_%s_2" % time.strftime(
+                filename2 = CFG_TMPDIR + "/oai_archive_%s_2" % time.strftime(
                     "%Y%m%d_H%M%S", time.localtime())
                 oai_out2 = open(filename2,"w")
 
@@ -548,13 +548,13 @@ def oaiarchive_task():
                 # Check if file is empty or not:
                 len_file = os.stat(filename)[ST_SIZE]
                 if len_file > 0:
-                    command = "%s/bibupload -a %s" % (bindir, filename)
+                    command = "%s/bibupload -a %s" % (CFG_BINDIR, filename)
                     os.system(command)
             if mode == 2 or mode == 4:
                 # Check if file is empty or not:
                 len_file = os.stat(filename2)[ST_SIZE]
                 if len_file > 0:
-                    command = "%s/bibupload -c %s" % (bindir, filename2)
+                    command = "%s/bibupload -c %s" % (CFG_BINDIR, filename2)
                     os.system(command)
 
     return True

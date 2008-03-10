@@ -75,7 +75,7 @@ def update_date_of_last_run():
 
 def task_run_core():
     """Runs anayse_documents for each ontology,collection,record ids set."""
-    outfilename = tmpdir + "/bibclassifyd_%s.xml" % time.strftime("%Y%m%dH%M%S", time.localtime())
+    outfilename = CFG_TMPDIR + "/bibclassifyd_%s.xml" % time.strftime("%Y%m%dH%M%S", time.localtime())
     outfiledesc = open(outfilename, "w")
     coll_counter = 0
     print >> outfiledesc, """<?xml version="1.0" encoding="UTF-8"?>"""
@@ -87,7 +87,7 @@ def task_run_core():
     print >> outfiledesc, '</collection>'
     outfiledesc.close()
     if coll_counter:
-        cmd = "%s/bibupload -n -c '%s' " % (bindir, outfilename)
+        cmd = "%s/bibupload -n -c '%s' " % (CFG_BINDIR, outfilename)
         errcode = 0
         try:
             errcode = os.system(cmd)
@@ -114,7 +114,7 @@ def analyse_documents(recs, ontology, collection, outfilename, outfiledesc):
         # process records:
         cmd = None
         path = None
-        temp_text = tmpdir + '/bibclassify.pdftotext.' + str(os.getpid())
+        temp_text = CFG_TMPDIR + '/bibclassify.pdftotext.' + str(os.getpid())
         for rec in recs:
             bibdocfiles = BibRecDocs(rec).list_latest_files()
             found_one_pdf = False
@@ -136,7 +136,7 @@ def analyse_documents(recs, ontology, collection, outfilename, outfiledesc):
                     if errcode != 0 or not os.path.exists("%s" % temp_text):
                         write_message("Error while executing command %s Error code was: %s " % (cmd, errcode))
                     write_message('Generating keywords for %s' % f.get_full_path())
-                    print >> outfiledesc, generate_keywords_rdf(temp_text, etcdir + '/bibclassify/' + ontology + '.rdf', 2, 70, 25, 0, False, verbose=0, ontology=ontology)
+                    print >> outfiledesc, generate_keywords_rdf(temp_text, CFG_ETCDIR + '/bibclassify/' + ontology + '.rdf', 2, 70, 25, 0, False, verbose=0, ontology=ontology)
                 print >> outfiledesc, '</record>'
             task_update_progress("Done %s of %s for collction  %s." % (counter, max, collection))
             counter += 1
@@ -146,8 +146,8 @@ def analyse_documents(recs, ontology, collection, outfilename, outfiledesc):
 
 def cleanup_tmp():
     """Remove old temporary files created by this module"""
-    for f in listdir(tmpdir):
-        if 'bibclassify' in f: remove(tmpdir + '/' +f)
+    for f in listdir(CFG_TMPDIR):
+        if 'bibclassify' in f: remove(CFG_TMPDIR + '/' +f)
 
 def main():
     """Constructs the bibclassifyd bibtask."""

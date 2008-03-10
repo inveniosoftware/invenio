@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-     version, sweburl
+     CFG_VERSION, sweburl
 from invenio.dbquery import run_sql_cached, ProgrammingError
 import invenio.access_control_admin as aca
 from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS

@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 import os
 import time
 import cPickle
-from invenio.config import bindir, tmpdir
+from invenio.config import CFG_BINDIR, CFG_TMPDIR
 from invenio.bibedit_dblayer import marc_to_split_tag
 from invenio.bibedit_config import *
 from invenio.search_engine import print_record, record_exists
@@ -173,7 +173,7 @@ def perform_request_submit(ln, recid):
 def get_file_path(recid):
     """ return the file path of record. """
 
-    return "%s/%s_%s" % (tmpdir, CFG_BIBEDIT_TMPFILENAMEPREFIX, str(recid))
+    return "%s/%s_%s" % (CFG_TMPDIR, CFG_BIBEDIT_TMPFILENAMEPREFIX, str(recid))
 
 
 def save_xml_record(recid):
@@ -185,7 +185,7 @@ def save_xml_record(recid):
     file_temp.write(record_xml_output(get_temp_record("%s.tmp" % file_path)[1]))
     file_temp.close()
 
-    os.system("%s/bibupload -u bibedit -r %s.xml" % (bindir, file_path))
+    os.system("%s/bibupload -u bibedit -r %s.xml" % (CFG_BINDIR, file_path))
     os.system("rm %s.tmp" % file_path)
 
 def save_temp_record(record, uid, file_path):

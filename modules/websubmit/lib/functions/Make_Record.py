@@ -31,16 +31,16 @@ __revision__ = "$Id$"
 import os
 
 from invenio.config import \
-     bibconvert, \
-     bibconvertconf
+     CFG_BINDIR, \
+     CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
-def Make_Record(parameters, curdir, form, user_info=None): 
+def Make_Record(parameters, curdir, form, user_info=None):
     # Get rid of "invisible" white spaces
     source = parameters['sourceTemplate'].replace(" ","")
     create = parameters['createTemplate'].replace(" ","")
     # We use bibconvert to create the xml record
-    call_uploader_txt = "%s -l1 -d'%s'  -Cs'%s/%s' -Ct'%s/%s' > %s/recmysql" % (bibconvert,curdir,bibconvertconf,source,bibconvertconf,create,curdir)
+    call_uploader_txt = "%s/bibconvert -l1 -d'%s'  -Cs'%s/%s' -Ct'%s/%s' > %s/recmysql" % (CFG_BINDIR,curdir,CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR,source,CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR,create,curdir)
     os.system(call_uploader_txt)
     # Then we have to format this record (turn & into &amp; and < into &lt;
     # After all we know nothing about the text entered by the users at submission time

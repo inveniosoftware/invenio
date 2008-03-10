@@ -24,8 +24,8 @@ import time
 import shutil
 
 from invenio.config import \
-     bibupload, \
-     tmpdir
+     CFG_BINDIR, \
+     CFG_TMPDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Insert_Record(parameters, curdir, form, user_info=None):
@@ -35,7 +35,7 @@ def Insert_Record(parameters, curdir, form, user_info=None):
     else:
         raise InvenioWebSubmitFunctionError("Could not find record file")
     initialfile = "%s/%s" % (curdir,recfile)
-    finalfile = "%s/%s_%s" % (tmpdir,rn,time.strftime("%Y-%m-%d_%H:%M:%S"))
+    finalfile = "%s/%s_%s" % (CFG_TMPDIR,rn,time.strftime("%Y-%m-%d_%H:%M:%S"))
     shutil.copy(initialfile,finalfile)
-    os.system("%s -r -i %s" % (bibupload,finalfile))
+    os.system("%s/bibupload -r -i %s" % (CFG_BINDIR,finalfile))
     return ""

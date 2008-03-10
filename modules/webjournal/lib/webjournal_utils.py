@@ -25,7 +25,7 @@ Various utilities for WebJournal, e.g. config parser, etc.
 from invenio.bibformat_engine import BibFormatObject
 from invenio.errorlib import register_exception
 from invenio.search_engine import search_pattern
-from invenio.config import etcdir, weburl, adminemail, cachedir, cdslang
+from invenio.config import CFG_ETCDIR, weburl, adminemail, CFG_CACHEDIR, cdslang
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.dbquery import run_sql
@@ -690,7 +690,7 @@ def get_xml_from_config(xpath_list, journal_name):
     """
     # get and open the config file
     results = {}
-    config_path = '%s/webjournal/%s/config.xml' % (etcdir, journal_name)
+    config_path = '%s/webjournal/%s/config.xml' % (CFG_ETCDIR, journal_name)
     config_file = minidom.Document
     try:
         config_file = minidom.parse("%s" % config_path)
@@ -885,9 +885,9 @@ def cache_index_page(html, journal_name, category, issue, ln):
     """
     issue = issue.replace("/", "_")
     category = category.replace(" ", "")
-    if not (os.path.isdir('%s/webjournal/%s' % (cachedir, journal_name) )):
-        os.makedirs('%s/webjournal/%s' % (cachedir, journal_name))
-    cached_file = open('%s/webjournal/%s/%s_index_%s_%s.html' % (cachedir,
+    if not (os.path.isdir('%s/webjournal/%s' % (CFG_CACHEDIR, journal_name) )):
+        os.makedirs('%s/webjournal/%s' % (CFG_CACHEDIR, journal_name))
+    cached_file = open('%s/webjournal/%s/%s_index_%s_%s.html' % (CFG_CACHEDIR,
                                                                  journal_name,
                                                                  issue, category,
                                                                  ln), "w")
@@ -905,7 +905,7 @@ def get_index_page_from_cache(journal_name, category, issue, ln):
     category = category.replace(" ", "")
     try:
         cached_file = open('%s/webjournal/%s/%s_index_%s_%s.html'
-                        % (cachedir, journal_name, issue, category, ln)).read()
+                        % (CFG_CACHEDIR, journal_name, issue, category, ln)).read()
     except:
         return False
     return cached_file
@@ -916,10 +916,10 @@ def cache_article_page(html, journal_name, category, recid, issue, ln):
     """
     issue = issue.replace("/", "_")
     category = category.replace(" ", "")
-    if not (os.path.isdir('%s/webjournal/%s' % (cachedir, journal_name) )):
-        os.makedirs('%s/webjournal/%s' % (cachedir, journal_name))
+    if not (os.path.isdir('%s/webjournal/%s' % (CFG_CACHEDIR, journal_name) )):
+        os.makedirs('%s/webjournal/%s' % (CFG_CACHEDIR, journal_name))
     cached_file = open('%s/webjournal/%s/%s_article_%s_%s_%s.html'
-                       % (cachedir, journal_name, issue, category, recid, ln),
+                       % (CFG_CACHEDIR, journal_name, issue, category, recid, ln),
                        "w")
     cached_file.write(html)
     cached_file.close()
@@ -933,7 +933,7 @@ def get_article_page_from_cache(journal_name, category, recid, issue, ln):
     category = category.replace(" ", "")
     try:
         cached_file = open('%s/webjournal/%s/%s_article_%s_%s_%s.html'
-                % (cachedir, journal_name, issue, category, recid, ln)).read()
+                % (CFG_CACHEDIR, journal_name, issue, category, recid, ln)).read()
     except:
         return False
 
@@ -948,30 +948,30 @@ def clear_cache_for_article(journal_name, category, recid, issue):
     # try to delete the article cached file
     try:
         os.remove('%s/webjournal/%s/%s_article_%s_%s_en.html' %
-                  (cachedir, journal_name, issue, category, recid))
+                  (CFG_CACHEDIR, journal_name, issue, category, recid))
     except:
         pass
     try:
         os.remove('%s/webjournal/%s/%s_article_%s_%s_fr.html' %
-                  (cachedir, journal_name, issue, category, recid))
+                  (CFG_CACHEDIR, journal_name, issue, category, recid))
     except:
         pass
     # delete the index page for the category
     try:
         os.remove('%s/webjournal/%s/%s_index_%s_en.html'
-                  % (cachedir, journal_name, issue, category))
+                  % (CFG_CACHEDIR, journal_name, issue, category))
     except:
         pass
     try:
         os.remove('%s/webjournal/%s/%s_index_%s_fr.html'
-                  % (cachedir, journal_name, issue, category))
+                  % (CFG_CACHEDIR, journal_name, issue, category))
     except:
         pass
     # delete the entry in the recid_order_map
     # todo: make this per entry
     try:
         os.remove('%s/webjournal/%s/%s_recid_order_map.dat'
-                  % (cachedir, journal_name, issue))
+                  % (CFG_CACHEDIR, journal_name, issue))
     except:
         pass
     return True
@@ -982,12 +982,12 @@ def clear_cache_for_issue(journal_name, issue):
     """
     issue = issue.replace("/", "_")
     all_cached_files = os.listdir('%s/webjournal/%s/'
-                                  % (cachedir, journal_name))
+                                  % (CFG_CACHEDIR, journal_name))
     for cached_file in all_cached_files:
         if cached_file[:7] == issue:
             try:
                 os.remove('%s/webjournal/%s/%s'
-                          % (cachedir, journal_name, cached_file))
+                          % (CFG_CACHEDIR, journal_name, cached_file))
             except:
                 return False
     return True
@@ -999,14 +999,14 @@ def cache_recid_data_dict_CERNBulletin(recid, issue, rule, order):
     """
     issue = issue.replace("/", "_")
     # get whats in there
-    if not os.path.isdir('%s/webjournal/CERNBulletin' % cachedir):
-        os.makedirs('%s/webjournal/CERNBulletin' % cachedir)
+    if not os.path.isdir('%s/webjournal/CERNBulletin' % CFG_CACHEDIR):
+        os.makedirs('%s/webjournal/CERNBulletin' % CFG_CACHEDIR)
     try:
         temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat'
-                         % (cachedir, issue))
+                         % (CFG_CACHEDIR, issue))
     except:
         temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat'
-                         % (cachedir, issue), "w")
+                         % (CFG_CACHEDIR, issue), "w")
     try:
         recid_map = cPickle.load(temp_file)
     except:
@@ -1020,7 +1020,7 @@ def cache_recid_data_dict_CERNBulletin(recid, issue, rule, order):
     recid_map[rule][order] = recid
     # save back
     temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat'
-                     % (cachedir, issue), "w")
+                     % (CFG_CACHEDIR, issue), "w")
     cPickle.dump(recid_map, temp_file)
     temp_file.close()
 
@@ -1032,7 +1032,7 @@ def get_cached_recid_data_dict_CERNBulletin(issue, rule):
     issue = issue.replace("/", "_")
     try:
         temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat'
-                         % (cachedir, issue))
+                         % (CFG_CACHEDIR, issue))
     except:
         return {}
     try:

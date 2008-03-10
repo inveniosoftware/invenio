@@ -43,10 +43,10 @@
   arguments in order to more clearly describe what you are allowing
   connected users to do.
 
-  For example the system librarian can be allowed to run bibwords on
+  For example the system librarian can be allowed to run bibindex on
   the different indexes. To allow system librarians to run the
-  bibwords indexing on the field author we connect role <em>system
-  librarian</em> with action <em>runbibwords</em> using the argument
+  bibindex indexing on the field author we connect role <em>system
+  librarian</em> with action <em>runbibindex</em> using the argument
   <em>index='author'</em>.
 
   Additionally, roles could have <em><a href="#6">firewall-like role

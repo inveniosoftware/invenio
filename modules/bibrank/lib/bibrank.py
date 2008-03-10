@@ -69,7 +69,7 @@ import sys
 import traceback
 import ConfigParser
 
-from invenio.config import etcdir
+from invenio.config import CFG_ETCDIR
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, write_message, task_get_option, \
     task_set_option, get_datetime, task_update_status
@@ -118,7 +118,7 @@ def task_run_core():
     try:
         for key in task_get_option("run"):
             write_message("")
-            filename = etcdir + "/bibrank/" + key + ".cfg"
+            filename = CFG_ETCDIR + "/bibrank/" + key + ".cfg"
             write_message("Getting configuration from file: %s" % filename,
                 verbose=9)
             config = ConfigParser.ConfigParser()

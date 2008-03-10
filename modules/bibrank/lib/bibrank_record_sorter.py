@@ -33,8 +33,8 @@ import copy
 
 from invenio.config import \
      cdslang, \
-     etcdir, \
-     version
+     CFG_ETCDIR, \
+     CFG_VERSION
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
 from invenio.webpage import adderrorbox
 from invenio.bibindex_engine_stemmer import stem
@@ -75,7 +75,7 @@ def create_rnkmethod_cache():
 
     for (rank_method_code,) in bibrank_meths:
         try:
-            file = etcdir + "/bibrank/" + rank_method_code + ".cfg"
+            file = CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"
             config = ConfigParser.ConfigParser()
             config.readfp(open(file))
         except StandardError, e:
@@ -89,7 +89,7 @@ def create_rnkmethod_cache():
             methods[rank_method_code]["postfix"] = config.get(cfg_function, "relevance_number_output_epilogue")
             methods[rank_method_code]["chars_alphanumericseparators"] = r"[1234567890\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~]"
         else:
-            raise Exception("Error in configuration file: %s" % (etcdir + "/bibrank/" + rank_method_code + ".cfg"))
+            raise Exception("Error in configuration file: %s" % (CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"))
 
         i8n_names = run_sql("""SELECT ln,value from rnkMETHODNAME,rnkMETHOD where id_rnkMETHOD=rnkMETHOD.id and rnkMETHOD.name=%s""", (rank_method_code,))
         for (ln, value) in i8n_names:

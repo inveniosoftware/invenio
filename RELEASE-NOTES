@@ -75,7 +75,9 @@ following steps:
      Please see INSTALL file, part 1b on how to customize your
      installation.  You will have to create 'invenio-local.conf' where
      you have to merge your old config.wml values (they are available
-     at /opt/cds-invenio-BACKUP/lib/wml/invenio/config.wml).
+     at /opt/cds-invenio-BACKUP/lib/wml/invenio/config.wml).  Beware
+     of variable name updates, e.g. 'filedirsize' now became
+     'CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT'.
 
    - If you have previously customized your page header and footer via
      WML, then you should now put your page customizations in a new

@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -23,7 +23,7 @@ __lastupdated__ = "$Date$"
 import os, time, re, datetime, cPickle, calendar
 
 from invenio import template
-from invenio.config import cdsname, webdir, tmpdir
+from invenio.config import cdsname, CFG_WEBDIR, CFG_TMPDIR
 from invenio.search_engine import get_alphabetically_ordered_collection_list
 from invenio.dbquery import run_sql
 from invenio.bibsched import is_task_scheduled, get_task_ids_by_descending_date, get_task_options
@@ -56,8 +56,8 @@ TEMPLATES = template.load('webstat')
 # Constants
 WEBSTAT_CACHE_INTERVAL = 600 # Seconds, cache_* functions not affected by this.
                              # Also not taking into account if BibSched has webstatadmin process.
-WEBSTAT_RAWDATA_DIRECTORY = tmpdir + "/"
-WEBSTAT_GRAPH_DIRECTORY = webdir + "/img/"
+WEBSTAT_RAWDATA_DIRECTORY = CFG_TMPDIR + "/"
+WEBSTAT_GRAPH_DIRECTORY = CFG_WEBDIR + "/img/"
 
 TYPE_REPOSITORY = [ ('gnuplot', 'Image - Gnuplot'),
                     ('asciiart', 'Image - ASCII art'),
@@ -148,7 +148,7 @@ def create_customevent(id=None, name=None, cols=[]):
                );""" % tbl_name)
 
     # We're done! Print notice containing the name of the event.
-    return ("Event table [%s] successfully created.\n" + 
+    return ("Event table [%s] successfully created.\n" +
             "Please use event id [%s] when registering an event.") % (tbl_name, id)
 
 def destroy_customevent(id=None):
@@ -172,9 +172,9 @@ def destroy_customevent(id=None):
         tbl_name = get_customevent_table(id)
         run_sql("DROP TABLE %s" % tbl_name)
         run_sql("DELETE FROM staEVENT WHERE id = '%s'" % id)
-        return ("Event with id [%s] was successfully destroyed.\n" + 
+        return ("Event with id [%s] was successfully destroyed.\n" +
                 "Table [%s], with content, was destroyed.") % (id, tbl_name)
-       
+
 def register_customevent(id, *arguments):
     """
     Registers a custom event. Will add to the database's event tables
@@ -212,7 +212,7 @@ def cache_keyevent_trend(ids=[]):
     timespans = _get_timespans()
 
     for id in ids:
-        args['id'] = id 
+        args['id'] = id
         extraparams = KEYEVENT_REPOSITORY[id]['extraparams']
 
         # Construct all combinations of extraparams and store as [{param name: arg value}]
@@ -222,13 +222,13 @@ def cache_keyevent_trend(ids=[]):
         for x in [[(param, x[0]) for x in extraparams[param][1]()] for param in extraparams]:
             combos = [i + [y] for y in x for i in combos]
         combos = [dict(x) for x in combos]
-    
+
         for i in range(len(timespans)):
             # Get timespans parameters
             args['timespan'] = timespans[i][0]
             args.update({ 't_start': timespans[i][2], 't_end': timespans[i][3], 'granularity': timespans[i][4],
                           't_format': timespans[i][5], 'xtic_format': timespans[i][6] })
-                
+
             for combo in combos:
                 args.update(combo)
 
@@ -239,7 +239,7 @@ def cache_keyevent_trend(ids=[]):
                 # Create closure of gatherer function in case cache needs to be refreshed
                 gatherer = lambda: KEYEVENT_REPOSITORY[id]['gatherer'](args)
 
-                # Get data file from cache, ALWAYS REFRESH DATA! 
+                # Get data file from cache, ALWAYS REFRESH DATA!
                 _get_file_using_cache(filename, gatherer, True).read()
 
     return True
@@ -258,8 +258,8 @@ def cache_customevent_trend(ids=[]):
     timespans = _get_timespans()
 
     for id in ids:
-        args['id'] = id 
-   
+        args['id'] = id
+
         for i in range(len(timespans)):
             # Get timespans parameters
             args['timespan'] = timespans[i][0]
@@ -283,7 +283,7 @@ def cache_customevent_trend(ids=[]):
 def perform_request_index():
     """
     Displays some informative text, the health box, and a the list of
-    key/custom events. 
+    key/custom events.
     """
     out = TEMPLATES.tmpl_welcome()
 
@@ -302,7 +302,7 @@ def perform_request_index():
 
     # Append searches information to the health box
     args = { 't_start': today, 't_end': tomorrow, 'granularity': "day", 't_format': "%Y-%m-%d" }
-    searches = get_keyevent_trend_search_type_distribution(args) 
+    searches = get_keyevent_trend_search_type_distribution(args)
     health_indicators.append(("Searches since midnight", sum(searches[0][1])))
     health_indicators.append(("    Simple", searches[0][1][0]))
     health_indicators.append(("    Advanced", searches[0][1][1]))
@@ -326,7 +326,7 @@ def perform_request_index():
         health_indicators.append(("    " + item[0], str(item[1])))
     health_indicators.append(None)
 
-    # Append number of Apache processes to the health box   
+    # Append number of Apache processes to the health box
     health_indicators.append(("Apache processes", get_keyevent_snapshot_apache_processes()))
 
     # Append uptime and load average to the health box
@@ -367,7 +367,7 @@ def perform_display_keyevent(id=None, args={}, req=None):
     # Build a dictionary for the selected parameters: { parameter name: argument internal name }
     choosed = dict([(param, args[param]) for param in KEYEVENT_REPOSITORY[id]['extraparams']] +
                    [('timespan', args['timespan']), ('format', args['format'])])
-    # Send to template to prepare event customization FORM box 
+    # Send to template to prepare event customization FORM box
     out = TEMPLATES.tmpl_event_box(options, order, choosed)
 
     # Arguments OK?
@@ -381,7 +381,7 @@ def perform_display_keyevent(id=None, args={}, req=None):
         if not choosed[param] in [x[0] for x in options[param][1]]:
             return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".'
                                                % options[param][0] )
-    
+
     # Arguments OK beyond this point!
 
     # Get unique name for caching purposes (make sure that the params used in the filename are safe!)
@@ -411,7 +411,7 @@ def perform_display_keyevent(id=None, args={}, req=None):
     # If type indicates an export, run the export function and we're done
     if _is_type_export(choosed['format']):
         _get_export_closure(choosed['format'])(data, req)
-        return out 
+        return out
 
     # Prepare the graph settings that are being passed on to grapher
     settings = { "title": KEYEVENT_REPOSITORY[id]['specificname'] % choosed,
@@ -444,7 +444,7 @@ def perform_display_customevent(ids=[], args={}, req=None):
     order = ['ids', 'timespan', 'format']
     # Build a dictionary for the selected parameters: { parameter name: argument internal name }
     choosed = { 'ids': ids, 'timespan': args['timespan'], 'format': args['format'] }
-    # Send to template to prepare event customization FORM box 
+    # Send to template to prepare event customization FORM box
     out = TEMPLATES.tmpl_event_box(options, order, choosed)
 
     # Arguments OK?
@@ -471,7 +471,7 @@ def perform_display_customevent(ids=[], args={}, req=None):
              't_format': t_format, 'xtic_format': xtic_format }
 
     data_unmerged = []
-    
+
     # ASCII dump data is different from the standard formats, since we can speed up
     # dumping by using MySQL's temporary tables for sorting by dates. It would be
     # a computationally slow doing it here in Python, even though we then could make
@@ -481,31 +481,31 @@ def perform_display_customevent(ids=[], args={}, req=None):
         args['ids'] = ids
         gatherer = lambda: get_customevent_dump(args)
         data = eval(_get_file_using_cache(filename, gatherer).read())
-    else:   
+    else:
         for id in ids:
             # Get unique name for the rawdata file (wash arguments!)
             filename = "webstat_customevent_" + re.subn("[^\w]", "", id + "_" + choosed['timespan'])[0]
-    
+
             # Add the current id to the gatherer's arguments
             args['id'] = id
-    
+
             # Prepare raw data gatherer, if cache needs refreshing.
             gatherer = lambda: get_customevent_trend(args)
 
             # Determine if this particular file is due for scheduling cacheing, in that case we must not
             # allow refreshing of the rawdata.
             allow_refresh = not _is_scheduled_for_cacheing(id)
- 
+
             # Get file from cache, and evaluate it to trend data
             data_unmerged.append(eval(_get_file_using_cache(filename, gatherer, allow_refresh=allow_refresh).read()))
-    
+
         # Merge data from the unmerged trends into the final destination
         data = [(x[0][0], tuple([y[1] for y in x])) for x in zip(*data_unmerged)]
 
     # If type indicates an export, run the export function and we're done
     if _is_type_export(choosed['format']):
         _get_export_closure(choosed['format'])(data, req)
-        return out 
+        return out
 
     # Get full names, for those that have them
     names = []
@@ -585,7 +585,7 @@ def _get_timespans(dt=None):
     @param dt: A datetime object indicating the current date and time
     @type dt: datetime.datetime
 
-    @return [(Internal name, Readable name, t_start, t_end, granularity, format, xtic_format)] 
+    @return [(Internal name, Readable name, t_start, t_end, granularity, format, xtic_format)]
     @type [(str, str, str, str, str, str, str)]
     """
     if dt is None:
@@ -624,7 +624,7 @@ def _get_timespans(dt=None):
               to_str(dt-d_diff(d_in_m(1))-d_diff(d_in_m(2))-d_diff(d_in_m(3))-d_diff(dt.day)+d_diff(1)),
               to_str(dt-d_diff(dt.day)+d_diff(1)),
               "month", format, "%b")]
-    
+
     # Get first year as indicated by the content's in bibrec
     try:
         y1 = run_sql("SELECT creation_date FROM bibrec ORDER BY creation_date LIMIT 1")[0][0].year
@@ -634,7 +634,7 @@ def _get_timespans(dt=None):
     y2 = time.localtime()[0]
     spans.extend([(str(x-1), str(x), str(x), str(x+1), "month", "%Y", "%b") for x in  range(y2, y1-1, -1)])
 
-    return spans 
+    return spans
 
 def _get_formats(with_dump=False):
     """
@@ -642,10 +642,10 @@ def _get_formats(with_dump=False):
     output types (displaying and exporting) from the central repository as
     stored in the variable self.types at the top of this module.
 
-    @param with_dump: Optionally displays the custom-event only type 'asciidump' 
+    @param with_dump: Optionally displays the custom-event only type 'asciidump'
     @type with_dump: bool
 
-    @return [(Internal name, Readable name)] 
+    @return [(Internal name, Readable name)]
     @type [(str, str)]
     """
     # The third tuple value is internal
@@ -661,7 +661,7 @@ def _is_type_export(typename):
 
     @param typename: Internal type name
     @type typename: str
-    
+
     @return: Information whether a certain type exports data
     @type: bool
     """
@@ -674,7 +674,7 @@ def _get_export_closure(typename):
 
     @param typename: Internal type name
     @type type: str
-    
+
     @return: Closure that exports data to the type's format
     @type: function
     """
@@ -692,7 +692,7 @@ def _get_file_using_cache(filename, closure, force=False, allow_refresh=True):
 
     @param closure: A function, that executed will return data to be cached. The
                     function should return either a string, or something that
-                    makes sense after being interpreted with str().  
+                    makes sense after being interpreted with str().
     @type closure: function
 
     @param force: Override cache default value.
@@ -709,7 +709,7 @@ def _get_file_using_cache(filename, closure, force=False, allow_refresh=True):
     except OSError:
         # No cached version of this particular file exists, thus the modification
         # time is set to 0 for easy logic below.
-        mtime = 0  
+        mtime = 0
 
     # Consider refreshing cache if FORCE or NO CACHE AT ALL, or CACHE EXIST AND REFRESH IS ALLOWED.
     if force or mtime == 0 or (mtime > 0 and allow_refresh):
@@ -721,7 +721,7 @@ def _get_file_using_cache(filename, closure, force=False, allow_refresh=True):
             content = closure()
 
             # Cache the data
-            open(filename, 'w').write(str(content)) 
+            open(filename, 'w').write(str(content))
 
     # Return the (perhaps just) cached file
     return open(filename, 'r')

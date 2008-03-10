@@ -32,7 +32,7 @@ import time
 from invenio.config import \
      adminemail, \
      cdsname, \
-     counters, \
+     CFG_WEBSUBMIT_COUNTERSDIR, \
      supportemail
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 from invenio.mailutils import send_email
@@ -87,7 +87,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form, user_info=None):
     ## if so, raise an error and warn the admin:
     counter_lockfile = "last_SYS_%s.lock" % database
     try:
-        lockfile_modtime = getmtime("%s/%s" % (counters, counter_lockfile))
+        lockfile_modtime = getmtime("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_lockfile))
         time_now = mktime(localtime())
         time_since_last_lockfile_mod = time_now - lockfile_modtime
         if time_since_last_lockfile_mod > CFG_MAX_AGE_LOCKFILE:
@@ -117,8 +117,8 @@ def Allocate_ALEPH_SYS(parameters, curdir, form, user_info=None):
         raise InvenioWebSubmitFunctionError(msg)
 
     ## test that counter files exist for "database":
-    rw_count_lastsys_ok = access("%s/%s" % (counters, counter_lastsys), R_OK|W_OK)
-    rw_count_maxsys_ok = access("%s/%s" % (counters, counter_maxsys), R_OK|W_OK)
+    rw_count_lastsys_ok = access("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_lastsys), R_OK|W_OK)
+    rw_count_maxsys_ok = access("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_maxsys), R_OK|W_OK)
 
     if not rw_count_lastsys_ok or not rw_count_maxsys_ok:
         ## cannot access the ALEPH counter files - critical error
@@ -134,10 +134,10 @@ def Allocate_ALEPH_SYS(parameters, curdir, form, user_info=None):
 
     ## read last-sys and max-sys:
     try:
-        fp = open("%s/%s" % (counters, counter_lastsys), "r")
+        fp = open("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_lastsys), "r")
         fileval_lastsys = fp.read()
         fp.close()
-        fp = open("%s/%s" % (counters, counter_maxsys), "r")
+        fp = open("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_maxsys), "r")
         fileval_maxsys = fp.read()
         fp.close()
     except IOError:
@@ -200,7 +200,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form, user_info=None):
 
     ## open temp counter file for writing:
     try:
-        fp = open("%s/%s" % (counters, tmpfname), "w")
+        fp = open("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, tmpfname), "w")
         fp.write("%d" % (lastsys,))
         fp.flush()
         fp.close()
@@ -208,7 +208,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form, user_info=None):
         ## could not write to temp file
         msg = """ERROR: When trying to allocate an ALEPH SYS for a record, could not write out new value for last SYS used """\
               """to a temporary file [%s]. It was therefore not possible to allocate a SYS for the record ([%s] was not """\
-              """incremented.)""" % ("%s/%s" % (counters, tmpfname), counter_lastsys)
+              """incremented.)""" % ("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, tmpfname), counter_lastsys)
         ## remove the "lock file"
         lockfile_removed = _unlink_SYS_counter_lockfile(database)
         if lockfile_removed == 0:
@@ -219,11 +219,11 @@ def Allocate_ALEPH_SYS(parameters, curdir, form, user_info=None):
 
     ## copy old counter file to backup version:
     try:
-        copyfile("%s/%s" % (counters, counter_lastsys), "%s/%s.bk" % (counters, counter_lastsys))
+        copyfile("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_lastsys), "%s/%s.bk" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_lastsys))
     except IOError:
         ## unable to make backup of counter file:
         msg = """ERROR: When trying to allocate an ALEPH SYS for a record, could not write out new value for last SYS used."""\
-              """ Couldn't make a back-up copy of the SYS counter file [%s].""" % ("%s/%s" % (counters, counter_lastsys),)
+              """ Couldn't make a back-up copy of the SYS counter file [%s].""" % ("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_lastsys),)
         ## remove the "lock file"
         lockfile_removed = _unlink_SYS_counter_lockfile(database)
         if lockfile_removed == 0:
@@ -234,13 +234,13 @@ def Allocate_ALEPH_SYS(parameters, curdir, form, user_info=None):
 
     ## rename temp counter file to final counter file:
     try:
-        rename("%s/%s" % (counters, tmpfname), "%s/%s" % (counters, counter_lastsys))
+        rename("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, tmpfname), "%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_lastsys))
     except OSError:
         ## couldnt rename the tmp file to final file name
         msg = """ERROR: When trying to allocate an ALEPH SYS for a record, could not write out new value for last SYS used."""\
               """ Created the temporary last SYS counter file [%s], but couldn't then rename it to the final counter file [%s]."""\
               """ It was therefore not possible to allocate a SYS for the record ([%s] was not incremented.)"""\
-              % ("%s/%s" % (counters, tmpfname), "%s/%s" % (counters, counter_lastsys), counter_lastsys)
+              % ("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, tmpfname), "%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_lastsys), counter_lastsys)
         lockfile_removed = _unlink_SYS_counter_lockfile(database)
         if lockfile_removed == 0:
             ## couldn't remove lockfile - mail ADMIN
@@ -271,7 +271,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form, user_info=None):
     if lockfile_removed == 0:
         ## couldn't remove lockfile - mail ADMIN
         msg = """ERROR: After allocating an ALEPH SYS for a record, it was not possible to remove the lock file [last_SYS_%s.lock] after the """\
-              """SYS was allocated.""" % ("%s/%s" % (counters, database),)
+              """SYS was allocated.""" % ("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, database),)
         _mail_admin_because_lockfile_not_removeable(lockfilename="last_SYS_%s" % database, extramsg="\n\n"+msg)
         raise InvenioWebSubmitFunctionError(msg)
 
@@ -299,9 +299,9 @@ def _mail_admin_because_lockfile_not_removeable(lockfilename, extramsg=""):
 
 
 def _create_SYS_counter_lockfile(database):
-    """Write a lock-file for "last_SYS_%(database)s" to the "counters" directory, thus ensuring that only one process will
+    """Write a lock-file for "last_SYS_%(database)s" to the "CFG_WEBSUBMIT_COUNTERSDIR" directory, thus ensuring that only one process will
        access the counter at any one time.
-       If the lockfile doesn't already exist, it will be created in the counters directory with the name
+       If the lockfile doesn't already exist, it will be created in the CFG_WEBSUBMIT_COUNTERSDIR directory with the name
        "last_SYS_%(database)s.lock" (e.g. "last_SYS_CER.lock".)  If the lockfile does exist, the process will sleep for 1 second
        and then try again.  In all, it will try 60 times to create a lockfile before giving up.
        When a lockfile is created, it will contain a string of the format "processPID->YYYYMMDDhhmmss->random int, between 1-1000000"
@@ -322,19 +322,19 @@ def _create_SYS_counter_lockfile(database):
 
     ## get lock on counter:
     for i in range(0, 60):
-        if os.path.exists("%s/%s" % (counters, counter_lockfile)):
+        if os.path.exists("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_lockfile)):
             ## lock file exists - sleep 1 second and try again
             sleep(1)
             continue
         else:
             ## lock file doesn't exist - make it
             try:
-                fp = open("%s/%s" % (counters, counter_lockfile), "w")
+                fp = open("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_lockfile), "w")
                 fp.write("%s" % (lockfile_text,))
                 fp.flush()
                 fp.close()
                 ## open and read the contents of the lock file back to ensure that it *really* belongs to this process:
-                fp = open("%s/%s" % (counters, counter_lockfile), "r")
+                fp = open("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_lockfile), "r")
                 read_lockfile_contents = fp.readline()
                 fp.close()
                 if read_lockfile_contents.strip() != lockfile_text:
@@ -361,7 +361,7 @@ def _unlink_SYS_counter_lockfile(database):
     counter_lockfile = "last_SYS_%s.lock" % (database,)
     unlinked_lockfile = 0
     try:
-        unlink("%s/%s" % (counters, counter_lockfile))
+        unlink("%s/%s" % (CFG_WEBSUBMIT_COUNTERSDIR, counter_lockfile))
         unlinked_lockfile = 1
     except OSError:
         ## unable to remove lockfile:

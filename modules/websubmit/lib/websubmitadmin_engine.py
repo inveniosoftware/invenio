@@ -28,7 +28,7 @@ from time import strftime, localtime
 from invenio.websubmitadmin_dblayer import *
 from invenio.websubmitadmin_config import *
 from invenio.access_control_admin import acc_get_all_roles, acc_get_role_users, acc_delete_user_role
-from invenio.config import cdslang, bibconvertconf
+from invenio.config import cdslang, CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
 from invenio.access_control_engine import acc_authorize_action
 import invenio.template
 
@@ -2964,7 +2964,7 @@ def _update_submission_function_parameter_file(doctype, action, functionname,
 
     ## save file:
     try:
-        save_update_to_file(filepath="%s/%s" % (bibconvertconf, filename), filecontent=paramfilecontent)
+        save_update_to_file(filepath="%s/%s" % (CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR, filename), filecontent=paramfilecontent)
     except InvenioWebSubmitAdminWarningIOError, e:
         ## could not correctly update the file!
         user_msg.append(str(e))
@@ -3013,14 +3013,14 @@ def _create_configure_doctype_submission_functions_edit_parameter_file_form(doct
                                                                                             user_msg=user_msg)
         return (title, body)
     ## try to read file contents:
-    if access("%s/%s" % (bibconvertconf, filename), F_OK):
+    if access("%s/%s" % (CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR, filename), F_OK):
         ## file exists
-        if access("%s/%s" % (bibconvertconf, filename), R_OK) and \
-               isfile("%s/%s" % (bibconvertconf, filename)):
+        if access("%s/%s" % (CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR, filename), R_OK) and \
+               isfile("%s/%s" % (CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR, filename)):
             ## file is a regular file and is readable - get contents
-            filecontent = open("%s/%s" % (bibconvertconf, filename), "r").read()
+            filecontent = open("%s/%s" % (CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR, filename), "r").read()
         else:
-            if not isfile("%s/%s" % (bibconvertconf, filename)):
+            if not isfile("%s/%s" % (CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR, filename)):
                 ## file is not a regular file
                 user_msg.append("The parameter file [%s] is not  regular file - unable to read" % (filename,))
             else:

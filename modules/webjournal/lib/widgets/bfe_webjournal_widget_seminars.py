@@ -18,7 +18,7 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.config import cachedir
+from invenio.config import CFG_CACHEDIR
 from urllib2 import urlopen
 from xml.dom import minidom
 import time
@@ -45,20 +45,20 @@ def get_widget_HTML(bfo):
     them in a widget.
     """
     try:
-        seminar_xml = minidom.parse('%s/%s' % (cachedir, Cached_Filename))
+        seminar_xml = minidom.parse('%s/%s' % (CFG_CACHEDIR, Cached_Filename))
     except:
         _update_seminars()
-        seminar_xml = minidom.parse('%s/%s' % (cachedir, Cached_Filename))
+        seminar_xml = minidom.parse('%s/%s' % (CFG_CACHEDIR, Cached_Filename))
     try:
         timestamp = seminar_xml.firstChild.getAttribute("time")
     except:
         timestamp = time.struct_time()
-    
+
     last_update = time.mktime(time.strptime(timestamp, "%a, %d %b %Y %H:%M:%S %Z"))
     now = time.mktime(time.gmtime())
     if last_update + Update_Frequency < now:
         _update_seminars()
-        seminar_xml = minidom.parse('%s/%s' % (cachedir, Cached_Filename))
+        seminar_xml = minidom.parse('%s/%s' % (CFG_CACHEDIR, Cached_Filename))
     html = ""
     seminars = seminar_xml.getElementsByTagName("seminar")
     if len(seminars) == 0:
@@ -93,12 +93,12 @@ def get_widget_HTML(bfo):
         except:
             room = ""
         html += room
-        
+
         html += "</li>"
 
-            
+
     return html.encode('utf-8')
-    
+
 def _update_seminars():
     """
     helper function that gets the xml data source from CERN Indico and creates
@@ -120,7 +120,7 @@ def _update_seminars():
             category = category.split("/")[-1]
             category = category.replace("&amp;", "")
             category = category.replace("nbsp;", "")
-            category = category.replace("&nbsp;", "") 
+            category = category.replace("&nbsp;", "")
         except:
             category = ""
         seminar_xml.extend(["<category>%s</category>" % category, ])
@@ -145,11 +145,11 @@ def _update_seminars():
             room = ""
         seminar_xml.extend(["<room>%s</room>" % room, ])
         seminar_xml.extend(["</seminar>", ])
-    seminar_xml.extend(["</Indico_Seminars>", ])    
+    seminar_xml.extend(["</Indico_Seminars>", ])
     # write the created file to cache
-    fptr = open("%s/%s" % (cachedir, Cached_Filename), "w")
+    fptr = open("%s/%s" % (CFG_CACHEDIR, Cached_Filename), "w")
     fptr.write(("\n".join(seminar_xml)).encode('utf-8'))
     fptr.close()
-    
+
 if __name__ == "__main__":
     get_widget_HTML()

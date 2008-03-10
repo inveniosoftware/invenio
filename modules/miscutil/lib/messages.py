@@ -38,11 +38,11 @@ __revision__ = "$Id$"
 
 import gettext
 
-from invenio.config import localedir, cdslangs
+from invenio.config import CFG_LOCALEDIR, cdslangs
 
 lang = {}
 for ln in cdslangs:
-    lang[ln] = gettext.translation('cds-invenio', localedir, languages = [ln], fallback = True)
+    lang[ln] = gettext.translation('cds-invenio', CFG_LOCALEDIR, languages = [ln], fallback = True)
 
 def gettext_set_language(ln):
     """

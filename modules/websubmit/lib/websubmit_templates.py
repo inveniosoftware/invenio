@@ -32,7 +32,7 @@ import os
 from invenio.config import \
      accessurl, \
      images, \
-     version, \
+     CFG_VERSION, \
      weburl
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui

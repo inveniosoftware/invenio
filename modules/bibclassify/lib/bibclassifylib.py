@@ -671,15 +671,15 @@ def main():
         usage(1)
 
     try:
-        from invenio.config import tmpdir, CFG_PATH_PDFTOTEXT, version
+        from invenio.config import CFG_TMPDIR, CFG_PATH_PDFTOTEXT, CFG_VERSION
         version_bibclassify = 0.1
-        bibclassify_engine_version = "CDS Invenio/%s bibclassify/%s" % (version, version_bibclassify)
+        bibclassify_engine_version = "CDS Invenio/%s bibclassify/%s" % (CFG_VERSION, version_bibclassify)
 
     except:
-        tmpdir = TMPDIR_STANDALONE
+        CFG_TMPDIR = TMPDIR_STANDALONE
         CFG_PATH_PDFTOTEXT = PDFTOTEXT_STANDALONE
 
-    temp_text = tmpdir + '/bibclassify.pdftotext.' + str(os.getpid())
+    temp_text = CFG_TMPDIR + '/bibclassify.pdftotext.' + str(os.getpid())
 
     try:
         for opt in opts:

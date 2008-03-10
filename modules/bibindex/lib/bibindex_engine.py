@@ -41,7 +41,7 @@ from invenio.config import \
      CFG_BIBINDEX_MIN_WORD_LENGTH, \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
      CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
-     weburl, tmpdir
+     weburl, CFG_TMPDIR
 from invenio.bibindex_engine_config import *
 from invenio.bibdocfile import bibdocfile_url_to_fullpath, bibdocfile_url_p, decompose_bibdocfile_url
 from invenio.search_engine import perform_request_search, strip_accents, wash_index_term, get_index_stemming_language
@@ -219,7 +219,7 @@ def get_words_from_local_fulltext(path, ext=''):
         ext = path[len(file_strip_ext(path))+1:].lower()
 
     tmp_name = path.replace(';', '\\;')
-    tmp_dst_name = tempfile.mkstemp('invenio.tmp.txt', dir=tmpdir)[1]
+    tmp_dst_name = tempfile.mkstemp('invenio.tmp.txt', dir=CFG_TMPDIR)[1]
 
     # try all available conversion programs according to their order:
     bingo = 0
@@ -399,7 +399,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                 data_chunk = url.read(8*1024)
             os.close(tmp_fd)
 
-        tmp_dst_name = tempfile.mkstemp('invenio.tmp.txt', dir=tmpdir)[1]
+        tmp_dst_name = tempfile.mkstemp('invenio.tmp.txt', dir=CFG_TMPDIR)[1]
 
         bingo = 0
         # try all available conversion programs according to their order:

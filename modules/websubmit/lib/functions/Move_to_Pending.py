@@ -20,7 +20,7 @@
 __revision__ = "$Id$"
 
    ## Description:   function Move_to_Pending
-   ##                This function moves the current working directory to 
+   ##                This function moves the current working directory to
    ##             /pending (usually the document is then waiting for
    ##              approval)
    ## Author:         T.Baron
@@ -28,13 +28,13 @@ __revision__ = "$Id$"
 
 import os
 
-from invenio.config import storage
+from invenio.config import CFG_WEBSUBMIT_STORAGEDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Move_to_Pending(parameters, curdir, form, user_info=None):
     global rn
     doctype = form['doctype']
-    PENDIR = "%s/pending/%s" % (storage,doctype)
+    PENDIR = "%s/pending/%s" % (CFG_WEBSUBMIT_STORAGEDIR,doctype)
     if not os.path.exists(PENDIR):
         try:
             os.makedirs(PENDIR)

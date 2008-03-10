@@ -31,9 +31,9 @@ from zlib import compress,decompress
 
 from invenio.config import \
      cdslang, \
-     version, \
+     CFG_VERSION, \
      weburl, \
-     bindir
+     CFG_BINDIR
 from invenio.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
 from invenio.dbquery import run_sql, get_table_status_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly, adderrorbox
@@ -864,7 +864,7 @@ def perform_modifyindexstemming(idxID, ln=cdslang, idxSTEM='', callback='yes', c
             output += write_outcome(res)
             output += """<br /><span class="info">Please note you must run as soon as possible:
             <pre>$> %s/bibindex --reindex -w %s</pre></span>
-            """ % (bindir, get_idx(idxID)[0][1])
+            """ % (CFG_BINDIR, get_idx(idxID)[0][1])
         elif confirm in [1, "1"]:
             output += """<br><b><span class="info">Please give a name for the index.</span></b>"""
     else:

@@ -30,8 +30,8 @@ import calendar
 import shutil
 
 from invenio.config import \
-     bindir, \
-     tmpdir
+     CFG_BINDIR, \
+     CFG_TMPDIR
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_get_option, task_set_option, write_message, \
     task_update_status, task_init
@@ -41,7 +41,7 @@ re_subfields = re.compile('\$\$\w')
 re_html = re.compile("(?s)<[^>]*>|&#?\w+;")
 re_datetime_shift = re.compile("([-\+]{0, 1})([\d]+)([dhms])")
 
-tmpHARVESTpath = tmpdir + '/oaiharvest'
+tmpHARVESTpath = CFG_TMPDIR + '/oaiharvest'
 
 def get_nb_records_in_file(filename):
     """
@@ -98,7 +98,7 @@ def task_run_core():
         if postmode == "h" or postmode == "h-c" or \
                postmode == "h-u" or postmode == "h-c-u" or \
                postmode == "h-c-f-u":
-            harvestpath = tmpdir + "/oaiharvest" + str(os.getpid())
+            harvestpath = CFG_TMPDIR + "/oaiharvest" + str(os.getpid())
 
             if dateflag == 1:
                 res = call_bibharvest(prefix=repos[0][2],
@@ -194,7 +194,7 @@ def task_run_core():
                     continue
 
         if postmode == "h-c" or postmode == "h-c-u" or postmode == "h-c-f-u":
-            convert_dir = tmpdir
+            convert_dir = CFG_TMPDIR
             convertpath = convert_dir + os.sep +"bibconvertrun" + \
                 str(os.getpid())
             converted_files = []
@@ -312,7 +312,7 @@ def call_bibharvest(prefix, baseurl, harvestpath,
             fro="", until="", setspecs=""):
     """ A method that calls bibharvest and writes harvested output to disk """
     try:
-        command = '%s/bibharvest -o %s -v ListRecords -p %s ' % (bindir,
+        command = '%s/bibharvest -o %s -v ListRecords -p %s ' % (CFG_BINDIR,
                                                                  harvestpath,
                                                                  prefix)
 
@@ -356,7 +356,7 @@ def call_bibharvest(prefix, baseurl, harvestpath,
 def call_bibconvert(config, harvestpath, convertpath):
     """ A method that reads from a file and converts according to a BibConvert
         Configuration file. Converted output is returned """
-    command = """%s/bibconvert -c %s < %s > %s """ % (bindir, config,
+    command = """%s/bibconvert -c %s < %s > %s """ % (CFG_BINDIR, config,
         harvestpath, convertpath)
     os.popen(command)
     return 0
@@ -364,7 +364,7 @@ def call_bibconvert(config, harvestpath, convertpath):
 def call_bibupload(marcxmlfile, mode="-r -i"):
     """Call bibupload in insert mode on MARCXMLFILE."""
     if os.path.exists(marcxmlfile):
-        command = '%s/bibupload %s %s ' % (bindir, mode, marcxmlfile)
+        command = '%s/bibupload %s %s ' % (CFG_BINDIR, mode, marcxmlfile)
         return os.system(command)
     else:
         write_message("marcxmlfile %s does not exist" % marcxmlfile)

@@ -65,8 +65,8 @@ from invenio.config import \
      cdsnameintl, \
      supportemail, \
      sweburl, \
-     tmpdir, \
-     version, \
+     CFG_TMPDIR, \
+     CFG_VERSION, \
      weburl
 from invenio import session, websession
 from invenio.dbquery import run_sql, OperationalError, \
@@ -890,7 +890,7 @@ def auth_apache_user_p(user, password, apache_password_file=CFG_APACHE_PASSWORD_
     Apache password data file."""
     try:
         if not apache_password_file.startswith("/"):
-            apache_password_file = tmpdir + "/" + apache_password_file
+            apache_password_file = CFG_TMPDIR + "/" + apache_password_file
         dummy, pipe_output = os.popen2(["grep", "^" + user + ":", apache_password_file], 'r')
         line =  pipe_output.readlines()[0]
         password_apache = line.strip().split(":")[1]
@@ -904,7 +904,7 @@ def auth_apache_user_in_groups(user, apache_group_file=CFG_APACHE_GROUP_FILE):
     out = []
     try:
         if not apache_group_file.startswith("/"):
-            apache_group_file = tmpdir + "/" + apache_group_file
+            apache_group_file = CFG_TMPDIR + "/" + apache_group_file
         dummy, pipe_output = os.popen2(["grep", user, apache_group_file], 'r')
         for line in pipe_output.readlines():
             out.append(line.strip().split(":")[0])

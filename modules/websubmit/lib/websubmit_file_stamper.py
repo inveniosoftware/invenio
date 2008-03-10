@@ -41,11 +41,11 @@ __revision__ = "$Id$"
 import getopt, sys, re, os, time, shutil, tempfile
 from invenio.config import CFG_PATH_DISTILLER, CFG_PATH_GFILE
 
-from invenio.config import tmpdir
-from invenio.config import etcdir
+from invenio.config import CFG_TMPDIR
+from invenio.config import CFG_ETCDIR
 
 CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR = \
-                        "%s/websubmit/file_stamper_templates" % etcdir
+                        "%s/websubmit/file_stamper_templates" % CFG_ETCDIR
 from invenio.config import CFG_PATH_PDFTK
 from invenio.config import CFG_PATH_PDF2PS
 
@@ -973,13 +973,13 @@ def create_working_directory():
     path_workingdir = None
     try:
         path_workingdir = tempfile.mkdtemp(prefix="websubmit_file_stamper_", \
-                                           dir="%s" % tmpdir)
+                                           dir="%s" % CFG_TMPDIR)
     except OSError, err:
         ## Unable to create the temporary directory in ~invenio/var/tmp
         msg = "Error: Unable to create a temporary working directory in " \
               "which to carry out the stamping process. An attempt was made " \
               "to create the directory in [%s]; the error encountered was " \
-              "<%s>. Stamping has failed." % (tmpdir, str(err))
+              "<%s>. Stamping has failed." % (CFG_TMPDIR, str(err))
         raise InvenioWebSubmitFileStamperError(msg)
     ## return the path to the working-directory:
     return path_workingdir

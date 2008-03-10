@@ -37,14 +37,14 @@ except ImportError:
     pass
 
 from invenio.config import \
-     bibconvert, \
+     CFG_BINDIR, \
      cdslang, \
      cdsname, \
      images, \
-     pylibdir, \
-     storage, \
+     CFG_PYLIBDIR, \
+     CFG_WEBSUBMIT_STORAGEDIR, \
      urlpath, \
-     version, \
+     CFG_VERSION, \
      weburl
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
@@ -262,12 +262,12 @@ def interface(req,
         edsrn = ""
 
     ## This defines the path to the directory containing the action data
-    curdir = "%s/%s/%s/%s" % (storage, indir, doctype, access)
+    curdir = "%s/%s/%s/%s" % (CFG_WEBSUBMIT_STORAGEDIR, indir, doctype, access)
 
     ## if this submission comes from another one (fromdir is then set)
     ## We retrieve the previous submission directory and put it in the proper one
     if fromdir != "":
-        olddir = "%s/%s/%s/%s" % (storage, fromdir, doctype, access)
+        olddir = "%s/%s/%s/%s" % (CFG_WEBSUBMIT_STORAGEDIR, fromdir, doctype, access)
         if os.path.exists(olddir):
             os.rename(olddir, curdir)
     ## If the submission directory still does not exist, we create it
@@ -748,7 +748,7 @@ def endaction(req,
     reserved_words = ["stop", "file", "nextPg", "startPg", "access", "curpage", "nbPg", "act", \
                       "indir", "doctype", "mode", "step", "deleted", "file_path", "userfile_name"]
     # This defines the path to the directory containing the action data
-    curdir = "%s/%s/%s/%s" % (storage, indir, doctype, access)
+    curdir = "%s/%s/%s/%s" % (CFG_WEBSUBMIT_STORAGEDIR, indir, doctype, access)
     # If the submission directory still does not exist, we create it
     if not os.path.exists(curdir):
         try:
@@ -1344,7 +1344,7 @@ def action_details (doctype, action):
 def print_function_calls (req, doctype, action, step, form, start_time, ln=cdslang):
     # Calls the functions required by an "action" action on a "doctype" document
     # In supervisor mode, a table of the function calls is produced
-    global htdocsdir,storage,access,pylibdir,dismode
+    global htdocsdir,CFG_WEBSUBMIT_STORAGEDIR,access,CFG_PYLIBDIR,dismode
     user_info = collect_user_info(req)
     # load the right message language
     _ = gettext_set_language(ln)
@@ -1369,10 +1369,10 @@ def print_function_calls (req, doctype, action, step, form, start_time, ln=cdsla
               'error' : 0,
               'text' : '',
             }
-            if os.path.exists("%s/invenio/websubmit_functions/%s.py" % (pylibdir, function_name)):
+            if os.path.exists("%s/invenio/websubmit_functions/%s.py" % (CFG_PYLIBDIR, function_name)):
                 # import the function itself
                 #function = getattr(invenio.websubmit_functions, function_name)
-                execfile("%s/invenio/websubmit_functions/%s.py" % (pylibdir, function_name), globals())
+                execfile("%s/invenio/websubmit_functions/%s.py" % (CFG_PYLIBDIR, function_name), globals())
                 if not globals().has_key(function_name):
                     currfunction['error'] = 1
                 else:
@@ -1466,7 +1466,7 @@ def print_function_calls (req, doctype, action, step, form, start_time, ln=cdsla
 
 
 def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=cdslang):
-    global machine, storage, act, rn
+    global machine, CFG_WEBSUBMIT_STORAGEDIR, act, rn
     t = ""
     next_submissions = \
          get_submissions_at_level_X_with_score_above_N(doctype, currentlevel, action_score)

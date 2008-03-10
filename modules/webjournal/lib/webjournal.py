@@ -26,7 +26,7 @@ from invenio.bibformat_engine import BibFormatObject, \
                                     format_with_format_template
 from invenio.errorlib import register_exception
 from invenio.webpage import page
-from invenio.config import weburl, etcdir
+from invenio.config import weburl, CFG_ETCDIR
 from invenio.urlutils import redirect_to_url
 from invenio.webuser import collect_user_info
 

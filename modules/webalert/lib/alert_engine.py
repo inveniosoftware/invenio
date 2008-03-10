@@ -38,9 +38,9 @@ from email.Message import Message
 from email.MIMEText import MIMEText
 
 from invenio.config import \
-     logdir, \
+     CFG_LOGDIR, \
      supportemail, \
-     version, \
+     CFG_VERSION, \
      weburl
 from invenio.search_engine import perform_request_search
 from invenio.alert_engine_config import *
@@ -311,7 +311,7 @@ def update_arguments(argstr, date_from, date_until):
 
 def log(msg):
     try:
-        log = open(logdir + '/alertengine.log', 'a')
+        log = open(CFG_LOGDIR + '/alertengine.log', 'a')
         log.write(strftime('%Y%m%d%H%M%S#'))
         log.write(msg + '\n')
         log.close()

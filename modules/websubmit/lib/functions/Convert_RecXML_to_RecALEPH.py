@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import os
 from os import access, R_OK, W_OK
-from invenio.config import xmlmarc2textmarc
+from invenio.config import CFG_BINDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Convert_RecXML_to_RecALEPH(parameters, curdir, form, user_info=None):
@@ -58,9 +58,9 @@ def Convert_RecXML_to_RecALEPH(parameters, curdir, form, user_info=None):
 
     ## Command to perform conversion of recmysql -> recaleph500:
     convert_cmd = \
-        """%(xmlmarc2alephmarc)s --aleph-marc=r %(curdir)s/recmysql > """ \
+        """%(bindir)s/xmlmarc2textmarc --aleph-marc=r %(curdir)s/recmysql > """ \
         """%(curdir)s/recaleph500""" \
-        % { 'xmlmarc2alephmarc' : xmlmarc2textmarc,
+        % { 'bindir' : CFG_BINDIR,
             'curdir'            : curdir,
           }
     ## Perform the conversion of MARC XML record to ALEPH500 record:

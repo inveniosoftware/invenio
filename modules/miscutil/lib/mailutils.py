@@ -49,7 +49,7 @@ from invenio.config import \
      adminemail, \
      CFG_MISCUTIL_SMTP_HOST, \
      CFG_MISCUTIL_SMTP_PORT, \
-     version
+     CFG_VERSION
 
 from invenio.messages import wash_language, gettext_set_language
 from invenio.errorlib import get_msgs_for_code_list, register_errors, register_exception
@@ -266,7 +266,7 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
         else:
             msg_root['To'] = toaddr
         msg_root['Subject'] = Header(subject, charset)
-    msg_root.add_header('User-Agent', 'CDS Invenio %s' % version)
+    msg_root.add_header('User-Agent', 'CDS Invenio %s' % CFG_VERSION)
     return msg_root.as_string()
 
 RE_NEWLINES = re.compile(r'<br\s*/?>|</p>', re.I)

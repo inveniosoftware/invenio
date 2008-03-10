@@ -24,7 +24,7 @@ import time
 import string
 
 from invenio.config import \
-     alertengineemail, \
+     CFG_WEBALERT_ALERT_ENGINE_EMAIL, \
      cdsname, \
      supportemail, \
      weburl
@@ -480,7 +480,7 @@ class Template:
         headers['Subject'] = 'Alert %s run on %s' % (
             name, time.strftime("%Y-%m-%d"))
 
-        headers['From'] = '%s Alert Engine <%s>' % (cdsname, alertengineemail)
+        headers['From'] = '%s Alert Engine <%s>' % (cdsname, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
 
 
     def tmpl_alert_email_body(self, name, url, records, pattern,

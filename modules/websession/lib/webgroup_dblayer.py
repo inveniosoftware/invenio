@@ -28,7 +28,7 @@ from zlib import decompress
 
 from invenio.config import \
      cdslang, \
-     version
+     CFG_VERSION
 from invenio.dbquery import run_sql
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.messages import gettext_set_language

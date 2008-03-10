@@ -28,7 +28,7 @@ import urllib
 import sys
 
 from invenio.config import \
-     version, \
+     CFG_VERSION, \
      weburl
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.htmlutils import nmtoken_from_string

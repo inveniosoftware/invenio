@@ -31,8 +31,8 @@ import invenio.elmsubmit_submission_parser as elmsubmit_submission_parser
 
 # import the config file
 
-from invenio.config import tmpdir, cdsname
-from invenio.config import storage
+from invenio.config import CFG_TMPDIR, cdsname
+from invenio.config import CFG_WEBSUBMIT_STORAGEDIR
 import invenio.elmsubmit_config as elmsubmit_config
 
 import invenio.elmsubmit_field_validation as elmsubmit_field_validation
@@ -94,7 +94,7 @@ def process_email(email_string):
 
     folder_name = 'elmsubmit_' +  _random_alphanum_string(15)
 
-    storage_dir  = os.path.join(tmpdir, folder_name)
+    storage_dir  = os.path.join(CFG_TMPDIR, folder_name)
 
     try:
         os.makedirs(storage_dir)
@@ -111,10 +111,10 @@ def process_email(email_string):
 
     marc_xml = elmsubmit_generate_marc.generate_marc(submission_dict)
 
-    # Write the Marc to a file in tmpdir
+    # Write the Marc to a file in CFG_TMPDIR
 
     file_name = folder_name + '.xml'
-    fullpath = os.path.join(tmpdir, file_name)
+    fullpath = os.path.join(CFG_TMPDIR, file_name)
 
     try:
         open(fullpath, 'wb').write(marc_xml)

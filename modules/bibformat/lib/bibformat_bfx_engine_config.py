@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -24,9 +24,9 @@
 __revision__ = "$Id$"
 
 import os
-from invenio.config import etcdir
+from invenio.config import CFG_ETCDIR
 
-CFG_BIBFORMAT_BFX_TEMPLATES_PATH = "%s%sbibformat%sformat_templates" % (etcdir, os.sep, os.sep)
+CFG_BIBFORMAT_BFX_TEMPLATES_PATH = "%s%sbibformat%sformat_templates" % (CFG_ETCDIR, os.sep, os.sep)
 
 CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION = "bfx"
 

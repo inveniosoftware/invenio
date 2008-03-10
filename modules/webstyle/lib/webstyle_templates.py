@@ -35,7 +35,7 @@ from invenio.config import \
      supportemail, \
      sweburl, \
      weburl, \
-     version
+     CFG_VERSION
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.urlutils import make_canonical_urlargd, create_html_link
 from invenio.dateutils import convert_datecvs_to_datestruct, \
@@ -473,7 +473,7 @@ class Template:
 
           'msg_lastupdated' : msg_lastupdated,
           'languagebox' : self.tmpl_language_selection_box(req, ln),
-          'version' : version,
+          'version' : CFG_VERSION,
 
           'pagefooteradd' : pagefooteradd,
 

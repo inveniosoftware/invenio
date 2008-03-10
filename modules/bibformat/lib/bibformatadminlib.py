@@ -31,7 +31,7 @@ import stat
 import time
 import cgi
 
-from invenio.config import cdslang, weburl, etcdir
+from invenio.config import cdslang, weburl, CFG_ETCDIR
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_TEMPLATES_PATH, \
      CFG_BIBFORMAT_OUTPUTS_PATH, \
@@ -1060,7 +1060,7 @@ def can_write_etc_bibformat_dir():
     """
     Returns true if we can write in etc/bibformat dir.
     """
-    path = "%s%sbibformat" % (etcdir, os.sep)
+    path = "%s%sbibformat" % (CFG_ETCDIR, os.sep)
     return os.access(path, os.W_OK)
 
 def get_outputs_that_use_template(filename):

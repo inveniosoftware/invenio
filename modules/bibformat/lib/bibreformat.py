@@ -29,8 +29,8 @@ try:
     from invenio.dbquery import run_sql
     from invenio.config import \
          weburl,\
-         tmpdir,\
-         bindir
+         CFG_TMPDIR,\
+         CFG_BINDIR
 
     from invenio.search_engine import perform_request_search, search_pattern
     from invenio.search_engine import print_record, encode_for_xml
@@ -268,7 +268,7 @@ def iterate_over_new(list, fmt):
         if n_it_rec > n_it_max or total_rec == len(list):
 
             #Save formatted records to disk for bibupload
-            finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir, time.strftime('%Y%m%d_%H%M%S'))
+            finalfilename = "%s/rec_fmt_%s.xml" % (CFG_TMPDIR, time.strftime('%Y%m%d_%H%M%S'))
             filehandle = open(finalfilename, "w")
             filehandle.write("<collection>" + \
                              formatted_records + \
@@ -281,7 +281,7 @@ def iterate_over_new(list, fmt):
             message = "START bibupload external call"
             write_message(message, verbose=9)
 
-            command = "%s/bibupload -f %s" % (bindir, finalfilename)
+            command = "%s/bibupload -f %s" % (CFG_BINDIR, finalfilename)
             os.system(command)
 
             t2 = os.times()[4]
@@ -333,8 +333,8 @@ def iterate_over_old(list, weburl, fmt):
 
             if n_rec >= n_max:
 
-                finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir, time.strftime('%Y%m%d_%H%M%S'))
-                filename = "%s/bibreformat.xml" % tmpdir
+                finalfilename = "%s/rec_fmt_%s.xml" % (CFG_TMPDIR, time.strftime('%Y%m%d_%H%M%S'))
+                filename = "%s/bibreformat.xml" % CFG_TMPDIR
                 filehandle = open(filename ,"w")
                 filehandle.write(xml_content)
                 filehandle.close()
@@ -346,7 +346,7 @@ def iterate_over_old(list, weburl, fmt):
                 message = "START bibformat external call"
                 write_message(message, verbose=9)
 
-                command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (bindir, fmt.upper(), tmpdir, finalfilename, tmpdir)
+                command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (CFG_BINDIR, fmt.upper(), CFG_TMPDIR, finalfilename, CFG_TMPDIR)
                 os.system(command)
 
                 t22 = os.times()[4]
@@ -363,7 +363,7 @@ def iterate_over_old(list, weburl, fmt):
                 message = "START bibupload external call"
                 write_message(message, verbose=9)
 
-                command = "%s/bibupload -f %s" % (bindir, finalfilename)
+                command = "%s/bibupload -f %s" % (CFG_BINDIR, finalfilename)
                 os.system(command)
 
                 t22 = os.times()[4]
@@ -382,8 +382,8 @@ def iterate_over_old(list, weburl, fmt):
 
         write_message("Processing last record set (%d)" % n_rec, verbose=9)
 
-        finalfilename = "%s/rec_fmt_%s.xml" % (tmpdir, time.strftime('%Y%m%d_%H%M%S'))
-        filename = "%s/bibreformat.xml" % tmpdir
+        finalfilename = "%s/rec_fmt_%s.xml" % (CFG_TMPDIR, time.strftime('%Y%m%d_%H%M%S'))
+        filename = "%s/bibreformat.xml" % CFG_TMPDIR
         filehandle = open(filename ,"w")
         filehandle.write(xml_content)
         filehandle.close()
@@ -395,7 +395,7 @@ def iterate_over_old(list, weburl, fmt):
         message = "START bibformat external call"
         write_message(message, verbose=9)
 
-        command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (bindir, fmt.upper(), tmpdir, finalfilename, tmpdir)
+        command = "%s/bibformat otype='%s' < %s/bibreformat.xml > %s 2> %s/bibreformat.err" % (CFG_BINDIR, fmt.upper(), CFG_TMPDIR, finalfilename, CFG_TMPDIR)
         os.system(command)
 
         t22 = os.times()[4]
@@ -411,7 +411,7 @@ def iterate_over_old(list, weburl, fmt):
         message = "START bibupload external call"
         write_message(message, verbose=9)
 
-        command = "%s/bibupload -f %s" % (bindir, finalfilename)
+        command = "%s/bibupload -f %s" % (CFG_BINDIR, finalfilename)
         os.system(command)
 
         t22 = os.times()[4]

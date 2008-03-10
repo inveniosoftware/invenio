@@ -99,7 +99,7 @@ def Upload_Files(parameters, curdir, form, user_info=None):
                     bibdoc.add_icon(iconpath)
                     os.unlink(iconpath)
                 elif bibdoc is not None:
-                    bibdoc.delete_ocon()
+                    bibdoc.delete_icon()
                 bibrecdocs.build_bibdoc_list()
             os.unlink(fullpath)
             os.unlink("%s/myfile" % curdir)

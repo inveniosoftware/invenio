@@ -30,7 +30,7 @@ import ConfigParser
 
 from invenio.config import \
      cdslang, \
-     etcdir
+     CFG_ETCDIR
 from invenio.search_engine import perform_request_search, strip_accents, wash_index_term
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibindex_engine_stemmer import is_stemmer_available_for_language, stem
@@ -759,7 +759,7 @@ def word_index(run):
         method_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         write_message("Running rank method: %s" % getName(rank_method_code))
         try:
-            file = etcdir + "/bibrank/" + rank_method_code + ".cfg"
+            file = CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"
             config = ConfigParser.ConfigParser()
             config.readfp(open(file))
         except StandardError, e:

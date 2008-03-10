@@ -249,10 +249,10 @@ def log_sql_query_cached(key, result, hit_p):
     to enable logging of all SQL queries, please uncomment two lines
     in run_sql_cached() above. Useful for fine-level debugging only!
     """
-    from invenio.config import logdir
+    from invenio.config import CFG_LOGDIR
     from invenio.dateutils import convert_datestruct_to_datetext
     from invenio.textutils import indent_text
-    log_path = logdir + '/dbquery.log'
+    log_path = CFG_LOGDIR + '/dbquery.log'
     date_of_log = convert_datestruct_to_datetext(time.localtime())
     message = date_of_log + '-->\n'
     message += indent_text('Key:\n' + indent_text(str(key), 2, wrap=True), 2)
@@ -271,10 +271,10 @@ def log_sql_query(sql, param=None):
        to enable logging of all SQL queries, please uncomment one line
        in run_sql() above. Useful for fine-level debugging only!
     """
-    from invenio.config import logdir
+    from invenio.config import CFG_LOGDIR
     from invenio.dateutils import convert_datestruct_to_datetext
     from invenio.textutils import indent_text
-    log_path = logdir + '/dbquery.log'
+    log_path = CFG_LOGDIR + '/dbquery.log'
     date_of_log = convert_datestruct_to_datetext(time.localtime())
     message = date_of_log + '-->\n'
     message += indent_text('Query:\n' + indent_text(str(sql), 2, wrap=True), 2)

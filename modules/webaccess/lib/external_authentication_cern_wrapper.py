@@ -28,7 +28,7 @@ import httplib
 import urllib
 import re
 
-from invenio.config import etcdir
+from invenio.config import CFG_ETCDIR
 
 
 class AuthCernWrapper:
@@ -36,11 +36,11 @@ class AuthCernWrapper:
     def __init__(self):
         """Create a connection to CERN NICE/CRA webservice.
         Authentication credential should be in the file
-        etcdir/webaccess/cern_nice_soap_credentials.txt which must contain
+        CFG_ETCDIR/webaccess/cern_nice_soap_credentials.txt which must contain
         username:password in base64 encoding.
         """
         self._cern_nice_soap_auth = \
-          open(etcdir + "/webaccess/cern_nice_soap_credentials.txt",
+          open(CFG_ETCDIR + "/webaccess/cern_nice_soap_credentials.txt",
                "r").read().strip()
         self._headers = {"Content-type": "application/x-www-form-urlencoded",
                    "Accept": "text/plain",

@@ -35,8 +35,8 @@ import urllib
 
 from invenio.config import \
      cdslang, \
-     tmpdir, \
-     version, \
+     CFG_TMPDIR, \
+     CFG_VERSION, \
      weburl
 import invenio.access_control_engine as access_manager
 from invenio.dbquery import run_sql
@@ -46,7 +46,7 @@ from invenio.oaiarchive_engine import parse_set_definition
 import invenio.template
 bibharvest_templates = invenio.template.load('bibharvest')
 
-tmppath = tmpdir + '/oaiarchiveadmin.' + str(os.getpid())
+tmppath = CFG_TMPDIR + '/oaiarchiveadmin.' + str(os.getpid())
 guideurl = "help/admin/bibharvest-admin-guide"
 
 def getnavtrail(previous = ''):

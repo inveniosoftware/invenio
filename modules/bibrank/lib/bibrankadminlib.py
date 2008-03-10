@@ -35,8 +35,8 @@ except ImportError:
 
 from invenio.config import \
      cdslang, \
-     etcdir, \
-     version, \
+     CFG_ETCDIR, \
+     CFG_VERSION, \
      weburl
 import invenio.access_control_engine as acce
 from invenio.messages import language_list_long
@@ -319,12 +319,12 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
                 text = """<b><span class="info">Added new rank method with BibRank code '%s'</span></b>""" % rnkcode
                 try:
                     if template:
-                        infile =  open("%s/bibrank/%s" % (etcdir, template), 'r')
+                        infile =  open("%s/bibrank/%s" % (CFG_ETCDIR, template), 'r')
                         indata = infile.readlines()
                         infile.close()
                     else:
                         indata = ()
-                    file =  open("%s/bibrank/%s.cfg" % (etcdir, get_rnk_code(rnkID)[0][0]), 'w')
+                    file =  open("%s/bibrank/%s.cfg" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0]), 'w')
                     for line in indata:
                         file.write(line)
                     file.close()
@@ -333,7 +333,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
                     else:
                         text += """<b><span class="info"><br>Empty configuration file created.</span></b>"""
                 except StandardError, e:
-                    text += """<b><span class="info"><br>Sorry, could not create configuration file: '%s/bibrank/%s.cfg', either because it already exists, or not enough rights to create file. <br>Please create the file in the path given.</span></b>""" % (etcdir, get_rnk_code(rnkID)[0][0])
+                    text += """<b><span class="info"><br>Sorry, could not create configuration file: '%s/bibrank/%s.cfg', either because it already exists, or not enough rights to create file. <br>Please create the file in the path given.</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
 
             else:
                 text = """<b><span class="info">Sorry, could not add rank method, rank method with the same BibRank code probably exists.</span></b>"""
@@ -381,12 +381,12 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
         if cfgfile:
             textarea +=cfgfile
         else:
-            file = open("%s/bibrank/%s.cfg" % (etcdir, get_rnk_code(rnkID)[0][0]))
+            file = open("%s/bibrank/%s.cfg" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0]))
             for line in file.readlines():
                 textarea += line
         text += """<textarea class="admin_wvar" name="cfgfile" rows="15" cols="70">""" + textarea + """</textarea>"""
     except StandardError, e:
-        text += """<b><span class="info">Cannot load file, either it does not exist, or not enough rights to read it: '%s/bibrank/%s.cfg'<br>Please create the file in the path given.</span></b>""" % (etcdir, get_rnk_code(rnkID)[0][0])
+        text += """<b><span class="info">Cannot load file, either it does not exist, or not enough rights to read it: '%s/bibrank/%s.cfg'<br>Please create the file in the path given.</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
 
     output += createhiddenform(action="modifyrank",
                                text=text,
@@ -401,28 +401,28 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
         if result:
             text = """<b><span class="info">Rank method modified.</span></b>"""
             try:
-                file =  open("%s/bibrank/%s.cfg" % (etcdir, oldcode), 'r')
-                file2 =  open("%s/bibrank/%s.cfg" % (etcdir, rnkcode), 'w')
+                file =  open("%s/bibrank/%s.cfg" % (CFG_ETCDIR, oldcode), 'r')
+                file2 =  open("%s/bibrank/%s.cfg" % (CFG_ETCDIR, rnkcode), 'w')
                 lines = file.readlines()
                 for line in lines:
                     file2.write(line)
                 file.close()
                 file2.close()
-                os.remove("%s/bibrank/%s.cfg" % (etcdir, oldcode))
+                os.remove("%s/bibrank/%s.cfg" % (CFG_ETCDIR, oldcode))
             except StandardError, e:
-                text = """<b><span class="info">Sorry, could not change name of cfg file, must be done manually: '%s/bibrank/%s.cfg'</span></b>""" % (etcdir, oldcode)
+                text = """<b><span class="info">Sorry, could not change name of cfg file, must be done manually: '%s/bibrank/%s.cfg'</span></b>""" % (CFG_ETCDIR, oldcode)
         else:
             text = """<b><span class="info">Sorry, could not modify rank method.</span></b>"""
         output += text
 
     if cfgfile and confirm in ["1", 1]:
         try:
-            file =  open("%s/bibrank/%s.cfg" % (etcdir, get_rnk_code(rnkID)[0][0]), 'w')
+            file =  open("%s/bibrank/%s.cfg" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0]), 'w')
             file.write(cfgfile)
             file.close()
-            text = """<b><span class="info"><br>Configuration file modified: '%s/bibrank/%s.cfg'</span></b>""" % (etcdir, get_rnk_code(rnkID)[0][0])
+            text = """<b><span class="info"><br>Configuration file modified: '%s/bibrank/%s.cfg'</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
         except StandardError, e:
-            text = """<b><span class="info"><br>Sorry, could not modify configuration file, please check for rights to do so: '%s/bibrank/%s.cfg'<br>Please modify the file manually.</span></b>""" % (etcdir, get_rnk_code(rnkID)[0][0])
+            text = """<b><span class="info"><br>Sorry, could not modify configuration file, please check for rights to do so: '%s/bibrank/%s.cfg'<br>Please modify the file manually.</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
         output += text
 
     finoutput = addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mr">?</a>]</small>""" % weburl, [output])
@@ -448,7 +448,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
         if template:
             textarea = ""
             text = """<span class="adminlabel">Content:</span>"""
-            file =  open("%s/bibrank/%s" % (etcdir, template), 'r')
+            file =  open("%s/bibrank/%s" % (CFG_ETCDIR, template), 'r')
             lines = file.readlines()
             for line in lines:
                 textarea += line
@@ -456,7 +456,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
             text += """<textarea class="admin_wvar" readonly="true" rows="15" cols="70">""" + textarea + """</textarea>"""
             output += text
     except StandardError, e:
-        output += """Cannot load file, either it does not exist, or not enough rights to read it: '%s/bibrank/%s'""" % (etcdir, template)
+        output += """Cannot load file, either it does not exist, or not enough rights to read it: '%s/bibrank/%s'""" % (CFG_ETCDIR, template)
 
     finoutput += addadminbox("View templates", [output])
     return finoutput
@@ -495,7 +495,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
                 table = ""
                 try:
                     config = ConfigParser.ConfigParser()
-                    config.readfp(open("%s/bibrank/%s.cfg" % (etcdir, rnkcode), 'r'))
+                    config.readfp(open("%s/bibrank/%s.cfg" % (CFG_ETCDIR, rnkcode), 'r'))
                     table = config.get(config.get('rank_method', "function"), "table")
                 except Exception:
                     pass
@@ -504,10 +504,10 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
                 if result:
                     text = """<b><span class="info">Rank method deleted</span></b>"""
                     try:
-                        os.remove("%s/bibrank/%s.cfg" % (etcdir, rnkcode))
-                        text += """<br><b><span class="info">Configuration file deleted: '%s/bibrank/%s.cfg'.</span></b>"""  % (etcdir, rnkcode)
+                        os.remove("%s/bibrank/%s.cfg" % (CFG_ETCDIR, rnkcode))
+                        text += """<br><b><span class="info">Configuration file deleted: '%s/bibrank/%s.cfg'.</span></b>"""  % (CFG_ETCDIR, rnkcode)
                     except StandardError, e:
-                        text += """<br><b><span class="info">Sorry, could not delete configuration file: '%s/bibrank/%s.cfg'.</span><br>Please delete the file manually.</span></b>""" % (etcdir, rnkcode)
+                        text += """<br><b><span class="info">Sorry, could not delete configuration file: '%s/bibrank/%s.cfg'.</span><br>Please delete the file manually.</span></b>""" % (CFG_ETCDIR, rnkcode)
                 else:
                     text = """<b><span class="info">Sorry, could not delete rank method</span></b>"""
             except StandardError, e:
@@ -574,10 +574,10 @@ def perform_showrankdetails(rnkID, ln=cdslang):
         text = """No translations exists"""
     output += addadminbox(subtitle, [text])
 
-    subtitle = """Configuration file: '%s/bibrank/%s.cfg' <a href="%s/admin/bibrank/bibrankadmin.py/modifyrank?rnkID=%s&ln=%s">[Modify]</a>""" % (etcdir, get_rnk_code(rnkID)[0][0], weburl, rnkID, ln)
+    subtitle = """Configuration file: '%s/bibrank/%s.cfg' <a href="%s/admin/bibrank/bibrankadmin.py/modifyrank?rnkID=%s&ln=%s">[Modify]</a>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0], weburl, rnkID, ln)
     text = ""
     try:
-        file = open("%s/bibrank/%s.cfg" % (etcdir, get_rnk_code(rnkID)[0][0]))
+        file = open("%s/bibrank/%s.cfg" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0]))
         text += """<pre>"""
         for line in file.readlines():
             text += line
@@ -652,10 +652,10 @@ def get_rnk_col(rnkID, ln=cdslang):
         return ()
 
 def get_templates():
-    """Read etcdir/bibrank and returns a list of all files with 'template' """
+    """Read CFG_ETCDIR/bibrank and returns a list of all files with 'template' """
 
     templates = []
-    files = os.listdir(etcdir + "/bibrank/")
+    files = os.listdir(CFG_ETCDIR + "/bibrank/")
     for file in files:
         if str.find(file,"template_") != -1:
             templates.append(file)

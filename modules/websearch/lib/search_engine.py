@@ -50,7 +50,7 @@ from invenio.config import \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
      cdslang, \
      cdsname, \
-     logdir, \
+     CFG_LOGDIR, \
      weburl
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES, InvenioWebSearchUnknownCollectionError
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records
@@ -3188,7 +3188,7 @@ def log_query(hostname, query_args, uid=-1):
 def log_query_info(action, p, f, colls, nb_records_found_total=-1):
     """Write some info to the log file for later analysis."""
     try:
-        log = open(logdir + "/search.log", "a")
+        log = open(CFG_LOGDIR + "/search.log", "a")
         log.write(time.strftime("%Y%m%d%H%M%S#", time.localtime()))
         log.write(action+"#")
         log.write(p+"#")
@@ -3988,7 +3988,7 @@ def perform_request_log(req, date=""):
         req.write("""<table border="1">""")
         req.write("<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>" % ("No.", "Time", "Pattern", "Field", "Collection", "Number of Hits"))
         # read file:
-        p = os.popen("grep ^%d %s/search.log" % (yyyymmdd, logdir), 'r')
+        p = os.popen("grep ^%d %s/search.log" % (yyyymmdd, CFG_LOGDIR), 'r')
         lines = p.readlines()
         p.close()
         # process lines:
@@ -4008,7 +4008,7 @@ def perform_request_log(req, date=""):
         req.write("""<table border="1">""")
         req.write("<tr><td><strong>%s</strong></td><td><strong>%s</strong></tr>" % ("Day", "Number of Queries"))
         for day in range(yyyymm01, yyyymmdd + 1):
-            p = os.popen("grep -c ^%d %s/search.log" % (day, logdir), 'r')
+            p = os.popen("grep -c ^%d %s/search.log" % (day, CFG_LOGDIR), 'r')
             for line in p.readlines():
                 req.write("""<tr><td>%s</td><td align="right"><a href="%s/search/log?date=%d">%s</a></td></tr>""" % \
                           (day, weburl, day, line))

@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -20,7 +20,7 @@
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
-from invenio.config import bindir, webdir, weburl
+from invenio.config import CFG_BINDIR, CFG_WEBDIR, weburl
 
 class Template:
 
@@ -33,7 +33,7 @@ class Template:
                      raw data can be exported for offline processing. Further on, a general
                      overview is presented below under the label Current System Health.</p>"""
 
-    def tmpl_system_health(self, health_statistics): 
+    def tmpl_system_health(self, health_statistics):
         """
         Generates a box with current information from the system providing the administrator
         an easy way of overlooking the 'health', i.e. the current performance/efficency, of
@@ -47,11 +47,11 @@ class Template:
                 temp_out += '\n'
             elif statistic[1] is None:
                 temp_out += statistic[0] + '\n'
-            else:            
+            else:
                 temp_out += statistic[0] + \
                             '.'*(85 - len(str(statistic[0])) - len(str(statistic[1]))) + \
                             str(statistic[1]) + '\n'
-        
+
         out += "<pre>" + temp_out + "</pre>"
 
         return out
@@ -75,7 +75,7 @@ class Template:
         """
         out = """<h3>Custom events</h3>
                  <p>The Webstat module supplies a mean for the administrators of CDS Invenio
-                 to define their own custom events, more abstract than the Key Statistics above. 
+                 to define their own custom events, more abstract than the Key Statistics above.
                  A technical walk-through how to create these, is available <a href="%s/stats/customevent_help">here</a>.
                  When a custom event has been made available, it is displayed below.</p>
                  """ % weburl
@@ -134,7 +134,7 @@ register_customevent('test') </pre>
                         from anywhere in your CDS Invenio sources in order to start logging
                         the custom event 'test' using the use case logic of your choice!
                     </li>
-                  </ol>""" % { "bindir": bindir, }
+                  </ol>""" % { "bindir": CFG_BINDIR, }
 
 
     def tmpl_error(self, msg):
@@ -153,7 +153,7 @@ register_customevent('test') </pre>
         @param order: A permutation of the keys in options, for design purpose.
         @type order: [str]
 
-        @param options: The selected parameters, and its values. 
+        @param options: The selected parameters, and its values.
         @type options: { str: str }
         """
         # Create the FORM's header
@@ -182,7 +182,7 @@ register_customevent('test') </pre>
 
     def tmpl_display_event_trend_image(self, title, filename):
         """Displays a ASCII graph represnting a trend"""
-        return self.tmpl_display_trend(title, """<div><img src="%s" /></div>""" % filename.replace(webdir, weburl))
+        return self.tmpl_display_trend(title, """<div><img src="%s" /></div>""" % filename.replace(CFG_WEBDIR, weburl))
 
     # INTERNALS
 
@@ -200,7 +200,7 @@ register_customevent('test') </pre>
         """
         Aggregates together the parameters in order to generate the
         corresponding box.
- 
+
         @param formheader: Start tag for the FORM element.
         @type formheader: str
 
@@ -217,7 +217,7 @@ register_customevent('test') </pre>
         @type: str
         """
         out = formheader + """<table class="searchbox"><thead><tr>"""
- 
+
         # Zip together the lists to achieve symmetry (some items might be discarded!)
         combined = zip(headers, selectboxes)
 
@@ -228,12 +228,12 @@ register_customevent('test') </pre>
             else:
                 colspan = ""
             out += """<th %s class="searchboxheader">%s</th>""" % (colspan, header)
-            
+
         out += """</tr></thead><tbody><tr valign="bottom">"""
- 
+
         # Append the SELECT boxes
         for selectbox in [x[1] for x in combined]:
-            out += """<td class="searchboxbody" valign="top">%s</td>""" % selectbox 
+            out += """<td class="searchboxbody" valign="top">%s</td>""" % selectbox
 
         # Append all the buttons in a row
         out += """<td class="searchboxbody" valign="top" align="left">""" + "".join(buttons)
@@ -256,8 +256,8 @@ register_customevent('test') </pre>
 
         @param preselected: The value, or list of values, of the OPTION that should be
                             preselected. Blank or empty list for none.
-        @type preselected: str | [] 
-    
+        @type preselected: str | []
+
         @param multiple: Optionally sets the SELECT box to accept multiple entries.
         @type multiple: bool
         """

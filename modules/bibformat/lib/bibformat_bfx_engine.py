@@ -11,14 +11,14 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-BFX formatting engine.  
+BFX formatting engine.
 For API: see format_with_bfx() docstring below.
 """
 
@@ -30,7 +30,7 @@ from xml.dom import minidom, Node
 from xml.sax import saxutils
 
 from invenio.bibformat_engine import BibFormatObject, get_format_element, eval_format_element
-from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS, CFG_BIBFORMAT_BFX_TEMPLATES_PATH 
+from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_LABEL_DEFINITIONS, CFG_BIBFORMAT_BFX_TEMPLATES_PATH
 from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION, CFG_BIBFORMAT_BFX_ELEMENT_NAMESPACE
 from invenio.bibformat_bfx_engine_config import CFG_BIBFORMAT_BFX_ERROR_MESSAGES, CFG_BIBFORMAT_BFX_WARNING_MESSAGES
 
@@ -40,7 +40,7 @@ def format_with_bfx(recIDs, out_file, template_name, preprocess=None):
     '''
     Format a set of records according to a BFX template.
     This is the main entry point to the BFX engine.
-    
+
     @param recIDs a list of record IDs to format
     @param out_file an object to write in; this can be every object which has a 'write' method: file, req, StringIO
     @param template_name the file name of the BFX template without the path and the .bfx extension
@@ -64,7 +64,7 @@ class BFXParser:
         - call_function(func_name, list_of_parameters)
     Customized for MARC to XML conversion through the use of a MARCTranslator.
 
-    Templates are strict XML files. They are built by combining any tags with the 
+    Templates are strict XML files. They are built by combining any tags with the
     special BFX tags living in the http://cdsware.cern.ch/invenio/ namespace.
     Easily extensible by tags of your own.
     Defined tags:
@@ -90,7 +90,7 @@ class BFXParser:
         self.known_operators = ['style', 'format', 'template', 'template_ref', 'text', 'field', 'element', 'loop', 'if', 'then', 'else', 'elif']
         self.flags = {} # store flags here;
         self.templates = {} # store templates and formats here
-        self.start_template_name = None #the name of the template from which the 'execution' starts; 
+        self.start_template_name = None #the name of the template from which the 'execution' starts;
                                         #this is usually a format or the only template found in a doc
 
     def load_template(self, template_name, template_source=None):
@@ -105,7 +105,7 @@ class BFXParser:
         Template can be given by name (in that case search path is in
         standard directory for bfx template) or directly using the template source.
         If given, template_source overrides template_name
-        
+
         @param template_name the name of the BFX template, the same as the name of the filename without the extension
         @return a DOM tree of the template
         '''
@@ -158,7 +158,7 @@ class BFXParser:
             output = self.translator.get_value(var, display)
         output = xml_escape(output)
         return output
-                        
+
     def walk(self, parent, out_file=None):
         '''
         Walk a template DOM tree.
@@ -170,7 +170,7 @@ class BFXParser:
 
         @param parent a node to process; in an API call this is the root node
         @param out_file an object to write to; must have a 'write' method
-        
+
         @return None
         '''
         for node in parent.childNodes:
@@ -262,7 +262,7 @@ class BFXParser:
             print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_TEMPLATE_NO_NAME']
             return None
         return None
-    
+
     def ctl_template(self, node, out_file):
         '''
         Process a template node.
@@ -303,7 +303,7 @@ class BFXParser:
         #walk node
         self.walk(node, out_file)
         return None
-        
+
     def ctl_template_ref(self, node, out_file):
         '''
         Reference to an external template.
@@ -314,7 +314,7 @@ class BFXParser:
             return None
         #exec mode
         attrs = get_node_attributes(node)
-        if not attrs.has_key('name'): 
+        if not attrs.has_key('name'):
             print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_TEMPLATE_REF_NO_NAME']
             return None
         name = attrs['name']
@@ -325,13 +325,13 @@ class BFXParser:
         else:
             #load a file and execute it
             pass
-            #template_file_name = CFG_BIBFORMAT_BFX_TEMPLATES_PATH + name + '/' + CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION 
+            #template_file_name = CFG_BIBFORMAT_BFX_TEMPLATES_PATH + name + '/' + CFG_BIBFORMAT_BFX_FORMAT_TEMPLATE_EXTENSION
             #try:
             #    node = minidom.parse(template_file_name)
             #except:
             #    print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_TEMPLATE_NOT_FOUND'] % (template_file_name)
         return None
-        
+
     def ctl_element(self, node, out_file):
         '''
         Call an external element (written in Python).
@@ -352,13 +352,13 @@ class BFXParser:
             value = xml_escape(value)
             out_file.write(value)
         return None
-    
+
     def ctl_field(self, node, out_file):
         '''
         Get the value of a field by its name.
         '''
         #test mode
-        if not self.flags['exec']: 
+        if not self.flags['exec']:
             return None
         #exec mode
         attrs = get_node_attributes(node)
@@ -382,7 +382,7 @@ class BFXParser:
         Output a text
         '''
         #test mode
-        if not self.flags['exec']: 
+        if not self.flags['exec']:
             return None
         #exec mode
         attrs = get_node_attributes(node)
@@ -402,7 +402,7 @@ class BFXParser:
         Loop through a set of values.
         '''
         #test mode
-        if not self.flags['exec']: 
+        if not self.flags['exec']:
             self.walk(node, out_file)
             return None
         #exec mode
@@ -432,7 +432,7 @@ class BFXParser:
         <if name="var" nin="val1 val2"/>  : True if var not in [val1, val2], eval as string
         <if name="var" neq="value"/>      : True if var!=value, eval as string
         <if name="var" like="regexp"/>    : Match against a regular expression
-        
+
         Example:
         <if name="author" eq="Pauli">
           <then>Pauli</then>
@@ -451,11 +451,11 @@ class BFXParser:
         if not attrs.has_key('name'):
             print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_IF_NO_NAME']
             return None
-        #determine result        
+        #determine result
         var = attrs['name']
         if not self.translator.is_defined(var):
             print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_NO_SUCH_FIELD'] % (var)
-            return None        
+            return None
         value = self.translator.get_value(var)
         value = value.strip()
         #equal
@@ -471,7 +471,7 @@ class BFXParser:
             if is_number(pattern) and is_number(value):
                 result = (float(value)!=float(pattern))
             else:
-                result = (value!=pattern)                
+                result = (value!=pattern)
         #lower than
         elif attrs.has_key('lt'):
             pattern = attrs['lt']
@@ -531,7 +531,7 @@ class BFXParser:
         if (else_node is not None) and (elif_node is not None):
             print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_IF_WRONG_SYNTAX']
             return None
-        #now walk appropriate nodes, according to the result        
+        #now walk appropriate nodes, according to the result
         if result: #True
             if then_node:
                 self.walk(then_node, out_file)
@@ -554,7 +554,7 @@ class BFXParser:
         #exec mode
         print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_IF_WRONG_SYNTAX']
         return None
-        
+
     def ctl_else(self, node, out_file):
         '''
         Calling 'else' directly from the walk function means a syntax error.
@@ -566,7 +566,7 @@ class BFXParser:
         #exec mode
         print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_IF_WRONG_SYNTAX']
         return None
-    
+
     def ctl_elif(self, node, out_file):
         '''
         Calling 'elif' directly from the walk function means a syntax error.
@@ -575,11 +575,11 @@ class BFXParser:
         if not self.flags['exec']:
             self.walk(node, out_file)
             return None
-        #exec mode        
+        #exec mode
         print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_IF_WRONG_SYNTAX']
         return None
-            
-        
+
+
 class MARCTranslator:
     '''
     memory[name]
@@ -600,7 +600,7 @@ class MARCTranslator:
         self.record = None
         self.memory = {}
         pattern = address_pattern
-        expr = re.compile(pattern)        
+        expr = re.compile(pattern)
         for name in labels.keys():
             self.memory[name] = {}
             self.memory[name]['object'] = None
@@ -636,11 +636,11 @@ class MARCTranslator:
         Initialize the translator with the set of record IDs.
         @param recIDs a list of the record IDs
         @param preprocess an optional function which acts on every record structure after creating it
-               This can be used to enrich the record with fields not present in the record initially, 
+               This can be used to enrich the record with fields not present in the record initially,
                verify the record data or whatever plausible.
                Another solution is to use external function elements.
         '''
-        self.record = None        
+        self.record = None
         self.recIDs = recIDs
         self.preprocess = preprocess
         if self.recIDs:
@@ -649,8 +649,8 @@ class MARCTranslator:
             self.record = get_record(self.recID)
             if self.preprocess:
                 self.preprocess(self.record)
-        return None        
-    
+        return None
+
     def determine_level(self, name):
         '''
         Determine the type of the variable, whether this is an instance or a subfield.
@@ -663,7 +663,7 @@ class MARCTranslator:
             if self.memory[name]['addresses']:
                 match = expr.match(self.memory[name]['addresses'][0])
                 if match:
-                    tag = match.group('tag') 
+                    tag = match.group('tag')
                     code = match.group('code')
                     reg = match.group('reg')
                     if reg:
@@ -709,7 +709,7 @@ class MARCTranslator:
             return ''
         record = self.get_object(name)
         return self.display_record(record, display_type)
-            
+
     def iterator(self, name):
         '''
         An iterator over the values of a certain name.
@@ -733,7 +733,7 @@ class MARCTranslator:
                 yield new_object
             #the result for a call of the same name after an iterator should be the same as if there was no iterator called before
             self.memory[name]['object'] = None
-            
+
     def call_function(self, function_name, parameters=None):
         '''
         Call an external element which is a Python file, using BibFormat
@@ -748,7 +748,7 @@ class MARCTranslator:
         (value, errors) = eval_format_element(format_element, bfo, parameters)
         #to do: check errors from function call
         return value
-    
+
     #========================================
     #end of API functions
     #========================================
@@ -764,7 +764,7 @@ class MARCTranslator:
             return self.memory[name]['object']
         new_object = self.build_object(name)
         #if you have reached here you are not in an iterator; return first non-empty
-        level = self.determine_level(name)        
+        level = self.determine_level(name)
         for tmp_object in record_parts(new_object, level):
             #get the first non-empty
             if tmp_object:
@@ -779,9 +779,9 @@ class MARCTranslator:
         A slave function for get_object.
         '''
         new_object = {}
-        parent_name = self.memory[name]['parent']; 
+        parent_name = self.memory[name]['parent'];
         has_parent = parent_name
-        for address in self.memory[name]['addresses']:        
+        for address in self.memory[name]['addresses']:
             if not has_parent:
                 tmp_object = copy(self.record, address)
                 new_object = merge(new_object, tmp_object)
@@ -790,8 +790,8 @@ class MARCTranslator:
                 tmp_object = copy(parent_object, address)
                 new_object = merge(new_object, tmp_object)
         return new_object
-    
-    
+
+
     def display_record(self, record, display_type='value'):
         '''
         Decide what the final output value is according to the display_type.
@@ -833,7 +833,7 @@ class MARCTranslator:
             output = tag + ind1 + ind2
         else:
             print CFG_BIBFORMAT_BFX_ERROR_MESSAGES['ERR_BFX_INVALID_DISPLAY_TYPE'] % (display_type)
-        return output            
+        return output
 
 '''
 Functions for use with the structure representing a MARC record defined here.
@@ -841,7 +841,7 @@ This record structure differs from the one defined in bibrecord.
 The reason is that we want a symmetry between controlfields and datafields.
 In this format controlfields are represented internally as a subfield value with code ' ' of a datafield.
 This allows for easier handling of the fields.
-However, there is a restriction associated with this structure and it is that subfields cannot be repeated 
+However, there is a restriction associated with this structure and it is that subfields cannot be repeated
 in the same instance. If this is the case, the result will be incorrect.
 
 The record structure has the form:
@@ -862,7 +862,7 @@ def convert_record(old_record):
     old_tags.sort()
     for old_tag in old_tags:
         if int(old_tag) < 11:
-            #controlfields            
+            #controlfields
             new_tag = old_tag
             fields[new_tag] = [{' ':old_record[old_tag][0][3]}]
         else:
@@ -913,7 +913,7 @@ def print_record(record):
 def record_fields_value(record, tag, subfield):
     '''
     Return a list of all the fields with a certain tag and subfield code.
-    Works on subfield level. 
+    Works on subfield level.
     @param record a record
     @param tag a 3 or 5 letter tag; required
     @param subfield a subfield code; required
@@ -960,7 +960,7 @@ def record_parts(record, level):
            level=1 - iterate over instances
            level=2 - iterate over subfields
     @yield a record structure representing the part (instance or subfield)
-    '''    
+    '''
     if level == 1:
         names = record.keys()
         names.sort()
@@ -968,7 +968,7 @@ def record_parts(record, level):
             old_field_instances = record[name]
             for old_field_instance in old_field_instances:
                 new_record = {}
-                new_field_instances = []            
+                new_field_instances = []
                 new_field_instance = {}
                 for old_field_code in old_field_instance.keys():
                     new_field_code = old_field_code
@@ -977,7 +977,7 @@ def record_parts(record, level):
                 new_field_instances.append(new_field_instance)
                 new_record[name] = []
                 new_record[name].extend(new_field_instances)
-                yield new_record        
+                yield new_record
     if level == 2:
         names = record.keys()
         names.sort()
@@ -996,7 +996,7 @@ def record_parts(record, level):
                     new_field_instances.append(new_field_instance)
                     new_record[name] = []
                     new_record[name].extend(new_field_instances)
-                    yield new_record        
+                    yield new_record
 
 
 def copy(old_record, address=''):
@@ -1024,7 +1024,7 @@ def copy(old_record, address=''):
     if code_pattern:
         code_pattern = code_pattern.replace('?','[\w ]')
     else:
-        code_pattern = r'.*'        
+        code_pattern = r'.*'
     tag_expr = re.compile(tag_pattern)
     code_expr = re.compile(code_pattern)
     new_record = {}
@@ -1042,7 +1042,7 @@ def copy(old_record, address=''):
                         if code_match:
                             new_field_value = old_field_instance[old_field_code]
                             new_field_instance[new_field_code] = new_field_value
-                    if new_field_instance: 
+                    if new_field_instance:
                         new_field_instances.append(new_field_instance)
                 if new_field_instances:
                     new_record[tag] = new_field_instances
@@ -1079,7 +1079,7 @@ def merge(record1, record2):
                 new_field_code = old_field_code
                 new_field_value = old_field_instance[old_field_code]
                 new_field_instance[new_field_code] = new_field_value
-            if new_field_instance: 
+            if new_field_instance:
                 new_field_instances.append(new_field_instance)
         if new_field_instances:
             #controlfield
@@ -1120,7 +1120,7 @@ def create_xml_element(name, value='', attrs=None, element_type=xmlfull, level=0
     output = ''
     if attrs is None:
         attrs = {}
-    if element_type == xmlempty:    
+    if element_type == xmlempty:
         output += '<'+name
         for attrname in attrs.keys():
             attrvalue = attrs[attrname]
@@ -1165,7 +1165,7 @@ def xml_unescape(value):
     @return unescaped value
     '''
     return saxutils.unescape(value)
-    
+
 def node_has_subelements(node):
     '''
     Check if a node has any childnodes.
@@ -1214,7 +1214,7 @@ def get_node_name(node):
     Get the node value of a node. For use with element nodes.
     @param node an element node
     @return a string of the node name
-    '''    
+    '''
     return node.nodeName
 
 def get_node_attributes(node):
@@ -1257,4 +1257,4 @@ def is_number(value):
     except ValueError:
         result = False
     return result
-    
+

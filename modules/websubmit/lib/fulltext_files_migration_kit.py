@@ -27,7 +27,7 @@ compatible with file.py structure, but the viceversa is not true).
 import sys
 from invenio.intbitset import intbitset
 from invenio.textutils import wrap_text_in_a_box
-from invenio.config import logdir, supportemail
+from invenio.config import CFG_LOGDIR, supportemail
 from invenio.dbquery import run_sql, OperationalError
 from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
 from datetime import datetime
@@ -91,7 +91,7 @@ def check_yes():
 
 def main():
     """Core loop."""
-    logfilename = '%s/fulltext_files_migration_kit-%s.log' % (logdir, datetime.today().strftime('%Y%m%d%H%M%S'))
+    logfilename = '%s/fulltext_files_migration_kit-%s.log' % (CFG_LOGDIR, datetime.today().strftime('%Y%m%d%H%M%S'))
     try:
         logfile = open(logfilename, 'w')
     except IOError, e:

@@ -20,7 +20,7 @@
 __revision__ = "$Id$"
 
    ## Description:   function Move_to_Done
-   ##                This function move the current working directory to the 
+   ##                This function move the current working directory to the
    ##             /done directory and compress it
    ## Author:         T.Baron
    ## PARAMETERS:    -
@@ -32,7 +32,7 @@ import time
 from invenio.config import \
      CFG_PATH_GZIP, \
      CFG_PATH_TAR, \
-     storage
+     CFG_WEBSUBMIT_STORAGEDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Move_to_Done(parameters, curdir, form, user_info=None):
@@ -40,7 +40,7 @@ def Move_to_Done(parameters, curdir, form, user_info=None):
     data = re.search(".*/([^/]*)/([^/]*)/[^/]*$",curdir)
     dir = data.group(1)
     doctype = data.group(2)
-    DONEDIR = "%s/done/%s/%s" % (storage,dir,doctype)
+    DONEDIR = "%s/done/%s/%s" % (CFG_WEBSUBMIT_STORAGEDIR,dir,doctype)
     if not os.path.exists(DONEDIR):
         try:
             os.makedirs(DONEDIR)
@@ -56,7 +56,7 @@ def Move_to_Done(parameters, curdir, form, user_info=None):
         tar_txt = "%s -cf - %s > %s.tar" % (CFG_PATH_TAR,namedir,namedir)
         os.system(tar_txt)
         zip_txt = "%s %s.tar" % (CFG_PATH_GZIP,namedir)
-        os.system(zip_txt) 
+        os.system(zip_txt)
         rm_txt = "rm -R %s" % namedir
         os.system(rm_txt)
     return ""

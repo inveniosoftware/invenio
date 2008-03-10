@@ -51,8 +51,8 @@ from invenio.config import \
      CFG_PREFIX, \
      CFG_BIBSCHED_REFRESHTIME, \
      CFG_BIBSCHED_LOG_PAGER, \
-     bindir, \
-     logdir
+     CFG_BINDIR, \
+     CFG_LOGDIR
 from invenio.dbquery import run_sql
 
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
@@ -106,7 +106,7 @@ def get_task_pid(task_name, task_id):
 
 def get_output_channelnames(task_id):
     "Construct and return filename for stdout and stderr for the task 'task_id'."
-    filenamebase = "%s/bibsched_task_%d" % (logdir, task_id)
+    filenamebase = "%s/bibsched_task_%d" % (CFG_LOGDIR, task_id)
     return [filenamebase + ".log", filenamebase + ".err"]
 
 def is_task_scheduled(task_name):
@@ -240,11 +240,11 @@ class Manager:
             tmpname = os.tmpnam()
             tmpfile = open(tmpname, "w")
             try:
-                tmpfile.write(open(os.path.join(logdir, 'bibsched_task_%d.log' % task_id)).read())
+                tmpfile.write(open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % task_id)).read())
             except IOError:
                 pass
             try:
-                tmpfile.write(open(os.path.join(logdir, 'bibsched_task_%d.err' % task_id)).read())
+                tmpfile.write(open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % task_id)).read())
             except IOError:
                 pass
             tmpfile.close()
@@ -325,7 +325,7 @@ class Manager:
             self.display_in_footer("a process is already running!")
         elif status == "STOPPED" or status == "WAITING":
             if process in self.helper_modules:
-                program = os.path.join(bindir, process)
+                program = os.path.join(CFG_BINDIR, process)
                 fdout, fderr = get_output_channelnames(task_id)
                 COMMAND = "%s %s >> %s 2>> %s &" % (program, str(task_id), fdout, fderr)
                 os.system(COMMAND)
@@ -426,13 +426,13 @@ class Manager:
 
     def change_auto_mode(self):
         if self.auto_mode:
-            program = os.path.join(bindir, "bibsched")
+            program = os.path.join(CFG_BINDIR, "bibsched")
             COMMAND = "%s -q stop" % program
             os.system(COMMAND)
 
             self.auto_mode = 0
         else:
-            program = os.path.join( bindir, "bibsched")
+            program = os.path.join( CFG_BINDIR, "bibsched")
             COMMAND = "%s -q start" % program
             os.system(COMMAND)
 
@@ -666,7 +666,7 @@ class BibSched:
             del self.running[task_id]
         elif self.can_run(proc) and status == "WAITING" and runtime <= time.time():
             if proc in self.helper_modules:
-                program = os.path.join(bindir, proc)
+                program = os.path.join(CFG_BINDIR, proc)
                 fdout, fderr = get_output_channelnames(task_id)
                 COMMAND = "%s %s >> %s 2>> %s" % (program, str(task_id), fdout, fderr)
                 Log("task #%d (%s) started" % (task_id, proc))
@@ -721,7 +721,7 @@ def timed_out(f, timeout, *args, **kwargs):
 
 
 def Log(message):
-    log = open(logdir + "/bibsched.log","a")
+    log = open(CFG_LOGDIR + "/bibsched.log","a")
     log.write(time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
     log.write(message)
     log.write("\n")
@@ -729,8 +729,8 @@ def Log(message):
 
 def redirect_stdout_and_stderr():
     "This function redirects stdout and stderr to bibsched.log and bibsched.err file."
-    sys.stdout = open(logdir + "/bibsched.log", "a")
-    sys.stderr = open(logdir + "/bibsched.err", "a")
+    sys.stdout = open(CFG_LOGDIR + "/bibsched.log", "a")
+    sys.stderr = open(CFG_LOGDIR + "/bibsched.err", "a")
 
 def usage(exitcode=1, msg=""):
     """Prints usage info."""

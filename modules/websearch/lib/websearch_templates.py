@@ -43,7 +43,7 @@ from invenio.config import \
      cdslang, \
      cdsname, \
      cdsnameintl, \
-     version, \
+     CFG_VERSION, \
      weburl, \
      supportemail
 from invenio.dbquery import run_sql
@@ -2638,7 +2638,7 @@ class Template:
                'weburl': weburl,
                'cdslang': cdslang,
                'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()),
-               'version': version,
+               'version': CFG_VERSION,
                'supportemail': supportemail,
                'timetolive': CFG_WEBSEARCH_RSS_TTL
                }

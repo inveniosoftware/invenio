@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 import unittest
 from string import expandtabs, replace
 
-from invenio.config import tmpdir, etcdir
+from invenio.config import CFG_TMPDIR, CFG_ETCDIR
 from invenio import bibrecord
 
 # pylint: disable-msg=C0301
@@ -33,7 +33,7 @@ class BibRecordSanityTest(unittest.TestCase):
     """ bibrecord - sanity test (xml -> create records -> xml)"""
     def test_for_sanity(self):
         """ bibrecord - demo file sanity test (xml -> create records -> xml)"""
-        f = open(tmpdir + '/demobibdata.xml', 'r')
+        f = open(CFG_TMPDIR + '/demobibdata.xml', 'r')
         xmltext = f.read()
         f.close()
         # let's try to reproduce the demo XML MARC file by parsing it and printing it back:
@@ -46,7 +46,7 @@ class BibRecordSanityTest(unittest.TestCase):
         y = expandtabs(y)
         x = x.replace(' ', '')
         y = y.replace(' ', '')
-        x = x.replace('<!DOCTYPEcollectionSYSTEM"file://%s/bibedit/MARC21slim.dtd">\n<collection>' % etcdir,
+        x = x.replace('<!DOCTYPEcollectionSYSTEM"file://%s/bibedit/MARC21slim.dtd">\n<collection>' % CFG_ETCDIR,
                       '<collectionxmlns="http://www.loc.gov/MARC21/slim">')
         x = x.replace('</record><record>', "</record>\n<record>")
         x = x.replace('</record></collection>', "</record>\n</collection>\n")
@@ -60,7 +60,7 @@ class BibRecordSuccessTest(unittest.TestCase):
     def setUp(self):
         # pylint: disable-msg=C0103
         """Initialize stuff"""
-        f = open(tmpdir + '/demobibdata.xml', 'r')
+        f = open(CFG_TMPDIR + '/demobibdata.xml', 'r')
         xmltext = f.read()
         f.close()
         self.recs = map((lambda x: x[0]), bibrecord.create_records(xmltext))

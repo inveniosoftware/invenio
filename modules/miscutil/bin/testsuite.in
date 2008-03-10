@@ -33,7 +33,7 @@ import sys
 from invenio import webinterface_tests
 
 # now we import the rest:
-from invenio.config import version
+from invenio.config import CFG_VERSION
 from invenio import search_engine_tests
 from invenio import bibindex_engine_tests
 from invenio import bibindex_engine_stemmer_tests
@@ -97,7 +97,7 @@ def create_all_test_suites():
 
 def print_info_line():
     """Prints info line about tests to be executed."""
-    info_line = """CDS Invenio v%s test suite results:""" % version
+    info_line = """CDS Invenio v%s test suite results:""" % CFG_VERSION
     sys.stderr.write(info_line + "\n")
     sys.stderr.write("=" * len(info_line) + "\n")
 

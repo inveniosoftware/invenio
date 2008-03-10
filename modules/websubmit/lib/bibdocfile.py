@@ -32,7 +32,7 @@ from mimetypes import MimeTypes
 from invenio.dbquery import run_sql, DatabaseError
 from invenio.errorlib import register_exception
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import cdslang, images, weburl, webdir, filedir, filedirsize, sweburl
+from invenio.config import cdslang, images, weburl, CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR, CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, sweburl
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -1174,10 +1174,10 @@ def stream_restricted_icon(req):
     req.filename = 'restricted'
     req.headers_out["Content-Disposition"] = \
         "inline; filename=%s" % quoteattr('restricted')
-    req.set_content_length(os.path.getsize('%s/img/restricted.gif' % webdir))
+    req.set_content_length(os.path.getsize('%s/img/restricted.gif' % CFG_WEBDIR))
     req.send_http_header()
     try:
-        req.sendfile('%s/img/restricted.gif' % webdir)
+        req.sendfile('%s/img/restricted.gif' % CFG_WEBDIR)
         return ""
     except Exception, e:
         register_exception(req=req)
@@ -1208,8 +1208,8 @@ def order_files_with_version(docfile1, docfile2):
 
 def _make_base_dir(docid):
     """Given a docid it returns the complete path that should host its files."""
-    group = "g" + str(int(int(docid) / filedirsize))
-    return "%s/%s/%s" % (filedir, group, docid)
+    group = "g" + str(int(int(docid) / CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT))
+    return "%s/%s/%s" % (CFG_WEBSUBMIT_FILEDIR, group, docid)
 
 
 class Md5Folder:

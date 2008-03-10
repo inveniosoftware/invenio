@@ -14,7 +14,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,7 +27,7 @@ __revision__ = "$Id$"
 try:
     import sys
     import getopt
-    from invenio.config import version, supportemail
+    from invenio.config import CFG_VERSION, supportemail
     from invenio.alert_engine import run_alerts
     from time import time
 except ImportError, e:
@@ -49,11 +49,11 @@ Run the alert engine.
                               specified day, for test purposes (today)
 
 Report bugs to <%s>""" % supportemail
-        
+
 def main():
 
     date = datetime.date.today()
-    
+
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hVd:",
                                    ["help", "version", "date="])
@@ -71,12 +71,12 @@ def main():
         if o in ("-d", "--date"):
             year, month, day = map(int, a.split('-'))
             date = datetime.date(year, month, day)
-            
-        
+
+
     run_alerts(date)
 
 if __name__ == "__main__":
     t0 = time()
-    main()	
+    main()
     t1 = time()
     print 'Alert engine finished in %.2f seconds' % (t1 - t0)

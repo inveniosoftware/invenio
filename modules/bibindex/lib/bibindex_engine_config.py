@@ -28,7 +28,7 @@ __revision__ = \
 
 ## configuration parameters read from the general config file:
 from invenio.config import \
-     version, cdsname,\
+     CFG_VERSION, cdsname,\
      CFG_PATH_PDFTOTEXT, \
      CFG_PATH_PSTOTEXT, \
      CFG_PATH_PSTOASCII, \
@@ -41,7 +41,7 @@ from invenio.config import \
      CFG_PATH_GZIP
 
 ## version number:
-BIBINDEX_ENGINE_VERSION = "CDS Invenio/%s bibindex/%s" % (version, version)
+BIBINDEX_ENGINE_VERSION = "CDS Invenio/%s bibindex/%s" % (CFG_VERSION, CFG_VERSION)
 
 ## programs used to convert fulltext files to text:
 CONV_PROGRAMS = { ### PS switched off at the moment, since PDF is faster

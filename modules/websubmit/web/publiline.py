@@ -47,12 +47,12 @@ from invenio.config import \
      cdslang, \
      cdsname, \
      images, \
-     pylibdir, \
-     storage, \
+     CFG_PYLIBDIR, \
+     CFG_WEBSUBMIT_STORAGEDIR, \
      supportemail, \
      sweburl, \
      urlpath, \
-     version
+     CFG_VERSION
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *
@@ -76,12 +76,12 @@ from invenio.websubmit_functions.Retrieve_Data import Get_Field
 from invenio.errorlib import register_exception
 from invenio.bibrecord import create_records, record_get_field_value, record_get_field_values
 
-execfile("%s/invenio/websubmit_functions/Retrieve_Data.py" % pylibdir)
+execfile("%s/invenio/websubmit_functions/Retrieve_Data.py" % CFG_PYLIBDIR)
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 
-CFG_WEBSUBMIT_PENDING_DIR = "%s/pending" % storage
+CFG_WEBSUBMIT_PENDING_DIR = "%s/pending" % CFG_WEBSUBMIT_STORAGEDIR
 CFG_WEBSUBMIT_DUMMY_MARC_XML_REC = "dummy_marcxml_rec"
 CFG_WEBSUBMIT_MARC_XML_REC = "recmysql"
 
@@ -1454,7 +1454,7 @@ def getInfo(doctype,categ,RN):
 #seek info in pending directory
 def getInPending(doctype,categ,RN):
     """FIXME: DEPRECATED!"""
-    PENDIR="%s/pending" % storage
+    PENDIR="%s/pending" % CFG_WEBSUBMIT_STORAGEDIR
     if os.path.exists("%s/%s/%s/AU" % (PENDIR,doctype,RN)):
         fp = open("%s/%s/%s/AU" % (PENDIR,doctype,RN),"r")
         authors=fp.read()

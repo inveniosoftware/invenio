@@ -30,7 +30,7 @@ import ConfigParser
 
 from invenio.config import \
      cdslang, \
-     etcdir
+     CFG_ETCDIR
 from invenio.search_engine import perform_request_search, HitSet
 from invenio.bibrank_citation_indexer import get_citation_weight
 from invenio.bibrank_downloads_indexer import *
@@ -286,7 +286,7 @@ def bibrank_engine(run):
             cfg_name = getName(rank_method_code)
             write_message("Running rank method: %s." % cfg_name)
 
-            file = etcdir + "/bibrank/" + rank_method_code + ".cfg"
+            file = CFG_ETCDIR + "/bibrank/" + rank_method_code + ".cfg"
             config = ConfigParser.ConfigParser()
             try:
                 config.readfp(open(file))

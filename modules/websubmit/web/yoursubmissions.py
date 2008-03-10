@@ -34,9 +34,9 @@ from invenio.config import \
      cdslang, \
      cdsname, \
      images, \
-     storage, \
+     CFG_WEBSUBMIT_STORAGEDIR, \
      sweburl, \
-     version, \
+     CFG_VERSION, \
      weburl
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
@@ -186,12 +186,12 @@ def index(req,c=cdsname,ln=cdslang,order="",doctype="",deletedId="",deletedActio
                 navmenuid='yoursubmissions')
 
 def deleteSubmission(id, action, doctype, u_email):
-    global storage
+    global CFG_WEBSUBMIT_STORAGEDIR
     run_sql("delete from sbmSUBMISSIONS WHERE doctype=%s and action=%s and email=%s and status='pending' and id=%s",(doctype,action,u_email,id,))
     res = run_sql("select dir from sbmACTION where sactname=%s",(action,))
     dir = res[0][0]
     if not ('..' in doctype or '..' in id) and id != "":
-        full = os.path.join(storage, dir, doctype, id)
+        full = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, dir, doctype, id)
         if os.path.isdir(full):
             shutil.rmtree(full)
     return ""

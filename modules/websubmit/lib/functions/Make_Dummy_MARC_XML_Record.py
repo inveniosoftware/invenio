@@ -26,8 +26,8 @@ __revision__ = "$Id$"
 import os
 from invenio.errorlib import register_exception
 from invenio.config import \
-     bibconvert, \
-     bibconvertconf
+     CFG_BINDIR, \
+     CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 CFG_WEBSUBMIT_DUMMY_XML_NAME = "dummy_marcxml_rec"
@@ -72,13 +72,13 @@ def Make_Dummy_MARC_XML_Record(parameters, curdir, form, user_info=None):
     create_tpl = parameters['dummyrec_create_tpl'].replace(" ","")
 
     ## Call bibconvert to create the MARC XML record:
-    cmd_bibconvert_call = "%s -l1 -d'%s' -Cs'%s/%s' -Ct'%s/%s' " \
+    cmd_bibconvert_call = "%s/bibconvert -l1 -d'%s' -Cs'%s/%s' -Ct'%s/%s' " \
                           "> %s/%s 2>/dev/null" \
-                          % (bibconvert, \
+                          % (CFG_BINDIR, \
                              curdir, \
-                             bibconvertconf, \
+                             CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR, \
                              source_tpl, \
-                             bibconvertconf, \
+                             CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR, \
                              create_tpl, \
                              curdir, \
                              CFG_WEBSUBMIT_DUMMY_XML_NAME)
