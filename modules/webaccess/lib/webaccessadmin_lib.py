@@ -3672,7 +3672,7 @@ Option to administrate authorizations:
   -a, --add\t\tadd default authorization settings
   -c, --compile\t\tcompile firewall like role definitions (FireRole)
   -r, --reset\t\treset to default settings
-  -D, --demo\t\tto be used with -a or -r in order to consider Demo Site authorizationss
+  -D, --demo\t\tto be used with -a or -r in order to consider demo site authorizationss
 """ % sys.argv[0]
     sys.exit(exitcode)
 
@@ -3717,13 +3717,13 @@ def main():
                     authorization_action="cfgwebaccess")
             if options['reset'] and options['demo']:
                 acca.acc_reset_default_settings([supportemail], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
-                print "Reset default Demo Site settings."
+                print "Reset default demo site settings."
             elif options['reset']:
                 acca.acc_reset_default_settings([supportemail])
                 print "Reset default settings."
             elif options['add'] and options['demo']:
                 acca.acc_add_default_settings([supportemail], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
-                print "Added default Demo Site settings."
+                print "Added default demo site settings."
             elif options['add']:
                 acca.acc_add_default_settings([supportemail])
                 print "Added default settings."
