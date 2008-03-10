@@ -48,27 +48,8 @@ CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR = \
                         "%s/websubmit/file_stamper_templates" % CFG_ETCDIR
 from invenio.config import CFG_PATH_PDFTK
 from invenio.config import CFG_PATH_PDF2PS
+from invenio.websubmit_config import InvenioWebSubmitFileStamperError
 
-
-class InvenioWebSubmitFileStamperError(Exception):
-    """This exception should be raised when an error is encoutered that
-       prevents a file from being stamped.
-       When caught, this exception should be used to stop processing with a
-       failure signal.
-    """
-    def __init__(self, value):
-        """Set the internal "value" attribute to that of the passed "value"
-           parameter.
-           @param value: (string) - a string to write to the log.
-        """
-        Exception.__init__(self)
-        self.value = value
-    def __str__(self):
-        """Return oneself as a string (actually, return the contents of
-           self.value).
-           @return: (string)
-        """
-        return str(self.value)
 
 def quote_shell_arg(shell_arg):
     """Quote a shell argument with single-quotes. This basically means putting
