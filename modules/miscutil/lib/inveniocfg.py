@@ -754,9 +754,11 @@ def main():
             if os.path.exists(conffile):
                 conf.read(conffile)
             else:
-                print "ERROR: Badly guessed conf file location", conffile
-                print "(Please use --conf-dir option.)"
-                sys.exit(1)
+                if not conffile.endswith("invenio-local.conf"):
+                    # invenio-local.conf is optional, otherwise stop
+                    print "ERROR: Badly guessed conf file location", conffile
+                    print "(Please use --conf-dir option.)"
+                    sys.exit(1)
         ## decide what to do:
         done = False
         for opt_idx in range(0, len(sys.argv)):
