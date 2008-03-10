@@ -21,9 +21,9 @@ msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-03-07 12:22+0100\n"
-"PO-Revision-Date: 2008-03-07 15:12+0100\n"
+"PO-Revision-Date: 2008-03-10 16:02+0100\n"
 "Last-Translator: Samuele Kaplun <Samuele.Kaplun@cern.ch>\n"
-"Language-Team:  <en@li.org>\n"
+"Language-Team:  <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1963,12 +1963,11 @@ msgstr "Cronologia delle citazioni:"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:78
 msgid "Download history:"
-msgstr "Cronologia dei download"
+msgstr "Cronologia dei download:"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:100
-#, fuzzy
 msgid "Download user distribution:"
-msgstr "Distribuzione degli utenti/download"
+msgstr "Distribuzione degli utenti/download:"
 
 #: modules/miscutil/lib/dateutils.py:69 modules/miscutil/lib/dateutils.py:96
 #: modules/webbasket/lib/webbasket.py:170
@@ -2297,7 +2296,7 @@ msgstr "Non sei il proprietario di questo cestino."
 #: modules/webalert/lib/webalert.py:209
 #, python-format
 msgid "The alert %s has been added to your profile."
-msgstr "Làavviso %s è stato aggiunto al tuo profilo."
+msgstr "L'avviso %s è stato aggiunto al tuo profilo."
 
 #: modules/webalert/lib/webalert.py:330
 #, python-format
@@ -3079,7 +3078,7 @@ msgid ""
 "of the current session."
 msgstr ""
 "Sei autenticato come utente ospite, perciò i tuoi cestini scompariranno al "
-"termine della sessione correente."
+"termine della sessione corrente."
 
 #: modules/webbasket/lib/webbasket_templates.py:1465
 #: modules/webbasket/lib/webbasket_templates.py:1480
@@ -3201,7 +3200,7 @@ msgstr "I lettori hanno trovato le seguenti %s recensioni tra le più utili."
 #: modules/webcomment/lib/webcomment_templates.py:277
 #, python-format
 msgid "View all %s reviews"
-msgstr "Visulalizza tutte le %s recensioni"
+msgstr "Visualizza tutte le %s recensioni"
 
 #: modules/webcomment/lib/webcomment_templates.py:273
 #: modules/webcomment/lib/webcomment_templates.py:295
@@ -3409,7 +3408,7 @@ msgid ""
 "a comment reported at least once."
 msgstr ""
 "Ecco una lista, ordinata secondo il numero totale di commenti, di tutti gli "
-"utenti che hanno riportato un commento almento una volta."
+"utenti che hanno riportato un commento almeno una volta."
 
 #: modules/webcomment/lib/webcomment_templates.py:1138
 #: modules/webcomment/lib/webcomment_templates.py:1167
@@ -4228,7 +4227,7 @@ msgstr "Citato con: %s articoli"
 
 #: modules/websearch/lib/websearch_webinterface.py:281
 msgid "You are not authorized to view this area."
-msgstr "Non sei autorizzato a visualizzare quest'area"
+msgstr "Non sei autorizzato a visualizzare quest'area."
 
 #: modules/websearch/lib/websearch_webinterface.py:611
 msgid "Not found"
@@ -5236,7 +5235,7 @@ msgid ""
 "You have successfully obtained an authorization as %(x_role)s! This "
 "authorization will last until %(x_expiration)s and until you close your "
 "browser if you are a guest user."
-msgstr "Hai ottenuto l'autorizzazione al ruolo %(x_role)s! Questa autorizzazione durerà fino a %(x_expiration)s o, se sei un utente guest, fino a quando chiuderai il tuo browser."
+msgstr "Hai ottenuto l'autorizzazione al ruolo %(x_role)s! Questa autorizzazione durerà fino a %(x_expiration)s o, se sei un utente ospite, fino a quando chiuderai il tuo browser."
 
 #: modules/websession/lib/websession_webinterface.py:114
 msgid "You have confirmed the validity of your email address!"
@@ -5316,8 +5315,7 @@ msgid ""
 "following button:"
 msgstr ""
 "Per favore, nota che se questa è la prima volta che stai utilizzando questo account con il metodo di autenticazione interno allora il sistema ha impostato per te una password generata in maniera "
-"casuale che puoi ricuperare via email facendo clic sul seguente\n"
-"pulsante:</p>"
+"casuale che puoi ricuperare via email facendo clic sul seguente pulsante:"
 
 #: modules/websession/lib/websession_webinterface.py:319
 msgid "Send Password"
@@ -5713,6 +5711,8 @@ msgid ""
 "You may want to start browsing from %(rooturl)s or have a look at the %"
 "(x_url_open)s index of the %(category)s pages%(x_url_close)s."
 msgstr ""
+"Puoi iniziare la consultazione a partire da %(rooturl)s o vedere %"
+"(x_url_open)sl'indice delle pagine %(category)s%(x_url_close)s."
 
 #: modules/websubmit/lib/websubmit_engine.py:188
 #: modules/websubmit/lib/websubmit_engine.py:711
@@ -6070,35 +6070,31 @@ msgstr "Alcuni documenti in sospeso."
 
 #: modules/websubmit/lib/websubmit_templates.py:1791
 msgid "List of specific approvals"
-msgstr ""
+msgstr "Elenco di classi di approvazione"
 
 #: modules/websubmit/lib/websubmit_templates.py:1796
-#, fuzzy
 msgid "List of refereing categories"
-msgstr "Lista delle categorie con referee"
+msgstr "Elenco delle categorie con referee"
 
 #: modules/websubmit/lib/websubmit_templates.py:1800
-#, fuzzy
 msgid "List of publication categories"
-msgstr "Lista dei cestini pubblici"
+msgstr "Elenco delle categorie di pubblicazioni"
 
 #: modules/websubmit/lib/websubmit_templates.py:1804
-#, fuzzy
 msgid "List of direct approval categories"
-msgstr "Lista delle categorie con referee"
+msgstr "Elenco delle categorie ad approvazione diretta"
 
 #: modules/websubmit/lib/websubmit_templates.py:1870
 #: modules/websubmit/lib/websubmit_templates.py:1913
 #: modules/websubmit/lib/websubmit_templates.py:1914
 #: modules/websubmit/lib/websubmit_templates.py:2101
-#, fuzzy
 msgid "Cancelled"
-msgstr "Annulla"
+msgstr "Annullato"
 
 #: modules/websubmit/lib/websubmit_templates.py:1970
 #: modules/websubmit/lib/websubmit_templates.py:2059
 msgid "List of refereed documents"
-msgstr "Lista dei documenti con referee"
+msgstr "Elenco dei documenti con referee"
 
 #: modules/websubmit/lib/websubmit_templates.py:1971
 #: modules/websubmit/lib/websubmit_templates.py:2095
@@ -6111,14 +6107,12 @@ msgid "Report Number"
 msgstr "Numero di rapporto"
 
 #: modules/websubmit/lib/websubmit_templates.py:2061
-#, fuzzy
 msgid "List of publication documents"
-msgstr "Lista dei cestini pubblici"
+msgstr "Elenco delle pubblicazioni"
 
 #: modules/websubmit/lib/websubmit_templates.py:2063
-#, fuzzy
 msgid "List of direct approval documents"
-msgstr "Lista dei documenti con referee"
+msgstr "Elenco dei documenti ad approvazione diretta"
 
 #: modules/websubmit/lib/websubmit_templates.py:2236
 msgid "Your request has been sent to the referee."
@@ -6229,84 +6223,81 @@ msgstr "È stato rifiutato il:"
 #: modules/websubmit/lib/websubmit_templates.py:2426
 #: modules/websubmit/lib/websubmit_templates.py:2489
 msgid "It has first been asked for refereing process on the "
-msgstr ""
+msgstr "La richiesta di referee è stata fatta la prima volta il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2384
 #: modules/websubmit/lib/websubmit_templates.py:2428
 msgid "Last request e-mail was sent to the publication committee chair on the "
-msgstr ""
+msgstr "L'ultima email di richiesta spedita alla rappresentanza della commissione per la pubblicazione è stata inviata il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2387
 msgid "A referee has been selected by the publication committee on the "
-msgstr ""
+msgstr "Un referee è stato scelto dalla commissione della pubblicazione il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2389
 #: modules/websubmit/lib/websubmit_templates.py:2444
-#, fuzzy
 msgid "No referee has been selected yet."
-msgstr "Il record è stato cancellato."
+msgstr "Non è stato ancora scelto un referee."
 
 #: modules/websubmit/lib/websubmit_templates.py:2391
 #: modules/websubmit/lib/websubmit_templates.py:2446
-#, fuzzy
 msgid "Select a referee"
-msgstr "Seleziona un punteggio"
+msgstr "Seleziona un referee"
 
 #: modules/websubmit/lib/websubmit_templates.py:2395
 msgid ""
 "The referee has sent his final recommendations to the publication committee "
 "on the "
-msgstr ""
+msgstr "Il referee ha inviato le sue raccomandazioni finali alla commissione della pubblicazione il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2397
 #: modules/websubmit/lib/websubmit_templates.py:2452
 msgid "No recommendation from the referee yet."
-msgstr ""
+msgstr "Ancora nessuna raccomandazione dal referee."
 
 #: modules/websubmit/lib/websubmit_templates.py:2399
 #: modules/websubmit/lib/websubmit_templates.py:2407
 #: modules/websubmit/lib/websubmit_templates.py:2454
 #: modules/websubmit/lib/websubmit_templates.py:2462
 #: modules/websubmit/lib/websubmit_templates.py:2470
-#, fuzzy
 msgid "Send a recommendation"
-msgstr "Scrivi un commento"
+msgstr "Spedisci una raccomandazione"
 
 #: modules/websubmit/lib/websubmit_templates.py:2403
 #: modules/websubmit/lib/websubmit_templates.py:2466
 msgid ""
 "The publication committee has sent his final recommendations to the project "
 "leader on the "
-msgstr ""
+msgstr "La commissione per la pubblicazione ha spedito le proprie raccomandazioni finali al leader del progetto il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2405
 #: modules/websubmit/lib/websubmit_templates.py:2468
 msgid "No recommendation from the publication committee yet."
-msgstr ""
+msgstr "Ancora nessuna raccomandazione dalla commissione della pubblicazione."
 
 #: modules/websubmit/lib/websubmit_templates.py:2411
 #: modules/websubmit/lib/websubmit_templates.py:2474
 #: modules/websubmit/lib/websubmit_templates.py:2494
 msgid "It has been cancelled by the author on the "
-msgstr ""
+msgstr "È stata annullata dall'autore il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2414
 #: modules/websubmit/lib/websubmit_templates.py:2477
 #: modules/websubmit/lib/websubmit_templates.py:2497
 msgid "It has been approved by the project leader on the "
-msgstr ""
+msgstr "È stata approvata dal leader del progetto il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2416
 #: modules/websubmit/lib/websubmit_templates.py:2479
 #: modules/websubmit/lib/websubmit_templates.py:2499
 msgid "It has been rejected by the project leader on the "
-msgstr ""
+msgstr "È stata rifiutata dal leader del progetto il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2418
 #: modules/websubmit/lib/websubmit_templates.py:2481
 #: modules/websubmit/lib/websubmit_templates.py:2501
 msgid "No final decision taken yet."
-msgstr ""
+msgstr "Non è stata presa ancora nessuna decisione finale."
 
 #: modules/websubmit/lib/websubmit_templates.py:2420
 #: modules/websubmit/lib/websubmit_templates.py:2483
@@ -6314,102 +6305,94 @@ msgstr ""
 #: modules/websubmit/web/publiline.py:1016
 #: modules/websubmit/web/publiline.py:1026
 msgid "Take a decision"
-msgstr ""
+msgstr "Prendi una decisione"
 
 #: modules/websubmit/lib/websubmit_templates.py:2431
 msgid "An editorial board has been selected by the publication committee on the "
-msgstr ""
+msgstr "Una editorial board è stata selezionata dalla commissione della pubblicazione il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2433
 msgid "Add an author list"
-msgstr ""
+msgstr "Aggiungi una lista di autori"
 
 #: modules/websubmit/lib/websubmit_templates.py:2436
-#, fuzzy
 msgid "No editorial board has been selected yet."
-msgstr "Il record è stato cancellato."
+msgstr "Non è ancora stata selezionata alcuna editorial board."
 
 #: modules/websubmit/lib/websubmit_templates.py:2438
 msgid "Select an editorial board"
-msgstr ""
+msgstr "Seleziona una editorial board"
 
 #: modules/websubmit/lib/websubmit_templates.py:2442
 msgid "A referee has been selected by the editorial board on the "
-msgstr ""
+msgstr "L'editorial board ha selezionato un referee il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2450
 msgid "The referee has sent his final recommendations to the editorial board on the "
-msgstr ""
+msgstr "Il referee ha inviato le sue raccomandazioni finali alla editorial board il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2458
 msgid ""
 "The editorial board has sent his final recommendations to the publication "
 "committee on the "
-msgstr ""
+msgstr "L'editorial board ha inviato le sue raccomandazioni finali alla commissione della pubblicazione il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2460
 msgid "No recommendation from the editorial board yet."
-msgstr ""
+msgstr "Ancora nessuna raccomandazione dall'editorial board."
 
 #: modules/websubmit/lib/websubmit_templates.py:2491
 msgid "Last request e-mail was sent to the project leader on the "
-msgstr ""
+msgstr "L'ultima email di richiesta al leader del progetto è stata inviata il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2585
-#, fuzzy
 msgid "Comments overview"
-msgstr "Commenti"
+msgstr "Panoramica dei commenti"
 
 #: modules/websubmit/lib/websubmit_templates.py:2700
 msgid "search for user"
-msgstr ""
+msgstr "ricerca utente"
 
 #: modules/websubmit/lib/websubmit_templates.py:2702
 msgid "search for users"
-msgstr ""
+msgstr "ricerca utenti"
 
 #: modules/websubmit/lib/websubmit_templates.py:2705
 #: modules/websubmit/lib/websubmit_templates.py:2707
 #: modules/websubmit/lib/websubmit_templates.py:2758
 #: modules/websubmit/lib/websubmit_templates.py:2760
-#, fuzzy
 msgid "select user"
-msgstr "Seleziona cestino"
+msgstr "seleziona utente"
 
 #: modules/websubmit/lib/websubmit_templates.py:2716
 msgid "connected"
-msgstr ""
+msgstr "connesso"
 
 #: modules/websubmit/lib/websubmit_templates.py:2719
-#, fuzzy
 msgid "add this user"
-msgstr "Aggiungi agli utenti"
+msgstr "aggiungi questo utente"
 
 #: modules/websubmit/lib/websubmit_templates.py:2767
-#, fuzzy
 msgid "remove this user"
-msgstr "Non corrisponde nessun utente"
+msgstr "rimuovi questo utente"
 
 #: modules/websubmit/lib/websubmit_templates.py:2878
-#, fuzzy
 msgid "User"
-msgstr "Utenti"
+msgstr "Utente"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:118
 msgid ""
 "The system has encountered an error in retrieving the list of files for this "
 "document."
-msgstr ""
+msgstr "Il sistema ha incontrato un errore nel ricuperare l'elenco dei file di questo documento."
 
 #: modules/websubmit/lib/websubmit_webinterface.py:166
-#, fuzzy
 msgid "The collection to which this file belong is restricted: "
-msgstr "Il contenuto di questa collezione è riservato."
+msgstr "L'accesso alla collezione a cui appartiene questo file è ristretto: "
 
 #: modules/websubmit/lib/websubmit_webinterface.py:172
-#, fuzzy
 msgid "This file is restricted: "
-msgstr "Questo file ha delle restrizioni!"
+msgstr "Questo file è riservato: "
 
 #: modules/websubmit/lib/websubmit_webinterface.py:244
 #: modules/websubmit/lib/websubmit_webinterface.py:352
@@ -6440,9 +6423,8 @@ msgstr "Impossibile visualizzare il documento."
 #: modules/websubmit/web/publiline.py:971
 #: modules/websubmit/web/publiline.py:1032
 #: modules/websubmit/web/publiline.py:1082
-#, fuzzy
 msgid "Action unauthorized for this document."
-msgstr "Non è mai stata richiesta approvazione per questo documento."
+msgstr "Azione non autorizzata per questo documento."
 
 #: modules/websubmit/web/publiline.py:598
 #: modules/websubmit/web/publiline.py:717
@@ -6452,85 +6434,75 @@ msgstr "Non è mai stata richiesta approvazione per questo documento."
 #: modules/websubmit/web/publiline.py:974
 #: modules/websubmit/web/publiline.py:1035
 #: modules/websubmit/web/publiline.py:1085
-#, fuzzy
 msgid "Action unavailable for this document."
-msgstr "Impossibile visualizzare il documento."
+msgstr "Azione non disponibile per questo documento."
 
 #: modules/websubmit/web/publiline.py:608
-#, fuzzy
 msgid "Adding users to the editorial board"
-msgstr "Aggiungo %i record a questi cestini"
+msgstr "Aggiunta di utenti alla editorial board"
 
 #: modules/websubmit/web/publiline.py:630
 #: modules/websubmit/web/publiline.py:750
 msgid "no qualified users, try new search."
-msgstr ""
+msgstr "nessun utente corrisponde, prova una nuova ricerca."
 
 #: modules/websubmit/web/publiline.py:632
 #: modules/websubmit/web/publiline.py:752
-#, fuzzy
 msgid "hits"
-msgstr "Risultati"
+msgstr "risultati"
 
 #: modules/websubmit/web/publiline.py:632
 #: modules/websubmit/web/publiline.py:752
 msgid "too many qualified users, specify more narrow search."
-msgstr ""
+msgstr "troppi utenti corrispondono, specifica una ricerca più precisa."
 
 #: modules/websubmit/web/publiline.py:632
 #: modules/websubmit/web/publiline.py:752
 msgid "limit"
-msgstr ""
+msgstr "limite"
 
 #: modules/websubmit/web/publiline.py:648
 msgid "users in brackets are already attached to the role, try another one..."
-msgstr ""
+msgstr "gli utenti tra parentesi sono già stati collegati al ruolo, provane altri..."
 
 #: modules/websubmit/web/publiline.py:654
 msgid "Removing users from the editorial board"
-msgstr ""
+msgstr "Rimozione di utenti dall'editorial board"
 
 #: modules/websubmit/web/publiline.py:691
 msgid "Validate the editorial board selection"
-msgstr ""
+msgstr "Conferma la seleziona dell'editorial board"
 
 #: modules/websubmit/web/publiline.py:734
-#, fuzzy
 msgid "Referee selection"
-msgstr "Riferimento non ancora fornito"
+msgstr "Selezione referee"
 
 #: modules/websubmit/web/publiline.py:819
 #: modules/websubmit/web/publiline.py:988
-#, fuzzy
 msgid "Come back to the document"
-msgstr "Vota questo documento"
+msgstr "Torna al documento"
 
 #: modules/websubmit/web/publiline.py:1013
-#, fuzzy
 msgid "Select:"
-msgstr "Seleziona"
+msgstr "Seleziona:"
 
 #: modules/websubmit/web/publiline.py:1014
 #: modules/websubmit/web/publiline.py:1074
-#, fuzzy
 msgid "Approve"
-msgstr "Approvato"
+msgstr "Approva"
 
 #: modules/websubmit/web/publiline.py:1015
 #: modules/websubmit/web/publiline.py:1075
-#, fuzzy
 msgid "Reject"
-msgstr "Rifiutato"
+msgstr "Rifiuta"
 
 #: modules/websubmit/web/publiline.py:1113
-#, fuzzy
 msgid "Wrong action for this document."
-msgstr "Vota questo documento"
+msgstr "Azione errata per questo documento."
 
 #: modules/webjournal/lib/webjournal_utils.py:144
-#, fuzzy
 msgid "Please login to perform this action."
-msgstr "Spiacente, devi autenticarti per eseguire questa azione."
+msgstr "Per favore, autenticati per eseguire questa azione."
 
 #: modules/webjournal/lib/webjournal_utils.py:148
 msgid ""
@@ -6538,208 +6510,192 @@ msgid ""
 "logged                         in and be registered by your system "
 "administrator for                         this kind of task. If you have a "
 "login, use the link                         below to login."
-msgstr ""
+msgstr "Per pubblicare numeri di webjournal devi essere autenticato e autorizzato per questa azione. Se devi effettuare il login, utilizza il link sottostante."
 
 #: modules/webjournal/lib/webjournal_utils.py:160
 msgid "We need you to login"
-msgstr ""
+msgstr "Occorre autenticarsi"
 
 #: modules/webjournal/lib/webjournal_templates.py:38
 msgid "Available Journals"
-msgstr ""
+msgstr "Journal disponibili"
 
 #: modules/webjournal/lib/webjournal_templates.py:83
-#, fuzzy, python-format
+#, python-format
 msgid "Mail %(x_url_open)sdevelopers%(x_url_close)s"
-msgstr "Se lo desideri, puoi %(x_url_open)sautenticarti qui%(x_url_close)s."
+msgstr "Scrivi agli %(x_url_open)ssviluppatori%(x_url_close)s"
 
 #: modules/webjournal/lib/webjournal_templates.py:110
 msgid "Issue regenerated"
-msgstr ""
+msgstr "Numero rigenerato"
 
 #: modules/webjournal/lib/webjournal_templates.py:123
-#, fuzzy
 msgid "Regeneration Error"
-msgstr "Errore Interno"
+msgstr "Errore nella rigenerazione"
 
 #: modules/webjournal/lib/webjournal_templates.py:124
 msgid ""
 "The issue could not be correctly regenerated. Please contact your "
 "administrator."
-msgstr ""
+msgstr "Il numero non può essere rigenerato correttamente. Per favore contatta il tuo amministratore."
 
 #: modules/webjournal/lib/webjournal_templates.py:143
-#, fuzzy
 msgid "Feature a record"
-msgstr "Record esterno"
+msgstr "Visualizza un record"
 
 #: modules/webjournal/lib/webjournal_templates.py:248
-#, fuzzy
 msgid "Alert sent successfully!"
-msgstr "L'avviso %s è stato aggiornato con successo."
+msgstr "Avviso inviato con successo!"
 
 #: modules/webjournal/lib/webjournal_templates.py:378
-#, fuzzy
 msgid "Webjournal Administration Interface"
-msgstr "Amministrazione Websubmit"
+msgstr "Interfaccia di amministrazione di WebJournal"
 
 #: modules/webjournal/lib/webjournal_config.py:62
 #: modules/webjournal/lib/webjournal_config.py:94
 #: modules/webjournal/lib/webjournal_config.py:126
 #: modules/webjournal/lib/webjournal_config.py:161
-#, fuzzy
 msgid "Internal configuration error"
-msgstr "Errore Interno"
+msgstr "Errore di configurazione interno"
 
 #: modules/webjournal/lib/webjournal_config.py:63
 #: modules/webjournal/lib/webjournal_config.py:95
 msgid "There is no format configured for this journals index page"
-msgstr ""
+msgstr "Non è stato configurato alcun formato per questa pagina indice di journal"
 
 #: modules/webjournal/lib/webjournal_config.py:127
 msgid "There is no format configured for this journals search page"
-msgstr ""
+msgstr "Non è stato configurato alcun formato per questa pagina di ricerca di journal"
 
 #: modules/webjournal/lib/webjournal_config.py:162
 msgid "There is no format configured for this journals popup page"
-msgstr ""
+msgstr "Non è stato configurato alcun formato per questa pagina a comparsa di journal"
 
 #: modules/webjournal/lib/webjournal_config.py:194
-#, fuzzy
 msgid "No journal articles"
-msgstr "Nessun tipo di documento disponibile."
+msgstr "Nessun articolo di journal"
 
 #: modules/webjournal/lib/webjournal_config.py:195
 #: modules/webjournal/lib/webjournal_config.py:233
 msgid "Problem with the configuration of this journal"
-msgstr ""
+msgstr "Riscontrato un problema nella configurazione di questo journal"
 
 #: modules/webjournal/lib/webjournal_config.py:232
-#, fuzzy
 msgid "No journal issues"
-msgstr "stato corrente:"
+msgstr "Nessun numero di journal"
 
 #: modules/webjournal/lib/webjournal_config.py:269
-#, fuzzy
 msgid "Journal article error"
-msgstr "Errore Interno"
+msgstr "Errore articolo di journal"
 
 #: modules/webjournal/lib/webjournal_config.py:270
 msgid "We could not know which article you were looking for"
-msgstr ""
+msgstr "Impossibile determinare l'articolo da te ricercato"
 
 #: modules/webjournal/lib/webjournal_config.py:303
-#, fuzzy
 msgid "No journals available"
-msgstr "Nessun tipo di documento disponibile."
+msgstr "Nessun journal disponibile"
 
 #: modules/webjournal/lib/webjournal_config.py:304
 msgid "We could not provide you any journals"
-msgstr ""
+msgstr "Impossibile ricuperare alcun journal"
 
 #: modules/webjournal/lib/webjournal_config.py:305
 msgid ""
 "It seems that there are no journals defined on this server. Please contact "
 "support if this is not right."
-msgstr ""
+msgstr "Non sembrano esserci journal definiti su questo server. Se pensi che questo non è corretto contatta il servizio di supporto."
 
 #: modules/webjournal/lib/webjournal_config.py:330
 msgid "Select a journal on this server"
-msgstr ""
+msgstr "Seleziona un journal su questo server"
 
 #: modules/webjournal/lib/webjournal_config.py:331
 msgid "We couldn't guess which journal you are looking for"
-msgstr ""
+msgstr "Impossibile comprendere il journal che stai cercando"
 
 #: modules/webjournal/lib/webjournal_config.py:332
 msgid ""
 "You did not provide an argument for a journal name. Please select the "
 "journal you want to read in the list below."
-msgstr ""
+msgstr "Non hai fornito un parametro per il nome del journal. Per favore seleziona il journal che desideri leggere dall'elenco sottostante."
 
 #: modules/webjournal/lib/webjournal_config.py:358
-#, fuzzy
 msgid "No current issue"
-msgstr "stato corrente:"
+msgstr "Nessun numero corrente"
 
 #: modules/webjournal/lib/webjournal_config.py:359
 msgid "We could not find any informtion on the current issue"
-msgstr ""
+msgstr "Impossibile trovare alcuna informazione sul numero corrente"
 
 #: modules/webjournal/lib/webjournal_config.py:360
 msgid ""
 "The configuration for the current issue seems to be empty. Try providing an "
 "issue number or check with support."
-msgstr ""
+msgstr "La configurazione per il numero corrente sembra essere vuota. Prova a fornire il numero o fai riferimento al servizio di supporto."
 
 #: modules/webjournal/lib/webjournal_config.py:387
 msgid "Issue number badly formed"
-msgstr ""
+msgstr "Numero formattato erroneamente"
 
 #: modules/webjournal/lib/webjournal_config.py:388
 msgid "We could not read the issue number you provided"
-msgstr ""
+msgstr "Impossibile interpretare il numero da te fornito"
 
 #: modules/webjournal/lib/webjournal_config.py:417
 msgid "Archive date badly formed"
-msgstr ""
+msgstr "Data di archivio formattata erroneamente"
 
 #: modules/webjournal/lib/webjournal_config.py:418
 msgid "We could not read the archive date you provided"
-msgstr ""
+msgstr "Impossibile interpretare la data di archivio da te fornita"
 
 #: modules/webjournal/lib/webjournal_config.py:449
 msgid "No popup type"
-msgstr ""
+msgstr "Nessun tipo di finestra a comparsa"
 
 #: modules/webjournal/lib/webjournal_config.py:450
 msgid "We could not know what kind of popup you requested"
-msgstr ""
+msgstr "Impossibile determinare il tipo di finestra a comparsa da te richiesto"
 
 #: modules/webjournal/lib/webjournal_config.py:482
-#, fuzzy
 msgid "No popup record"
-msgstr "Torna al record"
+msgstr "Nessun record con finestra a comparsa"
 
 #: modules/webjournal/lib/webjournal_config.py:483
 msgid "We could not deduce the popup article you requested"
-msgstr ""
+msgstr "Impossibile comprendere l'articolo a comparsa da te richiesto"
 
 #: modules/webjournal/lib/webjournal_config.py:514
-#, fuzzy
 msgid "Update error"
-msgstr "Aggiorna gruppo"
+msgstr "Errore di aggiornamento"
 
 #: modules/webjournal/lib/webjournal_config.py:515
 #: modules/webjournal/lib/webjournal_config.py:546
 msgid "There was an internal error"
-msgstr ""
+msgstr "È avvenuto un errore interno"
 
 #: modules/webjournal/lib/webjournal_config.py:545
-#, fuzzy
 msgid "Journal publishing DB error"
-msgstr "Errore Interno"
+msgstr "Errore DB di pubblicazione del journal"
 
 #: modules/webjournal/lib/webjournal_config.py:577
-#, fuzzy
 msgid "Journal issue error"
-msgstr "Errore Interno"
+msgstr "Errore numero Journal"
 
 #: modules/webjournal/lib/webjournal_config.py:578
-#, fuzzy
 msgid "We could not find a current issue in the Database"
-msgstr "Sorgenti OAI al momento presenti nel database"
+msgstr "Impossibile trovare un numero corrente nel database"
 
 #: modules/webjournal/lib/webjournal_config.py:608
-#, fuzzy
 msgid "Journal ID error"
-msgstr "Errore Interno"
+msgstr "Errore ID del journal"
 
 #: modules/webjournal/lib/webjournal_config.py:609
 msgid "We could not find the id for this journal in the Database"
-msgstr ""
+msgstr "Impossibile trovare l'id di questo journal nel database"
 
 #: modules/webjournal/lib/webjournal_config.py:630
 msgid "Available journals"
-msgstr ""
+msgstr "Journal disponibili"
 
