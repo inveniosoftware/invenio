@@ -196,6 +196,6 @@ def getFiles(bfo):
                 if not assigned: # Url is not a bibdoc :-S
                     if not descr:
                         descr = filename
-                    parsed_urls['others_urls'].append(url, descr) # Let's put it in a general other url
+                    parsed_urls['others_urls'].append((url, descr)) # Let's put it in a general other url
 
     return (parsed_urls, old_versions, additionals)
