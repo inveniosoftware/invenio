@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 import time
 
-def format(bfo, date_format=''):
+def format(bfo, date_format='%d %B %Y'):
     """
     Prints the imprint publication date. If <code>format</code> is specified,
     Parameter <code>date_format</code> allows to specify the string representation of the output.
@@ -40,7 +40,7 @@ def format(bfo, date_format=''):
     if format != '':
         try:
             date_time = time.strptime(date, "%Y-%m-%d")
-            return date_time.strftime(date_format)
+            return time.strftime(date_format, date_time)
         except ValueError:
             return date
     else:
