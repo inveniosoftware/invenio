@@ -61,6 +61,7 @@ class InvenioWebSubmitFileStamperError(Exception):
            parameter.
            @param value: (string) - a string to write to the log.
         """
+        Exception.__init__(self)
         self.value = value
     def __str__(self):
         """Return oneself as a string (actually, return the contents of
@@ -68,6 +69,19 @@ class InvenioWebSubmitFileStamperError(Exception):
            @return: (string)
         """
         return str(self.value)
+
+def quote_shell_arg(shell_arg):
+    """Quote a shell argument with single-quotes. This basically means putting
+       single quotes around it and escaping any single-quotes within it.
+       E.g.:
+          hello         ---> 'hello'
+          hello'world   ---> 'hello'\''world'
+       @param shell_arg: (string) - the item to be quoted.
+       @return: (string) - the single-quoted string.
+       Details of this were found here:
+       <http://mail.python.org/pipermail/python-list/2005-October/346957.html>
+    """
+    return "'%s'" % shell_arg.replace("'", r"'\''")
 
 
 ## ***** Functions related to the creation of the PDF Stamp file: *****
@@ -147,8 +161,9 @@ def copy_template_files_to_stampdir(path_workingdir, latex_template):
             ## The template has been found in WebSubmit's latex templates
             ## directory. Copy it locally to the stamping working directory:
             try:
-                shutil.copyfile("%s/%s" % (CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR, \
-                                           template_name), \
+                shutil.copyfile("%s/%s" \
+                                % (CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR, \
+                                   template_name), \
                                 "%s/%s" % (path_workingdir, template_name))
             except IOError:
                 ## Unable to copy the LaTeX template file to the
@@ -171,9 +186,9 @@ def copy_template_files_to_stampdir(path_workingdir, latex_template):
     ## the names of graphics files to be included in the resulting
     ## document and attempt to copy them to the working "stamp" directory:
     cmd_findgraphics = \
-       """grep includegraphic %s/%s | """ \
+       """grep includegraphic %s | """ \
        """sed -n 's/^[^{]*{\\([^}]\\{1,\\}\\)}.*$/\\1/p'""" \
-       % (path_workingdir, template_name)
+       % quote_shell_arg("%s/%s" % (path_workingdir, template_name))
 
     fh_findgraphics = os.popen(cmd_findgraphics, "r")
     graphic_names = fh_findgraphics.readlines()
@@ -328,7 +343,8 @@ def create_final_latex_template(working_dirname, \
                         ## generate today's date
                         date_format = replacement_term[5:-1].strip('\'"')
                         try:
-                            replacement = time.strftime(date_format, time.localtime())
+                            replacement = time.strftime(date_format, \
+                                                        time.localtime())
                         except TypeError:
                             ## Bad date format
                             replacement = ""
@@ -389,12 +405,15 @@ def create_pdf_stamp(path_workingdir, latex_template, latex_template_var):
     ## Now, build the Stamp PDF from the LaTeX template:
     cmd_latex = """cd %(workingdir)s; /usr/bin/pdflatex """ \
                 """-interaction=batchmode """ \
-                """%(workingdir)s/%(latex-template)s > /dev/null 2>&1""" \
-                % { 'workingdir'         : path_workingdir,
-                    'latex-template'     : final_template,
+                """%(template-path)s > /dev/null 2>&1""" \
+                % { 'template-path' : quote_shell_arg("%s/%s" \
+                                          % (path_workingdir, final_template)),
+                    'workingdir'    : path_workingdir,
                   }
     ## Log the latex command
-    os.system("""echo '%s' > latex_cmd""" % cmd_latex)
+    os.system("""echo %s > %s""" % (quote_shell_arg(cmd_latex), \
+                                    quote_shell_arg("%s/latex_cmd" \
+                                                    % path_workingdir)))
     ## Run the latex command
     errcode_latex = os.system("%s" % cmd_latex)
 
@@ -429,15 +448,20 @@ def apply_stamp_cover_page(path_workingdir, \
     """
     ## Build the stamping command:
     cmd_add_cover_page = \
-                """%(pdftk)s %(working-dir)s/%(cover-page)s """ \
-                """%(working-dir)s/%(file-to-stamp)s """ \
-                """cat output %(working-dir)s/%(stamped-file)s """ \
+                """%(pdftk)s %(cover-page-path)s """ \
+                """%(file-to-stamp-path)s """ \
+                """cat output %(stamped-file-path)s """ \
                 """2>/dev/null"""% \
-                  { 'pdftk'         : CFG_PATH_PDFTK,
-                    'working-dir'   : path_workingdir,
-                    'cover-page'    : stamp_file_name,
-                    'file-to-stamp' : subject_file,
-                    'stamped-file'  : output_file,
+                  { 'pdftk'              : CFG_PATH_PDFTK,
+                    'cover-page-path'    : quote_shell_arg("%s/%s" \
+                                                % (path_workingdir, \
+                                                   stamp_file_name)),
+                    'file-to-stamp-path' : quote_shell_arg("%s/%s" \
+                                                % (path_workingdir, \
+                                                   subject_file)),
+                    'stamped-file-path'  : quote_shell_arg("%s/%s" \
+                                                % (path_workingdir, \
+                                                   output_file)),
                   }
     ## Execute the stamping command:
     errcode_add_cover_page = os.system(cmd_add_cover_page)
@@ -489,13 +513,15 @@ def apply_stamp_first_page(path_workingdir, \
 
     ## Perform the separation:
     cmd_get_first_page = \
-             "%(pdftk)s A=%(working-dir)s/%(file-to-stamp)s " \
-             "cat A1 output %(working-dir)s/%(first-page)s " \
+             "%(pdftk)s A=%(file-to-stamp-path)s " \
+             "cat A1 output %(first-page-path)s " \
              "2>/dev/null" \
              % { 'pdftk'         : CFG_PATH_PDFTK,
-                 'working-dir'   : path_workingdir,
-                 'file-to-stamp' : subject_file,
-                 'first-page'    : output_file_first_page,
+                 'file-to-stamp-path' : quote_shell_arg("%s/%s" % \
+                                              (path_workingdir, subject_file)),
+                 'first-page-path'    : quote_shell_arg("%s/%s" % \
+                                              (path_workingdir, \
+                                               output_file_first_page)),
                }
     errcode_get_first_page = os.system(cmd_get_first_page)
     ## Check that the separation was successful:
@@ -511,14 +537,19 @@ def apply_stamp_first_page(path_workingdir, \
 
     ## Now stamp the first page:
     cmd_stamp_first_page = \
-             "%(pdftk)s %(working-dir)s/%(first-page)s background " \
-             "%(working-dir)s/%(stamp-file)s output " \
-             "%(working-dir)s/%(stamped-first-page)s 2>/dev/null" \
-             % { 'pdftk'              : CFG_PATH_PDFTK,
-                 'working-dir'        : path_workingdir,
-                 'stamp-file'         : stamp_file_name,
-                 'first-page'         : output_file_first_page,
-                 'stamped-first-page' : stamped_output_file_first_page,
+             "%(pdftk)s %(first-page-path)s background " \
+             "%(stamp-file-path)s output " \
+             "%(stamped-first-page-path)s 2>/dev/null" \
+             % { 'pdftk'                   : CFG_PATH_PDFTK,
+                 'first-page-path'         : quote_shell_arg("%s/%s" % \
+                                              (path_workingdir, \
+                                               output_file_first_page)),
+                 'stamp-file-path'         : quote_shell_arg("%s/%s" % \
+                                              (path_workingdir, \
+                                               stamp_file_name)),
+                 'stamped-first-page-path' : quote_shell_arg("%s/%s" % \
+                                              (path_workingdir, \
+                                               stamped_output_file_first_page)),
                }
     errcode_stamp_first_page = os.system(cmd_stamp_first_page)
     ## Check that the first page was stamped successfully:
@@ -534,14 +565,19 @@ def apply_stamp_first_page(path_workingdir, \
     ## Now that the first page has been stamped successfully, merge it with
     ## the remaining pages of the original file:
     cmd_merge_stamped_and_original_files = \
-             "%(pdftk)s A=%(working-dir)s/%(stamped-first-page)s  " \
-             "B=%(working-dir)s/%(original-file)s cat A1 B2-end output " \
-             "%(working-dir)s/%(stamped-file)s 2>/dev/null" \
+             "%(pdftk)s A=%(stamped-first-page-path)s  " \
+             "B=%(original-file-path)s cat A1 B2-end output " \
+             "%(stamped-file-path)s 2>/dev/null" \
              % { 'pdftk'              : CFG_PATH_PDFTK,
-                 'working-dir'        : path_workingdir,
-                 'stamped-first-page' : stamped_output_file_first_page,
-                 'original-file'      : subject_file,
-                 'stamped-file'       : output_file,
+                 'stamped-first-page-path' : quote_shell_arg("%s/%s" % \
+                                              (path_workingdir, \
+                                               stamped_output_file_first_page)),
+                 'original-file-path'      : quote_shell_arg("%s/%s" % \
+                                              (path_workingdir, \
+                                               subject_file)),
+                 'stamped-file-path'       : quote_shell_arg("%s/%s" % \
+                                              (path_workingdir, \
+                                               output_file)),
                }
     errcode_merge_stamped_and_original_files = \
                    os.system(cmd_merge_stamped_and_original_files)
@@ -559,12 +595,13 @@ def apply_stamp_first_page(path_workingdir, \
         ## error when merging the stamped first page with the rest of the
         ## pages and stamping can be considered to have failed.
         cmd_find_number_pages = \
-           """%(pdftk)s %(working-dir)s/%(original-file)s dump_data | """ \
+           """%(pdftk)s %(original-file-path)s dump_data | """ \
            """grep NumberOfPages | """ \
            """sed -n 's/^NumberOfPages: \\([0-9]\\{1,\\}\\)$/\\1/p'""" \
-             % { 'pdftk'         : CFG_PATH_PDFTK,
-                 'working-dir'   : path_workingdir,
-                 'original-file' : subject_file,
+             % { 'pdftk'              : CFG_PATH_PDFTK,
+                 'original-file-path' : quote_shell_arg("%s/%s" % \
+                                                        (path_workingdir, \
+                                                         subject_file)),
                }
         fh_find_number_pages = os.popen(cmd_find_number_pages, "r")
         match_number_pages = fh_find_number_pages.read()
@@ -659,14 +696,19 @@ def apply_stamp_all_pages(path_workingdir, \
         will be written in the working directory after the function has ended.
     """
     cmd_stamp_all_pages = \
-             "%(pdftk)s %(working-dir)s/%(file-to-stamp)s background " \
-             "%(working-dir)s/%(stamp-file)s output " \
-             "%(working-dir)s/%(stamped-file-all-pages)s 2>/dev/null" \
-             % { 'pdftk'                  : CFG_PATH_PDFTK,
-                 'working-dir'            : path_workingdir,
-                 'stamp-file'             : stamp_file_name,
-                 'file-to-stamp'          : subject_file,
-                 'stamped-file-all-pages' : output_file,
+             "%(pdftk)s %(file-to-stamp-path)s background " \
+             "%(stamp-file-path)s output " \
+             "%(stamped-file-all-pages-path)s 2>/dev/null" \
+             % { 'pdftk'                       : CFG_PATH_PDFTK,
+                 'file-to-stamp-path'          : quote_shell_arg("%s/%s" % \
+                                                  (path_workingdir, \
+                                                   subject_file)),
+                 'stamp-file-path'             : quote_shell_arg("%s/%s" % \
+                                                  (path_workingdir, \
+                                                   stamp_file_name)),
+                 'stamped-file-all-pages-path' : quote_shell_arg("%s/%s" % \
+                                                  (path_workingdir, \
+                                                   output_file)),
                }
     errcode_stamp_all_pages = os.system(cmd_stamp_all_pages)
     if errcode_stamp_all_pages or \
@@ -689,10 +731,11 @@ def apply_stamp_to_file(path_workingdir,
     subject_filetype = ""
 
     ## Using the file command, test for the file-type of "subject_file":
-    cmd_gfile = "%(gfile)s %(working-dir)s/%(file-to-stamp)s 2> /dev/null" \
-                % { 'gfile'         : CFG_PATH_GFILE,
-                    'working-dir'   : path_workingdir,
-                    'file-to-stamp' : subject_file,
+    cmd_gfile = "%(gfile)s %(file-to-stamp-path)s 2> /dev/null" \
+                % { 'gfile'              : CFG_PATH_GFILE,
+                    'file-to-stamp-path' : quote_shell_arg("%s/%s" % \
+                                                           (path_workingdir, \
+                                                            subject_file)),
                   }
     ## Execute the file command:
     fh_gfile = os.popen(cmd_gfile, "r")
@@ -751,12 +794,15 @@ def apply_stamp_to_file(path_workingdir,
             created_pdfname = "%s.pdf" % subject_file
 
         ## Build the distilling command:
-        cmd_distill = """%(distiller)s %(working-dir)s/%(ps-file)s """ \
-                      """%(working-dir)s/%(pdf-file)s 2>/dev/null""" % \
-                      { 'distiller' : CFG_PATH_DISTILLER, \
-                        'working-dir' : path_workingdir,
-                        'ps-file' : subject_file,
-                        'pdf-file' : created_pdfname,
+        cmd_distill = """%(distiller)s %(ps-file-path)s """ \
+                      """%(pdf-file-path)s 2>/dev/null""" % \
+                      { 'distiller'     : CFG_PATH_DISTILLER,
+                        'ps-file-path'  : quote_shell_arg("%s/%s" % \
+                                                          (path_workingdir, \
+                                                           subject_file)),
+                        'pdf-file-path' : quote_shell_arg("%s/%s" % \
+                                                          (path_workingdir, \
+                                                           created_pdfname)),
                       }
         ## Distill the PS into a PDF:
         errcode_distill = os.system(cmd_distill)
@@ -847,11 +893,13 @@ def apply_stamp_to_file(path_workingdir,
             stamped_psname = "%s.ps" % output_file
 
         ## Build the conversion command:
-        cmd_pdf2ps = "%s %s/%s %s/%s 2>/dev/null" % (CFG_PATH_PDF2PS,
-                                                     path_workingdir,
-                                                     output_file,
-                                                     path_workingdir,
-                                                     stamped_psname)
+        cmd_pdf2ps = "%s %s %s 2>/dev/null" % (CFG_PATH_PDF2PS,
+                                               quote_shell_arg("%s/%s" % \
+                                                     (path_workingdir, \
+                                                      output_file)),
+                                               quote_shell_arg("%s/%s" % \
+                                                     (path_workingdir, \
+                                                      stamped_psname)))
         errcode_pdf2ps = os.system(cmd_pdf2ps)
         ## Check to see that the command executed OK:
         if not errcode_pdf2ps and \
@@ -1317,8 +1365,9 @@ def stamp_file_cli():
         except IOError:
             ## Report that it wasn't possible to copy the stamped file locally
             ## and offer the user a path to it:
-            msg = "It was not possible to copy the stamped file to the current " \
-                  "working directory.\nYou can find it here: [%s/%s].\n" \
+            msg = "It was not possible to copy the stamped file to the " \
+                  "current working directory.\nYou can find it here: " \
+                  "[%s/%s].\n" \
                   % (working_dir, stamped_file)
             sys.stderr.write(msg)
             sys.stderr.flush()
