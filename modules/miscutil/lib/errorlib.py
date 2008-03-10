@@ -118,39 +118,32 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
         if exc_info[0]:
             ## We found an exception.
 
-            ## Preparing the exception dump
-            stream = stream=='error' and 'err' or 'log'
-            stream_to_write = StringIO()
 
             ## We want to extract the name of the Exception
             exc_name = exc_info[0].__name__
             exc_value = str(exc_info[1])
 
             ## Let's record when and where and what
-            print >> stream_to_write, "%(time)s -> %(name)s: %(value)s" % {
+            www_data = "%(time)s -> %(name)s: %(value)s" % {
                 'time' : time.strftime("%Y-%m-%d %H:%M:%S"),
                 'name' : exc_name,
                 'value' : exc_value
             }
 
-            ## If a prefix was requested let's print it
-            if prefix:
-                print >> stream_to_write, prefix
-
-            ## Let's print contextual user related info, if any
+            ## Let's retrieve contextual user related info, if any
             try:
-                print >> stream_to_write, get_pretty_wide_client_info(req)
+                client_data = get_pretty_wide_client_info(req)
             except Exception, e:
-                print >> stream_to_write, "Error in retrieving contextual information: %s" % e
+                client_data = "Error in retrieving contextual information: %s" % e
 
             ## Let's extract the traceback
             if not exc_name.startswith('Invenio') or force_stack:
                 ## We put a large traceback only if requested
                 ## or the Exception is not an Invenio one.
                 tracestack = traceback.extract_stack()[-5:-2]
-                tracestack_pretty = "%sForced traceback (most recent call last)" % (' '*4,)
+                tracestack_data = "%sForced traceback (most recent call last)" % (' '*4,)
                 for trace_tuple in tracestack:
-                    tracestack_pretty += """
+                    tracestack_data += """
   File "%(file)s", line %(line)s, in %(function)s
     %(text)s""" % \
                         {   'file'      : trace_tuple[0],
@@ -158,30 +151,65 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                             'function'  : trace_tuple[2],
                             'text'      : trace_tuple[3] is not None and str(trace_tuple[3]) or ""
                         }
-                print >> stream_to_write, tracestack_pretty
+            else:
+                tracestack_data = ""
 
+            exception_data = StringIO()
             ## Let's print the exception (and the traceback)
-            traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, stream_to_write)
+            traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, exception_data)
+            exception_data = exception_data.getvalue()
+
+            log_stream = StringIO()
+            email_stream = StringIO()
+
+
+            ## If a prefix was requested let's print it
+            if prefix:
+                print >> log_stream, prefix
+                print >> email_stream, prefix
+
+            print >> email_stream, "The following problem occurred on %s" % weburl
+            print >> email_stream, ">>> Registered exception"
+
+            print >> log_stream, www_data
+            print >> email_stream, www_data
+
+            print >> email_stream, ">>> User details"
+
+            print >> log_stream, client_data
+            print >> email_stream, client_data
+
+            print >> email_stream, ">>> Traceback details"
+
+            if tracestack_data:
+                print >> log_stream, tracestack_data
+                print >> email_stream, tracestack_data
+
+            print >> log_stream, exception_data
+            print >> email_stream, exception_data
 
             ## If a suffix was requested let's print it
             if suffix:
-                print >> stream_to_write, suffix
-            print >> stream_to_write, '\n'
+                print >> log_stream, suffix
+                print >> email_stream, suffix
+
+            log_text = log_stream.getvalue()
+            email_text = email_stream.getvalue()
+
+            ## Preparing the exception dump
+            stream = stream=='error' and 'err' or 'log'
 
             ## We now have the whole trace
-            text = stream_to_write.getvalue()
-            stream_to_write.close()
             written_to_log = False
             try:
                 ## Let's try to write into the log.
-                open(os.path.join(logdir, 'invenio.' + stream), 'a').write(text)
+                open(os.path.join(logdir, 'invenio.' + stream), 'a').write(log_text)
                 written_to_log = True
             finally:
                 if alert_admin or not written_to_log:
                     ## If requested or if it's impossible to write in the log
                     from invenio.mailutils import send_email
-                    send_email(adminemail, adminemail, subject='Registered exception @ %s' % weburl, content=text)
-
+                    send_email(adminemail, adminemail, subject='Registered exception at %s' % weburl, content=email_text)
             return 1
         else:
             return 0
