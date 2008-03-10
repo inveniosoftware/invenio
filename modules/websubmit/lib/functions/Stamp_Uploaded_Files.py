@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 from invenio.errorlib import register_exception
 from invenio import websubmit_file_stamper
 from invenio.websubmit_config import InvenioWebSubmitFunctionWarning, \
-     InvenioWebSubmitFunctionError
+     InvenioWebSubmitFunctionError, InvenioWebSubmitFileStamperError
 import os.path, shutil, re
 
 def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
@@ -170,7 +170,7 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
             os.path.walk(path_to_stampdir, \
                          visit_for_stamping, \
                          visit_for_stamping_arguments)
-        except InvenioWebSubmitFunctionWarning, wrn:
+        except InvenioWebSubmitFunctionWarning:
             ## Unable to stamp the files in stampdir. Register the exception
             ## and continue to try to stamp the files in the other stampdirs:
             ## FIXME - The original exception was registered in 'visit'.
@@ -250,7 +250,7 @@ def visit_for_stamping(visit_for_stamping_arguments, dirname, filenames):
             ## Try to stamp the file:
             (stamped_file_path_only, stamped_file_name) = \
                     websubmit_file_stamper.stamp_file(file_stamper_options)
-        except websubmit_file_stamper.InvenioWebSubmitFileStamperError:
+        except InvenioWebSubmitFileStamperError:
             ## It wasn't possible to stamp this file.
             ## Register the exception along with an informational message:
             exception_prefix = "A problem occurred when stamping [%s]. The " \
