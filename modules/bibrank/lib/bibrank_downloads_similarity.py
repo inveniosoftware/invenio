@@ -80,7 +80,7 @@ def register_page_view_event(recid, uid, client_ip_address):
     return run_sql("INSERT INTO rnkPAGEVIEWS " \
                    " (id_bibrec,id_user,client_host,view_time) " \
                    " VALUES (%s,%s,INET_ATON(%s),NOW())", \
-                   (recid, uid, client_ip_address))    
+                   (recid, uid, client_ip_address))
 
 def calculate_reading_similarity_list(recid, type="pageviews"):
     """Calculate reading similarity data to use in reading similarity
@@ -89,17 +89,18 @@ def calculate_reading_similarity_list(recid, type="pageviews"):
        (recid2,score2), ... for all recidN that were consulted by the
        same people who have also consulted RECID.  The reading
        similarity TYPE can be either `pageviews' or `downloads',
-       depending whether we want to obtain page view similarity or 
+       depending whether we want to obtain page view similarity or
        download similarity.
     """
     if type == "downloads":
         tablename = "rnkDOWNLOADS"
     else: # default
-        tablename = "rnkPAGEVIEWS"        
+        tablename = "rnkPAGEVIEWS"
     # firstly compute the set of client hosts who consulted recid:
-    client_host_list = run_sql("SELECT DISTINCT(client_host)" \
+    client_host_list = run_sql("SELECT DISTINCT(client_host)" + \
                                "  FROM " + tablename + \
-                               " WHERE id_bibrec=%s", 
+                               " WHERE id_bibrec=%s " + \
+                               "   AND client_host IS NOT NULL",
                                (recid,))
     # secondly look up all recids that were consulted by these client hosts,
     # and order them by the number of different client hosts reading them:
