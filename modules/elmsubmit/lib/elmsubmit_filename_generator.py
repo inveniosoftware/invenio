@@ -60,7 +60,7 @@ def generate_filename(filename=None, file=None, content_type=None, no_rand_chars
 
 def calculate_filename_extension(filename=None, file=None, content_type=None):
 
-    # If libmagic and its Python wrapper are installed that the latter is
+    # If libmagic and its Python wrapper are installed then the latter is
     # used to calculate a file extension using a specially
     # prepared magic data file (./magic/magic.ext) which maps
     # magic tests to file extensions. Otherwise we use the mimetypes
