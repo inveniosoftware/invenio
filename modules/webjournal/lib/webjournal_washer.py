@@ -21,7 +21,9 @@ import time
 import re
 from invenio.webjournal_config import InvenioWebJournalIssueNumberBadlyFormedError, \
                                     InvenioWebJournalNoArticleNumberError, \
-                                    InvenioWebJournalArchiveDateWronglyFormedError
+                                    InvenioWebJournalArchiveDateWronglyFormedError, \
+                                    IvenioWebJournalNoPopupTypeError, \
+                                    InvenioWebJournalNoPopupRecordError
 from invenio.webjournal_utils import get_current_issue, \
                                     guess_journal_name
 
@@ -68,13 +70,13 @@ def wash_issue_number(language, journal_name, issue_number):
         else:
             raise InvenioWebJournalIssueNumberBadlyFormedError(language,
                                                                issue_number)
-            
+
 def wash_category(language, category):
     """
     Wahses a category name. No washing criterions so far.
     """
     return category
-    
+
 def wash_article_number(language, number, journal_name):
     """
     Washes an article number. First checks if it is non-empty, then if it is
@@ -96,7 +98,7 @@ def wash_popup_type(language, type, journal_name):
         raise IvenioWebJournalNoPopupTypeError(language)
     else:
         return type
-    
+
 def wash_popup_record(language, record, journal_name):
     """
     """

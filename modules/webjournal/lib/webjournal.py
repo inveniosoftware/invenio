@@ -38,7 +38,8 @@ from invenio.webjournal_config import InvenioWebJournalNoIndexTemplateError, \
                                       InvenioWebJournalReleaseUpdateError, \
                                       InvenioWebJournalIssueNotFoundDBError, \
                                       InvenioWebJournalJournalIdNotFoundDBError, \
-                                      InvenioWebJournalArchiveDateWronglyFormedError
+                                      InvenioWebJournalArchiveDateWronglyFormedError, \
+                                      InvenioWebJournalNoSearchTemplateError
 from invenio.webjournal_utils import get_xml_from_config
 from invenio.webjournal_utils import get_recid_from_order_CERNBulletin, \
                                     get_article_page_from_cache, \
