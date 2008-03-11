@@ -90,7 +90,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                     lastupdated=__lastupdated__,
                     navmenuid='youralerts')
 
-    def input(left, req, form):
+    def input(self, req, form):
 
         argd = wash_urlargd(form, {'idq': (int, None),
                                    'name': (str, ""),
