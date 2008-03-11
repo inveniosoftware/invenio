@@ -967,14 +967,7 @@ Your CDS Invenio Installation</a> guide for more information.</p>
 <p>The new Python BibFormat formats are not backward compatible with the previous formats. New concepts and capabilities have been introduced and some have been dropped. If you have not modified the "Formats" or modified only a
 little bit the "Behaviours" (or modified "Knowledge Bases"), then the transition will be painless and
 automatic. Otherwise you will have to manually rewrite some of the
-formats. This should however not be a big problem. Firstly because the
-CDS Invenio installation will provide both versions of BibFormat for
-some time. Secondly because both BibFormat versions can run side by
-side, so that you can migrate your formats while your server still
-works with the old formats.  Thirdly because we provide a migration
-kit that can help you go through this process. Finally because the
-migration is not so difficult, and because it will be much easier for
-you to customize how BibFormat formats your bibliographic data.</p>
+formats. This should however not be a big problem.</p>
 <p>The first thing you should do is to read the <a href="#shortIntro">Five Minutes Introduction to BibFormat</a> to understand how the new BibFormat works. We also assume that you are familiar with the concepts of the old BibFormat. As the new formats separate the presentation from the business logic (i.e. the bindings to the database), it is not possible to automatically handle the translation. This is why you should at least be able to read and understand the formats that you want to migrate.</p>
 
 <h4>Differences between old and new BibFormat</h4>
@@ -1089,64 +1082,23 @@ default: Default_HTML_brief.bft<br/>
 <p>or visual representation through web interface:<br/>
 <img src="<WEBURL>/img/admin/bibformat-guide-bfo_hb_migrate.png" alt="Image representation of HB output format" />
 </p>
-<p>We suggest that you use the migration kit to produce initial output formats from
-your behaviours, but that you go through the created .bfo files in the /etc/bibformat/output_formats/ directory of your CDS Invenio installation to check that they correspond to your behaviours.</p>
 <h4>Migrating <i>formats</i> to <i>format templates</i> and <i>format elements</i></h4>
 <p>The migration of formats is the most difficult part of the migration. You will need to separate the presentation code (HTML) from the business code (iterations, tests and calls to the database). Here are some tips on how you can do this:</p>
 <ul>
 <li>If you want to save the time of unescaping all HTML characters and understanding how the layout should look like, just go with your web browser to a formatted version of the format in your CDS Invenio installation, and copy the source of the web page. Identify the parts of the HTML code which are specific to the current record, and replace them with a call to the corresponding format element.</li>
 <li>If you have made small modifications to the old default provided formats, we suggest that you use the new provided ones and modify them according to your needs.</li>
 </ul>
-<p>We recommend that you do not use the migration kit for this part: it can help you create the initial files, but will never be able to provide a working implementation of the formats.</p>
-<h4>Migrating <i>Knowledge Bases</i></h4>
-<p>We recommend you use the migration kit to migrate your knowledge bases. It should have no problem to migrate this part of your configuration.</p>
 <h4>Migrating <i>UDFs</i> and <i>Link rules</i></h4>
 <p><i>User Defined Functions</i> and <i>Link rules</i> have been dropped in the new BibFormat. These concepts have no reasons to be as they can be fully implemented in the <i>format elements</i>. For example the <code>AUTHOR_SEARCH</code> link rule can directly be implemented in the <code>Authors.bfe</code> element.</p>
 <p>As for the UDFs, most of them are directly built-in functions of Python. Whenever a special function as to be implemented, it can be defined in a regular Python file and used in any element.</p>
 <h4>The Migration Kit</h4>
-<p>The migration kit is available from the main BibFormat admin webpage or
-<a href="bibformat_migration_kit_assistant.py">directly here</a>. The migration
-kit has 3 steps, each migrating some part of your configuration. Just
-click on the links to migrate each part and get the status of the migration.</p>
-<p>You should note that each migration will create new files or entries in the database, such that
-you will certainly want to click only once on each step (otherwise you will get duplicates).</p>
-<p>The migration kit can:<br/>
- a) Effortlessly migrate your behaviours, unless they include complex
-    logic, which usually they don't.<br/>
- b) Help you migrate formats to format templates and format elements.<br/>
- c) Effortlessly migrate your knowledge bases.<br/>
+<p>The migration kit is only available in older versions of Invenio.<br/>
+To enable the migration kit in this release, you need to copy the required files from an older release.
 </p>
-<p>Point b) is the most difficult to achieve: previous formats did mix
-business logic and code for the presentation, and could use PHP
-functions. The new BibFormat separates business logic and
-presentation, and does not support PHP. The transition kit will try to
-move business logic to the format elements, and the presentation to
-the format templates. These files will be created for you, includes
-the original code and, if possible, a proposal of Python
-translation. We recommend that you do not to use the transition kit to
-translate formats, especially if you have not modified default
-formats, or only modified default formats in some limited places. You
-will get cleaner code if you write format elements and format
-templates yourself.
-</p>
-
 <h4><a name="runSideBySide">Run old and new formats side by side</a></h4>
-<p>You might want to migrate your formats over a long period of time, making new formats available to your
-users once they have been migrated, while old formats are still being used if they have not been translated.
-BibFormat will do this almost automatically. This section tells you what you should be aware of if you want this to work seamlessly.</p>
-<p>When BibFormat has to format a record with a given output format code, it first tries to find a corresponding
-output format in the (new) output formats directory. If the output format cannot be found, it handle the formatting process
-to the old BibFormat, which will look for a behaviour with a name corresponding to code. This leads to the first rule you should follow:</p>
-<p align="center"><i>For each of the Behaviours you want to migrate, you should have an Output Format with a code corresponding to the name of the Behaviour.</i></p>
-<p>The second (and last) rule is as simple as the first one. Imagine you have a Behaviour "HD" that you want to migrate to Output Format "HB". Let's say that "HD" links to 'picture_HTML_detailed' format if field <code>980__a</code> is equal to "Picture", and links to 'default_HTML_detailed' in all other cases, but that 'picture_HTML_detailed' has not been migrated to a new format template. Then second rule says:<p>
-<p align="center"><i>Output Formats should have the same conditions on tags as Behaviours, even if format for that condition has not been migrated.</i></p>
-<p>In our example if you open the "HD" ouput format in the web interface, we can add a rule that works on condition <code>"If 980__a is PICTURE"</code> and set the template to be used to "defined in old BibFormat" in the template menu. This looks strange, this is the only way to tell BibFormat that it should consider this condition and not go to the default rule and use the default template.</p>
-<strong>For developers and adventurers only:</strong>
-<p>If you are to write Output Formats without the web interface, you should use the name <code>migration_in_progress</code> for each template which has not been migrated. The above example would therefore become:<br/>
-  <code>tag 980__a :<br/>
-PICTURE --- migration_in_progress<br/>
-default: Default_HTML_detailed.bft</code>
-  </p>
+<p>This was possible by default only in older versions of Invenio.<br/>
+To enable this functionality in this release, you need to copy the required files from an older release.
+</p>
 <h3><a name="integrationDreamweaver">7.3 Integrating BibFormat into Dreamweaver MX</a></h3>
 <p>BibFormat templates have been thought to be editable in custom HTML editors. We propose in this section
 a way to extend one particular editor, Dreamweaver.</p>

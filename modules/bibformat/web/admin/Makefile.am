@@ -19,7 +19,7 @@
 
 webappdir = $(localstatedir)/www/admin/bibformat
 
-webapp_DATA = bibformat_migration_kit_assistant.py bibformatadmin.py js_quicktags.js
+webapp_DATA = bibformatadmin.py js_quicktags.js
 
 EXTRA_DIST =  $(webapp_DATA)
 
