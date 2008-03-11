@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 ## import interesting modules:
 import string
-import os
+import os, os.path
 import sys
 import time
 import types
@@ -344,6 +344,10 @@ def interface(req,
                 except:
                     return errorMsg(_("Cannot create submission directory."), req, c, ln)
             filename = formfields.filename
+            ## Before saving the file to disc, wash the filename (in particular
+            ## washing away UNIX and Windows (e.g. DFS) paths):
+            filename = os.path.basename(filename.split('\\')[-1])
+            filename = filename.strip()
             if filename != "":
                 # This may be dangerous if the file size is bigger than the available memory
                 data = formfields.file.read()
@@ -815,6 +819,10 @@ def endaction(req,
                 except:
                     return errorMsg("can't create submission directory", req, cdsname, ln)
             filename = formfields.filename
+            ## Before saving the file to disc, wash the filename (in particular
+            ## washing away UNIX and Windows (e.g. DFS) paths):
+            filename = os.path.basename(filename.split('\\')[-1])
+            filename = filename.strip()
             if filename != "":
                 # This may be dangerous if the file size is bigger than the available memory
                 data = formfields.file.read()
