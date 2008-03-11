@@ -68,7 +68,7 @@ from invenio.access_control_config import VIEWRESTRCOLL
 def getnavtrail(previous = ''):
     """Get the navtrail"""
 
-    navtrail = """<a class=navtrail href="%s/help/admin">Admin Area</a> """ % (weburl,)
+    navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (weburl,)
     navtrail = navtrail + previous
     return navtrail
 
@@ -86,7 +86,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
 
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="3">3. Modify translations for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a href="%s/help/admin/websearch-admin-guide#3.3">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="3">3. Modify translations for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a href="%s/help/admin/websearch-admin-guide#3.3">?</a>]</small>""" % (col_dict[colID], weburl)
 
         if type(trans) is str:
             trans = [trans]
@@ -166,7 +166,7 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
         elif func in ["1", 1] and confirm in ["1", 1]:
             finresult = detach_rnk_col(colID, rnkID)
 
-        subtitle = """<a name="9">9. Modify rank options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.9">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="9">9. Modify rank options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.9">?</a>]</small>""" % (col_dict[colID], weburl)
         output  = """
         <dl>
         <dt>The rank methods enabled for the collection '%s' is:</dt>
@@ -248,27 +248,27 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
 
     output = ""
     output2 = ""
-    subtitle = """Attach collection to tree&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.2">?</a>]</small>""" % (weburl)
+    subtitle = """Attach collection to tree&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.2">?</a>]</small>""" % (weburl)
 
     col_dict = dict(get_def_name('', "collection"))
     if confirm not in [-1, "-1"] and not (add_son and add_dad and rtype):
-        output2 += """<b><span class="info">All fields must be filled.</span></b><br><br>
+        output2 += """<b><span class="info">All fields must be filled.</span></b><br /><br />
         """
     elif add_son and add_dad and rtype:
         add_son = int(add_son)
         add_dad = int(add_dad)
         if confirm not in [-1, "-1"]:
             if add_son == add_dad:
-                output2 += """<b><span class="info">Cannot add a collection as a pointer to itself.</span></b><br><br>
+                output2 += """<b><span class="info">Cannot add a collection as a pointer to itself.</span></b><br /><br />
                 """
             elif check_col(add_dad, add_son):
                 res = add_col_dad_son(add_dad, add_son, rtype)
                 output2 += write_outcome(res)
                 if res[0] == 1:
-                    output2 += """<b><span class="info"><br> The collection will appear on your website after the next webcoll run. You can either run it manually or wait until bibsched does it for you.</span></b><br><br>
+                    output2 += """<b><span class="info"><br /> The collection will appear on your website after the next webcoll run. You can either run it manually or wait until bibsched does it for you.</span></b><br /><br />
                     """
             else:
-                output2 += """<b><span class="info">Cannot add the collection '%s' as a %s subcollection of '%s' since it will either create a loop, or the association already exists.</span></b><br><br>
+                output2 += """<b><span class="info">Cannot add the collection '%s' as a %s subcollection of '%s' since it will either create a loop, or the association already exists.</span></b><br /><br />
                 """ % (col_dict[add_son], (rtype=="r" and 'regular' or 'virtual'), col_dict[add_dad])
         add_son = ''
         add_dad = ''
@@ -288,7 +288,7 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
         if id != colID:
             text += """<option value="%s" %s>%s</option>""" % (id, str(id)==str(add_son) and 'selected="selected"' or '', name)
     text += """
-    </select><br>
+    </select><br />
     <span class="adminlabel">to parent collection:</span>
     <select name="add_dad" class="admin_w200">
     <option value="">- select parent collection -</option>
@@ -297,7 +297,7 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
     for (id, name) in col_list:
         text += """<option value="%s" %s>%s</option>
         """ % (id, str(id)==add_dad and 'selected="selected"' or '', name)
-    text += """</select><br>
+    text += """</select><br />
     """
 
     text += """
@@ -333,7 +333,7 @@ def perform_addcollection(colID, ln, colNAME='', dbquery='', callback="yes", con
     subtitle = """Create new collection&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.1">?</a>]</small>""" % (weburl)
     text = """
     <span class="adminlabel">Default name</span>
-    <input class="admin_w200" type="text" name="colNAME" value="%s" /><br>
+    <input class="admin_w200" type="text" name="colNAME" value="%s" /><br />
     """ % colNAME
     output = createhiddenform(action="%s/admin/websearch/websearchadmin.py/addcollection" % weburl,
                               text=text,
@@ -366,7 +366,7 @@ def perform_modifydbquery(colID, ln, dbquery='', callback='yes', confirm=-1):
     col_dict = dict(get_def_name('', "collection"))
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="1">1. Modify collection query for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.1">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="1">1. Modify collection query for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.1">?</a>]</small>""" % (col_dict[colID], weburl)
 
         if confirm == -1:
             res = run_sql("SELECT dbquery FROM collection WHERE id=%s" % colID)
@@ -378,14 +378,14 @@ def perform_modifydbquery(colID, ln, dbquery='', callback='yes', confirm=-1):
         vir_sons = len(get_col_tree(colID, 'v'))
         if reg_sons > 1:
             if dbquery:
-                output += "Warning: This collection got subcollections, and should because of this not have a collection query, for further explanation, check the WebSearch Guide<br>"
+                output += "Warning: This collection got subcollections, and should because of this not have a collection query, for further explanation, check the WebSearch Guide<br />"
         elif reg_sons <= 1:
             if not dbquery:
-                output += "Warning: This collection does not have any subcollections, and should because of this have a collection query, for further explanation, check the WebSearch Guide<br>"
+                output += "Warning: This collection does not have any subcollections, and should because of this have a collection query, for further explanation, check the WebSearch Guide<br />"
 
         text = """
         <span class="adminlabel">Query</span>
-        <input class="admin_w200" type="text" name="dbquery" value="%s" /><br>
+        <input class="admin_w200" type="text" name="dbquery" value="%s" /><br />
         """ % cgi.escape(dbquery, 1)
         output += createhiddenform(action="modifydbquery",
                                    text=text,
@@ -435,19 +435,19 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
             move_up = int(move_up)
             switch = find_last(tree, move_up)
             if switch and switch_col_treescore(tree[move_up], tree[switch]):
-                output += """<b><span class="info">Moved the %s collection '%s' up and '%s' down.</span></b><br><br>
+                output += """<b><span class="info">Moved the %s collection '%s' up and '%s' down.</span></b><br /><br />
                 """ % ((rtype=="r" and 'regular' or 'virtual'), col_dict[tree[move_up][0]], col_dict[tree[switch][0]])
             else:
-                output += """<b><span class="info">Could not move the %s collection '%s' up and '%s' down.</span></b><br><br>
+                output += """<b><span class="info">Could not move the %s collection '%s' up and '%s' down.</span></b><br /><br />
                 """ % ((rtype=="r" and 'regular' or 'virtual'), col_dict[tree[move_up][0]], col_dict[tree[switch][0]])
         elif move_down:
             move_down = int(move_down)
             switch = find_next(tree, move_down)
             if switch and switch_col_treescore(tree[move_down], tree[switch]):
-                output += """<b><span class="info">Moved the %s collection '%s' down and '%s' up.</span></b><br><br>
+                output += """<b><span class="info">Moved the %s collection '%s' down and '%s' up.</span></b><br /><br />
                 """ % ((rtype=="r" and 'regular' or 'virtual'), col_dict[tree[move_down][0]], col_dict[tree[switch][0]])
             else:
-                output += """<b><span class="info">Could not move the %s collection '%s' up and '%s' down.</span></b><br><br>
+                output += """<b><span class="info">Could not move the %s collection '%s' up and '%s' down.</span></b><br /><br />
                 """ % ((rtype=="r" and 'regular' or 'virtual'), col_dict[tree[move_up][0]],col_dict[tree[switch][0]])
         elif delete:
             delete = int(delete)
@@ -475,20 +475,20 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
             else:
                 if remove_col_subcol(tree[delete][0], tree[delete][3], rtype):
                     if col_dict[tree[delete][0]] != col_dict[tree[delete][3]]:
-                        output += """<b><span class="info">Removed the %s collection '%s' and its subcollections in subdirectory '%s'.</span></b><br><br>
+                        output += """<b><span class="info">Removed the %s collection '%s' and its subcollections in subdirectory '%s'.</span></b><br /><br />
                         """ % ((tree[delete][4]=="r" and 'regular' or 'virtual'), col_dict[tree[delete][0]], col_dict[tree[delete][3]])
                     else:
-                        output += """<b><span class="info">Removed the subcollections of the %s collection '%s'.</span></b><br><br>
+                        output += """<b><span class="info">Removed the subcollections of the %s collection '%s'.</span></b><br /><br />
                         """ % ((rtype=="r" and 'regular' or 'virtual'), col_dict[tree[delete][3]])
 
                 else:
-                    output += """<b><span class="info">Could not remove the collection from the tree.</span></b><br><br>
+                    output += """<b><span class="info">Could not remove the collection from the tree.</span></b><br /><br />
                     """
                 delete = ''
         elif move_from and not move_to:
             move_from_rtype = move_from[0]
             move_from_id = int(move_from[1:len(move_from)])
-            text = """<b>Select collection to place the %s collection '%s' under.</b><br><br>
+            text = """<b>Select collection to place the %s collection '%s' under.</b><br /><br />
             """ % ((move_from_rtype=="r" and 'regular' or 'virtual'), col_dict[tree[move_from_id][0]])
             output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_modifycollectiontree#tree" % weburl,
                                        text=text,
@@ -505,10 +505,10 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
 
             if confirm in [0, '0']:
                 if move_from_id == move_to_id and move_from_rtype == move_to_rtype:
-                    output += """<b><span class="info">Cannot move to itself.</span></b><br><br>
+                    output += """<b><span class="info">Cannot move to itself.</span></b><br /><br />
                     """
                 elif tree_from[move_from_id][3] == tree_to[move_to_id][0] and move_from_rtype==move_to_rtype:
-                    output += """<b><span class="info">The collection is already there.</span></b><br><br>
+                    output += """<b><span class="info">The collection is already there.</span></b><br /><br />
                     """
                 elif check_col(tree_to[move_to_id][0], tree_from[move_from_id][0]) or (tree_to[move_to_id][0] == 1 and tree_from[move_from_id][3] == tree_to[move_to_id][0] and move_from_rtype != move_to_rtype):
                     text = """<b>Move %s collection '%s' to the %s collection '%s'.</b>
@@ -528,14 +528,14 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
                                                colID=colID,
                                                ln=ln)
                 else:
-                    output += """<b><span class="info">Cannot move the collection '%s' and set it as a subcollection of '%s' since it will create a loop.</span></b><br><br>
+                    output += """<b><span class="info">Cannot move the collection '%s' and set it as a subcollection of '%s' since it will create a loop.</span></b><br /><br />
                     """ % (col_dict[tree_from[move_from_id][0]], col_dict[tree_to[move_to_id][0]])
             else:
                 if (move_to_id != 0 and move_col_tree(tree_from[move_from_id], tree_to[move_to_id])) or (move_to_id == 0 and move_col_tree(tree_from[move_from_id], tree_to[move_to_id], move_to_rtype)):
-                    output += """<b><span class="info">Moved %s collection '%s' to the %s collection '%s'.</span></b><br><br>
+                    output += """<b><span class="info">Moved %s collection '%s' to the %s collection '%s'.</span></b><br /><br />
                     """ % ((move_from_rtype=="r" and 'regular' or 'virtual'), col_dict[tree_from[move_from_id][0]], (move_to_rtype=="r" and 'regular' or 'virtual'), col_dict[tree_to[move_to_id][0]])
                 else:
-                    output += """<b><span class="info">Could not move %s collection '%s' to the %s collection '%s'.</span></b><br><br>
+                    output += """<b><span class="info">Could not move %s collection '%s' to the %s collection '%s'.</span></b><br /><br />
                     """ % ((move_from_rtype=="r" and 'regular' or 'virtual'), col_dict[tree_from[move_from_id][0]], (move_to_rtype=="r" and 'regular' or 'virtual'), col_dict[tree_to[move_to_id][0]])
             move_from = ''
             move_to = ''
@@ -609,9 +609,9 @@ def perform_addportalbox(colID, ln, title='', body='', callback='yes', confirm=-
     subtitle = """<a name="5.1"></a>Create new portalbox"""
     text = """
     <span class="adminlabel">Title</span>
-    <textarea cols="50" rows="1" class="admin_wvar" type="text" name="title">%s</textarea><br>
+    <textarea cols="50" rows="1" class="admin_wvar" type="text" name="title">%s</textarea><br />
     <span class="adminlabel">Body</span>
-    <textarea cols="50" rows="10" class="admin_wvar" type="text" name="body">%s</textarea><br>
+    <textarea cols="50" rows="10" class="admin_wvar" type="text" name="body">%s</textarea><br />
     """ % (cgi.escape(title), cgi.escape(body))
     output = createhiddenform(action="addportalbox#5.1",
                               text=text,
@@ -663,7 +663,7 @@ def perform_addexistingportalbox(colID, ln, pbxID=-1, score=0, position='', sel_
             text += """<option value="%s" %s>%s - %s...</option>""" % \
                      (id, id  == int(pbxID) and 'selected="selected"' or '',
                       t_title, cgi.escape(t_body[0:25 - len(t_title)]))
-        text += """</select><br>
+        text += """</select><br />
         <span class="adminlabel">Language</span>
         <select name="sel_ln" class="admin_w200">
         <option value="">- Select language -</option>
@@ -673,7 +673,7 @@ def perform_addexistingportalbox(colID, ln, pbxID=-1, score=0, position='', sel_
         for (key, name) in listlang:
             text += """<option value="%s" %s>%s</option>
             """ % (key, key == sel_ln and 'selected="selected"' or '', name)
-        text += """</select><br>
+        text += """</select><br />
         <span class="adminlabel">Position</span>
         <select name="position" class="admin_w200">
         <option value="">- Select position -</option>
@@ -703,7 +703,7 @@ def perform_addexistingportalbox(colID, ln, pbxID=-1, score=0, position='', sel_
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_showportalboxes(colID, ln, content=output)
 
 def perform_deleteportalbox(colID, ln, pbxID=-1, callback='yes', confirm=-1):
@@ -740,7 +740,7 @@ def perform_deleteportalbox(colID, ln, pbxID=-1, callback='yes', confirm=-1):
             if not col_pbx.has_key(id):
                 text += """<option value="%s" %s>%s - %s...""" % (id, id  == int(pbxID) and 'selected="selected"' or '', t_title, cgi.escape(t_body[0:10]))
             text += "</option>"
-        text += """</select><br>"""
+        text += """</select><br />"""
 
         output += createhiddenform(action="deleteportalbox#5.3",
                                    text=text,
@@ -759,7 +759,7 @@ def perform_deleteportalbox(colID, ln, pbxID=-1, callback='yes', confirm=-1):
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_showportalboxes(colID, ln, content=output)
 
 def perform_modifyportalbox(colID, ln, pbxID=-1, score='', position='', sel_ln='', title='', body='', callback='yes', confirm=-1):
@@ -790,7 +790,7 @@ def perform_modifyportalbox(colID, ln, pbxID=-1, score='', position='', sel_ln='
                 if id_pbx == pbxID:
                     break
 
-        output += """Collection (presentation) specific values (Changes implies only to this collection.)<br>"""
+        output += """Collection (presentation) specific values (Changes implies only to this collection.)<br />"""
         text = """
         <span class="adminlabel">Position</span>
         <select name="position" class="admin_w200">
@@ -800,7 +800,7 @@ def perform_modifyportalbox(colID, ln, pbxID=-1, score='', position='', sel_ln='
         for (key, name) in listpos:
             text += """<option value="%s" %s>%s""" % (key, key==position and 'selected="selected"' or '', name)
             text += "</option>"
-        text += """</select><br>"""
+        text += """</select><br />"""
 
         output += createhiddenform(action="modifyportalbox#5.4",
                                    text=text,
@@ -820,15 +820,15 @@ def perform_modifyportalbox(colID, ln, pbxID=-1, score='', position='', sel_ln='
             res2 = get_pbx()
             pbx_dict = dict(map(lambda x: (x[0], x[1]), res2))
             output += write_outcome(res)
-        output += """<br>Portalbox (content) specific values (any changes appears everywhere the portalbox is used.)"""
+        output += """<br />Portalbox (content) specific values (any changes appears everywhere the portalbox is used.)"""
         text = """
         <span class="adminlabel">Title</span>
-        <textarea cols="50" rows="1" class="admin_wvar" type="text" name="title">%s</textarea><br>
+        <textarea cols="50" rows="1" class="admin_wvar" type="text" name="title">%s</textarea><br />
         """ % cgi.escape(title)
 
         text += """
         <span class="adminlabel">Body</span>
-        <textarea cols="50" rows="10" class="admin_wvar" type="text" name="body">%s</textarea><br>
+        <textarea cols="50" rows="10" class="admin_wvar" type="text" name="body">%s</textarea><br />
         """ % cgi.escape(body)
 
         output += createhiddenform(action="modifyportalbox#5.4",
@@ -851,7 +851,7 @@ def perform_modifyportalbox(colID, ln, pbxID=-1, score='', position='', sel_ln='
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_showportalboxes(colID, ln, content=output)
 
 def perform_switchpbxscore(colID, id_1, id_2, sel_ln, ln):
@@ -873,7 +873,7 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """<a name="5">5. Modify portalboxes for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.5">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="5">5. Modify portalboxes for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.5">?</a>]</small>""" % (col_dict[colID], weburl)
     output  = ""
     pos = get_pbx_pos()
 
@@ -960,7 +960,7 @@ def perform_removeportalbox(colID, ln, pbxID='', sel_ln='', callback='yes', conf
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_showportalboxes(colID, ln, content=output)
 
 def perform_switchfmtscore(colID, type, id_1, id_2, ln):
@@ -1012,9 +1012,9 @@ def perform_addnewfieldvalue(colID, fldID, ln, name='', value='', callback="yes"
     subtitle = """<a name="7.4"></a>Add new value"""
     text = """
     <span class="adminlabel">Display name</span>
-    <input class="admin_w200" type="text" name="name" value="%s" /><br>
+    <input class="admin_w200" type="text" name="name" value="%s" /><br />
     <span class="adminlabel">Search value</span>
-    <input class="admin_w200" type="text" name="value" value="%s" /><br>
+    <input class="admin_w200" type="text" name="value" value="%s" /><br />
     """ % (name, value)
     output = createhiddenform(action="%s/admin/websearch/websearchadmin.py/addnewfieldvalue" % weburl,
                               text=text,
@@ -1029,14 +1029,14 @@ def perform_addnewfieldvalue(colID, fldID, ln, name='', value='', callback="yes"
         if res[0] == 1:
             res = add_col_fld(colID, fldID, 'seo', res[1])
             if res[0] == 0:
-                output += "<br>" + write_outcome(res)
+                output += "<br />" + write_outcome(res)
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please fill in name and value.</span></b>
         """
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
 
 def perform_modifyfieldvalue(colID, fldID, fldvID, ln, name='', value='', callback="yes", confirm=-1):
@@ -1057,9 +1057,9 @@ def perform_modifyfieldvalue(colID, fldID, fldvID, ln, name='', value='', callba
 
     text = """
     <span class="adminlabel">Display name</span>
-    <input class="admin_w200" type="text" name="name" value="%s" /><br>
+    <input class="admin_w200" type="text" name="name" value="%s" /><br />
     <span class="adminlabel">Search value</span>
-    <input class="admin_w200" type="text" name="value" value="%s" /><br>
+    <input class="admin_w200" type="text" name="value" value="%s" /><br />
     """ % (name, value)
     output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifyfieldvalue" % weburl,
                               text=text,
@@ -1092,7 +1092,7 @@ def perform_modifyfieldvalue(colID, fldID, fldvID, ln, name='', value='', callba
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
 
 def perform_removefield(colID, ln, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
@@ -1139,7 +1139,7 @@ def perform_removefield(colID, ln, fldID='', fldvID='', fmeth='', callback='yes'
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
 
     if fmeth == "soo":
         return perform_showsortoptions(colID, ln, content=output)
@@ -1184,7 +1184,7 @@ def perform_removefieldvalue(colID, ln, fldID='', fldvID='', fmeth='', callback=
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID=fldID, ln=ln, content=output)
 
 def perform_rearrangefieldvalue(colID, fldID, ln, callback='yes', confirm=-1):
@@ -1211,7 +1211,7 @@ def perform_rearrangefieldvalue(colID, fldID, ln, callback='yes', confirm=-1):
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID, ln, content=output)
 
 def perform_rearrangefield(colID, ln, fmeth, callback='yes', confirm=-1):
@@ -1236,7 +1236,7 @@ def perform_rearrangefield(colID, ln, fmeth, callback='yes', confirm=-1):
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     if fmeth == "soo":
         return perform_showsortoptions(colID, ln, content=output)
     elif fmeth == "sew":
@@ -1277,7 +1277,7 @@ def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=cdslang, callback=
     for (id, name, value) in res:
         text += """<option value="%s" %s>%s - %s</option>
         """ % (id, id  == int(fldvID) and 'selected="selected"' or '', name, value)
-    text += """</select><br>"""
+    text += """</select><br />"""
 
     output += createhiddenform(action="addexistingfieldvalue#7.4",
                                text=text,
@@ -1294,7 +1294,7 @@ def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=cdslang, callback=
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_modifyfield(colID, fldID, ln, content=output)
 
 def perform_addexistingfield(colID, ln, fldID=-1, fldvID=-1, fmeth='', callback='yes', confirm=-1):
@@ -1331,7 +1331,7 @@ def perform_addexistingfield(colID, ln, fldID=-1, fldvID=-1, fmeth='', callback=
             text += """<option value="%s" %s>%s</option>
             """ % (id, '', fld_dict[id])
 
-    text += """</select><br>"""
+    text += """</select><br />"""
 
     output += createhiddenform(action="addexistingfield#6.2",
                                text=text,
@@ -1349,7 +1349,7 @@ def perform_addexistingfield(colID, ln, fldID=-1, fldvID=-1, fmeth='', callback=
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     if fmeth == "soo":
         return perform_showsortoptions(colID, ln, content=output)
     elif fmeth == "sew":
@@ -1365,7 +1365,7 @@ def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="8">8. Modify sort options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.8">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="8">8. Modify sort options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.8">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available sort options</dd>
@@ -1426,7 +1426,7 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="6">6. Modify search fields for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.6">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="6">6. Modify search fields for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.6">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available search fields</dd>
@@ -1487,7 +1487,7 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="7">7. Modify search options for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.7">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="7">7. Modify search options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.7">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available search options</dd>
@@ -1598,7 +1598,7 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='', callbac
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     if len(col_fld) == 0:
         output = content
     return perform_showsearchoptions(colID, ln, content=output)
@@ -1610,7 +1610,7 @@ def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1)
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """<a name="10">10. Modify output formats for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.10">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="10">10. Modify output formats for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.10">?</a>]</small>""" % (col_dict[colID], weburl)
     output = """
     <dl>
      <dt>Output format actions (not specific to the chosen collection)
@@ -1684,7 +1684,7 @@ def perform_manage_external_collections(colID, ln, callback='yes', content='', c
     colID = int(colID)
 
     subtitle = """<a name="11">11. Configuration of related external collections</a>
-    &nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.11">?</a>]</small>""" % weburl
+    &nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.11">?</a>]</small>""" % weburl
     output = '<form action="update_external_collections" method="POST"><input type="hidden" name="colID" value="%(colID)d">' % {'colID': colID}
 
     table_header = ['External collection', 'Mode', 'Apply also to daughter collections?']
@@ -1710,12 +1710,12 @@ def perform_update_external_collections(colID, ln, state_list, recurse_list):
     output = ""
 
     if not state_list:
-        return 'Warning : No state found.<br>' + perform_manage_external_collections(colID, ln)
+        return 'Warning : No state found.<br />' + perform_manage_external_collections(colID, ln)
 
     external_collections = external_collection_sort_engine_by_name(external_collections_dictionary.values())
 
     if len(external_collections) != len(state_list):
-        return 'Warning : Size of state_list different from external_collections!<br>' + perform_manage_external_collections(colID, ln)
+        return 'Warning : Size of state_list different from external_collections!<br />' + perform_manage_external_collections(colID, ln)
 
     for (external_collection, state) in zip(external_collections, state_list):
         state = int(state)
@@ -1727,7 +1727,7 @@ def perform_update_external_collections(colID, ln, state_list, recurse_list):
 
     external_collection_apply_changes(changes)
 
-    return output + '<br><br>' + perform_manage_external_collections(colID, ln)
+    return output + '<br /><br />' + perform_manage_external_collections(colID, ln)
 
 def perform_showdetailedrecordoptions(colID, ln, callback='yes', content='', confirm=-1):
     """Show the interface to configure detailed record page to the user."""
@@ -1735,7 +1735,7 @@ def perform_showdetailedrecordoptions(colID, ln, callback='yes', content='', con
     colID = int(colID)
 
     subtitle = """<a name="12">12. Configuration of detailed record page</a>
-    &nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.12">?</a>]</small>""" % weburl
+    &nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.12">?</a>]</small>""" % weburl
     output = '''<form action="update_detailed_record_options" method="post">
     <table><tr><td>
     <input type="hidden" name="colID" value="%(colID)d">
@@ -1829,7 +1829,7 @@ def perform_addexistingoutputformat(colID, ln, fmtID=-1, callback='yes', confirm
             if not col_fmt.has_key(id):
                 text += """<option value="%s" %s>%s</option>
                 """ % (id, id  == int(fmtID) and 'selected="selected"' or '', name)
-        text += """</select><br>
+        text += """</select><br />
         """
         output += createhiddenform(action="addexistingoutputformat#10.2",
                                    text=text,
@@ -1847,7 +1847,7 @@ def perform_addexistingoutputformat(colID, ln, fmtID=-1, callback='yes', confirm
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_showoutputformats(colID, ln, content=output)
 
 def perform_deleteoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
@@ -1884,7 +1884,7 @@ def perform_deleteoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
             if not col_fmt.has_key(id):
                 text += """<option value="%s" %s>%s""" % (id, id  == int(fmtID) and 'selected="selected"' or '', name)
             text += "</option>"
-        text += """</select><br>"""
+        text += """</select><br />"""
 
         output += createhiddenform(action="deleteoutputformat#10.3",
                                    text=text,
@@ -1913,7 +1913,7 @@ def perform_deleteoutputformat(colID, ln, fmtID=-1, callback='yes', confirm=-1):
         """
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_showoutputformats(colID, ln, content=output)
 
 def perform_removeoutputformat(colID, ln, fmtID='', callback='yes', confirm=0):
@@ -1946,7 +1946,7 @@ def perform_removeoutputformat(colID, ln, fmtID='', callback='yes', confirm=0):
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_showoutputformats(colID, ln, content=output)
 
 def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
@@ -1962,13 +1962,13 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     if not col_dict.has_key(1):
         res = add_col(CFG_SITE_NAME, '')
         if res:
-            fin_output += """<b><span class="info">Created root collection.</span></b><br>"""
+            fin_output += """<b><span class="info">Created root collection.</span></b><br />"""
         else:
             return "Cannot create root collection, please check database."
     if CFG_SITE_NAME != run_sql("SELECT name from collection WHERE id=1")[0][0]:
         res = run_sql("update collection set name='%s' where id=1" % CFG_SITE_NAME)
         if res:
-            fin_output += """<b><span class="info">The name of the root collection has been modified to be the same as the %(sitename)s installation name given prior to installing %(sitename)s.</span><b><br>""" % {'sitename' : CFG_SITE_NAME}
+            fin_output += """<b><span class="info">The name of the root collection has been modified to be the same as the %(sitename)s installation name given prior to installing %(sitename)s.</span><b><br />""" % {'sitename' : CFG_SITE_NAME}
         else:
             return "Error renaming root collection."
     fin_output += """
@@ -1987,25 +1987,25 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     """ % (weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, ln)
 
     if mtype == "":
-        fin_output += """<br><br><b><span class="info">For managing the collections, select an item from the menu.</span><b><br>"""
+        fin_output += """<br /><br /><b><span class="info">For managing the collections, select an item from the menu.</span><b><br />"""
 
     if mtype == "perform_addcollection" and content:
         fin_output += content
     elif mtype == "perform_addcollection" or mtype == "perform_showall":
         fin_output += perform_addcollection(colID=colID, ln=ln, callback='')
-        fin_output += "<br>"
+        fin_output += "<br />"
 
     if mtype == "perform_addcollectiontotree" and content:
         fin_output += content
     elif mtype == "perform_addcollectiontotree" or mtype == "perform_showall":
         fin_output += perform_addcollectiontotree(colID=colID, ln=ln, callback='')
-        fin_output += "<br>"
+        fin_output += "<br />"
 
     if mtype == "perform_modifycollectiontree" and content:
         fin_output += content
     elif mtype == "perform_modifycollectiontree" or mtype == "perform_showall":
         fin_output += perform_modifycollectiontree(colID=colID, ln=ln, callback='')
-        fin_output += "<br>"
+        fin_output += "<br />"
 
     if mtype == "perform_checkwebcollstatus" and content:
         fin_output += content
@@ -2026,7 +2026,7 @@ def show_coll_not_in_tree(colID, ln, col_dict):
 
     tree = get_col_tree(colID)
     in_tree = {}
-    output = "These collections are not in the tree, and should be added:<br>"
+    output = "These collections are not in the tree, and should be added:<br />"
     for (id, up, down, dad, reltype) in tree:
         in_tree[id] = 1
         in_tree[dad] = 1
@@ -2036,7 +2036,7 @@ def show_coll_not_in_tree(colID, ln, col_dict):
             if not in_tree.has_key(id[0]):
                 output += """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s" title="Edit collection">%s</a> ,
                 """ % (weburl, id[0], ln, col_dict[id[0]])
-        output += "<br><br>"
+        output += "<br /><br />"
     else:
         output = ""
     return output
@@ -2185,7 +2185,7 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     <dl>
      <dt>WARNING:</dt>
      <dd>When deleting a collection, you also deletes all data related to the collection like translations, relations to other collections and information about which rank methods to use.
-     <br>For more information, please go to the <a title="See guide" href="%s/help/admin/websearch-admin-guide">WebSearch guide</a> and read the section regarding deleting a collection.</dd>
+     <br />For more information, please go to the <a title="See guide" href="%s/help/admin/websearch-admin-guide">WebSearch guide</a> and read the section regarding deleting a collection.</dd>
     </dl>
     </strong>
     </span>
@@ -2194,7 +2194,7 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     col_dict = dict(get_def_name('', "collection"))
     if colID != 1 and colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.4">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.4">?</a>]</small>""" % (col_dict[colID], weburl)
         res = run_sql("SELECT * from collection_collection WHERE id_dad=%s" % colID)
         res2 = run_sql("SELECT * from collection_collection WHERE id_son=%s" % colID)
 
@@ -2333,23 +2333,23 @@ def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
 def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     """Check status of the collection tables with respect to the webcoll cache."""
 
-    subtitle = """<a name="11"></a>Webcoll Status&nbsp;&nbsp&nbsp;[<a href="%s/help/admin/websearch-admin-guide#4">?</a>]""" % weburl
+    subtitle = """<a name="11"></a>Webcoll Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#4">?</a>]""" % weburl
     output  = ""
 
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
-    output += """<br><b>Last updates:</b><br>"""
+    output += """<br /><b>Last updates:</b><br />"""
     collection_table_update_time = ""
     collection_web_update_time = ""
 
     collection_table_update_time = get_table_update_time('collection')
-    output += "Collection table last updated: %s<br>" % collection_table_update_time
+    output += "Collection table last updated: %s<br />" % collection_table_update_time
 
     try:
         file = open("%s/collections/last_updated" % CFG_CACHEDIR)
         collection_web_update_time = file.readline().strip()
-        output += "Collection cache last updated: %s<br>" % collection_web_update_time
+        output += "Collection cache last updated: %s<br />" % collection_web_update_time
         file.close()
     except:
         pass
@@ -2362,11 +2362,11 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
         pass
 
     if collection_table_update_time > collection_web_update_time:
-        output += """<br><b><span class="info">Warning: The collections has been modified since last time Webcoll was executed, to process the changes, Webcoll must be executed.</span></b><br>"""
+        output += """<br /><b><span class="info">Warning: The collections has been modified since last time Webcoll was executed, to process the changes, Webcoll must be executed.</span></b><br />"""
 
     header = ['ID', 'Name', 'Time', 'Status', 'Progress']
     actions = []
-    output += """<br><b>Last BibSched tasks:</b><br>"""
+    output += """<br /><b>Last BibSched tasks:</b><br />"""
 
     res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime< now() ORDER by runtime")
     if len(res) > 0:
@@ -2385,7 +2385,7 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
         actions.append(['', 'bibindex', '', '', 'Not executed yet'])
 
     output += tupletotable(header=header, tuple=actions)
-    output += """<br><b>Next scheduled BibSched run:</b><br>"""
+    output += """<br /><b>Next scheduled BibSched run:</b><br />"""
     actions = []
 
     res = run_sql("select id, proc, host, user, runtime, sleeptime, arguments, status, progress from schTASK where proc='webcoll' and runtime > now() ORDER by runtime")
@@ -2412,9 +2412,9 @@ def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     output += tupletotable(header=header, tuple=actions)
 
     if webcoll_future == "":
-        output += """<br><b><span class="info">Warning: Webcoll is not scheduled for a future run by bibsched, any updates to the collection will not be processed.</span></b><br>"""
+        output += """<br /><b><span class="info">Warning: Webcoll is not scheduled for a future run by bibsched, any updates to the collection will not be processed.</span></b><br />"""
     if bibindex_future == "":
-        output += """<br><b><span class="info">Warning: Bibindex is not scheduled for a future run by bibsched, any updates to the records will not be processed.</span></b><br>"""
+        output += """<br /><b><span class="info">Warning: Bibindex is not scheduled for a future run by bibsched, any updates to the records will not be processed.</span></b><br />"""
 
     body = [output]
 
@@ -2434,7 +2434,7 @@ def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
     action_id = acc_get_action_id(VIEWRESTRCOLL)
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="2">2. Modify access restrictions for collection '%s'</a>&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.2">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="2">2. Modify access restrictions for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.2">?</a>]</small>""" % (col_dict[colID], weburl)
 
         output = """<p>Please note that CDS Invenio versions greater than <em>0.92.1</em> manage collection restriction via the standard
         <strong><a href="/admin/webaccess/webaccessadmin.py/modifyauthorizations?id_action=%i&reverse=1">WebAccess Admin Interface</a></strong> (action '%s').</p>
@@ -2451,7 +2451,7 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
 
     from invenio.search_engine import collection_restricted_p
 
-    subtitle = """<a name="11"></a>Collection Status&nbsp;&nbsp&nbsp;[<a href="%s/help/admin/websearch-admin-guide#5">?</a>]""" % weburl
+    subtitle = """<a name="11"></a>Collection Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#5">?</a>]""" % weburl
     output  = ""
 
     colID = int(colID)

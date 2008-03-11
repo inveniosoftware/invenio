@@ -30,7 +30,7 @@ from invenio.config import \
 
 def Print_Success_MBI(parameters, curdir, form, user_info=None):
     global rn
-    t="<B>Modification completed!</B><br><BR>"
-    t+="These modifications on document %s will be processed as quickly as possible and made <br>available on the %s Server</b>" % (rn,CFG_SITE_NAME)
+    t="<b>Modification completed!</b><br /><br />"
+    t+="These modifications on document %s will be processed as quickly as possible and made <br />available on the %s Server</b>" % (rn, CFG_SITE_NAME)
     return t
 

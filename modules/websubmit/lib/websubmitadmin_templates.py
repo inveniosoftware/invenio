@@ -1113,7 +1113,7 @@ class Template:
 """ % (WEBSUBMITADMIN_WEBURL, cgi.escape(action[0], 1), cgi.escape(action[0], 1), cgi.escape(action[1], 1))
         body_content += """</table>"""
         ## Button to create new action:
-        body_content += """<br><form action="%s/actionadd" METHOD="post"><input class="adminbutton" type="submit" value="Add Action" /></form>""" \
+        body_content += """<br /><form action="%s/actionadd" METHOD="post"><input class="adminbutton" type="submit" value="Add Action" /></form>""" \
                         % (WEBSUBMITADMIN_WEBURL,)
         body_content += """</div>"""
         output += self._create_websubmitadmin_main_menu_header()
@@ -1141,7 +1141,7 @@ class Template:
 """ % (WEBSUBMITADMIN_WEBURL, cgi.escape(doctype[0], 1), cgi.escape(doctype[1], 1), cgi.escape(doctype[0], 1))
         body_content += """</table>"""
         ## Button to create new action:
-        body_content += """<br><form action="%s/doctypeadd" METHOD="post"><input class="adminbutton" type="submit" value="Add New Doctype" /></form>""" \
+        body_content += """<br /><form action="%s/doctypeadd" METHOD="post"><input class="adminbutton" type="submit" value="Add New Doctype" /></form>""" \
                         % (WEBSUBMITADMIN_WEBURL,)
         body_content += """</div>"""
         output += self._create_websubmitadmin_main_menu_header()
@@ -1170,7 +1170,7 @@ class Template:
 """ % (WEBSUBMITADMIN_WEBURL, cgi.escape(jscheck[0], 1), cgi.escape(jscheck[0], 1))
         body_content += """</table>"""
         ## Button to create new action:
-        body_content += """<br><form action="%s/jscheckadd" METHOD="post"><input class="adminbutton" type="submit" value="Add Check" /></form>""" \
+        body_content += """<br /><form action="%s/jscheckadd" METHOD="post"><input class="adminbutton" type="submit" value="Add Check" /></form>""" \
                         % (WEBSUBMITADMIN_WEBURL,)
         body_content += """</div>"""
         output += self._create_websubmitadmin_main_menu_header()
@@ -1230,7 +1230,7 @@ class Template:
 """ % (WEBSUBMITADMIN_WEBURL, cgi.escape(element[0], 1), cgi.escape(element[0], 1))
         body_content += """</table>"""
         ## Button to create new action:
-        body_content += """<br><form action="%s/elementadd" METHOD="post"><input class="adminbutton" type="submit" value="Add New Element" /></form>""" \
+        body_content += """<br /><form action="%s/elementadd" METHOD="post"><input class="adminbutton" type="submit" value="Add New Element" /></form>""" \
                         % (WEBSUBMITADMIN_WEBURL,)
         body_content += """</div>"""
         output += self._create_websubmitadmin_main_menu_header()

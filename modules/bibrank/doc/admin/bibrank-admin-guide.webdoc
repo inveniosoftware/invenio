@@ -47,7 +47,7 @@
 
 <a name="o"></a><h2>1. Overview</h2>
 <p>The bibrank module consist currently of two tools:
-<br/><br/>bibrank - Generates ranking data for ranking search results based on methods like:
+<br/><br/>bibrank - Generates ranking data for ranking search results based on methods like:</p>
 <blockquote>
 <pre>
 Journal Impact Factor
@@ -56,13 +56,14 @@ Combined Method
 &nbsp;##Number of downloads
 &nbsp;##Author Impact
 &nbsp;##Citation Impact
-</blockquote>
 </pre>
-bibrankgkb - For generating knowledge base files for use with bibrank
-<br/><br/>
-The bibrankgkb may not be necessary to use, it depends on which ranking methods you are planning
+</blockquote>
+<p>bibrankgkb - For generating knowledge base files for use with bibrank
+<br/><br/></p>
+<p>The bibrankgkb may not be necessary to use, it depends on which ranking methods you are planning
 to use, and what data you already got. This guide will take you through the necessary steps in detail in
 order to create different kinds of ranking methods for the search engine to use.
+</p>
 
 <a name="c"></a><h2>2. Configuration Conventions</h2>
 <blockquote>
@@ -70,16 +71,16 @@ order to create different kinds of ranking methods for the search engine to use.
 - comment line starts with '#' sign in the first column
 - each section in a configuration file is declared inside '[' ']' signs
 - values in knowledgebasefiles are separated by '---'
-</blockquote>
 </pre>
+</blockquote>
 
 <a name="bai"></a><h2>3. BibRank Admin Interface</h2>
-The bibrank web interface enables you to modify the configuration of most aspects of BibRank. For full functionality, it is advised to
-let the http-daemon have write/read access to your invenio/etc/bibrank directory. If this is not wanted, you have to edit the configuration files from the console using your favourite text editor.
+<p>The bibrank web interface enables you to modify the configuration of most aspects of BibRank. For full functionality, it is advised to
+let the http-daemon have write/read access to your invenio/etc/bibrank directory. If this is not wanted, you have to edit the configuration files from the console using your favourite text editor.</p>
 <a name="mi"></a><h3>3.1 Main interface</h3>
-In the main interface screen, you see a list of all rank methods currently added. Each rank method is identified by the rank method code. To find out about the functionality available, check out the topics below.
+<p>In the main interface screen, you see a list of all rank methods currently added. Each rank method is identified by the rank method code. To find out about the functionality available, check out the topics below.</p>
 
-<br/><br/><b>Explanation of concepts</b>
+<b>Explanation of concepts</b>
 <blockquote>
 <pre>
 Rank method:
@@ -92,28 +93,28 @@ Which collections the rank method should be visible in.
 </blockquote>
 
 <a name="ar"></a><h3>3.2 Add rank method</h3>
-When pressing the link in the upper right corner from the main interface, you will see the interface for adding a new rank method. The two available options that needs to be decided upon, are the bibrank code and the template to use, both values can be changed later. The bibrank code is used by the bibrank daemon to run the method, and should be fairly short without spaces. Which template you are using, decides how the ranking will be done, and must before used, be changed to suit your CDS Invenio configuration. When confirming to add a new rank method, it will be added to the list of possible rank methods, and a configuration file will be created if the httpd user has proper rights to the 'invenio/etc/bibrank' directory. If not, the file has to manually be created with the name 'bibrankcode.cfg' where bibrankcode is the same as given in the interface.
+<p>When pressing the link in the upper right corner from the main interface, you will see the interface for adding a new rank method. The two available options that needs to be decided upon, are the bibrank code and the template to use, both values can be changed later. The bibrank code is used by the bibrank daemon to run the method, and should be fairly short without spaces. Which template you are using, decides how the ranking will be done, and must before used, be changed to suit your CDS Invenio configuration. When confirming to add a new rank method, it will be added to the list of possible rank methods, and a configuration file will be created if the httpd user has proper rights to the 'invenio/etc/bibrank' directory. If not, the file has to manually be created with the name 'bibrankcode.cfg' where bibrankcode is the same as given in the interface.</p>
 
 <a name="sd"></a><h3>3.3 Show details of rank method</h3>
-This interface gives you an overview of the current status of the rank method, and gives direct access to the various interfaces for changing the configuration.
+<p>This interface gives you an overview of the current status of the rank method, and gives direct access to the various interfaces for changing the configuration.
 In the overview section, you see the bibrank code, for use with the bibrank daemon, and the date for the last run of the rank method.
-In the statistics section you see how many records have been added to the rank method and other statistic data. In the collection part, the collections which the rank method is visible to is shown. The translations part shows the various translations in the languages available in CDS Invenio. On the bottom the configuration file is shown, if accessible.
+In the statistics section you see how many records have been added to the rank method and other statistic data. In the collection part, the collections which the rank method is visible to is shown. The translations part shows the various translations in the languages available in CDS Invenio. On the bottom the configuration file is shown, if accessible.</p>
 
 <a name="mr"></a><h3>3.4 Modify rank method</h3>
-This interface gives access to modify the bibrank code given when creating the rank method and the configuration file of the rank method, if the file can be accessed. If not, it may not exist, or the httpd user doesn't have enough rights to read the file. On the bottom of the interface, it is possible to choose a template, see it, and copy it over the old rank method configuration if wanted. Remember that the values present in the template is an example, and must be changed where necessary. See this documentation for information about this, and the 'BibRank Internals' link below for additional information.
+<p>This interface gives access to modify the bibrank code given when creating the rank method and the configuration file of the rank method, if the file can be accessed. If not, it may not exist, or the httpd user doesn't have enough rights to read the file. On the bottom of the interface, it is possible to choose a template, see it, and copy it over the old rank method configuration if wanted. Remember that the values present in the template is an example, and must be changed where necessary. See this documentation for information about this, and the 'BibRank Internals' link below for additional information.</p>
 
 <a name="dr"></a><h3>3.5 Delete rank method</h3>
-If it is necessary to delete a rank method, some precautions must be taken since the configuration of the method will be lost. When deleting a rank method, the configuration file will also be deleted ('invenio/etc/bibrank/bibrankcode.cfg' where bibrankcode is the code of the rank method) if accessible to the httpd user. If not, the file can be deleted manually from console. Any bibrank tasks scheduled to run the deleted rank method must be modified or deleted manually.
+<p>If it is necessary to delete a rank method, some precautions must be taken since the configuration of the method will be lost. When deleting a rank method, the configuration file will also be deleted ('invenio/etc/bibrank/bibrankcode.cfg' where bibrankcode is the code of the rank method) if accessible to the httpd user. If not, the file can be deleted manually from console. Any bibrank tasks scheduled to run the deleted rank method must be modified or deleted manually.</p>
 
 <a name="mt"></a><h3>3.6 Modify translations</h3>
-If you want to use internalisation of the rank method names, you have to add them using the 'Modify translations' interface. Below a list of all the languages used in the CDS Invenio installation will be shown with the possibility to add the translation for each language.
+<p>If you want to use internalisation of the rank method names, you have to add them using the 'Modify translations' interface. Below a list of all the languages used in the CDS Invenio installation will be shown with the possibility to add the translation for each language.</p>
 
 <a name="mc"></a><h3>3.7 Modify visibility toward collections</h3>
-If a rank method should be visible to the users of the CDS Invenio search interface, it must be enabled for one or several collections. A rank method can be visible in the search interface of the whole site, or just one collection. The collections in the upper list box does not show the rank method in the search interface to the user. To change this select the wanted collection and press 'Enable' to enable the rank method for this collection. The collections that the method has been activated for, is  shown in the lower list box. To remove a collection, select it and press the 'Disable' button to remove it from the list of collections which the rank method is enabled for.
+<p>If a rank method should be visible to the users of the CDS Invenio search interface, it must be enabled for one or several collections. A rank method can be visible in the search interface of the whole site, or just one collection. The collections in the upper list box does not show the rank method in the search interface to the user. To change this select the wanted collection and press 'Enable' to enable the rank method for this collection. The collections that the method has been activated for, is  shown in the lower list box. To remove a collection, select it and press the 'Disable' button to remove it from the list of collections which the rank method is enabled for.</p>
 
 <a name="bd"></a><h2>4. BibRank Daemon</h2>
-The bibrank daemon read the necessary metadata from the CDS Invenio database and combines the read metadata
-in different ways to create the ranking data necessary at searchtime to fast be able to rank the results.
+<p>The bibrank daemon read the necessary metadata from the CDS Invenio database and combines the read metadata
+in different ways to create the ranking data necessary at searchtime to fast be able to rank the results.</p>
 <a name="cli1"></a><h3>4.1 Command Line Interface</h3>
 <blockquote>
 <pre>
@@ -158,14 +159,14 @@ Usage bibrank:
 <a name="ubd"></a><h3>4.2 Using BibRank</h3>
 
 <h4>Step 1 - Adding the rank option to the search interface</h4>
-To be able to add the needed ranking data to the database, you first have to add the rank method to the database, and
+<p>To be able to add the needed ranking data to the database, you first have to add the rank method to the database, and
 add the wished code you want to use together with it. The name of the configuration file in the next section, needs to
-have the same name as the code stored in the database.
+have the same name as the code stored in the database.</p>
 
 <h4>Step 2 - Get necessary external data (ex. jif values)</h4>
-Find out what is necessary of data for each method. The bibrankgkb documentation below may be of assistance.
+<p>Find out what is necessary of data for each method. The bibrankgkb documentation below may be of assistance.</p>
 
-<br/><br/><b>Example of necessary data</b> (<code>jif.kb</code> - journal impact factor knowledge base)
+<p><b>Example of necessary data</b> (<code>jif.kb</code> - journal impact factor knowledge base)</p>
 <blockquote>
 <pre>
 Phys. Rev., D---3.838
@@ -177,21 +178,21 @@ J. High Energy Phys.---8.664
 </blockquote>
 
 <h4>Step 3 - Modify the configuration file</h4>
-The configuration files for the different rank methods has different option, so verify that you are using the correct
+<p>The configuration files for the different rank methods has different option, so verify that you are using the correct
 configuration file and rank method. A template for each rank method exists as examples, but may not work on all configurations of CDS Invenio.
-For a description of each rank method and the configuration necessary, check section 6 below.
+For a description of each rank method and the configuration necessary, check section 6 below.</p>
 
 <h4>Step 4 - Add the ranking method as a scheduled task</h4>
-When the configuration is okay, you can add the bibrank daemon to the task scheduler using the scheduling options. The daemon can then do a update of the rank method once each day or similar automatically.
-<br/><br/><b>Example</b>
+<p>When the configuration is okay, you can add the bibrank daemon to the task scheduler using the scheduling options. The daemon can then do a update of the rank method once each day or similar automatically.</p>
+<b>Example</b>
 <blockquote>
 <pre>
 $ bibrank -wjif -r
 Task #53 was successfully scheduled for execution.
 </pre>
 </blockquote>
-It is adviced to run the BibRank daemon using no parameters, since the default settings then will be used.
-<br/><br/><b>Example</b>
+<p>It is adviced to run the BibRank daemon using no parameters, since the default settings then will be used.</p>
+<b>Example</b>
 <blockquote>
 <pre>
 $ bibrank
@@ -200,9 +201,8 @@ Task #2505 was successfully scheduled for execution.
 </blockquote>
 
 <h4>Step 5 - Running bibrank manually</h4>
-If BibRank is scheduled without any parameters, and no records has been modified, you may get a output like shown below.
-
-<br/><br/><b>Example</b>
+<p>If BibRank is scheduled without any parameters, and no records has been modified, you may get a output like shown below.</p>
+<b>Example</b>
 <blockquote>
 <pre>
 $ bibrank 2505
@@ -229,13 +229,13 @@ $ bibrank 2505
 </blockquote>
 
 <h4>Step 6 - Fast update of modified records</h4>
-If you just want to update the latest additions or modified records, you may want to do a faster update by running the daemon without the recalculate option. (the recalculate option is off by default). This may cause lower accurancy when ranking.
+<p>If you just want to update the latest additions or modified records, you may want to do a faster update by running the daemon without the recalculate option. (the recalculate option is off by default). This may cause lower accurancy when ranking.</p>
 
 <a name="brm"></a><h2>5. BibRank Methods</h2>
-Each BibRank method has a configuration file which contains different parameters and sections necessary to do the ranking.
+<p>Each BibRank method has a configuration file which contains different parameters and sections necessary to do the ranking.</p>
 <a name="str"></a><h3>5.1 Single tag rank method</h3>
-This method uses one MARC tag together with a file containing possible values for this MARC tag together with a ranking value. This data is used to create a structure containing the record id associated with the ranking value based on the content of the tag. The method can be used for various ways of ranking like ranking by Journal Impact Factor, or use it to let certain authors always appear top of a search.
-The parameters needed to be configured for this method is the 'tag','kb_src' and 'check_mandatory_tags'.
+<p>This method uses one MARC tag together with a file containing possible values for this MARC tag together with a ranking value. This data is used to create a structure containing the record id associated with the ranking value based on the content of the tag. The method can be used for various ways of ranking like ranking by Journal Impact Factor, or use it to let certain authors always appear top of a search.
+The parameters needed to be configured for this method is the 'tag','kb_src' and 'check_mandatory_tags'.</p>
 <br/><br/><b>Example</b>
 <blockquote>
 <pre>
@@ -252,8 +252,8 @@ check_mandatory_tags = 909C4c,909C4v,909C4y
 </blockquote>
 
 <b>Explanation:</b>
-<pre>
 <blockquote>
+<pre>
 [rank_method]
 &nbsp; ##The function which is responsible for doing the work. Should not be changed
 &nbsp; function = single_tag_rank_method
@@ -270,25 +270,26 @@ check_mandatory_tags = 909C4c,909C4v,909C4y
 &nbsp; ##Tags that must be included for a record to be added to the ranking data, to disable remove tags
 &nbsp; check_mandatory_tags = 909C4c,909C4v,909C4y
 &nbsp;
+</pre>
 </blockquote>
-The kb_src file must contain data on the form:
+<p>The kb_src file must contain data on the form:</p>
 <blockquote>
+<pre>
 Phys. Rev., D---3.838
 Phys. Rev. Lett.---6.462
 Phys. Lett., B---4.213
 Nucl. Instrum. Methods Phys. Res., A---0.964
 J. High Energy Phys.---8.664
-</blockquote>
-The left side must match the content of the tag mentioned in the tag variable.
 </pre>
+</blockquote>
+<p>The left side must match the content of the tag mentioned in the tag variable.
 <a name="wrd"></a><h3>5.2 Word Similarity/Similar Records</h3>
-The Word Similarity/Similar Records method uses the content of the tags selected to determine which records is most relevant to a query, or most similar to a selected record. This method got a lot of parameters to configure, and it may need some tweaking to get the best result. The BibRank code for this method has to be 'wrd' for it to work. For best result, it is adviced to install the stemming module mentioned in INSTALL, and use a stopword list containing stopwords in the languages the records exists in. The stemmer and stopword list is used to get better results and to limit the size of the index, thus making ranking faster and more accurate. For best result with the stemmer, it is important to mark each tag to be used with the most common language the value of the tag may be in. It is adviced to not change the 'function','table' and the parameters under [find_similar]. If the stemmer is not installed, to assure that no problems exists, the 'stem_if_avail' parameter should be set to 'no'. Each tag to be used by the method has to be given a point. The number of points describes how important one word is in this tag.
+<p>The Word Similarity/Similar Records method uses the content of the tags selected to determine which records is most relevant to a query, or most similar to a selected record. This method got a lot of parameters to configure, and it may need some tweaking to get the best result. The BibRank code for this method has to be 'wrd' for it to work. For best result, it is adviced to install the stemming module mentioned in INSTALL, and use a stopword list containing stopwords in the languages the records exists in. The stemmer and stopword list is used to get better results and to limit the size of the index, thus making ranking faster and more accurate. For best result with the stemmer, it is important to mark each tag to be used with the most common language the value of the tag may be in. It is adviced to not change the 'function','table' and the parameters under [find_similar]. If the stemmer is not installed, to assure that no problems exists, the 'stem_if_avail' parameter should be set to 'no'. Each tag to be used by the method has to be given a point. The number of points describes how important one word is in this tag.</p>
 
-When running BibRank to update the index for this rank method, it is not necessary to recalculate each time, but when large number of records has been updated/added, it can be wise to recalculate using the recalculate parameter of BibRank.
-<br/><br/><b>Example</b>
-<pre>
+<p>When running BibRank to update the index for this rank method, it is not necessary to recalculate each time, but when large number of records has been updated/added, it can be wise to recalculate using the recalculate parameter of BibRank.</p>
+<b>Example</b>
 <blockquote>
-
+<pre>
 [rank_method]
 function = word_similarity
 
@@ -324,13 +325,12 @@ min_nr_words_docs = 3
 max_nr_words_upper = 20
 max_nr_words_lower = 10
 default_min_relevance = 75
-
-</blockquote>
 </pre>
+</blockquote>
 
 <b>Explanation:</b>
-<pre>
 <blockquote>
+<pre>
 [rank_method]
 &nbsp;#internal name for the bibrank program, do not modify
 function = word_similarity
@@ -342,7 +342,7 @@ stemming = en
 table = rnkWORD01F
 &nbsp;#remove stopwords?
 stopword = True
-&nbsp;#text to show before the rank value when the search result is presented. <-- to hide result
+&nbsp;#text to show before the rank value when the search result is presented. &lt;-- to hide result
 relevance_number_output_prologue = (
 &nbsp;#text to show after the rank value when the search result is presented. --> to hide result
 relevance_number_output_epilogue = )
@@ -378,19 +378,17 @@ max_nr_words_upper = 20
 max_nr_words_lower = 10
 &nbsp;#default minimum relevance value to use for find similar
 default_min_relevance = 75
-
-</blockquote>
-Tip: When executing a search using a ranking method, you can add "verbose=1" to the list of parameteres
-in the URL to see which terms have been used in the ranking.
 </pre>
+</blockquote>
+<p>Tip: When executing a search using a ranking method, you can add "verbose=1" to the list of parameteres
+in the URL to see which terms have been used in the ranking.</p>
 
 <a name="cmb"></a><h3>5.3 Combine method</h3>
-The 'Combine method' is running each method mentioned in the config file and adding the score together
-based on the importance of the method given by the percentage.
-<br/><br/><b>Example</b>
-<pre>
+<p>The 'Combine method' is running each method mentioned in the config file and adding the score together
+based on the importance of the method given by the percentage.</p>
+<b>Example</b>
 <blockquote>
-
+<pre>
 [rank_method]
 function = combine_method
 [combine_method]
@@ -399,14 +397,12 @@ method2 = cern_acc,33
 method3 = wrd,33
 relevance_number_output_prologue = (
 relevance_number_output_epilogue = )
-
-</blockquote>
 </pre>
+</blockquote>
 
 <b>Explanation:</b>
-<pre>
 <blockquote>
-
+<pre>
 [rank_method]
 &nbsp;#tells which method to use, do not change
 function = combine_method
@@ -419,14 +415,13 @@ method2 = wrd,50
 relevance_number_output_prologue = (
 &nbsp;#text to be shown after the rank value on the search result screen.
 relevance_number_output_epilogue = )
-
-</blockquote>
 </pre>
+</blockquote>
 
 <a name="bt"></a><h2>6. bibrankgkb Tool</h2>
-For some ranking methods, like the single_tag_rank method, a knowledge base file (kb) with the needed data in the correct format is necessary. This file can be created using the bibrankgkb tool which can read the data either from
+<p>For some ranking methods, like the single_tag_rank method, a knowledge base file (kb) with the needed data in the correct format is necessary. This file can be created using the bibrankgkb tool which can read the data either from
 the CDS Invenio database, from several web pages using regular expressions, or from another file. In case one source
-has another naming convention, bibrank can convert between them using a convert file.
+has another naming convention, bibrank can convert between them using a convert file.</p>
 <a name="cli2"></a><h3>6.1 Command Line Interface</h3>
 
 <blockquote>
@@ -444,20 +439,19 @@ Usage: bibrankgkb %s [options]
  -h,  --help                print this help and exit
  -V,  --version             print version and exit
  -v,  --verbose=LEVEL       verbose level (from 0 to 9, default 1)
-</blockquote>
 </pre>
+</blockquote>
 
 <a name="ubt"></a><h3>6.2 Using bibrankgkb</h3>
 
 <h4>Step 1 - Find sources</h4>
-Since some of the data used for ranking purposes is not freely available, it cannot be bundled with CDS Invenio. To get hold of the necessary data,
-you may find it useful to ask your library if they have a copy of the data that can be used (like the Journal Impact Factors from the Science Citation Index), or use google to search the web for any public source.
+<p>Since some of the data used for ranking purposes is not freely available, it cannot be bundled with CDS Invenio. To get hold of the necessary data,
+you may find it useful to ask your library if they have a copy of the data that can be used (like the Journal Impact Factors from the Science Citation Index), or use google to search the web for any public source.</p>
 <h4>Step 2 - Create configuration file</h4>
-The default configuration file is shown below.
+<p>The default configuration file is shown below.</p>
 
-<pre>
 <blockquote>
-
+<pre>
 &nbsp;##The main section
 [bibrankgkb]
 &nbsp;##The url to a web page with the data to be read, does not need to have the same name as this one, but if there
@@ -502,41 +496,40 @@ create_1 = file,,%(kb_2_filter)s,,file,,%(kb_2)s
 </pre>
 </blockquote>
 
-When you have found a source for the data, created the configuration file, it may be necessary to
+<p>When you have found a source for the data, created the configuration file, it may be necessary to
 create an convertion file, but this depends on the conversions used in the available data versus
-the convertion used in your CDS Invenio installation.
-<br/>
-The available data may look like this:
-<pre>
+the convertion used in your CDS Invenio installation.</p>
+<p>The available data may look like this:</p>
 <blockquote>
+<pre>
 COLLOID SURFACE A---1.98
 </pre>
 </blockquote>
-But in CDS Invenio you are using:
-<pre>
+<p>But in CDS Invenio you are using:</p>
 <blockquote>
+<pre>
 Colloids Surf., A---1.98
 </pre>
 </blockquote>
-By using a convertion file like:
-<pre>
+<p>By using a convertion file like:</p>
 <blockquote>
+<pre>
 COLLOID SURFACE A---Colloids Surf., A
 </pre>
 </blockquote>
-You can convert the source to the correct naming convention.
-<pre>
+<p>You can convert the source to the correct naming convention.</p>
 <blockquote>
+<pre>
 Colloids Surf., A---1.98
 </pre>
 </blockquote>
 <h4>Step 3 - Run tool</h4>
-When ready to run the tool, you may either use the default file (/etc/bibrank/bibrankgkb.cfg), or use another one by giving it using the input variable '--input'.
+<p>When ready to run the tool, you may either use the default file (/etc/bibrank/bibrankgkb.cfg), or use another one by giving it using the input variable '--input'.
 If you want to test the configuration, you can use '--verbose=9' to output on screen, or if you want to save it to a file, use
-'--output=filename', but remember that the file will be saved in the program directory.
-The output may look like this:
-<pre>
+'--output=filename', but remember that the file will be saved in the program directory.</p>
+<p>The output may look like this:</p>
 <blockquote>
+<pre>
 $ ./bibrankgkb -v9
 2004-03-11 17:30:17 --> Running: Generate Knowledge base.
 2004-03-11 17:30:17 --> Reading data from file: /home/invenio/etc/bibrank/jif.kb

@@ -202,7 +202,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
         else:
             result = rank_by_method(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
     except Exception, e:
-        result = (None, "", adderrorbox("An error occured when trying to rank the search result "+rank_method_code, ["Unexpected error: %s<br><b>Traceback:</b>%s" % (e, traceback.format_tb(sys.exc_info()[2]))]), voutput)
+        result = (None, "", adderrorbox("An error occured when trying to rank the search result "+rank_method_code, ["Unexpected error: %s<br /><b>Traceback:</b>%s" % (e, traceback.format_tb(sys.exc_info()[2]))]), voutput)
 
     afterfind = time.time() - starttime
 
@@ -216,7 +216,7 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
 
     if verbose > 0:
         voutput = voutput+"\nElapsed time after finding: "+str(afterfind)+"\nElapsed after mapping: "+str(aftermap)
-        print string.replace(voutput, "<br>", "\n")
+        print string.replace(voutput, "<br />", "\n")
 
     #add stuff from here into voutput from result
     tmp = result[4]+voutput
@@ -295,12 +295,12 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
 
     rnkdict = deserialize_via_marshal(rnkdict[0][0])
     if verbose > 0:
-        voutput += "<br>Running rank method: %s, using rank_by_method function in bibrank_record_sorter<br>" % rank_method_code
-        voutput += "Ranking data loaded, size of structure: %s<br>" % len(rnkdict)
+        voutput += "<br />Running rank method: %s, using rank_by_method function in bibrank_record_sorter<br />" % rank_method_code
+        voutput += "Ranking data loaded, size of structure: %s<br />" % len(rnkdict)
     lrecIDs = list(hitset)
 
     if verbose > 0:
-        voutput += "Number of records to rank: %s<br>" % len(lrecIDs)
+        voutput += "Number of records to rank: %s<br />" % len(lrecIDs)
     reclist = []
     reclist_addend = []
 
@@ -321,8 +321,8 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
                 reclist_addend.append((recID, 0))
 
     if verbose > 0:
-        voutput += "Number of records ranked: %s<br>" % len(reclist)
-        voutput += "Number of records not ranked: %s<br>" % len(reclist_addend)
+        voutput += "Number of records ranked: %s<br />" % len(reclist)
+        voutput += "Number of records not ranked: %s<br />" % len(reclist_addend)
 
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
     return (reclist_addend + reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
@@ -382,7 +382,7 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
     global voutput
 
     if verbose > 0:
-        voutput += "<br>Running rank method: %s, using find_similar/word_frequency in bibrank_record_sorter<br>" % rank_method_code
+        voutput += "<br />Running rank method: %s, using find_similar/word_frequency in bibrank_record_sorter<br />" % rank_method_code
     rank_limit_relevance = methods[rank_method_code]["default_min_relevance"]
 
     try:
@@ -428,12 +428,12 @@ def find_similar(rank_method_code, recID, hitset, rank_limit_relevance,verbose):
         (reclist, hitset) = sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit_relevance, verbose)
 
     if verbose > 0:
-        voutput += "<br>Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
-        voutput += "Number of terms to use for query: %s<br>" % len(lwords)
-        voutput += "Terms: %s<br>" % lwords
-        voutput += "Current number of recIDs: %s<br>" % (methods[rank_method_code]["col_size"])
-        voutput += "Prepare time: %s<br>" % (str(time.time() - startCreate))
-        voutput += "Total time used: %s<br>" % (str(time.time() - startCreate))
+        voutput += "<br />Number of terms: %s<br />" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
+        voutput += "Number of terms to use for query: %s<br />" % len(lwords)
+        voutput += "Terms: %s<br />" % lwords
+        voutput += "Current number of recIDs: %s<br />" % (methods[rank_method_code]["col_size"])
+        voutput += "Prepare time: %s<br />" % (str(time.time() - startCreate))
+        voutput += "Total time used: %s<br />" % (str(time.time() - startCreate))
         rank_method_stat(rank_method_code, reclist, lwords)
 
     return (reclist[:len(reclist)], methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
@@ -456,7 +456,7 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance, verb
     startCreate = time.time()
 
     if verbose > 0:
-        voutput += "<br>Running rank method: %s, using word_frequency function in bibrank_record_sorter<br>" % rank_method_code
+        voutput += "<br />Running rank method: %s, using word_frequency function in bibrank_record_sorter<br />" % rank_method_code
 
     lwords_old = lwords
     lwords = []
@@ -493,11 +493,11 @@ def word_similarity(rank_method_code, lwords, hitset, rank_limit_relevance, verb
         reclist = zip(lrecIDs, [0] * len(lrecIDs)) + reclist      #using 6mb
 
     if verbose > 0:
-        voutput += "<br>Current number of recIDs: %s<br>" % (methods[rank_method_code]["col_size"])
-        voutput += "Number of terms: %s<br>" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
-        voutput += "Terms: %s<br>" % lwords
-        voutput += "Prepare and pre calculate time: %s<br>" % (str(time.time() - startCreate))
-        voutput += "Total time used: %s<br>" % (str(time.time() - startCreate))
+        voutput += "<br />Current number of recIDs: %s<br />" % (methods[rank_method_code]["col_size"])
+        voutput += "Number of terms: %s<br />" % run_sql("SELECT count(id) FROM %s" % methods[rank_method_code]["rnkWORD_table"])[0][0]
+        voutput += "Terms: %s<br />" % lwords
+        voutput += "Prepare and pre calculate time: %s<br />" % (str(time.time() - startCreate))
+        voutput += "Total time used: %s<br />" % (str(time.time() - startCreate))
         rank_method_stat(rank_method_code, reclist, lwords)
 
     return (reclist, methods[rank_method_code]["prefix"], methods[rank_method_code]["postfix"], voutput)
@@ -596,8 +596,8 @@ def sort_record_relevance(recdict, rec_termcount, hitset, rank_limit_relevance, 
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
 
     if verbose > 0:
-        voutput += "Number of records sorted: %s<br>" % len(reclist)
-        voutput += "Sort time: %s<br>" % (str(time.time() - startCreate))
+        voutput += "Number of records sorted: %s<br />" % len(reclist)
+        voutput += "Sort time: %s<br />" % (str(time.time() - startCreate))
     return (reclist, hitset)
 
 def sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit_relevance, verbose):
@@ -629,8 +629,8 @@ def sort_record_relevance_findsimilar(recdict, rec_termcount, hitset, rank_limit
     reclist.sort(lambda x, y: cmp(x[1], y[1]))
 
     if verbose > 0:
-        voutput += "Number of records sorted: %s<br>" % len(reclist)
-        voutput += "Sort time: %s<br>" % (str(time.time() - startCreate))
+        voutput += "Number of records sorted: %s<br />" % len(reclist)
+        voutput += "Sort time: %s<br />" % (str(time.time() - startCreate))
     return (reclist, hitset)
 
 def rank_method_stat(rank_method_code, reclist, lwords):
@@ -645,25 +645,25 @@ def rank_method_stat(rank_method_code, reclist, lwords):
     else:
         j = len(reclist)
 
-    voutput += "<br>Rank statistics:<br>"
+    voutput += "<br />Rank statistics:<br />"
     for i in range(1, j + 1):
-        voutput += "%s,Recid:%s,Score:%s<br>" % (i,reclist[len(reclist) - i][0],reclist[len(reclist) - i][1])
+        voutput += "%s,Recid:%s,Score:%s<br />" % (i,reclist[len(reclist) - i][0],reclist[len(reclist) - i][1])
         for (term, table) in lwords:
             term_recs = run_sql("""SELECT hitlist FROM %s WHERE term=%%s""" % table, (term,))
             if term_recs:
                 term_recs = deserialize_via_marshal(term_recs[0][0])
                 if term_recs.has_key(reclist[len(reclist) - i][0]):
                     voutput += "%s-%s / " % (term, term_recs[reclist[len(reclist) - i][0]])
-        voutput += "<br>"
+        voutput += "<br />"
 
-    voutput += "<br>Score variation:<br>"
+    voutput += "<br />Score variation:<br />"
     count = {}
     for i in range(0, len(reclist)):
         count[reclist[i][1]] = count.get(reclist[i][1], 0) + 1
     i = 100
     while i >= 0:
         if count.has_key(i):
-            voutput += "%s-%s<br>" % (i, count[i])
+            voutput += "%s-%s<br />" % (i, count[i])
         i -= 1
 
 try:

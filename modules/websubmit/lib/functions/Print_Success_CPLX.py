@@ -32,10 +32,10 @@ from invenio.websubmit_config import InvenioWebSubmitFunctionError
 def Print_Success_CPLX(parameters, curdir, form, user_info=None):
     global rn
     act = form['act']
-    t="<br><br><B>Your request has been taken into account!</B><br><BR>"
+    t="<br /><br /><B>Your request has been taken into account!</B><br /><br />"
     if (act == "RRP") or (act == "RPB"):
-        t+="An email has been sent to the Publication Committee Chair. You will be warned by email as soon as the Project Leader takes his/her decision regarding your document.<br><br>"
+        t+="An email has been sent to the Publication Committee Chair. You will be warned by email as soon as the Project Leader takes his/her decision regarding your document.<br /><br />"
     elif act == "RDA":
-        t+="An email has been sent to the Project Leader. You will be warned by email as soon as the Project Leader takes his/her decision regarding your document.<br><br>"
+        t+="An email has been sent to the Project Leader. You will be warned by email as soon as the Project Leader takes his/her decision regarding your document.<br /><br />"
     return t
 

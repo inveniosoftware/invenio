@@ -35,7 +35,7 @@ def getnavtrail(previous = '', ln=cdslang):
     previous = wash_url_argument(previous, 'str')
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail = """<a class=navtrail href="%s/help/admin">%s</a> """ % (weburl, _("Admin Area"))
+    navtrail = """<a class="navtrail" href="%s/help/admin">%s</a> """ % (weburl, _("Admin Area"))
     navtrail = navtrail + previous
     return navtrail
 

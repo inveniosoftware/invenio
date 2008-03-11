@@ -45,7 +45,7 @@ from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
 
 def getnavtrail(previous = ''):
-    navtrail = """<a class=navtrail href="%s/help/admin">Admin Area</a> """ % (weburl,)
+    navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (weburl,)
     navtrail = navtrail + previous
     return navtrail
 
@@ -74,16 +74,16 @@ def perform_index(ln=cdslang):
                     (('Show Details', 'showrankdetails'),
                      ('Modify', 'modifyrank'),
                      ('Delete', 'deleterank'))]:
-            actions[-1].append('<a href="%s/admin/bibrank/bibrankadmin.py/%s?rnkID=%s&ln=%s">%s</a>' % (weburl, col[0][1], rnkID, ln, col[0][0]))
+            actions[-1].append('<a href="%s/admin/bibrank/bibrankadmin.py/%s?rnkID=%s&amp;ln=%s">%s</a>' % (weburl, col[0][1], rnkID, ln, col[0][0]))
             for (str, function) in col[1:]:
-                actions[-1][-1] += ' / <a href="%s/admin/bibrank/bibrankadmin.py/%s?rnkID=%s&ln=%s">%s</a>' % (weburl, function, rnkID, ln, str)
+                actions[-1][-1] += ' / <a href="%s/admin/bibrank/bibrankadmin.py/%s?rnkID=%s&amp;ln=%s">%s</a>' % (weburl, function, rnkID, ln, str)
 
     output = """
-    <a href="%s/admin/bibrank/bibrankadmin.py/addrankarea?ln=%s">Add new rank method</a><br><br>
+    <a href="%s/admin/bibrank/bibrankadmin.py/addrankarea?ln=%s">Add new rank method</a><br /><br />
     """ % (weburl, ln)
 
     output += tupletotable(header=header, tuple=actions)
-    return addadminbox("""Overview of rank methods&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mi">?</a>]</small>""" % weburl, datalist=[output, ''])
+    return addadminbox("""Overview of rank methods&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mi">?</a>]</small>""" % weburl, datalist=[output, ''])
 
 def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0):
     """Modify which collections the rank method is visible to"""
@@ -183,7 +183,7 @@ def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0)
 
     body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mc">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mc">?</a>]</small>""" % weburl, body)
 
 def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='yes'):
     """Modify the translations of a rank method"""
@@ -260,7 +260,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
 
     body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mt">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mt">?</a>]</small>""" % weburl, body)
 
 def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
     """form to add a new rank method with these values:"""
@@ -270,8 +270,8 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
     <dl>
      <dt>BibRank code:</dt>
      <dd>A unique code that identifies a rank method, is used when running the bibrank daemon and used to name the configuration file for the method.
-     <br>The template files includes the necessary parameters for the chosen rank method, and only needs to be edited with the correct tags and paths.
-     <br>For more information, please go to the <a title="See guide" href="%s/help/admin/bibrank-admin-guide">BibRank guide</a> and read the section about adding a rank method</dd>
+     <br />The template files includes the necessary parameters for the chosen rank method, and only needs to be edited with the correct tags and paths.
+     <br />For more information, please go to the <a title="See guide" href="%s/help/admin/bibrank-admin-guide">BibRank guide</a> and read the section about adding a rank method</dd>
     </dl>
     """ % weburl
     text = """
@@ -279,7 +279,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
     <input class="admin_wvar" type="text" name="rnkcode" value="%s" />
     """ % (rnkcode)
 
-    text += """<br>
+    text += """<br />
     <span class="adminlabel">Cfg template</span>
     <select name="template" class="admin_w200">
     <option value="">No template</option>
@@ -301,9 +301,9 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
             subtitle = 'Step 2 - Confirm addition of rank method'
             text = """<b>Add rank method with BibRank code: '%s'.</b>""" % (rnkcode)
             if template:
-                text += """<br><b>Using configuration template: '%s'.</b>""" % (template)
+                text += """<br /><b>Using configuration template: '%s'.</b>""" % (template)
             else:
-                text += """<br><b>Create empty configuration file.</b>"""
+                text += """<br /><b>Create empty configuration file.</b>"""
             output += createhiddenform(action="addrankarea",
                                        text=text,
                                        rnkcode=rnkcode,
@@ -329,12 +329,11 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
                         file.write(line)
                     file.close()
                     if template:
-                        text += """<b><span class="info"><br>Configuration file created using '%s' as template.</span></b>""" % template
+                        text += """<b><span class="info"><br />Configuration file created using '%s' as template.</span></b>""" % template
                     else:
-                        text += """<b><span class="info"><br>Empty configuration file created.</span></b>"""
+                        text += """<b><span class="info"><br />Empty configuration file created.</span></b>"""
                 except StandardError, e:
-                    text += """<b><span class="info"><br>Sorry, could not create configuration file: '%s/bibrank/%s.cfg', either because it already exists, or not enough rights to create file. <br>Please create the file in the path given.</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
-
+                    text += """<b><span class="info"><br />Sorry, could not create configuration file: '%s/bibrank/%s.cfg', either because it already exists, or not enough rights to create file. <br />Please create the file in the path given.</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
             else:
                 text = """<b><span class="info">Sorry, could not add rank method, rank method with the same BibRank code probably exists.</span></b>"""
             output += text
@@ -343,7 +342,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
 
     body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#ar">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#ar">?</a>]</small>""" % weburl, body)
 
 def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', confirm=0):
     """form to modify a rank method
@@ -365,14 +364,14 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
     output  = """
     <dl>
      <dd>When changing the BibRank code of a rank method, you must also change any scheduled tasks using the old value.
-     <br>For more information, please go to the <a title="See guide" href="%s/help/admin/bibrank-admin-guide">BibRank guide</a> and read the section about modifying a rank method's  BibRank code.</dd>
+     <br />For more information, please go to the <a title="See guide" href="%s/help/admin/bibrank-admin-guide">BibRank guide</a> and read the section about modifying a rank method's  BibRank code.</dd>
     </dl>
     """ % weburl
 
     text = """
      <span class="adminlabel">BibRank code</span>
      <input class="admin_wvar" type="text" name="rnkcode" value="%s" />
-     <br>
+     <br />
     """ % (oldcode)
 
     try:
@@ -386,7 +385,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
                 textarea += line
         text += """<textarea class="admin_wvar" name="cfgfile" rows="15" cols="70">""" + textarea + """</textarea>"""
     except StandardError, e:
-        text += """<b><span class="info">Cannot load file, either it does not exist, or not enough rights to read it: '%s/bibrank/%s.cfg'<br>Please create the file in the path given.</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
+        text += """<b><span class="info">Cannot load file, either it does not exist, or not enough rights to read it: '%s/bibrank/%s.cfg'<br />Please create the file in the path given.</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
 
     output += createhiddenform(action="modifyrank",
                                text=text,
@@ -420,12 +419,12 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
             file =  open("%s/bibrank/%s.cfg" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0]), 'w')
             file.write(cfgfile)
             file.close()
-            text = """<b><span class="info"><br>Configuration file modified: '%s/bibrank/%s.cfg'</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
+            text = """<b><span class="info"><br />Configuration file modified: '%s/bibrank/%s.cfg'</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
         except StandardError, e:
-            text = """<b><span class="info"><br>Sorry, could not modify configuration file, please check for rights to do so: '%s/bibrank/%s.cfg'<br>Please modify the file manually.</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
+            text = """<b><span class="info"><br />Sorry, could not modify configuration file, please check for rights to do so: '%s/bibrank/%s.cfg'<br />Please modify the file manually.</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
         output += text
 
-    finoutput = addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mr">?</a>]</small>""" % weburl, [output])
+    finoutput = addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mr">?</a>]</small>""" % weburl, [output])
     output = ""
 
     text = """
@@ -436,7 +435,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
     templates = get_templates()
     for templ in templates:
         text += """<option value="%s" %s>%s</option>""" % (templ, template == templ and 'selected="selected"' or '', templ[9:len(templ)-4])
-    text += """</select><br>"""
+    text += """</select><br />"""
 
     output += createhiddenform(action="modifyrank",
                                text=text,
@@ -467,14 +466,12 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
     subtitle =''
     output  = """
     <span class="warning">
-    <strong>
     <dl>
-     <dt>WARNING:</dt>
-     <dd>When deleting a rank method, you also deletes all data related to the rank method, like translations, which collections
+     <dt><strong>WARNING:</strong></dt>
+     <dd><strong>When deleting a rank method, you also deletes all data related to the rank method, like translations, which collections
      it was attached to and the data necessary to rank the searchresults. Any scheduled tasks using the deleted rank method will also stop working.
-     <br><br>For more information, please go to the <a title="See guide" href="%s/help/admin/bibrank-admin-guide">BibRank guide</a> and read the section regarding deleting a rank method.</dd>
+     <br /><br />For more information, please go to the <a title="See guide" href="%s/help/admin/bibrank-admin-guide">BibRank guide</a> and read the section regarding deleting a rank method.</strong></dd>
     </dl>
-    </strong>
     </span>
     """ % weburl
 
@@ -505,9 +502,9 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
                     text = """<b><span class="info">Rank method deleted</span></b>"""
                     try:
                         os.remove("%s/bibrank/%s.cfg" % (CFG_ETCDIR, rnkcode))
-                        text += """<br><b><span class="info">Configuration file deleted: '%s/bibrank/%s.cfg'.</span></b>"""  % (CFG_ETCDIR, rnkcode)
+                        text += """<br /><b><span class="info">Configuration file deleted: '%s/bibrank/%s.cfg'.</span></b>"""  % (CFG_ETCDIR, rnkcode)
                     except StandardError, e:
-                        text += """<br><b><span class="info">Sorry, could not delete configuration file: '%s/bibrank/%s.cfg'.</span><br>Please delete the file manually.</span></b>""" % (CFG_ETCDIR, rnkcode)
+                        text += """<br /><b><span class="info">Sorry, could not delete configuration file: '%s/bibrank/%s.cfg'.</span><br />Please delete the file manually.</span></b>""" % (CFG_ETCDIR, rnkcode)
                 else:
                     text = """<b><span class="info">Sorry, could not delete rank method</span></b>"""
             except StandardError, e:
@@ -516,7 +513,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
 
     body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#dr">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#dr">?</a>]</small>""" % weburl, body)
 
 
 def perform_showrankdetails(rnkID, ln=cdslang):
@@ -527,15 +524,15 @@ def perform_showrankdetails(rnkID, ln=cdslang):
     if not get_rnk_code(rnkID):
         return "Ranking method %s does not seem to exist." % str(rnkID)
 
-    subtitle = """Overview <a href="%s/admin/bibrank/bibrankadmin.py/modifyrank?rnkID=%s&ln=%s">[Modify]</a>""" % (weburl, rnkID, ln)
+    subtitle = """Overview <a href="%s/admin/bibrank/bibrankadmin.py/modifyrank?rnkID=%s&amp;ln=%s">[Modify]</a>""" % (weburl, rnkID, ln)
     text  = """
-    BibRank code: %s<br>
+    BibRank code: %s<br />
     Last updated by BibRank:
     """ % (get_rnk_code(rnkID)[0][0])
     if get_rnk(rnkID)[0][2]:
-        text += "%s<br>" % get_rnk(rnkID)[0][2]
+        text += "%s<br />" % get_rnk(rnkID)[0][2]
     else:
-        text += "Not yet run.<br>"
+        text += "Not yet run.<br />"
     output = addadminbox(subtitle, [text])
 
     subtitle = """Rank method statistics"""
@@ -546,16 +543,16 @@ def perform_showrankdetails(rnkID, ln=cdslang):
         text = "BibRank not yet run, cannot show statistics for method"
     output += addadminbox(subtitle, [text])
 
-    subtitle = """Attached to collections <a href="%s/admin/bibrank/bibrankadmin.py/modifycollection?rnkID=%s&ln=%s">[Modify]</a>""" % (weburl, rnkID, ln)
+    subtitle = """Attached to collections <a href="%s/admin/bibrank/bibrankadmin.py/modifycollection?rnkID=%s&amp;ln=%s">[Modify]</a>""" % (weburl, rnkID, ln)
     text = ""
     col = get_rnk_col(rnkID, ln)
     for key,  value in col:
-        text+= "%s<br>" % value
+        text+= "%s<br />" % value
     if not col:
         text +="No collections"
     output += addadminbox(subtitle, [text])
 
-    subtitle = """Translations <a href="%s/admin/bibrank/bibrankadmin.py/modifytranslations?rnkID=%s&ln=%s">[Modify]</a>""" % (weburl, rnkID, ln)
+    subtitle = """Translations <a href="%s/admin/bibrank/bibrankadmin.py/modifytranslations?rnkID=%s&amp;ln=%s">[Modify]</a>""" % (weburl, rnkID, ln)
     prev_lang = ''
     trans = get_translations(rnkID)
     types = get_rnk_nametypes()
@@ -567,14 +564,14 @@ def perform_showrankdetails(rnkID, ln=cdslang):
             if lang and languages.has_key(lang) and type and name:
                 if prev_lang != lang:
                     prev_lang = lang
-                    text += """%s: <br>""" % (languages[lang])
+                    text += """%s: <br />""" % (languages[lang])
                 if types.has_key(type):
-                    text+= """<span style="margin-left: 10px">'%s'</span><span class="note">(%s)</span><br>""" % (name, types[type])
+                    text+= """<span style="margin-left: 10px">'%s'</span><span class="note">(%s)</span><br />""" % (name, types[type])
     else:
         text = """No translations exists"""
     output += addadminbox(subtitle, [text])
 
-    subtitle = """Configuration file: '%s/bibrank/%s.cfg' <a href="%s/admin/bibrank/bibrankadmin.py/modifyrank?rnkID=%s&ln=%s">[Modify]</a>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0], weburl, rnkID, ln)
+    subtitle = """Configuration file: '%s/bibrank/%s.cfg' <a href="%s/admin/bibrank/bibrankadmin.py/modifyrank?rnkID=%s&amp;ln=%s">[Modify]</a>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0], weburl, rnkID, ln)
     text = ""
     try:
         file = open("%s/bibrank/%s.cfg" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0]))
@@ -941,7 +938,7 @@ def get_def_name(ID, table):
         else:
             res = run_sql("SELECT id,name FROM %s" % table)
         res = list(res)
-	res.sort(compare_on_val)
+        res.sort(compare_on_val)
         return res
     except StandardError, e:
         return []
@@ -976,7 +973,7 @@ def get_i8n_name(ID, ln, rtype, table):
         result = filter(lambda x: not res2.has_key(x[0]), res1)
         res = res + result
         res = list(res)
-	res.sort(compare_on_val)
+        res.sort(compare_on_val)
         return res
     except StandardError, e:
         raise StandardError
@@ -1027,15 +1024,15 @@ def modify_translations(ID, langs, sel_type, trans, table):
                                   (ID, sel_type, langs[nr][0], trans[nr]))
         return (1, "")
     except StandardError, e:
-	return (0, e)
+        return (0, e)
 
 def write_outcome(res):
     try:
         if res and res[0] == 1:
             return """<b><span class="info">Operation successfully completed.</span></b>"""
         elif res:
-            return """<b><span class="info">Operation failed. Reason:</span></b><br>%s""" % res[1][1]
+            return """<b><span class="info">Operation failed. Reason:</span></b><br />%s""" % res[1][1]
     except Exception, e:
-        return """<b><span class="info">Operation failed. Reason unknown</span></b><br>"""
+        return """<b><span class="info">Operation failed. Reason unknown</span></b><br />"""
 
 

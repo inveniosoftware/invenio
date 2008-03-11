@@ -39,12 +39,12 @@ def Print_Success(parameters, curdir, form, user_info=None):
         additional_rn = " and %s" % additional_rn
     else:
         additional_rn = ""
-    t=t+Request_Print("A",  "<br><br><B>Submission Complete!</B><br><BR>")
-    t=t+Request_Print("A",  "Your document has the following reference(s): <b>%s%s</b><br><br>" % (rn,additional_rn))
+    t=t+Request_Print("A",  "<br /><br /><b>Submission Complete!</b><br /><br />")
+    t=t+Request_Print("A",  "Your document has the following reference(s): <b>%s%s</b><br /><br />" % (rn,additional_rn))
     if status == "APPROVAL":
-        t=t+Request_Print("A",  "An email has been sent to the referee. You will be warned by email as soon as the referee takes his/her decision regarding your document.<br><br>\n")
+        t=t+Request_Print("A",  "An email has been sent to the referee. You will be warned by email as soon as the referee takes his/her decision regarding your document.<br /><br />\n")
     if status == "ADDED":
-        t=t+Request_Print("A",  "It will soon appear on our server.<br><br>\n")
+        t=t+Request_Print("A",  "It will soon appear on our server.<br /><br />\n")
     t=t+Request_Print("A",  "Thank you for using %s!" % CFG_SITE_NAME)
-    t=t+Request_Print("A",  "<br><br><br><br>")
+    t=t+Request_Print("A",  "<br /><br /><br /><br />")
     return t

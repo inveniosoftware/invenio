@@ -796,7 +796,7 @@ class Template:
         warnings = self.tmpl_warnings(warnings, ln)
         form = """<div><h2>%(add_comment)s</h2>
 
-<textarea name="msg" rows="20" style="width:90%%">%(msg)s</textarea>
+<textarea name="msg" cols="80" rows="20" style="width:90%%">%(msg)s</textarea>
 <br />
                 <span class="reportabuse">%(note)s</span>
                 </div>
@@ -890,7 +890,7 @@ class Template:
                     </tr>
                     <tr>
                       <td>
-<textarea name="msg" rows="20" style="width:90%%">%(msg)s</textarea>
+<textarea name="msg" cols="80" rows="20" style="width:90%%">%(msg)s</textarea>
                       </td>
                     </tr>
                     <tr>
@@ -1021,7 +1021,7 @@ class Template:
                 out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=1">%(reported_rev_label)s</a></li>' % \
                     {'weburl': weburl, 'ln': ln, 'reported_rev_label': _("View all reported reviews")}
             out += """
-                <li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/delete?ln=%(ln)s&amp;comid=-1">%(delete_label)s</a></small></li>
+                <li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/delete?ln=%(ln)s&amp;comid=-1">%(delete_label)s</a></li>
                 <li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/users?ln=%(ln)s">%(view_users)s</a></li>
                 <li><a href="%(weburl)s/help/admin/webcomment-admin-guide">%(guide)s</a></li>
                 """ % {'weburl'    : weburl,
@@ -1265,9 +1265,9 @@ class Template:
       <td class="admintdleft" style="padding: 5px; border-bottom: 1px solid lightgray;">%s</td>
       <td class="admintdleft" style="padding: 5px; border-bottom: 1px solid lightgray;">%s</td>
       <td class="admintd" style="padding: 5px; border-bottom: 1px solid lightgray;">%s</td>
-    </tr>
-  </tbody>""" % (comments[i], users[i], comments_info[i], checkboxes[i])
+    </tr>""" % (comments[i], users[i], comments_info[i], checkboxes[i])
         out += """
+  </tbody>
 </table>"""
         if reviews:
             action_display = {

@@ -630,7 +630,7 @@ def makePattern(candidate, mode):
             pattern = re.compile(begREGEX + candidate.replace("/","") + endREGEX, re.I)
 
     except:
-        print "Invalid thesaurus term: " + re.escape(candidate) + "<br>"
+        print "Invalid thesaurus term: " + re.escape(candidate) + "<br />"
 
     return pattern
 
@@ -792,7 +792,7 @@ def main():
             print "<table>"
             print '<tr><div class="pagebox2" align="top"><small>'
             for i in range(limit):
-                print "<b>" + str(outcome[i]) + "</b><br>"
+                print "<b>" + str(outcome[i]) + "</b><br />"
             print '</small></div></tr>'
             print "</table></body>"
             print "</html>"

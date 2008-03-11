@@ -664,11 +664,11 @@ def display_collection(req, c, as, verbose, ln):
                     rssurl=rssurl)
     except:
         if verbose >= 9:
-            req.write("<br>c=%s" % c)
-            req.write("<br>as=%s" % as)
-            req.write("<br>ln=%s" % ln)
-            req.write("<br>colID=%s" % colID)
-            req.write("<br>uid=%s" % uid)
+            req.write("<br />c=%s" % c)
+            req.write("<br />as=%s" % as)
+            req.write("<br />ln=%s" % ln)
+            req.write("<br />colID=%s" % colID)
+            req.write("<br />uid=%s" % uid)
         return page(title=_("Internal Error"),
                     body = create_error_box(req, ln=ln),
                     description="%s - Internal Error" % CFG_SITE_NAME,

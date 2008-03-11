@@ -34,7 +34,7 @@ def get_verbose_print(req, prefix, cur_verbosity_level):
     def vprint(verbosity_level, message):
         """Print a verbose message."""
         if cur_verbosity_level >= verbosity_level:
-            req.write('<br><span class="quicknote">' + prefix + message + '</span><br>')
+            req.write('<br /><span class="quicknote">' + prefix + message + '</span><br />')
 
     return vprint
 

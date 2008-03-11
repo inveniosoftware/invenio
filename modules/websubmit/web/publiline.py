@@ -331,7 +331,7 @@ def displayDocument(req, doctype,categ,RN,send, ln = cdslang):
         dAction = arr[4]
         access = arr[5]
     else:
-        return _("Approval has never been requested for this document.") + "<BR>&nbsp;"
+        return _("Approval has never been requested for this document.") + "<br />&nbsp;"
 
     ## Get the details of the pending item:
     item_details = get_pending_item_details(doctype, RN)
@@ -424,7 +424,7 @@ def displayCplxDocument(req, doctype,categ,RN,apptype, ln = cdslang):
                  'dProjectLeaderAction' : dProjectLeaderAction,
                 }
     else:
-        return _("Approval has never been requested for this document.") + "<BR>&nbsp;"
+        return _("Approval has never been requested for this document.") + "<br />&nbsp;"
 
 ## Removing call to deprecated "getInAlice" function and replacing it with
 ## a call to the newer "get_brief_doc_details_from_repository" function:
@@ -1176,7 +1176,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         return t
 
     else:
-        return _("Wrong action for this document.") + "<BR>&nbsp;"
+        return _("Wrong action for this document.") + "<br />&nbsp;"
 
     return t
 
@@ -1326,7 +1326,7 @@ def get_brief_doc_details_from_pending(doctype, reportnumber):
                     pending_doc_details['recid'] = ""
                 else:
                     pending_doc_details['recid'] = recid.strip()
-                
+
                 ## Item report number (from record):
                 ## Note: I don't know what purpose this serves. It appears
                 ## to be used in the email that is sent to the author, but
@@ -1355,20 +1355,20 @@ def get_brief_doc_details_from_pending(doctype, reportnumber):
                                                        code="a")
                     if alt_title != "":
                         pending_doc_details['title'] = alt_title
-                
+
                 ## Item first author:
                 first_author = record_get_field_value(rec=record, \
                                                       tag="100", \
                                                       code="a")
                 if first_author != "":
                     pending_doc_details['authors'].append(first_author)
-                
+
                 ## Other Authors:
                 other_authors = record_get_field_values(rec=record, \
                                                         tag="700", \
                                                         code="a")
                 for author in other_authors:
-                    pending_doc_details['authors'].append(author)                
+                    pending_doc_details['authors'].append(author)
 
     ## Return the details discovered about the pending document:
     return pending_doc_details

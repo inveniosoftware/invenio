@@ -27,6 +27,6 @@ __revision__ = "$Id$"
 
 def Print_Success_SRV(parameters, curdir, form, user_info=None): 
     global rn
-    t="<br><br><b>Document %s was successfully revised.</b>" % rn
+    t="<br /><br /><b>Document %s was successfully revised.</b>" % rn
     return t
 

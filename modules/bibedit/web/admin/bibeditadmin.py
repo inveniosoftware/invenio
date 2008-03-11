@@ -32,7 +32,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.messages import gettext_set_language, wash_language
 from invenio.urlutils import wash_url_argument, redirect_to_url
 
-navtrail = """ <a class=navtrail href=\"%s/help/admin\">Admin Area</a> """ % (weburl,)
+navtrail = """ <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> """ % (weburl,)
 
 def index(req, ln=cdslang, recid=None, temp="false", format_tag='marc',
           edit_tag=None, delete_tag=None, num_field=None, add=0, cancel=0,

@@ -106,12 +106,12 @@ def Upload_Files(parameters, curdir, form, user_info=None):
     t+="<form>"
     t=t+Display_Form(bibrecdocs)
     t=t+Display_File_List(bibrecdocs)
-    t=t+ "<br><CENTER><small><INPUT TYPE=\"button\" HEIGHT=35 WIDTH=250 NAME=\"Submit\" VALUE=\"End Submission\" onClick=\"step2();\"></small></CENTER>"
+    t=t+ "<br /><CENTER><small><INPUT TYPE=\"button\" HEIGHT=35 WIDTH=250 NAME=\"Submit\" VALUE=\"End Submission\" onClick=\"step2();\"></small></CENTER>"
     t+="</form>"
     return t
 
 def Display_File_List(bibrecdocs):
-    t="""<br><br><table cellpadding=0 cellspacing=0 border=0 bgcolor=#dddddd width=80% align=center><tr><td>"""
+    t="""<br /><br /><table cellpadding=0 cellspacing=0 border=0 bgcolor=#dddddd width=80% align=center><tr><td>"""
     bibdocs = bibrecdocs.list_bibdocs()
     if len(bibdocs) > 0:
         types = list_types_from_array(bibdocs)
@@ -124,7 +124,7 @@ def Display_File_List(bibrecdocs):
             for bibdoc in bibdocs:
                 if mytype == bibdoc.get_type():
                     t+="<table cellpadding=0 cellspacing=1 border=0><tr><td bgcolor=\"white\">"
-                    t+="<center><input type=radio name=mybibdocname value=%s><br><br><A href=\"\" onClick=\"if (confirm('Are you sure you want to delete this file?')) { document.forms[0].deletedfile.value='%s';document.forms[0].deleted.value='yes';document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/smallbin.gif border=0 align=center></a><br></small></center>" % (bibdoc.get_docname(),bibdoc.get_docname(),images)
+                    t+="<center><input type=radio name=mybibdocname value=%s><br /><br /><A href=\"\" onClick=\"if (confirm('Are you sure you want to delete this file?')) { document.forms[0].deletedfile.value='%s';document.forms[0].deleted.value='yes';document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/smallbin.gif border=0 align=center></a><br /></small></center>" % (bibdoc.get_docname(),bibdoc.get_docname(),images)
                     t+="</td><td>"
                     t+=bibdoc.display()
                     t+="</td></tr></table>"
@@ -135,7 +135,7 @@ def Display_Form(bibrecdocs):
     #output the upload files form.
     t=""
     t=t+"""
-<B>Don't forget to click on the \"End Submission\" button when you have finished managing the files.</b><br><br>
+<B>Don't forget to click on the \"End Submission\" button when you have finished managing the files.</b><br /><br />
 <TABLE cellpadding=0 cellspacing=0 border=0 bgcolor=#dddddd width=80% align=center>
 <TR>
 <TD>

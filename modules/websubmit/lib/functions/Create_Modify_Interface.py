@@ -120,7 +120,7 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
         else:
             raise InvenioWebSubmitFunctionError("cannot find fields to modify")
     #output some text    
-    t = t+"<CENTER bgcolor=\"white\">The document <B>%s</B> has been found in the database.</CENTER><BR>Please modify the following fields:<BR>Then press the 'END' button at the bottom of the page<BR>\n" % rn
+    t = t+"<CENTER bgcolor=\"white\">The document <B>%s</B> has been found in the database.</CENTER><br />Please modify the following fields:<br />Then press the 'END' button at the bottom of the page<br />\n" % rn
     for field in fields:
         subfield = ""
         value = ""
@@ -199,7 +199,7 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
                 text = "%s: unknown field type" % field
             t = t + "<small>%s</small>" % text
     # output some more text
-    t = t + "<BR><BR><CENTER><small><INPUT type=\"button\" width=400 height=50 name=\"End\" value=\"END\" onClick=\"document.forms[0].step.value = 2;document.forms[0].submit();\"></small></CENTER></H4>"
+    t = t + "<br /><br /><CENTER><small><INPUT type=\"button\" width=400 height=50 name=\"End\" value=\"END\" onClick=\"document.forms[0].step.value = 2;document.forms[0].submit();\"></small></CENTER></H4>"
     # Flag File to be written if first call to page, which tells function that if page is reloaded,
     # it should get field values from text files in curdir, instead of from DB record:
     if not os.path.exists("%s/%s" % (curdir, "Create_Modify_Interface_DONE")):

@@ -241,7 +241,7 @@ def perform_set(email, ln, verbose=0):
                 )
     if verbose >= 9:
         for key, value in prefs.items():
-            out += "<b>%s</b>:%s<br>" % (key, value)
+            out += "<b>%s</b>:%s<br />" % (key, value)
     out += perform_display_external_user_settings(prefs, ln)
     return out
 

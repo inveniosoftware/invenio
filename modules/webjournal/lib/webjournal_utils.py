@@ -1218,7 +1218,7 @@ image_pattern = re.compile(r'''
                                </center>
                                \s*
                                (</a>)?
-                               (<br>|<br />|<br/>)*# the caption can be separated by any nr of line breaks
+                               (<br />|<br />|<br/>)*# the caption can be separated by any nr of line breaks
                                (
                                <b>
                                \s*
@@ -1233,5 +1233,5 @@ image_pattern = re.compile(r'''
                                #''',re.DOTALL | re.IGNORECASE | re.VERBOSE | re.MULTILINE)
 
 # (<a\s*href=["']?(?P<hyperlink>\S*)["']?>)?\s*<center>\s*<img\s*(class=["']imageScale["'])*?\s*src=(?P<image>\S*)\s*border=1\s*(/)?>
-# \s*</center>\s*(</a>)?(<br>|<br />|<br/>)*(<b>\s*<i>\s*<center>(?P<caption>.*?)</center>\s*</i>\s*</b>)?
+# \s*</center>\s*(</a>)?(<br />|<br />|<br/>)*(<b>\s*<i>\s*<center>(?P<caption>.*?)</center>\s*</i>\s*</b>)?
 #url(["']?(?P<url>\S*)["']?)

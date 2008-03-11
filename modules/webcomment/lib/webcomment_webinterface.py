@@ -358,12 +358,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         success = perform_request_vote(argd['comid'], client_ip_address, argd['com_value'], uid)
         if argd['referer']:
-            argd['referer'] += "?ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;voted=%s&amp;" % (argd['ln'],
-                                                                                                    argd['do'],
-                                                                                                    argd['ds'],
-                                                                                                    argd['nb'],
-                                                                                                    argd['p'],
-                                                                                                    success)
+            argd['referer'] += "?ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;voted=%s&amp;" % (
+                argd['ln'], argd['do'], argd['ds'], argd['nb'], argd['p'], success)
             redirect_to_url(req, argd['referer'])
         else:
             #Note: sent to comments display
@@ -421,12 +417,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
         success = perform_request_report(argd['comid'], client_ip_address, uid)
         if argd['referer']:
-            argd['referer'] += "?ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;reported=%s&amp;" % (argd['ln'],
-                                                                                                       argd['do'],
-                                                                                                       argd['ds'],
-                                                                                                       argd['nb'],
-                                                                                                       argd['p'],
-                                                                                                       str(success))
+            argd['referer'] += "?ln=%s&amp;do=%s&amp;ds=%s&amp;nb=%s&amp;p=%s&amp;reported=%s&amp;" % (argd['ln'], argd['do'], argd['ds'], argd['nb'], argd['p'], str(success))
 
             redirect_to_url(req, argd['referer'])
         else:

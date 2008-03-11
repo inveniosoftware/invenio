@@ -131,7 +131,7 @@ class Template:
             passed as parameters to the BibFormat modules while executing
             formatting.
 
-            <br><em>Example:</em> You can tell BibFormat that is has to enrich the
+            <br /><em>Example:</em> You can tell BibFormat that is has to enrich the
             incoming metadata file by the created format, or that it only has to
             print the format out.
 
@@ -141,7 +141,7 @@ class Template:
             BibFormat variable names.  The variable names can afterwards be used
             in formatting and linking rules.
 
-            <br><em>Example:</em> You can tell that <code>100 $a</code> field
+            <br /><em>Example:</em> You can tell that <code>100 $a</code> field
             should be mapped into <code>$100.a</code> internal variable that you
             could use later.
 
@@ -150,7 +150,7 @@ class Template:
             <dd>Define rules for automated creation of URI links from mapped
             internal variables.
 
-            <br><em>Example:</em> You can tell a rule how to create a link to
+            <br /><em>Example:</em> You can tell a rule how to create a link to
             People database out of the <code>$100.a</code> internal variable
             repesenting author's name.  (The <code>$100.a</code> variable was mapped
             in the previous step, see the Extraction Rules.)
@@ -160,7 +160,7 @@ class Template:
             <dd>Define file format types based on file extensions.  This will be
             used when proposing various fulltext services.
 
-            <br><em>Example:</em> You can tell that <code>*.pdf</code> files will
+            <br /><em>Example:</em> You can tell that <code>*.pdf</code> files will
             be treated as PDF files.
 
             <dt><a href="UDF_display.php">User Defined Functions (UDFs)</a>
@@ -169,7 +169,7 @@ class Template:
             own output formats.  This enables you to do complex formatting without
             ever touching the BibFormat core code.
 
-            <br><em>Example:</em> You can define a function how to match and
+            <br /><em>Example:</em> You can define a function how to match and
             extract email addresses out of a text file.
 
             <dt><a href="FORMAT_display.php">Formats</a>
@@ -180,7 +180,7 @@ class Template:
             time.  It may reuse formats, user defined functions, knowledge bases,
             etc.
 
-            <br><em>Example:</em> You can tell that authors should be printed in
+            <br /><em>Example:</em> You can tell that authors should be printed in
             italic, that if there are more than 10 authors only the first three
             should be printed, etc.
 
@@ -190,7 +190,7 @@ class Template:
             various forms of input data values into the unique standard form on
             the output.
 
-            <br><em>Example:</em> You can tell that <em>Phys Rev D</em> and
+            <br /><em>Example:</em> You can tell that <em>Phys Rev D</em> and
             <em>Physical Review D</em> are both the same journal and that these
             names should be standardized to <em>Phys Rev : D</em>.
 
@@ -211,14 +211,14 @@ class Template:
             <p>
             Run <a href="BIBREFORMAT_display.php">Reformat Records</a> tool.
             This tool permits you to update stored formats for bibliographic records.
-            <br>
+            <br />
             It should normally be used after configuring BibFormat's
             <a href="BEH_display.php">Behaviours</a> and
             <a href="FORMAT_display.php">Formats</a>.
             When these are ready, you can choose to rebuild formats for selected
             collections or you can manually enter a search query and the web interface
             will accomplish all necessary formatting steps.
-            <br>
+            <br />
             <i>Example:</i> You can request Photo collections to have their HTML
             brief formats rebuilt, or you can reformat all the records written by Ellis.
 

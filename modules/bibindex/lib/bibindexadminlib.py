@@ -45,7 +45,7 @@ websearch_templates = invenio.template.load('websearch')
 def getnavtrail(previous = ''):
     """Get the navtrail"""
 
-    navtrail = """<a class=navtrail href="%s/help/admin">Admin Area</a> """ % (weburl,)
+    navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (weburl,)
     navtrail = navtrail + previous
     return navtrail
 
@@ -252,7 +252,7 @@ def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
         if forward_table_status_info and reverse_table_status_info:
             output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
-                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s" title="%s">%s</A>""" % (weburl, idxID, ln, idxDESC, idx_dict.get(idxID, idxNAME)),
+                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s" title="%s">%s</a>""" % (weburl, idxID, ln, idxDESC, idx_dict.get(idxID, idxNAME)),
                        "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
                        "%s MB" % websearch_templates.tmpl_nice_number(reverse_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
                        websearch_templates.tmpl_nice_number(forward_table_status_info['Rows']),
@@ -264,7 +264,7 @@ def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
         elif not forward_table_status_info:
             output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
-                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)),
+                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</a>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)),
                        "Error", "%s MB" % websearch_templates.tmpl_nice_number(reverse_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
                        "Error",
                        websearch_templates.tmpl_nice_number(reverse_table_status_info['Rows'], max_ndigits_after_dot=3),
@@ -274,7 +274,7 @@ def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
         elif not reverse_table_status_info:
             output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
-                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</A>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)),
+                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</a>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)),
                        "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
                        "Error", websearch_templates.tmpl_nice_number(forward_table_status_info['Rows'], max_ndigits_after_dot=3),
                        "Error",
@@ -367,7 +367,7 @@ def perform_addindex(ln=cdslang, idxNAME='', callback="yes", confirm=-1):
     subtitle = """<a name="3"></a>3. Add new index"""
     text = """
     <span class="adminlabel">Index name</span>
-    <input class="admin_w200" type="text" name="idxNAME" value="%s" /><br>
+    <input class="admin_w200" type="text" name="idxNAME" value="%s" /><br />
     """ % idxNAME
     output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addindex" % weburl,
                               text=text,
@@ -376,7 +376,7 @@ def perform_addindex(ln=cdslang, idxNAME='', callback="yes", confirm=-1):
                               confirm=1)
     if idxNAME and confirm in ["1", 1]:
         res = add_idx(idxNAME)
-        output += write_outcome(res) + """<br><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&ln=%s">Configure this index</a>.""" % (weburl, res[1], ln)
+        output += write_outcome(res) + """<br /><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&ln=%s">Configure this index</a>.""" % (weburl, res[1], ln)
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please give the index a name.</span></b>
         """
@@ -557,14 +557,14 @@ def perform_showdetailsfieldtag(fldID, tagID, ln=cdslang, callback="yes", confir
     output = ""
     subtitle = """<a name="4.1"></a>Showing details for MARC tag '%s'""" % tagname
 
-    output += "<br><b>This MARC tag is used directly in these logical fields:</b>&nbsp;"
+    output += "<br /><b>This MARC tag is used directly in these logical fields:</b>&nbsp;"
     fld_tag = get_fld_tags('', tagID)
     exist = {}
     for (id_field,id_tag, tname, tvalue, score) in fld_tag:
         output += "%s, " % fld_dict[int(id_field)]
         exist[id_field] = 1
 
-    output += "<br><b>This MARC tag is used indirectly in these logical fields:</b>&nbsp;"
+    output += "<br /><b>This MARC tag is used indirectly in these logical fields:</b>&nbsp;"
     tag = run_sql("SELECT value from tag where id=%s" % id_tag)
     tag = tag[0][0]
     for i in range(0, len(tag) - 1):
@@ -599,12 +599,12 @@ def perform_showdetailsfield(fldID, ln=cdslang, callback="yes", confirm=-1):
     fin_output = ""
     subtitle = """<a name="1"></a>5. Show usage for logical field '%s'""" % fld_dict[fldID]
 
-    output = "This logical field is used in these collections:<br>"
+    output = "This logical field is used in these collections:<br />"
     ltype = ''
     exist = {}
     for (id_collection, id_field, id_fieldvalue, ftype, score, score_fieldvalue) in col_fld:
         if ltype != ftype:
-            output += "<br><b>%s:&nbsp;</b>" % sort_types[ftype]
+            output += "<br /><b>%s:&nbsp;</b>" % sort_types[ftype]
             ltype = ftype
             exist = {}
         if not exist.has_key(id_collection):
@@ -633,9 +633,9 @@ def perform_addfield(ln=cdslang, fldNAME='', code='', callback="yes", confirm=-1
     code = str.replace(code,' ', '')
     text = """
     <span class="adminlabel">Field name</span>
-    <input class="admin_w200" type="text" name="fldNAME" value="%s" /><br>
+    <input class="admin_w200" type="text" name="fldNAME" value="%s" /><br />
     <span class="adminlabel">Field code</span>
-    <input class="admin_w200" type="text" name="code" value="%s" /><br>
+    <input class="admin_w200" type="text" name="code" value="%s" /><br />
     """ % (fldNAME, code)
     output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addfield" % weburl,
                               text=text,
@@ -674,7 +674,7 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
             check = run_sql("SELECT id_field from idxINDEX_field where id_field=%s" % fldID)
             text = ""
             if check:
-                text += """<b><span class="info">This field is used in an index, deletion may cause problems.</span></b><br>"""
+                text += """<b><span class="info">This field is used in an index, deletion may cause problems.</span></b><br />"""
             text += """Do you want to delete the logical field '%s' and all its relations and definitions.""" % (fld_dict[fldID])
             output += createhiddenform(action="deletefield#4",
                                        text=text,
@@ -684,7 +684,7 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
         elif confirm in ["1", 1]:
             res = delete_fld(fldID)
             if res[0] == 1:
-                return """<br><b><span class="info">Field deleted.</span></b>""" + write_outcome(res)
+                return """<br /><b><span class="info">Field deleted.</span></b>""" + write_outcome(res)
             else:
                 output += write_outcome(res)
 
@@ -708,7 +708,7 @@ def perform_deleteindex(idxID, ln=cdslang, callback='yes', confirm=0):
             idx = get_idx(idxID)
             if idx:
                 text = ""
-                text += """<b><span class="info">By deleting an index, you may also loose any indexed data in the forward and reverse table for this index.</span></b><br>"""
+                text += """<b><span class="info">By deleting an index, you may also loose any indexed data in the forward and reverse table for this index.</span></b><br />"""
                 text += """Do you want to delete the index '%s' and all its relations and definitions.""" % (idx[0][1])
                 output += createhiddenform(action="deleteindex#5",
                                        text=text,
@@ -716,11 +716,11 @@ def perform_deleteindex(idxID, ln=cdslang, callback='yes', confirm=0):
                                        idxID=idxID,
                                        confirm=1)
             else:
-                return """<br><b><span class="info">Index specified does not exist.</span></b>"""
+                return """<br /><b><span class="info">Index specified does not exist.</span></b>"""
         elif confirm in ["1", 1]:
             res = delete_idx(idxID)
             if res[0] == 1:
-                return """<br><b><span class="info">Index deleted.</span></b>""" + write_outcome(res)
+                return """<br /><b><span class="info">Index deleted.</span></b>""" + write_outcome(res)
             else:
                 output += write_outcome(res)
 
@@ -752,7 +752,7 @@ def perform_showfieldoverview(ln=cdslang, callback='', confirm=0):
             field_tags = """<b><span class="info">None</span></b>"""
 
         lang = get_lang_list("fieldname", "id_field", field_id)
-        output += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % ("""<a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&ln=%s">%s</A>""" % (weburl, field_id, ln, fld_dict[field_id]), field_tags, lang)
+        output += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % ("""<a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&ln=%s">%s</a>""" % (weburl, field_id, ln, fld_dict[field_id]), field_tags, lang)
     output += "</table>"
 
     body = [output]
@@ -779,9 +779,9 @@ def perform_modifyindex(idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes
             idxDESC = idx[0][2]
         text = """
         <span class="adminlabel">Index name</span>
-        <input class="admin_w200" type="text" name="idxNAME" value="%s" /><br>
+        <input class="admin_w200" type="text" name="idxNAME" value="%s" /><br />
         <span class="adminlabel">Index description</span>
-        <textarea class="admin_w200" name="idxDESC">%s</textarea><br>
+        <textarea class="admin_w200" name="idxDESC">%s</textarea><br />
         """ % (idxNAME, idxDESC)
 
         output += createhiddenform(action="modifyindex#1",
@@ -795,7 +795,7 @@ def perform_modifyindex(idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes
             res = modify_idx(idxID, idxNAME, idxDESC)
             output += write_outcome(res)
         elif confirm in [1, "1"]:
-            output += """<br><b><span class="info">Please give a name for the index.</span></b>"""
+            output += """<br /><b><span class="info">Please give a name for the index.</span></b>"""
     else:
         output  = """No index to modify."""
 
@@ -866,7 +866,7 @@ def perform_modifyindexstemming(idxID, ln=cdslang, idxSTEM='', callback='yes', c
             <pre>$> %s/bibindex --reindex -w %s</pre></span>
             """ % (CFG_BINDIR, get_idx(idxID)[0][1])
         elif confirm in [1, "1"]:
-            output += """<br><b><span class="info">Please give a name for the index.</span></b>"""
+            output += """<br /><b><span class="info">Please give a name for the index.</span></b>"""
     else:
         output  = """No index to modify."""
 
@@ -898,7 +898,7 @@ def perform_modifyfield(fldID, ln=cdslang, code='', callback='yes', confirm=-1):
 
         text = """
         <span class="adminlabel">Field code</span>
-        <input class="admin_w200" type="text" name="code" value="%s" /><br>
+        <input class="admin_w200" type="text" name="code" value="%s" /><br />
         """ % code
 
         output += createhiddenform(action="modifyfield#2",
@@ -984,11 +984,11 @@ def perform_modifyfieldtags(fldID, ln=cdslang, callback='yes', content='', confi
     if len(res) > 0:
         i = 0
         for (fldID, tagID, tname, tvalue, score) in res:
-	    move = ""
+        move = ""
             if i != 0:
                 move += """<a href="%s/admin/bibindex/bibindexadmin.py/switchtagscore?fldID=%s&amp;id_1=%s&amp;id_2=%s&amp;ln=%s&amp=rand=%s#4"><img border="0" src="%s/img/smallup.gif" title="Move tag up"></a>""" % (weburl, fldID, tagID, res[i - 1][1], ln, random.randint(0, 1000), weburl)
-	    else:
-		move += "&nbsp;&nbsp;&nbsp;"
+        else:
+        move += "&nbsp;&nbsp;&nbsp;"
             i += 1
             if i != len(res):
                 move += '<a href="%s/admin/bibindex/bibindexadmin.py/switchtagscore?fldID=%s&amp;id_1=%s&amp;id_2=%s&amp;ln=%s&amp;rand=%s#4"><img border="0" src="%s/img/smalldown.gif" title="Move tag down"></a>' % (weburl, fldID, tagID, res[i][1], ln, random.randint(0, 1000), weburl)
@@ -1020,13 +1020,13 @@ def perform_addtag(fldID, ln=cdslang, value=['',-1], name='', callback="yes", co
     output = ""
     subtitle = """<a name="4.1"></a>Add MARC tag to logical field"""
     text = """
-    Add new tag:<br>
+    Add new tag:<br />
     <span class="adminlabel">Tag value</span>
-    <input class="admin_w200" maxlength="6" type="text" name="value" value="%s" /><br>
+    <input class="admin_w200" maxlength="6" type="text" name="value" value="%s" /><br />
     <span class="adminlabel">Tag comment</span>
-    <input class="admin_w200" type="text" name="name" value="%s" /><br>
+    <input class="admin_w200" type="text" name="name" value="%s" /><br />
     """ % ((name=='' and value[0] or name), value[0])
-    text += """Or existing tag:<br>
+    text += """Or existing tag:<br />
     <span class="adminlabel">Tag</span>
     <select name="value" class="admin_w200">
     <option value="-1">- Select a tag -</option>
@@ -1082,11 +1082,11 @@ def perform_modifytag(fldID, tagID, ln=cdslang, name='', value='', callback='yes
     subtitle = """<a name="3.1"></a>Modify MARC tag"""
 
     text = """
-    Any modifications will apply to all logical fields using this tag.<br>
+    Any modifications will apply to all logical fields using this tag.<br />
     <span class="adminlabel">Tag value</span>
-    <input class="admin_w200" type="text" name="value" value="%s" /><br>
+    <input class="admin_w200" type="text" name="value" value="%s" /><br />
     <span class="adminlabel">Comment</span>
-    <input class="admin_w200" type="text" name="name" value="%s" /><br>
+    <input class="admin_w200" type="text" name="name" value="%s" /><br />
     """ % (value, name)
 
     output += createhiddenform(action="modifytag#4.1",
@@ -1256,10 +1256,10 @@ def perform_deletetag(fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
             text += """<option value="%s" %s>%s</option>""" % (id, id  == int(tagID) and 'selected="selected"' or '', "%s - %s" % (value, name))
             i += 1
 
-    text += """</select><br>"""
+    text += """</select><br />"""
 
     if i == 0:
-        output += """<b><span class="info">No unused MARC tags</span></b><br>"""
+        output += """<b><span class="info">No unused MARC tags</span></b><br />"""
     else:
         output += createhiddenform(action="deletetag#4.1",
                                    text=text,
@@ -1288,7 +1288,7 @@ def perform_deletetag(fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
 
     body = [output]
 
-    output = "<br>" + addadminbox(subtitle, body)
+    output = "<br />" + addadminbox(subtitle, body)
     return perform_modifyfieldtags(fldID, ln, content=output)
 
 def compare_on_val(first, second):

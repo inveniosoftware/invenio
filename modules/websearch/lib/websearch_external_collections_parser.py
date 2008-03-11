@@ -145,7 +145,7 @@ class CDSIndicoCollectionResutsParser(ExternalCollectionResultsParser):
             num = result.group(1)
             html = result.group(2)
 
-            self.add_html_result(num + ' ' + html  + '<br>')
+            self.add_html_result(num + ' ' + html  + '<br />')
 
 class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for Kiss."""
@@ -170,7 +170,7 @@ class KISSExternalCollectionResultsParser(ExternalCollectionResultsParser):
             end_index = element.find('</DL>')
             if end_index != -1:
                 element = element[:end_index + 4]
-            self.add_html_result(element + '<br><br>')
+            self.add_html_result(element + '<br /><br />')
 
 class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for Kiss books."""
@@ -203,12 +203,12 @@ class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
                 url = title_match.group(2)
                 title = title_match.group(3)
 
-                html = num + ') <a href=http://' + self.host + url + ">" + title + "</a><br>"
+                html = num + ') <a href=http://' + self.host + url + ">" + title + "</a><br />"
             else:
                 info_line_match = self.info_line.match(data)
                 if info_line_match:
                     info = info_line_match.group(1)
-                    html += info + '<br>'
+                    html += info + '<br />'
         
         self.add_html_result(html)
 
@@ -248,7 +248,7 @@ class GoogleScholarExternalCollectionResultsParser(GoogleExternalCollectionResul
             end_index = element.find('</table>')
             if end_index != -1:
                 element = element[:end_index + 8]
-            self.add_html_result(element + '<br>')
+            self.add_html_result(element + '<br />')
 
 class GoogleBooksExternalCollectionResultsParser(GoogleExternalCollectionResultsParser):
     """Parser for Google Books."""
@@ -290,7 +290,7 @@ class SCIRUSExternalCollectionResultsParser(ExternalCollectionResultsParser):
 
     num_results_regex = re.compile(r'<b>([0-9,]+) total</b> ')
     result_separator = re.compile(r'<td width="100%" valign="top" colspan="2">[ ]*(.*?)</td>[ ]*</tr>[ ]*</table>')
-    result_decode = re.compile('[ ]*(.*?)[ ]*<font class="filesize">.*?<br>[ ]*(.*?)[ ]*<br>[ ]*(.*?)[ ]*</td>.*?<br>[ ]*(.*)[ ]*')
+    result_decode = re.compile('[ ]*(.*?)[ ]*<font class="filesize">.*?<br />[ ]*(.*?)[ ]*<br />[ ]*(.*?)[ ]*</td>.*?<br />[ ]*(.*)[ ]*')
 
     cleaning = re.compile('(<img .*?>|</td>|</tr>|<td .*?>|<tr.*?>)')
 
@@ -309,16 +309,16 @@ class SCIRUSExternalCollectionResultsParser(ExternalCollectionResultsParser):
                 date = parsed_line.group(2)
                 comments = parsed_line.group(3)
                 similar = parsed_line.group(4)
-                html = "%(link)s - %(date)s <br> %(comments)s <br> %(similar)s <br>" % {'link' : link, 
+                html = "%(link)s - %(date)s <br /> %(comments)s <br /> %(similar)s <br />" % {'link' : link, 
                     'date' : date, 'comments' : comments, 'similar' : similar}
             else:
-                html = self.cleaning.sub("", data) + '<br>'
+                html = self.cleaning.sub("", data) + '<br />'
             self.add_html_result(html)
 
 class CiteSeerExternalCollectionResultsParser(ExternalCollectionResultsParser):
     """Parser for CiteSeer."""
 
-    num_results_regex = re.compile(r'<br>(?:More than |)([0-9]+)(?: documents found.| results)')
+    num_results_regex = re.compile(r'<br />(?:More than |)([0-9]+)(?: documents found.| results)')
     result_separator = re.compile(r'<!--RIS-->.*?<!--RIE-->', re.DOTALL)
 
     def __init__(self, host='', path=''):
@@ -327,5 +327,5 @@ class CiteSeerExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def parse(self):
         """Parse buffer to extract records."""
         for element in self.result_separator.finditer(self.buffer):
-            self.add_html_result(element.group() + '<br>')
+            self.add_html_result(element.group() + '<br />')
 

@@ -948,7 +948,7 @@ To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?co
             'record_details'        : record,
             'comID'                 : comID2,
             'review_stuff'          : star_score>0 and review_stuff or "",
-            'body'                  : body.replace('<br>','\n'),
+            'body'                  : body.replace('<br />','\n'),
             'weburl'                : weburl
         }
 

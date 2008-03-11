@@ -252,7 +252,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if args['verbose']==9:
             user_info = webuser.collect_user_info(req)
             for key, value in user_info.items():
-                body += "<b>%s</b>:%s<br>" % (key, value)
+                body += "<b>%s</b>:%s<br />" % (key, value)
 
         return page(title= _("Your Settings"),
                     body=body+webaccount.perform_set(webuser.get_email(uid),
