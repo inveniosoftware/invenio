@@ -984,11 +984,11 @@ def perform_modifyfieldtags(fldID, ln=CFG_SITE_LANG, callback='yes', content='',
     if len(res) > 0:
         i = 0
         for (fldID, tagID, tname, tvalue, score) in res:
-        move = ""
+            move = ""
             if i != 0:
                 move += """<a href="%s/admin/bibindex/bibindexadmin.py/switchtagscore?fldID=%s&amp;id_1=%s&amp;id_2=%s&amp;ln=%s&amp=rand=%s#4"><img border="0" src="%s/img/smallup.gif" title="Move tag up"></a>""" % (weburl, fldID, tagID, res[i - 1][1], ln, random.randint(0, 1000), weburl)
-        else:
-        move += "&nbsp;&nbsp;&nbsp;"
+            else:
+                move += "&nbsp;&nbsp;&nbsp;"
             i += 1
             if i != len(res):
                 move += '<a href="%s/admin/bibindex/bibindexadmin.py/switchtagscore?fldID=%s&amp;id_1=%s&amp;id_2=%s&amp;ln=%s&amp;rand=%s#4"><img border="0" src="%s/img/smalldown.gif" title="Move tag down"></a>' % (weburl, fldID, tagID, res[i][1], ln, random.randint(0, 1000), weburl)
