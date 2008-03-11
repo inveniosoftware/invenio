@@ -63,7 +63,6 @@ modules/bibformat/bin/bibreformat.in
 modules/bibformat/lib/bibformat_templates.py
 modules/bibformat/lib/bibformatadminlib.py
 modules/bibformat/lib/elements/bfe_authors.py
-modules/bibformat/web/admin/bibformat_migration_kit_assistant.py
 modules/bibformat/web/admin/bibformatadmin.py
 modules/bibharvest/bin/bibharvest.in
 modules/bibharvest/bin/oaiharvest.in
