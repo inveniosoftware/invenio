@@ -23,10 +23,11 @@
 __revision__ = "$Id$"
 
 from invenio.bibdocfile import BibRecDocs, file_strip_ext
+from invenio.messages import gettext_set_language
 from invenio.config import weburl, CFG_CERN_SITE
 from cgi import escape
 from urlparse import urlparse
-from os.path import basename, splitext
+from os.path import basename
 
 def format(bfo, style, separator='; ', show_icons='no'):
     """
@@ -35,10 +36,12 @@ def format(bfo, style, separator='; ', show_icons='no'):
     @param style CSS class of the link
     @param show_icons if 'yes', print icons for fulltexts
     """
+    _ = gettext_set_language(bfo.lang)
+
     out = ''
 
     # Retrieve files
-    (parsed_urls, old_versions, additionals) = getFiles(bfo)
+    (parsed_urls, old_versions, additionals) = get_files(bfo)
 
     main_urls = parsed_urls['main_urls']
     others_urls = parsed_urls['others_urls']
@@ -50,7 +53,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
         style = 'class="'+style+'"'
 
     if show_icons.lower() == 'yes':
-        file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="Download fulltext"/>' % weburl
+        file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (weburl, _("Download fulltext"))
     else:
         file_icon = ''
 
@@ -59,11 +62,11 @@ def format(bfo, style, separator='; ', show_icons='no'):
 
     additional_str = ''
     if additionals:
-        additional_str = ' <small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">additional files</a>)</small>'
+        additional_str = ' <small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
 
     versions_str = ''
     if old_versions:
-        versions_str = ' <small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">older versions</a>)</small>'
+        versions_str = ' <small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
 
     if main_urls:
         last_name = ""
@@ -83,19 +86,19 @@ def format(bfo, style, separator='; ', show_icons='no'):
             out += separator.join(url_list) + additional_str + versions_str + '<br />'
 
     if CFG_CERN_SITE and cern_urls:
-        link_word = len(cern_urls) == 1 and 'link' or 'links'
-        out += '<strong>CERN %s</strong>: ' % link_word
+        link_word = len(cern_urls) == 1 and _('link') or _('links')
+        out += '<strong>%s</strong>: ' % _("CERN %(link_or_links)s" % {'link_or_links' : link_word})
         url_list = []
-        for url,descr in cern_urls:
+        for url, descr in cern_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+ \
                             file_icon + escape(str(descr))+'</a>')
         out += separator.join(url_list)
 
     if others_urls:
-        link_word = len(others_urls) == 1 and 'link' or 'links'
-        out += '<strong>External %s</strong>: ' % link_word
+        link_word = len(others_urls) == 1 and _('link') or _('links')
+        out += '<strong>%s</strong>: ' % _("External %(link_or_links)s" % {'link_or_links' : link_word})
         url_list = []
-        for url,descr in others_urls:
+        for url, descr in others_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+ \
                             file_icon + escape(str(descr))+'</a>')
         out += separator.join(url_list) + '<br />'
@@ -112,7 +115,7 @@ def escape_values(bfo):
     """
     return 0
 
-def getFiles(bfo):
+def get_files(bfo):
     """
     Returns the files available for the given record.
     Returned structure is a tuple (parsed_urls, old_versions, additionals):
@@ -137,6 +140,8 @@ def getFiles(bfo):
     - keys in main_url dictionaries are defined by the BibDoc.
     - older versions are not part of the parsed urls
     """
+    _ = gettext_set_language(bfo.lang)
+
     urls = bfo.fields("8564_")
     bibarchive = BibRecDocs(bfo.recID)
 
@@ -169,7 +174,7 @@ def getFiles(bfo):
             if not url.startswith(weburl): # Not a bibdoc?
                 if not descr: # For not bibdoc let's have a description
                     if '/setlink?' in url: # Setlink (i.e. hosted on doc.cern.ch)
-                        descr = "Fulltext" # Surely a fulltext
+                        descr = _("Fulltext") # Surely a fulltext
                     else:
                         #FIXME remove eventual ?parameters
                         descr = filename or host # Let's take the name from the url
@@ -189,7 +194,7 @@ def getFiles(bfo):
                             additionals = True
                         else:
                             if not descr:
-                                descr = 'Main file(s)'
+                                descr = _('Main file(s)')
                             if not parsed_urls['main_urls'].has_key(descr):
                                 parsed_urls['main_urls'][descr] = []
                             parsed_urls['main_urls'][descr].append((url, name, format))

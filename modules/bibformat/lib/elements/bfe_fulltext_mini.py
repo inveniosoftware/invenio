@@ -22,7 +22,8 @@
 """
 __revision__ = "$Id$"
 
-from invenio.bibformat_elements.bfe_fulltext import getFiles
+from invenio.bibformat_elements.bfe_fulltext import get_files
+from invenio.messages import gettext_set_language
 from invenio.config import weburl, CFG_CERN_SITE
 from cgi import escape
 
@@ -33,10 +34,11 @@ def format(bfo, style, separator='; ', show_icons='no'):
     @param style CSS class of the link
     @param show_icons if 'yes', print icons for fulltexts
     """
+    _ = gettext_set_language(bfo.lang)
     out = ''
 
     # Retrieve files
-    (parsed_urls, old_versions, additionals) = getFiles(bfo)
+    (parsed_urls, old_versions, additionals) = get_files(bfo)
 
     main_urls = parsed_urls['main_urls']
     others_urls = parsed_urls['others_urls']
@@ -52,21 +54,21 @@ def format(bfo, style, separator='; ', show_icons='no'):
 
     additional_str = ''
     if additionals:
-        additional_str = separator + '<small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">additional files</a>)</small>'
+        additional_str = separator + '<small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
 
     versions_str = ''
     if old_versions:
-        versions_str = separator + '<small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">older versions</a>)</small>'
+        versions_str = separator + '<small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
 
     if main_urls:
         # Put a big file icon if only one file
         if len(main_urls.keys()) == 1 and len(main_urls.items()[0][1]) == 1 and \
                (not CFG_CERN_SITE or len(cern_urls) == 0) and len(others_urls) == 0 and \
                show_icons.lower() == 'yes':
-            file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="Download fulltext" /><br />' % weburl
+            file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="%s" /><br />' % (weburl, _("Download fulltext"))
 
         elif show_icons.lower() == 'yes':
-            file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="Download fulltext"/>' % weburl
+            file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (weburl, _("Download fulltext"))
         else:
             file_icon = ''
 
@@ -91,15 +93,15 @@ def format(bfo, style, separator='; ', show_icons='no'):
         if len(main_urls.keys()) == 0 and \
                len(cern_urls) == 1 and len(others_urls) == 0 and \
                show_icons.lower() == 'yes':
-            file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="Download fulltext" /><br />' % weburl
+            file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="%s" /><br />' % (weburl, _("Download fulltext"))
 
         elif show_icons.lower() == 'yes':
-            file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="Download fulltext"/>' % weburl
+            file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (weburl, _("Download fulltext"))
         else:
             file_icon = ''
 
-        link_word = len(cern_urls) == 1 and 'link' or 'links'
-        out += '<small class="detailedRecordActions">(CERN %s)</small><br />' % link_word
+        link_word = len(cern_urls) == 1 and _('link') or _('links')
+        out += '<small class="detailedRecordActions">(%s)</small><br />' % _("CERN %(link_or_links)s" % {'link_or_links' : link_word})
         url_list = []
         for url, descr in cern_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
@@ -110,13 +112,13 @@ def format(bfo, style, separator='; ', show_icons='no'):
         if len(main_urls.keys()) == 0 and \
                (not CFG_CERN_SITE or len(cern_urls) == 0) and len(others_urls) == 1 and \
                show_icons.lower() == 'yes':
-            file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="Download fulltext" /><br />' % weburl
+            file_icon = '<img style="border:none" src="%s/img/file-icon-text-34x48.gif" alt="%s" /><br />' % (weburl, _("Download fulltext"))
         elif show_icons.lower() == 'yes':
-            file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="Download fulltext"/>' % weburl
+            file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (weburl, _("Download fulltext"))
         else:
             file_icon = ''
-        link_word = len(others_urls) == 1 and 'link' or 'links'
-        out += '<small class="detailedRecordActions">(external %s)</small>%s' % (link_word, separator)
+        link_word = len(others_urls) == 1 and _('link') or _('links')
+        out += '<small class="detailedRecordActions">(%s)</small>%s' % (_("external %(link_or_links)s") % {'link_or_links' : link_word}, separator)
         url_list = []
         for url, descr in others_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
