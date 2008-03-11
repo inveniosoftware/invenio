@@ -32,7 +32,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      sweburl, \
      weburl, \
      CFG_VERSION
@@ -51,8 +51,6 @@ class Template:
         """Create navigation trail box body
 
            Parameters:
-
-          - 'weburl' *string* - The base URL for the site
 
           - 'ln' *string* - The language to display
 
@@ -107,21 +105,11 @@ class Template:
 
            Parameters:
 
-          - 'weburl' *string* - The base URL for the site
-
           - 'ln' *string* - The language to display
-
-          - 'sitename' *string* - the first part of the page HTML title
-
-          - 'headertitle' *string* - the second part of the page HTML title
-
-          - 'supportemail' *string* - email of the support team
 
           - 'description' *string* - description goes to the metadata in the header of the HTML page
 
           - 'keywords' *string* - keywords goes to the metadata in the header of the HTML page
-
-          - 'metaheaderadd' *string* - list of further tags to add to the <HEAD></HEAD> part of the page
 
           - 'userinfobox' *string* - the HTML code for the user information box
 
@@ -147,19 +135,23 @@ class Template:
 
           - 'title' *string* - the title of the page
 
-          - 'body' *string* - the body of the page
+          - 'titleprologue' *string* - what to print before page title
 
-          - 'version' *string* - the version number of CDS Invenio
+          - 'titleepilogue' *string* - what to print after page title
+
+          - 'body' *string* - the body of the page
 
           - 'lastupdated' *string* - when the page was last updated
 
-          - 'languagebox' *string* - the HTML code for the language box
+          - 'uid' *int* - user ID
 
           - 'pagefooteradd' *string* - additional page footer HTML code
 
           - 'secure_page_p' *int* (0 or 1) - are we to use HTTPS friendly page elements or not?
 
           - 'navmenuid' *string* - the id of the navigation item to highlight for this page
+
+          - 'metaheaderadd' *string* - list of further tags to add to the <HEAD></HEAD> part of the page
 
           - 'rssurl' *string* - the url of the RSS feed for this page
 
@@ -237,21 +229,13 @@ class Template:
 
            Parameters:
 
-          - 'weburl' *string* - The base URL for the site
-
           - 'ln' *string* - The language to display
 
-          - 'sitename' *string* - the first part of the page HTML title
-
           - 'headertitle' *string* - the second part of the page HTML title
-
-          - 'supportemail' *string* - email of the support team
 
           - 'description' *string* - description goes to the metadata in the header of the HTML page
 
           - 'keywords' *string* - keywords goes to the metadata in the header of the HTML page
-
-          - 'metaheaderadd' *string* - list of further tags to add to the <HEAD></HEAD> part of the page
 
           - 'userinfobox' *string* - the HTML code for the user information box
 
@@ -259,11 +243,13 @@ class Template:
 
           - 'pageheaderadd' *string* - additional page header HTML code
 
-          - 'languagebox' *string* - the HTML code for the language box
+          - 'uid' *int* - user ID
 
           - 'secure_page_p' *int* (0 or 1) - are we to use HTTPS friendly page elements or not?
 
           - 'navmenuid' *string* - the id of the navigation item to highlight for this page
+
+          - 'metaheaderadd' *string* - list of further tags to add to the <HEAD></HEAD> part of the page
 
           - 'rssurl' *string* - the url of the RSS feed for this page
 
@@ -284,7 +270,7 @@ class Template:
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
  <title>%(sitename)s: %(headertitle)s</title>
- <link rev="made" href="mailto:%(supportemail)s" />
+ <link rev="made" href="mailto:%(sitesupportemail)s" />
  <link rel="stylesheet" href="%(cssurl)s/img/cds.css" type="text/css" />
  <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -369,7 +355,7 @@ class Template:
           'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
           'headertitle' : cgi.escape(headertitle),
 
-          'supportemail' : supportemail,
+          'sitesupportemail' : CFG_SITE_SUPPORT_EMAIL,
 
           'description' : cgi.escape(description),
           'keywords' : cgi.escape(keywords),
@@ -400,19 +386,9 @@ class Template:
 
            Parameters:
 
-          - 'weburl' *string* - The base URL for the site
-
           - 'ln' *string* - The language to display
 
-          - 'sitename' *string* - the first part of the page HTML title
-
-          - 'supportemail' *string* - email of the support team
-
-          - 'version' *string* - the version number of CDS Invenio
-
           - 'lastupdated' *string* - when the page was last updated
-
-          - 'languagebox' *string* - the HTML code for the language box
 
           - 'pagefooteradd' *string* - additional page footer HTML code
 
@@ -443,7 +419,7 @@ class Template:
   <br />
   %(msg_poweredby)s <a class="footer" href="http://cdsware.cern.ch/">CDS Invenio</a> v%(version)s
   <br />
-  %(msg_maintainedby)s <a class="footer" href="mailto:%(supportemail)s">%(supportemail)s</a>
+  %(msg_maintainedby)s <a class="footer" href="mailto:%(sitesupportemail)s">%(sitesupportemail)s</a>
   <br />
   %(msg_lastupdated)s
  </div>
@@ -461,7 +437,7 @@ class Template:
           'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
 
           'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
-          'supportemail' : supportemail,
+          'sitesupportemail' : CFG_SITE_SUPPORT_EMAIL,
 
           'msg_search' : _("Search"),
           'msg_submit' : _("Submit"),
@@ -519,7 +495,7 @@ class Template:
         return _("This site is also available in the following languages:") + \
                  "<br />" + ' &nbsp;'.join(parts)
 
-    def tmpl_error_box(self, ln, title, verbose, req, supportemail, errors):
+    def tmpl_error_box(self, ln, title, verbose, req, errors):
         """Produces an error box.
 
            Parameters:
@@ -532,11 +508,7 @@ class Template:
 
           - 'req' *object* - the request object
 
-          - 'supportemail' *string* - the supportemail for this installation
-
           - 'errors' list of tuples (error_code, error_message)
-
-          - #! todo
         """
 
         # load the right message language
@@ -645,8 +617,8 @@ URI: http://%(host)s%(page)s
                 'esc_sys2'  : str((sys.exc_info()[1] or '')).replace('"', '&quot;"'),
                 'contact'   : \
                    _("Please contact %s quoting the following information:") % \
-                     ('<a href="mailto:' + urllib.quote(supportemail) +'">' + \
-                       supportemail + '</a>'),
+                     ('<a href="mailto:' + urllib.quote(CFG_SITE_SUPPORT_EMAIL) +'">' + \
+                       CFG_SITE_SUPPORT_EMAIL + '</a>'),
                 'host'      : host_s,
                 'page'      : page_s,
                 'time'      : time.strftime("%d/%b/%Y:%H:%M:%S %z"),
@@ -782,6 +754,7 @@ URI: http://%(host)s%(page)s
            Parameters:
 
          - recid *int* - the id of the displayed record
+         - ln *string* - interface language code
          - format *string* - the format used to display the record
          - files *string* - the small panel representing the fulltext
          - reviews *string* - the small panel representing the reviews
@@ -802,6 +775,7 @@ URI: http://%(host)s%(page)s
 	<div id="detailedrecordminipanelreview" style="width:33%%;float:left;text-align:center">
              %(reviews)s
 	</div>
+
 	<div id="detailedrecordminipanelactions" style="width:33%%;float:right;text-align:right;">
              %(actions)s
 	</div>

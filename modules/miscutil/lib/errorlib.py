@@ -29,7 +29,7 @@ import sys
 import time
 from cStringIO import StringIO
 
-from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, supportemail, CFG_SITE_NAME, weburl
+from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, weburl
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
@@ -445,7 +445,7 @@ Please see the %(logdir)s/invenio.err for traceback details.""" % \
             'sys_error' : sys_error,
             'traceback' : traceback_msg,
             'logdir'    : CFG_LOGDIR,
-            'contact'   : "Please contact %s quoting the following information:"  % (supportemail,) #! is support email always cds?
+            'contact'   : "Please contact %s quoting the following information:"  % (CFG_SITE_SUPPORT_EMAIL,)
         }
     from invenio.mailutils import send_email
     send_email(from_addr, to_addr, subject="Error notification", content=body)

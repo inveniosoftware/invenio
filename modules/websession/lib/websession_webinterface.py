@@ -38,7 +38,7 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      sweburl, \
      weburl, \
      CFG_CERN_SITE
@@ -510,7 +510,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         ip_address = req.connection.remote_host or req.connection.remote_ip
 
-        if not send_email(supportemail, args['p_email'], "%s %s"
+        if not send_email(CFG_SITE_SUPPORT_EMAIL, args['p_email'], "%s %s"
                 % (_("Password reset request for"),
                 CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME)),
                 websession_templates.tmpl_account_reset_password_email_body(

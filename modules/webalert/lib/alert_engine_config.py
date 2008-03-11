@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -33,13 +33,13 @@ CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES = 3
 
 # when sending alert emails fails, what is the sleeptime between
 # tries? (in seconds)
-CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES = 300 
+CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES = 300
 
 # are we debugging?
 ## 0 = production, nothing on the console, email sent
 ## 1 = messages on the console, email sent
 ## 2 = messages on the console, no email sent
 ## 3 = many messages on the console, no email sent
-## 4 = many messages on the console, email sent to supportemail
+## 4 = many messages on the console, email sent to CFG_SITE_SUPPORT_EMAIL
 CFG_WEBALERT_DEBUG_LEVEL = 0
 

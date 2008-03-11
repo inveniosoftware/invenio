@@ -19,7 +19,7 @@
 import os
 import time
 
-from invenio.config import CFG_SITE_ADMIN_EMAIL, supportemail, CFG_ETCDIR, weburl, CFG_SITE_LANG
+from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_ETCDIR, weburl, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webjournal_utils import get_number_of_articles_for_issue, \
@@ -81,7 +81,7 @@ def tmpl_webjournal_error_box(language, title, title_msg, msg):
     title_msg = _(title_msg)
     msg = _(msg)
     mail_msg = _("Mail %(x_url_open)sdevelopers%(x_url_close)s") % {'x_url_open' :
-        '<a href="mailto:%s">' % supportemail,
+        '<a href="mailto:%s">' % CFG_SITE_SUPPORT_EMAIL,
         'x_url_close' : '</a>'}
     box = '''
     <div style="text-align: center;">

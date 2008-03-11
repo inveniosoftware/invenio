@@ -19,7 +19,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import supportemail
+from invenio.config import CFG_SITE_SUPPORT_EMAIL
 from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
 from invenio.websubmit_config import InvenioWebSubmitFunctionStop
@@ -43,6 +43,6 @@ def Is_Referee(parameters, curdir, form, user_info=None):
         document.forms[0].step.value = 0;
         document.forms[0].submit();
         alert('Sorry you (%s) have not been recognized as a referee for this type of document.\\nIf you think this is an error, please contact %s');
-</SCRIPT>""" % (uid_email,supportemail))
+</SCRIPT>""" % (uid_email,CFG_SITE_SUPPORT_EMAIL))
     return ""
 

@@ -88,7 +88,6 @@ def convert_conf_option(option_name, option_value):
     ## also, adjust some conf names due to backwards compatibility:
     option_name_replace_data = {'CFG_SITE_URL': 'weburl',
                                 'CFG_SITE_SECURE_URL': 'sweburl',
-                                'CFG_SITE_SUPPORT_EMAIL': 'supportemail',
                                 }
     if option_name_replace_data.has_key(option_name):
         option_name = option_name_replace_data[option_name]

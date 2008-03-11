@@ -39,7 +39,7 @@ from invenio.config import \
      CFG_OAI_SET_FIELD, \
      CFG_CACHEDIR, \
      CFG_SITE_NAME, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      weburl
 
 from invenio.dbquery import run_sql
@@ -677,7 +677,7 @@ def oaiidentify(args):
     repositoryname        = "  <repositoryName>" + CFG_SITE_NAME + "</repositoryName>\n"
     baseurl               = "  <baseURL>%s/oai2d/</baseURL>\n" % weburl
     protocolversion       = "  <protocolVersion>2.0</protocolVersion>\n"
-    adminemailtxt         = "  <adminEmail>%s</adminEmail>\n" % supportemail
+    adminemailtxt         = "  <adminEmail>%s</adminEmail>\n" % CFG_SITE_SUPPORT_EMAIL
     earliestdst		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()
     deletedrecord         = "  <deletedRecord>%s</deletedRecord>\n" % CFG_OAI_DELETED_POLICY
     repositoryidentifier  = "%s" % CFG_OAI_ID_PREFIX

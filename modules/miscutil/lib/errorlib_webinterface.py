@@ -42,7 +42,7 @@ class WebInterfaceErrorPages(WebInterfaceDirectory):
     def index(self, req, form):
         """Index page."""
         redirect_to_url(req, '%s/error/send' % weburl)
-        
+
     def send(self, req, form):
         """
         Confirmation page of error report sent the admin

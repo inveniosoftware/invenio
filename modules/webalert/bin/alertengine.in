@@ -27,7 +27,7 @@ __revision__ = "$Id$"
 try:
     import sys
     import getopt
-    from invenio.config import CFG_VERSION, supportemail
+    from invenio.config import CFG_VERSION, CFG_SITE_SUPPORT_EMAIL
     from invenio.alert_engine import run_alerts
     from time import time
 except ImportError, e:
@@ -48,7 +48,7 @@ Run the alert engine.
   -d  --date="YEAR-MONTH-DAY" run the alertengine as if we were the
                               specified day, for test purposes (today)
 
-Report bugs to <%s>""" % supportemail
+Report bugs to <%s>""" % CFG_SITE_SUPPORT_EMAIL
 
 def main():
 

@@ -20,7 +20,7 @@
 
 import os
 
-from invenio.config import CFG_SITE_ADMIN_EMAIL, supportemail, CFG_ETCDIR, weburl, CFG_SITE_LANG
+from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_ETCDIR, weburl, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.htmlutils import escape_html
@@ -674,6 +674,6 @@ def webjournal_error_box(language, title, title_msg, msg):
                     <div style="text-align:right;">Mail<a href="mailto:%s"> the Developers.</a></div>
                 </fieldset>
             </div>
-            ''' % (weburl, title_msg, msg, supportemail)
+            ''' % (weburl, title_msg, msg, CFG_SITE_SUPPORT_EMAIL)
     return page(title=title, body=box)
 

@@ -32,7 +32,7 @@ import datetime
 
 from invenio.config import \
      CFG_LOGDIR, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      weburl
 from invenio.search_engine import perform_request_search
 from invenio.webinterface_handler import wash_urlargd
@@ -151,7 +151,7 @@ def email_notify(alert, records, argstr):
                    attempt_sleeptime=CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES)
     if CFG_WEBALERT_DEBUG_LEVEL == 4:
         send_email(fromaddr=webalert_templates.tmpl_alert_email_from(),
-                   toaddr=supportemail,
+                   toaddr=CFG_SITE_SUPPORT_EMAIL,
                    subject=webalert_templates.tmpl_alert_email_title(alert[5]),
                    content=msg,
                    header='',

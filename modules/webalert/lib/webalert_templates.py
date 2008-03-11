@@ -26,7 +26,7 @@ import string
 from invenio.config import \
      CFG_WEBALERT_ALERT_ENGINE_EMAIL, \
      CFG_SITE_NAME, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      weburl
 from invenio.messages import gettext_set_language
 from invenio.htmlparser import get_as_text, wrap
@@ -513,14 +513,14 @@ Hello:
 Below are the results of the email notification alert that
 you set up with the %(sitename)s.
 This is an automatic message, please don't reply to it.
-For any question, please use <%(supportemail)s> instead.
+For any question, please use <%(sitesupportemail)s> instead.
 
 alert name: %(name)s
 %(pattern)s%(collections)sfrequency: %(frequency)s
 run time: %(runtime)s
 found: %(total)s
 url: <%(url)s>
-""" % {'supportemail': supportemail,
+""" % {'sitesupportemail': CFG_SITE_SUPPORT_EMAIL,
        'name': name,
        'sitename': CFG_SITE_NAME,
        'pattern': pattern,
@@ -548,7 +548,7 @@ URL given at the top of this email to see all the results.
 %s Alert Service <%s>
 Unsubscribe?  See <%s>
 Need human intervention?  Contact <%s>
-''' % (CFG_SITE_NAME, weburl, weburl + '/youralerts/list', supportemail)
+''' % (CFG_SITE_NAME, weburl, weburl + '/youralerts/list', CFG_SITE_SUPPORT_EMAIL)
 
         return body
 

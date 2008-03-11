@@ -45,7 +45,7 @@ from invenio.config import \
      CFG_SITE_NAME_INTL, \
      CFG_VERSION, \
      weburl, \
-     supportemail
+     CFG_SITE_SUPPORT_EMAIL
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 #from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
@@ -2621,7 +2621,7 @@ class Template:
         <pubDate>%(timestamp)s</pubDate>
         <category></category>
         <generator>CDS Invenio %(version)s</generator>
-        <webMaster>%(supportemail)s</webMaster>
+        <webMaster>%(sitesupportemail)s</webMaster>
         <ttl>%(timetolive)s</ttl>
         <image>
             <url>%(weburl)s/img/cds.png</url>
@@ -2639,7 +2639,7 @@ class Template:
                'sitelang': CFG_SITE_LANG,
                'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()),
                'version': CFG_VERSION,
-               'supportemail': supportemail,
+               'sitesupportemail': CFG_SITE_SUPPORT_EMAIL,
                'timetolive': CFG_WEBSEARCH_RSS_TTL
                }
         return out

@@ -39,7 +39,7 @@ from invenio.config import \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_NAME, \
      htdocsurl, \
-     supportemail
+     CFG_SITE_SUPPORT_EMAIL
 from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
@@ -48,7 +48,7 @@ from invenio.errorlib import register_exception
 
 def Send_APP_Mail (parameters, curdir, form, user_info=None):
     global emailvalue,titlevalue,authorvalue,sysno,rn
-    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
     doctype = form['doctype']
     emailvalue = emailvalue.replace("\n","")
     titlevalue = titlevalue.replace("\n","")

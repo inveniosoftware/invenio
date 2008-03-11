@@ -27,7 +27,7 @@ compatible with file.py structure, but the viceversa is not true).
 import sys
 from invenio.intbitset import intbitset
 from invenio.textutils import wrap_text_in_a_box
-from invenio.config import CFG_LOGDIR, supportemail
+from invenio.config import CFG_LOGDIR, CFG_SITE_SUPPORT_EMAIL
 from invenio.dbquery import run_sql, OperationalError
 from invenio.bibdocfile import BibRecDocs, InvenioWebSubmitFileError
 from datetime import datetime
@@ -135,7 +135,7 @@ In order for the script to go further they need to be removed.""", style='import
     for recid in recids:
         if not fix_recid(recid, logfile):
             logfile.close()
-            print wrap_text_in_a_box(title="INTERRUPTED BECAUSE OF ERROR!", body="""Please see the log file %s for what was the status of record %s prior to the error. Contact %s in case of problems, attaching the log.""" % (logfilename, recid, supportemail),
+            print wrap_text_in_a_box(title="INTERRUPTED BECAUSE OF ERROR!", body="""Please see the log file %s for what was the status of record %s prior to the error. Contact %s in case of problems, attaching the log.""" % (logfilename, recid, CFG_SITE_SUPPORT_EMAIL),
             style='conclusion')
             sys.exit(1)
     print wrap_text_in_a_box("DONE", style='conclusion')

@@ -28,7 +28,7 @@ __revision__ = "$Id$"
 
 
 from invenio.messages import gettext_set_language
-from invenio.config import supportemail, CFG_SITE_LANG
+from invenio.config import CFG_SITE_SUPPORT_EMAIL, CFG_SITE_LANG
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DELEGATEADDUSERROLE, SUPERADMINROLE, \
     DEF_USERS, DEF_ROLES, DEF_AUTHS, DEF_ACTIONS, CFG_ACC_ACTIVITIES_URLS
@@ -1844,8 +1844,8 @@ def acc_add_default_settings(superusers=[],
         if type(user) is str:
             user = [user]
         DEF_USERS.append(user[0])
-    if supportemail not in DEF_USERS:
-        DEF_USERS.append(supportemail)
+    if CFG_SITE_SUPPORT_EMAIL not in DEF_USERS:
+        DEF_USERS.append(CFG_SITE_SUPPORT_EMAIL)
 
     # add data
 

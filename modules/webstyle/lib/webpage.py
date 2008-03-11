@@ -27,7 +27,7 @@ from invenio.config import \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM, \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP, \
      CFG_SITE_LANG, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      weburl
 from invenio.messages import gettext_set_language
 from invenio.webuser import create_userinfobox_body
@@ -215,7 +215,6 @@ def create_error_box(req, title=None, verbose=1, ln=CFG_SITE_LANG, errors=None):
                                              ln = ln,
                                              verbose = verbose,
                                              req = req,
-                                             supportemail = supportemail,
                                              errors = errors)
 
 def adderrorbox(header='', datalist=[]):

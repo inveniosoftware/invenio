@@ -63,7 +63,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      sweburl, \
      CFG_TMPDIR, \
      CFG_VERSION, \
@@ -423,7 +423,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
             address_activation_key = mail_cookie_create_mail_activation(email)
             ip_address = req.connection.remote_host or req.connection.remote_ip
             try:
-                if not send_email(supportemail, email, _("Account registration at %s") % CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
+                if not send_email(CFG_SITE_SUPPORT_EMAIL, email, _("Account registration at %s") % CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
                                   tmpl.tmpl_account_address_activation_email_body(email,
                                                   address_activation_key, ip_address, ln)):
                     return 1
@@ -657,7 +657,7 @@ def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=CFG_SITE_LANG):
     body += ":\n\n"
     body += _("   Username/Email") + ": %s\n\n" % newAccountEmail
     body += _("You can approve or reject this account request at") + ": %s/admin/webaccess/webaccessadmin.py/manageaccounts\n" % weburl
-    return send_email(supportemail, sendTo, subject=sub, content=body)
+    return send_email(CFG_SITE_SUPPORT_EMAIL, sendTo, subject=sub, content=body)
 
 def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=CFG_SITE_LANG):
     """Send an email to the address given by sendTo about the new account newAccountEmail."""
@@ -666,7 +666,7 @@ def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=CFG_SITE_LAN
     body = _("You have created a new account on") + " '%s'\n\n" % CFG_SITE_NAME
     body += _("   Username/Email:") + " %s\n" % newAccountEmail
     body += _("   Password:") + " %s\n\n" % ("*" * len(password))
-    return send_email(supportemail, sendTo, subject=sub, content=body)
+    return send_email(CFG_SITE_SUPPORT_EMAIL, sendTo, subject=sub, content=body)
 
 def get_email(uid):
     """Return email address of the user uid.  Return string 'guest' in case

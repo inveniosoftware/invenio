@@ -101,8 +101,8 @@ basically HTML with the following main differences:
     <code>&lt;body&gt;</code> tag)
 </li>
 <li>You can make use of special tags such as
-    <code>&lt;WEBURL&gt;</code> and <code>&lt;SUPPORTEMAIL&gt;</code>,
-    that will be replaced by <WEBURL> and <SUPPORTEMAIL>, the values that
+    <code>&lt;WEBURL&gt;</code> and <code>&lt;CFG_SITE_SUPPORT_EMAIL&gt;</code>,
+    that will be replaced by <WEBURL> and <CFG_SITE_SUPPORT_EMAIL>, the values that
     you should have configured in your <code>config.py</code> file.
 </li>
 <li>You can internationalize the content. For example:

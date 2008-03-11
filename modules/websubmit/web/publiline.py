@@ -49,7 +49,7 @@ from invenio.config import \
      images, \
      CFG_PYLIBDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      sweburl, \
      urlpath, \
      CFG_VERSION
@@ -1502,7 +1502,7 @@ def getInAlice(doctype,categ,RN):
         return 0
 
 def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
-    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
     # retrieve useful information from webSubmit configuration
     res = run_sql("select value from sbmPARAMETERS where name='categformatDAM' and doctype=%s", (doctype,))
     categformat = res[0][0]
@@ -1564,7 +1564,7 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     return ""
 
 def SendWarning(doctype,categ,RN,title,authors,access):
-    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
     message = "Failed sending approval email request for %s" % RN
     # send the mail
     send_email(FROMADDR,CFG_SITE_ADMIN_EMAIL,"Failed sending approval email request",message)

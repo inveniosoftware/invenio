@@ -37,13 +37,13 @@ from invenio.config import \
      accessurl, \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_NAME, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      weburl
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 
 def Send_Modify_Mail (parameters, curdir, form, user_info=None):
-    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
     global sysno,rn
     if parameters['emailFile'] is not None and parameters['emailFile']!= "" and os.path.exists("%s/%s" % (curdir,parameters['emailFile'])):
         fp = open("%s/%s" % (curdir,parameters['emailFile']),"r")

@@ -24,7 +24,7 @@ __revision__ = \
 
 # pylint: disable-msg=C0301
 
-from invenio.config import CFG_SITE_NAME, weburl, sweburl, supportemail, CFG_CERN_SITE
+from invenio.config import CFG_SITE_NAME, weburl, sweburl, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE
 import cPickle
 from zlib import compress
 from invenio.messages import gettext_set_language
@@ -179,8 +179,8 @@ CFG_ACC_ACTIVITIES_URLS = {
 
 CFG_WEBACCESS_MSGS = {
                                 0: 'Try to <a href="%s/youraccount/login?referer=%%s">login</a> with another account.' % (sweburl),
-                                1: '<br />If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
-                                2: '<br />If you have any questions, please write to <a href="mailto:%s">%s</a>' % (supportemail, supportemail),
+                                1: '<br />If you think this is not correct, please contact: <a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL),
+                                2: '<br />If you have any questions, please write to <a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL),
                                 3: 'Guest users are not allowed, please <a href="%s/youraccount/login">login</a>.' % sweburl,
                                 4: 'The site is temporarily closed for maintenance.  Please come back soon.',
                                 5: 'Authorization failure',

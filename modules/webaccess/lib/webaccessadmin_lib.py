@@ -44,7 +44,7 @@ from invenio.config import \
     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
     CFG_SITE_LANG, \
     CFG_SITE_NAME, \
-    supportemail, \
+    CFG_SITE_SUPPORT_EMAIL, \
     sweburl, \
     weburl
 import invenio.access_control_engine as acce
@@ -375,7 +375,7 @@ def perform_resetdefaultsettings(req, superusers=[], confirm=0):
     enter as many e-mail addresses you want and press <strong>reset</strong>.<br />
     <strong>confirm reset settings</strong> when you have added enough e-mails.<br />
     <strong>%s</strong> is added as default.
-    </p>""" % (SUPERADMINROLE, supportemail)
+    </p>""" % (SUPERADMINROLE, CFG_SITE_SUPPORT_EMAIL)
 
     # add more superusers
     output += """
@@ -454,7 +454,7 @@ def perform_adddefaultsettings(req, superusers=[], confirm=0):
     enter as many e-mail addresses you want and press <strong>add</strong>.<br />
     <strong>confirm add settings</strong> when you have added enough e-mails.<br />
     <strong>%s</strong> is added as default.
-    </p>""" % (SUPERADMINROLE, supportemail)
+    </p>""" % (SUPERADMINROLE, CFG_SITE_SUPPORT_EMAIL)
 
     # add more superusers
     output += """
@@ -3545,7 +3545,7 @@ def sendAccountActivatedMessage(AccountEmail, sendTo, password, ln=CFG_SITE_LANG
     """Send an email to the address given by sendTo about the new activated
     account."""
 
-    fromaddr = "From: %s" % supportemail
+    fromaddr = "From: %s" % CFG_SITE_SUPPORT_EMAIL
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
     sub = "Subject: Your account on '%s' has been activated\n\n" % CFG_SITE_NAME
@@ -3555,7 +3555,7 @@ def sendAccountActivatedMessage(AccountEmail, sendTo, password, ln=CFG_SITE_LANG
     body += "   Password: %s\n" % ("*" * len(password))
     body += "\n---------------------------------"
     body += "\n%s" % CFG_SITE_NAME
-    body += "\nContact: %s" % supportemail
+    body += "\nContact: %s" % CFG_SITE_SUPPORT_EMAIL
     msg = to + sub + body
 
     server = smtplib.SMTP('localhost')
@@ -3573,7 +3573,7 @@ def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=CFG_SITE_LAN
     """Send an email to the address given by sendTo about the new account
     newAccountEmail."""
 
-    fromaddr = "From: %s" % supportemail
+    fromaddr = "From: %s" % CFG_SITE_SUPPORT_EMAIL
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
     sub = "Subject: Account created on '%s'\n\n" % CFG_SITE_NAME
@@ -3582,7 +3582,7 @@ def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=CFG_SITE_LAN
     body += "   Password: %s\n" % ("*" * len(password))
     body += "\n---------------------------------"
     body += "\n%s" % CFG_SITE_NAME
-    body += "\nContact: %s" % supportemail
+    body += "\nContact: %s" % CFG_SITE_SUPPORT_EMAIL
     msg = to + sub + body
 
     server = smtplib.SMTP('localhost')
@@ -3600,7 +3600,7 @@ def sendAccountRejectedMessage(newAccountEmail, sendTo, ln=CFG_SITE_LANG):
     """Send an email to the address given by sendTo about the new account
     newAccountEmail."""
 
-    fromaddr = "From: %s" % supportemail
+    fromaddr = "From: %s" % CFG_SITE_SUPPORT_EMAIL
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
     sub = "Subject: Account rejected on '%s'\n\n" % CFG_SITE_NAME
@@ -3609,7 +3609,7 @@ def sendAccountRejectedMessage(newAccountEmail, sendTo, ln=CFG_SITE_LANG):
     body += "   Username/Email: %s\n" % newAccountEmail
     body += "\n---------------------------------"
     body += "\n%s" % CFG_SITE_NAME
-    body += "\nContact: %s" % supportemail
+    body += "\nContact: %s" % CFG_SITE_SUPPORT_EMAIL
     msg = to + sub + body
 
     server = smtplib.SMTP('localhost')
@@ -3627,7 +3627,7 @@ def sendAccountDeletedMessage(newAccountEmail, sendTo, ln=CFG_SITE_LANG):
     """Send an email to the address given by sendTo about the new account
     newAccountEmail."""
 
-    fromaddr = "From: %s" % supportemail
+    fromaddr = "From: %s" % CFG_SITE_SUPPORT_EMAIL
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
     sub = "Subject: Account deleted on '%s'\n\n" % CFG_SITE_NAME
@@ -3635,7 +3635,7 @@ def sendAccountDeletedMessage(newAccountEmail, sendTo, ln=CFG_SITE_LANG):
     body += "   Username/Email: %s\n" % newAccountEmail
     body += "\n---------------------------------"
     body += "\n%s" % CFG_SITE_NAME
-    body += "\nContact: %s" % supportemail
+    body += "\nContact: %s" % CFG_SITE_SUPPORT_EMAIL
     msg = to + sub + body
 
     server = smtplib.SMTP('localhost')
@@ -3712,16 +3712,16 @@ def main():
                     authorization_msg="WebAccess Administration",
                     authorization_action="cfgwebaccess")
             if options['reset'] and options['demo']:
-                acca.acc_reset_default_settings([supportemail], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
+                acca.acc_reset_default_settings([CFG_SITE_SUPPORT_EMAIL], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
                 print "Reset default demo site settings."
             elif options['reset']:
-                acca.acc_reset_default_settings([supportemail])
+                acca.acc_reset_default_settings([CFG_SITE_SUPPORT_EMAIL])
                 print "Reset default settings."
             elif options['add'] and options['demo']:
-                acca.acc_add_default_settings([supportemail], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
+                acca.acc_add_default_settings([CFG_SITE_SUPPORT_EMAIL], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
                 print "Added default demo site settings."
             elif options['add']:
-                acca.acc_add_default_settings([supportemail])
+                acca.acc_add_default_settings([CFG_SITE_SUPPORT_EMAIL])
                 print "Added default settings."
             if options['compile']:
                 repair_role_definitions()

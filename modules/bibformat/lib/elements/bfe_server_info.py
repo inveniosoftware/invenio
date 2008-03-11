@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-from invenio.config import accessurl, CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_NAME, weburl, CFG_VERSION, CFG_SITE_NAME_INTL, supportemail
+from invenio.config import accessurl, CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_NAME, weburl, CFG_VERSION, CFG_SITE_NAME_INTL, CFG_SITE_SUPPORT_EMAIL
 
 # FIXME: new cfg variable names like CFG_VERSION
 
@@ -52,7 +52,7 @@ def format(bfo, var=''):
     elif var in ['email', 'admin_email']:
         out = CFG_SITE_ADMIN_EMAIL
     elif var == 'support_email':
-        out = supportemail
+        out = CFG_SITE_SUPPORT_EMAIL
     elif var == 'weburl':
         out = weburl
         if not out.endswith('/'):

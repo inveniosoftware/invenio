@@ -26,12 +26,12 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_NAME, supportemail, weburl, CFG_SITE_ADMIN_EMAIL
+from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL, weburl, CFG_SITE_ADMIN_EMAIL
 from invenio.webuser import email_valid_p
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 
-CFG_EMAIL_FROM_ADDRESS = '%s Submission Engine <%s>' % (CFG_SITE_NAME, supportemail)
+CFG_EMAIL_FROM_ADDRESS = '%s Submission Engine <%s>' % (CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL)
 
 def Mail_New_Record_Notification(parameters, curdir, form, user_info=None):
     """This function sends a mail giving notification about the submission
@@ -250,10 +250,10 @@ following URL:
 
   <%(weburl)s/record/%(record-id)s>
 
-Please report any problems to <%(supportemail)s>.
+Please report any problems to <%(sitesupportemail)s>.
 """ % { 'weburl' : weburl,
         'record-id' : sysno,
-        'supportemail' : supportemail,
+        'sitesupportemail' : CFG_SITE_SUPPORT_EMAIL,
       }
     else:
         ## The item has not yet been added - instead it awaits the

@@ -30,7 +30,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_LANGS, \
      CFG_SITE_NAME, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_ADMIN_EMAIL, \
      weburl, \
      sweburl, \
@@ -127,7 +127,7 @@ ln_pattern_text += r')\s*(revision="[^"]"\s*)?>(?P<translation>.*?)</\1>'
 ln_pattern =  re.compile(ln_pattern_text, re.IGNORECASE | re.DOTALL)
 
 defined_tags = {'<CFG_SITE_NAME>': CFG_SITE_NAME,
-                '<SUPPORTEMAIL>': supportemail,
+                '<CFG_SITE_SUPPORT_EMAIL>': CFG_SITE_SUPPORT_EMAIL,
                 '<CFG_SITE_ADMIN_EMAIL>': CFG_SITE_ADMIN_EMAIL,
                 '<WEBURL>': weburl,
                 '<SWEBURL>': sweburl,

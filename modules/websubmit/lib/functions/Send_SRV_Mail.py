@@ -37,7 +37,7 @@ from invenio.config import \
      accessurl, \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_NAME, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      weburl
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
@@ -46,7 +46,7 @@ from invenio.websubmit_functions.Retrieve_Data import Get_Field
 def Send_SRV_Mail(parameters, curdir, form, user_info=None):
     global rn,doctype,sysno
     # variables declaration
-    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
     addresses = parameters['addressesSRV']
     addresses = addresses.strip()
     if parameters['emailFile'] is not None and parameters['emailFile']!="" and os.path.exists("%s/%s" % (curdir,parameters['emailFile'])):

@@ -29,7 +29,7 @@ from invenio.config import \
      CFG_CERN_SITE, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      sweburl, \
      CFG_VERSION, \
      weburl
@@ -251,7 +251,6 @@ def create_register_page_box(referer='', ln=CFG_SITE_LANG):
              referer = referer,
              ln = ln,
              level = CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS,
-             supportemail = supportemail,
            )
 
 ##  create_login_page_box(): ask for the user's email and password, for login into the system
@@ -299,7 +298,6 @@ def create_login_page_box(referer='', apache_msg="", ln=CFG_SITE_LANG):
              register_available = register_available,
              methods = methods,
              selected_method = selected,
-             supportemail = supportemail,
              msg = msg,
            )
 

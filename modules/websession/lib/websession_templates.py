@@ -31,7 +31,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      sweburl, \
      CFG_VERSION, \
      weburl
@@ -362,7 +362,7 @@ class Template:
             % make_canonical_urlargd({'lf': 'auth', 'returnURL' : sweburl + '/youraccount/login?ln='+ln}, {}), 'x_url_close' : '</a>'} + " "
         else:
             out += "<p>" + _("Note that if you have been using an external login system, then we cannot do anything and you have to ask there.") + " "
-        out += _("Alternatively, you can ask %s to change your login system from external to internal.") % ("""<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : supportemail }) + "</p>"
+        out += _("Alternatively, you can ask %s to change your login system from external to internal.") % ("""<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : CFG_SITE_SUPPORT_EMAIL }) + "</p>"
 
 
         return out
@@ -724,7 +724,7 @@ class Template:
                  'x_url_close': '</a>'}
         return out
 
-    def tmpl_login_form(self, ln, referer, internal, register_available, methods, selected_method, supportemail, msg=None):
+    def tmpl_login_form(self, ln, referer, internal, register_available, methods, selected_method, msg=None):
         """
         Displays a login form
 
@@ -741,8 +741,6 @@ class Template:
           - 'methods' *array* - The available authentication methods
 
           - 'selected_method' *string* - The default authentication method
-
-          - 'supportemail' *string* - The email of the support team
 
           - 'msg' *string* - The message to print before the form, if needed
         """
@@ -763,7 +761,7 @@ class Template:
                         {'x_url_open': '<a href="../youraccount/register?ln=' + ln + '">',
                         'x_url_close': '</a>'} + "</p>"
                 else:
-                    out += "<p>" + _("It is not possible to create an account yourself. Contact %s if you want an account.") % ('<a href="mailto:%s">%s</a>' % (supportemail, supportemail)) + "</p>"
+                    out += "<p>" + _("It is not possible to create an account yourself. Contact %s if you want an account.") % ('<a href="mailto:%s">%s</a>' % (CFG_SITE_SUPPORT_EMAIL, CFG_SITE_SUPPORT_EMAIL)) + "</p>"
 
         else:
             out = "<p>%s</p>" % msg
@@ -879,7 +877,7 @@ class Template:
         }
         return out
 
-    def tmpl_register_page(self, ln, referer, level, supportemail):
+    def tmpl_register_page(self, ln, referer, level):
         """
         Displays a login form
 
@@ -890,8 +888,6 @@ class Template:
           - 'referer' *string* - The referer URL - will be redirected upon after login
 
           - 'level' *int* - Login level (0 - all access, 1 - accounts activated, 2+ - no self-registration)
-
-          - 'supportemail' *string* - The email of the support team
         """
 
         # load the right message language

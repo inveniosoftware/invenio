@@ -38,7 +38,7 @@ from invenio.config import \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_NAME, \
      htdocsurl, \
-     supportemail, \
+     CFG_SITE_SUPPORT_EMAIL, \
      urlpath
 from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_get_role_users,acc_get_role_id
@@ -49,7 +49,7 @@ def Send_Request_For_Publication(parameters, curdir, form, user_info=None):
     global rn,sysno
     # variables declaration
     doctype = re.search(".*/([^/]*)/([^/]*)/[^/]*$",curdir).group(2)
-    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
     otheraddresses = parameters['addressesDAM']
     categformat = parameters['categformatDAM']
     # retrieve category

@@ -28,10 +28,10 @@ try:
     import getpass
     import readline
     import sys
-    from invenio.config import supportemail
+    from invenio.config import CFG_SITE_SUPPORT_EMAIL
     from invenio.webmessage_dblayer import clean_messages
     from invenio.dbquery import run_sql
-    
+
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -55,7 +55,7 @@ def main():
     arguments in sys.argv.
     If the number of arguments is wrong it prints help.
     Return 1 on success, 0 on failure. """
-    
+
     alen = len(sys.argv)
     action = ''
 
@@ -64,12 +64,12 @@ def main():
         usage(0)
     elif alen > 1 and sys.argv[1] in ["-V", "--version"]:
         print __revision__
-        sys.exit(0)    
-    if alen != 2 or sys.argv[1] not in ['clean']: 
+        sys.exit(0)
+    if alen != 2 or sys.argv[1] not in ['clean']:
         usage(1)
 
     # getting input from user
-    print 'User:    ', 
+    print 'User:    ',
     user = raw_input()
     password = getpass.getpass()
 
@@ -77,8 +77,8 @@ def main():
     perform = 0
 
     # check password
-    if user == supportemail:
-        perform = run_sql("""select * from user where email = '%s' and password = '%s' """ % (supportemail, password)) and 1 or 0
+    if user == CFG_SITE_SUPPORT_EMAIL:
+        perform = run_sql("""select * from user where email = '%s' and password = '%s' """ % (CFG_SITE_SUPPORT_EMAIL, password)) and 1 or 0
 
     if not perform:
         # wrong password or user not recognized
@@ -94,5 +94,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main() 
+    main()
 
