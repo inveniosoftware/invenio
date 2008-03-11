@@ -84,7 +84,7 @@ def send_email(fromaddr,
     @param html_header: [string] header to add to the html part, None for the Default
     @param html_footer: [string] footer to add to the html part, None for the Default
     @param copy_to_admin: [int] if 1 add emailamin in receivers
-    @attempt_time: [int] number of tries
+    @attempt_times: [int] number of tries
     @attempt_sleeptime: [int] seconds in between tries
     @debug_level: [int] debug level
     @ln: [string] invenio language
