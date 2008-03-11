@@ -790,9 +790,9 @@ class WordTable:
            idxFOO table.  Mode 'normal' means normal execution,
            mode 'emergency' means words index reverting to old state.
            """
-        write_message("%s %s wordtable flush started" % (self.tablename, mode), verbose=2)
+        write_message("%s %s wordtable flush started" % (self.tablename, mode))
         write_message('...updating %d words into %s started' % \
-                (len(self.value), self.tablename), verbose=2)
+                (len(self.value), self.tablename))
         task_update_progress("%s flushed %d/%d words" % (self.tablename, 0, len(self.value)))
 
         self.recIDs_in_mem = beautify_range_list(self.recIDs_in_mem)
@@ -814,8 +814,8 @@ class WordTable:
             if nb_words_report != 0 and ((nb_words_done % nb_words_report) == 0):
                 write_message('......processed %d/%d words' % (nb_words_done, nb_words_total))
                 task_update_progress("%s flushed %d/%d words" % (self.tablename, nb_words_done, nb_words_total))
-            write_message('...updating %d words into %s ended' % \
-                (nb_words_total, self.tablename), verbose=9)
+        write_message('...updating %d words into %s ended' % \
+                      (nb_words_total, self.tablename))
 
         write_message('...updating reverse table %sR started' % self.tablename[:-1])
         if mode == "normal":
