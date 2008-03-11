@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import cdslang
+from invenio.config import CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
       CFG_WEBSESSION_USERGROUP_STATUS, \
@@ -46,7 +46,7 @@ except NameError:
 
 
 def perform_request_groups_display(uid, infos=[], errors = [], warnings = [], \
-        ln=cdslang):
+        ln=CFG_SITE_LANG):
     """Display all the groups the user belongs to.
     @param uid:   user id
     @param info: info about last user action
@@ -75,7 +75,7 @@ def perform_request_groups_display(uid, infos=[], errors = [], warnings = [], \
     return (body, errors, warnings)
 
 
-def display_admin_groups(uid, ln=cdslang):
+def display_admin_groups(uid, ln=CFG_SITE_LANG):
     """Display groups the user is admin of.
     @param uid: user id
     @param ln: language
@@ -91,7 +91,7 @@ def display_admin_groups(uid, ln=cdslang):
     return (body, errors)
 
 
-def display_member_groups(uid, ln=cdslang):
+def display_member_groups(uid, ln=CFG_SITE_LANG):
     """Display groups the user is member of.
     @param uid: user id
     @param ln: language
@@ -108,7 +108,7 @@ def display_member_groups(uid, ln=cdslang):
     return (body, errors)
 
 
-def display_external_groups(uid, ln=cdslang):
+def display_external_groups(uid, ln=CFG_SITE_LANG):
     """Display groups the user is admin of.
     @param uid: user id
     @param ln: language
@@ -131,7 +131,7 @@ def perform_request_input_create_group(group_name,
                                        group_description,
                                        join_policy,
                                        warnings=[],
-                                       ln=cdslang):
+                                       ln=CFG_SITE_LANG):
     """Display form for creating new group.
     @param group_name: name of the group entered if the page has been reloaded
     @param group_description: description entered if the page has been reloaded
@@ -155,7 +155,7 @@ def perform_request_create_group(uid,
         group_name,
         group_description,
         join_policy,
-        ln=cdslang):
+        ln=CFG_SITE_LANG):
     """Create new group.
     @param group_name: name of the group entered
     @param group_description: description of the group entered
@@ -211,7 +211,7 @@ def perform_request_create_group(uid,
             infos=infos,
             errors=errors,
             warnings=warnings,
-            ln=cdslang)
+            ln=ln)
     return (body, errors, warnings)
 
 
@@ -219,7 +219,7 @@ def perform_request_input_join_group(uid,
                                      group_name,
                                      search,
                                      warnings=[],
-                                     ln=cdslang):
+                                     ln=CFG_SITE_LANG):
     """Return html for joining new group.
     @param group_name: name of the group entered if user is looking for a group
     @param search=1 if search performed else 0
@@ -245,7 +245,7 @@ def perform_request_join_group(uid,
                                grpID,
                                group_name,
                                search,
-                               ln=cdslang):
+                               ln=CFG_SITE_LANG):
     """Join group.
     @param grpID: list of the groups the user wants to join,
     only one value must be selected among the two group lists
@@ -274,7 +274,7 @@ def perform_request_join_group(uid,
                 infos=infos,
                 errors=errors,
                 warnings=warnings,
-                ln=cdslang)
+                ln=ln)
             # insert new user of group
         else:
             group_infos = db.get_group_infos(grpID)
@@ -310,7 +310,7 @@ def perform_request_join_group(uid,
                 infos=infos,
                 errors=errors,
                 warnings=warnings,
-                ln=cdslang)
+                ln=ln)
     else:
         warnings.append('WRN_WEBSESSION_MULTIPLE_GROUPS')
         (body, errors, warnings) = perform_request_input_join_group(uid,
@@ -322,7 +322,7 @@ def perform_request_join_group(uid,
 
 def perform_request_input_leave_group(uid,
                                       warnings=[],
-                                      ln=cdslang):
+                                      ln=CFG_SITE_LANG):
     """Return html for leaving group.
     @param uid: user ID
     @param warnings: warnings != [] if 0 group is selected or if not admin
@@ -342,7 +342,7 @@ def perform_request_input_leave_group(uid,
 
     return (body, errors, warnings)
 
-def perform_request_leave_group(uid, grpID, confirmed=0, ln=cdslang):
+def perform_request_leave_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
 
     """Leave group.
     @param uid: user ID
@@ -362,7 +362,7 @@ def perform_request_leave_group(uid, grpID, confirmed=0, ln=cdslang):
             db.leave_group(grpID, uid)
             infos.append(CFG_WEBSESSION_INFO_MESSAGES["LEAVE_GROUP"])
             (body, errors, warnings) = perform_request_groups_display(uid,
-                infos=infos, errors=errors, warnings=warnings, ln=cdslang)
+                infos=infos, errors=errors, warnings=warnings, ln=ln)
 
         else:
             body = websession_templates.tmpl_confirm_leave(uid, grpID, ln)
@@ -377,7 +377,7 @@ def perform_request_leave_group(uid, grpID, confirmed=0, ln=cdslang):
 def perform_request_edit_group(uid,
         grpID,
         warnings=[],
-        ln=cdslang):
+        ln=CFG_SITE_LANG):
     """Return html for group editing.
     @param uid: user ID
     @param grpID: ID of the group
@@ -413,7 +413,7 @@ def perform_request_edit_group(uid,
     return (body, errors, warnings)
 
 def perform_request_update_group(uid, grpID, group_name, group_description,
-        join_policy, ln=cdslang):
+        join_policy, ln=CFG_SITE_LANG):
     """Update group datas in database.
     @param uid: user ID
     @param grpID: ID of the group
@@ -464,12 +464,12 @@ def perform_request_update_group(uid, grpID, group_name, group_description,
             infos=infos,
             errors=errors,
             warnings=warnings,
-            ln=cdslang)
+            ln=CFG_SITE_LANG)
 
     return (body, errors, warnings)
 
 
-def  perform_request_delete_group(uid, grpID, confirmed=0, ln=cdslang):
+def  perform_request_delete_group(uid, grpID, confirmed=0, ln=CFG_SITE_LANG):
     """First display confirm message(confirmed=0).
     then(confirmed=1) delete group and all its members
     @param uid: user ID
@@ -491,7 +491,7 @@ def  perform_request_delete_group(uid, grpID, confirmed=0, ln=cdslang):
             infos=infos,
             errors=errors,
             warnings=warnings,
-            ln=cdslang)
+            ln=CFG_SITE_LANG)
     else:
         if not len(user_status):
             errors.append('ERR_WEBSESSION_DB_ERROR')
@@ -513,7 +513,7 @@ def  perform_request_delete_group(uid, grpID, confirmed=0, ln=cdslang):
                 infos=infos,
                 errors=errors,
                 warnings=warnings,
-                ln=cdslang)
+                ln=CFG_SITE_LANG)
         else:
             body = websession_templates.tmpl_confirm_delete(grpID, ln)
 
@@ -524,7 +524,7 @@ def perform_request_manage_member(uid,
         grpID,
         infos=[],
         warnings=[],
-        ln=cdslang):
+        ln=CFG_SITE_LANG):
     """Return html for managing group's members.
     @param uid: user ID
     @param grpID: ID of the group
@@ -561,7 +561,7 @@ def perform_request_manage_member(uid,
         ln=ln)
     return (body, errors, warnings)
 
-def perform_request_remove_member(uid, grpID, member_id, ln=cdslang):
+def perform_request_remove_member(uid, grpID, member_id, ln=CFG_SITE_LANG):
     """Remove member from a group.
     @param uid: user ID
     @param grpID: ID of the group
@@ -596,7 +596,7 @@ def perform_request_remove_member(uid, grpID, member_id, ln=cdslang):
             ln=ln)
     return (body, errors, warnings)
 
-def perform_request_add_member(uid, grpID, user_id, ln=cdslang):
+def perform_request_add_member(uid, grpID, user_id, ln=CFG_SITE_LANG):
     """Add waiting member to a group.
     @param uid: user ID
     @param grpID: ID of the group
@@ -657,7 +657,7 @@ def perform_request_add_member(uid, grpID, user_id, ln=cdslang):
 def perform_request_reject_member(uid,
         grpID,
         user_id,
-        ln=cdslang):
+        ln=CFG_SITE_LANG):
     """Reject waiting member and delete it from the list.
     @param uid: user ID
     @param grpID: ID of the group
@@ -716,7 +716,7 @@ def perform_request_reject_member(uid,
 
     return (body, errors, warnings)
 
-def account_group(uid, ln=cdslang):
+def account_group(uid, ln=CFG_SITE_LANG):
     """Display group info for myaccount.py page.
     @param uid: user id (int)
     @param ln: language
@@ -731,7 +731,7 @@ def account_group(uid, ln=cdslang):
         nb_member_groups,
         nb_total_groups,
         ln=ln)
-def get_navtrail(ln=cdslang, title=""):
+def get_navtrail(ln=CFG_SITE_LANG, title=""):
     """Gets the navtrail for title.
     @param title: title of the page
     @param ln: language

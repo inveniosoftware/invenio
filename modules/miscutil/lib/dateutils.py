@@ -44,14 +44,14 @@ __revision__ = "$Id$"
 
 from time import strptime, strftime, localtime
 
-from invenio.config import cdslang
+from invenio.config import CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 
 datetext_default = '0000-00-00 00:00:00'
 datestruct_default = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 datetext_format = "%Y-%m-%d %H:%M:%S"
 
-def convert_datetext_to_dategui(datetext, ln=cdslang):
+def convert_datetext_to_dategui(datetext, ln=CFG_SITE_LANG):
     """
     Convert:
     '2005-11-16 15:11:57' => '16 nov 2005, 15:11'
@@ -78,7 +78,7 @@ def convert_datetext_to_datestruct(datetext):
     except:
         return datestruct_default
 
-def convert_datestruct_to_dategui(datestruct, ln=cdslang):
+def convert_datestruct_to_dategui(datestruct, ln=CFG_SITE_LANG):
     """
     Convert:
     (2005, 11, 16, 15, 11, 44, 2, 320, 0) => '16 nov 2005, 15:11'
@@ -146,7 +146,7 @@ def get_datestruct(year, month, day):
     except ValueError or TypeError:
         return datestruct_default
 
-def get_i18n_day_name(day_nb, display='short', ln=cdslang):
+def get_i18n_day_name(day_nb, display='short', ln=CFG_SITE_LANG):
     """
     get the string representation of a weekday, internationalized
     @param day_nb: number of weekday UNIX like.
@@ -174,7 +174,7 @@ def get_i18n_day_name(day_nb, display='short', ln=cdslang):
 
     return days[day_nb]
 
-def get_i18n_month_name(month_nb, display='short', ln=cdslang):
+def get_i18n_month_name(month_nb, display='short', ln=CFG_SITE_LANG):
     """
     get a non-numeric representation of a month, internationalized.
     @param month_nb: number of month, (1 based!)
@@ -213,7 +213,7 @@ def get_i18n_month_name(month_nb, display='short', ln=cdslang):
                    12: _("December")}
     return monthes[month_nb]
 
-def create_day_selectbox(name, selected_day=0, ln=cdslang):
+def create_day_selectbox(name, selected_day=0, ln=CFG_SITE_LANG):
     """
     Creates an HTML menu for day selection. (0..31 values).
     @param name: name of the control (i.e. name of the var you'll get)
@@ -234,7 +234,7 @@ def create_day_selectbox(name, selected_day=0, ln=cdslang):
     out += "</select>\n"
     return out
 
-def create_month_selectbox(name, selected_month=0, ln=cdslang):
+def create_month_selectbox(name, selected_month=0, ln=CFG_SITE_LANG):
     """
     Creates an HTML menu for month selection. Value of selected field is numeric
     @param name: name of the control (your form will be sent with name=value...)
@@ -262,7 +262,7 @@ def create_year_inputbox(name, value=0):
     out = "<input type=\"text\" name=\"%s\" value=\"%i\" maxlength=\"4\" size=\"4\"/>\n"% (name, value)
     return out
 
-def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=cdslang):
+def create_year_selectbox(name, from_year=-1, length=10, selected_year=0, ln=CFG_SITE_LANG):
     """
     Creates an HTML menu (dropdownbox) for year selection.
     @param name: name of control( i.e. name of the variable you'll get)

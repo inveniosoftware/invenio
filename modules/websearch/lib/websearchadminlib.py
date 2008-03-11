@@ -31,7 +31,7 @@ import time
 
 from invenio.config import \
      CFG_CACHEDIR, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      weburl,\
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
@@ -79,9 +79,9 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
 
     output = ''
     subtitle = ''
-    cdslangs = get_languages()
+    sitelangs = get_languages()
     if confirm in ["2", 2] and colID:
-        finresult = modify_translations(colID, cdslangs, sel_type, trans, "collection")
+        finresult = modify_translations(colID, sitelangs, sel_type, trans, "collection")
     col_dict = dict(get_def_name('', "collection"))
 
     if colID and col_dict.has_key(int(colID)):
@@ -119,15 +119,15 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
 
         if confirm in [-1, "-1", 0, "0"]:
             trans = []
-            for (key, value) in cdslangs:
+            for (key, value) in sitelangs:
                 try:
                     trans_names = get_name(colID, key, sel_type, "collection")
                     trans.append(trans_names[0][0])
                 except StandardError, e:
                     trans.append('')
 
-        for nr in range(0, len(cdslangs)):
-            actions.append(["%s %s" % (cdslangs[nr][1], (cdslangs[nr][0]==cdslang and '<small>(def)</small>' or ''))])
+        for nr in range(0, len(sitelangs)):
+            actions.append(["%s %s" % (sitelangs[nr][1], (sitelangs[nr][0]==CFG_SITE_LANG and '<small>(def)</small>' or ''))])
             actions[-1].append('<input type="text" name="trans" size="30" value="%s"/>' % trans[nr])
 
         text = tupletotable(header=header, tuple=actions)
@@ -888,14 +888,14 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
 
     header = ['Position', 'Language', '', 'Title', 'Actions']
     actions = []
-    cdslang = get_languages()
-    lang = dict(cdslang)
+    sitelangs = get_languages()
+    lang = dict(sitelangs)
 
     pos_list = pos.items()
     pos_list.sort()
 
     if len(get_col_pbx(colID)) > 0:
-        for (key, value) in cdslang:
+        for (key, value) in sitelangs:
             for (pos_key, pos_value) in pos_list:
                 res = get_col_pbx(colID, key, pos_key)
                 i = 0
@@ -1244,7 +1244,7 @@ def perform_rearrangefield(colID, ln, fmeth, callback='yes', confirm=-1):
     elif fmeth == "seo":
         return perform_showsearchoptions(colID, ln, content=output)
 
-def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=cdslang, callback='yes', confirm=-1):
+def perform_addexistingfieldvalue(colID, fldID, fldvID=-1, ln=CFG_SITE_LANG, callback='yes', confirm=-1):
     """form to add an existing fieldvalue to a field.
     colID - the collection
     fldID - the field to add the fieldvalue to
@@ -1378,8 +1378,8 @@ def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
     header = ['', 'Sort option', 'Actions']
 
     actions = []
-    cdslang = get_languages()
-    lang = dict(cdslang)
+    sitelangs = get_languages()
+    lang = dict(sitelangs)
 
     fld_type_list = fld_type.items()
 
@@ -1439,8 +1439,8 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
     header = ['', 'Search field', 'Actions']
 
     actions = []
-    cdslang = get_languages()
-    lang = dict(cdslang)
+    sitelangs = get_languages()
+    lang = dict(sitelangs)
 
     fld_type_list = fld_type.items()
 
@@ -1500,8 +1500,8 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
     header = ['', 'Search option', 'Actions']
 
     actions = []
-    cdslang = get_languages()
-    lang = dict(cdslang)
+    sitelangs = get_languages()
+    lang = dict(sitelangs)
 
     fld_type_list = fld_type.items()
     fld_distinct = run_sql("SELECT distinct(id_field) FROM collection_field_fieldvalue WHERE type='seo' AND id_collection=%s ORDER by score desc" % colID)
@@ -1541,7 +1541,7 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
         return addadminbox(subtitle, body)
 
 
-def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='', callback='yes', confirm=0):
+def perform_modifyfield(colID, fldID, fldvID='', ln=CFG_SITE_LANG, content='', callback='yes', confirm=0):
     """Modify the fieldvalues for a field"""
 
     colID = int(colID)
@@ -1561,8 +1561,8 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=cdslang, content='', callbac
     header = ['', 'Value name', 'Actions']
 
     actions = []
-    cdslang = get_languages()
-    lang = dict(cdslang)
+    sitelangs = get_languages()
+    lang = dict(sitelangs)
 
     fld_type_list = fld_type.items()
     col_fld = list(get_col_fld(colID, 'seo', fldID))
@@ -1949,7 +1949,7 @@ def perform_removeoutputformat(colID, ln, fmtID='', callback='yes', confirm=0):
     output = "<br />" + addadminbox(subtitle, body)
     return perform_showoutputformats(colID, ln, content=output)
 
-def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
+def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
     """The index method, calling methods to show the collection tree, create new collections and add collections to tree.
     """
 
@@ -2230,7 +2230,7 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     else:
         return addadminbox(subtitle, body)
 
-def perform_editcollection(colID=1, ln=cdslang, mtype='', content=''):
+def perform_editcollection(colID=1, ln=CFG_SITE_LANG, mtype='', content=''):
     """interface to modify a collection. this method is calling other methods which again is calling this and sending back the output of the method.
     if callback, the method will call perform_editcollection, if not, it will just return its output.
     colID - id of the collection
@@ -2919,7 +2919,7 @@ def add_fmt(code, name, rtype):
         res = run_sql("INSERT INTO format (code, name) values (%s,%s)", (code, name))
         fmtID = run_sql("SELECT id FROM format WHERE code=%s", (code,))
         res = run_sql("INSERT INTO formatname(id_format, type, ln, value) VALUES (%s,%s,%s,%s)",
-                      (fmtID[0][0], rtype, cdslang, name))
+                      (fmtID[0][0], rtype, CFG_SITE_LANG, name))
         return (1, fmtID)
     except StandardError, e:
         return (0, e)
@@ -2982,7 +2982,7 @@ def add_col(colNAME, dbquery=None):
             res = run_sql("INSERT INTO collection (id,name,dbquery) VALUES (1,%s,%s)",
                           (colNAME,dbquery))
         colID = run_sql("SELECT id FROM collection WHERE name=%s", (colNAME,))
-        res = run_sql("INSERT INTO collectionname(id_collection, type, ln, value) VALUES (%s,%s,%s,%s)" % (colID[0][0], rtype, cdslang, colNAME))
+        res = run_sql("INSERT INTO collectionname(id_collection, type, ln, value) VALUES (%s,%s,%s,%s)" % (colID[0][0], rtype, CFG_SITE_LANG, colNAME))
         if colID:
             return (1, colID[0][0])
         else:
@@ -3179,7 +3179,7 @@ def switch_score(colID, id_1, id_2, table):
     except Exception, e:
         return (0, e)
 
-def get_detailed_page_tabs(colID=None, recID=None, ln=cdslang):
+def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
     """
     Returns the complete list of tabs to be displayed in the
     detailed record pages.

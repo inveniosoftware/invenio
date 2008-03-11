@@ -39,7 +39,7 @@ import cgi
 from invenio.config import \
      CFG_PATH_PHP, \
      CFG_BINDIR, \
-     cdslang
+     CFG_SITE_LANG
 from invenio.errorlib import \
      register_errors, \
      get_msgs_for_code_list
@@ -78,8 +78,6 @@ format_elements_cache = {}
 format_outputs_cache = {}
 kb_mappings_cache = {}
 
-cdslangs = language_list_long()
-
 html_field = '<!--HTML-->' # String indicating that field should be
                            # treated as HTML (and therefore no escaping of
                            # HTML tags should occur.
@@ -99,7 +97,7 @@ pattern_lang = re.compile(r'''
 
 # Builds regular expression for finding each known language in <lang> tags
 ln_pattern_text = r"<("
-for lang in cdslangs:
+for lang in language_list_long():
     ln_pattern_text += lang[0] +r"|"
 
 ln_pattern_text = ln_pattern_text.rstrip(r"|")
@@ -266,7 +264,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
             out += bibformat_output
         return out
 
-def format_record(recID, of, ln=cdslang, verbose=0,
+def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
                   search_pattern=[], xml_record=None, user_info=None):
     """
     Formats a record given output format. Main entry function of
@@ -335,7 +333,7 @@ def format_record(recID, of, ln=cdslang, verbose=0,
     ############################# END ##################################
 
         error = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_TEMPLATE_FOUND", of)],
-                                       stream='error', ln=cdslang)
+                                       stream='error', ln=CFG_SITE_LANG)
         errors_.append(error)
         if verbose == 0:
             register_errors(error, 'error')
@@ -479,7 +477,7 @@ def eval_format_template_elements(format_template, bfo, verbose=0):
                        '</span>'
         if format_element is None:
             error = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_RESOLVE_ELEMENT_NAME", function_name)],
-                                           stream='error', ln=cdslang)
+                                           stream='error', ln=CFG_SITE_LANG)
             errors_.append(error)
             if verbose >= 5:
                 return '<b><span style="color: rgb(255, 0, 0);">' + \
@@ -573,7 +571,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                 tb = sys.exc_info()[2]
                 error_string = get_msgs_for_code_list(error,
                                                       stream='error',
-                                                      ln=cdslang)
+                                                      ln=CFG_SITE_LANG)
                 stack = traceback.format_exception(Exception, e, tb, limit=None)
                 output_text = '<b><span style="color: rgb(255, 0, 0);">'+ \
                               str(error_string[0][1]) + "".join(stack) +'</span></b> '
@@ -608,7 +606,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                     tb = sys.exc_info()[2]
                     error_string = get_msgs_for_code_list(error,
                                                           stream='error',
-                                                          ln=cdslang)
+                                                          ln=CFG_SITE_LANG)
                     output_text += '<b><span style="color: rgb(255, 0, 0);">'+ \
                                    str(error_string[0][1]) +'</span></b> '
         # (3)
@@ -679,7 +677,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                 elif verbose >= 5:
                     error_string = get_msgs_for_code_list(error,
                                                           stream='error',
-                                                          ln=cdslang)
+                                                          ln=CFG_SITE_LANG)
                     output_text = output_text.append(error_string[0][1])
 
 
@@ -705,7 +703,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
     else:
         # c) Element is unknown
         error = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_RESOLVE_ELEMENT_NAME", format_element)],
-                                       stream='error', ln=cdslang)
+                                       stream='error', ln=CFG_SITE_LANG)
         errors.append(error)
         if verbose < 5:
             register_errors(error, 'error')
@@ -732,7 +730,7 @@ def filter_languages(format_template, ln='en'):
         Searches for the <lang>...</lang> tag and remove inner localized tags
         such as <en>, <fr>, that are not current_lang.
 
-        If current_lang cannot be found inside <lang> ... </lang>, try to use 'cdslang'
+        If current_lang cannot be found inside <lang> ... </lang>, try to use 'CFG_SITE_LANG'
 
         @param match a match object corresponding to the special tag that must be interpreted
         """
@@ -754,12 +752,12 @@ def filter_languages(format_template, ln='en'):
 
         lang_tag_content = match.group("langs")
         # Try to find tag with current lang. If it does not exists,
-        # then current_lang becomes cdslang until the end of this
+        # then current_lang becomes CFG_SITE_LANG until the end of this
         # replace
         pattern_current_lang = re.compile(r"<("+current_lang+ \
                                           r")\s*>(.*?)(</"+current_lang+r"\s*>)", re.IGNORECASE | re.DOTALL)
         if re.search(pattern_current_lang, lang_tag_content) is None:
-            current_lang = cdslang
+            current_lang = CFG_SITE_LANG
 
         cleaned_lang_tag = ln_pattern.sub(clean_language_tag, lang_tag_content)
         return cleaned_lang_tag
@@ -821,7 +819,7 @@ def get_format_template(filename, with_attributes=False):
 
     except Exception, e:
         errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE", filename, str(e))],
-                                        stream='error', ln=cdslang)
+                                        stream='error', ln=CFG_SITE_LANG)
         register_errors(errors, 'error')
 
     # Save attributes if necessary
@@ -896,7 +894,7 @@ def get_format_template_attrs(filename):
     except Exception, e:
         errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE",
                                           filename, str(e))],
-                                        stream='error', ln=cdslang)
+                                        stream='error', ln=CFG_SITE_LANG)
         register_errors(errors, 'error')
         attrs['name'] = filename
 
@@ -958,7 +956,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
         else:
             errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_NOT_FOUND",
                                               element_name)],
-                                            stream='error', ln=cdslang)
+                                            stream='error', ln=CFG_SITE_LANG)
             if verbose == 0:
                 register_errors(errors, 'error')
             elif verbose >= 5:
@@ -992,7 +990,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
             stack = traceback.format_exception(Exception, e, tb, limit=None)
             errors = get_msgs_for_code_list([("ERR_BIBFORMAT_IN_FORMAT_ELEMENT",
                                               element_name,"\n" + "\n".join(stack[-2:-1]))],
-                                            stream='error', ln=cdslang)
+                                            stream='error', ln=CFG_SITE_LANG)
             if verbose == 0:
                 register_errors(errors, 'error')
             elif verbose >= 5:
@@ -1010,7 +1008,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
         except AttributeError, e:
             errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_FORMAT_FUNCTION",
                                               element_name)],
-                                            stream='warning', ln=cdslang)
+                                            stream='warning', ln=CFG_SITE_LANG)
             if verbose == 0:
                 register_errors(errors, 'error')
             elif verbose >= 5:
@@ -1337,7 +1335,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
 
     if filename is None:
         errors = get_msgs_for_code_list([("ERR_BIBFORMAT_OUTPUT_FORMAT_CODE_UNKNOWN", code)],
-                                        stream='error', ln=cdslang)
+                                        stream='error', ln=CFG_SITE_LANG)
         register_errors(errors, 'error')
         if with_attributes: #Create empty attrs if asked for attributes
             output_format['attrs'] = get_output_format_attrs(code, verbose)
@@ -1392,7 +1390,7 @@ def get_output_format(code, with_attributes=False, verbose=0):
 
     except Exception, e:
         errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_READ_OUTPUT_FILE", filename, str(e))],
-                                        stream='error', ln=cdslang)
+                                        stream='error', ln=CFG_SITE_LANG)
         register_errors(errors, 'error')
 
     # Cache and return
@@ -1583,7 +1581,7 @@ def resolve_output_format_filename(code, verbose=0):
 
     # No output format with that name found
     errors = get_msgs_for_code_list([("ERR_BIBFORMAT_CANNOT_RESOLVE_OUTPUT_NAME", code)],
-                                    stream='error', ln=cdslang)
+                                    stream='error', ln=CFG_SITE_LANG)
     if verbose == 0:
         register_errors(errors, 'error')
     elif verbose >= 5:
@@ -1662,7 +1660,7 @@ def get_fresh_output_format_filename(code):
         # could get there.. Sanity check.
         if index >= 99999:
             errors = get_msgs_for_code_list([("ERR_BIBFORMAT_NB_OUTPUTS_LIMIT_REACHED", code)],
-                                            stream='error', ln=cdslang)
+                                            stream='error', ln=CFG_SITE_LANG)
             register_errors(errors, 'error')
             sys.exit("Output format cannot be named as %s"%code)
 
@@ -1694,7 +1692,7 @@ class BibFormatObject:
     record = None
 
     # The language in which the formatting has to be done
-    lang = cdslang
+    lang = CFG_SITE_LANG
 
     # A list of string describing the context in which the record has
     # to be formatted.
@@ -1715,7 +1713,7 @@ class BibFormatObject:
 
     req = None # DEPRECATED: use bfo.user_info instead
 
-    def __init__(self, recID, ln=cdslang, search_pattern=[],
+    def __init__(self, recID, ln=CFG_SITE_LANG, search_pattern=[],
                  xml_record=None, user_info=None, format=''):
         """
         Creates a new bibformat object, with given record.
@@ -1995,7 +1993,7 @@ def bf_profile():
     Runs a benchmark
     """
     for i in range(1, 51):
-        format_record(i, "HD", ln=cdslang, verbose=9, search_pattern=[])
+        format_record(i, "HD", ln=CFG_SITE_LANG, verbose=9, search_pattern=[])
     return
 
 if __name__ == "__main__":

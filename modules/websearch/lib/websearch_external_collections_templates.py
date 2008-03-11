@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 import cgi
 
-from invenio.config import cdslang
+from invenio.config import CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.urlutils import create_html_link
 
@@ -33,7 +33,7 @@ class Template:
     def __init__(self):
         pass
 
-    def external_collection_seealso_box(self, lang, links, 
+    def external_collection_seealso_box(self, lang, links,
             prolog_start='<table class="externalcollectionsbox"><tr><th colspan="2" class="externalcollectionsboxheader">',
             prolog_end='</th></tr><tr><td class="externalcollectionsboxbody">',
             column_separator='</td><td class="externalcollectionsboxbody">',
@@ -41,7 +41,7 @@ class Template:
         """Creates the box that proposes links to other useful search engines like Google.
         lang: string - The language to display in
         links: list of string - List of links to display in the box
-        prolog_start, prolog_end, column_separator, link_separator, epilog': strings - 
+        prolog_start, prolog_end, column_separator, link_separator, epilog': strings -
             default HTML code for the specified position in the box"""
         _ = gettext_set_language(lang)
 
@@ -58,7 +58,7 @@ class Template:
             out += epilog
         return out
 
-    def external_collection_overview(self, lang=cdslang, engine_list=()):
+    def external_collection_overview(self, lang=CFG_SITE_LANG, engine_list=()):
         """Prints results overview box with links to particular collections below.
         lang: The language to display
         engine_list: The external engines to be used"""
@@ -96,7 +96,7 @@ def print_info_line(req,
                     html_external_engine_nb_results_box,
                     html_external_engine_nb_seconds_box):
     """Print on req an information line about results of an external collection search."""
-    
+
     req.write('<table class="externalcollectionsresultsbox"><tr>')
     req.write('<td class="externalcollectionsresultsboxheader">')
     req.write('<big><strong>' + \
@@ -131,7 +131,7 @@ def print_results(req, lang, pagegetter, infos, current_time):
     """
     _ = gettext_set_language(lang)
     url = infos[0]
-    engine = infos[1]    
+    engine = infos[1]
     internal_name = get_link_name(engine.name)
     name = _(engine.name)
     base_url = engine.base_url
@@ -156,7 +156,7 @@ def print_results(req, lang, pagegetter, infos, current_time):
 
     req.write('<a name="%(internal_name)s"></a>' % locals())
     print_info_line(req,
-                    html_tit,                   
+                    html_tit,
                     html_num,
                     html_sec)
 

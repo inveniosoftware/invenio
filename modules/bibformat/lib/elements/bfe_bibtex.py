@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -22,7 +22,7 @@
 """
 __revision__ = "$Id$"
 
-from invenio.config import cdslang
+from invenio.config import CFG_SITE_LANG
 
 def format(bfo, width="50"):
     """
@@ -31,18 +31,18 @@ def format(bfo, width="50"):
     'width' must be bigger than or equal to 30.
     This format element is an example of large element, which does
     all the formatting by itself
-    
+
     @param width the width (in number of characters) of the notice
     """
     out = "@"
     width = int(width)
     if width < 30:
         width = 30
-        
+
     name_width = 19
     value_width = width-name_width
     recID = bfo.control_field('001')
-    
+
     #Print entry type
     import invenio.bibformat_elements.bfe_collection as bfe_collection
     collection = bfe_collection.format(bfo=bfo, kb="DBCOLLID2BIBTEX")
@@ -52,7 +52,7 @@ def format(bfo, width="50"):
         out += collection
 
     out += "{"
-    
+
     #Print BibTeX key
     #
     #Try to have: author_name:recID
@@ -84,7 +84,7 @@ def format(bfo, width="50"):
                     if title != "":
                         key = get_name(title)+":"+recID
     out += key +","
- 
+
     #Print authors
     #If author cannot be found, print a field key=recID
     import invenio.bibformat_elements.bfe_authors as bfe_authors
@@ -114,7 +114,7 @@ def format(bfo, width="50"):
                                editors,
                                name_width,
                                value_width)
-    
+
     #Print title
     import invenio.bibformat_elements.bfe_title as bfe_title
     title = bfe_title.format(bfo=bfo, separator = ". ")
@@ -143,8 +143,8 @@ def format(bfo, width="50"):
                                    ". ".join(organization),
                                    name_width,
                                    value_width)
-        
-    #Print publisher 
+
+    #Print publisher
     if collection == "book" or \
            collection == "inproceedings" \
            or collection == "proceedings":
@@ -167,7 +167,7 @@ def format(bfo, width="50"):
                                    ". ".join(publishers),
                                    name_width,
                                    value_width)
-          
+
     #Print journal
     if collection == "article":
         journals = []
@@ -177,12 +177,12 @@ def format(bfo, width="50"):
         journal = bfo.field("909C4p")
         if journal != "":
             journals.append(journal)
-        
+
         out += format_bibtex_field("journal",
                                    ". ".join(journals),
                                    name_width,
                                    value_width)
-          
+
     #Print school
     if collection == "phdthesis":
         university = bfo.field("502__b")
@@ -191,7 +191,7 @@ def format(bfo, width="50"):
                                    university,
                                    name_width,
                                    value_width)
-        
+
     #Print address
     if collection == "book" or \
            collection == "inproceedings" or \
@@ -211,12 +211,12 @@ def format(bfo, width="50"):
         imprint_e_journal__publisher_place = bfo.field("934__a")
         if imprint_e_journal__publisher_place != "":
             addresses.append(imprint_e_journal__publisher_place)
-                
+
         out += format_bibtex_field("address",
                                    ". ".join(addresses),
                                    name_width,
                                    value_width)
-       
+
     #Print number
     if collection == "techreport" or \
            collection == "article":
@@ -238,7 +238,7 @@ def format(bfo, width="50"):
                                    ". ".join(numbers),
                                    name_width,
                                    value_width)
-                  
+
     #Print volume
     if collection == "article" or \
            collection == "book":
@@ -249,7 +249,7 @@ def format(bfo, width="50"):
         volume = bfo.field("909C4v")
         if volume != "":
             volumes.append(volume)
-        
+
         out += format_bibtex_field("volume",
                                    ". ".join(volumes),
                                    name_width,
@@ -262,7 +262,7 @@ def format(bfo, width="50"):
                                    series,
                                    name_width,
                                    value_width)
-    
+
     #Print pages
     if collection == "article" or \
            collection == "inproceedings":
@@ -276,24 +276,24 @@ def format(bfo, width="50"):
         phys_pagination = bfo.field("300__a")
         if phys_pagination != "":
             pages.append(phys_pagination)
-            
+
         out += format_bibtex_field("pages",
                                    ". ".join(pages),
                                    name_width,
                                    value_width)
-          
+
     #Print month
     month = get_month(bfo.field("269__c"))
     if month == "":
         month = get_month(bfo.field("260__c"))
         if month == "":
             month = get_month(bfo.field("502__c"))
-                
+
     out += format_bibtex_field("month",
                                month,
                                name_width,
-                               value_width)  
-    
+                               value_width)
+
     #Print year
     year = get_year(bfo.field("269__c"))
     if year == "":
@@ -302,41 +302,41 @@ def format(bfo, width="50"):
             year = get_year(bfo.field("502__c"))
             if year == "":
                 year = get_year(bfo.field("909C0y"))
-                
+
     out += format_bibtex_field("year",
                                year,
                                name_width,
                                value_width)
-                
+
     #Print note
     note = bfo.field("500__a")
     out += format_bibtex_field("note",
                                note,
                                name_width,
                                value_width)
-          
+
     out +="\n}"
-    
-    return out 
+
+    return out
 
 
 def format_bibtex_field(name, value, name_width=20, value_width=40):
     """
     Formats a name and value to display as BibTeX field.
-    
+
     'name_width' is the width of the name of the field (everything before " = " on first line)
     'value_width' is the width of everything after " = ".
 
     6 empty chars are printed before the name, then the name and then it is filled with spaces to meet
     the required width. Therefore name_width must be > 6 + len(name)
 
-    Then " = " is printed (notice spaces). 
+    Then " = " is printed (notice spaces).
 
     So the total width will be name_width + value_width + len(" = ")
                                                                (3)
 
     if value is empty string, then return empty string.
-    
+
     For example format_bibtex_field('author', 'a long value for this record', 13, 15) will
     return :
     >>
@@ -349,7 +349,7 @@ def format_bibtex_field(name, value, name_width=20, value_width=40):
         value_width = 2
     if value is None or value == "":
         return ""
-    
+
     #format name
     name = "\n      "+name
     name = name.ljust(name_width)
@@ -365,7 +365,7 @@ def format_bibtex_field(name, value, name_width=20, value_width=40):
                                #number of chars per line
             increase = True
             cursor = last_cut+value_width-1
-            
+
         if value[cursor] != " " and not increase:
             cursor -= 1
         elif value[cursor] != " " and increase:
@@ -379,7 +379,7 @@ def format_bibtex_field(name, value, name_width=20, value_width=40):
     last_line = value[last_cut:]
     if last_line != "":
         value_lines.append(last_line)
-    
+
     tabs = "".ljust(name_width + 2)
     value = ("\n"+tabs).join(value_lines)
 
@@ -395,7 +395,7 @@ def get_name(string):
     Behaviour inherited from old GET_NAME function defined as UFD in
     old BibFormat. We need to return the same value, to keep back
     compatibility with already generated BibTeX notices.
-    
+
     Eg: get_name("سtlund, عvind B") returns "سtlund".
     """
     names = string.split(',')
@@ -429,10 +429,10 @@ def get_year(date, default=""):
     result = year_pattern.search(date)
     if result is not None:
         return result.group()
-    
+
     return default
 
-def get_month(date, ln=cdslang, default=""):
+def get_month(date, ln=CFG_SITE_LANG, default=""):
     """
     Returns the year from a textual date retrieved from a record
 
@@ -447,7 +447,7 @@ def get_month(date, ln=cdslang, default=""):
     from invenio.messages import language_list_long
 
     #Look for textual month like "Jan" or "sep" or "November" or "novem"
-    #Limit to cdslang as language first (most probable date)
+    #Limit to CFG_SITE_LANG as language first (most probable date)
     #Look for short months. Also matches for long months
     short_months = [get_i18n_month_name(month).lower()
                     for month in range(1, 13)] # ["jan","feb","mar",...]
@@ -471,13 +471,13 @@ def get_month(date, ln=cdslang, default=""):
             return get_i18n_month_name(month_nb, "short", ln)
         except:
             pass
-        
+
     #Look for textual month like "Jan" or "sep" or "November" or "novem"
     #Look for the month in each language
 
     #Retrieve ['en', 'fr', 'de', ...]
     language_list_short = [x[0]
-                           for x in language_list_long()] 
+                           for x in language_list_long()]
     for lang in language_list_short: #For each language
         #Look for short months. Also matches for long months
         short_months = [get_i18n_month_name(month, "short", lang).lower()
@@ -491,7 +491,7 @@ def get_month(date, ln=cdslang, default=""):
                 return get_i18n_month_name(month_nb, "short", ln)
             except:
                 pass
-       
+
     return default
 
 

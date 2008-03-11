@@ -19,7 +19,7 @@
 import os
 import time
 
-from invenio.config import adminemail, supportemail, CFG_ETCDIR, weburl, cdslang
+from invenio.config import adminemail, supportemail, CFG_ETCDIR, weburl, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webjournal_utils import get_number_of_articles_for_issue, \
@@ -369,7 +369,7 @@ def tmpl_webjournal_updated_issue_msg(language, update_issue, journal_name):
 
 def tmpl_webjournal_admin_interface(journal_name, current_issue,
                                 current_publication, issue_list,
-                                next_issue_number, language=cdslang):
+                                next_issue_number, language=CFG_SITE_LANG):
     """
     Returns an administration interface that shows the current publication and
     supports links to all important actions.

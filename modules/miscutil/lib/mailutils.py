@@ -43,7 +43,7 @@ from formatter import DumbWriter, AbstractFormatter
 from invenio.config import \
      supportemail, \
      weburl, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_NAME, \
      adminemail, \
@@ -68,7 +68,7 @@ def send_email(fromaddr,
                attempt_times=1,
                attempt_sleeptime=10,
                debug_level=0,
-               ln=cdslang,
+               ln=CFG_SITE_LANG,
                charset='utf-8'
                ):
     """Send an forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
@@ -132,7 +132,7 @@ def send_email(fromaddr,
         return False
     return True
 
-def email_header(ln=cdslang):
+def email_header(ln=CFG_SITE_LANG):
     """The header of the email
     @param ln: language
     @return header as a string"""
@@ -145,7 +145,7 @@ def email_header(ln=cdslang):
             }
     return out
 
-def email_html_header(ln=cdslang):
+def email_html_header(ln=CFG_SITE_LANG):
     """The header of the email
     @param ln: language
     @return header as a string"""
@@ -159,7 +159,7 @@ def email_html_header(ln=cdslang):
     return out
 
 
-def email_footer(ln=cdslang):
+def email_footer(ln=CFG_SITE_LANG):
     """The footer of the email
     @param ln: language
     @return footer as a string"""
@@ -179,7 +179,7 @@ def email_footer(ln=cdslang):
             }
     return out
 
-def email_html_footer(ln=cdslang):
+def email_html_footer(ln=CFG_SITE_LANG):
     """The html footer of the email
     @param ln: language
     @return footer as a string"""
@@ -202,7 +202,7 @@ def email_html_footer(ln=cdslang):
 
 def forge_email(fromaddr, toaddr, subject, content, html_content='',
                 html_images={}, usebcc=False, header=None, footer=None,
-                html_header=None, html_footer=None, ln=cdslang,
+                html_header=None, html_footer=None, ln=CFG_SITE_LANG,
                 charset='utf-8'):
     """Prepare email. Add header and footer if needed.
     @param fromaddr: [string] sender
@@ -291,7 +291,7 @@ def log(*error):
     """Register error
     @param error: tuple of the form(ERR_, arg1, arg2...)
     """
-    _ = gettext_set_language(cdslang)
-    errors = get_msgs_for_code_list([error], 'error', cdslang)
+    _ = gettext_set_language(CFG_SITE_LANG)
+    errors = get_msgs_for_code_list([error], 'error', CFG_SITE_LANG)
     register_errors(errors, 'error')
 

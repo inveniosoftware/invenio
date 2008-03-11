@@ -28,13 +28,13 @@ __lastupdated__ = """$Date$"""
 from invenio.webcommentadminlib import *
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl,cdslang,CFG_SITE_NAME
+from invenio.config import weburl,CFG_SITE_LANG,CFG_SITE_NAME
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.urlutils import wash_url_argument, redirect_to_url
 from invenio.messages import wash_language, gettext_set_language
 
-def index(req, ln=cdslang):
+def index(req, ln=CFG_SITE_LANG):
     """
     Menu of admin options
     @param ln: language
@@ -67,7 +67,7 @@ def index(req, ln=cdslang):
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-def delete(req, ln=cdslang, comid=""):
+def delete(req, ln=CFG_SITE_LANG, comid=""):
     """
     Delete a comment by giving its comment id
     @param ln: language
@@ -105,7 +105,7 @@ def delete(req, ln=cdslang, comid=""):
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
 
-def comments(req, ln=cdslang, uid="", comid="", reviews=0):
+def comments(req, ln=CFG_SITE_LANG, uid="", comid="", reviews=0):
     """
     View reported comments, filter by either user or a specific comment (only one given at a time)
     @param ln: language
@@ -142,7 +142,7 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
 
-def users(req, ln=cdslang):
+def users(req, ln=CFG_SITE_LANG):
     """
     View a list of all the users that have been reported, sorted by most reported
     @param ln: language
@@ -176,7 +176,7 @@ def users(req, ln=cdslang):
 
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-def del_com(req, ln=cdslang, action="delete", **hidden):
+def del_com(req, ln=CFG_SITE_LANG, action="delete", **hidden):
     """
     private funciton
     Delete a comment

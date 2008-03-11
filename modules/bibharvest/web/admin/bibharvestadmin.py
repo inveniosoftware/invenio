@@ -25,11 +25,11 @@ __lastupdated__ = """$Date$"""
 
 import invenio.bibharvestadminlib as bhc
 from invenio.webpage import page, create_error_box
-from invenio.config import CFG_SITE_NAME, weburl, cdslang
+from invenio.config import CFG_SITE_NAME, weburl, CFG_SITE_LANG
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
-def index(req, ln=cdslang):
+def index(req, ln=CFG_SITE_LANG):
     navtrail_previous_links = bhc.getnavtrail()
 
     try:
@@ -55,7 +55,7 @@ def index(req, ln=cdslang):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='', ln=cdslang, mtype='', callback='yes', confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
+def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_src_prefix='', oai_src_frequency='', oai_src_config='', oai_src_post='', ln=CFG_SITE_LANG, mtype='', callback='yes', confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (weburl)
 
     try:
@@ -93,7 +93,7 @@ def editsource(req, oai_src_id=None, oai_src_name='', oai_src_baseurl='', oai_sr
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
+def addsource(req, ln=CFG_SITE_LANG, oai_src_name='', oai_src_baseurl ='', oai_src_prefix='', oai_src_frequency='', oai_src_lastrun='', oai_src_config='', oai_src_post='', confirm=-1, oai_src_sets=[], oai_src_bibfilter=''):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (weburl)
 
     try:
@@ -121,7 +121,7 @@ def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_pre
                                                        oai_src_post=oai_src_post,
                                                        oai_src_sets=oai_src_sets,
                                                        oai_src_bibfilter=oai_src_bibfilter,
-                                                       ln=cdslang,
+                                                       ln=ln,
                                                        confirm=confirm),
                     uid=uid,
                     language=ln,
@@ -132,7 +132,7 @@ def addsource(req, ln=cdslang, oai_src_name='', oai_src_baseurl ='', oai_src_pre
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def delsource(req, oai_src_id=None, ln=cdslang, confirm=0):
+def delsource(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (weburl)
 
     try:

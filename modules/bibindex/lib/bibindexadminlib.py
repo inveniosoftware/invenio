@@ -30,7 +30,7 @@ import random
 from zlib import compress,decompress
 
 from invenio.config import \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_VERSION, \
      weburl, \
      CFG_BINDIR
@@ -49,7 +49,7 @@ def getnavtrail(previous = ''):
     navtrail = navtrail + previous
     return navtrail
 
-def perform_index(ln=cdslang, mtype='', content=''):
+def perform_index(ln=CFG_SITE_LANG, mtype='', content=''):
     """start area for modifying indexes
     mtype - the method that called this method.
     content - the output from that method."""
@@ -83,7 +83,7 @@ def perform_index(ln=cdslang, mtype='', content=''):
 
     return addadminbox("<b>Menu</b>",  [fin_output])
 
-def perform_field(ln=cdslang, mtype='', content=''):
+def perform_field(ln=CFG_SITE_LANG, mtype='', content=''):
     """Start area for modifying fields
     mtype - the method that called this method.
     content - the output from that method."""
@@ -117,7 +117,7 @@ def perform_field(ln=cdslang, mtype='', content=''):
 
     return addadminbox("<b>Menu</b>",  [fin_output])
 
-def perform_editfield(fldID, ln=cdslang, mtype='', content='', callback='yes', confirm=-1):
+def perform_editfield(fldID, ln=CFG_SITE_LANG, mtype='', content='', callback='yes', confirm=-1):
     """form to modify a field. this method is calling other methods which again is calling this and sending back the output of the method.
     if callback, the method will call perform_editcollection, if not, it will just return its output.
     fldID - id of the field
@@ -167,7 +167,7 @@ def perform_editfield(fldID, ln=cdslang, mtype='', content='', callback='yes', c
 
     return addadminbox("Edit logical field '%s'" % fld_dict[int(fldID)],  [fin_output])
 
-def perform_editindex(idxID, ln=cdslang, mtype='', content='', callback='yes', confirm=-1):
+def perform_editindex(idxID, ln=CFG_SITE_LANG, mtype='', content='', callback='yes', confirm=-1):
     """form to modify a index. this method is calling other methods which again is calling this and sending back the output of the method.
     idxID - id of the index
     mtype - the method that called this method.
@@ -219,7 +219,7 @@ def perform_editindex(idxID, ln=cdslang, mtype='', content='', callback='yes', c
 
     return addadminbox("Edit index",  [fin_output])
 
-def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
+def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
     subtitle = """<a name="1"></a>1. Overview of indexes"""
     output = """<table cellpadding="3" border="1">"""
     output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("ID", "Name", "Fwd.Idx Size", "Rev.Idx Size", "Fwd.Idx Words", "Rev.Idx Records", "Last updated", "Fields", "Translations", "Stemming Language")
@@ -290,7 +290,7 @@ def perform_showindexoverview(ln=cdslang, callback='', confirm=0):
     else:
         return addadminbox(subtitle, body)
 
-def perform_editindexes(ln=cdslang, callback='yes', content='', confirm=-1):
+def perform_editindexes(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1):
     """show a list of indexes that can be edited."""
 
     subtitle = """<a name="2"></a>2. Edit index&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (weburl)
@@ -324,7 +324,7 @@ def perform_editindexes(ln=cdslang, callback='yes', content='', confirm=-1):
     else:
         return addadminbox(subtitle, body)
 
-def perform_editfields(ln=cdslang, callback='yes', content='', confirm=-1):
+def perform_editfields(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1):
     """show a list of all logical fields that can be edited."""
 
     subtitle = """<a name="5"></a>5. Edit logical field&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (weburl)
@@ -359,7 +359,7 @@ def perform_editfields(ln=cdslang, callback='yes', content='', confirm=-1):
     else:
         return addadminbox(subtitle, body)
 
-def perform_addindex(ln=cdslang, idxNAME='', callback="yes", confirm=-1):
+def perform_addindex(ln=CFG_SITE_LANG, idxNAME='', callback="yes", confirm=-1):
     """form to add a new index.
     idxNAME - the name of the new index"""
 
@@ -388,16 +388,16 @@ def perform_addindex(ln=cdslang, idxNAME='', callback="yes", confirm=-1):
     else:
         return addadminbox(subtitle, body)
 
-def perform_modifyindextranslations(idxID, ln=cdslang, sel_type='', trans=[], confirm=-1, callback='yes'):
+def perform_modifyindextranslations(idxID, ln=CFG_SITE_LANG, sel_type='', trans=[], confirm=-1, callback='yes'):
     """Modify the translations of a index
     sel_type - the nametype to modify
     trans - the translations in the same order as the languages from get_languages()"""
 
     output = ''
     subtitle = ''
-    cdslangs = get_languages()
+    langs = get_languages()
     if confirm in ["2", 2] and idxID:
-        finresult = modify_translations(idxID, cdslangs, sel_type, trans, "idxINDEX")
+        finresult = modify_translations(idxID, langs, sel_type, trans, "idxINDEX")
     idx_dict = dict(get_def_name('', "idxINDEX"))
     if idxID and idx_dict.has_key(int(idxID)):
         idxID = int(idxID)
@@ -436,15 +436,15 @@ def perform_modifyindextranslations(idxID, ln=cdslang, sel_type='', trans=[], co
 
         if confirm in [-1, "-1", 0, "0"]:
             trans = []
-            for (key, value) in cdslangs:
+            for (key, value) in langs:
                 try:
                     trans_names = get_name(idxID, key, sel_type, "idxINDEX")
                     trans.append(trans_names[0][0])
                 except StandardError, e:
                     trans.append('')
 
-        for nr in range(0,len(cdslangs)):
-            actions.append(["%s %s" % (cdslangs[nr][1], (cdslangs[nr][0]==cdslang and '<small>(def)</small>' or ''))])
+        for nr in range(0,len(langs)):
+            actions.append(["%s %s" % (langs[nr][1], (langs[nr][0]==CFG_SITE_LANG and '<small>(def)</small>' or ''))])
             actions[-1].append('<input type="text" name="trans" size="30" value="%s"/>' % trans[nr])
 
         text = tupletotable(header=header, tuple=actions)
@@ -467,16 +467,16 @@ def perform_modifyindextranslations(idxID, ln=cdslang, sel_type='', trans=[], co
     else:
         return addadminbox(subtitle, body)
 
-def perform_modifyfieldtranslations(fldID, ln=cdslang, sel_type='', trans=[], confirm=-1, callback='yes'):
+def perform_modifyfieldtranslations(fldID, ln=CFG_SITE_LANG, sel_type='', trans=[], confirm=-1, callback='yes'):
     """Modify the translations of a field
     sel_type - the nametype to modify
     trans - the translations in the same order as the languages from get_languages()"""
 
     output = ''
     subtitle = ''
-    cdslangs = get_languages()
+    langs = get_languages()
     if confirm in ["2", 2] and fldID:
-        finresult = modify_translations(fldID, cdslangs, sel_type, trans, "field")
+        finresult = modify_translations(fldID, langs, sel_type, trans, "field")
     fld_dict = dict(get_def_name('', "field"))
     if fldID and fld_dict.has_key(int(fldID)):
         fldID = int(fldID)
@@ -514,15 +514,15 @@ def perform_modifyfieldtranslations(fldID, ln=cdslang, sel_type='', trans=[], co
 
         if confirm in [-1, "-1", 0, "0"]:
             trans = []
-            for (key, value) in cdslangs:
+            for (key, value) in langs:
                 try:
                     trans_names = get_name(fldID, key, sel_type, "field")
                     trans.append(trans_names[0][0])
                 except StandardError, e:
                     trans.append('')
 
-        for nr in range(0,len(cdslangs)):
-            actions.append(["%s %s" % (cdslangs[nr][1], (cdslangs[nr][0]==cdslang and '<small>(def)</small>' or ''))])
+        for nr in range(0,len(langs)):
+            actions.append(["%s %s" % (langs[nr][1], (langs[nr][0]==CFG_SITE_LANG and '<small>(def)</small>' or ''))])
             actions[-1].append('<input type="text" name="trans" size="30" value="%s"/>' % trans[nr])
 
         text = tupletotable(header=header, tuple=actions)
@@ -545,7 +545,7 @@ def perform_modifyfieldtranslations(fldID, ln=cdslang, sel_type='', trans=[], co
     else:
         return addadminbox(subtitle, body)
 
-def perform_showdetailsfieldtag(fldID, tagID, ln=cdslang, callback="yes", confirm=-1):
+def perform_showdetailsfieldtag(fldID, tagID, ln=CFG_SITE_LANG, callback="yes", confirm=-1):
     """form to add a new field.
     fldNAME - the name of the new field
     code - the field code"""
@@ -585,7 +585,7 @@ def perform_showdetailsfieldtag(fldID, tagID, ln=cdslang, callback="yes", confir
     else:
         return addadminbox(subtitle, body)
 
-def perform_showdetailsfield(fldID, ln=cdslang, callback="yes", confirm=-1):
+def perform_showdetailsfield(fldID, ln=CFG_SITE_LANG, callback="yes", confirm=-1):
     """form to add a new field.
     fldNAME - the name of the new field
     code - the field code"""
@@ -623,7 +623,7 @@ def perform_showdetailsfield(fldID, ln=cdslang, callback="yes", confirm=-1):
         return addadminbox(subtitle, body)
 
 
-def perform_addfield(ln=cdslang, fldNAME='', code='', callback="yes", confirm=-1):
+def perform_addfield(ln=CFG_SITE_LANG, fldNAME='', code='', callback="yes", confirm=-1):
     """form to add a new field.
     fldNAME - the name of the new field
     code - the field code"""
@@ -656,7 +656,7 @@ def perform_addfield(ln=cdslang, fldNAME='', code='', callback="yes", confirm=-1
     else:
         return addadminbox(subtitle, body)
 
-def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
+def perform_deletefield(fldID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
     """form to remove a field.
     fldID - the field id from table field.
     """
@@ -695,7 +695,7 @@ def perform_deletefield(fldID, ln=cdslang, callback='yes', confirm=0):
     else:
         return addadminbox(subtitle, body)
 
-def perform_deleteindex(idxID, ln=cdslang, callback='yes', confirm=0):
+def perform_deleteindex(idxID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
     """form to delete an index.
     idxID - the index id from table idxINDEX.
     """
@@ -731,7 +731,7 @@ def perform_deleteindex(idxID, ln=cdslang, callback='yes', confirm=0):
     else:
         return addadminbox(subtitle, body)
 
-def perform_showfieldoverview(ln=cdslang, callback='', confirm=0):
+def perform_showfieldoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
     subtitle = """<a name="4"></a>4. Logical fields overview"""
     output = """<table cellpadding="3" border="1">"""
     output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("Field", "MARC Tags", "Translations")
@@ -762,7 +762,7 @@ def perform_showfieldoverview(ln=cdslang, callback='', confirm=0):
     else:
         return addadminbox(subtitle, body)
 
-def perform_modifyindex(idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes', confirm=-1):
+def perform_modifyindex(idxID, ln=CFG_SITE_LANG, idxNAME='', idxDESC='', callback='yes', confirm=-1):
     """form to modify an index name.
     idxID - the index name to change.
     idxNAME - new name of index
@@ -806,7 +806,7 @@ def perform_modifyindex(idxID, ln=cdslang, idxNAME='', idxDESC='', callback='yes
     else:
         return addadminbox(subtitle, body)
 
-def perform_modifyindexstemming(idxID, ln=cdslang, idxSTEM='', callback='yes', confirm=-1):
+def perform_modifyindexstemming(idxID, ln=CFG_SITE_LANG, idxSTEM='', callback='yes', confirm=-1):
     """form to modify an index name.
     idxID - the index name to change.
     idxSTEM - new stemming language code"""
@@ -878,7 +878,7 @@ def perform_modifyindexstemming(idxID, ln=cdslang, idxSTEM='', callback='yes', c
         return addadminbox(subtitle, body)
 
 
-def perform_modifyfield(fldID, ln=cdslang, code='', callback='yes', confirm=-1):
+def perform_modifyfield(fldID, ln=CFG_SITE_LANG, code='', callback='yes', confirm=-1):
     """form to modify a field.
     fldID - the field to change."""
 
@@ -923,7 +923,7 @@ def perform_modifyfield(fldID, ln=cdslang, code='', callback='yes', confirm=-1):
     else:
         return addadminbox(subtitle, body)
 
-def perform_modifyindexfields(idxID, ln=cdslang, callback='yes', content='', confirm=-1):
+def perform_modifyindexfields(idxID, ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1):
     """Modify which logical fields to use in this index.."""
 
     output = ''
@@ -960,7 +960,7 @@ def perform_modifyindexfields(idxID, ln=cdslang, callback='yes', content='', con
     else:
         return addadminbox(subtitle, body)
 
-def perform_modifyfieldtags(fldID, ln=cdslang, callback='yes', content='', confirm=-1):
+def perform_modifyfieldtags(fldID, ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1):
     """show the sort fields of this collection.."""
 
     output = ''
@@ -1012,7 +1012,7 @@ def perform_modifyfieldtags(fldID, ln=cdslang, callback='yes', content='', confi
         return addadminbox(subtitle, body)
 
 
-def perform_addtag(fldID, ln=cdslang, value=['',-1], name='', callback="yes", confirm=-1):
+def perform_addtag(fldID, ln=CFG_SITE_LANG, value=['',-1], name='', callback="yes", confirm=-1):
     """form to add a new field.
     fldNAME - the name of the new field
     code - the field code"""
@@ -1063,7 +1063,7 @@ def perform_addtag(fldID, ln=cdslang, value=['',-1], name='', callback="yes", co
     else:
         return addadminbox(subtitle, body)
 
-def perform_modifytag(fldID, tagID, ln=cdslang, name='', value='', callback='yes', confirm=-1):
+def perform_modifytag(fldID, tagID, ln=CFG_SITE_LANG, name='', value='', callback='yes', confirm=-1):
     """form to modify a field.
     fldID - the field to change."""
 
@@ -1108,7 +1108,7 @@ def perform_modifytag(fldID, tagID, ln=cdslang, name='', value='', callback='yes
     else:
         return addadminbox(subtitle, body)
 
-def perform_removefieldtag(fldID, tagID, ln=cdslang, callback='yes', confirm=0):
+def perform_removefieldtag(fldID, tagID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
     """form to remove a tag from a field.
     fldID - the current field, remove the tag from this field.
     tagID - remove the tag with this id"""
@@ -1141,7 +1141,7 @@ def perform_removefieldtag(fldID, tagID, ln=cdslang, callback='yes', confirm=0):
     else:
         return addadminbox(subtitle, body)
 
-def perform_addindexfield(idxID, ln=cdslang, fldID='', callback="yes", confirm=-1):
+def perform_addindexfield(idxID, ln=CFG_SITE_LANG, fldID='', callback="yes", confirm=-1):
     """form to add a new field.
     fldNAME - the name of the new field
     code - the field code"""
@@ -1180,7 +1180,7 @@ def perform_addindexfield(idxID, ln=cdslang, fldID='', callback="yes", confirm=-
     else:
         return addadminbox(subtitle, body)
 
-def perform_removeindexfield(idxID, fldID, ln=cdslang, callback='yes', confirm=0):
+def perform_removeindexfield(idxID, fldID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
     """form to remove a field from an index.
     idxID - the current index, remove the field from this index.
     fldID - remove the field with this id"""
@@ -1212,7 +1212,7 @@ def perform_removeindexfield(idxID, fldID, ln=cdslang, callback='yes', confirm=0
     else:
         return addadminbox(subtitle, body)
 
-def perform_switchtagscore(fldID, id_1, id_2, ln=cdslang):
+def perform_switchtagscore(fldID, id_1, id_2, ln=CFG_SITE_LANG):
     """Switch the score of id_1 and id_2 in the table type.
     colID - the current collection
     id_1/id_2 - the id's to change the score for.
@@ -1225,7 +1225,7 @@ def perform_switchtagscore(fldID, id_1, id_2, ln=cdslang):
     output += write_outcome(res)
     return perform_modifyfieldtags(fldID, ln, content=output)
 
-def perform_deletetag(fldID, ln=cdslang, tagID=-1, callback='yes', confirm=-1):
+def perform_deletetag(fldID, ln=CFG_SITE_LANG, tagID=-1, callback='yes', confirm=-1):
     """form to delete an MARC tag not in use.
     fldID - the collection id of the current collection.
     fmtID - the format id to delete."""
@@ -1522,7 +1522,7 @@ def add_idx(idxNAME):
         res = run_sql("INSERT INTO idxINDEX (id, name) VALUES (%s,%s)", (idxID, idxNAME))
         type = get_idx_nametypes()[0][0]
         res = run_sql("INSERT INTO idxINDEXNAME (id_idxINDEX, ln, type, value) VALUES (%s,%s,%s,%s)",
-                      (idxID, cdslang, type, idxNAME))
+                      (idxID, CFG_SITE_LANG, type, idxNAME))
 
         res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%sF (
                          id mediumint(9) unsigned NOT NULL auto_increment,
@@ -1577,7 +1577,7 @@ def add_fld(name, code):
         type = get_fld_nametypes()[0][0]
         res = run_sql("INSERT INTO field (name, code) VALUES (%s,%s)", (name, code))
         fldID = run_sql("SELECT id FROM field WHERE code=%s", (code,))
-        res = run_sql("INSERT INTO fieldname (id_field, type, ln, value) VALUES (%s,%s,%s,%s)", (fldID[0][0], type, cdslang, name))
+        res = run_sql("INSERT INTO fieldname (id_field, type, ln, value) VALUES (%s,%s,%s,%s)", (fldID[0][0], type, CFG_SITE_LANG, name))
         if fldID:
             return (1, fldID[0][0])
         else:

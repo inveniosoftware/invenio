@@ -27,11 +27,11 @@ import sys
 import invenio.bibrankadminlib as brc
 #reload(brc)
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl, cdslang, CFG_SITE_NAME
+from invenio.config import weburl, CFG_SITE_LANG, CFG_SITE_NAME
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
-def index(req, ln=cdslang):
+def index(req, ln=CFG_SITE_LANG):
     navtrail_previous_links = brc.getnavtrail() # + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py">BibRank Admin Interface</a> """ % (weburl)
 
     try:
@@ -51,7 +51,7 @@ def index(req, ln=cdslang):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
+def addrankarea(req, ln=CFG_SITE_LANG, rnkcode='', template='', confirm=-1):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
 
     try:
@@ -63,7 +63,7 @@ def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
     if not auth[0]:
         return page(title="Add new rank method",
                 body=brc.perform_addrankarea(rnkcode=rnkcode,
-                                             ln=cdslang,
+                                             ln=ln,
                                              template=template,
                                              confirm=confirm),
                 uid=uid,
@@ -74,7 +74,7 @@ def addrankarea(req, ln=cdslang, rnkcode='', template='', confirm=-1):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confirm=0):
+def modifytranslations(req, rnkID='', ln=CFG_SITE_LANG, sel_type='', trans = [], confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
 
     try:
@@ -98,7 +98,7 @@ def modifytranslations(req, rnkID='', ln=cdslang, sel_type='', trans = [], confi
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
+def modifycollection(req, ln=CFG_SITE_LANG, rnkID='', func='', colID='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
 
     try:
@@ -122,7 +122,7 @@ def modifycollection(req, ln=cdslang, rnkID='', func='', colID='', confirm=0):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def deleterank(req, ln=cdslang, rnkID='', confirm=0):
+def deleterank(req, ln=CFG_SITE_LANG, rnkID='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
 
     try:
@@ -144,7 +144,7 @@ def deleterank(req, ln=cdslang, rnkID='', confirm=0):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', confirm=0):
+def modifyrank(req, ln=CFG_SITE_LANG, rnkID='', rnkcode='', template='', cfgfile='', confirm=0):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
 
     try:
@@ -169,7 +169,7 @@ def modifyrank(req, ln=cdslang, rnkID='', rnkcode='', template='', cfgfile='', c
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def showrankdetails(req, ln=cdslang, rnkID=''):
+def showrankdetails(req, ln=CFG_SITE_LANG, rnkID=''):
     navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
 
     try:
@@ -190,7 +190,7 @@ def showrankdetails(req, ln=cdslang, rnkID=''):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def error_page(req, ln=cdslang, verbose=1):
+def error_page(req, ln=CFG_SITE_LANG, verbose=1):
     return page(title="Internal Error",
                 body = create_error_box(req, verbose=verbose, ln=ln),
                 description="%s - Internal Error" % CFG_SITE_NAME,

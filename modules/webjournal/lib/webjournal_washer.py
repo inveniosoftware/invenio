@@ -27,7 +27,7 @@ from invenio.webjournal_config import InvenioWebJournalIssueNumberBadlyFormedErr
 from invenio.webjournal_utils import get_current_issue, \
                                     guess_journal_name
 
-from invenio.config import cdslang
+from invenio.config import CFG_SITE_LANG
 
 # precompiled patterns for the parameters
 issue_number_pattern = re.compile("^\d{1,2}/\d{4}$")
@@ -35,10 +35,10 @@ issue_number_pattern = re.compile("^\d{1,2}/\d{4}$")
 def wash_journal_language(language):
     """
     Washes the language parameter. If there is a language, return this,
-    otherwise return cdslang constant
+    otherwise return CFG_SITE_LANG constant
     """
     if language == "":
-        return cdslang
+        return CFG_SITE_LANG
     else:
         return language
 

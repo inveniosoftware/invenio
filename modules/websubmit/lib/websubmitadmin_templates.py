@@ -21,7 +21,7 @@
 __revision__ = "$Id$"
 
 import cgi
-from invenio.config import weburl, cdslang
+from invenio.config import weburl, CFG_SITE_LANG
 from invenio.websubmitadmin_config import WEBSUBMITADMIN_WEBURL, FUNCTIONS_WITH_FILE_PARAMS, WEBSUBMITADMIN_OLDWEBURL
 
 def create_html_table_from_tuple(tableheader=None, tablebody=None, start="", end=""):
@@ -38,7 +38,7 @@ def create_html_table_from_tuple(tableheader=None, tablebody=None, start="", end
     ## determine table cells alignment based upon first row alignment
     align = []
     try:
-        if type(tablebody[0]) in [int, long]: 
+        if type(tablebody[0]) in [int, long]:
             align = ['admintdright']
         elif type(tablebody[0]) in [str, dict]:
             align = ['admintdleft']
@@ -162,7 +162,7 @@ def create_html_select_list(select_name, option_list, selected_values="", defaul
 
 class Template:
     """CDS Invenio Template class for creating Web interface"""
-    def tmpl_navtrail(self, ln=cdslang):
+    def tmpl_navtrail(self, ln=CFG_SITE_LANG):
         """display the navtrail, e.g.:
            Home > Admin Area > WebSubmit Administration > Available WebSubmit Actions
            @param title: the last part of the navtrail. Is not a link
@@ -274,7 +274,7 @@ class Template:
                                              elfidesc="",
                                              ellabel=""):
         """Return the raw display-code for an individual element.
-           @param 
+           @param
         """
         preview = "%s" % (ellabel,)
         try:
@@ -562,7 +562,7 @@ class Template:
                               'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1),
                               'collection_id'   : cgi.escape(str(branch['collection_id']), 1),
                             }
-                
+
                 ## does this collection have a collection brother above it?
                 if branch['has_brother_above'] == 1:
                     ## Yes it does - add 'up' arrow:
@@ -605,7 +605,7 @@ class Template:
             if num_doctype_children > 0:
                 outstr += """<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>""" \
                           """<table border ="0" cellspacing="0" cellpadding="0">\n"""
-            
+
             for child_num in xrange(0, num_doctype_children):
                 outstr += """<tr>\n"""
                 ## Button to allow doctype to be detached from tree:
@@ -690,7 +690,7 @@ class Template:
          <tbody>
          <tr>
           <td><br />"""
-        
+
         body_content += _build_collection_tree_display(submission_collection_tree)
 
         body_content += """</td>
@@ -1456,7 +1456,7 @@ class Template:
                 'md'          : cgi.escape(md, 1),
                 'savebutton'  : ((saveaction == "edit" and "doctypesubmissioneditdetailscommit") or ("doctypesubmissionadddetailscommit"))
               }
-               
+
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Enter Details of '%s' Submission of '%s' Document Type:" % (action, doctype),
                                         datalist=[body_content])
@@ -1764,7 +1764,7 @@ class Template:
 
                 ## finally, append the newly created row to the tbody list:
                 categs_tablebody.append(t_row)
-                
+
             txt += create_html_table_from_tuple(tableheader=categs_tableheader, tablebody=categs_tablebody)
         except IndexError:
             ## categs tuple was not in expected format ((sname, lname), (sname, lname)[, ...])
@@ -1924,7 +1924,7 @@ class Template:
          </tr>
         </tbody>
        </table>"""
-                
+
         return txt
 
     def _tmpl_configure_doctype_overview_create_referees_view(self,
@@ -2000,7 +2000,7 @@ class Template:
         if type(add_actions_list) not in (list, tuple):
             add_actions_list = ()
 
-        output = ""        
+        output = ""
         body_content = ""
         output += self._create_user_message_string(user_msg)
         ## table containing document type details:
@@ -2021,7 +2021,7 @@ class Template:
                                                                                                         perform_act=perform_act
                                                                                                        )
                                          )
-        
+
         body_content += """<hr style="width: 80%%;" />"""
         ## table containing document type's categories:
         body_content += """<br />%s""" % (self._tmpl_configure_doctype_overview_create_categories_view(doctype=doctype,
@@ -2229,7 +2229,7 @@ class Template:
         ## sanity checking:
         if type(submissionfunctions) not in (list, tuple):
             submissionfunctions = ()
-        
+
         output = ""
         output += self._create_user_message_string(user_msg)
         body_content = """<div><br />\n"""
@@ -2418,7 +2418,7 @@ class Template:
                          'websubadmin_url' : cgi.escape(WEBSUBMITADMIN_WEBURL, 1)
                        }
 
-        
+
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="""Functions of the "%s" Submission of the "%s" Document Type:""" \
                                         % (cgi.escape(action, 1), cgi.escape(doctype, 1)), datalist=[body_content])
@@ -2594,7 +2594,7 @@ class Template:
         output = ""
         body_content = ""
         output += self._create_user_message_string(user_msg)
-        
+
         body_content += """
         <table class="admin_wvar" width="95%%">
          <thead>
@@ -2627,7 +2627,7 @@ class Template:
                       'submission'      : cgi.escape("%s%s" % (action, doctype), 1),
                       'performaction'   : cgi.escape(perform_act, 1)
                     }
-          
+
         ## field creation date:
         if cd not in ("", None):
             body_content += """
@@ -2754,7 +2754,7 @@ class Template:
         </table>
         </form>
         </div>"""
-         
+
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Preview of Page %s of Submission %s:" \
                                         % (pagenum, "%s%s" % (action, doctype)), datalist=[body_content])
@@ -2915,7 +2915,7 @@ class Template:
                 t_row += ["%s" % (cgi.escape(str(page_elements[i][7]), 1),)]
             else:
                 t_row += ["&nbsp;"]
-                
+
             ## Modification Date:
             if page_elements[i][8] not in ("", None):
                 t_row += ["%s" % (cgi.escape(str(page_elements[i][8]), 1),)]
@@ -3032,7 +3032,7 @@ class Template:
         output = ""
         body_content = ""
         output += self._create_user_message_string(user_msg)
-        
+
         body_content += """
         <table class="admin_wvar" width="95%%">
          <tbody>
@@ -3083,7 +3083,7 @@ class Template:
         output += self._create_websubmitadmin_main_menu_header()
         output += self._create_adminbox(header="Edit the [%s] parameter file:" % (paramfilename,), datalist=[body_content])
         return output
-          
+
     def tmpl_configuredoctype_edit_functionparameter_value(self,
                                                            doctype,
                                                            action,
@@ -3095,7 +3095,7 @@ class Template:
         output = ""
         body_content = ""
         output += self._create_user_message_string(user_msg)
-        
+
         body_content += """
         <table class="admin_wvar" width="95%%">
          <tbody>

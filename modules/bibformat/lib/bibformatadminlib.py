@@ -31,7 +31,7 @@ import stat
 import time
 import cgi
 
-from invenio.config import cdslang, weburl, CFG_ETCDIR
+from invenio.config import CFG_SITE_LANG, weburl, CFG_ETCDIR
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_TEMPLATES_PATH, \
      CFG_BIBFORMAT_OUTPUTS_PATH, \
@@ -47,7 +47,7 @@ from invenio import bibformat_engine
 import invenio.template
 bibformat_templates = invenio.template.load('bibformat')
 
-def getnavtrail(previous = '', ln=cdslang):
+def getnavtrail(previous = '', ln=CFG_SITE_LANG):
     """Get the navtrail"""
     previous = wash_url_argument(previous, 'str')
     ln = wash_language(ln)
@@ -57,7 +57,7 @@ def getnavtrail(previous = '', ln=cdslang):
     navtrail = navtrail + previous
     return navtrail
 
-def perform_request_index(ln=cdslang, warnings=None, is_admin=False):
+def perform_request_index(ln=CFG_SITE_LANG, warnings=None, is_admin=False):
     """
     Returns the main BibFormat admin page.
 
@@ -72,7 +72,7 @@ def perform_request_index(ln=cdslang, warnings=None, is_admin=False):
 
     return bibformat_templates.tmpl_admin_index(ln, warnings, is_admin)
 
-def perform_request_format_templates_management(ln=cdslang, checking=0):
+def perform_request_format_templates_management(ln=CFG_SITE_LANG, checking=0):
     """
     Returns the main management console for format templates
 
@@ -128,8 +128,8 @@ def perform_request_format_templates_management(ln=cdslang, checking=0):
 
     return bibformat_templates.tmpl_admin_format_templates_management(ln, sorted_format_templates)
 
-def perform_request_format_template_show(bft, ln=cdslang, code=None,
-                                         ln_for_preview=cdslang, pattern_for_preview="",
+def perform_request_format_template_show(bft, ln=CFG_SITE_LANG, code=None,
+                                         ln_for_preview=CFG_SITE_LANG, pattern_for_preview="",
                                          content_type_for_preview="text/html"):
     """
     Returns the editor for format templates.
@@ -173,7 +173,7 @@ def perform_request_format_template_show(bft, ln=cdslang, code=None,
                                                                content_type_for_preview=content_type_for_preview,
                                                                content_types=content_types)
 
-def perform_request_format_template_show_dependencies(bft, ln=cdslang):
+def perform_request_format_template_show_dependencies(bft, ln=CFG_SITE_LANG):
     """
     Show the dependencies (on elements) of the given format.
 
@@ -200,7 +200,7 @@ def perform_request_format_template_show_dependencies(bft, ln=cdslang):
                                                                             format_elements,
                                                                             tags)
 
-def perform_request_format_template_show_attributes(bft, ln=cdslang, new=False):
+def perform_request_format_template_show_attributes(bft, ln=CFG_SITE_LANG, new=False):
     """
     Page for template name and descrition attributes edition.
 
@@ -247,7 +247,7 @@ def perform_request_format_template_show_attributes(bft, ln=cdslang, new=False):
 									  new)
 
 
-def perform_request_format_template_show_short_doc(ln=cdslang, search_doc_pattern=""):
+def perform_request_format_template_show_short_doc(ln=CFG_SITE_LANG, search_doc_pattern=""):
     """
     Returns the format elements documentation to be included inside format templated editor.
 
@@ -285,7 +285,7 @@ def perform_request_format_template_show_short_doc(ln=cdslang, search_doc_patter
 
     return bibformat_templates.tmpl_admin_format_template_show_short_doc(ln, elements)
 
-def perform_request_format_elements_documentation(ln=cdslang):
+def perform_request_format_elements_documentation(ln=CFG_SITE_LANG):
     """
     Returns the main management console for format elements.
 
@@ -308,7 +308,7 @@ def perform_request_format_elements_documentation(ln=cdslang):
 
     return bibformat_templates.tmpl_admin_format_elements_documentation(ln, filtered_elements)
 
-def perform_request_format_element_show_dependencies(bfe, ln=cdslang):
+def perform_request_format_element_show_dependencies(bfe, ln=CFG_SITE_LANG):
     """
     Show the dependencies of the given format.
 
@@ -323,7 +323,7 @@ def perform_request_format_element_show_dependencies(bfe, ln=cdslang):
                                                                            format_templates,
                                                                            tags)
 
-def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, user_info=None):
+def perform_request_format_element_test(bfe, ln=CFG_SITE_LANG, param_values=None, user_info=None):
     """
     Show the dependencies of the given format.
 
@@ -397,7 +397,7 @@ def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, user
         (result, errors) = bibformat_engine.eval_format_element(format_element, bfo, params)
     else:
         result = get_msgs_for_code_list([("ERR_BIBFORMAT_NO_RECORD_FOUND_FOR_PATTERN", search_pattern)],
-                                        stream='error', ln=cdslang)[0][1]
+                                        stream='error', ln=CFG_SITE_LANG)[0][1]
 
     return bibformat_templates.tmpl_admin_format_element_test(ln,
                                                               bfe,
@@ -407,7 +407,7 @@ def perform_request_format_element_test(bfe, ln=cdslang, param_values=None, user
                                                               param_descriptions,
                                                               result)
 
-def perform_request_output_formats_management(ln=cdslang, sortby="code"):
+def perform_request_output_formats_management(ln=CFG_SITE_LANG, sortby="code"):
     """
     Returns the main management console for output formats.
 
@@ -479,7 +479,7 @@ def perform_request_output_formats_management(ln=cdslang, sortby="code"):
 
     return bibformat_templates.tmpl_admin_output_formats_management(ln, sorted_output_formats)
 
-def perform_request_output_format_show(bfo, ln=cdslang, r_fld=[], r_val=[], r_tpl=[], default="", r_upd="", args={}):
+def perform_request_output_format_show(bfo, ln=CFG_SITE_LANG, r_fld=[], r_val=[], r_tpl=[], default="", r_upd="", args={}):
     """
     Returns the editing tools for a given output format.
 
@@ -598,7 +598,7 @@ def perform_request_output_format_show(bfo, ln=cdslang, r_fld=[], r_val=[], r_tp
                                                             format_templates,
                                                             editable)
 
-def perform_request_output_format_show_dependencies(bfo, ln=cdslang):
+def perform_request_output_format_show_dependencies(bfo, ln=CFG_SITE_LANG):
     """
     Show the dependencies of the given format.
 
@@ -614,7 +614,7 @@ def perform_request_output_format_show_dependencies(bfo, ln=cdslang):
                                                                           bfo,
                                                                           format_templates)
 
-def perform_request_output_format_show_attributes(bfo, ln=cdslang):
+def perform_request_output_format_show_attributes(bfo, ln=CFG_SITE_LANG):
     """
     Page for output format names and description attributes edition.
 
@@ -647,7 +647,7 @@ def perform_request_output_format_show_attributes(bfo, ln=cdslang):
                                                                         visible)
 
 
-def perform_request_knowledge_bases_management(ln=cdslang):
+def perform_request_knowledge_bases_management(ln=CFG_SITE_LANG):
     """
     Returns the main page for knowledge bases management.
 
@@ -658,7 +658,7 @@ def perform_request_knowledge_bases_management(ln=cdslang):
 
     return bibformat_templates.tmpl_admin_kbs_management(ln, kbs)
 
-def perform_request_knowledge_base_show(kb_id, ln=cdslang, sortby="to"):
+def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to"):
     """
     Show the content of a knowledge base
 
@@ -673,7 +673,7 @@ def perform_request_knowledge_base_show(kb_id, ln=cdslang, sortby="to"):
     return bibformat_templates.tmpl_admin_kb_show(ln, kb_id, name, mappings, sortby)
 
 
-def perform_request_knowledge_base_show_attributes(kb_id, ln=cdslang, sortby="to"):
+def perform_request_knowledge_base_show_attributes(kb_id, ln=CFG_SITE_LANG, sortby="to"):
     """
     Show the attributes of a knowledge base
 
@@ -688,7 +688,7 @@ def perform_request_knowledge_base_show_attributes(kb_id, ln=cdslang, sortby="to
     return bibformat_templates.tmpl_admin_kb_show_attributes(ln, kb_id, name, description, sortby)
 
 
-def perform_request_knowledge_base_show_dependencies(kb_id, ln=cdslang, sortby="to"):
+def perform_request_knowledge_base_show_dependencies(kb_id, ln=CFG_SITE_LANG, sortby="to"):
     """
     Show the dependencies of a kb
 
@@ -1347,7 +1347,7 @@ def get_elements_that_use_kb(name):
 # Validation tools
 ##
 
-def perform_request_format_validate(ln=cdslang, bfo=None, bft=None, bfe=None):
+def perform_request_format_validate(ln=CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
     """
     Returns a page showing the status of an output format or format
     template or format element. This page is called from output
@@ -1618,4 +1618,4 @@ def perform_request_dreamweaver_floater():
 
 
 
-    return bibformat_templates.tmpl_dreamweaver_floater(cdslang, elements)
+    return bibformat_templates.tmpl_dreamweaver_floater(CFG_SITE_LANG, elements)

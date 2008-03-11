@@ -27,7 +27,7 @@ from time import localtime
 from zlib import decompress
 
 from invenio.config import \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_VERSION
 from invenio.dbquery import run_sql
 from invenio.dateutils import convert_datestruct_to_datetext
@@ -298,7 +298,7 @@ def get_user_status(uid, grpID):
     return res
 
 
-def get_users_by_status(grpID, status, ln=cdslang):
+def get_users_by_status(grpID, status, ln=CFG_SITE_LANG):
     """Get the list of users with the given status.
     @return ((id, nickname),) nickname= user # uid if
     the user has no nickname

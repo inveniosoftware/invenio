@@ -36,7 +36,7 @@ from urllib import quote
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      images, \
      CFG_WEBSUBMIT_STORAGEDIR, \
@@ -224,7 +224,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
             ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
             link_ln = ''
-            if ln != cdslang:
+            if ln != CFG_SITE_LANG:
                 link_ln = '?ln=%s' % ln
             tabs = [(unordered_tabs[tab_id]['label'], \
                      '%s/record/%s/%s%s' % (weburl, self.recid, tab_id, link_ln), \
@@ -263,7 +263,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
         args = wash_urlargd(form, websubmit_templates.files_default_urlargd)
         ln = args['ln']
         link_ln = ''
-        if ln != cdslang:
+        if ln != CFG_SITE_LANG:
             link_ln = '?ln=%s' % ln
 
         return redirect_to_url(req, '%s/record/%s/files/%s' % (weburl, self.recid, link_ln))
@@ -283,7 +283,7 @@ def websubmit_legacy_getfile(req, form):
         'format': (str, '')
         })
 
-    def _getfile_py(req,c=CFG_SITE_NAME,ln=cdslang,recid="",docid="",version="",name="",format=""):
+    def _getfile_py(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,recid="",docid="",version="",name="",format=""):
         _ = gettext_set_language(ln)
 
         # get user ID:
@@ -534,7 +534,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
     # Answer to both /submit/ and /submit
     __call__ = index
 
-def errorMsg(title, req, c=CFG_SITE_NAME, ln=cdslang):
+def errorMsg(title, req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -547,7 +547,7 @@ def errorMsg(title, req, c=CFG_SITE_NAME, ln=cdslang):
                 req=req,
                 navmenuid='submit')
 
-def warningMsg(title, req, c=CFG_SITE_NAME, ln=cdslang):
+def warningMsg(title, req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     # load the right message language
     _ = gettext_set_language(ln)
 

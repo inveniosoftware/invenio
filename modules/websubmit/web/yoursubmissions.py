@@ -31,7 +31,7 @@ import operator
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      images, \
      CFG_WEBSUBMIT_STORAGEDIR, \
@@ -50,7 +50,7 @@ from invenio.search_engine import search_pattern
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 
-def index(req,c=CFG_SITE_NAME,ln=cdslang,order="",doctype="",deletedId="",deletedAction="",deletedDoctype=""):
+def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",deletedAction="",deletedDoctype=""):
     global uid
     ln = wash_language(ln)
 
@@ -196,7 +196,7 @@ def deleteSubmission(id, action, doctype, u_email):
             shutil.rmtree(full)
     return ""
 
-def warningMsg(title,req,c=CFG_SITE_NAME,ln=cdslang):
+def warningMsg(title,req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
     return page(title="warning",
                 body = title,
                 description="%s - Internal Error" % c,
@@ -206,7 +206,7 @@ def warningMsg(title,req,c=CFG_SITE_NAME,ln=cdslang):
                 req=req,
                 navmenuid='yoursubmissions')
 
-def errorMsg(title,req,c=CFG_SITE_NAME,ln=cdslang):
+def errorMsg(title,req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
     return page(title="error",
                 body = create_error_box(req, title=title,verbose=0, ln=ln),
                 description="%s - Internal Error" % c,

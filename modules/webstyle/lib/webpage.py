@@ -26,7 +26,7 @@ from invenio.config import \
      CFG_WEBSTYLE_CDSPAGEBOXLEFTTOP, \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM, \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP, \
-     cdslang, \
+     CFG_SITE_LANG, \
      supportemail, \
      weburl
 from invenio.messages import gettext_set_language
@@ -43,7 +43,7 @@ def create_navtrailbox_body(title,
                             prolog="",
                             separator=""" &gt; """,
                             epilog="",
-                            language=cdslang):
+                            language=CFG_SITE_LANG):
     """Create navigation trail box body
        input: title = page title;
               previous_links = the trail content from site title until current page (both ends exlusive).
@@ -62,7 +62,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
          cdspageheaderadd="", cdspageboxlefttopadd="",
          cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
          cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
-         language=cdslang, verbose=1, titleprologue="",
+         language=CFG_SITE_LANG, verbose=1, titleprologue="",
          titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], navmenuid="admin",
          navtrail_append_title_p=1, of="", rssurl=weburl+"/rss"):
 
@@ -171,7 +171,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
 
 
 def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
-                   cdspageheaderadd="", language=cdslang, req=None,
+                   cdspageheaderadd="", language=CFG_SITE_LANG, req=None,
                    secure_page_p=0, verbose=1, navmenuid="admin",
                    navtrail_append_title_p=1, metaheaderadd="",
                    rssurl=weburl+"/rss"):
@@ -196,7 +196,7 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
                       rssurl = rssurl)
 
 def pagefooteronly(cdspagefooteradd="", lastupdated="",
-                   language=cdslang, req=None, verbose=1):
+                   language=CFG_SITE_LANG, req=None, verbose=1):
     """Return just the ending of page(), with full footer.
        Suitable for the search results page and any long-taking scripts."""
 
@@ -205,7 +205,7 @@ def pagefooteronly(cdspagefooteradd="", lastupdated="",
                                               lastupdated = lastupdated,
                                               pagefooteradd = cdspagefooteradd)
 
-def create_error_box(req, title=None, verbose=1, ln=cdslang, errors=None):
+def create_error_box(req, title=None, verbose=1, ln=CFG_SITE_LANG, errors=None):
     """Analyse the req object and the sys traceback and return a text
        message box with internal information that would be suitful to
        display when something bad has happened.

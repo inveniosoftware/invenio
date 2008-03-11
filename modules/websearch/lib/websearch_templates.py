@@ -40,7 +40,7 @@ from invenio.config import \
      CFG_BIBRANK_SHOW_CITATION_STATS, \
      CFG_BIBRANK_SHOW_CITATION_GRAPHS, \
      CFG_WEBSEARCH_RSS_TTL, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
      CFG_VERSION, \
@@ -566,7 +566,7 @@ class Template:
         </table>
         <!--/create_searchfor_simple()-->
         ''' % {'ln' : ln,
-               'langlink': ln != cdslang and '?ln=' + ln or '',
+               'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
                'weburl' : weburl,
                'asearch' : create_html_link(asearchurl, {}, _('Advanced Search')),
                'header' : header,
@@ -683,7 +683,7 @@ class Template:
         </table>
         <!-- @todo - more imports -->
         ''' % {'ln' : ln,
-               'langlink': ln != cdslang and '?ln=' + ln or '',
+               'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
                'weburl' : weburl,
                'ssearch' : create_html_link(ssearchurl, {}, _("Simple Search")),
                'header' : header,
@@ -915,7 +915,7 @@ class Template:
         box += """</select>"""
         return box
 
-    def tmpl_inputdatetype(self, dt='', ln=cdslang):
+    def tmpl_inputdatetype(self, dt='', ln=CFG_SITE_LANG):
         """
           Produces input date type selection box to choose
           added-or-modified date search option.
@@ -1066,7 +1066,7 @@ class Template:
         html += """</tbody></table></td></tr></table>"""
         return html
 
-    def tmpl_nbrecs_info(self, number, prolog=None, epilog=None, ln=cdslang):
+    def tmpl_nbrecs_info(self, number, prolog=None, epilog=None, ln=CFG_SITE_LANG):
         """
         Return information on the number of records.
 
@@ -1676,7 +1676,7 @@ class Template:
               'browse' : _("Browse"),
               'weburl' : weburl,
               'ln' : ln,
-              'langlink': ln != cdslang and '?ln=' + ln or '',
+              'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
               'search_tips': _("Search Tips")
             }
         else:
@@ -1733,7 +1733,7 @@ class Template:
               'browse' : _("Browse"),
               'weburl' : weburl,
               'ln' : ln,
-              'langlink': ln != cdslang and '?ln=' + ln or '',
+              'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
               'search_tips': _("Search Tips")
             }
 
@@ -2120,7 +2120,7 @@ class Template:
         out += "</form>"
         return out
 
-    def tmpl_nice_number(self, number, ln=cdslang, thousands_separator=',', max_ndigits_after_dot=None):
+    def tmpl_nice_number(self, number, ln=CFG_SITE_LANG, thousands_separator=',', max_ndigits_after_dot=None):
         """
         Return nicely printed number NUMBER in language LN using
         given THOUSANDS_SEPARATOR character.
@@ -2147,7 +2147,7 @@ class Template:
             chars_out.reverse()
             return ''.join(chars_out)
 
-    def tmpl_nice_number_via_locale(self, number, ln=cdslang):
+    def tmpl_nice_number_via_locale(self, number, ln=CFG_SITE_LANG):
         """
         Return nicely printed number NUM in language LN using the locale.
         See also version tmpl_nice_number().
@@ -2477,7 +2477,7 @@ class Template:
         out += "<br /><br />"
         return out
 
-    def tmpl_print_record_list_for_similarity_boxen(self, title, recID_score_list, ln=cdslang):
+    def tmpl_print_record_list_for_similarity_boxen(self, title, recID_score_list, ln=CFG_SITE_LANG):
         """Print list of records in the "hs" (HTML Similarity) format for similarity boxes.
            RECID_SCORE_LIST is a list of (recID1, score1), (recID2, score2), etc.
         """
@@ -2617,7 +2617,7 @@ class Template:
         <title>%(sitename)s</title>
         <link>%(weburl)s</link>
         <description>%(sitename)s latest documents</description>
-        <language>%(cdslang)s</language>
+        <language>%(sitelang)s</language>
         <pubDate>%(timestamp)s</pubDate>
         <category></category>
         <generator>CDS Invenio %(version)s</generator>
@@ -2636,7 +2636,7 @@ class Template:
         </textInput>
         """ % {'sitename': CFG_SITE_NAME,
                'weburl': weburl,
-               'cdslang': cdslang,
+               'sitelang': CFG_SITE_LANG,
                'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()),
                'version': CFG_VERSION,
                'supportemail': supportemail,
@@ -2682,7 +2682,7 @@ class Template:
         return out
 
 
-    def tmpl_collection_not_found_page_title(self, colname, ln=cdslang):
+    def tmpl_collection_not_found_page_title(self, colname, ln=CFG_SITE_LANG):
         """
         Create page title for cases when unexisting collection was asked for.
         """
@@ -2690,7 +2690,7 @@ class Template:
         out = _("Collection %s Not Found") % cgi.escape(colname)
         return out
 
-    def tmpl_collection_not_found_page_body(self, colname, ln=cdslang):
+    def tmpl_collection_not_found_page_body(self, colname, ln=CFG_SITE_LANG):
         """
         Create page body for cases when unexisting collection was asked for.
         """

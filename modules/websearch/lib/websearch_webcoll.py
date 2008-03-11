@@ -36,7 +36,7 @@ from invenio.config import \
      CFG_WEBSEARCH_NARROW_SEARCH_SHOW_GRANDSONS, \
      CFG_WEBSEARCH_I18N_LATEST_ADDITIONS, \
      CFG_CACHEDIR, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      weburl
 from invenio.messages import gettext_set_language, language_list_long
@@ -157,7 +157,7 @@ class Collection:
                 print "Error %d: %s" % (e.args[0], e.args[1])
                 sys.exit(1)
 
-    def get_name(self, ln=cdslang, name_type="ln", prolog="", epilog="", prolog_suffix=" ", epilog_suffix=""):
+    def get_name(self, ln=CFG_SITE_LANG, name_type="ln", prolog="", epilog="", prolog_suffix=" ", epilog_suffix=""):
         """Return nicely formatted collection name for language LN.
         The NAME_TYPE may be 'ln' (=long name), 'sn' (=short name), etc."""
         out = prolog
@@ -299,7 +299,7 @@ class Collection:
                                                                     ln=lang))
         return
 
-    def create_navtrail_links(self, as=0, ln=cdslang):
+    def create_navtrail_links(self, as=0, ln=CFG_SITE_LANG):
         """Creates navigation trail links, i.e. links to collection
         ancestors (except Home collection).  If as==1, then links to
         Advanced Search interfaces; otherwise Simple Search.
@@ -314,8 +314,8 @@ class Collection:
             as=as, ln=ln, dads=dads)
 
 
-    def create_portalbox(self, lang=cdslang, position="rt"):
-        """Creates portalboxes of language CDSLANG of the position POSITION by consulting DB configuration database.
+    def create_portalbox(self, lang=CFG_SITE_LANG, position="rt"):
+        """Creates portalboxes of language CFG_SITE_LANG of the position POSITION by consulting DB configuration database.
            The position may be: 'lt'='left top', 'rt'='right top', etc."""
         out = ""
         query = "SELECT p.title,p.body FROM portalbox AS p, collection_portalbox AS cp "\
@@ -332,7 +332,7 @@ class Collection:
                 out += body
         return out
 
-    def create_narrowsearch(self, as=0, ln=cdslang, type="r"):
+    def create_narrowsearch(self, as=0, ln=CFG_SITE_LANG, type="r"):
         """Creates list of collection descendants of type 'type' under title 'title'.
         If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
         Suitable for 'Narrow search' and 'Focus on' boxes."""
@@ -364,7 +364,7 @@ class Collection:
                  grandsons = grandsons
                )
 
-    def create_external_collections_box(self, ln=cdslang):
+    def create_external_collections_box(self, ln=CFG_SITE_LANG):
         external_collection_load_states()
         if not dico_collection_external_searches.has_key(self.id):
             return ""
@@ -373,7 +373,7 @@ class Collection:
 
         return websearch_templates.tmpl_searchalso(ln, engines_list, self.id)
 
-    def create_latest_additions_info(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, ln=cdslang):
+    def create_latest_additions_info(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, ln=CFG_SITE_LANG):
         """
         Create info about latest additions that will be used for
         create_instant_browse() later.
@@ -400,7 +400,7 @@ class Collection:
                                                    'date': get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")})
         return
 
-    def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, as=0, ln=cdslang):
+    def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, as=0, ln=CFG_SITE_LANG):
         "Searches database and produces list of last 'rg' records."
 
         if self.restricted_p():
@@ -465,7 +465,7 @@ class Collection:
                                 )
         return box
 
-    def create_sortoptions(self, ln=cdslang):
+    def create_sortoptions(self, ln=CFG_SITE_LANG):
         """Produces 'Sort options' portal box."""
 
 
@@ -500,7 +500,7 @@ class Collection:
                    )
         return box
 
-    def create_rankoptions(self, ln=cdslang):
+    def create_rankoptions(self, ln=CFG_SITE_LANG):
         "Produces 'Rank options' portal box."
 
         # load the right message language
@@ -516,7 +516,7 @@ class Collection:
                   )
         return box
 
-    def create_displayoptions(self, ln=cdslang):
+    def create_displayoptions(self, ln=CFG_SITE_LANG):
         "Produces 'Display options' portal box."
 
         # load the right message language
@@ -543,7 +543,7 @@ class Collection:
                        )
         return box
 
-    def create_formatoptions(self, ln=cdslang):
+    def create_formatoptions(self, ln=CFG_SITE_LANG):
         "Produces 'Output format options' portal box."
 
         # load the right message language
@@ -599,14 +599,14 @@ class Collection:
         out = "$collSearchExamples = getSearchExample(%d, $se);" % self.id
         return out
 
-    def create_searchfor(self, as=0, ln=cdslang):
+    def create_searchfor(self, as=0, ln=CFG_SITE_LANG):
         "Produces either Simple or Advanced 'Search for' box for the current collection."
         if as == 1:
             return self.create_searchfor_advanced(ln)
         else:
             return self.create_searchfor_simple(ln)
 
-    def create_searchfor_simple(self, ln=cdslang):
+    def create_searchfor_simple(self, ln=CFG_SITE_LANG):
         "Produces simple 'Search for' box for the current collection."
 
         return websearch_templates.tmpl_searchfor_simple(
@@ -617,7 +617,7 @@ class Collection:
           middle_option = self.create_searchwithin_selection_box(ln=ln),
         )
 
-    def create_searchfor_advanced(self, ln=cdslang):
+    def create_searchfor_advanced(self, ln=CFG_SITE_LANG):
         "Produces advanced 'Search for' box for the current collection."
 
         return websearch_templates.tmpl_searchfor_advanced(

@@ -28,7 +28,7 @@ from time import strftime, localtime
 from invenio.websubmitadmin_dblayer import *
 from invenio.websubmitadmin_config import *
 from invenio.access_control_admin import acc_get_all_roles, acc_get_role_users, acc_delete_user_role
-from invenio.config import cdslang, CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
+from invenio.config import CFG_SITE_LANG, CFG_WEBSUBMIT_BIBCONVERTCONFIGDIR
 from invenio.access_control_engine import acc_authorize_action
 import invenio.template
 
@@ -50,7 +50,7 @@ def check_user(req, role, adminarea=2, authorized=0):
         return ("false", auth_message)
     return ("", auth_message)
 
-def get_navtrail(ln=cdslang):
+def get_navtrail(ln=CFG_SITE_LANG):
     """gets the navtrail for title...
        @param title: title of the page
        @param ln: language

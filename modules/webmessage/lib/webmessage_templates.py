@@ -36,14 +36,14 @@ from invenio.dateutils import convert_datetext_to_dategui, \
                               create_year_selectbox
 from invenio.urlutils import create_html_link, create_url
 from invenio.htmlutils import escape_html
-from invenio.config import weburl, cdslang
+from invenio.config import weburl, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webuser import get_user_info
 
 class Template:
     """Templates for WebMessage module"""
 
-    def tmpl_display_inbox(self, messages, infos=[], warnings=[], nb_messages=0, no_quota=0, ln=cdslang):
+    def tmpl_display_inbox(self, messages, infos=[], warnings=[], nb_messages=0, no_quota=0, ln=CFG_SITE_LANG):
         """
         Displays a list of messages, with the appropriate links and buttons
         @param messages: a list of tuples:
@@ -157,7 +157,7 @@ class Template:
                    search_results_list=[],
                    search_pattern="",
                    results_field=CFG_WEBMESSAGE_RESULTS_FIELD['NONE'],
-                   ln=cdslang):
+                   ln=CFG_SITE_LANG):
         """
         Displays a writing message form with optional prefilled fields
         @param msg_to: nick of the user (prefills the To: field)
@@ -298,7 +298,7 @@ class Template:
                          msg_body="",
                          msg_sent_date="",
                          msg_received_date=datetext_default,
-                         ln=cdslang):
+                         ln=CFG_SITE_LANG):
         """
         Displays a given message
         @param msg_id: id of the message
@@ -453,7 +453,7 @@ class Template:
                      'reply_but_label':_("REPLY"),
                      'delete_but_label': _("DELETE")}
 
-    def tmpl_navtrail(self, ln=cdslang, title=""):
+    def tmpl_navtrail(self, ln=CFG_SITE_LANG, title=""):
         """
         display the navtrail, e.g.:
         Your account > Your messages > title
@@ -475,7 +475,7 @@ class Template:
             return nav_h1 + ' &gt; ' + nav_h2
         return nav_h1
 
-    def tmpl_confirm_delete(self, ln=cdslang):
+    def tmpl_confirm_delete(self, ln=CFG_SITE_LANG):
         """
         display a confirm message
         @param ln: language
@@ -510,7 +510,7 @@ class Template:
               'no_label': _("No")}
         return out
 
-    def tmpl_infobox(self, infos, ln=cdslang):
+    def tmpl_infobox(self, infos, ln=CFG_SITE_LANG):
         """Display len(infos) information fields
         @param infos: list of strings
         @param ln=language
@@ -529,7 +529,7 @@ class Template:
         return infobox
 
 
-    def tmpl_warning(self, warnings, ln=cdslang):
+    def tmpl_warning(self, warnings, ln=CFG_SITE_LANG):
         """
         Display len(warnings) warning fields
         @param infos: list of strings
@@ -552,7 +552,7 @@ class Template:
         return warningbox
 
 
-    def tmpl_quota(self, nb_messages=0, ln=cdslang):
+    def tmpl_quota(self, nb_messages=0, ln=CFG_SITE_LANG):
         """
         Display a quota bar.
         @nb_messages: number of messages in inbox.
@@ -574,7 +574,7 @@ class Template:
         return out
 
 
-    def tmpl_multiple_select(self, select_name, tuples_list, ln=cdslang):
+    def tmpl_multiple_select(self, select_name, tuples_list, ln=CFG_SITE_LANG):
         """displays a multiple select environment
         @param tuples_list: a list of (value, isSelected) tuples
         @return HTML output
@@ -598,7 +598,7 @@ class Template:
                                   tuples_list=[],
                                   search_pattern="",
                                   results_field=CFG_WEBMESSAGE_RESULTS_FIELD['NONE'],
-                                  ln=cdslang):
+                                  ln=CFG_SITE_LANG):
         """
         Display a box for user searching
         @param tuples_list: list of (value, is_selected) tuples
@@ -668,7 +668,7 @@ class Template:
                      'add_button'         : add_button}
         return out
 
-    def tmpl_account_new_mail(self, nb_new_mail=0, total_mail=0, ln=cdslang):
+    def tmpl_account_new_mail(self, nb_new_mail=0, total_mail=0, ln=CFG_SITE_LANG):
         """
         display infos about inbox (used by myaccount.py)
         @param nb_new_mail: number of new mails

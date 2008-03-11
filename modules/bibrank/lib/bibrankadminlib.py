@@ -34,7 +34,7 @@ except ImportError:
     pass
 
 from invenio.config import \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_ETCDIR, \
      CFG_VERSION, \
      weburl
@@ -59,7 +59,7 @@ def is_adminuser(req, role):
     """check if user is a registered administrator. """
     return acce.acc_authorize_action(req, role)
 
-def perform_index(ln=cdslang):
+def perform_index(ln=CFG_SITE_LANG):
     """create the bibrank main area menu page."""
 
     header = ['Code', 'Translations', 'Collections', 'Rank method']
@@ -85,7 +85,7 @@ def perform_index(ln=cdslang):
     output += tupletotable(header=header, tuple=actions)
     return addadminbox("""Overview of rank methods&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mi">?</a>]</small>""" % weburl, datalist=[output, ''])
 
-def perform_modifycollection(rnkID='', ln=cdslang, func='', colID='', confirm=0):
+def perform_modifycollection(rnkID='', ln=CFG_SITE_LANG, func='', colID='', confirm=0):
     """Modify which collections the rank method is visible to"""
 
     output = ""
@@ -190,11 +190,11 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
 
     output = ''
     subtitle = ''
-    cdslangs = get_languages()
-    cdslangs.sort()
+    langs = get_languages()
+    langs.sort()
 
     if confirm in ["2", 2] and rnkID:
-        finresult = modify_translations(rnkID, cdslangs, sel_type, trans, "rnkMETHOD")
+        finresult = modify_translations(rnkID, langs, sel_type, trans, "rnkMETHOD")
 
     rnk_name = get_def_name(rnkID, "rnkMETHOD")[0][1]
     rnk_dict = dict(get_i8n_name('', ln, get_rnk_nametypes()[0][0], "rnkMETHOD"))
@@ -235,15 +235,15 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
 
         if confirm in [-1, "-1", 0, "0"]:
             trans = []
-            for key, value in cdslangs:
+            for key, value in langs:
                 try:
                     trans_names = get_name(rnkID, key, sel_type, "rnkMETHOD")
                     trans.append(trans_names[0][0])
                 except StandardError, e:
                     trans.append('')
 
-        for nr in range(0,len(cdslangs)):
-            actions.append(["%s %s" % (cdslangs[nr][1], (cdslangs[nr][0]==cdslang and '<small>(def)</small>' or ''))])
+        for nr in range(0,len(langs)):
+            actions.append(["%s %s" % (langs[nr][1], (langs[nr][0]==CFG_SITE_LANG and '<small>(def)</small>' or ''))])
             actions[-1].append('<input type="text" name="trans" size="30" value="%s"/>' % trans[nr])
 
         text = tupletotable(header=header, tuple=actions)
@@ -262,7 +262,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
 
     return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mt">?</a>]</small>""" % weburl, body)
 
-def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
+def perform_addrankarea(rnkcode='', ln=CFG_SITE_LANG, template='', confirm=-1):
     """form to add a new rank method with these values:"""
 
     subtitle = 'Step 1 - Create new rank method'
@@ -344,7 +344,7 @@ def perform_addrankarea(rnkcode='', ln=cdslang, template='', confirm=-1):
 
     return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#ar">?</a>]</small>""" % weburl, body)
 
-def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', confirm=0):
+def perform_modifyrank(rnkID, rnkcode='', ln=CFG_SITE_LANG, template='', cfgfile='', confirm=0):
     """form to modify a rank method
 
     rnkID - id of the rank method
@@ -460,7 +460,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=cdslang, template='', cfgfile='', c
     finoutput += addadminbox("View templates", [output])
     return finoutput
 
-def perform_deleterank(rnkID, ln=cdslang, confirm=0):
+def perform_deleterank(rnkID, ln=CFG_SITE_LANG, confirm=0):
     """form to delete a rank method
     """
     subtitle =''
@@ -516,7 +516,7 @@ def perform_deleterank(rnkID, ln=cdslang, confirm=0):
     return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#dr">?</a>]</small>""" % weburl, body)
 
 
-def perform_showrankdetails(rnkID, ln=cdslang):
+def perform_showrankdetails(rnkID, ln=CFG_SITE_LANG):
     """Returns details about the rank method given by rnkID"""
 
     if not rnkID:
@@ -636,7 +636,7 @@ def get_col_nametypes():
     type.append(('ln', 'Long name'))
     return type
 
-def get_rnk_col(rnkID, ln=cdslang):
+def get_rnk_col(rnkID, ln=CFG_SITE_LANG):
     """ Returns a list of the collections the given rank method is attached to
     rnkID - id from rnkMETHOD"""
 
@@ -957,11 +957,11 @@ def get_i8n_name(ID, ln, rtype, table):
             res = run_sql("SELECT id_%s,value FROM %s%s where type='%s' and ln='%s' and id_%s=%s" % (table, table, name, rtype,ln, table, ID))
         else:
             res = run_sql("SELECT id_%s,value FROM %s%s where type='%s' and ln='%s'" % (table, table, name,  rtype,ln))
-        if ln != cdslang:
+        if ln != CFG_SITE_LANG:
             if ID:
-                res1 = run_sql("SELECT id_%s,value FROM %s%s WHERE ln='%s' and type='%s' and id_%s=%s"  % (table, table, name, cdslang, rtype, table, ID))
+                res1 = run_sql("SELECT id_%s,value FROM %s%s WHERE ln='%s' and type='%s' and id_%s=%s"  % (table, table, name, CFG_SITE_LANG, rtype, table, ID))
             else:
-                res1 = run_sql("SELECT id_%s,value FROM %s%s WHERE ln='%s' and type='%s'"  % (table, table, name, cdslang, rtype))
+                res1 = run_sql("SELECT id_%s,value FROM %s%s WHERE ln='%s' and type='%s'"  % (table, table, name, CFG_SITE_LANG, rtype))
             res2 = dict(res)
             result = filter(lambda x: not res2.has_key(x[0]), res1)
             res = res + result

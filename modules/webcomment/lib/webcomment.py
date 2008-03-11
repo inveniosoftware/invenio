@@ -29,7 +29,7 @@ import math
 # CDS Invenio imports:
 
 from invenio.dbquery import run_sql
-from invenio.config import cdslang, \
+from invenio.config import CFG_SITE_LANG, \
                            CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
                            adminemail,\
                            weburl,\
@@ -59,7 +59,7 @@ except:
     pass
 
 
-def perform_request_display_comments_or_remarks(recID, ln=cdslang, display_order='od', display_since='all', nb_per_page=100, page=1, voted=-1, reported=-1, reviews=0, uid=-1):
+def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display_order='od', display_since='all', nb_per_page=100, page=1, voted=-1, reported=-1, reviews=0, uid=-1):
     """
     Returns all the comments (reviews) of a specific internal record or external basket record.
     @param recID:  record id where (internal record IDs > 0) or (external basket record IDs < -100)
@@ -667,7 +667,7 @@ def count_reviews(recID):
     return run_sql(query % recID)[0][0]
 
 def get_first_comments_or_remarks(recID=-1,
-                                  ln=cdslang,
+                                  ln=CFG_SITE_LANG,
                                   nb_comments='all',
                                   nb_reviews='all',
                                   voted=-1,
@@ -765,7 +765,7 @@ def calculate_avg_score(res):
 def perform_request_add_comment_or_remark(recID=0,
                                           uid=-1,
                                           action='DISPLAY',
-                                          ln=cdslang,
+                                          ln=CFG_SITE_LANG,
                                           msg=None,
                                           score=None,
                                           note=None,
@@ -958,7 +958,7 @@ To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?co
 
     send_email(from_addr, to_addr, subject, out)
 
-def check_recID_is_in_range(recID, warnings=[], ln=cdslang):
+def check_recID_is_in_range(recID, warnings=[], ln=CFG_SITE_LANG):
     """
     Check that recID is >= 0
     Append error messages to errors listi
@@ -1030,7 +1030,7 @@ def check_int_arg_is_in_range(value, name, errors, gte_value, lte_value=None):
     return 1
 
 
-def get_mini_reviews(recid, ln=cdslang):
+def get_mini_reviews(recid, ln=CFG_SITE_LANG):
     """
     Returns the web controls to add reviews to a record from the
     detailed record pages mini-panel.

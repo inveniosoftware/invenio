@@ -32,7 +32,7 @@ import traceback
 import copy
 
 from invenio.config import \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_ETCDIR, \
      CFG_VERSION
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
@@ -145,7 +145,7 @@ def is_method_valid(colID, rank_method_code):
                 colID = colID[0][0]
     return 0
 
-def get_bibrank_methods(collection, ln=cdslang):
+def get_bibrank_methods(collection, ln=CFG_SITE_LANG):
     """Returns a list of rank methods and the name om them in the language defined by the ln parameter, if collection is given, only methods enabled for that collection is returned."""
 
     if not globals().has_key('methods'):
@@ -156,8 +156,8 @@ def get_bibrank_methods(collection, ln=cdslang):
         if options.has_key("function") and is_method_valid(collection, rank_method_code):
             if options.has_key(ln):
                 avail_methods.append((rank_method_code, options[ln]))
-            elif options.has_key(cdslang):
-                avail_methods.append((rank_method_code, options[cdslang]))
+            elif options.has_key(CFG_SITE_LANG):
+                avail_methods.append((rank_method_code, options[CFG_SITE_LANG]))
             else:
                 avail_methods.append((rank_method_code, rank_method_code))
     return avail_methods

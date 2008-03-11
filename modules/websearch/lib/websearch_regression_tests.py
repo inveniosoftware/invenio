@@ -32,7 +32,7 @@ from sets import Set
 
 from mechanize import Browser, LinkNotFoundError, HTTPError
 
-from invenio.config import weburl, CFG_SITE_NAME, cdslang
+from invenio.config import weburl, CFG_SITE_NAME, CFG_SITE_LANG
 from invenio.testutils import make_test_suite, \
                               warn_user_about_tests_and_run, \
                               make_url, test_web_page_content, \
@@ -158,11 +158,11 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
 
         # Drop unnecessary arguments, like ln and as (when they are
         # the default value)
-        check(make_url('/', c='Poetry', as=0, ln=cdslang),
+        check(make_url('/', c='Poetry', as=0, ln=CFG_SITE_LANG),
               make_url('/collection/Poetry'))
 
         # Otherwise, keep them
-        check(make_url('/', c='Poetry', as=1, ln=cdslang),
+        check(make_url('/', c='Poetry', as=1, ln=CFG_SITE_LANG),
               make_url('/collection/Poetry', as=1))
 
         # Support the /index.py addressing too

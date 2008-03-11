@@ -47,8 +47,8 @@ If you are installing CDS Invenio and you want to enable/disable some
 languages, please just follow the standard installation procedure as
 described in the INSTALL file.  The default language of the
 installation as well as the list of all user-seen languages can be
-selected in the general invenio.conf file, see variables CDSLANG and
-CDSLANGS.
+selected in the general invenio.conf file, see variables CFG_SITE_LANG
+and CFG_SITE_LANGS.
 
 (Please note that some runtime CDS Invenio daemons -- such as webcoll,
 responsible for updating the collection cache, running every hour or
@@ -132,7 +132,7 @@ the _() convention:
 
    from messages import gettext_set_language
    [...]
-   def square(x, ln=cdslang):
+   def square(x, ln=CFG_SITE_LANG):
        _ = gettext_set_language(ln)
        print _("Hello there!")
        print _("The square of %s is %s.") % (x, x*x)

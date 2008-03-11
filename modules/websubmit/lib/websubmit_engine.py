@@ -38,7 +38,7 @@ except ImportError:
 
 from invenio.config import \
      CFG_BINDIR, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      images, \
      CFG_PYLIBDIR, \
@@ -90,7 +90,7 @@ websubmit_templates = invenio.template.load('websubmit')
 
 def interface(req,
               c=CFG_SITE_NAME,
-              ln=cdslang,
+              ln=CFG_SITE_LANG,
               doctype="",
               act="",
               startPg=1,
@@ -128,7 +128,7 @@ def interface(req,
         found on the previous submission page.
        @param c: (string), defaulted to CFG_SITE_NAME. The name of the CDS Invenio
         installation.
-       @param ln: (string), defaulted to cdslang. The language in which to
+       @param ln: (string), defaulted to CFG_SITE_LANG. The language in which to
         display the pages.
        @param doctype: (string) - the doctype ID of the doctype for which the
         submission is being made.
@@ -619,7 +619,7 @@ def interface(req,
 
 def endaction(req,
               c=CFG_SITE_NAME,
-              ln=cdslang,
+              ln=CFG_SITE_LANG,
               doctype="",
               act="",
               startPg=1,
@@ -658,7 +658,7 @@ def endaction(req,
         found on the previous submission page.
        @param c: (string), defaulted to CFG_SITE_NAME. The name of the CDS Invenio
         installation.
-       @param ln: (string), defaulted to cdslang. The language in which to
+       @param ln: (string), defaulted to CFG_SITE_LANG. The language in which to
         display the pages.
        @param doctype: (string) - the doctype ID of the doctype for which the
         submission is being made.
@@ -987,7 +987,7 @@ def endaction(req,
                 req = req,
                 navmenuid='submit')
 
-def home(req, c=CFG_SITE_NAME, ln=cdslang):
+def home(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     """This function generates the WebSubmit "home page".
        Basically, this page contains a list of submission-collections
        in WebSubmit, and gives links to the various document-type
@@ -997,7 +997,7 @@ def home(req, c=CFG_SITE_NAME, ln=cdslang):
        @param req: (apache request object)
        @param c: (string) - defaults to CFG_SITE_NAME
        @param ln: (string) - The CDS Invenio interface language of choice.
-        Defaults to cdslang (the default language of the installation).
+        Defaults to CFG_SITE_LANG (the default language of the installation).
        @return: (string) - the Web page to be displayed.
     """
     ln = wash_language(ln)
@@ -1029,12 +1029,12 @@ def home(req, c=CFG_SITE_NAME, ln=cdslang):
                navmenuid='submit'
                )
 
-def makeCataloguesTable(ln=cdslang):
+def makeCataloguesTable(ln=CFG_SITE_LANG):
     """Build the 'catalogues' (submission-collections) tree for
        the WebSubmit home-page. This tree contains the links to
        the various document types in WebSubmit.
        @param ln: (string) - the language of the interface.
-        (defaults to 'cdslang').
+        (defaults to 'CFG_SITE_LANG').
        @return: (string) - the submission-collections tree.
     """
     text = ""
@@ -1178,7 +1178,7 @@ def displayDoctypeBranch(doctype, catalogues):
     return text
 
 
-def action(req, c=CFG_SITE_NAME, ln=cdslang, doctype=""):
+def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -1349,7 +1349,7 @@ def action_details (doctype, action):
     else:
         return -1
 
-def print_function_calls (req, doctype, action, step, form, start_time, ln=cdslang):
+def print_function_calls (req, doctype, action, step, form, start_time, ln=CFG_SITE_LANG):
     # Calls the functions required by an "action" action on a "doctype" document
     # In supervisor mode, a table of the function calls is produced
     global htdocsdir,CFG_WEBSUBMIT_STORAGEDIR,access,CFG_PYLIBDIR,dismode
@@ -1473,7 +1473,7 @@ def print_function_calls (req, doctype, action, step, form, start_time, ln=cdsla
     return t
 
 
-def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=cdslang):
+def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=CFG_SITE_LANG):
     global machine, CFG_WEBSUBMIT_STORAGEDIR, act, rn
     t = ""
     next_submissions = \
@@ -1530,7 +1530,7 @@ def log_function(curdir, message, start_time, filename="function_log"):
 
 ## FIXME: Duplicated
 
-def errorMsg(title, req, c=CFG_SITE_NAME, ln=cdslang):
+def errorMsg(title, req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -1543,7 +1543,7 @@ def errorMsg(title, req, c=CFG_SITE_NAME, ln=cdslang):
                 req=req,
                 navmenuid='submit')
 
-def warningMsg(title, req, c=CFG_SITE_NAME, ln=cdslang):
+def warningMsg(title, req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     # load the right message language
     _ = gettext_set_language(ln)
 

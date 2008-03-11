@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl, cdslang
+from invenio.config import weburl, CFG_SITE_LANG
 from invenio.testutils import make_test_suite, \
                               warn_user_about_tests_and_run, \
                               test_web_page_content
@@ -37,7 +37,7 @@ class BibFormatAPITest(unittest.TestCase):
         """bibformat - Checking BibFormat API"""
         result = format_record(recID=73,
                                of='hx',
-                               ln=cdslang,
+                               ln=CFG_SITE_LANG,
                                verbose=0,
                                search_pattern=[],
                                xml_record=None,
@@ -95,7 +95,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
 
         self.record_74_hd_authors = '''<a href="%(weburl)s/search?f=author&amp;p=Wang%%2C%%20B&amp;ln=%(lang)s">Wang, B</a><small> (Fudan University)</small> ; <a href="%(weburl)s/search?f=author&amp;p=Lin%%2C%%20C%%20Y&amp;ln=%(lang)s">Lin, C Y</a> ; <a href="%(weburl)s/search?f=author&amp;p=Abdalla%%2C%%20E&amp;ln=%(lang)s">Abdalla, E</a><br />'''% \
                                      {'weburl' : weburl,
-                                      'lang': cdslang}
+                                      'lang': CFG_SITE_LANG}
 
         self.record_74_hd_abstract = '''<small><strong>Abstract: </strong>Complex frequencies associated with quasinormal modes for large Reissner-Nordstr$\ddot{o}$m Anti-de Sitter black holes have been computed. These frequencies have close relation to the black hole charge and do not linearly scale withthe black hole temperature as in Schwarzschild Anti-de Sitter case. In terms of AdS/CFT correspondence, we found that the bigger the black hole charge is, the quicker for the approach to thermal equilibrium in the CFT. The propertiesof quasinormal modes for $l&gt;0$ have also been studied.</small><br />'''
 
@@ -105,7 +105,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
 
         self.record_74_hd_citations = '''<strong>Cited by:</strong> try citation search for <a href="%(weburl)s/search?f=reference&amp;p=hep-th/0003295&amp;ln=%(lang)s">hep-th/0003295</a>'''% \
                                       {'weburl' : weburl,
-                                       'lang': cdslang}
+                                       'lang': CFG_SITE_LANG}
         self.record_74_hd_references = '''<li><small>[17]</small> <small>A. Chamblin, R. Emparan, C. V. Johnson and R. C. Myers, Phys. Rev., D60: 104026 (1999) 5070 90 110 130 150 r+ 130 230 330 50 70 90 110 130 150 r+</small> </li>'''
 
         # Record 7 (Picture)
@@ -250,7 +250,7 @@ class BibFormatBriefHTMLTest(unittest.TestCase):
 <br /><small>
 Σα βγεις στον πηγαιμό για την Ιθάκη,<br />
 να εύχεσαι νάναι μακρύς ο δρόμος,<br />
-γεμάτος περιπέτειες, γεμάτος γνώσεις [...] </small>''' % (weburl, cdslang)
+γεμάτος περιπέτειες, γεμάτος γνώσεις [...] </small>''' % (weburl, CFG_SITE_LANG)
 
 
     def test_brief_html_output(self):

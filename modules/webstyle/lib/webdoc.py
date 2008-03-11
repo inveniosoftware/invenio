@@ -27,8 +27,8 @@ __revision__ = \
 
 from invenio.config import \
      CFG_PREFIX, \
-     cdslang, \
-     cdslangs, \
+     CFG_SITE_LANG, \
+     CFG_SITE_LANGS, \
      CFG_SITE_NAME, \
      supportemail, \
      adminemail, \
@@ -116,13 +116,13 @@ pattern_lang = re.compile(r'''
 
 # Regular expression for finding <en>...</en> tag (particular case of
 # pattern_lang)
-pattern_cdslang = re.compile(r"<("+cdslang+ \
-                             r")\s*>(.*?)(</"+cdslang+r"\s*>)",
+pattern_CFG_SITE_LANG = re.compile(r"<("+CFG_SITE_LANG+ \
+                             r")\s*>(.*?)(</"+CFG_SITE_LANG+r"\s*>)",
                              re.IGNORECASE | re.DOTALL)
 
 # Builds regular expression for finding each known language in <lang> tags
 ln_pattern_text = r"<(?P<lang>"
-ln_pattern_text += r"|".join(cdslangs)
+ln_pattern_text += r"|".join(CFG_SITE_LANGS)
 ln_pattern_text += r')\s*(revision="[^"]"\s*)?>(?P<translation>.*?)</\1>'
 ln_pattern =  re.compile(ln_pattern_text, re.IGNORECASE | re.DOTALL)
 
@@ -143,7 +143,7 @@ def get_webdoc_parts(webdoc,
                             'description'],
                      categ="",
                      update_cache_mode=1,
-                     ln=cdslang,
+                     ln=CFG_SITE_LANG,
                      verbose=0):
     """
     Returns the html of the specified 'webdoc' part(s).
@@ -198,8 +198,8 @@ def get_webdoc_parts(webdoc,
                                                           webdoc, ln, part)):
                 # Check given language
                 webdoc_cached_part_path = get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, ln, part)
-            elif os.path.exists(get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, cdslang, part)):
-                # Check cdslang
+            elif os.path.exists(get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, CFG_SITE_LANG, part)):
+                # Check CFG_SITE_LANG
                 webdoc_cached_part_path = get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, 'en', part)
             elif os.path.exists(get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, ln, part)):
                 # Check English
@@ -254,7 +254,7 @@ def get_webdoc_parts(webdoc,
 
     return html_parts
 
-def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=cdslangs):
+def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
     """
     Update the cache (on disk) of the given webdoc.
 
@@ -476,7 +476,7 @@ def get_webdoc_info(webdoc):
 
 def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
                       categ=['help', 'admin', 'hacking'],
-                      ln=cdslang):
+                      ln=CFG_SITE_LANG):
     """
     List the available webdoc files in html format.
 
@@ -494,7 +494,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
     _ = gettext_set_language(ln)
 
     topics = {}
-    ln_link = (ln != cdslang and '?ln=' + ln) or ''
+    ln_link = (ln != CFG_SITE_LANG and '?ln=' + ln) or ''
 
     for category in categ:
         if not webdoc_dirs.has_key(category):
@@ -556,7 +556,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
 
     return out
 
-def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
+def transform(webdoc_source, verbose=0, req=None, languages=CFG_SITE_LANGS):
     """
     Transform a WebDoc into html
 
@@ -611,7 +611,7 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
         # Check if translation is really needed
         ## Just a quick check. Might trigger false negative, but it is
         ## ok.
-        if ln != cdslang and \
+        if ln != CFG_SITE_LANG and \
            translation_pattern.search(webdoc_source) is None and \
            pattern_lang_link_current.search(webdoc_source) is None and \
            pattern_lang_current.search(webdoc_source) is None and \
@@ -627,7 +627,7 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
         ## Print current language 'en', 'fr', .. instead of
         ## <lang:current /> tags and '?ln=en', '?ln=fr', .. instead of
         ## <lang:link /> if ln is not default language
-        if ln != cdslang:
+        if ln != CFG_SITE_LANG:
             localized_webdoc = pattern_lang_link_current.sub('?ln=' + ln,
                                                              localized_webdoc)
         else:
@@ -673,17 +673,17 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
 
     # Remove duplicates
     filtered_html_texts = []
-    if html_texts.has_key(cdslang):
+    if html_texts.has_key(CFG_SITE_LANG):
         filtered_html_texts = [(html_text[0], \
-                                (html_text[1] != html_texts[cdslang][1] and html_text[1]) or None, \
-                                (html_text[2] != html_texts[cdslang][2] and html_text[2]) or None, \
-                                (html_text[3] != html_texts[cdslang][3] and html_text[3]) or None, \
-                                (html_text[4] != html_texts[cdslang][4] and html_text[4]) or None, \
-                                (html_text[5] != html_texts[cdslang][5] and html_text[5]) or None, \
-                                (html_text[6] != html_texts[cdslang][6] and html_text[6]) or None)
+                                (html_text[1] != html_texts[CFG_SITE_LANG][1] and html_text[1]) or None, \
+                                (html_text[2] != html_texts[CFG_SITE_LANG][2] and html_text[2]) or None, \
+                                (html_text[3] != html_texts[CFG_SITE_LANG][3] and html_text[3]) or None, \
+                                (html_text[4] != html_texts[CFG_SITE_LANG][4] and html_text[4]) or None, \
+                                (html_text[5] != html_texts[CFG_SITE_LANG][5] and html_text[5]) or None, \
+                                (html_text[6] != html_texts[CFG_SITE_LANG][6] and html_text[6]) or None)
                                for html_text in html_texts.values() \
-                               if html_text[0] != cdslang]
-        filtered_html_texts.append(html_texts[cdslang])
+                               if html_text[0] != CFG_SITE_LANG]
+        filtered_html_texts.append(html_texts[CFG_SITE_LANG])
     else:
         filtered_html_texts = html_texts.values()
 
@@ -730,7 +730,7 @@ def get_mo_last_modification():
     """
     # Take one of the mo files. They are all installed at the same
     # time, so last modication date should be the same
-    mo_file = '%s/share/locale/%s/LC_MESSAGES/cds-invenio.mo' % (CFG_PREFIX, cdslang)
+    mo_file = '%s/share/locale/%s/LC_MESSAGES/cds-invenio.mo' % (CFG_PREFIX, CFG_SITE_LANG)
 
     if os.path.exists(os.path.abspath(mo_file)):
         return os.stat(mo_file).st_mtime
@@ -761,7 +761,7 @@ def filter_languages(text, ln='en', defined_tags=None):
         Searches for the <lang>...</lang> tag and remove inner localized tags
         such as <en>, <fr>, that are not current_lang.
 
-        If current_lang cannot be found inside <lang> ... </lang>, try to use 'cdslang'
+        If current_lang cannot be found inside <lang> ... </lang>, try to use 'CFG_SITE_LANG'
 
         @param match a match object corresponding to the special tag that must be interpreted
         """
@@ -789,16 +789,16 @@ def filter_languages(text, ln='en', defined_tags=None):
 
         lang_tag_content = match.group("langs")
         # Try to find tag with current lang. If it does not exists,
-        # then try to look for cdslang. If still does not exist, use
+        # then try to look for CFG_SITE_LANG. If still does not exist, use
         # 'en' as current_lang
         pattern_current_lang = re.compile(r"<(" + current_lang + \
                                           r")\s*>(.*?)(</"+current_lang+r"\s*>)",
                                           re.IGNORECASE | re.DOTALL)
 
         if re.search(pattern_current_lang, lang_tag_content) is None:
-            current_lang = cdslang
-            # Can we find translation in 'cdslang'?
-            if re.search(pattern_cdslang, lang_tag_content) is None:
+            current_lang = CFG_SITE_LANG
+            # Can we find translation in 'CFG_SITE_LANG'?
+            if re.search(pattern_CFG_SITE_LANG, lang_tag_content) is None:
                 current_lang = 'en'
 
         cleaned_lang_tag = ln_pattern.sub(clean_language_tag, lang_tag_content)
@@ -839,7 +839,7 @@ def main():
     """
     main entry point for webdoc via command line
     """
-    options = {'language':cdslangs, 'verbose':1, 'mode':2}
+    options = {'language':CFG_SITE_LANGS, 'verbose':1, 'mode':2}
 
     try:
         opts, args = getopt.getopt(sys.argv[1:],
@@ -864,7 +864,7 @@ def main():
             elif opt[0] in ["-l", "--language"]:
                 options["language"]  = [wash_language(lang.strip().lower()) \
                                         for lang in opt[1].split(',') \
-                                        if lang in cdslangs]
+                                        if lang in CFG_SITE_LANGS]
             elif opt[0] in ["-m", "--mode"]:
                 options["mode"] = opt[1]
     except StandardError, e:

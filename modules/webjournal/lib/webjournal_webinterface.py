@@ -35,7 +35,7 @@ from mod_python import apache
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import weburl, CFG_WEBDIR, cdslang, CFG_ETCDIR
+from invenio.config import weburl, CFG_WEBDIR, CFG_SITE_LANG, CFG_ETCDIR
 from invenio.webpage import page
 from invenio.webuser import getUid
 from invenio.urlutils import redirect_to_url
@@ -462,7 +462,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                     'archive_select': (str, "False"),
                                     'archive_date': (str, ""),
                                     'archive_search': (str, "False"),
-                                    'ln': (str, cdslang)})
+                                    'ln': (str, CFG_SITE_LANG)})
         try:
             language = wash_journal_language(argd['ln'])
             journal_name = wash_journal_name(language, argd['name'])

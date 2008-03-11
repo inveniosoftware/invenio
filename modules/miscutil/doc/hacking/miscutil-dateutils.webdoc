@@ -69,7 +69,7 @@ epoch are unvalid!).</p>
 <h2>2. <a name="converting">Converting dates</a></h2>
 The functions for conversion are listed below.
 <dl>
-    <dt><b><code>convert&#95;datestruct&#95;to&#95;dategui(datestruct, ln=cdslang)</code></b></dt>
+    <dt><b><code>convert&#95;datestruct&#95;to&#95;dategui(datestruct, ln=CFG_SITE_LANG)</code></b></dt>
     <dd>
         <code>(2005, 11, 16, 15, 11, 44, 2, 320, 0) =&gt; '16 nov 2005, 15:11'</code><br/>
         Month is internationalized
@@ -79,7 +79,7 @@ The functions for conversion are listed below.
         <code>(2005, 11, 16, 15, 11, 44, 2, 320, 0) =&gt; '2005-11-16 15:11:57'</code>
     </dd>
 
-    <dt><b><code>convert&#95;datetext&#95;to&#95;dategui(datetext, ln=cdslang)</code></b></dt>
+    <dt><b><code>convert&#95;datetext&#95;to&#95;dategui(datetext, ln=CFG_SITE_LANG)</code></b></dt>
     <dd>
         <code>'2005-11-16 15:11:57' =&gt; '16 nov 2005, 15:11'</code><br />
         Month is internationalized
@@ -107,7 +107,7 @@ The following functions provide means of internationalizing part of dates.
 
 <dl>
     <dt>
-      <b><code>get&#95;i18n&#95;day&#95;name(day&#95;nb, display='short', ln=cdslang)</code></b>
+      <b><code>get&#95;i18n&#95;day&#95;name(day&#95;nb, display='short', ln=CFG_SITE_LANG)</code></b>
     </dt>
     <dd>
         get the string representation of a weekday, internationalized<br />
@@ -118,7 +118,7 @@ The following functions provide means of internationalizing part of dates.
         </code>
     </dd>
     <dt>
-        <b><code>get&#95;i18n&#95;month&#95;name(month&#95;nb, display='short', ln=cdslang)</code></b>
+        <b><code>get&#95;i18n&#95;month&#95;name(month&#95;nb, display='short', ln=CFG_SITE_LANG)</code></b>
     </dt>
     <dd>
         get a non-numeric representation of a month, internationalized.<br />
@@ -136,7 +136,7 @@ The following functions create HTML fields for date selection:
 <dl>
 
 <dt>
-    <b><code>create&#95;day&#95;selectbox(name, selected&#95;day=0, ln=cdslang)</code></b>
+    <b><code>create&#95;day&#95;selectbox(name, selected&#95;day=0, ln=CFG_SITE_LANG)</code></b>
 </dt>
 <dd>Creates an HTML menu for day selection. (<code>0..31</code> values).<br />
 <code>@param name: name of the control (i.e. name of the var you'll get)<br />
@@ -146,7 +146,7 @@ The following functions create HTML fields for date selection:
 </code>
 </dd>
 <dt>
-    <b><code>create&#95;month&#95;selectbox(name, selected&#95;month=0, ln=cdslang)</code></b>
+    <b><code>create&#95;month&#95;selectbox(name, selected&#95;month=0, ln=CFG_SITE_LANG)</code></b>
 </dt>
 <dd>Creates an HTML menu for month selection. Value of selected field is numeric<br />
 <code>@param name: name of the control (your form will be sent with name=value...)<br />
@@ -165,7 +165,7 @@ Creates an HTML field (simple input) for year selection.<br />
 @return html as string
 </code>
 <dt>
-    <b><code>create&#95;year&#95;selectbox(name, from&#95;year=-1, length=10, selected&#95;year=0, ln=cdslang)</code></b>
+    <b><code>create&#95;year&#95;selectbox(name, from&#95;year=-1, length=10, selected&#95;year=0, ln=CFG_SITE_LANG)</code></b>
 </dt>
 <dd>
 Creates an HTML menu (dropdownbox) for year selection.<br />

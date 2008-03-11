@@ -38,7 +38,7 @@ from invenio.urlutils import wash_url_argument, redirect_to_url
 from invenio.search_engine import search_pattern, \
                                   create_basic_search_units
 
-def index(req, ln=config.cdslang):
+def index(req, ln=config.CFG_SITE_LANG):
     """
     Main BibFormat administration page.
 
@@ -81,7 +81,7 @@ def index(req, ln=config.cdslang):
                 req=req,
                 warnings=warnings)
 
-def output_formats_manage(req, ln=config.cdslang, sortby="code"):
+def output_formats_manage(req, ln=config.CFG_SITE_LANG, sortby="code"):
     """
     Main page for output formats management. Check for authentication and print output formats list.
     @param ln language
@@ -111,7 +111,7 @@ def output_formats_manage(req, ln=config.cdslang, sortby="code"):
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def output_format_show(req, bfo, ln=config.cdslang,
+def output_format_show(req, bfo, ln=config.CFG_SITE_LANG,
                        r_fld=[], r_val=[], r_tpl=[],
                        default="", r_upd="", chosen_option="",
                        **args):
@@ -222,7 +222,7 @@ def output_format_show(req, bfo, ln=config.cdslang,
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def output_format_show_attributes(req, bfo, ln=config.cdslang):
+def output_format_show_attributes(req, bfo, ln=config.CFG_SITE_LANG):
     """
     Page for output format names and descrition attributes edition.
 
@@ -267,7 +267,7 @@ def output_format_show_attributes(req, bfo, ln=config.cdslang):
     else:
         return page_not_authorized(req=req, text=auth_msg)
 
-def output_format_show_dependencies(req, bfo, ln=config.cdslang):
+def output_format_show_dependencies(req, bfo, ln=config.CFG_SITE_LANG):
     """
     Show the dependencies of the given output format.
 
@@ -312,7 +312,7 @@ def output_format_show_dependencies(req, bfo, ln=config.cdslang):
     else:
         return page_not_authorized(req=req, text=auth_msg)
 
-def output_format_update_attributes(req, bfo, ln=config.cdslang,
+def output_format_update_attributes(req, bfo, ln=config.CFG_SITE_LANG,
                                     name = "", description="",
                                     code="", content_type="",
                                     names_trans=[], visibility="0"):
@@ -360,7 +360,7 @@ def output_format_update_attributes(req, bfo, ln=config.cdslang,
                                    text=auth_msg,
                                    chosen_option="")
 
-def output_format_delete(req, bfo, ln=config.cdslang, chosen_option=""):
+def output_format_delete(req, bfo, ln=config.CFG_SITE_LANG, chosen_option=""):
     """
     Delete an output format
 
@@ -397,7 +397,7 @@ def output_format_delete(req, bfo, ln=config.cdslang, chosen_option=""):
     else:
         return page_not_authorized(req=req, text=auth_msg)
 
-def output_format_add(req, ln=config.cdslang):
+def output_format_add(req, ln=config.CFG_SITE_LANG):
     """
     Adds a new output format
     """
@@ -417,7 +417,7 @@ def output_format_add(req, ln=config.cdslang):
     else:
         return page_not_authorized(req=req, text=auth_msg)
 
-def format_templates_manage(req, ln=config.cdslang, checking='0'):
+def format_templates_manage(req, ln=config.CFG_SITE_LANG, checking='0'):
     """
     Main page for formats templates management. Check for authentication and print formats list.
     @param ln language
@@ -448,8 +448,8 @@ def format_templates_manage(req, ln=config.cdslang, checking='0'):
                                    navtrail=navtrail_previous_links)
 
 
-def format_template_show(req, bft, code=None, ln=config.cdslang,
-                         ln_for_preview=config.cdslang,
+def format_template_show(req, bft, code=None, ln=config.CFG_SITE_LANG,
+                         ln_for_preview=config.CFG_SITE_LANG,
                          pattern_for_preview="",
                          content_type_for_preview="text/html",
                          chosen_option=""):
@@ -524,7 +524,7 @@ def format_template_show(req, bft, code=None, ln=config.cdslang,
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def format_template_show_attributes(req, bft, ln=config.cdslang, new=0):
+def format_template_show_attributes(req, bft, ln=config.CFG_SITE_LANG, new=0):
     """
     Page for template name and descrition attributes edition.
 
@@ -575,7 +575,7 @@ def format_template_show_attributes(req, bft, ln=config.cdslang, new=0):
     else:
         return page_not_authorized(req=req, text=auth_msg)
 
-def format_template_show_dependencies(req, bft, ln=config.cdslang):
+def format_template_show_dependencies(req, bft, ln=config.CFG_SITE_LANG):
     """
     Show the dependencies (on elements) of the given format.
 
@@ -607,7 +607,7 @@ def format_template_show_dependencies(req, bft, ln=config.cdslang):
     else:
         return page_not_authorized(req=req, text=auth_msg)
 
-def format_template_update_attributes(req, bft, ln=config.cdslang,
+def format_template_update_attributes(req, bft, ln=config.CFG_SITE_LANG,
                                       name = "", description="",
                                       duplicate=None):
     """
@@ -643,7 +643,7 @@ def format_template_update_attributes(req, bft, ln=config.cdslang,
     else:
         return page_not_authorized(req=req, text=auth_msg)
 
-def format_template_delete(req, bft, ln=config.cdslang, chosen_option=""):
+def format_template_delete(req, bft, ln=config.CFG_SITE_LANG, chosen_option=""):
     """
     Delete a format template
     """
@@ -679,7 +679,7 @@ def format_template_delete(req, bft, ln=config.cdslang, chosen_option=""):
     else:
         return page_not_authorized(req=req, text=auth_msg)
 
-def format_template_add(req, ln=config.cdslang):
+def format_template_add(req, ln=config.CFG_SITE_LANG):
     """
     Adds a new format template
     """
@@ -699,8 +699,8 @@ def format_template_add(req, ln=config.cdslang):
     else:
         return page_not_authorized(req=req, text=auth_msg)
 
-def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
-                                         ln_for_preview=config.cdslang,
+def format_template_show_preview_or_save(req, bft, ln=config.CFG_SITE_LANG, code=None,
+                                         ln_for_preview=config.CFG_SITE_LANG,
                                          pattern_for_preview="",
                                          content_type_for_preview='text/html',
                                          save_action=None,
@@ -790,7 +790,7 @@ def format_template_show_preview_or_save(req, bft, ln=config.cdslang, code=None,
     else:
         return page_not_authorized(req=req, text=auth_msg)
 
-def format_template_show_short_doc(req, ln=config.cdslang, search_doc_pattern=""):
+def format_template_show_short_doc(req, ln=config.CFG_SITE_LANG, search_doc_pattern=""):
     """
     Prints the format elements documentation in a brief way. To be included inside Format template
     editor.
@@ -815,7 +815,7 @@ def format_template_show_short_doc(req, ln=config.cdslang, search_doc_pattern=""
         return page_not_authorized(req=req, text=auth_msg)
 
 
-def format_elements_doc(req, ln=config.cdslang):
+def format_elements_doc(req, ln=config.CFG_SITE_LANG):
     """
     Main page for format elements documentation. Check for authentication and print format elements list.
     @param ln language
@@ -843,7 +843,7 @@ def format_elements_doc(req, ln=config.cdslang):
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def format_element_show_dependencies(req, bfe, ln=config.cdslang):
+def format_element_show_dependencies(req, bfe, ln=config.CFG_SITE_LANG):
     """
     Shows format element dependencies
 
@@ -871,7 +871,7 @@ def format_element_show_dependencies(req, bfe, ln=config.cdslang):
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-def format_element_test(req, bfe, ln=config.cdslang, param_values=None):
+def format_element_test(req, bfe, ln=config.CFG_SITE_LANG, param_values=None):
     """
     Allows user to test element with different parameters and check output
 
@@ -907,7 +907,7 @@ def format_element_test(req, bfe, ln=config.cdslang, param_values=None):
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def kb_manage(req, ln=config.cdslang):
+def kb_manage(req, ln=config.CFG_SITE_LANG):
     """
     Main page for knowledge bases management. Check for authentication.
 
@@ -937,7 +937,7 @@ def kb_manage(req, ln=config.cdslang):
                                    navtrail=navtrail_previous_links)
 
 
-def kb_show(req, kb, sortby="to", ln=config.cdslang):
+def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG):
     """
     Shows the content of the given knowledge base id. Check for authentication and kb existence.
     Before displaying the content of the knowledge base, check if a form was submitted asking for
@@ -987,7 +987,7 @@ def kb_show(req, kb, sortby="to", ln=config.cdslang):
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def kb_show_attributes(req, kb, ln=config.cdslang, sortby="to"):
+def kb_show_attributes(req, kb, ln=config.CFG_SITE_LANG, sortby="to"):
     """
     Shows the attributes (name, description) of a given kb
 
@@ -1032,7 +1032,7 @@ def kb_show_attributes(req, kb, ln=config.cdslang, sortby="to"):
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-def kb_show_dependencies(req, kb, ln=config.cdslang, sortby="to"):
+def kb_show_dependencies(req, kb, ln=config.CFG_SITE_LANG, sortby="to"):
     """
     Shows the dependencies of a given kb
 
@@ -1079,7 +1079,7 @@ def kb_show_dependencies(req, kb, ln=config.cdslang, sortby="to"):
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.cdslang):
+def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG):
     """
     Adds a new mapping to a kb.
 
@@ -1126,7 +1126,7 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.cdslang):
                                    navtrail=navtrail_previous_links)
 
 def kb_edit_mapping(req, kb, key, mapFrom, mapTo,
-                    update="", delete="", sortby="to", ln=config.cdslang):
+                    update="", delete="", sortby="to", ln=config.CFG_SITE_LANG):
     """
     Edit a mapping to in kb. Edit can be "update old value" or "delete existing value"
 
@@ -1179,7 +1179,7 @@ def kb_edit_mapping(req, kb, key, mapFrom, mapTo,
                                    navtrail=navtrail_previous_links)
 
 def kb_update_attributes(req, kb="", name="", description="", sortby="to",
-                         ln=config.cdslang, chosen_option=None):
+                         ln=config.CFG_SITE_LANG, chosen_option=None):
     """
     Update the attributes of the kb
 
@@ -1242,7 +1242,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def kb_add(req, ln=config.cdslang, sortby="to"):
+def kb_add(req, ln=config.CFG_SITE_LANG, sortby="to"):
     """
     Adds a new kb
     """
@@ -1267,7 +1267,7 @@ def kb_add(req, ln=config.cdslang, sortby="to"):
                                    navtrail=navtrail_previous_links)
 
 
-def kb_delete(req, kb, ln=config.cdslang, chosen_option="", sortby="to"):
+def kb_delete(req, kb, ln=config.CFG_SITE_LANG, chosen_option="", sortby="to"):
     """
     Deletes an existing kb
 
@@ -1315,7 +1315,7 @@ def kb_delete(req, kb, ln=config.cdslang, chosen_option="", sortby="to"):
 
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-def validate_format(req, ln=config.cdslang, bfo=None, bft=None, bfe=None):
+def validate_format(req, ln=config.CFG_SITE_LANG, bfo=None, bft=None, bfe=None):
     """
     Returns a page showing the status of an output format or format
     template or format element. This page is called from output
@@ -1433,7 +1433,7 @@ def download_dreamweaver_floater(req):
     req.send_http_header()
     req.write(bibformatadminlib.perform_request_dreamweaver_floater())
 
-def dialog_box(req, url="", ln=config.cdslang, navtrail="",
+def dialog_box(req, url="", ln=config.CFG_SITE_LANG, navtrail="",
                title="", message="", options=[]):
     """
     Returns a dialog box with a given title, message and options.
@@ -1463,7 +1463,7 @@ def error_page(req):
     Returns a default error page
     """
     return page(title="Internal Error",
-                body = create_error_box(req, ln=config.cdslang),
+                body = create_error_box(req, ln=config.CFG_SITE_LANG),
                 description="%s - Internal Error" % config.CFG_SITE_NAME,
                 keywords="%s, Internal Error" % config.CFG_SITE_NAME,
-                language=config.cdslang)
+                language=config.CFG_SITE_LANG)

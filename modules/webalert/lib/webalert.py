@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 import cgi
 import time
 
-from invenio.config import cdslang
+from invenio.config import CFG_SITE_LANG
 from invenio.dbquery import run_sql
 from invenio.webuser import isGuestUser
 from invenio.webaccount import warning_guest_user
@@ -41,7 +41,7 @@ webalert_templates = invenio.template.load('webalert')
 class AlertError(Exception):
     pass
 
-def check_alert_name(alert_name, uid, ln=cdslang):
+def check_alert_name(alert_name, uid, ln=CFG_SITE_LANG):
     """check this user does not have another alert with this name."""
 
     # load the right message language
@@ -54,7 +54,7 @@ def check_alert_name(alert_name, uid, ln=cdslang):
     if len(res) > 0:
         raise AlertError( _("You already have an alert named %s.") % ('<b>' + alert_name + '</b>',) )
 
-def get_textual_query_info_from_urlargs(urlargs, ln=cdslang):
+def get_textual_query_info_from_urlargs(urlargs, ln=CFG_SITE_LANG):
     """Return nicely formatted search pattern and catalogue from urlargs of the search query.
     Suitable for 'your searches' display."""
     out = ""
@@ -66,7 +66,7 @@ def get_textual_query_info_from_urlargs(urlargs, ln=cdslang):
     return out
 
 
-def perform_display(permanent, uid, ln=cdslang):
+def perform_display(permanent, uid, ln=CFG_SITE_LANG):
     """display the searches performed by the current user
     input:  default permanent="n"; permanent="y" display permanent queries(most popular)
     output: list of searches in formatted html
@@ -129,7 +129,7 @@ def perform_display(permanent, uid, ln=cdslang):
              guesttxt = warning_guest_user(type="alerts", ln=ln)
            )
 
-def perform_input_alert(action, id_query, alert_name, frequency, notification, id_basket,uid, old_id_basket=None, ln = cdslang):
+def perform_input_alert(action, id_query, alert_name, frequency, notification, id_basket,uid, old_id_basket=None, ln = CFG_SITE_LANG):
     """get the alert settings
     input:  action="add" for a new alert (blank form), action="modify" for an update
             (get old values)
@@ -162,7 +162,7 @@ def perform_input_alert(action, id_query, alert_name, frequency, notification, i
              guesttxt = warning_guest_user(type="alerts", ln=ln)
            )
 
-def check_alert_is_unique(id_basket, id_query, uid, ln=cdslang ):
+def check_alert_is_unique(id_basket, id_query, uid, ln=CFG_SITE_LANG ):
     """check the user does not have another alert for the specified query and basket"""
     _ = gettext_set_language(ln)
     sql = """select id_query
@@ -174,7 +174,7 @@ def check_alert_is_unique(id_basket, id_query, uid, ln=cdslang ):
         raise AlertError(_("You already have an alert defined for the specified query and basket."))
 
 def perform_add_alert(alert_name, frequency, notification,
-                      id_basket, id_query, uid, ln = cdslang):
+                      id_basket, id_query, uid, ln = CFG_SITE_LANG):
     """add an alert to the database
     input:  the name of the new alert;
             alert frequency: 'month', 'week' or 'day';
@@ -212,7 +212,7 @@ def perform_add_alert(alert_name, frequency, notification,
     return out
 
 
-def perform_list_alerts (uid, ln=cdslang):
+def perform_list_alerts (uid, ln=CFG_SITE_LANG):
     """perform_list_alerts display the list of alerts for the connected user"""
     # set variables
     out = ""
@@ -252,7 +252,7 @@ def perform_list_alerts (uid, ln=cdslang):
                                               guesttxt=warning_guest_user(type="alerts", ln=ln))
     return out
 
-def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=cdslang):
+def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=CFG_SITE_LANG):
     """perform_remove_alert: remove an alert from the database
     input:  alert name
             identifier of the query;
@@ -276,7 +276,7 @@ def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=cdslang):
     return out
 
 
-def perform_update_alert(alert_name, frequency, notification, id_basket, id_query, old_id_basket,uid, ln = cdslang):
+def perform_update_alert(alert_name, frequency, notification, id_basket, id_query, old_id_basket,uid, ln = CFG_SITE_LANG):
     """update alert settings into the database
     input:  the name of the new alert;
             alert frequency: 'month', 'week' or 'day';
@@ -338,7 +338,7 @@ def is_selected(var, fld):
     else:
         return ""
 
-def account_list_alerts(uid, ln=cdslang):
+def account_list_alerts(uid, ln=CFG_SITE_LANG):
     """account_list_alerts: list alert for the account page
     input:  the user id
             language
@@ -363,7 +363,7 @@ def account_list_alerts(uid, ln=cdslang):
 
     return webalert_templates.tmpl_account_list_alerts(ln=ln, alerts=alerts)
 
-def account_list_searches(uid, ln=cdslang):
+def account_list_searches(uid, ln=CFG_SITE_LANG):
     """ account_list_searches: list the searches of the user
         input:  the user id
         output: resume of the searches"""

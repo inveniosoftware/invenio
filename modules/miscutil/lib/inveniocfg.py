@@ -88,8 +88,6 @@ def convert_conf_option(option_name, option_value):
     ## also, adjust some conf names due to backwards compatibility:
     option_name_replace_data = {'CFG_SITE_URL': 'weburl',
                                 'CFG_SITE_SECURE_URL': 'sweburl',
-                                'CFG_SITE_LANG': 'cdslang',
-                                'CFG_SITE_LANGS': 'cdslangs',
                                 'CFG_SITE_SUPPORT_EMAIL': 'supportemail',
                                 'CFG_SITE_ADMIN_EMAIL': 'adminemail',
                                 }
@@ -116,8 +114,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS']:
         option_value = option_value[1:-1]
 
-    ## 3d) special cases: cdslangs
-    if option_name == 'cdslangs':
+    ## 3d) special cases: CFG_SITE_LANGS
+    if option_name == 'CFG_SITE_LANGS':
         out = "["
         for lang in option_value[1:-1].split(","):
             out += "'%s', " % lang

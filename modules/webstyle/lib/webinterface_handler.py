@@ -45,7 +45,7 @@ try:
 except ImportError:
     pass
 
-from invenio.config import cdslang, weburl, sweburl, CFG_TMPDIR
+from invenio.config import CFG_SITE_LANG, weburl, sweburl, CFG_TMPDIR
 from invenio.messages import wash_language
 from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
@@ -334,7 +334,7 @@ def wash_urlargd(form, content):
 
     result = {}
 
-    content['ln'] = (str, cdslang)
+    content['ln'] = (str, CFG_SITE_LANG)
 
     for k, (dst_type, default) in content.items():
         try:

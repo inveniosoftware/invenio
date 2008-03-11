@@ -25,7 +25,7 @@ Various utilities for WebJournal, e.g. config parser, etc.
 from invenio.bibformat_engine import BibFormatObject
 from invenio.errorlib import register_exception
 from invenio.search_engine import search_pattern
-from invenio.config import CFG_ETCDIR, weburl, adminemail, CFG_CACHEDIR, cdslang
+from invenio.config import CFG_ETCDIR, weburl, adminemail, CFG_CACHEDIR, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.dbquery import run_sql
@@ -219,7 +219,7 @@ def get_monday_of_the_week(week_number, year):
     timetuple = issue_week_strings_to_times(['%s/%s' % (week_number, year), ])[0]
     return time.strftime("%A %d %B %Y", timetuple)
 
-def get_issue_number_display(issue_number, journal_name, language=cdslang):
+def get_issue_number_display(issue_number, journal_name, language=CFG_SITE_LANG):
     """
     Returns the display string for a given issue number.
     """
@@ -229,7 +229,7 @@ def get_issue_number_display(issue_number, journal_name, language=cdslang):
                                                           journal_id))[0][0]
     return issue_display
 
-def get_current_issue_time(journal_name, language=cdslang):
+def get_current_issue_time(journal_name, language=CFG_SITE_LANG):
     """
     Return the current issue of a journal as a time object.
     """
@@ -314,7 +314,7 @@ def count_down_to_monday(current_time):
     return next_monday.timetuple()
 
 def get_next_journal_issues(current_issue_time, journal_name,
-                            language=cdslang, number=2):
+                            language=CFG_SITE_LANG, number=2):
     """
     Returns the <number> next issue numbers from the current_issue_time.
     """
@@ -337,7 +337,7 @@ def get_next_journal_issues(current_issue_time, journal_name,
         #next_issues.append(date_formated)
     return next_issues
 
-def issue_times_to_week_strings(issue_times, language=cdslang):
+def issue_times_to_week_strings(issue_times, language=CFG_SITE_LANG):
     """
     Function that approaches a correct python time to MySQL time week string
     conversion by looking up and down the time horizon and always rechecking
@@ -434,7 +434,7 @@ def get_consistent_issue_week(issue_time, issue_week):
     else:
         return False
 
-def issue_week_strings_to_times(issue_weeks, language=cdslang):
+def issue_week_strings_to_times(issue_weeks, language=CFG_SITE_LANG):
     """
     Converts a list of issue week strings (WW/YYYY) to python time objects.
     """
@@ -449,7 +449,7 @@ def issue_week_strings_to_times(issue_weeks, language=cdslang):
         issue_times.append(result.timetuple())
     return issue_times
 
-def release_journal_update(update_issue, journal_name, language=cdslang):
+def release_journal_update(update_issue, journal_name, language=CFG_SITE_LANG):
     """
     Releases an update to a journal.
     """
@@ -472,7 +472,7 @@ def sort_by_week_number(x, y):
         week_y = y.split("/")[0]
         return cmp(week_x, week_y)
 
-def release_journal_issue(publish_issues, journal_name, language=cdslang):
+def release_journal_issue(publish_issues, journal_name, language=CFG_SITE_LANG):
     """
     Releases a new issue.
     """
@@ -496,7 +496,7 @@ def release_journal_issue(publish_issues, journal_name, language=cdslang):
     # set first issue to published
     release_journal_update(publish_issues[0], journal_name, language)
 
-def delete_journal_issue(issue, journal_name, language=cdslang):
+def delete_journal_issue(issue, journal_name, language=CFG_SITE_LANG):
     """
     Deletes an issue from the DB.
     """
@@ -525,7 +525,7 @@ def update_DB_for_alert(issue, journal_name, language):
                 AND id_jrnJOURNAL=%s", (issue,
                                         journal_id))
 
-def get_number_of_articles_for_issue(issue, journal_name, language=cdslang):
+def get_number_of_articles_for_issue(issue, journal_name, language=CFG_SITE_LANG):
     """
     Function that returns a dictionary with all categories and number of
     articles in each category.
@@ -586,7 +586,7 @@ def get_list_of_issues_for_publication(publication):
         issues.append("%s/%s" % (bounds[0], year))
     return issues
 
-def get_release_time(issue, journal_name, language=cdslang):
+def get_release_time(issue, journal_name, language=CFG_SITE_LANG):
     """
     Gets the date at which an issue was released from the DB.
     """
@@ -602,7 +602,7 @@ def get_release_time(issue, journal_name, language=cdslang):
     else:
         return release_date.timetuple()
 
-def get_announcement_time(issue, journal_name, language=cdslang):
+def get_announcement_time(issue, journal_name, language=CFG_SITE_LANG):
     """
     Get the date at which an issue was announced through the alert system.
     """
@@ -620,7 +620,7 @@ def get_announcement_time(issue, journal_name, language=cdslang):
 
 ######################## GET DEFAULTS FUNCTIONS ###############################
 
-def get_journal_id(journal_name, language=cdslang):
+def get_journal_id(journal_name, language=CFG_SITE_LANG):
     """
     Get the id for this journal from the DB.
     """
@@ -668,7 +668,7 @@ def get_current_issue(language, journal_name):
                                       current_issue))
     return current_issue
 
-def get_current_publication(journal_name, current_issue, language=cdslang):
+def get_current_publication(journal_name, current_issue, language=CFG_SITE_LANG):
     """
     Returns the current publication string (current issue + updates).
     """

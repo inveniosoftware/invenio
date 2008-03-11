@@ -29,7 +29,7 @@ from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.config import weburl, \
                            sweburl, \
-                           cdslang, \
+                           CFG_SITE_LANG, \
                            CFG_SITE_NAME, \
                            CFG_SITE_NAME_INTL,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS, \
@@ -142,7 +142,7 @@ class Template:
 
         return out
 
-    def tmpl_record_not_found(self, status='missing', recID="", ln=cdslang):
+    def tmpl_record_not_found(self, status='missing', recID="", ln=CFG_SITE_LANG):
         """
         Displays a page when bad or missing record ID was given.
         @param status:  'missing'   : no recID was given
@@ -673,7 +673,7 @@ class Template:
 
         return '<div style="margin-left:10px;margin-right:10px;">' + body + '</div>'
 
-    def create_messaging_link(self, to, display_name, ln=cdslang):
+    def create_messaging_link(self, to, display_name, ln=CFG_SITE_LANG):
         """prints a link to the messaging system"""
         link = "%s/yourmessages/write?msg_to=%s&amp;ln=%s" % (weburl, to, ln)
         if to:
@@ -726,7 +726,7 @@ class Template:
 </form>"""
         return output
 
-    def tmpl_warnings(self, warnings, ln=cdslang):
+    def tmpl_warnings(self, warnings, ln=CFG_SITE_LANG):
         """
         Prepare the warnings list
         @param warnings: list of warning tuples (warning_msg, arg1, arg2, etc)
@@ -1310,7 +1310,7 @@ class Template:
 
         return header + form
 
-    def tmpl_admin_del_com(self, del_res, ln=cdslang):
+    def tmpl_admin_del_com(self, del_res, ln=CFG_SITE_LANG):
         """
         @param del_res: list of the following tuple (comment_id, was_successfully_deleted),
                         was_successfully_deleted is boolean (0=false, >0=true
@@ -1335,7 +1335,7 @@ class Template:
         return out
 
 
-    def tmpl_admin_suppress_abuse_report(self, del_res, ln=cdslang):
+    def tmpl_admin_suppress_abuse_report(self, del_res, ln=CFG_SITE_LANG):
         """
         @param del_res: list of the following tuple (comment_id, was_successfully_deleted),
                         was_successfully_deleted is boolean (0=false, >0=true
@@ -1359,7 +1359,7 @@ class Template:
 
         return out
 
-    def tmpl_mini_review(self, recID, ln=cdslang, action='SUBMIT',
+    def tmpl_mini_review(self, recID, ln=CFG_SITE_LANG, action='SUBMIT',
                          avg_score=0, nb_comments_total=0):
         """Display the mini version of reviews (only the grading part)"""
 

@@ -27,7 +27,7 @@ import tempfile
 from marshal import loads
 from zlib import decompress
 
-from invenio.config import weburl, cdslang
+from invenio.config import weburl, CFG_SITE_LANG
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 from invenio.bibrank_grapher import create_temporary_image, write_coordinates_in_tmp_file, remove_old_img
@@ -107,7 +107,7 @@ def html_command(file):
     #t += "</table></td></tr></table>"
     return t
 
-def create_citation_history_graph_and_box(recid, ln=cdslang):
+def create_citation_history_graph_and_box(recid, ln=CFG_SITE_LANG):
     """Create graph with citation history for record RECID (into a
        temporary file) and return HTML box refering to that image.
        Called by Detailed record pages.

@@ -35,13 +35,13 @@ try:
 except ImportError:
     pass
 
-from invenio.config import cdslang
+from invenio.config import CFG_SITE_LANG
 
 def wash_url_argument(var, new_type):
     """
-    Wash argument into 'new_type', that can be 'list', 'str', 
+    Wash argument into 'new_type', that can be 'list', 'str',
                                                'int', 'tuple' or 'dict'.
-    If needed, the check 'type(var) is not None' should be done before 
+    If needed, the check 'type(var) is not None' should be done before
     calling this function.
     @param var: variable value
     @param new_type: variable type, 'list', 'str', 'int', 'tuple' or 'dict'
@@ -111,7 +111,7 @@ def get_referer(req, replace_ampersands=False):
     When visiting a webpage, the referer or referring page is the URL of the
     previous webpage from which a link was followed.
     @param req: request
-    @param replace_ampersands: if 1, replace & by &amp; in url 
+    @param replace_ampersands: if 1, replace & by &amp; in url
                                (correct HTML cannot contain & characters alone).
     """
     try:
@@ -125,18 +125,18 @@ def get_referer(req, replace_ampersands=False):
 def drop_default_urlargd(urlargd, default_urlargd):
     lndefault = {}
     lndefault.update(default_urlargd)
-    lndefault['ln'] = (str, cdslang)
-    
+    lndefault['ln'] = (str, CFG_SITE_LANG)
+
     canonical = {}
     canonical.update(urlargd)
-    
+
     for k, v in urlargd.items():
         try:
             d = lndefault[k]
 
             if d[1] == v:
                 del canonical[k]
-                
+
         except KeyError:
             pass
 
@@ -163,7 +163,7 @@ def make_canonical_urlargd(urlargd, default_urlargd):
 
     return ''
 
-def create_html_link(urlbase, urlargd, link_label, linkattrd={}, 
+def create_html_link(urlbase, urlargd, link_label, linkattrd={},
                      escape_urlargd=True, escape_linkattrd=True):
     """Creates a W3C compliant link.
     @param urlbase: base url (e.g. invenio.config.weburl/search)
@@ -188,8 +188,8 @@ def create_html_link(urlbase, urlargd, link_label, linkattrd={},
                                 for key in linkattrd.keys()]
         output += attributes_separator.join(attributes)
     output += '>' + link_label + '</a>'
-    return output    
-    
+    return output
+
 def create_url(urlbase, urlargd, escape_urlargd=True):
     """Creates a W3C compliant URL. Output will look like this:
     'urlbase?param1=value1&amp;param2=value2'
@@ -207,17 +207,17 @@ def create_url(urlbase, urlargd, escape_urlargd=True):
                          escape(quote(str(urlargd[key])), quote=True)
                                 for key in urlargd.keys()]
         else:
-            arguments = [str(key) + '=' + str(urlargd[key]) 
+            arguments = [str(key) + '=' + str(urlargd[key])
                             for key in urlargd.keys()]
         output += separator.join(arguments)
-    return output         
-            
+    return output
+
 def same_urls_p(a, b):
     """ Compare two URLs, ignoring reorganizing of query arguments """
 
     ua = list(urlparse(a))
     ub = list(urlparse(b))
-    
+
     ua[4] = parse_qs(ua[4], True)
     ub[4] = parse_qs(ub[4], True)
 

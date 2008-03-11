@@ -60,7 +60,7 @@ from invenio.config import \
      CFG_APACHE_GROUP_FILE, \
      CFG_APACHE_PASSWORD_FILE, \
      adminemail, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
      supportemail, \
@@ -105,7 +105,7 @@ def createGuestUser():
         except OperationalError:
             return None
 
-def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=cdslang,
+def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SITE_LANG,
                         navmenuid=""):
     """Show error message when user is not authorized to do something.
 
@@ -250,7 +250,7 @@ def setUid(req, uid):
     sm.maintain_session(req, s)
     return uid
 
-def get_user_info(uid, ln=cdslang):
+def get_user_info(uid, ln=CFG_SITE_LANG):
     """Get infos for a given user.
     @param uid: user id (int)
     @return tuple: (uid, nickname, display_name)
@@ -364,7 +364,7 @@ def confirm_email(email):
 
 
 def registerUser(req, email, passw, nickname, register_without_nickname=False,
-        login_method=None, ln=cdslang):
+        login_method=None, ln=CFG_SITE_LANG):
     """Register user with the desired values of NICKNAME, EMAIL and
        PASSW.
 
@@ -645,7 +645,7 @@ def update_Uid(req, p_email):
     setUid(req, query_ID)
     return query_ID
 
-def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
+def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=CFG_SITE_LANG):
     """Send an email to the address given by sendTo about the new account newAccountEmail."""
     _ = gettext_set_language(ln)
     sub = _("New account on") + " '%s'" % CFG_SITE_NAME
@@ -659,7 +659,7 @@ def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
     body += _("You can approve or reject this account request at") + ": %s/admin/webaccess/webaccessadmin.py/manageaccounts\n" % weburl
     return send_email(supportemail, sendTo, subject=sub, content=body)
 
-def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
+def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=CFG_SITE_LANG):
     """Send an email to the address given by sendTo about the new account newAccountEmail."""
     _ = gettext_set_language(ln)
     sub = _("Your account created on") + " '%s'" % CFG_SITE_NAME

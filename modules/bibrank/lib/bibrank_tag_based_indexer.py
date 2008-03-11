@@ -29,7 +29,7 @@ import traceback
 import ConfigParser
 
 from invenio.config import \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_ETCDIR
 from invenio.search_engine import perform_request_search, HitSet
 from invenio.bibrank_citation_indexer import get_citation_weight
@@ -386,7 +386,7 @@ def add_recIDs_by_date(rank_method_code, dates=""):
         write_message("No new records added since last time method was run")
     return list
 
-def getName(rank_method_code, ln=cdslang, type='ln'):
+def getName(rank_method_code, ln=CFG_SITE_LANG, type='ln'):
     """Returns the name of the method if it exists"""
 
     try:
@@ -395,7 +395,7 @@ def getName(rank_method_code, ln=cdslang, type='ln'):
             rnkid = str(rnkid[0][0])
             res = run_sql("SELECT value FROM rnkMETHODNAME where type=%s and ln=%s and id_rnkMETHOD=%s", (type, ln, rnkid))
             if not res:
-                res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln=%s and id_rnkMETHOD=%s and type=%s", (cdslang, rnkid, type))
+                res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln=%s and id_rnkMETHOD=%s and type=%s", (CFG_SITE_LANG, rnkid, type))
             if not res:
                 return rank_method_code
             return res[0][0]

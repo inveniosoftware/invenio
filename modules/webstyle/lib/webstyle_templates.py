@@ -29,7 +29,7 @@ import sys
 import string
 
 from invenio.config import \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
      supportemail, \
@@ -92,7 +92,7 @@ class Template:
 
         return cgi.escape(prolog) + out + cgi.escape(epilog)
 
-    def tmpl_page(self, req=None, ln=cdslang, description="",
+    def tmpl_page(self, req=None, ln=CFG_SITE_LANG, description="",
                   keywords="", userinfobox="", navtrailbox="",
                   pageheaderadd="", boxlefttop="", boxlefttopadd="",
                   boxleftbottom="", boxleftbottomadd="",
@@ -227,7 +227,7 @@ class Template:
                            pagefooteradd = pagefooteradd)
         return out
 
-    def tmpl_pageheader(self, req, ln=cdslang, headertitle="",
+    def tmpl_pageheader(self, req, ln=CFG_SITE_LANG, headertitle="",
                         description="", keywords="", userinfobox="",
                         navtrailbox="", pageheaderadd="", uid=0,
                         secure_page_p=0, navmenuid="admin", metaheaderadd="",
@@ -364,7 +364,7 @@ class Template:
           'cssurl' : secure_page_p and sweburl or weburl,
           'rssurl': rssurl,
           'ln' : ln,
-          'langlink': ln != cdslang and '?ln=' + ln or '',
+          'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
 
           'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
           'headertitle' : cgi.escape(headertitle),
@@ -394,7 +394,7 @@ class Template:
         }
         return out
 
-    def tmpl_pagefooter(self, req=None, ln=cdslang, lastupdated=None,
+    def tmpl_pagefooter(self, req=None, ln=CFG_SITE_LANG, lastupdated=None,
                         pagefooteradd=""):
         """Creates a page footer
 
@@ -458,7 +458,7 @@ class Template:
           'weburl' : weburl,
           'sweburl' : sweburl,
           'ln' : ln,
-          'langlink': ln != cdslang and '?ln=' + ln or '',
+          'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
 
           'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
           'supportemail' : supportemail,
@@ -480,7 +480,7 @@ class Template:
         }
         return out
 
-    def tmpl_language_selection_box(self, req, language=cdslang):
+    def tmpl_language_selection_box(self, req, language=CFG_SITE_LANG):
         """Take URLARGS and LANGUAGE and return textual language
            selection box for the given page.
 
@@ -665,7 +665,7 @@ URI: http://%(host)s%(page)s
 
         return out
 
-    def detailed_record_container(self, content, recid, tabs, ln=cdslang,
+    def detailed_record_container(self, content, recid, tabs, ln=CFG_SITE_LANG,
                                   show_similar_rec_p=True,
                                   creationdate=None,
                                   modifydate=None, show_short_rec_p=True):
@@ -771,7 +771,7 @@ URI: http://%(host)s%(page)s
 
         return out
 
-    def detailed_record_mini_panel(self, recid, ln=cdslang,
+    def detailed_record_mini_panel(self, recid, ln=CFG_SITE_LANG,
                                    format='hd',
                                    files='',
                                    reviews='',

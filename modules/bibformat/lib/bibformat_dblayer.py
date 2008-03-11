@@ -544,7 +544,7 @@ def get_output_format_names(code):
               'generic': "a name"}
 
     The returned dictionary is never None. The keys 'ln' and 'sn' are always present. However
-    only languages present in the database are in dicts 'sn' and 'ln'. language "cdslang" is always
+    only languages present in the database are in dicts 'sn' and 'ln'. language "CFG_SITE_LANG" is always
     in dict.
 
     The localized names of output formats are located in formatname table.

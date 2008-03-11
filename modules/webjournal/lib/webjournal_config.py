@@ -20,7 +20,7 @@
 
 import os
 
-from invenio.config import adminemail, supportemail, CFG_ETCDIR, weburl, cdslang
+from invenio.config import adminemail, supportemail, CFG_ETCDIR, weburl, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.htmlutils import escape_html
@@ -102,7 +102,7 @@ class InvenioWebJournalNoSearchTemplateError(Exception):
     """
     Exception if an article was called without its order number.
     """
-    def __init__(self, journal_name, language=cdslang):
+    def __init__(self, journal_name, language=CFG_SITE_LANG):
         """
         Initialisation.
         """
@@ -621,7 +621,7 @@ def webjournal_missing_info_box(language, title, msg_title, msg):
     #try:
     #    language = params["ln"]
     #except:
-    #    language = cdslang
+    #    language = CFG_SITE_LANG
     _ = gettext_set_language(language)
     title = _(title)
     box_title = _(msg_title)
@@ -661,7 +661,7 @@ def webjournal_error_box(language, title, title_msg, msg):
     #try:
     #    language = params["ln"]
     #except:
-    #    language = cdslang
+    #    language = CFG_SITE_LANG
     _ = gettext_set_language(language)
     title = _(title)
     title_msg = _(title_msg)

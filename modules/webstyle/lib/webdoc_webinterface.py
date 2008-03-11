@@ -27,7 +27,7 @@ __revision__ = \
 __lastupdated__ = """$Date$"""
 
 import cgi
-from invenio.config import weburl, cdslang, CFG_SITE_NAME, CFG_SITE_NAME_INTL, cdslangs
+from invenio.config import weburl, CFG_SITE_LANG, CFG_SITE_NAME, CFG_SITE_NAME_INTL, CFG_SITE_LANGS
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid
@@ -82,7 +82,7 @@ class WebInterfaceDocumentationPages(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """Serve webdoc page in the given language."""
-        argd = wash_urlargd(form, {'ln': (str, cdslang)})
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
         if self.webdocname in ['admin', 'hacking', ''] and \
                self.categ == 'help' and \
                not (req.uri.endswith('.html') or \
@@ -90,7 +90,7 @@ class WebInterfaceDocumentationPages(WebInterfaceDirectory):
                     req.uri.endswith('/help/submit/')):
             # Eg. /help/hacking -> /help/hacking/
             #     /help         -> /help/
-            ln_link = (argd['ln'] != cdslang and '?ln=' + argd['ln']) or ''
+            ln_link = (argd['ln'] != CFG_SITE_LANG and '?ln=' + argd['ln']) or ''
             redirect_to_url(req, req.uri + "/" + ln_link)
         elif req.uri.endswith('.html') or \
                  req.uri.endswith('/help/search/') or \
@@ -99,8 +99,8 @@ class WebInterfaceDocumentationPages(WebInterfaceDirectory):
             path = req.uri.split('/')
             parts = path[-1].split('.')
             title = parts[0]
-            ln = cdslang
-            if len(parts) > 1 and parts[1] in cdslangs:
+            ln = CFG_SITE_LANG
+            if len(parts) > 1 and parts[1] in CFG_SITE_LANGS:
                 ln = parts[1]
             category = path[-2]
             webdocname = self.legacy_urls_mappings.get(title, '')
@@ -113,14 +113,14 @@ class WebInterfaceDocumentationPages(WebInterfaceDirectory):
                 category += '/'
 
             url = weburl + '/help/' + category  + webdocname
-            ln_link = (ln != cdslang and '?ln=' + ln) or ''
+            ln_link = (ln != CFG_SITE_LANG and '?ln=' + ln) or ''
             redirect_to_url(req, url + ln_link)
         else:
             return display_webdoc_page(self.webdocname, categ=self.categ, ln=argd['ln'], req=req)
 
     index = __call__
 
-def display_webdoc_page(webdocname, categ="help", ln=cdslang, req=None):
+def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
     """Display webdoc page WEBDOCNAME in language LN."""
 
     _ = gettext_set_language(ln)
@@ -131,7 +131,7 @@ def display_webdoc_page(webdocname, categ="help", ln=cdslang, req=None):
     if not webdocname:
         webdocname = 'help-central'
 
-    ln_link = (ln != cdslang and '?ln=' + ln) or ''
+    ln_link = (ln != CFG_SITE_LANG and '?ln=' + ln) or ''
 
     # get page parts in given language:
     if webdocname != 'contents':

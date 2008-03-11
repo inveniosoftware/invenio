@@ -151,7 +151,7 @@ CFG&#95;WEBMESSAGE&#95;ERROR&#95;MESSAGES = \
 <pre>
 from invenio.webmessage&#95;config import CFG&#95;WEBMESSAGE&#95;ERROR&#95;MESSAGES
 
-def perform&#95;request&#95;display&#95;msg(uid, msgid, ln=cdslang):
+def perform&#95;request&#95;display&#95;msg(uid, msgid, ln=CFG_SITE_LANG):
     uid   = wash&#95;url&#95;argument(uid, 'int')
     msgid = wash&#95;url&#95;argument(msgid, 'int')
     ln    = wash&#95;language(ln)
@@ -177,7 +177,7 @@ def perform&#95;request&#95;display&#95;msg(uid, msgid, ln=cdslang):
 from invenio.webpage import page
 from invenio.webmessage import perform&#95;request&#95;display&#95;msg
 
-def display&#95;msg(req, msgid=-1, ln=cdslang):
+def display&#95;msg(req, msgid=-1, ln=CFG_SITE_LANG):
     &#95; = gettext&#95;set&#95;language(ln)
     # Generate content
     (body, errors, warnings) = perform&#95;request&#95;display&#95;msg(uid, msgid, ln)
@@ -198,7 +198,7 @@ def display&#95;msg(req, msgid=-1, ln=cdslang):
 
 <p>The following functions can be useful (see source code for other functions):</p>
 <pre>
-   get&#95;msgs&#95;for&#95;code&#95;list(code&#95;list, stream='error', ln=cdslang)
+   get&#95;msgs&#95;for&#95;code&#95;list(code&#95;list, stream='error', ln=CFG_SITE_LANG)
         Returns formatted strings for the given errors
         @param code&#95;list: list of tuples  [(err&#95;name, arg1, ..., argN), ...]
         @param stream: 'error' or 'warning'

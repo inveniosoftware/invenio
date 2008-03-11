@@ -26,12 +26,12 @@ import sys
 from mod_python import apache
 
 from invenio.websubmitadmin_engine import *
-from invenio.config import cdslang
+from invenio.config import CFG_SITE_LANG
 from invenio.webuser import getUid, page_not_authorized
 from invenio.webpage import page
 from invenio.messages import wash_language, gettext_set_language
 
-def index(req, ln=cdslang):
+def index(req, ln=CFG_SITE_LANG):
     """Websubmit Admin home page. Default action: list all WebSubmit document types."""
 
     ln = wash_language(ln)
@@ -55,7 +55,7 @@ def index(req, ln=cdslang):
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
-def showall(req, ln=cdslang):
+def showall(req, ln=CFG_SITE_LANG):
     """Placeholder for the showall functionality"""
 
     ln = wash_language(ln)
@@ -79,7 +79,7 @@ def showall(req, ln=cdslang):
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
-def doctypelist(req, ln=cdslang):
+def doctypelist(req, ln=CFG_SITE_LANG):
     """List all WebSubmit document types."""
 
     ln = wash_language(ln)
@@ -104,7 +104,7 @@ def doctypelist(req, ln=cdslang):
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
 
-def jschecklist(req, ln=cdslang):
+def jschecklist(req, ln=CFG_SITE_LANG):
     """List all WebSubmit JavaScript Checks (checks can be applied to form elements in WebSubmit.)"""
 
     ln = wash_language(ln)
@@ -129,7 +129,7 @@ def jschecklist(req, ln=cdslang):
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
 
-def actionlist(req, ln=cdslang):
+def actionlist(req, ln=CFG_SITE_LANG):
     """List all WebSubmit actions."""
 
     ln = wash_language(ln)
@@ -154,7 +154,7 @@ def actionlist(req, ln=cdslang):
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
 
-def functionlist(req, ln=cdslang):
+def functionlist(req, ln=CFG_SITE_LANG):
     """List all WebSubmit FUNCTIONS (Functions do the work of processing a submission)"""
 
     ln = wash_language(ln)
@@ -178,7 +178,7 @@ def functionlist(req, ln=cdslang):
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
-def elementlist(req, ln=cdslang):
+def elementlist(req, ln=CFG_SITE_LANG):
     """List all WebSubmit form ELEMENTS (elements are input fields on a WebSubmit form)"""
 
     ln = wash_language(ln)
@@ -202,7 +202,7 @@ def elementlist(req, ln=cdslang):
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
-def actionadd(req, actid=None, actname=None, working_dir=None, status_text=None, actcommit="", ln=cdslang):
+def actionadd(req, actid=None, actname=None, working_dir=None, status_text=None, actcommit="", ln=CFG_SITE_LANG):
     """Add a new action to the WebSubmit database.
        Web form for action details will be displayed if "actid" and "actname" are empty; else
        new action will be committed to websubmit.
@@ -236,7 +236,7 @@ def actionadd(req, actid=None, actname=None, working_dir=None, status_text=None,
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
-def actionedit(req, actid, actname=None, working_dir=None, status_text=None, actcommit="", ln=cdslang):
+def actionedit(req, actid, actname=None, working_dir=None, status_text=None, actcommit="", ln=CFG_SITE_LANG):
     """Display the details of a WebSubmit action in a Web form so that it can be viewed and/or edited.
        @param actid: The unique action identifier code.
        @param actname: name of action (if present, action will be updated, else action details will be displayed)
@@ -267,7 +267,7 @@ def actionedit(req, actid, actname=None, working_dir=None, status_text=None, act
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
-def jscheckadd(req, chname=None, chdesc=None, chcommit="", ln=cdslang):
+def jscheckadd(req, chname=None, chdesc=None, chcommit="", ln=CFG_SITE_LANG):
     """Add a new JavaScript CHECK to the WebSubmit database.
        Web form for action details will be displayed if "actid" and "actname" are empty; else
        new action will be committed to WebSubmit.
@@ -300,7 +300,7 @@ def jscheckadd(req, chname=None, chdesc=None, chcommit="", ln=cdslang):
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
-def jscheckedit(req, chname, chdesc=None, chcommit="", ln=cdslang):
+def jscheckedit(req, chname, chdesc=None, chcommit="", ln=CFG_SITE_LANG):
     """Display the details of a WebSubmit checking function in a Web form so that it can be viewed
        and/or edited.
        @param chname: The unique Check name/identifier code.
@@ -332,7 +332,7 @@ def jscheckedit(req, chname, chdesc=None, chcommit="", ln=cdslang):
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
 def elementadd(req, elname=None, elmarccode=None, eltype=None, elsize=None, elrows=None, elcols=None, elmaxlength=None, \
-                elval=None, elfidesc=None, elmodifytext=None, elcommit="", ln=cdslang):
+                elval=None, elfidesc=None, elmodifytext=None, elcommit="", ln=CFG_SITE_LANG):
     """Add a new WebSubmit ELEMENT to the WebSubmit database.
        @param elname: unique name/ID for new check (if empty, Web form will be displayed)
        @param elmarccode: MARC Code for element
@@ -376,7 +376,7 @@ def elementadd(req, elname=None, elmarccode=None, eltype=None, elsize=None, elro
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
 def elementedit(req, elname, elmarccode=None, eltype=None, elsize=None, elrows=None, elcols=None, elmaxlength=None, \
-                elval=None, elfidesc=None, elmodifytext=None, elcommit="", ln=cdslang):
+                elval=None, elfidesc=None, elmodifytext=None, elcommit="", ln=CFG_SITE_LANG):
     """Display the details of a WebSubmit ELEMENT in a Web form so that it can be viewed
        and/or edited.
        @param elname: unique name/ID for new check (if empty, Web form will be displayed)
@@ -420,7 +420,7 @@ def elementedit(req, elname, elmarccode=None, eltype=None, elsize=None, elrows=N
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
-def functionadd(req, funcname=None, funcdescr=None, funcaddcommit="", ln=cdslang):
+def functionadd(req, funcname=None, funcdescr=None, funcaddcommit="", ln=CFG_SITE_LANG):
     """Add a new function to WebSubmit"""
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -449,7 +449,7 @@ def functionadd(req, funcname=None, funcdescr=None, funcaddcommit="", ln=cdslang
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
 def functionedit(req, funcname=None, funcdescr=None, funceditaddparam=None, funceditaddparamfree=None, \
-                 funceditdelparam=None, funcdescreditcommit="", funcparamdelcommit="", funcparamaddcommit="", ln=cdslang):
+                 funceditdelparam=None, funcdescreditcommit="", funcparamdelcommit="", funcparamaddcommit="", ln=CFG_SITE_LANG):
     """Edit a WebSubmit function"""
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -482,7 +482,7 @@ def functionedit(req, funcname=None, funcdescr=None, funceditaddparam=None, func
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
-def functionusage(req, funcname, ln=cdslang):
+def functionusage(req, funcname, ln=CFG_SITE_LANG):
     """View the usage cases (document-type and actions) in which a function is used.
        @param function: the function name
        @param ln: the language
@@ -510,7 +510,7 @@ def functionusage(req, funcname, ln=cdslang):
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
-def doctyperemove(req, doctype="", doctypedelete="", doctypedeleteconfirm="", ln=cdslang):
+def doctyperemove(req, doctype="", doctypedelete="", doctypedeleteconfirm="", ln=CFG_SITE_LANG):
     """Delete a WebSubmit document-type.
     @param doctype: the unique id of the document type to be deleted
     @param ln: the interface language
@@ -540,7 +540,7 @@ def doctyperemove(req, doctype="", doctypedelete="", doctypedeleteconfirm="", ln
         ## user is not authorised to use WebSubmit Admin:
         return page_not_authorized(req=req, text=auth_msg, navtrail=get_navtrail(ln))
 
-def doctypeadd(req, doctype=None, doctypename=None, doctypedescr=None, clonefrom=None, doctypedetailscommit="", ln=cdslang):
+def doctypeadd(req, doctype=None, doctypename=None, doctypedescr=None, clonefrom=None, doctypedetailscommit="", ln=CFG_SITE_LANG):
     """Add a new document type to WebSubmit"""
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -585,7 +585,7 @@ def doctypeconfiguresubmissionpageelements(req,
                                            fieldlevel="",
                                            fieldshortdesc="",
                                            fieldcheck="",
-                                           ln=cdslang):
+                                           ln=CFG_SITE_LANG):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
@@ -626,7 +626,7 @@ def doctypeconfiguresubmissionpagespreview(req,
                                            doctype="",
                                            action="",
                                            pagenum="",
-                                           ln=cdslang):
+                                           ln=CFG_SITE_LANG):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
@@ -662,7 +662,7 @@ def doctypeconfiguresubmissionpages(req,
                                     deletepage="",
                                     deletepageconfirm="",
                                     addpage="",
-                                    ln=cdslang
+                                    ln=CFG_SITE_LANG
                                    ):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -706,7 +706,7 @@ def doctypeconfiguresubmissionfunctionsparameters(req,
                                                   editfunctionparameterfilecommit="",
                                                   paramfilename="",
                                                   paramfilecontent="",
-                                                  ln=cdslang):
+                                                  ln=CFG_SITE_LANG):
     """Configure the parameters for a function belonging to a given submission.
        @param doctype: (string) the unique ID of a document type
        @param action: (string) the unique ID of an action
@@ -784,7 +784,7 @@ def doctypeconfiguresubmissionfunctions(req,
                                         addfunctionname="",
                                         addfunctionstep="",
                                         addfunctionscore="",
-                                        ln=cdslang):
+                                        ln=CFG_SITE_LANG):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
@@ -862,7 +862,7 @@ def doctypeconfigure(req,
                      stpage=None,
                      endtxt=None,
                      doctype_cloneactionfrom=None,
-                     ln=cdslang):
+                     ln=CFG_SITE_LANG):
     """The main entry point to the configuration of a WebSubmit document type and its submission interfaces,
        functions, etc.
     """
@@ -932,7 +932,7 @@ def organisesubmissionpage(req,
                            deletedoctypefromsbmcollection="",
                            movedoctypeupinsbmcollection="",
                            movedoctypedowninsbmcollection="",
-                           ln=cdslang):
+                           ln=CFG_SITE_LANG):
     """Entry point for organising the document types on a submission page.
     """
     ln = wash_language(ln)

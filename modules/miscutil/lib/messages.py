@@ -23,7 +23,7 @@ I18N interfaces.  Typical usage in the caller code is:
 
    from messages import gettext_set_language
    [...]
-   def square(x, ln=cdslang):
+   def square(x, ln=CFG_SITE_LANG):
        _ = gettext_set_language(ln)
        print _("Hello there!")
        print _("The square of %s is %s.") % (x, x*x)
@@ -38,10 +38,10 @@ __revision__ = "$Id$"
 
 import gettext
 
-from invenio.config import CFG_LOCALEDIR, cdslangs
+from invenio.config import CFG_LOCALEDIR, CFG_SITE_LANGS
 
 lang = {}
-for ln in cdslangs:
+for ln in CFG_SITE_LANGS:
     lang[ln] = gettext.translation('cds-invenio', CFG_LOCALEDIR, languages = [ln], fallback = True)
 
 def gettext_set_language(ln):
@@ -56,7 +56,7 @@ def gettext_set_language(ln):
 def wash_language(ln):
     """Look at LN and check if it is one of allowed languages for the interface.
        Return it in case of success, return the default language otherwise."""
-    if ln in cdslangs:
+    if ln in CFG_SITE_LANGS:
         return ln
     else:
         return 'en'
@@ -84,6 +84,6 @@ def language_list_long():
                               'zh_CN': '中文(简)',
                               'zh_TW': '中文(繁)',}
     enabled_lang_list = []
-    for lang in cdslangs:
+    for lang in CFG_SITE_LANGS:
         enabled_lang_list.append([lang,cfg_all_language_names[lang]])
     return enabled_lang_list

@@ -25,7 +25,7 @@ import types
 import re
 
 from invenio.config import \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      images, \
      weburl
@@ -47,7 +47,7 @@ from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, list_registered_users, page_not_authorized
 from invenio.messages import wash_language
 
-def index(req, c=CFG_SITE_NAME, ln=cdslang, todo="", id="", doctype="",
+def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, todo="", id="", doctype="",
           categ="", addusers="", warningText="", role=""):
     """Main entry point for the management of referees."""
     ln = wash_language(ln)
@@ -232,7 +232,7 @@ def displayAddUser(doctype):
     return t
 
 
-def errorMsg(title, req, uid, c=CFG_SITE_NAME, ln=cdslang):
+def errorMsg(title, req, uid, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
     """Prints the error page."""
     return page(title="error",
                     body = create_error_box(req, title=title,verbose=0, ln=ln),

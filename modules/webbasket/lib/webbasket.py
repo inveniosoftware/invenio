@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 import cgi
 from zlib import decompress
 
-from invenio.config import cdslang, weburl
+from invenio.config import CFG_SITE_LANG, weburl
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui, \
                               convert_datetext_to_datestruct,\
@@ -49,7 +49,7 @@ def perform_request_display(uid,
                             category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                             selected_topic=0,
                             selected_group_id=0,
-                            ln=cdslang):
+                            ln=CFG_SITE_LANG):
     """Display all the baskets of given category, topic or group.
     @param uid: user id
     @param category: selected category (see webbasket_config.py)
@@ -151,7 +151,7 @@ def __display_basket(bskid, name, date_modification, nb_views,
                      share_level, group_sharing_level,
                      category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                      selected_topic=0, selected_group_id=0,
-                     ln=cdslang):
+                     ln=CFG_SITE_LANG):
     """Private function. Display a basket giving its category and topic or group.
     @param share_level: rights user has on basket
     @param group_sharing_level: None if basket is not shared,
@@ -211,7 +211,7 @@ def __display_basket(bskid, name, date_modification, nb_views,
 
 def perform_request_display_item(uid, bskid, recid, format='hb',
                                  category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                                 topic=0, group_id=0, ln=cdslang):
+                                 topic=0, group_id=0, ln=CFG_SITE_LANG):
     """Display an item of a basket of given category, topic or group.
     @param uid: user id
     @param bskid: basket_id
@@ -269,7 +269,7 @@ def perform_request_display_item(uid, bskid, recid, format='hb',
 def perform_request_write_comment(uid, bskid, recid, cmtid=0,
                                   category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                                   topic=0, group_id=0,
-                                  ln=cdslang):
+                                  ln=CFG_SITE_LANG):
     """Display a comment writing form
     @param uid: user id
     @param bskid: basket id
@@ -324,7 +324,7 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
     body = webbasket_templates.tmpl_display(topicsbox, '', [ body ], category, ln)
     return (body, errors, warnings)
 
-def perform_request_save_comment(uid, bskid, recid, title='', text='', ln=cdslang):
+def perform_request_save_comment(uid, bskid, recid, title='', text='', ln=CFG_SITE_LANG):
     """ Save a given comment if able to.
     @param uid: user id (int)
     @param bskid: basket id (int)
@@ -357,7 +357,7 @@ def perform_request_delete_comment(uid, bskid, recid, cmtid):
 
 def perform_request_add(uid, recids=[], bskids=[], referer='',
                         new_basket_name='', new_topic_name='', create_in_topic='',
-                        ln=cdslang):
+                        ln=CFG_SITE_LANG):
     """Add records to baskets
     @param uid: user id
     @param recids: list of records to add
@@ -444,7 +444,7 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
 def perform_request_delete(uid, bskid, confirmed=0,
                            category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                            selected_topic=0, selected_group_id=0,
-                           ln=cdslang):
+                           ln=CFG_SITE_LANG):
     """Delete a given basket.
     @param uid: user id (user has to be owner of this basket)
     @param bskid: basket id
@@ -497,7 +497,7 @@ def move_record(uid, bskid, recid, direction):
 def perform_request_edit(uid, bskid, topic=0, new_name='',
                          new_topic = '', new_topic_name='',
                          groups=[], external='',
-                         ln=cdslang):
+                         ln=CFG_SITE_LANG):
     """Interface for management of basket. If names, groups or external is
      provided, will save new rights into database, else will provide interface.
     @param uid: user id (user has to have sufficient rights on this basket
@@ -569,7 +569,7 @@ def perform_request_edit(uid, bskid, topic=0, new_name='',
             errors.append(('ERR_WEBBASKET_NOT_OWNER'))
     return (body, errors, warnings)
 
-def perform_request_add_group(uid, bskid, topic=0, group_id=0, ln=cdslang):
+def perform_request_add_group(uid, bskid, topic=0, group_id=0, ln=CFG_SITE_LANG):
     """If group id is specified, share basket bskid to this group with
     READITM rights;
     else return a page for selection of a group.
@@ -592,7 +592,7 @@ def perform_request_create_basket(uid,
                                   new_basket_name='',
                                   new_topic_name='', create_in_topic=-1,
                                   topic_number=-1,
-                                  ln=cdslang):
+                                  ln=CFG_SITE_LANG):
     """if new_basket_name and topic infos are given create a basket and return topic number,
     else return (body, errors, warnings) tuple of basket creation form.
     @param uid: user id (int)
@@ -629,7 +629,7 @@ def perform_request_create_basket(uid,
                                                       ln)
         return (body, [], [])
 
-def perform_request_display_public(bskid=0, of='hb', ln=cdslang):
+def perform_request_display_public(bskid=0, of='hb', ln=CFG_SITE_LANG):
     """return html representation of a public basket
     @param bskid: basket id
     @param of: format
@@ -668,7 +668,7 @@ def perform_request_display_public(bskid=0, of='hb', ln=cdslang):
         errors.append('ERR_WEBBASKET_RESTRICTED_ACCESS')
     return (body, errors, warnings)
 
-def perform_request_list_public_baskets(inf_limit=0, order=1, asc=1, ln=cdslang):
+def perform_request_list_public_baskets(inf_limit=0, order=1, asc=1, ln=CFG_SITE_LANG):
     """Display list of public baskets.
     @param inf_limit: display baskets from inf_limit
     @param order: 1: order by name of basket, 2: number of views, 3: owner
@@ -722,14 +722,14 @@ def __check_sufficient_rights(rights_user_has, rights_needed):
         out = 0
     return out
 
-def create_guest_warning_box(ln=cdslang):
+def create_guest_warning_box(ln=CFG_SITE_LANG):
     """return a warning message about logging into system"""
     return webbasket_templates.tmpl_create_guest_warning_box(ln)
 
 def create_personal_baskets_selection_box(uid,
                                           html_select_box_name='baskets',
                                           selected_bskid=None,
-                                          ln=cdslang):
+                                          ln=CFG_SITE_LANG):
     """Return HTML box for basket selection. Only for personal baskets.
     @param uid: user id
     @param html_select_box_name: name used in html form
@@ -746,7 +746,7 @@ def create_personal_baskets_selection_box(uid,
 def create_basket_navtrail(uid,
                            category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                            topic=0, group=0,
-                           bskid=0, ln=cdslang):
+                           bskid=0, ln=CFG_SITE_LANG):
     """display navtrail for basket navigation.
     @param uid: user id (int)
     @param category: selected category (see CFG_WEBBASKET_CATEGORIES)
@@ -829,7 +829,7 @@ def create_infobox(infos=[]):
     Return formatted infos"""
     return webbasket_templates.tmpl_create_infobox(infos)
 
-def account_list_baskets(uid, ln=cdslang):
+def account_list_baskets(uid, ln=CFG_SITE_LANG):
     """Display baskets informations on account page"""
     _ = gettext_set_language(ln)
     (personal, group, external) = db.count_baskets(uid)

@@ -45,7 +45,7 @@ Contents:
 
 The APIs of bibformat.py consists in these functions:
 
- def format_record(recID, of, ln=cdslang, verbose=0,
+ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
                    search_pattern=None, xml_record=None, user_info=None,
                    on_the_fly=False):
      """
@@ -77,7 +77,7 @@ The APIs of bibformat.py consists in these functions:
 
                   ln -  the language to use to format the record. If
                         'ln' is an unknown language, or translation
-                        does not exist, default cdslang language
+                        does not exist, default CFG_SITE_LANG language
                         will be applied whenever possible.
                         Allows contextual formatting.
 
@@ -111,7 +111,7 @@ The APIs of bibformat.py consists in these functions:
    >> format_record(5, "hb", "fr")
 
 
- def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None,
+ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                     xml_records=None, user_info=None, record_prefix=None,
                     record_separator=None, record_suffix=None,
                     prologue="", epilogue="", req=None, on_the_fly=False):

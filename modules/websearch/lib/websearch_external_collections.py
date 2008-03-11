@@ -27,7 +27,7 @@ import cgi
 from copy import copy
 from sets import Set
 
-from invenio.config import cdslang
+from invenio.config import CFG_SITE_LANG
 from invenio.dbquery import run_sql, OperationalError
 from invenio.messages import gettext_set_language
 
@@ -45,7 +45,7 @@ template = invenio.template.load('websearch_external_collections')
 #dico_collection_seealso = {}
 
 def print_external_results_overview(req, current_collection, pattern_list, field,
-        external_collection, verbosity_level=0, lang=cdslang):
+        external_collection, verbosity_level=0, lang=CFG_SITE_LANG):
     """Print the external collection overview box. Return the selected external collections and parsed query"""
     from invenio.search_engine import create_basic_search_units
     assert req
@@ -72,7 +72,7 @@ def print_external_results_overview(req, current_collection, pattern_list, field
     return (search_engines, seealso_engines, pattern, basic_search_units)
 
 def perform_external_collection_search(req, current_collection, pattern_list, field,
-        external_collection, verbosity_level=0, lang=cdslang, selected_external_collections_infos=None):
+        external_collection, verbosity_level=0, lang=CFG_SITE_LANG, selected_external_collections_infos=None):
     """Search external collection and print the seealso box."""
 
     vprint = get_verbose_print(req, 'External collection: ', verbosity_level)

@@ -27,7 +27,7 @@ import re
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_CERN_SITE, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      supportemail, \
      sweburl, \
@@ -150,7 +150,7 @@ def template_account(title, body, ln):
              body = body
            )
 
-def warning_guest_user(type, ln=cdslang):
+def warning_guest_user(type, ln=CFG_SITE_LANG):
     """It returns an alert message,showing that the user is a guest user and should log into the system."""
 
     # load the right message language
@@ -245,7 +245,7 @@ def perform_set(email, ln, verbose=0):
     out += perform_display_external_user_settings(prefs, ln)
     return out
 
-def create_register_page_box(referer='', ln=cdslang):
+def create_register_page_box(referer='', ln=CFG_SITE_LANG):
     """Register a new account."""
     return websession_templates.tmpl_register_page(
              referer = referer,
@@ -255,7 +255,7 @@ def create_register_page_box(referer='', ln=cdslang):
            )
 
 ##  create_login_page_box(): ask for the user's email and password, for login into the system
-def create_login_page_box(referer='', apache_msg="", ln=cdslang):
+def create_login_page_box(referer='', apache_msg="", ln=CFG_SITE_LANG):
     # List of referer regexep and message to print
 
     _ = gettext_set_language(ln)

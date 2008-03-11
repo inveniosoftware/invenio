@@ -31,7 +31,7 @@ from invenio.webcomment import check_recID_is_in_range, \
                                perform_request_add_comment_or_remark,\
                                perform_request_vote,\
                                perform_request_report
-from invenio.config import cdslang, \
+from invenio.config import CFG_SITE_LANG, \
                            weburl, \
                            sweburl, \
                            CFG_WEBCOMMENT_ALLOW_COMMENTS,\
@@ -138,7 +138,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
             ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
             link_ln = ''
-            if argd['ln'] != cdslang:
+            if argd['ln'] != CFG_SITE_LANG:
                 link_ln = '?ln=%s' % argd['ln']
             tabs = [(unordered_tabs[tab_id]['label'], \
                      '%s/record/%s/%s%s' % (weburl, self.recid, tab_id, link_ln), \
@@ -265,7 +265,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                             body=msg,
                             navtrail=navtrail,
                             uid=uid,
-                            language=cdslang,
+                            language=CFG_SITE_LANG,
                             verbose=1,
                             req=req,
                             navmenuid='search')
@@ -289,7 +289,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                             body=body,
                             navtrail=navtrail,
                             uid=uid,
-                            language=cdslang,
+                            language=CFG_SITE_LANG,
                             verbose=1,
                             errors=errors,
                             warnings=warnings,

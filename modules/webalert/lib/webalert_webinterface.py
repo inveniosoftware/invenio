@@ -29,7 +29,7 @@ import zlib
 import urllib
 from mod_python import apache
 
-from invenio.config import weburl, sweburl, cdslang, CFG_SITE_NAME, \
+from invenio.config import weburl, sweburl, CFG_SITE_LANG, CFG_SITE_NAME, \
   CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_SITE_NAME_INTL
 from invenio.webpage import page
 from invenio import webalert

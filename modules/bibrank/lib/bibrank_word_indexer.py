@@ -29,7 +29,7 @@ import re
 import ConfigParser
 
 from invenio.config import \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_ETCDIR
 from invenio.search_engine import perform_request_search, strip_accents, wash_index_term
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
@@ -1159,7 +1159,7 @@ def get_from_reverse_index(records, start, stop, table):
     #for (word, count) in gwfp.iteritems():
         #print "\t-> %s - %s" % (word, count)
 
-def getName(methname, ln=cdslang, type='ln'):
+def getName(methname, ln=CFG_SITE_LANG, type='ln'):
     """Returns the name of the rank method, either in default language or given language.
     methname = short name of the method
     ln - the language to get the name in
@@ -1171,7 +1171,7 @@ def getName(methname, ln=cdslang, type='ln'):
             rnkid = str(rnkid[0][0])
             res = run_sql("SELECT value FROM rnkMETHODNAME where type='%s' and ln='%s' and id_rnkMETHOD=%s" % (type, ln, rnkid))
             if not res:
-                res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln='%s' and id_rnkMETHOD=%s and type='%s'"  % (cdslang, rnkid, type))
+                res = run_sql("SELECT value FROM rnkMETHODNAME WHERE ln='%s' and id_rnkMETHOD=%s and type='%s'"  % (CFG_SITE_LANG, rnkid, type))
             if not res:
                 return methname
             return res[0][0]

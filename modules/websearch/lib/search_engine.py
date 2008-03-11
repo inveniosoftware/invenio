@@ -48,7 +48,7 @@ from invenio.config import \
      CFG_WEBSEARCH_SEARCH_CACHE_SIZE, \
      CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_LOGDIR, \
      weburl
@@ -261,7 +261,7 @@ class FieldI18nNameDataCacher(DataCacher):
 
         DataCacher.__init__(self, cache_filler, timestamp_getter)
 
-    def get_field_i18nname(self, f, ln=cdslang):
+    def get_field_i18nname(self, f, ln=CFG_SITE_LANG):
         out = f
         try:
             out = self.get_cache()[f][ln]
@@ -339,7 +339,7 @@ class CollectionI18nDataCacher(DataCacher):
 
         DataCacher.__init__(self, cache_filler, timestamp_getter)
 
-    def get_coll_i18nname(self, c, ln=cdslang):
+    def get_coll_i18nname(self, c, ln=CFG_SITE_LANG):
         """Return nicely formatted collection name (of name type 'ln',
         'long name') for collection C in language LN."""
         cache = self.get_cache()
@@ -357,7 +357,7 @@ except Exception:
     collection_i18n_name_cache = CollectionI18nDataCacher()
 
 
-def get_alphabetically_ordered_collection_list(level=0, ln=cdslang):
+def get_alphabetically_ordered_collection_list(level=0, ln=CFG_SITE_LANG):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
        (collection name, printable collection name).
        Suitable for create_search_box()."""
@@ -375,7 +375,7 @@ def get_alphabetically_ordered_collection_list(level=0, ln=cdslang):
         out.append([c_name, c_printable])
     return out
 
-def get_nicely_ordered_collection_list(collid=1, level=0, ln=cdslang):
+def get_nicely_ordered_collection_list(collid=1, level=0, ln=CFG_SITE_LANG):
     """Returns nicely ordered (score respected) list of collections, more exactly list of tuples
        (collection name, printable collection name).
        Suitable for create_search_box()."""
@@ -672,7 +672,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
     #else:
     #    req.send_http_header()
 
-def page_end(req, of="hb", ln=cdslang):
+def page_end(req, of="hb", ln=CFG_SITE_LANG):
     "End page according to given output format: e.g. close XML tags, add HTML footer, etc."
     if of == "id":
         return [] # empty recID list
@@ -683,7 +683,7 @@ def page_end(req, of="hb", ln=cdslang):
         req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, req=req))
     return "\n"
 
-def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_day=0, ln=cdslang):
+def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_day=0, ln=CFG_SITE_LANG):
     "Produces 'From Date', 'Until Date' kind of selection box.  Suitable for search options."
 
     _ = gettext_set_language(ln)
@@ -843,7 +843,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
              ec = ec,
            )
 
-def create_navtrail_links(cc=CFG_SITE_NAME, as=0, ln=cdslang, self_p=1, tab=''):
+def create_navtrail_links(cc=CFG_SITE_NAME, as=0, ln=CFG_SITE_LANG, self_p=1, tab=''):
     """Creates navigation trail links, i.e. links to collection
     ancestors (except Home collection).  If as==1, then links to
     Advanced Search interfaces; otherwise Simple Search.
@@ -1217,7 +1217,7 @@ def get_colID(c):
         colID = res[0][0]
     return colID
 
-def get_coll_i18nname(c, ln=cdslang):
+def get_coll_i18nname(c, ln=CFG_SITE_LANG):
     """Return nicely formatted collection name (of name type 'ln',
     'long name') for collection C in language LN."""
     global collection_i18nname_cache
@@ -1234,7 +1234,7 @@ def get_coll_i18nname(c, ln=cdslang):
         pass # translation in LN does not exist
     return out
 
-def get_field_i18nname(f, ln=cdslang):
+def get_field_i18nname(f, ln=CFG_SITE_LANG):
     """Return nicely formatted field name (of type 'ln', 'long name')
        for field F in language LN."""
     global field_i18nname_cache
@@ -1444,7 +1444,7 @@ except:
     except:
         field_i18nname_cache = {}
 
-def browse_pattern(req, colls, p, f, rg, ln=cdslang):
+def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
     """Browse either biliographic phrases or words indexes, and display it."""
 
     # load the right message language
@@ -1503,7 +1503,7 @@ def browse_pattern(req, colls, p, f, rg, ln=cdslang):
     req.write(out)
     return
 
-def browse_in_bibwords(req, p, f, ln=cdslang):
+def browse_in_bibwords(req, p, f, ln=CFG_SITE_LANG):
     """Browse inside words indexes."""
     if not p:
         return
@@ -1523,7 +1523,7 @@ def browse_in_bibwords(req, p, f, ln=cdslang):
     ))
     return
 
-def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=cdslang):
+def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG):
     """Search for complex pattern 'p' within field 'f' according to
        matching type 'm'.  Return hitset of recIDs.
 
@@ -1835,7 +1835,7 @@ def search_unit_in_bibrec(datetext1, datetext2, type='c'):
         set += row[0]
     return set
 
-def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=cdslang):
+def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=CFG_SITE_LANG):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
     _ = gettext_set_language(ln)
 
@@ -1898,7 +1898,7 @@ def intersect_results_with_hitset(req, results, hitset, ap=0, aptext="", of="hb"
         results = results_ap
     return results
 
-def create_similarly_named_authors_link_box(author_name, ln=cdslang):
+def create_similarly_named_authors_link_box(author_name, ln=CFG_SITE_LANG):
     """Return a box similar to ``Not satisfied...'' one by proposing
        author searches for similar names.  Namely, take AUTHOR_NAME
        and the first initial of the firstame (after comma) and look
@@ -1957,7 +1957,7 @@ def create_similarly_named_authors_link_box(author_name, ln=cdslang):
 
     return out
 
-def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=cdslang, intro_text_p=True):
+def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_text_p=True):
     """Return text box containing list of 'n' nearest terms above/below 'p'
        for the field 'f' for matching type 't' (words/phrases) in
        language 'ln'.
@@ -2377,7 +2377,7 @@ def print_warning(req, msg, type='', prologue='<br />', epilogue='<br />'):
         return
 
 def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb_found=-1, jrec=1, rg=10,
-                      as=0, ln=cdslang, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
+                      as=0, ln=CFG_SITE_LANG, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
                       sc=1, pl_in_url="",
                       d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, dt="",
                       cpu_time=-1, middle_only=0):
@@ -2437,7 +2437,7 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb
              cpu_time = cpu_time,
            )
 
-def print_results_overview(req, colls, results_final_nb_total, results_final_nb, cpu_time, ln=cdslang, ec=[]):
+def print_results_overview(req, colls, results_final_nb_total, results_final_nb, cpu_time, ln=CFG_SITE_LANG, ec=[]):
     """Prints results overview box with links to particular collections below."""
 
     out = ""
@@ -2459,7 +2459,7 @@ def print_results_overview(req, colls, results_final_nb_total, results_final_nb,
              ec = ec,
            )
 
-def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=cdslang):
+def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', verbose=0, of='hb', ln=CFG_SITE_LANG):
     """Sort records in 'recIDs' list according sort field 'sort_field' in order 'sort_order'.
        If more than one instance of 'sort_field' is found for a given record, try to choose that that is given by
        'sort pattern', for example "sort by report number that starts by CERN-PS".
@@ -2545,7 +2545,7 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         # good, no sort needed
         return recIDs
 
-def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True, print_records_epilogue_p=True, verbose=0, tab=''):
+def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LANG, relevances=[], relevances_prologue="(", relevances_epilogue="%%)", decompress=zlib.decompress, search_pattern='', print_records_prologue_p=True, print_records_epilogue_p=True, verbose=0, tab=''):
 
     """
     Prints list of records 'recIDs' formatted according to 'format' in
@@ -2667,7 +2667,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=cdslang, re
                     ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
                     ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
                     link_ln = ''
-                    if ln != cdslang:
+                    if ln != CFG_SITE_LANG:
                         link_ln = '?ln=%s' % ln
                     tabs = [(unordered_tabs[tab_id]['label'], \
                              '%s/record/%s/%s%s' % (weburl, recIDs[irec], tab_id, link_ln), \
@@ -2815,7 +2815,7 @@ def print_records_epilogue(req, format):
         epilogue = websearch_templates.tmpl_xml_default_epilogue()
     req.write(epilogue)
 
-def print_record(recID, format='hb', ot='', ln=cdslang, decompress=zlib.decompress,
+def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.decompress,
                  search_pattern=None, user_info=None, verbose=0):
     """Prints record 'recID' formatted accoding to 'format'."""
 
@@ -3147,7 +3147,7 @@ def encode_for_xml(s):
     s = string.replace(s, '<', '&lt;')
     return s
 
-def call_bibformat(recID, format="HD", ln=cdslang, search_pattern=None, user_info=None, verbose=0):
+def call_bibformat(recID, format="HD", ln=CFG_SITE_LANG, search_pattern=None, user_info=None, verbose=0):
     """
     Calls BibFormat and returns formatted record.
 
@@ -3247,7 +3247,7 @@ def wash_url_argument(var, new_type):
 def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10, sf="", so="d", sp="", rm="", of="id", ot="", as=0,
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
                            recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
-                           d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=cdslang, ec=None, tab=""):
+                           d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=CFG_SITE_LANG, ec=None, tab=""):
     """Perform search or browse request, without checking for
        authentication.  Return list of recIDs found, if of=id.
        Otherwise create web page.

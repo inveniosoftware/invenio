@@ -25,7 +25,7 @@ import sys
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      sweburl, \
      CFG_VERSION
@@ -41,7 +41,7 @@ from invenio.search_engine import search_pattern
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 
-def index(req,c=CFG_SITE_NAME,ln=cdslang,order="",doctype="",deletedId="",deletedAction="",deletedDoctype=""):
+def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",deletedAction="",deletedDoctype=""):
     global uid
     ln = wash_language(ln)
 
@@ -111,7 +111,7 @@ def isReferee(req,doctype="",categ=""):
     else:
         return 0
 
-def errorMsg(title,req,c=CFG_SITE_NAME,ln=cdslang):
+def errorMsg(title,req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
     return page(title="error",
                 body = create_error_box(req, title=title,verbose=0, ln=ln),
                 description="%s - Internal Error" % c,

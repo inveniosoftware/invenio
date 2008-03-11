@@ -28,7 +28,7 @@ __revision__ = "$Id$"
 
 
 from invenio.messages import gettext_set_language
-from invenio.config import supportemail, cdslang
+from invenio.config import supportemail, CFG_SITE_LANG
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SER, \
     CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, DELEGATEADDUSERROLE, SUPERADMINROLE, \
     DEF_USERS, DEF_ROLES, DEF_AUTHS, DEF_ACTIONS, CFG_ACC_ACTIVITIES_URLS
@@ -1319,7 +1319,7 @@ def acc_find_user_info_names(id_user=0):
 
     return res2
 
-def acc_find_possible_activities(user_info, ln=cdslang):
+def acc_find_possible_activities(user_info, ln=CFG_SITE_LANG):
     """Return a dictionary with all the possible activities for which the user
     is allowed (i.e. all the administrative action which are connected to
     an web area in Invenio) and the corresponding url.

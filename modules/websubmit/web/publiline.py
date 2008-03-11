@@ -44,7 +44,7 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      accessurl, \
      adminemail, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      images, \
      CFG_PYLIBDIR, \
@@ -86,7 +86,7 @@ CFG_WEBSUBMIT_DUMMY_MARC_XML_REC = "dummy_marcxml_rec"
 CFG_WEBSUBMIT_MARC_XML_REC = "recmysql"
 
 
-def index(req,c=CFG_SITE_NAME,ln=cdslang,doctype="",categ="",RN="",send="",flow="",apptype="", action="", email_user_pattern="", id_user="", id_user_remove="", validate="", id_user_val="", msg_subject="", msg_body=""):
+def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send="",flow="",apptype="", action="", email_user_pattern="", id_user="", id_user_remove="", validate="", id_user_val="", msg_subject="", msg_body=""):
     global uid
 
     ln = wash_language(ln)
@@ -162,7 +162,7 @@ def index(req,c=CFG_SITE_NAME,ln=cdslang,doctype="",categ="",RN="",send="",flow=
                     req=req,
                     navmenuid='yourapprovals')
 
-def selectDoctype(ln = cdslang):
+def selectDoctype(ln = CFG_SITE_LANG):
     res = run_sql("select DISTINCT doctype from sbmAPPROVAL")
     docs = []
     for row in res:
@@ -177,7 +177,7 @@ def selectDoctype(ln = cdslang):
         )
     return t
 
-def selectCplxDoctype(ln = cdslang):
+def selectCplxDoctype(ln = CFG_SITE_LANG):
     res = run_sql("select DISTINCT doctype from sbmCPLXAPPROVAL")
     docs = []
     for row in res:
@@ -192,7 +192,7 @@ def selectCplxDoctype(ln = cdslang):
         )
     return t
 
-def selectCateg(doctype, ln = cdslang):
+def selectCateg(doctype, ln = CFG_SITE_LANG):
     t=""
     res = run_sql("select ldocname from sbmDOCTYPE where sdocname=%s",(doctype,))
     title = res[0][0]
@@ -228,7 +228,7 @@ def selectCateg(doctype, ln = cdslang):
         )
     return t
 
-def selectCplxCateg(doctype, ln = cdslang):
+def selectCplxCateg(doctype, ln = CFG_SITE_LANG):
     t=""
     res = run_sql("SELECT ldocname FROM sbmDOCTYPE WHERE sdocname=%s",(doctype,))
     title = res[0][0]
@@ -255,7 +255,7 @@ def selectCplxCateg(doctype, ln = cdslang):
         )
     return t
 
-def selectDocument(doctype,categ, ln = cdslang):
+def selectDocument(doctype,categ, ln = CFG_SITE_LANG):
     t=""
     res = run_sql("select ldocname from sbmDOCTYPE where sdocname=%s", (doctype,))
     title = res[0][0]
@@ -280,7 +280,7 @@ def selectDocument(doctype,categ, ln = cdslang):
         )
     return t
 
-def selectCplxDocument(doctype,categ,apptype, ln = cdslang):
+def selectCplxDocument(doctype,categ,apptype, ln = CFG_SITE_LANG):
     t=""
     res = run_sql("select ldocname from sbmDOCTYPE where sdocname=%s", (doctype,))
     title = res[0][0]
@@ -311,7 +311,7 @@ def selectCplxDocument(doctype,categ,apptype, ln = cdslang):
         )
     return t
 
-def displayDocument(req, doctype,categ,RN,send, ln = cdslang):
+def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -396,7 +396,7 @@ def displayDocument(req, doctype,categ,RN,send, ln = cdslang):
         )
     return t
 
-def displayCplxDocument(req, doctype,categ,RN,apptype, ln = cdslang):
+def displayCplxDocument(req, doctype,categ,RN,apptype, ln = CFG_SITE_LANG):
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -585,7 +585,7 @@ def __db_set_PubComRecom_time (key):
 def __db_set_status ((RN,apptype), status):
     run_sql("UPDATE sbmCPLXAPPROVAL SET status=%s, dProjectLeaderAction=NOW() WHERE  rn=%s and type=%s", (status,RN,apptype,))
 
-def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, ln=cdslang):
+def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, ln=CFG_SITE_LANG):
     """
     Perform complex action. Note: all argume,ts are supposed to be washed already.
     Return HTML body for the paget.
@@ -1570,7 +1570,7 @@ def SendWarning(doctype,categ,RN,title,authors,access):
     send_email(FROMADDR,adminemail,"Failed sending approval email request",message)
     return ""
 
-def errorMsg(title,req,c=CFG_SITE_NAME,ln=cdslang):
+def errorMsg(title,req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
     return page(title="error",
                 body = create_error_box(req, title=title,verbose=0, ln=ln),
                 description="%s - Internal Error" % c,
@@ -1580,7 +1580,7 @@ def errorMsg(title,req,c=CFG_SITE_NAME,ln=cdslang):
                 req=req,
                 navmenuid='yourapprovals')
 
-def warningMsg(title,req,c=CFG_SITE_NAME,ln=cdslang):
+def warningMsg(title,req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
     return page(title="warning",
                 body = title,
                 description="%s - Internal Error" % c,

@@ -32,7 +32,7 @@ from mimetypes import MimeTypes
 from invenio.dbquery import run_sql, DatabaseError
 from invenio.errorlib import register_exception
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import cdslang, images, weburl, CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR, CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, sweburl
+from invenio.config import CFG_SITE_LANG, images, weburl, CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR, CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, sweburl
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -335,7 +335,7 @@ class BibRecDocs:
             docfiles += bibdoc.list_latest_files()
         return docfiles
 
-    def display(self, docname="", version="", doctype="", ln=cdslang):
+    def display(self, docname="", version="", doctype="", ln=CFG_SITE_LANG):
         """Returns a formatted panel with information and links about a given
         docid of a particular version (or any), of a particular doctype (or any)
         """
@@ -726,7 +726,7 @@ class BibDoc:
         self.touch()
         self._build_related_file_list()
 
-    def display(self, version="", ln = cdslang):
+    def display(self, version="", ln = CFG_SITE_LANG):
         """Returns a formatted representation of the files linked with
         the bibdoc.
         """
@@ -1075,7 +1075,7 @@ class BibDocFile:
         out += '%s:%s:%s:%s:encoding=%s\n' % (self.recid, self.docid, self.version, self.format, self.encoding)
         return out
 
-    def display(self, ln = cdslang):
+    def display(self, ln = CFG_SITE_LANG):
         """Returns a formatted representation of this docfile."""
         return websubmit_templates.tmpl_bibdocfile_filelist(
                  ln = ln,

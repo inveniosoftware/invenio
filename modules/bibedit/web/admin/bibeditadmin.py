@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.config import cdslang, weburl
+from invenio.config import CFG_SITE_LANG, weburl
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized
 from invenio.bibedit_engine import perform_request_index, perform_request_edit, perform_request_submit
@@ -34,7 +34,7 @@ from invenio.urlutils import wash_url_argument, redirect_to_url
 
 navtrail = """ <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> """ % (weburl,)
 
-def index(req, ln=cdslang, recid=None, temp="false", format_tag='marc',
+def index(req, ln=CFG_SITE_LANG, recid=None, temp="false", format_tag='marc',
           edit_tag=None, delete_tag=None, num_field=None, add=0, cancel=0,
           delete=0 ,confirm_delete=0,  **args):
     """ BibEdit Admin interface. """
@@ -74,7 +74,7 @@ def index(req, ln=cdslang, recid=None, temp="false", format_tag='marc',
 
 
 def edit(req, recid=None, tag=None, num_field='0', num_subfield=0, format_tag='marc',
-         del_subfield=None, temp="false", add=0, ln=cdslang, **args):
+         del_subfield=None, temp="false", add=0, ln=CFG_SITE_LANG, **args):
     """ Edit Field page. """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -110,7 +110,7 @@ def edit(req, recid=None, tag=None, num_field='0', num_subfield=0, format_tag='m
                 req         = req)
 
 
-def submit(req, recid='', ln=cdslang):
+def submit(req, recid='', ln=CFG_SITE_LANG):
     """ Submit temp_record on database. """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)

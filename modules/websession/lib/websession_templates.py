@@ -28,7 +28,7 @@ import locale
 
 from invenio.config import \
      CFG_CERN_SITE, \
-     cdslang, \
+     CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
      supportemail, \
@@ -592,7 +592,7 @@ class Template:
           }
         return out
 
-    def tmpl_account_reset_password_email_body(self, email, reset_key, ip_address, ln=cdslang):
+    def tmpl_account_reset_password_email_body(self, email, reset_key, ip_address, ln=CFG_SITE_LANG):
         """
         The body of the email that sends lost internal account
         passwords to users.
@@ -629,7 +629,7 @@ class Template:
         }
         return out
 
-    def tmpl_account_address_activation_email_body(self, email, address_activation_key, ip_address, ln=cdslang):
+    def tmpl_account_address_activation_email_body(self, email, address_activation_key, ip_address, ln=CFG_SITE_LANG):
         """
         The body of the email that sends email address activation cookie
         passwords to users.
@@ -829,7 +829,7 @@ class Template:
 
         return out
 
-    def tmpl_lost_your_password_teaser(self, ln=cdslang):
+    def tmpl_lost_your_password_teaser(self, ln=CFG_SITE_LANG):
         """Displays a short sentence to attract user to the fact that
         maybe he lost his password.  Used by the registration page.
         """
@@ -1105,7 +1105,7 @@ class Template:
                    }
         return out
 
-    def tmpl_warning(self, warnings, ln=cdslang):
+    def tmpl_warning(self, warnings, ln=CFG_SITE_LANG):
         """
         Prepare the warnings list
         @param warnings: list of warning tuples (warning_msg, arg1, arg2, etc)
@@ -1131,7 +1131,7 @@ class Template:
         else:
             return ""
 
-    def tmpl_warnings(self, warnings, ln=cdslang):
+    def tmpl_warnings(self, warnings, ln=CFG_SITE_LANG):
         """
         Display len(warnings) warning fields
         @param infos: list of strings
@@ -1158,7 +1158,7 @@ class Template:
                                 member_group_html,
                                 external_group_html = None,
                                 warnings=[],
-                                ln=cdslang):
+                                ln=CFG_SITE_LANG):
         """
         Displays the 3 tables of groups: admin, member and external
 
@@ -1206,7 +1206,7 @@ class Template:
         return group_text
 
 
-    def tmpl_display_admin_groups(self, groups, ln=cdslang):
+    def tmpl_display_admin_groups(self, groups, ln=CFG_SITE_LANG):
         """
         Display the groups the user is admin of.
 
@@ -1294,7 +1294,7 @@ class Template:
                }
         return out
 
-    def tmpl_display_member_groups(self, groups, ln=cdslang):
+    def tmpl_display_member_groups(self, groups, ln=CFG_SITE_LANG):
         """
         Display the groups the user is member of.
 
@@ -1357,7 +1357,7 @@ class Template:
         return group_text
 
 
-    def tmpl_display_external_groups(self, groups, ln=cdslang):
+    def tmpl_display_external_groups(self, groups, ln=CFG_SITE_LANG):
         """
         Display the external groups the user is member of.
 
@@ -1411,7 +1411,7 @@ class Template:
                                       act_type="create",
                                       grpID="",
                                       warnings=[],
-                                      ln=cdslang):
+                                      ln=CFG_SITE_LANG):
         """
         Display group data when creating or updating a group:
         Name, description, join_policy.
@@ -1538,7 +1538,7 @@ class Template:
                                       group_from_search,
                                       search,
                                       warnings=[],
-                                      ln=cdslang):
+                                      ln=CFG_SITE_LANG):
 
         """
         Display the groups the user can join.
@@ -1644,7 +1644,7 @@ class Template:
                                    pending_members,
                                    infos=[],
                                    warnings=[],
-                                   ln=cdslang):
+                                   ln=CFG_SITE_LANG):
         """Display current members and waiting members of a group.
 
         Parameters:
@@ -1824,7 +1824,7 @@ class Template:
     def tmpl_display_input_leave_group(self,
                                        groups,
                                        warnings=[],
-                                       ln=cdslang):
+                                       ln=CFG_SITE_LANG):
         """Display groups the user can leave.
 
         Parameters:
@@ -1906,7 +1906,7 @@ class Template:
         return out
 
 
-    def tmpl_confirm_delete(self, grpID, ln=cdslang):
+    def tmpl_confirm_delete(self, grpID, ln=CFG_SITE_LANG):
         """
         display a confirm message when deleting a group
         @param ln: language
@@ -1945,7 +1945,7 @@ class Template:
               }
         return out
 
-    def tmpl_confirm_leave(self, uid, grpID, ln=cdslang):
+    def tmpl_confirm_leave(self, uid, grpID, ln=CFG_SITE_LANG):
         """
         display a confirm message
         @param ln: language
@@ -1984,7 +1984,7 @@ class Template:
               }
         return out
 
-    def __create_join_policy_selection_menu(self, name, current_join_policy, ln=cdslang):
+    def __create_join_policy_selection_menu(self, name, current_join_policy, ln=CFG_SITE_LANG):
         """Private function. create a drop down menu for selection of join policy
         @param current_join_policy: join policy as defined in CFG_WEBSESSION_GROUP_JOIN_POLICY
         @param ln: language
@@ -2018,7 +2018,7 @@ class Template:
         return out
 
 
-    def tmpl_infobox(self, infos, ln=cdslang):
+    def tmpl_infobox(self, infos, ln=CFG_SITE_LANG):
         """Display len(infos) information fields
         @param infos: list of strings
         @param ln=language
@@ -2036,7 +2036,7 @@ class Template:
             infobox += lines[-1] + "</span></div>\n"
         return infobox
 
-    def tmpl_navtrail(self, ln=cdslang, title=""):
+    def tmpl_navtrail(self, ln=CFG_SITE_LANG, title=""):
         """
         display the navtrail, e.g.:
         Your account > Your group > title
@@ -2053,7 +2053,7 @@ class Template:
 
         return  nav_h1 % (weburl, _("Your Account")) + nav_h2
 
-    def tmpl_group_table_title(self, img="", text="", ln=cdslang):
+    def tmpl_group_table_title(self, img="", text="", ln=CFG_SITE_LANG):
         """
         display the title of a table:
         - 'img' *string* - img path
@@ -2070,7 +2070,7 @@ class Template:
         </div>""" % text
         return out
 
-    def tmpl_admin_msg(self, group_name, grpID, ln=cdslang):
+    def tmpl_admin_msg(self, group_name, grpID, ln=CFG_SITE_LANG):
         """
         return message content for joining group
         - 'group_name' *string* - name of the group
@@ -2091,7 +2091,7 @@ class Template:
     def tmpl_member_msg(self,
                         group_name,
                         accepted=0,
-                        ln=cdslang):
+                        ln=CFG_SITE_LANG):
         """
         return message content when new member is accepted/rejected
         - 'group_name' *string* - name of the group
@@ -2114,7 +2114,7 @@ class Template:
 
     def tmpl_delete_msg(self,
                         group_name,
-                        ln=cdslang):
+                        ln=CFG_SITE_LANG):
         """
         return message content when new member is accepted/rejected
         - 'group_name' *string* - name of the group
@@ -2130,7 +2130,7 @@ class Template:
         body += '<br />'
         return subject, body
 
-    def tmpl_group_info(self, nb_admin_groups=0, nb_member_groups=0, nb_total_groups=0, ln=cdslang):
+    def tmpl_group_info(self, nb_admin_groups=0, nb_member_groups=0, nb_total_groups=0, ln=CFG_SITE_LANG):
         """
         display infos about groups (used by myaccount.py)
         @param nb_admin_group: number of groups the user is admin of

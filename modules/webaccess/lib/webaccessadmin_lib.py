@@ -42,7 +42,7 @@ from invenio.config import \
     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION, \
     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION, \
     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
-    cdslang, \
+    CFG_SITE_LANG, \
     CFG_SITE_NAME, \
     supportemail, \
     sweburl, \
@@ -3541,7 +3541,7 @@ def check_email(txt=''):
     r = re.compile(r'(.)+\@(.)+\.(.)+')
     return r.match(txt) and 1 or 0
 
-def sendAccountActivatedMessage(AccountEmail, sendTo, password, ln=cdslang):
+def sendAccountActivatedMessage(AccountEmail, sendTo, password, ln=CFG_SITE_LANG):
     """Send an email to the address given by sendTo about the new activated
     account."""
 
@@ -3569,7 +3569,7 @@ def sendAccountActivatedMessage(AccountEmail, sendTo, password, ln=cdslang):
     server.quit()
     return 1
 
-def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
+def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=CFG_SITE_LANG):
     """Send an email to the address given by sendTo about the new account
     newAccountEmail."""
 
@@ -3596,7 +3596,7 @@ def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
     server.quit()
     return 1
 
-def sendAccountRejectedMessage(newAccountEmail, sendTo, ln=cdslang):
+def sendAccountRejectedMessage(newAccountEmail, sendTo, ln=CFG_SITE_LANG):
     """Send an email to the address given by sendTo about the new account
     newAccountEmail."""
 
@@ -3623,7 +3623,7 @@ def sendAccountRejectedMessage(newAccountEmail, sendTo, ln=cdslang):
     server.quit()
     return 1
 
-def sendAccountDeletedMessage(newAccountEmail, sendTo, ln=cdslang):
+def sendAccountDeletedMessage(newAccountEmail, sendTo, ln=CFG_SITE_LANG):
     """Send an email to the address given by sendTo about the new account
     newAccountEmail."""
 

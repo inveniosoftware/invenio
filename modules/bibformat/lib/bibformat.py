@@ -42,7 +42,7 @@ import zlib
 from invenio import bibformat_dblayer
 from invenio import bibformat_engine
 from invenio import bibformat_utils
-from invenio.config import cdslang, weburl, CFG_PATH_PHP
+from invenio.config import CFG_SITE_LANG, weburl, CFG_PATH_PHP
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 try:
     import invenio.template
@@ -55,7 +55,7 @@ import sys
 # Functions to format a single record
 ##
 
-def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[],
+def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=[],
                   xml_record=None, user_info=None, on_the_fly=False):
     """
     Formats a record given output format.
@@ -98,9 +98,9 @@ def format_record(recID, of, ln=cdslang, verbose=0, search_pattern=[],
     ############################# END ##################################
 
     if not on_the_fly and \
-       (ln==cdslang or CFG_BIBFORMAT_USE_OLD_BIBFORMAT):
+       (ln==CFG_SITE_LANG or CFG_BIBFORMAT_USE_OLD_BIBFORMAT):
 	# Try to fetch preformatted record
-        # Only possible for records formatted in cdslang language (other are never stored)
+        # Only possible for records formatted in CFG_SITE_LANG language (other are never stored)
         res = bibformat_dblayer.get_preformatted_record(recID, of)
         if res is not None:
             # record 'recID' is formatted in 'of', so return it
@@ -186,7 +186,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress):
 # that relies on format_records to do the formatting.
 ##
 
-def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None,
+def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                    xml_records=None, user_info=None, record_prefix=None,
                    record_separator=None, record_suffix=None, prologue="",
                    epilogue="", req=None, on_the_fly=False):
@@ -290,7 +290,7 @@ def format_records(recIDs, of, ln=cdslang, verbose=0, search_pattern=None,
 
     return prologue + formatted_records + epilogue
 
-def create_excel(recIDs, req=None, ln=cdslang):
+def create_excel(recIDs, req=None, ln=CFG_SITE_LANG):
     """
     Returns an Excel readable format containing the given recIDs.
     If 'req' is given, also prints the output in 'req' while individual
@@ -328,7 +328,7 @@ def create_excel(recIDs, req=None, ln=cdslang):
         req.send_http_header()
 
     #Format the records
-    excel_formatted_records = format_records(recIDs, 'excel', ln=cdslang,
+    excel_formatted_records = format_records(recIDs, 'excel', ln=CFG_SITE_LANG,
                                              record_separator='\n',
                                              prologue = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><table>',
                                              epilogue = footer,
@@ -387,7 +387,7 @@ def main():
     options = {} # will hold command-line options
     options["verbose"] = 0
     options["onthefly"] = False
-    options["lang"] = cdslang
+    options["lang"] = CFG_SITE_LANG
     options["output"] = "HB"
     options["recID"] = None
 

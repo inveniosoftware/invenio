@@ -36,7 +36,7 @@ from invenio.config import \
      weburl, \
      CFG_SITE_NAME, \
      CFG_CACHEDIR, \
-     cdslang, \
+     CFG_SITE_LANG, \
      adminemail, \
      sweburl, \
      CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
@@ -115,7 +115,7 @@ class WebInterfaceAuthorPage(WebInterfaceDirectory):
 
     def __call__(self, req, form):
         """Serve the page in the given language."""
-        argd = wash_urlargd(form, {'ln': (str, cdslang)})
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
         req.argd = argd #needed since perform_req_search
         #wants to check it in case of no results
         self.authorname = self.authorname.replace("+"," ")
@@ -176,7 +176,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
             target = '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                     weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
-                    search_results_default_urlargd)}, {'ln' : cdslang})
+                    search_results_default_urlargd)}, {'ln' : CFG_SITE_LANG})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -322,7 +322,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                                 target = '/youraccount/login' + \
                                 make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : \
                                 weburl + '/search' + make_canonical_urlargd(argd, \
-                                search_results_default_urlargd)}, {'ln' : cdslang})
+                                search_results_default_urlargd)}, {'ln' : CFG_SITE_LANG})
                                 return redirect_to_url(req, target)
                             else:
                                 return page_not_authorized(req, "../", \
@@ -341,7 +341,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     target = '/youraccount/login' + \
                     make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : \
                     weburl + '/search' + make_canonical_urlargd(argd, \
-                    search_results_default_urlargd)}, {'ln' : cdslang})
+                    search_results_default_urlargd)}, {'ln' : CFG_SITE_LANG})
                     return redirect_to_url(req, target)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
@@ -808,7 +808,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
             target = '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                     weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
-                    search_results_default_urlargd)}, {'ln' : cdslang})
+                    search_results_default_urlargd)}, {'ln' : CFG_SITE_LANG})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \

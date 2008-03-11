@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## Comments and reviews for records. 
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -20,7 +20,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import cdslang, weburl
+from invenio.config import CFG_SITE_LANG, weburl
 from invenio.webcomment import query_get_comment
 from invenio.urlutils import wash_url_argument
 from invenio.dbquery import run_sql
@@ -30,7 +30,7 @@ from invenio.webuser import get_user_info
 import invenio.template
 webcomment_templates = invenio.template.load('webcomment')
 
-def getnavtrail(previous = '', ln=cdslang):
+def getnavtrail(previous = '', ln=CFG_SITE_LANG):
     """Get the navtrail"""
     previous = wash_url_argument(previous, 'str')
     ln = wash_language(ln)
@@ -39,12 +39,12 @@ def getnavtrail(previous = '', ln=cdslang):
     navtrail = navtrail + previous
     return navtrail
 
-def perform_request_index(ln=cdslang):
+def perform_request_index(ln=CFG_SITE_LANG):
     """
-    """ 
+    """
     return webcomment_templates.tmpl_admin_index(ln=ln)
 
-def perform_request_delete(comID=-1, ln=cdslang):
+def perform_request_delete(comID=-1, ln=CFG_SITE_LANG):
     """
     """
     warnings = []
@@ -65,14 +65,14 @@ def perform_request_delete(comID=-1, ln=cdslang):
                 reviews = 1
             else:
                 reviews = 0
-            return (perform_request_comments(ln=ln, comID=comID, reviews=reviews), None, warnings) 
+            return (perform_request_comments(ln=ln, comID=comID, reviews=reviews), None, warnings)
         else:
             warnings.append(('WRN_WEBCOMMENT_ADMIN_COMID_INEXISTANT', comID))
             return (webcomment_templates.tmpl_admin_delete_form(ln, warnings), None, warnings)
     else:
         return (webcomment_templates.tmpl_admin_delete_form(ln, warnings), None, warnings)
 
-def perform_request_users(ln=cdslang):
+def perform_request_users(ln=CFG_SITE_LANG):
     """
     """
     ln = wash_language(ln)
@@ -84,7 +84,7 @@ def query_get_users_reported():
     """
     Get the users who have been reported at least one.
     @return tuple of ct, i.e. (ct, ct, ...)
-            where ct is a tuple (total_number_reported, total_comments_reported, total_reviews_reported, 
+            where ct is a tuple (total_number_reported, total_comments_reported, total_reviews_reported,
                                  total_nb_votes_yes_of_reported, total_nb_votes_total_of_reported, user_id, user_email, user_nickname)
             sorted by order of ct having highest total_number_reported
     """
@@ -99,7 +99,7 @@ def query_get_users_reported():
     for cmt in res1:
         uid = int(cmt[3])
         if users.has_key(uid):
-            users[uid] = (users[uid][0]+int(cmt[0]), int(cmt[6])>0 and users[uid][1] or users[uid][1]+1, int(cmt[6])>0 and users[uid][2]+1 or users[uid][2], 
+            users[uid] = (users[uid][0]+int(cmt[0]), int(cmt[6])>0 and users[uid][1] or users[uid][1]+1, int(cmt[6])>0 and users[uid][2]+1 or users[uid][2],
                           users[uid][3]+int(cmt[1]), users[uid][4]+int(cmt[2]), int(cmt[3]), cmt[4], cmt[5])
         else:
             users[uid] = (int(cmt[0]), int(cmt[6])==0 and 1 or 0, int(cmt[6])>0 and 1 or 0, int(cmt[1]), int(cmt[2]), int(cmt[3]), cmt[4], cmt[5])
@@ -108,15 +108,15 @@ def query_get_users_reported():
     users.reverse()
     users = tuple(users)
     return users
-            
-def perform_request_comments(ln=cdslang, uid="", comID="", reviews=0):
+
+def perform_request_comments(ln=CFG_SITE_LANG, uid="", comID="", reviews=0):
     """
     """
     ln = wash_language(ln)
     uid = wash_url_argument(uid, 'int')
     comID = wash_url_argument(comID, 'int')
     reviews = wash_url_argument(reviews, 'int')
-    
+
     comments = query_get_comments(uid, comID, reviews, ln)
     return webcomment_templates.tmpl_admin_comments(ln=ln, uid=uid,
                                                     comID=comID,
@@ -181,7 +181,7 @@ def query_get_comments(uid, cmtID, reviews, ln):
         output.append(out_tuple)
     return tuple(output)
 
-def perform_request_del_com(ln=cdslang, comIDs=[]):
+def perform_request_del_com(ln=CFG_SITE_LANG, comIDs=[]):
     """
     private function
     Delete the comments and say whether successful or not
@@ -196,13 +196,13 @@ def perform_request_del_com(ln=cdslang, comIDs=[]):
     if not comIDs:
         comIDs = map(coerce, comIDs, ('0 '*len(comIDs)).split(' ')[:-1])
         return webcomment_templates.tmpl_admin_del_com(del_res=comIDs, ln=ln)
- 
+
     del_res=[]
     for comID in comIDs:
         del_res.append((comID, query_delete_comment(comID)))
     return webcomment_templates.tmpl_admin_del_com(del_res=del_res, ln=ln)
 
-def suppress_abuse_report(ln=cdslang, comIDs=[]):
+def suppress_abuse_report(ln=CFG_SITE_LANG, comIDs=[]):
     """
     private function
     suppress the abuse reports for the given comIDs.
@@ -217,7 +217,7 @@ def suppress_abuse_report(ln=cdslang, comIDs=[]):
     if not comIDs:
         comIDs = map(coerce, comIDs, ('0 '*len(comIDs)).split(' ')[:-1])
         return webcomment_templates.tmpl_admin_del_com(del_res=comIDs, ln=ln)
- 
+
     del_res=[]
     for comID in comIDs:
         del_res.append((comID, query_suppress_abuse_report(comID)))
@@ -231,7 +231,7 @@ def query_suppress_abuse_report(comID):
     params = comID
     res = run_sql(query%params)
     return int(res)
-    
+
 def query_delete_comment(comID):
     """
     delete comment with id comID

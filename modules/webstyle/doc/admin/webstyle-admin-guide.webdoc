@@ -161,13 +161,13 @@ following content:</p>
 
 <blockquote>
 <pre>
-from invenio.config import cdslang
+from invenio.config import CFG_SITE_LANG
 from invenio.webstyle_templates import Template as DefaultTemplate
 
 class Template(DefaultTemplate):
     """Ithaca style templates."""
 
-    def tmpl_pagefooter(self, req=None, ln=cdslang, lastupdated=None,
+    def tmpl_pagefooter(self, req=None, ln=CFG_SITE_LANG, lastupdated=None,
                         pagefooteradd=""):
         """
         Ithaca style page footer.  See the default function for
@@ -194,7 +194,7 @@ style footer will be seen in action.</p>
     paste the original <code>tmpl_foo()</code> function definition "as
     is" into the above-cited example and then you would only modify
     its HTML snippets.  The important thing is to preserve the imports
-    (<code>from invenio.config import cdslang</code>) as in the original
+    (<code>from invenio.config import CFG_SITE_LANG</code>) as in the original
     <code>webstyle_templates.py</code> file and to preserve the
     leading whitespace Pythonic indentation.
 

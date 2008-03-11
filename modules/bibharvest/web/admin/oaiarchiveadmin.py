@@ -27,11 +27,11 @@ import sys
 
 import invenio.oaiarchiveadminlib as bhc
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl,cdslang
+from invenio.config import weburl,CFG_SITE_LANG
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
-def index(req, ln=cdslang):
+def index(req, ln=CFG_SITE_LANG):
     navtrail_previous_links = bhc.getnavtrail()
 
     try:
@@ -58,7 +58,7 @@ def index(req, ln=cdslang):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='',oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', oai_set_op1='a', oai_set_op2='a', ln=cdslang, func=0):
+def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='',oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', oai_set_op1='a', oai_set_op2='a', ln=CFG_SITE_LANG, func=0):
 
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (weburl)
 
@@ -93,7 +93,7 @@ def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set
                                            oai_set_m3=oai_set_m3,
                                            oai_set_op1=oai_set_op1,
                                            oai_set_op2=oai_set_op2,
-                                           ln=cdslang,
+                                           ln=ln,
                                            func=func),
                 uid=uid,
                 language=ln,
@@ -104,7 +104,7 @@ def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def delset(req, oai_set_id=None, ln=cdslang, func=0):
+def delset(req, oai_set_id=None, ln=CFG_SITE_LANG, func=0):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (weburl)
 
     try:
@@ -132,7 +132,7 @@ def delset(req, oai_set_id=None, ln=cdslang, func=0):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def editset(req, oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='', oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', oai_set_op1='a', oai_set_op2='a', ln=cdslang, func=0):
+def editset(req, oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='', oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', oai_set_op1='a', oai_set_op2='a', ln=CFG_SITE_LANG, func=0):
 
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (weburl)
 

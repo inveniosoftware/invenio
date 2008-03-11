@@ -29,7 +29,7 @@ from invenio.webbasket_config import \
                        CFG_WEBBASKET_SHARE_LEVELS, \
                        CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
 from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
-from invenio.config import weburl, sweburl, cdslang
+from invenio.config import weburl, sweburl, CFG_SITE_LANG
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
 
@@ -44,7 +44,7 @@ class Template:
                      selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                      nb_groups=0,
                      nb_external_baskets=0,
-                     ln=cdslang):
+                     ln=CFG_SITE_LANG):
         """Generic display. takes already formatted baskets (list of formatted
         baskets), infobox and topicsbox, add tabs and returns complete
         interface"""
@@ -78,7 +78,7 @@ class Template:
                       selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                       nb_groups=0,
                       nb_external_baskets=0,
-                      ln=cdslang):
+                      ln=CFG_SITE_LANG):
         """Private function, display tabs
         (private baskets, group baskets, others' basket)."""
         _ = gettext_set_language(ln)
@@ -116,7 +116,7 @@ class Template:
     def tmpl_topic_selection(self,
                              topics_list=[],
                              selected_topic=0,
-                             ln=cdslang):
+                             ln=CFG_SITE_LANG):
         """Display the topics selection area.
         @param topics_list: list of (topic name, number of baskets) tuples
         @param selected_topic: # of selected topic in topics_list"""
@@ -154,7 +154,7 @@ class Template:
     def tmpl_group_selection(self,
                              groups_list=[],
                              selected_group_id=0,
-                             ln=cdslang):
+                             ln=CFG_SITE_LANG):
         """Display the group selection area which appears on the top of group
         baskets category.
         @param groups_list: list of (group id, group name, number of baskets)
@@ -185,7 +185,7 @@ class Template:
         return out
 
     def tmpl_baskets_infobox(self, basket_infos=[], create_link='',
-                             ln=cdslang):
+                             ln=CFG_SITE_LANG):
         """
         displays infos about baskets.
         @param basket_infos: list of (bskid, bsk_name, bsk_last_update)
@@ -221,7 +221,7 @@ class Template:
     def tmpl_display_public(self,
                              basket_infos,
                              bsk_items=[],
-                             ln=cdslang):
+                             ln=CFG_SITE_LANG):
         """
         Display public basketwith link to subscribe to it.
         @param  basket_infos:
@@ -294,7 +294,7 @@ class Template:
 
     def tmpl_display_list_public_baskets(self, baskets, inf_limit,
                                          total_baskets, order, asc,
-                                         ln=cdslang):
+                                         ln=CFG_SITE_LANG):
         """Display list of public baskets.
         @param baskets: list of (bskid, name, nb_views,
                                  owner_id, owner_nickname)
@@ -438,7 +438,7 @@ class Template:
                     selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                     selected_topic=0, selected_group=0,
                     items=[],
-                    ln=cdslang):
+                    ln=CFG_SITE_LANG):
         """
         display a basket.
         @param group_sharing_level: Indicate to which level a basket is shared
@@ -557,7 +557,7 @@ class Template:
                          view_comments=0,
                          selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                          selected_topic=0, selected_group=0,
-                         ln=cdslang):
+                         ln=CFG_SITE_LANG):
         """
         display a row in a basket (row is item description and actions).
         @param bskid: basket id (int)
@@ -653,7 +653,7 @@ class Template:
                            selected_group=0,
                            group_sharing_level=None,
                            content='',
-                           ln=cdslang):
+                           ln=CFG_SITE_LANG):
         """display footer of a basket.
         @param group sharing level: None: basket is not shared,
                                     0: basket is publcly accessible,
@@ -708,7 +708,7 @@ class Template:
                   recid, record, comments,
                   group_sharing_level, rights_on_item,
                   selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                  selected_topic=0, selected_group_id=0, ln=cdslang):
+                  selected_topic=0, selected_group_id=0, ln=CFG_SITE_LANG):
         """display a specific item inside a basket.
         @param basket_infos: (bskid, bsk_name, bsk_date_modification,
                               nb_views, bsk_nb_records, id_owner)
@@ -831,7 +831,7 @@ class Template:
                                (cmt_uid, cmt_nickname, cmt_title, cmt_body, cmt_date, cmt_priority, cmtid),
                                (user_can_add_comment, user_can_delete_comment),
                                selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
-                               selected_topic=0, selected_group_id=0, ln=cdslang):
+                               selected_topic=0, selected_group_id=0, ln=CFG_SITE_LANG):
         """Display a given comment. """
         _ = gettext_set_language(ln)
         out = """
@@ -870,7 +870,7 @@ class Template:
                 'delete_label': _("Delete comment")}
         return out
 
-    def tmpl_quote_comment(self, title, uid, nickname, date, body, ln=cdslang):
+    def tmpl_quote_comment(self, title, uid, nickname, date, body, ln=CFG_SITE_LANG):
         """Return a comment in a quoted form (i.e. with '>' signs before each line)
         @param title: title of comment to quote
         @param uid: user id of user who posted comment to quote
@@ -889,7 +889,7 @@ class Template:
                            cmt_body='',
                            selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                            selected_topic=0, selected_group_id=0,
-                           ln=cdslang,
+                           ln=CFG_SITE_LANG,
                            warnings=[]):
         """Display interface to write a comment.
         @param bskid: basket id (int)
@@ -933,7 +933,7 @@ class Template:
 
         ############################ Basket creation ###################################
 
-    def tmpl_create_basket_link(self, selected_topic=0, ln=cdslang):
+    def tmpl_create_basket_link(self, selected_topic=0, ln=CFG_SITE_LANG):
         """ Create link to basket creation """
         _ = gettext_set_language(ln)
         url = weburl + '/yourbaskets/create_basket?topic_number=%i&amp;ln=%s'
@@ -976,7 +976,7 @@ class Template:
 
     def tmpl_create_box(self, new_basket_name='', new_topic_name='',
                         topics=[], selected_topic=None,
-                        ln=cdslang):
+                        ln=CFG_SITE_LANG):
         """Display a HTML box for creation of a new basket
         @param new_basket_name: prefilled value (string)
         @param new_topic_name: prefilled value (string)
@@ -1017,7 +1017,7 @@ class Template:
 
     def tmpl_create_basket(self, new_basket_name='',
                            new_topic_name='', create_in_topic=None, topics=[],
-                           ln=cdslang):
+                           ln=CFG_SITE_LANG):
         """Template for basket creation
         @param new_basket_name: prefilled value (string)
         @param new_topic_name: prefilled value (string)
@@ -1050,7 +1050,7 @@ class Template:
                  group_baskets,
                  external_baskets,
                  topics,
-                 referer, ln=cdslang):
+                 referer, ln=CFG_SITE_LANG):
         """ returns HTML for the basket selection form when adding new records
         @param recids: list of record ids
         @param personal_baskets: list of (basket id, basket name, topic) tuples
@@ -1161,7 +1161,7 @@ class Template:
               'submit_label': _("Add to baskets")}
         return out
 
-    def tmpl_added_to_basket(self, nb_baskets_modified=0, ln=cdslang):
+    def tmpl_added_to_basket(self, nb_baskets_modified=0, ln=CFG_SITE_LANG):
         """Display message for addition of records to baskets"""
         _ = gettext_set_language(ln)
         if nb_baskets_modified:
@@ -1176,7 +1176,7 @@ class Template:
                             (nb_users, nb_groups, nb_alerts),
                             category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                             selected_topic=0, selected_group_id=0,
-                            ln=cdslang):
+                            ln=CFG_SITE_LANG):
         """
         display a confirm message
         @param bskid: basket id
@@ -1237,7 +1237,7 @@ class Template:
         return out
 
     def tmpl_edit(self, bskid, bsk_name, topic, topics, groups_rights, external_rights,
-                  display_general=0, display_sharing=0, display_delete=0, ln=cdslang):
+                  display_general=0, display_sharing=0, display_delete=0, ln=CFG_SITE_LANG):
         """Display interface for rights management over the given basket
         @param group_rights: list of (group id, name, rights) tuples
         @param external_rights: rights as defined in CFG_WEBBASKET_SHARE_LEVELS for public access.
@@ -1343,7 +1343,7 @@ class Template:
         return out
 
 
-    def __create_rights_selection_menu(self, name, current_rights, ln=cdslang):
+    def __create_rights_selection_menu(self, name, current_rights, ln=CFG_SITE_LANG):
         """Private function. create a drop down menu for selection of rights
         @param name: name of menu (for HTML name attribute)
         @param current_rights: rights as defined in CFG_WEBBASKET_SHARE_LEVELS
@@ -1368,7 +1368,7 @@ class Template:
                     ]
         return self.__create_select_menu(name, elements, current_rights)
 
-    def __create_group_rights_selection_menu(self, group_id, current_rights, ln=cdslang):
+    def __create_group_rights_selection_menu(self, group_id, current_rights, ln=CFG_SITE_LANG):
         """Private function. create a drop down menu for selection of rights
         @param current_rights: rights as defined in CFG_WEBBASKET_SHARE_LEVELS
         @param ln: language
@@ -1392,7 +1392,7 @@ class Template:
                     ]
         return self.__create_select_menu('groups', elements, str(group_id) + '_' + current_rights)
 
-    def tmpl_add_group(self, bskid, selected_topic, groups=[], ln=cdslang):
+    def tmpl_add_group(self, bskid, selected_topic, groups=[], ln=CFG_SITE_LANG):
         """
         return form for selection of groups.
         @param bskid: basket id (int)
@@ -1446,7 +1446,7 @@ class Template:
                                             baskets=[],
                                             select_box_name='baskets',
                                             selected_bskid=None,
-                                            ln=cdslang):
+                                            ln=CFG_SITE_LANG):
         """return an HTML popupmenu
         @param baskets: list of (bskid, bsk_name, bsk_topic) tuples
         @param select_box_name: name that will be used for the control
@@ -1458,7 +1458,7 @@ class Template:
             elements.append((bskid, bsk_topic + ' > ' + bsk_name))
         return self.__create_select_menu(select_box_name, elements, selected_bskid)
 
-    def tmpl_create_guest_warning_box(self, ln=cdslang):
+    def tmpl_create_guest_warning_box(self, ln=CFG_SITE_LANG):
         """return html warning box for non registered users"""
         _ = gettext_set_language(ln)
         message = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session.") + ' '
@@ -1473,7 +1473,7 @@ class Template:
 </table>"""
         return out % message
 
-    def tmpl_create_guest_forbidden_box(self, ln=cdslang):
+    def tmpl_create_guest_forbidden_box(self, ln=CFG_SITE_LANG):
         """return html warning box for non registered users"""
         _ = gettext_set_language(ln)
         message = _("This functionality is forbidden to guest users.") + ' '
@@ -1508,7 +1508,7 @@ class Template:
         out += '</select>'
         return out
 
-    def tmpl_warnings(self, warnings=[], ln=cdslang):
+    def tmpl_warnings(self, warnings=[], ln=CFG_SITE_LANG):
         """ returns HTML for warnings """
         from invenio.errorlib import get_msgs_for_code_list
         out = ''
@@ -1532,7 +1532,7 @@ class Template:
         return out
 
 
-    def tmpl_back_link(self, link, ln=cdslang):
+    def tmpl_back_link(self, link, ln=CFG_SITE_LANG):
         """ returns HTML for a link whose label should be
         'Back to search results'
         """
@@ -1541,7 +1541,7 @@ class Template:
         out = '<a href="%s">%s</a>' % (link, label)
         return out
 
-    def __create_messaging_link(self, to, display_name, ln=cdslang):
+    def __create_messaging_link(self, to, display_name, ln=CFG_SITE_LANG):
         """prints a link to the messaging system"""
         link = "%s/yourmessages/write?msg_to=%s&amp;ln=%s" % (weburl, to, ln)
         if to:

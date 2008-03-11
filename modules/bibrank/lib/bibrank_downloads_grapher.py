@@ -28,7 +28,7 @@ import time
 import tempfile
 import calendar
 
-from invenio.config import weburl, cdslang, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION
+from invenio.config import weburl, CFG_SITE_LANG, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION
 from invenio.messages import gettext_set_language
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
@@ -37,7 +37,7 @@ from invenio.bibrank_grapher import *
 color_line_list = ['9', '19', '10', '15', '21', '18']
 cfg_id_bibdoc_id_bibrec = 5
 
-def create_download_history_graph_and_box(id_bibrec, ln=cdslang):
+def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
     """Create graph with citation history for record ID_BIBREC (into a
        temporary file) and return HTML box refering to that image.
        Called by Detailed record pages.

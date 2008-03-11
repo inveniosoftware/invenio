@@ -85,7 +85,7 @@ else:
 # --------------------------------------------------
 
 from invenio import webinterface_handler
-from invenio.config import cdslang
+from invenio.config import CFG_SITE_LANG
 
 
 class TestWashArgs(unittest.TestCase):
@@ -97,7 +97,7 @@ class TestWashArgs(unittest.TestCase):
         result = webinterface_handler.wash_urlargd(form, default)
 
         if not 'ln' in expected:
-            expected['ln'] = cdslang
+            expected['ln'] = CFG_SITE_LANG
 
         self.failUnlessEqual(result, expected)
 

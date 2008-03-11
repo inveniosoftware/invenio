@@ -29,7 +29,7 @@ import sys
 import time
 from cStringIO import StringIO
 
-from invenio.config import cdslang, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, adminemail, supportemail, CFG_SITE_NAME, weburl
+from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, adminemail, supportemail, CFG_SITE_NAME, weburl
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
@@ -338,7 +338,7 @@ def get_msg_associated_to_code(err_code, stream='error'):
         err_code = error
     return (err_code, err_msg)
 
-def get_msgs_for_code_list(code_list, stream='error', ln=cdslang):
+def get_msgs_for_code_list(code_list, stream='error', ln=CFG_SITE_LANG):
     """
     @param code_list: list of tuples  [(err_name, arg1, ..., argN), ...]
 
