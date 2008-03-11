@@ -29,7 +29,7 @@ import sys
 import time
 from cStringIO import StringIO
 
-from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, adminemail, supportemail, CFG_SITE_NAME, weburl
+from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, supportemail, CFG_SITE_NAME, weburl
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
@@ -217,7 +217,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 if alert_admin or not written_to_log:
                     ## If requested or if it's impossible to write in the log
                     from invenio.mailutils import send_email
-                    send_email(adminemail, adminemail, subject='Registered exception at %s' % weburl, content=email_text, header='', footer='')
+                    send_email(CFG_SITE_ADMIN_EMAIL, CFG_SITE_ADMIN_EMAIL, subject='Registered exception at %s' % weburl, content=email_text, header='', footer='')
             return 1
         else:
             return 0
@@ -420,7 +420,7 @@ def send_error_report_to_admin(header, url, time_msg,
     Sends an email to the admin with client info and tracestack
     """
     from_addr =  '%s Alert Engine <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
-    to_addr = adminemail
+    to_addr = CFG_SITE_ADMIN_EMAIL
     body = """
 The following error was seen by a user and sent to you.
 %(contact)s

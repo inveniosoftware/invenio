@@ -35,7 +35,7 @@ import re
 
 from invenio.config import \
      accessurl, \
-     adminemail, \
+     CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_NAME, \
      supportemail, \
      weburl

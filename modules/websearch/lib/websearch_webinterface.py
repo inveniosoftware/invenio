@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_CACHEDIR, \
      CFG_SITE_LANG, \
-     adminemail, \
+     CFG_SITE_ADMIN_EMAIL, \
      sweburl, \
      CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
      CFG_WEBSEARCH_RSS_TTL, \

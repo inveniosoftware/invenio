@@ -59,7 +59,7 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
      CFG_APACHE_GROUP_FILE, \
      CFG_APACHE_PASSWORD_FILE, \
-     adminemail, \
+     CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
@@ -357,7 +357,7 @@ def confirm_email(email):
     res = run_sql('SELECT id FROM user where email=%s', (email, ))
     if res:
         if CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS:
-            sendNewAdminAccountWarning(email, adminemail)
+            sendNewAdminAccountWarning(email, CFG_SITE_ADMIN_EMAIL)
         return res[0][0]
     else:
         return None

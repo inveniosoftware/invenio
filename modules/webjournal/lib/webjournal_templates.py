@@ -19,7 +19,7 @@
 import os
 import time
 
-from invenio.config import adminemail, supportemail, CFG_ETCDIR, weburl, CFG_SITE_LANG
+from invenio.config import CFG_SITE_ADMIN_EMAIL, supportemail, CFG_ETCDIR, weburl, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webjournal_utils import get_number_of_articles_for_issue, \
@@ -69,7 +69,7 @@ def tmpl_webjournal_missing_info_box(language, title, msg_title, msg):
                             % (weburl,
                                journal,
                                journal) for journal in all_journals]),
-                   adminemail)
+                   CFG_SITE_ADMIN_EMAIL)
     return page(title=title, body=box)
 
 def tmpl_webjournal_error_box(language, title, title_msg, msg):

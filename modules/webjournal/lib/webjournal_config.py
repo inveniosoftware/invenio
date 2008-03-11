@@ -20,7 +20,7 @@
 
 import os
 
-from invenio.config import adminemail, supportemail, CFG_ETCDIR, weburl, CFG_SITE_LANG
+from invenio.config import CFG_SITE_ADMIN_EMAIL, supportemail, CFG_ETCDIR, weburl, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.htmlutils import escape_html
@@ -649,7 +649,7 @@ def webjournal_missing_info_box(language, title, msg_title, msg):
                    box_text,
                    box_list_title,
                    "".join(['<li><a href="%s/journal/?name=%s">%s</a></li>' % (weburl, journal, journal) for journal in all_journals]),
-                   adminemail)
+                   CFG_SITE_ADMIN_EMAIL)
     return page(title=title, body=box)
 
 

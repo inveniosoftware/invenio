@@ -25,7 +25,7 @@ Various utilities for WebJournal, e.g. config parser, etc.
 from invenio.bibformat_engine import BibFormatObject
 from invenio.errorlib import register_exception
 from invenio.search_engine import search_pattern
-from invenio.config import CFG_ETCDIR, weburl, adminemail, CFG_CACHEDIR, CFG_SITE_LANG
+from invenio.config import CFG_ETCDIR, weburl, CFG_SITE_ADMIN_EMAIL, CFG_CACHEDIR, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.dbquery import run_sql
@@ -173,7 +173,7 @@ def please_login(req, journal_name, ln="en", title="", message="", backlink=""):
                    message_out,
                    weburl,
                    backlink_out,
-                   adminemail)
+                   CFG_SITE_ADMIN_EMAIL)
 
     return page(title = title_out,
                 body = body_out,

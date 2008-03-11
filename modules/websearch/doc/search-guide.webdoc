@@ -4193,7 +4193,7 @@ If you produce your own list of publications and you notice that
 sometimes your first name is spelled abbreviated and sometimes in
 full, or if you want to identify your publications among several
 authors with the same abbreviation, please contact the <a
-href="mailto:<ADMINEMAIL>">administrators</a> of <CFG_SITE_NAME_INTL> so that
+href="mailto:<CFG_SITE_ADMIN_EMAIL>">administrators</a> of <CFG_SITE_NAME_INTL> so that
 they could work with you on inputting a consistently spelled and
 properly formatted first name everywhere.  Only the consistent
 database content will ensure a proper author searching behaviour.</p>
@@ -4310,7 +4310,7 @@ vous créez votre propre liste de publications et remarquez que le
 prénom est parfois épelé de manière abrégée et d'autres fois de
 manière complète ou si vous souhaitez identifier vos publications
 parmi celles de différents auteurs disposant du même nom en abrégé,
-veuillez <a href="mailto:<ADMINEMAIL>">contacter les
+veuillez <a href="mailto:<CFG_SITE_ADMIN_EMAIL>">contacter les
 administrateurs</a> de <CFG_SITE_NAME_INTL> de manière à ce qu'ils vous aident
 à saisir les prénoms de manière correcte et cohérente dans l'ensemble
 de la base de données. Une base de données au contenu cohérent
@@ -4430,7 +4430,7 @@ Si es autor de su propia lista de publicaciones y detecta que algunas
 veces su nombre se escribe de forma abreviada y a veces completo, o si
 desea identificar sus publicaciones entre diversos autores con la
 misma forma abreviada, por favor contacte con los<a
-href="mailto:<ADMINEMAIL>">administradores</a> de <CFG_SITE_NAME_INTL> que
+href="mailto:<CFG_SITE_ADMIN_EMAIL>">administradores</a> de <CFG_SITE_NAME_INTL> que
 trataran de trabajar conjuntamente para implementar una forma
 consistente y normalizada de introducción de su nombre en toda la base
 de datos.  Sólo una base de datos con contenido consistente puede
@@ -4551,7 +4551,7 @@ Si es autor de la seva pròpia llista de publicacions i detecta que
 algunes vegades el seu nom s’escriu de forma abreujada i de vegades
 complet, o si desitja identificar les seves publicacions entre
 diversos autors amb la mateixa forma abreujada, sis plau, contacti amb
-els <a href="mailto:<ADMINEMAIL>">administradors</a> de <CFG_SITE_NAME_INTL>
+els <a href="mailto:<CFG_SITE_ADMIN_EMAIL>">administradors</a> de <CFG_SITE_NAME_INTL>
 que tractaran de treballar-hi conjuntament per implementar una forma
 consistent i normalitzada d’introducció del seu nom a tota la base de
 dades.  Només una base de dades amb contingut consistent pot garantir

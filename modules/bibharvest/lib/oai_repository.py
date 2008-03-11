@@ -677,7 +677,7 @@ def oaiidentify(args):
     repositoryname        = "  <repositoryName>" + CFG_SITE_NAME + "</repositoryName>\n"
     baseurl               = "  <baseURL>%s/oai2d/</baseURL>\n" % weburl
     protocolversion       = "  <protocolVersion>2.0</protocolVersion>\n"
-    adminemail            = "  <adminEmail>%s</adminEmail>\n" % supportemail
+    adminemailtxt         = "  <adminEmail>%s</adminEmail>\n" % supportemail
     earliestdst		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()
     deletedrecord         = "  <deletedRecord>%s</deletedRecord>\n" % CFG_OAI_DELETED_POLICY
     repositoryidentifier  = "%s" % CFG_OAI_ID_PREFIX
@@ -687,7 +687,7 @@ def oaiidentify(args):
     out = out + repositoryname
     out = out + baseurl
     out = out + protocolversion
-    out = out + adminemail
+    out = out + adminemailtxt
     out = out + earliestdst
     out = out + deletedrecord
     out = out + "  <granularity>YYYY-MM-DDThh:mm:ssZ</granularity>\n"

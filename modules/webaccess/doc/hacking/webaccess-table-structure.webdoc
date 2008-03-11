@@ -45,7 +45,7 @@ firerole_def_src - definition text source for repairing after Python upgrades
 
 give users access to the authorizations/actions provided by the given role.
 
-   id_user - id of user in the database, usually just the supportemail and/or adminemail
+   id_user - id of user in the database, usually just the supportemail and/or CFG_SITE_ADMIN_EMAIL
 
 id_accROLE - id of role from accROLE
 

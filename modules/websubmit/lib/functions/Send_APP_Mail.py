@@ -36,7 +36,7 @@ import os
 import re
 
 from invenio.config import \
-     adminemail, \
+     CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_NAME, \
      htdocsurl, \
      supportemail

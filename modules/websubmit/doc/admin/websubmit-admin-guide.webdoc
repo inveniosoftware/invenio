@@ -2177,7 +2177,7 @@ def Get_Report_Number (parameters,curdir,form):
     action is made through the manager. Is this possible?
     </i>
     <blockquote>
-        Yes, it is. Edit the invenio.conf file in CDS Invenio distribution, find the "ADMINEMAIL" definition and set it to your email
+        Yes, it is. Edit the invenio-local.conf file, the "CFG_SITE_ADMIN_EMAIL" definition and set it to your email
         address. You will then receive all the warning emails issued by the manager.
     </blockquote>
     <a name="Q2"></a>

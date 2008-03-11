@@ -26,7 +26,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_NAME, supportemail, weburl, adminemail
+from invenio.config import CFG_SITE_NAME, supportemail, weburl, CFG_SITE_ADMIN_EMAIL
 from invenio.webuser import email_valid_p
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
@@ -282,7 +282,7 @@ Thank you for submitting your item into %(sitename)s.
                    email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     elif CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
         ## We don't want to mail the "owners". Let's mail the admin instead:
-        send_email(CFG_EMAIL_FROM_ADDRESS, adminemail, \
+        send_email(CFG_EMAIL_FROM_ADDRESS, CFG_SITE_ADMIN_EMAIL, \
                    "[%s] Submitted" % reference_numbers, email_txt)
 
     ## Return an empty string

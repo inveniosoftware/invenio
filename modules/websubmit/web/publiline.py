@@ -43,7 +43,7 @@ import shutil
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      accessurl, \
-     adminemail, \
+     CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      images, \
@@ -1567,7 +1567,7 @@ def SendWarning(doctype,categ,RN,title,authors,access):
     FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
     message = "Failed sending approval email request for %s" % RN
     # send the mail
-    send_email(FROMADDR,adminemail,"Failed sending approval email request",message)
+    send_email(FROMADDR,CFG_SITE_ADMIN_EMAIL,"Failed sending approval email request",message)
     return ""
 
 def errorMsg(title,req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):

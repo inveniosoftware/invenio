@@ -26,7 +26,7 @@
 __revision__ = "$Id$"
 
 from mechanize import Browser
-from invenio.config import sweburl, adminemail
+from invenio.config import sweburl, CFG_SITE_ADMIN_EMAIL
 
 from invenio.dbquery import run_sql
 from invenio.webgroup import synchronize_external_groups, synchronize_all_external_groups

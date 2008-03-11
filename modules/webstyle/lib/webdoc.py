@@ -31,7 +31,7 @@ from invenio.config import \
      CFG_SITE_LANGS, \
      CFG_SITE_NAME, \
      supportemail, \
-     adminemail, \
+     CFG_SITE_ADMIN_EMAIL, \
      weburl, \
      sweburl, \
      CFG_VERSION, \
@@ -128,7 +128,7 @@ ln_pattern =  re.compile(ln_pattern_text, re.IGNORECASE | re.DOTALL)
 
 defined_tags = {'<CFG_SITE_NAME>': CFG_SITE_NAME,
                 '<SUPPORTEMAIL>': supportemail,
-                '<ADMINEMAIL>': adminemail,
+                '<CFG_SITE_ADMIN_EMAIL>': CFG_SITE_ADMIN_EMAIL,
                 '<WEBURL>': weburl,
                 '<SWEBURL>': sweburl,
                 '<CFG_VERSION>': CFG_VERSION,

@@ -31,7 +31,7 @@ import math
 from invenio.dbquery import run_sql
 from invenio.config import CFG_SITE_LANG, \
                            CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
-                           adminemail,\
+                           CFG_SITE_ADMIN_EMAIL,\
                            weburl,\
                            CFG_SITE_NAME,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS,\
@@ -307,7 +307,7 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
          user_nb_votes_total) = query_get_user_reports_and_votes(int(id_user))
         (nickname, user_email, last_login) = query_get_user_contact_info(id_user)
         from_addr = '%s Alert Engine <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
-        to_addr = adminemail
+        to_addr = CFG_SITE_ADMIN_EMAIL
         subject = "An error report has been sent from a user"
         body = '''
 The following comment has been reported a total of %(cmt_reported)s times.
@@ -953,7 +953,7 @@ To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?co
         }
 
     from_addr = '%s WebComment <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
-    to_addr = adminemail
+    to_addr = CFG_SITE_ADMIN_EMAIL
     subject = "A new comment/review has just been posted"
 
     send_email(from_addr, to_addr, subject, out)

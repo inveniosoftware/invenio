@@ -31,7 +31,7 @@ import unittest
 from mechanize import Browser
 
 from invenio.dbquery import run_sql
-from invenio.config import sweburl, adminemail
+from invenio.config import sweburl, CFG_SITE_ADMIN_EMAIL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 

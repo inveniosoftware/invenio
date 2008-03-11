@@ -21,7 +21,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import adminemail, \
+from invenio.config import CFG_SITE_ADMIN_EMAIL, \
      weburl, CFG_SITE_NAME
 
 # elmsubmit configuration file:
@@ -48,7 +48,7 @@ CFG_ELMSUBMIT_NOLANGMSGS = {'bad_email': 'Your email could not be parsed correct
 
 CFG_ELMSUBMIT_SERVERS = {'smtp': 'localhost'}
 
-CFG_ELMSUBMIT_PEOPLE = {'admin': adminemail}
+CFG_ELMSUBMIT_PEOPLE = {'admin': CFG_SITE_ADMIN_EMAIL}
 
 # fields required in the submission mail
 CFG_ELMSUBMIT_REQUIRED_FIELDS = ['title',

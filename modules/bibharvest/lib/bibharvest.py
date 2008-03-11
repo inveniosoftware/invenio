@@ -36,7 +36,7 @@ except ImportError, e:
     sys.exit(1)
 
 try:
-    from invenio.config import adminemail, CFG_VERSION, CFG_SITE_NAME
+    from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_VERSION, CFG_SITE_NAME
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -203,7 +203,7 @@ def OAI_Request(server, script, params, method="POST"):
 
     headers = {"Content-type":"application/x-www-form-urlencoded",
         "Accept":"text/xml",
-        "From": adminemail,
+        "From": CFG_SITE_ADMIN_EMAIL,
         "User-Agent":"CDS Invenio %s" % CFG_VERSION}
 
     i = 0
@@ -214,7 +214,7 @@ def OAI_Request(server, script, params, method="POST"):
             conn.putrequest(method, script + "?" + params)
             conn.putheader("Content-type", "application/x-www-form-urlencoded")
             conn.putheader("Accept", "text/xml")
-            conn.putheader("From", adminemail)
+            conn.putheader("From", CFG_SITE_ADMIN_EMAIL)
             conn.putheader("User-Agent", CFG_SITE_NAME)
             conn.endheaders()
         elif method == "POST":

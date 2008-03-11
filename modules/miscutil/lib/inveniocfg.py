@@ -51,7 +51,7 @@ Options to update config files in situ:
 Options to update DB tables:
    --reset-all              perform all the reset options
    --reset-sitename         reset tables to take account of new CFG_SITE_NAME*
-   --reset-adminemail       reset tables to take account of new ADMINEMAIL
+   --reset-siteadminemail   reset tables to take account of new CFG_SITE_ADMIN_EMAIL
    --reset-fieldnames       reset tables to take account of new I18N names from PO files
 
 Options to help the work:
@@ -89,7 +89,6 @@ def convert_conf_option(option_name, option_value):
     option_name_replace_data = {'CFG_SITE_URL': 'weburl',
                                 'CFG_SITE_SECURE_URL': 'sweburl',
                                 'CFG_SITE_SUPPORT_EMAIL': 'supportemail',
-                                'CFG_SITE_ADMIN_EMAIL': 'adminemail',
                                 }
     if option_name_replace_data.has_key(option_name):
         option_name = option_name_replace_data[option_name]
@@ -295,19 +294,19 @@ def cli_cmd_reset_sitename(conf):
     print "You may want to restart Apache now."
     print ">>> CFG_SITE_NAME and CFG_SITE_NAME_INTL* reset successfully."
 
-def cli_cmd_reset_adminemail(conf):
+def cli_cmd_reset_siteadminemail(conf):
     """
-    Reset user-related tables with new ADMINEMAIL read from conf files.
+    Reset user-related tables with new CFG_SITE_ADMIN_EMAIL read from conf files.
     """
-    print ">>> Going to reset ADMINEMAIL..."
+    print ">>> Going to reset CFG_SITE_ADMIN_EMAIL..."
     from invenio.dbquery import run_sql
-    adminemail = conf.get("Invenio", "CFG_SITE_ADMIN_EMAIL")
+    siteadminemail = conf.get("Invenio", "CFG_SITE_ADMIN_EMAIL")
     run_sql("DELETE FROM user WHERE id=1")
     run_sql("""INSERT INTO user (id, email, password, note, nickname) VALUES
                         (1, %s, AES_ENCRYPT(email, ''), 1, 'admin')""",
-            (adminemail,))
+            (siteadminemail,))
     print "You may want to restart Apache now."
-    print ">>> ADMINEMAIL reset successfully."
+    print ">>> CFG_SITE_ADMIN_EMAIL reset successfully."
 
 def cli_cmd_reset_fieldnames(conf):
     """
@@ -451,7 +450,7 @@ def cli_cmd_create_tables(conf):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
     cli_cmd_reset_sitename(conf)
-    cli_cmd_reset_adminemail(conf)
+    cli_cmd_reset_siteadminemail(conf)
     cli_cmd_reset_fieldnames(conf)
     for cmd in ["%s/bin/webaccessadmin -u admin -c -a" % CFG_PREFIX]:
         if os.system(cmd):
@@ -824,14 +823,14 @@ def main():
                 done = True
             elif opt == '--reset-all':
                 cli_cmd_reset_sitename(conf)
-                cli_cmd_reset_adminemail(conf)
+                cli_cmd_reset_siteadminemail(conf)
                 cli_cmd_reset_fieldnames(conf)
                 done = True
             elif opt == '--reset-sitename':
                 cli_cmd_reset_sitename(conf)
                 done = True
-            elif opt == '--reset-adminemail':
-                cli_cmd_reset_adminemail(conf)
+            elif opt == '--reset-siteadminemail':
+                cli_cmd_reset_siteadminemail(conf)
                 done = True
             elif opt == '--reset-fieldnames':
                 cli_cmd_reset_fieldnames(conf)

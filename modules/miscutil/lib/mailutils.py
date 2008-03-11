@@ -46,7 +46,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_NAME, \
-     adminemail, \
+     CFG_SITE_ADMIN_EMAIL, \
      CFG_MISCUTIL_SMTP_HOST, \
      CFG_MISCUTIL_SMTP_PORT, \
      CFG_VERSION
@@ -102,9 +102,9 @@ def send_email(fromaddr,
     usebcc = ',' in toaddr # More than one address, let's use Bcc in place of To
     if copy_to_admin:
         if len(toaddr) > 0:
-            toaddr += ",%s" % (adminemail,)
+            toaddr += ",%s" % (CFG_SITE_ADMIN_EMAIL,)
         else:
-            toaddr = adminemail
+            toaddr = CFG_SITE_ADMIN_EMAIL
     body = forge_email(fromaddr, toaddr, subject, content, html_content, html_images, usebcc, header, footer, html_header, html_footer, ln, charset)
     toaddr = toaddr.split(",")
     if attempt_times < 1 or len(toaddr[0]) == 0:

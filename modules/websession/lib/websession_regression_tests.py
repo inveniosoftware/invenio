@@ -29,7 +29,7 @@ __revision__ = \
 import unittest
 
 from mechanize import Browser
-from invenio.config import sweburl, adminemail
+from invenio.config import sweburl, CFG_SITE_ADMIN_EMAIL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 from invenio.dbquery import run_sql
@@ -73,9 +73,9 @@ class WebSessionLostYourPasswordTest(unittest.TestCase):
     def test_lost_your_password_for_internal_accounts(self):
         """websession - sending lost password for internal admin account"""
 
-        try_with_account = adminemail
+        try_with_account = CFG_SITE_ADMIN_EMAIL
 
-        # click on "send lost password" for adminemail internal account
+        # click on "send lost password" for CFG_SITE_ADMIN_EMAIL internal account
         browser = Browser()
         browser.open(sweburl + "/youraccount/lost")
         browser.select_form(nr=0)
