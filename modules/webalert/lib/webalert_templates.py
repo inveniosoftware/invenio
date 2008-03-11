@@ -475,13 +475,12 @@ class Template:
 
         return out
 
-    def tmpl_alert_email_headers(self, name, headers):
-
-        headers['Subject'] = 'Alert %s run on %s' % (
+    def tmpl_alert_email_title(self, name):
+        return 'Alert %s run on %s' % (
             name, time.strftime("%Y-%m-%d"))
 
-        headers['From'] = '%s Alert Engine <%s>' % (cdsname, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
-
+    def tmpl_alert_email_from(self):
+        return '%s Alert Engine <%s>' % (cdsname, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
 
     def tmpl_alert_email_body(self, name, url, records, pattern,
                               catalogues, frequency):

@@ -27,27 +27,22 @@ __revision__ = "$Id$"
 
 from cgi import parse_qs
 from re import search, sub
-import sys
-from time import localtime, strftime, mktime, sleep
-from string import split
-import smtplib
+from time import strftime
 import datetime
-
-from email.Header import Header
-from email.Message import Message
-from email.MIMEText import MIMEText
 
 from invenio.config import \
      CFG_LOGDIR, \
      supportemail, \
-     CFG_VERSION, \
      weburl
 from invenio.search_engine import perform_request_search
-from invenio.alert_engine_config import *
 from invenio.webinterface_handler import wash_urlargd
 from invenio.dbquery import run_sql
-from invenio.htmlparser import *
 from invenio.webuser import get_email
+from invenio.mailutils import send_email
+from invenio.errorlib import register_exception
+from invenio.alert_engine_config import CFG_WEBALERT_DEBUG_LEVEL, \
+    CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES, \
+    CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 webalert_templates = invenio.template.load('webalert')
@@ -98,7 +93,8 @@ def add_records_to_basket(record_ids, basket_id):
             else:
                 print '   NOT ADDED, DEBUG LEVEL == 4'
                 return 0
-        except:
+        except Exception:
+            register_exception()
             return 0
     else:
         return 0
@@ -129,7 +125,6 @@ def email_notify(alert, records, argstr):
 
     msg += webalert_templates.tmpl_alert_email_body(
         alert[5], url, records, pattern, catalogues, frequency)
-    msg = MIMEText(msg, _charset='utf-8')
 
     email = get_email(alert[0])
 
@@ -140,27 +135,28 @@ def email_notify(alert, records, argstr):
         print "********************************************************************************"
         return
 
-    msg['To'] = email
-
-    # Let the template fill in missing fields
-    webalert_templates.tmpl_alert_email_headers(alert[5], msg)
-
-    sender = msg['From']
-
-    body = msg.as_string()
-
     if CFG_WEBALERT_DEBUG_LEVEL > 0:
         print "********************************************************************************"
-        print body
+        print msg
         print "********************************************************************************"
 
     if CFG_WEBALERT_DEBUG_LEVEL < 2:
-        send_email(sender, email, content=body,
-                   attempt_time=CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES,
+        send_email(fromaddr=webalert_templates.tmpl_alert_email_from(),
+                   toaddr=email,
+                   subject=webalert_templates.tmpl_alert_email_title(alert[5]),
+                   content=msg,
+                   header='',
+                   footer='',
+                   attempt_times=CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES,
                    attempt_sleeptime=CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES)
     if CFG_WEBALERT_DEBUG_LEVEL == 4:
-        send_email(sender, supportemail, content=body,
-                   attempt_time=CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES,
+        send_email(fromaddr=webalert_templates.tmpl_alert_email_from(),
+                   toaddr=supportemail,
+                   subject=webalert_templates.tmpl_alert_email_title(alert[5]),
+                   content=msg,
+                   header='',
+                   footer='',
+                   attempt_times=CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES,
                    attempt_sleeptime=CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES)
 
 def get_argument(args, argname):
@@ -315,8 +311,8 @@ def log(msg):
         log.write(strftime('%Y%m%d%H%M%S#'))
         log.write(msg + '\n')
         log.close()
-    except:
-        pass
+    except Exception:
+        register_exception()
 
 def process_alerts(alerts):
     # TBD: do not generate the email each time, forge it once and then
