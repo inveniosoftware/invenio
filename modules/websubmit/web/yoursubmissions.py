@@ -33,7 +33,7 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     images, \
+     CFG_SITE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      sweburl, \
      CFG_VERSION, \
@@ -166,7 +166,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
     t += websubmit_templates.tmpl_yoursubmissions(
            ln = ln,
            weburl = weburl,
-           images = images,
+           images = CFG_SITE_URL + '/img',
            order = order,
            doctypes = doctypes,
            submissions = submissions,

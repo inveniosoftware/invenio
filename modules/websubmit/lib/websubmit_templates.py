@@ -30,8 +30,7 @@ import operator
 import os
 
 from invenio.config import \
-     accessurl, \
-     images, \
+     CFG_SITE_URL, \
      CFG_VERSION, \
      weburl
 from invenio.messages import gettext_set_language
@@ -2169,7 +2168,7 @@ class Template:
                  </table>"""
         return out
 
-    def tmpl_publiline_displaydoc(self, ln, doctype, docname, categ, rn, status, dFirstReq, dLastReq, dAction, access, images, accessurl, confirm_send, auth_code, auth_message, authors, title, sysno, newrn):
+    def tmpl_publiline_displaydoc(self, ln, doctype, docname, categ, rn, status, dFirstReq, dLastReq, dAction, access, images, confirm_send, auth_code, auth_message, authors, title, sysno, newrn):
         """
         Displays the categories from a doctype that the user can select
 
@@ -2194,8 +2193,6 @@ class Template:
           - 'dAction' *string* - The date of the last action (approval or rejection)
 
           - 'images' *string* - the path to the images
-
-          - 'accessurl' *string* - the URL of the publications
 
           - 'confirm_send' *bool* - must display a confirmation message about sending approval email
 
@@ -2317,7 +2314,7 @@ class Template:
                   </table>"""
         return out
 
-    def tmpl_publiline_displaycplxdoc(self, ln, doctype, docname, categ, rn, apptype, status, dates, images, accessurl, isPubCom, isEdBoard, isReferee, isProjectLeader, isAuthor, authors, title, sysno, newrn):
+    def tmpl_publiline_displaycplxdoc(self, ln, doctype, docname, categ, rn, apptype, status, dates, images, isPubCom, isEdBoard, isReferee, isProjectLeader, isAuthor, authors, title, sysno, newrn):
 
         # load the right message language
         _ = gettext_set_language(ln)

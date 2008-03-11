@@ -32,7 +32,7 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     urlpath, \
+     CFG_SITE_URL, \
      CFG_VERSION
 from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
@@ -63,7 +63,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
             rn = res[0][1]
         res = run_sql("select value from sbmPARAMETERS where name='edsrn' and doctype=%s",(doctype,))
         edsrn = res[0][0]
-        url = "%s/submit/sub?%s=%s&password=%s@APP%s" % (urlpath,edsrn,rn,access,doctype)
+        url = "%s/submit/sub?%s=%s&password=%s@APP%s" % (CFG_SITE_URL,edsrn,rn,access,doctype)
         req.err_headers_out.add("Location", url)
         raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
         return ""

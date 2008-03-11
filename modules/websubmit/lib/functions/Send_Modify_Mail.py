@@ -34,7 +34,7 @@ import os
 import re
 
 from invenio.config import \
-     accessurl, \
+     CFG_SITE_URL, \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
@@ -67,7 +67,7 @@ def Send_Modify_Mail (parameters, curdir, form, user_info=None):
     else:
         fields = ""
     email_txt = "Dear Sir or Madam, \n%s %s has just been modified.\nModified fields: %s\n\n" % (type,rn,fields)
-    if accessurl != "" and sysno != "":
+    if CFG_SITE_URL != "" and sysno != "":
         email_txt += "You can check the modified document here:\n"
         email_txt += "<%s/record/%s>\n\n" % (weburl,sysno)
     email_txt += "Please note that the modifications will be taken into account in a couple of minutes.\n\nBest regards,\nThe %s Server support Team" % CFG_SITE_NAME

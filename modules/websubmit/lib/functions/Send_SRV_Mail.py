@@ -34,7 +34,7 @@ import os
 import re
 
 from invenio.config import \
-     accessurl, \
+     CFG_SITE_URL, \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \

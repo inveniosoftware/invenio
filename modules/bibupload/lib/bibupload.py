@@ -78,7 +78,6 @@ from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.bibformat import format_record
 from invenio.config import CFG_WEBSUBMIT_FILEDIR, \
                            CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, \
-                           htdocsurl, \
                            CFG_TMPDIR, \
                            CFG_PREFIX
 from invenio.bibtask import task_init, write_message, get_datetime, \

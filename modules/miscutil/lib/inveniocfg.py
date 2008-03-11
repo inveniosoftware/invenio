@@ -157,11 +157,9 @@ def cli_cmd_update_config_py(conf):
     for lang in conf.get("Invenio", "CFG_SITE_LANGS").split(","):
         fdesc.write("CFG_SITE_NAME_INTL['%s'] = \"%s\"\n" % (lang, conf.get("Invenio",
                                                                             "CFG_SITE_NAME_INTL_" + lang)))
-    ## special treatment for legacy WebSubmit options: (FIXME: phase them out)
-    fdesc.write("accessurl = '%s/search'\n" % conf.get("Invenio", "CFG_SITE_URL"))
-    fdesc.write("urlpath = '%s'\n" % conf.get("Invenio", "CFG_SITE_URL"))
-    fdesc.write("images = '%s/img'\n" % conf.get("Invenio", "CFG_SITE_URL"))
-    fdesc.write("htdocsurl = '%s'\n" % conf.get("Invenio", "CFG_SITE_URL"))
+    ## special treatment for new CFG_SITE_URL options: (FIXME: remove them when weburl is phased out)
+    fdesc.write("CFG_SITE_URL = '%s'\n" % conf.get("Invenio", "CFG_SITE_URL"))
+    fdesc.write("CFG_SITE_SECURE_URL = '%s'\n" % conf.get("Invenio", "CFG_SITE_SECURE_URL"))
     ## process all the options normally:
     for section in conf.sections():
         for option in conf.options(section):

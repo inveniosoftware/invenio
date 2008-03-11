@@ -27,7 +27,7 @@ import re
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     images, \
+     CFG_SITE_URL, \
      weburl
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
@@ -171,7 +171,7 @@ def displayUserTable(doctype):
                 referees[role_name] = acc_get_role_users(role_id)
 
     if len(referees) == 0:
-        t += '<tr><td align="center" colspan="2"><img src="%s/noway.gif" height="16px" width="16px" alt="Empty"/></td></tr>' % images
+        t += '<tr><td align="center" colspan="2"><img src="%s/img/noway.gif" height="16px" width="16px" alt="Empty"/></td></tr>' % CFG_SITE_URL
     i = 0
     for role in referees.keys():
         categ = re.match("referee_%s_(.*)" % doctype, role).group(1)
@@ -191,7 +191,7 @@ def displayUserTable(doctype):
             t += referee[1]
             t += '</small></td>'
             t += '''<td><a href="" onclick="if (confirm('Are you sure you want to delete this referee?')){document.forms[0].todo.value='deleteuser';document.forms[0].id.value='%s';document.forms[0].role.value='%s';document.forms[0].submit();return false;}else{return false;}">''' % (referee[0], role)
-            t += '<img src="%s/iconcross.gif" border="0" alt="Remove" /></a>' % images
+            t += '<img src="%s/img/iconcross.gif" border="0" alt="Remove" /></a>' % CFG_SITE_URL
             t += '</td>'
             t += '</tr>'
             i += 1

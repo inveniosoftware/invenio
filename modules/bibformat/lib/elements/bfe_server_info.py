@@ -20,9 +20,9 @@
 """
 __revision__ = "$Id$"
 
-from invenio.config import accessurl, CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_NAME, weburl, CFG_VERSION, CFG_SITE_NAME_INTL, CFG_SITE_SUPPORT_EMAIL
+from invenio.config import CFG_SITE_URL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_NAME, weburl, CFG_VERSION, CFG_SITE_NAME_INTL, CFG_SITE_SUPPORT_EMAIL
 
-# FIXME: new cfg variable names like CFG_VERSION
+# FIXME: what about admin_email? needed? or use new arguments like CFG_SITE_ADMIN_EMAIL?
 
 def format(bfo, var=''):
     '''
@@ -58,7 +58,7 @@ def format(bfo, var=''):
         if not out.endswith('/'):
             out += '/'
     elif var == 'searchurl':
-        out = accessurl
+        out = CFG_SITE_URL + '/search'
         if not out.endswith('/'):
             out += '/'
     elif var == 'recurl':

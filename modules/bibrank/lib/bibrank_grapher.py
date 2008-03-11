@@ -27,7 +27,7 @@ import time
 import tempfile
 
 from invenio.config import \
-     images, \
+     CFG_SITE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_VERSION, \
      CFG_WEBDIR

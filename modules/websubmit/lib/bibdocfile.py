@@ -32,7 +32,7 @@ from mimetypes import MimeTypes
 from invenio.dbquery import run_sql, DatabaseError
 from invenio.errorlib import register_exception
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_SITE_LANG, images, weburl, CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR, CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, sweburl
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, weburl, CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR, CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, sweburl
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -742,7 +742,7 @@ class BibDoc:
             imagepath = "%s/record/%s/files/%s" % \
                 (weburl, self.recid, existing_icon.get_full_name())
         else:
-            imagepath = "%s/smallfiles.gif" % images
+            imagepath = "%s/img/smallfiles.gif" % CFG_SITE_URL
 
         versions = []
         for version in list_versions_from_array(docfiles):

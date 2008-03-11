@@ -42,16 +42,14 @@ import shutil
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
-     accessurl, \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     images, \
+     CFG_SITE_URL, \
      CFG_PYLIBDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
      sweburl, \
-     urlpath, \
      CFG_VERSION
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
@@ -224,7 +222,7 @@ def selectCateg(doctype, ln = CFG_SITE_LANG):
           categories = categories,
           doctype = doctype,
           title = title,
-          images = images,
+          images = CFG_SITE_URL + '/img',
         )
     return t
 
@@ -251,7 +249,7 @@ def selectCplxCateg(doctype, ln = CFG_SITE_LANG):
           types = types,
           doctype = doctype,
           title = title,
-          images = images,
+          images = CFG_SITE_URL + '/img',
         )
     return t
 
@@ -275,7 +273,7 @@ def selectDocument(doctype,categ, ln = CFG_SITE_LANG):
           doctype = doctype,
           title = title,
           categ = categ,
-          images = images,
+          images = CFG_SITE_URL + '/img',
           docs = docs,
         )
     return t
@@ -305,7 +303,7 @@ def selectCplxDocument(doctype,categ,apptype, ln = CFG_SITE_LANG):
           title = title,
           categ = categ,
           categname = categname,
-          images = images,
+          images = CFG_SITE_URL + '/img',
           docs = docs,
           apptype = apptype,
         )
@@ -384,8 +382,7 @@ def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
           dLastReq = dLastReq,
           dAction = dAction,
           access = access,
-          images = images,
-          accessurl = accessurl,
+          images = CFG_SITE_URL + '/img',
           confirm_send = confirm_send,
           auth_code = auth_code,
           auth_message = auth_message,
@@ -472,8 +469,7 @@ def displayCplxDocument(req, doctype,categ,RN,apptype, ln = CFG_SITE_LANG):
           apptype = apptype,
           status = status,
           dates = dates,
-          images = images,
-          accessurl = accessurl,
+          images = CFG_SITE_URL + '/img',
           isPubCom = isPubCom,
           isEdBoard = isEdBoard,
           isReferee = isReferee,
@@ -741,7 +737,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
               apptype = apptype,
               action = action,
               status = status,
-              images = images,
+              images = CFG_SITE_URL + '/img',
               authors = authors,
               title = title,
               sysno = sysno,
@@ -843,7 +839,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
               apptype = apptype,
               action = action,
               status = status,
-              images = images,
+              images = CFG_SITE_URL + '/img',
               authors = authors,
               title = title,
               sysno = sysno,
@@ -929,7 +925,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
               apptype = apptype,
               action = action,
               status = status,
-              images = images,
+              images = CFG_SITE_URL + '/img',
               authors = authors,
               title = title,
               sysno = sysno,
@@ -971,7 +967,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
               apptype = apptype,
               action = action,
               status = status,
-              images = images,
+              images = CFG_SITE_URL + '/img',
               authors = authors,
               title = title,
               sysno = sysno,
@@ -1021,7 +1017,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
               apptype = apptype,
               action = action,
               status = status,
-              images = images,
+              images = CFG_SITE_URL + '/img',
               authors = authors,
               title = title,
               sysno = sysno,
@@ -1558,7 +1554,7 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
 
     ---------------------------------------------
     Best regards.
-    The submission team.""" % (RN,title,authors,urlpath,sysno,urlpath,access)
+    The submission team.""" % (RN,title,authors,CFG_SITE_URL,sysno,CFG_SITE_URL,access)
     # send the mail
     send_email(FROMADDR,addresses,"Request for Approval of %s" % RN, message,footer="")
     return ""

@@ -38,9 +38,8 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     images, \
+     CFG_SITE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
-     urlpath, \
      CFG_VERSION, \
      weburl
 from invenio.dbquery import run_sql, Error
@@ -432,7 +431,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                 IN = re.sub(".*@","",myQuery)
             else:
                 IN = myQuery
-            url = "%s/submit/direct?sub=%s&%s" % (urlpath,IN,param)
+            url = "%s/submit/direct?sub=%s&%s" % (CFG_SITE_URL,IN,param)
             req.err_headers_out.add("Location", url)
             raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
             return ""
@@ -483,7 +482,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         return websubmit_templates.tmpl_submit_summary(
                  ln = args['ln'],
                  values = values,
-                 images = images,
+                 images = CFG_SITE_URL + '/img',
                )
 
     def index(self, req, form):

@@ -40,10 +40,9 @@ from invenio.config import \
      CFG_BINDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     images, \
+     CFG_SITE_URL, \
      CFG_PYLIBDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
-     urlpath, \
      CFG_VERSION, \
      weburl
 from invenio.dbquery import run_sql, Error
@@ -288,7 +287,7 @@ def interface(req,
         mainmenu = fp.read()
         fp.close()
     else:
-        mainmenu = "%s/submit" % (urlpath,)
+        mainmenu = "%s/submit" % (CFG_SITE_URL,)
     # various authentication related tasks...
     if uid_email != "guest" and uid_email != "":
         #First save the username (email address) in the SuE file. This way bibconvert will be able to use it if needed
@@ -591,10 +590,10 @@ def interface(req,
                          radio = radio,
                          curpage = curpage,
                          nbpages = nbpages,
-                         images = images,
+                         images = CFG_SITE_URL + '/img',
                          returnto = returnto,
                        ),
-          images = images,
+          images = CFG_SITE_URL + '/img',
           mainmenu = mainmenu,
          )
 
@@ -771,7 +770,7 @@ def endaction(req,
         mainmenu = fp.read()
         fp.close()
     else:
-        mainmenu = "%s/submit" % (urlpath,)
+        mainmenu = "%s/submit" % (CFG_SITE_URL,)
 
     ## retrieve the name of the file in which the reference of
     ## the submitted document will be stored
@@ -963,7 +962,7 @@ def endaction(req,
           indir = indir,
           mainmenu = mainmenu,
           finished = finished,
-          images = images,
+          images = CFG_SITE_URL + '/img',
           function_content = function_content,
           next_action = next_action,
         )

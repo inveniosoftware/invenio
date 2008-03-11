@@ -26,7 +26,7 @@ from invenio.config import \
      CFG_PATH_DISTILLER, \
      CFG_PATH_GUNZIP, \
      CFG_PATH_GZIP, \
-     images
+     CFG_SITE_URL
 import os
 import re
 from invenio.bibdocfile import BibRecDocs, list_versions_from_array, list_types_from_array
@@ -124,7 +124,7 @@ def Display_File_List(bibrecdocs):
             for bibdoc in bibdocs:
                 if mytype == bibdoc.get_type():
                     t+="<table cellpadding=0 cellspacing=1 border=0><tr><td bgcolor=\"white\">"
-                    t+="<center><input type=radio name=mybibdocname value=%s><br /><br /><A href=\"\" onClick=\"if (confirm('Are you sure you want to delete this file?')) { document.forms[0].deletedfile.value='%s';document.forms[0].deleted.value='yes';document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/smallbin.gif border=0 align=center></a><br /></small></center>" % (bibdoc.get_docname(),bibdoc.get_docname(),images)
+                    t+="<center><input type=radio name=mybibdocname value=%s><br /><br /><A href=\"\" onClick=\"if (confirm('Are you sure you want to delete this file?')) { document.forms[0].deletedfile.value='%s';document.forms[0].deleted.value='yes';document.forms[0].submit();return false;} else { return false; }\"><IMG src=%s/img/smallbin.gif border=0 align=center></a><br /></small></center>" % (bibdoc.get_docname(),bibdoc.get_docname(),CFG_SITE_URL)
                     t+="</td><td>"
                     t+=bibdoc.display()
                     t+="</td></tr></table>"
