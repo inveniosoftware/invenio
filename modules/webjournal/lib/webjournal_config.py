@@ -431,7 +431,7 @@ class IvenioWebJournalNoPopupTypeError(Exception):
         Initialisation.
         """
         self.language = language
-        self.journal_name
+        self.journal_name = journal_name
 
     def __str__(self):
         """
@@ -463,7 +463,7 @@ class InvenioWebJournalNoPopupRecordError(Exception):
         Initialisation.
         """
         self.language = language
-        self.journal_name
+        self.journal_name = journal_name
         self.recid = recid
 
     def __str__(self):
@@ -559,14 +559,13 @@ class InvenioWebJournalIssueNotFoundDBError(Exception):
         """
         self.language = language
         self.journal_name = journal_name
-        sefl.issue_number = issue_number
+        self.issue_number = issue_number
 
     def __str__(self):
         """
         String representation.
         """
-        return 'The issue %s could not be found in the DB for journal %s.' % (self.issue_number,
-                                                                              self.journal_name)
+        return 'The issue %s could not be found in the DB for journal %s.' % (self.issue_number, self.journal_name)
 
     def user_box(self):
         """
