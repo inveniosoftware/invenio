@@ -38,11 +38,6 @@ import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 websearch_templates = invenio.template.load('websearch')
 
-try:
-    from mod_python import apache
-except ImportError:
-    pass
-
 CFG_BIBDOCFILE_MD5_THRESHOLD = 256 * 1024
 CFG_BIBDOCFILE_MD5_BUFFER = 1024 * 1024
 CFG_BIBDOCFILE_MD5SUM_EXISTS = os.system('which md5sum 2>&1 > /dev/null') == 0
@@ -463,6 +458,9 @@ class BibDoc:
         pair is needed."""
         # docid is known, the document already exists
         docname = normalize_docname(docname)
+        self.docfiles = []
+        self.md5s = None
+        self.related_files = []
         if docid != "":
             if recid == "":
                 recid = None
@@ -595,7 +593,7 @@ class BibDoc:
             else:
                 myversion = latestVersion + 1
             if os.path.exists(filename):
-                dummy, basename, format = decompose_file(filename)
+                dummy, dummy, format = decompose_file(filename)
                 format = normalize_format(format)
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, myversion)
                 try:
@@ -645,7 +643,7 @@ class BibDoc:
             for docfile in self.list_version_files(version):
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, docfile.get_format(), new_version)
                 if os.path.exists(destination):
-                    raise InvenioWebSubmitFileError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, format)
+                    raise InvenioWebSubmitFileError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, docfile.get_format())
                 try:
                     shutil.copyfile(docfile.get_full_path(), destination)
                     os.chmod(destination, 0644)
@@ -665,7 +663,7 @@ class BibDoc:
             if version == 0:
                 version = 1
             if os.path.exists(filename):
-                dummy, basename, format = decompose_file(filename)
+                dummy, dummy, format = decompose_file(filename)
                 format = normalize_format(format)
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, version)
                 if os.path.exists(destination):
@@ -912,7 +910,7 @@ class BibDoc:
             return (added_files, deleted_files)
 
         if context != 'init':
-            previous_file_list = self.docfiles
+            previous_file_list = list(self.docfiles)
         self.docfiles = []
         if os.path.exists(self.basedir):
             self.md5s = Md5Folder(self.basedir)
@@ -1342,7 +1340,7 @@ def bibdocfile_url_to_bibdoc(url):
 def bibdocfile_url_to_bibdocfile(url):
     """Given a url in the form (s)weburl/record/xxx/files/... it returns
     a BibDocFile object for the corresponding recid/docname/format."""
-    dummy, docname, format = decompose_bibdocfile_url(url)
+    dummy, dummy, format = decompose_bibdocfile_url(url)
     return bibdocfile_url_to_bibdoc(url).get_file(format)
 
 def bibdocfile_url_to_fullpath(url):
