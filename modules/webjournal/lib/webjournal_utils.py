@@ -835,7 +835,7 @@ def put_css_in_file(html_message, journal_name):
     try:
         css_path = config_strings["screen"][0]
     except:
-        register_exception(req=Null,
+        register_exception(req=None,
                            suffix="No css file for journal %s. Is this right?"
                            % journal_name)
         return
