@@ -63,8 +63,14 @@ def get_pretty_wide_client_info(req):
         ret = ""
         fmt = "%% %is: %%s\n" % max_key
         for key in keys:
-            ret += fmt % (key, user_info[key])
-        return ret
+            if key in ('uri', 'referer'):
+                ret += fmt % (key, "<%s>" % user_info[key])
+            else:
+                ret += fmt % (key, user_info[key])
+        if ret.endswith('\n'):
+            return ret[:-1]
+        else:
+            return ret
     else:
         return "No client information available"
 
@@ -158,6 +164,8 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             ## Let's print the exception (and the traceback)
             traceback.print_exception(exc_info[0], exc_info[1], exc_info[2], None, exception_data)
             exception_data = exception_data.getvalue()
+            if exception_data.endswith('\n'):
+                exception_data = exception_data[:-1]
 
             log_stream = StringIO()
             email_stream = StringIO()
@@ -168,16 +176,16 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 print >> log_stream, prefix
                 print >> email_stream, prefix
 
-            print >> email_stream, "The following problem occurred on %s" % weburl
+            print >> email_stream, "The following problem occurred on <%s>" % weburl
             print >> email_stream, ">>> Registered exception"
 
             print >> log_stream, www_data
-            print >> email_stream, www_data
+            print >> email_stream, '%s\n' % www_data
 
             print >> email_stream, ">>> User details"
 
             print >> log_stream, client_data
-            print >> email_stream, client_data
+            print >> email_stream, '%s\n' % client_data
 
             print >> email_stream, ">>> Traceback details"
 
@@ -186,7 +194,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 print >> email_stream, tracestack_data
 
             print >> log_stream, exception_data
-            print >> email_stream, exception_data
+            print >> email_stream, '%s\n' % exception_data
 
             ## If a suffix was requested let's print it
             if suffix:
@@ -209,7 +217,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 if alert_admin or not written_to_log:
                     ## If requested or if it's impossible to write in the log
                     from invenio.mailutils import send_email
-                    send_email(adminemail, adminemail, subject='Registered exception at %s' % weburl, content=email_text)
+                    send_email(adminemail, adminemail, subject='Registered exception at %s' % weburl, content=email_text, header='', footer='')
             return 1
         else:
             return 0
