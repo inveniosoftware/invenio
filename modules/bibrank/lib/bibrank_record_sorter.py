@@ -280,7 +280,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     for j in range(0, len(lwords)): #find which docs to search based on ranges..should be done in search_engine...
         if lwords[j] and lwords[j][:6] == "recid:":
             if not lwords_hitset:
-                lwords_hitset = HitSet()
+                lwords_hitset = intbitset()
             lword = lwords[j][6:]
             if string.find(lword, "->") > -1:
                 lword = string.split(lword, "->")
@@ -312,8 +312,7 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
             else:
                 reclist_addend.append((recID, 0))
     else: #rank docs in hitset, can this be speed up using something else than for loop?
-        lwords_lrecIDs = lwords_hitset.items()
-        for recID in lwords_lrecIDs:
+        for recID in lwords_hitset:
             if rnkdict.has_key(recID) and recID in hitset:
                 reclist.append((recID, rnkdict[recID]))
                 del rnkdict[recID]
