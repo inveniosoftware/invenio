@@ -93,7 +93,7 @@ def get_widget_HTML():
     now_in_gmt = time.gmtime()
     now_time_string = time.strftime( "%a, %d %b %Y %H:%M:%S GMT", now_in_gmt)
     try:
-        expire_time_string = open('%s/%s' (CFG_CACHEDIR, Expire_Time_Filename)).read()
+        expire_time_string = open('%s/%s' % (CFG_CACHEDIR, Expire_Time_Filename)).read()
         expire_time = time.strptime(open(Expire_Time_Filename).read(), "%a, %d %b %Y %H:%M:%S %Z")
         #expire_time['tm_isdt'] = 0
         expire_in_seconds = time.mktime(expire_time)
