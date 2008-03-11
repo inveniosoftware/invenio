@@ -28,11 +28,11 @@ the WebAccess internals.
 <blockquote>
  <dl>
   <dt><a href="webaccess-api">Access Control Engine API</a> </dt>
-  <dd>Explains how to call access control engine from your Python programs.<br>
+  <dd>Explains how to call access control engine from your Python programs.<br />
       In addition the program flow is explained briefly.</dd>
   <dt><a href="webaccess-admin-internals">Access Control Admin Internals</a> </dt>
-  <dd>Explains how to administrate the authorizations stored in the database for <br>
-      WebAccess. Not all functions are mentioned. All mentioned functions are  <br>
+  <dd>Explains how to administrate the authorizations stored in the database for <br />
+      WebAccess. Not all functions are mentioned. All mentioned functions are  <br />
       represented with signatures, some with additional explanations as well.</dd>
   <dt><a href="webaccess-table-structure">Access Control Table Structure</a> </dt>
   <dd>Explains the structure of the WebAccess tables and how to create authorizations.</dd>

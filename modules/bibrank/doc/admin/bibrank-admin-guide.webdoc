@@ -59,7 +59,7 @@ Combined Method
 </pre>
 </blockquote>
 <p>bibrankgkb - For generating knowledge base files for use with bibrank
-<br/><br/></p>
+</p>
 <p>The bibrankgkb may not be necessary to use, it depends on which ranking methods you are planning
 to use, and what data you already got. This guide will take you through the necessary steps in detail in
 order to create different kinds of ranking methods for the search engine to use.

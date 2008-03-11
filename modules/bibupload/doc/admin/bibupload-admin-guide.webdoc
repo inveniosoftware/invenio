@@ -23,14 +23,14 @@
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <h2>Contents</h2>
-<strong>1. <a href="#1">Overview</a></strong><br>
-<strong>2. <a href="#2">Configuring BibUpload</a></strong><br>
-<strong>3. <a href="#3">Running BibUpload</a></strong><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1. <a href="#3.1">Inserting new records</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2. <a href="#3.2">Updating existing records</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3. <a href="#3.3">Inserting and updating at the same time</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4. <a href="#3.4">Updating preformatted output formats</a><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5. <a href="#3.5">Uploading fulltext files</a><br>
+<strong>1. <a href="#1">Overview</a></strong><br />
+<strong>2. <a href="#2">Configuring BibUpload</a></strong><br />
+<strong>3. <a href="#3">Running BibUpload</a></strong><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1. <a href="#3.1">Inserting new records</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2. <a href="#3.2">Updating existing records</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3. <a href="#3.3">Inserting and updating at the same time</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.4. <a href="#3.4">Updating preformatted output formats</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.5. <a href="#3.5">Uploading fulltext files</a><br />
 
 <a name="1"></a><h2>1. Overview</h2>
 

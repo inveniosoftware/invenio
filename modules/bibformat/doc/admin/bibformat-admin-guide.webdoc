@@ -1031,15 +1031,15 @@ of the record to define the format template to use.</p>
     <tr bgcolor="#ffffff">
       <td bgcolor="#33ccff"><font size="2"><b>Action (0)</b></font></td>
       <td>"&lt;record&gt;
-<br>&nbsp;&lt;controlfield&nbsp;tag=\"001\"&gt;"&nbsp;$001&nbsp;"&lt;/controlfield&gt;
-<br>&nbsp;&lt;datafield&nbsp;tag=\"FMT\"&nbsp;ind1=\"\"&nbsp;ind2=\"\"&gt;&nbsp;
+<br />&nbsp;&lt;controlfield&nbsp;tag=\"001\"&gt;"&nbsp;$001&nbsp;"&lt;/controlfield&gt;
+<br />&nbsp;&lt;datafield&nbsp;tag=\"FMT\"&nbsp;ind1=\"\"&nbsp;ind2=\"\"&gt;&nbsp;
 
-<br>&nbsp;&lt;subfield&nbsp;code=\"f\"&gt;hb&lt;/subfield&gt;&nbsp;
-<br>&nbsp;&lt;subfield&nbsp;code=\"g\"&gt;"&nbsp;
-<br>xml_text(format("PICTURE_HTML_BRIEF"))
-<br>"&nbsp;&lt;/subfield&gt;&nbsp;
-<br>&nbsp;&lt;/datafield&gt;
-<br>&lt;/record&gt;"</td>
+<br />&nbsp;&lt;subfield&nbsp;code=\"f\"&gt;hb&lt;/subfield&gt;&nbsp;
+<br />&nbsp;&lt;subfield&nbsp;code=\"g\"&gt;"&nbsp;
+<br />xml_text(format("PICTURE_HTML_BRIEF"))
+<br />"&nbsp;&lt;/subfield&gt;&nbsp;
+<br />&nbsp;&lt;/datafield&gt;
+<br />&lt;/record&gt;"</td>
     </tr>
     <tr align="center" bgcolor="#cccccc">
       <td colspan="2">&nbsp;
@@ -1054,16 +1054,16 @@ of the record to define the format template to use.</p>
     <tr bgcolor="#ffffff">
       <td bgcolor="#33ccff"><font size="2"><b>Action (0)</b></font></td>
       <td>"&lt;record&gt;
-<br>&nbsp;&lt;controlfield&nbsp;tag=\"001\"&gt;"&nbsp;$001&nbsp;"&lt;/controlfield&gt;
+<br />&nbsp;&lt;controlfield&nbsp;tag=\"001\"&gt;"&nbsp;$001&nbsp;"&lt;/controlfield&gt;
 
-<br>&nbsp;&lt;datafield&nbsp;tag=\"FMT\"&nbsp;ind1=\"\"&nbsp;ind2=\"\"&gt;&nbsp;
-<br>&nbsp;&lt;subfield&nbsp;code=\"f\"&gt;hb&lt;/subfield&gt;&nbsp;
-<br>&nbsp;&lt;subfield&nbsp;code=\"g\"&gt;"&nbsp;
-<br>xml_text(format("DEFAULT_HTML_BRIEF"))
-<br>"&nbsp;&lt;/subfield&gt;&nbsp;
+<br />&nbsp;&lt;datafield&nbsp;tag=\"FMT\"&nbsp;ind1=\"\"&nbsp;ind2=\"\"&gt;&nbsp;
+<br />&nbsp;&lt;subfield&nbsp;code=\"f\"&gt;hb&lt;/subfield&gt;&nbsp;
+<br />&nbsp;&lt;subfield&nbsp;code=\"g\"&gt;"&nbsp;
+<br />xml_text(format("DEFAULT_HTML_BRIEF"))
+<br />"&nbsp;&lt;/subfield&gt;&nbsp;
 
-<br>&nbsp;&lt;/datafield&gt;
-<br>&lt;/record&gt;"</td>
+<br />&nbsp;&lt;/datafield&gt;
+<br />&lt;/record&gt;"</td>
     </tr>
     <tr align="center" bgcolor="#cccccc">
       <td colspan="2">

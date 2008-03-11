@@ -241,7 +241,7 @@ style footer will be seen in action.</p>
     This tool can be run before doing a <code>'make install'</code>,
     therefore giving you a chance to fix your templates before
     upgrading. Just run <code>'make check-custom-templates'</code> to
-    get the list of problems found with your templates. <br><br>
+    get the list of problems found with your templates. <br /><br />
 
     You can also run this tool any time after the new default
     templates have been installed, in order to ensure that

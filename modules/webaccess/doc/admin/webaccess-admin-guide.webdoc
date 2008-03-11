@@ -23,12 +23,12 @@
 
 <h2>Contents</h2>
 
-<strong>1. <a href="#1">Introduction, using roles</a></strong><br>
-<strong>2. <a href="#2">WebAccess admin interface</a></strong><br>
-<strong>3. <a href="#3">Example pages, illustrating snapshots</a></strong><br>
-<strong>4. <a href="#4">Managing accounts / Access policy</a></strong><br>
-<strong>5. <a href="#5">Managing login methods</a></strong><br>
-<strong>6. <a href="#6">Firewall-like role definitions</a></strong><br>
+<strong>1. <a href="#1">Introduction, using roles</a></strong><br />
+<strong>2. <a href="#2">WebAccess admin interface</a></strong><br />
+<strong>3. <a href="#3">Example pages, illustrating snapshots</a></strong><br />
+<strong>4. <a href="#4">Managing accounts / Access policy</a></strong><br />
+<strong>5. <a href="#5">Managing login methods</a></strong><br />
+<strong>6. <a href="#6">Firewall-like role definitions</a></strong><br />
 
 <h2><a name="1">1. INTRODUCTION, USING ROLES</a></h2>
 <pre>
@@ -153,10 +153,10 @@ I. Role area</a>
                             <dt>Users:</dt>
                             <dd>add or remove users from the access to a role and its priviliges.</dd>
                             <dt>Authorizations/Actions:</dt>
-                            <dd>these terms means almost the same, but an authorization is a <br>
+                            <dd>these terms means almost the same, but an authorization is a <br />
                                     connection between a role and an action (possibly) containing arguments.</dd>
                                 <dt>Roles:</dt>
-                                <dd>see all the information attached to a role and decide if you want to<br>delete it.</dd>
+                                <dd>see all the information attached to a role and decide if you want to<br />delete it.</dd>
                                 </dl>
                                 <table class="admin_wvar_nomargin">
                                     <tr>

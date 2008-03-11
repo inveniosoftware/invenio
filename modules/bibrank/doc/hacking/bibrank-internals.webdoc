@@ -29,12 +29,12 @@ BibRank and it's different ranking methods.</p>
 <dl>
 
 <dt><a href="bibrank-single-tag-rank">Single tag rank method</a>
-<dd>Ex. of use: Journal Impact Factor. Explains what this ranking method<br>
-does to create the ranking data for use when ranking based on<br>
+<dd>Ex. of use: Journal Impact Factor. Explains what this ranking method<br />
+does to create the ranking data for use when ranking based on<br />
 Journal Impact Factor or similar methods.</dd>
 </dt>
 <dt><a href="bibrank-word-similarity">Word Similarity/Similar Records methods</a>
-<dd>Ex. of use: Ranking based on the importance of words in the whole<br>
+<dd>Ex. of use: Ranking based on the importance of words in the whole<br />
 collection and in a single record. Explains how the ranking data is calculated.</dd>
 </dt>
 <dt><a href="bibrank-api">Bibrank Record Sorter API</a>

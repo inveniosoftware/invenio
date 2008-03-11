@@ -462,13 +462,13 @@ define a common look and feel of CDS Invenio web pages.
 </td>
 <td>
   <a href="<WEBURL>/admin/webaccess/webaccessadmin.py">WebAccess Admin Interface - Full functionality</a>
-   <br><small>Full interface. Manage, grant, revoke any right.</small>
+   <br /><small>Full interface. Manage, grant, revoke any right.</small>
   <p>
   <a href="<WEBURL>/admin/webaccess/webaccessadmin.py/delegate_startarea">Delegate Rights - With Restrictions</a>
-   <br><small>Delegate your rights for some roles.</small>
+   <br /><small>Delegate your rights for some roles.</small>
   <p>
   <a href="<WEBURL>/admin/webaccess/webaccessadmin.py/manageaccounts">Manage Accounts</a>
-   <br><small>Enable, disable, and modify accounts.</small>
+   <br /><small>Enable, disable, and modify accounts.</small>
 </td>
 <td>
   <a href="webaccess-admin-guide">WebAccess Admin Guide</a>
