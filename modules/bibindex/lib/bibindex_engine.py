@@ -213,8 +213,9 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
                 #out.append([ext, match.group(1)])
     return out
 
-def get_words_from_local_fulltext(path, ext=''):
-    # FIXME
+def get_words_from_local_fulltext(path, ext='', stemming_language=None):
+    # FIXME to be continued
+    raise NotImplemented
     if not ext:
         ext = path[len(file_strip_ext(path))+1:].lower()
 
@@ -672,7 +673,7 @@ def get_word_tables(tables):
                 write_message("Error: There is no %s words table." % index, sys.stderr)
     else:
         for index in get_all_indexes():
-            index_id = get_index_id_index_name(index)
+            index_id = get_index_id_from_index_name(index)
             wordTables[index_id] = get_index_tags(index)
     return wordTables
 

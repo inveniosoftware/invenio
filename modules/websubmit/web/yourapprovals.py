@@ -57,7 +57,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
                                        navmenuid='yourapprovals')
         u_email = get_email(uid)
     except Error, e:
-        return errorMsg(e.value,req, ln = ln)
+        return errorMsg(str(e), req, ln = ln)
 
     res = run_sql("select sdocname,ldocname from sbmDOCTYPE")
     referees = []

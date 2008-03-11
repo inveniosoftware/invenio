@@ -116,7 +116,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
                                        navmenuid='yourapprovals')
         uid_email = get_email(uid)
     except Error, e:
-        return errorMsg(e.value,req, ln = ln)
+        return errorMsg(str(e),req, ln = ln)
     if flow == "cplx":
         if doctype == "":
             t = selectCplxDoctype(ln)
@@ -1521,10 +1521,10 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     # Build referee's email address
     refereeaddress = ""
     # Try to retrieve the referee's email from the referee's database
-    for user in acc_get_role_users(acc_getRoleId("referee_%s_%s" % (doctype,categ))):
+    for user in acc_get_role_users(acc_get_role_id("referee_%s_%s" % (doctype,categ))):
         refereeaddress += user[1] + ","
     # And if there are general referees
-    for user in acc_get_role_users(acc_getRoleId("referee_%s_*" % doctype)):
+    for user in acc_get_role_users(acc_get_role_id("referee_%s_*" % doctype)):
         refereeaddress += user[1] + ","
     refereeaddress = re.sub(",$","",refereeaddress)
     # Creation of the mail for the referee

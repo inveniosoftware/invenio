@@ -66,7 +66,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
                                        navmenuid='yoursubmissions')
         u_email = get_email(uid)
     except Error, e:
-        return errorMsg(e.value, req, ln)
+        return errorMsg(str(e), req, ln=ln)
 
     if u_email == "guest" or u_email == "":
         return warningMsg(websubmit_templates.tmpl_warning_message(

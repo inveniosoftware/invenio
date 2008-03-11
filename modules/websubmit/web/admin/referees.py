@@ -55,7 +55,7 @@ def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, todo="", id="", doctype="",
     try:
         uid = getUid(req)
     except Error, e:
-        return errorMsg(e.value, req)
+        return errorMsg(str(e), req, ln=ln)
     (auth_code, auth_message) = acc_authorize_action(req, "cfgwebsubmit", verbose=0)
     if auth_code != 0:
         ## user is not authorised to use WebSubmit Admin:
