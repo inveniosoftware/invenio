@@ -39,7 +39,7 @@ except ImportError:
 from invenio.config import \
      CFG_BINDIR, \
      cdslang, \
-     cdsname, \
+     CFG_SITE_NAME, \
      images, \
      CFG_PYLIBDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
@@ -89,7 +89,7 @@ import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 
 def interface(req,
-              c=cdsname,
+              c=CFG_SITE_NAME,
               ln=cdslang,
               doctype="",
               act="",
@@ -126,7 +126,7 @@ def interface(req,
         the index function of websubmit_webinterface. It contains a
         "mod_python.util.FieldStorage" instance, that contains the form-fields
         found on the previous submission page.
-       @param c: (string), defaulted to cdsname. The name of the CDS Invenio
+       @param c: (string), defaulted to CFG_SITE_NAME. The name of the CDS Invenio
         installation.
        @param ln: (string), defaulted to cdslang. The language in which to
         display the pages.
@@ -618,7 +618,7 @@ def interface(req,
 
 
 def endaction(req,
-              c=cdsname,
+              c=CFG_SITE_NAME,
               ln=cdslang,
               doctype="",
               act="",
@@ -656,7 +656,7 @@ def endaction(req,
         the index function of websubmit_webinterface. It contains a
         "mod_python.util.FieldStorage" instance, that contains the form-fields
         found on the previous submission page.
-       @param c: (string), defaulted to cdsname. The name of the CDS Invenio
+       @param c: (string), defaulted to CFG_SITE_NAME. The name of the CDS Invenio
         installation.
        @param ln: (string), defaulted to cdslang. The language in which to
         display the pages.
@@ -817,7 +817,7 @@ def endaction(req,
                 try:
                     os.makedirs("%s/files/%s" % (curdir, key))
                 except:
-                    return errorMsg("can't create submission directory", req, cdsname, ln)
+                    return errorMsg("can't create submission directory", req, CFG_SITE_NAME, ln)
             filename = formfields.filename
             ## Before saving the file to disc, wash the filename (in particular
             ## washing away UNIX and Windows (e.g. DFS) paths):
@@ -864,7 +864,7 @@ def endaction(req,
     else:
         ## Unable to determine the number of pages for this submission:
         return errorMsg(_("Unable to determine the number of submission pages."), \
-                        req, cdsname, ln)
+                        req, CFG_SITE_NAME, ln)
 
     ## Determine whether the action is finished
     ## (ie there are no other steps after the current one):
@@ -987,7 +987,7 @@ def endaction(req,
                 req = req,
                 navmenuid='submit')
 
-def home(req, c=cdsname, ln=cdslang):
+def home(req, c=CFG_SITE_NAME, ln=cdslang):
     """This function generates the WebSubmit "home page".
        Basically, this page contains a list of submission-collections
        in WebSubmit, and gives links to the various document-type
@@ -995,7 +995,7 @@ def home(req, c=cdsname, ln=cdslang):
        Document-types only appear on this page when they have been
        connected to a submission-collection in WebSubmit.
        @param req: (apache request object)
-       @param c: (string) - defaults to cdsname
+       @param c: (string) - defaults to CFG_SITE_NAME
        @param ln: (string) - The CDS Invenio interface language of choice.
         Defaults to cdslang (the default language of the installation).
        @return: (string) - the Web page to be displayed.
@@ -1178,7 +1178,7 @@ def displayDoctypeBranch(doctype, catalogues):
     return text
 
 
-def action(req, c=cdsname, ln=cdslang, doctype=""):
+def action(req, c=CFG_SITE_NAME, ln=cdslang, doctype=""):
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -1530,7 +1530,7 @@ def log_function(curdir, message, start_time, filename="function_log"):
 
 ## FIXME: Duplicated
 
-def errorMsg(title, req, c=cdsname, ln=cdslang):
+def errorMsg(title, req, c=CFG_SITE_NAME, ln=cdslang):
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -1543,7 +1543,7 @@ def errorMsg(title, req, c=cdsname, ln=cdslang):
                 req=req,
                 navmenuid='submit')
 
-def warningMsg(title, req, c=cdsname, ln=cdslang):
+def warningMsg(title, req, c=CFG_SITE_NAME, ln=cdslang):
     # load the right message language
     _ = gettext_set_language(ln)
 

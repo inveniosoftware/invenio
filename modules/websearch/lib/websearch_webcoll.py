@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_WEBSEARCH_I18N_LATEST_ADDITIONS, \
      CFG_CACHEDIR, \
      cdslang, \
-     cdsname, \
+     CFG_SITE_NAME, \
      weburl
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname, collection_restricted_p
@@ -129,7 +129,7 @@ class Collection:
         self.update_reclist_run_already = 0 # to speed things up without much refactoring
         self.reclist_with_nonpublic_subcolls = HitSet()
         if not name:
-            self.name = cdsname # by default we are working on the home page
+            self.name = CFG_SITE_NAME # by default we are working on the home page
             self.id = 1
             self.dbquery = None
             self.nbrecs = None
@@ -307,7 +307,7 @@ class Collection:
 
         dads = []
         for dad in self.get_ancestors():
-            if dad.name != cdsname: # exclude Home collection
+            if dad.name != CFG_SITE_NAME: # exclude Home collection
                 dads.append((dad.name, dad.get_name(ln)))
 
         return websearch_templates.tmpl_navtrail_links(

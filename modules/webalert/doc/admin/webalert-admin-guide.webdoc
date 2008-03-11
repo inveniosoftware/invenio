@@ -46,7 +46,7 @@
 
 <h2>Overview</h2>
 
-<p><CDSNAME> users may set up an automatic notification email alerts
+<p><CFG_SITE_NAME> users may set up an automatic notification email alerts
 that would send them documents corresponding to the user profile by
 email either daily, weekly, or monthly.  It is the job of the WebAlert
 module to permit this functionality.

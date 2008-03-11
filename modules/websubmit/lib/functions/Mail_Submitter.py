@@ -43,7 +43,7 @@ import re
 
 from invenio.config import \
      adminemail, \
-     cdsname, \
+     CFG_SITE_NAME, \
      htdocsurl, \
      supportemail
 
@@ -51,7 +51,7 @@ from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 
 def Mail_Submitter (parameters, curdir, form, user_info=None):
-    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
     # retrieve report number
     edsrn = parameters['edsrn']
     newrnin = parameters['newrnin']
@@ -96,7 +96,7 @@ def Mail_Submitter (parameters, curdir, form, user_info=None):
         email_txt =  email_txt + "An email has been sent to the referee. You will be warned by email as soon as the referee takes his/her decision regarding your document.\n\n"
     elif parameters['status'] == "ADDED":
         email_txt = email_txt + "It will be soon added to our Document Server.\n\nOnce inserted, you will be able to check the  bibliographic information and the quality of the electronic documents at this URL:\n<%s/record/%s>\nIf you detect an error please let us know by sending an email to %s. \n\n" % (htdocsurl,sysno,supportemail)
-    email_txt = email_txt + "Thank you for using %s Submission Interface.\n" % cdsname
+    email_txt = email_txt + "Thank you for using %s Submission Interface.\n" % CFG_SITE_NAME
 
     # send the mail
     send_email(FROMADDR, m_recipient.strip(), "%s: Document Received" % fullrn, email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)

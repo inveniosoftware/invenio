@@ -895,7 +895,7 @@ II. Example - connecting role and user</a>
      default one. The internal login method should be given with None as classname.
 
      Example:
-      CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % cdsname: (None, True), "CERN NICE (external)":
+      CFG_EXTERNAL_AUTHENTICATION = {"%s (internal)" % CFG_SITE_NAME: (None, True), "CERN NICE (external)":
                                                         (AuthCernWrapper(), False)}
 
    - A class must be created derived from the class external_authentication inside file

@@ -313,7 +313,7 @@ way that contain either of the words <em>muon</em> or
 
 <blockquote>
 <form action="<WEBURL>/search" method="get">
-    <input type="hidden" name="cc" value="<CDSNAME>" />
+    <input type="hidden" name="cc" value="<CFG_SITE_NAME>" />
     <input type="hidden" name="as" value="1" />
     <input type="hidden" name="ln" value="<lang:current />" />
         <table>
@@ -445,7 +445,7 @@ exactement ainsi), qui contiennent les mots <em>muon</em> ou
 
 <blockquote>
 <form action="<WEBURL>/search" method="get">
-    <input type="hidden" name="cc" value="<CDSNAME>" />
+    <input type="hidden" name="cc" value="<CFG_SITE_NAME>" />
     <input type="hidden" name="as" value="1" />
     <input type="hidden" name="ln" value="<lang:current />" />
         <table>
@@ -582,7 +582,7 @@ publicación y <em>2001</em> en el año, escribiremos lo siguiente:</p>
 
 <blockquote>
 <form action="<WEBURL>/search" method="get">
-    <input type="hidden" name="cc" value="<CDSNAME>" />
+    <input type="hidden" name="cc" value="<CFG_SITE_NAME>" />
     <input type="hidden" name="as" value="1" />
     <input type="hidden" name="ln" value="<lang:current />" />
         <table>
@@ -720,7 +720,7 @@ J</em> -transcrit exactament d'aquesta manera- i també les paraules
 
 <blockquote>
 <form action="<WEBURL>/search" method="get">
-    <input type="hidden" name="cc" value="<CDSNAME>" />
+    <input type="hidden" name="cc" value="<CFG_SITE_NAME>" />
     <input type="hidden" name="as" value="1" />
     <input type="hidden" name="ln" value="<lang:current />" />
         <table>
@@ -4193,7 +4193,7 @@ If you produce your own list of publications and you notice that
 sometimes your first name is spelled abbreviated and sometimes in
 full, or if you want to identify your publications among several
 authors with the same abbreviation, please contact the <a
-href="mailto:<ADMINEMAIL>">administrators</a> of <CDSNAMEINTL> so that
+href="mailto:<ADMINEMAIL>">administrators</a> of <CFG_SITE_NAME_INTL> so that
 they could work with you on inputting a consistently spelled and
 properly formatted first name everywhere.  Only the consistent
 database content will ensure a proper author searching behaviour.</p>
@@ -4311,7 +4311,7 @@ prénom est parfois épelé de manière abrégée et d'autres fois de
 manière complète ou si vous souhaitez identifier vos publications
 parmi celles de différents auteurs disposant du même nom en abrégé,
 veuillez <a href="mailto:<ADMINEMAIL>">contacter les
-administrateurs</a> de <CDSNAMEINTL> de manière à ce qu'ils vous aident
+administrateurs</a> de <CFG_SITE_NAME_INTL> de manière à ce qu'ils vous aident
 à saisir les prénoms de manière correcte et cohérente dans l'ensemble
 de la base de données. Une base de données au contenu cohérent
 garantit des résultats satisfaisants lors de la recherche d'auteurs.</p>
@@ -4430,7 +4430,7 @@ Si es autor de su propia lista de publicaciones y detecta que algunas
 veces su nombre se escribe de forma abreviada y a veces completo, o si
 desea identificar sus publicaciones entre diversos autores con la
 misma forma abreviada, por favor contacte con los<a
-href="mailto:<ADMINEMAIL>">administradores</a> de <CDSNAMEINTL> que
+href="mailto:<ADMINEMAIL>">administradores</a> de <CFG_SITE_NAME_INTL> que
 trataran de trabajar conjuntamente para implementar una forma
 consistente y normalizada de introducción de su nombre en toda la base
 de datos.  Sólo una base de datos con contenido consistente puede
@@ -4551,7 +4551,7 @@ Si es autor de la seva pròpia llista de publicacions i detecta que
 algunes vegades el seu nom s’escriu de forma abreujada i de vegades
 complet, o si desitja identificar les seves publicacions entre
 diversos autors amb la mateixa forma abreujada, sis plau, contacti amb
-els <a href="mailto:<ADMINEMAIL>">administradors</a> de <CDSNAMEINTL>
+els <a href="mailto:<ADMINEMAIL>">administradors</a> de <CFG_SITE_NAME_INTL>
 que tractaran de treballar-hi conjuntament per implementar una forma
 consistent i normalitzada d’introducció del seu nom a tota la base de
 dades.  Només una base de dades amb contingut consistent pot garantir
@@ -4816,7 +4816,7 @@ que en estos casos, el sistema no los enlazará.</p>
 
 <lang>
 <en>
-<p>If a metadata record contains some associated fulltext files, <CDSNAMEINTL>
+<p>If a metadata record contains some associated fulltext files, <CFG_SITE_NAME_INTL>
 tries to extract the textual information from the files and index it into a separate <code>fulltext</code> index.
 To search for all records that contain the term <em>e-</em> in their fulltext files,
 type:</p>
@@ -4852,7 +4852,7 @@ metadata or in the fulltext, type:
 </en>
 
 <fr>
-<p>Si une notice a des fichiers associés, <CDSNAMEINTL> tente d'en
+<p>Si une notice a des fichiers associés, <CFG_SITE_NAME_INTL> tente d'en
 extraire les informations textuelles et de les indexer dans l'index
 "fulltext". Pour chercher toutes les notices qui contiennent le
 terme <em>e-</em> dans leur fichiers, saisissez:</p>
@@ -4892,7 +4892,7 @@ saisissez:
 
 <ca>
 <p>Si un registre de metadades té arxius a text complet associats
-<CDSNAMEINTL> tractarà de extraure la informació textual dels arxius e
+<CFG_SITE_NAME_INTL> tractarà de extraure la informació textual dels arxius e
 indexar-la a un índex de <code>text complet</code>separat.  Per
 recuperar tots els documents que contenen el terme <em>e-</em>al text
 complet dels seus documents associats, cal escriure:</p>
@@ -4930,7 +4930,7 @@ metadades como all text complet, cal escriure:
 </ca>
 <es>
 <p>Si un registro de metadatos contiene archivos a texto completo
-asociados, <CDSNAMEINTL> tratará de extraer la información textual de
+asociados, <CFG_SITE_NAME_INTL> tratará de extraer la información textual de
 los archivos e indexarla en un índice de <code>texto
 completo</code>separado.  Para recuperar todos los documentos que
 contienen el término <em>e-</em> en el texto completo de sus
@@ -4981,7 +4981,7 @@ tanto en los metadatos como en el texto completo, debemos escribir:
 
 <lang>
 <en>
-<p>If a metadata record contains an associated fulltext file, <CDSNAMEINTL>
+<p>If a metadata record contains an associated fulltext file, <CFG_SITE_NAME_INTL>
 tries to extract references automatically from that file and index
 them into a separate <code>reference</code> index.  To search for
 all records that cite <em>Ellis</em> in their reference lists,
@@ -5047,7 +5047,7 @@ For example, to find all articles on <em>standard model</em> that aren't written
 
 <fr>
 <p>Si les métadonnées d'une notice contiennent un texte complet
-   associé, <CDSNAMEINTL> tente d'en extraire automatiquement les
+   associé, <CFG_SITE_NAME_INTL> tente d'en extraire automatiquement les
    références et les indexe dans l'index <code>references</code>. Pour
    chercher tous les documents qui citent <em>Ellis</em>, saisissez:</p>
 
@@ -5113,7 +5113,7 @@ mais qui le citent, saisissez:
 </fr>
 <es>
 <p>Si un registro de metadatos contiene un fichero de texto asociado,
-<CDSNAMEINTL> trata de extraer las citas automaticamente del fichero e
+<CFG_SITE_NAME_INTL> trata de extraer las citas automaticamente del fichero e
 indexarlas en un índice separado de <code>citas</code>.  Para
 recuperar todos los registros que citan a <em>Ellis</em> en sus
 listados de citas bibliogáficas, escribiremos:</p>
@@ -5181,7 +5181,7 @@ artículos sobre <em>modelo estándar</em> que no han sido escritos por
 
 <ca>
 <p>Si un registre de metadades conté un fitxer de text associat,
-<CDSNAMEINTL> tracta de extraure les referències automàticament del
+<CFG_SITE_NAME_INTL> tracta de extraure les referències automàticament del
 fitxer e indexar-les a un índex separat de <code>referències</code>.
 Para recuperar tots els registres que citen a <em>Ellis</em> en els
 seus llistats de referències bibliogràfiques, escriurem:</p>

@@ -28,7 +28,7 @@ __lastupdated__ = """$Date$"""
 from invenio.webcommentadminlib import *
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl,cdslang,cdsname
+from invenio.config import weburl,cdslang,CFG_SITE_NAME
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.urlutils import wash_url_argument, redirect_to_url
@@ -50,8 +50,8 @@ def index(req, ln=cdslang):
     except Error:
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
-                    description="%s - Internal Error" % cdsname,
-                    keywords="%s, Internal Error" % cdsname,
+                    description="%s - Internal Error" % CFG_SITE_NAME,
+                    keywords="%s, Internal Error" % CFG_SITE_NAME,
                     language=ln,
                     req=req)
 
@@ -84,8 +84,8 @@ def delete(req, ln=cdslang, comid=""):
     except Error:
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
-                    description="%s - Internal Error" % cdsname,
-                    keywords="%s, Internal Error" % cdsname,
+                    description="%s - Internal Error" % CFG_SITE_NAME,
+                    keywords="%s, Internal Error" % CFG_SITE_NAME,
                     language=ln,
                     req=req)
 
@@ -124,8 +124,8 @@ def comments(req, ln=cdslang, uid="", comid="", reviews=0):
     except Error:
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
-                    description="%s - Internal Error" % cdsname,
-                    keywords="%s, Internal Error" % cdsname,
+                    description="%s - Internal Error" % CFG_SITE_NAME,
+                    keywords="%s, Internal Error" % CFG_SITE_NAME,
                     language=ln,
                     req=req)
 
@@ -158,8 +158,8 @@ def users(req, ln=cdslang):
     except Error:
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
-                    description="%s - Internal Error" % cdsname,
-                    keywords="%s, Internal Error" % cdsname,
+                    description="%s - Internal Error" % CFG_SITE_NAME,
+                    keywords="%s, Internal Error" % CFG_SITE_NAME,
                     language=ln,
                     req=req)
 
@@ -195,8 +195,8 @@ def del_com(req, ln=cdslang, action="delete", **hidden):
     except Error:
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=0, ln=ln),
-                    description="%s - Internal Error" % cdsname,
-                    keywords="%s, Internal Error" % cdsname,
+                    description="%s - Internal Error" % CFG_SITE_NAME,
+                    keywords="%s, Internal Error" % CFG_SITE_NAME,
                     language=ln,
                     req=req)
 

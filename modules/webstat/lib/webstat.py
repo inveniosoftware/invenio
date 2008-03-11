@@ -1,4 +1,4 @@
-## $id: webstat.py,v 1.28 2007/04/01 23:46:46 marcusj exp $
+## $Id$
 ##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
@@ -23,7 +23,7 @@ __lastupdated__ = "$Date$"
 import os, time, re, datetime, cPickle, calendar
 
 from invenio import template
-from invenio.config import cdsname, CFG_WEBDIR, CFG_TMPDIR
+from invenio.config import CFG_SITE_NAME, CFG_WEBDIR, CFG_TMPDIR
 from invenio.search_engine import get_alphabetically_ordered_collection_list
 from invenio.dbquery import run_sql
 from invenio.bibsched import is_task_scheduled, get_task_ids_by_descending_date, get_task_options
@@ -309,10 +309,10 @@ def perform_request_index():
     health_indicators.append(None)
 
     # Append new records information to the health box
-    args = { 'collection': cdsname, 't_start': today, 't_end': tomorrow, 'granularity': "day", 't_format': "%Y-%m-%d" }
+    args = { 'collection': CFG_SITE_NAME, 't_start': today, 't_end': tomorrow, 'granularity': "day", 't_format': "%Y-%m-%d" }
     try: tot_records = get_keyevent_trend_collection_population(args)[0][1]
     except IndexError: tot_records = 0
-    args = { 'collection': cdsname, 't_start': yesterday, 't_end': today, 'granularity': "day", 't_format': "%Y-%m-%d" }
+    args = { 'collection': CFG_SITE_NAME, 't_start': yesterday, 't_end': today, 'granularity': "day", 't_format': "%Y-%m-%d" }
     try: new_records = tot_records - get_keyevent_trend_collection_population(args)[0][1]
     except IndexError: new_records = 0
     health_indicators.append(("Total records", tot_records))

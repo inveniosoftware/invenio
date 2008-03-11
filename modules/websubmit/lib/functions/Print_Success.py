@@ -20,11 +20,11 @@ __revision__ = "$Id$"
 
 import os
 
-from invenio.config import cdsname
+from invenio.config import CFG_SITE_NAME
 
 # FIXME: cannot import Request_Print(), is defined in websubmit_engine.py
 
-def Print_Success(parameters, curdir, form, user_info=None): 
+def Print_Success(parameters, curdir, form, user_info=None):
     t=""
     edsrn = parameters['edsrn']
     newrnin = parameters['newrnin']
@@ -45,6 +45,6 @@ def Print_Success(parameters, curdir, form, user_info=None):
         t=t+Request_Print("A",  "An email has been sent to the referee. You will be warned by email as soon as the referee takes his/her decision regarding your document.<br><br>\n")
     if status == "ADDED":
         t=t+Request_Print("A",  "It will soon appear on our server.<br><br>\n")
-    t=t+Request_Print("A",  "Thank you for using %s!" % cdsname)
+    t=t+Request_Print("A",  "Thank you for using %s!" % CFG_SITE_NAME)
     t=t+Request_Print("A",  "<br><br><br><br>")
     return t

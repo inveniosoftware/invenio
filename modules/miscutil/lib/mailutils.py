@@ -44,8 +44,8 @@ from invenio.config import \
      supportemail, \
      weburl, \
      cdslang, \
-     cdsnameintl, \
-     cdsname, \
+     CFG_SITE_NAME_INTL, \
+     CFG_SITE_NAME, \
      adminemail, \
      CFG_MISCUTIL_SMTP_HOST, \
      CFG_MISCUTIL_SMTP_PORT, \
@@ -168,10 +168,10 @@ def email_footer(ln=cdslang):
     #standard footer
     out = """\n\n%(best_regards)s
 --
-%(cdsnameintl)s <%(weburl)s>
+%(sitename)s <%(weburl)s>
 %(need_intervention_please_contact)s <%(supportemail)s>
         """ % {
-            'cdsnameintl': cdsnameintl[ln],
+            'sitename': CFG_SITE_NAME_INTL[ln],
             'best_regards': _("Best regards"),
             'weburl': weburl,
             'need_intervention_please_contact': _("Need human intervention?  Contact"),
@@ -188,10 +188,10 @@ def email_html_footer(ln=cdslang):
     #standard footer
     out = """<br /><br /><em>%(best_regards)s</em>
     <hr />
-<a href="%(weburl)s"><strong>%(cdsnameintl)s</strong></a><br />
+<a href="%(weburl)s"><strong>%(sitename)s</strong></a><br />
 %(need_intervention_please_contact)s <a href="mailto:%(supportemail)s">%(supportemail)s</a>
         """ % {
-            'cdsnameintl': cdsnameintl.get(ln, cdsname),
+            'sitename': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
             'best_regards': _("Best regards"),
             'weburl': weburl,
             'need_intervention_please_contact': _("Need human intervention?  Contact"),

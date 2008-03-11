@@ -28,7 +28,7 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_CERN_SITE, \
      cdslang, \
-     cdsname, \
+     CFG_SITE_NAME, \
      supportemail, \
      sweburl, \
      CFG_VERSION, \
@@ -252,7 +252,6 @@ def create_register_page_box(referer='', ln=cdslang):
              ln = ln,
              level = CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS,
              supportemail = supportemail,
-             cdsname = cdsname
            )
 
 ##  create_login_page_box(): ask for the user's email and password, for login into the system

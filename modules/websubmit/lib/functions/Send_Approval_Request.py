@@ -36,7 +36,7 @@ import re
 
 from invenio.config import \
      adminemail, \
-     cdsname, \
+     CFG_SITE_NAME, \
      htdocsurl, \
      supportemail, \
      urlpath
@@ -49,7 +49,7 @@ def Send_Approval_Request (parameters, curdir, form, user_info=None):
     global rn,sysno
     # variables declaration
     doctype = re.search(".*/([^/]*)/([^/]*)/[^/]*$",curdir).group(2)
-    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
     otheraddresses = parameters['addressesDAM']
     categformat = parameters['categformatDAM']
     # retrieve category
@@ -108,7 +108,7 @@ def Send_Approval_Request (parameters, curdir, form, user_info=None):
     else:
         addresses = re.sub(",$","",addresses)
     title_referee = "Request for approval of %s" % rn
-    mail_referee = "The document %s has been submitted to the %s Server..\nYour approval is requested on it.\n\n" % (rn,cdsname)
+    mail_referee = "The document %s has been submitted to the %s Server..\nYour approval is requested on it.\n\n" % (rn,CFG_SITE_NAME)
     mail_referee +="Title: %s\n\nAuthor(s): %s\n\n" % (title,author)
     mail_referee +="To access the document(s), select the file(s) from the location:<%s/getfile.py?recid=%s>\n\n" % (htdocsurl,sysno)
     mail_referee +="To approve/reject the document, you should go to this URL:\n<%s/approve.py?%s>\n" % (urlpath,access)

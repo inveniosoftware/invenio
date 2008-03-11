@@ -25,7 +25,7 @@ import string
 
 from invenio.config import \
      CFG_WEBALERT_ALERT_ENGINE_EMAIL, \
-     cdsname, \
+     CFG_SITE_NAME, \
      supportemail, \
      weburl
 from invenio.messages import gettext_set_language
@@ -480,7 +480,7 @@ class Template:
             name, time.strftime("%Y-%m-%d"))
 
     def tmpl_alert_email_from(self):
-        return '%s Alert Engine <%s>' % (cdsname, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
+        return '%s Alert Engine <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
 
     def tmpl_alert_email_body(self, name, url, records, pattern,
                               catalogues, frequency):
@@ -511,7 +511,7 @@ class Template:
 Hello:
 
 Below are the results of the email notification alert that
-you set up with the %(cdsname)s.
+you set up with the %(sitename)s.
 This is an automatic message, please don't reply to it.
 For any question, please use <%(supportemail)s> instead.
 
@@ -522,7 +522,7 @@ found: %(total)s
 url: <%(url)s>
 """ % {'supportemail': supportemail,
        'name': name,
-       'cdsname': cdsname,
+       'sitename': CFG_SITE_NAME,
        'pattern': pattern,
        'collections': collections,
        'frequency': frequency,
@@ -548,7 +548,7 @@ URL given at the top of this email to see all the results.
 %s Alert Service <%s>
 Unsubscribe?  See <%s>
 Need human intervention?  Contact <%s>
-''' % (cdsname, weburl, weburl + '/youralerts/list', supportemail)
+''' % (CFG_SITE_NAME, weburl, weburl + '/youralerts/list', supportemail)
 
         return body
 

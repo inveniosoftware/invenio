@@ -61,8 +61,8 @@ from invenio.config import \
      CFG_APACHE_PASSWORD_FILE, \
      adminemail, \
      cdslang, \
-     cdsname, \
-     cdsnameintl, \
+     CFG_SITE_NAME, \
+     CFG_SITE_NAME_INTL, \
      supportemail, \
      sweburl, \
      CFG_TMPDIR, \
@@ -423,7 +423,7 @@ def registerUser(req, email, passw, nickname, register_without_nickname=False,
             address_activation_key = mail_cookie_create_mail_activation(email)
             ip_address = req.connection.remote_host or req.connection.remote_ip
             try:
-                if not send_email(supportemail, email, _("Account registration at %s") % cdsnameintl.get(ln, cdsname),
+                if not send_email(supportemail, email, _("Account registration at %s") % CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
                                   tmpl.tmpl_account_address_activation_email_body(email,
                                                   address_activation_key, ip_address, ln)):
                     return 1
@@ -648,10 +648,10 @@ def update_Uid(req, p_email):
 def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
     """Send an email to the address given by sendTo about the new account newAccountEmail."""
     _ = gettext_set_language(ln)
-    sub = _("New account on") + " '%s'" % cdsname
+    sub = _("New account on") + " '%s'" % CFG_SITE_NAME
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
         sub += " - " + _("PLEASE ACTIVATE")
-    body = _("A new account has been created on") + " '%s'" % cdsname
+    body = _("A new account has been created on") + " '%s'" % CFG_SITE_NAME
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
         body += _(" and is awaiting activation")
     body += ":\n\n"
@@ -662,8 +662,8 @@ def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=cdslang):
 def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
     """Send an email to the address given by sendTo about the new account newAccountEmail."""
     _ = gettext_set_language(ln)
-    sub = _("Your account created on") + " '%s'" % cdsname
-    body = _("You have created a new account on") + " '%s'\n\n" % cdsname
+    sub = _("Your account created on") + " '%s'" % CFG_SITE_NAME
+    body = _("You have created a new account on") + " '%s'\n\n" % CFG_SITE_NAME
     body += _("   Username/Email:") + " %s\n" % newAccountEmail
     body += _("   Password:") + " %s\n\n" % ("*" * len(password))
     return send_email(supportemail, sendTo, subject=sub, content=body)

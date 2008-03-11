@@ -26,12 +26,12 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import cdsname, supportemail, weburl, adminemail
+from invenio.config import CFG_SITE_NAME, supportemail, weburl, adminemail
 from invenio.webuser import email_valid_p
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 
-CFG_EMAIL_FROM_ADDRESS = '%s Submission Engine <%s>' % (cdsname, supportemail)
+CFG_EMAIL_FROM_ADDRESS = '%s Submission Engine <%s>' % (CFG_SITE_NAME, supportemail)
 
 def Mail_New_Record_Notification(parameters, curdir, form, user_info=None):
     """This function sends a mail giving notification about the submission
@@ -233,11 +233,11 @@ def Mail_New_Record_Notification(parameters, curdir, form, user_info=None):
 
     ## Now build the email from the information we've collected:
     email_txt = """
-The following item has been submitted to %(cdsname)s:
+The following item has been submitted to %(sitename)s:
    Reference(s): %(reference)s
    Title:        %(title)s
    Author(s):      %(author)s
-""" % { 'cdsname'   : cdsname,
+""" % { 'sitename'   : CFG_SITE_NAME,
         'reference' : reference_numbers,
         'title'     : title,
         'author'    : authors,
@@ -266,8 +266,8 @@ has been taken.
     ## Finish the message with a signature:
     email_txt += """
 
-Thank you for submitting your item into %(cdsname)s.
-""" % { 'cdsname' : cdsname, }
+Thank you for submitting your item into %(sitename)s.
+""" % { 'sitename' : CFG_SITE_NAME, }
 
 
     ## Send the email:

@@ -28,7 +28,7 @@ import sys
 import invenio.websearchadminlib as wsc
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box, adderrorbox
-from invenio.config import weburl, sweburl, cdslang, cdsname
+from invenio.config import weburl, sweburl, cdslang, CFG_SITE_NAME
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import gettext_set_language
@@ -1070,7 +1070,7 @@ def error_page(req, ln=cdslang, verbose=1):
 
     return page(title=_("Internal Error"),
                 body = create_error_box(req, verbose=verbose, ln=ln),
-                description="%s - Internal Error" % cdsname,
-                keywords="%s, Internal Error" % cdsname,
+                description="%s - Internal Error" % CFG_SITE_NAME,
+                keywords="%s, Internal Error" % CFG_SITE_NAME,
                 language=ln,
                 req=req)

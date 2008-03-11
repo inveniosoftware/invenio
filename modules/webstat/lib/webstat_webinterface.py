@@ -22,7 +22,7 @@ __lastupdated__ = "$Date$"
 
 import os
 
-from invenio.config import CFG_TMPDIR, weburl, cdsname
+from invenio.config import CFG_TMPDIR, weburl, CFG_SITE_NAME
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webpage import page
 from invenio import template
@@ -68,7 +68,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def collection_population(self, req, form):
         """Collection population statistics page."""
-        argd = wash_urlargd(form, {'collection': (str, cdsname),
+        argd = wash_urlargd(form, {'collection': (str, CFG_SITE_NAME),
                                    'timespan': (str, "today"),
                                    'format': (str, SUITABLE_GRAPH_FORMAT)})
 

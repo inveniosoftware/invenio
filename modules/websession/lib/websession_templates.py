@@ -29,8 +29,8 @@ import locale
 from invenio.config import \
      CFG_CERN_SITE, \
      cdslang, \
-     cdsname, \
-     cdsnameintl, \
+     CFG_SITE_NAME, \
+     CFG_SITE_NAME_INTL, \
      supportemail, \
      sweburl, \
      CFG_VERSION, \
@@ -331,7 +331,7 @@ class Template:
 
         # load the right message language
         _ = gettext_set_language(ln)
-        out = "<p>" + _("If you have lost the password for your %(cdsname)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form in order to have a password reset link emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'cdsname' : cdsnameintl[ln]} + "</p>"
+        out = "<p>" + _("If you have lost the password for your %(sitename)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form in order to have a password reset link emailed to you.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'sitename' : CFG_SITE_NAME_INTL[ln]} + "</p>"
 
         out += """
           <blockquote>
@@ -389,7 +389,7 @@ class Template:
                  <blockquote>
                  <dl>
               """ % {
-                'account_offer' : _("%s offers you the possibility to personalize the interface, to set up your own personal library of documents, or to set up an automatic alert query that would run periodically and would notify you of search results by email.") % cdsnameintl[ln],
+                'account_offer' : _("%s offers you the possibility to personalize the interface, to set up your own personal library of documents, or to set up an automatic alert query that would run periodically and would notify you of search results by email.") % CFG_SITE_NAME_INTL[ln],
               }
 
         if not guest:
@@ -611,9 +611,9 @@ class Template:
 
 %(outro2)s""" % {
             'intro': _("Somebody (possibly you) coming from %(ip_address)s "
-                "has asked\nfor a password reset at %(cdsname)s\nfor "
+                "has asked\nfor a password reset at %(sitename)s\nfor "
                 "the account \"%(email)s\"." % {
-                    'cdsname' :cdsnameintl.get(ln, cdsname),
+                    'sitename' :CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
                     'email' : email,
                     'ip_address' : ip_address,
                     }
@@ -648,9 +648,9 @@ class Template:
 
 %(outro2)s""" % {
             'intro': _("Somebody (possibly you) coming from %(ip_address)s "
-                "has asked\nto register a new account at %(cdsname)s\nfor the "
+                "has asked\nto register a new account at %(sitename)s\nfor the "
                 "email address \"%(email)s\"." % {
-                    'cdsname' :cdsnameintl.get(ln, cdsname),
+                    'sitename' :CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
                     'email' : email,
                     'ip_address' : ip_address,
                     }
@@ -879,7 +879,7 @@ class Template:
         }
         return out
 
-    def tmpl_register_page(self, ln, referer, level, supportemail, cdsname):
+    def tmpl_register_page(self, ln, referer, level, supportemail):
         """
         Displays a login form
 
@@ -892,8 +892,6 @@ class Template:
           - 'level' *int* - Login level (0 - all access, 1 - accounts activated, 2+ - no self-registration)
 
           - 'supportemail' *string* - The email of the support team
-
-          - 'cdsname' *string* - The name of the installation
         """
 
         # load the right message language
@@ -954,7 +952,7 @@ class Template:
                 'password_contain' : _("The password phrase may contain punctuation, spaces, etc."),
                 'retype' : _("Retype Password"),
                 'register' : _("register"),
-                'explain_acc' : _("Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.") % cdsname,
+                'explain_acc' : _("Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email.") % CFG_SITE_NAME,
               }
         return out
 

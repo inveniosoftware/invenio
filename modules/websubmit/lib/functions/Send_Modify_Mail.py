@@ -36,14 +36,14 @@ import re
 from invenio.config import \
      accessurl, \
      adminemail, \
-     cdsname, \
+     CFG_SITE_NAME, \
      supportemail, \
      weburl
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 
 def Send_Modify_Mail (parameters, curdir, form, user_info=None):
-    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
     global sysno,rn
     if parameters['emailFile'] is not None and parameters['emailFile']!= "" and os.path.exists("%s/%s" % (curdir,parameters['emailFile'])):
         fp = open("%s/%s" % (curdir,parameters['emailFile']),"r")
@@ -70,7 +70,7 @@ def Send_Modify_Mail (parameters, curdir, form, user_info=None):
     if accessurl != "" and sysno != "":
         email_txt += "You can check the modified document here:\n"
         email_txt += "<%s/record/%s>\n\n" % (weburl,sysno)
-    email_txt += "Please note that the modifications will be taken into account in a couple of minutes.\n\nBest regards,\nThe %s Server support Team" % cdsname
+    email_txt += "Please note that the modifications will be taken into account in a couple of minutes.\n\nBest regards,\nThe %s Server support Team" % CFG_SITE_NAME
     # send the mail
     send_email(FROMADDR,sub,"%s modified" % rn,email_txt,copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     return ""

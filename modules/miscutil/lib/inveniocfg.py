@@ -88,8 +88,6 @@ def convert_conf_option(option_name, option_value):
     ## also, adjust some conf names due to backwards compatibility:
     option_name_replace_data = {'CFG_SITE_URL': 'weburl',
                                 'CFG_SITE_SECURE_URL': 'sweburl',
-                                'CFG_SITE_NAME': 'cdsname',
-                                'CFG_SITE_NAME_INTL': 'cdsnameintl',
                                 'CFG_SITE_LANG': 'cdslang',
                                 'CFG_SITE_LANGS': 'cdslangs',
                                 'CFG_SITE_SUPPORT_EMAIL': 'supportemail',
@@ -132,7 +130,7 @@ def convert_conf_option(option_name, option_value):
         option_value = '""' + option_value + '""'
 
     ## 3f) ignore some options:
-    if option_name == 'cdsnameintl':
+    if option_name == 'CFG_SITE_NAME_INTL':
         # treated elsewhere
         return
 
@@ -159,10 +157,10 @@ def cli_cmd_update_config_py(conf):
     fdesc.write("# FROM INVENIO.CONF BY EXECUTING:\n")
     fdesc.write("# " + " ".join(sys.argv) + "\n")
     ## special treatment for CFG_SITE_NAME_INTL options:
-    fdesc.write("cdsnameintl = {}\n")
+    fdesc.write("CFG_SITE_NAME_INTL = {}\n")
     for lang in conf.get("Invenio", "CFG_SITE_LANGS").split(","):
-        fdesc.write("cdsnameintl['%s'] = \"%s\"\n" % (lang, conf.get("Invenio",
-                                                                   "CFG_SITE_NAME_INTL_" + lang)))
+        fdesc.write("CFG_SITE_NAME_INTL['%s'] = \"%s\"\n" % (lang, conf.get("Invenio",
+                                                                            "CFG_SITE_NAME_INTL_" + lang)))
     ## special treatment for legacy WebSubmit options: (FIXME: phase them out)
     fdesc.write("accessurl = '%s/search'\n" % conf.get("Invenio", "CFG_SITE_URL"))
     fdesc.write("urlpath = '%s'\n" % conf.get("Invenio", "CFG_SITE_URL"))

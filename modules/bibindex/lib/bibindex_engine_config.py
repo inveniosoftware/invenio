@@ -28,7 +28,7 @@ __revision__ = \
 
 ## configuration parameters read from the general config file:
 from invenio.config import \
-     CFG_VERSION, cdsname,\
+     CFG_VERSION, CFG_SITE_NAME,\
      CFG_PATH_PDFTOTEXT, \
      CFG_PATH_PSTOTEXT, \
      CFG_PATH_PSTOASCII, \

@@ -45,7 +45,7 @@ from invenio.config import \
      accessurl, \
      adminemail, \
      cdslang, \
-     cdsname, \
+     CFG_SITE_NAME, \
      images, \
      CFG_PYLIBDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
@@ -86,7 +86,7 @@ CFG_WEBSUBMIT_DUMMY_MARC_XML_REC = "dummy_marcxml_rec"
 CFG_WEBSUBMIT_MARC_XML_REC = "recmysql"
 
 
-def index(req,c=cdsname,ln=cdslang,doctype="",categ="",RN="",send="",flow="",apptype="", action="", email_user_pattern="", id_user="", id_user_remove="", validate="", id_user_val="", msg_subject="", msg_body=""):
+def index(req,c=CFG_SITE_NAME,ln=cdslang,doctype="",categ="",RN="",send="",flow="",apptype="", action="", email_user_pattern="", id_user="", id_user_remove="", validate="", id_user_val="", msg_subject="", msg_body=""):
     global uid
 
     ln = wash_language(ln)
@@ -1502,7 +1502,7 @@ def getInAlice(doctype,categ,RN):
         return 0
 
 def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
-    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
     # retrieve useful information from webSubmit configuration
     res = run_sql("select value from sbmPARAMETERS where name='categformatDAM' and doctype=%s", (doctype,))
     categformat = res[0][0]
@@ -1564,13 +1564,13 @@ def SendEnglish(doctype,categ,RN,title,authors,access,sysno):
     return ""
 
 def SendWarning(doctype,categ,RN,title,authors,access):
-    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
     message = "Failed sending approval email request for %s" % RN
     # send the mail
     send_email(FROMADDR,adminemail,"Failed sending approval email request",message)
     return ""
 
-def errorMsg(title,req,c=cdsname,ln=cdslang):
+def errorMsg(title,req,c=CFG_SITE_NAME,ln=cdslang):
     return page(title="error",
                 body = create_error_box(req, title=title,verbose=0, ln=ln),
                 description="%s - Internal Error" % c,
@@ -1580,7 +1580,7 @@ def errorMsg(title,req,c=cdsname,ln=cdslang):
                 req=req,
                 navmenuid='yourapprovals')
 
-def warningMsg(title,req,c=cdsname,ln=cdslang):
+def warningMsg(title,req,c=CFG_SITE_NAME,ln=cdslang):
     return page(title="warning",
                 body = title,
                 description="%s - Internal Error" % c,

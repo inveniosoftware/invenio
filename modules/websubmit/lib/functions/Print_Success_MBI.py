@@ -20,7 +20,7 @@
 __revision__ = "$Id$"
 
 from invenio.config import \
-     cdsname
+     CFG_SITE_NAME
 
    ## Description:   function Print_Success_MBI
    ##                This function displays a message telling the user the
@@ -31,6 +31,6 @@ from invenio.config import \
 def Print_Success_MBI(parameters, curdir, form, user_info=None):
     global rn
     t="<B>Modification completed!</B><br><BR>"
-    t+="These modifications on document %s will be processed as quickly as possible and made <br>available on the %s Server</b>" % (rn,cdsname)
+    t+="These modifications on document %s will be processed as quickly as possible and made <br>available on the %s Server</b>" % (rn,CFG_SITE_NAME)
     return t
 

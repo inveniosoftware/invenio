@@ -20,7 +20,7 @@
 """
 __revision__ = "$Id$"
 
-from invenio.config import accessurl, adminemail, cdslang, cdsname, weburl, CFG_VERSION, cdsnameintl, supportemail
+from invenio.config import accessurl, adminemail, cdslang, CFG_SITE_NAME, weburl, CFG_VERSION, CFG_SITE_NAME_INTL, supportemail
 
 # FIXME: new cfg variable names like CFG_VERSION
 
@@ -42,9 +42,9 @@ def format(bfo, var=''):
     if var == '':
         out =  ''
     elif var == 'name':
-        out = cdsname
+        out = CFG_SITE_NAME
     elif var == 'i18n_name':
-        out = cdsnameintl.get(bfo.lang, cdsname)
+        out = CFG_SITE_NAME_INTL.get(bfo.lang, CFG_SITE_NAME)
     elif var == 'lang':
         out = cdslang
     elif var == 'CFG_VERSION':

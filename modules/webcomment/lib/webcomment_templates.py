@@ -30,8 +30,8 @@ from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.config import weburl, \
                            sweburl, \
                            cdslang, \
-                           cdsname, \
-                           cdsnameintl,\
+                           CFG_SITE_NAME, \
+                           CFG_SITE_NAME_INTL,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS, \
                            CFG_WEBCOMMENT_ALLOW_COMMENTS
 
@@ -160,7 +160,7 @@ class Template:
             body = _("Sorry, no record ID was provided.")
 
         body += "<br /><br />"
-        link = "<a href=\"%s?ln=%s\">%s</a>." % (weburl, ln, cdsnameintl.get(ln, cdsname))
+        link = "<a href=\"%s?ln=%s\">%s</a>." % (weburl, ln, CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME))
         body += _("You may want to start browsing from %s") % link
         return body
 

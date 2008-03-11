@@ -36,7 +36,7 @@ from invenio.config import \
      CFG_OAI_ID_PREFIX, \
      CFG_OAI_SET_FIELD, \
      CFG_BINDIR, \
-     cdsname, \
+     CFG_SITE_NAME, \
      CFG_TMPDIR
 from invenio.search_engine import perform_request_search
 from invenio.dbquery import run_sql
@@ -178,7 +178,7 @@ def get_recID_list(oai_set_descriptions, set):
                     recID_list.append(recID)
 
     if (setSpec == "global"):
-        setCoverage = cdsname
+        setCoverage = CFG_SITE_NAME
 
     return (setSpec, setName, setCoverage, recID_list)
 
@@ -197,7 +197,7 @@ def oaiarchive_task():
         all_oai_sets = all_sets()
         repository_size_s = "%d" % repository_size()
 
-        write_message(cdsname)
+        write_message(CFG_SITE_NAME)
         write_message(" OAI Repository Status")
         write_message("=" * 73)
         write_message("  setSpec" + " " * 16 + "  setName" +
@@ -210,7 +210,7 @@ def oaiarchive_task():
             setSpec, setName, setCoverage, recID_list = \
                 get_recID_list(oai_sets, _set)
 
-            oai_has_list = perform_request_search(c=cdsname, p1=_set[2],
+            oai_has_list = perform_request_search(c=CFG_SITE_NAME, p1=_set[2],
                 f1=CFG_OAI_SET_FIELD, m1="e", ap=0)
             oai_has_list_len = "%d" % len(oai_has_list)
 
@@ -253,7 +253,7 @@ def oaiarchive_task():
                 raise StandardError
             else:
 
-                oai_has_list = perform_request_search(c=cdsname, p1=set,
+                oai_has_list = perform_request_search(c=CFG_SITE_NAME, p1=set,
                     f1=CFG_OAI_SET_FIELD, m1="e", ap=0)
 
                 write_message(" setSpec            : %s" % setSpec)
@@ -450,7 +450,7 @@ def oaiarchive_task():
 
                 # Fetch records that are currently marked with this set in
                 # the database
-                oai_has_list = perform_request_search(c=cdsname, p1=set,
+                oai_has_list = perform_request_search(c=CFG_SITE_NAME, p1=set,
                     f1=CFG_OAI_SET_FIELD, m1="e", ap=0)
 
                 # Fetch records that should not be in this set

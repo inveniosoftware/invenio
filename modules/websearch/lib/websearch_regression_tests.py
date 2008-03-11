@@ -32,7 +32,7 @@ from sets import Set
 
 from mechanize import Browser, LinkNotFoundError, HTTPError
 
-from invenio.config import weburl, cdsname, cdslang
+from invenio.config import weburl, CFG_SITE_NAME, cdslang
 from invenio.testutils import make_test_suite, \
                               warn_user_about_tests_and_run, \
                               make_url, test_web_page_content, \
@@ -149,7 +149,7 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
             self.failUnless(same_urls_p(got, new), got)
 
         # Use the root URL unless we need more
-        check(make_url('/', c=cdsname),
+        check(make_url('/', c=CFG_SITE_NAME),
               make_url('/'))
 
         # Other collections are redirected in the /collection area

@@ -24,7 +24,8 @@
 
 __revision__ = "$Id$"
 
-## import interesting modules:
+import sys
+
 try:
     from invenio.dbquery import run_sql
     from invenio.config import \

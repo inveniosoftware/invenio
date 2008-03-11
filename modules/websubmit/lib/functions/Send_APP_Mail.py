@@ -37,7 +37,7 @@ import re
 
 from invenio.config import \
      adminemail, \
-     cdsname, \
+     CFG_SITE_NAME, \
      htdocsurl, \
      supportemail
 from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
@@ -48,7 +48,7 @@ from invenio.errorlib import register_exception
 
 def Send_APP_Mail (parameters, curdir, form, user_info=None):
     global emailvalue,titlevalue,authorvalue,sysno,rn
-    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
     doctype = form['doctype']
     emailvalue = emailvalue.replace("\n","")
     titlevalue = titlevalue.replace("\n","")

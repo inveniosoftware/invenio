@@ -38,7 +38,7 @@ from invenio.config import \
      CFG_OAI_SAMPLE_IDENTIFIER, \
      CFG_OAI_SET_FIELD, \
      CFG_CACHEDIR, \
-     cdsname, \
+     CFG_SITE_NAME, \
      supportemail, \
      weburl
 
@@ -674,7 +674,7 @@ def oaiidentify(args):
 
     out = ""
 
-    repositoryname        = "  <repositoryName>" + cdsname + "</repositoryName>\n"
+    repositoryname        = "  <repositoryName>" + CFG_SITE_NAME + "</repositoryName>\n"
     baseurl               = "  <baseURL>%s/oai2d/</baseURL>\n" % weburl
     protocolversion       = "  <protocolVersion>2.0</protocolVersion>\n"
     adminemail            = "  <adminEmail>%s</adminEmail>\n" % supportemail

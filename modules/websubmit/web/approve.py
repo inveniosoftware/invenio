@@ -31,7 +31,7 @@ from mod_python import apache
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      cdslang, \
-     cdsname, \
+     CFG_SITE_NAME, \
      urlpath, \
      CFG_VERSION
 from invenio.dbquery import run_sql
@@ -42,7 +42,7 @@ from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, page_not_authorized
 from invenio.messages import wash_language
 
-def index(req,c=cdsname,ln=cdslang):
+def index(req,c=CFG_SITE_NAME,ln=cdslang):
 
     uid = getUid(req)
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
@@ -70,7 +70,7 @@ def index(req,c=cdsname,ln=cdslang):
     else:
         return errorMsg("Sorry parameter missing...", req, c, ln)
 
-def errorMsg(title,req,c=cdsname,ln=cdslang):
+def errorMsg(title,req,c=CFG_SITE_NAME,ln=cdslang):
     return page(title="error",
                     body = create_error_box(req, title=title,verbose=0, ln=ln),
                     description="%s - Internal Error" % c,

@@ -23,26 +23,26 @@
 
 <p>
 <lang>
-  <en>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</en>
-  <fr>Bienvenue au _(Help Central)_ de <CDSNAMEINTL>.</fr>
-  <de>Herzlich Willkommen in der _(Help Central)_ von <CDSNAMEINTL>.</de>
-  <es>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</es>
-  <ca>Benvinguts al _(Help Central)_ de <CDSNAMEINTL>.</ca>
-  <pl>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</pl>
-  <pt>Bem vindo à _(Help Central)_ do <CDSNAMEINTL>.</pt>
-  <it>Benvenuti nell'_(Help Central)_ di <CDSNAMEINTL>.</it>
-  <ru>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</ru>
-  <sk>Víta Vás _(Help Central)_ <CDSNAMEINTL>.</sk>
-  <cs>Vítá Vás _(Help Central)_ <CDSNAMEINTL>.</cs>
-  <no>Velkommen til _(Help Central)_ for <CDSNAMEINTL>.</no>
-  <sv>Välkommen till _(Help Central)_en för <CDSNAMEINTL>.</sv>
-  <el>Καλωσήλθατε στην _(Help Central)_ για το <CDSNAMEINTL>.</el>
-  <uk>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</uk>
-  <ja>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</ja>
-  <bg>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</bg>
-  <hr>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</hr>
-  <zh_CN>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</zh_CN>
-  <zh_TW>Welcome to _(Help Central)_ of the <CDSNAMEINTL>.</zh_TW>
+  <en>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</en>
+  <fr>Bienvenue au _(Help Central)_ de <CFG_SITE_NAME_INTL>.</fr>
+  <de>Herzlich Willkommen in der _(Help Central)_ von <CFG_SITE_NAME_INTL>.</de>
+  <es>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</es>
+  <ca>Benvinguts al _(Help Central)_ de <CFG_SITE_NAME_INTL>.</ca>
+  <pl>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</pl>
+  <pt>Bem vindo à _(Help Central)_ do <CFG_SITE_NAME_INTL>.</pt>
+  <it>Benvenuti nell'_(Help Central)_ di <CFG_SITE_NAME_INTL>.</it>
+  <ru>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</ru>
+  <sk>Víta Vás _(Help Central)_ <CFG_SITE_NAME_INTL>.</sk>
+  <cs>Vítá Vás _(Help Central)_ <CFG_SITE_NAME_INTL>.</cs>
+  <no>Velkommen til _(Help Central)_ for <CFG_SITE_NAME_INTL>.</no>
+  <sv>Välkommen till _(Help Central)_en för <CFG_SITE_NAME_INTL>.</sv>
+  <el>Καλωσήλθατε στην _(Help Central)_ για το <CFG_SITE_NAME_INTL>.</el>
+  <uk>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</uk>
+  <ja>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</ja>
+  <bg>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</bg>
+  <hr>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</hr>
+  <zh_CN>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</zh_CN>
+  <zh_TW>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</zh_TW>
 </lang>
 </p>
 <blockquote>
@@ -51,43 +51,43 @@
 <dd><lang>
       <en>
         This page presents you with useful tips and techniques in order to
-        help you use the <CDSNAMEINTL> site to the full.
+        help you use the <CFG_SITE_NAME_INTL> site to the full.
       </en>
       <fr>
         Cette page vous présente des suggestions et des techniques qui puissent vous être utiles
-        afin d'utiliser au mieux <CDSNAMEINTL>.
+        afin d'utiliser au mieux <CFG_SITE_NAME_INTL>.
       </fr>
       <de>
         Diese Seite zeigt Ihnen alle nützliche Tipps und Techniken die
-        beim <CDSNAMEINTL> zur Verfügung stehen.
+        beim <CFG_SITE_NAME_INTL> zur Verfügung stehen.
       </de>
       <ca>
         Aquesta pàgina us presenta suggeriments i tècniques que us poden
-        resultar útils per usar <CDSNAMEINTL> en totes les seves possibilitats.
+        resultar útils per usar <CFG_SITE_NAME_INTL> en totes les seves possibilitats.
       </ca>
       <pt>
         Esta página oferece dicas  úteis e técnicas para ajuda-lo a usar o sítio do
-        <CDSNAMEINTL> em toda sua potencialidade.
+        <CFG_SITE_NAME_INTL> em toda sua potencialidade.
       </pt>
       <it>
         Questa pagina vi fornisce utili consigli per servirvi al meglio
-        <CDSNAMEINTL>.
+        <CFG_SITE_NAME_INTL>.
       </it>
       <sk>
         Táto stránka Vám ponúka užitočné tipy a triky ktoré Vám umožnia
-        plne využívať možností <CDSNAMEINTL>.
+        plne využívať možností <CFG_SITE_NAME_INTL>.
       </sk>
       <cs>
         Tato stránka Vám nabízí užitečné tipy a triky které Vám umožní
-        plně využívat možností <CDSNAMEINTL>.
+        plně využívat možností <CFG_SITE_NAME_INTL>.
       </cs>
       <no>
         Denne siden presenter nyttige tips og teknikker slik at du lettere kan få
-        fullt utbytte av <CDSNAMEINTL> sine sider.
+        fullt utbytte av <CFG_SITE_NAME_INTL> sine sider.
       </no>
       <sv>
         Denna sida ger dig användbara tips och tekniker för att hjälpa dig att
-        till fullo använda denna webbplats som <CDSNAMEINTL> erbjuder dig.
+        till fullo använda denna webbplats som <CFG_SITE_NAME_INTL> erbjuder dig.
       </sv>
     </lang>
 </dd>
@@ -99,30 +99,30 @@
       <ca>Guia completa de com cercar a l'</ca>
       <pt>Guia completo de como realizar buscas no</pt>
     </lang>
-    <CDSNAMEINTL>.
+    <CFG_SITE_NAME_INTL>.
 </dd>
 <dt><a href="submit-guide<lang:link/>">_(Submit Guide)_</a></dt>
 <dd><lang>
-      <en>Get help with submitting to <CDSNAMEINTL>.</en>
-      <fr>Obtenez de l'aide avec la soumission dans <CDSNAMEINTL>.</fr>
-      <de>Hier können Sie die Eintragehilfe für den <CDSNAMEINTL> konsultieren.</de>
-      <es>Get help with submitting to <CDSNAMEINTL>.</es>
-      <ca>Ajuda per la tramesa de documents a <CDSNAMEINTL>.</ca>
-      <pl>Get help with submitting to <CDSNAMEINTL>.</pl>
-      <pt>Obtenha ajuda em submissões ao <CDSNAMEINTL>.</pt>
-      <it>Aiuto per la sottomissione di documenti ad <CDSNAMEINTL>.</it>
-      <ru>Get help with submitting to <CDSNAMEINTL>.</ru>
-      <sk>Pomoc pre pridávanie do <CDSNAMEINTL>.</sk>
-      <cs>Nápověda pro přidávaní do <CDSNAMEINTL>.</cs>
-      <no>Få hjelp til innsending til <CDSNAMEINTL>.</no>
-      <sv>För hjälp med publicering i <CDSNAMEINTL>.</sv>
-      <el>Πληροφορίες σχετικά με τις υποβολές σας στο <CDSNAMEINTL>.</el>
-      <uk>Get help with submitting to <CDSNAMEINTL>.</uk>
-      <ja>Get help with submitting to <CDSNAMEINTL>.</ja>
-      <bg>Get help with submitting to <CDSNAMEINTL>.</bg>
-      <hr>Get help with submitting to <CDSNAMEINTL>.</hr>
-      <zh_CN>Get help with submitting to <CDSNAMEINTL>.</zh_CN>
-      <zh_TW>Get help with submitting to <CDSNAMEINTL>.</zh_TW>
+      <en>Get help with submitting to <CFG_SITE_NAME_INTL>.</en>
+      <fr>Obtenez de l'aide avec la soumission dans <CFG_SITE_NAME_INTL>.</fr>
+      <de>Hier können Sie die Eintragehilfe für den <CFG_SITE_NAME_INTL> konsultieren.</de>
+      <es>Get help with submitting to <CFG_SITE_NAME_INTL>.</es>
+      <ca>Ajuda per la tramesa de documents a <CFG_SITE_NAME_INTL>.</ca>
+      <pl>Get help with submitting to <CFG_SITE_NAME_INTL>.</pl>
+      <pt>Obtenha ajuda em submissões ao <CFG_SITE_NAME_INTL>.</pt>
+      <it>Aiuto per la sottomissione di documenti ad <CFG_SITE_NAME_INTL>.</it>
+      <ru>Get help with submitting to <CFG_SITE_NAME_INTL>.</ru>
+      <sk>Pomoc pre pridávanie do <CFG_SITE_NAME_INTL>.</sk>
+      <cs>Nápověda pro přidávaní do <CFG_SITE_NAME_INTL>.</cs>
+      <no>Få hjelp til innsending til <CFG_SITE_NAME_INTL>.</no>
+      <sv>För hjälp med publicering i <CFG_SITE_NAME_INTL>.</sv>
+      <el>Πληροφορίες σχετικά με τις υποβολές σας στο <CFG_SITE_NAME_INTL>.</el>
+      <uk>Get help with submitting to <CFG_SITE_NAME_INTL>.</uk>
+      <ja>Get help with submitting to <CFG_SITE_NAME_INTL>.</ja>
+      <bg>Get help with submitting to <CFG_SITE_NAME_INTL>.</bg>
+      <hr>Get help with submitting to <CFG_SITE_NAME_INTL>.</hr>
+      <zh_CN>Get help with submitting to <CFG_SITE_NAME_INTL>.</zh_CN>
+      <zh_TW>Get help with submitting to <CFG_SITE_NAME_INTL>.</zh_TW>
     </lang>
 </dd>
 </dl>

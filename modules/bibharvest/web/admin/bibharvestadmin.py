@@ -25,7 +25,7 @@ __lastupdated__ = """$Date$"""
 
 import invenio.bibharvestadminlib as bhc
 from invenio.webpage import page, create_error_box
-from invenio.config import cdsname, weburl, cdslang
+from invenio.config import CFG_SITE_NAME, weburl, cdslang
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 

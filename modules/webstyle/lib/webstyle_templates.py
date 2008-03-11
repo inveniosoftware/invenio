@@ -30,8 +30,8 @@ import string
 
 from invenio.config import \
      cdslang, \
-     cdsname, \
-     cdsnameintl, \
+     CFG_SITE_NAME, \
+     CFG_SITE_NAME_INTL, \
      supportemail, \
      sweburl, \
      weburl, \
@@ -75,7 +75,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = ""
-        if title != cdsnameintl.get(ln, cdsname):
+        if title != CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME):
             out += create_html_link(weburl, {'ln': ln},
                                     _("Home"), {'class': 'navtrail'})
         if previous_links:
@@ -85,7 +85,7 @@ class Template:
         if title:
             if out:
                 out += separator
-            if title == cdsnameintl.get(ln, cdsname): # hide site name, print Home instead
+            if title == CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME): # hide site name, print Home instead
                 out += cgi.escape(_("Home"))
             else:
                 out += cgi.escape(title)
@@ -275,7 +275,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        if headertitle == cdsnameintl.get(ln, cdsname):
+        if headertitle == CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME):
             headertitle = _("Home")
 
         out = """\
@@ -366,7 +366,7 @@ class Template:
           'ln' : ln,
           'langlink': ln != cdslang and '?ln=' + ln or '',
 
-          'sitename' : cdsnameintl.get(ln, cdsname),
+          'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
           'headertitle' : cgi.escape(headertitle),
 
           'supportemail' : supportemail,
@@ -460,7 +460,7 @@ class Template:
           'ln' : ln,
           'langlink': ln != cdslang and '?ln=' + ln or '',
 
-          'sitename' : cdsnameintl.get(ln, cdsname),
+          'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
           'supportemail' : supportemail,
 
           'msg_search' : _("Search"),

@@ -43,7 +43,7 @@ from invenio.config import \
     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION, \
     CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT, \
     cdslang, \
-    cdsname, \
+    CFG_SITE_NAME, \
     supportemail, \
     sweburl, \
     weburl
@@ -3552,13 +3552,13 @@ def sendAccountActivatedMessage(AccountEmail, sendTo, password, ln=cdslang):
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
-    sub = "Subject: Your account on '%s' has been activated\n\n" % cdsname
+    sub = "Subject: Your account on '%s' has been activated\n\n" % CFG_SITE_NAME
     body = "Your account earlier created on '%s' has been activated:\n\n" \
-        % cdsname
+        % CFG_SITE_NAME
     body += "   Username/Email: %s\n" % AccountEmail
     body += "   Password: %s\n" % ("*" * len(password))
     body += "\n---------------------------------"
-    body += "\n%s" % cdsname
+    body += "\n%s" % CFG_SITE_NAME
     body += "\nContact: %s" % supportemail
     msg = to + sub + body
 
@@ -3580,12 +3580,12 @@ def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=cdslang):
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
-    sub = "Subject: Account created on '%s'\n\n" % cdsname
-    body = "An account has been created for you on '%s':\n\n" % cdsname
+    sub = "Subject: Account created on '%s'\n\n" % CFG_SITE_NAME
+    body = "An account has been created for you on '%s':\n\n" % CFG_SITE_NAME
     body += "   Username/Email: %s\n" % newAccountEmail
     body += "   Password: %s\n" % ("*" * len(password))
     body += "\n---------------------------------"
-    body += "\n%s" % cdsname
+    body += "\n%s" % CFG_SITE_NAME
     body += "\nContact: %s" % supportemail
     msg = to + sub + body
 
@@ -3607,12 +3607,12 @@ def sendAccountRejectedMessage(newAccountEmail, sendTo, ln=cdslang):
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
-    sub = "Subject: Account rejected on '%s'\n\n" % cdsname
+    sub = "Subject: Account rejected on '%s'\n\n" % CFG_SITE_NAME
     body = "Your request for an account has been rejected on '%s':\n\n" \
-        % cdsname
+        % CFG_SITE_NAME
     body += "   Username/Email: %s\n" % newAccountEmail
     body += "\n---------------------------------"
-    body += "\n%s" % cdsname
+    body += "\n%s" % CFG_SITE_NAME
     body += "\nContact: %s" % supportemail
     msg = to + sub + body
 
@@ -3634,11 +3634,11 @@ def sendAccountDeletedMessage(newAccountEmail, sendTo, ln=cdslang):
     fromaddr = "From: %s" % supportemail
     toaddrs  = "To: %s" % sendTo
     to = toaddrs + "\n"
-    sub = "Subject: Account deleted on '%s'\n\n" % cdsname
-    body = "Your account on '%s' has been deleted:\n\n" % cdsname
+    sub = "Subject: Account deleted on '%s'\n\n" % CFG_SITE_NAME
+    body = "Your account on '%s' has been deleted:\n\n" % CFG_SITE_NAME
     body += "   Username/Email: %s\n" % newAccountEmail
     body += "\n---------------------------------"
-    body += "\n%s" % cdsname
+    body += "\n%s" % CFG_SITE_NAME
     body += "\nContact: %s" % supportemail
     msg = to + sub + body
 

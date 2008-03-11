@@ -29,13 +29,13 @@ from invenio.config import \
      CFG_PREFIX, \
      cdslang, \
      cdslangs, \
-     cdsname, \
+     CFG_SITE_NAME, \
      supportemail, \
      adminemail, \
      weburl, \
      sweburl, \
      CFG_VERSION, \
-     cdsnameintl, \
+     CFG_SITE_NAME_INTL, \
      CFG_CACHEDIR
 from invenio.dateutils import \
      convert_datestruct_to_datetext, \
@@ -126,13 +126,13 @@ ln_pattern_text += r"|".join(cdslangs)
 ln_pattern_text += r')\s*(revision="[^"]"\s*)?>(?P<translation>.*?)</\1>'
 ln_pattern =  re.compile(ln_pattern_text, re.IGNORECASE | re.DOTALL)
 
-defined_tags = {'<CDSNAME>': cdsname,
+defined_tags = {'<CFG_SITE_NAME>': CFG_SITE_NAME,
                 '<SUPPORTEMAIL>': supportemail,
                 '<ADMINEMAIL>': adminemail,
                 '<WEBURL>': weburl,
                 '<SWEBURL>': sweburl,
                 '<CFG_VERSION>': CFG_VERSION,
-                '<CDSNAMEINTL>': cdsnameintl}
+                '<CFG_SITE_NAME_INTL>': CFG_SITE_NAME_INTL}
 
 def get_webdoc_parts(webdoc,
                      parts=['title', \
@@ -643,7 +643,7 @@ def transform(webdoc_source, verbose=0, req=None, languages=cdslangs):
         ## Replace defined tags with their value from config file
         ## Eg. replace <weburl> with 'http://cdsweb.cern.ch/':
         for defined_tag, value in defined_tags.iteritems():
-            if defined_tag.upper() == '<CDSNAMEINTL>':
+            if defined_tag.upper() == '<CFG_SITE_NAME_INTL>':
                 localized_webdoc = localized_webdoc.replace(defined_tag, \
                                                             value.get(ln, value['en']))
             else:
@@ -745,7 +745,7 @@ def filter_languages(text, ln='en', defined_tags=None):
          - with ln = 'en': "A book"
          - with ln = 'fr': "A book"
 
-    Also replace variables such as <WEBURL> and <CDSNAMEINTL> inside
+    Also replace variables such as <WEBURL> and <CFG_SITE_NAME_INTL> inside
     <lang><..><..></lang> tags in order to print them with the correct
     language
 

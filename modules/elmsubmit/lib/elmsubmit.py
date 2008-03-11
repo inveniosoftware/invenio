@@ -31,7 +31,7 @@ import invenio.elmsubmit_submission_parser as elmsubmit_submission_parser
 
 # import the config file
 
-from invenio.config import CFG_TMPDIR, cdsname
+from invenio.config import CFG_TMPDIR, CFG_SITE_NAME
 from invenio.config import CFG_WEBSUBMIT_STORAGEDIR
 import invenio.elmsubmit_config as elmsubmit_config
 
@@ -254,7 +254,7 @@ def _notify_admin(response):
     response = elmsubmit_EZEmail.CreateMessage(to=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'],
                                                _from=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'],
                                                message=response,
-                                               subject="%s / elmsubmit problem." % cdsname,
+                                               subject="%s / elmsubmit problem." % CFG_SITE_NAME,
                                                wrap_message=False)
     _send_smtp(_from=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'], to=elmsubmit_config.CFG_ELMSUBMIT_PEOPLE['admin'], msg=response)
 

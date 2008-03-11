@@ -46,7 +46,7 @@
 
 <h2>Guest User Sessions</h2>
 
-<p>Guest users create a lot of entries in <CDSNAMEINTL> tables that are
+<p>Guest users create a lot of entries in <CFG_SITE_NAME_INTL> tables that are
 related to their web sessions, their search history, personal baskets,
 etc.  This data has to be garbage-collected periodically. This is done
 via a bibsched program, the <em>Invenio Gargabe Collector</em> (<strong>InvenioGC</strong>):

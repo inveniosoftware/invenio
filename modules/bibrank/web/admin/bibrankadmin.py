@@ -27,7 +27,7 @@ import sys
 import invenio.bibrankadminlib as brc
 #reload(brc)
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl, cdslang, cdsname
+from invenio.config import weburl, cdslang, CFG_SITE_NAME
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
@@ -193,7 +193,7 @@ def showrankdetails(req, ln=cdslang, rnkID=''):
 def error_page(req, ln=cdslang, verbose=1):
     return page(title="Internal Error",
                 body = create_error_box(req, verbose=verbose, ln=ln),
-                description="%s - Internal Error" % cdsname,
-                keywords="%s, Internal Error" % cdsname,
+                description="%s - Internal Error" % CFG_SITE_NAME,
+                keywords="%s, Internal Error" % CFG_SITE_NAME,
                 language=ln,
                 req=req)

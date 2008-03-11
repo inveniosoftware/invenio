@@ -68,7 +68,7 @@ or dynamic Python pages.</p>
 website, such as the search and browse pages, as well as the admin
 pages. The content of these pages is defined at run time, depending on
 the users parameters. You can modify them to provide a totally
-different experience to your users when browsing <CDSNAME>. Most
+different experience to your users when browsing <CFG_SITE_NAME>. Most
 probably, you will only want to customize 'webstyle_templates.py',
 which define the headers and footer of a page.</p>
 

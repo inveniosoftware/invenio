@@ -36,7 +36,7 @@ import re
 
 from invenio.config import \
      adminemail, \
-     cdsname, \
+     CFG_SITE_NAME, \
      htdocsurl, \
      supportemail, \
      urlpath
@@ -49,7 +49,7 @@ def Send_Request_For_Publication(parameters, curdir, form, user_info=None):
     global rn,sysno
     # variables declaration
     doctype = re.search(".*/([^/]*)/([^/]*)/[^/]*$",curdir).group(2)
-    FROMADDR = '%s Submission Engine <%s>' % (cdsname,supportemail)
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,supportemail)
     otheraddresses = parameters['addressesDAM']
     categformat = parameters['categformatDAM']
     # retrieve category
@@ -103,7 +103,7 @@ def Send_Request_For_Publication(parameters, curdir, form, user_info=None):
     else:
         addresses = re.sub(",$","",addresses)
     title_referee = "Request for publication of %s" % rn
-    mail_referee = "The document %s has been asked for publication to the %s Server..\nYour have to select an editorial board for it.\n\n" % (rn,cdsname)
+    mail_referee = "The document %s has been asked for publication to the %s Server..\nYour have to select an editorial board for it.\n\n" % (rn,CFG_SITE_NAME)
     mail_referee +="Title: %s\n\nAuthor(s): %s\n\n" % (title,author)
     mail_referee +="To access the document(s), select the file(s) from the location:<%s/getfile.py?recid=%s>\n\n" % (htdocsurl,sysno)
     mail_referee +="To select an editorial board, you should go to this URL:\n<%s/publiline.py?doctype=%s&categ=%s&RN=%s>\n" % (urlpath,doctype,category,rn)

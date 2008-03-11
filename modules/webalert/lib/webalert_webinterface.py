@@ -29,8 +29,8 @@ import zlib
 import urllib
 from mod_python import apache
 
-from invenio.config import weburl, sweburl, cdslang, cdsname, \
-  CFG_ACCESS_CONTROL_LEVEL_SITE, cdsnameintl
+from invenio.config import weburl, sweburl, cdslang, CFG_SITE_NAME, \
+  CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_SITE_NAME_INTL
 from invenio.webpage import page
 from invenio import webalert
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
@@ -82,8 +82,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description=_("%s Personalize, Display searches") % cdsnameintl.get(argd['ln'], cdsname),
-                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
+                    description=_("%s Personalize, Display searches") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
                     uid=uid,
                     language=argd['ln'],
                     req=req,
@@ -133,8 +133,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description=_("%s Personalize, Set a new alert") % cdsnameintl.get(argd['ln'], cdsname),
-                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
+                    description=_("%s Personalize, Set a new alert") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
                     uid=uid,
                     language=argd['ln'],
                     req=req,
@@ -185,8 +185,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description=_("%s Personalize, Modify alert settings") % cdsnameintl.get(argd['ln'], cdsname),
-                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
+                    description=_("%s Personalize, Modify alert settings") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
                     uid=uid,
                     language=argd['ln'],
                     req=req,
@@ -222,8 +222,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description=_("%s Personalize, Display alerts") % cdsnameintl.get(argd['ln'], cdsname),
-                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
+                    description=_("%s Personalize, Display alerts") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
                     uid=uid,
                     language=argd['ln'],
                     req=req,
@@ -270,8 +270,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description=_("%s Personalize, Display alerts") % cdsnameintl.get(argd['ln'], cdsname),
-                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
+                    description=_("%s Personalize, Display alerts") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
                     uid=uid,
                     language=argd['ln'],
                     req=req,
@@ -318,8 +318,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description=_("%s Personalize, Display alerts") % cdsnameintl.get(argd['ln'], cdsname),
-                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
+                    description=_("%s Personalize, Display alerts") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
                     uid=uid,
                     language=argd['ln'],
                     req=req,
@@ -359,8 +359,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
-                    description=_("%s Personalize, Display alerts") % cdsnameintl.get(argd['ln'], cdsname),
-                    keywords=_("%s, personalize") % cdsnameintl.get(argd['ln'], cdsname),
+                    description=_("%s Personalize, Display alerts") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
+                    keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(argd['ln'], CFG_SITE_NAME),
                     uid=uid,
                     language=argd['ln'],
                     req=req,

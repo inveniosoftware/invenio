@@ -29,7 +29,7 @@ from invenio.bibrecord import \
      record_get_field_values, \
      record_order_fields
 
-from invenio.config import CFG_CERN_SITE, cdsname
+from invenio.config import CFG_CERN_SITE, CFG_SITE_NAME
 
 from random import randint, seed
 from os.path import basename
@@ -719,7 +719,7 @@ def get_cli_options():
             sys.stderr.write("Error: ***CFG_ORGANIZATION_IDENTIFIER IS NOT " \
                              "SET!*** Unable to create ALEPH INSERT or " \
                              "REPLACE records. Please inform your %s" \
-                             " Administrator.\n" % cdsname)
+                             " Administrator.\n" % CFG_SITE_NAME)
             sys.exit(1)
 
     ## Check that a filename for the MARC XML file was provided:

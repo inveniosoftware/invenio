@@ -22,7 +22,7 @@
 __revision__ = "$Id$"
 
 from invenio.config import adminemail, \
-     weburl, cdsname
+     weburl, CFG_SITE_NAME
 
 # elmsubmit configuration file:
 CFG_ELMSUBMIT_FILES = {
@@ -44,7 +44,7 @@ CFG_ELMSUBMIT_NOLANGMSGS = {'bad_email': 'Your email could not be parsed correct
               'bad_field': 'This field does not validate correctly:',
               'correct_format': 'It must be formatted as follows:',
               'missing_attachment': 'We could not find the following file attached to your submission email:',
-              'temp_problem': 'There is a temporary problem with %s\'s email submission interface. Please retry your submission again shortly.' % cdsname}
+              'temp_problem': 'There is a temporary problem with %s\'s email submission interface. Please retry your submission again shortly.' % CFG_SITE_NAME}
 
 CFG_ELMSUBMIT_SERVERS = {'smtp': 'localhost'}
 

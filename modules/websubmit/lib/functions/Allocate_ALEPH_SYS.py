@@ -31,7 +31,7 @@ import time
 
 from invenio.config import \
      adminemail, \
-     cdsname, \
+     CFG_SITE_NAME, \
      CFG_WEBSUBMIT_COUNTERSDIR, \
      supportemail
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
@@ -71,7 +71,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form, user_info=None):
         Also, the absence of either of the 2 counter files "last_SYS_${database}" and
         "maximum_SYS_${database}" will cause the function to fail.
     """
-    mailfrom_addr = '%s Submission Engine <%s>' % (cdsname, supportemail)
+    mailfrom_addr = '%s Submission Engine <%s>' % (CFG_SITE_NAME, supportemail)
     database = parameters['alephdatabase'].strip()
     counter_lastsys = "last_SYS_%s" % database
     counter_maxsys = "maximum_SYS_%s" % database
@@ -279,7 +279,7 @@ def Allocate_ALEPH_SYS(parameters, curdir, form, user_info=None):
 
 
 def _warn_admin_counterlimit_approaching(db, lastsys, maxsys):
-    mailfrom_addr = '%s Submission Engine <%s>' % (cdsname, supportemail)
+    mailfrom_addr = '%s Submission Engine <%s>' % (CFG_SITE_NAME, supportemail)
     mailtxt = """WARNING: The maxmimum ALEPH SYS value for the [%s] database is approaching!\n"""\
               """The last SYS allocated was [%d]; The maximum SYS allowed is [%d].\n\n"""\
               """You should be thinking about allocating a new range of SYS now!\n"""\
@@ -289,7 +289,7 @@ def _warn_admin_counterlimit_approaching(db, lastsys, maxsys):
 
 
 def _mail_admin_because_lockfile_not_removeable(lockfilename, extramsg=""):
-    mailfrom_addr = '%s Submission Engine <%s>' % (cdsname, supportemail)
+    mailfrom_addr = '%s Submission Engine <%s>' % (CFG_SITE_NAME, supportemail)
     mailtxt = """ERROR: When trying to allocate an ALEPH SYS for a record, it was not possible to remove the lockfile [%s]!"""\
               """ This means that all attempted new submissions to that database will be blocked and fail, as it is not"""\
               """ possible to allocate them a SYS in ALEPH. Please investigate and remove the lockfile ASAP.\n\n"""\

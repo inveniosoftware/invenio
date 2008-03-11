@@ -32,7 +32,7 @@ import time
 from invenio.config import \
      CFG_CACHEDIR, \
      cdslang, \
-     cdsname, \
+     CFG_SITE_NAME, \
      weburl,\
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
      CFG_WEBCOMMENT_ALLOW_REVIEWS
@@ -1960,15 +1960,15 @@ def perform_index(colID=1, ln=cdslang, mtype='', content='', confirm=0):
     output = ""
     fin_output = ""
     if not col_dict.has_key(1):
-        res = add_col(cdsname, '')
+        res = add_col(CFG_SITE_NAME, '')
         if res:
             fin_output += """<b><span class="info">Created root collection.</span></b><br>"""
         else:
             return "Cannot create root collection, please check database."
-    if cdsname != run_sql("SELECT name from collection WHERE id=1")[0][0]:
-        res = run_sql("update collection set name='%s' where id=1" % cdsname)
+    if CFG_SITE_NAME != run_sql("SELECT name from collection WHERE id=1")[0][0]:
+        res = run_sql("update collection set name='%s' where id=1" % CFG_SITE_NAME)
         if res:
-            fin_output += """<b><span class="info">The name of the root collection has been modified to be the same as the %(cdsname)s installation name given prior to installing %(cdsname)s.</span><b><br>""" % {'cdsname' : cdsname}
+            fin_output += """<b><span class="info">The name of the root collection has been modified to be the same as the %(sitename)s installation name given prior to installing %(sitename)s.</span><b><br>""" % {'sitename' : CFG_SITE_NAME}
         else:
             return "Error renaming root collection."
     fin_output += """

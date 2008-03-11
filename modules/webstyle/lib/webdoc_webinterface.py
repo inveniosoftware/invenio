@@ -27,7 +27,7 @@ __revision__ = \
 __lastupdated__ = """$Date$"""
 
 import cgi
-from invenio.config import weburl, cdslang, cdsname, cdsnameintl, cdslangs
+from invenio.config import weburl, cdslang, CFG_SITE_NAME, CFG_SITE_NAME_INTL, cdslangs
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid
@@ -191,7 +191,7 @@ def display_webdoc_page(webdocname, categ="help", ln=cdslang, req=None):
                     '</p>'
         page_body += '<p>' + (_("You may want to start browsing from %(rooturl)s or have a look at the %(x_url_open)s index of the %(category)s pages%(x_url_close)s.") % \
                               {'rooturl':'<a href="%s%s">%s</a>' % \
-                               (weburl, ln_link, cdsnameintl.get(ln, cdsname)),
+                               (weburl, ln_link, CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)),
                                'category': _(categ),
                                'x_url_open': '<a href="%s/help/%scontents%s">' % \
                                (weburl, ((categ != 'help' and categ + '/') or ''), ln_link),

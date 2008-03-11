@@ -41,8 +41,8 @@ from invenio.config import \
      CFG_BIBRANK_SHOW_CITATION_GRAPHS, \
      CFG_WEBSEARCH_RSS_TTL, \
      cdslang, \
-     cdsname, \
-     cdsnameintl, \
+     CFG_SITE_NAME, \
+     CFG_SITE_NAME_INTL, \
      CFG_VERSION, \
      weburl, \
      supportemail
@@ -103,7 +103,7 @@ class Template:
 
     # Type of the allowed parameters for the web interface for search results
     search_results_default_urlargd = {
-        'cc': (str, cdsname),
+        'cc': (str, CFG_SITE_NAME),
         'c': (list, []),
         'p': (str, ""), 'f': (str, ""),
         'rg': (int, 10),
@@ -373,7 +373,7 @@ class Template:
         del parameters['c']
 
         # Now, we only have the arguments which have _not_ their default value
-        if c and c != cdsname:
+        if c and c != CFG_SITE_NAME:
             base = weburl + '/collection/' + urllib.quote(c)
         else:
             base = weburl
@@ -2614,9 +2614,9 @@ class Template:
         """Creates XML RSS 2.0 prologue."""
         out = """<rss version="2.0">
       <channel>
-        <title>%(cdsname)s</title>
+        <title>%(sitename)s</title>
         <link>%(weburl)s</link>
-        <description>%(cdsname)s latest documents</description>
+        <description>%(sitename)s latest documents</description>
         <language>%(cdslang)s</language>
         <pubDate>%(timestamp)s</pubDate>
         <category></category>
@@ -2625,7 +2625,7 @@ class Template:
         <ttl>%(timetolive)s</ttl>
         <image>
             <url>%(weburl)s/img/cds.png</url>
-            <title>%(cdsname)s</title>
+            <title>%(sitename)s</title>
             <link>%(weburl)s</link>
         </image>
         <textInput>
@@ -2634,7 +2634,7 @@ class Template:
           <name>p</name>
           <link>%(weburl)s/search</link>
         </textInput>
-        """ % {'cdsname': cdsname,
+        """ % {'sitename': CFG_SITE_NAME,
                'weburl': weburl,
                'cdslang': cdslang,
                'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()),
@@ -2703,7 +2703,7 @@ class Template:
                                 ('<strong>' + cgi.escape(colname) + '</strong>'),
                       'you_may_want': _("You may want to start browsing from %s.") % \
                                  ('<a href="' + weburl + '?ln=' + ln + '">' + \
-                                        cgi.escape(cdsnameintl.get(ln, cdsname)) + '</a>')}
+                                        cgi.escape(CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)) + '</a>')}
         return out
 
     def tmpl_alert_rss_teaser_box_for_query(self, id_query, ln):

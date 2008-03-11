@@ -29,7 +29,7 @@ import sys
 import time
 from cStringIO import StringIO
 
-from invenio.config import cdslang, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, adminemail, supportemail, cdsname, weburl
+from invenio.config import cdslang, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, adminemail, supportemail, CFG_SITE_NAME, weburl
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
@@ -411,7 +411,7 @@ def send_error_report_to_admin(header, url, time_msg,
     """
     Sends an email to the admin with client info and tracestack
     """
-    from_addr =  '%s Alert Engine <%s>' % (cdsname, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
+    from_addr =  '%s Alert Engine <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
     to_addr = adminemail
     body = """
 The following error was seen by a user and sent to you.

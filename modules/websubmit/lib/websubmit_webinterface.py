@@ -37,7 +37,7 @@ from urllib import quote
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      cdslang, \
-     cdsname, \
+     CFG_SITE_NAME, \
      images, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      urlpath, \
@@ -117,7 +117,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 msg = "<p>%s</p><p>%s</p>" % (
                     _("The system has encountered an error in retrieving the list of files for this document."),
                     _("The error has been logged and will be taken in consideration as soon as possibile."))
-                return errorMsg(msg, req, cdsname, ln)
+                return errorMsg(msg, req, CFG_SITE_NAME, ln)
 
             docname = ''
             format = ''
@@ -156,20 +156,20 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             docfile = doc.get_file(format, version)
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req)
-                            return errorMsg(str(msg), req, cdsname, ln)
+                            return errorMsg(str(msg), req, CFG_SITE_NAME, ln)
 
                         if docfile.get_status() == '':
                             # The file is not resticted, let's check for
                             # collection restriction then.
                             (auth_code, auth_message) = check_user_can_view_record(user_info, self.recid)
                             if auth_code:
-                                return warningMsg(_("The collection to which this file belong is restricted: ") + auth_message, req, cdsname, ln)
+                                return warningMsg(_("The collection to which this file belong is restricted: ") + auth_message, req, CFG_SITE_NAME, ln)
                         else:
                             # The file is probably restricted on its own.
                             # Let's check for proper authorization then
                             (auth_code, auth_message) = docfile.is_restricted(req)
                             if auth_code != 0:
-                                return warningMsg(_("This file is restricted: ") + auth_message, req, cdsname, ln)
+                                return warningMsg(_("This file is restricted: ") + auth_message, req, CFG_SITE_NAME, ln)
 
                         if not readonly:
                             ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
@@ -178,7 +178,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             return docfile.stream(req)
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req)
-                            return errorMsg(str(msg), req, cdsname, ln)
+                            return errorMsg(str(msg), req, CFG_SITE_NAME, ln)
 
                     elif doc.get_icon() is not None and doc.get_icon().docname in filename:
                         icon = doc.get_icon()
@@ -186,7 +186,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             iconfile = icon.get_file('gif', args['version'])
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req)
-                            return errorMsg(msg, req, cdsname, ln)
+                            return errorMsg(msg, req, CFG_SITE_NAME, ln)
 
                         if iconfile.get_status() == '':
                             # The file is not resticted, let's check for
@@ -275,7 +275,7 @@ def websubmit_legacy_getfile(req, form):
     # /record/.../files/... URL.
 
     args = wash_urlargd(form, {
-        'c': (str, cdsname),
+        'c': (str, CFG_SITE_NAME),
         'recid': (str, ''),
         'docid': (str, ''),
         'version': (str, ''),
@@ -283,7 +283,7 @@ def websubmit_legacy_getfile(req, form):
         'format': (str, '')
         })
 
-    def _getfile_py(req,c=cdsname,ln=cdslang,recid="",docid="",version="",name="",format=""):
+    def _getfile_py(req,c=CFG_SITE_NAME,ln=cdslang,recid="",docid="",version="",name="",format=""):
         _ = gettext_set_language(ln)
 
         # get user ID:
@@ -338,7 +338,7 @@ def websubmit_legacy_getfile(req, form):
                 bibdoc = BibDoc(docid=docid)
             except InvenioWebSubmitFileError, msg:
                 register_exception(req=req)
-                return errorMsg(msg, req, cdsname, ln)
+                return errorMsg(msg, req, CFG_SITE_NAME, ln)
             recid = bibdoc.get_recid()
             filelist = bibdoc.display(version, ln=ln)
 
@@ -489,7 +489,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
     def index(self, req, form):
 
         args = wash_urlargd(form, {
-            'c': (str, cdsname),
+            'c': (str, CFG_SITE_NAME),
             'doctype': (str, ''),
             'act': (str, ''),
             'startPg': (str, "1"),
@@ -534,7 +534,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
     # Answer to both /submit/ and /submit
     __call__ = index
 
-def errorMsg(title, req, c=cdsname, ln=cdslang):
+def errorMsg(title, req, c=CFG_SITE_NAME, ln=cdslang):
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -547,7 +547,7 @@ def errorMsg(title, req, c=cdsname, ln=cdslang):
                 req=req,
                 navmenuid='submit')
 
-def warningMsg(title, req, c=cdsname, ln=cdslang):
+def warningMsg(title, req, c=CFG_SITE_NAME, ln=cdslang):
     # load the right message language
     _ = gettext_set_language(ln)
 

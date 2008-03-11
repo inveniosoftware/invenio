@@ -86,7 +86,7 @@ subsequently described in the rest of this guide.
 <p>Metadata corpus in CDS Invenio is organized into collections.  The
 collections are organized in a tree.  The collection tree is what the
 end-users see when they start to navigate at <a
-href="<WEBURL>"><CDSNAME></a>.  The collection tree is similar to what
+href="<WEBURL>"><CFG_SITE_NAME></a>.  The collection tree is similar to what
 other sites call Web Directories that organize Web into topical
 categories, such as <a href="http://www.google.com/dirhp">Google
 Directory</a>.

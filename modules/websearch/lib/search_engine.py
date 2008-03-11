@@ -49,7 +49,7 @@ from invenio.config import \
      CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
      cdslang, \
-     cdsname, \
+     CFG_SITE_NAME, \
      CFG_LOGDIR, \
      weburl
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES, InvenioWebSearchUnknownCollectionError
@@ -616,7 +616,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
             description = "%s %s." % (cc, _("Search Results"))
 
         if not keywords:
-            keywords = "%s, WebSearch, %s" % (get_coll_i18nname(cdsname, ln), get_coll_i18nname(cc, ln))
+            keywords = "%s, WebSearch, %s" % (get_coll_i18nname(CFG_SITE_NAME, ln), get_coll_i18nname(cc, ln))
 
         argd = {}
         if req.args:
@@ -740,7 +740,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                               })
 
     coll_selects = []
-    if colls and colls[0] != cdsname:
+    if colls and colls[0] != CFG_SITE_NAME:
         # some collections are defined, so print these first, and only then print 'add another collection' heading:
         for c in colls:
             if c:
@@ -759,7 +759,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
         coll_selects.append([{ 'value' : '',
                                'text' : '*** %s ***' % _("add another collection")
                              }] + colls_nice)
-    else: # we searched in CDSNAME, so print 'any collection' heading
+    else: # we searched in CFG_SITE_NAME, so print 'any collection' heading
         coll_selects.append([{ 'value' : '',
                                'text' : '*** %s ***' % _("any collection")
                              }] + colls_nice)
@@ -843,7 +843,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
              ec = ec,
            )
 
-def create_navtrail_links(cc=cdsname, as=0, ln=cdslang, self_p=1, tab=''):
+def create_navtrail_links(cc=CFG_SITE_NAME, as=0, ln=cdslang, self_p=1, tab=''):
     """Creates navigation trail links, i.e. links to collection
     ancestors (except Home collection).  If as==1, then links to
     Advanced Search interfaces; otherwise Simple Search.
@@ -851,10 +851,10 @@ def create_navtrail_links(cc=cdsname, as=0, ln=cdslang, self_p=1, tab=''):
 
     dads = []
     for dad in get_coll_ancestors(cc):
-        if dad != cdsname: # exclude Home collection
+        if dad != CFG_SITE_NAME: # exclude Home collection
             dads.append ((dad, get_coll_i18nname (dad, ln)))
 
-    if self_p and cc != cdsname:
+    if self_p and cc != CFG_SITE_NAME:
         dads.append((cc, get_coll_i18nname(cc, ln)))
 
     return websearch_templates.tmpl_navtrail_links(
@@ -971,7 +971,7 @@ def wash_colls(cc, c, split_colls=0):
             if cc:
                 raise InvenioWebSearchUnknownCollectionError(cc)
             else:
-                cc = cdsname # cc is not set, so replace it with Home collection
+                cc = CFG_SITE_NAME # cc is not set, so replace it with Home collection
 
     # check type of 'c' argument:
     if type(c) is list:
@@ -1373,7 +1373,7 @@ def create_collection_reclist_cache():
     return collrecs
 
 try:
-    collection_reclist_cache.has_key(cdsname)
+    collection_reclist_cache.has_key(CFG_SITE_NAME)
 except:
     try:
         collection_reclist_cache = create_collection_reclist_cache()
@@ -1405,7 +1405,7 @@ def create_collection_i18nname_cache():
     return names
 
 try:
-    collection_i18nname_cache.has_key(cdsname)
+    collection_i18nname_cache.has_key(CFG_SITE_NAME)
 except:
     try:
         collection_i18nname_cache = create_collection_i18nname_cache()
@@ -1437,7 +1437,7 @@ def create_field_i18nname_cache():
     return names
 
 try:
-    field_i18nname_cache.has_key(cdsname)
+    field_i18nname_cache.has_key(CFG_SITE_NAME)
 except:
     try:
         field_i18nname_cache = create_field_i18nname_cache()
@@ -1849,11 +1849,11 @@ def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, 
         results_nbhits += len(results[coll])
     if results_nbhits == 0:
         # no hits found, try to search in Home:
-        results_in_Home = hitset_in_any_collection & get_collection_reclist(cdsname)
+        results_in_Home = hitset_in_any_collection & get_collection_reclist(CFG_SITE_NAME)
         if len(results_in_Home) > 0:
             # some hits found in Home, so propose this search:
             if of.startswith("h"):
-                url = websearch_templates.build_search_url(req.argd, cc=cdsname, c=[])
+                url = websearch_templates.build_search_url(req.argd, cc=CFG_SITE_NAME, c=[])
                 print_warning(req, _("No match found in collection %(x_collection)s. Other public collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s.") %\
                               {'x_collection': '<em>' + string.join([get_coll_i18nname(coll, ln) for coll in colls], ', ') + '</em>',
                                'x_url_open': '<a class="nearestterms" href="%s">' % (url),
@@ -2183,8 +2183,8 @@ def get_mysql_recid_from_aleph_sysno(sysno):
 def guess_primary_collection_of_a_record(recID):
     """Return primary collection name a record recid belongs to, by testing 980 identifier.
        May lead to bad guesses when a collection is defined dynamically bia dbquery.
-       In that case, return 'cdsname'."""
-    out = cdsname
+       In that case, return 'CFG_SITE_NAME'."""
+    out = CFG_SITE_NAME
     dbcollids = get_fieldvalues(recID, "980__a")
     if dbcollids:
         dbquery = "collection:" + dbcollids[0]
@@ -2347,7 +2347,7 @@ def record_public_p(recID):
     """Return 1 if the record is public, i.e. if it can be found in the Home collection.
        Return 0 otherwise.
     """
-    return recID in get_collection_reclist(cdsname)
+    return recID in get_collection_reclist(CFG_SITE_NAME)
 
 def get_creation_date(recID, fmt="%Y-%m-%d"):
     "Returns the creation date of the record 'recID'."
@@ -2376,7 +2376,7 @@ def print_warning(req, msg, type='', prologue='<br />', epilogue='<br />'):
                  ))
         return
 
-def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=cdsname, nb_found=-1, jrec=1, rg=10,
+def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb_found=-1, jrec=1, rg=10,
                       as=0, ln=cdslang, p1="", p2="", p3="", f1="", f2="", f3="", m1="", m2="", m3="", op1="", op2="",
                       sc=1, pl_in_url="",
                       d1y=0, d1m=0, d1d=0, d2y=0, d2m=0, d2d=0, dt="",
@@ -3244,7 +3244,7 @@ def wash_url_argument(var, new_type):
 
 ### CALLABLES
 
-def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="", so="d", sp="", rm="", of="id", ot="", as=0,
+def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10, sf="", so="d", sp="", rm="", of="id", ot="", as=0,
                            p1="", f1="", m1="", op1="", p2="", f2="", m2="", op2="", p3="", f3="", m3="", sc=0, jrec=0,
                            recid=-1, recidb=-1, sysno="", id=-1, idb=-1, sysnb="", action="", d1="",
                            d1y=0, d1m=0, d1d=0, d2="", d2y=0, d2m=0, d2d=0, dt="", verbose=0, ap=0, ln=cdslang, ec=None, tab=""):
@@ -3551,12 +3551,12 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
             # record well exists, so find similar ones to it
             t1 = os.times()[4]
             results_similar_recIDs, results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, results_similar_comments = \
-                                    rank_records(rm, 0, get_collection_reclist(cdsname), string.split(p), verbose)
+                                    rank_records(rm, 0, get_collection_reclist(CFG_SITE_NAME), string.split(p), verbose)
             if results_similar_recIDs:
                 t2 = os.times()[4]
                 cpu_time = t2 - t1
                 if of.startswith("h"):
-                    req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, cdsname, len(results_similar_recIDs),
+                    req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, CFG_SITE_NAME, len(results_similar_recIDs),
                                                 jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                 sc, pl_in_url,
                                                 d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
@@ -3606,7 +3606,7 @@ def perform_request_search(req=None, cc=cdsname, c=None, p="", f="", rg=10, sf="
                 t2 = os.times()[4]
                 cpu_time = t2 - t1
                 if of.startswith("h"):
-                    req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, cdsname, len(results_cocited_recIDs),
+                    req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, CFG_SITE_NAME, len(results_cocited_recIDs),
                                                 jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                 sc, pl_in_url,
                                                 d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
@@ -4017,7 +4017,7 @@ def perform_request_log(req, date=""):
     req.write("</html>")
     return "\n"
 
-def profile(p="", f="", c=cdsname):
+def profile(p="", f="", c=CFG_SITE_NAME):
     """Profile search time."""
     import profile
     import pstats
@@ -4027,7 +4027,7 @@ def profile(p="", f="", c=cdsname):
     return 0
 
 ## test cases:
-#print wash_colls(cdsname,"Library Catalogue", 0)
+#print wash_colls(CFG_SITE_NAME,"Library Catalogue", 0)
 #print wash_colls("Periodicals & Progress Reports",["Periodicals","Progress Reports"], 0)
 #print wash_field("wau")
 #print print_record(20,"tm","001,245")

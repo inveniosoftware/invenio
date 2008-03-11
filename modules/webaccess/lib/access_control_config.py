@@ -24,7 +24,7 @@ __revision__ = \
 
 # pylint: disable-msg=C0301
 
-from invenio.config import cdsname, weburl, sweburl, supportemail, CFG_CERN_SITE
+from invenio.config import CFG_SITE_NAME, weburl, sweburl, supportemail, CFG_CERN_SITE
 import cPickle
 from zlib import compress
 from invenio.messages import gettext_set_language
@@ -184,7 +184,7 @@ CFG_WEBACCESS_MSGS = {
                                 3: 'Guest users are not allowed, please <a href="%s/youraccount/login">login</a>.' % sweburl,
                                 4: 'The site is temporarily closed for maintenance.  Please come back soon.',
                                 5: 'Authorization failure',
-                                6: '%s temporarily closed' % cdsname,
+                                6: '%s temporarily closed' % CFG_SITE_NAME,
                                 7: 'This functionality is temporarily closed due to server maintenance. Please use only the search engine in the meantime.',
                                 8: 'Functionality temporarily closed'
         }

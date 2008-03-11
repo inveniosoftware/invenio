@@ -1464,6 +1464,6 @@ def error_page(req):
     """
     return page(title="Internal Error",
                 body = create_error_box(req, ln=config.cdslang),
-                description="%s - Internal Error" % config.cdsname,
-                keywords="%s, Internal Error" % config.cdsname,
+                description="%s - Internal Error" % config.CFG_SITE_NAME,
+                keywords="%s, Internal Error" % config.CFG_SITE_NAME,
                 language=config.cdslang)

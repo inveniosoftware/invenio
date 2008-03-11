@@ -33,7 +33,7 @@ from invenio.config import cdslang, \
                            CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
                            adminemail,\
                            weburl,\
-                           cdsname,\
+                           CFG_SITE_NAME,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS,\
                            CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS,\
                            CFG_WEBCOMMENT_ALLOW_COMMENTS,\
@@ -306,7 +306,7 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
          user_votes,
          user_nb_votes_total) = query_get_user_reports_and_votes(int(id_user))
         (nickname, user_email, last_login) = query_get_user_contact_info(id_user)
-        from_addr = '%s Alert Engine <%s>' % (cdsname, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
+        from_addr = '%s Alert Engine <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
         to_addr = adminemail
         subject = "An error report has been sent from a user"
         body = '''
@@ -952,7 +952,7 @@ To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?co
             'weburl'                : weburl
         }
 
-    from_addr = '%s WebComment <%s>' % (cdsname, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
+    from_addr = '%s WebComment <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)
     to_addr = adminemail
     subject = "A new comment/review has just been posted"
 

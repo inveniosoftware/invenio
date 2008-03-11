@@ -34,7 +34,7 @@ except NameError:
 
 from invenio.config import \
      weburl, \
-     cdsname, \
+     CFG_SITE_NAME, \
      CFG_CACHEDIR, \
      cdslang, \
      adminemail, \
@@ -408,7 +408,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
 legacy_collection_default_urlargd = {
     'as': (int, 0),
     'verbose': (int, 0),
-    'c': (str, cdsname)}
+    'c': (str, CFG_SITE_NAME)}
 
 class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 
@@ -455,7 +455,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 if not argd['c']:
                     # collection argument not present; display
                     # home collection by default
-                    argd['c'] = cdsname
+                    argd['c'] = CFG_SITE_NAME
 
                 return display_collection(req, **argd)
 
@@ -540,12 +540,12 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             return display_collection(req, **argd)
 
         # make the collection an element of the path, and keep the
-        # other query elements as is. If the collection is cdsname,
+        # other query elements as is. If the collection is CFG_SITE_NAME,
         # however, redirect to the main URL.
         c = argd['c']
         del argd['c']
 
-        if c == cdsname:
+        if c == CFG_SITE_NAME:
             target = '/'
         else:
             target = '/collection/' + quote(c)
@@ -593,8 +593,8 @@ def display_collection(req, c, as, verbose, ln):
     except Error:
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=verbose, ln=ln),
-                    description="%s - Internal Error" % cdsname,
-                    keywords="%s, Internal Error" % cdsname,
+                    description="%s - Internal Error" % CFG_SITE_NAME,
+                    keywords="%s, Internal Error" % CFG_SITE_NAME,
                     language=ln,
                     req=req,
                     navmenuid='search')
@@ -605,11 +605,11 @@ def display_collection(req, c, as, verbose, ln):
     colID = get_colID(c)
     if type(colID) is not int:
         page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
-        page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + weburl + '?ln=' + ln + '">' + get_coll_i18nname(cdsname, ln) + '</a>')) + '</p>'
+        page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + weburl + '?ln=' + ln + '">' + get_coll_i18nname(CFG_SITE_NAME, ln) + '</a>')) + '</p>'
         return page(title=_("Collection %s Not Found") % cgi.escape(c),
                     body=page_body,
-                    description=(cdsname + ' - ' + _("Not found") + ': ' + cgi.escape(str(c))),
-                    keywords="%s" % cdsname,
+                    description=(CFG_SITE_NAME + ' - ' + _("Not found") + ': ' + cgi.escape(str(c))),
+                    keywords="%s" % CFG_SITE_NAME,
                     uid=uid,
                     language=ln,
                     req=req,
@@ -644,14 +644,14 @@ def display_collection(req, c, as, verbose, ln):
 
         title = get_coll_i18nname(c, ln)
         rssurl = weburl + '/rss'
-        if c != cdsname:
+        if c != CFG_SITE_NAME:
             rssurl += '?cc=' + quote(c)
 
         return page(title=title,
                     body=c_body,
                     navtrail=c_navtrail,
-                    description="%s - %s" % (cdsname, c),
-                    keywords="%s, %s" % (cdsname, c),
+                    description="%s - %s" % (CFG_SITE_NAME, c),
+                    keywords="%s, %s" % (CFG_SITE_NAME, c),
                     uid=uid,
                     language=ln,
                     req=req,
@@ -671,8 +671,8 @@ def display_collection(req, c, as, verbose, ln):
             req.write("<br>uid=%s" % uid)
         return page(title=_("Internal Error"),
                     body = create_error_box(req, ln=ln),
-                    description="%s - Internal Error" % cdsname,
-                    keywords="%s, Internal Error" % cdsname,
+                    description="%s - Internal Error" % CFG_SITE_NAME,
+                    keywords="%s, Internal Error" % CFG_SITE_NAME,
                     uid=uid,
                     language=ln,
                     req=req,
