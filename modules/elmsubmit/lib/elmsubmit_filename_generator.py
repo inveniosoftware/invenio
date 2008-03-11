@@ -35,7 +35,7 @@ import mimetypes
 import zlib
 
 try:
-    import magic.magic as magic
+    import magic
     _got_magic = True
 except ImportError:
     import mimetypes
@@ -56,7 +56,7 @@ from invenio.elmsubmit_misc import remove_tempfile as _remove_tempfile
 def generate_filename(filename=None, file=None, content_type=None, no_rand_chars=8, prefix='', postfix=''):
 
     name_stub = _random_alphanum_string(no_rand_chars)
-    name_ext = calculate_filename_extension(filename, file, content_type)    
+    name_ext = calculate_filename_extension(filename, file, content_type)
     return prefix + name_stub + postfix + '.' + name_ext
 
 def calculate_filename_extension(filename=None, file=None, content_type=None):
@@ -82,7 +82,7 @@ def calculate_filename_extension(filename=None, file=None, content_type=None):
         if content_type is None:
             raise ImportError('Failed to import magic module. If no content-type is given, then magic module is required.')
         else:
-            return calculate_filename_ext_mimetypes(content_type)            
+            return calculate_filename_ext_mimetypes(content_type)
 
 def calculate_filename_ext_libmagic(filename=None, file=None):
 
@@ -102,13 +102,13 @@ def calculate_filename_ext_libmagic(filename=None, file=None):
     if not _got_magic: raise ImportError('magic module did not import successfully')
 
     magician = magic.open(magic.MAGIC_NONE)
-        
+
     magic_data_file = os.path.join(_this_module_dir, 'magic/magic.ext')
     ret_load = magician.load(magic_data_file)
 
     # Throw private error if the magic data file is corrupt, or
     # doesn't exist.
-        
+
     if ret_load != 0: raise _MagicDataError()
 
     if filename is None:
@@ -117,7 +117,7 @@ def calculate_filename_ext_libmagic(filename=None, file=None):
         # Get a temporary file and write file variable out to it
         # because the magic module expects to be handed the name of a
         # real file.
-        
+
         tf, tf_name = _open_tempfile(mode='wb')
         tf.write(file)
         tf.close()
@@ -127,15 +127,15 @@ def calculate_filename_ext_libmagic(filename=None, file=None):
         os.stat(filename) # Make sure we can stat the file.
         tf_name = filename
         delete_file = False
-        
+
     ext_info = magician.file(tf_name)
 
     # Now process ext_info to see if we can find a file extension
     # contained in it.
 
     file_ext_re = re.compile(r'file_ext:{(.+?)}')
-    file_ext_match = file_ext_re.search(ext_info)        
-        
+    file_ext_match = file_ext_re.search(ext_info)
+
     if file_ext_match:
         name_ext = file_ext_match.group(1)
 
@@ -148,7 +148,7 @@ def calculate_filename_ext_libmagic(filename=None, file=None):
         # 1. It only supports gzip
         # 2. The implementation has a nasty bug which has only
         #    been fixed in very recent releases of libmagic.
-            
+
         if name_ext == 'gz':
 
             try:
@@ -162,7 +162,7 @@ def calculate_filename_ext_libmagic(filename=None, file=None):
                 # Guess an extension of the decompressed stream and
                 # tack current '.gz' on the end:
                 name_ext = calculate_filename_ext_libmagic(file=decomp_file)  + '.' + name_ext
-                
+
         elif name_ext == 'bz2':
 
             try:
@@ -178,25 +178,25 @@ def calculate_filename_ext_libmagic(filename=None, file=None):
                 # Guess an extension of the decompressed stream and
                 # tack current '.bz2' on the end:
                 name_ext = calculate_filename_ext_libmagic(file=decomp_file)  + '.' + name_ext
-                
+
     # Otherwise, look for special results from libmagic's
     # 'internal tests' that we recognize:
 
     elif ext_info.lower().rfind('tar archive') != -1:
         name_ext = 'tar'
-        
+
     elif ext_info.lower().rfind('text') != -1:
         name_ext = 'txt'
-            
+
     # Can't guess a filetype so use generic extension .dat
-    
+
     else:
         name_ext = 'dat'
 
     # Identification done so get rid of the temp file, assuming we created the file:
     if delete_file: _remove_tempfile(tf_name)
 
-    return name_ext    
+    return name_ext
 
 mimetypes.types_map = {}
 mimetypes.init([os.path.join(_this_module_dir, 'mime.types.edited')])
@@ -216,7 +216,7 @@ def calculate_filename_ext_mimetypes(content_type):
     name_ext = name_ext[1:]
 
     return name_ext
-        
+
 # Errors:
 
 # This module may also produce IOError from it use of temporary
@@ -230,6 +230,6 @@ class _MagicDataError(Exception):
     data file successfully. This will only occur if there is a problem
     with the module's installation.
     """
-    
+
     pass
 
