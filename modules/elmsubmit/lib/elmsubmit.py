@@ -99,7 +99,7 @@ def process_email(email_string):
     try:
         os.makedirs(storage_dir)
     except EnvironmentError:
-        _notify(e=e, response=elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['temp_problem'])
+        _notify(msg=e, response=elmsubmit_config.CFG_ELMSUBMIT_NOLANGMSGS['temp_problem'])
         _notify_admin(response="Could not create directory: %s" % (storage_dir))
         raise elmsubmitError("Could not create directory: %s" % (storage_dir))
 

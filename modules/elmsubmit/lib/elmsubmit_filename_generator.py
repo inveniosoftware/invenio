@@ -38,7 +38,6 @@ try:
     import magic
     _got_magic = True
 except ImportError:
-    import mimetypes
     _got_magic = False
 
 import gzip
@@ -61,9 +60,8 @@ def generate_filename(filename=None, file=None, content_type=None, no_rand_chars
 
 def calculate_filename_extension(filename=None, file=None, content_type=None):
 
-    # If libmagic is installed and ./magic/magic.so has been
-    # successfully built, then we use a python interface to libmagic
-    # (man libmagic) to calculate a file extension using a specially
+    # If libmagic and its Python wrapper are installed that the latter is
+    # used to calculate a file extension using a specially
     # prepared magic data file (./magic/magic.ext) which maps
     # magic tests to file extensions. Otherwise we use the mimetypes
     # module from the standard Python distribution.
@@ -103,8 +101,7 @@ def calculate_filename_ext_libmagic(filename=None, file=None):
 
     magician = magic.open(magic.MAGIC_NONE)
 
-    magic_data_file = os.path.join(_this_module_dir, 'magic/magic.ext')
-    ret_load = magician.load(magic_data_file)
+    ret_load = magician.load()
 
     # Throw private error if the magic data file is corrupt, or
     # doesn't exist.
