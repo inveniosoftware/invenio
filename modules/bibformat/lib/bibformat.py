@@ -330,7 +330,7 @@ def create_excel(recIDs, req=None, ln=cdslang):
     #Format the records
     excel_formatted_records = format_records(recIDs, 'excel', ln=cdslang,
                                              record_separator='\n',
-                                             prologue = '<table>',
+                                             prologue = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><table>',
                                              epilogue = footer,
                                              req=req)
 
