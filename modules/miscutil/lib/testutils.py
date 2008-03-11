@@ -41,7 +41,7 @@ import unittest
 from urllib import urlencode
 from itertools import chain, repeat
 
-from invenio.config import weburl, sweburl
+from invenio.config import weburl, sweburl, CFG_LOGDIR
 from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, CFG_TESTS_REQUIRE_HTML_VALIDATION
 
 def warn_user_about_tests():
@@ -240,9 +240,11 @@ def test_web_page_content(url,
         if require_validate_p:
             valid_p, errors, warnings = w3c_validate(url_body)
             if not valid_p:
-                raise InvenioTestUtilsBrowserException, \
-                      'ERROR: Page %s (login %s) does not validate:\n %s' % \
+                error_text = 'ERROR: Page %s (login %s) does not validate:\n %s' % \
                                   (url, username, w3c_errors_to_str(errors, warnings))
+                open('%s/w3c-markup-validator.log' % CFG_LOGDIR, 'a').write(error_text)
+                raise InvenioTestUtilsBrowserException, error_text
+
 
     except mechanize.HTTPError, msg:
         error_messages.append('ERROR: Page %s (login %s) not accessible. %s' % \
