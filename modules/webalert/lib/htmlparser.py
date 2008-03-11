@@ -124,8 +124,3 @@ def get_as_text(record_id):
     out = re.sub(r"[\-:]?\s*Similar records\s*[\-:]?", "", out)
     return out.strip()
 
-if __name__ == "__main__":
-    test_recID = 11
-    print print_record(test_recID)
-    print "***"
-    print get_as_text(test_recID)

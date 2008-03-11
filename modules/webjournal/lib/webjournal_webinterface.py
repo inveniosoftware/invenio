@@ -623,5 +623,3 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     #
     #    return html_out
 
-if __name__ == "__main__":
-    index()
