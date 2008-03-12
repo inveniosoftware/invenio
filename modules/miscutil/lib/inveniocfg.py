@@ -648,8 +648,8 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
            PythonDebug On
         </Directory>
 </VirtualHost>
-""" % {'servername': conf.get('Invenio', 'CFG_SITE_URL_SECURE').replace("http://", ""),
-       'serveralias': conf.get('Invenio', 'CFG_SITE_URL_SECURE').replace("http://", "").split('.')[0],
+""" % {'servername': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("http://", ""),
+       'serveralias': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("http://", "").split('.')[0],
        'serveradmin': conf.get('Invenio', 'CFG_SITE_ADMIN_EMAIL'),
        'webdir': conf.get('Invenio', 'CFG_WEBDIR'),
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
@@ -663,7 +663,7 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
     fdesc.close()
     print "Created file", apache_vhost_file
     # write HTTPS vhost snippet:
-    if conf.get('Invenio', 'CFG_SITE_URL_SECURE') != \
+    if conf.get('Invenio', 'CFG_SITE_SECURE_URL') != \
        conf.get('Invenio', 'CFG_SITE_URL'):
         if os.path.exists(apache_vhost_ssl_file):
             shutil.copy(apache_vhost_ssl_file,
