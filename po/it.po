@@ -21,7 +21,7 @@ msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-03-11 12:12+0100\n"
-"PO-Revision-Date: 2008-03-11 12:14+0100\n"
+"PO-Revision-Date: 2008-03-12 12:06+0100\n"
 "Last-Translator: Samuele Kaplun <Samuele.Kaplun@cern.ch>\n"
 "Language-Team:  <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1497,8 +1497,7 @@ msgstr "Modifica record %(x_recid)s, campo %(x_field)s"
 #: modules/bibedit/web/admin/bibeditadmin.py:100
 #, python-format
 msgid "Edit record %(x_recid)s, field %(x_field)s - Add a subfield"
-msgstr ""
-"Modifica record %(x_recid)s, campo %(x_field)s - Aggiungi un sotto-campo"
+msgstr "Modifica record %(x_recid)s, campo %(x_field)s - Aggiungi un sotto-campo"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:128
 #, python-format
@@ -2761,8 +2760,7 @@ msgstr "Modifica cestino"
 
 #: modules/webbasket/lib/webbasket_templates.py:503
 msgid "You do not have sufficient rights to view this basket's content."
-msgstr ""
-"Non possiedi diritti sufficienti a visualizzare il contenuto del cestino."
+msgstr "Non possiedi diritti sufficienti a visualizzare il contenuto del cestino."
 
 #: modules/webbasket/lib/webbasket_templates.py:508
 #: modules/webbasket/lib/webbasket_templates.py:783
@@ -3087,8 +3085,7 @@ msgstr ""
 #: modules/webbasket/lib/webbasket_templates.py:1480
 #: modules/websession/lib/websession_templates.py:461
 #, python-format
-msgid ""
-"If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
+msgid "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr ""
 "Se lo desideri puoi %(x_url_open)sautenticarti o registrarti qui%"
 "(x_url_close)s."
@@ -3286,8 +3283,7 @@ msgstr "Pagina:"
 #: modules/webcomment/lib/webcomment_templates.py:784
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment"
-msgstr ""
-"Nota: il tuo soprannome, %s, sarà visualizzato come autore di questo commento"
+msgstr "Nota: il tuo soprannome, %s, sarà visualizzato come autore di questo commento"
 
 #: modules/webcomment/lib/webcomment_templates.py:788
 #: modules/webcomment/lib/webcomment_templates.py:843
@@ -3310,8 +3306,7 @@ msgstr "Aggiungi commento"
 
 #: modules/webcomment/lib/webcomment_templates.py:838
 #, python-format
-msgid ""
-"Note: Your nickname, %s, will be displayed as the author of this review."
+msgid "Note: Your nickname, %s, will be displayed as the author of this review."
 msgstr ""
 "Nota: il tuo soprannome, %s, verrà visualizzato come autore di questa "
 "recensione."
@@ -3745,8 +3740,7 @@ msgstr "Sei sicuro di voler svuotare interamente la tua casella di posta?"
 #: modules/webmessage/lib/webmessage_templates.py:569
 #, python-format
 msgid "Quota used: %(x_nb_used)i messages out of max. %(x_nb_total)i"
-msgstr ""
-"Quota utilizzata: %(x_nb_used)i messaggi su un massimo di %(x_nb_total)i"
+msgstr "Quota utilizzata: %(x_nb_used)i messaggi su un massimo di %(x_nb_total)i"
 
 #: modules/webmessage/lib/webmessage_templates.py:587
 msgid "Please select one or more:"
@@ -3886,8 +3880,7 @@ msgstr ""
 
 #: modules/websearch/lib/search_engine.py:2019
 #, python-format
-msgid ""
-"Search term %s did not match any record. Nearest terms in any collection are:"
+msgid "Search term %s did not match any record. Nearest terms in any collection are:"
 msgstr ""
 "Il termine di ricerca %s non corrisponde ad alcun record. I termini più "
 "vicini in tutte le collezioni sono:"
@@ -4099,9 +4092,8 @@ msgid "results"
 msgstr "risultati"
 
 #: modules/websearch/lib/websearch_templates.py:1856
-#, fuzzy
 msgid "Sort:"
-msgstr "Ordinamento :"
+msgstr "Ordinamento:"
 
 #: modules/websearch/lib/websearch_templates.py:1862
 #: modules/websearch/lib/websearch_webcoll.py:497
@@ -4170,8 +4162,7 @@ msgstr ""
 "record in %(x_nb_seconds)s secondi."
 
 #: modules/websearch/lib/websearch_templates.py:2346
-msgid ""
-"Boolean query returned no hits. Please combine your search terms differently."
+msgid "Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
 "La ricerca booleana non ha dato risultati. Vi preghiamo di combinare "
 "differentemente i termini."
@@ -4200,8 +4191,7 @@ msgstr "Potresti iniziare a sfogliare cominciando con %s."
 
 #: modules/websearch/lib/websearch_templates.py:2734
 msgid "Interested in being notified about new results for this query?"
-msgstr ""
-"Sei interessato ad essere notificato su nuovi risultati di questa ricerca?"
+msgstr "Sei interessato ad essere notificato su nuovi risultati di questa ricerca?"
 
 #: modules/websearch/lib/websearch_templates.py:2735
 #, python-format
@@ -4249,8 +4239,7 @@ msgid "in"
 msgstr "in"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:52
-msgid ""
-"Haven't found what you were looking for? Try your search on other servers:"
+msgid "Haven't found what you were looking for? Try your search on other servers:"
 msgstr "Non hai trovato quello che cercavi? Prova la ricerca su altri server:"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:80
@@ -4554,8 +4543,7 @@ msgstr "Tue ricerche"
 
 #: modules/websession/lib/websession_templates.py:414
 msgid "View all the searches you performed during the last 30 days."
-msgstr ""
-"Visualizza tutte le ricerche che hai effettuato negli ultimi 30 giorni."
+msgstr "Visualizza tutte le ricerche che hai effettuato negli ultimi 30 giorni."
 
 #: modules/websession/lib/websession_templates.py:416
 msgid ""
@@ -4691,8 +4679,7 @@ msgstr "per confermare la validità di questa richiesta."
 #: modules/websession/lib/websession_templates.py:628
 #: modules/websession/lib/websession_templates.py:665
 #, python-format
-msgid ""
-"Please note that this URL will remain valid for about %(days)s days only."
+msgid "Please note that this URL will remain valid for about %(days)s days only."
 msgstr "Nota che questa URL sarà valida solo per circa %(days)s giorni."
 
 #: modules/websession/lib/websession_templates.py:650
@@ -4708,8 +4695,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:658
 msgid "If you want to complete this account registration, please go to:"
-msgstr ""
-"Se desideri completare la registrazione di questo account, segui il link:"
+msgstr "Se desideri completare la registrazione di questo account, segui il link:"
 
 #: modules/websession/lib/websession_templates.py:684
 #, python-format
@@ -4747,13 +4733,11 @@ msgstr ""
 "seguenti."
 
 #: modules/websession/lib/websession_templates.py:759
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "If you don't own a CERN account yet, you can register a %(x_url_open)snew "
 "CERN lightweight account%(x_url_close)s."
-msgstr ""
-"Se non possiedi ancora un account CERN, puoi registrare un %(x_url_open)"
-"snuovo lightweight account CERN%(x_url_close)s."
+msgstr "Se non possiedi ancora un account CERN, puoi registrare un %(x_url_open)snuovo CERN lightweight account%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:762
 #, python-format
@@ -4769,8 +4753,7 @@ msgstr ""
 msgid ""
 "It is not possible to create an account yourself. Contact %s if you want an "
 "account."
-msgstr ""
-"Non è possibile creare da soli un account.Contatta %s se desideri un account."
+msgstr "Non è possibile creare da soli un account.Contatta %s se desideri un account."
 
 #: modules/websession/lib/websession_templates.py:789
 msgid "Login method:"
@@ -4800,8 +4783,7 @@ msgstr "Password dimenticata?"
 
 #: modules/websession/lib/websession_templates.py:828
 msgid "You can use your nickname or your email address to login."
-msgstr ""
-"Puoi utilizzare il tuo soprannome o il tuo indirizzo email per autenticarti."
+msgstr "Puoi utilizzare il tuo soprannome o il tuo indirizzo email per autenticarti."
 
 #: modules/websession/lib/websession_templates.py:852
 msgid ""
@@ -4887,8 +4869,7 @@ msgstr "Sei abilitato per i seguenti ruoli: %(x_role)s."
 
 #: modules/websession/lib/websession_templates.py:996
 msgid "Here are some interesting web admin links for you:"
-msgstr ""
-"Ecco per te alcuni interessanti collegamenti per l'amministrazione via web:"
+msgstr "Ecco per te alcuni interessanti collegamenti per l'amministrazione via web:"
 
 #: modules/websession/lib/websession_templates.py:1021
 #, python-format
@@ -5142,8 +5123,7 @@ msgstr "Un utente desidera unirsi al gruppo %s."
 
 #: modules/websession/lib/websession_templates.py:2086
 #, python-format
-msgid ""
-"Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
+msgid "Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
 msgstr ""
 "Per favore %(x_url_open)saccetta o rifiuta%(x_url_close)s la richiesta di "
 "questo utente."
@@ -5172,8 +5152,7 @@ msgstr "La tua richiesta di appartenenza al gruppo %s è stata rifiutata."
 #: modules/websession/lib/websession_templates.py:2128
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
-msgstr ""
-"Puoi consultare la lista dei  %(x_url_open)stuoi gruppi%(x_url_close)s."
+msgstr "Puoi consultare la lista dei  %(x_url_open)stuoi gruppi%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:2124
 #, python-format
@@ -5284,8 +5263,7 @@ msgstr "Per favore, attendi che l'amministratore abiliti il tuo account."
 #: modules/websession/lib/websession_webinterface.py:130
 #, python-format
 msgid "You can now go to %(x_url_open)syour account page%(x_url_close)s."
-msgstr ""
-"Puoi ora accedere alla %(x_url_open)spagina del tuo account%(x_url_close)s."
+msgstr "Puoi ora accedere alla %(x_url_open)spagina del tuo account%(x_url_close)s."
 
 #: modules/websession/lib/websession_webinterface.py:122
 #: modules/websession/lib/websession_webinterface.py:131
@@ -5297,10 +5275,8 @@ msgid "You have already confirmed the validity of your email address!"
 msgstr "Hai già confermato la validità del tuo indirizzo email!"
 
 #: modules/websession/lib/websession_webinterface.py:134
-msgid ""
-"This request for confirmation of an email address is not valid or is expired."
-msgstr ""
-"Questa richiesta di conferma di un indirizzo email non è valida od è scaduta."
+msgid "This request for confirmation of an email address is not valid or is expired."
+msgstr "Questa richiesta di conferma di un indirizzo email non è valida od è scaduta."
 
 #: modules/websession/lib/websession_webinterface.py:139
 msgid "This request for an authorization is not valid or is expired."
@@ -5312,8 +5288,7 @@ msgstr "Reimposta la password"
 
 #: modules/websession/lib/websession_webinterface.py:159
 msgid "This request for resetting the password is not valid or is expired."
-msgstr ""
-"Questa richiesta per reimpostare la password non è valida od è scaduta."
+msgstr "Questa richiesta per reimpostare la password non è valida od è scaduta."
 
 #: modules/websession/lib/websession_webinterface.py:172
 msgid "The two provided passwords aren't equal."
@@ -5348,7 +5323,6 @@ msgid "Switched to internal login method."
 msgstr "Impostata l'autenticazione tramite login interno."
 
 #: modules/websession/lib/websession_webinterface.py:312
-#, fuzzy
 msgid ""
 "Please note that if this is the first time that you are using this account "
 "with the internal login method then the system has set for you a randomly "
@@ -5357,8 +5331,7 @@ msgid ""
 msgstr ""
 "Per favore, nota che se questa è la prima volta che stai utilizzando questo "
 "account con il metodo di autenticazione interno allora il sistema ha "
-"impostato per te una password generata in maniera casuale che puoi "
-"ricuperare via email facendo clic sul seguente pulsante:"
+"impostato per te una password generata in maniera casuale. Fai clic sul pulsante che segue perché ti venga inviato via email un link per reimpostarla:"
 
 #: modules/websession/lib/websession_webinterface.py:320
 msgid "Send Password"
@@ -5488,13 +5461,10 @@ msgid "Unable to update settings."
 msgstr "Impossibile aggiornare le impostazioni."
 
 #: modules/websession/lib/websession_webinterface.py:484
-#, fuzzy
 msgid ""
 "Cannot send password reset request since you are using external "
 "authentication system."
-msgstr ""
-"Impossibile inviare la password via email perché stai utilizzando un sistema "
-"di autenticazione esterno."
+msgstr "Impossibile inviare via email la richiesta per reimpostare la password perché stai utilizzando un sistema di autenticazione esterno."
 
 #: modules/websession/lib/websession_webinterface.py:500
 msgid "The entered email address does not exist in the database."
@@ -5705,8 +5675,7 @@ msgstr "Per favore, contatta %s riportando le seguenti informazioni:"
 
 #: modules/webstyle/lib/webstyle_templates.py:766
 #, python-format
-msgid ""
-"Record created %(x_date_creation)s, last modified %(x_date_modification)s"
+msgid "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
 msgstr ""
 "Record creato %(x_date_creation)s, modificato l'ultima volta il %"
 "(x_date_modification)s"
@@ -5813,8 +5782,7 @@ msgstr "Campo del modulo sconosciuto trovato nella pagina di sottomissione."
 
 #: modules/websubmit/lib/websubmit_engine.py:514
 msgid "Unknown form field found on one of the submission pages."
-msgstr ""
-"Campo del modulo sconosciuto trovato in una delle pagine di sottomissione."
+msgstr "Campo del modulo sconosciuto trovato in una delle pagine di sottomissione."
 
 #: modules/websubmit/lib/websubmit_engine.py:1212
 msgid "Unable to find document type."
@@ -6059,8 +6027,7 @@ msgstr "Lista dei tipi di documento con referee"
 
 #: modules/websubmit/lib/websubmit_templates.py:1581
 #: modules/websubmit/lib/websubmit_templates.py:1624
-msgid ""
-"Select one of the following types of documents to check the documents status."
+msgid "Select one of the following types of documents to check the documents status."
 msgstr ""
 "Seleziona uno dei seguenti tipi di documento per verificare lo stato dei "
 "documenti."
@@ -6203,8 +6170,7 @@ msgstr "Fai clic qui"
 
 #: modules/websubmit/lib/websubmit_templates.py:2273
 #, python-format
-msgid ""
-"This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
+msgid "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
 msgstr ""
 "Questo documento è ancora %(x_fmt_open)sin attesa di approvazione%"
 "(x_fmt_close)s."
@@ -6370,8 +6336,7 @@ msgid "Take a decision"
 msgstr "Prendi una decisione"
 
 #: modules/websubmit/lib/websubmit_templates.py:2433
-msgid ""
-"An editorial board has been selected by the publication committee on the "
+msgid "An editorial board has been selected by the publication committee on the "
 msgstr ""
 "Una editorial board è stata selezionata dalla commissione della "
 "pubblicazione il "
@@ -6393,10 +6358,8 @@ msgid "A referee has been selected by the editorial board on the "
 msgstr "L'editorial board ha selezionato un referee il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2452
-msgid ""
-"The referee has sent his final recommendations to the editorial board on the "
-msgstr ""
-"Il referee ha inviato le sue raccomandazioni finali alla editorial board il "
+msgid "The referee has sent his final recommendations to the editorial board on the "
+msgstr "Il referee ha inviato le sue raccomandazioni finali alla editorial board il "
 
 #: modules/websubmit/lib/websubmit_templates.py:2460
 msgid ""
@@ -6534,8 +6497,7 @@ msgstr "limite"
 
 #: modules/websubmit/web/publiline.py:714
 msgid "users in brackets are already attached to the role, try another one..."
-msgstr ""
-"gli utenti tra parentesi sono già stati collegati al ruolo, provane altri..."
+msgstr "gli utenti tra parentesi sono già stati collegati al ruolo, provane altri..."
 
 #: modules/websubmit/web/publiline.py:720
 msgid "Removing users from the editorial board"
@@ -6577,7 +6539,6 @@ msgid "Please login to perform this action."
 msgstr "Per favore, autenticati per eseguire questa azione."
 
 #: modules/webjournal/lib/webjournal_utils.py:148
-#, fuzzy
 msgid ""
 "In order to publish webjournal issues you must be "
 "logged                         in and be authorized for this kind of task. "
@@ -6585,7 +6546,7 @@ msgid ""
 "link                         below to login."
 msgstr ""
 "Per pubblicare numeri di webjournal devi essere autenticato e autorizzato "
-"per questa azione. Se devi effettuare il login, utilizza il link sottostante."
+"per eseguire questa azione. Se devi effettuare il login, utilizza il link sottostante."
 
 #: modules/webjournal/lib/webjournal_utils.py:160
 msgid "We need you to login"
@@ -6638,18 +6599,15 @@ msgstr "Errore di configurazione interno"
 #: modules/webjournal/lib/webjournal_config.py:63
 #: modules/webjournal/lib/webjournal_config.py:95
 msgid "There is no format configured for this journals index page"
-msgstr ""
-"Non è stato configurato alcun formato per questa pagina indice di journal"
+msgstr "Non è stato configurato alcun formato per questa pagina indice di journal"
 
 #: modules/webjournal/lib/webjournal_config.py:127
 msgid "There is no format configured for this journals search page"
-msgstr ""
-"Non è stato configurato alcun formato per questa pagina di ricerca di journal"
+msgstr "Non è stato configurato alcun formato per questa pagina di ricerca di journal"
 
 #: modules/webjournal/lib/webjournal_config.py:162
 msgid "There is no format configured for this journals popup page"
-msgstr ""
-"Non è stato configurato alcun formato per questa pagina a comparsa di journal"
+msgstr "Non è stato configurato alcun formato per questa pagina a comparsa di journal"
 
 #: modules/webjournal/lib/webjournal_config.py:194
 msgid "No journal articles"
@@ -6784,3 +6742,4 @@ msgstr "Impossibile trovare l'id di questo journal nel database"
 #: modules/webjournal/lib/webjournal_config.py:630
 msgid "Available journals"
 msgstr "Journal disponibili"
+
