@@ -20,7 +20,7 @@
 submission_templatesdir = $(sysconfdir)/bibconvert/config
 submission_templates_DATA = DEMOPIC.tpl DEMOPICcreate.tpl DEMOPICmodify.tpl \
            DEMOTHE.tpl DEMOTHEcreate.tpl DEMOTHEmodify.tpl \
-           DEMOTXT.tpl DEMOTXTcreate.tpl DEMOTXTmodify.tpl \
+           DEMOART.tpl DEMOARTcreate.tpl DEMOARTmodify.tpl \
            DEMOPOE.tpl DEMOPOEcreate.tpl DEMOPOEmodify.tpl \
            DEMOBOO.tpl DEMOBOOcreate.tpl DEMOBOOmodify.tpl
 
