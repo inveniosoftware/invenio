@@ -38,10 +38,7 @@ try:
 except ImportError:
     pass
 
-import marshal
-from zlib import compress, decompress
 from socket import gethostbyname
-import time
 import os
 import crypt
 import socket
@@ -66,14 +63,12 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      sweburl, \
      CFG_TMPDIR, \
-     CFG_VERSION, \
      weburl
-from invenio import session, websession
+from invenio import session
 from invenio.dbquery import run_sql, OperationalError, \
     serialize_via_marshal, deserialize_via_marshal
 from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
-from invenio.access_control_config import *
 from invenio.access_control_admin import acc_find_user_role_actions, acc_get_role_id
 from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
 from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
@@ -82,6 +77,8 @@ from invenio.mailutils import send_email
 from invenio.errorlib import register_exception
 from invenio.webgroup_dblayer import get_groups
 from invenio.external_authentication import InvenioWebAccessExternalAuthError
+from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, \
+    CFG_WEBACCESS_MSGS, CFG_WEBACCESS_WARNING_MSGS
 import invenio.template
 tmpl = invenio.template.load('websession')
 
@@ -357,7 +354,7 @@ def confirm_email(email):
     res = run_sql('SELECT id FROM user where email=%s', (email, ))
     if res:
         if CFG_ACCESS_CONTROL_NOTIFY_ADMIN_ABOUT_NEW_ACCOUNTS:
-            sendNewAdminAccountWarning(email, CFG_SITE_ADMIN_EMAIL)
+            send_new_admin_account_warning(email, CFG_SITE_ADMIN_EMAIL)
         return res[0][0]
     else:
         return None
@@ -645,8 +642,8 @@ def update_Uid(req, p_email):
     setUid(req, query_ID)
     return query_ID
 
-def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=CFG_SITE_LANG):
-    """Send an email to the address given by sendTo about the new account newAccountEmail."""
+def send_new_admin_account_warning(new_account_email, send_to, ln=CFG_SITE_LANG):
+    """Send an email to the address given by send_to about the new account new_account_email."""
     _ = gettext_set_language(ln)
     sub = _("New account on") + " '%s'" % CFG_SITE_NAME
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
@@ -655,18 +652,9 @@ def sendNewAdminAccountWarning(newAccountEmail, sendTo, ln=CFG_SITE_LANG):
     if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS == 1:
         body += _(" and is awaiting activation")
     body += ":\n\n"
-    body += _("   Username/Email") + ": %s\n\n" % newAccountEmail
+    body += _("   Username/Email") + ": %s\n\n" % new_account_email
     body += _("You can approve or reject this account request at") + ": %s/admin/webaccess/webaccessadmin.py/manageaccounts\n" % weburl
-    return send_email(CFG_SITE_SUPPORT_EMAIL, sendTo, subject=sub, content=body)
-
-def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=CFG_SITE_LANG):
-    """Send an email to the address given by sendTo about the new account newAccountEmail."""
-    _ = gettext_set_language(ln)
-    sub = _("Your account created on") + " '%s'" % CFG_SITE_NAME
-    body = _("You have created a new account on") + " '%s'\n\n" % CFG_SITE_NAME
-    body += _("   Username/Email:") + " %s\n" % newAccountEmail
-    body += _("   Password:") + " %s\n\n" % ("*" * len(password))
-    return send_email(CFG_SITE_SUPPORT_EMAIL, sendTo, subject=sub, content=body)
+    return send_email(CFG_SITE_SUPPORT_EMAIL, send_to, subject=sub, content=body)
 
 def get_email(uid):
     """Return email address of the user uid.  Return string 'guest' in case

@@ -29,7 +29,6 @@ try:
     from mod_python import apache
 except ImportError:
     pass
-import smtplib
 from datetime import timedelta
 
 from invenio.config import \
@@ -50,7 +49,6 @@ from invenio import webbasket
 from invenio import webalert
 from invenio.dbquery import run_sql
 from invenio.webmessage import account_new_mail
-from invenio.access_control_config import *
 from invenio.access_control_engine import make_apache_message, make_list_apache_firerole
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
@@ -63,6 +61,9 @@ from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
     mail_cookie_create_pw_reset, mail_cookie_check_role, \
     mail_cookie_check_mail_activation, InvenioWebAccessMailCookieError, \
     InvenioWebAccessMailCookieDeletedError, mail_cookie_check_authorize_action
+from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS, \
+    CFG_EXTERNAL_AUTH_USING_SSO, CFG_EXTERNAL_AUTH_LOGOUT_SSO, \
+    CFG_EXTERNAL_AUTHENTICATION
 
 import invenio.template
 websession_templates = invenio.template.load('websession')
@@ -249,7 +250,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                text=_("This functionality is forbidden to guest users."),
                                                navmenuid='youraccount')
         body = ''
-        if args['verbose']==9:
+        if args['verbose'] == 9:
             user_info = webuser.collect_user_info(req)
             for key, value in user_info.items():
                 body += "<b>%s</b>:%s<br />" % (key, value)

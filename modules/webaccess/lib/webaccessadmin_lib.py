@@ -27,9 +27,7 @@ __lastupdated__ = """$Date$"""
 ## fill config variables:
 
 import re
-import os
 import random
-import smtplib
 import getopt
 import sys
 
@@ -45,20 +43,25 @@ from invenio.config import \
     CFG_SITE_LANG, \
     CFG_SITE_NAME, \
     CFG_SITE_SUPPORT_EMAIL, \
-    sweburl, \
     weburl
 import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
+from invenio.mailutils import send_email
 from invenio.bibrankadminlib import addadminbox, tupletotable, \
         tupletotable_onlyselected, addcheckboxes, createhiddenform
-from invenio.access_control_config import *
 from invenio.access_control_firerole import compile_role_definition, \
     repair_role_definitions, serialize
+from invenio.messages import gettext_set_language
 from invenio.dbquery import run_sql
 from invenio.webpage import page
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webuser import email_valid_p, get_user_preferences, \
     set_user_preferences
+from invenio.access_control_config import DEF_DEMO_USER_ROLES, \
+    DEF_DEMO_ROLES, DEF_DEMO_AUTHS, WEBACCESSACTION, MAXPAGEUSERS, \
+    SUPERADMINROLE, CFG_EXTERNAL_AUTHENTICATION, DELEGATEADDUSERROLE, \
+    CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, InvenioWebAccessFireroleError, \
+    MAXSELECTUSERS
 from invenio.bibtask import authenticate
 from cgi import escape
 
@@ -664,7 +667,7 @@ def perform_createaccount(req, email='', password='', callback='yes', confirm=0)
         if not res:
             res = run_sql("INSERT INTO user (email,password, note) values(%s,AES_ENCRYPT(email,%s), '1')", (email, password))
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT == 1:
-                emailsent = sendNewUserAccountWarning(email, email, password) == 0
+                emailsent = send_new_user_account_warning(email, email, password) == 0
             if password:
                 output += '<b><span class="info">Account created with password and activated.</span></b>'
             else:
@@ -706,7 +709,7 @@ def perform_modifyaccountstatus(req, userID, email_user_pattern, limit_to, maxpa
                 password = int(random.random() * 1000000)
                 run_sql("UPDATE user SET password=AES_ENCRYPT(email, %s) "
                     "WHERE id=%s", (password, userID))
-                emailsent = sendAccountActivatedMessage(res[0][1], res[0][1], password)
+                emailsent = send_account_activated_message(res[0][1], res[0][1], password)
                 if emailsent:
                     output += """<br /><b><span class="info">An email has been sent to the owner of the account.</span></b>"""
                 else:
@@ -1001,7 +1004,7 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
             res2 = run_sql("DELETE FROM user WHERE id=%s", (userID, ))
             output += '<b><span class="info">Account deleted.</span></b>'
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION == 1:
-                emailsent = sendAccountDeletedMessage(res[0][1], res[0][1])
+                emailsent = send_account_deleted_message(res[0][1], res[0][1])
     else:
         output += '<b><span class="info">The account id given does not exist.</span></b>'
 
@@ -1026,9 +1029,9 @@ def perform_rejectaccount(req, userID, email_user_pattern, limit_to, maxpage, pa
         output += '<b><span class="info">Account rejected and deleted.</span></b>'
         if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_DELETION == 1:
             if not res[0][2] or res[0][2] == "0":
-                emailsent = sendAccountRejectedMessage(res[0][1], res[0][1])
+                emailsent = send_account_rejected_message(res[0][1], res[0][1])
             elif res[0][2] == "1":
-                emailsent = sendAccountDeletedMessage(res[0][1], res[0][1])
+                emailsent = send_account_deleted_message(res[0][1], res[0][1])
             if emailsent:
                 output += """<br /><b><span class="info">An email has been sent to the owner of the account.</span></b>"""
             else:
@@ -3000,7 +3003,7 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
             output += 'select authorizations and perform modification.<br />\n'
 
         if not res:
-            errortext='all connections deleted, try different '
+            errortext = 'all connections deleted, try different '
             if reverse in ["0", 0]:
                 return perform_modifyauthorizations(req=req, id_role=id_role, errortext=errortext + 'action.')
             else:
@@ -3049,8 +3052,10 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
             output += '<p>no valid groups selected</p>'
 
     # trying to put extra link on the right side
-    try: body = [output, extra]
-    except NameError: body = [output]
+    try:
+        body = [output, extra]
+    except NameError:
+        body = [output]
 
     # Display the page
     return index(req=req,
@@ -3151,14 +3156,16 @@ def splitgroups(id_role=0, id_action=0, authids=[]):
     # find all the actions
     datalist = acca.acc_find_possible_actions(id_role, id_action)
 
-    if type(authids) is str: authids = [authids]
-    for i in range(len(authids)): authids[i] = int(authids[i])
+    if type(authids) is str:
+        authids = [authids]
+    for i in range(len(authids)):
+        authids[i] = int(authids[i])
 
     # argumentlistids of groups to be split
     splitgrps = []
     for authid in authids:
         hlp = datalist[authid][0]
-        if hlp not in splitgrps and authid in range(1,len(datalist)):
+        if hlp not in splitgrps and authid in range(1, len(datalist)):
             splitgrps.append(hlp)
 
     # split groups and return success or failure
@@ -3182,8 +3189,10 @@ def mergegroups(id_role=0, id_action=0, authids=[]):
 
     datalist = acca.acc_find_possible_actions(id_role, id_action)
 
-    if type(authids) is str: authids = [authids]
-    for i in range(len(authids)): authids[i] = int(authids[i])
+    if type(authids) is str:
+        authids = [authids]
+    for i in range(len(authids)):
+        authids[i] = int(authids[i])
 
     # argumentlistids of groups to be merged
     mergegroups = []
@@ -3212,8 +3221,10 @@ def deleteselected(id_role=0, id_action=0,  authids=[]):
     if not id_role or not id_action or not authids:
         return 0
 
-    if type(authids) in [str, int]: authids = [authids]
-    for i in range(len(authids)): authids[i] = int(authids[i])
+    if type(authids) in [str, int]:
+        authids = [authids]
+    for i in range(len(authids)):
+        authids[i] = int(authids[i])
 
     result = acca.acc_delete_possible_actions(id_role=id_role,
                                             id_action=id_action,
@@ -3238,14 +3249,16 @@ def headeritalic(**ids):
         elif key in ['Action', 'action']:
             value, table = 'name', 'accACTION'
         else:
-            if output: output += ' and '
+            if output:
+                output += ' and '
             output += ' %s <i>%s</i>' % (key, ids[key])
             continue
 
         res = run_sql("""SELECT %%s FROM %s WHERE id = %%s""" % table, (value, ids[key]))
 
         if res:
-            if output: output += ' and '
+            if output:
+                output += ' and '
             output += ' %s <i>%s</i>' % (key, res[0][0])
 
     return output
@@ -3271,17 +3284,20 @@ def headerstrong(query=1, **ids):
         elif key in ['Action', 'action']:
             value, table = 'name', 'accACTION'
         else:
-            if output: output += ' and '
+            if output:
+                output += ' and '
             output += ' %s <strong>%s</strong>' % (key, ids[key])
             continue
 
         if query:
             res = run_sql("""SELECT %%s FROM %s WHERE id = %%s""" % table, (value, ids[key]))
             if res:
-                if output: output += ' and '
+                if output:
+                    output += ' and '
                 output += ' %s <strong>%s</strong>' % (key, res[0][0])
         else:
-            if output: output += ' and '
+            if output:
+                output += ' and '
             output += ' %s <strong>%s</strong>' % (key, ids[key])
 
     return output
@@ -3325,7 +3341,8 @@ def perform_simpleauthorization(req, id_role=0, id_action=0):
     connected role and action. """
 
     (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0: return mustloginpage(req, auth_message)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
 
     res = acca.acc_find_possible_actions(id_role, id_action)
     if res:
@@ -3351,7 +3368,8 @@ def perform_showroleusers(req, id_role=0):
     """show a page with simple overview of a role and connected users. """
 
     (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0: return mustloginpage(req, auth_message)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
 
     res = acca.acc_get_role_users(id_role=id_role)
     name_role = acca.acc_get_role_name(id_role=id_role)
@@ -3501,8 +3519,10 @@ def cleanstring(txt='', comma=0):
     items = txt.split(',')
     txt = ''
     for item in items:
-        if not item: continue
-        if comma and txt: txt += ','
+        if not item:
+            continue
+        if comma and txt:
+            txt += ','
         # create valid variable names
         txt += re.sub(r'^([0-9_])*', '', item)
 
@@ -3541,114 +3561,57 @@ def check_email(txt=''):
     r = re.compile(r'(.)+\@(.)+\.(.)+')
     return r.match(txt) and 1 or 0
 
-def sendAccountActivatedMessage(AccountEmail, sendTo, password, ln=CFG_SITE_LANG):
-    """Send an email to the address given by sendTo about the new activated
+def send_account_activated_message(account_email, send_to, password, ln=CFG_SITE_LANG):
+    """Send an email to the address given by send_to about the new activated
     account."""
-
-    fromaddr = "From: %s" % CFG_SITE_SUPPORT_EMAIL
-    toaddrs  = "To: %s" % sendTo
-    to = toaddrs + "\n"
-    sub = "Subject: Your account on '%s' has been activated\n\n" % CFG_SITE_NAME
-    body = "Your account earlier created on '%s' has been activated:\n\n" \
+    _ = gettext_set_language(ln)
+    sub = _("Your account on '%s' has been activated") % CFG_SITE_NAME
+    body = _("Your account earlier created on '%s' has been activated:\n\n") \
         % CFG_SITE_NAME
-    body += "   Username/Email: %s\n" % AccountEmail
-    body += "   Password: %s\n" % ("*" * len(password))
+    body += _("   Username/Email: %s\n") % account_email
+    body += _("   Password: %s\n") % ("*" * len(password))
     body += "\n---------------------------------"
     body += "\n%s" % CFG_SITE_NAME
-    body += "\nContact: %s" % CFG_SITE_SUPPORT_EMAIL
-    msg = to + sub + body
 
-    server = smtplib.SMTP('localhost')
-    server.set_debuglevel(1)
+    return send_email(CFG_SITE_SUPPORT_EMAIL, send_to, sub, body, header='')
 
-    try:
-        server.sendmail(fromaddr, toaddrs, msg)
-    except smtplib.SMTPRecipientsRefused,e:
-        return 0
-
-    server.quit()
-    return 1
-
-def sendNewUserAccountWarning(newAccountEmail, sendTo, password, ln=CFG_SITE_LANG):
-    """Send an email to the address given by sendTo about the new account
-    newAccountEmail."""
-
-    fromaddr = "From: %s" % CFG_SITE_SUPPORT_EMAIL
-    toaddrs  = "To: %s" % sendTo
-    to = toaddrs + "\n"
-    sub = "Subject: Account created on '%s'\n\n" % CFG_SITE_NAME
-    body = "An account has been created for you on '%s':\n\n" % CFG_SITE_NAME
-    body += "   Username/Email: %s\n" % newAccountEmail
-    body += "   Password: %s\n" % ("*" * len(password))
+def send_new_user_account_warning(new_account_email, send_to, password, ln=CFG_SITE_LANG):
+    """Send an email to the address given by send_to about the new account
+    new_account_email."""
+    _ = gettext_set_language(ln)
+    sub = _("Account created on '%s'") % CFG_SITE_NAME
+    body = _("An account has been created for you on '%s':\n\n") % CFG_SITE_NAME
+    body += _("   Username/Email: %s\n") % new_account_email
+    body += _("   Password: %s\n") % ("*" * len(password))
     body += "\n---------------------------------"
     body += "\n%s" % CFG_SITE_NAME
-    body += "\nContact: %s" % CFG_SITE_SUPPORT_EMAIL
-    msg = to + sub + body
 
-    server = smtplib.SMTP('localhost')
-    server.set_debuglevel(1)
+    return send_email(CFG_SITE_SUPPORT_EMAIL, send_to, sub, body, header='')
 
-    try:
-        server.sendmail(fromaddr, toaddrs, msg)
-    except smtplib.SMTPRecipientsRefused,e:
-        return 0
-
-    server.quit()
-    return 1
-
-def sendAccountRejectedMessage(newAccountEmail, sendTo, ln=CFG_SITE_LANG):
-    """Send an email to the address given by sendTo about the new account
-    newAccountEmail."""
-
-    fromaddr = "From: %s" % CFG_SITE_SUPPORT_EMAIL
-    toaddrs  = "To: %s" % sendTo
-    to = toaddrs + "\n"
-    sub = "Subject: Account rejected on '%s'\n\n" % CFG_SITE_NAME
-    body = "Your request for an account has been rejected on '%s':\n\n" \
+def send_account_rejected_message(new_account_email, send_to, ln=CFG_SITE_LANG):
+    """Send an email to the address given by send_to about the new account
+    new_account_email."""
+    _ = gettext_set_language(ln)
+    sub = _("Account rejected on '%s'") % CFG_SITE_NAME
+    body = _("Your request for an account has been rejected on '%s':\n\n") \
         % CFG_SITE_NAME
-    body += "   Username/Email: %s\n" % newAccountEmail
+    body += _("   Username/Email: %s\n") % new_account_email
     body += "\n---------------------------------"
     body += "\n%s" % CFG_SITE_NAME
-    body += "\nContact: %s" % CFG_SITE_SUPPORT_EMAIL
-    msg = to + sub + body
 
-    server = smtplib.SMTP('localhost')
-    server.set_debuglevel(1)
+    return send_email(CFG_SITE_SUPPORT_EMAIL, send_to, sub, body, header='')
 
-    try:
-        server.sendmail(fromaddr, toaddrs, msg)
-    except smtplib.SMTPRecipientsRefused,e:
-        return 0
-
-    server.quit()
-    return 1
-
-def sendAccountDeletedMessage(newAccountEmail, sendTo, ln=CFG_SITE_LANG):
-    """Send an email to the address given by sendTo about the new account
-    newAccountEmail."""
-
-    fromaddr = "From: %s" % CFG_SITE_SUPPORT_EMAIL
-    toaddrs  = "To: %s" % sendTo
-    to = toaddrs + "\n"
-    sub = "Subject: Account deleted on '%s'\n\n" % CFG_SITE_NAME
-    body = "Your account on '%s' has been deleted:\n\n" % CFG_SITE_NAME
-    body += "   Username/Email: %s\n" % newAccountEmail
+def send_account_deleted_message(new_account_email, send_to, ln=CFG_SITE_LANG):
+    """Send an email to the address given by send_to about the new account
+    new_account_email."""
+    _ = gettext_set_language(ln)
+    sub = _("Account deleted on '%s'") % CFG_SITE_NAME
+    body = _("Your account on '%s' has been deleted:\n\n") % CFG_SITE_NAME
+    body += _("   Username/Email: %s\n") % new_account_email
     body += "\n---------------------------------"
     body += "\n%s" % CFG_SITE_NAME
-    body += "\nContact: %s" % CFG_SITE_SUPPORT_EMAIL
-    msg = to + sub + body
 
-    server = smtplib.SMTP('localhost')
-    server.set_debuglevel(1)
-
-    try:
-        server.sendmail(fromaddr, toaddrs, msg)
-    except smtplib.SMTPRecipientsRefused,e:
-        return 0
-
-    server.quit()
-    return 1
-
+    return send_email(CFG_SITE_SUPPORT_EMAIL, send_to, sub, body, header='')
 
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
