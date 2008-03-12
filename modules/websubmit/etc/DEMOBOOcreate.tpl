@@ -13,6 +13,6 @@ START::DEFP()---<record>
 6531xa::REP(EOL,)::MINLW(82)---<datafield tag="653" ind1="1" ind2=" "><subfield code="a"><:DEMOBOO_KW*::DEMOBOO_KW:></subfield></datafield>
 700a::REP(EOL,)::RANGE(2,1999)::MINLW(82)---<datafield tag="700" ind1=" " ind2=" "><subfield code="a"><:DEMOBOO_AU*::DEMOBOO_AU:></subfield></datafield>
 856f::REPL(EOL,)---<datafield tag="856" ind1="0" ind2=" "><subfield code="f"><:SuE::SuE:></subfield></datafield>
-8564u::REPL(EOL,)---<datafield tag="856" ind1="4" ind2=" "><subfield code="u">http://localhost/record/<:SN::SN:>/files/<:DEMOBOO_FILE_RENAMED::DEMOBOO_FILE_RENAMED:></subfield><subfield code="z">Access to files</subfield></datafield>
+8564u::REPL(EOL,)::MINLW(160)---<datafield tag="856" ind1="4" ind2=" "><subfield code="u">http://localhost/record/<:SN::SN:>/files/<:DEMOBOO_FILE_RENAMED::DEMOBOO_FILE_RENAMED:></subfield><subfield code="z">Access to files</subfield></datafield>
 980::DEFP()---<datafield tag="980" ind1=" " ind2=" "><subfield code="a">BOOK</subfield></datafield>
 END::DEFP()---</record>
