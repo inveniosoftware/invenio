@@ -33,7 +33,7 @@ from invenio.webcomment import check_recID_is_in_range, \
                                perform_request_report
 from invenio.config import CFG_SITE_LANG, \
                            weburl, \
-                           sweburl, \
+                           CFG_SITE_SECURE_URL, \
                            CFG_WEBCOMMENT_ALLOW_COMMENTS,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS
 from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
@@ -259,7 +259,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                                     argd['score'])
                 msg = _("Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s first.") % {
                           'x_url_open': '<a href="%s/youraccount/login?referer=%s">' % \
-                                        (sweburl, urllib.quote(referer)),
+                                        (CFG_SITE_SECURE_URL, urllib.quote(referer)),
                           'x_url_close': '</a>'}
                 return page(title=_("Login"),
                             body=msg,

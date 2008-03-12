@@ -33,7 +33,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_SUPPORT_EMAIL, \
-     sweburl, \
+     CFG_SITE_SECURE_URL, \
      weburl, \
      CFG_VERSION
 from invenio.messages import gettext_set_language, language_list_long
@@ -317,7 +317,7 @@ class Template:
              &nbsp;
        </td>
        <td class="headermoduleboxbody%(personalize_selected)s">
-             <a class="header%(personalize_selected)s" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>
+             <a class="header%(personalize_selected)s" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
@@ -346,8 +346,8 @@ class Template:
 </div>
         """ % {
           'weburl' : weburl,
-          'sweburl' : sweburl,
-          'cssurl' : secure_page_p and sweburl or weburl,
+          'sitesecureurl' : CFG_SITE_SECURE_URL,
+          'cssurl' : secure_page_p and CFG_SITE_SECURE_URL or weburl,
           'rssurl': rssurl,
           'ln' : ln,
           'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
@@ -415,7 +415,7 @@ class Template:
 %(pagefooteradd)s
 <!-- replaced page footer -->
  <div class="pagefooterstripeleft">
-  %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/submit?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/help/%(langlink)s">%(msg_help)s</a>
+  %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/submit?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/help/%(langlink)s">%(msg_help)s</a>
   <br />
   %(msg_poweredby)s <a class="footer" href="http://cdsware.cern.ch/">CDS Invenio</a> v%(version)s
   <br />
@@ -432,7 +432,7 @@ class Template:
 </html>
         """ % {
           'weburl' : weburl,
-          'sweburl' : sweburl,
+          'sitesecureurl' : CFG_SITE_SECURE_URL,
           'ln' : ln,
           'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
 

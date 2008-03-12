@@ -28,7 +28,7 @@ import sys
 import invenio.websearchadminlib as wsc
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box, adderrorbox
-from invenio.config import weburl, sweburl, CFG_SITE_LANG, CFG_SITE_NAME
+from invenio.config import weburl, CFG_SITE_SECURE_URL, CFG_SITE_LANG, CFG_SITE_NAME
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import gettext_set_language
@@ -657,7 +657,7 @@ def addexistingfield(req, colID, ln=CFG_SITE_LANG, fldID=-1, fldvID=-1, fmeth=''
                 uid=uid,
                 body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (sweburl, weburl)]),
+                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -687,7 +687,7 @@ def rearrangefield(req, colID, ln=CFG_SITE_LANG, fmeth='', callback='yes', confi
                 uid=uid,
                 body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (sweburl, weburl)]),
+                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -717,7 +717,7 @@ def addexistingfieldvalue(req, colID, fldID, ln=CFG_SITE_LANG, callback='yes', c
                 uid=uid,
                 body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (sweburl, weburl)]),
+                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -747,7 +747,7 @@ def rearrangefieldvalue(req, colID, fldID, ln=CFG_SITE_LANG, callback='yes', con
                 uid=uid,
                 body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (sweburl, weburl)]),
+                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
@@ -933,7 +933,7 @@ def addexistingportalbox(req, colID, ln=CFG_SITE_LANG, pbxID=-1, score=0, positi
                 uid=uid,
                 body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (sweburl, weburl)]),
+                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, weburl)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 

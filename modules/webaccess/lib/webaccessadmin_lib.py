@@ -43,6 +43,7 @@ from invenio.config import \
     CFG_SITE_LANG, \
     CFG_SITE_NAME, \
     CFG_SITE_SUPPORT_EMAIL, \
+    CFG_SITE_SECURE_URL, \
     weburl
 import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
@@ -814,7 +815,7 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
     #output = ""
     #if res:
         #text = """To modify the baskets for this account, you have to login as the user."""
-        #output += createhiddenform(action="%s/youraccount/login?" % sweburl,
+        #output += createhiddenform(action="%s/youraccount/login?" % CFG_SITE_SECURE_URL,
                                 #text=text,
                                 #p_email=res[0][1],
                                 #p_pw=res[0][2],
@@ -907,7 +908,7 @@ def perform_modifylogindata(req, userID, nickname='', email='', password='', cal
     #output = ""
     #if res:
         #text = """To modify the alerts for this account, you have to login as the user."""
-        #output += createhiddenform(action="%s/youraccount/login?" % sweburl,
+        #output += createhiddenform(action="%s/youraccount/login?" % CFG_SITE_SECURE_URL,
                                 #text=text,
                                 #p_email=res[0][1],
                                 #p_pw=res[0][2],

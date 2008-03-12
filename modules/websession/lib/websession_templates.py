@@ -32,7 +32,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_SUPPORT_EMAIL, \
-     sweburl, \
+     CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
      weburl
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
@@ -126,7 +126,7 @@ class Template:
 
         out = """
                 <p><big><strong class="headline">%(edit_params)s</strong></big></p>
-                <form method="post" action="%(sweburl)s/youraccount/change" name="edit_logins_settings">
+                <form method="post" action="%(sitesecureurl)s/youraccount/change" name="edit_logins_settings">
                 <p>%(change_user)s</p>
                 <table>
                   <tr><td align="right" valign="top"><strong>
@@ -169,13 +169,13 @@ class Template:
                 'set_values' : _("Set new values"),
                 'email' : email,
                 'email_disabled' : email_disabled and "readonly" or "",
-                'sweburl': sweburl,
+                'sitesecureurl': CFG_SITE_SECURE_URL,
                 'fixed_nickname_note' : _('Since this is considered as a signature for comments and reviews, once set it can not be changed.')
             }
 
         if not password_disabled and not CFG_EXTERNAL_AUTH_USING_SSO:
             out += """
-                <form method="post" action="%(sweburl)s/youraccount/change" name="edit_password">
+                <form method="post" action="%(sitesecureurl)s/youraccount/change" name="edit_password">
                 <p>%(change_pass)s</p>
                 <table>
                   <tr>
@@ -222,14 +222,14 @@ class Template:
                     'retype_password' : _("Retype password"),
                     'set_values' : _("Set new password"),
                     'password_disabled' : password_disabled and "disabled" or "",
-                    'sweburl': sweburl,
+                    'sitesecureurl': CFG_SITE_SECURE_URL,
                 }
         elif not CFG_EXTERNAL_AUTH_USING_SSO and CFG_CERN_SITE:
             out += "<p>" + _("""If you are using a lightweight CERN account you can
                 %(x_url_open)sreset the password%(x_url_close)s.""") % \
                     {'x_url_open' : \
                         '<a href="http://cern.ch/LightweightRegistration/ResetPassword.aspx%s">' \
-                        % (make_canonical_urlargd({'email': email, 'returnurl' : sweburl + '/youraccount/edit' + make_canonical_urlargd({'lang' : ln}, {})}, {})), 'x_url_close' : '</a>'} + "</p>"
+                        % (make_canonical_urlargd({'email': email, 'returnurl' : CFG_SITE_SECURE_URL + '/youraccount/edit' + make_canonical_urlargd({'lang' : ln}, {})}, {})), 'x_url_close' : '</a>'} + "</p>"
         elif CFG_EXTERNAL_AUTH_USING_SSO and CFG_CERN_SITE:
             out += "<p>" + _("""You can change or reset your CERN account password by means of the %(x_url_open)sCERN account system%(x_url_close)s.""") % \
                 {'x_url_open' : '<a href="https://cern.ch/login/password.aspx">', 'x_url_close' : '</a>'} + "</p>"
@@ -241,7 +241,7 @@ class Template:
     def tmpl_user_websearch_edit(self, ln, current = 10, show_latestbox = True, show_helpbox = True):
         _ = gettext_set_language(ln)
         out = """
-            <form method="post" action="%(sweburl)s/youraccount/change" name="edit_websearch_settings">
+            <form method="post" action="%(sitesecureurl)s/youraccount/change" name="edit_websearch_settings">
               <p><big><strong class="headline">%(edit_websearch_settings)s</strong></big></p>
               <table>
                 <tr><td align="right"><input type="checkbox" %(checked_latestbox)s value="1" name="latestbox" /></td>
@@ -250,7 +250,7 @@ class Template:
                 <td valign="top"><b>%(show_helpbox)s</b></td></tr>
                 <tr><td align="right"><select name="group_records">
         """ % {
-          'sweburl' : sweburl,
+          'sitesecureurl' : CFG_SITE_SECURE_URL,
           'edit_websearch_settings' : _("Edit search-related settings"),
           'show_latestbox' : _("Show the latest additions box"),
           'checked_latestbox' : show_latestbox and 'checked="checked"' or '',
@@ -292,7 +292,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-                 <form method="post" action="%(sweburl)s/youraccount/change">
+                 <form method="post" action="%(sitesecureurl)s/youraccount/change">
                    <big><strong class="headline">%(edit_method)s</strong></big>
                    <p>%(explain_method)s:</p>
                    <table>
@@ -301,7 +301,7 @@ class Template:
                  'edit_method' : _("Edit login method"),
                  'explain_method' : _("Please select which login method you would like to use to authenticate yourself"),
                  'select_method' : _("Select method"),
-                 'sweburl': sweburl,
+                 'sitesecureurl': CFG_SITE_SECURE_URL,
                }
         for system in methods:
             out += """<input type="radio" name="login_method" value="%(system)s" %(disabled)s %(selected)s />%(system)s<br />""" % {
@@ -359,7 +359,7 @@ class Template:
 
         if CFG_CERN_SITE:
             out += "<p>" + _("If you have been using the %(x_fmt_open)sCERN login system%(x_fmt_close)s, then you can recover your password through the %(x_url_open)sCERN authentication system%(x_url_close)s.") % {'x_fmt_open' : '<em>', 'x_fmt_close' : '</em>', 'x_url_open' : '<a href="https://cern.ch/lightweightregistration/ResetPassword.aspx%s">' \
-            % make_canonical_urlargd({'lf': 'auth', 'returnURL' : sweburl + '/youraccount/login?ln='+ln}, {}), 'x_url_close' : '</a>'} + " "
+            % make_canonical_urlargd({'lf': 'auth', 'returnURL' : CFG_SITE_SECURE_URL + '/youraccount/login?ln='+ln}, {}), 'x_url_close' : '</a>'} + " "
         else:
             out += "<p>" + _("Note that if you have been using an external login system, then we cannot do anything and you have to ask there.") + " "
         out += _("Alternatively, you can ask %s to change your login system from external to internal.") % ("""<a href="mailto:%(email)s">%(email)s</a>""" % { 'email' : CFG_SITE_SUPPORT_EMAIL }) + "</p>"
@@ -458,7 +458,7 @@ class Template:
             msg = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session.") + ' '
         elif (type=='alerts'):
             msg = _("You are logged in as a guest user, so your alerts will disappear at the end of the current session.") + ' '
-        msg += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.") % {'x_url_open': '<a href="' + sweburl + '/youraccount/login?ln=' + ln + '">',
+        msg += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.") % {'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
                                                                                                'x_url_close': '</a>'}
         return """<table class="errorbox" summary="">
                             <tr>
@@ -482,9 +482,9 @@ class Template:
 
         out = _("You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings%(x_url2_close)s.") %\
             {'x_user': user,
-             'x_url1_open': '<a href="' + sweburl + '/youraccount/logout?ln=' + ln + '">',
+             'x_url1_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/logout?ln=' + ln + '">',
              'x_url1_close': '</a>',
-             'x_url2_open': '<a href="' + sweburl + '/youraccount/edit?ln=' + ln + '">',
+             'x_url2_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/edit?ln=' + ln + '">',
              'x_url2_close': '</a>',
              }
         return out + "<br /><br />"
@@ -620,7 +620,7 @@ class Template:
                 ),
             'intro2' : _("If you want to reset the password for this account, please go to:"),
             'link' : "%s/youraccount/access%s" %
-                (sweburl, make_canonical_urlargd({
+                (CFG_SITE_SECURE_URL, make_canonical_urlargd({
                     'ln' : ln,
                     'mailcookie' : reset_key
                 }, {})),
@@ -657,7 +657,7 @@ class Template:
                 ),
             'intro2' : _("If you want to complete this account registration, please go to:"),
             'link' : "%s/youraccount/access%s" %
-                (sweburl, make_canonical_urlargd({
+                (CFG_SITE_SECURE_URL, make_canonical_urlargd({
                     'ln' : ln,
                     'mailcookie' : address_activation_key
                 }, {})),
@@ -1046,9 +1046,9 @@ class Template:
         out = """<img src="%s/img/user-icon-1-20x20.gif" border="0" alt=""/> """ % weburl
         if guest:
             out += """%(guest_msg)s ::
-                   <a class="userinfo" href="%(sweburl)s/youraccount/login?ln=%(ln)s%(referer)s">%(login)s</a>""" % {
+                   <a class="userinfo" href="%(sitesecureurl)s/youraccount/login?ln=%(ln)s%(referer)s">%(login)s</a>""" % {
                      'weburl' : weburl,
-                     'sweburl': sweburl,
+                     'sitesecureurl': CFG_SITE_SECURE_URL,
                      'ln' : ln,
                      'guest_msg' : _("guest"),
                      'session' : _("session"),
@@ -1059,7 +1059,7 @@ class Template:
                    }
         else:
             out += """%(username)s ::
-               <a class="userinfo" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a> ::
+               <a class="userinfo" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a> ::
                    <a class="userinfo" href="%(weburl)s/yourmessages/display?ln=%(ln)s">%(messages)s</a> ::
                    <a class="userinfo" href="%(weburl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> ::
                    <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
@@ -1067,7 +1067,7 @@ class Template:
                    <a class="userinfo" href="%(weburl)s/stats/?ln=%(ln)s">%(stats)s</a> :: """ % {
                      'username' : username,
                      'weburl' : weburl,
-                     'sweburl' : sweburl,
+                     'sitesecureurl' : CFG_SITE_SECURE_URL,
                      'ln' : ln,
                      'account' : _("account"),
                      'alerts' : _("alerts"),
@@ -1089,13 +1089,13 @@ class Template:
                          'approvals' : _("approvals"),
                        }
             if admin:
-                out += """<a class="userinfo" href="%(sweburl)s/youraccount/youradminactivities?ln=%(ln)s">%(administration)s</a> :: """ % {
-                         'sweburl' : sweburl,
+                out += """<a class="userinfo" href="%(sitesecureurl)s/youraccount/youradminactivities?ln=%(ln)s">%(administration)s</a> :: """ % {
+                         'sitesecureurl' : CFG_SITE_SECURE_URL,
                          'ln' : ln,
                          'administration' : _("administration"),
                        }
-            out += """<a class="userinfo" href="%(sweburl)s/youraccount/logout?ln=%(ln)s">%(logout)s</a>""" % {
-                     'sweburl' : sweburl,
+            out += """<a class="userinfo" href="%(sitesecureurl)s/youraccount/logout?ln=%(ln)s">%(logout)s</a>""" % {
+                     'sitesecureurl' : CFG_SITE_SECURE_URL,
                      'ln' : ln,
                      'logout' : _("logout"),
                    }

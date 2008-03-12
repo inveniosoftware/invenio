@@ -49,7 +49,7 @@ from invenio.config import \
      CFG_PYLIBDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
-     sweburl, \
+     CFG_SITE_SECURE_URL, \
      CFG_VERSION
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
@@ -127,8 +127,8 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
         else:
             t = doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, ln)
         return page(title="specific publication line",
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
-                                 'sweburl' : sweburl,
+                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display">%(account)s</a>""" % {
+                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'account' : _("Your Account"),
                               },
                     body=t,
@@ -148,8 +148,8 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
         else:
             t = displayDocument(req, doctype, categ, RN, send, ln)
         return page(title="publication line",
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
-                                 'sweburl' : sweburl,
+                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display">%(account)s</a>""" % {
+                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'account' : _("Your Account"),
                               },
                     body=t,

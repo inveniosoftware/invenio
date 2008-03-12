@@ -32,7 +32,7 @@ from mimetypes import MimeTypes
 from invenio.dbquery import run_sql, DatabaseError
 from invenio.errorlib import register_exception
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, weburl, CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR, CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, sweburl
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, weburl, CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR, CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -1352,7 +1352,7 @@ def bibdocfile_url_to_fullpath(url):
 def bibdocfile_url_p(url):
     """Return True when the url is a potential valid url pointing to a
     fulltext owned by a system."""
-    if not (url.startswith('%s/record/' % weburl) or url.startswith('%s/record/' % sweburl)):
+    if not (url.startswith('%s/record/' % weburl) or url.startswith('%s/record/' % CFG_SITE_SECURE_URL)):
         return False
     splitted_url = url.split('/files/')
     return len(splitted_url) == 2 and splitted_url[0] != '' and splitted_url[1] != ''
@@ -1361,8 +1361,8 @@ def decompose_bibdocfile_url(url):
     """Given a bibdocfile_url return a triple (recid, docname, format)."""
     if url.startswith('%s/record/' % weburl):
         recid_file = url[len('%s/record/' % weburl):]
-    elif url.startswith('%s/record/' % sweburl):
-        recid_file = url[len('%s/record/' % sweburl):]
+    elif url.startswith('%s/record/' % CFG_SITE_SECURE_URL):
+        recid_file = url[len('%s/record/' % CFG_SITE_SECURE_URL):]
     else:
         raise InvenioWebSubmitFileError, "Url %s doesn't correspond to a valid record inside the system." % url
     recid_file = recid_file.replace('/files/', '/')

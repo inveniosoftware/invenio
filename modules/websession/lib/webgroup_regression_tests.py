@@ -26,7 +26,7 @@
 __revision__ = "$Id$"
 
 from mechanize import Browser
-from invenio.config import sweburl, CFG_SITE_ADMIN_EMAIL
+from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_ADMIN_EMAIL
 
 from invenio.dbquery import run_sql
 from invenio.webgroup import synchronize_external_groups, synchronize_all_external_groups
@@ -113,7 +113,7 @@ class WebGroupTest(unittest.TestCase):
     def test_external_groups_visibility_groupspage(self):
         """webgroup - external group visibility in groups page"""
         browser = Browser()
-        browser.open(sweburl + "/youraccount/login")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
         browser.select_form(nr=0)
         browser['p_un'] = 'admin'
         browser['p_pw'] = ''
@@ -127,7 +127,7 @@ class WebGroupTest(unittest.TestCase):
             self.fail("Expected to see %s, got %s." % \
                       (expected_response, login_response_body))
 
-        browser.open(sweburl + "/yourgroups/display")
+        browser.open(CFG_SITE_SECURE_URL + "/yourgroups/display")
         expected_response = self.goodgroup
         groups_body = browser.response().read()
         try:
@@ -148,7 +148,7 @@ class WebGroupTest(unittest.TestCase):
     def test_external_groups_visibility_messagespage(self):
         """webgroup - external group visibility in messages page"""
         browser = Browser()
-        browser.open(sweburl + "/youraccount/login")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
         browser.select_form(nr=0)
         browser['p_un'] = 'admin'
         browser['p_pw'] = ''
@@ -162,7 +162,7 @@ class WebGroupTest(unittest.TestCase):
             self.fail("Expected to see %s, got %s." % \
                       (expected_response, login_response_body))
 
-        browser.open(sweburl + "/yourmessages/write")
+        browser.open(CFG_SITE_SECURE_URL + "/yourmessages/write")
         browser.select_form(nr=0)
         browser['search_pattern'] = 'b'
         browser.submit(name='search_group')

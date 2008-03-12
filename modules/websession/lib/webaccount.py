@@ -30,7 +30,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
-     sweburl, \
+     CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
      weburl
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, SUPERADMINROLE
@@ -112,7 +112,7 @@ def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
     #your account
     if isGuestUser(uid):
         user = "guest"
-        login = "%s/youraccount/login?ln=%s" % (sweburl, ln)
+        login = "%s/youraccount/login?ln=%s" % (CFG_SITE_SECURE_URL, ln)
         accBody = _("You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)s as a regular user.") %\
             {'x_url_open': '<a href="' + login + '">',
              'x_url_close': '</a>'}

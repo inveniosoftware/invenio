@@ -87,7 +87,6 @@ def convert_conf_option(option_name, option_value):
 
     ## also, adjust some conf names due to backwards compatibility:
     option_name_replace_data = {'CFG_SITE_URL': 'weburl',
-                                'CFG_SITE_SECURE_URL': 'sweburl',
                                 }
     if option_name_replace_data.has_key(option_name):
         option_name = option_name_replace_data[option_name]
@@ -159,7 +158,6 @@ def cli_cmd_update_config_py(conf):
                                                                             "CFG_SITE_NAME_INTL_" + lang)))
     ## special treatment for new CFG_SITE_URL options: (FIXME: remove them when weburl is phased out)
     fdesc.write("CFG_SITE_URL = '%s'\n" % conf.get("Invenio", "CFG_SITE_URL"))
-    fdesc.write("CFG_SITE_SECURE_URL = '%s'\n" % conf.get("Invenio", "CFG_SITE_SECURE_URL"))
     ## process all the options normally:
     for section in conf.sections():
         for option in conf.options(section):

@@ -400,7 +400,7 @@ page functionality:
 <blockquote>
 <pre>
 browser = mechanize.Browser()
-browser.open(sweburl + "/youraccount/login")
+browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
 browser.select_form(nr=0)
 browser['p_un'] = 'userfoo'
 browser['p_pw'] = 'passbar'

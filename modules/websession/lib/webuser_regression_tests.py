@@ -31,7 +31,7 @@ import unittest
 from mechanize import Browser
 
 from invenio.dbquery import run_sql
-from invenio.config import sweburl, CFG_SITE_ADMIN_EMAIL
+from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_ADMIN_EMAIL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -45,7 +45,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
     def test_password_setting(self):
         """webuser - check password settings"""
         browser = Browser()
-        browser.open(sweburl + "/youraccount/login")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
         browser.select_form(nr=0)
         browser['p_un'] = 'admin'
         browser['p_pw'] = ''
@@ -60,7 +60,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
                       (expected_response, login_response_body))
 
         # Going to set new password from "" to "123"
-        browser.open(sweburl + "/youraccount/edit")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit")
         browser.select_form(name="edit_password")
         browser['old_password'] = ""
         browser['password'] = "123"
@@ -75,7 +75,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
                     (expected_response, change_password_body))
 
         # Going to set a wrong old password
-        browser.open(sweburl + "/youraccount/edit")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit")
         browser.select_form(name="edit_password")
         browser['old_password'] = "321"
         browser['password'] = "123"
@@ -90,7 +90,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
                     (expected_response, change_password_body))
 
         # Going to put different new passwords
-        browser.open(sweburl + "/youraccount/edit")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit")
         browser.select_form(name="edit_password")
         browser['old_password'] = "123"
         browser['password'] = "123"
@@ -105,7 +105,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
                     (expected_response, change_password_body))
 
         # Reset the situation
-        browser.open(sweburl + "/youraccount/edit")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit")
         browser.select_form(name="edit_password")
         browser['old_password'] = "123"
         browser['password'] = ""
@@ -122,7 +122,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
     def test_email_caseless(self):
         """webuser - check email caseless"""
         browser = Browser()
-        browser.open(sweburl + "/youraccount/register")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/register")
         browser.select_form(nr=0)
         browser['p_email'] = 'foo@cds.cern.ch'
         browser['p_nickname'] = 'foobar'
@@ -140,7 +140,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
 
 
         browser = Browser()
-        browser.open(sweburl + "/youraccount/register")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/register")
         browser.select_form(nr=0)
         browser['p_email'] = 'foo@cds.cern.ch'
         browser['p_nickname'] = 'foobar2'
@@ -157,7 +157,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
                       (expected_response, login_response_body))
 
         browser = Browser()
-        browser.open(sweburl + "/youraccount/register")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/register")
         browser.select_form(nr=0)
         browser['p_email'] = 'FOO@cds.cern.ch'
         browser['p_nickname'] = 'foobar2'
@@ -178,7 +178,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
 
         # logging in as admin
         browser = Browser()
-        browser.open(sweburl + "/youraccount/login")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
         browser.select_form(nr=0)
         browser['p_un'] = 'admin'
         browser['p_pw'] = ''
@@ -193,7 +193,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
                       (expected_response, login_response_body))
 
         # Going to edit page and setting records per group to 20
-        browser.open(sweburl + "/youraccount/edit")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit")
         browser.select_form(name="edit_websearch_settings")
         browser['group_records'] = ["20"]
         browser.submit()
@@ -207,7 +207,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
                       (expected_response, changed_settings_body))
 
         # Going to the search page, making an empty search
-        browser.open(sweburl)
+        browser.open(CFG_SITE_SECURE_URL)
         browser.select_form(nr=0)
         browser.submit()
         expected_response = "1 - 20"
@@ -219,7 +219,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
                       (expected_response, records_found_body))
 
         # Going again to edit and setting records per group back to 10
-        browser.open(sweburl + "/youraccount/edit")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/edit")
         browser.select_form(name="edit_websearch_settings")
         browser['group_records'] = ["10"]
         browser.submit()
@@ -233,7 +233,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
                       (expected_response, changed_settings_body))
 
         # Logging out!
-        browser.open(sweburl + "/youraccount/logout")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/logout")
         expected_response = "You are no longer recognized"
         logout_response_body = browser.response().read()
         try:
@@ -243,7 +243,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
                       (expected_response, logout_response_body))
 
         # Logging in again
-        browser.open(sweburl + "/youraccount/login")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
         browser.select_form(nr=0)
         browser['p_un'] = 'admin'
         browser['p_pw'] = ''
@@ -258,7 +258,7 @@ class WebSessionYourSettingsTest(unittest.TestCase):
                       (expected_response, login_response_body))
 
         # Let's go to search and check that the setting is still there
-        browser.open(sweburl)
+        browser.open(CFG_SITE_SECURE_URL)
         browser.select_form(nr=0)
         browser.submit()
         expected_response = "1 - 10"

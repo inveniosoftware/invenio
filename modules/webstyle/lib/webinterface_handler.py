@@ -45,12 +45,12 @@ try:
 except ImportError:
     pass
 
-from invenio.config import CFG_SITE_LANG, weburl, sweburl, CFG_TMPDIR
+from invenio.config import CFG_SITE_LANG, weburl, CFG_SITE_SECURE_URL, CFG_TMPDIR
 from invenio.messages import wash_language
 from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
 
-has_https_support = weburl != sweburl
+has_https_support = weburl != CFG_SITE_SECURE_URL
 
 
 DEBUG = False
@@ -164,10 +164,10 @@ class WebInterfaceDirectory(object):
 
             if not is_over_https:
                 # We need to isolate the part of the URI that is after
-                # weburl, and append that to our sweburl.
+                # weburl, and append that to our CFG_SITE_SECURE_URL.
                 original_parts = urlparse.urlparse(req.unparsed_uri)
                 plain_prefix_parts = urlparse.urlparse(weburl)
-                secure_prefix_parts = urlparse.urlparse(sweburl)
+                secure_prefix_parts = urlparse.urlparse(CFG_SITE_SECURE_URL)
 
                 # Compute the new path
                 plain_path = original_parts[2]

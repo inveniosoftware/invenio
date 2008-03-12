@@ -29,7 +29,7 @@ __revision__ = \
 import unittest
 
 from mechanize import Browser
-from invenio.config import sweburl, CFG_SITE_ADMIN_EMAIL
+from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_ADMIN_EMAIL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 from invenio.dbquery import run_sql
@@ -40,7 +40,7 @@ class WebSessionWebPagesAvailabilityTest(unittest.TestCase):
     def test_your_account_pages_availability(self):
         """websession - availability of Your Account pages"""
 
-        baseurl = sweburl + '/youraccount/'
+        baseurl = CFG_SITE_SECURE_URL + '/youraccount/'
 
         _exports = ['', 'edit', 'change', 'lost', 'display',
                     'send_email', 'youradminactivities',
@@ -56,7 +56,7 @@ class WebSessionWebPagesAvailabilityTest(unittest.TestCase):
     def test_your_groups_pages_availability(self):
         """websession - availability of Your Groups pages"""
 
-        baseurl = sweburl + '/yourgroups/'
+        baseurl = CFG_SITE_SECURE_URL + '/yourgroups/'
 
         _exports = ['', 'display', 'create', 'join', 'leave', 'edit', 'members']
 
@@ -77,7 +77,7 @@ class WebSessionLostYourPasswordTest(unittest.TestCase):
 
         # click on "send lost password" for CFG_SITE_ADMIN_EMAIL internal account
         browser = Browser()
-        browser.open(sweburl + "/youraccount/lost")
+        browser.open(CFG_SITE_SECURE_URL + "/youraccount/lost")
         browser.select_form(nr=0)
         browser['p_email'] = try_with_account
         try:

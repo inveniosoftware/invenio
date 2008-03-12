@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
-     CFG_VERSION, sweburl
+     CFG_VERSION, CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql_cached, ProgrammingError
 import invenio.access_control_admin as aca
 from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
@@ -71,7 +71,7 @@ def _format_list_of_apache_firerole(roles, referer):
         for name, description in roles:
             out += "<tr>"
             out += "<td><a href='%s'>%s</a></td><td> - <em>%s</em></td>" % \
-            ('%s%s' % (sweburl, make_canonical_urlargd({'realm' : name, 'referer' : referer}, {})), name, description)
+            ('%s%s' % (CFG_SITE_SECURE_URL, make_canonical_urlargd({'realm' : name, 'referer' : referer}, {})), name, description)
             out += "</tr>"
         out += "</table>"
         out += "</p>"
@@ -85,7 +85,7 @@ def make_apache_message(name_action, arguments, referer=None):
     Apache Passwords restricted collections to FireRole roles.
     Please use it with care."""
     if not referer:
-        referer = '%s/youraccount/youradminactivities' % sweburl
+        referer = '%s/youraccount/youradminactivities' % CFG_SITE_SECURE_URL
     roles = make_list_apache_firerole(name_action, arguments)
     if roles:
         return _format_list_of_apache_firerole(roles, referer)

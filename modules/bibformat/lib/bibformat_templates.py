@@ -28,7 +28,7 @@ import cgi
 
 # Invenio imports
 from invenio.messages import gettext_set_language
-from invenio.config import weburl, sweburl
+from invenio.config import weburl, CFG_SITE_SECURE_URL
 from invenio.messages import language_list_long
 from invenio.config import CFG_PATH_PHP
 
@@ -574,7 +574,7 @@ class Template:
                'template_editor': _("Template Editor"),
                'check_dependencies': _("Check Dependencies"),
                'nb_menu_options': nb_menu_options,
-               'weburl': sweburl or weburl
+               'weburl': CFG_SITE_SECURE_URL or weburl
                }
 
         if not filename.endswith('.xsl'):
@@ -588,7 +588,7 @@ class Template:
                'modify_template_attributes': _("Modify Template Attributes"),
                'template_editor': _("Template Editor"),
                'check_dependencies': _("Check Dependencies"),
-               'weburl': sweburl or weburl
+               'weburl': CFG_SITE_SECURE_URL or weburl
                }
 
         out +='''
@@ -619,7 +619,7 @@ class Template:
                'modify_template_attributes': _("Modify Template Attributes"),
                'template_editor': _("Template Editor"),
                'check_dependencies': _("Check Dependencies"),
-               'weburl': sweburl or weburl
+               'weburl': CFG_SITE_SECURE_URL or weburl
                }
 
         disabled = ""
@@ -816,7 +816,7 @@ class Template:
         }
         }
         </script>
-        ''' % {'weburl': sweburl or weburl}
+        ''' % {'weburl': CFG_SITE_SECURE_URL or weburl}
 
         if len(format_elements) == 0:
             out += '''

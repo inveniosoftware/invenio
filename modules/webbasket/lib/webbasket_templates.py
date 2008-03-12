@@ -29,7 +29,7 @@ from invenio.webbasket_config import \
                        CFG_WEBBASKET_SHARE_LEVELS, \
                        CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
 from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
-from invenio.config import weburl, sweburl, CFG_SITE_LANG
+from invenio.config import weburl, CFG_SITE_SECURE_URL, CFG_SITE_LANG
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
 
@@ -1463,7 +1463,7 @@ class Template:
         _ = gettext_set_language(ln)
         message = _("You are logged in as a guest user, so your baskets will disappear at the end of the current session.") + ' '
         message += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.") %\
-            {'x_url_open': '<a href="' + sweburl + '/youraccount/login?ln=' + ln + '">',
+            {'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
              'x_url_close': '</a>'}
         out = """
 <table class="errorbox">
@@ -1478,7 +1478,7 @@ class Template:
         _ = gettext_set_language(ln)
         message = _("This functionality is forbidden to guest users.") + ' '
         message += _("If you wish you can %(x_url_open)slogin or register here%(x_url_close)s.") %\
-            {'x_url_open': '<a href="' + sweburl + '/youraccount/login?ln=' + ln + '">',
+            {'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/login?ln=' + ln + '">',
              'x_url_close': '</a>'}
         out = """
 <table class="errorbox">

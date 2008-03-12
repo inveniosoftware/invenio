@@ -29,7 +29,7 @@ import zlib
 import urllib
 from mod_python import apache
 
-from invenio.config import weburl, sweburl, CFG_SITE_LANG, CFG_SITE_NAME, \
+from invenio.config import weburl, CFG_SITE_SECURE_URL, CFG_SITE_LANG, CFG_SITE_NAME, \
   CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_SITE_NAME_INTL
 from invenio.webpage import page
 from invenio import webalert
@@ -68,7 +68,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/display%s" % (
                         weburl,
@@ -77,8 +77,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         return page(title=_("Display searches"),
                     body=webalert.perform_display(argd['p'], uid, ln=argd['ln']),
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
-                                 'sweburl' : sweburl,
+                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
@@ -108,7 +108,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/input%s" % (
                         weburl,
@@ -128,8 +128,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                    )
         return page(title=_("Set a new alert"),
                     body=html,
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
-                                 'sweburl' : sweburl,
+                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
@@ -160,7 +160,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/modify%s" % (
                         weburl,
@@ -180,8 +180,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                    )
         return page(title=_("Modify alert settings"),
                     body=html,
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
-                                 'sweburl' : sweburl,
+                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
@@ -205,7 +205,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/list%s" % (
                         weburl,
@@ -217,8 +217,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         return page(title=_("Display alerts"),
                     body=webalert.perform_list_alerts(uid, ln = argd['ln']),
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
-                                 'sweburl' : sweburl,
+                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
@@ -247,7 +247,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/add%s" % (
                         weburl,
@@ -265,8 +265,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
             #return self.input(req, form)
         return page(title=_("Display alerts"),
                     body=html,
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
-                                 'sweburl' : sweburl,
+                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
@@ -296,7 +296,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/update%s" % (
                         weburl,
@@ -313,8 +313,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
             return self.modify(req, form)
         return page(title=_("Display alerts"),
                     body=html,
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
-                                 'sweburl' : sweburl,
+                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },
@@ -341,7 +341,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                        navmenuid="youralerts")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/youralerts/remove%s" % (
                         weburl,
@@ -354,8 +354,8 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         return page(title=_("Display alerts"),
                     body=webalert.perform_remove_alert(argd['name'], argd['idq'],
                                                        argd['idb'], uid, ln=argd['ln']),
-                    navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
-                                 'sweburl' : sweburl,
+                    navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
+                                 'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'ln': argd['ln'],
                                  'account' : _("Your Account"),
                               },

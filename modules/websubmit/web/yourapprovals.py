@@ -27,7 +27,7 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     sweburl, \
+     CFG_SITE_SECURE_URL, \
      CFG_VERSION
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
@@ -92,8 +92,8 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
           referees = referees
         )
     return page(title=_("Your Approvals"),
-                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
-                             'sweburl' : sweburl,
+                navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display">%(account)s</a>""" % {
+                             'sitesecureurl' : CFG_SITE_SECURE_URL,
                              'account' : _("Your Account"),
                           },
                 body=t,

@@ -61,7 +61,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_SUPPORT_EMAIL, \
-     sweburl, \
+     CFG_SITE_SECURE_URL, \
      CFG_TMPDIR, \
      weburl
 from invenio import session
@@ -716,7 +716,7 @@ def create_userinfobox_body(req, uid, language="en"):
     if req:
         if req.subprocess_env.has_key('HTTPS') \
            and req.subprocess_env['HTTPS'] == 'on':
-            url_referer = sweburl + req.unparsed_uri
+            url_referer = CFG_SITE_SECURE_URL + req.unparsed_uri
         else:
             url_referer = weburl + req.unparsed_uri
         if '/youraccount/logout' in url_referer:

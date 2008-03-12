@@ -38,7 +38,7 @@ from invenio.config import \
      CFG_CACHEDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_ADMIN_EMAIL, \
-     sweburl, \
+     CFG_SITE_SECURE_URL, \
      CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
      CFG_WEBSEARCH_RSS_TTL, \
      CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS
@@ -528,7 +528,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         # Apache authentication stuff
         if argd['realm']:
             http_check_credentials(req, argd['realm'])
-            return redirect_to_url(req, argd['referer'] or '%s/youraccount/youradminactivities' % sweburl)
+            return redirect_to_url(req, argd['referer'] or '%s/youraccount/youradminactivities' % CFG_SITE_SECURE_URL)
 
         del argd['referer']
         del argd['realm']

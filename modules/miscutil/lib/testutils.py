@@ -41,7 +41,7 @@ import unittest
 from urllib import urlencode
 from itertools import chain, repeat
 
-from invenio.config import weburl, sweburl, CFG_LOGDIR
+from invenio.config import weburl, CFG_SITE_SECURE_URL, CFG_LOGDIR
 from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, CFG_TESTS_REQUIRE_HTML_VALIDATION
 
 def warn_user_about_tests():
@@ -110,7 +110,7 @@ def make_surl(path, **kargs):
     """ Helper to generate an absolute invenio Secure URL with query
     arguments"""
 
-    url = sweburl + path
+    url = CFG_SITE_SECURE_URL + path
 
     if kargs:
         url += '?' + urlencode(kargs, doseq=True)
@@ -176,7 +176,7 @@ def test_web_page_content(url,
         if username == "guest":
             pass
         else:
-            browser.open(sweburl + "/youraccount/login")
+            browser.open(CFG_SITE_SECURE_URL + "/youraccount/login")
             browser.select_form(nr=0)
             browser['p_un'] = username
             browser['p_pw'] = password
@@ -254,7 +254,7 @@ def test_web_page_content(url,
                               (url, username, msg))
 
     # logout after tests:
-    browser.open(sweburl + "/youraccount/logout")
+    browser.open(CFG_SITE_SECURE_URL + "/youraccount/logout")
 
     if CFG_TESTUTILS_VERBOSE >= 9:
         print "%s test_web_page_content(), tested page `%s', login `%s', expected text `%s', errors `%s'." % \

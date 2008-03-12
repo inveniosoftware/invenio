@@ -28,7 +28,7 @@ __lastupdated__ = """$Date$"""
 unique urls sent by email.
 """
 
-from invenio.config import CFG_SITE_LANG, sweburl
+from invenio.config import CFG_SITE_LANG, CFG_SITE_SECURE_URL
 from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_get_role_id, acc_add_user_role
 from datetime import datetime, timedelta

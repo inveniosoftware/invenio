@@ -35,7 +35,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_SITE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
-     sweburl, \
+     CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
      weburl
 from invenio.dbquery import run_sql, Error
@@ -173,8 +173,8 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
          )
 
     return page(title=_("Your Submissions"),
-                navtrail= """<a class="navtrail" href="%(sweburl)s/youraccount/display">%(account)s</a>""" % {
-                             'sweburl' : sweburl,
+                navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display">%(account)s</a>""" % {
+                             'sitesecureurl' : CFG_SITE_SECURE_URL,
                              'account' : _("Your Account"),
                           },
                 body=t,

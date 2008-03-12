@@ -33,7 +33,7 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_ADMIN_EMAIL, \
      weburl, \
-     sweburl, \
+     CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
      CFG_SITE_NAME_INTL, \
      CFG_CACHEDIR
@@ -130,7 +130,7 @@ defined_tags = {'<CFG_SITE_NAME>': CFG_SITE_NAME,
                 '<CFG_SITE_SUPPORT_EMAIL>': CFG_SITE_SUPPORT_EMAIL,
                 '<CFG_SITE_ADMIN_EMAIL>': CFG_SITE_ADMIN_EMAIL,
                 '<WEBURL>': weburl,
-                '<SWEBURL>': sweburl,
+                '<CFG_SITE_SECURE_URL>': CFG_SITE_SECURE_URL,
                 '<CFG_VERSION>': CFG_VERSION,
                 '<CFG_SITE_NAME_INTL>': CFG_SITE_NAME_INTL}
 

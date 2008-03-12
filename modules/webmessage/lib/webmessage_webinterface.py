@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 ## $Id$
-## Messaging system (internal)
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -25,7 +24,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.config import sweburl, weburl, CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.config import CFG_SITE_SECURE_URL, weburl, CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webmessage import perform_request_display, \
                                perform_request_display_msg, \
@@ -70,7 +69,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                        navmenuid="yourmessages")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/display%s" % (
                         weburl,
@@ -118,7 +117,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                        navmenuid="yourmessages")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/write%s" % (
                         weburl,
@@ -194,7 +193,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                        navmenuid="yourmessages")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/send%s" % (
                         weburl,
@@ -265,7 +264,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                        navmenuid="yourmessages")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/delete%s" % (
                         weburl,
@@ -307,7 +306,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                        navmenuid="yourmessages")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/delete_all%s" % (
                         weburl,
@@ -349,7 +348,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
                                        navmenuid="yourmessages")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
-                sweburl,
+                CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/display_msg%s" % (
                         weburl,

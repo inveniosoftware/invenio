@@ -28,7 +28,7 @@ from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.config import weburl, \
-                           sweburl, \
+                           CFG_SITE_SECURE_URL, \
                            CFG_SITE_LANG, \
                            CFG_SITE_NAME, \
                            CFG_SITE_NAME_INTL,\
@@ -784,7 +784,7 @@ class Template:
             note = _("Note: Your nickname, %s, will be displayed as author of this comment") % ('<i>' + nickname + '</i>')
         else:
             (uid, nickname, display) = get_user_info(uid)
-            link = '<a href="%s/youraccount/edit">' % sweburl
+            link = '<a href="%s/youraccount/edit">' % CFG_SITE_SECURE_URL
             note = _("Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %(x_nickname)s will be displayed as the author of this comment.") % \
                 {'x_url_open': link,
                  'x_url_close': '</a>',
@@ -839,7 +839,7 @@ class Template:
             note_label %= ('<i>' + nickname + '</i>')
         else:
             (uid, nickname, display) = get_user_info(uid)
-            link = '<a href="%s/youraccount/edit">' % sweburl
+            link = '<a href="%s/youraccount/edit">' % CFG_SITE_SECURE_URL
             note_label = _("Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %(x_nickname)s will be displayed as the author of this comment.") % \
                 {'x_url_open': link,
                  'x_url_close': '</a>',

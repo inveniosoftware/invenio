@@ -38,7 +38,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_SUPPORT_EMAIL, \
-     sweburl, \
+     CFG_SITE_SECURE_URL, \
      weburl, \
      CFG_CERN_SITE
 from invenio.websession_config import CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
@@ -77,7 +77,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
     _force_https = True
 
     def index(self, req, form):
-        redirect_to_url(req, '%s/youraccount/display' % sweburl)
+        redirect_to_url(req, '%s/youraccount/display' % CFG_SITE_SECURE_URL)
 
     def access(self, req, form):
         args = wash_urlargd(form, {'mailcookie' : (str, '')})
@@ -86,7 +86,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         try:
             kind = mail_cookie_retrieve_kind(args['mailcookie'])
             if kind == 'pw_reset':
-                redirect_to_url(req, '%s/youraccount/resetpassword?k=%s&ln=%s' % (sweburl, args['mailcookie'], args['ln']))
+                redirect_to_url(req, '%s/youraccount/resetpassword?k=%s&ln=%s' % (CFG_SITE_SECURE_URL, args['mailcookie'], args['ln']))
             elif kind == 'role':
                 uid = webuser.getUid(req)
                 try:
@@ -258,7 +258,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         return page(title= _("Your Settings"),
                     body=body+webaccount.perform_set(webuser.get_email(uid),
                                                 args['ln'], verbose=args['verbose']),
-                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
+                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description=_("%s Personalize, Your Settings")  % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     uid=uid,
@@ -432,7 +432,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         return page(title=title,
                     body=webaccount.perform_back(mess, act, linkname, args['ln']),
-                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
+                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     uid=uid,
@@ -455,7 +455,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         return page(title=_("Lost your password?"),
                     body=webaccount.perform_lost(args['ln']),
-                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
+                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     uid=uid,
@@ -551,7 +551,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         return page(title=_("Your Administrative Activities"),
                     body=webaccount.perform_youradminactivities(user_info, args['ln']),
-                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
+                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     uid=uid,
@@ -574,7 +574,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         return page(title=_("Delete Account"),
                     body=webaccount.perform_delete(args['ln']),
-                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
+                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     uid=uid,
@@ -600,7 +600,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         return page(title=_("Logout"),
                     body=webaccount.perform_logout(req, args['ln']),
-                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
+                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords=_("%s, personalize") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     uid=uid,
@@ -645,7 +645,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     if len(roles) == 1:
                         # There's only one role enabled to see this collection
                         # Let's redirect to log to it!
-                        return redirect_to_url(req, '%s%s' % (sweburl, make_canonical_urlargd({'realm' : roles[0][0], 'referer' : args['referer']}, {})))
+                        return redirect_to_url(req, '%s%s' % (CFG_SITE_SECURE_URL, make_canonical_urlargd({'realm' : roles[0][0], 'referer' : args['referer']}, {})))
             except InvenioWebAccessMailCookieError:
                 pass
 
@@ -653,7 +653,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             if args['p_un'] is None or not args['login_method']:
                 return page(title=_("Login"),
                             body=webaccount.create_login_page_box(args['referer'], apache_msg, args['ln']),
-                            navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
+                            navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                             description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                             keywords="%s , personalize" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                             uid=uid,
@@ -688,7 +688,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             act = "login"
             return page(title=_("Login"),
                         body=webaccount.perform_back(mess, act, _("login"), args['ln']),
-                        navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
+                        navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                         description="%s Personalize, Main page" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                         keywords="%s , personalize" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                         uid=uid,
@@ -719,7 +719,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if args['p_nickname'] is None or args['p_email'] is None:
             return  page(title=_("Register"),
                          body=webaccount.create_register_page_box(args['referer'], args['ln']),
-                         navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
+                         navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                          description=_("%s  Personalize, Main page") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                          keywords="%s , personalize" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                          uid=uid,
@@ -746,7 +746,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             elif CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_NEW_ACCOUNT != 1:
                 uid = webuser.update_Uid(req, args['p_email'])
                 mess += " " + _("You can now access your %(x_url_open)saccount%(x_url_close)s.") %\
-                    {'x_url_open': '<a href="' + sweburl + '/youraccount/display?ln=' + args['ln'] + '">',
+                    {'x_url_open': '<a href="' + CFG_SITE_SECURE_URL + '/youraccount/display?ln=' + args['ln'] + '">',
                      'x_url_close': '</a>'}
         elif ruid == -2:
             mess = _("Both passwords must match.")
@@ -790,7 +790,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
         return page(title=title,
                     body=webaccount.perform_back(mess,act, (act == 'register' and _("register") or ""), args['ln']),
-                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (sweburl, args['ln']) + _("Your Account") + """</a>""",
+                    navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description=_("%s  Personalize, Main page") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords="%s , personalize" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     uid=uid,
