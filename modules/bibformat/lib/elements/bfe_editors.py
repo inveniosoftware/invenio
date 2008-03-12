@@ -32,7 +32,7 @@ def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes"):
     @param print_links if yes, print the editors as HTML link to their publications
     """
     from urllib import quote
-    from invenio.config import weburl
+    from invenio.config import CFG_SITE_URL
     from invenio import bibrecord
     
     authors = bibrecord.record_get_field_instances(bfo.get_record(), '100')
@@ -41,7 +41,7 @@ def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes"):
                for author in authors if len(bibrecord.field_get_subfield_values(author, "e")) > 0 and bibrecord.field_get_subfield_values(author, "e")[0]=="ed." ]
 
     if print_links.lower() == "yes":
-        editors = ['<a href="' + weburl + '/search?f=author&p=' + \
+        editors = ['<a href="' + CFG_SITE_URL + '/search?f=author&p=' + \
                    quote(editor) + \
                    '&amp;ln='+ bfo.lang + \
                    '">' + editor + '</a>'

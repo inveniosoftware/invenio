@@ -27,7 +27,7 @@ __revision__ = "$Id$"
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
-from invenio.config import weburl, \
+from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
                            CFG_SITE_LANG, \
                            CFG_SITE_NAME, \
@@ -74,8 +74,8 @@ class Template:
             comment_rows += """
                     <tr>
                         <td>"""
-            report_link = '%s/record/%s/comments/report?ln=%s&amp;comid=%s' % (weburl, recID, ln, comment[c_id])
-            reply_link = '%s/record/%s/comments/add?ln=%s&amp;comid=%s&amp;action=REPLY' % (weburl, recID, ln, comment[c_id])
+            report_link = '%s/record/%s/comments/report?ln=%s&amp;comid=%s' % (CFG_SITE_URL, recID, ln, comment[c_id])
+            reply_link = '%s/record/%s/comments/add?ln=%s&amp;comid=%s&amp;action=REPLY' % (CFG_SITE_URL, recID, ln, comment[c_id])
             comment_rows += self.tmpl_get_comment_without_ranking(ln=ln, nickname=messaging_link,
                                                                   date_creation=comment[c_date_creation],
                                                                   body=comment[c_body],
@@ -88,7 +88,7 @@ class Template:
 
         # write button
         write_button_label = _("Write a comment")
-        write_button_link = '%s/record/%s/comments/add' % (weburl, recID)
+        write_button_link = '%s/record/%s/comments/add' % (CFG_SITE_URL, recID)
         write_button_form = '<input type="hidden" name="ln" value="%s"/>' % ln
         write_button_form = self.createhiddenform(action=write_button_link, method="get", text=write_button_form, button=write_button_label)
 
@@ -117,10 +117,10 @@ class Template:
              'recID': recID,
              'comment_rows': comment_rows,
              'tab': '&nbsp;'*4,
-             'weburl': weburl,
+             'siteurl': CFG_SITE_URL,
              's': nb_comments_total>1 and 's' or "",
              'view_all_comments_link': nb_comments_total>0 and '''<a href="%s/record/%s/comments/display">View all %s comments</a>''' \
-                                                                  % (weburl, recID, nb_comments_total) or "",
+                                                                  % (CFG_SITE_URL, recID, nb_comments_total) or "",
              'write_button_form': write_button_form,
              'nb_comments': len(comments)
             }
@@ -160,7 +160,7 @@ class Template:
             body = _("Sorry, no record ID was provided.")
 
         body += "<br /><br />"
-        link = "<a href=\"%s?ln=%s\">%s</a>." % (weburl, ln, CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME))
+        link = "<a href=\"%s?ln=%s\">%s</a>." % (CFG_SITE_URL, ln, CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME))
         body += _("You may want to start browsing from %s") % link
         return body
 
@@ -197,13 +197,13 @@ class Template:
             avg_score_img = "stars-0-0.png"
 
         # voting links
-        useful_dict =   {   'weburl'        : weburl,
+        useful_dict =   {   'siteurl'        : CFG_SITE_URL,
                             'recID'         : recID,
                             'ln'            : ln,
                             'yes_img'       : 'smchk_gr.gif', #'yes.gif',
                             'no_img'        : 'iconcross.gif' #'no.gif'
                         }
-        link = '<a href="%(weburl)s/record/%(recID)s/reviews/vote?ln=%(ln)s&amp;comid=%%(comid)s' % useful_dict
+        link = '<a href="%(siteurl)s/record/%(recID)s/reviews/vote?ln=%(ln)s&amp;comid=%%(comid)s' % useful_dict
         useful_yes = link + '&amp;com_value=1">' + _("Yes") + '</a>'
         useful_no = link + '&amp;com_value=-1">' + _("No") + '</a>'
 
@@ -220,7 +220,7 @@ class Template:
             comment_rows += '''
                     <tr>
                         <td>'''
-            report_link = '%s/record/%s/reviews/report?ln=%s&amp;comid=%s' % (weburl, recID, ln, comment[c_id])
+            report_link = '%s/record/%s/reviews/report?ln=%s&amp;comid=%s' % (CFG_SITE_URL, recID, ln, comment[c_id])
             comment_rows += self.tmpl_get_comment_with_ranking(ln=ln, nickname=messaging_link,
                                                                date_creation=comment[c_date_creation],
                                                                body=comment[c_body],
@@ -236,7 +236,7 @@ class Template:
                       </tr>'''
 
         # write button
-        write_button_link = '''%s/record/%s/reviews/add''' % (weburl, recID)
+        write_button_link = '''%s/record/%s/reviews/add''' % (CFG_SITE_URL, recID)
         write_button_form = ' <input type="hidden" name="ln" value="%s"/>' % ln
         write_button_form = self.createhiddenform(action=write_button_link, method="get", text=write_button_form, button=_("Write a review"))
 
@@ -246,11 +246,11 @@ class Template:
             nb_comments_total = str(nb_comments_total)
             score = '<b>'
             score += _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") % \
-                {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + avg_score + '" />',
+                {'x_nb_score': '</b><img src="' + CFG_SITE_URL + '/img/' + avg_score_img + '" alt="' + avg_score + '" />',
                  'x_nb_reviews': nb_comments_total}
             useful_label = _("Readers found the following %s reviews to be most helpful.")
             useful_label %= len(comments) > 1 and len(comments) or ""
-            view_all_comments_link ='<a href="%s/record/%s/reviews/display?ln=%s&amp;do=hh">' % (weburl, recID, ln)
+            view_all_comments_link ='<a href="%s/record/%s/reviews/display?ln=%s&amp;do=hh">' % (CFG_SITE_URL, recID, ln)
             view_all_comments_link += _("View all %s reviews") % nb_comments_total
             view_all_comments_link += '</a><br />'
 
@@ -278,7 +278,7 @@ class Template:
                 'write_comment'         : _("Write a review"),
                 'comment_rows'          : comment_rows,
                 'tab'                   : '&nbsp;'*4,
-                'weburl'                : weburl,
+                'siteurl'                : CFG_SITE_URL,
                 'view_all_comments_link': nb_comments_total>0 and view_all_comments_link or "",
                 'write_button_form'     : write_button_form
             }
@@ -330,7 +330,7 @@ class Template:
 <br />
 <div style="float:right">%(links)s</div>
 </div>""" % \
-                {'title'         : '<div style="background-color:#EEE;padding:2px;"><img src="%s/img/user-icon-1-24x24.png" alt="" />&nbsp;%s</div>' % (weburl, title),
+                {'title'         : '<div style="background-color:#EEE;padding:2px;"><img src="%s/img/user-icon-1-24x24.png" alt="" />&nbsp;%s</div>' % (CFG_SITE_URL, title),
                  'body'          : final_body,
                  'links'         : links}
         return out
@@ -374,13 +374,13 @@ class Template:
         out += '''
 <div style="background:#F9F9F9;border:1px solid #DDD">
   <div style="background-color:#EEE;padding:2px;">
-    <img src="%(weburl)s/img/%(star_score_img)s" alt="%(star_score)s" style="margin-right:10px;"/><b>%(title)s</b><br />
+    <img src="%(siteurl)s/img/%(star_score_img)s" alt="%(star_score)s" style="margin-right:10px;"/><b>%(title)s</b><br />
       %(reviewed_label)s<br />
       %(useful_label)s
   </div>
   %(body)s
 </div>
-%(abuse)s''' % {'weburl'        : weburl,
+%(abuse)s''' % {'siteurl'        : CFG_SITE_URL,
                'star_score_img': star_score_img,
                'star_score'    : star_score,
                'title'         : title,
@@ -441,7 +441,7 @@ class Template:
             c_title = 7
             c_id = 8
             discussion = 'reviews'
-            comments_link = '<a href="%s/record/%s/comments/">%s</a> (%i)' % (weburl, recID, _('Comments'), total_nb_comments)
+            comments_link = '<a href="%s/record/%s/comments/">%s</a> (%i)' % (CFG_SITE_URL, recID, _('Comments'), total_nb_comments)
             reviews_link = '<b>%s (%i)</b>' % (_('Reviews'), total_nb_reviews)
             add_comment_or_review = self.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, '', score, note, warnings, show_title_p=True)
         else:
@@ -452,11 +452,11 @@ class Template:
             c_id = 4
             discussion = 'comments'
             comments_link = '<b>%s (%i)</b>' % (_('Comments'), total_nb_comments)
-            reviews_link = '<a href="%s/record/%s/reviews/">%s</a> (%i)' % (weburl, recID, _('Reviews'), total_nb_reviews)
+            reviews_link = '<a href="%s/record/%s/reviews/">%s</a> (%i)' % (CFG_SITE_URL, recID, _('Reviews'), total_nb_reviews)
             add_comment_or_review = self.tmpl_add_comment_form(recID, uid, nickname, ln, note, warnings)
 
         # voting links
-        useful_dict =   {   'weburl'        : weburl,
+        useful_dict =   {   'siteurl'        : CFG_SITE_URL,
                             'recID'         : recID,
                             'ln'            : ln,
                             'do'            : display_order,
@@ -466,13 +466,13 @@ class Template:
                             'reviews'       : reviews,
                             'discussion'    : discussion
                         }
-        useful_yes = '<a href="%(weburl)s/record/%(recID)s/%(discussion)s/vote?ln=%(ln)s&amp;comid=%%(comid)s&amp;com_value=1&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(weburl)s/record/%(recID)s/%(discussion)s/display">' + _("Yes") + '</a>'
+        useful_yes = '<a href="%(siteurl)s/record/%(recID)s/%(discussion)s/vote?ln=%(ln)s&amp;comid=%%(comid)s&amp;com_value=1&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(siteurl)s/record/%(recID)s/%(discussion)s/display">' + _("Yes") + '</a>'
         useful_yes %= useful_dict
-        useful_no = '<a href="%(weburl)s/record/%(recID)s/%(discussion)s/vote?ln=%(ln)s&amp;comid=%%(comid)s&amp;com_value=-1&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(weburl)s/record/%(recID)s/%(discussion)s/display">' + _("No") + '</a>'
+        useful_no = '<a href="%(siteurl)s/record/%(recID)s/%(discussion)s/vote?ln=%(ln)s&amp;comid=%%(comid)s&amp;com_value=-1&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(siteurl)s/record/%(recID)s/%(discussion)s/display">' + _("No") + '</a>'
         useful_no %= useful_dict
         warnings = self.tmpl_warnings(warnings, ln)
 
-        link_dic =  {   'weburl'    : weburl,
+        link_dic =  {   'siteurl'    : CFG_SITE_URL,
                         'module'    : 'comments',
                         'function'  : 'index',
                         'discussion': discussion,
@@ -497,11 +497,11 @@ class Template:
 <tr>
   <td>"""
             if not reviews:
-                report_link = '%(weburl)s/record/%(recID)s/comments/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(weburl)s/record/%(recID)s/comments/display' % useful_dict % {'comid':comment[c_id]}
-                reply_link = '%(weburl)s/record/%(recID)s/comments/add?ln=%(ln)s&amp;action=REPLY&amp;comid=%%(comid)s' % useful_dict % {'comid':comment[c_id]}
+                report_link = '%(siteurl)s/record/%(recID)s/comments/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(siteurl)s/record/%(recID)s/comments/display' % useful_dict % {'comid':comment[c_id]}
+                reply_link = '%(siteurl)s/record/%(recID)s/comments/add?ln=%(ln)s&amp;action=REPLY&amp;comid=%%(comid)s' % useful_dict % {'comid':comment[c_id]}
                 comments_rows += self.tmpl_get_comment_without_ranking(ln, messaging_link, comment[c_date_creation], comment[c_body], reply_link, report_link)
             else:
-                report_link = '%(weburl)s/record/%(recID)s/reviews/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(weburl)s/record/%(recID)s/reviews/display' % useful_dict % {'comid': comment[c_id]}
+                report_link = '%(siteurl)s/record/%(recID)s/reviews/report?ln=%(ln)s&amp;comid=%%(comid)s&amp;do=%(do)s&amp;ds=%(ds)s&amp;nb=%(nb)s&amp;p=%(p)s&amp;referer=%(siteurl)s/record/%(recID)s/reviews/display' % useful_dict % {'comid': comment[c_id]}
                 comments_rows += self.tmpl_get_comment_with_ranking(ln, messaging_link, comment[c_date_creation], comment[c_body], comment[c_nb_votes_total], comment[c_nb_votes_yes], comment[c_star_score], comment[c_title])
                 helpful_label = _("Was this review helpful?")
                 report_abuse_label = "(" + _("Report abuse") + ")"
@@ -532,7 +532,7 @@ class Template:
         # Previous
         if page != 1:
             link_dic['arg_page'] = 'p=%s' % (page - 1)
-            page_links += '<a href=\"%(weburl)s/record/%(rec_id)s/%(discussion)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">&lt;&lt;</a> ' % link_dic
+            page_links += '<a href=\"%(siteurl)s/record/%(rec_id)s/%(discussion)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">&lt;&lt;</a> ' % link_dic
         else:
             page_links += ' %s ' % ('&nbsp;'*(len(_('Previous'))+7))
         # Page Numbers
@@ -541,14 +541,14 @@ class Template:
             link_dic['page'] = '%s' % i
             if i != page:
                 page_links += '''
-                <a href=\"%(weburl)s/record/%(rec_id)s/%(discussion)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">%(page)s</a> ''' % link_dic
+                <a href=\"%(siteurl)s/record/%(rec_id)s/%(discussion)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">%(page)s</a> ''' % link_dic
             else:
                 page_links += ''' <b>%s</b> ''' % i
         # Next
         if page != nb_pages:
             link_dic['arg_page'] = 'p=%s' % (page + 1)
             page_links += '''
-                <a href=\"%(weburl)s/record/%(rec_id)s/%(discussion)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">&gt;&gt;</a> ''' % link_dic
+                <a href=\"%(siteurl)s/record/%(rec_id)s/%(discussion)s/%(function)s?%(arguments)s&amp;%(arg_page)s\">&gt;&gt;</a> ''' % link_dic
         else:
             page_links += '%s' % ('&nbsp;'*(len(_('Next'))+7))
 
@@ -560,13 +560,13 @@ class Template:
                 avg_score_img = "stars-0-0.png"
             ranking_average = '<br /><b>'
             ranking_average += _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") % \
-                {'x_nb_score': '</b><img src="' + weburl + '/img/' + avg_score_img + '" alt="' + str(avg_score) + '" />',
+                {'x_nb_score': '</b><img src="' + CFG_SITE_URL + '/img/' + avg_score_img + '" alt="' + str(avg_score) + '" />',
                  'x_nb_reviews': str(total_nb_reviews)}
             ranking_average += '<br />'
         else:
             ranking_average = ""
 
-        write_button_link = '''%s/record/%s/%s/add''' % (weburl, recID, discussion)
+        write_button_link = '''%s/record/%s/%s/add''' % (CFG_SITE_URL, recID, discussion)
         write_button_form = '<input type="hidden" name="ln" value="%s"/>'
         write_button_form = self.createhiddenform(action=write_button_link,
                                                   method="get",
@@ -604,7 +604,7 @@ class Template:
             'total_nb_comments'         : total_nb_comments,
             'comments_or_reviews'       : reviews and _('review') or _('comment'),
             'comments_or_reviews_title' : reviews and _('Review') or _('Comment'),
-            'weburl'                    : weburl,
+            'siteurl'                    : CFG_SITE_URL,
             'module'                    : "comments",
             'recid'                     : recID,
             'ln'                        : ln,
@@ -651,7 +651,7 @@ class Template:
         #                            </select>''' or '''
         #                            </select>''')
         #
-        #form_link = "%(weburl)s/%(module)s/%(function)s" % link_dic
+        #form_link = "%(siteurl)s/%(module)s/%(function)s" % link_dic
         #form = self.createhiddenform(action=form_link, method="get", text=form, button='Go', recid=recID, p=1)
         pages = """
 <div>
@@ -675,7 +675,7 @@ class Template:
 
     def create_messaging_link(self, to, display_name, ln=CFG_SITE_LANG):
         """prints a link to the messaging system"""
-        link = "%s/yourmessages/write?msg_to=%s&amp;ln=%s" % (weburl, to, ln)
+        link = "%s/yourmessages/write?msg_to=%s&amp;ln=%s" % (CFG_SITE_URL, to, ln)
         if to:
             return '<a href="%s" class="maillink">%s</a>' % (link, display_name)
         else:
@@ -771,7 +771,7 @@ class Template:
         @return html add comment form
         """
         _ = gettext_set_language(ln)
-        link_dic =  {   'weburl'    : weburl,
+        link_dic =  {   'siteurl'    : CFG_SITE_URL,
                         'module'    : 'comments',
                         'function'  : 'add',
                         'arguments' : 'ln=%s&amp;action=%s' % (ln, 'SUBMIT'),
@@ -806,7 +806,7 @@ class Template:
                                'record_label': _("Article") + ":",
                                'comment_label': _("Comment") + ":",
                                'add_comment': _('Add comment')}
-        form_link = "%(weburl)s/record/%(recID)s/comments/%(function)s?%(arguments)s" % link_dic
+        form_link = "%(siteurl)s/record/%(recID)s/comments/%(function)s?%(arguments)s" % link_dic
         form = self.createhiddenform(action=form_link, method="post", text=form, button='Add comment')
         return warnings + form
 
@@ -825,7 +825,7 @@ class Template:
         @return html add review form
         """
         _ = gettext_set_language(ln)
-        link_dic =  {   'weburl'    : weburl,
+        link_dic =  {   'siteurl'    : CFG_SITE_URL,
                         'module'    : 'comments',
                         'function'  : 'add',
                         'arguments' : 'ln=%s&amp;action=%s' % (ln, 'SUBMIT'),
@@ -913,7 +913,7 @@ class Template:
                                'selected4': selected4,
                                'selected5': selected5
                                }
-        form_link = "%(weburl)s/record/%(recID)s/reviews/%(function)s?%(arguments)s" % link_dic
+        form_link = "%(siteurl)s/record/%(recID)s/reviews/%(function)s?%(arguments)s" % link_dic
         form = self.createhiddenform(action=form_link, method="post", text=form, button=_('Add Review'))
         return warnings + form
 
@@ -924,13 +924,13 @@ class Template:
         @return html page of successfully added comment/review
         """
         _ = gettext_set_language(ln)
-        link_dic =  {   'weburl'    : weburl,
+        link_dic =  {   'siteurl'    : CFG_SITE_URL,
                         'module'    : 'comments',
                         'function'  : 'display',
                         'arguments' : 'ln=%s&amp;do=od' % ln,
                         'recID'     : recID,
                         'discussion': reviews==1 and 'reviews' or 'comments'}
-        link = "%(weburl)s/record/%(recID)s/%(discussion)s/%(function)s?%(arguments)s" % link_dic
+        link = "%(siteurl)s/record/%(recID)s/%(discussion)s/%(function)s?%(arguments)s" % link_dic
         if warnings:
             out = self.tmpl_warnings(warnings, ln)  + '<br /><br />'
         else:
@@ -1015,16 +1015,16 @@ class Template:
         out = '<ol>'
         if CFG_WEBCOMMENT_ALLOW_COMMENTS or CFG_WEBCOMMENT_ALLOW_REVIEWS:
             if CFG_WEBCOMMENT_ALLOW_COMMENTS:
-                out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=0">%(reported_cmt_label)s</a></li>' % \
-                    {'weburl': weburl, 'ln': ln, 'reported_cmt_label': _("View all reported comments")}
+                out += '<li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=0">%(reported_cmt_label)s</a></li>' % \
+                    {'siteurl': CFG_SITE_URL, 'ln': ln, 'reported_cmt_label': _("View all reported comments")}
             if CFG_WEBCOMMENT_ALLOW_REVIEWS:
-                out += '<li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=1">%(reported_rev_label)s</a></li>' % \
-                    {'weburl': weburl, 'ln': ln, 'reported_rev_label': _("View all reported reviews")}
+                out += '<li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/comments?ln=%(ln)s&amp;reviews=1">%(reported_rev_label)s</a></li>' % \
+                    {'siteurl': CFG_SITE_URL, 'ln': ln, 'reported_rev_label': _("View all reported reviews")}
             out += """
-                <li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/delete?ln=%(ln)s&amp;comid=-1">%(delete_label)s</a></li>
-                <li><a href="%(weburl)s/admin/webcomment/webcommentadmin.py/users?ln=%(ln)s">%(view_users)s</a></li>
-                <li><a href="%(weburl)s/help/admin/webcomment-admin-guide">%(guide)s</a></li>
-                """ % {'weburl'    : weburl,
+                <li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/delete?ln=%(ln)s&amp;comid=-1">%(delete_label)s</a></li>
+                <li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/users?ln=%(ln)s">%(view_users)s</a></li>
+                <li><a href="%(siteurl)s/help/admin/webcomment-admin-guide">%(guide)s</a></li>
+                """ % {'siteurl'    : CFG_SITE_URL,
                        'delete_label': _("Delete a specific comment/review (by ID)"),
                        'view_users': _("View all users who have been reported"),
                        'ln'        : ln,
@@ -1061,7 +1061,7 @@ class Template:
             </table>
             <br />
         ''' %_("Comment ID:")
-        form_link = "%s/admin/webcomment/webcommentadmin.py/delete?ln=%s" % (weburl, ln)
+        form_link = "%s/admin/webcomment/webcommentadmin.py/delete?ln=%s" % (CFG_SITE_URL, ln)
         form = self.createhiddenform(action=form_link, method="get", text=form, button=_('View Comment'))
         return warnings + out + form
 
@@ -1089,10 +1089,10 @@ class Template:
         for utuple in users_data:
             com_label = _("View all %s reported comments") % utuple[u_comment_reports]
             com_link = '''<a href="%s/admin/webcomment/webcommentadmin.py/comments?ln=%s&amp;uid=%s&amp;reviews=0">%s</a><br />''' % \
-                          (weburl, ln, utuple[u_uid], com_label)
+                          (CFG_SITE_URL, ln, utuple[u_uid], com_label)
             rev_label = _("View all %s reported reviews") % utuple[u_reviews_reports]
             rev_link = '''<a href="%s/admin/webcomment/webcommentadmin.py/comments?ln=%s&amp;uid=%s&amp;reviews=1">%s</a>''' % \
-                          (weburl, ln, utuple[u_uid], rev_label)
+                          (CFG_SITE_URL, ln, utuple[u_uid], rev_label)
             if not utuple[u_nickname]:
                 user_info = get_user_info(utuple[u_uid])
                 nickname = user_info[2]
@@ -1120,7 +1120,7 @@ class Template:
              'uid'       : utuple[u_uid],
              'reports'   : utuple[u_reports],
              'review_row': review_row,
-             'weburl'    : weburl,
+             'siteurl'    : CFG_SITE_URL,
              'ln'        : ln,
              'com_link'  : CFG_WEBCOMMENT_ALLOW_COMMENTS and com_link or "",
              'rev_link'  : CFG_WEBCOMMENT_ALLOW_REVIEWS and rev_link or ""
@@ -1182,11 +1182,11 @@ class Template:
         reported_label %= int(nb_reports)
         out = """
 %(reported_label)s<br />
-<a href="%(weburl)s/record/%(rec_id)i?ln=%(ln)s">%(rec_id_label)s</a><br />
+<a href="%(siteurl)s/record/%(rec_id)i?ln=%(ln)s">%(rec_id_label)s</a><br />
 %(cmt_id_label)s"""
         out %= {'reported_label': reported_label,
                 'rec_id_label': _("Record") + ' #' + str(rec_id),
-                'weburl': weburl,
+                'siteurl': CFG_SITE_URL,
                 'rec_id': int(rec_id),
                 'cmt_id_label': _("Comment") + ' #' + str(cmt_id),
                 'ln': ln}
@@ -1243,7 +1243,7 @@ class Template:
                                                              meta_data[4]))# rec_id
             checkboxes.append(self.tmpl_admin_select_comment_checkbox(meta_data[3]))
 
-        form_link = "%s/admin/webcomment/webcommentadmin.py/del_com?ln=%s" % (weburl, ln)
+        form_link = "%s/admin/webcomment/webcommentadmin.py/del_com?ln=%s" % (CFG_SITE_URL, ln)
         out = """
 <table class="admin_wvar" style="width:100%%;">
   <thead>
@@ -1365,7 +1365,7 @@ class Template:
 
         _ = gettext_set_language(ln)
 
-        url = '%s/record/%s/reviews/add?ln=%s&amp;action=%s' % (weburl, recID, ln, action)
+        url = '%s/record/%s/reviews/add?ln=%s&amp;action=%s' % (CFG_SITE_URL, recID, ln, action)
 
         if avg_score > 0:
             score = _("Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews") % \

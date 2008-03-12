@@ -34,7 +34,7 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
-     weburl
+     CFG_SITE_URL
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO
 from invenio.websession_config import \
@@ -515,15 +515,13 @@ class Template:
                           </table>""" % (url, title, body)
         return out
 
-    def tmpl_account_page(self, ln, weburl, accBody, baskets, alerts, searches, messages, groups, administrative):
+    def tmpl_account_page(self, ln, accBody, baskets, alerts, searches, messages, groups, administrative):
         """
         Displays the your account page
 
         Parameters:
 
           - 'ln' *string* - The language to display the interface in
-
-          - 'weburl' *string* - The URL of CDS Invenio
 
           - 'accBody' *string* - The body of the heading block
 
@@ -550,15 +548,15 @@ class Template:
         out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln, '/youralerts/list?ln=%s' % ln)
         out += self.tmpl_account_template(_("Your Searches"), searches, ln, '/youralerts/display?ln=%s' % ln)
         groups_description = _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are administering or are a member of.")
-        groups_description %= {'x_url_open': '<a href="' + weburl + '/yourgroups/display?ln=' + ln + '">',
+        groups_description %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourgroups/display?ln=' + ln + '">',
                                'x_url_close': '</a>'}
         out += self.tmpl_account_template(_("Your Groups"), groups_description, ln, '/yourgroups/display?ln=%s' % ln)
         submission_description = _("You can consult the list of %(x_url_open)syour submissions%(x_url_close)s and inquire about their status.")
-        submission_description %= {'x_url_open': '<a href="' + weburl + '/yoursubmissions.py?ln=' + ln + '">',
+        submission_description %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yoursubmissions.py?ln=' + ln + '">',
                                    'x_url_close': '</a>'}
         out += self.tmpl_account_template(_("Your Submissions"), submission_description, ln, '/yoursubmissions.py?ln=%s' % ln)
         approval_description =  _("You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with the documents you approved or refereed.")
-        approval_description %=  {'x_url_open': '<a href="' + weburl + '/yourapprovals.py?ln=' + ln + '">',
+        approval_description %=  {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourapprovals.py?ln=' + ln + '">',
                                   'x_url_close': '</a>'}
         out += self.tmpl_account_template(_("Your Approvals"), approval_description, ln, '/yourapprovals.py?ln=%s' % ln)
         out += self.tmpl_account_template(_("Your Administrative Activities"), administrative, ln, '/admin')
@@ -952,15 +950,13 @@ class Template:
               }
         return out
 
-    def tmpl_account_adminactivities(self, ln, weburl, uid, guest, roles, activities):
+    def tmpl_account_adminactivities(self, ln, uid, guest, roles, activities):
         """
         Displays the admin activities block for this user
 
         Parameters:
 
           - 'ln' *string* - The language to display the interface in
-
-          - 'weburl' *string* - The address of the site
 
           - 'uid' *string* - The used id
 
@@ -995,27 +991,27 @@ class Template:
             activities.sort(lambda x, y: cmp(string.lower(x), string.lower(y)))
             for action in activities:
                 if action == "runbibedit":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibedit/bibeditadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Run BibEdit"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibedit/bibeditadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run BibEdit"))
                 if action == "cfgbibformat":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibFormat"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibFormat"))
                 if action == "cfgbibharvest":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/bibharvestadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibHarvest"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/bibharvestadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibHarvest"))
                 if action == "cfgoairepository":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/oaiarchiveadmin.py?ln=%s">%s</a>""" % (weburl, ln,  _("Configure OAI Repository"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibharvest/oaiarchiveadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln,  _("Configure OAI Repository"))
                 if action == "cfgbibindex":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibIndex"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibindex/bibindexadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibIndex"))
                 if action == "cfgbibrank":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure BibRank"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibrank/bibrankadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibRank"))
                 if action == "cfgwebaccess":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/webaccessadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebAccess"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webaccess/webaccessadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebAccess"))
                 if action == "cfgwebcomment":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webcomment/webcommentadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebComment"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/webcomment/webcommentadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebComment"))
                 if action == "cfgwebsearch":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSearch"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websearch/websearchadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSearch"))
                 if action == "cfgwebsubmit":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/websubmitadmin.py?ln=%s">%s</a>""" % (weburl, ln, _("Configure WebSubmit"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/websubmit/websubmitadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure WebSubmit"))
         out += "<br />" + _("For more admin-level activities, see the complete %(x_url_open)sAdmin Area%(x_url_close)s.") %\
-            {'x_url_open': '<a href="' + weburl + '/help/admin?ln=' + ln + '">',
+            {'x_url_open': '<a href="' + CFG_SITE_URL + '/help/admin?ln=' + ln + '">',
              'x_url_close': '</a>'}
         return out
 
@@ -1043,11 +1039,11 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """<img src="%s/img/user-icon-1-20x20.gif" border="0" alt=""/> """ % weburl
+        out = """<img src="%s/img/user-icon-1-20x20.gif" border="0" alt=""/> """ % CFG_SITE_URL
         if guest:
             out += """%(guest_msg)s ::
                    <a class="userinfo" href="%(sitesecureurl)s/youraccount/login?ln=%(ln)s%(referer)s">%(login)s</a>""" % {
-                     'weburl' : weburl,
+                     'siteurl' : CFG_SITE_URL,
                      'sitesecureurl': CFG_SITE_SECURE_URL,
                      'ln' : ln,
                      'guest_msg' : _("guest"),
@@ -1060,13 +1056,13 @@ class Template:
         else:
             out += """%(username)s ::
                <a class="userinfo" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/yourmessages/display?ln=%(ln)s">%(messages)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/yourgroups/display?ln=%(ln)s">%(groups)s</a> ::
-                   <a class="userinfo" href="%(weburl)s/stats/?ln=%(ln)s">%(stats)s</a> :: """ % {
+                   <a class="userinfo" href="%(siteurl)s/yourmessages/display?ln=%(ln)s">%(messages)s</a> ::
+                   <a class="userinfo" href="%(siteurl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> ::
+                   <a class="userinfo" href="%(siteurl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
+                   <a class="userinfo" href="%(siteurl)s/yourgroups/display?ln=%(ln)s">%(groups)s</a> ::
+                   <a class="userinfo" href="%(siteurl)s/stats/?ln=%(ln)s">%(stats)s</a> :: """ % {
                      'username' : username,
-                     'weburl' : weburl,
+                     'siteurl' : CFG_SITE_URL,
                      'sitesecureurl' : CFG_SITE_SECURE_URL,
                      'ln' : ln,
                      'account' : _("account"),
@@ -1077,14 +1073,14 @@ class Template:
                      'stats' : _("statistics"),
                    }
             if submitter:
-                out += """<a class="userinfo" href="%(weburl)s/yoursubmissions.py?ln=%(ln)s">%(submission)s</a> :: """ % {
-                         'weburl' : weburl,
+                out += """<a class="userinfo" href="%(siteurl)s/yoursubmissions.py?ln=%(ln)s">%(submission)s</a> :: """ % {
+                         'siteurl' : CFG_SITE_URL,
                          'ln' : ln,
                          'submission' : _("submissions"),
                        }
             if referee:
-                out += """<a class="userinfo" href="%(weburl)s/yourapprovals.py?ln=%(ln)s">%(approvals)s</a> :: """ % {
-                         'weburl' : weburl,
+                out += """<a class="userinfo" href="%(siteurl)s/yourapprovals.py?ln=%(ln)s">%(approvals)s</a> :: """ % {
+                         'siteurl' : CFG_SITE_URL,
                          'ln' : ln,
                          'approvals' : _("approvals"),
                        }
@@ -1215,8 +1211,8 @@ class Template:
 
         _ = gettext_set_language(ln)
         img_link = """
-        <a href="%(weburl)s/yourgroups/%(action)s?grpID=%(grpID)s&amp;ln=%(ln)s">
-        <img src="%(weburl)s/img/%(img)s" alt="%(text)s" style="border:0" width="25"
+        <a href="%(siteurl)s/yourgroups/%(action)s?grpID=%(grpID)s&amp;ln=%(ln)s">
+        <img src="%(siteurl)s/img/%(img)s" alt="%(text)s" style="border:0" width="25"
         height="25" /><br /><small>%(text)s</small>
         </a>"""
 
@@ -1252,14 +1248,14 @@ class Template:
     </tr>""" %(_("You are not an administrator of any groups."),)
         for group_data in groups:
             (grpID, name, description) = group_data
-            edit_link = img_link % {'weburl' : weburl,
+            edit_link = img_link % {'siteurl' : CFG_SITE_URL,
                                     'grpID' : grpID,
                                     'ln': ln,
                                     'img':"webbasket_create_small.png",
                                     'text':_("Edit group"),
                                     'action':"edit"
                                     }
-            members_link = img_link % {'weburl' : weburl,
+            members_link = img_link % {'siteurl' : CFG_SITE_URL,
                                        'grpID' : grpID,
                                        'ln': ln,
                                        'img':"webbasket_usergroup.png",
@@ -1425,7 +1421,7 @@ class Template:
         #default
         hidden_id =""
         form_name = "create_group"
-        action = weburl + '/yourgroups/create'
+        action = CFG_SITE_URL + '/yourgroups/create'
         button_label = _("Create new group")
         button_name = "create_button"
         label = _("Create new group")
@@ -1433,7 +1429,7 @@ class Template:
 
         if act_type == "update":
             form_name = "update_group"
-            action = weburl + '/yourgroups/edit'
+            action = CFG_SITE_URL + '/yourgroups/edit'
             button_label = _("Update group")
             button_name = "update"
             label = _('Edit group %s') % cgi.escape(group_name)
@@ -1508,7 +1504,7 @@ class Template:
 
 """
         out %= {'action' : action,
-                'logo': weburl + '/img/webbasket_create.png',
+                'logo': CFG_SITE_URL + '/img/webbasket_create.png',
                 'label': label,
                 'form_name' : form_name,
                 'name_label': _("Group name:"),
@@ -1619,8 +1615,8 @@ class Template:
 </form>
 
 """
-        out %= {'action' : weburl + '/yourgroups/join',
-                'logo': weburl + '/img/webbasket_create.png',
+        out %= {'action' : CFG_SITE_URL + '/yourgroups/join',
+                'logo': CFG_SITE_URL + '/img/webbasket_create.png',
                 'label': _("Join group"),
                 'group_name': cgi.escape(group_name, 1),
                 'label2':_("or find it") + ': ',
@@ -1794,11 +1790,11 @@ class Template:
         header2 = self.tmpl_group_table_title(text=_("Members awaiting approval"))
         header3 = _("Invite new members")
         link_open = '<a href="%s/yourmessages/write?ln=%s">'
-        link_open %= (weburl, ln)
+        link_open %= (CFG_SITE_URL, ln)
         invite_text = _("If you want to invite new members to join your group, please use the %(x_url_open)sweb message%(x_url_close)s system.") % \
             {'x_url_open': link_open,
              'x_url_close': '</a>'}
-        action = weburl + '/yourgroups/members?ln=' + ln
+        action = CFG_SITE_URL + '/yourgroups/members?ln=' + ln
         out %= {'title':_('Group: %s') % group_name,
                 'member_text' : member_text,
                 'pending_text' :pending_text,
@@ -1811,7 +1807,7 @@ class Template:
                 'img_alt_header2': _("Members awaiting approval"),
                 'img_alt_header3': _("Invite new members"),
                 'invite_text': invite_text,
-                'imgurl': weburl + '/img',
+                'imgurl': CFG_SITE_URL + '/img',
                 'cancel_label':_("Cancel"),
                 'ln':ln
                 }
@@ -1888,12 +1884,12 @@ class Template:
             groups = _("You are not member of any group.")
             list_label = ""
             submit = ""
-        action = weburl + '/yourgroups/leave?ln=%s'
+        action = CFG_SITE_URL + '/yourgroups/leave?ln=%s'
         action %= (ln)
         out %= {'groups' : groups,
                 'list_label' : list_label,
                 'action':action,
-                'logo': weburl + '/img/webbasket_create.png',
+                'logo': CFG_SITE_URL + '/img/webbasket_create.png',
                 'label' : _("Leave group"),
                 'cancel_label':_("Cancel"),
                 'ln' :ln,
@@ -1909,7 +1905,7 @@ class Template:
         @return html output
         """
         _ = gettext_set_language(ln)
-        action = weburl + '/yourgroups/edit'
+        action = CFG_SITE_URL + '/yourgroups/edit'
         out = """
 <form name="delete_group" action="%(action)s" method="post">
 <table class="confirmoperation">
@@ -1948,7 +1944,7 @@ class Template:
         @return html output
         """
         _ = gettext_set_language(ln)
-        action = weburl + '/yourgroups/leave'
+        action = CFG_SITE_URL + '/yourgroups/leave'
         out = """
 <form name="leave_group" action="%(action)s" method="post">
 <table class="confirmoperation">
@@ -2045,9 +2041,9 @@ class Template:
         nav_h2 = ""
         if (title != ""):
             nav_h2 = ' &gt; <a class="navtrail" href="%s/yourgroups/display">%s</a>'
-            nav_h2 = nav_h2 % (weburl, _("Your Groups"))
+            nav_h2 = nav_h2 % (CFG_SITE_URL, _("Your Groups"))
 
-        return  nav_h1 % (weburl, _("Your Account")) + nav_h2
+        return  nav_h1 % (CFG_SITE_URL, _("Your Account")) + nav_h2
 
     def tmpl_group_table_title(self, img="", text="", ln=CFG_SITE_LANG):
         """
@@ -2060,7 +2056,7 @@ class Template:
         if img:
             out += """
             <img src="%s" alt="" />
-            """ % (weburl + img)
+            """ % (CFG_SITE_URL + img)
         out += """
         <b>%s</b>
         </div>""" % text
@@ -2075,7 +2071,7 @@ class Template:
         """
         _ = gettext_set_language(ln)
         subject = _("Group %s: New membership request") % group_name
-        url = weburl + "/yourgroups/members?grpID=%i&ln=%s"
+        url = CFG_SITE_URL + "/yourgroups/members?grpID=%i&ln=%s"
         url %= (int(grpID), ln)
         # FIXME: which user?  We should show his nickname.
         body = (_("A user wants to join the group %s.") % group_name) + '<br />'
@@ -2101,7 +2097,7 @@ class Template:
         else:
             subject = _("Group %s: Join request has been rejected") % (group_name)
             body = _("Your request for joining group %s has been rejected.") % (group_name)
-        url = weburl + "/yourgroups/display?ln=" + ln
+        url = CFG_SITE_URL + "/yourgroups/display?ln=" + ln
         body += '<br />'
         body += _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s.") % {'x_url_open': '<a href="' + url + '">',
                                                                                               'x_url_close': '</a>'}
@@ -2118,7 +2114,7 @@ class Template:
         """
         _ = gettext_set_language(ln)
         subject = _("Group %s has been deleted") % group_name
-        url = weburl + "/yourgroups/display?ln=" + ln
+        url = CFG_SITE_URL + "/yourgroups/display?ln=" + ln
         body = _("Group %s has been deleted by its administrator.") % group_name
         body += '<br />'
         body += _("You can consult the list of %(x_url_open)syour groups%(x_url_close)s.") % {'x_url_open': '<a href="' + url + '">',
@@ -2137,7 +2133,7 @@ class Template:
         """
         _ = gettext_set_language(ln)
         out = _("You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i).")
-        out %= {'x_url_open': '<a href="' + weburl + '/yourgroups/display?ln=' + ln + '">',
+        out %= {'x_url_open': '<a href="' + CFG_SITE_URL + '/yourgroups/display?ln=' + ln + '">',
                 'x_nb_total': nb_total_groups,
                 'x_url_close': '</a>',
                 'x_nb_admin': nb_admin_groups,

@@ -33,7 +33,7 @@ import datetime
 from invenio.config import \
      CFG_LOGDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
-     weburl
+     CFG_SITE_URL
 from invenio.search_engine import perform_request_search
 from invenio.webinterface_handler import wash_urlargd
 from invenio.dbquery import run_sql
@@ -114,7 +114,7 @@ def email_notify(alert, records, argstr):
     if CFG_WEBALERT_DEBUG_LEVEL > 0:
         msg = "*** THIS MESSAGE WAS SENT IN DEBUG MODE ***\n\n"
 
-    url = weburl + "/search?" + argstr
+    url = CFG_SITE_URL + "/search?" + argstr
 
     # Extract the pattern and catalogue list from the formatted query
     query = parse_qs(argstr)

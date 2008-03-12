@@ -27,7 +27,7 @@ import unittest
 import os
 
 from invenio.errorlib import register_exception
-from invenio.config import weburl, CFG_LOGDIR
+from invenio.config import CFG_SITE_URL, CFG_LOGDIR
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -37,7 +37,7 @@ class ErrorlibWebPagesAvailabilityTest(unittest.TestCase):
     def test_your_baskets_pages_availability(self):
         """errorlib - availability of error sending pages"""
 
-        baseurl = weburl + '/error/'
+        baseurl = CFG_SITE_URL + '/error/'
 
         _exports = ['', 'send']
 

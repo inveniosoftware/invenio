@@ -20,7 +20,7 @@
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
-from invenio.config import CFG_BINDIR, CFG_WEBDIR, weburl
+from invenio.config import CFG_BINDIR, CFG_WEBDIR, CFG_SITE_URL
 
 class Template:
 
@@ -67,7 +67,7 @@ class Template:
                     <li><a href="%s/stats/search_frequency">Search frequency</a></li>
                     <li><a href="%s/stats/search_type_distribution">Search type distribution</a></li>
                     <li><a href="%s/stats/download_frequency">Download frequency</a></li>
-                  </ul>""" % ((weburl,)*4)
+                  </ul>""" % ((CFG_SITE_URL,)*4)
 
     def tmpl_customevent_list(self, customevents):
         """
@@ -78,13 +78,13 @@ class Template:
                  to define their own custom events, more abstract than the Key Statistics above.
                  A technical walk-through how to create these, is available <a href="%s/stats/customevent_help">here</a>.
                  When a custom event has been made available, it is displayed below.</p>
-                 """ % weburl
+                 """ % CFG_SITE_URL
 
 
         temp_out = ""
         for event in customevents:
             temp_out += """<li><a href="%s/stats/customevent?ids=%s">%s</a></li>""" \
-                        % (weburl, event[0], (event[1] is None) and event[0] or event[1])
+                        % (CFG_SITE_URL, event[0], (event[1] is None) and event[0] or event[1])
         if len(customevents) == 0:
             out += self.tmpl_error("There are currently no custom events available.")
         else:
@@ -182,7 +182,7 @@ register_customevent('test') </pre>
 
     def tmpl_display_event_trend_image(self, title, filename):
         """Displays a ASCII graph represnting a trend"""
-        return self.tmpl_display_trend(title, """<div><img src="%s" /></div>""" % filename.replace(CFG_WEBDIR, weburl))
+        return self.tmpl_display_trend(title, """<div><img src="%s" /></div>""" % filename.replace(CFG_WEBDIR, CFG_SITE_URL))
 
     # INTERNALS
 

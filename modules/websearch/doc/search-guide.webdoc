@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: _(Search Guide)_ -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/<lang:link/>">_(Help Central)_</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/<lang:link/>">_(Help Central)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <lang>
@@ -208,7 +208,7 @@ interested in and hit return.  For example, if you are interested in
 documents on <em>standard model</em> that are written by (or mention)
 <em>Ellis</em>, you would type:</p>
 
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
     <input size="40" type="text" name="p" value="ellis standard model" />
@@ -232,7 +232,7 @@ intéressent et lancer la recherche. Si, par exemple, vous souhaitez
 trouver des documents relatifs au <em>standard model</em> écrits (ou
 mentionnés) par <em>Ellis</em>, votre requête doit être la suivante:</p>
 
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
     <input size="40" type="text" name="p" value="ellis standard model" />
@@ -258,7 +258,7 @@ interesa recuperar documentos sobre <em>modelos estándar</em> que han
 sido escritos por (o que mencionan a) <em>Ellis</em>, debemos
 escribir:</p>
 
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
     <input size="40" type="text" name="p" value="ellis modelos estandar" />
@@ -283,7 +283,7 @@ exemple, si interessa recuperar documents sobre <em>models
 estàndard</em> que han estat escrits per (o que fan esment a)
 <em>Ellis</em>, haurem d'escriure:</p>
 
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
     <input size="40" type="text" name="p" value="ellis models est&agrave;ndar" />
@@ -312,7 +312,7 @@ way that contain either of the words <em>muon</em> or
 <em>2001</em>, you would type:</p>
 
 <blockquote>
-<form action="<WEBURL>/search" method="get">
+<form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="cc" value="<CFG_SITE_NAME>" />
     <input type="hidden" name="as" value="1" />
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -444,7 +444,7 @@ exactement ainsi), qui contiennent les mots <em>muon</em> ou
 <em>neutrino</em> dans le titre et qui ont été publiés en 2001, saisissez:</p>
 
 <blockquote>
-<form action="<WEBURL>/search" method="get">
+<form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="cc" value="<CFG_SITE_NAME>" />
     <input type="hidden" name="as" value="1" />
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -581,7 +581,7 @@ palabras <em>muons</em> o <em>neutrino</em> en el título de la
 publicación y <em>2001</em> en el año, escribiremos lo siguiente:</p>
 
 <blockquote>
-<form action="<WEBURL>/search" method="get">
+<form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="cc" value="<CFG_SITE_NAME>" />
     <input type="hidden" name="as" value="1" />
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -719,7 +719,7 @@ J</em> -transcrit exactament d'aquesta manera- i també les paraules
 <em>2001</em> a l'any, escriurem:</p>
 
 <blockquote>
-<form action="<WEBURL>/search" method="get">
+<form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="cc" value="<CFG_SITE_NAME>" />
     <input type="hidden" name="as" value="1" />
     <input type="hidden" name="ln" value="<lang:current />" />
@@ -863,7 +863,7 @@ will try to always guide you in case no exact match could be found.
 For example, it would print you a list of closest indexed terms in
 case of spelling troubles:</p>
 
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
     <input size="40" type="text" name="p" value="elllis muon" />
@@ -894,7 +894,7 @@ trouvée. Il affiche, par exemple, une liste des termes indexés les
 plus proches en cas d'orthographe approximative:</p>
 
 
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
     <input size="40" type="text" name="p" value="elllis muon" />
@@ -934,7 +934,7 @@ listas de los términos indexados que se encuentran más cercanos al
 término introducido, en caso de que se produzacan errores ortográficos
 o de transcripción al efectuar la consulta:</p>
 
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
     <input size="40" type="text" name="p" value="elllis muon" />
@@ -968,7 +968,7 @@ dels termes indexats que es troben més propers al terme introduït a la
 consulta en cas que no es trobin coincidències per errors ortogràfics
 o de transcripció:</p>
 
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
     <input size="40" type="text" name="p" value="elllis muon" />
@@ -1008,7 +1008,7 @@ Google does.  For example, to find all records that contain both the
 word <em>ellis</em> and the word <em>muon</em> anywhere in the record,
 type:</p>
 
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
     <input size="40" type="text" name="p" value="ellis muon" />
@@ -1030,7 +1030,7 @@ There are two phrase searching modes:
     pattern.  For example, to find all documents written by <em>Ellis,
     J</em> spelled exactly that way, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="&quot;Ellis, J&quot;" />
@@ -1050,7 +1050,7 @@ There are two phrase searching modes:
     containing the expression <em>muon decay</em> regardless of the
     position of the expression in the title, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="'muon decay'"/>
@@ -1066,7 +1066,7 @@ There are two phrase searching modes:
     Richard</em> (and other authors, such as <em>De Lellis, Jim</em>)
     at the same time:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="'Ellis, J'" />
@@ -1106,7 +1106,7 @@ automatiquement un booléen AND (=<em>ET</em>) entre les mots", à la manière d
 Google. Par exemple, pour trouver toutes les notices qui contiennent à la fois le mot
 <em>ellis</em> et le mot <em>muon</em>, saisissez:</p>
 
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
     <input size="40" type="text" name="p" value="ellis muon" />
@@ -1129,7 +1129,7 @@ Il existe également deux modes de recherche de phrases:
      exemple, pour trouver tous les documents écrits par <em>Ellis,
      J</em> (écrit exactement ainsi), saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="&quot;Ellis, J&quot;" />
@@ -1150,7 +1150,7 @@ Il existe également deux modes de recherche de phrases:
      l'expression <em>muon decay</em> sans tenir compte de sa position
      dans le titre, saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="'muon decay'" />
@@ -1165,7 +1165,7 @@ Il existe également deux modes de recherche de phrases:
     parfois écrit <em>Ellis, J</em> et parfois <em>Ellis, Jonathan
     Richard</em> (et d'autres auteurs comme <em>De Lellis, Jim</em>):
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <blockquote>
       <input type="hidden" name="ln" value="<lang:current />" />
       <input size="40" type="text" name="p" value="'Ellis, J'"/>
@@ -1209,7 +1209,7 @@ recuperar todos los registros que contengan tanto la palabra
 <em>ellis</em> como <em>muon</em> en cualquier parte del
 registro, debemos escribir:</p>
 
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
     <input size="40" type="text" name="p" value="ellis muon" />
@@ -1234,7 +1234,7 @@ por frases:
     <em>Ellis, J</em> escrito exactamente de ese modo, debemos
     escribir:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="&quot;Ellis, J&quot;" />
@@ -1255,7 +1255,7 @@ por frases:
     que contengan la expresión <em>muon decay</em> independientemente
     de la posición que ocupe la expresión en el título, escribiremos:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="'muon decay'" />
@@ -1271,7 +1271,7 @@ por frases:
     <em>Ellis, Jonathan Richard</em> (incluyendo otros autores, como
     <em>De Lellis, Jim</em>) en una misma acción de búsqueda:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="'Ellis, J'" />
@@ -1316,7 +1316,7 @@ recuperar tots els registres que continguin tant la paraula
 <em>ellis</em> com <em>muon</em> a qualsevol part del registre,
 haurem d'escriure:</p>
 
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <blockquote>
     <input size="40" type="text" name="p" value="ellis muon" />
@@ -1339,7 +1339,7 @@ localitzats siguin exactament igual al patró sol·licitat. Per exemple,
 per recuperar tots els documents escrits per <em>Ellis, J</em> escrit
 exactament d'aquesta manera, hem d'escriure:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="&quot;Ellis, J&quot;" />
@@ -1361,7 +1361,7 @@ web.  Per exemple, per localitzar tots els títols que continguin
 l'expressió <em>muon decay</em> independentment de la posició que
 aquesta ocupi dins el títol, escriurem:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="'muon decay'" />
@@ -1377,7 +1377,7 @@ aquesta ocupi dins el títol, escriurem:
     Jonathan Richard</em> (incloent altres autors com <em>De Lellis,
     Jim</em>) en una mateixa acció de cerca:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="'Ellis, J'" />
@@ -1747,7 +1747,7 @@ emprada en anglès per a descriure "altre forma similar de cridar una funció"</
 For example, if you want to search for documents written by Ellis on
 muons or kaons, write:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon or kaon and ellis"/>
@@ -1761,7 +1761,7 @@ muons or kaons, write:</p>
 which looks for <code>(muon or kaon) and ellis</code>.  Note that this
 gives different results from:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="ellis and muon or kaon"/>
@@ -1779,7 +1779,7 @@ your search by adding/removing words with and/not or +/- operators.
 For example, to exclude the documents on decay from the above search,
 append <code>-decay</code>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon or kaon and ellis -decay" />
@@ -1798,7 +1798,7 @@ satisfied.
 Par exemple, si vous cherchez les documents écrits par Ellis sur les muons
 ou les kaons, écrivez:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon or kaon and ellis"/>
@@ -1811,7 +1811,7 @@ ou les kaons, écrivez:</p>
 
 qui recherche pour <code>(muon or kaon) and ellis</code>. Notez que cela donne un résultat différent de:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="ellis and muon or kaon"/>
@@ -1829,7 +1829,7 @@ recherche en ajoutant/supprimant des mots avec les opérateurs and/not ou
 +/-. Par exemple, pour exclure les documents sur le "decay" de la
 recherche ci-dessus, ajoutez <code>-decay</code>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon or kaon and ellis -decay" />
@@ -1849,7 +1849,7 @@ a derecha.  Logical operations are automatically chained from left to
 right.  Por ejemplo, si queremos buscar documentos escritos por Ellis
 sobre muon o kaon, escribiremos:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon or kaon and ellis"/>
@@ -1864,7 +1864,7 @@ ello nos realizará una búsqueda equivalente a <code>(muon O
 kaon) Y ellis</code>.  Nótese también que se obtienen
 resultados diferentes si introducimos
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="ellis and muon or kaon"/>
@@ -1883,7 +1883,7 @@ utilizanto los operadores AND/NOT +/-.
 Por ejemplo, para excluir los documentos sobre desintegración en la
 búsqueda anterior, sólo hay que añadir <code>-decay</code>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon or kaon and ellis -decay" />
@@ -1906,7 +1906,7 @@ precisión en la búsqueda.
 a dreta.  Per exemple, si es volen recuperar documents escrits per Ellis
 sobre muon o kaon, escriurem:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon or kaon and ellis"/>
@@ -1921,7 +1921,7 @@ es realitzarà una cerca equivalent a <code>(muon OR kaon)
 AND ellis</code>.  Notis també que s’obtenen resultats diferents si
 s’introdueix
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="ellis and muon or kaon"/>
@@ -1940,7 +1940,7 @@ operadors AND/NOT +/-.
 Per exemple, per excloure els documents sobre desintegració a la cerca
 anterior, només cal afegir <code>-decay</code>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon or kaon and ellis -decay" />
@@ -1972,7 +1972,7 @@ precisió a la cerca.  </ca>
    without punctuation, so that you should be able to search for terms
    containing special characters, such as <em>C++</em>, verbatim:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="C++" />
@@ -1983,7 +1983,7 @@ precisió a la cerca.  </ca>
       </blockquote>
       </form>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="O'Shea"/>
@@ -1997,7 +1997,7 @@ precisió a la cerca.  </ca>
    For example, to find records containing the LaTeX expression
    <code>$e^{+}e^{-}$</code> in the title, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="$e^{+}e^{-}$" />
@@ -2011,7 +2011,7 @@ precisió a la cerca.  </ca>
    For example, to find document with the report number
    <em>hep-ph/0204133</em>, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="hep-ph/0204133" />
@@ -2024,7 +2024,7 @@ precisió a la cerca.  </ca>
 
    Note that the search is case-insensitive:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="BlaCK hOlEs" />
@@ -2040,7 +2040,7 @@ precisió a la cerca.  </ca>
 sans ponctuation, afin qu'il soit possible de rechercher des termes
 contenant des caractères spéciaux, comme dans <em>C++</em>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="C++" />
@@ -2051,7 +2051,7 @@ contenant des caractères spéciaux, comme dans <em>C++</em>:</p>
       </blockquote>
       </form>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="O'Shea"/>
@@ -2065,7 +2065,7 @@ contenant des caractères spéciaux, comme dans <em>C++</em>:</p>
    Par exemple, pour trouver les notices contenant l'expression
    LaTeX <code>$e^{+}e^{-}$</code> dans le titre, saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="$e^{+}e^{-}$" />
@@ -2079,7 +2079,7 @@ contenant des caractères spéciaux, comme dans <em>C++</em>:</p>
    Par exemple, pour trouver le rapport avec le
    numéro <em>hep-ph/0204133</em>, saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <blockquote>
       <input type="hidden" name="ln" value="<lang:current />" />
       <input size="40" type="text" name="p" value="hep-ph/0204133" />
@@ -2092,7 +2092,7 @@ contenant des caractères spéciaux, comme dans <em>C++</em>:</p>
 
    Notez que la recherche est insensible à la casse:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="BlaCK hOlEs" />
@@ -2108,7 +2108,7 @@ contenant des caractères spéciaux, comme dans <em>C++</em>:</p>
 con y sin puntuación.  Ello hace posible la búsqueda de términos que contienen
 caracteres especiales, como por ejemplo <em>C++</em>, textualmente:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="C++" />
@@ -2119,7 +2119,7 @@ caracteres especiales, como por ejemplo <em>C++</em>, textualmente:</p>
       </blockquote>
       </form>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="O'Shea"/>
@@ -2133,7 +2133,7 @@ caracteres especiales, como por ejemplo <em>C++</em>, textualmente:</p>
    Por ejemplo, para recuperar registros que contengan la expresión LaTeX
    <code>$e^{+}e^{-}$</code> en el título, debemos escribir:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="$e^{+}e^{-}$" />
@@ -2147,7 +2147,7 @@ caracteres especiales, como por ejemplo <em>C++</em>, textualmente:</p>
    Por ejemplo, para recuperar un documento con el número de informe
    <em>hep-ph/0204133</em>, debemos escribir:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="hep-ph/0204133" />
@@ -2160,7 +2160,7 @@ caracteres especiales, como por ejemplo <em>C++</em>, textualmente:</p>
 
    Nótese que esta búsqueda es sensible a las mayúsculas:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="AguJeros NEgRos" />
@@ -2178,7 +2178,7 @@ indexades amb i sense puntuació.  Això fa possible la cerca de termes
 que contenen caràcters especials, com per exemple <em>C++</em>,
 textualment:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="C++" />
@@ -2189,7 +2189,7 @@ textualment:</p>
       </blockquote>
       </form>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="O'Shea"/>
@@ -2203,7 +2203,7 @@ textualment:</p>
   Per exemple, per recuperar registres que contenen l’expresió LaTeX
    <code>$e^{+}e^{-}$</code> al títol, cal escriure:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="$e^{+}e^{-}$" />
@@ -2217,7 +2217,7 @@ textualment:</p>
    Per exemple, per recuperar un document amb número d'informe
    <em>hep-ph/0204133</em>, cal escriure:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="hep-ph/0204133" />
@@ -2230,7 +2230,7 @@ textualment:</p>
 
   Observis que aquesta cerca és sensible a les majúscules:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="ForaTs NEgRes" />
@@ -2259,7 +2259,7 @@ textualment:</p>
    query strings in any language stored in the database.  For
    example, to find the documents written by (or on) Пушкин, type:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="пушкин" />
@@ -2273,7 +2273,7 @@ textualment:</p>
    Note that you don't have to type accents to find accented results.  For example,
    type <code>Lemaitre</code> to find papers by <em>Lemaître</em>:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="Lemaitre" />
@@ -2308,7 +2308,7 @@ UTF-8, afin de rendre possible la recherche dans n'importe quelle
 langue. Par exemple, pour trouver les documents écrits par (ou
 concernant) Пушкин, saisissez:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="пушкин" />
@@ -2321,7 +2321,7 @@ concernant) Пушкин, saisissez:</p>
 
 Notez que les accents sont optionnels. Par exemple, saisissez <code>Lemaitre</code> pour trouver des articles de <em>Lemaître</em>.
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="Lemaitre" />
@@ -2356,7 +2356,7 @@ hace posible introducir cadenas de búsqueda en cualquier idioma que se
 encuentre en la base de datos.  Por ejemplo, para recuperar documentos
 escritos por (o sobre) Пушкин, debemos escribir:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="пушкин" />
@@ -2370,7 +2370,7 @@ escritos por (o sobre) Пушкин, debemos escribir:</p>
   Obsérvese que no es necesario introducir acentos para conseguir registros que contienen palabras acentuadas.
   Por ejemplo, escribiremos <code>Lemaitre</code> para buscar artículos de <em>Lemaître</em>:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="Lemaitre" />
@@ -2406,7 +2406,7 @@ possible introduir cadenes de cerca en qualsevol llengua que es trobi
 a la base de dades.  Per exemple, per recuperar documents escrits per
 (o sobre) Пушкин, cal escriure:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="пушкин" />
@@ -2420,7 +2420,7 @@ a la base de dades.  Per exemple, per recuperar documents escrits per
   Notis que no és necessari introduir accents per aconseguir registres
 que contenen paraules accentuades.  Per exemple, escriurem <code>Lemaitre</code> para recuperar articles de <em>Lemaître</em>:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="Lemaitre" />
@@ -2469,7 +2469,7 @@ recuperar entrant els caràcters accentuats a la consulta.
    that contain words <em>muon</em>, <em>muons</em>, <em>muonic</em>
    etc, type:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon*" />
@@ -2484,7 +2484,7 @@ recuperar entrant els caràcters accentuats a la consulta.
    example, to get all the words that start by <em>CERN-TH</em> and
    end by <em>31</em>, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="CERN-TH*31" />
@@ -2498,7 +2498,7 @@ recuperar entrant els caràcters accentuats a la consulta.
    Note that the wildcard will be ignored if you try to apply it to
    very short words, such as <em>a*</em>:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="a*" />
@@ -2513,7 +2513,7 @@ recuperar entrant els caràcters accentuats a la consulta.
    mode.  For example, to find all the documents whose title starts by
    "Neutrino mass", type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="&quot;Neutrino mass*&quot;" />
@@ -2541,7 +2541,7 @@ recuperar entrant els caràcters accentuats a la consulta.
    résultats contenant les
    mots <em>muon</em>, <em>muons</em>, <em>muonic</em> etc, saisissez:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon*" />
@@ -2556,7 +2556,7 @@ recuperar entrant els caràcters accentuats a la consulta.
    d'infixe. Par exemple, pour obtenir tous les termes commençant
    par <em>CERN-TH</em> et finissant par <em>31</em>, saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="CERN-TH*31" />
@@ -2570,7 +2570,7 @@ recuperar entrant els caràcters accentuats a la consulta.
     s'il est inséré avant ou après une lettre isolée (a*, par
     exemple):
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="a*" />
@@ -2586,7 +2586,7 @@ recuperar entrant els caràcters accentuats a la consulta.
     les documents dont le titre commence par "Neutrino mass",
     saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="&quot;Neutrino mass*&quot;" />
@@ -2618,7 +2618,7 @@ recuperar entrant els caràcters accentuats a la consulta.
    <em>muon</em>, <em>muonic</em>, <em>muons</em>
    etc, debemos escribir:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon*" />
@@ -2634,7 +2634,7 @@ recuperar entrant els caràcters accentuats a la consulta.
    palabras que comiencen por <em>CERN-TH</em> y acaben con
    <em>31</em>, debemos escribir:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="CERN-TH*31" />
@@ -2648,7 +2648,7 @@ recuperar entrant els caràcters accentuats a la consulta.
    Obsérvese que el comodín se ignorará si tratamos de utilizarlo en
    palabras demasiado cortas, como por ejemplo <em>a*</em>:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="a*" />
@@ -2663,7 +2663,7 @@ recuperar entrant els caràcters accentuats a la consulta.
 frase.  Por ejemplo, para recuperar todos los documentos cuyo título
 comience con "Neutrino mass", debemos escribir:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="&quot;Neutrino mass*&quot;" />
@@ -2694,7 +2694,7 @@ comience con "Neutrino mass", debemos escribir:
   recuperar registres que continguin les paraules <em>astronomia</em>,
   <em>astrònoms</em>, <em>astronòmics</em> etc, cal escriure:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="astronom*" />
@@ -2710,7 +2710,7 @@ comience con "Neutrino mass", debemos escribir:
    comencin per <em>CERN-TH</em> i acabin amb <em>31</em>, cal
    escriure:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="CERN-TH*31" />
@@ -2724,7 +2724,7 @@ comience con "Neutrino mass", debemos escribir:
    Notis que el comodí s’ignora si es tracta d’utilitzar-lo amb
    paraules massa curtes, com per exemple <em>a*</em>:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="a*" />
@@ -2739,7 +2739,7 @@ comience con "Neutrino mass", debemos escribir:
    frase.  Per exemple, per recuperar tots els documents el títol dels
    quals comenci per "Neutrino mass", cal escriure:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="&quot;Neutrino mass*&quot;" />
@@ -2781,7 +2781,7 @@ comience con "Neutrino mass", debemos escribir:
    documents containing the word <em>ellis</em> within author index,
    type:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:ellis" />
@@ -2796,7 +2796,7 @@ comience con "Neutrino mass", debemos escribir:
    like <em>muon</em>, <em>muons</em>, <em>muonic</em> within title,
    type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:ellis title:muon*" />
@@ -2810,7 +2810,7 @@ comience con "Neutrino mass", debemos escribir:
    To select documents written by the <em>NA60</em> experiment from
    the year <em>2001</em>, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="experiment:NA60 year:2001" />
@@ -2835,7 +2835,7 @@ comience con "Neutrino mass", debemos escribir:
    donné. Par exemple, pour trouver les documents contenant le mot
    <em>ellis</em> dans l'index des auteurs, saisissez:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:ellis" />
@@ -2850,7 +2850,7 @@ comience con "Neutrino mass", debemos escribir:
    titre contient des mots tels que <em>muon</em>, <em>muons</em>,
    <em>muonic</em>, saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:ellis title:muon*" />
@@ -2864,7 +2864,7 @@ comience con "Neutrino mass", debemos escribir:
    Pour sélectionner les documents écrits par l'expérience
    <em>NA60</em> en <em>2001</em>, saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="experiment:NA60 year:2001" />
@@ -2893,7 +2893,7 @@ comience con "Neutrino mass", debemos escribir:
    documentos que contienen la palabra <em>ellis</em> dentro del
    índice de autores, debemos escribir:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:ellis" />
@@ -2908,7 +2908,7 @@ comience con "Neutrino mass", debemos escribir:
     palabras tales como <em>muon</em>, <em>muonic</em>,
     <em>muons</em> dentro del título, debemos escribir:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:ellis title:muon*" />
@@ -2922,7 +2922,7 @@ comience con "Neutrino mass", debemos escribir:
    Para recuperar documentos escritos por el experimento <em>NA60</em>
    del año <em>2001</em>, debemos escribir:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="experiment:NA60 year:2001" />
@@ -2950,7 +2950,7 @@ punts aquest terme es cerca únicament dins el camp especificat.  Per
 exemple, per recuperar documents que contenen la paraula
 <em>ellis</em> dins l’índex d’autors, cal escriure:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:ellis" />
@@ -2965,7 +2965,7 @@ exemple, per recuperar documents que contenen la paraula
     paraules tals com <em>muon</em>, <em>muonic</em>,
     <em>muons</em> dins el títol, cal escriure:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:ellis title:muon*" />
@@ -2978,7 +2978,7 @@ exemple, per recuperar documents que contenen la paraula
 
    Per recuperar documents escrits per l’experiment <em>NA60</em> de l’any <em>2001</em>, cal escriure:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="experiment:NA60 year:2001" />
@@ -3013,7 +3013,7 @@ acquainted with the traditional Unix/POSIX regexp syntax.  In the
 Simple Search interface you can trigger it by using slashes instead of
 quotes:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="title:/^E.*s$/" />
@@ -3035,7 +3035,7 @@ by any number of any characters, and end by the letter <em>s</em>.
    Unix/POSIX. Dans le mode de Recherche Simple, on définit une
    expression régulière en substituant le signe / aux guillemets:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="title:/^E.*s$/" />
@@ -3059,7 +3059,7 @@ sobre todo a usuarios avanzados que conocen la sintaxis tradicional
 Unix/POSIX regexp.  En el interfaz de consulta simple se puede forzar
 este modo usando barras inclinadas en lugar de comillas:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="title:/^E.*s$/" />
@@ -3083,7 +3083,7 @@ sobretot a usuaris avançats que coneixen la sintaxi tradicional
 Unix/POSIX regexp.  A l’interficie de consulta simple es pot forçar
 aquest mode utilitzant les Barres inclinades enlloc de comentes:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="title:/^E.*s$/" />
@@ -3107,7 +3107,7 @@ lletra <em>s</em>.
 <p>Another example could be an author search for an author expressed
 in the database as either <em>Ellis, J</em> or <em>Ellis, John</em>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
@@ -3122,7 +3122,7 @@ in the database as either <em>Ellis, J</em> or <em>Ellis, John</em>:</p>
 <p>Autre exemple: la recherche d'un auteur dont le prénom peut être
    abrégé ou entier, comme <em>Ellis, J</em> ou <em>Ellis, John</em>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
@@ -3138,7 +3138,7 @@ in the database as either <em>Ellis, J</em> or <em>Ellis, John</em>:</p>
 se ha introducido en la base de datos como <em>Ellis, J</em> o bien
 como <em>Ellis, John</em>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
@@ -3155,7 +3155,7 @@ como <em>Ellis, John</em>:</p>
 ha estat introduït a la base de dades com <em>Ellis, J</em> o bé com
 <em>Ellis, John</em>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
@@ -3175,7 +3175,7 @@ specific word proximity queries.  For example, let us find all titles
 containing words <em>dense</em> and <em>matter</em> that are separated
 by at most one word that doesn't contain the letter <em>l</em>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="title:/dense ([^ l]* )?matter/" />
@@ -3192,7 +3192,7 @@ by at most one word that doesn't contain the letter <em>l</em>:</p>
    titres contenant les mots <em>dense</em> et <em>matter</em> séparés
    par un seul mot ne contenant pas la lettre <em>l</em>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
@@ -3211,7 +3211,7 @@ recuperar registros cuyos títulos contienen las palabras
 <em>dense</em> y <em>matter</em> y que estén separadas al menos por
 una palabra que no contenga la letra <em>l</em>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="title:/dense ([^ l]* )?matter/" />
@@ -3230,7 +3230,7 @@ recuperar registres Els títols dels quals contenen les paraules
 <em>dense</em> i <em>matter</em> i que estiguin separades, al menys,
 per una paraula que no contingui la lletra <em>l</em>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="title:/dense ([^ l]* )?matter/" />
@@ -3251,7 +3251,7 @@ For example, let us find all preprints that do not follow the year
 cataloguing policy, that is <em>YYYY</em> to denote year, optionally
 followed by <em>?</em> or by another <em>-YYYY</em>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/" />
@@ -3265,7 +3265,7 @@ followed by <em>?</em> or by another <em>-YYYY</em>:</p>
 You can use also character classes such <protect><code>[:alnum:]</code></protect>, so
 that the above query is equivalent to:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/" />
@@ -3285,7 +3285,7 @@ pour spécifier une l'année de publication, éventuellement suivi
 par <em>?</em> ou une autre année <em>-YYYY</em> (p.ex. 2003-2004 sera
 exclus) :</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/" />
@@ -3300,7 +3300,7 @@ Il est aussi possible d'utiliser des "familles" de caractères, tel
 que <protect><code>[:alnum:]</code></protect>, de telle sorte que la
 requête ci-dessus est équivalente à:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/" />
@@ -3319,7 +3319,7 @@ que no se corresponden con la política de catalogación <em>AAAA</em>
 para describir los años, opcionalmente seguida por <em>?</em> o por
 otro <em>-AAAA</em>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/" />
@@ -3334,7 +3334,7 @@ También pueden utilizarse otras clases de caracteres como
 <protect><code>[:alnum:]</code></protect>, el cual en el ejemplo anterior sería
 equivalente a:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/" />
@@ -3354,7 +3354,7 @@ corresponguin amb la política de catalogació <em>AAAA</em> per
 descriure anys, opcionalment seguida per <em>?</em> o per altre
 <em>-AAAA</em>:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[0-9]{4}([\?\-]|\-[0-9]{4})?$/" />
@@ -3369,7 +3369,7 @@ També poden emprar-se altres classe de caràcters com
 <protect><code>[:alnum:]</code></protect>, que a l’exemple anterior seria
 equivalent a:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="collection:PREPRINT -year:/^[[:digit:]]{4}([\?\-]|\-[[:digit:]]{4})?$/" />
@@ -3431,7 +3431,7 @@ documentation</a>.</p>
 example, to search for all documents on <em>muon decay</em> published
 between <em>1983</em> and <em>1992</em>, type:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="30" type="text" name="p" value="muon decay year:1983->1992" />
@@ -3445,7 +3445,7 @@ between <em>1983</em> and <em>1992</em>, type:</p>
 To find all documents by authors with names ranging from <em>Ellis,
 J</em> to <em>Ellis, Qqq</em>, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="30" type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
@@ -3462,7 +3462,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
    pour rechercher tous les documents relatifs au <em>muon decay</em>
    publiés entre 1983 et 1992, saisissez:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="30" type="text" name="p" value="muon decay year:1983->1992" />
@@ -3475,7 +3475,7 @@ J</em> to <em>Ellis, Qqq</em>, type:
 Pour trouver tous les documents dont l'orthographe du nom de l'auteur est comprise entre <em>Ellis,
 J</em> to <em>Ellis, Qqq</em>, saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="30" type="text" name="p" value="author:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
@@ -3493,7 +3493,7 @@ J</em> to <em>Ellis, Qqq</em>, saisissez:
 sobre <em>par motor</em> publicados entre <em>1983</em> y
 <em>1992</em>, debemos escribir:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="30" type="text" name="p" value="destintegraci&oacute;n muon a&ntilde;o:1983->1992" />
@@ -3508,7 +3508,7 @@ Para recuperar todos los documentos de autores cuyos nombres estén
 dentro del rango que va de <em>Ellis, J</em> a <em>Ellis, Qqq</em>,
 debemos escribir:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="30" type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
@@ -3526,7 +3526,7 @@ debemos escribir:
 <em>par motor</em> publicats entre <em>1983</em> i <em>1992</em>, cal
 escriure:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="30" type="text" name="p" value="destintegraci&oacute; muon any:1983->1992" />
@@ -3541,7 +3541,7 @@ Per recuperar tots els documents d’autors els noms dels quals estiguin
 dins El rang que va des de <em>Ellis, J</em> fins <em>Ellis, Qqq</em>,
 cal escriure:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="30" type="text" name="p" value="autor:&quot;Ellis, J&quot;->&quot;Ellis, Qqq&quot;" />
@@ -3574,7 +3574,7 @@ cal escriure:
    abstract fields, and that were published in year starting by digits
    '200', type:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*" />
@@ -3590,7 +3590,7 @@ cal escriure:
    or <code>reference</code> index to search there.  For example, to find the term <em>Higgs</em>
    in either metadata, references or fulltext files, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs" />
@@ -3607,7 +3607,7 @@ cal escriure:
    <em>Schwarzschild</em> and <em>AdS</em>, and who cite journal
    <em>Adv. Theor. Math. Phys.</em>, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;" />
@@ -3627,7 +3627,7 @@ cal escriure:
    sous-chaîne, pour être plus précis) 'dense quark matter', et qui
    ont été publiés dans les années 2000 et plus, saisissez:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*" />
@@ -3641,7 +3641,7 @@ cal escriure:
    Notez que la recherche dans "tous les champs" ne s'effectue que sur les métadonnées, et non pas sur les citations, ni le contenu des documents. Il vous faut explicitement indique une recherche dans les champs <code>fulltext</code>
    ou <code>reference</code> pour chercher dans ces données. Par exemple, pour trouver le terme <em>Higgs</em> dans les métadonnées, les références et le contenu des fichiers, saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs" />
@@ -3659,7 +3659,7 @@ cal escriure:
    <em>Schwarzschild</em> et <em>AdS</em>, et citant le journal
    <em>Adv. Theor. Math. Phys.</em>, saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;" />
@@ -3680,7 +3680,7 @@ precisos) ‘dense quark matter’ dentro del campo de resumen, y que han sido
 publicados dentro de los años que comienzan por los dígitos '200',
 debe escribirse:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*" />
@@ -3699,7 +3699,7 @@ las opciones de buscar en el índice <code>texto completo</code> o de
 Por ejemplo, para recuperar el término <em>Higgs</em> tanto dentro de
 los metadatos, las citas o el texto completo, debe escribirse:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs" />
@@ -3717,7 +3717,7 @@ completo contengan las palabras <em>Schwarzschild</em> y <em>AdS</em>,
 que citen la revista <em>Adv. Theor. Math. Phys.</em>, debe
 escribirse:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;" />
@@ -3739,7 +3739,7 @@ camp, i que contenen la frase (o subcadena de paraules, per ser més
 precisos) ‘dense quark matter’ dins el camp de resum, i que han estat
 publicats dins els anys que comencen pels dígits '200', cal escriure:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="author:ellis -muon* +abstract:'dense quark matter' year:200*" />
@@ -3758,7 +3758,7 @@ opcions de cercar a l’índex <code>text complet</code> o de
 camps.  Per exemple, per recuperar el terme <em>Higgs</em> tant dins
 les metadades, les referències o el text complet, cal escriure:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="higgs or reference:higgs or fulltext:higgs" />
@@ -3775,7 +3775,7 @@ les metadades, les referències o el text complet, cal escriure:
    continguin les paraules <em>Schwarzschild</em> and <em>AdS</em>,
    que citi la revista <em>Adv. Theor. Math. Phys.</em>, cal escriure:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="author:lin fulltext:Schwarzschild fulltext:AdS reference:&quot;Adv. Theor. Math. Phys.&quot;" />
@@ -3819,7 +3819,7 @@ les metadades, les referències o el text complet, cal escriure:
     as a <em>report number</em>, choose corresponding index.</li>
 <li>If you are looking for a specific document collection, such
     as <em>Theses</em>, choose the
-    <a href="<WEBURL>/?c=Theses">Theses</a> collection first, and start your search from there.</li>
+    <a href="<CFG_SITE_URL>/?c=Theses">Theses</a> collection first, and start your search from there.</li>
 </ul>
 </en>
 <fr>
@@ -3834,7 +3834,7 @@ les metadades, les referències o el text complet, cal escriure:
     correspondant.</li>
 <li>Si vous recherchez une collection spécifique de documents
     (Thèses, par exemple), commencez la recherche dans la collection
-    <a href="<WEBURL>/?c=Theses&amp;ln=fr">Thèses</a>.</li>
+    <a href="<CFG_SITE_URL>/?c=Theses&amp;ln=fr">Thèses</a>.</li>
 </ul>
 </fr>
 
@@ -3850,7 +3850,7 @@ metadatos, como por ejemplo, <em>número de registro</em>, seleccionar
 el índice correspondiente.</li>
 <li>Si la búsqueda versa sobre una colección específica de documentos,
 como por ejemplo, <em>Tesis</em>, elegir en primer lugar la colección
-<a href="<WEBURL>/?c=Theses">Tesis</a>, e iniciar la búsqueda a partir
+<a href="<CFG_SITE_URL>/?c=Theses">Tesis</a>, e iniciar la búsqueda a partir
 de aquí.</li>
 </ul>
 </es>
@@ -3868,7 +3868,7 @@ per exemple, <em>número de registre</em>, cal seleccionar l’índex
 corresponent.</li>
 <li>Si la cerca versa sobre una col•lecció específica de documents,
 com per exemple, <em>Tesis</em>, cal escollir en primer lloc la
-col•lecció <a href="<WEBURL>/?c=Theses">Tesis</a>, e iniciar la cerca
+col•lecció <a href="<CFG_SITE_URL>/?c=Theses">Tesis</a>, e iniciar la cerca
 a partir de aquí.</li>
 </ul>
 </ca>
@@ -3896,7 +3896,7 @@ would want here.  If you choose to search for the words <code>Ellis
 words <code>Ellis</code> and <code>J</code>) are effected first and a
 boolean AND is performed next:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="Ellis J" />
@@ -3921,7 +3921,7 @@ permit you to achieve higher search precisions.</p>
 only, such as <em>Ellis, J</em>.  To get the list of publications of
 an author whose name is spelled exactly that way, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
@@ -3944,7 +3944,7 @@ sont généralement pas adaptées. Si vous recherchez les mots
 les mots <code>Ellis</code> et <code>J</code>) sont d'abord
 effectuées. Le booléen ET n'est utilisé que par la suite:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="Ellis J" />
@@ -3970,7 +3970,7 @@ contenant uniquement des initiales, telle que <em>Ellis, J</em>. Pour
 obtenir la liste des publications d'un auteur dont le nom est
 orthographié de cette manière, saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
@@ -3994,7 +3994,7 @@ selecciona la búsqueda por palabras <code>Ellis J</code> dentro del
 palabras <code>Ellis</code> y <code>J</code>) que se efectuarán en
 primer lugar, y una booleana Y que se realizará después.
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="Ellis J" />
@@ -4021,7 +4021,7 @@ por ejemplo, <em>Ellis, J</em>.  Para obtener un listado de las
 publicaciones de dicho autor con el nombre escrito exactamente de ese
 modo, debemos escribir:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
@@ -4046,7 +4046,7 @@ consultes (per a les paraules <code>Ellis</code> i <code>J</code>) que
 es realitzaran en primer lloc, i una booleana I que es realitzarà
 després.
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="Ellis J" />
@@ -4072,7 +4072,7 @@ formularis continguin únicament la inicial del nom, com per exemple,
 <em>Ellis, J</em>.  Per obtenir un llistat de les publicacions de tal
 autor amb el nom escrit exactament d’aquesta manera, cal escriure:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:&quot;Ellis, J&quot;" />
@@ -4101,7 +4101,7 @@ name: <em>Ellis, John Rolfe</em>).  To get the list of publications
 for all these forms at the same time, you could use a boolean OR
 query:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;" />
@@ -4121,7 +4121,7 @@ fast.</p>
 <li>To match all of the above forms in a single search term, you can
 try to use a wildcard query:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:&quot;Ellis, J*&quot;" />
@@ -4145,7 +4145,7 @@ positives.  The search is relatively fast.</p>
 <li>Yet another, the most general alternative is to use a partial
 phrase matching:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:'Ellis, J'" />
@@ -4172,7 +4172,7 @@ expression syntax</a> to construct any complex author query.  A simple
 example is to search for an author expressed in the database as either
 <em>Ellis, J</em> or <em>Ellis, John</em>:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
@@ -4212,7 +4212,7 @@ John Rolfe</em>). Pour obtenir la liste de publications correspondant
 à l'ensemble de ces formes, vous pouvez utiliser une requête booléenne
 OU:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;" />
@@ -4233,7 +4233,7 @@ données <a href="#author-full-names"><sup>*</sup></a>). La recherche est rapide
 seule recherche de termes, vous pouvez baser la requête sur un
 caractère de remplacement:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:&quot;Ellis, J*&quot;" />
@@ -4257,7 +4257,7 @@ incorrectes. La recherche est relativement rapide.</p>
 <li>L'alternative la plus fréquemment utilisée reste néanmoins la
 recherche de phrases partielles:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:'Ellis, J'" />
@@ -4287,7 +4287,7 @@ n'importe quelle recherche d'auteur, même complexe. Un exemple simple
 est la recherche d'un auteur dont le nom est archivé en tant
 que <em>Ellis, J</em> ou <em>Ellis, John</em>:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
@@ -4331,7 +4331,7 @@ también con el nombre compuesto:<em>Ellis, John Rolfe</em>).  Para
 obtener una lista de publicaciones del autor con todas sus formas en
 una misma búsqueda, se puede utilizar el operador booleano O:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;" />
@@ -4353,7 +4353,7 @@ rápida.</p>
 anterior con un único término de búsqueda, podemos probar de utilizar
 una búsqueda con comodín:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:&quot;Ellis, J*&quot;" />
@@ -4378,7 +4378,7 @@ obtener resultados poco pertinentes.  La búsqueda es relativamente rápida.</p>
 <li>Aparte de esta última, la alternativa general más utilizada es el
 uso de una búsqueda por parte de la frase:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:'Ellis, J'" />
@@ -4408,7 +4408,7 @@ consultas complejas para buscar por autor.  Un ejemplo sencillo es la
 búsqueda de un autor introducido en la base de datos tanto como
 <em>Ellis, J</em> como <em>Ellis, John</em>:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
@@ -4453,7 +4453,7 @@ també amb el nom compost:<em>Ellis, John Rolfe</em>).  Per
 obtenir una llista de publicacions de l’autor amb totes les seves formes en
 una mateixa cerca, es pot utilitzar l’operador booleà O:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="60" type="text" name="p" value="author:&quot;Ellis, J&quot; or author:&quot;Ellis, John&quot; or author:&quot;Ellis, John Rolfe&quot;" />
@@ -4474,7 +4474,7 @@ href="#author-full-names"><sup>*</sup></a>.)  La cerca és molt ràpida.</p>
 amb un únic terme de cerca, podem provar d’emprar una cerca amb
 comodí:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:&quot;Ellis, J*&quot;" />
@@ -4499,7 +4499,7 @@ poc pertinents. La cerca és relativament ràpida.</p>
 <li>Apart d’aquesta darrera, l’alternativa general més emprada és la
 cerca per part de la frase:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:'Ellis, J'" />
@@ -4529,7 +4529,7 @@ consultes complexes per fer cerques per autor.  Un exemple senzill és
 la cerca d’un autor introduït a la base de dades tant per <em>Ellis,
 J</em> com per <em>Ellis, John</em>:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="author:/^Ellis, (J|John)$/" />
@@ -4577,7 +4577,7 @@ una cerca per autors exitosa.</p>
    that your documents have several of them.  For example, the report
    numbers <em>hep-ph/0204140</em>, <em>CERN-TH-2002-069</em> and
    <em>RM3-TH-02-4</em> all denote <a
-   href="<WEBURL>/search?p=CERN-TH-2002-069&amp;f=reportnumber">the
+   href="<CFG_SITE_URL>/search?p=CERN-TH-2002-069&amp;f=reportnumber">the
    same document</a>.  Now if you sort your search results set
    containing this document, the system will take into consideration
    the first report number, that may be either of these three.
@@ -4603,7 +4603,7 @@ una cerca per autors exitosa.</p>
    and on the search results page, being satisfied with the results,
    you would add <code>&amp;sp=CERN-TH</code> to the URL to sort the
    results preferentially by CERN-TH report numbers, to get a <a
-   href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH">nicely
+   href="<CFG_SITE_URL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH">nicely
    sorted list</a> of all CERN-TH 2001 publications.</p>
 </en>
 <fr>
@@ -4615,7 +4615,7 @@ una cerca per autors exitosa.</p>
    rapport <em>hep-ph/0204140</em>, <em>CERN-TH-2002-069</em> et
    <em>RM3-TH-02-4</em> appartiennent tous
    au <a
-   href="<WEBURL>/search?p=CERN-TH-2002-069&amp;f=reportnumber&amp;ln=fr">même
+   href="<CFG_SITE_URL>/search?p=CERN-TH-2002-069&amp;f=reportnumber&amp;ln=fr">même
    document</a>. Si ce document se trouve dans vos résultats, le
    système ne prendra en compte qu' seul de ces numéros pour le tri.
    Il arrive que l'on cherche à trier parfois selon la
@@ -4643,7 +4643,7 @@ una cerca per autors exitosa.</p>
       (une fois que ceux-ci sont satisfaisants), ajouter
       <code>&amp;sp=CERN-TH</code> à l'URL pour obtenir
       la <a
-      href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH&amp;ln=fr">liste
+      href="<CFG_SITE_URL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH&amp;ln=fr">liste
       triée</a> selon ce paramètre.</p>
 
 </fr>
@@ -4655,7 +4655,7 @@ una cerca per autors exitosa.</p>
    código de referencia y que un mismo documento tenga más de uno.
    Por ejemplo, los códigos <em>hep-ph/0204140</em>,
    <em>CERN-TH-2002-069</em> y <em>RM3-TH-02-4</em> apuntan todos <a
-   href="<WEBURL>/search?p=CERN-TH-2002-069&amp;f=reportnumber">al
+   href="<CFG_SITE_URL>/search?p=CERN-TH-2002-069&amp;f=reportnumber">al
    mismo documento</a>. Si se ordena el conjunto de resultados de
    búsqueda contenidos en el documento, el sistema tendrá en cuenta el
    primer número de informe, que puede ser cualquiera de los tres.  En
@@ -4684,7 +4684,7 @@ una cerca per autors exitosa.</p>
    esté satisfecho con los resultados obtenidos, añadir
    <code>&amp;sp=CERN-TH</code> en el URL a fin de ordenar los resultados
    sgún los códigos de informe CERN-TH, y conseguir una correcta <a
-   href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH">
+   href="<CFG_SITE_URL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH">
    ordenación del listado</a> de todas las publicaciones CERN-TH del
    2001.</p>
 </es>
@@ -4697,7 +4697,7 @@ una cerca per autors exitosa.</p>
    i que un mateix document en tingui més d’un.  Per exemple, els
    codis <em>hep-ph/0204140</em>, <em>CERN-TH-2002-069</em> i
    <em>RM3-TH-02-4</em> apunten tots <a
-   href="<WEBURL>/search?p=CERN-TH-2002-069&amp;f=reportnumber">al
+   href="<CFG_SITE_URL>/search?p=CERN-TH-2002-069&amp;f=reportnumber">al
    mateix document</a>. Si s’ordena el conjunt de resultats de cerca
    que conté el document, el sistema tindrà en consideració el primer
    número d’informe, que pot ser qualsevol dels tres.  En ocasions es
@@ -4725,7 +4725,7 @@ una cerca per autors exitosa.</p>
    s’estigui satisfet amb els resultats obtinguts, afegir
    <code>&amp;sp=CERN-TH</code> a la URL per tal d’ordenar els resultats
    segons els codis d’informe CERN-TH, i aconseguir una correcta <a
-   href="<WEBURL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH">
+   href="<CFG_SITE_URL>/search?p=reportnumber%3A%22CERN-TH-2001*%22&amp;sf=reportnumber&amp;so=a&amp;sp=CERN-TH">
    ordenació de la llista </a> de totes les publicacions CERN-TH del
    2001.</p>
 </ca>
@@ -4821,7 +4821,7 @@ tries to extract the textual information from the files and index it into a sepa
 To search for all records that contain the term <em>e-</em> in their fulltext files,
 type:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="fulltext:e-" />
@@ -4837,7 +4837,7 @@ but that you may freely combine a fulltext and metadata search.  For example, to
 articles written by <em>Ellis</em> that contain the word <em>muon</em> either in the
 metadata or in the fulltext, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis" />
@@ -4857,7 +4857,7 @@ extraire les informations textuelles et de les indexer dans l'index
 "fulltext". Pour chercher toutes les notices qui contiennent le
 terme <em>e-</em> dans leur fichiers, saisissez:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="fulltext:e-" />
@@ -4876,7 +4876,7 @@ articles écrits par <em>Ellis</em> qui contiennent le
 mot <em>muon</em> dans les métadonnées et/ou dans le texte complet,
 saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis" />
@@ -4897,7 +4897,7 @@ indexar-la a un índex de <code>text complet</code>separat.  Per
 recuperar tots els documents que contenen el terme <em>e-</em>al text
 complet dels seus documents associats, cal escriure:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="fulltext:e-" />
@@ -4915,7 +4915,7 @@ Per exemple, per recuperar tots els articles escrits per
 <em>Ellis</em> que continguin la paraula <em>muon</em> tant a les
 metadades como all text complet, cal escriure:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis" />
@@ -4936,7 +4936,7 @@ completo</code>separado.  Para recuperar todos los documentos que
 contienen el término <em>e-</em> en el texto completo de sus
 documentos asociados, debemos escribir:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="fulltext:e-" />
@@ -4954,7 +4954,7 @@ misma búsqueda.  Por ejemplo, para recuperar todos los artículos
 escritos por <em>Ellis</em> que contengan la palabra <em>muon</em>
 tanto en los metadatos como en el texto completo, debemos escribir:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="muon or fulltext:muon and author:ellis" />
@@ -4987,7 +4987,7 @@ them into a separate <code>reference</code> index.  To search for
 all records that cite <em>Ellis</em> in their reference lists,
 type:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="reference:Ellis" />
@@ -5001,7 +5001,7 @@ type:</p>
 To search for all records that cite preprint <em>hep-ph/0103062</em>
 in their reference lists, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="reference:hep-ph/0103062" />
@@ -5016,7 +5016,7 @@ To search for all records that cite an article from <em>Giddings</em>
 and <em>Ross</em> published in <em>Physical Review D</em> in volume
 <em>61</em> in year <em>2000</em>, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000" />
@@ -5032,7 +5032,7 @@ but that you may freely combine a citation search with a metadata search.
 For example, to find all articles on <em>standard model</em> that aren't written by
 <em>Ellis</em> but that do cite him, type:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="standard model -author:ellis reference:ellis" />
@@ -5051,7 +5051,7 @@ For example, to find all articles on <em>standard model</em> that aren't written
    références et les indexe dans l'index <code>references</code>. Pour
    chercher tous les documents qui citent <em>Ellis</em>, saisissez:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="reference:Ellis" />
@@ -5065,7 +5065,7 @@ For example, to find all articles on <em>standard model</em> that aren't written
 Pour chercher toutes les notices qui citent le
 preprint <em>hep-ph/0103062</em>, saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="reference:hep-ph/0103062" />
@@ -5081,7 +5081,7 @@ de <em>Giddings</em> et <em>Ross</em> publié dans
 <em>Physical Review D</em>, volume <em>61</em> en <em>2000</em>, saisissez:
 
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000" />
@@ -5099,7 +5099,7 @@ métadonnées.  Par exemple, pour trouver tous les articles sur le
 <em>standard model</em> qui n'ont pas été écrits par <em>Ellis</em>
 mais qui le citent, saisissez:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="standard model -author:ellis reference:ellis" />
@@ -5118,7 +5118,7 @@ indexarlas en un índice separado de <code>citas</code>.  Para
 recuperar todos los registros que citan a <em>Ellis</em> en sus
 listados de citas bibliogáficas, escribiremos:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="reference:Ellis" />
@@ -5133,7 +5133,7 @@ Para recuperar todos los registros que citan el pre-print
 <em>hep-ph/0103062</em>en sus listados de citas bibliográficas,
 escribiremos:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="reference:hep-ph/0103062" />
@@ -5148,7 +5148,7 @@ Para recuperar todos los documentos que citan un artículo de
 <em>Giddings</em> y <em>Ross</em>publicado en <em>Physical Review
 D</em> volumen <em>61</em> y en el año <em>2000</em>, escribiremos:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:20000" />
@@ -5166,7 +5166,7 @@ bibliogràfica y por metadatos.  Por ejemplo, para recuperar todos los
 artículos sobre <em>modelo estándar</em> que no han sido escritos por
 <em>Ellis</em> pero lo citan, escribiremos:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="standard model -author:ellis reference:ellis" />
@@ -5186,7 +5186,7 @@ fitxer e indexar-les a un índex separat de <code>referències</code>.
 Para recuperar tots els registres que citen a <em>Ellis</em> en els
 seus llistats de referències bibliogràfiques, escriurem:</p>
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="reference:Ellis" />
@@ -5201,7 +5201,7 @@ Per recuperar tots els registres que citen el pre-print
 <em>hep-ph/0103062</em>en els seus llistats de referències
 bibliogràfiques, escriurem:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="reference:hep-ph/0103062" />
@@ -5216,7 +5216,7 @@ Per recuperar tots els documents que citen un article de
 <em>Giddings</em> i <em>Ross</em>publicat a <em>Physical Review D</em>
 volum <em>61</em> i a l’any <em>2000</em>, escriurem:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="70" type="text" name="p" value="reference:giddings reference:ross reference:&quot;Phys. Rev., D&quot; reference:61 reference:2000" />
@@ -5236,7 +5236,7 @@ Per exemple, per recuperar tots els articles sobre <em>model
 estàndar</em> que no han estat escrits per <em>Ellis</em> però el
 citen, escriurem:
 
-      <form action="<WEBURL>/search" method="get">
+      <form action="<CFG_SITE_URL>/search" method="get">
       <input type="hidden" name="ln" value="<lang:current />" />
       <blockquote>
       <input size="40" type="text" name="p" value="standard model -author:ellis reference:ellis" />

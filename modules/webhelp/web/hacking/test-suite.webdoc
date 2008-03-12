@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: Test Suite Strategy -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <h2>Contents</h2>
@@ -371,10 +371,10 @@ interface but guests cannot:
 
 <blockquote>
 <pre>
-test_web_page_content(weburl + '/admin/websearch/websearchadmin.py',
+test_web_page_content(CFG_SITE_URL + '/admin/websearch/websearchadmin.py',
                       username='admin')
 
-test_web_page_content(weburl + '/admin/websearch/websearchadmin.py',
+test_web_page_content(CFG_SITE_URL + '/admin/websearch/websearchadmin.py',
                       username='guest',
                       expected_text='Authorization failure')
 </pre>
@@ -385,7 +385,7 @@ terms box:
 
 <blockquote>
 <pre>
-test_web_page_content(weburl + '/search?p=aoeuidhtns',
+test_web_page_content(CFG_SITE_URL + '/search?p=aoeuidhtns',
                       expected_text='Nearest terms in any collection are')
 </pre>
 </blockquote>

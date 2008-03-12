@@ -44,7 +44,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_SITE_NAME_INTL, \
      CFG_VERSION, \
-     weburl, \
+     CFG_SITE_URL, \
      CFG_SITE_SUPPORT_EMAIL
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
@@ -300,36 +300,36 @@ class Template:
 
         if doi_query:
             if perform_request_search(p=doi_query):
-                return '%s/search%s' % (weburl, make_canonical_urlargd({
+                return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
                     'p' : doi_query,
                     'sc' : 1,
                     'of' : 'hd'}, {}))
         if isbn_query:
             if perform_request_search(p=isbn_query):
-                return '%s/search%s' % (weburl, make_canonical_urlargd({
+                return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
                     'p' : isbn_query,
                     'sc' : 1,
                     'of' : 'hd'}, {}))
         if coden_query:
             if perform_request_search(p=coden_query):
-                return '%s/search%s' % (weburl, make_canonical_urlargd({
+                return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
                     'p' : coden_query,
                     'sc' : 1,
                     'of' : 'hd'}, {}))
         if author_query and title_query:
             if perform_request_search(p='%s and %s' % (title_query, author_query)):
-                return '%s/search%s' % (weburl, make_canonical_urlargd({
+                return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
                     'p' : '%s and %s' % (title_query, author_query),
                     'sc' : 1,
                     'of' : 'hd'}, {}))
         if title_query:
             if perform_request_search(p=title_query):
-                return '%s/search%s' % (weburl, make_canonical_urlargd({
+                return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
                     'p' : title_query,
                     'sc' : 1,
                     'of' : 'hb'}, {}))
         if title:
-            return '%s/search%s' % (weburl, make_canonical_urlargd({
+            return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
                     'p' : title,
                     'sc' : 1,
                     'of' : 'hb'}, {}))
@@ -355,12 +355,12 @@ class Template:
 
         # Asking for a recid? Return a /record/<recid> URL
         if 'recid' in parameters:
-            target = "%s/record/%d" % (weburl, parameters['recid'])
+            target = "%s/record/%d" % (CFG_SITE_URL, parameters['recid'])
             del parameters['recid']
             target += make_canonical_urlargd(parameters, self.search_results_default_urlargd)
             return target
 
-        return "%s/search%s" % (weburl, make_canonical_urlargd(parameters, self.search_results_default_urlargd))
+        return "%s/search%s" % (CFG_SITE_URL, make_canonical_urlargd(parameters, self.search_results_default_urlargd))
 
     def build_search_interface_url(self, known_parameters={}, **kargs):
         """ Helper for generating a canonical search interface URL."""
@@ -374,9 +374,9 @@ class Template:
 
         # Now, we only have the arguments which have _not_ their default value
         if c and c != CFG_SITE_NAME:
-            base = weburl + '/collection/' + urllib.quote(c)
+            base = CFG_SITE_URL + '/collection/' + urllib.quote(c)
         else:
-            base = weburl
+            base = CFG_SITE_URL
         return create_url(base, drop_default_urlargd(parameters, self.search_results_default_urlargd))
 
     def build_rss_url(self, known_parameters,  **kargs):
@@ -400,7 +400,7 @@ class Template:
                 c = [urllib.quote(coll) for coll in c]
                 args += '&amp;c=' + '&amp;c='.join(c)
 
-        return weburl + '/rss' + args
+        return CFG_SITE_URL + '/rss' + args
 
     def tmpl_record_page_header_content(self, req, recid, ln):
         """ Provide extra information in the header of /record pages """
@@ -430,8 +430,6 @@ class Template:
           - 'as' *bool* - Should we display an advanced search box?
 
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
 
           - 'separator' *string* - The separator between two consecutive collections
 
@@ -472,14 +470,14 @@ class Template:
             narrowsearch = instantbrowse
 
         body = '''
-                <form name="search" action="%(weburl)s/search" method="get">
+                <form name="search" action="%(siteurl)s/search" method="get">
                 %(searchfor)s
                 %(np_portalbox)s
                 <table cellspacing="0" cellpadding="0" border="0">
                   <tr>
                     <td valign="top">%(narrowsearch)s</td>
                ''' % {
-                 'weburl' : weburl,
+                 'siteurl' : CFG_SITE_URL,
                  'searchfor' : searchfor,
                  'np_portalbox' : np_portalbox,
                  'narrowsearch' : narrowsearch
@@ -557,7 +555,7 @@ class Template:
           <tr valign="baseline">
            <td class="searchboxbody" colspan="3" align="right">
              <small>
-               <a href="%(weburl)s/help/search-tips%(langlink)s">%(msg_search_tips)s</a> ::
+               <a href="%(siteurl)s/help/search-tips%(langlink)s">%(msg_search_tips)s</a> ::
                %(asearch)s
              </small>
            </td>
@@ -567,7 +565,7 @@ class Template:
         <!--/create_searchfor_simple()-->
         ''' % {'ln' : ln,
                'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
-               'weburl' : weburl,
+               'siteurl' : CFG_SITE_URL,
                'asearch' : create_html_link(asearchurl, {}, _('Advanced Search')),
                'header' : header,
                'middle_option' : middle_option,
@@ -595,12 +593,6 @@ class Template:
           Parameters:
 
             - 'ln' *string* - The language to display
-
-            - 'weburl' *string* - The base URL for the site
-
-            - 'ssearchurl' *string* - The URL to simple search form
-
-            - 'header' *string* - header of search form
 
             - 'middle_option_1' *string* - HTML code for the first row of options (any field, specific fields ...)
 
@@ -674,7 +666,7 @@ class Template:
           <tr valign="bottom">
             <td colspan="3" class="searchboxbody" align="right">
               <small>
-                <a href="%(weburl)s/help/search-tips%(langlink)s">%(msg_search_tips)s</a> ::
+                <a href="%(siteurl)s/help/search-tips%(langlink)s">%(msg_search_tips)s</a> ::
                 %(ssearch)s
               </small>
             </td>
@@ -684,7 +676,7 @@ class Template:
         <!-- @todo - more imports -->
         ''' % {'ln' : ln,
                'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
-               'weburl' : weburl,
+               'siteurl' : CFG_SITE_URL,
                'ssearch' : create_html_link(ssearchurl, {}, _("Simple Search")),
                'header' : header,
 
@@ -1054,14 +1046,14 @@ class Template:
                 <td valign="top" class="searchalsosearchboxbody">
                 <div style="white-space: nowrap"><label for="%(id)s">%(name)s</label>
                 <a href="%(base_url)s">
-                <img src="%(weburl)s/img/external-icon-light-8x8.gif" border="0" alt="%(name)s"/></a>
+                <img src="%(siteurl)s/img/external-icon-light-8x8.gif" border="0" alt="%(name)s"/></a>
                 </div></td></tr>""" % \
                                  { 'checked': checked,
                                    'base_url': base_url,
                                    'internal_name': internal_name,
                                    'name': cgi.escape(name),
                                    'id': "extSearch" + nmtoken_from_string(name),
-                                   'weburl': weburl,}
+                                   'siteurl': CFG_SITE_URL,}
 
         html += """</tbody></table></td></tr></table>"""
         return html
@@ -1237,15 +1229,13 @@ class Template:
         out += """</select>"""
         return out
 
-    def tmpl_record_links(self, weburl, recid, ln):
+    def tmpl_record_links(self, recid, ln):
         """
           Displays the *More info* and *Find similar* links for a record
 
         Parameters:
 
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
 
           - 'recid' *string* - the id of the displayed record
         """
@@ -1269,13 +1259,11 @@ class Template:
 
         return out
 
-    def tmpl_record_body(self, weburl, titles, authors, dates, rns, abstracts, urls_u, urls_z, ln):
+    def tmpl_record_body(self, titles, authors, dates, rns, abstracts, urls_u, urls_z, ln):
         """
           Displays the "HTML basic" format of a record
 
         Parameters:
-
-          - 'weburl' *string* - The base URL for the site
 
           - 'authors' *list* - the authors (as strings)
 
@@ -1352,8 +1340,6 @@ class Template:
 
           - 'ln' *string* - The language to display
 
-          - 'weburl' *string* - The base URL for the site
-
           - 'terminfo': tuple (term, hits, argd) for each near term
 
           - 'intro' *string* - the intro HTML to prefix the box with
@@ -1404,8 +1390,6 @@ class Template:
           - 'fn' *string* - field name (i18nized)
 
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
 
           - 'browsed_phrases_in_colls' *array* - the phrases to display
 
@@ -1491,12 +1475,12 @@ class Template:
                             &nbsp;
                           </td>
                           <td class="normal">
-                            <img src="%(weburl)s/img/sn.gif" alt="" border="0" />
+                            <img src="%(siteurl)s/img/sn.gif" alt="" border="0" />
                             %(link)s
                           </td>
                       </tr>""" % {'link': create_html_link(self.build_search_url(query, action='browse'),
                                                            {}, _("next")),
-                                  'weburl' : weburl}
+                                  'siteurl' : CFG_SITE_URL}
         out += """</tbody>
             </table>"""
         return out
@@ -1513,8 +1497,6 @@ class Template:
         Parameters:
 
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
 
           - 'as' *bool* - Should we display an advanced search box?
 
@@ -1571,9 +1553,9 @@ class Template:
 
         out = '''
         <h1 class="headline">%(ccname)s</h1>
-        <form name="search" action="%(weburl)s/search" method="get">
+        <form name="search" action="%(siteurl)s/search" method="get">
         ''' % {'ccname' : cgi.escape(cc_intl),
-               'weburl' : weburl}
+               'siteurl' : CFG_SITE_URL}
 
         # Only add non-default hidden values
         for field, value in argd.items():
@@ -1625,7 +1607,7 @@ class Template:
               <tr valign="bottom">
                 <td colspan="3" align="right" class="searchboxbody">
                   <small>
-                    <a href="%(weburl)s/help/search-tips%(langlink)s">%(search_tips)s</a> ::
+                    <a href="%(siteurl)s/help/search-tips%(langlink)s">%(search_tips)s</a> ::
                     %(simple_search)s
                   </small>
                 </td>
@@ -1674,7 +1656,7 @@ class Template:
                                 ),
               'search' : _("Search"),
               'browse' : _("Browse"),
-              'weburl' : weburl,
+              'siteurl' : CFG_SITE_URL,
               'ln' : ln,
               'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
               'search_tips': _("Search Tips")
@@ -1702,7 +1684,7 @@ class Template:
               <tr valign="bottom">
                 <td colspan="3" align="right" class="searchboxbody">
                   <small>
-                    <a href="%(weburl)s/help/search-tips%(langlink)s">%(search_tips)s</a> ::
+                    <a href="%(siteurl)s/help/search-tips%(langlink)s">%(search_tips)s</a> ::
                     %(advanced_search)s
                   </small>
                 </td>
@@ -1731,7 +1713,7 @@ class Template:
                                 ),
               'search' : _("Search"),
               'browse' : _("Browse"),
-              'weburl' : weburl,
+              'siteurl' : CFG_SITE_URL,
               'ln' : ln,
               'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
               'search_tips': _("Search Tips")
@@ -1938,7 +1920,7 @@ class Template:
         out += '%s</span>%s' % (msg, epilogue)
         return out
 
-    def tmpl_print_search_info(self, ln, weburl, middle_only,
+    def tmpl_print_search_info(self, ln, middle_only,
                                collection, collection_name, collection_id,
                                as, sf, so, rm, rg, nb_found, of, ot, p, f, f1,
                                f2, f3, m1, m2, m3, op1, op2, p1, p2,
@@ -1954,8 +1936,6 @@ class Template:
         Parameters:
 
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
 
           - 'middle_only' *bool* - Only display parts of the interface
 
@@ -2005,19 +1985,19 @@ class Template:
         if not middle_only:
             out += '''
                   <a name="%(collection_id)s"></a>
-                  <form action="%(weburl)s/search" method="get">
+                  <form action="%(siteurl)s/search" method="get">
                   <table class="searchresultsbox"><tr><td class="searchresultsboxheader" align="left">
                   <strong><big>%(collection_link)s</big></strong></td>
                   ''' % {
                     'collection_id': collection_id,
-                    'weburl' : weburl,
+                    'siteurl' : CFG_SITE_URL,
                     'collection_link': create_html_link(self.build_search_interface_url(c=collection, as=as, ln=ln),
                                                         {}, cgi.escape(collection_name))
                   }
         else:
             out += """
-                  <form action="%(weburl)s/search" method="get"><div align="center">
-                  """ % { 'weburl' : weburl }
+                  <form action="%(siteurl)s/search" method="get"><div align="center">
+                  """ % { 'siteurl' : CFG_SITE_URL }
 
         # middle table cell: print beg/next/prev/end arrows:
         if not middle_only:
@@ -2050,8 +2030,8 @@ class Template:
 
             # @todo here
             def img(gif, txt):
-                return '<img src="%(weburl)s/img/%(gif)s.gif" alt="%(txt)s" border="0" />' % {
-                    'txt': txt, 'gif': gif, 'weburl': weburl}
+                return '<img src="%(siteurl)s/img/%(gif)s.gif" alt="%(txt)s" border="0" />' % {
+                    'txt': txt, 'gif': gif, 'siteurl': CFG_SITE_URL}
 
             if jrec-rg > 1:
                 out += create_html_link(self.build_search_url(query, jrec=1, rg=rg),
@@ -2186,10 +2166,10 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = """
-              <form action="%(weburl)s/yourbaskets/add" method="post">
+              <form action="%(siteurl)s/yourbaskets/add" method="post">
               <table>
               """ % {
-                'weburl' : weburl,
+                'siteurl' : CFG_SITE_URL,
               }
 
         return out
@@ -2266,14 +2246,12 @@ class Template:
 
         return out
 
-    def tmpl_print_results_overview(self, ln, weburl, results_final_nb_total, cpu_time, results_final_nb, colls, ec):
+    def tmpl_print_results_overview(self, ln, results_final_nb_total, cpu_time, results_final_nb, colls, ec):
         """Prints results overview box with links to particular collections below.
 
         Parameters:
 
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
 
           - 'results_final_nb_total' *int* - The total number of hits for the query
 
@@ -2327,8 +2305,6 @@ class Template:
         Parameters:
 
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
 
           - 'nearestterms' *array* - Parts of the interface to display, in the format:
 
@@ -2393,14 +2369,12 @@ class Template:
 
         return out
 
-    def tmpl_print_record_detailed(self, recID, ln, weburl):
+    def tmpl_print_record_detailed(self, recID, ln):
         """Displays a detailed on-the-fly record
 
         Parameters:
 
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
 
           - 'recID' *int* - The record id
         """
@@ -2517,14 +2491,12 @@ class Template:
         out += """</table></td></tr></table> """
         return out
 
-    def tmpl_print_record_brief(self, ln, recID, weburl):
+    def tmpl_print_record_brief(self, ln, recID):
         """Displays a brief record on-the-fly
 
         Parameters:
 
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
 
           - 'recID' *int* - The record id
         """
@@ -2547,7 +2519,6 @@ class Template:
         urls_u = get_fieldvalues(recID, "8564_u")
 
         return self.tmpl_record_body(
-                 weburl = weburl,
                  titles = titles,
                  authors = authors,
                  dates = dates,
@@ -2557,14 +2528,12 @@ class Template:
                  urls_z = urls_z,
                  ln=ln)
 
-    def tmpl_print_record_brief_links(self, ln, recID, weburl):
+    def tmpl_print_record_brief_links(self, ln, recID):
         """Displays links for brief record on-the-fly
 
         Parameters:
 
           - 'ln' *string* - The language to display
-
-          - 'weburl' *string* - The base URL for the site
 
           - 'recID' *int* - The record id
         """
@@ -2615,7 +2584,7 @@ class Template:
         out = """<rss version="2.0">
       <channel>
         <title>%(sitename)s</title>
-        <link>%(weburl)s</link>
+        <link>%(siteurl)s</link>
         <description>%(sitename)s latest documents</description>
         <language>%(sitelang)s</language>
         <pubDate>%(timestamp)s</pubDate>
@@ -2624,18 +2593,18 @@ class Template:
         <webMaster>%(sitesupportemail)s</webMaster>
         <ttl>%(timetolive)s</ttl>
         <image>
-            <url>%(weburl)s/img/cds.png</url>
+            <url>%(siteurl)s/img/cds.png</url>
             <title>%(sitename)s</title>
-            <link>%(weburl)s</link>
+            <link>%(siteurl)s</link>
         </image>
         <textInput>
           <title>Search </title>
           <description>Search this site:</description>
           <name>p</name>
-          <link>%(weburl)s/search</link>
+          <link>%(siteurl)s/search</link>
         </textInput>
         """ % {'sitename': CFG_SITE_NAME,
-               'weburl': weburl,
+               'siteurl': CFG_SITE_URL,
                'sitelang': CFG_SITE_LANG,
                'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()),
                'version': CFG_VERSION,
@@ -2702,7 +2671,7 @@ class Template:
                       'sorry': _("Sorry, collection %s does not seem to exist.") % \
                                 ('<strong>' + cgi.escape(colname) + '</strong>'),
                       'you_may_want': _("You may want to start browsing from %s.") % \
-                                 ('<a href="' + weburl + '?ln=' + ln + '">' + \
+                                 ('<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + \
                                         cgi.escape(CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)) + '</a>')}
         return out
 
@@ -2724,7 +2693,7 @@ class Template:
             argd = cgi.parse_qs(res[0][0])
 
         rssurl = self.build_rss_url(argd)
-        alerturl = weburl + '/youralerts/input?ln=%s&amp;idq=%s' % (ln, id_query)
+        alerturl = CFG_SITE_URL + '/youralerts/input?ln=%s&amp;idq=%s' % (ln, id_query)
 
         out = '''<a name="googlebox"></a>
                  <table class="googlebox"><tr><th class="googleboxheader">%(similar)s</th></tr>
@@ -2734,9 +2703,9 @@ class Template:
                 'similar' : _("Interested in being notified about new results for this query?"),
                 'msg_alert': _("""Set up a personal %(x_url1_open)semail alert%(x_url1_close)s
                                   or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s.""") % \
-                        {'x_url1_open': '<a href="%s"><img src="%s/img/mail-icon-12x8.gif" border="0" alt="" /></a> ' % (alerturl, weburl) + ' <a class="google" href="%s">' % (alerturl),
+                        {'x_url1_open': '<a href="%s"><img src="%s/img/mail-icon-12x8.gif" border="0" alt="" /></a> ' % (alerturl, CFG_SITE_URL) + ' <a class="google" href="%s">' % (alerturl),
                          'x_url1_close': '</a>',
-                         'x_url2_open': '<a href="%s"><img src="%s/img/feed-icon-12x12.gif" border="0" alt="" /></a> ' % (rssurl, weburl) + ' <a class="google" href="%s">' % rssurl,
+                         'x_url2_open': '<a href="%s"><img src="%s/img/feed-icon-12x12.gif" border="0" alt="" /></a> ' % (rssurl, CFG_SITE_URL) + ' <a class="google" href="%s">' % rssurl,
                          'x_url2_close': '</a>',
                          }}
         return out
@@ -2798,7 +2767,7 @@ class Template:
             out += '''
                     <tr><td>%(graph)s</td></tr>
                     <tr><td>%(similar)s</td></tr>
-                    ''' % { 'weburl': weburl,   'recid': recID, 'ln': ln,
+                    ''' % { 'siteurl': CFG_SITE_URL,   'recid': recID, 'ln': ln,
                              'similar': similar, 'more': _("more"),
                              'graph': downloadsimilarity
                              }

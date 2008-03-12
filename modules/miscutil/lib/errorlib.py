@@ -29,7 +29,7 @@ import sys
 import time
 from cStringIO import StringIO
 
-from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, weburl
+from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
@@ -176,7 +176,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 print >> log_stream, prefix
                 print >> email_stream, prefix
 
-            print >> email_stream, "The following problem occurred on <%s>" % weburl
+            print >> email_stream, "The following problem occurred on <%s>" % CFG_SITE_URL
             print >> email_stream, ">>> Registered exception"
 
             print >> log_stream, www_data
@@ -217,7 +217,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 if alert_admin or not written_to_log:
                     ## If requested or if it's impossible to write in the log
                     from invenio.mailutils import send_email
-                    send_email(CFG_SITE_ADMIN_EMAIL, CFG_SITE_ADMIN_EMAIL, subject='Registered exception at %s' % weburl, content=email_text, header='', footer='')
+                    send_email(CFG_SITE_ADMIN_EMAIL, CFG_SITE_ADMIN_EMAIL, subject='Registered exception at %s' % CFG_SITE_URL, content=email_text, header='', footer='')
             return 1
         else:
             return 0

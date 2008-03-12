@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -35,7 +35,7 @@ class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
     def test_your_baskets_pages_availability(self):
         """webcomment - availability of comments pages"""
 
-        baseurl = weburl + '/record/10/comments/'
+        baseurl = CFG_SITE_URL + '/record/10/comments/'
 
         _exports = ['', 'display', 'add', 'vote', 'report']
 
@@ -49,7 +49,7 @@ class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
     def test_webcomment_admin_interface_availability(self):
         """webcomment - availability of WebComment Admin interface pages"""
 
-        baseurl = weburl + '/admin/webcomment/webcommentadmin.py/'
+        baseurl = CFG_SITE_URL + '/admin/webcomment/webcommentadmin.py/'
 
         _exports = ['', 'comments', 'delete', 'users']
 
@@ -70,13 +70,13 @@ class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
     def test_webcomment_admin_guide_availability(self):
         """webcomment - availability of WebComment Admin Guide"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/admin/webcomment-admin-guide',
+                         test_web_page_content(CFG_SITE_URL + '/help/admin/webcomment-admin-guide',
                                                expected_text="WebComment Admin Guide"))
         return
 
     def test_webcomment_mini_review_availability(self):
         """webcomment - availability of mini-review panel on detailed record page"""
-        url = weburl + '/record/12'
+        url = CFG_SITE_URL + '/record/12'
         error_messages = test_web_page_content(url,
                                                expected_text="(Not yet reviewed)")
 

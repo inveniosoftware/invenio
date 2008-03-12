@@ -62,7 +62,7 @@ import re
 import urllib2
 import tempfile
 
-from invenio.config import CFG_OAI_ID_FIELD, weburl
+from invenio.config import CFG_OAI_ID_FIELD, CFG_SITE_URL
 from invenio.bibupload_config import *
 from invenio.dbquery import run_sql, \
                             Error
@@ -692,7 +692,7 @@ def download_url(url, format):
 
 def make_mark_url(recid, docname, format):
     """Return a url valid to be used for MARC."""
-    return '%s/record/%s/files/%s%s' % (weburl, recid, docname, format)
+    return '%s/record/%s/files/%s%s' % (CFG_SITE_URL, recid, docname, format)
 
 def get_docname_from_url(url):
     """Return a potential docname given a url"""
@@ -731,7 +731,7 @@ def elaborate_fft_tags(record, rec_id, mode):
         for field in tags8564s:
             to_be_removed = False
             for value in field_get_subfield_values(field, 'u'):
-                if value.startswith('%s/record/%s/files/' % (weburl, rec_id)):
+                if value.startswith('%s/record/%s/files/' % (CFG_SITE_URL, rec_id)):
                     to_be_removed = True
                     description = field_get_subfield_values(field, 'y')
                     if description:
@@ -751,7 +751,7 @@ def elaborate_fft_tags(record, rec_id, mode):
         bibrecdocs = BibRecDocs(rec_id)
         latest_files = bibrecdocs.list_latest_files()
         for file in latest_files:
-            new_url = '%s/record/%s/files/%s' % (weburl, rec_id, file.get_full_name())
+            new_url = '%s/record/%s/files/%s' % (CFG_SITE_URL, rec_id, file.get_full_name())
             new_subfield = [('u', new_url)]
             description = descriptions.get(new_url, '')
             if description == 'KEEP-OLD-VALUE':
@@ -772,7 +772,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                 icon = icon.list_all_files()
                 if icon:
                     icon = icon[0].get_full_name()
-                    new_subfield = [('q', '%s/record/%s/files/%s' % (weburl, rec_id, icon))]
+                    new_subfield = [('q', '%s/record/%s/files/%s' % (CFG_SITE_URL, rec_id, icon))]
                     new_subfield.append(('x', 'icon'))
                     record_add_field(record, '856', '4', ' ', '', new_subfield)
         return record
@@ -945,10 +945,10 @@ def elaborate_fft_tags(record, rec_id, mode):
                     docs[name] = (doctype, newname, restriction, icon, version, [(url, format)])
                 else:
                     docs[name] = (doctype, newname, restriction, icon, version, [])
-            comments['%s/record/%s/files/%s%s' % (weburl, rec_id, newname, format)] = comment
-            descriptions['%s/record/%s/files/%s%s' % (weburl, rec_id, newname, format)] = description
+            comments['%s/record/%s/files/%s%s' % (CFG_SITE_URL, rec_id, newname, format)] = comment
+            descriptions['%s/record/%s/files/%s%s' % (CFG_SITE_URL, rec_id, newname, format)] = description
             if newname != name:
-                changed['%s/record/%s/files/%s%s' % (weburl, rec_id, newname, format)] = '%s/record/%s/files/%s%s' % (weburl, rec_id, name, format)
+                changed['%s/record/%s/files/%s%s' % (CFG_SITE_URL, rec_id, newname, format)] = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, rec_id, name, format)
 
         write_message('Result of FFT analysis:\n\tDocs: %s\n\tComments: %s\n\tDescriptions: %s' % (docs, comments, descriptions), verbose=9, stream=sys.stderr)
 

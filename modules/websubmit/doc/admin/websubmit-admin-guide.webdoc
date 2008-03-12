@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: _(WebSubmit Admin Guide)_ -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
    <p><table class="errorbox">
@@ -139,15 +139,15 @@
         </blockquote>
 
     <h3>The user reaches WebSubmit main page.</h3>
-    <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-main_menu.png" alt="Main Page" class="guideimg" align="left">
-    &nbsp;<span class="guideheader">T</span>o add a document type to WebSubmit, you should go to the <a target=top href="<WEBURL>/admin/websubmit/index.php">main page</a>
+    <IMG src="<CFG_SITE_URL>/img/admin/websubmit-admin-guide-main_menu.png" alt="Main Page" class="guideimg" align="left">
+    &nbsp;<span class="guideheader">T</span>o add a document type to WebSubmit, you should go to the <a target=top href="<CFG_SITE_URL>/admin/websubmit/index.php">main page</a>
      and click on "New Doctype" in the left blue panel.<br/><br/>
     &nbsp;<span class="guideheader">E</span>ven once created, a document type will not appear automatically on this page. To configure the list of catalogues and document
-     types displayed on this page, the administrator shall go to the <a target=top href="<WEBURL>/admin/websubmit/editCatalogues.php">edit catalogues</a>
+     types displayed on this page, the administrator shall go to the <a target=top href="<CFG_SITE_URL>/admin/websubmit/editCatalogues.php">edit catalogues</a>
       page. (see the <a href="#catalogues">guide section</a>)<br clear="all"/>
 
     <h3>The user can then click on the document type he is interested in.</h3>
-    <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-menu_doc.png" alt="Document type Page" class="guideimg" align="left">
+    <IMG src="<CFG_SITE_URL>/img/admin/websubmit-admin-guide-menu_doc.png" alt="Document type Page" class="guideimg" align="left">
     &nbsp;<span class="guideheader">T</span>he text appearing under the header containing the name of the document
      can be configured by going to the <a target=top href="websubmit-admin">main page</a>, click on
      the title of the document type then on the "Edit Document Types Details" button.<br/><br/>
@@ -167,7 +167,7 @@
     line of the desired action. There you can set the "buttonorder" form field.<br/><br clear="all"/>
 
     <h3>The user now may choose a category, then click on the action button he wishes.<br/>The submission starts, the first page of the web form appears.</h3>
-    <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-form.png" alt="Document type Page" class="guideimg" align="left">
+    <IMG src="<CFG_SITE_URL>/img/admin/websubmit-admin-guide-form.png" alt="Document type Page" class="guideimg" align="left">
     &nbsp;<span class="guideheader">T</span>his web form is composed of several pages, on each of these
     pages form fields can be found. To modify the number of pages, add or withdraw form fields and modify
     the texts before each form field, you shall go to the <a target=top href="websubmit-admin">main page</a>,
@@ -176,7 +176,7 @@
 
     <h3>On the last page of the submission, there should be a button like in the following image which will
     trigger the end script</h3>
-    <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-end_action.png" alt="Document type End Page" class="guideimg" align="left">
+    <IMG src="<CFG_SITE_URL>/img/admin/websubmit-admin-guide-end_action.png" alt="Document type End Page" class="guideimg" align="left">
     &nbsp;<span class="guideheader">T</span>his button is defined like any other form field. Its definition should include
      a <i> onclick="finish();"</i> javascript attribute.<br/><br/>
     &nbsp;<span class="guideheader">A</span>fter clicking this button, WebSubmit will apply the end script functions
@@ -283,7 +283,7 @@
         <blockquote>
             <ul>
                 &nbsp;<span class="guideheader">o</span>n the websubmit admin <a href="websubmit-admin">main page</a> you will find:<br/><br/>
-                <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-main_page.png" class="guideimg"><br/><br/>
+                <IMG src="<CFG_SITE_URL>/img/admin/websubmit-admin-guide-main_page.png" class="guideimg"><br/><br/>
                 <ul>
                     <li>The list of all existing document type in the middle of the page. Click on one line in the list to have
                      access to the main document modification panel
@@ -607,7 +607,7 @@
             &nbsp;<span class="guideheader">Y</span>ou then go back to the document type manager page where you
             can see that in the bottom array your newly implemented action appears (check the acronym in the first
             column).<br/><br/>
-            <img src="<WEBURL>/img/admin/websubmit-admin-guide-implement.png" class="guideimg"><br/><br/>
+            <img src="<CFG_SITE_URL>/img/admin/websubmit-admin-guide-implement.png" class="guideimg"><br/><br/>
             <ul>
                 <li>Clicking on the action acronym will allow you to modify the general data about the action (remember
                 in this case that all the other implementations of this particular action will also be changed).
@@ -680,7 +680,7 @@
             then come back later (or if the browser crashes!) he will be able to get back to the submission at the exact
             moment he left it.<br/><br/>
             &nbsp;<span class="guideheader">O</span>nce here:<br/><br/>
-            <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-menu_page.png" class="guideimg"><br/><br/>
+            <IMG src="<CFG_SITE_URL>/img/admin/websubmit-admin-guide-menu_page.png" class="guideimg"><br/><br/>
             you can see the ordered list of already existing pages in the web form. In this example there are 4 pages.
             You can then:
             <ul>
@@ -701,10 +701,10 @@
             form elements is roughly made of an html template and a text displayed before the form field.<br/><br/>
             &nbsp;<span class="guideheader">I</span>n the first part of the page, you have a preview of what the form
             will look like to the user:<br/>
-            <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-preview.png" class="guideimg"><br/><br/>
+            <IMG src="<CFG_SITE_URL>/img/admin/websubmit-admin-guide-preview.png" class="guideimg"><br/><br/>
             &nbsp;<span class="guideheader">T</span>hen the second table shows you the list of the form elements
             present on the page:<br/>
-            <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-elements.png" class="guideimg"><br/><br/>
+            <IMG src="<CFG_SITE_URL>/img/admin/websubmit-admin-guide-elements.png" class="guideimg"><br/><br/>
             &nbsp;<span class="guideheader">Y</span>ou can then:
             <ul>
                 <li>Move one element from one place to another using the drop-down menus in the first
@@ -827,7 +827,7 @@
         <blockquote>
             &nbsp;<span class="guideheader">H</span>ere is what you may see then (this is the end script list of functions
             for a document type named "TEST" and action "FTT" - Fulltext Transfer):<br/><br/>
-            <IMG src="<WEBURL>/img/admin/websubmit-admin-guide-list_functions.png" class="guideimg"><br/><br/>
+            <IMG src="<CFG_SITE_URL>/img/admin/websubmit-admin-guide-list_functions.png" class="guideimg"><br/><br/>
             &nbsp;<span class="guideheader">Y</span>ou can see the ordered list of all the functions in the end script.
             This end script is composed of 2 steps (see the "step" column). The functions composing the first step are called,
              then there should be  action from the user which would trigger step 2 - in the present case the

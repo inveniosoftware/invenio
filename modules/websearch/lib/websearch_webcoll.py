@@ -38,7 +38,7 @@ from invenio.config import \
      CFG_CACHEDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     weburl
+     CFG_SITE_URL
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname, collection_restricted_p
 from invenio.dbquery import run_sql, Error, get_table_update_time
@@ -422,8 +422,7 @@ class Collection:
             for idx in range(0, min(len(self.latest_additions_info), rg)):
                 passIDs.append({'id': self.latest_additions_info[idx]['id'],
                                 'body': self.latest_additions_info[idx]['format'] + \
-                                        websearch_templates.tmpl_record_links(weburl=weburl,
-                                                                              recid=self.latest_additions_info[idx]['id'],
+                                        websearch_templates.tmpl_record_links(recid=self.latest_additions_info[idx]['id'],
                                                                               ln=ln),
                                 'date': self.latest_additions_info[idx]['date']})
 

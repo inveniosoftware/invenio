@@ -27,7 +27,7 @@ import tempfile
 from marshal import loads
 from zlib import decompress
 
-from invenio.config import weburl, CFG_SITE_LANG
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 from invenio.bibrank_grapher import create_temporary_image, write_coordinates_in_tmp_file, remove_old_img
@@ -103,7 +103,7 @@ def get_initial_result(rec_years):
     return result
 
 def html_command(file):
-    t = """<img src='%s/img/%s' align="center" alt="">""" % (weburl, file)
+    t = """<img src='%s/img/%s' align="center" alt="">""" % (CFG_SITE_URL, file)
     #t += "</table></td></tr></table>"
     return t
 

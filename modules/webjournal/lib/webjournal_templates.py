@@ -19,7 +19,7 @@
 import os
 import time
 
-from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_ETCDIR, weburl, CFG_SITE_LANG
+from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_ETCDIR, CFG_SITE_URL, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webjournal_utils import get_number_of_articles_for_issue, \
@@ -61,12 +61,12 @@ def tmpl_webjournal_missing_info_box(language, title, msg_title, msg):
             </div>
         </fieldset>
     </div>
-            ''' % (weburl,
+            ''' % (CFG_SITE_URL,
                    box_title,
                    box_text,
                    box_list_title,
                    "".join(['<li><a href="%s/journal/?name=%s">%s</a></li>'
-                            % (weburl,
+                            % (CFG_SITE_URL,
                                journal,
                                journal) for journal in all_journals]),
                    CFG_SITE_ADMIN_EMAIL)
@@ -97,7 +97,7 @@ def tmpl_webjournal_error_box(language, title, title_msg, msg):
             </div>
         </fieldset>
     </div>
-            ''' % (weburl, title_msg, msg, mail_msg)
+            ''' % (CFG_SITE_URL, title_msg, msg, mail_msg)
     return page(title=title, body=box)
 
 def tmpl_webjournal_regenerate_success(language, journal_name, issue_number):
@@ -112,7 +112,7 @@ def tmpl_webjournal_regenerate_success(language, journal_name, issue_number):
     The issue number %s for the journal %s has been successfully
     regenerated.
     Look at your changes: >> <a href="%s/journal/?name=%s"> %s </a>
-    ''' % (issue_number, journal_name, weburl, journal_name, journal_name))
+    ''' % (issue_number, journal_name, CFG_SITE_URL, journal_name, journal_name))
 
 def tmpl_webjournal_regenerate_error(language, journal_name, issue_number):
     """
@@ -139,7 +139,7 @@ def tmpl_webjournal_feature_record_interface(language, journal_name):
         <br/>
         <input class="formbutton" type="submit" value="feature" name="featured"/>
     </form>
-    ''' % (weburl, journal_name)
+    ''' % (CFG_SITE_URL, journal_name)
     return page(title=_("Feature a record"), body=interface)
 
 def tmpl_webjournal_feature_record_success(language, journal_name, recid):
@@ -149,7 +149,7 @@ def tmpl_webjournal_feature_record_success(language, journal_name, recid):
     _ = gettext_set_language(language)
     title = "Successfully featured record: %s" % recid
     msg = '''Return to your journal here >>
-            <a href="%s/journal/?name=%s">%s</a>''' % (weburl,
+            <a href="%s/journal/?name=%s">%s</a>''' % (CFG_SITE_URL,
                                                        journal_name,
                                                        journal_name)
     return page(title = title, body = msg)
@@ -208,7 +208,7 @@ def tmpl_webjournal_alert_interface(language, journal_name, subject,
         </p>
         <br/>
         <input class="formbutton" type="submit" value="alert" name="sent"/>
-    </form>''' % (weburl, journal_name, subject, plain_text)
+    </form>''' % (CFG_SITE_URL, journal_name, subject, plain_text)
     return interface
 
 def tmpl_webjournal_alert_was_already_sent(language, journal_name,
@@ -235,8 +235,8 @@ def tmpl_webjournal_alert_was_already_sent(language, journal_name,
         <br/>
         <input class="formbutton" type="submit" value="I really want this!" name="sent"/>
     </form>
-            ''' % (weburl, journal_name, recipients,
-                   subject, plain_text, html_mail, issue, weburl, journal_name,
+            ''' % (CFG_SITE_URL, journal_name, recipients,
+                   subject, plain_text, html_mail, issue, CFG_SITE_URL, journal_name,
                    issue)
     return page(title="Confirmation Required", body=interface)
 
@@ -247,7 +247,7 @@ def tmpl_webjournal_alert_success_msg(language, journal_name):
     _ = gettext_set_language(language)
     title = _("Alert sent successfully!")
     body = 'Return to your journal here: >> \
-             <a href="%s/journal/?name=%s"> %s </a>' % (weburl, journal_name,
+             <a href="%s/journal/?name=%s"> %s </a>' % (CFG_SITE_URL, journal_name,
                                                          journal_name)
     return page(title=title, body=body)
 
@@ -284,7 +284,7 @@ def tmpl_webjournal_issue_control_interface(language, journal_name,
             <input class="formbutton" type="submit" value="Publish" name="action_publish"/>
         </form>
     </div>
-        ''' % (weburl,
+        ''' % (CFG_SITE_URL,
                journal_name,
                "".join(['<li><input type="checkbox" name="issue_number" value="%s" CHECKED>&nbsp;%s</input></li>'
                         % (issue, issue) for issue in active_issues]),
@@ -308,9 +308,9 @@ def tmpl_webjournal_issue_control_success_msg(language,
             </p>\
             <p>Send an alert email here: >> \
             <a href="%s/journal/alert?name=%s"> Send an alert</a> \
-            </p>' % (weburl, journal_name,
-                     journal_name, weburl,
-                     journal_name, weburl, journal_name)
+            </p>' % (CFG_SITE_URL, journal_name,
+                     journal_name, CFG_SITE_URL,
+                     journal_name, CFG_SITE_URL, journal_name)
     return title + body
 
 def tmpl_webjournal_update_an_issue(language, journal_name, next_issue,
@@ -345,7 +345,7 @@ def tmpl_webjournal_update_an_issue(language, journal_name, next_issue,
            ",".join(["%s : %s" % (item[0], item[1]) for item in current_articles.iteritems()]),
            next_issue,
            ",".join(["%s : %s" % (item[0], item[1]) for item in next_articles.iteritems()]),
-           weburl, journal_name, next_issue)
+           CFG_SITE_URL, journal_name, next_issue)
     return html
 
 def tmpl_webjournal_updated_issue_msg(language, update_issue, journal_name):
@@ -363,8 +363,8 @@ def tmpl_webjournal_updated_issue_msg(language, update_issue, journal_name):
              </p>\
              <p>Send an alert email here: >> \
              <a href="%s/journal/alert?name=%s"> Send an alert</a> \
-             </p>' % (weburl, journal_name, journal_name,
-                      weburl, journal_name, weburl, journal_name)
+             </p>' % (CFG_SITE_URL, journal_name, journal_name,
+                      CFG_SITE_URL, journal_name, CFG_SITE_URL, journal_name)
     return title + body
 
 def tmpl_webjournal_admin_interface(journal_name, current_issue,
@@ -410,18 +410,18 @@ def tmpl_webjournal_admin_interface(journal_name, current_issue,
 
                 "\n".join(['<p>%s : %s <a href="%s/journal/?name=%s&issue=%s&category=%s">&gt;edit</a></p>' %
                            (item[0], item[1],
-                            weburl, journal_name,
+                            CFG_SITE_URL, journal_name,
                             issue, item[0]) for item in articles.iteritems()]),
 
                 (released_on==False) and
-                '<em>not released</em><br/><a href="%s/journal/issue_control?name=%s">&gt;release now</a>' % (weburl, journal_name) or
+                '<em>not released</em><br/><a href="%s/journal/issue_control?name=%s">&gt;release now</a>' % (CFG_SITE_URL, journal_name) or
                 'released on: %s' % time.strftime("%d.%m.%Y", released_on),
 
                 (announced_on==False)
-                and '<em>not announced</em><br/><a href="%s/journal/alert?name=%s&issue=%s">&gt;announce now</a>' % (weburl, journal_name, issue) or
-                'announced on: %s <br/><a href="%s/journal/alert?name=%s&issue=%s">&gt;re-announce</a>' % (time.strftime("%d.%m.%Y", announced_on), weburl, journal_name, issue),
+                and '<em>not announced</em><br/><a href="%s/journal/alert?name=%s&issue=%s">&gt;announce now</a>' % (CFG_SITE_URL, journal_name, issue) or
+                'announced on: %s <br/><a href="%s/journal/alert?name=%s&issue=%s">&gt;re-announce</a>' % (time.strftime("%d.%m.%Y", announced_on), CFG_SITE_URL, journal_name, issue),
 
-                weburl, journal_name, issue
+                CFG_SITE_URL, journal_name, issue
             )
         issue_boxes.append(issue_box)
     body = '''
@@ -442,6 +442,6 @@ def tmpl_webjournal_admin_interface(journal_name, current_issue,
              <p><a href="%s/journal/feature_record?name=%s">Feature a Record</a></p>
              <p align="right"><a href="%s/journal/?name=%s">&gt;Go to the Journal</a></p>
              ''' % ("\n".join([issue_box for issue_box in issue_boxes]),
-                weburl, weburl, journal_name, weburl, journal_name)
+                CFG_SITE_URL, CFG_SITE_URL, journal_name, CFG_SITE_URL, journal_name)
 
     return page(title=title, body=body)

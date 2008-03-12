@@ -29,7 +29,7 @@ import sys
 try:
     from invenio.dbquery import run_sql
     from invenio.config import \
-         weburl,\
+         CFG_SITE_URL,\
          CFG_TMPDIR,\
          CFG_BINDIR
 
@@ -128,7 +128,6 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
                                             # when migration from php to
                                             # python bibformat is done
             (total_rec_1, tbibformat_1, tbibupload_1) = iterate_over_old(recIDs,
-                                                                         weburl,
                                                                          fmt)
         else:
             (total_rec_1, tbibformat_1, tbibupload_1) = iterate_over_new(recIDs,
@@ -143,7 +142,6 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
                                             # when migration from php to
                                             # python bibformat is done
             (total_rec_2, tbibformat_2, tbibupload_2) = iterate_over_old(without_format,
-                                                                         weburl,
                                                                          fmt)
         else:
             (total_rec_2, tbibformat_2, tbibupload_2) = iterate_over_new(without_format,
@@ -296,7 +294,7 @@ def iterate_over_new(list, fmt):
 
     return (total_rec, tbibformat, tbibupload)
 
-def iterate_over_old(list, weburl, fmt):
+def iterate_over_old(list, fmt):
     "Iterate over list of IDs"
 
     n_rec       = 0
@@ -325,7 +323,7 @@ def iterate_over_old(list, weburl, fmt):
             count = count + 1
             time.sleep(10)
         if count == 10:
-            sys.stderr.write("Failed to download %s from %s after 10 attempts... terminating" % (query, weburl))
+            sys.stderr.write("Failed to download %s from %s after 10 attempts... terminating" % (query, CFG_SITE_URL))
             sys.exit(0)
 
         xml_content = xml_content + contents

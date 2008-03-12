@@ -166,7 +166,7 @@ def make_canonical_urlargd(urlargd, default_urlargd):
 def create_html_link(urlbase, urlargd, link_label, linkattrd={},
                      escape_urlargd=True, escape_linkattrd=True):
     """Creates a W3C compliant link.
-    @param urlbase: base url (e.g. invenio.config.weburl/search)
+    @param urlbase: base url (e.g. invenio.config.CFG_SITE_URL/search)
     @param urlargd: dictionary of parameters. (e.g. p={'recid':3, 'of'='hb'})
     @param link_label: text displayed in a browser (has to be already escaped)
     @param linkattrd: dictionary of attributes (e.g. a={'class': 'img'})
@@ -193,7 +193,7 @@ def create_html_link(urlbase, urlargd, link_label, linkattrd={},
 def create_url(urlbase, urlargd, escape_urlargd=True):
     """Creates a W3C compliant URL. Output will look like this:
     'urlbase?param1=value1&amp;param2=value2'
-    @param urlbase: base url (e.g. invenio.config.weburl/search)
+    @param urlbase: base url (e.g. invenio.config.CFG_SITE_URL/search)
     @param urlargd: dictionary of parameters. (e.g. p={'recid':3, 'of'='hb'}
     @param escape_urlargd: boolean indicating if the function should escape
                            arguments (e.g. < becomes &lt; or " becomes &quot;)

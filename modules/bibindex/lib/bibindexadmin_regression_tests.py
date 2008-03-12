@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -35,7 +35,7 @@ class BibIndexAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_bibindex_admin_interface_pages_availability(self):
         """bibindexadmin - availability of BibIndex Admin interface pages"""
 
-        baseurl = weburl + '/admin/bibindex/bibindexadmin.py/'
+        baseurl = CFG_SITE_URL + '/admin/bibindex/bibindexadmin.py/'
 
         _exports = ['',
                     'index',
@@ -65,7 +65,7 @@ class BibIndexAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_bibindex_admin_guide_availability(self):
         """bibindexadmin - availability of BibIndex Admin guide pages"""
 
-        url = weburl + '/help/admin/bibindex-admin-guide'
+        url = CFG_SITE_URL + '/help/admin/bibindex-admin-guide'
         error_messages = test_web_page_content(url,
                                                expected_text="BibIndex Admin Guide")
         if error_messages:

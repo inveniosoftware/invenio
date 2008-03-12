@@ -39,7 +39,7 @@ from invenio.config import \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
-     weburl, \
+     CFG_SITE_URL, \
      CFG_CERN_SITE
 from invenio.websession_config import CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
 from invenio import webuser
@@ -866,7 +866,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                                navmenuid='yourgroups')
 
         if argd['cancel']:
-            url = weburl + '/yourgroups/display?ln=%s'
+            url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
 
@@ -922,7 +922,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                                navmenuid='yourgroups')
 
         if argd['cancel']:
-            url = weburl + '/yourgroups/display?ln=%s'
+            url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
 
@@ -981,7 +981,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                                navmenuid='yourgroups')
 
         if argd['cancel']:
-            url = weburl + '/yourgroups/display?ln=%s'
+            url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
 
@@ -1035,7 +1035,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                                navmenuid='yourgroups')
 
         if argd['cancel']:
-            url = weburl + '/yourgroups/display?ln=%s'
+            url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
 
@@ -1103,7 +1103,7 @@ class WebInterfaceYourGroupsPages(WebInterfaceDirectory):
                                                navmenuid='yourgroups')
 
         if argd['cancel']:
-            url = weburl + '/yourgroups/display?ln=%s'
+            url = CFG_SITE_URL + '/yourgroups/display?ln=%s'
             url %= argd['ln']
             redirect_to_url(req, url)
 

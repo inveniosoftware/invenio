@@ -29,7 +29,7 @@ import sys
 
 from invenio.config import \
      CFG_VERSION, \
-     weburl
+     CFG_SITE_URL
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.htmlutils import nmtoken_from_string
 
@@ -38,14 +38,13 @@ class Template:
         """Get the navigation trail
           - 'previous' *string* - The previous navtrail"""
         _ = gettext_set_language(ln)
-        navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (weburl,)
+        navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (CFG_SITE_URL,)
         navtrail = navtrail + previous
         return navtrail
 
-    def tmpl_draw_titlebar(self, ln, weburl, title, guideurl, extraname="", extraurl=""):
+    def tmpl_draw_titlebar(self, ln, title, guideurl, extraname="", extraurl=""):
         """Draws an html title bar
           - 'title' *string* - The name of the titlebar
-          - 'weburl' *string* - The general weburl root for this admin section (e.g. help/admin/bibharvest-admin-guide#mi )
           - 'guideurl' *string* - The relative url of the guide relative to this section
           - 'extraname' *string* - The name of an extra function
           - 'extraurl' *string* - The relative url to an extra function
@@ -55,18 +54,17 @@ class Template:
         guidetitle = _("See Guide")
 
         titlebar = """ <table class="admin_wvar_nomargin"><tr><th class="adminheader">"""
-        titlebar += """%s&nbsp;&nbsp;&nbsp;<small>[<a title="%s" href="%s/%s">?</a>]</small>""" % (title, guidetitle, weburl, guideurl)
+        titlebar += """%s&nbsp;&nbsp;&nbsp;<small>[<a title="%s" href="%s/%s">?</a>]</small>""" % (title, guidetitle, CFG_SITE_URL, guideurl)
         if extraname and extraurl:
-            titlebar += """&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="%s/%s">%s</a>]</small>""" % (weburl, extraurl, extraname)
+            titlebar += """&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<small>[<a href="%s/%s">%s</a>]</small>""" % (CFG_SITE_URL, extraurl, extraname)
         titlebar += """</th></tr></table>"""
         return titlebar
 
 
-    def tmpl_draw_subtitle(self, ln, weburl, title, subtitle, guideurl):
+    def tmpl_draw_subtitle(self, ln, title, subtitle, guideurl):
         """Draws an html title bar
           - 'title' *string* - The name of the titlebar
           - 'subtitle' *string* - The header name of the subtitle
-          - 'weburl' *string* - The general weburl root for this admin section (e.g. help/admin/bibharvest-admin-guide#mi )
           - 'guideurl' *string* - The relative url of the guide relative to this section
           """
         _ = gettext_set_language(ln)
@@ -74,18 +72,17 @@ class Template:
 
         titlebar = """<a name="%s">""" % nmtoken_from_string(title)
         titlebar += """ </a>%s&nbsp;&nbsp;&nbsp;<small>""" % subtitle
-        titlebar += """ [<a title="%s" href="%s/%s">?</a>]</small>""" % (guidetitle, weburl, guideurl)
+        titlebar += """ [<a title="%s" href="%s/%s">?</a>]</small>""" % (guidetitle, CFG_SITE_URL, guideurl)
         return titlebar
 
-    def tmpl_link_with_args(self, ln, weburl, funcurl, title, args):
+    def tmpl_link_with_args(self, ln, funcurl, title, args):
         """Draws an html title bar
-          - 'weburl' *string* - The general weburl root for this admin section (e.g. help/admin/bibharvest-admin-guide#mi )
           - 'funcurl' *string* - The relative url to this section
           - 'title' *string* - The name of the link
           - 'args' *list* - The list of arguments to be appended to the url in the form [name, value]
           """
         _ = gettext_set_language(ln)
-        initurl = '<a href="' + weburl + '/' + funcurl
+        initurl = '<a href="' + CFG_SITE_URL + '/' + funcurl
         endurl = '" title="' + title + '">' + title + '</a>'
         noargs = len(args)
         if noargs==0:

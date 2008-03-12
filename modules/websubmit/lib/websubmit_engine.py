@@ -43,8 +43,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_PYLIBDIR, \
      CFG_WEBSUBMIT_STORAGEDIR, \
-     CFG_VERSION, \
-     weburl
+     CFG_VERSION
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
@@ -946,7 +945,6 @@ def endaction(req,
     ## to the user:
     t = websubmit_templates.tmpl_page_endaction(
           ln = ln,
-          weburl = weburl,
           # these fields are necessary for the navigation
           file = file,
           nextPg = nextPg,

@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.config import CFG_SITE_SECURE_URL, weburl, CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_URL, CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webmessage import perform_request_display, \
                                perform_request_display_msg, \
@@ -51,7 +51,7 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
     def index(self, req, form):
         """ The function called by default
         """
-        redirect_to_url(req, "%s/yourmessages/display?%s" % (weburl, req.args))
+        redirect_to_url(req, "%s/yourmessages/display?%s" % (CFG_SITE_URL, req.args))
 
     def display(self, req, form):
         """
@@ -65,14 +65,14 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/yourmessages/display" % \
-                                             (weburl,),
+                                             (CFG_SITE_URL,),
                                        navmenuid="yourmessages")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/display%s" % (
-                        weburl,
+                        CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -113,14 +113,14 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
 
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/yourmessages/write" % \
-                                             (weburl,),
+                                             (CFG_SITE_URL,),
                                        navmenuid="yourmessages")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/write%s" % (
-                        weburl,
+                        CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -189,14 +189,14 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         _ = gettext_set_language(argd['ln'])
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/yourmessages/send" % \
-                                             (weburl,),
+                                             (CFG_SITE_URL,),
                                        navmenuid="yourmessages")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/send%s" % (
-                        weburl,
+                        CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -260,14 +260,14 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/yourmessages/delete" % \
-                                             (weburl,),
+                                             (CFG_SITE_URL,),
                                        navmenuid="yourmessages")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/delete%s" % (
-                        weburl,
+                        CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -302,14 +302,14 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/yourmessages/delete_all" % \
-                                             (weburl,),
+                                             (CFG_SITE_URL,),
                                        navmenuid="yourmessages")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/delete_all%s" % (
-                        weburl,
+                        CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
@@ -344,14 +344,14 @@ class WebInterfaceYourMessagesPages(WebInterfaceDirectory):
         uid = getUid(req)
         if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "%s/yourmessages/display_msg" % \
-                                             (weburl,),
+                                             (CFG_SITE_URL,),
                                        navmenuid="yourmessages")
         elif uid == -1 or isGuestUser(uid):
             return redirect_to_url(req, "%s/youraccount/login%s" % (
                 CFG_SITE_SECURE_URL,
                 make_canonical_urlargd({
                     'referer' : "%s/yourmessages/display_msg%s" % (
-                        weburl,
+                        CFG_SITE_URL,
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 

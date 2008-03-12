@@ -32,7 +32,7 @@ from zlib import compress,decompress
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_VERSION, \
-     weburl, \
+     CFG_SITE_URL, \
      CFG_BINDIR
 from invenio.bibrankadminlib import write_outcome,modify_translations,get_def_name,get_i8n_name,get_name,get_rnk_nametypes,get_languages,check_user,is_adminuser,addadminbox,tupletotable,tupletotable_onlyselected,addcheckboxes,createhiddenform
 from invenio.dbquery import run_sql, get_table_status_info
@@ -45,7 +45,7 @@ websearch_templates = invenio.template.load('websearch')
 def getnavtrail(previous = ''):
     """Get the navtrail"""
 
-    navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (weburl,)
+    navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (CFG_SITE_URL,)
     navtrail = navtrail + previous
     return navtrail
 
@@ -64,7 +64,7 @@ def perform_index(ln=CFG_SITE_LANG, mtype='', content=''):
     <td>4.&nbsp;<small><a href="%s/help/admin/bibindex-admin-guide">Guide</a></small></td>
     </tr>
     </table>
-    """ % (weburl, ln, weburl, ln, weburl, ln, weburl, ln, weburl)
+    """ % (CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL)
 
     if mtype == "perform_showindexoverview" and content:
         fin_output += content
@@ -98,7 +98,7 @@ def perform_field(ln=CFG_SITE_LANG, mtype='', content=''):
     <td>4.&nbsp;<small><a href="%s/help/admin/bibindex-admin-guide">Guide</a></small></td>
     </tr>
     </table>
-    """ % (weburl, ln, weburl, ln, weburl, ln, weburl, ln, weburl)
+    """ % (CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL)
 
     if mtype == "perform_editfields" and content:
         fin_output += content
@@ -143,7 +143,7 @@ def perform_editfield(fldID, ln=CFG_SITE_LANG, mtype='', content='', callback='y
     <td>5.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&amp;ln=%s&amp;mtype=perform_showdetailsfield">Show field usage</a></small></td>
     </tr>
     </table>
-    """ % (weburl, fldID, ln, weburl, fldID, ln, weburl, fldID, ln, weburl, fldID, ln, weburl, fldID, ln, weburl, fldID, ln)
+    """ % (CFG_SITE_URL, fldID, ln, CFG_SITE_URL, fldID, ln, CFG_SITE_URL, fldID, ln, CFG_SITE_URL, fldID, ln, CFG_SITE_URL, fldID, ln, CFG_SITE_URL, fldID, ln)
 
     if mtype == "perform_modifyfield" and content:
         fin_output += content
@@ -190,7 +190,7 @@ def perform_editindex(idxID, ln=CFG_SITE_LANG, mtype='', content='', callback='y
     <td>5.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s&amp;mtype=perform_deleteindex">Delete index</a></small></td>
     </tr>
     </table>
-    """ % (weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln, weburl, idxID, ln)
+    """ % (CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln, CFG_SITE_URL, idxID, ln)
 
     if mtype == "perform_modifyindex" and content:
         fin_output += content
@@ -252,7 +252,7 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
         if forward_table_status_info and reverse_table_status_info:
             output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
-                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s" title="%s">%s</a>""" % (weburl, idxID, ln, idxDESC, idx_dict.get(idxID, idxNAME)),
+                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s" title="%s">%s</a>""" % (CFG_SITE_URL, idxID, ln, idxDESC, idx_dict.get(idxID, idxNAME)),
                        "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
                        "%s MB" % websearch_templates.tmpl_nice_number(reverse_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
                        websearch_templates.tmpl_nice_number(forward_table_status_info['Rows']),
@@ -264,7 +264,7 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
         elif not forward_table_status_info:
             output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
-                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</a>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)),
+                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</a>""" % (CFG_SITE_URL, idxID, ln, idx_dict.get(idxID, idxNAME)),
                        "Error", "%s MB" % websearch_templates.tmpl_nice_number(reverse_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
                        "Error",
                        websearch_templates.tmpl_nice_number(reverse_table_status_info['Rows'], max_ndigits_after_dot=3),
@@ -274,7 +274,7 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
         elif not reverse_table_status_info:
             output += """<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>""" % \
                       (idxID,
-                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</a>""" % (weburl, idxID, ln, idx_dict.get(idxID, idxNAME)),
+                       """<a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&amp;ln=%s">%s</a>""" % (CFG_SITE_URL, idxID, ln, idx_dict.get(idxID, idxNAME)),
                        "%s MB" % websearch_templates.tmpl_nice_number(forward_table_status_info['Data_length'] / 1048576.0, max_ndigits_after_dot=3),
                        "Error", websearch_templates.tmpl_nice_number(forward_table_status_info['Rows'], max_ndigits_after_dot=3),
                        "Error",
@@ -293,7 +293,7 @@ def perform_showindexoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
 def perform_editindexes(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1):
     """show a list of indexes that can be edited."""
 
-    subtitle = """<a name="2"></a>2. Edit index&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (weburl)
+    subtitle = """<a name="2"></a>2. Edit index&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (CFG_SITE_URL)
 
     fin_output = ''
     idx = get_idx()
@@ -308,7 +308,7 @@ def perform_editindexes(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1
             text += """<option value="%s">%s</option>""" % (idxID, idxNAME)
         text += """</select>"""
 
-        output += createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/editindex" % weburl,
+        output += createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/editindex" % CFG_SITE_URL,
                                    text=text,
                                    button="Edit",
                                    ln=ln,
@@ -327,7 +327,7 @@ def perform_editindexes(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1
 def perform_editfields(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1):
     """show a list of all logical fields that can be edited."""
 
-    subtitle = """<a name="5"></a>5. Edit logical field&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (weburl)
+    subtitle = """<a name="5"></a>5. Edit logical field&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (CFG_SITE_URL)
 
     fin_output = ''
 
@@ -343,7 +343,7 @@ def perform_editfields(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1)
             text += """<option value="%s">%s</option>""" % (fldID, name)
         text += """</select>"""
 
-        output += createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/editfield" % weburl,
+        output += createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/editfield" % CFG_SITE_URL,
                                    text=text,
                                    button="Edit",
                                    ln=ln,
@@ -369,14 +369,14 @@ def perform_addindex(ln=CFG_SITE_LANG, idxNAME='', callback="yes", confirm=-1):
     <span class="adminlabel">Index name</span>
     <input class="admin_w200" type="text" name="idxNAME" value="%s" /><br />
     """ % idxNAME
-    output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addindex" % weburl,
+    output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addindex" % CFG_SITE_URL,
                               text=text,
                               ln=ln,
                               button="Add index",
                               confirm=1)
     if idxNAME and confirm in ["1", 1]:
         res = add_idx(idxNAME)
-        output += write_outcome(res) + """<br /><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&ln=%s">Configure this index</a>.""" % (weburl, res[1], ln)
+        output += write_outcome(res) + """<br /><a href="%s/admin/bibindex/bibindexadmin.py/editindex?idxID=%s&ln=%s">Configure this index</a>.""" % (CFG_SITE_URL, res[1], ln)
     elif confirm not in ["-1", -1]:
         output += """<b><span class="info">Please give the index a name.</span></b>
         """
@@ -401,7 +401,7 @@ def perform_modifyindextranslations(idxID, ln=CFG_SITE_LANG, sel_type='', trans=
     idx_dict = dict(get_def_name('', "idxINDEX"))
     if idxID and idx_dict.has_key(int(idxID)):
         idxID = int(idxID)
-        subtitle = """<a name="2"></a>2. Modify translations for index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % weburl
+        subtitle = """<a name="2"></a>2. Modify translations for index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
 
         if type(trans) is str:
             trans = [trans]
@@ -480,7 +480,7 @@ def perform_modifyfieldtranslations(fldID, ln=CFG_SITE_LANG, sel_type='', trans=
     fld_dict = dict(get_def_name('', "field"))
     if fldID and fld_dict.has_key(int(fldID)):
         fldID = int(fldID)
-        subtitle = """<a name="3"></a>3. Modify translations for logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (fld_dict[fldID], weburl)
+        subtitle = """<a name="3"></a>3. Modify translations for logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (fld_dict[fldID], CFG_SITE_URL)
 
         if type(trans) is str:
             trans = [trans]
@@ -637,7 +637,7 @@ def perform_addfield(ln=CFG_SITE_LANG, fldNAME='', code='', callback="yes", conf
     <span class="adminlabel">Field code</span>
     <input class="admin_w200" type="text" name="code" value="%s" /><br />
     """ % (fldNAME, code)
-    output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addfield" % weburl,
+    output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addfield" % CFG_SITE_URL,
                               text=text,
                               ln=ln,
                               button="Add field",
@@ -665,7 +665,7 @@ def perform_deletefield(fldID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
     if not fld_dict.has_key(int(fldID)):
         return """<b><span class="info">Field does not exist</span></b>"""
 
-    subtitle = """<a name="4"></a>4. Delete the logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
+    subtitle = """<a name="4"></a>4. Delete the logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (fld_dict[int(fldID)], CFG_SITE_URL)
     output  = ""
 
     if fldID:
@@ -701,7 +701,7 @@ def perform_deleteindex(idxID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
     """
 
     if idxID:
-        subtitle = """<a name="5"></a>5. Delete the index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % weburl
+        subtitle = """<a name="5"></a>5. Delete the index.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
         output  = ""
 
         if confirm in ["0", 0]:
@@ -752,7 +752,7 @@ def perform_showfieldoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
             field_tags = """<b><span class="info">None</span></b>"""
 
         lang = get_lang_list("fieldname", "id_field", field_id)
-        output += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % ("""<a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&ln=%s">%s</a>""" % (weburl, field_id, ln, fld_dict[field_id]), field_tags, lang)
+        output += """<tr><td>%s</td><td>%s</td><td>%s</td></tr>""" % ("""<a href="%s/admin/bibindex/bibindexadmin.py/editfield?fldID=%s&ln=%s">%s</a>""" % (CFG_SITE_URL, field_id, ln, fld_dict[field_id]), field_tags, lang)
     output += "</table>"
 
     body = [output]
@@ -772,7 +772,7 @@ def perform_modifyindex(idxID, ln=CFG_SITE_LANG, idxNAME='', idxDESC='', callbac
     output  = ""
 
     if idxID not in [-1, "-1"]:
-        subtitle = """<a name="2"></a>1. Modify index name.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % weburl
+        subtitle = """<a name="2"></a>1. Modify index name.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
         if confirm in [-1, "-1"]:
             idx = get_idx(idxID)
             idxNAME = idx[0][1]
@@ -818,7 +818,7 @@ def perform_modifyindexstemming(idxID, ln=CFG_SITE_LANG, idxSTEM='', callback='y
     stemming_language_map['None'] = ''
 
     if idxID not in [-1, "-1"]:
-        subtitle = """<a name="4"></a>4. Modify index stemming language.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % weburl
+        subtitle = """<a name="4"></a>4. Modify index stemming language.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
         if confirm in [-1, "-1"]:
             idx = get_idx(idxID)
             idxSTEM = idx[0][4]
@@ -894,7 +894,7 @@ def perform_modifyfield(fldID, ln=CFG_SITE_LANG, code='', callback='yes', confir
         else:
             code = str.replace("%s" % code, " ", "")
         fldID = int(fldID)
-        subtitle = """<a name="2"></a>1. Modify field code for logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
+        subtitle = """<a name="2"></a>1. Modify field code for logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (fld_dict[int(fldID)], CFG_SITE_URL)
 
         text = """
         <span class="adminlabel">Field code</span>
@@ -927,14 +927,14 @@ def perform_modifyindexfields(idxID, ln=CFG_SITE_LANG, callback='yes', content='
     """Modify which logical fields to use in this index.."""
 
     output = ''
-    subtitle = """<a name="3"></a>3. Modify index fields.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % weburl
+    subtitle = """<a name="3"></a>3. Modify index fields.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
 
     output = """<dl>
      <dt>Menu</dt>
      <dd><a href="%s/admin/bibindex/bibindexadmin.py/addindexfield?idxID=%s&amp;ln=%s#3.1">Add field to index</a></dd>
      <dd><a href="%s/admin/bibindex/bibindexadmin.py/field?ln=%s">Manage fields</a></dd>
     </dl>
-    """  % (weburl, idxID, ln, weburl, ln)
+    """  % (CFG_SITE_URL, idxID, ln, CFG_SITE_URL, ln)
 
     header = ['Field', '']
     actions = []
@@ -944,9 +944,9 @@ def perform_modifyindexfields(idxID, ln=CFG_SITE_LANG, callback='yes', content='
         for (idxID, idxNAME,fldID, fldNAME, regexp_punct, regexp_alpha_sep) in idx_fld:
             actions.append([fldNAME])
             for col in [(('Remove','removeindexfield'),)]:
-                actions[-1].append('<a href="%s/admin/bibindex/bibindexadmin.py/%s?idxID=%s&amp;fldID=%s&amp;ln=%s#3.1">%s</a>' % (weburl, col[0][1], idxID, fldID, ln, col[0][0]))
+                actions[-1].append('<a href="%s/admin/bibindex/bibindexadmin.py/%s?idxID=%s&amp;fldID=%s&amp;ln=%s#3.1">%s</a>' % (CFG_SITE_URL, col[0][1], idxID, fldID, ln, col[0][0]))
                 for (str, function) in col[1:]:
-                    actions[-1][-1] += ' / <a href="%s/admin/bibindex/bibindexadmin.py/%s?fldID=%s&amp;flID=%s&amp;ln=%s#4.1">%s</a>' % (weburl, function, idxID, fldID, ln, str)
+                    actions[-1][-1] += ' / <a href="%s/admin/bibindex/bibindexadmin.py/%s?fldID=%s&amp;flID=%s&amp;ln=%s#4.1">%s</a>' % (CFG_SITE_URL, function, idxID, fldID, ln, str)
         output += tupletotable(header=header, tuple=actions)
     else:
         output += """No index fields exists"""
@@ -969,13 +969,13 @@ def perform_modifyfieldtags(fldID, ln=CFG_SITE_LANG, callback='yes', content='',
     fld_type = get_fld_nametypes()
     fldID = int(fldID)
 
-    subtitle = """<a name="4"></a>3. Modify MARC tags for the logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (fld_dict[int(fldID)], weburl)
+    subtitle = """<a name="4"></a>3. Modify MARC tags for the logical field '%s'&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (fld_dict[int(fldID)], CFG_SITE_URL)
     output = """<dl>
      <dt>Menu</dt>
      <dd><a href="%s/admin/bibindex/bibindexadmin.py/addtag?fldID=%s&amp;ln=%s#4.1">Add MARC tag</a></dd>
      <dd><a href="%s/admin/bibindex/bibindexadmin.py/deletetag?fldID=%s&amp;ln=%s#4.1">Delete unused MARC tags</a></dd>
     </dl>
-    """  % (weburl, fldID, ln, weburl, fldID, ln)
+    """  % (CFG_SITE_URL, fldID, ln, CFG_SITE_URL, fldID, ln)
 
     header = ['', 'Value', 'Comment', 'Actions']
     actions = []
@@ -986,18 +986,18 @@ def perform_modifyfieldtags(fldID, ln=CFG_SITE_LANG, callback='yes', content='',
         for (fldID, tagID, tname, tvalue, score) in res:
             move = ""
             if i != 0:
-                move += """<a href="%s/admin/bibindex/bibindexadmin.py/switchtagscore?fldID=%s&amp;id_1=%s&amp;id_2=%s&amp;ln=%s&amp=rand=%s#4"><img border="0" src="%s/img/smallup.gif" title="Move tag up"></a>""" % (weburl, fldID, tagID, res[i - 1][1], ln, random.randint(0, 1000), weburl)
+                move += """<a href="%s/admin/bibindex/bibindexadmin.py/switchtagscore?fldID=%s&amp;id_1=%s&amp;id_2=%s&amp;ln=%s&amp=rand=%s#4"><img border="0" src="%s/img/smallup.gif" title="Move tag up"></a>""" % (CFG_SITE_URL, fldID, tagID, res[i - 1][1], ln, random.randint(0, 1000), CFG_SITE_URL)
             else:
                 move += "&nbsp;&nbsp;&nbsp;"
             i += 1
             if i != len(res):
-                move += '<a href="%s/admin/bibindex/bibindexadmin.py/switchtagscore?fldID=%s&amp;id_1=%s&amp;id_2=%s&amp;ln=%s&amp;rand=%s#4"><img border="0" src="%s/img/smalldown.gif" title="Move tag down"></a>' % (weburl, fldID, tagID, res[i][1], ln, random.randint(0, 1000), weburl)
+                move += '<a href="%s/admin/bibindex/bibindexadmin.py/switchtagscore?fldID=%s&amp;id_1=%s&amp;id_2=%s&amp;ln=%s&amp;rand=%s#4"><img border="0" src="%s/img/smalldown.gif" title="Move tag down"></a>' % (CFG_SITE_URL, fldID, tagID, res[i][1], ln, random.randint(0, 1000), CFG_SITE_URL)
 
             actions.append([move, tvalue, tname])
             for col in [(('Details','showdetailsfieldtag'), ('Modify','modifytag'),('Remove','removefieldtag'),)]:
-                actions[-1].append('<a href="%s/admin/bibindex/bibindexadmin.py/%s?fldID=%s&amp;tagID=%s&amp;ln=%s#4.1">%s</a>' % (weburl, col[0][1], fldID, tagID, ln, col[0][0]))
+                actions[-1].append('<a href="%s/admin/bibindex/bibindexadmin.py/%s?fldID=%s&amp;tagID=%s&amp;ln=%s#4.1">%s</a>' % (CFG_SITE_URL, col[0][1], fldID, tagID, ln, col[0][0]))
                 for (str, function) in col[1:]:
-                    actions[-1][-1] += ' / <a href="%s/admin/bibindex/bibindexadmin.py/%s?fldID=%s&amp;tagID=%s&amp;ln=%s#4.1">%s</a>' % (weburl, function, fldID, tagID, ln, str)
+                    actions[-1][-1] += ' / <a href="%s/admin/bibindex/bibindexadmin.py/%s?fldID=%s&amp;tagID=%s&amp;ln=%s#4.1">%s</a>' % (CFG_SITE_URL, function, fldID, tagID, ln, str)
         output += tupletotable(header=header, tuple=actions)
     else:
         output += """No fields exists"""
@@ -1041,7 +1041,7 @@ def perform_addtag(fldID, ln=CFG_SITE_LANG, value=['',-1], name='', callback="ye
             text += """<option value="%s" %s>%s</option>""" % (tvalue, (tvalue==value[1] and 'selected="selected"' or ''), "%s - %s" % (tvalue, tname))
     text += """</select>"""
 
-    output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addtag" % weburl,
+    output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addtag" % CFG_SITE_URL,
                               text=text,
                               fldID=fldID,
                               ln=ln,
@@ -1160,7 +1160,7 @@ def perform_addindexfield(idxID, ln=CFG_SITE_LANG, fldID='', callback="yes", con
         text += """<option value="%s" %s>%s</option>""" % (fldID2, (fldID==fldID2 and 'selected="selected"' or ''), fldNAME)
     text += """</select>"""
 
-    output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addindexfield" % weburl,
+    output = createhiddenform(action="%s/admin/bibindex/bibindexadmin.py/addindexfield" % CFG_SITE_URL,
                               text=text,
                               idxID=idxID,
                               ln=ln,

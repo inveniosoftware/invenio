@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 from mod_python import apache
 
-from invenio.config import weburl, CFG_WEBDIR, CFG_SITE_LANG, \
+from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_SITE_LANG, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
@@ -45,7 +45,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
     def index(self, req, form):
         """Index page."""
-        redirect_to_url(req, '%s/yourbaskets/display?%s' % (weburl, req.args))
+        redirect_to_url(req, '%s/yourbaskets/display?%s' % (CFG_SITE_URL, req.args))
 
     def display(self, req, form):
         """Display basket"""
@@ -74,7 +74,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             body = create_guest_warning_box(argd['ln']) + body
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
-        navtrail %= (weburl, argd['ln'], _("Your Account"))
+        navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=argd['category'],
                                               topic=argd['topic'],
@@ -123,7 +123,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             body = create_guest_warning_box(argd['ln']) + body
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
-        navtrail %= (weburl, argd['ln'], _("Your Account"))
+        navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=argd['category'],
                                               topic=argd['topic'],
@@ -171,7 +171,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                         ln=argd['ln'])
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
-        navtrail %= (weburl, argd['ln'], _("Your Account"))
+        navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=argd['category'],
                                               topic=argd['topic'],
@@ -229,7 +229,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         errors = errors_saving.extend(errors_displaying)
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
-        navtrail %= (weburl, argd['ln'], _("Your Account"))
+        navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=argd['category'],
                                               topic=argd['topic'],
@@ -274,7 +274,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                        navmenuid = 'yourbaskets')
 
         _ = gettext_set_language(argd['ln'])
-        url = weburl + '/yourbaskets/display_item?recid=%i&bskid=%i' % \
+        url = CFG_SITE_URL + '/yourbaskets/display_item?recid=%i&bskid=%i' % \
                             (argd['recid'], argd['bskid'])
         url += '&category=%s&topic=%i&group=%i&ln=%s' % \
                             (argd['category'], argd['topic'],
@@ -337,7 +337,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             title = _("Add records to baskets")
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
-        navtrail %= (weburl, argd['ln'], _("Your Account"))
+        navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
         return page(title       = title,
                     body        = body,
                     navtrail    = navtrail,
@@ -375,14 +375,14 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                         selected_group_id=argd['group'],
                                         ln=argd['ln'])
         if argd['confirmed']:
-            url = weburl
+            url = CFG_SITE_URL
             url += '/yourbaskets/display?category=%s&topic=%i&group=%i&ln=%s' %\
                    (argd['category'], argd['topic'], argd['group'], argd['ln'])
             redirect_to_url(req, url)
         else:
             navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                        '%s</a>'
-            navtrail %= (weburl, argd['ln'], _("Your Account"))
+            navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
             navtrail_end = create_basket_navtrail(uid=uid,
                                                   category=argd['category'],
                                                   topic=argd['topic'],
@@ -420,7 +420,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/modify",
                                        navmenuid = 'yourbaskets')
-        url = weburl
+        url = CFG_SITE_URL
         url += '/yourbaskets/display?category=%s&topic=%i&group=%i&ln=%s' %\
                (argd['category'], argd['topic'], argd['group'], argd['ln'])
         if argd['action'] == CFG_WEBBASKET_ACTIONS['DELETE']:
@@ -448,7 +448,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             errors = [('ERR_WEBBASKET_UNDEFINED_ACTION',)]
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
-        navtrail %= (weburl, argd['ln'], _("Your Account"))
+        navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(uid=uid,
                                               category=argd['category'],
                                               topic=argd['topic'],
@@ -492,12 +492,12 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         _ = gettext_set_language(argd['ln'])
         if argd['cancel']:
-            url = weburl + '/yourbaskets/display?category=%s&topic=%i&ln=%s'
+            url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%i&ln=%s'
             url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], argd['topic'],
                     argd['ln'])
             redirect_to_url(req, url)
         elif argd['delete']:
-            url = weburl
+            url = CFG_SITE_URL
             url += '/yourbaskets/delete?bskid=%i&category=%s&topic=%i&ln=%s' %\
                    (argd['bskid'], CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                    argd['topic'], argd['ln'])
@@ -533,7 +533,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                          ln=argd['ln'])
             if argd['new_topic'] != -1:
                 argd['topic'] = argd['new_topic']
-            url = weburl + '/yourbaskets/display?category=%s&topic=%i&ln=%s' %\
+            url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%i&ln=%s' %\
                   (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                    argd['topic'], argd['ln'])
             redirect_to_url(req, url)
@@ -545,7 +545,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
 
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
                    '%s</a>'
-        navtrail %= (weburl, argd['ln'], _("Your Account"))
+        navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
         navtrail_end = create_basket_navtrail(
                             uid=uid,
                             category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
@@ -591,7 +591,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                             new_topic_name=argd['new_topic_name'],
                             create_in_topic=argd['create_in_topic'],
                             ln=argd['ln'])
-            url = weburl + '/yourbaskets/display?category=%s&topic=%i&ln=%s'
+            url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%i&ln=%s'
             url %= (CFG_WEBBASKET_CATEGORIES['PRIVATE'], int(topic), argd['ln'])
             redirect_to_url(req, url)
         else:
@@ -604,7 +604,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                             ln=argd['ln'])
             navtrail = '<a class="navtrail" href="%s/youraccount/'\
                        'display?ln=%s">%s</a>'
-            navtrail %= (weburl, argd['ln'], _("Your Account"))
+            navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
             if isGuestUser(uid):
                 body = create_guest_warning_box(argd['ln']) + body
             return page(title = _("Create basket"),
@@ -658,7 +658,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                             ln=argd['ln'])
         referer = get_referer(req)
         if 'list_public_basket' not in  referer:
-            referer = weburl + '/yourbaskets/list_public_baskets?ln=' + \
+            referer = CFG_SITE_URL + '/yourbaskets/list_public_baskets?ln=' + \
                                 argd['ln']
         navtrail =  '<a class="navtrail" href="%s">%s</a>' % \
                     (referer, _("List of public baskets"))
@@ -715,7 +715,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../yourbaskets/unsubscribe",
                                        navmenuid = 'yourbaskets')
         perform_request_unsubscribe(uid, argd['bskid'])
-        url = weburl + '/yourbaskets/display?category=%s&ln=%s'
+        url = CFG_SITE_URL + '/yourbaskets/display?category=%s&ln=%s'
         url %= (CFG_WEBBASKET_CATEGORIES['EXTERNAL'], argd['ln'])
         redirect_to_url(req, url)
 
@@ -737,6 +737,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                         title = '',
                         req=req,
                         navmenuid = 'yourbaskets')
-        url = weburl + '/yourbaskets/display?category=%s&ln=%s'
+        url = CFG_SITE_URL + '/yourbaskets/display?category=%s&ln=%s'
         url %= (CFG_WEBBASKET_CATEGORIES['EXTERNAL'], argd['ln'])
         redirect_to_url(req, url)

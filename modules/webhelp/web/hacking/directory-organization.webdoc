@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: Directory Organization -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <pre>
@@ -81,26 +81,26 @@ and how the visible URLs are organized.
    and hacker-level access to the site, as reflected by the visible
    URL structure.
 
-     a) The user-level access point is provided by the main WEBURL
+     a) The user-level access point is provided by the main CFG_SITE_URL
         address and its subdirs.  All the user-level documentation is
-        available under WEBURL/help/.  The module-specific user-level
-        documentation is available under WEBURL/help/&lt;module&gt;/.
+        available under CFG_SITE_URL/help/.  The module-specific user-level
+        documentation is available under CFG_SITE_URL/help/&lt;module&gt;/.
 
-     b) The admin-level access is provided by WEBURL/admin/ entry
+     b) The admin-level access is provided by CFG_SITE_URL/admin/ entry
         point.  The admin-level documentation is accessible from the
         same place.  The admin-level module-specific functionality and
-        help is available under WEBURL/admin/&lt;module&gt;/.  (If
+        help is available under CFG_SITE_URL/admin/&lt;module&gt;/.  (If
         it's written in mod_python, it usually points to
-        WEBURL/&lt;module&gt;admin.py/ since we configure the server
+        CFG_SITE_URL/&lt;module&gt;admin.py/ since we configure the server
         to have all mod_python scripts under the prefix/var/www root
         directory.)
 
-     c) The hacker-level documentation is provided by WEBURL/hacking/
+     c) The hacker-level documentation is provided by CFG_SITE_URL/hacking/
         entry point.  There is no hacker-level functionality possible
         via Web, of course, so that unlike admin-level entry point,
         the hacker-level entry point provides only a common access to
         available hacking documention, etc.  The module-specific
-        information is available under WEBURL/hacking/&lt;module&gt;/.
+        information is available under CFG_SITE_URL/hacking/&lt;module&gt;/.
 
 4. Let's now return a bit more closely to the role Python and PHP
    library directories outside of the Apache tree:

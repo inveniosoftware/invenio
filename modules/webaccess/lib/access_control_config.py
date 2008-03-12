@@ -24,7 +24,7 @@ __revision__ = \
 
 # pylint: disable-msg=C0301
 
-from invenio.config import CFG_SITE_NAME, weburl, CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE
+from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE
 import cPickle
 from zlib import compress
 from invenio.messages import gettext_set_language
@@ -165,16 +165,16 @@ DEF_DEMO_AUTHS = (
 
 _ = gettext_set_language('en')
 CFG_ACC_ACTIVITIES_URLS = {
-    'runbibedit' : (_("Run BibEdit"), "%s/admin/bibedit/bibeditadmin.py?ln=%%s" % weburl),
-    'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % weburl),
-    'cfgbibharvest' : (_("Configure BibHarvest"), "%s/admin/bibharvest/bibharvestadmin.py?ln=%%s" % weburl),
-    'cfgoairepository' : (_("Configure OAI Repository"), "%s/admin/bibharvest/oaiarchiveadmin.py?ln=%%s" % weburl),
-    'cfgbibindex' : (_("Configure BibIndex"), "%s/admin/bibindex/bibindexadmin.py?ln=%%s" % weburl),
-    'cfgbibrank' : (_("Configure BibRank"), "%s/admin/bibrank/bibrankadmin.py?ln=%%s" % weburl),
-    'cfgwebaccess' : (_("Configure WebAccess"), "%s/admin/webaccess/webaccessadmin.py?ln=%%s" % weburl),
-    'cfgwebcomment' : (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % weburl),
-    'cfgwebsearch' : (_("Configure WebSearch"), "%s/admin/websearch/websearchadmin.py?ln=%%s" % weburl),
-    'cfgwebsubmit' : (_("Configure WebSubmit"), "%s/admin/websubmit/websubmitadmin.py?ln=%%s" % weburl),
+    'runbibedit' : (_("Run BibEdit"), "%s/admin/bibedit/bibeditadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgbibharvest' : (_("Configure BibHarvest"), "%s/admin/bibharvest/bibharvestadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgoairepository' : (_("Configure OAI Repository"), "%s/admin/bibharvest/oaiarchiveadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgbibindex' : (_("Configure BibIndex"), "%s/admin/bibindex/bibindexadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgbibrank' : (_("Configure BibRank"), "%s/admin/bibrank/bibrankadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebaccess' : (_("Configure WebAccess"), "%s/admin/webaccess/webaccessadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebcomment' : (_("Configure WebComment"), "%s/admin/webcomment/webcommentadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebsearch' : (_("Configure WebSearch"), "%s/admin/websearch/websearchadmin.py?ln=%%s" % CFG_SITE_URL),
+    'cfgwebsubmit' : (_("Configure WebSubmit"), "%s/admin/websubmit/websubmitadmin.py?ln=%%s" % CFG_SITE_URL),
 }
 
 CFG_WEBACCESS_MSGS = {

@@ -24,10 +24,10 @@ __revision__ = \
 
 # pylint: disable-msg=C0301
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 
-WEBSUBMITADMIN_WEBURL = "%s/admin/websubmit/websubmitadmin.py" % (weburl,)
-WEBSUBMITADMIN_OLDWEBURL = "%s/admin/websubmit" % (weburl,)
+WEBSUBMITADMINURL = "%s/admin/websubmit/websubmitadmin.py" % (CFG_SITE_URL,)
+WEBSUBMITADMINURL_OLD = "%s/admin/websubmit" % (CFG_SITE_URL,)
 
 
 class InvenioWebSubmitAdminWarningIOError(Exception):

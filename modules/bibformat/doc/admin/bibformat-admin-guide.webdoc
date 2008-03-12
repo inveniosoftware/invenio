@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title:BibFormat Admin Guide -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <h2>Contents</h2>
@@ -164,7 +164,7 @@ a typical workflow:</p>
   </tr>
   <tr valign="top">
     <td>
-    <img src="<WEBURL>/img/admin/bibformat-guide-url_bar.png" alt="http://cdsweb.cern.ch/search?recid=946417&amp;ln=en&amp;of=hd"/>
+    <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-url_bar.png" alt="http://cdsweb.cern.ch/search?recid=946417&amp;ln=en&amp;of=hd"/>
     </td>
 
     <td width="50%">When CDS Invenio has to display a record, it
@@ -180,7 +180,7 @@ a typical workflow:</p>
   <tr>
   <td colspan="2"><hr/><span style="white-space: nowrap;">Step 2:</span></td>
   </tr><tr valign="top">
-  <td><img src="<WEBURL>/img/admin/bibformat-guide-bfo_hd_rules.png" alt="1. Use Template [Picture HTML Detailed] if tag [980__a] is equal to [PICTURE] 2. Use Template [Thesis HTML detailed] if tag [980__a] is equal to [THESIS] 3. By default use [Default HTML Detailed]"/>
+  <td><img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfo_hd_rules.png" alt="1. Use Template [Picture HTML Detailed] if tag [980__a] is equal to [PICTURE] 2. Use Template [Thesis HTML detailed] if tag [980__a] is equal to [THESIS] 3. By default use [Default HTML Detailed]"/>
 
     <td>
     Beside is a screenshot of the "hd" or "HTML Detailed" output format.
@@ -242,7 +242,7 @@ a typical workflow:</p>
       &nbsp;&nbsp;&nbsp;&quot;&quot;&quot;<br />
       &nbsp;&nbsp;&nbsp;authors = bfo.fields(&quot;100__a&quot;)<br />
       &nbsp;&nbsp;&nbsp;if link == 'yes':<br />
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;authors = map(lambda x: '&lt;a href="'+weburl+'/search?f=author&p='\<br/>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;authors = map(lambda x: '&lt;a href="'+CFG_SITE_URL+'/search?f=author&p='\<br/>
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                                         + quote(x) +'"&gt;'+x+'&lt;/a&gt;', authors)<br />
       &nbsp;&nbsp;&nbsp;return authors.split(separator)</code>
@@ -293,25 +293,25 @@ This format will just print the title of a record.
 
 <p>First go to the main <a href="bibformatadmin.py">BibFormat admin page</a>.
 Then click on the "Manage Ouput Format" links. You will see the list of all output formats:</p>
-<img src="<WEBURL>/img/admin/bibformat-guide-bfo_manage.png" alt="Output formats management page"/>
+<img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfo_manage.png" alt="Output formats management page"/>
 <p>This is were you can delete, create or check output formats.
 The menu at the top of the page let you go to other admininistration pages.<br/>
 Click on the "Add New Output Format" button at the bottom of the page. You can then fill in some attributes
 for the output format. Choose "title" as code, "Only Title" as name and "Prints only title" as description:</p>
-<img src="<WEBURL>/img/admin/bibformat-guide-bfo_attributes.png" alt="Screenshot of the Update Output Format Attributes page" />
+<img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfo_attributes.png" alt="Screenshot of the Update Output Format Attributes page" />
 <p>Leave other fields blank, and click on the button "Update Output format Attributes".<br/> You are then
 redirected to the rules editor. Notice the menu at the top which let you close the editor, change the attributes again
 and check the output format. However do not click on these links before saving your modification of rules!</p>
-<img src="<WEBURL>/img/admin/bibformat-guide-bfo_rules.png" alt="Output format menu" />
+<img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfo_rules.png" alt="Output format menu" />
 <p>As our format does not need to have a different behaviour depending on the record, we do not need to add new rules to the format. You just need to select a format template in the "By default use" list. However we first have to create our special format template that only print titles. So close the editor using the menu at the top of the page, and in the menu that just appeared instead, click on "Manage Format Templates". In a similar way to output formats, you see the list of format templates.</p>
-<img src="<WEBURL>/img/admin/bibformat-guide-bft_manage.png" alt="Format template management page" />
+<img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bft_manage.png" alt="Format template management page" />
 <p>
 Click on the "Add New Format Template" button at the bottom of the page. As for the output format, fill in the attributes of the template with name "Title" and any relevant description.
 </p>
 
-<img src="<WEBURL>/img/admin/bibformat-guide-bft_attributes.png" alt="update format template attributes"/>
+<img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bft_attributes.png" alt="update format template attributes"/>
 <p>Click on the "Update Output Format Attributes" button. You are redirected to the template editor. The editor is divided in three parts. The upper left part contains the code of the template. The bottom part is a preview of the template. The part on the right side is a short remainder of the format elements you can use in you template. You can hide this documentation by clicking on  "Hide Documentation".</p>
-<img src="<WEBURL>/img/admin/bibformat-guide-bft_editor2.png" alt="Format template editor" />
+<img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bft_editor2.png" alt="Format template editor" />
 <p>The above screenshot shows the template code already filled in. It calls the <code>BFE_TITLE</code> element. If you do not know the name of the element you want to call, you can search for it using the embedded documentation search. You can try to add other elements into your template, or write some HTML formatting.</p>
 <p>When you are satisfied with your template, click on the save button, close the editor and go back to the "Only titles" output format rules editor. There select the template you have just created in the "Use by default" menu and save the ouput format and you are done. </p>
 <p>This tutorial does not cover all aspects of the management of formats (For example "Knowledge bases" or internationalization). It also does not show all the power of output formats, as the one we have created simply call a template. However you have seen enough to configure BibFormat trough the web interface. Read the sections below to learn more about it.</p>
@@ -367,14 +367,14 @@ However you must make sure that it is removed from the tables <code>format</code
     this is enough. You can however add other rules, by clicking on the "Add New Rule" button.<br/>
     Once you have added a rule, you can fill it with a condition, and a template that should be used
     if the condition is true. For example the rule</p>
-    <img src="<WEBURL>/img/admin/bibformat-guide-bfo_edit_rule.png" alt="Rule: Use template [Picture HTML Detailed] if field [980__a] is equal to [PICTURE]"/>
+    <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfo_edit_rule.png" alt="Rule: Use template [Picture HTML Detailed] if field [980__a] is equal to [PICTURE]"/>
    <p> will use template named "Picture HTML Detailed" if the field <code>980__a</code> of the record to format is equal to "Picture".
     Note that text "PICTURE" will match any letter case like "picture" or "Picture".
     Leading and trailing spaces are ignored too ("  Picture  " will match "PICTURE").
     <br/><b>Tips:</b> you can use a regular expression as text. For example "PICT.*" will match "pictures"
     and "PICTURE".</p>
 
-    <p><div style="float:right"><img src="<WEBURL>/img/admin/bibformat-guide-bfo_edit_rule2.png" alt="Reorder rules using arrows"/></div>
+    <p><div style="float:right"><img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfo_edit_rule2.png" alt="Reorder rules using arrows"/></div>
     The above configuration will use format template "Default HTML Detailed" if all above rules fail (in that case
     if field 980__a is different from "PICTURE"). If you have more rules, you decide in which order the conditions are evaluated. You can reorder rules by clicking on the small arrows on the left of the rules.
     </p>
@@ -466,7 +466,7 @@ However you must make sure that it is removed from the tables <code>format</code
     <p>To check the dependencies of an output format on format templates, format elements and tags,
     go to the <a href="bibformatadmin.py/output_formats_manage">Manage Output Formats</a> page, click on
     the output format you want to check, and then in the menu click on "Check Dependencies".</p>
-    <img src="<WEBURL>/img/admin/bibformat-guide-bfo_check_deps.png" alt="Check Dependencies menu"/>
+    <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfo_check_deps.png" alt="Check Dependencies menu"/>
     <p>The next page shows you:
     <ul> <li>the format templates which might be called by the rules of the output format</li>
     <li>the elements used in each of these templates</li>
@@ -503,7 +503,7 @@ However you must make sure that it is removed from the tables <code>format</code
     <p>The format template editor contains three panels. The left upper panel is the code editor. This is were
     you write the code that specifies the formatting of a template. The right-most panel is a short documentation
     on the "bricks" you can use in your format template code. The panel at the bottom of the page allows you to preview the template. </p>
-     <img src="<WEBURL>/img/admin/bibformat-guide-bft_editor.png" alt="Template Editor Page"/>
+     <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bft_editor.png" alt="Template Editor Page"/>
     <p>The following sections explain how to write the code that specifies the formatting.</p>
     <h4><a name="editFormatTemplate">3.4 Basic Editing</a></h4>
     <p>The first thing you have to know before editing the code is that everything you write in the
@@ -551,7 +551,7 @@ However you must make sure that it is removed from the tables <code>format</code
 
     <h4><a name="previewFormatTemplate">3.6 Preview a Format Template</a></h4>
     <p>To preview a format template go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page and click on the format template you want to preview to open the template editor. The editor contains a preview panel at the bottom of the page.</p>
-    <img src="<WEBURL>/img/admin/bibformat-guide-bft_preview.png" alt="Preview Panel"/>
+    <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bft_preview.png" alt="Preview Panel"/>
     <p>Simply click on " Reload Preview" button to preview the template (you do not need to save the code before previewing).<br/>
     Use the "Language" menu to preview the template in a given language</p>
     <p>You can fill in the "Search Pattern" field to preview a specific record. The search pattern uses exactly the same
@@ -622,7 +622,7 @@ are not returned by the format elements.</p>
      <p>To check the dependencies of a format template
     go to the <a href="bibformatadmin.py/format_template_manage">Manage Format Template</a> page, click on
     the format template you want to check, and then in the menu click on "Check Dependencies".</p>
-    <img src="<WEBURL>/img/admin/bibformat-guide-bfo_check_deps.png" alt="Check Dependencies menu"/>
+    <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfo_check_deps.png" alt="Check Dependencies menu"/>
     <p>The next page shows you:
     <ul> <li>The output formats that use this format template</li>
     <li>the elements used in the template (and Marc tags use in these elements in parentheses)</li>
@@ -669,12 +669,12 @@ are not returned by the format elements.</p>
 
     <h3><a name="addFormatElement">4.1 Add a Format Element</a></h3>
     <p>The most typical way of adding a format element is to drop a <code>.py</code> file in the lib/python/invenio/bibformat_elements directory of your CDS Invenio installation. See <a href="#codeFormatElement">Edit the Code of a Format Element</a> to learn how to implement an element.</p>
-    <p>The most simple way to add a format element is to add a en entry in the "<a href="<WEBURL>//admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module. When BibFormat cannot find the Python format element corresponding to a given name, it looks into this table for the name and prints the value of the field declared for this name. This lightweight way of doing is straightforward but does not allow complex handling of the data (it limits to printing the value of the field, or the values of the fields if multiple fields are declared under the same label).</p>
+    <p>The most simple way to add a format element is to add a en entry in the "<a href="<CFG_SITE_URL>//admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module. When BibFormat cannot find the Python format element corresponding to a given name, it looks into this table for the name and prints the value of the field declared for this name. This lightweight way of doing is straightforward but does not allow complex handling of the data (it limits to printing the value of the field, or the values of the fields if multiple fields are declared under the same label).</p>
     <h3><a name="removeFormatElement">4.2 Remove a Format Element</a></h3>
     <p>To remove a Python format element simply remove the corresponding file from the lib/python/invenio/bibformat_elements directory of your CDS Invenio installation.</p>
-    <p>To remove a format element declared in the "<a href="<WEBURL>//admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module simply remove the entry from the table.</p>
+    <p>To remove a format element declared in the "<a href="<CFG_SITE_URL>//admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module simply remove the entry from the table.</p>
     <h3><a name="codeFormatElement">4.3 Edit the Code of a Format Element</a></h3>
-    <p>This section only applies to Python format elements. Basic format elements declared in "<a href="<WEBURL>//admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" have non configurable behaviour.</p>
+    <p>This section only applies to Python format elements. Basic format elements declared in "<a href="<CFG_SITE_URL>//admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" have non configurable behaviour.</p>
     <p>A format element file is like any regular Python program. It has to implement a <code>format</code> function, which returns a <code>string</code> and takes at least <code>bfo</code> as first parameter (but can take as many others as needed).</p>
     <p>Here is for example the code of the "bfe_title.py" element:
 <pre>
@@ -735,7 +735,7 @@ Notice that the call uses (almost) the filename of your element. To find out whi
 <li><code>kb(kb, string, default="")</code>: Returns the value of the <code>string</code> in the knowledge base <code>kb</code>. If kb does not exist or string does not exist in kb, returns <code>default</code> string.</li>
 </ul>
 You can also get access to other information through <code>bfo</code>, such as the language in which the formatting should occur with <code>bfo.lang</code>. To learn more
-about the possibilities offered by the <code>bfo</code>, read the <a href="<WEBURL>/help/hacking/bibformat-api">BibFormat APIs</a>
+about the possibilities offered by the <code>bfo</code>, read the <a href="<CFG_SITE_URL>/help/hacking/bibformat-api">BibFormat APIs</a>
 </p>
         <p><b>Method 2: Use module <code>BibRecord</code></b>:<br/>
 
@@ -946,7 +946,7 @@ launch:
 it will process all the records that have been modified since the last
 run of BibReformat, as well as all newly inputted records. This is
 suitable for running BibReformat in a periodical daemon mode via
-BibSched. See our <a href="<WEBURL>/help/admin/howto-run">HOWTO Run
+BibSched. See our <a href="<CFG_SITE_URL>/help/admin/howto-run">HOWTO Run
 Your CDS Invenio Installation</a> guide for more information.</p>
 
 <h2><a name="Appendix">7. Appendix</a></h2>
@@ -1080,7 +1080,7 @@ PICTURE --- Picture_HTML_brief.bft<br/>
 default: Default_HTML_brief.bft<br/>
 </code><p/>
 <p>or visual representation through web interface:<br/>
-<img src="<WEBURL>/img/admin/bibformat-guide-bfo_hb_migrate.png" alt="Image representation of HB output format" />
+<img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfo_hb_migrate.png" alt="Image representation of HB output format" />
 </p>
 <h4>Migrating <i>formats</i> to <i>format templates</i> and <i>format elements</i></h4>
 <p>The migration of formats is the most difficult part of the migration. You will need to separate the presentation code (HTML) from the business code (iterations, tests and calls to the database). Here are some tips on how you can do this:</p>
@@ -1111,7 +1111,7 @@ of your Dreamweaver installation folder. At the end of this file, copy-paste the
   &lt;tagspec tag_name="BIBFORMAT" start_string="&lt;BFE_" end_string="/&gt;" parse_attributes="false" detect_in_attribute="true" icon="bibformat.gif" icon_width="25" icon_height="16"&gt;&lt;/tagspec &gt;
   &lt;tagspec tag_name="BIBFORMAT" start_string="&lt;bfe_" end_string="/&gt;" parse_attributes="false" detect_in_attribute="true" icon="bibformat.gif" icon_width="25" icon_height="16"&gt;&lt;/tagspec &gt;
   </pre>
-  Also copy this icon <img src="<WEBURL>/img/admin/bibformat-guide-bfe.gif" alt="bibformat.gif"/> in the same directory as <code>Tags.xml</code> (right-click on icon, or ctrl-click on one-button mouse, and "Save Image As..."). Make sure the downloaded image is named "<code>bibformat.gif</code>".
+  Also copy this icon <img src="<CFG_SITE_URL>/img/admin/bibformat-guide-bfe.gif" alt="bibformat.gif"/> in the same directory as <code>Tags.xml</code> (right-click on icon, or ctrl-click on one-button mouse, and "Save Image As..."). Make sure the downloaded image is named "<code>bibformat.gif</code>".
   </p>
   <p>Note that Dreamweaver might not recognize Format Elements when complex formatting is involved due to these elements.</p>
   <h4>Add a Format Elements Floating Panel</h4>
@@ -1145,7 +1145,7 @@ administrator to unprotect the file if you want to edit it.</p>
 
 <h4>How can I add a format element from the web interface?</h4>
 <p>Format elements cannot be added, removed or edited through the web interface. This limitation
-has been introduced to limit the security risks caused by the upload of Pythonic files on the server. The only possibility to add a basic format element from the web interface is to add a en entry in the "<a href="<WEBURL>//admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module (see <a href="#addFormatElement">Add a Format Element</a>)</p>
+has been introduced to limit the security risks caused by the upload of Pythonic files on the server. The only possibility to add a basic format element from the web interface is to add a en entry in the "<a href="<CFG_SITE_URL>//admin/bibindex/bibindexadmin.py/field">Logical Fields</a>" management interface of the BibIndex module (see <a href="#addFormatElement">Add a Format Element</a>)</p>
 
 <h4>Why are some Marc codes omitted in the "Check Dependencies" pages?</h4>
 <p>When you check the dependencies of a format, the page reminds you that

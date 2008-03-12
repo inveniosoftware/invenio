@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: Coding Style -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <pre>
@@ -62,7 +62,7 @@ A brief description of things we strive at, more or less unsuccessfully.
    the existing code surely do not fulfil them here and there.
    The code indentation is done via spaces only, please do not use
    tabs.  One tab counts as four spaces.  Emacs users can look into
-   our <a href="<WEBURL>/hacking/cdsware.el">cdsware.el</a> for inspiration.
+   our <a href="<CFG_SITE_URL>/hacking/cdsware.el">cdsware.el</a> for inspiration.
 
    All the Python code should be extensively documented via
    docstrings, so you can always run pydoc file.py to peruse the

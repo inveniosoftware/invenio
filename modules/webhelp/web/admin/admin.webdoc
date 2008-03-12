@@ -29,12 +29,12 @@ system.</p>
 <p>CDS Invenio comes as a suite of several more or less independent
 modules.  You'll find brief descriptions for each admin module below.
 (More background information on each module may be read in the <a
-href="<WEBURL>/help/hacking/modules-overview">modules overview</a> article.)
+href="<CFG_SITE_URL>/help/hacking/modules-overview">modules overview</a> article.)
 </p>
 
 <h3>Admin HOWTO guides</h3>
 
-<p><a href="<WEBURL>/help/admin/howto">Admin HOWTO Guides</a> give you
+<p><a href="<CFG_SITE_URL>/help/admin/howto">Admin HOWTO Guides</a> give you
 you both short and not-so-short recipes and thoughts on some of the
 most frequently encountered administrative tasks.  They tend to answer
 various admin-level questions of a rather general level.  The specific
@@ -77,9 +77,9 @@ data are uploaded in CDS Invenio, you may want to modify them via
   define your OAI sets in case you want to export your own data.
 </td>
 <td>
-  <a href="<WEBURL>/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a>
+  <a href="<CFG_SITE_URL>/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a>
   <p>
-  <a href="<WEBURL>/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a>
+  <a href="<CFG_SITE_URL>/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a>
 </td>
 <td>
   <a href="bibharvest-admin-guide">BibHarvest Admin Guide</a>
@@ -148,7 +148,7 @@ data are uploaded in CDS Invenio, you may want to modify them via
     possible peer review and approval strategy, etc.
 </td>
 <td>
-  <a href="<WEBURL>/admin/websubmit/websubmitadmin.py">WebSubmit Admin Interface</a>
+  <a href="<CFG_SITE_URL>/admin/websubmit/websubmitadmin.py">WebSubmit Admin Interface</a>
 </td>
 <td>
   <a href="websubmit-admin-guide">WebSubmit Admin Guide</a>
@@ -179,7 +179,7 @@ data are uploaded in CDS Invenio, you may want to modify them via
   record, do global replacements, and other cataloguing tasks.
 </td>
 <td>
-  <a href="<WEBURL>/admin/bibedit/bibeditadmin.py">BibEdit Admin Interface</a>
+  <a href="<CFG_SITE_URL>/admin/bibedit/bibeditadmin.py">BibEdit Admin Interface</a>
 </td>
 <td>
   <a href="bibedit-admin-guide">BibEdit Admin Guide</a>
@@ -220,9 +220,9 @@ engine.
   can force reindexing of the fulltext index, etc.
 </td>
 <td>
-  <a href="<WEBURL>/admin/bibindex/bibindexadmin.py">Manage indexes</a>
+  <a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py">Manage indexes</a>
   <p>
-  <a href="<WEBURL>/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a>
+  <a href="<CFG_SITE_URL>/admin/bibindex/bibindexadmin.py/field">Manage logical fields</a>
 </td>
 <td>
   <a href="bibindex-admin-guide">BibIndex Admin Guide</a>
@@ -238,7 +238,7 @@ engine.
   You can rebalance existing ranking sets, create new ranking methods, etc.
 </td>
 <td>
-  <a href="<WEBURL>/admin/bibrank/bibrankadmin.py">BibRank Admin Interface</a>
+  <a href="<CFG_SITE_URL>/admin/bibrank/bibrankadmin.py">BibRank Admin Interface</a>
 </td>
 <td>
   <a href="bibrank-admin-guide">BibRank Admin Guide</a>
@@ -273,7 +273,7 @@ engine.
 
 </td>
 <td>
-  <a href="<WEBURL>/admin/bibformat/bibformatadmin.py">BibFormat Admin Interface</a>
+  <a href="<CFG_SITE_URL>/admin/bibformat/bibformatadmin.py">BibFormat Admin Interface</a>
 </td>
 <td>
   <a href="bibformat-admin-guide">BibFormat Admin Guide</a>
@@ -292,7 +292,7 @@ engine.
     present, etc.
 </td>
 <td>
-  <a href="<WEBURL>/admin/websearch/websearchadmin.py">WebSearch Admin Interface</a>
+  <a href="<CFG_SITE_URL>/admin/websearch/websearchadmin.py">WebSearch Admin Interface</a>
 </td>
 <td>
   <a href="websearch-admin-guide">WebSearch Admin Guide</a>
@@ -392,7 +392,7 @@ set up personal email notification alerts.
   see which ones were reported as abuse/spam, delete them, etc.
 </td>
 <td>
-  <a href="<WEBURL>/admin/webcomment/webcommentadmin.py">WebComment Admin Interface</a>
+  <a href="<CFG_SITE_URL>/admin/webcomment/webcommentadmin.py">WebComment Admin Interface</a>
 </td>
 <td>
   <a href="webcomment-admin-guide">WebComment Admin Guide</a>
@@ -461,13 +461,13 @@ define a common look and feel of CDS Invenio web pages.
     Jill is the submission approval editor, etc.
 </td>
 <td>
-  <a href="<WEBURL>/admin/webaccess/webaccessadmin.py">WebAccess Admin Interface - Full functionality</a>
+  <a href="<CFG_SITE_URL>/admin/webaccess/webaccessadmin.py">WebAccess Admin Interface - Full functionality</a>
    <br /><small>Full interface. Manage, grant, revoke any right.</small>
   <p>
-  <a href="<WEBURL>/admin/webaccess/webaccessadmin.py/delegate_startarea">Delegate Rights - With Restrictions</a>
+  <a href="<CFG_SITE_URL>/admin/webaccess/webaccessadmin.py/delegate_startarea">Delegate Rights - With Restrictions</a>
    <br /><small>Delegate your rights for some roles.</small>
   <p>
-  <a href="<WEBURL>/admin/webaccess/webaccessadmin.py/manageaccounts">Manage Accounts</a>
+  <a href="<CFG_SITE_URL>/admin/webaccess/webaccessadmin.py/manageaccounts">Manage Accounts</a>
    <br /><small>Enable, disable, and modify accounts.</small>
 </td>
 <td>

@@ -22,7 +22,7 @@ __lastupdated__ = "$Date$"
 
 import os
 
-from invenio.config import CFG_TMPDIR, weburl, CFG_SITE_NAME
+from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_SITE_NAME
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webpage import page
 from invenio import template
@@ -74,7 +74,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
         return page(title="Collection population",
                     body=perform_display_keyevent('collection population', argd, req),
-                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % weburl,
+                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
                     description="CDS, Statistics, Collection population",
                     keywords="CDS, statistics, collection population",
                     req=req,
@@ -88,7 +88,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
         return page(title="Search frequency",
                     body=perform_display_keyevent('search frequency', argd, req),
-                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % weburl,
+                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
                     description="CDS, Statistics, Search frequency",
                     keywords="CDS, statistics, search frequency",
                     req=req,
@@ -102,7 +102,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
         return page(title="Search type distribution",
                     body=perform_display_keyevent('search type distribution', argd, req),
-                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % weburl,
+                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
                     description="CDS, Statistics, Search type distribution",
                     keywords="CDS, statistics, search type distribution",
                     req=req,
@@ -116,7 +116,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
         return page(title="Download frequency",
                     body=perform_display_keyevent('download frequency', argd, req),
-                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % weburl,
+                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
                     description="CDS, Statistics, Download frequency",
                     keywords="CDS, statistics, download frequency",
                     req=req,
@@ -133,7 +133,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
         return page(title="Custom event",
                     body=perform_display_customevent(argd['ids'], argd, req=req),
-                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % weburl,
+                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
                     description="CDS Personalize, Statistics, Custom event",
                     keywords="CDS, statistics, custom event",
                     req=req,
@@ -144,7 +144,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         """Custom event help page"""
         return page(title="Custom event help",
                     body=perform_display_customevent_help(),
-                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % weburl,
+                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
                     description="CDS Personalize, Statistics, Custom event help",
                     keywords="CDS, statistics, custom event help",
                     req=req,

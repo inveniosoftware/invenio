@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -35,7 +35,7 @@ class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
     def test_webaccess_admin_interface_availability(self):
         """webaccess - availability of WebAccess Admin interface pages"""
 
-        baseurl = weburl + '/admin/webaccess/webaccessadmin.py/'
+        baseurl = CFG_SITE_URL + '/admin/webaccess/webaccessadmin.py/'
 
         _exports = ['', 'delegate_startarea', 'manageaccounts']
 
@@ -56,7 +56,7 @@ class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
     def test_webaccess_admin_guide_availability(self):
         """webaccess - availability of WebAccess Admin guide pages"""
 
-        url = weburl + '/help/admin/webaccess-admin-guide'
+        url = CFG_SITE_URL + '/help/admin/webaccess-admin-guide'
         error_messages = test_web_page_content(url,
                                                expected_text="WebAccess Admin Guide")
         if error_messages:

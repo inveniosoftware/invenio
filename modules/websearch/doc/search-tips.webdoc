@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: _(Search Tips)_ -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/<lang:link/>">_(Help Central)_</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/<lang:link/>">_(Help Central)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <h5><lang>
@@ -31,7 +31,7 @@
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input size="20" type="text" name="p" value="" />
     <select name="f"><option value="">_(any field)_</option>
                      <option>_(title)_</option>
@@ -61,7 +61,7 @@
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="" />
     <select name="f"><option value="">_(any field)_</option>
@@ -72,9 +72,9 @@
     <p>
     _(Narrow by collection:)_
     <br />
-    <input type="checkbox" name="c" value="Preprints" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Preprints<lang:link />">Preprints</a>
+    <input type="checkbox" name="c" value="Preprints" checked="checked" />&nbsp;<a href="<CFG_SITE_URL>/?c=Preprints<lang:link />">Preprints</a>
     <br />
-    <input type="checkbox" name="c" value="Theses" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Theses<lang:link />">Theses</a>
+    <input type="checkbox" name="c" value="Theses" checked="checked" />&nbsp;<a href="<CFG_SITE_URL>/?c=Theses<lang:link />">Theses</a>
     </p>
     </form>
 
@@ -99,7 +99,7 @@
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="NA60" />
     <select name="f"><option value="">_(any field)_</option>
@@ -110,9 +110,9 @@
     <p>
     _(Narrow by collection:)_
     <br />
-    <input type="checkbox" name="c" value="Preprints" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Preprints<lang:link />">Preprints</a>
+    <input type="checkbox" name="c" value="Preprints" checked="checked" />&nbsp;<a href="<CFG_SITE_URL>/?c=Preprints<lang:link />">Preprints</a>
     <br />
-    <input type="checkbox" name="c" value="Theses" checked="checked" />&nbsp;<a href="<WEBURL>/?c=Theses<lang:link />">Theses</a>
+    <input type="checkbox" name="c" value="Theses" checked="checked" />&nbsp;<a href="<CFG_SITE_URL>/?c=Theses<lang:link />">Theses</a>
     </p>
     </form>
 </td>
@@ -147,7 +147,7 @@ della ricerca.</it>
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="higgs boson" />
     <select name="f"><option value="">_(any field)_</option>
@@ -170,7 +170,7 @@ della ricerca.</it>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="'higgs boson'" />
     <select name="f"><option value="">_(any field)_</option>
@@ -194,7 +194,7 @@ della ricerca.</it>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="&quot;higgs boson&quot;" />
     <select name="f"><option value="">_(any field)_</option>
@@ -239,7 +239,7 @@ della ricerca.</it>
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon*" />
     <select name="f"><option value="">_(any field)_</option>
@@ -279,7 +279,7 @@ della ricerca.</it>
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon kaon" />
     <select name="f"><option value="">_(any field)_</option>
@@ -290,7 +290,7 @@ della ricerca.</it>
     </form>
     _(or)_:
     <br />
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon AND kaon" />
     <select name="f"><option value="">_(any field)_</option>
@@ -310,7 +310,7 @@ della ricerca.</it>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon OR kaon" />
     <select name="f"><option value="">_(any field)_</option>
@@ -330,7 +330,7 @@ della ricerca.</it>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="muon NOT kaon" />
     <select name="f"><option value="">_(any field)_</option>
@@ -367,7 +367,7 @@ della ricerca.</it>
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="2003" />
     <select name="f"><option value="">_(any field)_</option>
@@ -388,7 +388,7 @@ della ricerca.</it>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="year:2003" />
     <select name="f"><option value="">_(any field)_</option>
@@ -408,7 +408,7 @@ della ricerca.</it>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="year:2003->2004" />
     <select name="f"><option value="">_(any field)_</option>
@@ -444,7 +444,7 @@ della ricerca.</it>
 <table width="100%" border="1" cellpadding="10" cellspacing="0">
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="Ellis" />
     <select name="f"><option value="">_(any field)_</option>
@@ -469,7 +469,7 @@ della ricerca.</it>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="Ellis, J R" />
     <select name="f"><option value="">_(any field)_</option>
@@ -493,7 +493,7 @@ della ricerca.</it>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="Ellis, John Rolfe" />
     <select name="f"><option value="">_(any field)_</option>
@@ -514,7 +514,7 @@ della ricerca.</it>
 </tr>
 <tr>
 <td width="50%" style="white-space: nowrap">
-    <form action="<WEBURL>/search" method="get">
+    <form action="<CFG_SITE_URL>/search" method="get">
     <input type="hidden" name="ln" value="<lang:current />" />
     <input size="20" type="text" name="p" value="author:&quot;Ellis, J*&quot; year:1990->1993" />
     <select name="f"><option value="">_(any field)_</option>

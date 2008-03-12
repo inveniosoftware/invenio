@@ -28,7 +28,7 @@ import time
 import tempfile
 import calendar
 
-from invenio.config import weburl, CFG_SITE_LANG, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION
 from invenio.messages import gettext_set_language
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
@@ -66,7 +66,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         else:
             history_analysis_results = draw_downloads_statistics(id_bibrec, [])
         if history_analysis_results and history_analysis_results[0]:
-            graph_file_history = weburl + "/img/" + history_analysis_results[0]
+            graph_file_history = CFG_SITE_URL + "/img/" + history_analysis_results[0]
             file_to_close_history = history_analysis_results[1]
             html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_history
             if file_to_close_history :
@@ -88,7 +88,7 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         if ips:
             users_analysis_results = create_users_analysis_graph(id_bibrec, ips)
 	    if users_analysis_results[0]:
-	            graph_file_users = weburl + "/img/"  + users_analysis_results[0]
+	            graph_file_users = CFG_SITE_URL + "/img/"  + users_analysis_results[0]
         	    file_to_close_users = users_analysis_results[1]
 	            html_content += """<tr><td valign=center align=center><img src='%s'/></td>""" % graph_file_users
         	    if file_to_close_users:

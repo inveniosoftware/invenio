@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_ETCDIR, \
      CFG_VERSION, \
-     weburl
+     CFG_SITE_URL
 import invenio.access_control_engine as acce
 from invenio.messages import language_list_long
 from invenio.dbquery import run_sql
@@ -45,7 +45,7 @@ from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.webuser import getUid, get_email
 
 def getnavtrail(previous = ''):
-    navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (weburl,)
+    navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (CFG_SITE_URL,)
     navtrail = navtrail + previous
     return navtrail
 
@@ -74,16 +74,16 @@ def perform_index(ln=CFG_SITE_LANG):
                     (('Show Details', 'showrankdetails'),
                      ('Modify', 'modifyrank'),
                      ('Delete', 'deleterank'))]:
-            actions[-1].append('<a href="%s/admin/bibrank/bibrankadmin.py/%s?rnkID=%s&amp;ln=%s">%s</a>' % (weburl, col[0][1], rnkID, ln, col[0][0]))
+            actions[-1].append('<a href="%s/admin/bibrank/bibrankadmin.py/%s?rnkID=%s&amp;ln=%s">%s</a>' % (CFG_SITE_URL, col[0][1], rnkID, ln, col[0][0]))
             for (str, function) in col[1:]:
-                actions[-1][-1] += ' / <a href="%s/admin/bibrank/bibrankadmin.py/%s?rnkID=%s&amp;ln=%s">%s</a>' % (weburl, function, rnkID, ln, str)
+                actions[-1][-1] += ' / <a href="%s/admin/bibrank/bibrankadmin.py/%s?rnkID=%s&amp;ln=%s">%s</a>' % (CFG_SITE_URL, function, rnkID, ln, str)
 
     output = """
     <a href="%s/admin/bibrank/bibrankadmin.py/addrankarea?ln=%s">Add new rank method</a><br /><br />
-    """ % (weburl, ln)
+    """ % (CFG_SITE_URL, ln)
 
     output += tupletotable(header=header, tuple=actions)
-    return addadminbox("""Overview of rank methods&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mi">?</a>]</small>""" % weburl, datalist=[output, ''])
+    return addadminbox("""Overview of rank methods&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mi">?</a>]</small>""" % CFG_SITE_URL, datalist=[output, ''])
 
 def perform_modifycollection(rnkID='', ln=CFG_SITE_LANG, func='', colID='', confirm=0):
     """Modify which collections the rank method is visible to"""
@@ -183,7 +183,7 @@ def perform_modifycollection(rnkID='', ln=CFG_SITE_LANG, func='', colID='', conf
 
     body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mc">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mc">?</a>]</small>""" % CFG_SITE_URL, body)
 
 def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='yes'):
     """Modify the translations of a rank method"""
@@ -260,7 +260,7 @@ def perform_modifytranslations(rnkID, ln, sel_type, trans, confirm, callback='ye
 
     body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mt">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mt">?</a>]</small>""" % CFG_SITE_URL, body)
 
 def perform_addrankarea(rnkcode='', ln=CFG_SITE_LANG, template='', confirm=-1):
     """form to add a new rank method with these values:"""
@@ -273,7 +273,7 @@ def perform_addrankarea(rnkcode='', ln=CFG_SITE_LANG, template='', confirm=-1):
      <br />The template files includes the necessary parameters for the chosen rank method, and only needs to be edited with the correct tags and paths.
      <br />For more information, please go to the <a title="See guide" href="%s/help/admin/bibrank-admin-guide">BibRank guide</a> and read the section about adding a rank method</dd>
     </dl>
-    """ % weburl
+    """ % CFG_SITE_URL
     text = """
     <span class="adminlabel">BibRank code</span>
     <input class="admin_wvar" type="text" name="rnkcode" value="%s" />
@@ -342,7 +342,7 @@ def perform_addrankarea(rnkcode='', ln=CFG_SITE_LANG, template='', confirm=-1):
 
     body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#ar">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#ar">?</a>]</small>""" % CFG_SITE_URL, body)
 
 def perform_modifyrank(rnkID, rnkcode='', ln=CFG_SITE_LANG, template='', cfgfile='', confirm=0):
     """form to modify a rank method
@@ -366,7 +366,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=CFG_SITE_LANG, template='', cfgfile
      <dd>When changing the BibRank code of a rank method, you must also change any scheduled tasks using the old value.
      <br />For more information, please go to the <a title="See guide" href="%s/help/admin/bibrank-admin-guide">BibRank guide</a> and read the section about modifying a rank method's  BibRank code.</dd>
     </dl>
-    """ % weburl
+    """ % CFG_SITE_URL
 
     text = """
      <span class="adminlabel">BibRank code</span>
@@ -424,7 +424,7 @@ def perform_modifyrank(rnkID, rnkcode='', ln=CFG_SITE_LANG, template='', cfgfile
             text = """<b><span class="info"><br />Sorry, could not modify configuration file, please check for rights to do so: '%s/bibrank/%s.cfg'<br />Please modify the file manually.</span></b>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0])
         output += text
 
-    finoutput = addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mr">?</a>]</small>""" % weburl, [output])
+    finoutput = addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#mr">?</a>]</small>""" % CFG_SITE_URL, [output])
     output = ""
 
     text = """
@@ -473,7 +473,7 @@ def perform_deleterank(rnkID, ln=CFG_SITE_LANG, confirm=0):
      <br /><br />For more information, please go to the <a title="See guide" href="%s/help/admin/bibrank-admin-guide">BibRank guide</a> and read the section regarding deleting a rank method.</strong></dd>
     </dl>
     </span>
-    """ % weburl
+    """ % CFG_SITE_URL
 
     if rnkID:
         if confirm in ["0", 0]:
@@ -513,7 +513,7 @@ def perform_deleterank(rnkID, ln=CFG_SITE_LANG, confirm=0):
 
     body = [output]
 
-    return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#dr">?</a>]</small>""" % weburl, body)
+    return addadminbox(subtitle + """&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibrank-admin-guide#dr">?</a>]</small>""" % CFG_SITE_URL, body)
 
 
 def perform_showrankdetails(rnkID, ln=CFG_SITE_LANG):
@@ -524,7 +524,7 @@ def perform_showrankdetails(rnkID, ln=CFG_SITE_LANG):
     if not get_rnk_code(rnkID):
         return "Ranking method %s does not seem to exist." % str(rnkID)
 
-    subtitle = """Overview <a href="%s/admin/bibrank/bibrankadmin.py/modifyrank?rnkID=%s&amp;ln=%s">[Modify]</a>""" % (weburl, rnkID, ln)
+    subtitle = """Overview <a href="%s/admin/bibrank/bibrankadmin.py/modifyrank?rnkID=%s&amp;ln=%s">[Modify]</a>""" % (CFG_SITE_URL, rnkID, ln)
     text  = """
     BibRank code: %s<br />
     Last updated by BibRank:
@@ -543,7 +543,7 @@ def perform_showrankdetails(rnkID, ln=CFG_SITE_LANG):
         text = "BibRank not yet run, cannot show statistics for method"
     output += addadminbox(subtitle, [text])
 
-    subtitle = """Attached to collections <a href="%s/admin/bibrank/bibrankadmin.py/modifycollection?rnkID=%s&amp;ln=%s">[Modify]</a>""" % (weburl, rnkID, ln)
+    subtitle = """Attached to collections <a href="%s/admin/bibrank/bibrankadmin.py/modifycollection?rnkID=%s&amp;ln=%s">[Modify]</a>""" % (CFG_SITE_URL, rnkID, ln)
     text = ""
     col = get_rnk_col(rnkID, ln)
     for key,  value in col:
@@ -552,7 +552,7 @@ def perform_showrankdetails(rnkID, ln=CFG_SITE_LANG):
         text +="No collections"
     output += addadminbox(subtitle, [text])
 
-    subtitle = """Translations <a href="%s/admin/bibrank/bibrankadmin.py/modifytranslations?rnkID=%s&amp;ln=%s">[Modify]</a>""" % (weburl, rnkID, ln)
+    subtitle = """Translations <a href="%s/admin/bibrank/bibrankadmin.py/modifytranslations?rnkID=%s&amp;ln=%s">[Modify]</a>""" % (CFG_SITE_URL, rnkID, ln)
     prev_lang = ''
     trans = get_translations(rnkID)
     types = get_rnk_nametypes()
@@ -571,7 +571,7 @@ def perform_showrankdetails(rnkID, ln=CFG_SITE_LANG):
         text = """No translations exists"""
     output += addadminbox(subtitle, [text])
 
-    subtitle = """Configuration file: '%s/bibrank/%s.cfg' <a href="%s/admin/bibrank/bibrankadmin.py/modifyrank?rnkID=%s&amp;ln=%s">[Modify]</a>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0], weburl, rnkID, ln)
+    subtitle = """Configuration file: '%s/bibrank/%s.cfg' <a href="%s/admin/bibrank/bibrankadmin.py/modifyrank?rnkID=%s&amp;ln=%s">[Modify]</a>""" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0], CFG_SITE_URL, rnkID, ln)
     text = ""
     try:
         file = open("%s/bibrank/%s.cfg" % (CFG_ETCDIR, get_rnk_code(rnkID)[0][0]))

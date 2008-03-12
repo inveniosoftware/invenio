@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl, CFG_SITE_LANG
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.testutils import make_test_suite, \
                               warn_user_about_tests_and_run, \
                               test_web_page_content
@@ -44,7 +44,7 @@ class BibFormatAPITest(unittest.TestCase):
                                user_info=None,
                                on_the_fly=True)
 
-        pageurl = weburl + '/record/73?of=hx'
+        pageurl = CFG_SITE_URL + '/record/73?of=hx'
         result = test_web_page_content(pageurl,
                                        expected_text=result)
 
@@ -70,7 +70,7 @@ class BibFormatBibTeXTest(unittest.TestCase):
     def test_bibtex_output(self):
         """bibformat - BibTeX output"""
 
-        pageurl = weburl + '/record/74?of=hx'
+        pageurl = CFG_SITE_URL + '/record/74?of=hx'
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_74_hx)
         self.assertEqual([], result)
@@ -93,8 +93,8 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
 
         self.record_74_hd_title = '''<center><big><big><strong>Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes</strong></big></big></center>'''
 
-        self.record_74_hd_authors = '''<a href="%(weburl)s/search?f=author&amp;p=Wang%%2C%%20B&amp;ln=%(lang)s">Wang, B</a><small> (Fudan University)</small> ; <a href="%(weburl)s/search?f=author&amp;p=Lin%%2C%%20C%%20Y&amp;ln=%(lang)s">Lin, C Y</a> ; <a href="%(weburl)s/search?f=author&amp;p=Abdalla%%2C%%20E&amp;ln=%(lang)s">Abdalla, E</a><br />'''% \
-                                     {'weburl' : weburl,
+        self.record_74_hd_authors = '''<a href="%(siteurl)s/search?f=author&amp;p=Wang%%2C%%20B&amp;ln=%(lang)s">Wang, B</a><small> (Fudan University)</small> ; <a href="%(siteurl)s/search?f=author&amp;p=Lin%%2C%%20C%%20Y&amp;ln=%(lang)s">Lin, C Y</a> ; <a href="%(siteurl)s/search?f=author&amp;p=Abdalla%%2C%%20E&amp;ln=%(lang)s">Abdalla, E</a><br />'''% \
+                                     {'siteurl' : CFG_SITE_URL,
                                       'lang': CFG_SITE_LANG}
 
         self.record_74_hd_abstract = '''<small><strong>Abstract: </strong>Complex frequencies associated with quasinormal modes for large Reissner-Nordstr$\ddot{o}$m Anti-de Sitter black holes have been computed. These frequencies have close relation to the black hole charge and do not linearly scale withthe black hole temperature as in Schwarzschild Anti-de Sitter case. In terms of AdS/CFT correspondence, we found that the bigger the black hole charge is, the quicker for the approach to thermal equilibrium in the CFT. The propertiesof quasinormal modes for $l&gt;0$ have also been studied.</small><br />'''
@@ -103,8 +103,8 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
 
         self.record_74_hd_fulltext = '''0003295.pdf"><img style="border:none"'''
 
-        self.record_74_hd_citations = '''<strong>Cited by:</strong> try citation search for <a href="%(weburl)s/search?f=reference&amp;p=hep-th/0003295&amp;ln=%(lang)s">hep-th/0003295</a>'''% \
-                                      {'weburl' : weburl,
+        self.record_74_hd_citations = '''<strong>Cited by:</strong> try citation search for <a href="%(siteurl)s/search?f=reference&amp;p=hep-th/0003295&amp;ln=%(lang)s">hep-th/0003295</a>'''% \
+                                      {'siteurl' : CFG_SITE_URL,
                                        'lang': CFG_SITE_LANG}
         self.record_74_hd_references = '''<li><small>[17]</small> <small>A. Chamblin, R. Emparan, C. V. Johnson and R. C. Myers, Phys. Rev., D60: 104026 (1999) 5070 90 110 130 150 r+ 130 230 330 50 70 90 110 130 150 r+</small> </li>'''
 
@@ -124,14 +124,14 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
         self.record_7_hd_abstract = '''<p><span class="blocknote">
  Caption</span><br /> <small>Conference "Internet, Web, What's next?" on 26 June 1998 at CERN : Tim Berners-Lee, inventor of the World-Wide Web and Director of the W3C, explains how the Web came to be and give his views on the future.</small></p><p><span class="blocknote">
  Légende</span><br /><small>Conference "Internet, Web, What's next?" le 26 juin 1998 au CERN: Tim Berners-Lee, inventeur du World-Wide Web et directeur du W3C, explique comment le Web est ne, et donne ses opinions sur l'avenir.</small></p>'''
-        self.record_7_hd_resource = '''<img src="%s/record/7/files/icon-9806033.gif" alt="" /><br /><font size="-2"><b>© CERN Geneva</b></font>''' % weburl
-        self.record_7_hd_resource_link = '%s/record/7/files/9806033.jpeg' %  weburl
+        self.record_7_hd_resource = '''<img src="%s/record/7/files/icon-9806033.gif" alt="" /><br /><font size="-2"><b>© CERN Geneva</b></font>''' % CFG_SITE_URL
+        self.record_7_hd_resource_link = '%s/record/7/files/9806033.jpeg' %  CFG_SITE_URL
 
     def test_detailed_html_output(self):
         """bibformat - Detailed HTML output"""
 
         # Test record 74 (Article)
-        pageurl = weburl + '/record/74?of=hd'
+        pageurl = CFG_SITE_URL + '/record/74?of=hd'
         result = test_web_page_content(pageurl,
                                        expected_text=[self.record_74_hd_header,
                                                       self.record_74_hd_title,
@@ -145,7 +145,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
         self.assertEqual([], result)
 
         # Test record 7 (Picture)
-        pageurl = weburl + '/record/7?of=hd'
+        pageurl = CFG_SITE_URL + '/record/7?of=hd'
         result = test_web_page_content(pageurl,
                                        expected_text=[self.record_7_hd_header,
                                                       self.record_7_hd_title,
@@ -157,7 +157,7 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
 
     def test_detailed_html_edit_record(self):
         """bibformat - Detailed HTML output edit record link presence"""
-        pageurl = weburl + '/record/74?of=hd'
+        pageurl = CFG_SITE_URL + '/record/74?of=hd'
         result = test_web_page_content(pageurl, username='admin',
                                        expected_text="Edit This Record")
         self.assertEqual([], result)
@@ -165,13 +165,13 @@ class BibFormatDetailedHTMLTest(unittest.TestCase):
     def test_detailed_html_no_error_message(self):
         """bibformat - Detailed HTML output without error message"""
         # No error message should be displayed in the web interface, whatever happens
-        pageurl = weburl + '/record/74?of=hd'
+        pageurl = CFG_SITE_URL + '/record/74?of=hd'
         result = test_web_page_content(pageurl, username='admin',
                                        expected_text=["Exception",
                                                       "Could not"])
         self.assertNotEqual([], result)
 
-        pageurl = weburl + '/record/7?of=hd'
+        pageurl = CFG_SITE_URL + '/record/7?of=hd'
         result = test_web_page_content(pageurl, username='admin',
                                        expected_text=["Exception",
                                                       "Could not"])
@@ -213,9 +213,9 @@ class BibFormatNLMTest(unittest.TestCase):
       <volume>05</volume>
       <fpage/>
       <lpage/>
-      <self-uri xlink:href="%(weburl)s/record/70"/>
-      <self-uri xlink:href="%(weburl)s/record/70/files/0003291.pdf"/>
-      <self-uri xlink:href="%(weburl)s/record/70/files/0003291.ps.gz"/>
+      <self-uri xlink:href="%(siteurl)s/record/70"/>
+      <self-uri xlink:href="%(siteurl)s/record/70/files/0003291.pdf"/>
+      <self-uri xlink:href="%(siteurl)s/record/70/files/0003291.ps.gz"/>
     </article-meta>
     <abstract>In its Euclidean formulation, the AdS/CFT correspondence begins as a study of Yang-Mills conformal field theories on the sphere, S^4. It has been successfully extended, however, to S^1 X S^3 and to the torus T^4. It is natural tohope that it can be made to work for any manifold on which it is possible to define a stable Yang-Mills conformal field theory. We consider a possible classification of such manifolds, and show how to deal with the most obviousobjection : the existence of manifolds which cannot be represented as boundaries. We confirm Witten's suggestion that this can be done with the help of a brane in the bulk.</abstract>
   </front>
@@ -223,12 +223,12 @@ class BibFormatNLMTest(unittest.TestCase):
   <ref/>
 </article>
 
-</articles>''' % {'weburl': weburl}
+</articles>''' % {'siteurl': CFG_SITE_URL}
 
     def test_nlm_output(self):
         """bibformat - NLM output"""
 
-        pageurl = weburl + '/record/70?of=xn'
+        pageurl = CFG_SITE_URL + '/record/70?of=xn'
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_70_xn)
         self.assertEqual([], result)
@@ -250,12 +250,12 @@ class BibFormatBriefHTMLTest(unittest.TestCase):
 <br /><small>
 Σα βγεις στον πηγαιμό για την Ιθάκη,<br />
 να εύχεσαι νάναι μακρύς ο δρόμος,<br />
-γεμάτος περιπέτειες, γεμάτος γνώσεις [...] </small>''' % (weburl, CFG_SITE_LANG)
+γεμάτος περιπέτειες, γεμάτος γνώσεις [...] </small>''' % (CFG_SITE_URL, CFG_SITE_LANG)
 
 
     def test_brief_html_output(self):
         """bibformat - Brief HTML output"""
-        pageurl = weburl + '/record/76?of=HB'
+        pageurl = CFG_SITE_URL + '/record/76?of=HB'
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_76_hb)
         self.assertEqual([], result)
@@ -335,7 +335,7 @@ class BibFormatMARCXMLTest(unittest.TestCase):
 
     def test_marcxml_output(self):
         """bibformat - MARCXML output"""
-        pageurl = weburl + '/record/9?of=xm'
+        pageurl = CFG_SITE_URL + '/record/9?of=xm'
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_9_xm)
         self.assertEqual([], result)
@@ -364,7 +364,7 @@ class BibFormatMARCTest(unittest.TestCase):
     def test_marc_output(self):
         """bibformat - MARC output"""
 
-        pageurl = weburl + '/record/29?of=hm'
+        pageurl = CFG_SITE_URL + '/record/29?of=hm'
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_29_hm)
         self.assertEqual([], result)
@@ -375,25 +375,25 @@ class BibFormatTitleFormattingTest(unittest.TestCase):
     def test_subtitle_in_html_brief(self):
         """bibformat - title subtitle in HTML brief formats"""
 	self.assertEqual([],
-          test_web_page_content(weburl + '/search?p=statistics+computer',
+          test_web_page_content(CFG_SITE_URL + '/search?p=statistics+computer',
             expected_text="Statistics: a computer approach"))
 
     def test_subtitle_in_html_detailed(self):
         """bibformat - title subtitle in HTML detailed formats"""
 	self.assertEqual([],
-          test_web_page_content(weburl + '/search?p=statistics+computer&of=HD',
+          test_web_page_content(CFG_SITE_URL + '/search?p=statistics+computer&of=HD',
             expected_text="Statistics: a computer approach"))
 
     def test_title_edition_in_html_brief(self):
         """bibformat - title edition in HTML brief formats"""
 	self.assertEqual([],
-          test_web_page_content(weburl + '/search?p=2nd',
+          test_web_page_content(CFG_SITE_URL + '/search?p=2nd',
             expected_text="Introductory statistics: a decision map; 2nd ed"))
 
     def test_title_edition_in_html_detailed(self):
         """bibformat - title edition in HTML detailed formats"""
 	self.assertEqual([],
-          test_web_page_content(weburl + '/search?p=2nd&of=HD',
+          test_web_page_content(CFG_SITE_URL + '/search?p=2nd&of=HD',
             expected_text="Introductory statistics: a decision map; 2nd ed"))
 
 test_suite = make_test_suite(BibFormatBibTeXTest,

@@ -40,7 +40,7 @@ from invenio.config import \
      CFG_CACHEDIR, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
-     weburl
+     CFG_SITE_URL
 
 from invenio.dbquery import run_sql
 from invenio.search_engine import record_exists, perform_request_search
@@ -675,7 +675,7 @@ def oaiidentify(args):
     out = ""
 
     repositoryname        = "  <repositoryName>" + CFG_SITE_NAME + "</repositoryName>\n"
-    baseurl               = "  <baseURL>%s/oai2d/</baseURL>\n" % weburl
+    baseurl               = "  <baseURL>%s/oai2d/</baseURL>\n" % CFG_SITE_URL
     protocolversion       = "  <protocolVersion>2.0</protocolVersion>\n"
     adminemailtxt         = "  <adminEmail>%s</adminEmail>\n" % CFG_SITE_SUPPORT_EMAIL
     earliestdst		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()
@@ -704,7 +704,7 @@ def oaigetrequesturl(args):
 
     # re_amp = re.compile('&')
 
-    requesturl = weburl + "/" + "oai2d/"# + "?" + re_amp.sub("&amp;", args)
+    requesturl = CFG_SITE_URL + "/" + "oai2d/"# + "?" + re_amp.sub("&amp;", args)
 
     return requesturl
 

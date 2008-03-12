@@ -32,7 +32,7 @@ import os
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_VERSION, \
-     weburl
+     CFG_SITE_URL
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
@@ -821,15 +821,13 @@ class Template:
         out += """</script>"""
         return out
 
-    def tmpl_page_endaction(self, ln, weburl, file, nextPg, startPg, access, curpage, nbPg, nbpages, doctype, act, docname, actname, indir, mainmenu, finished, function_content, next_action, images):
+    def tmpl_page_endaction(self, ln, file, nextPg, startPg, access, curpage, nbPg, nbpages, doctype, act, docname, actname, indir, mainmenu, finished, function_content, next_action, images):
         """
         Produces the pages after all the fields have been submitted.
 
         Parameters:
 
           - 'ln' *string* - The language to display the interface in
-
-          - 'weburl' *string* - The url of CDS Invenio
 
           - 'doctype' *string* - The document type
 
@@ -1103,7 +1101,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        title = _("record") + ' #' + '<a href="%s/record/%s">%s</a>' % (weburl, recid, recid)
+        title = _("record") + ' #' + '<a href="%s/record/%s">%s</a>' % (CFG_SITE_URL, recid, recid)
         if docname != "":
             title += ' ' + _("document") + ' #' + str(docname)
         if version != "":
@@ -1144,15 +1142,13 @@ class Template:
             out += "</ul>"
         return out
 
-    def tmpl_bibdoc_filelist(self, ln, weburl='', versions=[], imageurl='', recid='', docname=''):
+    def tmpl_bibdoc_filelist(self, ln, versions=[], imageurl='', recid='', docname=''):
         """
         Displays the file list for a record.
 
         Parameters:
 
           - 'ln' *string* - The language to display the interface in
-
-          - 'weburl' *string* - The url of CDS Invenio
 
           - 'versions' *array* - The different versions to display, each record in the format:
 
@@ -1183,9 +1179,9 @@ class Template:
                    }
         for version in versions:
             if version['previous']:
-                versiontext =  """<br />(%(see)s <a href="%(weburl)s/record/%(recID)s/files/?docname=%(docname)s&amp;version=all">%(previous)s</a>)""" % {
+                versiontext =  """<br />(%(see)s <a href="%(siteurl)s/record/%(recID)s/files/?docname=%(docname)s&amp;version=all">%(previous)s</a>)""" % {
                                  'see' : _("see"),
-                                 'weburl' : weburl,
+                                 'siteurl' : CFG_SITE_URL,
                                  'docname' : urllib.quote(docname),
                                  'recID': recid,
                                  'previous': _("previous"),
@@ -1209,15 +1205,13 @@ class Template:
         out += "</table>"
         return out
 
-    def tmpl_bibdocfile_filelist(self, ln, weburl, recid, name, version, format, size):
+    def tmpl_bibdocfile_filelist(self, ln, recid, name, version, format, size):
         """
         Displays a file in the file list.
 
         Parameters:
 
           - 'ln' *string* - The language to display the interface in
-
-          - 'weburl' *string* - The url of CDS Invenio
 
           - 'recid' *int* - The id of the record
 
@@ -1235,14 +1229,14 @@ class Template:
 
         return """<tr>
                     <td valign="top">
-                      <small><a href="%(weburl)s/record/%(recid)s/files/%(docname)s%(format)s?version=%(version)s">
+                      <small><a href="%(siteurl)s/record/%(recid)s/files/%(docname)s%(format)s?version=%(version)s">
                         %(name)s%(format)s
                       </a></small>
                     </td>
                     <td valign="top">
                       <font size="-2" color="green">[%(size)s&nbsp;B]</font>
                     </td></tr>""" % {
-                      'weburl' : weburl,
+                      'siteurl' : CFG_SITE_URL,
                       'recid' : recid,
                       'docname' : name,
                       'version' : version,
@@ -1303,7 +1297,7 @@ class Template:
         out += "</table>"
         return out
 
-    def tmpl_yoursubmissions(self, ln, images, weburl, order, doctypes, submissions):
+    def tmpl_yoursubmissions(self, ln, images, order, doctypes, submissions):
         """
         Displays the list of the user's submissions.
 
@@ -1312,8 +1306,6 @@ class Template:
           - 'ln' *string* - The language to display the interface in
 
           - 'images' *string* - the path to the images
-
-          - 'weburl' *string* - The url of CDS Invenio
 
           - 'order' *string* - The ordering parameter
 
@@ -2257,12 +2249,12 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(weburl)s/record/%(sysno)s">%(click)s</a>
+                        <a href="%(siteurl)s/record/%(sysno)s">%(click)s</a>
                         <br /><br />
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
-                     'weburl' : weburl,
+                     'siteurl' : CFG_SITE_URL,
                      'sysno' : sysno,
                    }
 
@@ -2366,12 +2358,12 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(weburl)s/record/%(sysno)s">%(click)s</a>
+                        <a href="%(siteurl)s/record/%(sysno)s">%(click)s</a>
                         <br /><br />
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
-                     'weburl' : weburl,
+                     'siteurl' : CFG_SITE_URL,
                      'sysno' : sysno,
                    }
 
@@ -2656,12 +2648,12 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(weburl)s/record/%(sysno)s">%(click)s</a>
+                        <a href="%(siteurl)s/record/%(sysno)s">%(click)s</a>
                         <br /><br />
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
-                     'weburl' : weburl,
+                     'siteurl' : CFG_SITE_URL,
                      'sysno' : sysno,
                    }
 
@@ -2833,12 +2825,12 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(weburl)s/record/%(sysno)s">%(click)s</a>
+                        <a href="%(siteurl)s/record/%(sysno)s">%(click)s</a>
                         <br /><br />
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
-                     'weburl' : weburl,
+                     'siteurl' : CFG_SITE_URL,
                      'sysno' : sysno,
                    }
 

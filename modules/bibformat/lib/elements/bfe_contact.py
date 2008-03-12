@@ -30,12 +30,12 @@ def format(bfo, separator='; ', link="yes"):
     @param link Link the addresses to search engine (HTML links) if 'yes'
     """
     from urllib import quote
-    from invenio.config import weburl
+    from invenio.config import CFG_SITE_URL
 
     addresses = bfo.fields('270__p')
 
     if link == "yes":
-        addresses = ['<a href="'+weburl+'/search?f=author&p='+ \
+        addresses = ['<a href="'+CFG_SITE_URL+'/search?f=author&p='+ \
                      quote(address) +'&amp;ln=' + bfo.lang + '">' + \
                      address +'</a>' for address in addresses]
         

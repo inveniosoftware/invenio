@@ -35,7 +35,7 @@ from mod_python import apache
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import weburl, CFG_WEBDIR, CFG_SITE_LANG, CFG_ETCDIR
+from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_SITE_LANG, CFG_ETCDIR
 from invenio.webpage import page
 from invenio.webuser import getUid
 from invenio.urlutils import redirect_to_url
@@ -209,11 +209,11 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                 name="%s" % journal_name)[0] != 0:
             return please_login(req, journal_name,
                                 backlink='%s/journal/edit_article?%s'
-                                % (weburl, urllib.quote(req.args)))
+                                % (CFG_SITE_URL, urllib.quote(req.args)))
                                 # todo: use make_canonical_url from urlutils
         redirect_to_url(req,
                         "%s/journal/article?%s&editor=True"
-                        % (weburl, req.args))
+                        % (CFG_SITE_URL, req.args))
 
     def administrate(self, req, form):
         """Index page."""
@@ -234,7 +234,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                 name="%s" % journal_name)[0] != 0:
             return please_login(req, journal_name,
                                 backlink='%s/journal/administrate?name=%s'
-                                % (weburl, journal_name))
+                                % (CFG_SITE_URL, journal_name))
 
         return perform_request_administrate(journal_name, language)
 
@@ -265,7 +265,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                 name="%s" % journal_name)[0] != 0:
             return please_login(req, journal_name,
                                 backlink='%s/journal/feature_record?name=%s'
-                                % (weburl, journal_name))
+                                % (CFG_SITE_URL, journal_name))
 
         if recid == "init":
             return tmpl_webjournal_feature_record_interface(language,
@@ -310,7 +310,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                 name="%s" % journal_name)[0] != 0:
             return please_login(req, journal_name,
                                 backlink='%s/journal/regenerate?name=%s'
-                                % (weburl, journal_name))
+                                % (CFG_SITE_URL, journal_name))
         # clear cache
         success = clear_cache_for_issue(journal_name, issue_number)
         if success:
@@ -363,7 +363,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                 name="%s" % journal_name)[0] != 0:
             return please_login(req, journal_name,
                                 backlink='%s/journal/alert?name=%s'
-                                % (weburl, journal_name))
+                                % (CFG_SITE_URL, journal_name))
 
         html = perform_request_alert(req, journal_name, issue_number, language,
                               sent, plain_text, subject, recipients,

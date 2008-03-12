@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content
 
@@ -36,11 +36,11 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
         """testutils - test_web_page_content() and username arguments"""
         # should login as admin without password:
         self.assertEqual([],
-                         test_web_page_content(weburl,
+                         test_web_page_content(CFG_SITE_URL,
                                                username="admin",
                                                expected_text="</html>"))
         # should not login as admin with password:
-        errmsgs = test_web_page_content(weburl,
+        errmsgs = test_web_page_content(CFG_SITE_URL,
                                         username="admin",
                                         password="foo",
                                         expected_text="</html>")
@@ -54,10 +54,10 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
         """testutils - test_web_page_content() and expected_text argument"""
         # should find HTML in an HTML page:
         self.assertEqual([],
-                         test_web_page_content(weburl + "/search?p=ellis",
+                         test_web_page_content(CFG_SITE_URL + "/search?p=ellis",
                                                expected_text="</html>"))
         # should not find HTML tag in an XML page:
-        errmsgs = test_web_page_content(weburl + "/search?p=ellis&of=xm")
+        errmsgs = test_web_page_content(CFG_SITE_URL + "/search?p=ellis&of=xm")
         if errmsgs[0].find(" does not contain </html>") > -1:
             pass
         else:
@@ -68,20 +68,20 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
         """testutils - test_web_page_content() and expected_link argument"""
         # should find link to ALEPH:
         self.assertEqual([],
-                         test_web_page_content(weburl,
-                              expected_link_target=weburl+"/collection/ALEPH"))
+                         test_web_page_content(CFG_SITE_URL,
+                              expected_link_target=CFG_SITE_URL+"/collection/ALEPH"))
         # should find link entitled ISOLDE:
         self.assertEqual([],
-                         test_web_page_content(weburl,
+                         test_web_page_content(CFG_SITE_URL,
                               expected_link_label="ISOLDE"))
         # should find link to ISOLDE entitled ISOLDE:
         self.assertEqual([],
-                         test_web_page_content(weburl,
-                              expected_link_target=weburl+"/collection/ISOLDE",
+                         test_web_page_content(CFG_SITE_URL,
+                              expected_link_target=CFG_SITE_URL+"/collection/ISOLDE",
                               expected_link_label="ISOLDE"))
         # should not find link to ALEPH entitled ISOLDE:
-        errmsgs = test_web_page_content(weburl,
-                              expected_link_target=weburl+"/collection/ALEPH",
+        errmsgs = test_web_page_content(CFG_SITE_URL,
+                              expected_link_target=CFG_SITE_URL+"/collection/ALEPH",
                               expected_link_label="ISOLDE")
         if errmsgs[0].find(" does not contain link to ") > -1:
             pass

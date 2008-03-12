@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 import cgi
 from urllib import quote
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 import re
 
 def format(bfo, separator=" ", highlight='no'):

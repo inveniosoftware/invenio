@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -35,7 +35,7 @@ class WebMessageWebPagesAvailabilityTest(unittest.TestCase):
     def test_your_baskets_pages_availability(self):
         """webmessage - availability of Your Messages pages""" 
 
-        baseurl = weburl + '/yourmessages/'
+        baseurl = CFG_SITE_URL + '/yourmessages/'
 
         _exports = ['', 'display', 'write', 'send', 'delete', 'delete_all',
                     'display_msg']

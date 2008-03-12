@@ -37,7 +37,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_TMPDIR, \
      CFG_VERSION, \
-     weburl
+     CFG_SITE_URL
 import invenio.access_control_engine as access_manager
 from invenio.dbquery import run_sql
 from invenio.webpage import page, pageheaderonly, pagefooteronly
@@ -58,11 +58,10 @@ def perform_request_index(ln=CFG_SITE_LANG):
 
     out = '''<p>Define below the sets to expose through the OAI harvesting
     protocol. <br /> You will have to run the
-    <a href="%(weburl)s/help/admin/bibharvest-admin-guide#3.2"><code>oaiarchive</code></a>
-    utility to apply the settings you have defined here.</p>''' % {'weburl': weburl}
+    <a href="%(siteurl)s/help/admin/bibharvest-admin-guide#3.2"><code>oaiarchive</code></a>
+    utility to apply the settings you have defined here.</p>''' % {'siteurl': CFG_SITE_URL}
 
     titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG,
-                                                       weburl = weburl,
                                                        title = "OAI repository",
                                                        guideurl = guideurl,
                                                        extraname = "add new OAI set",
@@ -75,13 +74,13 @@ def perform_request_index(ln=CFG_SITE_LANG):
 
     for (id, setSpec, setName, setCollection, setDescription, p1, f1, m1, p2, f2, m2, p3, f3, m3, op1, op2) in oai_set:
 
-        del_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/delset?ln=" + ln + "&amp;oai_set_id=" + str(id) + '">delete</a>'
+        del_request = '<a href="' + CFG_SITE_URL + "/" + "admin/bibharvest/oaiarchiveadmin.py/delset?ln=" + ln + "&amp;oai_set_id=" + str(id) + '">delete</a>'
 
-        edit_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/editset?ln=" + ln + "&amp;oai_set_id=" + str(id) + '">edit</a>'
+        edit_request = '<a href="' + CFG_SITE_URL + "/" + "admin/bibharvest/oaiarchiveadmin.py/editset?ln=" + ln + "&amp;oai_set_id=" + str(id) + '">edit</a>'
 
         sets.append([id, setSpec, setName, setCollection, p1,f1,m1, op1,  p2,f2,m2, op2,  p3,f3,m3, del_request, edit_request])
 
-    add_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/addset?ln=" + ln + '">Add new OAI set definition</a>'
+    add_request = '<a href="' + CFG_SITE_URL + "/" + "admin/bibharvest/oaiarchiveadmin.py/addset?ln=" + ln + '">Add new OAI set definition</a>'
 
     sets.append(['',add_request,'','','','','','','','','','','','','','',''])
 
@@ -117,7 +116,7 @@ def perform_request_addset(oai_set_name='', oai_set_spec='', oai_set_collection=
 
         lnargs = [["ln", ln]]
         out += "<br /><br />"
-        out += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs)
+        out += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs)
 
     body = [out]
 
@@ -205,7 +204,7 @@ def perform_request_editset(oai_set_id=None, oai_set_name='', oai_set_spec='', o
     lnargs = [["ln", ln]]
     out += "<br />"
 
-    out += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs)
+    out += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs)
 
     body = [out]
 
@@ -279,7 +278,7 @@ def perform_request_delset(oai_set_id=None, ln=CFG_SITE_LANG, callback='yes', fu
 
     lnargs = [["ln", ln]]
     out += "<br /><br />"
-    out += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, weburl = weburl, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs )
+    out += bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/oaiarchiveadmin.py/index", title = "Return to main selection", args = lnargs )
 
     body = [out]
 
@@ -456,17 +455,17 @@ def createform(action="", text="", button="func", cnfrm='', **hidden):
 def oai_table(ln=CFG_SITE_LANG):
     """"""
 
-    titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, weburl = weburl, title = "OAI repository", guideurl = guideurl, extraname = "add new OAI set" , extraurl = "admin/bibharvest/oaiarchiveadmin.py/addset" )
+    titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = "OAI repository", guideurl = guideurl, extraname = "add new OAI set" , extraurl = "admin/bibharvest/oaiarchiveadmin.py/addset" )
     header = ['id', 'setSpec', 'setName', 'setCollection', 'p1', 'f1', 'm1', 'op1', 'p2', 'f2', 'm2', 'p3', 'op2', 'f3', 'm3', '', '']
     oai_set = get_oai_set()
 
     sets = []
     for (id, setSpec, setName, setCollection, setDescription, p1,f1,m1, p2,f2,m2, p3,f3,m3, op1, op2) in oai_set:
-        del_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/delset?ln=" + ln + "&amp;oai_set_id=" + str(id) + '">delete</a>'
+        del_request = '<a href="' + CFG_SITE_URL + "/" + "admin/bibharvest/oaiarchiveadmin.py/delset?ln=" + ln + "&amp;oai_set_id=" + str(id) + '">delete</a>'
 
         sets.append([id, setSpec, setName, setCollection, p1,f1,m1, op1, p2,f2,m2, op2, p3,f3,m3, del_request])
 
-    add_request = '<a href="' + weburl + "/" + "admin/bibharvest/oaiarchiveadmin.py/addset?ln=" + ln + '">Add new OAI set definition</a>'
+    add_request = '<a href="' + CFG_SITE_URL + "/" + "admin/bibharvest/oaiarchiveadmin.py/addset?ln=" + ln + '">Add new OAI set definition</a>'
     sets.append(['',add_request,'','','','','','','','','','','',''])
 
     out = transform_tuple(header=header, tuple=sets)

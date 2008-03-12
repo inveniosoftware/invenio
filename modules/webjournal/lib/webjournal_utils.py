@@ -25,7 +25,7 @@ Various utilities for WebJournal, e.g. config parser, etc.
 from invenio.bibformat_engine import BibFormatObject
 from invenio.errorlib import register_exception
 from invenio.search_engine import search_pattern
-from invenio.config import CFG_ETCDIR, weburl, CFG_SITE_ADMIN_EMAIL, CFG_CACHEDIR, CFG_SITE_LANG
+from invenio.config import CFG_ETCDIR, CFG_SITE_URL, CFG_SITE_ADMIN_EMAIL, CFG_CACHEDIR, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.dbquery import run_sql
@@ -153,7 +153,7 @@ def please_login(req, journal_name, ln="en", title="", message="", backlink=""):
         message_out = message
 
     if backlink == "":
-        backlink_out = "%s/journal/issue_control?name=%s" % (weburl, journal_name)
+        backlink_out = "%s/journal/issue_control?name=%s" % (CFG_SITE_URL, journal_name)
     else:
         backlink_out = backlink
 
@@ -168,10 +168,10 @@ def please_login(req, journal_name, ln="en", title="", message="", backlink=""):
                     <div style="text-align:right;">Mail<a href="mailto:%s"> the Administrator.</a></div>
                 </fieldset>
             </div>
-            ''' % (weburl,
+            ''' % (CFG_SITE_URL,
                    title_msg,
                    message_out,
-                   weburl,
+                   CFG_SITE_URL,
                    backlink_out,
                    CFG_SITE_ADMIN_EMAIL)
 
@@ -839,7 +839,7 @@ def put_css_in_file(html_message, journal_name):
                            suffix="No css file for journal %s. Is this right?"
                            % journal_name)
         return
-    css_file = urlopen('%s/%s' % (weburl, css_path))
+    css_file = urlopen('%s/%s' % (CFG_SITE_URL, css_path))
     css = css_file.read()
     css = make_full_paths_in_css(css, journal_name)
     html_parted = html_message.split("</head>")
@@ -869,7 +869,7 @@ def make_full_paths_in_css(css, journal_name):
         url_string = url_string.replace("\"", "")
         url_string = url_string.replace("\'", "")
         if url_string[:6] != "http://":
-            rel_to_full_path[url_string] = '"%s/img/%s/%s"' % (weburl,
+            rel_to_full_path[url_string] = '"%s/img/%s/%s"' % (CFG_SITE_URL,
                                                                journal_name,
                                                                url_string)
     for url in rel_to_full_path.keys():

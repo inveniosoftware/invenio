@@ -42,7 +42,7 @@ from formatter import DumbWriter, AbstractFormatter
 
 from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
-     weburl, \
+     CFG_SITE_URL, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_NAME, \
@@ -168,12 +168,12 @@ def email_footer(ln=CFG_SITE_LANG):
     #standard footer
     out = """\n\n%(best_regards)s
 --
-%(sitename)s <%(weburl)s>
+%(sitename)s <%(siteurl)s>
 %(need_intervention_please_contact)s <%(sitesupportemail)s>
         """ % {
             'sitename': CFG_SITE_NAME_INTL[ln],
             'best_regards': _("Best regards"),
-            'weburl': weburl,
+            'siteurl': CFG_SITE_URL,
             'need_intervention_please_contact': _("Need human intervention?  Contact"),
             'sitesupportemail': CFG_SITE_SUPPORT_EMAIL
             }
@@ -188,12 +188,12 @@ def email_html_footer(ln=CFG_SITE_LANG):
     #standard footer
     out = """<br /><br /><em>%(best_regards)s</em>
     <hr />
-<a href="%(weburl)s"><strong>%(sitename)s</strong></a><br />
+<a href="%(siteurl)s"><strong>%(sitename)s</strong></a><br />
 %(need_intervention_please_contact)s <a href="mailto:%(sitesupportemail)s">%(sitesupportemail)s</a>
         """ % {
             'sitename': CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
             'best_regards': _("Best regards"),
-            'weburl': weburl,
+            'siteurl': CFG_SITE_URL,
             'need_intervention_please_contact': _("Need human intervention?  Contact"),
             'sitesupportemail': CFG_SITE_SUPPORT_EMAIL
             }

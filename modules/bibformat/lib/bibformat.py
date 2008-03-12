@@ -42,7 +42,7 @@ import zlib
 from invenio import bibformat_dblayer
 from invenio import bibformat_engine
 from invenio import bibformat_utils
-from invenio.config import CFG_SITE_LANG, weburl, CFG_PATH_PHP
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_PATH_PHP
 from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
 try:
     import invenio.template
@@ -147,7 +147,6 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=[],
                 return out + websearch_templates.tmpl_print_record_detailed(
                     ln = ln,
                     recID = recID,
-                    weburl = weburl,
                     )
         if verbose == 9:
             out+= """\n<br/><span class="quicknote">
@@ -155,7 +154,6 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=[],
             </span><br/>""" % recID
         return out + websearch_templates.tmpl_print_record_brief(ln = ln,
                                                                  recID = recID,
-                                                                 weburl = weburl,
                                                                  )
 
 

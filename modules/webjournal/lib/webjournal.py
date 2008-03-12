@@ -26,7 +26,7 @@ from invenio.bibformat_engine import BibFormatObject, \
                                     format_with_format_template
 from invenio.errorlib import register_exception
 from invenio.webpage import page
-from invenio.config import weburl, CFG_ETCDIR
+from invenio.config import CFG_SITE_URL, CFG_ETCDIR
 from invenio.urlutils import redirect_to_url
 from invenio.webuser import collect_user_info
 
@@ -259,7 +259,7 @@ def perform_request_alert(req, journal_name, issue_number, language,
                                                           html_mail, issue_number)
         if html_mail == "html":
             html_file = urlopen('%s/journal/?name=%s&ln=en'
-                                % (weburl, journal_name))
+                                % (CFG_SITE_URL, journal_name))
             html_string = html_file.read()
             html_file.close()
             html_string = put_css_in_file(html_string, journal_name)
@@ -423,7 +423,7 @@ def perform_request_search(journal_name, language, req, issue,
         html = format_with_format_template(search_page_template_path, bfo)[0]
         return html
     elif archive_select == "Go":
-        redirect_to_url(req, "%s/journal/?name=%s&issue=%s&ln=%s" % (weburl,
+        redirect_to_url(req, "%s/journal/?name=%s&issue=%s&ln=%s" % (CFG_SITE_URL,
                                                                journal_name,
                                                                archive_issue,
                                                                language))
@@ -431,7 +431,7 @@ def perform_request_search(journal_name, language, req, issue,
         archive_issue_time = time.strptime(archive_date, "%d/%m/%Y")
         archive_issue_time = count_down_to_monday(archive_issue_time)
         archive_issue = issue_times_to_week_strings([archive_issue_time,])[0]
-        redirect_to_url(req, "%s/journal/?name=%s&issue=%s&ln=%s" % (weburl,
+        redirect_to_url(req, "%s/journal/?name=%s&issue=%s&ln=%s" % (CFG_SITE_URL,
                                                                journal_name,
                                                                archive_issue,
                                                                language))

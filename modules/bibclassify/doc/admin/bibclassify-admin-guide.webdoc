@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibClassify Admin Guide -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <h2>Contents</h2>
@@ -108,7 +108,7 @@ aid the building of a semantic thesaurus can be found at the <a href="http://www
 website</a>. Furthermore, BibClassify can function on top
 of an extended version of SKOS, which includes special elements such
 as keychains, composite keywords and special annotations. The
-extension of the SKOS language is documented in the <a href="<WEBURL>/help/hacking/bibclassify/">hacking guide</a>.</p>
+extension of the SKOS language is documented in the <a href="<CFG_SITE_URL>/help/hacking/bibclassify/">hacking guide</a>.</p>
 
 <a name="1.2"></a><h3>1.1 Keyword extraction</h3>
 
@@ -126,7 +126,7 @@ described in 1.1, has been retained only for historical and
 demonstrative reasons.</p>
 
 <p> A detailed account of the phrase matching mechanisms used by
-BibClassify is included in the <a href="<WEBURL>/help/hacking/bibclassify/">hacking guide</a>.</p>
+BibClassify is included in the <a href="<CFG_SITE_URL>/help/hacking/bibclassify/">hacking guide</a>.</p>
 
 
 <a name="2"></a><h2>2. Running BibClassify</h2>
@@ -182,7 +182,7 @@ This parameter sets the number of output (single) keywords that will be output (
 This parameter sets the maximum number of single keywords that will make part of
 the pool of composite candidates, i.e. the single keywords that occur in the vicinity creating sequences of keywords.
 (default is 70). Tweaking with this value can have drastic effects on
-the generated results. Please check the <a href="<WEBURL>/help/hacking/bibclassify/">hacking guide</a> to find out more.</li>
+the generated results. Please check the <a href="<CFG_SITE_URL>/help/hacking/bibclassify/">hacking guide</a> to find out more.</li>
 </ul>
 
 
@@ -248,6 +248,6 @@ using the high-energy physics SKOS taxonomy (<code>HEP.rdf</code>) would yield t
 
 or, the following keyword-cloud HTML visualization:<br />
 <br />
-<img src="<WEBURL>/img/admin/bibclassify-admin-guide-cloud.jpeg" alt="tag-cloud for document hep-ph/0608096" border="0" />
+<img src="<CFG_SITE_URL>/img/admin/bibclassify-admin-guide-cloud.jpeg" alt="tag-cloud for document hep-ph/0608096" border="0" />
 </p>
 

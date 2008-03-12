@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: _(WebSearch Admin Guide)_ -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
    <p><table class="errorbox">
@@ -86,7 +86,7 @@ subsequently described in the rest of this guide.
 <p>Metadata corpus in CDS Invenio is organized into collections.  The
 collections are organized in a tree.  The collection tree is what the
 end-users see when they start to navigate at <a
-href="<WEBURL>"><CFG_SITE_NAME></a>.  The collection tree is similar to what
+href="<CFG_SITE_URL>"><CFG_SITE_NAME></a>.  The collection tree is similar to what
 other sites call Web Directories that organize Web into topical
 categories, such as <a href="http://www.google.com/dirhp">Google
 Directory</a>.
@@ -208,7 +208,7 @@ follows:
 <table border="1">
 <tr>
  <td>
-  <img border="0" src="<WEBURL>/img/iconcross.gif">
+  <img border="0" src="<CFG_SITE_URL>/img/iconcross.gif">
  </td>
  <td>
   Remove chosen collection with its subcollections from the collection tree,
@@ -218,8 +218,8 @@ follows:
 </tr>
 <tr>
  <td>
-  <img border="0" src="<WEBURL>/img/arrow_up.gif"> &nbsp;
-  <img border="0" src="<WEBURL>/img/arrow_down.gif">
+  <img border="0" src="<CFG_SITE_URL>/img/arrow_up.gif"> &nbsp;
+  <img border="0" src="<CFG_SITE_URL>/img/arrow_down.gif">
  </td>
  <td>
   Move chosen collection up or down among its brothers and sisters, i.e.
@@ -228,14 +228,14 @@ follows:
 </tr>
 <tr>
  <td>
-  <img border="0" src="<WEBURL>/img/move_from.gif">
-  <img border="0" src="<WEBURL>/img/move_to.gif">
+  <img border="0" src="<CFG_SITE_URL>/img/move_from.gif">
+  <img border="0" src="<CFG_SITE_URL>/img/move_to.gif">
  </td>
  <td>
   Move chosen collection among branches of the tree.
-  Press the first icon (<img border="0" src="<WEBURL>/img/move_from.gif">)
+  Press the first icon (<img border="0" src="<CFG_SITE_URL>/img/move_from.gif">)
   to choose a collection to move, and the second icon
-  (<img border="0" src="<WEBURL>/img/move_to.gif">)
+  (<img border="0" src="<CFG_SITE_URL>/img/move_to.gif">)
   to select a new father collection that the chosen collection should be attached to.
  </td>
 </tr>
@@ -248,7 +248,7 @@ many parameters, such as define list of records belonging to a
 collection, define search fields, define search interface page
 portalboxes, etc.  In this section we will subsequently describe all
 the various possibilities as they are presented in the <a
-href="<WEBURL>/admin/websearch/websearchadmin.py/editcollection?colID=1">Edit
+href="<CFG_SITE_URL>/admin/websearch/websearchadmin.py/editcollection?colID=1">Edit
 Collection</a> pages of the WebSearch Admin Interface.
 
 <a name="3.1"></a><h3>3.1 Modify collection query</h3>
@@ -398,7 +398,7 @@ be shown.
 
 <p>Note that if you want to add a new logical field or modify existing
 physical MARC tags for a logical field, you have to use the <a
-href="<WEBURL>/admin/bibindex/">BibIndex Admin</a> interface.
+href="<CFG_SITE_URL>/admin/bibindex/">BibIndex Admin</a> interface.
 
 <a name="3.7"></a><h3>3.7 Modify search options</h3>
 
@@ -435,7 +435,7 @@ example "subject") and then a list of possible field values must be
 entered (for example "Mathematics", "Physics", "Chemistry", "Biology",
 etc).  Note that if you want to add a new logical field or modify
 existing physical MARC tags for a logical field, you have to use the
-<a href="<WEBURL>/admin/bibindex/">BibIndex Admin</a> interface.
+<a href="<CFG_SITE_URL>/admin/bibindex/">BibIndex Admin</a> interface.
 
 <a name="3.8"></a><h3>3.8 Modify sort options</h3>
 
@@ -446,7 +446,7 @@ title, year, etc) will be shown.
 
 <p>Note that if you want to add a new logical field or modify existing
 physical MARC tags for a logical field, you have to use the <a
-href="<WEBURL>/admin/bibindex/">BibIndex Admin</a> interface.
+href="<CFG_SITE_URL>/admin/bibindex/">BibIndex Admin</a> interface.
 
 <a name="3.9"></a><h3>3.9 Modify rank options</h3>
 
@@ -458,7 +458,7 @@ but select the method from the 'disable rank method' box.
 
 <p>Note that if you want to add new ranking method or modify existing
 ranking method, you have to use the <a
-href="<WEBURL>/admin/bibrank/">BibRank Admin</a> interface.
+href="<CFG_SITE_URL>/admin/bibrank/">BibRank Admin</a> interface.
 
 <a name="3.10"></a><h3>3.10 Modify output formats</h3>
 
@@ -473,7 +473,7 @@ changed using the 'move' arrows.
 
 <p>Note that if you want to add new output format ('behaviour') or
 modify existing output format, you have to use the <a
-href="<WEBURL>/admin/bibformat/">BibFormat Admin</a> interface.
+href="<CFG_SITE_URL>/admin/bibformat/">BibFormat Admin</a> interface.
 
 <a name="3.11"></a><h3>3.11 Configuration of related external collections</h3>
 
@@ -502,11 +502,11 @@ your modifications.
 <a name="3.12"></a><h3>3.12 Detailed record page options</h3>
 
 <p>These settings let you define how the detailed view (such as <a
-href="<WEBURL>/record/1"><WEBURL>/record/1</a>) of records in this
+href="<CFG_SITE_URL>/record/1"><CFG_SITE_URL>/record/1</a>) of records in this
 collection will look like. <br/>
 
 More details are available in the <a
-href="<WEBURL>/help/admin/webstyle-admin-guide#det_page">WebStyle admin
+href="<CFG_SITE_URL>/help/admin/webstyle-admin-guide#det_page">WebStyle admin
 guide</a>.
 
 <p> Please note that since a record might belong to several
@@ -518,7 +518,7 @@ which are applied.
 <a name="4"></a><h2>4. Webcoll Status</h2>
 
 <p>WebColl is the daemon that normally periodically runs via <a
-href="<WEBURL>/help/admin/bibsched-admin-guide">BibSched</a> and that updates the
+href="<CFG_SITE_URL>/help/admin/bibsched-admin-guide">BibSched</a> and that updates the
 collection cache with the collection parameters configured in the
 previous section.  Alternatively to running webcoll via BibSched, you
 can also run it any time you want from the command line, either for
@@ -581,4 +581,4 @@ subcollections.
 
 <a name="8"></a><h2>8. Additional Information</h2>
 
-<a href="<WEBURL>/help/hacking/search-engine-internals">WebSearch Internals</a>
+<a href="<CFG_SITE_URL>/help/hacking/search-engine-internals">WebSearch Internals</a>

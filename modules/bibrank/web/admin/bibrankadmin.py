@@ -27,12 +27,12 @@ import sys
 import invenio.bibrankadminlib as brc
 #reload(brc)
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl, CFG_SITE_LANG, CFG_SITE_NAME
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
 def index(req, ln=CFG_SITE_LANG):
-    navtrail_previous_links = brc.getnavtrail() # + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py">BibRank Admin Interface</a> """ % (weburl)
+    navtrail_previous_links = brc.getnavtrail() # + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py">BibRank Admin Interface</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -52,7 +52,7 @@ def index(req, ln=CFG_SITE_LANG):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addrankarea(req, ln=CFG_SITE_LANG, rnkcode='', template='', confirm=-1):
-    navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
+    navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -75,7 +75,7 @@ def addrankarea(req, ln=CFG_SITE_LANG, rnkcode='', template='', confirm=-1):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifytranslations(req, rnkID='', ln=CFG_SITE_LANG, sel_type='', trans = [], confirm=0):
-    navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
+    navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -99,7 +99,7 @@ def modifytranslations(req, rnkID='', ln=CFG_SITE_LANG, sel_type='', trans = [],
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifycollection(req, ln=CFG_SITE_LANG, rnkID='', func='', colID='', confirm=0):
-    navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
+    navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -123,7 +123,7 @@ def modifycollection(req, ln=CFG_SITE_LANG, rnkID='', func='', colID='', confirm
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def deleterank(req, ln=CFG_SITE_LANG, rnkID='', confirm=0):
-    navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
+    navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -145,7 +145,7 @@ def deleterank(req, ln=CFG_SITE_LANG, rnkID='', confirm=0):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyrank(req, ln=CFG_SITE_LANG, rnkID='', rnkcode='', template='', cfgfile='', confirm=0):
-    navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
+    navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -170,7 +170,7 @@ def modifyrank(req, ln=CFG_SITE_LANG, rnkID='', rnkcode='', template='', cfgfile
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showrankdetails(req, ln=CFG_SITE_LANG, rnkID=''):
-    navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (weburl)
+    navtrail_previous_links = brc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibrank/bibrankadmin.py/">BibRank Admin Interface</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)

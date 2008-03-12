@@ -32,7 +32,7 @@ from mimetypes import MimeTypes
 from invenio.dbquery import run_sql, DatabaseError
 from invenio.errorlib import register_exception
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, weburl, CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR, CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_URL, CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR, CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -740,7 +740,7 @@ class BibDoc:
         if existing_icon is not None:
             existing_icon = existing_icon.list_all_files()[0]
             imageurl = "%s/record/%s/files/%s" % \
-                (weburl, self.recid, existing_icon.get_full_name())
+                (CFG_SITE_URL, self.recid, existing_icon.get_full_name())
         else:
             imageurl = "%s/img/smallfiles.gif" % CFG_SITE_URL
 
@@ -760,7 +760,6 @@ class BibDoc:
 
         t = websubmit_templates.tmpl_bibdoc_filelist(
               ln = ln,
-              weburl = weburl,
               versions = versions,
               imageurl = imageurl,
               docname = self.docname,
@@ -1077,7 +1076,6 @@ class BibDocFile:
         """Returns a formatted representation of this docfile."""
         return websubmit_templates.tmpl_bibdocfile_filelist(
                  ln = ln,
-                 weburl = weburl,
                  recid = self.recid,
                  version = self.version,
                  name = self.name,
@@ -1324,27 +1322,27 @@ def calculate_md5(filename, force_internal=False):
 
 
 def bibdocfile_url_to_bibrecdocs(url):
-    """Given a url in the form (s)weburl/record/xxx/files/... it returns
+    """Given an URL in the form CFG_SITE_[SECURE_]URL/record/xxx/files/... it returns
     a BibRecDocs object for the corresponding recid."""
 
     recid = decompose_bibdocfile_url(url)[0]
     return BibRecDocs(recid)
 
 def bibdocfile_url_to_bibdoc(url):
-    """Given a url in the form (s)weburl/record/xxx/files/... it returns
+    """Given an URL in the form CFG_SITE_[SECURE_]URL/record/xxx/files/... it returns
     a BibDoc object for the corresponding recid/docname."""
 
     docname = decompose_bibdocfile_url(url)[1]
     return bibdocfile_url_to_bibrecdocs(url).get_bibdoc(docname)
 
 def bibdocfile_url_to_bibdocfile(url):
-    """Given a url in the form (s)weburl/record/xxx/files/... it returns
+    """Given an URL in the form CFG_SITE_[SECURE_]URL/record/xxx/files/... it returns
     a BibDocFile object for the corresponding recid/docname/format."""
     dummy, dummy, format = decompose_bibdocfile_url(url)
     return bibdocfile_url_to_bibdoc(url).get_file(format)
 
 def bibdocfile_url_to_fullpath(url):
-    """Given a url in the form (s)weburl/record/xxx/files/... it returns
+    """Given an URL in the form CFG_SITE_[SECURE_]URL/record/xxx/files/... it returns
     the fullpath for the corresponding recid/docname/format."""
 
     return bibdocfile_url_to_bibdocfile(url).get_full_path()
@@ -1352,15 +1350,15 @@ def bibdocfile_url_to_fullpath(url):
 def bibdocfile_url_p(url):
     """Return True when the url is a potential valid url pointing to a
     fulltext owned by a system."""
-    if not (url.startswith('%s/record/' % weburl) or url.startswith('%s/record/' % CFG_SITE_SECURE_URL)):
+    if not (url.startswith('%s/record/' % CFG_SITE_URL) or url.startswith('%s/record/' % CFG_SITE_SECURE_URL)):
         return False
     splitted_url = url.split('/files/')
     return len(splitted_url) == 2 and splitted_url[0] != '' and splitted_url[1] != ''
 
 def decompose_bibdocfile_url(url):
     """Given a bibdocfile_url return a triple (recid, docname, format)."""
-    if url.startswith('%s/record/' % weburl):
-        recid_file = url[len('%s/record/' % weburl):]
+    if url.startswith('%s/record/' % CFG_SITE_URL):
+        recid_file = url[len('%s/record/' % CFG_SITE_URL):]
     elif url.startswith('%s/record/' % CFG_SITE_SECURE_URL):
         recid_file = url[len('%s/record/' % CFG_SITE_SECURE_URL):]
     else:

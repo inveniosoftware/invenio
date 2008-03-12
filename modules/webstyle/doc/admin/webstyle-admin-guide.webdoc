@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: WebStyle Admin Guide -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <h2>Contents</h2>
@@ -55,8 +55,8 @@ Invenio installation.
 <h3><a name="overview_css">1.1 CSS Style Sheet and Images</a></h3>
 
 <p>The most obvious modification you may want to do is the
-modification of <a href="<WEBURL>/img/cds.css">CSS style sheet</a>.
-You may also customize default <a href="<WEBURL>/img/">images</a>.</p>
+modification of <a href="<CFG_SITE_URL>/img/cds.css">CSS style sheet</a>.
+You may also customize default <a href="<CFG_SITE_URL>/img/">images</a>.</p>
 
 <h3><a name="overview_page_layout">1.2 HTML Page Layout</a></h3>
 
@@ -101,8 +101,8 @@ basically HTML with the following main differences:
     <code>&lt;body&gt;</code> tag)
 </li>
 <li>You can make use of special tags such as
-    <code>&lt;WEBURL&gt;</code> and <code>&lt;CFG_SITE_SUPPORT_EMAIL&gt;</code>,
-    that will be replaced by <WEBURL> and <CFG_SITE_SUPPORT_EMAIL>, the values that
+    <code>&lt;CFG_SITE_URL&gt;</code> and <code>&lt;CFG_SITE_SUPPORT_EMAIL&gt;</code>,
+    that will be replaced by <CFG_SITE_URL> and <CFG_SITE_SUPPORT_EMAIL>, the values that
     you should have configured in your <code>config.py</code> file.
 </li>
 <li>You can internationalize the content. For example:
@@ -272,7 +272,7 @@ boxes, etc).</p>
 <h2><a name="det_page">2. Detailed Record Pages</a></h2>
 
 <p>The web pages displaying the details of a record (such as
-<a href="<WEBURL>/record/1"><WEBURL>/record/1</a>) do not only show metadata, but
+<a href="<CFG_SITE_URL>/record/1"><CFG_SITE_URL>/record/1</a>) do not only show metadata, but
 also users' comments and reviews, statistics, etc. This information is
 organized into tabs.</p>
 
@@ -317,27 +317,27 @@ The following tabs are available:
   <tr>
     <td>Information</td>
     <td>Show the formatted metadata of the record</td>
-    <td><a href="<WEBURL>/record/10"><WEBURL>/record/10</a></td>
+    <td><a href="<CFG_SITE_URL>/record/10"><CFG_SITE_URL>/record/10</a></td>
   </tr>
   <tr>
     <td>References</td>
     <td>Displays the references (bibliography) of the record</td>
-    <td><a href="<WEBURL>/record/10/references"><WEBURL>/record/10/references</a></td>
+    <td><a href="<CFG_SITE_URL>/record/10/references"><CFG_SITE_URL>/record/10/references</a></td>
   </tr>
   <tr>
     <td>Discussion</td>
     <td>Displays the users' comments and reviews</td>
-    <td><a href="<WEBURL>/record/10/comments"><WEBURL>/record/10/comments</a><br/>
-        <a href="<WEBURL>/record/10/reviews"><WEBURL>/record/10/reviews</a></td>
+    <td><a href="<CFG_SITE_URL>/record/10/comments"><CFG_SITE_URL>/record/10/comments</a><br/>
+        <a href="<CFG_SITE_URL>/record/10/reviews"><CFG_SITE_URL>/record/10/reviews</a></td>
   </tr>
   <tr>
     <td>Usage Statistics</td>
     <td>Statistics data and graph about file downloads/views</td>
-    <td><a href="<WEBURL>/record/10/statistics"><WEBURL>/record/10/statistics</a></td>
+    <td><a href="<CFG_SITE_URL>/record/10/statistics"><CFG_SITE_URL>/record/10/statistics</a></td>
   </tr>
   <tr><td>Fulltext</td>
     <td>Link(s) to fulltext file(s)</td>
-    <td><a href="<WEBURL>/record/10/files"><WEBURL>/record/10/files</a></td>
+    <td><a href="<CFG_SITE_URL>/record/10/files"><CFG_SITE_URL>/record/10/files</a></td>
   </tr>
 </table>
 
@@ -373,7 +373,7 @@ etc pages.</p>
 <p>Here are some behaviours you should expect when changing the tabs
 configuration:</p>
 <ul>
-  <li>Given that search results pages always link to <WEBURL>/record/10,
+  <li>Given that search results pages always link to <CFG_SITE_URL>/record/10,
   and given the above comment about accessibility of tabs when they
   are not displayed, the content of the <em>Information</em> will always be
   show when clicking on <a href="#" class="moreinfo">detailed record</a> link in search results, even

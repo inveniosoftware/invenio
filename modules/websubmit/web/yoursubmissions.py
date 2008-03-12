@@ -36,8 +36,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_SITE_SECURE_URL, \
-     CFG_VERSION, \
-     weburl
+     CFG_VERSION
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *
@@ -165,7 +164,6 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
     # display
     t += websubmit_templates.tmpl_yoursubmissions(
            ln = ln,
-           weburl = weburl,
            images = CFG_SITE_URL + '/img',
            order = order,
            doctypes = doctypes,

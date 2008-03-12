@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 #import cgi
 from invenio import bibformat_utils
 from urllib import quote
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 import re
 
 def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,

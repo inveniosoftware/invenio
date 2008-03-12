@@ -32,7 +32,7 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
-     weburl
+     CFG_SITE_URL
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, SUPERADMINROLE
 from invenio.webpage import page
 from invenio.dbquery import run_sql
@@ -98,7 +98,6 @@ def perform_youradminactivities(user_info, ln):
              guest = guest,
              roles = your_roles,
              activities = your_admin_activities,
-             weburl = weburl,
            )
 
 def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
@@ -132,7 +131,6 @@ def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
 
     return websession_templates.tmpl_account_page(
              ln = ln,
-             weburl = weburl,
              accBody = accBody,
              baskets = bask,
              alerts = aler,

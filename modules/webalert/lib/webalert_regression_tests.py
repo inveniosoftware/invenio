@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -35,7 +35,7 @@ class WebAlertWebPagesAvailabilityTest(unittest.TestCase):
     def test_your_alerts_pages_availability(self):
         """webalert - availability of Your Alerts pages""" 
 
-        baseurl = weburl + '/youralerts/'
+        baseurl = CFG_SITE_URL + '/youralerts/'
 
         _exports = ['', 'display', 'input', 'modify', 'list', 'add',
                     'update', 'remove']

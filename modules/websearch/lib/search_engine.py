@@ -51,7 +51,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_LOGDIR, \
-     weburl
+     CFG_SITE_URL
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES, InvenioWebSearchUnknownCollectionError
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
@@ -649,12 +649,12 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
                 if res:
                     format_name = res[0][0]
                 navtrail += ' &gt; <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
-                            (weburl, recID, title_message, format_name)
+                            (CFG_SITE_URL, recID, title_message, format_name)
             else:
                 # Discussion, citations, etc. tabs
                 tab_label = get_detailed_page_tabs(cc, ln=ln)[tab]['label']
                 navtrail += ' &gt; <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
-                            (weburl, recID, title_message, _(tab_label))
+                            (CFG_SITE_URL, recID, title_message, _(tab_label))
             navtrail_append_title_p = 0
 
         req.write(pageheaderonly(req=req, title=title_message,
@@ -2396,7 +2396,6 @@ def print_search_info(p, f, sf, so, sp, rm, of, ot, collection=CFG_SITE_NAME, nb
 
     return websearch_templates.tmpl_print_search_info(
              ln = ln,
-             weburl = weburl,
              collection = collection,
              as = as,
              collection_name = get_coll_i18nname(collection, ln),
@@ -2451,7 +2450,6 @@ def print_results_overview(req, colls, results_final_nb_total, results_final_nb,
 
     return websearch_templates.tmpl_print_results_overview(
              ln = ln,
-             weburl = weburl,
              results_final_nb_total = results_final_nb_total,
              results_final_nb = results_final_nb,
              cpu_time = cpu_time,
@@ -2670,7 +2668,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                     if ln != CFG_SITE_LANG:
                         link_ln = '?ln=%s' % ln
                     tabs = [(unordered_tabs[tab_id]['label'], \
-                             '%s/record/%s/%s%s' % (weburl, recIDs[irec], tab_id, link_ln), \
+                             '%s/record/%s/%s%s' % (CFG_SITE_URL, recIDs[irec], tab_id, link_ln), \
                              tab_id == tab,
                              unordered_tabs[tab_id]['enabled']) \
                             for (tab_id, order) in ordered_tabs_id
@@ -2856,7 +2854,6 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                 out += websearch_templates.tmpl_print_record_brief_links(
                     ln = ln,
                     recID = recID,
-                    weburl = weburl
                     )
         return out
 
@@ -3029,7 +3026,6 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                     out += websearch_templates.tmpl_print_record_detailed(
                              ln = ln,
                              recID = recID,
-                             weburl = weburl,
                            )
 
     elif format.startswith("hb_") or format.startswith("hd_"):
@@ -3115,13 +3111,11 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                         out += websearch_templates.tmpl_print_record_brief(
                                  ln = ln,
                                  recID = recID,
-                                 weburl = weburl,
                                )
                 else:
                     out += websearch_templates.tmpl_print_record_brief(
                              ln = ln,
                              recID = recID,
-                             weburl = weburl,
                            )
 
             # at the end of HTML brief mode, print the "Detailed record" functionality:
@@ -3131,7 +3125,6 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                 out += websearch_templates.tmpl_print_record_brief_links(
                          ln = ln,
                          recID = recID,
-                         weburl = weburl,
                        )
 
     # print record closing tags, if needed:
@@ -3950,7 +3943,7 @@ def perform_request_cache(req, action="show"):
     else:
         out += "<p>Search cache is empty."
     out += "</blockquote>"
-    out += """<p><a href="%s/search/cache?action=clear">clear cache</a>""" % weburl
+    out += """<p><a href="%s/search/cache?action=clear">clear cache</a>""" % CFG_SITE_URL
     # show field i18nname cache:
     out += "<h3>Field I18N names cache</h3>"
     out += "- fieldname table last updated: %s" % get_table_update_time('fieldname')
@@ -4011,7 +4004,7 @@ def perform_request_log(req, date=""):
             p = os.popen("grep -c ^%d %s/search.log" % (day, CFG_LOGDIR), 'r')
             for line in p.readlines():
                 req.write("""<tr><td>%s</td><td align="right"><a href="%s/search/log?date=%d">%s</a></td></tr>""" % \
-                          (day, weburl, day, line))
+                          (day, CFG_SITE_URL, day, line))
             p.close()
         req.write("</table>")
     req.write("</html>")

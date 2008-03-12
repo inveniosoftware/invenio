@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -35,7 +35,7 @@ class BibRankWebPagesAvailabilityTest(unittest.TestCase):
     def test_rank_by_word_similarity_pages_availability(self):
         """bibrank - availability of ranking search results pages"""
 
-        baseurl = weburl + '/search'
+        baseurl = CFG_SITE_URL + '/search'
 
         _exports = ['?p=ellis&r=wrd']
 
@@ -49,7 +49,7 @@ class BibRankWebPagesAvailabilityTest(unittest.TestCase):
     def test_similar_records_pages_availability(self):
         """bibrank - availability of similar records results pages"""
 
-        baseurl = weburl + '/search'
+        baseurl = CFG_SITE_URL + '/search'
 
         _exports = ['?p=recid%3A18&rm=wrd']
 
@@ -66,13 +66,13 @@ class BibRankWordSimilarityRankingTest(unittest.TestCase):
     def test_search_results_ranked_by_similarity(self):
         """bibrank - search results ranked by word similarity"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=ellis&rm=wrd&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&rm=wrd&of=id',
                                                expected_text="[8, 10, 11, 12, 47, 17, 13, 16, 18, 9, 14, 15]"))
 
     def test_similar_records_link(self):
         """bibrank - 'Similar records' link"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=recid%3A77&rm=wrd&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A77&rm=wrd&of=id',
                                                expected_text="[84, 95, 85, 77]"))
 
 class BibRankCitationRankingTest(unittest.TestCase):
@@ -81,13 +81,13 @@ class BibRankCitationRankingTest(unittest.TestCase):
     def test_search_results_ranked_by_citations(self):
         """bibrank - search results ranked by number of citations"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&of=id',
                                                expected_text="[85, 77, 84]"))
 
     def test_search_results_ranked_by_citations_verbose(self):
         """bibrank - search results ranked by number of citations, verbose output"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&verbose=2',
+                         test_web_page_content(CFG_SITE_URL + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&verbose=2',
                                                expected_text="find_citations retlist [[85, 0], [77, 2], [84, 3]]"))
 
 test_suite = make_test_suite(BibRankWebPagesAvailabilityTest,

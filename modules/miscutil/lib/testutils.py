@@ -41,7 +41,7 @@ import unittest
 from urllib import urlencode
 from itertools import chain, repeat
 
-from invenio.config import weburl, CFG_SITE_SECURE_URL, CFG_LOGDIR
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_LOGDIR
 from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, CFG_TESTS_REQUIRE_HTML_VALIDATION
 
 def warn_user_about_tests():
@@ -99,7 +99,7 @@ def make_url(path, **kargs):
     """ Helper to generate an absolute invenio URL with query
     arguments"""
 
-    url = weburl + path
+    url = CFG_SITE_URL + path
 
     if kargs:
         url += '?' + urlencode(kargs, doseq=True)

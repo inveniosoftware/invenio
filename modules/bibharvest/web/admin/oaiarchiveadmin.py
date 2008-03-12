@@ -27,7 +27,7 @@ import sys
 
 import invenio.oaiarchiveadminlib as bhc
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl,CFG_SITE_LANG
+from invenio.config import CFG_SITE_URL,CFG_SITE_LANG
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 
@@ -60,7 +60,7 @@ def index(req, ln=CFG_SITE_LANG):
 
 def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='',oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', oai_set_op1='a', oai_set_op2='a', ln=CFG_SITE_LANG, func=0):
 
-    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (weburl)
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -105,7 +105,7 @@ def addset(req, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set
 
 
 def delset(req, oai_set_id=None, ln=CFG_SITE_LANG, func=0):
-    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (weburl)
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -134,7 +134,7 @@ def delset(req, oai_set_id=None, ln=CFG_SITE_LANG, func=0):
 
 def editset(req, oai_set_id=None, oai_set_name='', oai_set_spec='', oai_set_collection='', oai_set_description='', oai_set_definition='', oai_set_reclist='', oai_set_p1='', oai_set_f1='', oai_set_m1='', oai_set_p2='', oai_set_f2='', oai_set_m2='', oai_set_p3='', oai_set_f3='', oai_set_m3='', oai_set_op1='a', oai_set_op2='a', ln=CFG_SITE_LANG, func=0):
 
-    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (weburl)
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)

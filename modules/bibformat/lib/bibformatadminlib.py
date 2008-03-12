@@ -31,7 +31,7 @@ import stat
 import time
 import cgi
 
-from invenio.config import CFG_SITE_LANG, weburl, CFG_ETCDIR
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_ETCDIR
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_TEMPLATES_PATH, \
      CFG_BIBFORMAT_OUTPUTS_PATH, \
@@ -53,7 +53,7 @@ def getnavtrail(previous = '', ln=CFG_SITE_LANG):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail = '''<a class="navtrail" href="%s/help/admin">%s</a> &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a> ''' % \
-               (weburl, _("Admin Area"), weburl, ln,  _("BibFormat Admin"))
+               (CFG_SITE_URL, _("Admin Area"), CFG_SITE_URL, ln,  _("BibFormat Admin"))
     navtrail = navtrail + previous
     return navtrail
 
@@ -106,8 +106,8 @@ def perform_request_format_templates_management(ln=CFG_SITE_LANG, checking=0):
         if len(status) > 1 or (len(status)==1 and status[0][0] != 'ERR_BIBFORMAT_CANNOT_READ_TEMPLATE_FILE'):
             status = '''
             <a style="color: rgb(255, 0, 0);"
-            href="%(weburl)s/admin/bibformat/bibformatadmin.py/validate_format?ln=%(ln)s&amp;bft=%(bft)s">Not OK</a>
-            ''' % {'weburl':weburl,
+            href="%(siteurl)s/admin/bibformat/bibformatadmin.py/validate_format?ln=%(ln)s&amp;bft=%(bft)s">Not OK</a>
+            ''' % {'siteurl':CFG_SITE_URL,
                    'ln':ln,
                    'bft':filename}
         else:
@@ -439,8 +439,8 @@ def perform_request_output_formats_management(ln=CFG_SITE_LANG, sortby="code"):
         if len(status) > 1 or (len(status)==1 and status[0][0] != 'ERR_BIBFORMAT_CANNOT_WRITE_OUTPUT_FILE'):
             status = '''
             <a style="color: rgb(255, 0, 0);"
-            href="%(weburl)s/admin/bibformat/bibformatadmin.py/validate_format?ln=%(ln)s&bfo=%(bfo)s">Not OK</a>
-            ''' % {'weburl':weburl,
+            href="%(siteurl)s/admin/bibformat/bibformatadmin.py/validate_format?ln=%(ln)s&bfo=%(bfo)s">Not OK</a>
+            ''' % {'siteurl':CFG_SITE_URL,
                    'ln':ln,
                    'bfo':code}
         else:

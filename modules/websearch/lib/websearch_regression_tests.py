@@ -32,7 +32,7 @@ from sets import Set
 
 from mechanize import Browser, LinkNotFoundError, HTTPError
 
-from invenio.config import weburl, CFG_SITE_NAME, CFG_SITE_LANG
+from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG
 from invenio.testutils import make_test_suite, \
                               warn_user_about_tests_and_run, \
                               make_url, test_web_page_content, \
@@ -52,7 +52,7 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
     def test_search_interface_pages_availability(self):
         """websearch - availability of search interface pages"""
 
-        baseurl = weburl + '/'
+        baseurl = CFG_SITE_URL + '/'
 
         _exports = ['', 'collection/Poetry', 'collection/Poetry?as=1']
 
@@ -66,7 +66,7 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
     def test_search_results_pages_availability(self):
         """websearch - availability of search results pages"""
 
-        baseurl = weburl + '/search'
+        baseurl = CFG_SITE_URL + '/search'
 
         _exports = ['', '?c=Poetry', '?p=ellis', '/cache', '/log']
 
@@ -80,7 +80,7 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
     def test_search_detailed_record_pages_availability(self):
         """websearch - availability of search detailed record pages"""
 
-        baseurl = weburl + '/record/'
+        baseurl = CFG_SITE_URL + '/record/'
 
         _exports = ['', '1', '1/', '1/files', '1/files/']
 
@@ -94,7 +94,7 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
     def test_browse_results_pages_availability(self):
         """websearch - availability of browse results pages"""
 
-        baseurl = weburl + '/search'
+        baseurl = CFG_SITE_URL + '/search'
 
         _exports = ['?p=ellis&f=author&action_browse=Browse']
 
@@ -108,28 +108,28 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
     def test_help_page_availability(self):
         """websearch - availability of Help Central page"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help',
+                         test_web_page_content(CFG_SITE_URL + '/help',
                                                expected_text="Help Central"))
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/?ln=fr',
+                         test_web_page_content(CFG_SITE_URL + '/help/?ln=fr',
                                                expected_text="Centre d'aide"))
 
     def test_search_tips_page_availability(self):
         """websearch - availability of Search Tips"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/search-tips',
+                         test_web_page_content(CFG_SITE_URL + '/help/search-tips',
                                                expected_text="Search Tips"))
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/search-tips?ln=fr',
+                         test_web_page_content(CFG_SITE_URL + '/help/search-tips?ln=fr',
                                                expected_text="Conseils de recherche"))
 
     def test_search_guide_page_availability(self):
         """websearch - availability of Search Guide"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/search-guide',
+                         test_web_page_content(CFG_SITE_URL + '/help/search-guide',
                                                expected_text="Search Guide"))
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/search-guide?ln=fr',
+                         test_web_page_content(CFG_SITE_URL + '/help/search-guide?ln=fr',
                                                expected_text="Guide de recherche"))
 
 class WebSearchTestLegacyURLs(unittest.TestCase):
@@ -193,19 +193,19 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
     def test_legacy_search_help_link(self):
         """websearch - legacy Search Help page link"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/search/index.en.html',
+                         test_web_page_content(CFG_SITE_URL + '/help/search/index.en.html',
                                                expected_text="Help Central"))
 
     def test_legacy_search_tips_link(self):
         """websearch - legacy Search Tips page link"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/search/tips.fr.html',
+                         test_web_page_content(CFG_SITE_URL + '/help/search/tips.fr.html',
                                                expected_text="Conseils de recherche"))
 
     def test_legacy_search_guide_link(self):
         """websearch - legacy Search Guide page link"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/search/guide.en.html',
+                         test_web_page_content(CFG_SITE_URL + '/help/search/guide.en.html',
                                                expected_text="Search Guide"))
 
 class WebSearchTestRecord(unittest.TestCase):
@@ -364,7 +364,7 @@ class WebSearchTestBrowse(unittest.TestCase):
             # We'll get a few links to search for the actual hits, plus a
             # link to the following results.
             res = []
-            for link in browser.links(url_regex=re.compile(weburl +
+            for link in browser.links(url_regex=re.compile(CFG_SITE_URL +
                                                            r'/search\?')):
                 if link.text == 'Advanced Search':
                     continue
@@ -438,7 +438,7 @@ class WebSearchTestSearch(unittest.TestCase):
         if 'cc' in original:
             del original['cc']
 
-        for link in browser.links(url_regex=re.compile(weburl + r'/search\?')):
+        for link in browser.links(url_regex=re.compile(CFG_SITE_URL + r'/search\?')):
             if link.text == 'Advanced Search':
                 continue
 
@@ -534,64 +534,64 @@ class WebSearchNearestTermsTest(unittest.TestCase):
     def test_nearest_terms_box_in_okay_query(self):
         """ websearch - no nearest terms box for a successful query """
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=ellis',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis',
                                                expected_text="jump to record"))
 
     def test_nearest_terms_box_in_unsuccessful_simple_query(self):
         """ websearch - nearest terms box for unsuccessful simple query """
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=ellisz',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellisz',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=weburl+"/search?p=embed",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=embed",
                                                expected_link_label='embed'))
 
     def test_nearest_terms_box_in_unsuccessful_structured_query(self):
         """ websearch - nearest terms box for unsuccessful structured query """
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=ellisz&f=author',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellisz&f=author',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=weburl+"/search?p=fabbro&f=author",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=fabbro&f=author",
                                                expected_link_label='fabbro'))
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=author%3Aellisz',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=author%3Aellisz',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=weburl+"/search?p=author%3Afabbro",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=author%3Afabbro",
                                                expected_link_label='fabbro'))
 
     def test_nearest_terms_box_in_unsuccessful_phrase_query(self):
         """ websearch - nearest terms box for unsuccessful phrase query """
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=author%3A%22Ellis%2C+Z%22',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=author%3A%22Ellis%2C+Z%22',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=weburl+"/search?p=author%3A%22Enqvist%2C+K%22",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=author%3A%22Enqvist%2C+K%22",
                                                expected_link_label='Enqvist, K'))
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=%22ellisz%22&f=author',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%22ellisz%22&f=author',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=weburl+"/search?p=%22Enqvist%2C+K%22&f=author",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=%22Enqvist%2C+K%22&f=author",
                                                expected_link_label='Enqvist, K'))
 
     def test_nearest_terms_box_in_unsuccessful_boolean_query(self):
         """ websearch - nearest terms box for unsuccessful boolean query """
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=title%3Aellisz+author%3Aellisz',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aellisz+author%3Aellisz',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=weburl+"/search?p=title%3Aenergie+author%3Aellisz",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergie+author%3Aellisz",
                                                expected_link_label='energie'))
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=title%3Aenergie+author%3Aenergie',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aenergie+author%3Aenergie',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=weburl+"/search?p=title%3Aenergie+author%3Aenqvist",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergie+author%3Aenqvist",
                                                expected_link_label='enqvist'))
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=title%3Aellisz+author%3Aellisz&f=keyword',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aellisz+author%3Aellisz&f=keyword',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=weburl+"/search?p=title%3Aenergie+author%3Aellisz&f=keyword",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergie+author%3Aellisz&f=keyword",
                                                expected_link_label='energie'))
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=title%3Aenergie+author%3Aenergie&f=keyword',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aenergie+author%3Aenergie&f=keyword',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=weburl+"/search?p=title%3Aenergie+author%3Aenqvist&f=keyword",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergie+author%3Aenqvist&f=keyword",
                                                expected_link_label='enqvist'))
 
 class WebSearchBooleanQueryTest(unittest.TestCase):
@@ -600,14 +600,14 @@ class WebSearchBooleanQueryTest(unittest.TestCase):
     def test_successful_boolean_query(self):
         """ websearch - successful boolean query """
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=ellis+muon',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis+muon',
                                                expected_text="records found",
                                                expected_link_label="Detailed record"))
 
     def test_unsuccessful_boolean_query_where_all_individual_terms_match(self):
         """ websearch - unsuccessful boolean query where all individual terms match """
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=ellis+muon+letter',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis+muon+letter',
                                                expected_text="Boolean query returned no hits. Please combine your search terms differently."))
 
 class WebSearchAuthorQueryTest(unittest.TestCase):
@@ -616,15 +616,15 @@ class WebSearchAuthorQueryTest(unittest.TestCase):
     def test_propose_similar_author_names_box(self):
         """ websearch - propose similar author names box """
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=Ellis%2C+R&f=author',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=Ellis%2C+R&f=author',
                                                expected_text="See also: similar author names",
-                                               expected_link_target=weburl+"/search?p=Ellis%2C+R+K&f=author",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=Ellis%2C+R+K&f=author",
                                                expected_link_label="Ellis, R K"))
 
     def test_do_not_propose_similar_author_names_box(self):
         """ websearch - do not propose similar author names box """
-        errmsgs = test_web_page_content(weburl + '/search?p=author%3A%22Ellis%2C+R%22',
-                                        expected_link_target=weburl+"/search?p=Ellis%2C+R+K&f=author",
+        errmsgs = test_web_page_content(CFG_SITE_URL + '/search?p=author%3A%22Ellis%2C+R%22',
+                                        expected_link_target=CFG_SITE_URL+"/search?p=Ellis%2C+R+K&f=author",
                                         expected_link_label="Ellis, R K")
         if errmsgs[0].find("does not contain link to") > -1:
             pass
@@ -671,38 +671,38 @@ class WebSearchSearchEngineWebAPITest(unittest.TestCase):
     def test_search_engine_web_api_for_failed_query(self):
         """websearch - search engine Web API for failed query"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=aoeuidhtns&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=aoeuidhtns&of=id',
                                                expected_text="[]"))
 
 
     def test_search_engine_web_api_for_successful_query(self):
         """websearch - search engine Web API for successful query"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=ellis&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=ellis&of=id',
                                                expected_text="[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 47]"))
 
     def test_search_engine_web_api_for_existing_record(self):
         """websearch - search engine Web API for existing record"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?recid=8&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?recid=8&of=id',
                                                expected_text="[8]"))
 
     def test_search_engine_web_api_for_nonexisting_record(self):
         """websearch - search engine Web API for non-existing record"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?recid=123456789&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?recid=123456789&of=id',
                                                expected_text="[]"))
 
     def test_search_engine_web_api_for_nonexisting_collection(self):
         """websearch - search engine Web API for non-existing collection"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?c=Foo&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?c=Foo&of=id',
                                                expected_text="[]"))
 
     def test_search_engine_web_api_for_range_of_records(self):
         """websearch - search engine Web API for range of records"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?recid=1&recidb=10&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?recid=1&recidb=10&of=id',
                                                expected_text="[1, 2, 3, 4, 5, 6, 7, 8, 9]"))
 
 class WebSearchRestrictedCollectionTest(unittest.TestCase):
@@ -711,13 +711,13 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
     def test_restricted_collection_interface_page(self):
         """websearch - restricted collection interface page body"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/collection/Theses',
+                         test_web_page_content(CFG_SITE_URL + '/collection/Theses',
                                                expected_text="The contents of this collection is restricted."))
 
     def test_restricted_search_as_anonymous_guest(self):
         """websearch - restricted collection not searchable by anonymous guest"""
         browser = Browser()
-        browser.open(weburl + '/search?c=Theses')
+        browser.open(CFG_SITE_URL + '/search?c=Theses')
         response = browser.response().read()
         if response.find("If you think you have right to access it, please authenticate yourself.") > -1:
             pass
@@ -728,7 +728,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
     def test_restricted_search_as_authorized_person(self):
         """websearch - restricted collection searchable by authorized person"""
         browser = Browser()
-        browser.open(weburl + '/search?c=Theses')
+        browser.open(CFG_SITE_URL + '/search?c=Theses')
         browser.select_form(nr=0)
         browser['p_un'] = 'jekyll'
         browser['p_pw'] = 'j123ekyll'
@@ -741,7 +741,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
     def test_restricted_search_as_unauthorized_person(self):
         """websearch - restricted collection not searchable by unauthorized person"""
         browser = Browser()
-        browser.open(weburl + '/search?c=Theses')
+        browser.open(CFG_SITE_URL + '/search?c=Theses')
         browser.select_form(nr=0)
         browser['p_un'] = 'hyde'
         browser['p_pw'] = 'h123yde'
@@ -754,7 +754,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
     def test_restricted_detailed_record_page_as_anonymous_guest(self):
         """websearch - restricted detailed record page not accessible to guests"""
         browser = Browser()
-        browser.open(weburl + '/record/35')
+        browser.open(CFG_SITE_URL + '/record/35')
         if browser.response().read().find("You can use your nickname or your email address to login.") > -1:
             pass
         else:
@@ -764,14 +764,14 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
     def test_restricted_detailed_record_page_as_authorized_person(self):
         """websearch - restricted detailed record page accessible to authorized person"""
         browser = Browser()
-        browser.open(weburl + '/youraccount/login')
+        browser.open(CFG_SITE_URL + '/youraccount/login')
         browser.select_form(nr=0)
         browser['p_un'] = 'jekyll'
         browser['p_pw'] = 'j123ekyll'
         browser.submit()
-        browser.open(weburl + '/record/35')
+        browser.open(CFG_SITE_URL + '/record/35')
         # Dr. Jekyll should be able to connect
-        # (add the pw to the whole weburl because we shall be
+        # (add the pw to the whole CFG_SITE_URL because we shall be
         # redirected to '/reordrestricted/'):
         if browser.response().read().find("A High-performance Video Browsing System") > -1:
             pass
@@ -781,12 +781,12 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
     def test_restricted_detailed_record_page_as_unauthorized_person(self):
         """websearch - restricted detailed record page not accessible to unauthorized person"""
         browser = Browser()
-        browser.open(weburl + '/youraccount/login')
+        browser.open(CFG_SITE_URL + '/youraccount/login')
         browser.select_form(nr=0)
         browser['p_un'] = 'hyde'
         browser['p_pw'] = 'h123yde'
         browser.submit()
-        browser.open(weburl + '/record/35')
+        browser.open(CFG_SITE_URL + '/record/35')
         # Mr. Hyde should not be able to connect:
         if browser.response().read().find('You are not authorized') <= -1:
             # if we got here, things are broken:
@@ -798,7 +798,7 @@ class WebSearchRSSFeedServiceTest(unittest.TestCase):
     def test_rss_feed_service(self):
         """websearch - RSS feed service"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/rss',
+                         test_web_page_content(CFG_SITE_URL + '/rss',
                                                expected_text='<rss version="2.0">'))
 
 class WebSearchXSSVulnerabilityTest(unittest.TestCase):
@@ -807,32 +807,32 @@ class WebSearchXSSVulnerabilityTest(unittest.TestCase):
     def test_xss_in_collection_interface_page(self):
         """websearch - no XSS vulnerability in collection interface pages"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/?c=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
+                         test_web_page_content(CFG_SITE_URL + '/?c=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
                                                expected_text='Collection &amp;lt;SCRIPT&amp;gt;alert("XSS");&amp;lt;/SCRIPT&amp;gt; Not Found'))
 
     def test_xss_in_collection_search_page(self):
         """websearch - no XSS vulnerability in collection search pages"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?c=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
+                         test_web_page_content(CFG_SITE_URL + '/search?c=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
                                                expected_text='Collection &lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt; Not Found'))
 
     def test_xss_in_simple_search(self):
         """websearch - no XSS vulnerability in simple search"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
                                                expected_text='Search term <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> did not match any record.'))
 
     def test_xss_in_structured_search(self):
         """websearch - no XSS vulnerability in structured search"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
                                                expected_text='Search term <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> inside index <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> did not match any record.'))
 
 
     def test_xss_in_advanced_search(self):
         """websearch - no XSS vulnerability in advanced search"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?as=1&p1=ellis&f1=author&op1=a&p2=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f2=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
+                         test_web_page_content(CFG_SITE_URL + '/search?as=1&p1=ellis&f1=author&op1=a&p2=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f2=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E',
                                                expected_text='Search term <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> inside index <em>&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;</em> did not match any record.'))
 
 
@@ -840,7 +840,7 @@ class WebSearchXSSVulnerabilityTest(unittest.TestCase):
     def test_xss_in_browse(self):
         """websearch - no XSS vulnerability in browse"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&action_browse=Browse',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&f=%3CSCRIPT%3Ealert%28%22XSS%22%29%3B%3C%2FSCRIPT%3E&action_browse=Browse',
                                                expected_text='&lt;SCRIPT&gt;alert("XSS");&lt;/SCRIPT&gt;'))
 
 class WebSearchResultsOverview(unittest.TestCase):
@@ -849,7 +849,7 @@ class WebSearchResultsOverview(unittest.TestCase):
     def test_results_overview_split_off(self):
         """websearch - results overview box when split by collection is off"""
         browser = Browser()
-        browser.open(weburl + '/search?p=of&sc=0')
+        browser.open(CFG_SITE_URL + '/search?p=of&sc=0')
         body = browser.response().read()
         if body.find("Results overview") > -1:
             self.fail("Oops, when split by collection is off, "
@@ -870,7 +870,7 @@ class WebSearchResultsOverview(unittest.TestCase):
     def test_results_overview_split_on(self):
         """websearch - results overview box when split by collection is on"""
         browser = Browser()
-        browser.open(weburl + '/search?p=of&sc=1')
+        browser.open(CFG_SITE_URL + '/search?p=of&sc=1')
         body = browser.response().read()
         if body.find("Results overview") == -1:
             self.fail("Oops, when split by collection is on, "
@@ -893,25 +893,25 @@ class WebSearchSortResultsTest(unittest.TestCase):
     def test_sort_results_default(self):
         """websearch - search results sorting, default method"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=cern&rg=1',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=cern&rg=1',
                                                expected_text="[hep-th/9809057]"))
 
     def test_sort_results_ascending(self):
         """websearch - search results sorting, ascending field"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=cern&rg=1&sf=reportnumber&so=a',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=cern&rg=1&sf=reportnumber&so=a',
                                                expected_text="ISOLTRAP"))
 
     def test_sort_results_descending(self):
         """websearch - search results sorting, descending field"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=cern&rg=1&sf=reportnumber&so=d',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=cern&rg=1&sf=reportnumber&so=d',
                                                expected_text="SCAN-9605071"))
 
     def test_sort_results_sort_pattern(self):
         """websearch - search results sorting, preferential sort pattern"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=cern&rg=1&sf=reportnumber&so=d&sp=cern',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=cern&rg=1&sf=reportnumber&so=d&sp=cern',
                                                expected_text="CERN-TH-4036"))
 
 class WebSearchSearchResultsXML(unittest.TestCase):
@@ -920,7 +920,7 @@ class WebSearchSearchResultsXML(unittest.TestCase):
     def test_search_results_xm_output_split_on(self):
         """ websearch - check document element of search results in xm output (split by collection on)"""
         browser = Browser()
-        browser.open(weburl + '/search?sc=1&of=xm')
+        browser.open(CFG_SITE_URL + '/search?sc=1&of=xm')
         body = browser.response().read()
 
         num_doc_element = body.count("<collection "
@@ -945,7 +945,7 @@ class WebSearchSearchResultsXML(unittest.TestCase):
     def test_search_results_xm_output_split_off(self):
         """ websearch - check document element of search results in xm output (split by collection off)"""
         browser = Browser()
-        browser.open(weburl + '/search?sc=0&of=xm')
+        browser.open(CFG_SITE_URL + '/search?sc=0&of=xm')
         body = browser.response().read()
 
         num_doc_element = body.count("<collection "
@@ -969,7 +969,7 @@ class WebSearchSearchResultsXML(unittest.TestCase):
     def test_search_results_xd_output_split_on(self):
         """ websearch - check document element of search results in xd output (split by collection on)"""
         browser = Browser()
-        browser.open(weburl + '/search?sc=1&of=xd')
+        browser.open(CFG_SITE_URL + '/search?sc=1&of=xd')
         body = browser.response().read()
 
         num_doc_element = body.count("<collection")
@@ -993,7 +993,7 @@ class WebSearchSearchResultsXML(unittest.TestCase):
     def test_search_results_xd_output_split_off(self):
         """ websearch - check document element of search results in xd output (split by collection off)"""
         browser = Browser()
-        browser.open(weburl + '/search?sc=0&of=xd')
+        browser.open(CFG_SITE_URL + '/search?sc=0&of=xd')
         body = browser.response().read()
 
         num_doc_element = body.count("<collection>")
@@ -1019,31 +1019,31 @@ class WebSearchUnicodeQueryTest(unittest.TestCase):
     def test_unicode_word_query(self):
         """websearch - Unicode word query"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?of=id&p=title%3A%CE%99%CE%B8%CE%AC%CE%BA%CE%B7',
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=title%3A%CE%99%CE%B8%CE%AC%CE%BA%CE%B7',
                                                expected_text="[76]"))
 
     def test_unicode_word_query_not_found_term(self):
         """websearch - Unicode word query, not found term"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?p=title%3A%CE%99%CE%B8',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=title%3A%CE%99%CE%B8',
                                                expected_text="ιθάκη"))
 
     def test_unicode_exact_phrase_query(self):
         """websearch - Unicode exact phrase query"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?of=id&p=title%3A%22%CE%99%CE%B8%CE%AC%CE%BA%CE%B7%22',
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=title%3A%22%CE%99%CE%B8%CE%AC%CE%BA%CE%B7%22',
                                                expected_text="[76]"))
 
     def test_unicode_partial_phrase_query(self):
         """websearch - Unicode partial phrase query"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?of=id&p=title%3A%27%CE%B7%27',
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=title%3A%27%CE%B7%27',
                                                expected_text="[76]"))
 
     def test_unicode_regexp_query(self):
         """websearch - Unicode regexp query"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?of=id&p=title%3A%2F%CE%B7%2F',
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=title%3A%2F%CE%B7%2F',
                                                expected_text="[76]"))
 
 class WebSearchMARCQueryTest(unittest.TestCase):
@@ -1052,19 +1052,19 @@ class WebSearchMARCQueryTest(unittest.TestCase):
     def test_single_marc_tag_exact_phrase_query(self):
         """websearch - single MARC tag, exact phrase query (100__a)"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?of=id&p=100__a%3A%22Ellis%2C+J%22',
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=100__a%3A%22Ellis%2C+J%22',
                                                expected_text="[9, 14, 18]"))
 
     def test_single_marc_tag_partial_phrase_query(self):
         """websearch - single MARC tag, partial phrase query (245__b)"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?of=id&p=245__b%3A%27and%27',
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245__b%3A%27and%27',
                                                expected_text="[28]"))
 
     def test_many_marc_tags_partial_phrase_query(self):
         """websearch - many MARC tags, partial phrase query (245)"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?of=id&p=245%3A%27and%27',
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%27and%27',
                                                expected_text="[1, 8, 9, 14, 15, 20, 22, 24, 28, 33, 47, 48, 49, 51, 53, 64, 69, 71, 79, 82, 83, 85, 91]"))
 
     def test_single_marc_tag_regexp_query(self):
@@ -1073,7 +1073,7 @@ class WebSearchMARCQueryTest(unittest.TestCase):
         # are not treated by the search engine by purpose.  But maybe
         # we should support them?!
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?of=id&p=245%3A%2Fand%2F',
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=245%3A%2Fand%2F',
                                                expected_text="[]"))
 
 class WebSearchExtSysnoQueryTest(unittest.TestCase):
@@ -1082,26 +1082,26 @@ class WebSearchExtSysnoQueryTest(unittest.TestCase):
     def test_existing_sysno_html_output(self):
         """websearch - external sysno query, existing sysno, HTML output"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?sysno=000289446CER',
+                         test_web_page_content(CFG_SITE_URL + '/search?sysno=000289446CER',
                                                expected_text="The wall of the cave"))
 
     def test_existing_sysno_id_output(self):
         """websearch - external sysno query, existing sysno, ID output"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?sysno=000289446CER&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?sysno=000289446CER&of=id',
                                                expected_text="[95]"))
 
 
     def test_nonexisting_sysno_html_output(self):
         """websearch - external sysno query, non-existing sysno, HTML output"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?sysno=000289446CERRRR',
+                         test_web_page_content(CFG_SITE_URL + '/search?sysno=000289446CERRRR',
                                                expected_text="Requested record does not seem to exist."))
 
     def test_nonexisting_sysno_id_output(self):
         """websearch - external sysno query, non-existing sysno, ID output"""
         self.assertEqual([],
-                         test_web_page_content(weburl + '/search?sysno=000289446CERRRR&of=id',
+                         test_web_page_content(CFG_SITE_URL + '/search?sysno=000289446CERRRR&of=id',
                                                expected_text="[]"))
 
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,

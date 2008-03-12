@@ -44,7 +44,7 @@ from invenio.config import \
     CFG_SITE_NAME, \
     CFG_SITE_SUPPORT_EMAIL, \
     CFG_SITE_SECURE_URL, \
-    weburl
+    CFG_SITE_URL
 import invenio.access_control_engine as acce
 import invenio.access_control_admin as acca
 from invenio.mailutils import send_email
@@ -89,37 +89,37 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
     authorized - if 1, don't check if the user is allowed to be webadmin """
 
     navtrail_previous_links = '<a class="navtrail" href="%s/help/admin">Admin Area' \
-        '</a>' % (weburl,)
+        '</a>' % (CFG_SITE_URL,)
 
     if body:
         if adminarea == 1:
             navtrail_previous_links += '&gt; <a class=navtrail ' \
             ' href=%s/admin/webaccess/webaccessadmin.py/delegate_startarea>' \
-            'Delegate Rights</a> ' % (weburl, )
+            'Delegate Rights</a> ' % (CFG_SITE_URL, )
         if adminarea >= 2 and adminarea < 7:
             navtrail_previous_links += '&gt; ' \
             '<a class="navtrail" href=%s/admin/webaccess/webaccessadmin.py>' \
-            'WebAccess Admin</a> ' % (weburl, )
+            'WebAccess Admin</a> ' % (CFG_SITE_URL, )
         if adminarea == 3:
             navtrail_previous_links += '&gt; <a class=navtrail ' \
             'href=%s/admin/webaccess/webaccessadmin.py/rolearea>' \
-            'Role Administration</a> ' % (weburl, )
+            'Role Administration</a> ' % (CFG_SITE_URL, )
         elif adminarea == 4:
             navtrail_previous_links += '&gt; ' \
             '<a class="navtrail" href=%s/admin/webaccess/webaccessadmin.py' \
-            '/actionarea>Action Administration</a> ' % (weburl, )
+            '/actionarea>Action Administration</a> ' % (CFG_SITE_URL, )
         elif adminarea == 5:
             navtrail_previous_links += '&gt; ' \
             '<a class="navtrail" href=%s/admin/webaccess/webaccessadmin.py' \
-            '/userarea>User Administration</a> ' % (weburl, )
+            '/userarea>User Administration</a> ' % (CFG_SITE_URL, )
         elif adminarea == 6:
             navtrail_previous_links += '&gt; ' \
             '<a class="navtrail" href=%s/admin/webaccess/webaccessadmin.py' \
-            '/resetarea>Reset Authorizations</a> ' % (weburl, )
+            '/resetarea>Reset Authorizations</a> ' % (CFG_SITE_URL, )
         elif adminarea == 7:
             navtrail_previous_links += '&gt; ' \
             '<a class="navtrail" href=%s/admin/webaccess/webaccessadmin.py' \
-            '/manageaccounts>Manage Accounts</a> ' % (weburl, )
+            '/manageaccounts>Manage Accounts</a> ' % (CFG_SITE_URL, )
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -143,7 +143,7 @@ def mustloginpage(req, message):
 
     navtrail_previous_links = '<a class="navtrail" href="%s/admin/">' \
         'Admin Area</a> &gt; <a class="navtrail" href="%s/admin/webaccess/">' \
-        'WebAccess Admin</a> ' % (weburl, weburl)
+        'WebAccess Admin</a> ' % (CFG_SITE_URL, CFG_SITE_URL)
 
     return page_not_authorized(req=req, text=message,
         navtrail=navtrail_previous_links)
@@ -537,7 +537,7 @@ def perform_manageaccounts(req, mtype='', content='', confirm=0):
     <td>4.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/manageaccounts?mtype=perform_modifyaccounts#4">Edit accounts</a></small></td>
     </tr>
     </table>
-    """ % (weburl, weburl, weburl, weburl, weburl)
+    """ % (CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL, CFG_SITE_URL)
 
     if mtype == "perform_accesspolicy" and content:
         fin_output += content
@@ -576,7 +576,7 @@ def perform_accesspolicy(req, callback='yes', confirm=0):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="1"></a>1. Access policy.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="1"></a>1. Access policy.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_URL
 
     account_policy = {}
     account_policy[0] = "Users can register new accounts. New accounts automatically activated."
@@ -623,7 +623,7 @@ def perform_accountoverview(req, callback='yes', confirm=0):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="2"></a>2. Account overview.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="2"></a>2. Account overview.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_URL
     output = ""
     res = run_sql("SELECT COUNT(*) FROM user WHERE email=''")
     output += "Guest accounts: %s<br />" % res[0][0]
@@ -649,7 +649,7 @@ def perform_createaccount(req, email='', password='', callback='yes', confirm=0)
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="3"></a>3. Create account.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="3"></a>3. Create account.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_URL
 
     output = ""
 
@@ -768,7 +768,7 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
     <td>3.&nbsp;<small><a href="%s/admin/webaccess/webaccessadmin.py/editaccount?userID=%s&amp;mtype=perform_deleteaccount">Delete account</a></small></td>
     </tr>
     </table>
-    """ % (weburl, userID, weburl, userID, weburl, userID, weburl, userID)
+    """ % (CFG_SITE_URL, userID, CFG_SITE_URL, userID, CFG_SITE_URL, userID, CFG_SITE_URL, userID)
 
     if mtype == "perform_modifylogindata" and content:
         fin_output += content
@@ -809,7 +809,7 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
     #(auth_code, auth_message) = is_adminuser(req)
     #if auth_code != 0: return mustloginpage(req, auth_message)
 
-    #subtitle = """<a name="2"></a>2. Modify baskets.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
+    #subtitle = """<a name="2"></a>2. Modify baskets.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_URL
 
     #res = run_sql("SELECT id, email, FROM user WHERE id=%s", (userID, ))
     #output = ""
@@ -819,7 +819,7 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
                                 #text=text,
                                 #p_email=res[0][1],
                                 #p_pw=res[0][2],
-                                #referer="%s/yourbaskets/display" % weburl,
+                                #referer="%s/yourbaskets/display" % CFG_SITE_URL,
                                 #button="Login")
         #output += "Remember that you will be logged out as the current user."
 
@@ -850,7 +850,7 @@ def perform_modifylogindata(req, userID, nickname='', email='', password='', cal
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="1"></a>1. Edit login-data.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="1"></a>1. Edit login-data.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_URL
 
     res = run_sql("SELECT id, email, nickname FROM user WHERE id=%s", (userID, ))
     output = ""
@@ -902,7 +902,7 @@ def perform_modifylogindata(req, userID, nickname='', email='', password='', cal
     #(auth_code, auth_message) = is_adminuser(req)
     #if auth_code != 0: return mustloginpage(req, auth_message)
 
-    #subtitle = """<a name="3"></a>3. Modify alerts.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
+    #subtitle = """<a name="3"></a>3. Modify alerts.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_URL
 
     #res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
     #output = ""
@@ -912,7 +912,7 @@ def perform_modifylogindata(req, userID, nickname='', email='', password='', cal
                                 #text=text,
                                 #p_email=res[0][1],
                                 #p_pw=res[0][2],
-                                #referer="%s/youralerts/display" % weburl,
+                                #referer="%s/youralerts/display" % CFG_SITE_URL,
                                 #button="Login")
         #output += "Remember that you will be logged out as the current user."
 
@@ -942,7 +942,7 @@ def perform_modifypreferences(req, userID, login_method='', callback='yes', conf
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="2"></a>2. Modify preferences.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="2"></a>2. Modify preferences.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_URL
 
     res = run_sql("SELECT id, email FROM user WHERE id=%s", (userID, ))
     output = ""
@@ -988,7 +988,7 @@ def perform_deleteaccount(req, userID, callback='yes', confirm=0):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="3"></a>3. Delete account.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="3"></a>3. Delete account.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_URL
 
     res = run_sql("SELECT id, email FROM user WHERE id=%s", (userID, ))
     output = ""
@@ -1053,7 +1053,7 @@ def perform_modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=MAXP
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    subtitle = """<a name="4"></a>4. Edit accounts.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % weburl
+    subtitle = """<a name="4"></a>4. Edit accounts.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_URL
 
     output = ""
 

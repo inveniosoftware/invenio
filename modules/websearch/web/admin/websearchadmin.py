@@ -28,14 +28,14 @@ import sys
 import invenio.websearchadminlib as wsc
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box, adderrorbox
-from invenio.config import weburl, CFG_SITE_SECURE_URL, CFG_SITE_LANG, CFG_SITE_NAME
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_LANG, CFG_SITE_NAME
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.messages import gettext_set_language
 from invenio.urlutils import wash_url_argument
 
 def switchfmtscore(req, colID, type, id_1, id_2, ln=CFG_SITE_LANG):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -59,7 +59,7 @@ def switchfmtscore(req, colID, type, id_1, id_2, ln=CFG_SITE_LANG):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def switchfldscore(req, colID, id_1, id_2, fmeth, ln=CFG_SITE_LANG):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -83,7 +83,7 @@ def switchfldscore(req, colID, id_1, id_2, fmeth, ln=CFG_SITE_LANG):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def switchfldvaluescore(req, colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=CFG_SITE_LANG):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -107,7 +107,7 @@ def switchfldvaluescore(req, colID, id_1, id_fldvalue_1, id_fldvalue_2, ln=CFG_S
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def runwebcoll(req, colID, ln=CFG_SITE_LANG, confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -129,7 +129,7 @@ def runwebcoll(req, colID, ln=CFG_SITE_LANG, confirm=0):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def switchpbxscore(req, colID, id_1, id_2, sel_ln,ln=CFG_SITE_LANG):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -153,7 +153,7 @@ def switchpbxscore(req, colID, id_1, id_2, sel_ln,ln=CFG_SITE_LANG):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifydbquery(req, colID, ln=CFG_SITE_LANG, dbquery='', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -176,7 +176,7 @@ def modifydbquery(req, colID, ln=CFG_SITE_LANG, dbquery='', confirm=-1):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showtree(req, colID, ln=CFG_SITE_LANG):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -197,7 +197,7 @@ def showtree(req, colID, ln=CFG_SITE_LANG):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifytranslations(req, colID, ln=CFG_SITE_LANG, sel_type='', trans = [], confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -221,7 +221,7 @@ def modifytranslations(req, colID, ln=CFG_SITE_LANG, sel_type='', trans = [], co
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addcollectiontotree(req, colID, ln=CFG_SITE_LANG, add_dad='', add_son='', rtype='', mtype='', callback='yes', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -247,7 +247,7 @@ def addcollectiontotree(req, colID, ln=CFG_SITE_LANG, add_dad='', add_son='', rt
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addcollection(req, colID, ln=CFG_SITE_LANG, colNAME='', dbquery='', callback="yes", confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -272,7 +272,7 @@ def addcollection(req, colID, ln=CFG_SITE_LANG, colNAME='', dbquery='', callback
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyrankmethods(req, colID, ln=CFG_SITE_LANG, func='', rnkID='', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -296,7 +296,7 @@ def modifyrankmethods(req, colID, ln=CFG_SITE_LANG, func='', rnkID='', confirm=0
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def deletecollection(req, colID, ln=CFG_SITE_LANG, confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -318,7 +318,7 @@ def deletecollection(req, colID, ln=CFG_SITE_LANG, confirm=-1):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def editcollection(req, colID=1, ln=CFG_SITE_LANG, mtype=''):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -340,7 +340,7 @@ def editcollection(req, colID=1, ln=CFG_SITE_LANG, mtype=''):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addoutputformat(req, colID, ln=CFG_SITE_LANG, code='', name='', callback='yes', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -366,7 +366,7 @@ def addoutputformat(req, colID, ln=CFG_SITE_LANG, code='', name='', callback='ye
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showoutputformats(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -389,7 +389,7 @@ def showoutputformats(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addexistingoutputformat(req, colID, ln=CFG_SITE_LANG, fmtID=-1, callback='yes', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -413,7 +413,7 @@ def addexistingoutputformat(req, colID, ln=CFG_SITE_LANG, fmtID=-1, callback='ye
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def deleteoutputformat(req, colID, ln=CFG_SITE_LANG, fmtID=-1, callback='yes', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -437,7 +437,7 @@ def deleteoutputformat(req, colID, ln=CFG_SITE_LANG, fmtID=-1, callback='yes', c
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def removeoutputformat(req, colID, ln=CFG_SITE_LANG, fmtID='', callback='yes', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -461,7 +461,7 @@ def removeoutputformat(req, colID, ln=CFG_SITE_LANG, fmtID='', callback='yes', c
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def update_external_collections(req, colID, ln=CFG_SITE_LANG, state=None, recurse=None):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -484,7 +484,7 @@ def update_detailed_record_options(req, colID, ln=CFG_SITE_LANG, tabs=[], recurs
     """Update the preferences for the tab to show/hide in the detailed record page. """
 
     _tabs = wash_url_argument(tabs, 'list')
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -504,7 +504,7 @@ def update_detailed_record_options(req, colID, ln=CFG_SITE_LANG, tabs=[], recurs
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def removefieldvalue(req, colID, ln=CFG_SITE_LANG, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -531,7 +531,7 @@ def removefieldvalue(req, colID, ln=CFG_SITE_LANG, fldID='', fldvID='', fmeth=''
 
 
 def removefield(req, colID, ln=CFG_SITE_LANG, fldID='', fldvID='', fmeth='', callback='yes', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -557,7 +557,7 @@ def removefield(req, colID, ln=CFG_SITE_LANG, fldID='', fldvID='', fmeth='', cal
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyfield(req, colID, fldID, fldvID='', ln=CFG_SITE_LANG, callback='yes', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -582,7 +582,7 @@ def modifyfield(req, colID, fldID, fldvID='', ln=CFG_SITE_LANG, callback='yes', 
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyoutputformat(req, colID, ln=CFG_SITE_LANG, fmtID=-1, sel_type='', trans=[], confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -607,7 +607,7 @@ def modifyoutputformat(req, colID, ln=CFG_SITE_LANG, fmtID=-1, sel_type='', tran
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showsearchoptions(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -630,7 +630,7 @@ def showsearchoptions(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addexistingfield(req, colID, ln=CFG_SITE_LANG, fldID=-1, fldvID=-1, fmeth='', callback='yes', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -657,12 +657,12 @@ def addexistingfield(req, colID, ln=CFG_SITE_LANG, fldID=-1, fldvID=-1, fmeth=''
                 uid=uid,
                 body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, weburl)]),
+                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, CFG_SITE_URL)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
 def rearrangefield(req, colID, ln=CFG_SITE_LANG, fmeth='', callback='yes', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -687,12 +687,12 @@ def rearrangefield(req, colID, ln=CFG_SITE_LANG, fmeth='', callback='yes', confi
                 uid=uid,
                 body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, weburl)]),
+                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, CFG_SITE_URL)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
 def addexistingfieldvalue(req, colID, fldID, ln=CFG_SITE_LANG, callback='yes', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -717,12 +717,12 @@ def addexistingfieldvalue(req, colID, fldID, ln=CFG_SITE_LANG, callback='yes', c
                 uid=uid,
                 body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, weburl)]),
+                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, CFG_SITE_URL)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
 def rearrangefieldvalue(req, colID, fldID, ln=CFG_SITE_LANG, callback='yes', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -747,12 +747,12 @@ def rearrangefieldvalue(req, colID, fldID, ln=CFG_SITE_LANG, callback='yes', con
                 uid=uid,
                 body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, weburl)]),
+                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, CFG_SITE_URL)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
 def addnewfieldvalue(req, colID, fldID, ln=CFG_SITE_LANG, name='', value='', callback="yes", confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -778,7 +778,7 @@ def addnewfieldvalue(req, colID, fldID, ln=CFG_SITE_LANG, name='', value='', cal
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyfieldvalue(req, colID, fldID, fldvID, ln=CFG_SITE_LANG, name='', value='', callback="yes", confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -805,7 +805,7 @@ def modifyfieldvalue(req, colID, fldID, fldvID, ln=CFG_SITE_LANG, name='', value
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showsearchfields(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -828,7 +828,7 @@ def showsearchfields(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showsortoptions(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -851,7 +851,7 @@ def showsortoptions(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifyportalbox(req, colID, ln=CFG_SITE_LANG, pbxID=-1, score='', position='', sel_ln='', title='', body='', callback='yes', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -880,7 +880,7 @@ def modifyportalbox(req, colID, ln=CFG_SITE_LANG, pbxID=-1, score='', position='
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def removeportalbox(req, colID, ln=CFG_SITE_LANG, pbxID='', sel_ln='', callback='yes', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -905,7 +905,7 @@ def removeportalbox(req, colID, ln=CFG_SITE_LANG, pbxID='', sel_ln='', callback=
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addexistingportalbox(req, colID, ln=CFG_SITE_LANG, pbxID=-1, score=0, position='', sel_ln='', callback='yes', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -933,12 +933,12 @@ def addexistingportalbox(req, colID, ln=CFG_SITE_LANG, pbxID=-1, score=0, positi
                 uid=uid,
                 body=adderrorbox('try to login first',
                                      datalist=["""You are not a user authorized to perform admin tasks, try to
-                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, weburl)]),
+                                     <a href="%s/youraccount/login?referer=%s/admin/websearch/websearchadmin.py/">login</a> with another account.""" % (CFG_SITE_SECURE_URL, CFG_SITE_URL)]),
                 navtrail= navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
 def deleteportalbox(req, colID, ln=CFG_SITE_LANG, pbxID=-1, callback='yes', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -963,7 +963,7 @@ def deleteportalbox(req, colID, ln=CFG_SITE_LANG, pbxID=-1, callback='yes', conf
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def showportalboxes(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -987,7 +987,7 @@ def showportalboxes(req, colID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def addportalbox(req, colID, ln=CFG_SITE_LANG, title='', body='', callback='yes', confirm=-1):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)
@@ -1012,7 +1012,7 @@ def addportalbox(req, colID, ln=CFG_SITE_LANG, title='', body='', callback='yes'
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 def modifycollectiontree(req, colID, ln=CFG_SITE_LANG, move_up='', move_down='', move_from='', move_to='', delete='', rtype='', callback='yes', confirm=0):
-    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (weburl)
+    navtrail_previous_links = wsc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/websearch/websearchadmin.py/">WebSearch Admin</a> """ % (CFG_SITE_URL)
 
     try:
         uid = getUid(req)

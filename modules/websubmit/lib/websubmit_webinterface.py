@@ -41,7 +41,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_VERSION, \
-     weburl
+     CFG_SITE_URL
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
@@ -96,7 +96,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
                 target = '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : ln, 'referer' : \
-                    weburl + user_info['uri']}, {})
+                    CFG_SITE_URL + user_info['uri']}, {})
                 return redirect_to_url(req, target)
             elif auth_code:
                 return page_not_authorized(req, "../", \
@@ -226,7 +226,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             if ln != CFG_SITE_LANG:
                 link_ln = '?ln=%s' % ln
             tabs = [(unordered_tabs[tab_id]['label'], \
-                     '%s/record/%s/%s%s' % (weburl, self.recid, tab_id, link_ln), \
+                     '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
                      tab_id == 'files',
                      unordered_tabs[tab_id]['enabled']) \
                     for (tab_id, order) in ordered_tabs_id
@@ -240,7 +240,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         navtrail=create_navtrail_links(cc=cc, as=0, ln=ln) + \
                                         ''' &gt; <a class="navtrail" href="%s/record/%s">%s</a>
                                         &gt; %s''' % \
-                        (weburl, self.recid, title, _("Access to Fulltext")),
+                        (CFG_SITE_URL, self.recid, title, _("Access to Fulltext")),
 
                         description="",
                         keywords="keywords",
@@ -265,7 +265,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
         if ln != CFG_SITE_LANG:
             link_ln = '?ln=%s' % ln
 
-        return redirect_to_url(req, '%s/record/%s/files/%s' % (weburl, self.recid, link_ln))
+        return redirect_to_url(req, '%s/record/%s/files/%s' % (CFG_SITE_URL, self.recid, link_ln))
 
 def websubmit_legacy_getfile(req, form):
     """ Handle legacy /getfile.py URLs """
@@ -317,7 +317,7 @@ def websubmit_legacy_getfile(req, form):
             # redirect to this specific file, possibly dropping
             # the version if we are referring to the latest one.
             target = '%s/record/%d/files/%s%s' % (
-                weburl, doc.recid, quote(docfile.name), docfile.format)
+                CFG_SITE_URL, doc.recid, quote(docfile.name), docfile.format)
 
             if version and int(version) == int(doc.getLatestVersion()):
                 version = ''
@@ -329,7 +329,7 @@ def websubmit_legacy_getfile(req, form):
 
         # all files attached to a record
         elif recid!="":
-            return redirect_to_url(req, '%s/record/%s/files/' % (weburl, recid))
+            return redirect_to_url(req, '%s/record/%s/files/' % (CFG_SITE_URL, recid))
 
         # a precise filename
         elif docid!="":

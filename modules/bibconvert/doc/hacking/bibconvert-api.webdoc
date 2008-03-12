@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibConvert API -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibconvert-internals">BibConvert Internals</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibconvert-internals">BibConvert Internals</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <protect>
@@ -36,7 +36,7 @@ BibConvert High-level API (subject to change)
       conversion configuration language. There are two main functions accessible
       via the BibConvert API: (i) The BibConvert formatter and (ii) The BibConvert
       value generator. For detailed description of formatting functions and
-      generated values please have a look at the <a href=<WEBURL>/help/admin/bibconvert-admin-guide>BibConvert Admin Guide</a>.
+      generated values please have a look at the <a href=<CFG_SITE_URL>/help/admin/bibconvert-admin-guide>BibConvert Admin Guide</a>.
 
    Signature:
 

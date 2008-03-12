@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -35,7 +35,7 @@ class BibHarvestAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_bibharvest_admin_interface_pages_availability(self):
         """bibharvestadmin - availability of BibHarvest Admin interface pages"""
 
-        baseurl = weburl + '/admin/bibharvest/bibharvestadmin.py/'
+        baseurl = CFG_SITE_URL + '/admin/bibharvest/bibharvestadmin.py/'
 
         _exports = ['', 'editsource', 'addsource', 'delsource']
 
@@ -56,7 +56,7 @@ class BibHarvestAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_bibharvest_admin_guide_availability(self):
         """bibharvestadmin - availability of BibHarvest Admin guide pages"""
 
-        url = weburl + '/help/admin/bibharvest-admin-guide'
+        url = CFG_SITE_URL + '/help/admin/bibharvest-admin-guide'
         error_messages = test_web_page_content(url,
                                                expected_text="BibHarvest Admin Guide")
         if error_messages:

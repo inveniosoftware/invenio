@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 
 from invenio.bibdocfile import BibRecDocs, file_strip_ext
 from invenio.messages import gettext_set_language
-from invenio.config import weburl, CFG_CERN_SITE
+from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
 from cgi import escape
 from urlparse import urlparse
 from os.path import basename
@@ -53,7 +53,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
         style = 'class="'+style+'"'
 
     if show_icons.lower() == 'yes':
-        file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (weburl, _("Download fulltext"))
+        file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (CFG_SITE_URL, _("Download fulltext"))
     else:
         file_icon = ''
 
@@ -62,11 +62,11 @@ def format(bfo, style, separator='; ', show_icons='no'):
 
     additional_str = ''
     if additionals:
-        additional_str = ' <small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
+        additional_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
 
     versions_str = ''
     if old_versions:
-        versions_str = ' <small>(<a '+style+' href="'+weburl+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
+        versions_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
 
     if main_urls:
         last_name = ""
@@ -124,9 +124,9 @@ def get_files(bfo):
      - additionals: set to True if we have other documents than the 'main' document
 
     Returned dictionary is of the form:
-    {'main_urls' : {'Main'      : [('http://weburl/record/1/files/aFile.pdf', 'aFile', 'PDF'),
-                                   ('http://weburl/record/1/files/aFile.gif', 'aFile', 'GIF')],
-                    'Additional': [('http://weburl/record/1/files/bFile.pdf', 'bFile', 'PDF')]},
+    {'main_urls' : {'Main'      : [('http://CFG_SITE_URL/record/1/files/aFile.pdf', 'aFile', 'PDF'),
+                                   ('http://CFG_SITE_URL/record/1/files/aFile.gif', 'aFile', 'GIF')],
+                    'Additional': [('http://CFG_SITE_URL/record/1/files/bFile.pdf', 'bFile', 'PDF')]},
 
      'other_urls': [('http://externalurl.com/aFile.pdf', 'Fulltext'),      # url(8564_u), description(8564_z/y)
                     ('http://externalurl.com/bFile.pdf', 'Fulltext')],
@@ -171,7 +171,7 @@ def get_files(bfo):
                 descr = complete_url['z']
             elif complete_url.has_key('y'):
                 descr = complete_url['y']
-            if not url.startswith(weburl): # Not a bibdoc?
+            if not url.startswith(CFG_SITE_URL): # Not a bibdoc?
                 if not descr: # For not bibdoc let's have a description
                     if '/setlink?' in url: # Setlink (i.e. hosted on doc.cern.ch)
                         descr = _("Fulltext") # Surely a fulltext

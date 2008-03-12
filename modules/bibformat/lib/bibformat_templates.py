@@ -28,7 +28,7 @@ import cgi
 
 # Invenio imports
 from invenio.messages import gettext_set_language
-from invenio.config import weburl, CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.messages import language_list_long
 from invenio.config import CFG_PATH_PHP
 
@@ -66,33 +66,33 @@ class Template:
 
         if not is_admin:
             out += '''You need to
-            <a href="%(weburl)s/youraccount/login?referer=%(weburl)s/admin/bibformat/bibformatadmin.py">login</a> to enter.
-         ''' % {'weburl':weburl}
+            <a href="%(siteurl)s/youraccount/login?referer=%(siteurl)s/admin/bibformat/bibformatadmin.py">login</a> to enter.
+         ''' % {'siteurl':CFG_SITE_URL}
 
         out += '''
         </p>
         <dl>
-        <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%(ln)s">Manage Format Templates</a></dt>
+        <dt><a href="%(siteurl)s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%(ln)s">Manage Format Templates</a></dt>
         <dd>Define how to format a record.</dd>
         </dl>
         <dl>
-        <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%(ln)s">Manage Output Formats</a></dt>
+        <dt><a href="%(siteurl)s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%(ln)s">Manage Output Formats</a></dt>
         <dd>Define which template is applied to which record for a given output.</dd>
         </dl>
         <dl>
-        <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%(ln)s">Manage Knowledge Bases</a></dt>
+        <dt><a href="%(siteurl)s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%(ln)s">Manage Knowledge Bases</a></dt>
         <dd>Define mappings of values, for standardizing records or declaring often used values.</dd>
         </dl>
         <br/>
         <dl>
-        <dt><a href="%(weburl)s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%(ln)s">Format Elements Documentation</a></dt>
+        <dt><a href="%(siteurl)s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%(ln)s">Format Elements Documentation</a></dt>
         <dd>Documentation of the format elements to be used inside format templates.</dd>
         </dl>
         <dl>
-        <dt><a href="%(weburl)s/help/admin/bibformat-admin-guide">BibFormat Admin Guide</a></dt>
+        <dt><a href="%(siteurl)s/help/admin/bibformat-admin-guide">BibFormat Admin Guide</a></dt>
         <dd>Documentation about BibFormat administration</dd>
         </dl>
-        '''% {'weburl':weburl, 'ln':ln}
+        '''% {'siteurl':CFG_SITE_URL, 'ln':ln}
 
         if CFG_PATH_PHP:
             #Show PHP admin only if PHP is enabled
@@ -274,11 +274,11 @@ class Template:
             </blockquote>
 
             and that's it. The new formats should now appear in <a
-            href="%(weburl)s">WebSearch</a>.
+            href="%(siteurl)s">WebSearch</a>.
             </em>
             </div>
 
-            ''' % {'weburl':weburl, 'ln':ln}
+            ''' % {'siteurl':CFG_SITE_URL, 'ln':ln}
 
         return out
 
@@ -338,13 +338,13 @@ class Template:
 	    #Offer the possibility to make a duplicate of existing format template code
 	    out += '''
 	     <table><tr>
-	     <th class="adminheaderleft">Make a copy of format template:&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#addFormatTemplate">?</a>]</th>
+	     <th class="adminheaderleft">Make a copy of format template:&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#addFormatTemplate">?</a>]</th>
 	     </tr>
 	    <tr>
 	    <td><select tabindex="1" name="duplicate" id="duplicate" %(readonly)s>
 	    <option value="">None (Blank Page)</option>
 	    <option value="" disabled="disabled">-------------</option>
-	    ''' %  {'weburl': weburl,
+	    ''' %  {'siteurl': CFG_SITE_URL,
 		    'readonly':readonly}
 	    for (o_filename, o_name) in all_templates:
 		out += '''<option value="%(template_filename)s">%(template_name)s</option>''' % {'template_name':o_name,
@@ -354,7 +354,7 @@ class Template:
 
 	out += '''
         <table><tr>
-        <th colspan="2" class="adminheaderleft">%(name)s attributes&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#attrsFormatTemplate">?</a>]</th>
+        <th colspan="2" class="adminheaderleft">%(name)s attributes&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#attrsFormatTemplate">?</a>]</th>
         </tr>
         <tr>
         <td class="admintdright">
@@ -371,7 +371,7 @@ class Template:
 	       'disabled':disabled,
 	       'readonly':readonly,
 	       'name_label': _("Name"),
-	       'weburl':weburl
+	       'siteurl':CFG_SITE_URL
 	       }
 
 	out += '''
@@ -391,7 +391,7 @@ class Template:
                'readonly':readonly,
                'description_label': _("Description"),
                'update_format_attributes': _("Update Format Attributes"),
-               'weburl':weburl
+               'siteurl':CFG_SITE_URL
                }
 
         return out
@@ -504,7 +504,7 @@ class Template:
                 }
             -->
         </style>
-        <script src="%(weburl)s/admin/bibformat/js_quicktags.js" type="text/javascript"></script>
+        <script src="%(siteurl)s/admin/bibformat/js_quicktags.js" type="text/javascript"></script>
         <script type="text/javascript">
 
         function getByID( id ) {
@@ -574,7 +574,7 @@ class Template:
                'template_editor': _("Template Editor"),
                'check_dependencies': _("Check Dependencies"),
                'nb_menu_options': nb_menu_options,
-               'weburl': CFG_SITE_SECURE_URL or weburl
+               'siteurl': CFG_SITE_SECURE_URL or CFG_SITE_URL
                }
 
         if not filename.endswith('.xsl'):
@@ -588,7 +588,7 @@ class Template:
                'modify_template_attributes': _("Modify Template Attributes"),
                'template_editor': _("Template Editor"),
                'check_dependencies': _("Check Dependencies"),
-               'weburl': CFG_SITE_SECURE_URL or weburl
+               'siteurl': CFG_SITE_SECURE_URL or CFG_SITE_URL
                }
 
         out +='''
@@ -619,12 +619,12 @@ class Template:
                'modify_template_attributes': _("Modify Template Attributes"),
                'template_editor': _("Template Editor"),
                'check_dependencies': _("Check Dependencies"),
-               'weburl': CFG_SITE_SECURE_URL or weburl
+               'siteurl': CFG_SITE_SECURE_URL or CFG_SITE_URL
                }
 
         disabled = ""
         readonly = ""
-        toolbar = """<script type="text/javascript">edToolbar('%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s');</script>""" % (weburl, ln)
+        toolbar = """<script type="text/javascript">edToolbar('%s/admin/bibformat/bibformatadmin.py/format_elements_doc?ln=%s');</script>""" % (CFG_SITE_URL, ln)
         if not editable:
             disabled = 'disabled="disabled"'
             readonly = 'readonly="readonly"'
@@ -663,7 +663,7 @@ class Template:
         <nobr>
         <label for="content_type_for_preview">Content-type (MIME):</label> <select id="content_type_for_preview" name="content_type_for_preview" style="font-size: x-small;">
         ''' %  {'ln':ln,
-                'weburl':weburl,
+                'siteurl':CFG_SITE_URL,
                 'filename':filename,
                 'label_hide_doc':_("Hide Documentation"),
                 'code':code,
@@ -699,14 +699,14 @@ class Template:
         </td>
         </tr>
         <tr><td>
-        <iframe src ="%(weburl)s/admin/bibformat/bibformatadmin.py/format_template_show_preview_or_save?ln=%(ln)s&amp;ln_for_preview=%(ln_for_preview)s&amp;pattern_for_preview=%(pattern_for_preview)s&amp;bft=%(filename)s" name="previewiframe" id="previewiframe" width="100%%" height="400"></iframe>
+        <iframe src ="%(siteurl)s/admin/bibformat/bibformatadmin.py/format_template_show_preview_or_save?ln=%(ln)s&amp;ln_for_preview=%(ln_for_preview)s&amp;pattern_for_preview=%(pattern_for_preview)s&amp;bft=%(filename)s" name="previewiframe" id="previewiframe" width="100%%" height="400"></iframe>
 
         </td></tr>
         </table>
         </form>
         </td>
         ''' % {'code':code, 'ln':ln,
-               'weburl':weburl, 'filename':filename,
+               'siteurl':CFG_SITE_URL, 'filename':filename,
                'ln_for_preview':ln_for_preview,
                'pattern_for_preview':pattern_for_preview
                }
@@ -729,12 +729,12 @@ class Template:
         </tr>
         </table>
 
-        <iframe name="shortDocFrame" id="shortDocFrame" src ="%(weburl)s/admin/bibformat/bibformatadmin.py/format_template_show_short_doc?ln=%(ln)s" height="90%%" width="98%%"></iframe>
+        <iframe name="shortDocFrame" id="shortDocFrame" src ="%(siteurl)s/admin/bibformat/bibformatadmin.py/format_template_show_short_doc?ln=%(ln)s" height="90%%" width="98%%"></iframe>
 
         </td>
         </tr>
         </table>
-        ''' % {'weburl':weburl, 'ln':ln}
+        ''' % {'siteurl':CFG_SITE_URL, 'ln':ln}
 
         return out
 
@@ -754,8 +754,8 @@ class Template:
         <html>
         <head>
         <title>BibFormat Short Documentation of Format Elements</title>
-        <link rel="stylesheet" href="%(weburl)s/img/cds.css">
-        <script src="%(weburl)s/admin/bibformat/js_quicktags.js" type="text/javascript"></script>
+        <link rel="stylesheet" href="%(siteurl)s/img/cds.css">
+        <script src="%(siteurl)s/admin/bibformat/js_quicktags.js" type="text/javascript"></script>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         </head>
         <body>
@@ -816,7 +816,7 @@ class Template:
         }
         }
         </script>
-        ''' % {'weburl': CFG_SITE_SECURE_URL or weburl}
+        ''' % {'siteurl': CFG_SITE_SECURE_URL or CFG_SITE_URL}
 
         if len(format_elements) == 0:
             out += '''
@@ -919,7 +919,7 @@ class Template:
         <th class="adminheaderleft" >%(description)s</th>
         <th class="adminheaderleft" >%(status)s</th>
         <th class="adminheaderleft" >%(last_modification_date)s</th>
-        <th class="adminheadercenter" >%(action)s&nbsp;&nbsp;&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#formatTemplates">?</a>]</th>
+        <th class="adminheadercenter" >%(action)s&nbsp;&nbsp;&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#formatTemplates">?</a>]</th>
         </tr>
         ''' % {'name':_("Name"),
                'description':_("Description"),
@@ -932,7 +932,7 @@ class Template:
                'manage_format_templates':_("Manage Format Templates"),
                'format_elements_documentation':_("Format Elements Documentation"),
                'manage_knowledge_bases':_("Manage Knowledge Bases"),
-               'weburl':weburl}
+               'siteurl':CFG_SITE_URL}
 
         #table content: formats names, description and buttons
         if len(formats) == 0:
@@ -1045,7 +1045,7 @@ class Template:
         <th class="adminheaderleft" >%(description)s</th>
         <th class="adminheaderleft" >%(status)s</th>
         <th class="adminheaderleft" >%(last_modification_date)s</th>
-        <th class="adminheadercenter" >%(action)s&nbsp;&nbsp;&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#outputFormats">?</a>]</th>
+        <th class="adminheadercenter" >%(action)s&nbsp;&nbsp;&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#outputFormats">?</a>]</th>
         </tr>
         ''' %  {'code':_("Code"),
                 'name':_("Name"),
@@ -1059,7 +1059,7 @@ class Template:
                 'format_elements_documentation':_("Format Elements Documentation"),
                 'manage_knowledge_bases':_("Manage Knowledge Bases"),
                 'menu': _("Menu"),
-                'weburl':weburl}
+                'siteurl':CFG_SITE_URL}
 
         #table content: formats names, description and buttons
         if len(output_formats) == 0:
@@ -1203,14 +1203,14 @@ class Template:
             <td rowspan="2" class="adminheader" style="vertical-align: middle;">'''
             if line > 1:
                 out += '''
-                <input type="image" src="%(weburl)s/img/smallup.gif" alt="Increase priority of rule %(row)s" name="+ %(row)s" value="+ %(row)s" %(disabled)s/></div>
-                ''' % {'weburl':weburl, 'row':line, 'disabled':disabled}
+                <input type="image" src="%(siteurl)s/img/smallup.gif" alt="Increase priority of rule %(row)s" name="+ %(row)s" value="+ %(row)s" %(disabled)s/></div>
+                ''' % {'siteurl':CFG_SITE_URL, 'row':line, 'disabled':disabled}
 
             out += '''<div>%(row)s</div>''' % { 'row':line}
             if line < len(rules):
                 out += '''
-                <input type="image" src="%(weburl)s/img/smalldown.gif" alt="Decrease priority of rule %(row)s" name="- %(row)s" value="- %(row)s" %(disabled)s/>
-                ''' % {'weburl':weburl,
+                <input type="image" src="%(siteurl)s/img/smalldown.gif" alt="Decrease priority of rule %(row)s" name="- %(row)s" value="- %(row)s" %(disabled)s/>
+                ''' % {'siteurl':CFG_SITE_URL,
                        'row':line,
                        'disabled':disabled}
 
@@ -1256,10 +1256,10 @@ class Template:
             &nbsp;<input type="text" name="r_fld" value="%(field)s" size="10" %(readonly)s/>&nbsp;is equal to&nbsp;<input type="text" value="%(value)s" name="r_val" %(readonly)s/>
             </td>
             <td class="adminheaderright" style="vertical-align: middle;">
-            &nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#rulesOutputFormat">?</a>]
+            &nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#rulesOutputFormat">?</a>]
             </td>
             </tr>
-            ''' % {'weburl':weburl,
+            ''' % {'siteurl':CFG_SITE_URL,
                    'field': rule['field'],
                    'value':rule['value'],
                    'readonly':readonly}
@@ -1388,7 +1388,7 @@ class Template:
         <table class="admin_wvar" cellspacing="0">
         <tr>
         <th colspan="2" class="adminheaderleft">
-        Output Format Attributes&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#attrsOutputFormat">?</a>]</th>
+        Output Format Attributes&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#attrsOutputFormat">?</a>]</th>
         </tr>
         <tr>
         <td class="admintdright"><label for="outputFormatCode">Code</label>:&nbsp;</td>
@@ -1409,7 +1409,7 @@ class Template:
                'code':code,
                'content_type':content_type,
                'readonly':readonly,
-               'weburl':weburl,
+               'siteurl':CFG_SITE_URL,
                'visibility': visible==1 and 'checked="checked"' or '',
                'disabled':disabled}
 
@@ -1765,9 +1765,9 @@ class Template:
         _ = gettext_set_language(ln)    # load the right message language
 
         out = '''
-        <p>To add a new basic element (only fetch the value of a field, without special post-processing), go to the <a href="%(weburl)sadmin/bibindex/bibindexadmin.py/field">BibEdit "Manage Logical Fields"</a> page and add a name for a field. Make sure that the name is unique and corresponds well to the field. For example, to add an element that fetch the value of field 245__%, add a new logical field with name "title" and field "245__%". Then in your template, call BFE_TITLE to print the title.</p>
+        <p>To add a new basic element (only fetch the value of a field, without special post-processing), go to the <a href="%(siteurl)sadmin/bibindex/bibindexadmin.py/field">BibEdit "Manage Logical Fields"</a> page and add a name for a field. Make sure that the name is unique and corresponds well to the field. For example, to add an element that fetch the value of field 245__%, add a new logical field with name "title" and field "245__%". Then in your template, call BFE_TITLE to print the title.</p>
         <p>To add a new complex element (for eg. special formatting of the field, condition on the value, etc.) you must go to the lib/python/invenio/bibformat_elements directory of your Invenio installation, and add a new format element file. Read documentation for more information.</p>
-        ''' % {'weburl':weburl}
+        ''' % {'siteurl':CFG_SITE_URL}
 
         return out
 
@@ -1798,14 +1798,14 @@ class Template:
         <th class="adminheaderleft" >&nbsp;</th>
         <th class="adminheaderleft" >Name</th>
         <th class="adminheaderleft" >Description</th>
-        <th class="adminheadercenter" >Action&nbsp;&nbsp;&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#KBs">?</a>]</th>
+        <th class="adminheadercenter" >Action&nbsp;&nbsp;&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#KBs">?</a>]</th>
         </tr>''' % {'ln':ln,
                     'menu':_("Menu"),
                     'manage_output_formats':_("Manage Output Formats"),
                     'manage_format_templates':_("Manage Format Templates"),
                     'format_elements_documentation':_("Format Elements Documentation"),
                     'manage_knowledge_bases':_("Manage Knowledge Bases"),
-                    'weburl':weburl}
+                    'siteurl':CFG_SITE_URL}
 
         #table content: kb names, description and actions
         if len(kbs) == 0:
@@ -1820,7 +1820,7 @@ class Template:
                     kb_attributes['style'] = 'background-color: rgb(235, 247, 255);'
                 line += 1
                 kb_attributes['ln'] = ln
-                kb_attributes['weburl'] = weburl
+                kb_attributes['siteurl'] = CFG_SITE_URL
                 row_content = '''<tr>
                 <td class="admintdright" style="vertical-align: middle; %(style)s">&nbsp;</td>
                 <td class="admintdleft" style="vertical-align: middle; %(style)s white-space: nowrap;"><a href="kb_show?ln=%(ln)s&amp;amp;kb=%(id)s">%(name)s</a></td>
@@ -1903,7 +1903,7 @@ class Template:
         out += '''
         <table class="admin_wvar" width="100%%" cellspacing="0">
         <tr>
-        <th colspan="2" class="adminheaderleft">Add New Mapping &nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#addMappingKB">?</a>]</th>
+        <th colspan="2" class="adminheaderleft">Add New Mapping &nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#addMappingKB">?</a>]</th>
         </tr>
         <tr>
         <td class="admintdright"><label for="mapFrom"><span style="white-space: nowrap;">Map From</span></label>:&nbsp;</td>
@@ -1919,7 +1919,7 @@ class Template:
         </table>
         </form>
         </td>
-        ''' % {'weburl':weburl}
+        ''' % {'siteurl':CFG_SITE_URL}
 
         #Second column: mappings table
         #header and footer
@@ -1933,7 +1933,7 @@ class Template:
         <th class="adminheaderleft" width="34%%"><a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=from">Map From</a></th>
         <th class="adminheaderleft">&nbsp;</th>
         <th class="adminheaderleft" width="34%%"><a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=to">To</a></th>
-        <th class="adminheadercenter" width="25%%">Action&nbsp;&nbsp;&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#removeMappingKB">?</a>]</th>
+        <th class="adminheadercenter" width="25%%">Action&nbsp;&nbsp;&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#removeMappingKB">?</a>]</th>
         </tr>
         </thead>
         <tfoot>
@@ -1944,7 +1944,7 @@ class Template:
         <tbody>
         ''' % {'ln':ln,
                'kb_id':kb_id,
-               'weburl':weburl}
+               'siteurl':CFG_SITE_URL}
 
         #table content: key, value and actions
         if len(mappings) == 0:
@@ -2061,8 +2061,8 @@ class Template:
                'sortby':sortby}
 
         out += '''
-        <th colspan="2" class="adminheaderleft">%(kb_name)s attributes&nbsp;[<a href="%(weburl)s/help/admin/bibformat-admin-guide#attrsKB">?</a>]</th>''' % {'kb_name': kb_name,
-                                                                                                                                                       'weburl': weburl}
+        <th colspan="2" class="adminheaderleft">%(kb_name)s attributes&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#attrsKB">?</a>]</th>''' % {'kb_name': kb_name,
+                                                                                                                                                       'siteurl': CFG_SITE_URL}
 
         out += '''
          </tr>

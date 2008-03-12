@@ -28,7 +28,7 @@ __lastupdated__ = """$Date$"""
 from invenio.webcommentadminlib import *
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
-from invenio.config import weburl,CFG_SITE_LANG,CFG_SITE_NAME
+from invenio.config import CFG_SITE_URL,CFG_SITE_LANG,CFG_SITE_NAME
 from invenio.dbquery import Error
 from invenio.webuser import getUid, page_not_authorized
 from invenio.urlutils import wash_url_argument, redirect_to_url
@@ -42,7 +42,7 @@ def index(req, ln=CFG_SITE_LANG):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = getnavtrail()
-    navtrail_previous_links +=' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
+    navtrail_previous_links +=' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % CFG_SITE_URL
     navtrail_previous_links += _("WebComment Admin") + '</a>'
 
     try:
@@ -76,7 +76,7 @@ def delete(req, ln=CFG_SITE_LANG, comid=""):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = getnavtrail()
-    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
+    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % CFG_SITE_URL
     navtrail_previous_links += _("WebComment Admin") + '</a>'
 
     try:
@@ -116,7 +116,7 @@ def comments(req, ln=CFG_SITE_LANG, uid="", comid="", reviews=0):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = getnavtrail()
-    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
+    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % CFG_SITE_URL
     navtrail_previous_links += _("WebComment Admin") + '</a>'
 
     try:
@@ -150,7 +150,7 @@ def users(req, ln=CFG_SITE_LANG):
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     navtrail_previous_links = getnavtrail()
-    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
+    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % CFG_SITE_URL
     navtrail_previous_links += _("WebComment Admin") + '</a>'
 
     try:
@@ -187,7 +187,7 @@ def del_com(req, ln=CFG_SITE_LANG, action="delete", **hidden):
     action = wash_url_argument(action, 'str')
     _ = gettext_set_language(ln)
     navtrail_previous_links = getnavtrail()
-    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % weburl
+    navtrail_previous_links += ' &gt; <a class="navtrail" href="%s/admin/webcomment/webcommentadmin.py/">' % CFG_SITE_URL
     navtrail_previous_links += _("WebComment Admin") + '</a>'
 
     try:
@@ -216,7 +216,7 @@ def del_com(req, ln=CFG_SITE_LANG, action="delete", **hidden):
             body = suppress_abuse_report(ln=ln, comIDs=comIDs)
             title = _("Suppress abuse reports")
         else:
-            redirect_to_url(req, weburl + '/admin/webcomment/webcommentadmin.py')
+            redirect_to_url(req, CFG_SITE_URL + '/admin/webcomment/webcommentadmin.py')
         return page(title=title,
                     body=body,
                     uid=uid,

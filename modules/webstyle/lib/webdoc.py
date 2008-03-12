@@ -32,7 +32,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_ADMIN_EMAIL, \
-     weburl, \
+     CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
      CFG_SITE_NAME_INTL, \
@@ -129,7 +129,7 @@ ln_pattern =  re.compile(ln_pattern_text, re.IGNORECASE | re.DOTALL)
 defined_tags = {'<CFG_SITE_NAME>': CFG_SITE_NAME,
                 '<CFG_SITE_SUPPORT_EMAIL>': CFG_SITE_SUPPORT_EMAIL,
                 '<CFG_SITE_ADMIN_EMAIL>': CFG_SITE_ADMIN_EMAIL,
-                '<WEBURL>': weburl,
+                '<CFG_SITE_URL>': CFG_SITE_URL,
                 '<CFG_SITE_SECURE_URL>': CFG_SITE_SECURE_URL,
                 '<CFG_VERSION>': CFG_VERSION,
                 '<CFG_SITE_NAME_INTL>': CFG_SITE_NAME_INTL}
@@ -507,7 +507,7 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
                            os.listdir(source_path) \
                            if path.endswith('.webdoc')]:
             webdoc_name = webdocfile[:-7]
-            webdoc_url = weburl + "/help/" + \
+            webdoc_url = CFG_SITE_URL + "/help/" + \
                          ((category != 'help' and category + '/') or '') + \
                          webdoc_name
             try:
@@ -641,7 +641,7 @@ def transform(webdoc_source, verbose=0, req=None, languages=CFG_SITE_LANGS):
 
         # 5 Step
         ## Replace defined tags with their value from config file
-        ## Eg. replace <weburl> with 'http://cdsweb.cern.ch/':
+        ## Eg. replace <CFG_SITE_URL> with 'http://cdsweb.cern.ch/':
         for defined_tag, value in defined_tags.iteritems():
             if defined_tag.upper() == '<CFG_SITE_NAME_INTL>':
                 localized_webdoc = localized_webdoc.replace(defined_tag, \
@@ -745,7 +745,7 @@ def filter_languages(text, ln='en', defined_tags=None):
          - with ln = 'en': "A book"
          - with ln = 'fr': "A book"
 
-    Also replace variables such as <WEBURL> and <CFG_SITE_NAME_INTL> inside
+    Also replace variables such as <CFG_SITE_URL> and <CFG_SITE_NAME_INTL> inside
     <lang><..><..></lang> tags in order to print them with the correct
     language
 

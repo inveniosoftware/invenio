@@ -26,14 +26,14 @@ def format(bfo):
     """
     Prints html image and link to photo resources.
     """
-    from invenio.config import weburl
+    from invenio.config import CFG_SITE_URL
 
     resources = bfo.fields("8564_")
     out = ""
     for resource in resources:
 
         if resource.get("x", "") == "icon" and resource.get("u", "") == "":
-            out += '<a href="'+weburl+'/record/'+bfo.control_field("001")+ \
+            out += '<a href="'+CFG_SITE_URL+'/record/'+bfo.control_field("001")+ \
                    '?ln='+ bfo.lang + '"><img src="' + resource.get("q", "").replace(" ","") \
                    + '" alt="" border="0"/></a>'
 

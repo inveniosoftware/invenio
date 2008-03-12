@@ -33,7 +33,7 @@ except NameError:
     from sets import Set
 
 from invenio.config import \
-     weburl, \
+     CFG_SITE_URL, \
      CFG_SITE_NAME, \
      CFG_CACHEDIR, \
      CFG_SITE_LANG, \
@@ -175,7 +175,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                    weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
+                    CFG_SITE_URL + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
                     search_results_default_urlargd)}, {'ln' : CFG_SITE_LANG})
             return redirect_to_url(req, target)
         elif auth_code:
@@ -321,7 +321,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                                 cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : collname})
                                 target = '/youraccount/login' + \
                                 make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : \
-                                weburl + '/search' + make_canonical_urlargd(argd, \
+                                CFG_SITE_URL + '/search' + make_canonical_urlargd(argd, \
                                 search_results_default_urlargd)}, {'ln' : CFG_SITE_LANG})
                                 return redirect_to_url(req, target)
                             else:
@@ -340,7 +340,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = '/youraccount/login' + \
                     make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : \
-                    weburl + '/search' + make_canonical_urlargd(argd, \
+                    CFG_SITE_URL + '/search' + make_canonical_urlargd(argd, \
                     search_results_default_urlargd)}, {'ln' : CFG_SITE_LANG})
                     return redirect_to_url(req, target)
                 elif auth_code:
@@ -516,7 +516,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
         if ret_url:
             return redirect_to_url(req, ret_url)
         else:
-            return redirect_to_url(req, weburl)
+            return redirect_to_url(req, CFG_SITE_URL)
 
     def legacy_collection(self, req, form):
         """Collection URL backward compatibility handling."""
@@ -605,7 +605,7 @@ def display_collection(req, c, as, verbose, ln):
     colID = get_colID(c)
     if type(colID) is not int:
         page_body = '<p>' + (_("Sorry, collection %s does not seem to exist.") % ('<strong>' + str(c) + '</strong>')) + '</p>'
-        page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + weburl + '?ln=' + ln + '">' + get_coll_i18nname(CFG_SITE_NAME, ln) + '</a>')) + '</p>'
+        page_body = '<p>' + (_("You may want to start browsing from %s.") % ('<a href="' + CFG_SITE_URL + '?ln=' + ln + '">' + get_coll_i18nname(CFG_SITE_NAME, ln) + '</a>')) + '</p>'
         return page(title=_("Collection %s Not Found") % cgi.escape(c),
                     body=page_body,
                     description=(CFG_SITE_NAME + ' - ' + _("Not found") + ': ' + cgi.escape(str(c))),
@@ -643,7 +643,7 @@ def display_collection(req, c, as, verbose, ln):
         filedesc.close()
 
         title = get_coll_i18nname(c, ln)
-        rssurl = weburl + '/rss'
+        rssurl = CFG_SITE_URL + '/rss'
         if c != CFG_SITE_NAME:
             rssurl += '?cc=' + quote(c)
 
@@ -697,7 +697,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                     #cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     #target = '/youraccount/login' + \
                     #make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : \
-                    #weburl + user_info['uri']}, {})
+                    #CFG_SITE_URL + user_info['uri']}, {})
                     #return redirect_to_url(req, target)
                 #elif auth_code:
                     #raise apache.SERVER_RETURN, apache.HTTP_UNAUTHORIZED
@@ -807,7 +807,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                    weburl + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
+                    CFG_SITE_URL + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
                     search_results_default_urlargd)}, {'ln' : CFG_SITE_LANG})
             return redirect_to_url(req, target)
         elif auth_code:

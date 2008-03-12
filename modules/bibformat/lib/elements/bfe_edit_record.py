@@ -28,7 +28,7 @@ def format(bfo, style):
 
     @param style the CSS style to be applied to the link.
     """
-    from invenio.config import weburl
+    from invenio.config import CFG_SITE_URL
     from invenio.access_control_engine import acc_authorize_action
 
     out = ""
@@ -41,7 +41,7 @@ def format(bfo, style):
         if style != '':
             print_style = 'style="' + style + '"'
 
-        out += '<a href="' + weburl + \
+        out += '<a href="' + CFG_SITE_URL + \
                '/admin/bibedit/bibeditadmin.py/index?recid=' + \
                str(bfo.recID) + '&amp;ln=' + bfo.lang +'" ' + \
                print_style + \

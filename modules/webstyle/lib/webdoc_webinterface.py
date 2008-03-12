@@ -27,7 +27,7 @@ __revision__ = \
 __lastupdated__ = """$Date$"""
 
 import cgi
-from invenio.config import weburl, CFG_SITE_LANG, CFG_SITE_NAME, CFG_SITE_NAME_INTL, CFG_SITE_LANGS
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_SITE_NAME, CFG_SITE_NAME_INTL, CFG_SITE_LANGS
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid
@@ -112,7 +112,7 @@ class WebInterfaceDocumentationPages(WebInterfaceDirectory):
             if category != '':
                 category += '/'
 
-            url = weburl + '/help/' + category  + webdocname
+            url = CFG_SITE_URL + '/help/' + category  + webdocname
             ln_link = (ln != CFG_SITE_LANG and '?ln=' + ln) or ''
             redirect_to_url(req, url + ln_link)
         else:
@@ -143,20 +143,20 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
     else:
         # Print Table of Contents
         see_also_links = {'admin': '<a href="%s/help/admin/contents%s">%s</a>' % \
-                          (weburl, ln_link, _('Admin Pages Index')),
+                          (CFG_SITE_URL, ln_link, _('Admin Pages Index')),
                           'help':'<a href="%s/help/contents%s">%s</a>' % \
-                          (weburl, ln_link, _('Help Pages Index')),
+                          (CFG_SITE_URL, ln_link, _('Help Pages Index')),
                           'hacking':'<a href="%s/help/hacking/contents%s">%s</a>' % \
-                          (weburl, ln_link, _('Hacking Pages Index'))}
+                          (CFG_SITE_URL, ln_link, _('Hacking Pages Index'))}
         titles = {'admin': _("Admin Pages Index"),
                   'help': _("Help Pages Index"),
                   'hacking': _("Hacking Pages Index")}
         navtrails = {'admin': '<a class="navtrail" href="%s/help/admin%s">%s</a>' % \
-                     (weburl, ln_link, _("Admin Area")),
+                     (CFG_SITE_URL, ln_link, _("Admin Area")),
                      'help': '<a class="navtrail" href="%s/help/%s">%s</a>' % \
-                     (weburl, ln_link, _("Help Central")),
+                     (CFG_SITE_URL, ln_link, _("Help Central")),
                      'hacking': '<a class="navtrail" href="%s/help/hacking%s">%s</a>' % \
-                     (weburl, ln_link, _("Hacking CDS Invenio"))}
+                     (CFG_SITE_URL, ln_link, _("Hacking CDS Invenio"))}
         body = '''<div style="float:right;clear:none;font-size:small;color:#666;width:auto;margin-right:30px;padding:5px" class="mini-panel"><strong>''' + \
                _("Last modifications") + '</strong>' + \
                get_webdoc_topics(sort_by='date', sc=0, limit=5,
@@ -191,10 +191,10 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
                     '</p>'
         page_body += '<p>' + (_("You may want to start browsing from %(rooturl)s or have a look at the %(x_url_open)s index of the %(category)s pages%(x_url_close)s.") % \
                               {'rooturl':'<a href="%s%s">%s</a>' % \
-                               (weburl, ln_link, CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)),
+                               (CFG_SITE_URL, ln_link, CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)),
                                'category': _(categ),
                                'x_url_open': '<a href="%s/help/%scontents%s">' % \
-                               (weburl, ((categ != 'help' and categ + '/') or ''), ln_link),
+                               (CFG_SITE_URL, ((categ != 'help' and categ + '/') or ''), ln_link),
                                'x_url_close': '</a>'}) + \
                      '</p>'
 

@@ -32,7 +32,7 @@ from invenio.webcomment import check_recID_is_in_range, \
                                perform_request_vote,\
                                perform_request_report
 from invenio.config import CFG_SITE_LANG, \
-                           weburl, \
+                           CFG_SITE_URL, \
                            CFG_SITE_SECURE_URL, \
                            CFG_WEBCOMMENT_ALLOW_COMMENTS,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS
@@ -111,7 +111,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                weburl + user_info['uri']}, {})
+                CFG_SITE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -141,7 +141,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             if argd['ln'] != CFG_SITE_LANG:
                 link_ln = '?ln=%s' % argd['ln']
             tabs = [(unordered_tabs[tab_id]['label'], \
-                     '%s/record/%s/%s%s' % (weburl, self.recid, tab_id, link_ln), \
+                     '%s/record/%s/%s%s' % (CFG_SITE_URL, self.recid, tab_id, link_ln), \
                      tab_id in ['comments', 'reviews'],
                      unordered_tabs[tab_id]['enabled']) \
                     for (tab_id, order) in ordered_tabs_id
@@ -153,7 +153,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
             title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
             navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-            navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (weburl, self.recid, argd['ln'])
+            navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
             navtrail += title
             navtrail += '</a>'
             navtrail += ' &gt; <a class="navtrail">%s</a>' % (self.discussion==1 and _("Reviews") or _("Comments"))
@@ -217,7 +217,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                weburl + user_info['uri']}, {})
+                CFG_SITE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -231,10 +231,10 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                                                self.recid,
                                                                                                argd['ln'])
             navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid))
-            navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (weburl, self.recid, argd['ln'])
+            navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
             navtrail += title
             navtrail += '</a>'
-            navtrail += '&gt; <a class="navtrail" href="%s/record/%s/%s/?ln=%s">%s</a>' % (weburl,
+            navtrail += '&gt; <a class="navtrail" href="%s/record/%s/%s/?ln=%s">%s</a>' % (CFG_SITE_URL,
                                                                                            self.recid,
                                                                                            self.discussion==1 and 'reviews' or 'comments',
                                                                                            argd['ln'],
@@ -250,7 +250,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
             # if guest, must log in first
             if isGuestUser(uid):
-                referer = "%s/record/%s/%s/add?ln=%s&amp;comid=%s&amp;action=%s&amp;score=%s" % (weburl,
+                referer = "%s/record/%s/%s/add?ln=%s&amp;comid=%s&amp;action=%s&amp;score=%s" % (CFG_SITE_URL,
                                                                                     self.recid,
                                                                                     self.discussion == 1 and 'reviews' or 'comments',
                                                                                     argd['ln'],
@@ -350,7 +350,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                weburl + user_info['uri']}, {})
+                CFG_SITE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -364,7 +364,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         else:
             #Note: sent to comments display
             referer = "%s/record/%s/%s?&amp;ln=%s&amp;voted=1"
-            referer %= (weburl, self.recid, self.discussion == 1 and 'reviews' or 'comments', argd['ln'])
+            referer %= (CFG_SITE_URL, self.recid, self.discussion == 1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)
 
     def report(self, req, form):
@@ -409,7 +409,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                weburl + user_info['uri']}, {})
+                CFG_SITE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -423,5 +423,5 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         else:
             #Note: sent to comments display
             referer = "%s/record/%s/%s/display?ln=%s&amp;voted=1"
-            referer %= (weburl, self.recid, self.discussion==1 and 'reviews' or 'comments', argd['ln'])
+            referer %= (CFG_SITE_URL, self.recid, self.discussion==1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)

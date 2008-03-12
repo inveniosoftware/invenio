@@ -46,7 +46,7 @@ import os
 
 from invenio.config import \
      CFG_ETCDIR, \
-     weburl
+     CFG_SITE_URL
 from invenio.bibconvert import FormatField
 
 # The namespace used for BibConvert functions
@@ -222,9 +222,9 @@ def convert(xmltext, template_filename=None, template_source=None):
 
         # Load template and source
         transform = InputSource.DefaultFactory.fromString(template,
-                                                       uri=weburl)
+                                                       uri=CFG_SITE_URL)
         source = InputSource.DefaultFactory.fromString(xmltext,
-                                                       uri=weburl)
+                                                       uri=CFG_SITE_URL)
         processor.appendStylesheet(transform)
 
         # Transform

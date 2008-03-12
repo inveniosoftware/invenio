@@ -39,7 +39,7 @@ import sys
 import os
 
 from invenio.config import \
-     weburl
+     CFG_SITE_URL
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_TEMPLATES_PATH
 from invenio.bibformat_dblayer import \
@@ -364,9 +364,9 @@ def format(xmltext, template_filename=None, template_source=None):
                                             eval_bibformat_4suite)
         # Load template and source
         transform = InputSource.DefaultFactory.fromString(template,
-                                                       uri=weburl)
+                                                       uri=CFG_SITE_URL)
         source = InputSource.DefaultFactory.fromString(xmltext,
-                                                       uri=weburl)
+                                                       uri=CFG_SITE_URL)
         processor.appendStylesheet(transform)
 
         # Transform

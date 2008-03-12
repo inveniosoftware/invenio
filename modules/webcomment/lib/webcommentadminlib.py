@@ -20,7 +20,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_LANG, weburl
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.webcomment import query_get_comment
 from invenio.urlutils import wash_url_argument
 from invenio.dbquery import run_sql
@@ -35,7 +35,7 @@ def getnavtrail(previous = '', ln=CFG_SITE_LANG):
     previous = wash_url_argument(previous, 'str')
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail = """<a class="navtrail" href="%s/help/admin">%s</a> """ % (weburl, _("Admin Area"))
+    navtrail = """<a class="navtrail" href="%s/help/admin">%s</a> """ % (CFG_SITE_URL, _("Admin Area"))
     navtrail = navtrail + previous
     return navtrail
 

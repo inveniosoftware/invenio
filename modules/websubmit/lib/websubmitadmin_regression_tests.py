@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -35,7 +35,7 @@ class WebSubmitAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_websubmit_admin_interface_pages_availability(self):
         """websubmitadmin - availability of WebSubmit Admin interface pages"""
 
-        baseurl = weburl + '/admin/websubmit/websubmitadmin.py/'
+        baseurl = CFG_SITE_URL + '/admin/websubmit/websubmitadmin.py/'
 
         _exports = ['', 'showall', 'doctypelist', 'doctypeadd',
                     'doctyperemove', 'actionlist', 'jschecklist',
@@ -58,7 +58,7 @@ class WebSubmitAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_websubmit_admin_guide_availability(self):
         """websubmitadmin - availability of WebSubmit Admin guide pages"""
 
-        url = weburl + '/help/admin/websubmit-admin-guide'
+        url = CFG_SITE_URL + '/help/admin/websubmit-admin-guide'
         error_messages = test_web_page_content(url,
                                                expected_text="WebSubmit Admin Guide")
         if error_messages:

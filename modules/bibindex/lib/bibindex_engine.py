@@ -41,7 +41,7 @@ from invenio.config import \
      CFG_BIBINDEX_MIN_WORD_LENGTH, \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
      CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
-     weburl, CFG_TMPDIR
+     CFG_SITE_URL, CFG_TMPDIR
 from invenio.bibindex_engine_config import *
 from invenio.bibdocfile import bibdocfile_url_to_fullpath, bibdocfile_url_p, decompose_bibdocfile_url
 from invenio.search_engine import perform_request_search, strip_accents, wash_index_term, get_index_stemming_language
@@ -329,7 +329,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
     """
 
     if CFG_BIBINDEX_FULLTEXT_INDEX_LOCAL_FILES_ONLY and \
-        url_direct_or_indirect.find(weburl) < 0:
+        url_direct_or_indirect.find(CFG_SITE_URL) < 0:
         return []
     write_message("... reading fulltext files from %s started" % url_direct_or_indirect, verbose=2)
 
@@ -374,7 +374,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
 
         if bibdocfile_url_p(url_direct):
             # Let's manage this with BibRecDocs...
-            # We got something like http://$(weburl)/record/xxx/yyy.ext
+            # We got something like http://$(CFG_SITE_URL)/record/xxx/yyy.ext
             try:
                 tmp_name = bibdocfile_url_to_fullpath(url_direct)
                 write_message("Found internal path %s for url %s" % (tmp_name, url_direct), verbose=2)

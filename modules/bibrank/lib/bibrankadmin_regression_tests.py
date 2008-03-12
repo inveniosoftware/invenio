@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -35,7 +35,7 @@ class BibRankAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_bibrank_admin_interface_pages_availability(self):
         """bibrankadmin - availability of BibRank Admin interface pages"""
 
-        baseurl = weburl + '/admin/bibrank/bibrankadmin.py/'
+        baseurl = CFG_SITE_URL + '/admin/bibrank/bibrankadmin.py/'
 
         _exports = ['', 'addrankarea', 'modifytranslations',
                     'modifycollection', 'showrankdetails', 'modifyrank',
@@ -58,7 +58,7 @@ class BibRankAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_bibrank_admin_guide_availability(self):
         """bibrankadmin - availability of BibRank Admin guide pages"""
 
-        url = weburl + '/help/admin/bibrank-admin-guide'
+        url = CFG_SITE_URL + '/help/admin/bibrank-admin-guide'
         error_messages = test_web_page_content(url,
                                                expected_text="BibRank Admin Guide")
         if error_messages:

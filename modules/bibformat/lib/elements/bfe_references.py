@@ -29,7 +29,7 @@ def format(bfo, reference_prefix, reference_suffix):
     @param reference_prefix a prefix displayed before each reference
     @param reference_suffix a suffix displayed after each reference
     """
-    from invenio.config import weburl
+    from invenio.config import CFG_SITE_URL
     
     references = bfo.fields("999C5", escape=1)
     out = ""
@@ -46,7 +46,7 @@ def format(bfo, reference_prefix, reference_suffix):
             ref_out += "<small>"+ reference['m']+ "</small> "
 
         if reference.has_key('r'):
-            ref_out += '<small> [<a href="'+weburl+'/search?f=reportnumber&amp;p='+ \
+            ref_out += '<small> [<a href="'+CFG_SITE_URL+'/search?f=reportnumber&amp;p='+ \
                    reference['r']+ \
                    '&amp;ln=' + bfo.lang + \
                    '">'+ reference['r']+ "</a>] </small> <br />"

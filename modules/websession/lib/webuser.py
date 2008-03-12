@@ -63,7 +63,7 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_TMPDIR, \
-     weburl
+     CFG_SITE_URL
 from invenio import session
 from invenio.dbquery import run_sql, OperationalError, \
     serialize_via_marshal, deserialize_via_marshal
@@ -653,7 +653,7 @@ def send_new_admin_account_warning(new_account_email, send_to, ln=CFG_SITE_LANG)
         body += _(" and is awaiting activation")
     body += ":\n\n"
     body += _("   Username/Email") + ": %s\n\n" % new_account_email
-    body += _("You can approve or reject this account request at") + ": %s/admin/webaccess/webaccessadmin.py/manageaccounts\n" % weburl
+    body += _("You can approve or reject this account request at") + ": %s/admin/webaccess/webaccessadmin.py/manageaccounts\n" % CFG_SITE_URL
     return send_email(CFG_SITE_SUPPORT_EMAIL, send_to, subject=sub, content=body)
 
 def get_email(uid):
@@ -718,11 +718,11 @@ def create_userinfobox_body(req, uid, language="en"):
            and req.subprocess_env['HTTPS'] == 'on':
             url_referer = CFG_SITE_SECURE_URL + req.unparsed_uri
         else:
-            url_referer = weburl + req.unparsed_uri
+            url_referer = CFG_SITE_URL + req.unparsed_uri
         if '/youraccount/logout' in url_referer:
             url_referer = ''
     else:
-        url_referer = weburl
+        url_referer = CFG_SITE_URL
 
     try:
         return tmpl.tmpl_create_userinfobox(ln=language,

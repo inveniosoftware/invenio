@@ -20,7 +20,7 @@
 
 import os
 
-from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_ETCDIR, weburl, CFG_SITE_LANG
+from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_ETCDIR, CFG_SITE_URL, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.htmlutils import escape_html
@@ -274,7 +274,7 @@ class InvenioWebJournalNoArticleNumberError(Exception):
               report this to the admin. If you got this link through some \
               external resource, e.g. an email, you can try to put in a number \
               for the article in the url by hand or just visit the front \
-              page at %s/journal/?name=%s' % (weburl, self.journal))
+              page at %s/journal/?name=%s' % (CFG_SITE_URL, self.journal))
 
 class InvenioWebJournalNoJournalOnServerError(Exception):
     """
@@ -644,11 +644,11 @@ def webjournal_missing_info_box(language, title, msg_title, msg):
                     <div style="text-align:right;">Mail<a href="mailto:%s"> the Administrator.</a></div>
                 </fieldset>
             </div>
-            ''' % (weburl,
+            ''' % (CFG_SITE_URL,
                    box_title,
                    box_text,
                    box_list_title,
-                   "".join(['<li><a href="%s/journal/?name=%s">%s</a></li>' % (weburl, journal, journal) for journal in all_journals]),
+                   "".join(['<li><a href="%s/journal/?name=%s">%s</a></li>' % (CFG_SITE_URL, journal, journal) for journal in all_journals]),
                    CFG_SITE_ADMIN_EMAIL)
     return page(title=title, body=box)
 
@@ -674,6 +674,6 @@ def webjournal_error_box(language, title, title_msg, msg):
                     <div style="text-align:right;">Mail<a href="mailto:%s"> the Developers.</a></div>
                 </fieldset>
             </div>
-            ''' % (weburl, title_msg, msg, CFG_SITE_SUPPORT_EMAIL)
+            ''' % (CFG_SITE_URL, title_msg, msg, CFG_SITE_SUPPORT_EMAIL)
     return page(title=title, body=box)
 

@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -35,7 +35,7 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
     def test_submission_pages_availability(self):
         """websubmit - availability of submission pages"""
 
-        baseurl = weburl + '/submit/'
+        baseurl = CFG_SITE_URL + '/submit/'
 
         _exports = ['', 'direct']
 
@@ -49,7 +49,7 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
     def test_publiline_pages_availability(self):
         """websubmit - availability of approval pages"""
 
-        baseurl = weburl
+        baseurl = CFG_SITE_URL
 
         _exports = ['/approve.py', '/publiline.py',
                     '/yourapprovals.py']
@@ -64,7 +64,7 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
     def test_your_submissions_pages_availability(self):
         """websubmit - availability of Your Submissions pages"""
 
-        baseurl = weburl
+        baseurl = CFG_SITE_URL
 
         _exports = ['/yoursubmissions.py']
 
@@ -78,7 +78,7 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
     def test_help_page_availability(self):
         """websubmit - availability of WebSubmit help page"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/submit-guide',
+                         test_web_page_content(CFG_SITE_URL + '/help/submit-guide',
                                                expected_text="Submit Guide"))
 
 class WebSubmitTestLegacyURLs(unittest.TestCase):
@@ -87,16 +87,16 @@ class WebSubmitTestLegacyURLs(unittest.TestCase):
     def test_legacy_help_page_link(self):
         """websubmit - legacy Submit Guide page link"""
 	self.assertEqual([],
-                         test_web_page_content(weburl + '/help/submit',
+                         test_web_page_content(CFG_SITE_URL + '/help/submit',
                                                expected_text="Submit Guide"))
         self.assertEqual([],
-                         test_web_page_content(weburl + '/help/submit/',
+                         test_web_page_content(CFG_SITE_URL + '/help/submit/',
                                                expected_text="Submit Guide"))
         self.assertEqual([],
-                         test_web_page_content(weburl + '/help/submit/index.en.html',
+                         test_web_page_content(CFG_SITE_URL + '/help/submit/index.en.html',
                                               expected_text="Submit Guide"))
         self.assertEqual([],
-                         test_web_page_content(weburl + '/help/submit/access.en.html',
+                         test_web_page_content(CFG_SITE_URL + '/help/submit/access.en.html',
                                               expected_text="Submit Guide"))
 
 test_suite = make_test_suite(WebSubmitWebPagesAvailabilityTest,

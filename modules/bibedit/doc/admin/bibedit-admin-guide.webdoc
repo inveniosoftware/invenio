@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibEdit Admin Guide -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <h2>Contents</h2>
@@ -37,7 +37,7 @@ single record, do global replacements, and other cataloguing tasks.</p>
 <a name="2"></a><h2>2. Edit records via Web interface</h2>
 
 <p>To edit records via the web interface, please go to <a
-href="<WEBURL>/admin/bibedit/bibeditadmin.py">BibEdit Admin
+href="<CFG_SITE_URL>/admin/bibedit/bibeditadmin.py">BibEdit Admin
 Interface</a>.  This interface will let you to add, change or
 delete fields in a record.</p>
 

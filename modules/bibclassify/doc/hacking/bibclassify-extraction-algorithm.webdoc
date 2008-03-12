@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: The code behind BibClassify: the extraction algorithm -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibclassify-internals"/>BibClassify Internals</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="bibclassify-internals"/>BibClassify Internals</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 

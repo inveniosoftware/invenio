@@ -33,7 +33,7 @@ from invenio.config import \
      CFG_CACHEDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     weburl,\
+     CFG_SITE_URL,\
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
      CFG_WEBCOMMENT_ALLOW_REVIEWS
 from invenio.bibrankadminlib import \
@@ -68,7 +68,7 @@ from invenio.access_control_config import VIEWRESTRCOLL
 def getnavtrail(previous = ''):
     """Get the navtrail"""
 
-    navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (weburl,)
+    navtrail = """<a class="navtrail" href="%s/help/admin">Admin Area</a> """ % (CFG_SITE_URL,)
     navtrail = navtrail + previous
     return navtrail
 
@@ -86,7 +86,7 @@ def perform_modifytranslations(colID, ln, sel_type='', trans=[], confirm=-1, cal
 
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="3">3. Modify translations for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a href="%s/help/admin/websearch-admin-guide#3.3">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="3">3. Modify translations for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a href="%s/help/admin/websearch-admin-guide#3.3">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
 
         if type(trans) is str:
             trans = [trans]
@@ -166,7 +166,7 @@ def perform_modifyrankmethods(colID, ln, func='', rnkID='', confirm=0, callback=
         elif func in ["1", 1] and confirm in ["1", 1]:
             finresult = detach_rnk_col(colID, rnkID)
 
-        subtitle = """<a name="9">9. Modify rank options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.9">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="9">9. Modify rank options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.9">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
         output  = """
         <dl>
         <dt>The rank methods enabled for the collection '%s' is:</dt>
@@ -248,7 +248,7 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
 
     output = ""
     output2 = ""
-    subtitle = """Attach collection to tree&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.2">?</a>]</small>""" % (weburl)
+    subtitle = """Attach collection to tree&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.2">?</a>]</small>""" % (CFG_SITE_URL)
 
     col_dict = dict(get_def_name('', "collection"))
     if confirm not in [-1, "-1"] and not (add_son and add_dad and rtype):
@@ -308,7 +308,7 @@ def perform_addcollectiontotree(colID, ln, add_dad='', add_son='', rtype='', mty
     <option value="v" %s>Virtual (Focus on...)</option>
     </select>
     """ % ((rtype=="r" and 'selected="selected"' or ''), (rtype=="v" and 'selected="selected"' or ''))
-    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/addcollectiontotree" % weburl,
+    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/addcollectiontotree" % CFG_SITE_URL,
                                text=text,
                                button="Add",
                                colID=colID,
@@ -330,12 +330,12 @@ def perform_addcollection(colID, ln, colNAME='', dbquery='', callback="yes", con
     dbquery - the dbquery of the new collection"""
 
     output = ""
-    subtitle = """Create new collection&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.1">?</a>]</small>""" % (weburl)
+    subtitle = """Create new collection&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.1">?</a>]</small>""" % (CFG_SITE_URL)
     text = """
     <span class="adminlabel">Default name</span>
     <input class="admin_w200" type="text" name="colNAME" value="%s" /><br />
     """ % colNAME
-    output = createhiddenform(action="%s/admin/websearch/websearchadmin.py/addcollection" % weburl,
+    output = createhiddenform(action="%s/admin/websearch/websearchadmin.py/addcollection" % CFG_SITE_URL,
                               text=text,
                               colID=colID,
                               ln=ln,
@@ -366,7 +366,7 @@ def perform_modifydbquery(colID, ln, dbquery='', callback='yes', confirm=-1):
     col_dict = dict(get_def_name('', "collection"))
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="1">1. Modify collection query for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.1">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="1">1. Modify collection query for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.1">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
 
         if confirm == -1:
             res = run_sql("SELECT dbquery FROM collection WHERE id=%s" % colID)
@@ -426,7 +426,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
     tree = get_col_tree(colID, rtype)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """Modify collection tree: %s&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.3">?</a>]&nbsp;&nbsp;&nbsp;<a href="%s/admin/websearch/websearchadmin.py/showtree?colID=%s&amp;ln=%s">Printer friendly version</a></small>""" % (col_dict[colID], weburl, weburl, colID, ln)
+    subtitle = """Modify collection tree: %s&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#2.3">?</a>]&nbsp;&nbsp;&nbsp;<a href="%s/admin/websearch/websearchadmin.py/showtree?colID=%s&amp;ln=%s">Printer friendly version</a></small>""" % (col_dict[colID], CFG_SITE_URL, CFG_SITE_URL, colID, ln)
     fin_output = ""
     output = ""
 
@@ -459,7 +459,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
                     text = """<b>Do you want to remove all subcollections of the %s collection '%s'.</b>
                     """ % ((rtype=="r" and 'regular' or 'virtual'), col_dict[tree[delete][3]])
 
-                output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifycollectiontree#tree" % weburl,
+                output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifycollectiontree#tree" % CFG_SITE_URL,
                                            text=text,
                                            button="Confirm",
                                            colID=colID,
@@ -467,7 +467,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
                                            rtype=rtype,
                                            ln=ln,
                                            confirm=1)
-                output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_modifycollectiontree#tree" % weburl,
+                output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_modifycollectiontree#tree" % CFG_SITE_URL,
                                            text="<b>To cancel</b>",
                                            button="Cancel",
                                            colID=colID,
@@ -490,7 +490,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
             move_from_id = int(move_from[1:len(move_from)])
             text = """<b>Select collection to place the %s collection '%s' under.</b><br /><br />
             """ % ((move_from_rtype=="r" and 'regular' or 'virtual'), col_dict[tree[move_from_id][0]])
-            output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_modifycollectiontree#tree" % weburl,
+            output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_modifycollectiontree#tree" % CFG_SITE_URL,
                                        text=text,
                                        button="Cancel",
                                        colID=colID,
@@ -513,7 +513,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
                 elif check_col(tree_to[move_to_id][0], tree_from[move_from_id][0]) or (tree_to[move_to_id][0] == 1 and tree_from[move_from_id][3] == tree_to[move_to_id][0] and move_from_rtype != move_to_rtype):
                     text = """<b>Move %s collection '%s' to the %s collection '%s'.</b>
                     """ % ((tree_from[move_from_id][4]=="r" and 'regular' or 'virtual'), col_dict[tree_from[move_from_id][0]], (tree_to[move_to_id][4]=="r" and 'regular' or 'virtual'), col_dict[tree_to[move_to_id][0]])
-                    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifycollectiontree#tree" % weburl,
+                    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifycollectiontree#tree" % CFG_SITE_URL,
                                                text=text,
                                                button="Confirm",
                                                colID=colID,
@@ -522,7 +522,7 @@ def perform_modifycollectiontree(colID, ln, move_up='', move_down='', move_from=
                                                ln=ln,
                                                rtype=rtype,
                                                confirm=1)
-                    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_modifycollectiontree#tree" % weburl,
+                    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/index?mtype=perform_modifycollectiontree#tree" % CFG_SITE_URL,
                                                text="""<b>To cancel</b>""",
                                                button="Cancel",
                                                colID=colID,
@@ -873,7 +873,7 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """<a name="5">5. Modify portalboxes for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.5">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="5">5. Modify portalboxes for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.5">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
     output  = ""
     pos = get_pbx_pos()
 
@@ -902,20 +902,20 @@ def perform_showportalboxes(colID, ln, callback='yes', content='', confirm=-1):
                 for (pbxID, colID_pbx, tln, score, position, title, body) in res:
                     move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
                     if i != 0:
-                        move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smallup.gif" title="Move portalbox up"></a>""" % (weburl, colID, ln, pbxID, res[i - 1][0], tln, random.randint(0, 1000), weburl)
+                        move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smallup.gif" title="Move portalbox up"></a>""" % (CFG_SITE_URL, colID, ln, pbxID, res[i - 1][0], tln, random.randint(0, 1000), CFG_SITE_URL)
                     else:
                         move += "&nbsp;&nbsp;&nbsp;"
                     move += "</td><td>"
                     i += 1
                     if i != len(res):
-                        move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smalldown.gif" title="Move portalbox down"></a>""" % (weburl, colID, ln, pbxID, res[i][0], tln, random.randint(0, 1000), weburl)
+                        move += """<a href="%s/admin/websearch/websearchadmin.py/switchpbxscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;sel_ln=%s&amp;rand=%s#5"><img border="0" src="%s/img/smalldown.gif" title="Move portalbox down"></a>""" % (CFG_SITE_URL, colID, ln, pbxID, res[i][0], tln, random.randint(0, 1000), CFG_SITE_URL)
                     move += """</td></tr></table>"""
                     actions.append(["%s" % (i==1 and pos[position] or ''), "%s" % (i==1 and lang[tln] or ''), move, "%s" % title])
 
                     for col in [(('Modify', 'modifyportalbox'), ('Remove', 'removeportalbox'),)]:
-                        actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;pbxID=%s&amp;sel_ln=%s#5.4">%s</a>' % (weburl, col[0][1], colID, ln, pbxID, tln, col[0][0]))
+                        actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;pbxID=%s&amp;sel_ln=%s#5.4">%s</a>' % (CFG_SITE_URL, col[0][1], colID, ln, pbxID, tln, col[0][0]))
                         for (str, function) in col[1:]:
-                            actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;pbxID=%s&amp;sel_ln=%s#5.5">%s</a>' % (weburl, function, colID, ln, pbxID, tln, str)
+                            actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;pbxID=%s&amp;sel_ln=%s#5.5">%s</a>' % (CFG_SITE_URL, function, colID, ln, pbxID, tln, str)
         output += tupletotable(header=header, tuple=actions)
     else:
         output += """No portalboxes exists for this collection"""
@@ -1016,7 +1016,7 @@ def perform_addnewfieldvalue(colID, fldID, ln, name='', value='', callback="yes"
     <span class="adminlabel">Search value</span>
     <input class="admin_w200" type="text" name="value" value="%s" /><br />
     """ % (name, value)
-    output = createhiddenform(action="%s/admin/websearch/websearchadmin.py/addnewfieldvalue" % weburl,
+    output = createhiddenform(action="%s/admin/websearch/websearchadmin.py/addnewfieldvalue" % CFG_SITE_URL,
                               text=text,
                               colID=colID,
                               fldID=fldID,
@@ -1061,7 +1061,7 @@ def perform_modifyfieldvalue(colID, fldID, fldvID, ln, name='', value='', callba
     <span class="adminlabel">Search value</span>
     <input class="admin_w200" type="text" name="value" value="%s" /><br />
     """ % (name, value)
-    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifyfieldvalue" % weburl,
+    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifyfieldvalue" % CFG_SITE_URL,
                               text=text,
                               colID=colID,
                               fldID=fldID,
@@ -1069,7 +1069,7 @@ def perform_modifyfieldvalue(colID, fldID, fldvID, ln, name='', value='', callba
                               ln=ln,
                               button="Update",
                               confirm=1)
-    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifyfieldvalue" % weburl,
+    output += createhiddenform(action="%s/admin/websearch/websearchadmin.py/modifyfieldvalue" % CFG_SITE_URL,
                               text="Delete value and all associations",
                               colID=colID,
                               fldID=fldID,
@@ -1365,7 +1365,7 @@ def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="8">8. Modify sort options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.8">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="8">8. Modify sort options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.8">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available sort options</dd>
@@ -1390,21 +1390,21 @@ def perform_showsortoptions(colID, ln, callback='yes', content='', confirm=-1):
         for (fldID, fldvID, stype, score, score_fieldvalue) in res:
             move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
             if i != 0:
-                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), weburl)
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (CFG_SITE_URL, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), CFG_SITE_URL)
             else:
                 move += "&nbsp;&nbsp;&nbsp;&nbsp;"
             move += "</td><td>"
             i += 1
             if i != len(res):
-                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, fldID, res[i][0], random.randint(0, 1000), weburl)
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=soo&amp;rand=%s#8"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (CFG_SITE_URL, colID, ln, fldID, res[i][0], random.randint(0, 1000), CFG_SITE_URL)
             move += """</td></tr></table>"""
 
             actions.append([move, fld_dict[int(fldID)]])
 
             for col in [(('Remove sort option', 'removefield'),)]:
-                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=soo#8.4">%s</a>' % (weburl, col[0][1], colID, ln, fldID, col[0][0]))
+                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=soo#8.4">%s</a>' % (CFG_SITE_URL, col[0][1], colID, ln, fldID, col[0][0]))
                 for (str, function) in col[1:]:
-                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=soo#8.5">%s</a>' % (weburl, function, colID, ln, fldID, str)
+                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=soo#8.5">%s</a>' % (CFG_SITE_URL, function, colID, ln, fldID, str)
         output += tupletotable(header=header, tuple=actions)
     else:
         output += """No sort options exists for this collection"""
@@ -1426,7 +1426,7 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="6">6. Modify search fields for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.6">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="6">6. Modify search fields for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.6">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available search fields</dd>
@@ -1451,21 +1451,21 @@ def perform_showsearchfields(colID, ln, callback='yes', content='', confirm=-1):
         for (fldID, fldvID, stype, score, score_fieldvalue) in res:
             move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
             if i != 0:
-                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=sew&amp;rand=%s#6"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), weburl)
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=sew&amp;rand=%s#6"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (CFG_SITE_URL, colID, ln, fldID, res[i - 1][0], random.randint(0, 1000), CFG_SITE_URL)
             else:
                 move += "&nbsp;&nbsp;&nbsp;"
             move += "</td><td>"
             i += 1
             if i != len(res):
-                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=sew&amp;rand=%s#6"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (weburl, colID, ln, fldID, res[i][0], random.randint(0, 1000), weburl)
+                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=sew&amp;rand=%s#6"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (CFG_SITE_URL, colID, ln, fldID, res[i][0], random.randint(0, 1000), CFG_SITE_URL)
             move += """</td></tr></table>"""
 
             actions.append([move, fld_dict[int(fldID)]])
 
             for col in [(('Remove search field', 'removefield'),)]:
-                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=sew#6.4">%s</a>' % (weburl, col[0][1], colID, ln, fldID, col[0][0]))
+                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=sew#6.4">%s</a>' % (CFG_SITE_URL, col[0][1], colID, ln, fldID, col[0][0]))
                 for (str, function) in col[1:]:
-                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s#6.5">%s</a>' % (weburl, function, colID, ln, fldID, str)
+                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s#6.5">%s</a>' % (CFG_SITE_URL, function, colID, ln, fldID, str)
         output += tupletotable(header=header, tuple=actions)
     else:
         output += """No search fields exists for this collection"""
@@ -1487,7 +1487,7 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
     fld_dict = dict(get_def_name('', "field"))
     fld_type = get_sort_nametypes()
 
-    subtitle = """<a name="7">7. Modify search options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.7">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="7">7. Modify search options for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.7">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
     output = """<dl>
      <dt>Field actions (not related to this collection)</dt>
      <dd>Go to the BibIndex interface to modify the available search options</dd>
@@ -1514,19 +1514,19 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
 
             move = ""
             if i != 0:
-                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, fld_distinct[i - 1][0], random.randint(0, 1000), weburl)
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (CFG_SITE_URL, colID, ln, fldID, fld_distinct[i - 1][0], random.randint(0, 1000), CFG_SITE_URL)
             else:
                 move += "&nbsp;&nbsp;&nbsp;"
 
             i += 1
             if i != len(fld_distinct):
-                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (weburl, colID, ln, fldID, fld_distinct[i][0], random.randint(0, 1000), weburl)
+                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfldscore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_2=%s&amp;fmeth=seo&amp;rand=%s#7"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>' % (CFG_SITE_URL, colID, ln, fldID, fld_distinct[i][0], random.randint(0, 1000), CFG_SITE_URL)
 
             actions.append([move, "%s" % fld_dict[fldID]])
             for col in [(('Modify values', 'modifyfield'), ('Remove search option', 'removefield'),)]:
-                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s#7.3">%s</a>' % (weburl, col[0][1], colID, ln, fldID, col[0][0]))
+                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s#7.3">%s</a>' % (CFG_SITE_URL, col[0][1], colID, ln, fldID, col[0][0]))
                 for (str, function) in col[1:]:
-                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=seo#7.3">%s</a>' % (weburl, function, colID, ln, fldID, str)
+                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fmeth=seo#7.3">%s</a>' % (CFG_SITE_URL, function, colID, ln, fldID, str)
         output += tupletotable(header=header, tuple=actions)
     else:
         output += """No search options exists for this collection"""
@@ -1574,13 +1574,13 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=CFG_SITE_LANG, content='', c
             fieldvalue = get_fld_value(fldvID)
             move = ""
             if j != 0:
-                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7.3"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (weburl, colID, ln, fldID, fldvID, col_fld[j - 1][1], random.randint(0, 1000), weburl)
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7.3"><img border="0" src="%s/img/smallup.gif" title="Move up"></a>""" % (CFG_SITE_URL, colID, ln, fldID, fldvID, col_fld[j - 1][1], random.randint(0, 1000), CFG_SITE_URL)
             else:
                 move += "&nbsp;&nbsp;&nbsp;"
 
             j += 1
             if j != len(col_fld):
-                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7.3"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (weburl, colID, ln, fldID, fldvID, col_fld[j][1], random.randint(0, 1000), weburl)
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfldvaluescore?colID=%s&amp;ln=%s&amp;id_1=%s&amp;id_fldvalue_1=%s&amp;id_fldvalue_2=%s&amp;rand=%s#7.3"><img border="0" src="%s/img/smalldown.gif" title="Move down"></a>""" % (CFG_SITE_URL, colID, ln, fldID, fldvID, col_fld[j][1], random.randint(0, 1000), CFG_SITE_URL)
 
             if fieldvalue[0][1] != fieldvalue[0][2] and fldvID is not None:
                 actions.append([move, "%s - %s" % (fieldvalue[0][1], fieldvalue[0][2])])
@@ -1589,9 +1589,9 @@ def perform_modifyfield(colID, fldID, fldvID='', ln=CFG_SITE_LANG, content='', c
 
             move = ''
             for col in [(('Modify value', 'modifyfieldvalue'), ('Remove value', 'removefieldvalue'),)]:
-                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fldvID=%s&amp;fmeth=seo#7.4">%s</a>' % (weburl, col[0][1], colID, ln, fldID, fldvID, col[0][0]))
+                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fldvID=%s&amp;fmeth=seo#7.4">%s</a>' % (CFG_SITE_URL, col[0][1], colID, ln, fldID, fldvID, col[0][0]))
                 for (str, function) in col[1:]:
-                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fldvID=%s#7.4">%s</a>' % (weburl, function, colID, ln, fldID, fldvID, str)
+                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fldID=%s&amp;fldvID=%s#7.4">%s</a>' % (CFG_SITE_URL, function, colID, ln, fldID, fldvID, str)
         output += tupletotable(header=header, tuple=actions)
 
     output += content
@@ -1610,7 +1610,7 @@ def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1)
     colID = int(colID)
     col_dict = dict(get_def_name('', "collection"))
 
-    subtitle = """<a name="10">10. Modify output formats for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.10">?</a>]</small>""" % (col_dict[colID], weburl)
+    subtitle = """<a name="10">10. Modify output formats for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.10">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
     output = """
     <dl>
      <dt>Output format actions (not specific to the chosen collection)
@@ -1631,20 +1631,20 @@ def perform_showoutputformats(colID, ln, callback='yes', content='', confirm=-1)
         for (id_format, colID_fld, code, score) in col_fmt:
             move = """<table cellspacing="1" cellpadding="0" border="0"><tr><td>"""
             if i != 0:
-                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfmtscore?colID=%s&amp;ln=%s&amp;type=format&amp;id_1=%s&amp;id_2=%s&amp;rand=%s#10"><img border="0" src="%s/img/smallup.gif" title="Move format up"></a>""" % (weburl, colID, ln, id_format, col_fmt[i - 1][0], random.randint(0, 1000), weburl)
+                move += """<a href="%s/admin/websearch/websearchadmin.py/switchfmtscore?colID=%s&amp;ln=%s&amp;type=format&amp;id_1=%s&amp;id_2=%s&amp;rand=%s#10"><img border="0" src="%s/img/smallup.gif" title="Move format up"></a>""" % (CFG_SITE_URL, colID, ln, id_format, col_fmt[i - 1][0], random.randint(0, 1000), CFG_SITE_URL)
             else:
                 move += "&nbsp;&nbsp;&nbsp;"
             move += "</td><td>"
             i += 1
             if i != len(col_fmt):
-                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfmtscore?colID=%s&amp;ln=%s&amp;type=format&amp;id_1=%s&amp;id_2=%s&amp;rand=%s#10"><img border="0" src="%s/img/smalldown.gif" title="Move format down"></a>' % (weburl, colID, ln, id_format, col_fmt[i][0], random.randint(0, 1000), weburl)
+                move += '<a href="%s/admin/websearch/websearchadmin.py/switchfmtscore?colID=%s&amp;ln=%s&amp;type=format&amp;id_1=%s&amp;id_2=%s&amp;rand=%s#10"><img border="0" src="%s/img/smalldown.gif" title="Move format down"></a>' % (CFG_SITE_URL, colID, ln, id_format, col_fmt[i][0], random.randint(0, 1000), CFG_SITE_URL)
             move += """</td></tr></table>"""
 
             actions.append([move, code, fmt_dict[int(id_format)]])
             for col in [(('Remove', 'removeoutputformat'),)]:
-                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fmtID=%s#10">%s</a>' % (weburl, col[0][1], colID, ln, id_format, col[0][0]))
+                actions[-1].append('<a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fmtID=%s#10">%s</a>' % (CFG_SITE_URL, col[0][1], colID, ln, id_format, col[0][0]))
                 for (str, function) in col[1:]:
-                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fmtID=%s#10">%s</a>' % (weburl, function, colID, ln, id_format, str)
+                    actions[-1][-1] += ' / <a href="%s/admin/websearch/websearchadmin.py/%s?colID=%s&amp;ln=%s&amp;fmtID=%s#10">%s</a>' % (CFG_SITE_URL, function, colID, ln, id_format, str)
         output += tupletotable(header=header, tuple=actions)
     else:
         output += """No output formats exists for this collection"""
@@ -1684,7 +1684,7 @@ def perform_manage_external_collections(colID, ln, callback='yes', content='', c
     colID = int(colID)
 
     subtitle = """<a name="11">11. Configuration of related external collections</a>
-    &nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.11">?</a>]</small>""" % weburl
+    &nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.11">?</a>]</small>""" % CFG_SITE_URL
     output = '<form action="update_external_collections" method="POST"><input type="hidden" name="colID" value="%(colID)d">' % {'colID': colID}
 
     table_header = ['External collection', 'Mode', 'Apply also to daughter collections?']
@@ -1735,7 +1735,7 @@ def perform_showdetailedrecordoptions(colID, ln, callback='yes', content='', con
     colID = int(colID)
 
     subtitle = """<a name="12">12. Configuration of detailed record page</a>
-    &nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.12">?</a>]</small>""" % weburl
+    &nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.12">?</a>]</small>""" % CFG_SITE_URL
     output = '''<form action="update_detailed_record_options" method="post">
     <table><tr><td>
     <input type="hidden" name="colID" value="%(colID)d">
@@ -1984,7 +1984,7 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
     <td>6.&nbsp;<small><a href="%s/help/admin/websearch-admin-guide?ln=%s">Guide</a></small></td>
     </tr>
     </table>
-    """ % (weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, colID, ln, weburl, ln)
+    """ % (CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, colID, ln, CFG_SITE_URL, ln)
 
     if mtype == "":
         fin_output += """<br /><br /><b><span class="info">For managing the collections, select an item from the menu.</span><b><br />"""
@@ -2035,7 +2035,7 @@ def show_coll_not_in_tree(colID, ln, col_dict):
         for id in res:
             if not in_tree.has_key(id[0]):
                 output += """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s" title="Edit collection">%s</a> ,
-                """ % (weburl, id[0], ln, col_dict[id[0]])
+                """ % (CFG_SITE_URL, id[0], ln, col_dict[id[0]])
         output += "<br /><br />"
     else:
         output = ""
@@ -2098,13 +2098,13 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
             tstack.append((id_son, dad, tables))
 
         if up == 1 and edit:
-            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_up=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/smallup.gif" title="Move collection up"></a>""" % (weburl, colID, ln, i, rtype, tree[i][0], weburl)
+            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_up=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/smallup.gif" title="Move collection up"></a>""" % (CFG_SITE_URL, colID, ln, i, rtype, tree[i][0], CFG_SITE_URL)
         else:
             text += """&nbsp;"""
         text += "</td><td>"
 
         if down == 1 and edit:
-            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_down=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/smalldown.gif" title="Move collection down"></a>""" % (weburl, colID, ln, i, rtype, tree[i][0], weburl)
+            text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_down=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/smalldown.gif" title="Move collection down"></a>""" % (CFG_SITE_URL, colID, ln, i, rtype, tree[i][0], CFG_SITE_URL)
         else:
             text += """&nbsp;"""
         text += "</td><td>"
@@ -2124,18 +2124,18 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
                     #    check = "true"
                     if check:
                         text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_from=%s&amp;move_to=%s%s&amp;rtype=%s#tree"><img border="0" src="%s/img/move_to.gif" title="Move '%s' to '%s'"></a>
-                """ % (weburl, colID, ln, move_from, rtype, i, rtype, weburl,  col_dict[tree_from[int(move_from[1:len(move_from)])][0]], col_dict[tree_to[i][0]])
+                """ % (CFG_SITE_URL, colID, ln, move_from, rtype, i, rtype, CFG_SITE_URL,  col_dict[tree_from[int(move_from[1:len(move_from)])][0]], col_dict[tree_to[i][0]])
                 else:
                     try:
-                        text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_from=%s%s&amp;rtype=%s#%s"><img border="0" src="%s/img/move_from.gif" title="Move '%s' from this location."></a>""" % (weburl, colID, ln, rtype, i, rtype, tree[i][0], weburl, col_dict[tree[i][0]])
+                        text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;move_from=%s%s&amp;rtype=%s#%s"><img border="0" src="%s/img/move_from.gif" title="Move '%s' from this location."></a>""" % (CFG_SITE_URL, colID, ln, rtype, i, rtype, tree[i][0], CFG_SITE_URL, col_dict[tree[i][0]])
                     except KeyError:
                         pass
             else:
                 text += """<img border="0" src="%s/img/white_field.gif">
-                """ % weburl
+                """ % CFG_SITE_URL
         else:
             text += """<img border="0" src="%s/img/white_field.gif">
-                """ % weburl
+                """ % CFG_SITE_URL
 
         text += """
         </td>
@@ -2143,12 +2143,12 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
 
         if edit:
             try:
-                text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;delete=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/iconcross.gif" title="Remove colletion from tree"></a>""" % (weburl, colID, ln, i, rtype, tree[i][0], weburl)
+                text += """<a href="%s/admin/websearch/websearchadmin.py/modifycollectiontree?colID=%s&amp;ln=%s&amp;delete=%s&amp;rtype=%s#%s"><img border="0" src="%s/img/iconcross.gif" title="Remove colletion from tree"></a>""" % (CFG_SITE_URL, colID, ln, i, rtype, tree[i][0], CFG_SITE_URL)
             except KeyError:
                 pass
         elif i != 0:
             text += """<img border="0" src="%s/img/white_field.gif">
-        """ % weburl
+        """ % CFG_SITE_URL
 
         text += """</td><td>
         """
@@ -2157,7 +2157,7 @@ def create_colltree(tree, col_dict, colID, ln, move_from='', move_to='', rtype='
             move_from = tmove_from
 
         try:
-            text += """<a name="%s"></a>%s<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s" title="Edit collection">%s</a>%s%s%s""" % (tree[i][0], (reltype=="v" and '<i>' or ''), weburl, tree[i][0], ln, col_dict[id_son], (move_to=="%s%s" %(rtype, i) and '&nbsp;<img border="0" src="%s/img/move_to.gif">' % weburl or ''), (move_from=="%s%s" % (rtype, i) and '&nbsp;<img border="0" src="%s/img/move_from.gif">' % weburl or ''), (reltype=="v" and '</i>' or ''))
+            text += """<a name="%s"></a>%s<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s" title="Edit collection">%s</a>%s%s%s""" % (tree[i][0], (reltype=="v" and '<i>' or ''), CFG_SITE_URL, tree[i][0], ln, col_dict[id_son], (move_to=="%s%s" %(rtype, i) and '&nbsp;<img border="0" src="%s/img/move_to.gif">' % CFG_SITE_URL or ''), (move_from=="%s%s" % (rtype, i) and '&nbsp;<img border="0" src="%s/img/move_from.gif">' % CFG_SITE_URL or ''), (reltype=="v" and '</i>' or ''))
         except KeyError:
             pass
 
@@ -2189,12 +2189,12 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     </dl>
     </strong>
     </span>
-    """ % weburl
+    """ % CFG_SITE_URL
 
     col_dict = dict(get_def_name('', "collection"))
     if colID != 1 and colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.4">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.4">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
         res = run_sql("SELECT * from collection_collection WHERE id_dad=%s" % colID)
         res2 = run_sql("SELECT * from collection_collection WHERE id_son=%s" % colID)
 
@@ -2333,7 +2333,7 @@ def perform_editcollection(colID=1, ln=CFG_SITE_LANG, mtype='', content=''):
 def perform_checkwebcollstatus(colID, ln, confirm=0, callback='yes'):
     """Check status of the collection tables with respect to the webcoll cache."""
 
-    subtitle = """<a name="11"></a>Webcoll Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#4">?</a>]""" % weburl
+    subtitle = """<a name="11"></a>Webcoll Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#4">?</a>]""" % CFG_SITE_URL
     output  = ""
 
     colID = int(colID)
@@ -2434,7 +2434,7 @@ def perform_modifyrestricted(colID, ln, rest='', callback='yes', confirm=-1):
     action_id = acc_get_action_id(VIEWRESTRCOLL)
     if colID and col_dict.has_key(int(colID)):
         colID = int(colID)
-        subtitle = """<a name="2">2. Modify access restrictions for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.2">?</a>]</small>""" % (col_dict[colID], weburl)
+        subtitle = """<a name="2">2. Modify access restrictions for collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.2">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
 
         output = """<p>Please note that CDS Invenio versions greater than <em>0.92.1</em> manage collection restriction via the standard
         <strong><a href="/admin/webaccess/webaccessadmin.py/modifyauthorizations?id_action=%i&reverse=1">WebAccess Admin Interface</a></strong> (action '%s').</p>
@@ -2451,7 +2451,7 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
 
     from invenio.search_engine import collection_restricted_p
 
-    subtitle = """<a name="11"></a>Collection Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#5">?</a>]""" % weburl
+    subtitle = """<a name="11"></a>Collection Status&nbsp;&nbsp;&nbsp;[<a href="%s/help/admin/websearch-admin-guide#5">?</a>]""" % CFG_SITE_URL
     output  = ""
 
     colID = int(colID)
@@ -2503,7 +2503,7 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
 
         if status == "":
             status = """<b><span class="info">OK</span></b>"""
-        actions.append([id, """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s">%s</a>""" % (weburl, id, ln, name), dbquery, subs, restricted, i8n, status])
+        actions.append([id, """<a href="%s/admin/websearch/websearchadmin.py/editcollection?colID=%s&amp;ln=%s">%s</a>""" % (CFG_SITE_URL, id, ln, name), dbquery, subs, restricted, i8n, status])
 
 
     output += tupletotable(header=header, tuple=actions)

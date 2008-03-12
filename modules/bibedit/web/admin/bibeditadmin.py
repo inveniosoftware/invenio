@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 
-from invenio.config import CFG_SITE_LANG, weburl
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized
 from invenio.bibedit_engine import perform_request_index, perform_request_edit, perform_request_submit
@@ -32,7 +32,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.messages import gettext_set_language, wash_language
 from invenio.urlutils import wash_url_argument, redirect_to_url
 
-navtrail = """ <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> """ % (weburl,)
+navtrail = """ <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> """ % (CFG_SITE_URL,)
 
 def index(req, ln=CFG_SITE_LANG, recid=None, temp="false", format_tag='marc',
           edit_tag=None, delete_tag=None, num_field=None, add=0, cancel=0,

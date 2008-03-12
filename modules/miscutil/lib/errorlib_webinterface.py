@@ -27,7 +27,7 @@ __revision__ = "$Id$"
 
 __lastupdated__ = "$Date$"
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.webpage import page
 from invenio.errorlib import send_error_report_to_admin
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
@@ -41,7 +41,7 @@ class WebInterfaceErrorPages(WebInterfaceDirectory):
 
     def index(self, req, form):
         """Index page."""
-        redirect_to_url(req, '%s/error/send' % weburl)
+        redirect_to_url(req, '%s/error/send' % CFG_SITE_URL)
 
     def send(self, req, form):
         """

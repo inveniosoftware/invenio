@@ -28,7 +28,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_URL, \
-     weburl
+     CFG_SITE_URL
 from invenio.dbquery import run_sql, Error
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import \
@@ -140,9 +140,9 @@ def displayRefereesPage(doctype, warningText):
     <td valign="top">"""
     # call the function to display the form allowing the manager to add new users
     t += displayAddUser(doctype)
-    end_url = "%s/admin/websubmit/websubmitadmin.py/doctypeconfigure?doctype=%s" % (weburl, doctype)
+    end_url = "%s/admin/websubmit/websubmitadmin.py/doctypeconfigure?doctype=%s" % (CFG_SITE_URL, doctype)
     if doctype in ['', '*']:
-        end_url = "%s/admin/websubmit/websubmitadmin.py/" % weburl
+        end_url = "%s/admin/websubmit/websubmitadmin.py/" % CFG_SITE_URL
     t += """
     </td></tr></table>
 <!-- End submissionuser rule -->

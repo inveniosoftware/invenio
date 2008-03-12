@@ -20,13 +20,13 @@
 __revision__ = "$Id$"
 
 from invenio.bibedit_dblayer import *
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.messages import gettext_set_language
 
 ## Link of edit and delete button:
-btn_delete_url = weburl + "/img/iconcross.gif"
-btn_edit_url   = weburl + "/img/iconpen.gif"
-weburl_bibedit = "%s/admin/bibedit/bibeditadmin.py" % weburl
+btn_delete_url = CFG_SITE_URL + "/img/iconcross.gif"
+btn_edit_url   = CFG_SITE_URL + "/img/iconpen.gif"
+bibediturl = "%s/admin/bibedit/bibeditadmin.py" % CFG_SITE_URL
 
 class Template:
 
@@ -51,7 +51,7 @@ class Template:
             print_action_edit_100 = print_input_add_form + self.tmpl_input('hidden', str(num_field), 'num_field')
 
             if add != 1:
-                link_add_subfields = self.tmpl_link(ln, _("Add Subfield"), weburl_bibedit, 'edit',
+                link_add_subfields = self.tmpl_link(ln, _("Add Subfield"), bibediturl, 'edit',
                                                     {'recid'      : str(recid),
                                                      'tag'        : tag[:3],
                                                      'num_field'  : str(num_field),
@@ -66,7 +66,7 @@ class Template:
                 #and will be used in enrichment editing
                 if str(tag[:3]) == "100x": #FIXME
                             link_edit_100 = self.tmpl_link(
-                                ln, _("Edit institute"), weburl_bibedit, 'edit',
+                                ln, _("Edit institute"), bibediturl, 'edit',
                                 {'recid'      : str(recid),
                                  'tag'        : tag[:3],
                                  'num_field'  : str(num_field),
@@ -92,7 +92,7 @@ class Template:
             else:
                 link_form = "index"
 
-            result = """ <form action="%(weburl_bibedit)s/%(link_form)s" method="POST">
+            result = """ <form action="%(bibediturl)s/%(link_form)s" method="POST">
                            %(input_recid)s
                            %(input_temp)s
                            %(input_ln)s
@@ -100,7 +100,7 @@ class Template:
                            %(print_action_add_subfield)s
                            %(print_action_edit_100)s
                          </div>
-                     """ % {'weburl_bibedit'            : weburl_bibedit,
+                     """ % {'bibediturl'            : bibediturl,
                             'input_recid'               : self.tmpl_input('hidden', recid,  'recid'),
                             'input_temp'                : self.tmpl_input('hidden', 'true', 'temp'),
                             'input_ln'                  : self.tmpl_input('hidden', ln,     'ln'),
@@ -109,32 +109,32 @@ class Template:
                             'print_action_edit_100' : print_action_edit_100}
         else:
             link_submit         = ''
-            link_add_field      = self.tmpl_link(ln, _("Add Field"), weburl_bibedit, 'index',
+            link_add_field      = self.tmpl_link(ln, _("Add Field"), bibediturl, 'index',
                                                  {'recid'      : str(recid),
                                                   'tag'        : tag[:3],
                                                   'format_tag' : format_tag,
                                                   'temp'       : 'true',
                                                   'add'        : 3}, 'add') + " | "
 
-            link_diplay_verbose = self.tmpl_link(ln, _("Verbose"), weburl_bibedit, 'index',
+            link_diplay_verbose = self.tmpl_link(ln, _("Verbose"), bibediturl, 'index',
                                                  {'recid'      : str(recid),
                                                   'format_tag' : 's',
                                                   'temp'       : temp})
 
-            link_diplay_marc    = self.tmpl_link(ln, "MARC", weburl_bibedit, 'index',
+            link_diplay_marc    = self.tmpl_link(ln, "MARC", bibediturl, 'index',
                                                  {'recid'      : str(recid),
                                                   'format_tag' : 'marc',
                                                   'temp'       : temp})
 
             if temp != "false" and add != 3:
-                link_submit = self.tmpl_link(ln, _("Submit"), weburl_bibedit, 'submit', {'recid' : str(recid)}) + " | "
+                link_submit = self.tmpl_link(ln, _("Submit"), bibediturl, 'submit', {'recid' : str(recid)}) + " | "
 
             if add == 3:
                 link_add_field = ''
                 result = ''
             else:
-                link_cancel = self.tmpl_link(ln, _("Cancel"), weburl_bibedit, 'index', {'cancel' : str(recid)})
-                link_delete = self.tmpl_link(ln, _("Delete"), weburl_bibedit, 'index', {'delete' : str(recid),
+                link_cancel = self.tmpl_link(ln, _("Cancel"), bibediturl, 'index', {'cancel' : str(recid)})
+                link_delete = self.tmpl_link(ln, _("Delete"), bibediturl, 'index', {'delete' : str(recid),
                                                                                         'confirm_delete' :1,
                                                                                         'temp' : temp})
 
@@ -232,7 +232,7 @@ class Template:
         else:
             #click on "add field" link on the top of index page.
             result = """ <td class="bibEditCellTag">
-                           <form action="%(weburl_bibedit)s/index" method="POST">
+                           <form action="%(bibediturl)s/index" method="POST">
                              %(input_recid)s
                              %(input_temp)s
                              %(input_ln)s
@@ -245,7 +245,7 @@ class Template:
                                  ind2:
                                  <input type="text" name="add_ind2" maxlength="1" size="1" />
                                </b>
-                         </td> """ % {'weburl_bibedit' : weburl_bibedit,
+                         </td> """ % {'bibediturl' : bibediturl,
                                       'input_recid'    : self.tmpl_input('hidden', recid, 'recid'),
                                       'input_temp'     : self.tmpl_input('hidden', 'true', 'temp'),
                                       'input_add'      : self.tmpl_input('hidden', 4, 'add'),
@@ -331,7 +331,7 @@ class Template:
 
                     print_btn = "<td>%s</td>" \
                                % self.tmpl_link(ln, '<img border="0" src="%s" alt="%s" />' % (btn_delete_url, _("Delete")),
-                                                weburl_bibedit, 'edit',
+                                                bibediturl, 'edit',
                                                 {'recid'        : str(recid),
                                                  'tag'          : tag_field[:-1]+ tag_subfield,
                                                  'num_field'    : num_field,
@@ -367,7 +367,7 @@ class Template:
         """ Print button function to edit and delete information. """
         _ = gettext_set_language(ln)
         btn_edit = self.tmpl_link(ln, '<img style="border:0px" src="%s" alt="%s" />' % (btn_edit_url, _("Edit")),
-                                  weburl_bibedit, 'edit',
+                                  bibediturl, 'edit',
                                   {'recid'        : str(recid),
                                    'tag'          : tag,
                                    'num_field'    : num_field,
@@ -375,7 +375,7 @@ class Template:
                                    'temp'         : 'true'})
 
         btn_delete = self.tmpl_link(ln, '<img style="border: 0px" src="%s" alt="%s" />' % (btn_delete_url, _("Delete")),
-                                    weburl_bibedit, 'index',
+                                    bibediturl, 'index',
                                     {'recid'      : str(recid),
                                      'delete_tag' : tag,
                                      'num_field'  : num_field,
@@ -458,12 +458,12 @@ class Template:
         else:
             result = ''
 
-        result += """ <form action="%(weburl_bibedit)s/index"  method="POST">
+        result += """ <form action="%(bibediturl)s/index"  method="POST">
                         %(input_ln)s
                         <span style="background-color: #ddd; padding: 5px;">
                           %(message)s: %(input_recid)s %(input_button)s
                         </span>
-                      </form> """ % {'weburl_bibedit' : weburl_bibedit,
+                      </form> """ % {'bibediturl' : bibediturl,
                                      'message' : _("Please enter the ID of the record you want to edit"),
                                      'input_ln'       : self.tmpl_input('hidden', ln, 'ln'),
                                      'input_recid'    : self.tmpl_input('text'  , '', 'recid'),
@@ -487,19 +487,19 @@ class Template:
         if message == 1:
             return """ %(message)s
                        <div style="float:left;">
-                         <form action="%(weburl_bibedit)s/index?delete=%(recid)s" method="POST">
+                         <form action="%(bibediturl)s/index?delete=%(recid)s" method="POST">
                            %(input_ln)s
                            %(input_button_yes)s
                          </form>
                        </div>
                        <div style="float:left;">
-                         <form action="%(weburl_bibedit)s/index?recid=%(recid)s&temp=%(temp)s&format_tag=%(format_tag)s" method="POST">
+                         <form action="%(bibediturl)s/index?recid=%(recid)s&temp=%(temp)s&format_tag=%(format_tag)s" method="POST">
                            %(input_ln)s
                            %(input_button_no)s
                          </form>
                        </div>
                    """ % {'message'          : _("Do you really want to delete this record?"),
-                          'weburl_bibedit'   : weburl_bibedit,
+                          'bibediturl'   : bibediturl,
                           'recid'            : str(recid),
                           'input_ln'         : self.tmpl_input('hidden', ln, 'ln'),
                           'input_button_yes' : self.tmpl_input('submit', _("Yes"), class_css='formbutton'),

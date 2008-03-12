@@ -32,7 +32,7 @@ from invenio.dbquery import run_sql
 from invenio.config import CFG_SITE_LANG, \
                            CFG_WEBALERT_ALERT_ENGINE_EMAIL,\
                            CFG_SITE_ADMIN_EMAIL,\
-                           weburl,\
+                           CFG_SITE_URL,\
                            CFG_SITE_NAME,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS,\
                            CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS,\
@@ -345,7 +345,7 @@ Please go to the WebComment Admin interface %(comment_admin_link)s to delete thi
                     'review_stuff'          : CFG_WEBCOMMENT_ALLOW_REVIEWS and \
                                               "star score\t\t= %s\n\t\t\treview title\t\t= %s" % (cmt_star, cmt_title) or "",
                     'cmt_body'              : cmt_body,
-                    'comment_admin_link'    : weburl + "/admin/webcomment/webcommentadmin.py",
+                    'comment_admin_link'    : CFG_SITE_URL + "/admin/webcomment/webcommentadmin.py",
                     'user_admin_link'       : "user_admin_link" #! FIXME
                 }
 
@@ -936,7 +936,7 @@ RECORD CONCERNED:
 <!-- end body -->
 
 ADMIN OPTIONS:
-To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?comid=%(comID)s
+To delete comment go to %(siteurl)s/admin/webcomment/webcommentadmin.py/delete?comid=%(comID)s
     ''' % \
         {   'comment_or_review'     : star_score>0 and 'review' or 'comment',
             'comment_or_review_caps': star_score>0 and 'REVIEW' or 'COMMENT',
@@ -949,7 +949,7 @@ To delete comment go to %(weburl)s/admin/webcomment/webcommentadmin.py/delete?co
             'comID'                 : comID2,
             'review_stuff'          : star_score>0 and review_stuff or "",
             'body'                  : body.replace('<br />','\n'),
-            'weburl'                : weburl
+            'siteurl'                : CFG_SITE_URL
         }
 
     from_addr = '%s WebComment <%s>' % (CFG_SITE_NAME, CFG_WEBALERT_ALERT_ENGINE_EMAIL)

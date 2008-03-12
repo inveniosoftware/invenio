@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 import cgi
 from zlib import decompress
 
-from invenio.config import CFG_SITE_LANG, weburl
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui, \
                               convert_datetext_to_datestruct,\
@@ -385,7 +385,7 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
     if not(len(validated_recids)):
         warnings.append('WRN_WEBBASKET_NO_RECORD')
         body += webbasket_templates.tmpl_warnings(warnings, ln)
-        if referer and not(referer.find(weburl) == -1):
+        if referer and not(referer.find(CFG_SITE_URL) == -1):
             body += webbasket_templates.tmpl_back_link(referer, ln)
         return (body, errors, warnings)
 
@@ -759,7 +759,7 @@ def create_basket_navtrail(uid,
     if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
         out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">'\
                '%s</a>'
-        out %= (weburl,
+        out %= (CFG_SITE_URL,
                 'category=' + category + '&amp;ln=' + ln,
                 _("Personal baskets"))
         topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
@@ -767,7 +767,7 @@ def create_basket_navtrail(uid,
             out += ' &gt; '
             out += '<a class="navtrail" href="%s/yourbaskets/display?%s">'\
                    '%s</a>'
-            out %= (weburl,
+            out %= (CFG_SITE_URL,
                     'category=' + category + '&amp;topic=' + \
                                   str(topic) + '&amp;ln=' + ln,
                     cgi.escape(topics[topic]))
@@ -777,7 +777,7 @@ def create_basket_navtrail(uid,
                     out += ' &gt; '
                     out += '<a class="navtrail" href="%s/yourbaskets/display'\
                            '?%s">%s</a>'
-                    out %= (weburl,
+                    out %= (CFG_SITE_URL,
                             'category=' + category + '&amp;topic=' + \
                             str(topic) + '&amp;ln=' + ln + '#bsk' + str(bskid),
                             cgi.escape(basket[1]))
@@ -785,14 +785,14 @@ def create_basket_navtrail(uid,
     elif category == CFG_WEBBASKET_CATEGORIES['GROUP']:
         out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">'\
                '%s</a>'
-        out %= (weburl, 'category=' + category + '&amp;ln=' + ln, _("Group baskets"))
+        out %= (CFG_SITE_URL, 'category=' + category + '&amp;ln=' + ln, _("Group baskets"))
         groups = db.get_group_infos(uid)
         if group:
             groups = filter(lambda x: x[0] == group, groups)
         if len(groups):
             out += ' &gt; '
             out += '<a class="navtrail" href="%s/yourbaskets/display?%s">%s</a>'
-            out %= (weburl,
+            out %= (CFG_SITE_URL,
                     'category=' + category + '&amp;group=' + \
                               str(group) + '&amp;ln=' + ln,
                     cgi.escape(groups[0][1]))
@@ -802,14 +802,14 @@ def create_basket_navtrail(uid,
                     out += ' &gt; '
                     out += '<a class="navtrail" href="%s/yourbaskets/display?'\
                            '%s">%s</a>'
-                    out %= (weburl,
+                    out %= (CFG_SITE_URL,
                             'category=' + category + '&amp;group=' + \
                             str(group) + '&amp;ln=' + ln + '#bsk' + str(bskid),
                             cgi.escape(basket[1]))
     elif category == CFG_WEBBASKET_CATEGORIES['EXTERNAL']:
         out += ' &gt; <a class="navtrail" href="%s/yourbaskets/display?%s">'\
                '%s</a>'
-        out %= (weburl,
+        out %= (CFG_SITE_URL,
                 'category=' + category + '&amp;ln=' + ln,
                 _("Others' baskets"))
         if bskid:
@@ -818,7 +818,7 @@ def create_basket_navtrail(uid,
                 out += ' &gt; '
                 out += '<a class="navtrail" href="%s/yourbaskets/display?%s">'\
                        '%s</a>'
-                out %= (weburl,
+                out %= (CFG_SITE_URL,
                         'category=' + category + '&amp;ln=' + ln + \
                         '#bsk' + str(bskid),
                         cgi.escape(basket[1]))
@@ -834,7 +834,7 @@ def account_list_baskets(uid, ln=CFG_SITE_LANG):
     _ = gettext_set_language(ln)
     (personal, group, external) = db.count_baskets(uid)
     link = '<a href="%s">%s</a>'
-    base_url = weburl + '/yourbaskets/display?category=%s&amp;ln=' + ln
+    base_url = CFG_SITE_URL + '/yourbaskets/display?category=%s&amp;ln=' + ln
     personal_text = personal
     if personal:
         url = base_url % CFG_WEBBASKET_CATEGORIES['PRIVATE']
@@ -847,7 +847,7 @@ def account_list_baskets(uid, ln=CFG_SITE_LANG):
     if external:
         url = base_url % CFG_WEBBASKET_CATEGORIES['EXTERNAL']
     else:
-        url = weburl + '/yourbaskets/list_public_baskets?ln=' + ln
+        url = CFG_SITE_URL + '/yourbaskets/list_public_baskets?ln=' + ln
     external_text = link % (url, external_text)
     out = _("You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)s group baskets and %(x_nb_public)s other users public baskets.") %\
         {'x_nb_perso': personal_text,

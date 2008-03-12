@@ -46,7 +46,7 @@ def format(bfo, limit, separator=' ; ',
     """
     from urllib import quote
     from cgi import escape
-    from invenio.config import weburl
+    from invenio.config import CFG_SITE_URL
     from invenio.messages import gettext_set_language
 
     _ = gettext_set_language(bfo.lang)    # load the right message language
@@ -70,7 +70,7 @@ def format(bfo, limit, separator=' ; ',
                                                         bfo.search_pattern)
 
             if print_links.lower() == "yes":
-                author['a'] = '<a href="' + weburl + \
+                author['a'] = '<a href="' + CFG_SITE_URL + \
                               '/search?f=author&amp;p='+ quote(author['a']) + \
                               '&amp;ln='+ bfo.lang + \
                               '">'+escape(author['a'])+'</a>'

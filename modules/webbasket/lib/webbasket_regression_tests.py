@@ -27,7 +27,7 @@ import unittest
 import mechanize
 import re
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, make_url, make_surl, merge_error_messages
 
@@ -37,7 +37,7 @@ class WebBasketWebPagesAvailabilityTest(unittest.TestCase):
     def test_your_baskets_pages_availability(self):
         """webbasket - availability of Your Baskets pages"""
 
-        baseurl = weburl + '/yourbaskets/'
+        baseurl = CFG_SITE_URL + '/yourbaskets/'
 
         _exports = ['', 'display', 'display_item', 'write_comment',
                     'save_comment', 'delete_comment', 'add', 'delete',

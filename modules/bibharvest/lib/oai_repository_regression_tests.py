@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import unittest
 import time
 
-from invenio.config import weburl, CFG_OAI_SLEEP
+from invenio.config import CFG_SITE_URL, CFG_OAI_SLEEP
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -36,7 +36,7 @@ class OAIRepositoryWebPagesAvailabilityTest(unittest.TestCase):
     def test_your_baskets_pages_availability(self):
         """oairepository - availability of OAI server pages""" 
 
-        baseurl = weburl + '/oai2d'
+        baseurl = CFG_SITE_URL + '/oai2d'
 
         _exports = [#fast commands first:
                     '?verb=Identify',

@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import weburl
+from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
                               test_web_page_content, merge_error_messages
 
@@ -35,7 +35,7 @@ class OAIArchiveAdminWebPagesAvailabilityTest(unittest.TestCase):
     def test_oaiarchiveadmin_interface_pages_availability(self):
         """oaiarchiveadmin - availability of OAIArchive Admin interface pages""" 
 
-        baseurl = weburl + '/admin/bibharvest/oaiarchiveadmin.py/'
+        baseurl = CFG_SITE_URL + '/admin/bibharvest/oaiarchiveadmin.py/'
 
         _exports = ['', 'delset', 'editset', 'addset']
         
@@ -55,7 +55,7 @@ class OAIArchiveAdminWebPagesAvailabilityTest(unittest.TestCase):
 
     def test_oaiarchiveadmin_edit_set(self):
         """oaiarchiveadmin - edit set page"""
-        test_edit_url = weburl + \
+        test_edit_url = CFG_SITE_URL + \
                "/admin/bibharvest/oaiarchiveadmin.py/editset?oai_set_id=1"
         error_messages = test_web_page_content(test_edit_url,
                                                username='admin')
@@ -65,7 +65,7 @@ class OAIArchiveAdminWebPagesAvailabilityTest(unittest.TestCase):
 
     def test_oaiarchiveadmin_delete_set(self):
         """oaiarchiveadmin - delete set page"""
-        test_edit_url = weburl + \
+        test_edit_url = CFG_SITE_URL + \
                "/admin/bibharvest/oaiarchiveadmin.py/delset?oai_set_id=1"
         error_messages = test_web_page_content(test_edit_url,
                                                username='admin')

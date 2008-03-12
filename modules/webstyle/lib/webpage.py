@@ -28,7 +28,7 @@ from invenio.config import \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP, \
      CFG_SITE_LANG, \
      CFG_SITE_SUPPORT_EMAIL, \
-     weburl
+     CFG_SITE_URL
 from invenio.messages import gettext_set_language
 from invenio.webuser import create_userinfobox_body
 from invenio.errorlib import get_msgs_for_code_list, register_errors
@@ -64,7 +64,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
          cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
          language=CFG_SITE_LANG, verbose=1, titleprologue="",
          titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], navmenuid="admin",
-         navtrail_append_title_p=1, of="", rssurl=weburl+"/rss"):
+         navtrail_append_title_p=1, of="", rssurl=CFG_SITE_URL+"/rss"):
 
     """page(): display CDS web page
         input: title of the page
@@ -174,7 +174,7 @@ def pageheaderonly(title, navtrail="", description="", keywords="", uid=0,
                    cdspageheaderadd="", language=CFG_SITE_LANG, req=None,
                    secure_page_p=0, verbose=1, navmenuid="admin",
                    navtrail_append_title_p=1, metaheaderadd="",
-                   rssurl=weburl+"/rss"):
+                   rssurl=CFG_SITE_URL+"/rss"):
     """Return just the beginning of page(), with full headers.
        Suitable for the search results page and any long-taking scripts."""
 

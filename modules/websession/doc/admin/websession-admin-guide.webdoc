@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: WebSession Admin Guide -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
    <p><table class="errorbox">
@@ -83,4 +83,4 @@ You can use InvenioGC for cleaning old logs (e.g. BibSched task logs) and tempor
 files, by specfying the <tt>--logs</tt> option on the command line,
 or very old revisions of documents, by specfying <tt>--documents</tt>.</p>
 
-<p>Please see also the <a href="<WEBURL>/help/admin/howto-run">HOWTO Run</a> guide.</p>
+<p>Please see also the <a href="<CFG_SITE_URL>/help/admin/howto-run">HOWTO Run</a> guide.</p>

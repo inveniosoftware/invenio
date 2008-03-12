@@ -32,7 +32,7 @@ import time
 from urllib2 import urlopen
 from md5 import md5
 
-from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, weburl, CFG_TMPDIR
+from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDIR
 from invenio import bibupload
 from invenio.bibupload_config import CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
                              CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
@@ -1853,18 +1853,18 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
         </record>
-        """ % {'weburl': weburl}
+        """ % {'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/cds.gif
-        """ % {'weburl': weburl}
-        testrec_expected_url = "%(weburl)s/record/123456789/files/cds.gif" \
-            % {'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        """ % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+            % {'siteurl': CFG_SITE_URL}
         # insert test record:
         task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -1918,20 +1918,20 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/test.ps.Z</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/test.ps.Z</subfield>
          </datafield>
         </record>
-        """ % {'weburl': weburl}
+        """ % {'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/test.ps.Z
-        """ % {'weburl': weburl}
-        testrec_expected_url = "%(weburl)s/record/123456789/files/test.ps.Z" \
-               % {'weburl': weburl}
-        testrec_expected_url2 = "%(weburl)s/record/123456789/files/test?format=ps.Z" \
-               % {'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/test.ps.Z
+        """ % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/test.ps.Z" \
+               % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url2 = "%(siteurl)s/record/123456789/files/test?format=ps.Z" \
+               % {'siteurl': CFG_SITE_URL}
         # insert test record:
         task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -1975,13 +1975,13 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="a">%s/img/head.gif</subfield>
          </datafield>
         </record>
-        """ % weburl
+        """ % CFG_SITE_URL
         # insert test record:
         task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
 
-        original_md5 = md5(urlopen('%s/img/head.gif' % weburl).read()).hexdigest()
+        original_md5 = md5(urlopen('%s/img/head.gif' % CFG_SITE_URL).read()).hexdigest()
 
         bibrec_str = str(BibRecDocs(int(recid)))
 
@@ -2032,26 +2032,26 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/CIDIESSE.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/CIDIESSE.gif</subfield>
           <subfield code="y">This is a description</subfield>
           <subfield code="z">This is a comment</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/CIDIESSE.jpeg</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/CIDIESSE.jpeg</subfield>
           <subfield code="y">This is a description</subfield>
           <subfield code="z">This is a second comment</subfield>
          </datafield>
         </record>
-        """ % {'weburl': weburl}
+        """ % {'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/CIDIESSE.gif$$yThis is a description$$zThis is a comment
-        8564_ $$u%(weburl)s/record/123456789/files/CIDIESSE.jpeg$$yThis is a description$$zThis is a second comment
-        """ % {'weburl': weburl}
-        testrec_expected_url1 = "%(weburl)s/record/123456789/files/CIDIESSE.gif" % {'weburl': weburl}
-        testrec_expected_url2 = "%(weburl)s/record/123456789/files/CIDIESSE.jpeg" % {'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/CIDIESSE.gif$$yThis is a description$$zThis is a comment
+        8564_ $$u%(siteurl)s/record/123456789/files/CIDIESSE.jpeg$$yThis is a description$$zThis is a second comment
+        """ % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url1 = "%(siteurl)s/record/123456789/files/CIDIESSE.gif" % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url2 = "%(siteurl)s/record/123456789/files/CIDIESSE.jpeg" % {'siteurl': CFG_SITE_URL}
         # insert test record:
         task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -2104,25 +2104,25 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="q">%(weburl)s/record/123456789/files/icon-cds.gif</subfield>
+          <subfield code="q">%(siteurl)s/record/123456789/files/icon-cds.gif</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
         </record>
-        """ % {'weburl': weburl}
+        """ % {'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/cds.gif
-        8564_ $$q%(weburl)s/record/123456789/files/icon-cds.gif$$xicon
-        """ % {'weburl': weburl}
-        testrec_expected_url = "%(weburl)s/record/123456789/files/cds.gif" \
-            % {'weburl': weburl}
-        testrec_expected_icon = "%(weburl)s/record/123456789/files/icon-cds.gif" \
-            % {'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        8564_ $$q%(siteurl)s/record/123456789/files/icon-cds.gif$$xicon
+        """ % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+            % {'siteurl': CFG_SITE_URL}
+        testrec_expected_icon = "%(siteurl)s/record/123456789/files/icon-cds.gif" \
+            % {'siteurl': CFG_SITE_URL}
         # insert test record:
         task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -2148,7 +2148,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
         self.failUnless("This file is restricted" in open_url.read())
 
         open_icon = urlopen(testrec_expected_icon)
-        restricted_icon = urlopen("%s/img/restricted.gif" % weburl)
+        restricted_icon = urlopen("%s/img/restricted.gif" % CFG_SITE_URL)
         self.failUnless(open_icon.read() == restricted_icon.read())
         bibupload.wipe_out_record_from_all_tables(recid)
 
@@ -2177,25 +2177,25 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="q">%(weburl)s/record/123456789/files/icon-cds.gif</subfield>
+          <subfield code="q">%(siteurl)s/record/123456789/files/icon-cds.gif</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
         </record>
-        """ % {'weburl': weburl}
+        """ % {'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/cds.gif
-        8564_ $$q%(weburl)s/record/123456789/files/icon-cds.gif$$xicon
-        """ % {'weburl': weburl}
-        testrec_expected_url = "%(weburl)s/record/123456789/files/cds.gif" \
-            % {'weburl': weburl}
-        testrec_expected_icon = "%(weburl)s/record/123456789/files/icon-cds.gif" \
-            % {'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        8564_ $$q%(siteurl)s/record/123456789/files/icon-cds.gif$$xicon
+        """ % {'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
+            % {'siteurl': CFG_SITE_URL}
+        testrec_expected_icon = "%(siteurl)s/record/123456789/files/icon-cds.gif" \
+            % {'siteurl': CFG_SITE_URL}
         # insert test record:
         task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -2259,32 +2259,32 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/0101001.pdf</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/0101001.pdf</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/demobibdata.xml</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/demobibdata.xml</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/head.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/head.gif</subfield>
          </datafield>
         </record>
-        """ % { 'weburl': weburl}
+        """ % { 'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/0101001.pdf
-        8564_ $$u%(weburl)s/record/123456789/files/cds.gif
-        8564_ $$u%(weburl)s/record/123456789/files/demobibdata.xml
-        8564_ $$u%(weburl)s/record/123456789/files/head.gif
-        """ % { 'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/0101001.pdf
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/demobibdata.xml
+        8564_ $$u%(siteurl)s/record/123456789/files/head.gif
+        """ % { 'siteurl': CFG_SITE_URL}
         # insert test record:
         testrec_expected_urls = []
         for files in ('cds.gif', 'head.gif', '0101001.pdf', 'demobibdata.xml'):
-            testrec_expected_urls.append('%(weburl)s/record/123456789/files/%(files)s' % {'weburl' : weburl, 'files' : files})
+            testrec_expected_urls.append('%(siteurl)s/record/123456789/files/%(files)s' % {'siteurl' : CFG_SITE_URL, 'files' : files})
         task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -2295,7 +2295,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
                                                           str(recid))
         testrec_expected_urls = []
         for files in ('cds.gif', 'head.gif', '0101001.pdf', 'demobibdata.xml'):
-            testrec_expected_urls.append('%(weburl)s/record/%(recid)s/files/%(files)s' % {'weburl' : weburl, 'files' : files, 'recid' : recid})
+            testrec_expected_urls.append('%(siteurl)s/record/%(recid)s/files/%(files)s' % {'siteurl' : CFG_SITE_URL, 'files' : files, 'recid' : recid})
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
@@ -2352,18 +2352,18 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
         </record>
-        """ % { 'weburl': weburl}
+        """ % { 'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/cds.gif
-        """ % { 'weburl': weburl}
-        testrec_expected_url = "%(weburl)s/record/123456789/files/patata.gif" \
-            % {'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        """ % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/patata.gif" \
+            % {'siteurl': CFG_SITE_URL}
         # insert test record:
         task_set_option('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_upload)
@@ -2439,20 +2439,20 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/patata.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/patata.gif</subfield>
           <subfield code="y">Next Try</subfield>
           <subfield code="z">Comment</subfield>
          </datafield>
         </record>
-        """ % { 'weburl': weburl}
+        """ % { 'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/patata.gif$$yNext Try$$zComment
-        """ % { 'weburl': weburl}
-        testrec_expected_url = "%(weburl)s/record/123456789/files/patata.gif" \
-            % {'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/patata.gif$$yNext Try$$zComment
+        """ % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/patata.gif" \
+            % {'siteurl': CFG_SITE_URL}
 
         # insert test record:
         task_set_option('verbose', 0)
@@ -2531,20 +2531,20 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/patata.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/patata.gif</subfield>
           <subfield code="y">Try</subfield>
           <subfield code="z">Next Comment</subfield>
          </datafield>
         </record>
-        """ % { 'weburl': weburl}
+        """ % { 'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/patata.gif$$yTry$$zNext Comment
-        """ % { 'weburl': weburl}
-        testrec_expected_url = "%(weburl)s/record/123456789/files/patata.gif" \
-            % {'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/patata.gif$$yTry$$zNext Comment
+        """ % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/patata.gif" \
+            % {'siteurl': CFG_SITE_URL}
 
         # insert test record:
         task_set_option('verbose', 0)
@@ -2615,19 +2615,19 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="q">%(weburl)s/record/123456789/files/icon-cds.gif</subfield>
+          <subfield code="q">%(siteurl)s/record/123456789/files/icon-cds.gif</subfield>
           <subfield code="x">icon</subfield>
          </datafield>
         </record>
-        """ % { 'weburl': weburl}
+        """ % { 'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$q%(weburl)s/record/123456789/files/icon-cds.gif$$xicon
-        """ % { 'weburl': weburl}
-        testrec_expected_url = "%(weburl)s/record/123456789/files/icon-cds.gif" \
-            % {'weburl': weburl}
+        8564_ $$q%(siteurl)s/record/123456789/files/icon-cds.gif$$xicon
+        """ % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/icon-cds.gif" \
+            % {'siteurl': CFG_SITE_URL}
 
         # insert test record:
         task_set_option('verbose', 0)
@@ -2714,18 +2714,18 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/patata.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/patata.gif</subfield>
          </datafield>
         </record>
-        """ % { 'weburl': weburl}
+        """ % { 'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/patata.gif
-        """ % { 'weburl': weburl}
-        testrec_expected_url = "%(weburl)s/record/123456789/files/patata.gif" \
-            % {'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/patata.gif
+        """ % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/patata.gif" \
+            % {'siteurl': CFG_SITE_URL}
 
         # insert test record:
         task_set_option('verbose', 0)
@@ -2810,21 +2810,21 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/head.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/head.gif</subfield>
          </datafield>
         </record>
-        """ % { 'weburl': weburl}
+        """ % { 'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/cds.gif
-        8564_ $$u%(weburl)s/record/123456789/files/head.gif
-        """ % { 'weburl': weburl}
-        testrec_expected_url = "%(weburl)s/record/123456789/files/cds.gif" % { 'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        8564_ $$u%(siteurl)s/record/123456789/files/head.gif
+        """ % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" % { 'siteurl': CFG_SITE_URL}
 
         # insert test record:
         task_set_option('verbose', 0)
@@ -2885,7 +2885,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="n">cds</subfield>
          </datafield>
         </record>
-        """ % weburl
+        """ % CFG_SITE_URL
         test_to_correct = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -2894,7 +2894,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="n">cds</subfield>
          </datafield>
         </record>
-        """ % weburl
+        """ % CFG_SITE_URL
         test_to_revert = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -2915,17 +2915,17 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/cds.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/cds.gif</subfield>
          </datafield>
         </record>
-        """ % { 'weburl': weburl}
+        """ % { 'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/cds.gif
-        """ % { 'weburl': weburl}
-        testrec_expected_url = "%(weburl)s/record/123456789/files/cds.gif" % { 'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
+        """ % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" % { 'siteurl': CFG_SITE_URL}
 
         # insert test record:
         task_set_option('verbose', 0)
@@ -2964,13 +2964,13 @@ class BibUploadFFTModeTest(unittest.TestCase):
 
         self._test_bibdoc_status(recid, 'cds', '')
 
-        expected_content_version1 = urlopen('%s/img/iconpen.gif' % weburl).read()
-        expected_content_version2 = urlopen('%s/img/head.gif' % weburl).read()
+        expected_content_version1 = urlopen('%s/img/iconpen.gif' % CFG_SITE_URL).read()
+        expected_content_version2 = urlopen('%s/img/head.gif' % CFG_SITE_URL).read()
         expected_content_version3 = expected_content_version1
 
-        content_version1 = urlopen('%s/record/%s/files/cds.gif?version=1' % (weburl, recid)).read()
-        content_version2 = urlopen('%s/record/%s/files/cds.gif?version=2' % (weburl, recid)).read()
-        content_version3 = urlopen('%s/record/%s/files/cds.gif?version=3' % (weburl, recid)).read()
+        content_version1 = urlopen('%s/record/%s/files/cds.gif?version=1' % (CFG_SITE_URL, recid)).read()
+        content_version2 = urlopen('%s/record/%s/files/cds.gif?version=2' % (CFG_SITE_URL, recid)).read()
+        content_version3 = urlopen('%s/record/%s/files/cds.gif?version=3' % (CFG_SITE_URL, recid)).read()
 
         self.assertEqual(expected_content_version1, content_version1)
         self.assertEqual(expected_content_version2, content_version2)
@@ -2997,7 +2997,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="n">cds</subfield>
          </datafield>
         </record>
-        """ % weburl
+        """ % CFG_SITE_URL
         test_to_replace = """
         <record>
         <controlfield tag="001">123456789</controlfield>
@@ -3010,7 +3010,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="a">%s/img/head.gif</subfield>
          </datafield>
         </record>
-        """ % weburl
+        """ % CFG_SITE_URL
 
         testrec_expected_xm = """
         <record>
@@ -3021,17 +3021,17 @@ class BibUploadFFTModeTest(unittest.TestCase):
           <subfield code="u">Test University</subfield>
          </datafield>
          <datafield tag="856" ind1="4" ind2=" ">
-          <subfield code="u">%(weburl)s/record/123456789/files/head.gif</subfield>
+          <subfield code="u">%(siteurl)s/record/123456789/files/head.gif</subfield>
          </datafield>
         </record>
-        """ % { 'weburl': weburl}
+        """ % { 'siteurl': CFG_SITE_URL}
         testrec_expected_hm = """
         001__ 123456789
         003__ SzGeCERN
         100__ $$aTest, John$$uTest University
-        8564_ $$u%(weburl)s/record/123456789/files/head.gif
-        """ % { 'weburl': weburl}
-        testrec_expected_url = "%(weburl)s/record/123456789/files/head.gif" % { 'weburl': weburl}
+        8564_ $$u%(siteurl)s/record/123456789/files/head.gif
+        """ % { 'siteurl': CFG_SITE_URL}
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/head.gif" % { 'siteurl': CFG_SITE_URL}
 
         # insert test record:
         task_set_option('verbose', 0)
@@ -3060,9 +3060,9 @@ class BibUploadFFTModeTest(unittest.TestCase):
         self.failUnless(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm))
 
-        expected_content_version = urlopen('%s/img/head.gif' % weburl).read()
+        expected_content_version = urlopen('%s/img/head.gif' % CFG_SITE_URL).read()
 
-        content_version = urlopen('%s/record/%s/files/head.gif' % (weburl, recid)).read()
+        content_version = urlopen('%s/record/%s/files/head.gif' % (CFG_SITE_URL, recid)).read()
 
         self.assertEqual(expected_content_version, content_version)
 

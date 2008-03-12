@@ -34,7 +34,7 @@ from invenio.config import \
      CFG_SITE_NAME_INTL, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
-     weburl, \
+     CFG_SITE_URL, \
      CFG_VERSION
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.urlutils import make_canonical_urlargd, create_html_link
@@ -74,7 +74,7 @@ class Template:
 
         out = ""
         if title != CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME):
-            out += create_html_link(weburl, {'ln': ln},
+            out += create_html_link(CFG_SITE_URL, {'ln': ln},
                                     _("Home"), {'class': 'navtrail'})
         if previous_links:
             if out:
@@ -99,7 +99,7 @@ class Template:
                   titleprologue="", title="", titleepilogue="",
                   body="", lastupdated=None, pagefooteradd="", uid=0,
                   secure_page_p=0, navmenuid="", metaheaderadd="",
-                  rssurl=weburl+"/rss"):
+                  rssurl=CFG_SITE_URL+"/rss"):
 
         """Creates a complete page
 
@@ -223,7 +223,7 @@ class Template:
                         description="", keywords="", userinfobox="",
                         navtrailbox="", pageheaderadd="", uid=0,
                         secure_page_p=0, navmenuid="admin", metaheaderadd="",
-                        rssurl=weburl+"/rss"):
+                        rssurl=CFG_SITE_URL+"/rss"):
 
         """Creates a page header
 
@@ -305,13 +305,13 @@ class Template:
              &nbsp;
        </td>
        <td class="headermoduleboxbody%(search_selected)s">
-             <a class="header%(search_selected)s" href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>
+             <a class="header%(search_selected)s" href="%(siteurl)s/?ln=%(ln)s">%(msg_search)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
        </td>
        <td class="headermoduleboxbody%(submit_selected)s">
-             <a class="header%(submit_selected)s" href="%(weburl)s/submit?ln=%(ln)s">%(msg_submit)s</a>
+             <a class="header%(submit_selected)s" href="%(siteurl)s/submit?ln=%(ln)s">%(msg_submit)s</a>
        </td>
        <td class="headermoduleboxbodyblank">
              &nbsp;
@@ -323,7 +323,7 @@ class Template:
              &nbsp;
        </td>
        <td class="headermoduleboxbody%(help_selected)s">
-             <a class="header%(help_selected)s" href="%(weburl)s/help/%(langlink)s">%(msg_help)s</a>
+             <a class="header%(help_selected)s" href="%(siteurl)s/help/%(langlink)s">%(msg_help)s</a>
        </td>
        <td class="headermoduleboxbodyblanklast">
              &nbsp;
@@ -345,9 +345,9 @@ class Template:
 %(pageheaderadd)s
 </div>
         """ % {
-          'weburl' : weburl,
+          'siteurl' : CFG_SITE_URL,
           'sitesecureurl' : CFG_SITE_SECURE_URL,
-          'cssurl' : secure_page_p and CFG_SITE_SECURE_URL or weburl,
+          'cssurl' : secure_page_p and CFG_SITE_SECURE_URL or CFG_SITE_URL,
           'rssurl': rssurl,
           'ln' : ln,
           'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
@@ -415,7 +415,7 @@ class Template:
 %(pagefooteradd)s
 <!-- replaced page footer -->
  <div class="pagefooterstripeleft">
-  %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/submit?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(weburl)s/help/%(langlink)s">%(msg_help)s</a>
+  %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/submit?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/help/%(langlink)s">%(msg_help)s</a>
   <br />
   %(msg_poweredby)s <a class="footer" href="http://cdsware.cern.ch/">CDS Invenio</a> v%(version)s
   <br />
@@ -431,7 +431,7 @@ class Template:
 </body>
 </html>
         """ % {
-          'weburl' : weburl,
+          'siteurl' : CFG_SITE_URL,
           'sitesecureurl' : CFG_SITE_SECURE_URL,
           'ln' : ln,
           'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
@@ -586,7 +586,7 @@ URI: http://%(host)s%(page)s
                   </tr>
                   <tr>
                     <td>
-                      <form action="%(weburl)s/error/send" method="post">
+                      <form action="%(siteurl)s/error/send" method="post">
                         %(send_error_label)s
                         <input class="adminbutton" type="submit" value="%(send_label)s" />
                         <input type="hidden" name="header" value="%(esc_title)s %(esc_sys1)s %(esc_sys2)s" />
@@ -629,7 +629,7 @@ URI: http://%(host)s%(page)s
                 'traceback' : traceback_s,
                 'esc_traceback' : traceback_s.replace('"', '&quot;"'),
                 'sys_error' : sys_error_s,
-                'weburl'    : weburl,
+                'siteurl'    : CFG_SITE_URL,
                 'referer'   : page_s!=info_not_available and \
                                  ("http://" + host_s + page_s) or \
                                  info_not_available
@@ -784,7 +784,7 @@ URI: http://%(host)s%(page)s
 	<div class="bottom-left"></div><div class="bottom-right"></div>
         </div>
         """ % {
-        'weburl': weburl,
+        'siteurl': CFG_SITE_URL,
         'ln':ln,
         'recid':recid,
         'files': files,

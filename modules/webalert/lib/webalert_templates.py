@@ -27,7 +27,7 @@ from invenio.config import \
      CFG_WEBALERT_ALERT_ENGINE_EMAIL, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
-     weburl
+     CFG_SITE_URL
 from invenio.messages import gettext_set_language
 from invenio.htmlparser import get_as_text, wrap
 from invenio.alert_engine_config import CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
@@ -353,7 +353,7 @@ class Template:
                               <td>
                                  <a href="./remove?ln=%(ln)s&amp;name=%(alertname)s&amp;idq=%(queryid)d&amp;idb=%(basketid)d">%(remove)s</a><br />
                                  <a href="./modify?ln=%(ln)s&amp;idq=%(queryid)d&amp;name=%(alertname)s&amp;freq=%(freq)s&amp;notif=%(notif)s&amp;idb=%(basketid)d&amp;old_idb=%(basketid)d">%(modify)s</a><br />
-                                 <a href="%(weburl)s/search?%(queryargs)s&amp;ln=%(ln)s" style="white-space:nowrap">%(search)s</a>
+                                 <a href="%(siteurl)s/search?%(queryargs)s&amp;ln=%(ln)s" style="white-space:nowrap">%(search)s</a>
                              </td>
                             </tr>""" % {
                     'index' : i,
@@ -372,7 +372,7 @@ class Template:
                     'ln' : ln,
                     'remove' : _("Remove"),
                     'modify' : _("Modify"),
-                    'weburl' : weburl,
+                    'siteurl' : CFG_SITE_URL,
                     'search' : _("Execute search"),
                     'queryargs' : cgi.escape(alert['queryargs'])
                   }
@@ -418,7 +418,7 @@ class Template:
 
         if len(queries) == 0:
             out = _("You have not executed any search yet. Please go to the %(x_url_open)ssearch interface%(x_url_close)s first.") % \
-                {'x_url_open': '<a href="' + weburl + '/?ln=' + ln +'">',
+                {'x_url_open': '<a href="' + CFG_SITE_URL + '/?ln=' + ln +'">',
                  'x_url_close': '</a>'}
             return out
 
@@ -455,11 +455,11 @@ class Template:
             out += """<tr>
                         <td style="font-style: italic;">#%(index)d</td>
                         <td>%(textargs)s</td>
-                        <td><a href="%(weburl)s/search?%(args)s">%(execute_query)s</a><br />
-                            <a href="%(weburl)s/youralerts/input?ln=%(ln)s&amp;idq=%(id)d">%(set_alert)s</a></td>""" % {
+                        <td><a href="%(siteurl)s/search?%(args)s">%(execute_query)s</a><br />
+                            <a href="%(siteurl)s/youralerts/input?ln=%(ln)s&amp;idq=%(id)d">%(set_alert)s</a></td>""" % {
                      'index' : i,
                      'textargs' : query['textargs'],
-                     'weburl' : weburl,
+                     'siteurl' : CFG_SITE_URL,
                      'args' : cgi.escape(query['args']),
                      'id' : query['id'],
                      'ln': ln,
@@ -548,7 +548,7 @@ URL given at the top of this email to see all the results.
 %s Alert Service <%s>
 Unsubscribe?  See <%s>
 Need human intervention?  Contact <%s>
-''' % (CFG_SITE_NAME, weburl, weburl + '/youralerts/list', CFG_SITE_SUPPORT_EMAIL)
+''' % (CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_URL + '/youralerts/list', CFG_SITE_SUPPORT_EMAIL)
 
         return body
 
@@ -557,5 +557,5 @@ Need human intervention?  Contact <%s>
         """ Format a single record."""
 
         out = wrap(get_as_text(recid))
-        out += "Detailed record: <%s/record/%s>" % (weburl, recid)
+        out += "Detailed record: <%s/record/%s>" % (CFG_SITE_URL, recid)
         return out

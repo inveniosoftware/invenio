@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibConvert Admin Guide -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <h2>Contents</h2>
@@ -173,8 +173,8 @@ Guide</a> section below.
 <p>For a fully functional demo, consider the following sample input data:
 
 <blockquote>
-<a href="<WEBURL>/admin/bibconvert/sample.dat">sample.dat</a> -- sample bibliographic data to be converted and inputted into CDS Invenio
-<br /><a href="<WEBURL>/admin/bibconvert/sample.cfg">sample.cfg</a> -- sample configuration file, featuring knowledge base demo
+<a href="<CFG_SITE_URL>/admin/bibconvert/sample.dat">sample.dat</a> -- sample bibliographic data to be converted and inputted into CDS Invenio
+<br /><a href="<CFG_SITE_URL>/admin/bibconvert/sample.cfg">sample.cfg</a> -- sample configuration file, featuring knowledge base demo
 </blockquote>
 
 <p>To convert the above data into XML MARC, use the following command:
@@ -191,16 +191,16 @@ href="bibupload-admin-guide">BibUpload</a>.
 <p>Other useful BibConvert configuration examples:
 
 <blockquote>
-<a href="<WEBURL>/admin/bibconvert/dcq.cfg">dcq.cfg</a> -- Qualified Dublin Core in SGML to XML MARC example
-<br /><a href="<WEBURL>/admin/bibconvert/dcq.dat">dcq.dat</a> -- corresponding data file, featuring collection identifiers demo
+<a href="<CFG_SITE_URL>/admin/bibconvert/dcq.cfg">dcq.cfg</a> -- Qualified Dublin Core in SGML to XML MARC example
+<br /><a href="<CFG_SITE_URL>/admin/bibconvert/dcq.dat">dcq.dat</a> -- corresponding data file, featuring collection identifiers demo
 </blockquote>
 
 <blockquote>
-<a href="<WEBURL>/admin/bibconvert/dcxml-to-marcxml.cfg">dcxml-to-marcxml.cfg</a> -- OAI XML Dublin Core to XML MARC example
+<a href="<CFG_SITE_URL>/admin/bibconvert/dcxml-to-marcxml.cfg">dcxml-to-marcxml.cfg</a> -- OAI XML Dublin Core to XML MARC example
 </blockquote>
 
 <blockquote>
-<a href="<WEBURL>/admin/bibconvert/bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
+<a href="<CFG_SITE_URL>/admin/bibconvert/bibtex.cfg">bibtex.cfg</a> -- BibTeX to XML MARC example
 </blockquote>
 
 <a name="C.3"></a><h3>3 BibConvert Configuration Guide</h3>

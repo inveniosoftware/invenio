@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: Modules Overview -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<WEBURL>/help/hacking">Hacking CDS Invenio</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 
@@ -267,7 +267,7 @@ descriptions the module relationship diagram is presented.
 </ul>
 
 <p>Relationship between the modules: <br />
-<img src="<WEBURL>/img/hacking/modules-overview-diagram.jpeg" border="0" alt="Modules overview diagram" />
+<img src="<CFG_SITE_URL>/img/hacking/modules-overview-diagram.jpeg" border="0" alt="Modules overview diagram" />
 </p>
 
 

@@ -36,7 +36,7 @@ from invenio.dateutils import convert_datetext_to_dategui, \
                               create_year_selectbox
 from invenio.urlutils import create_html_link, create_url
 from invenio.htmlutils import escape_html
-from invenio.config import weburl, CFG_SITE_LANG
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.webuser import get_user_info
 
@@ -100,18 +100,18 @@ class Template:
             if not(subject):
                 subject = _("No subject")
             subject_link = create_html_link(
-                                weburl + '/yourmessages/display_msg',
+                                CFG_SITE_URL + '/yourmessages/display_msg',
                                 {'msgid': msgid, 'ln': ln},
                                 escape_html(subject))
             if user_from_nick:
                 from_link = '%s'% (user_from_nick)
             else:
                 from_link = get_user_info(id_user_from, ln)[2]
-            action_link = create_html_link(weburl + '/yourmessages/write',
+            action_link = create_html_link(CFG_SITE_URL + '/yourmessages/write',
                                            {'msg_reply_id': msgid, 'ln': ln},
                                            _("Reply"))
             action_link += ' '
-            action_link += create_html_link(weburl + '/yourmessages/delete',
+            action_link += create_html_link(CFG_SITE_URL + '/yourmessages/delete',
                                             {'msgid': msgid, 'ln': ln},
                                             _("Delete"))
             s_date = convert_datetext_to_dategui(sent_date, ln)
@@ -140,9 +140,9 @@ class Template:
       </td>
     </tr>
   </tbody>
-</table>""" % {'url_new': create_url(weburl + '/yourmessages/write',
+</table>""" % {'url_new': create_url(CFG_SITE_URL + '/yourmessages/write',
                                      {'ln': ln}),
-               'url_delete_all': create_url(weburl + '/yourmessages/delete_all',
+               'url_delete_all': create_url(CFG_SITE_URL + '/yourmessages/delete_all',
                                             {'ln': ln}),
                'write_label': _("Write new message"),
                'delete_all_label': _("Delete All")}
@@ -268,7 +268,7 @@ class Template:
         year_field = create_year_selectbox('msg_send_year', -1, 10,
                                             msg_send_year, ln)
         write_box = write_box % {'url_form': create_url(
-                                                weburl + '/yourmessages/send',
+                                                CFG_SITE_URL + '/yourmessages/send',
                                                 {'ln': ln}),
                                  'to_users' : msg_to,
                                  'to_groups': msg_to_group,
@@ -327,7 +327,7 @@ class Template:
                 to_display = to
                 if to.isdigit():
                     (dummy, to, to_display) = get_user_info(int(to), ln)
-                sent_to_link += create_html_link(weburl + '/yourmessages/write',
+                sent_to_link += create_html_link(CFG_SITE_URL + '/yourmessages/write',
                                                  {'msg_to': to, 'ln': ln},
                                                  escape_html(to_display))
                 sent_to_link += CFG_WEBMESSAGE_SEPARATOR
@@ -335,7 +335,7 @@ class Template:
             to = tos[-1]
             if to.isdigit():
                 (dummy, to, to_display) = get_user_info(int(to), ln)
-            sent_to_link += create_html_link(weburl + '/yourmessages/write',
+            sent_to_link += create_html_link(CFG_SITE_URL + '/yourmessages/write',
                                              {'msg_to': to, 'ln': ln},
                                              escape_html(to_display))
         group_to_link = ""
@@ -343,12 +343,12 @@ class Template:
         if (groups):
             for group in groups[0:-1]:
                 group_to_link += create_html_link(
-                                    weburl + '/yourmessages/write',
+                                    CFG_SITE_URL + '/yourmessages/write',
                                     {'msg_to_group': group, 'ln': ln},
                                     escape_html(group))
                 group_to_link += CFG_WEBMESSAGE_SEPARATOR
             group_to_link += create_html_link(
-                                weburl + '/yourmessages/write',
+                                CFG_SITE_URL + '/yourmessages/write',
                                 {'msg_to_group': groups[-1], 'ln': ln},
                                 escape_html(groups[-1]))
         # format the msg so that the '>>' chars give vertical lines
@@ -426,14 +426,14 @@ class Template:
             msg_from_nickname = msg_from_id
 
         return out % {'from_link': create_html_link(
-                                        weburl + '/yourmessages/write',
+                                        CFG_SITE_URL + '/yourmessages/write',
                                         {'msg_to': msg_from_nickname,
                                          'ln': ln},
                                         msg_from_display),
-                     'reply_url': create_url(weburl + '/yourmessages/write',
+                     'reply_url': create_url(CFG_SITE_URL + '/yourmessages/write',
                                              {'msg_reply_id': msg_id,
                                              'ln':  ln}),
-                     'delete_url': create_url(weburl + '/yourmessages/delete',
+                     'delete_url': create_url(CFG_SITE_URL + '/yourmessages/delete',
                                              {'msgid': msg_id,
                                              'ln':  ln}),
                      'sent_date' : convert_datetext_to_dategui(msg_sent_date, ln),
@@ -462,13 +462,13 @@ class Template:
         return html formatted navtrail
         """
         _ = gettext_set_language(ln)
-        nav_h1 = create_html_link(weburl + '/youraccount/display',
+        nav_h1 = create_html_link(CFG_SITE_URL + '/youraccount/display',
                                   {'ln': ln},
                                   _("Your Account"),
                                   {'class': 'navtrail'})
         nav_h2 = ""
         if (title != ""):
-            nav_h2 += create_html_link(weburl + '/yourmessages/display',
+            nav_h2 += create_html_link(CFG_SITE_URL + '/yourmessages/display',
                                        {'ln': ln},
                                        _("Your Messages"),
                                        {'class': 'navtrail'})
@@ -678,7 +678,7 @@ class Template:
         _ = gettext_set_language(ln)
         out = _("You have %(x_nb_new)s new messages out of %(x_nb_total)s messages") % \
               {'x_nb_new': '<b>' + str(nb_new_mail) + '</b>',
-               'x_nb_total': create_html_link(weburl + '/yourmessages/',
+               'x_nb_total': create_html_link(CFG_SITE_URL + '/yourmessages/',
                                               {'ln': ln},
                                               str(total_mail),
                                               {},

@@ -22,7 +22,7 @@
 __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_ADMIN_EMAIL, \
-     weburl, CFG_SITE_NAME
+     CFG_SITE_URL, CFG_SITE_NAME
 
 # elmsubmit configuration file:
 CFG_ELMSUBMIT_FILES = {
@@ -36,7 +36,7 @@ CFG_ELMSUBMIT_FILES = {
 # pylint: disable-msg=C0301
 
 CFG_ELMSUBMIT_NOLANGMSGS = {'bad_email': 'Your email could not be parsed correctly to discover a submission. Please check your email client is functioning correctly.',
-             'bad_submission': 'The submission data that you have provided could not be parsed correctly. Please visit <%s> for a description of the correct format.' % weburl,
+             'bad_submission': 'The submission data that you have provided could not be parsed correctly. Please visit <%s> for a description of the correct format.' % CFG_SITE_URL,
               'missing_type':  'The submission data that you have provided does not contain a TYPE field. This is mandatory for all submissions.',
               'unsupported_type': 'The TYPE field of your submission does not contain a recognized value.',
               'missing_fields_1': 'Your submission of type',

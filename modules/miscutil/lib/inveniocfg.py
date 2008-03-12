@@ -85,12 +85,6 @@ def convert_conf_option(option_name, option_value):
     ## 1) convert option name to uppercase:
     option_name = option_name.upper()
 
-    ## also, adjust some conf names due to backwards compatibility:
-    option_name_replace_data = {'CFG_SITE_URL': 'weburl',
-                                }
-    if option_name_replace_data.has_key(option_name):
-        option_name = option_name_replace_data[option_name]
-
     ## 2) convert option value to int or string:
     try:
         option_value = int(option_value)
@@ -156,8 +150,6 @@ def cli_cmd_update_config_py(conf):
     for lang in conf.get("Invenio", "CFG_SITE_LANGS").split(","):
         fdesc.write("CFG_SITE_NAME_INTL['%s'] = \"%s\"\n" % (lang, conf.get("Invenio",
                                                                             "CFG_SITE_NAME_INTL_" + lang)))
-    ## special treatment for new CFG_SITE_URL options: (FIXME: remove them when weburl is phased out)
-    fdesc.write("CFG_SITE_URL = '%s'\n" % conf.get("Invenio", "CFG_SITE_URL"))
     ## process all the options normally:
     for section in conf.sections():
         for option in conf.options(section):
