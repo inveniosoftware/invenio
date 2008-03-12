@@ -197,7 +197,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
     out = ""
     res = []
     if not on_the_fly:
-        # look for formatted notice existence:
+        # look for formatted record existence:
         query = "SELECT value, last_updated FROM bibfmt WHERE "\
                 "id_bibrec='%s' AND format='%s'" % (recID, format)
         res = run_sql(query, None, 1)

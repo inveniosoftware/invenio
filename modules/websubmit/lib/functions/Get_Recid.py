@@ -54,7 +54,7 @@ alert('Multiple documents with the report number [%s] have been found.\\n""" \
 
 
 def Get_Recid(parameters, curdir, form, user_info=None):
-    """Given the report number of a notice (the global "rn"), retrieve the
+    """Given the report number of a record (the global "rn"), retrieve the
        "recid" (001).
        The function first of all checks for the existence of the file "SN" in
        the current submission's working directory. If it exists, it is read in

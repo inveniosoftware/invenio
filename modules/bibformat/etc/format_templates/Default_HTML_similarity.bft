@@ -1,5 +1,5 @@
 <name>Default HTML similarity</name>
-<description>Small HTML notice printed in "Similar Documents" section</description>
+<description>Small HTML record printed in "Similar Documents" section</description>
 <strong><a href="/record/<BFE_FIELD tag="001" /><BFE_CLIENT_INFO var="ln" prefix="?ln=">"><BFE_TITLE_BRIEF /></a></strong>
 <BFE_AUTHORS limit="1" prefix=" - " extension=" <em>et al</em>"/>
 <BFE_PUBLI_INFO prefix=" - "/>

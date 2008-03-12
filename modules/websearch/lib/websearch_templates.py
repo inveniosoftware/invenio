@@ -1285,7 +1285,7 @@ class Template:
 
           - 'abstracts' *list* - the abstracts for the record
 
-          - 'urls_u' *list* - URLs to the original versions of the notice
+          - 'urls_u' *list* - URLs to the original versions of the record
 
           - 'urls_z' *list* - Not used
         """

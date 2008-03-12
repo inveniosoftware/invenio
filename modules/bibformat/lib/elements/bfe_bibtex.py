@@ -26,13 +26,13 @@ from invenio.config import CFG_SITE_LANG
 
 def format(bfo, width="50"):
     """
-    Prints a full BibTeX notice.
+    Prints a full BibTeX record.
 
     'width' must be bigger than or equal to 30.
     This format element is an example of large element, which does
     all the formatting by itself
 
-    @param width the width (in number of characters) of the notice
+    @param width the width (in number of characters) of the record
     """
     out = "@"
     width = int(width)
@@ -394,7 +394,7 @@ def get_name(string):
 
     Behaviour inherited from old GET_NAME function defined as UFD in
     old BibFormat. We need to return the same value, to keep back
-    compatibility with already generated BibTeX notices.
+    compatibility with already generated BibTeX records.
 
     Eg: get_name("سtlund, عvind B") returns "سtlund".
     """
