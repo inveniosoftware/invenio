@@ -22,25 +22,27 @@
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/<lang:link/>">_(Help Central)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
-<p>WebSubmit enables you to submit the details of an item to your repository.
-This could mean the creation of an entirely new item, or simply the 
-modification of the bibliographic information  associated with a record that 
+<p>The submission system enables you to submit the details of a record to your
+repository. This could mean the creation of an entirely new record, or simply
+the modification of the bibliographic information associated with a record that
 already exists in the repository.
 
 <h3><a name="startingasubmission">
 Getting started with a submission
 </a></h3>
-<p>Before you start submitting, you'll need to
+<p>Before you start submitting, you will need to
 <a href="<CFG_SITE_URL>/youraccount/login?ln=<lang:current />">login</a>.</p>
 
 <p>Having logged into the system, you will need to go to the
-<a href="<CFG_SITE_URL>/submit?ln=<lang:current />">submit home page</a>, where you
-will be presented with a list of the different document types supported by your
-submission system. From the list, click on the name of the document type that
-you'd like to submit - this will take you to a page containing the submission
-options supported by that document type.  Typically, the options offered will
-be something like submitting a new record or modifying an existing record, but
-they may vary by document type.</p>
+<a href="<CFG_SITE_URL>/submit?ln=<lang:current />">submit entry page</a>,
+where you will be presented with a list of the different document types
+supported by your submission system. Click on the name of the document that
+you'd like to submit and you will be taken to a submission entry page
+for that type of document. Here you will be able to see the different
+types of submission supported for that type of document. Typically, the
+options will be something like submitting a new record or modifying an
+existing record, but they may vary according to the type of document.
+</p>
 <p>The document type may be sub-divided into different categories. For example,
 articles may be sub-divided into "Reports" and "Preprints". If the document
 type that you're working with makes use of such categories, you'll see a list
@@ -54,22 +56,22 @@ choosing one - just click on the relevant action button.</p>
 <h3><a name="submitanewrecord">
 Submitting a new record
 </a></h3>
-<p>If you have clicked on the button to submit a new record into the 
+<p>If you have clicked on the button to submit a new record into the
 repository, you will be taken to a web page containing various fields that you
-will need to fill with information about the new item that you're submitting.
-This metadata will no doubt vary by document type, but typically, it might
-include details like the item's title, author(s), abstract, date of creation,
+will need to fill with information about the new record that you're submitting.
+This metadata will no doubt vary by document type, but typically it might
+include details like the record's title, author(s), abstract, date of creation,
 etc. Usually, the submission form will be contained entirely on one page, but
-could be also divided over several pages. You will notice that at the top of
-the submission form, there is a tab for each of the pages making up the
-submission form, so you'll be able to tell which page you're currently on and
+could also be spread over several pages. In that case, you will notice that at
+the top of the submission form, there is a tab for each of the pages making up
+the form, so you'll be able to tell which page you're currently on and
 also how many pages there are in total. If the submission form has several
-pages, you will also see a "next page" and/or "previous page" arrow at the
+pages, you will also see "next page" and/or "previous page" arrows at the
 bottom of the form, depending upon which page you're on.
 </p>
 <p>Some fields on the submission form may be mandatory and others optional.
-It depends entirely on the way in which it has been configured. If you miss
-a mandatory field, when you try to move to the next page, or when you click
+It depends entirely upon how it has been configured. If you miss
+a mandatory field, when you try to move to the next page or click
 on the "finish submission" button, you'll be informed about the missing
 information by means of a popup window and you won't be permitted to proceed
 until you have provided the necessary information.
@@ -80,46 +82,44 @@ to the file on your local machine - using the browse button associated
 with the field if possible.
 </p>
 <p>Once you have filled the form fields with the relevant information, you can
-proceed with the submission by clicking on the button at the bottom of the last 
-page. Normally, this will finish the submission and upload the information and
-and full-text files into the repository. During this step, please be patient;
-when the system has finished processing the information, you should see a 
-message indicating this. Please don't quit before you see this message. Some
-time after this, you will be able to view the newly created record in the
-repository. This will usually be fairly promptly but on some occasions, it 
-could take a little longer - for example during busy times for the server.
+proceed with the submission by clicking on the button at the bottom of the last
+page of the form. Normally, this will finish the submission and upload the
+information and full-text files into the repository. During this step, please
+be patient; when the system has finished processing the information, you should
+see a message indicating this. Please don't quit before you see this message.
+Some time after this, you will be able to view the newly created record in the
+repository.
 </p>
-<p>Now that you've submitted your item, if you want to, you can click on the
+<p>Now that you've submitted your record, if you want to, you can click on the
 "main menu" link at the bottom of the page in order to return to the document
-type's home page, from which you can make another submission.
+type's submission entry page. From there, you can make another submission.
 </p>
 
 <h3><a name="modifyarecord">
-Modifying an existing record
+Modifying the bibliographic information for an existing record
 </a></h3>
-<p>If you want to modify the metadata associated with an existing 
-record, click on the "Modify Record" button on the document-type's 
-home page. Modification of an item is a two-step process. First, you
-need to tell the system which record you wouldd like to modify, and which 
+<p>If you want to modify the bibliographic information associated with an
+existing record, click on the "Modify Record" button on the document type's
+submission entry page. Modification of a record is a two-step process. First,
+you need to tell the system which record you would like to modify, and which
 fields of that record you would like to modify. To enable you to do this,
-the system will present a page asking for the record's "report number" 
-and for the fields tio be modified. When you've provided this information,
+the system will present you with a page asking for the record's "report number"
+and for the fields to be modified. When you've provided this information,
 click on the "continue" button and you will be taken to a page containing
-the fields that you have chosen to modify, populated with the information 
-contained in the record that you are modifying. It's up to you to simply
-update these fields with the new values and to click on the finish 
-submission button when you're done. The changes will be applied to the
-record as soon as possible.
+the fields that you have chosen to modify, populated with the information
+contained in the record that you are modifying. It's up to you to update these
+fields with the new values and to click on the finish submission button when
+you're done. The changes will be applied to the record as soon as possible.
 </p>
 
 <h3><a name="reviseafile">
-Revise or add a file to a record
+Adding a file to an existing record
 </a></h3>
-<p>Currently, if you would like to revise or add a new file to an existing 
-record, please send a copy of it to 
-<a href="mailto:<CFG_SITE_SUPPORT_EMAIL>"><CFG_SITE_SUPPORT_EMAIL></a>, quoting 
-the record's reference number and title, and they will attach it to the record
-on your bahalf.
+<p>Currently, if you would like to revise or add a new file to an existing
+record, please send a copy of it to
+<a href="mailto:<CFG_SITE_SUPPORT_EMAIL>"><CFG_SITE_SUPPORT_EMAIL></a>, quoting
+the record's reference number and title and they will attach it to the record
+on your behalf.
 </p>
 
 <h3><a name="submissionhints">
@@ -129,20 +129,22 @@ Submission hints
 <ul>
 <li>JavaScript must be enabled in your browser.</li>
 <li>Usually, new records will be integrated into the repository fairly quickly.
-Sometimes however, there may be a short delay. If you experience such a case, 
-please be patient - don't submit the same information again as this may result 
-in duplicated records. If you think that there is a problem, contact 
-<a href="mailto:<CFG_SITE_SUPPORT_EMAIL>"><CFG_SITE_SUPPORT_EMAIL></a> with the 
+Sometimes however, there may be a short delay - longer if the server is very
+busy. If you experience such a case, please be patient - don't submit the same
+information again as this may result in duplicated records. If you think that
+there is a problem contact
+<a href="mailto:<CFG_SITE_SUPPORT_EMAIL>"><CFG_SITE_SUPPORT_EMAIL></a> with the
 details of your situation.</li>
-<li>If you would like to submit another item, having just completed a 
-submission, don't try to click back on the submission form - it is much better 
-to return to the document type's "home page" (e.g. by clicking on the "main 
-menu" link at the bottom of the page or the "submit" tab at the top of the page) 
-and to start a new submission from there. This is because the submission form 
-contains information specific to a given submission and if you try to use the 
-same form for two different submissions, you will not be permitted to do so.</li>
-<li>Don't forget, if you have any problems or questions about submitting, send 
-details of them to 
+<li>If you would like to submit another record having just completed a
+submission, don't try to click back on the submission form - it is much better
+to return to the document type's submission entry page (e.g. by clicking on the
+"main menu" link at the bottom of the page or the "submit" tab at the top of
+the page) and to start a new submission from there. This is because the
+submission form contains information specific to a given submission and if you
+try to use the same form for two different submissions, you will not be
+permitted to do so.</li>
+<li>Don't forget, if you have any problems or questions about submitting, send
+details of them to
 <a href="mailto:<CFG_SITE_SUPPORT_EMAIL>"><CFG_SITE_SUPPORT_EMAIL></a>.</li>
 </ul>
 </p>
