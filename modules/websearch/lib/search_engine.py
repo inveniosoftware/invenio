@@ -2737,17 +2737,17 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                                user_info=user_info, verbose=verbose)
 
                         creationdate = None
-                        modifydate = None
+                        modificationdate = None
                         if record_exists(recIDs[irec]) == 1:
                             creationdate = get_creation_date(recIDs[irec])
-                            modifydate = get_modification_date(recIDs[irec])
+                            modificationdate = get_modification_date(recIDs[irec])
 
                         content = websearch_templates.tmpl_detailed_record_metadata(
                             recID = recIDs[irec],
                             ln = ln,
                             format = format,
                             creationdate = creationdate,
-                            modifydate = modifydate,
+                            modificationdate = modificationdate,
                             content = content)
 
                         req.write(webstyle_templates.detailed_record_container(content,
@@ -2755,7 +2755,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                                                                tabs,
                                                                                ln=ln,
                                                                                creationdate=creationdate,
-                                                                               modifydate=modifydate,
+                                                                               modificationdate=modificationdate,
                                                                                show_short_rec_p=False))
 
                         if len(tabs) > 0:

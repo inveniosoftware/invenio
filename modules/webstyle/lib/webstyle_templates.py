@@ -640,7 +640,7 @@ URI: http://%(host)s%(page)s
     def detailed_record_container(self, content, recid, tabs, ln=CFG_SITE_LANG,
                                   show_similar_rec_p=True,
                                   creationdate=None,
-                                  modifydate=None, show_short_rec_p=True):
+                                  modificationdate=None, show_short_rec_p=True):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
            Parameters:
@@ -651,7 +651,7 @@ URI: http://%(host)s%(page)s
          - ln *string* - the language of the page in which the box is displayed
          - show_similar_rec_p *bool* print 'similar records' link in the box
          - creationdate *string* - the creation date of the displayed record
-         - modifydate *string* - the last modification date of the displayed record
+         - modificationdate *string* - the last modification date of the displayed record
          - show_short_rec_p *boolean* - prints a very short version of the record as reminder.
         """
         # load the right message language
@@ -737,7 +737,7 @@ URI: http://%(host)s%(page)s
     'dates':creationdate and '<div class="recordlastmodifiedbox" style="float:left;position:relative;margin-left:1px">&nbsp;%(dates)s</div>' % {
                    'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s") % \
                    {'x_date_creation': creationdate,
-                    'x_date_modification': modifydate},
+                    'x_date_modification': modificationdate},
                     } or ''
     }
 
