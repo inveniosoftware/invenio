@@ -1144,7 +1144,7 @@ class Template:
             out += "</ul>"
         return out
 
-    def tmpl_bibdoc_filelist(self, ln, weburl='', versions=[], imagepath='', recid='', docname=''):
+    def tmpl_bibdoc_filelist(self, ln, weburl='', versions=[], imageurl='', recid='', docname=''):
         """
         Displays the file list for a record.
 
@@ -1162,7 +1162,7 @@ class Template:
 
                - 'previous' *bool* - If the file has previous versions
 
-          - 'imagepath' *string* - The path to the image of the file
+          - 'imageurl' *string* - The URL to the file image
 
          - 'recid' *int* - The record id
 
@@ -1175,10 +1175,10 @@ class Template:
         out = """<table border="0" cellspacing="1" class="searchbox">
                    <tr>
                      <td align="left" colspan="2" class="portalboxheader">
-                       <img src='%(imagepath)s' border="0" />&nbsp;&nbsp;%(docname)s
+                       <img src='%(imageurl)s' border="0" />&nbsp;&nbsp;%(docname)s
                      </td>
                    </tr>""" % {
-                     'imagepath' : imagepath,
+                     'imageurl' : imageurl,
                      'docname' : docname
                    }
         for version in versions:

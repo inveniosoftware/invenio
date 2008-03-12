@@ -739,10 +739,10 @@ class BibDoc:
         existing_icon = self.get_icon()
         if existing_icon is not None:
             existing_icon = existing_icon.list_all_files()[0]
-            imagepath = "%s/record/%s/files/%s" % \
+            imageurl = "%s/record/%s/files/%s" % \
                 (weburl, self.recid, existing_icon.get_full_name())
         else:
-            imagepath = "%s/img/smallfiles.gif" % CFG_SITE_URL
+            imageurl = "%s/img/smallfiles.gif" % CFG_SITE_URL
 
         versions = []
         for version in list_versions_from_array(docfiles):
@@ -762,7 +762,7 @@ class BibDoc:
               ln = ln,
               weburl = weburl,
               versions = versions,
-              imagepath = imagepath,
+              imageurl = imageurl,
               docname = self.docname,
               recid = self.recid
             )
