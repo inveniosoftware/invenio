@@ -637,7 +637,7 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
         LogLevel warn
         CustomLog %(logdir)s/apache-ssl.log combined
         DirectoryIndex index.en.html index.html
-        <LocationMatch "^(/+$|/index|/collection|/record|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss|/help|/journal|/openurl|/stats)">
+        <LocationMatch "^(/+$|/index|/collection|/record|/author|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss|/help|/journal|/openurl|/stats)">
            SetHandler python-program
            PythonHandler invenio.webinterface_layout
            PythonDebug On
@@ -680,6 +680,7 @@ created. You can check created files and put the following
 include statements in your httpd.conf:\n
 
 Include %s
+
 Include %s
     """ % (apache_vhost_file, apache_vhost_ssl_file))
     print ">>> Apache conf files created."
