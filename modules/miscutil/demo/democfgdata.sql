@@ -802,8 +802,9 @@ INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOTHE',1);
 INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOPIC',2);
 INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOTXT',3);
 INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOBOO',4);
-INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'TEXT',5);
-INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'RTEXT',6);
+INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'DEMOPOE',5);
+INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'TEXT',6);
+INSERT INTO sbmCOLLECTION_sbmDOCTYPE VALUES (36,'RTEXT',7);
 
 INSERT INTO sbmCATEGORIES (doctype,sname,lname) VALUES ('TEXT','ARTICLE','Article');
 INSERT INTO sbmCATEGORIES (doctype,sname,lname) VALUES ('TEXT','BOOK','Book');
@@ -819,15 +820,16 @@ INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOPIC','LIFE','
 INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOPIC','HIST','Personalities and History of CERN',2);
 INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOPIC','EXP','Experiments',1);
 INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOTXT','ARTICLE','Article',1);
-INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOTXT','POETRY','Poetry',2);
+INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOTXT','PREPRINT','Preprint',2);
 INSERT INTO sbmCATEGORIES (doctype,sname,lname,score) VALUES ('DEMOTXT','REPORT','Report',3);
 
 INSERT INTO sbmDOCTYPE VALUES ('textual document (Article, Preprint, etc) with simple refereeing','RTEXT','2002-05-06','2002-06-20','');
 INSERT INTO sbmDOCTYPE VALUES ('textual document (Article, Preprint, etc)','TEXT','2002-05-03','2002-06-21','This is a template for a text type of document with direct integration after submission\r\nUse it as a reference to create your new document types and submissions (clone).');
 INSERT INTO sbmDOCTYPE VALUES ('Demo Picture Submission','DEMOPIC','2007-09-13','2007-10-17','<br /><br />\r\nThe Demo Picture submission demonstrates a slightly more detailed submission type.<br />\r\nIt makes use of different categories (which in this case are used in the picture\'s reference number to better describe it) and creates icons for the submitted picture-files. Records created with this submission are inserted into the Pictures collection.\r\n<br /><br />\r\n');
 INSERT INTO sbmDOCTYPE VALUES ('Demo Thesis Submission','DEMOTHE','2008-03-02','2008-03-05','<br />\r\n<br />\r\nThe Demo Thesis submission demonstrates a very simple submission type.<br />\r\nIt has no categories, submits directly into the Theses collection and also stamps full-text files.\r\n<br /><br />\r\n');
-INSERT INTO sbmDOCTYPE VALUES ('Demo Textual Document Submission','DEMOTXT','2008-03-06','2008-03-06','<br /><br />The Demo Textual Document submission demonstrates a more complex submission type.<br /><br />\r\nThe submission gives a document a category. This category is used in the document\'s reference number and also serves as a means to classify it into a specific ATLANTIS collection. Documents submitted into the \"Articles\" category are inserted into the ATLANTIS \"Articles\" collection, documents categorized as \"Poetry\" are inserted into the ATLANTIS \"Poetry\" collection, and a document categorized as a \"Report\" is inserted into the ATLANTIS \"Reports\" collection.<br /><br />\r\n');
+INSERT INTO sbmDOCTYPE VALUES ('Demo Textual Document Submission','DEMOTXT','2008-03-06','2008-03-06','<br /><br />The Demo Textual Document submission demonstrates a more complex submission type.<br /><br />\r\nThe submission gives a document a category. This category is used in the document\'s reference number and also serves as a means to classify it into a specific ATLANTIS collection. Documents submitted into the \"Articles\" category are inserted into the ATLANTIS \"Articles\" collection, documents categorized as \"Report\" are inserted into the ATLANTIS \"Reports\" collection, and a document categorized as a \"Report\" is inserted into the ATLANTIS \"Reports\" collection.<br /><br />\r\n');
 INSERT INTO sbmDOCTYPE VALUES ('Demo Book Submission (Refereed)','DEMOBOO','2008-03-06','2008-03-06','<br /><br />The Demo Book submission demonstrates a refereed submission.<br /><br />\r\nWhen the details of a book are submitted by a user, they must be approved by a referee before the record is integrated into the ATLANTIS repository.<br />\r\nApproved books are integrated into the \"Books\" collection.<br />\r\n');
+INSERT INTO sbmDOCTYPE VALUES ('Demo Poetry Submission','DEMOPOE','2008-03-12','2008-03-12','<br /><br />\r\nThe Demo Poetry submission demonstrates a simple submission type with a submission form split over two pages.<br />\r\nIt does not use categories. Records created with this submission are inserted into the ATLANTIS \"Poetry\" Poetry collection.\r\n<br /><br />');
 
 INSERT INTO sbmFIELD VALUES ('APPRTEXT',1,3,'COM','<br //>Enter here your additional comments:<br //>','O','comments','','2002-05-06','2002-05-28','','');
 INSERT INTO sbmFIELD VALUES ('APPRTEXT',1,2,'decision','<br //><br //>Your decision: ','M','decision','','2002-05-06','2002-05-28','','');
@@ -928,6 +930,16 @@ INSERT INTO sbmFIELD VALUES ('APPDEMOBOO',1,1,'DEMOBOO_RN','<table width=\"100%\
 INSERT INTO sbmFIELD VALUES ('APPDEMOBOO',1,2,'DEMOBOO_DECSN','<br /><br /><span style=\"color: red;\">*</span>Decision:<br />\r\n','M','Decision','','2008-03-07','2008-03-07',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('APPDEMOBOO',1,3,'DEMOBOO_COMNT','<br /><br />Comments on Decision:<br />\r\n','O','Referee\'s Comments','','2008-03-07','2008-03-07',NULL,NULL);
 INSERT INTO sbmFIELD VALUES ('APPDEMOBOO',1,4,'DEMOBOO_REGB','<br /><br /></td></tr></table>','O','','','2008-03-07','2008-03-07',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPOE',1,1,'DEMOPOE_TITLE','<TABLE WIDTH=\"100%\" BGCOLOR=\"#D3E3E2\" ALIGN=\"center\" CELLSPACING=\"2\" CELLPADDING=\"2\" BORDER=\"1\"><TR><TD ALIGN=\"left\"><br /><b>Submit an ATLANTIS Poem:</b><br /><br /><span style=\"color: red;\">*</span>Poem Title:<br />','M','>Title','','2008-03-12','2008-03-12',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPOE',1,2,'DEMOPOE_AU','<br /><br /><span style=\"color: red;\">*</span>Author(s) of the Poem: <i>(one per line)</i><br />','M','Author(s)','','2008-03-12','2008-03-12',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPOE',1,3,'DEMOPOE_LANG','<br /><br /><table width=\"100%\"><tr><td valign=\"top\"><span style=\"color: red;\">*</span>Poem Language:&nbsp;','M','Language','','2008-03-12','2008-03-12',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPOE',1,4,'DEMOPOE_YEAR','</td><td><span style=\"color: red;\">*</span>Year of the Poem:&nbsp;','M','Poem Year','','2008-03-12','2008-03-12',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPOE',1,5,'DEMOPOE_DUMMY','','O','','','2008-03-12','2008-03-12',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPOE',2,1,'DEMOPOE_ABS','<TABLE WIDTH=\"100%\" BGCOLOR=\"#D3E3E2\" ALIGN=\"center\" CELLSPACING=\"2\" CELLPADDING=\"2\" BORDER=\"1\"><TR><TD ALIGN=\"left\"><br /><br /><span style=\"color: red;\">*</span>Poem Text:<br />','M','Abstract','','2008-03-12','2008-03-12',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('SBIDEMOPOE',2,2,'DEMOPOE_END','<br /><br /></td></tr></table><br />','O','','','2008-03-12','2008-03-12',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('MBIDEMOPOE',1,1,'DEMOPOE_RN','<table width=\"100%\" bgcolor=\"#D3E3E2\" align=\"center\" cellspacing=\"2\" cellpadding=\"2\" border=\"1\"><tr><td align=\"left\"><br /><b>Modify a poem\'s bibliographic information:</b><br /><br /><span style=\'color: red;\'>*</span>Poem Reference Number:&nbsp;&nbsp;','M','Reference Number','','2008-03-12','2008-03-12',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('MBIDEMOPOE',1,2,'DEMOPOE_CHANGE','<br /><br /><span style=\"color: red;\">*</span>Choose the fields to be modified:<br />','M','Fields to Modify','','2008-03-12','2008-03-12',NULL,NULL);
+INSERT INTO sbmFIELD VALUES ('MBIDEMOPOE',1,3,'DEMOPOE_CONT','<br /><br /></td></tr></table>','O','','','2008-03-12','2008-03-12',NULL,NULL);
 
 INSERT INTO sbmFIELDDESC VALUES ('TI','TI','245__a','T',0,5,60,0,'','','1998-08-17','2002-06-11','<br //>Please correct the title:<br //>','',0);
 INSERT INTO sbmFIELDDESC VALUES ('AU','100__a','100__a,700__a','T',0,6,30,0,'','','1998-08-17','2002-02-08','<br //>Please correct the list of authors:<br //>','',0);
@@ -1008,6 +1020,16 @@ INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_TITLE',NULL,'245__a','T',NULL,5,60,NUL
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_COMNT',NULL,'','T',NULL,6,60,NULL,NULL,NULL,'2008-03-07','2008-03-07',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_DECSN',NULL,'','S',NULL,NULL,NULL,NULL,NULL,'<select name=\"DEMOBOO_DECSN\">\r\n<option>Select:</option>\r\n<option value=\"approve\">Approve</option>\r\n<option value=\"reject\">Reject</option>\r\n</select>\r\n','2008-03-07','2008-03-07',NULL,NULL,0);
 INSERT INTO sbmFIELDDESC VALUES ('DEMOBOO_REGB',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<INPUT TYPE=\"button\" name=\"endS\" width=\"400\" height=\"50\" value=\"Register Decision\" onclick=\"finish();\">\r\n</div>','2008-03-07','2008-03-07',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_ABS',NULL,'520__a','T',NULL,20,80,NULL,NULL,NULL,'2008-03-12','2008-03-12','<br />Abstract:<br />',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_AU',NULL,'100__a','T',NULL,6,60,NULL,NULL,NULL,'2008-03-12','2008-03-12','<br />Authors: <i>(one per line)</i><br />',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_CHANGE',NULL,'','S',NULL,NULL,NULL,NULL,NULL,'<select name=\"DEMOPOE_CHANGE[]\" size=\"6\" multiple>\r\n <option value=\"Select:\">Select:</option>\r\n <option value=\"DEMOPOE_TITLE\">Title</option>\r\n <option value=\"DEMOPOE_AU\">Author(s)</option>\r\n <option value=\"DEMOPOE_LANG\">Language</option>\r\n <option value=\"DEMOPOE_YEAR\">Year</option>\r\n <option value=\"DEMOPOE_ABS\">Poem Text</option>\r\n</select>\r\n','2008-03-12','2008-03-12',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_CONT',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<input type=\"button\" class=\"adminbutton\" width=\"400\" height=\"50\" name=\"endS\" value=\"Continue\" onclick=\"finish();\" />\r\n</div>','2008-03-12','2008-03-12',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_DUMMY',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'</td></tr></table><br /><br /></td></tr></table>','2008-03-12','2008-03-12',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_END',NULL,'','D',NULL,NULL,NULL,NULL,NULL,'<div align=\"center\">\r\n<INPUT TYPE=\"button\" name=\"endS\" width=\"400\" height=\"50\" value=\"Finish Submission\" onclick=\"finish();\">\r\n</div>','2008-03-12','2008-03-12',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_LANG',NULL,'041__a','S',NULL,NULL,NULL,NULL,NULL,'<SELECT name=\"DEMOPOE_LANG\">\r\n        <OPTION>Select:</option>\r\n        <option value=\"eng\">English</option>\r\n        <option value=\"fre\">French</option>\r\n        <option value=\"ger\">German</option>\r\n        <option value=\"dut\">Dutch</option>\r\n        <option value=\"ita\">Italian</option>\r\n        <option value=\"spa\">Spanish</option>\r\n        <option value=\"por\">Portuguese</option>\r\n        <option value=\"gre\">Greek</option>\r\n        <option value=\"slo\">Slovak</option>\r\n        <option value=\"cze\">Czech</option>\r\n        <option value=\"hun\">Hungarian</option>\r\n        <option value=\"pol\">Polish</option>\r\n        <option value=\"nor\">Norwegian</option>\r\n        <option value=\"swe\">Swedish</option>\r\n        <option value=\"fin\">Finnish</option>\r\n        <option value=\"rus\">Russian</option>\r\n</SELECT>','2008-03-12','2008-03-12','<br /><br />Select the Language:&nbsp;',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_RN',NULL,'037__a','I',35,NULL,NULL,NULL,'DEMO-POETRY-<YYYY>-???',NULL,'2008-03-12','2008-03-12',NULL,NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_TITLE',NULL,'245__a','T',NULL,5,60,NULL,NULL,NULL,'2008-03-12','2008-03-12','<br />Title:<br />',NULL,0);
+INSERT INTO sbmFIELDDESC VALUES ('DEMOPOE_YEAR',NULL,'909C0y','I',4,NULL,NULL,4,NULL,NULL,'2008-03-12','2008-03-12','<br /><br />Year:&nbsp;',NULL,0);
 
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','RTEXT','Move_to_Done',90,2);
 INSERT INTO sbmFUNCTIONS VALUES ('MBI','RTEXT','Get_Recid',20,2);
@@ -1184,6 +1206,24 @@ INSERT INTO sbmFUNCTIONS VALUES ('APP','DEMOBOO','Get_Recid',30,2);
 INSERT INTO sbmFUNCTIONS VALUES ('APP','DEMOBOO','Move_From_Pending',20,2);
 INSERT INTO sbmFUNCTIONS VALUES ('APP','DEMOBOO','Get_Report_Number',10,2);
 INSERT INTO sbmFUNCTIONS VALUES ('APP','DEMOBOO','Move_to_Done',100,2);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPOE','Create_Recid',10,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPOE','Report_Number_Generation',20,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPOE','Make_Record',30,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPOE','Insert_Record',40,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPOE','Print_Success',50,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPOE','Mail_Submitter',60,1);
+INSERT INTO sbmFUNCTIONS VALUES ('SBI','DEMOPOE','Move_to_Done',70,1);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPOE','Get_Report_Number',10,1);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPOE','Get_Recid',20,1);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPOE','Is_Original_Submitter',30,1);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPOE','Create_Modify_Interface',40,1);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPOE','Print_Success_MBI',50,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPOE','Insert_Modify_Record',40,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPOE','Make_Modify_Record',30,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPOE','Get_Recid',20,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPOE','Get_Report_Number',10,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPOE','Send_Modify_Mail',60,2);
+INSERT INTO sbmFUNCTIONS VALUES ('MBI','DEMOPOE','Move_to_Done',70,2);
 
 INSERT INTO sbmIMPLEMENT VALUES ('RTEXT','SBI','Y','SBIRTEXT',4,'2002-05-06','2002-06-19',1,'','1',1,1,'');
 INSERT INTO sbmIMPLEMENT VALUES ('RTEXT','MBI','Y','MBIRTEXT',1,'2002-05-06','2004-02-04',2,'','0',0,0,'');
@@ -1201,6 +1241,8 @@ INSERT INTO sbmIMPLEMENT VALUES ('DEMOTXT','MBI','Y','MBIDEMOTXT',1,'2008-03-07'
 INSERT INTO sbmIMPLEMENT VALUES ('DEMOBOO','SBI','Y','SBIDEMOBOO',1,'2008-03-06','2008-03-07',1,'','',0,0,'');
 INSERT INTO sbmIMPLEMENT VALUES ('DEMOBOO','MBI','Y','MBIDEMOBOO',1,'2008-03-07','2008-03-07',2,'','',0,0,'');
 INSERT INTO sbmIMPLEMENT VALUES ('DEMOBOO','APP','Y','APPDEMOBOO',1,'2002-05-06','2002-05-28',3,'0','0',0,1,'');
+INSERT INTO sbmIMPLEMENT VALUES ('DEMOPOE','SBI','Y','SBIDEMOPOE',2,'2008-03-12','2008-03-12',1,'','',0,0,'');
+INSERT INTO sbmIMPLEMENT VALUES ('DEMOPOE','MBI','Y','MBIDEMOPOE',1,'2008-03-12','2008-03-12',2,'','',0,0,'');
 
 INSERT INTO sbmPARAMETERS VALUES ('RTEXT','directory','TEST');
 INSERT INTO sbmPARAMETERS VALUES ('RTEXT','categformatDAM','TEST-<CATEG>-.*');
@@ -1385,6 +1427,23 @@ INSERT INTO sbmPARAMETERS VALUES ('DEMOBOO','dummyrec_source_tpl','DEMOBOO.tpl')
 INSERT INTO sbmPARAMETERS VALUES ('DEMOBOO','dummyrec_create_tpl','DEMOBOOcreate.tpl');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOBOO','decision_file','DEMOBOO_DECSN');
 INSERT INTO sbmPARAMETERS VALUES ('DEMOBOO','comments_file','DEMOBOO_COMNT');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','addressesMBI','');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','authorfile','DEMOPOE_AU');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','autorngen','Y');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','counterpath','lastid_DEMOPOE_<PA>yy</PA>');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','createTemplate','DEMOPOEcreate.tpl');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','edsrn','DEMOPOE_RN');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','emailFile','SuE');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','fieldnameMBI','DEMOPOE_CHANGE');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','modifyTemplate','DEMOPOEmodify.tpl');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','newrnin','');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','rnformat','DEMO-POETRY-<PA>yy</PA>');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','rnin','comboDEMOPOE');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','sourceDoc','Poem');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','sourceTemplate','DEMOPOE.tpl');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','status','ADDED');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','titleFile','DEMOPOE_TITLE');
+INSERT INTO sbmPARAMETERS VALUES ('DEMOPOE','yeargen','AUTO');
 
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (2,'demo_jif','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (15,2,90);
