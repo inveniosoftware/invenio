@@ -939,7 +939,7 @@ class WordTable:
         the records will be reindexed next time."""
         if starting_time is None:
             return None
-        write_message("updating last_updated to %s...", starting_time, verbose=9)
+        write_message("updating last_updated to %s..." % starting_time, verbose=9)
         return run_sql("UPDATE idxINDEX SET last_updated=%s WHERE id=%s",
                        (starting_time, self.index_id,))
 
@@ -1253,7 +1253,7 @@ class WordTable:
         AND id_bibrec BETWEEN '%d' AND '%d'""" % (self.tablename[:-1], low, high)
         res = run_sql(query, None, 1)
         if res[0][0]==0:
-            write_message("%s for %d-%d is in consistent state"%(self.tablename,low,high))
+            write_message("%s for %d-%d is in consistent state" % (self.tablename,low,high))
             return # okay, words table is consistent
 
         ## inconsistency detected!
