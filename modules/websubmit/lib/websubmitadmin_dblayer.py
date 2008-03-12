@@ -2498,24 +2498,6 @@ def clone_functionparameters_foraction_fromdoctype_todoctype(fromdoctype, todoct
         ## probably some could not be cloned. return 2 to signal that cloning not 100% successful
         return 2
 
-def update_doctype_details(doctype, doctypename, doctypedescr):
-    """Update a document type's details.  In effect the document type name (ldocname) and the description
-       are updated, as is the last modification date (md).
-       @param doctype: the ID of the document type to be updated
-       @param doctypename: the new/updated name of the document type
-       @param doctypedescr: the new/updated description of the document type
-       @return: Integer error code: 0 = update successful; 1 = update failed
-    """
-    numrows_doctype = get_number_doctypes_docid(docid=doctype)
-    if numrows_doctype == 1:
-        ## doctype exists - perform update
-        q = """UPDATE sbmDOCTYPE SET ldocname=%s, description=%s, md=CURDATE() WHERE sdocname=%s"""
-        run_sql(q, (doctypename, doctypedescr, doctype))
-        return 0  ## Everything OK
-    else:
-        ## Everything NOT OK - either doctype does not exists, or key is duplicated
-        return 1
-
 def update_category_description_doctype_categ(doctype, categ, categdescr):
     """Update the description of the category "categ", belonging to the document type "doctype".
         Set the description of this category equal to "categdescr".
