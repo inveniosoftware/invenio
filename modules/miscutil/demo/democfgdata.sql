@@ -19,7 +19,7 @@
 
 INSERT INTO user VALUES (2,'jekyll@cds.cern.ch',AES_ENCRYPT(email,'j123ekyll'),'1',NULL,'jekyll','');
 INSERT INTO user VALUES (3,'hyde@cds.cern.ch',AES_ENCRYPT(email,'h123yde'),'1',NULL,'hyde','');
-INSERT INTO user VALUES (4,'dorian.grey@cds.cern.ch',AES_ENCRYPT(email,'d123orian'),'1',NULL,'dorian','');
+INSERT INTO user VALUES (4,'dorian.gray@cds.cern.ch',AES_ENCRYPT(email,'d123orian'),'1',NULL,'dorian','');
 INSERT INTO usergroup VALUES (1,'Theses viewers','Theses viewers internal group','VO','INTERNAL');
 INSERT INTO user_usergroup VALUES (2,1,'M',NOW());
 
