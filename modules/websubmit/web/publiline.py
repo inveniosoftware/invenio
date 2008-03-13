@@ -367,6 +367,10 @@ def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
             confirm_send = 1
 
     if status == "waiting":
+        if categ == "unknown":
+            ## FIXME: This was necessary for document types without categories,
+            ## such as DEMOBOO:
+            categ = "*"
         (auth_code, auth_message) = acc_authorize_action(req, "referee",verbose=0,doctype=doctype, categ=categ)
     else:
         (auth_code, auth_message) = (None, None)
