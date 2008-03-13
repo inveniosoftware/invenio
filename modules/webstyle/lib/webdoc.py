@@ -539,8 +539,8 @@ def get_webdoc_topics(sort_by='name', sc=0, limit=-1,
     out = ''
     for category, topic in topics.iteritems():
         if category != '' and len(categ) > 1:
-            out += '<strong>'+ _("%(category)s Pages")  % \
-                   {'category': _(category).capitalize()} + '</strong>'
+            out += '<strong>'+ _("%(x_category)s Pages")  % \
+                   {'x_category': _(category).capitalize()} + '</strong>'
         if limit < 0:
             limit = len(topic)
         out += '<ul><li>' + \

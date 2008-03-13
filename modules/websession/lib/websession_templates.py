@@ -608,12 +608,12 @@ class Template:
 %(outro)s
 
 %(outro2)s""" % {
-            'intro': _("Somebody (possibly you) coming from %(ip_address)s "
-                "has asked\nfor a password reset at %(sitename)s\nfor "
-                "the account \"%(email)s\"." % {
-                    'sitename' :CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
-                    'email' : email,
-                    'ip_address' : ip_address,
+            'intro': _("Somebody (possibly you) coming from %(x_ip_address)s "
+                "has asked\nfor a password reset at %(x_sitename)s\nfor "
+                "the account \"%(x_email)s\"." % {
+                    'x_sitename' :CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
+                    'x_email' : email,
+                    'x_ip_address' : ip_address,
                     }
                 ),
             'intro2' : _("If you want to reset the password for this account, please go to:"),
@@ -623,7 +623,7 @@ class Template:
                     'mailcookie' : reset_key
                 }, {})),
             'outro' : _("in order to confirm the validity of this request."),
-            'outro2' : _("Please note that this URL will remain valid for about %(days)s days only.") % {'days' : CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS},
+            'outro2' : _("Please note that this URL will remain valid for about %s days only.") % CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS,
         }
         return out
 
@@ -645,12 +645,12 @@ class Template:
 %(outro)s
 
 %(outro2)s""" % {
-            'intro': _("Somebody (possibly you) coming from %(ip_address)s "
-                "has asked\nto register a new account at %(sitename)s\nfor the "
-                "email address \"%(email)s\"." % {
-                    'sitename' :CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
-                    'email' : email,
-                    'ip_address' : ip_address,
+            'intro': _("Somebody (possibly you) coming from %(x_ip_address)s "
+                "has asked\nto register a new account at %(x_sitename)s\nfor the "
+                "email address \"%(x_email)s\"." % {
+                    'x_sitename' :CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
+                    'x_email' : email,
+                    'x_ip_address' : ip_address,
                     }
                 ),
             'intro2' : _("If you want to complete this account registration, please go to:"),
