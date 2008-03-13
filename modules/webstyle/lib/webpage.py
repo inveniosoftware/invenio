@@ -30,7 +30,7 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_URL
 from invenio.messages import gettext_set_language
-from invenio.webuser import create_userinfobox_body
+from invenio.webuser import create_userinfobox_body, getUid
 from invenio.errorlib import get_msgs_for_code_list, register_errors
 
 import invenio.template
@@ -94,6 +94,8 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
     """
 
     _ = gettext_set_language(language)
+    if req and not uid:
+        uid = getUid(req)
     if of == 'xx':
         #xml output (e.g. AJAX calls) => of=xx
         req.content_type = 'text/xml'
