@@ -3544,12 +3544,12 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             # record well exists, so find similar ones to it
             t1 = os.times()[4]
             results_similar_recIDs, results_similar_relevances, results_similar_relevances_prologue, results_similar_relevances_epilogue, results_similar_comments = \
-                                    rank_records(rm, 0, get_collection_reclist(CFG_SITE_NAME), string.split(p), verbose)
+                                    rank_records(rm, 0, get_collection_reclist(cc), string.split(p), verbose)
             if results_similar_recIDs:
                 t2 = os.times()[4]
                 cpu_time = t2 - t1
                 if of.startswith("h"):
-                    req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, CFG_SITE_NAME, len(results_similar_recIDs),
+                    req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, cc, len(results_similar_recIDs),
                                                 jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
                                                 sc, pl_in_url,
                                                 d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
