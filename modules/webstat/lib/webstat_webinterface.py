@@ -22,10 +22,13 @@ __lastupdated__ = "$Date$"
 
 import os
 
-from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_SITE_NAME
+from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_SITE_NAME, \
+    CFG_ACCESS_CONTROL_LEVEL_SITE, CFG_SITE_SECURE_URL
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webpage import page
 from invenio import template
+from invenio.webuser import getUid, isGuestUser
+from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 
 from invenio.webstat import perform_request_index
 from invenio.webstat import perform_display_keyevent
@@ -56,6 +59,16 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def index(self, req, _):
         """Index page."""
+        uid = getUid(req)
+
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../stats",
+                                       navmenuid = 'stats')
+        if isGuestUser(uid):
+            redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : req.unparsed_uri}, {})))
         return page(title="Statistics",
                     body=perform_request_index(),
                     description="CDS, Statistics",
@@ -68,6 +81,15 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def collection_population(self, req, form):
         """Collection population statistics page."""
+        uid = getUid(req)
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../stats",
+                                       navmenuid = 'collection population')
+        if isGuestUser(uid):
+            redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : req.unparsed_uri}, {})))
         argd = wash_urlargd(form, {'collection': (str, CFG_SITE_NAME),
                                    'timespan': (str, "today"),
                                    'format': (str, SUITABLE_GRAPH_FORMAT)})
@@ -83,6 +105,16 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def search_frequency(self, req, form):
         """Search frequency statistics page."""
+        uid = getUid(req)
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../stats",
+                                       navmenuid = 'search frequency')
+        if isGuestUser(uid):
+            redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : req.unparsed_uri}, {})))
+
         argd = wash_urlargd(form, {'timespan': (str, "today"),
                                    'format': (str, SUITABLE_GRAPH_FORMAT)})
 
@@ -97,6 +129,15 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def search_type_distribution(self, req, form):
         """Search type distribution statistics page."""
+        uid = getUid(req)
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../stats",
+                                       navmenuid = 'search type distribution')
+        if isGuestUser(uid):
+            redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : req.unparsed_uri}, {})))
         argd = wash_urlargd(form, {'timespan': (str, "today"),
                                    'format': (str, SUITABLE_GRAPH_FORMAT)})
 
@@ -111,6 +152,15 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def download_frequency(self, req, form):
         """Download frequency statistics page."""
+        uid = getUid(req)
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../stats",
+                                       navmenuid = 'download frequency')
+        if isGuestUser(uid):
+            redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : req.unparsed_uri}, {})))
         argd = wash_urlargd(form, {'timespan': (str, "today"),
                                    'format': (str, SUITABLE_GRAPH_FORMAT)})
 
@@ -127,6 +177,15 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def customevent(self, req, form):
         """Custom event statistics page"""
+        uid = getUid(req)
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../stats",
+                                       navmenuid = 'custom event')
+        if isGuestUser(uid):
+            redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : req.unparsed_uri}, {})))
         argd = wash_urlargd(form, {'ids': (list, []),
                                    'timespan': (str, ""),
                                    'format': (str, SUITABLE_GRAPH_FORMAT)})
@@ -142,6 +201,15 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def customevent_help(self, req, form):
         """Custom event help page"""
+        uid = getUid(req)
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../stats",
+                                       navmenuid = 'custom event help')
+        if isGuestUser(uid):
+            redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : req.unparsed_uri}, {})))
         return page(title="Custom event help",
                     body=perform_display_customevent_help(),
                     navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
@@ -155,6 +223,15 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def export(self, req, form):
         """Exports data"""
+        uid = getUid(req)
+        if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "../stats",
+                                       navmenuid = 'export')
+        if isGuestUser(uid):
+            redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : req.unparsed_uri}, {})))
         argd = wash_urlargd(form, {"filename": (str, ""),
                                    "mime": (str, "")})
 
