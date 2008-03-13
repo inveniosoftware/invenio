@@ -280,7 +280,7 @@ def isGuestUser(uid):
             if res[0][0]:
                 out = 0
     except OperationalError:
-        pass
+        register_exception()
     return out
 
 def isUserSubmitter(user_info):
