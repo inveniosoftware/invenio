@@ -17,8 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = bibformat bibreformat
+bin_SCRIPTS = bibreformat
 
-EXTRA_DIST = bibformat.in bibreformat.in
+EXTRA_DIST = bibreformat.in
 
 CLEANFILES = *~ *.tmp 
