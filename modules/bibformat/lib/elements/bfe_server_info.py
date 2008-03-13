@@ -22,18 +22,16 @@ __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_LANG, CFG_SITE_NAME, CFG_SITE_URL, CFG_VERSION, CFG_SITE_NAME_INTL, CFG_SITE_SUPPORT_EMAIL
 
-# FIXME: what about admin_email? needed? or use new arguments like CFG_SITE_ADMIN_EMAIL?
-
 def format(bfo, var=''):
     '''
     Print several server specific variables.
-    @param var the name of the desired variable. Can be one of: name, i18n_name, lang, CFG_VERSION, admin_email, support_email, CFG_SITE_URL, searchurl, recurl
-           name: the name of the server
-           i18n_name: internationalized name
-           lang: the default language of the server
+    @param var the name of the desired variable. Can be one of: CFG_SITE_NAME, CFG_SITE_NAME_INTL, CFG_SITE_LANG, CFG_VERSION, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_URL, searchurl, recurl
+           CFG_SITE_NAME: the name of the server
+           CFG_SITE_NAME_INTL: internationalized name
+           CFG_SITE_LANG: the default language of the server
            CFG_VERSION: the software version
-           admin_email: the admin email
-           support_email: the support email
+           CFG_SITE_ADMIN_EMAIL: the admin email
+           CFG_SITE_SUPPORT_EMAIL: the support email
            CFG_SITE_URL: the base url for the server
            searchurl: the search url for the server
            recurl: the base url for the record
@@ -41,17 +39,17 @@ def format(bfo, var=''):
     recID = bfo.recID
     if var == '':
         out =  ''
-    elif var == 'name':
+    elif var in ['name', 'CFG_SITE_NAME']:
         out = CFG_SITE_NAME
-    elif var == 'i18n_name':
+    elif var in ['i18n_name', 'CFG_SITE_NAME_INTL']:
         out = CFG_SITE_NAME_INTL.get(bfo.lang, CFG_SITE_NAME)
-    elif var == 'lang':
+    elif var in ['lang', 'CFG_SITE_LANG']:
         out = CFG_SITE_LANG
     elif var == 'CFG_VERSION':
         out = 'CDS Invenio v' + str(CFG_VERSION)
-    elif var in ['email', 'admin_email']:
+    elif var in ['email', 'admin_email', 'CFG_SITE_ADMIN_EMAIL']:
         out = CFG_SITE_ADMIN_EMAIL
-    elif var == 'support_email':
+    elif var in ['support_email', 'CFG_SITE_SUPPORT_EMAIL']:
         out = CFG_SITE_SUPPORT_EMAIL
     elif var == 'CFG_SITE_URL':
         out = CFG_SITE_URL
