@@ -111,9 +111,11 @@ DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
 
 # Demo site roles
 DEF_DEMO_ROLES = (('photoadmin', 'Photo collection administrator', 'deny any'),
-                  ('thesesviewer', 'Theses viewer', 'allow group "Theses viewers"\nallow apache_group "theses"'))
+                  ('thesesviewer', 'Theses viewer', 'allow group "Theses viewers"\nallow apache_group "theses"'),
+                  ('bookadmin', 'Book collection administrator', 'deny any'),)
 
-DEF_DEMO_USER_ROLES = (('jekyll@cern.ch', 'thesesviewer'), )
+DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
+                       ('dorian.gray@cds.cern.ch', 'bookadmin'))
 
 # users
 # list of e-mail addresses
@@ -158,8 +160,9 @@ DEF_AUTHS = ()
 #              role          action       arglistid  optional arguments
 DEF_DEMO_AUTHS = (
              ('photoadmin', 'runwebcoll', -1, 0, {'collection': 'Pictures'}),
-             ('thesesviewer', 'viewrestrdoc', -1, 0, {'status' : 'restrdoc'}),
-             ('thesesviewer', VIEWRESTRCOLL, -1, 0, {'collection' : 'Theses'})
+             ('thesesviewer', 'viewrestrdoc', -1, 0, {'status': 'restrdoc'}),
+             ('thesesviewer', VIEWRESTRCOLL, -1, 0, {'collection': 'Theses'}),
+             ('bookadmin', 'referee', -1, 0, {'doctype': 'DEMOBOO', 'categ': '*'}),
             )
 
 
