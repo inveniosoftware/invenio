@@ -333,7 +333,10 @@ class Template:
                     'p' : title,
                     'sc' : 1,
                     'of' : 'hb'}, {}))
-        return ''
+        return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
+                    'p' : 'recid:-1',
+                    'sc' : 1,
+                    'of' : 'hb'}, {}))
 
     def build_search_url(self, known_parameters={}, **kargs):
         """ Helper for generating a canonical search
