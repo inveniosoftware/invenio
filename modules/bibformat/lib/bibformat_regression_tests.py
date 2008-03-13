@@ -231,7 +231,12 @@ class BibFormatNLMTest(unittest.TestCase):
         pageurl = CFG_SITE_URL + '/record/70?of=xn'
         result = test_web_page_content(pageurl,
                                        expected_text=self.record_70_xn)
-        self.assertEqual([], result)
+        try:
+            self.assertEqual([], result)
+        except AssertionError:
+            result = test_web_page_content(pageurl,
+                                           expected_text=self.record_70_xn.replace('<fpage/>', '<fpage></fpage>').replace('<lpage/>', '<lpage></lpage>'))
+            self.assertEqual([], result)
 
 class BibFormatBriefHTMLTest(unittest.TestCase):
     """Check output produced by BibFormat for brief HTML ouput for
