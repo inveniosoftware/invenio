@@ -31,6 +31,10 @@ def Is_Referee(parameters, curdir, form, user_info=None):
     res = run_sql("SELECT categ FROM sbmAPPROVAL WHERE rn=%s", (rn,))
     if len(res) >0:
         categ = res[0][0]
+        if categ == "unknown":
+            ## FIXME: This was necessary for document types without categories,
+            ## such as DEMOBOO:
+            categ = "*"
     else:
         categ=""
     # Try to retrieve the referee's email from the referee's database
