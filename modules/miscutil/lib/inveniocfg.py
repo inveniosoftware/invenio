@@ -575,6 +575,7 @@ AddDefaultCharset UTF-8
 ServerSignature Off
 ServerTokens Prod
 NameVirtualHost *:80
+Listen 80
 <Files *.pyc>
    deny from all
 </Files>
@@ -616,6 +617,7 @@ NameVirtualHost *:80
     apache_vhost_ssl_body = """\
 ServerSignature Off
 ServerTokens Prod
+Listen 443
 NameVirtualHost *:443
 #SSLCertificateFile /etc/apache2/ssl/apache.pem
 SSLCertificateFile /etc/apache2/ssl/server.crt
@@ -653,8 +655,8 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
            PythonDebug On
         </Directory>
 </VirtualHost>
-""" % {'servername': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("http://", ""),
-       'serveralias': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("http://", "").split('.')[0],
+""" % {'servername': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", ""),
+       'serveralias': conf.get('Invenio', 'CFG_SITE_SECURE_URL').replace("https://", "").split('.')[0],
        'serveradmin': conf.get('Invenio', 'CFG_SITE_ADMIN_EMAIL'),
        'webdir': conf.get('Invenio', 'CFG_WEBDIR'),
        'logdir': conf.get('Invenio', 'CFG_LOGDIR'),
