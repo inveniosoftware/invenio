@@ -143,14 +143,14 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
     else:
         # Print Table of Contents
         see_also_links = {'admin': '<a href="%s/help/admin/contents%s">%s</a>' % \
-                          (CFG_SITE_URL, ln_link, _('Admin Pages Index')),
+                          (CFG_SITE_URL, ln_link, _('Admin Pages')),
                           'help':'<a href="%s/help/contents%s">%s</a>' % \
-                          (CFG_SITE_URL, ln_link, _('Help Pages Index')),
+                          (CFG_SITE_URL, ln_link, _('Help Pages')),
                           'hacking':'<a href="%s/help/hacking/contents%s">%s</a>' % \
-                          (CFG_SITE_URL, ln_link, _('Hacking Pages Index'))}
-        titles = {'admin': _("Admin Pages Index"),
-                  'help': _("Help Pages Index"),
-                  'hacking': _("Hacking Pages Index")}
+                          (CFG_SITE_URL, ln_link, _('Hacking Pages'))}
+        titles = {'admin': _("Admin Pages"),
+                  'help': _("Help Pages"),
+                  'hacking': _("Hacking Pages")}
         navtrails = {'admin': '<a class="navtrail" href="%s/help/admin%s">%s</a>' % \
                      (CFG_SITE_URL, ln_link, _("Admin Area")),
                      'help': '<a class="navtrail" href="%s/help/%s">%s</a>' % \
@@ -158,15 +158,15 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
                      'hacking': '<a class="navtrail" href="%s/help/hacking%s">%s</a>' % \
                      (CFG_SITE_URL, ln_link, _("Hacking CDS Invenio"))}
         body = '''<div style="float:right;clear:none;font-size:small;color:#666;width:auto;margin-right:30px;padding:5px" class="mini-panel"><strong>''' + \
-               _("Last modifications") + '</strong>' + \
+               _("Latest modifications:") + '</strong>' + \
                get_webdoc_topics(sort_by='date', sc=0, limit=5,
                                  categ=[categ], ln=ln) + \
-               '</div>' + '<p>' +_('This is the index of the %(category)s pages.') % {'category': categ}
+               '</div>' + '<p>' +_('This is the table of contents of the %(x_category)s pages.') % {'x_category': categ}
         if categ != 'help':
             body += ' ' + _('See also') + ' ' + \
                               ', '.join([ link for (category, link) in \
                                           see_also_links.iteritems() \
-                                          if category != categ])
+                                          if category != categ]) + '.'
 
         body += '</p>' + get_webdoc_topics(sort_by='name', sc=1,
                                            categ=[categ], ln=ln)
@@ -189,10 +189,8 @@ def display_webdoc_page(webdocname, categ="help", ln=CFG_SITE_LANG, req=None):
         page_body = '<p>' + (_("Sorry, page %s does not seem to exist.") % \
                     ('<strong>' + cgi.escape(webdocname) + '</strong>')) + \
                     '</p>'
-        page_body += '<p>' + (_("You may want to start browsing from %(rooturl)s or have a look at the %(x_url_open)s index of the %(category)s pages%(x_url_close)s.") % \
-                              {'rooturl':'<a href="%s%s">%s</a>' % \
-                               (CFG_SITE_URL, ln_link, CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)),
-                               'category': _(categ),
+        page_body += '<p>' + (_("You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)s.") % \
+                              {'x_category': _(categ),
                                'x_url_open': '<a href="%s/help/%scontents%s">' % \
                                (CFG_SITE_URL, ((categ != 'help' and categ + '/') or ''), ln_link),
                                'x_url_close': '</a>'}) + \
