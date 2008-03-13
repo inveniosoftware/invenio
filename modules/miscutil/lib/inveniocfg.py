@@ -377,10 +377,15 @@ If yes, then please login as MySQL admin user and run the
 following commands now:
 
 
- $ mysql -h %(dbhost)s -u root -p mysql
-   mysql> CREATE DATABASE %(dbname)s DEFAULT CHARACTER SET utf8;
-   mysql> GRANT ALL PRIVILEGES ON %(dbname)s.* TO %(dbuser)s@%(webhost)s IDENTIFIED BY '%(dbpass)s';
-   mysql> QUIT
+$ mysql -h %(dbhost)s -u root -p mysql
+
+mysql> CREATE DATABASE %(dbname)s DEFAULT CHARACTER SET utf8;
+
+mysql> GRANT ALL PRIVILEGES ON %(dbname)s.*
+
+       TO %(dbuser)s@%(webhost)s IDENTIFIED BY '%(dbpass)s';
+
+mysql> QUIT
 
 
 The values printed above were detected from your configuration.
