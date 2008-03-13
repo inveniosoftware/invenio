@@ -107,7 +107,8 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
     """Show error message when user is not authorized to do something.
 
     @param referer: in case the displayed message propose a login link, this
-    is the url to return to after logging in.
+    is the url to return to after logging in. If not specified it is guessed
+    from req
 
     @param uid: the uid of the user. If not specified it is guessed from req.
 
@@ -118,6 +119,9 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
     from invenio.webpage import page
 
     _ = gettext_set_language(ln)
+
+    if not referer:
+        referer = req.unparsed_uri
 
     if not CFG_ACCESS_CONTROL_LEVEL_SITE:
         title = CFG_WEBACCESS_MSGS[5]
