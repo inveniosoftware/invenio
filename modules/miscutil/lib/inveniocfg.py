@@ -680,7 +680,6 @@ SSLCertificateKeyFile /etc/apache2/ssl/server.key
         fdesc.close()
         print "Created file", apache_vhost_ssl_file
 
-    print ""
     print wrap_text_in_a_box("""\
 Apache virtual host configurations for your site have been
 created. You can check created files and put the following
