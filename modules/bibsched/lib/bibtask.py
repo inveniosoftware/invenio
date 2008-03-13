@@ -47,9 +47,19 @@ cfg_valid_processes_no_auth_needed = ("bibupload")
 
 # Global variables
 _options = {'verbose' : 1, 'name' : ''}
-_task_params = {"task_name" : os.path.basename(sys.argv[0])
-}
-
+try:
+    _task_params = {"task_name" : os.path.basename(sys.argv[0])}
+except AttributeError:
+    # A workaround for some Python2.3 systems, e.g. SLC4, where
+    # importing this file under Apache/mod_python environment causes
+    # the following error:
+    #
+    #   "AttributeError: 'module' object has no attribute 'argv'".
+    #
+    # This workaround prevents it, but a proper solution would be not
+    # to import bibtask.py as a dependency from web-related files,
+    # because we simply do not need it there...
+    _task_params = {}
 
 def task_init(
     authorization_action="",
