@@ -58,6 +58,7 @@ Options to help the work:
    --list                   print names and values of all options from conf files
    --get <some-opt>         get value of a given option from conf files
    --conf-dir </some/path>  path to directory where invenio*.conf files are [optional]
+   --detect-system-details  print system details such as Apache/Python/MySQL versions
 """
 
 __revision__ = "$Id$"
@@ -66,7 +67,9 @@ from ConfigParser import ConfigParser
 import os
 import re
 import shutil
+import socket
 import sys
+import tempfile
 
 def print_usage():
     """Print help."""
@@ -75,6 +78,26 @@ def print_usage():
 def print_version():
     """Print version information."""
     print __revision__
+
+def run_command(cmd):
+    """
+    Run operating system command CMD (assumed to be washed already)
+    and return tuple (exit status code, out stream, err stream).
+    """
+    cmd_out = ''
+    cmd_err = ''
+    file_cmd_out = tempfile.mkstemp("inveniocfg-cmd-out")[1]
+    file_cmd_err = tempfile.mkstemp("inveniocfg-cmd-err")[1]
+    cmd_exit_code = os.system("%s > %s 2> %s" % (cmd,
+                                                 file_cmd_out,
+                                                 file_cmd_err))
+    if os.path.exists(file_cmd_out):
+        cmd_out = open(file_cmd_out).read()
+        os.remove(file_cmd_out)
+    if os.path.exists(file_cmd_err):
+        cmd_err = open(file_cmd_err).read()
+        os.remove(file_cmd_err)
+    return cmd_exit_code, cmd_out, cmd_err
 
 def convert_conf_option(option_name, option_value):
     """
@@ -714,6 +737,76 @@ def cli_cmd_list(conf):
         for option in conf.options(section):
             print option, '=', conf.get(section, option)
 
+def detect_apache_version():
+    """
+    Try to detect Apache httpd version by localizing httpd or apache2
+    executables and digging into binary.  Return Apache version as a
+    string.  Return empty string if not succeed.
+    """
+    apache_version = ""
+    dummy1, cmd_out, dummy2 = run_command("locate bin/httpd bin/apache2")
+    for apache in cmd_out.split("\n"):
+        if os.path.exists(apache):
+            dummy3, cmd2_out, dummy4 = run_command("strings %s | grep ^Apache\/" % apache)
+            if cmd2_out:
+                for cmd2_out_line in cmd2_out.split("\n"):
+                    if len(cmd2_out_line) > len(apache_version):
+                        # the longest the better
+                        apache_version = cmd2_out_line
+    return apache_version
+
+def detect_modpython_version():
+    """
+    Try to detect mod_python version.  Return mod_python version as a
+    string.  Return empty string if no success.
+    """
+    try:
+        from mod_python import version
+    except ImportError:
+        # try to detect via looking at mod_python.so:
+        version = ""
+        dummy1, cmd_out, dummy2 = run_command("locate /mod_python.so")
+        for modpython in cmd_out.split("\n"):
+            if os.path.exists(modpython):
+                dummy3, cmd2_out, dummy4 = run_command("strings %s | grep ^mod_python\/" % modpython)
+                if cmd2_out:
+                    for cmd2_out_line in cmd2_out.split("\n"):
+                        if len(cmd2_out_line) > len(version):
+                            # the longest the better
+                            version = cmd2_out_line
+    return version
+
+def cli_cmd_detect_system_details(conf):
+    """
+    Detect and print system details such as Apache/Python/MySQL
+    versions etc.  Useful for debugging problems on various OS.
+    """
+    import MySQLdb
+    print ">>> Going to detect system details..."
+    print "* Hostname: " + socket.gethostname()
+    print "* Invenio version: " + conf.get("Invenio", "CFG_VERSION")
+    print "* Python version: " + sys.version.replace("\n", " ")
+    print "* Apache version: " + detect_apache_version()
+    print "* mod_python version: " + detect_modpython_version()
+    print "* MySQLdb version: " + MySQLdb.__version__
+    try:
+        from invenio.dbquery import run_sql
+        print "* MySQL version:"
+        for key, val in run_sql("SHOW VARIABLES LIKE 'version%'") + \
+                run_sql("SHOW VARIABLES LIKE 'charact%'") + \
+                run_sql("SHOW VARIABLES LIKE 'collat%'"):
+            if False:
+                print "    - %s: %s" % (key, val)
+            elif key in ['version', 'character_set_connection',
+                         'character_set_database',
+                         'character_set_server',
+                         'collation_connection', 'collation_database',
+                         'collation_server']:
+                print "    - %s: %s" % (key, val)
+    except ImportError:
+        print "* ERROR: cannot import dbquery"
+    print ">>> System details detected successfully."
+
 def main():
     """Main entry point."""
     conf = ConfigParser()
@@ -772,6 +865,9 @@ def main():
                 done = True
             elif opt == '--list':
                 cli_cmd_list(conf)
+                done = True
+            elif opt == '--detect-system-details':
+                cli_cmd_detect_system_details(conf)
                 done = True
             elif opt == '--create-tables':
                 cli_cmd_create_tables(conf)
