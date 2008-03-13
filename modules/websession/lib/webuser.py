@@ -108,7 +108,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
 
     @param referer: in case the displayed message propose a login link, this
     is the url to return to after logging in. If not specified it is guessed
-    from req
+    from req.
 
     @param uid: the uid of the user. If not specified it is guessed from req.
 

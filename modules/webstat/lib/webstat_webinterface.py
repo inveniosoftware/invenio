@@ -57,12 +57,15 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                  'download_frequency', 'customevent', 'customevent_help',
                  'export' ]
 
+    navtrail = navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL
+
     def index(self, req, _):
         """Index page."""
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
-            return page_not_authorized(req, "/stats",
+            return page_not_authorized(req,
+                navtrail=self.navtrail,
                 text=auth_msg,
                 navmenuid='index')
 
@@ -81,7 +84,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
-            return page_not_authorized(req, "/stats",
+            return page_not_authorized(req,
+                navtrail=self.navtrail,
                 text=auth_msg,
                 navmenuid='collection population')
 
@@ -103,7 +107,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
-            return page_not_authorized(req, "/stats",
+            return page_not_authorized(req,
+                navtrail=self.navtrail,
                 text=auth_msg,
                 navmenuid='search frequency')
 
@@ -124,7 +129,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
-            return page_not_authorized(req, "/stats",
+            return page_not_authorized(req,
+                navtrail=self.navtrail,
                 text=auth_msg,
                 navmenuid='search type distribution')
 
@@ -145,7 +151,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
-            return page_not_authorized(req, "/stats",
+            return page_not_authorized(req,
+                navtrail=self.navtrail,
                 text=auth_msg,
                 navmenuid='download frequency')
 
@@ -168,7 +175,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
-            return page_not_authorized(req, "/stats",
+            return page_not_authorized(req,
+                navtrail=self.navtrail,
                 text=auth_msg,
                 navmenuid='custom event')
 
@@ -190,7 +198,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
-            return page_not_authorized(req, "/stats",
+            return page_not_authorized(req,
+                navtrail=self.navtrail,
                 text=auth_msg,
                 navmenuid='custom event help')
 
@@ -210,7 +219,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
-            return page_not_authorized(req, "/stats",
+            return page_not_authorized(req,
+                navtrail=self.navtrail,
                 text=auth_msg,
                 navmenuid='export')
 
