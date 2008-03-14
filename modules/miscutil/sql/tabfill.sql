@@ -44,7 +44,7 @@ INSERT INTO field VALUES (14,'record ID','recid');
 INSERT INTO field VALUES (15,'isbn','isbn');
 INSERT INTO field VALUES (16,'issn','issn');
 INSERT INTO field VALUES (17,'coden','coden');
-INSERT INTO field VALUES (18,'doi','doi');
+-- INSERT INTO field VALUES (18,'doi','doi');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,101,10);
@@ -166,7 +166,7 @@ INSERT INTO field_tag VALUES (14,117,100);
 INSERT INTO field_tag VALUES (15,118,100);
 INSERT INTO field_tag VALUES (16,119,100);
 INSERT INTO field_tag VALUES (17,120,100);
-INSERT INTO field_tag VALUES (18,121,100);
+-- INSERT INTO field_tag VALUES (18,121,100);
 
 INSERT INTO format VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
@@ -306,7 +306,7 @@ INSERT INTO tag VALUES (117,'record ID','001');
 INSERT INTO tag VALUES (118,'isbn','020__a');
 INSERT INTO tag VALUES (119,'issn','022__a');
 INSERT INTO tag VALUES (120,'coden','030__a');
-INSERT INTO tag VALUES (121,'doi','773__a');
+-- INSERT INTO tag VALUES (121,'doi','773__a');
 
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '');
