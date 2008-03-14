@@ -22,12 +22,12 @@
 
 __revision__ = "$Id$"
 
-import urllib
 import time
 import cgi
 import gettext
 import string
 import locale
+from urllib import quote, urlencode
 
 from invenio.config import \
      CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH, \
@@ -157,6 +157,7 @@ class Template:
                            'm3' : (str, "")}
 
     tmpl_openurl_accepted_args = {
+            'id' : (list, []),
             'genre' : (str, ''),
             'aulast' : (str, ''),
             'aufirst' : (str, ''),
@@ -185,7 +186,7 @@ class Template:
             'url_ver' : (str, ''),
             'ctx_ver' : (str, ''),
             'rft_val_fmt' : (str, ''),
-            'rfr_id' : (str, ''),
+            'rft_id' : (list, []),
             'rft.atitle' : (str, ''),
             'rft.title' : (str, ''),
             'rft.jtitle' : (str, ''),
@@ -231,7 +232,36 @@ class Template:
         """
 
         from invenio.search_engine import perform_request_search
+        doi = ''
+        pmid = ''
+        bibcode = ''
+        oai = ''
+        issn = ''
+        isbn = ''
+        for elem in openurl_data['id']:
+            if elem.startswith('doi:'):
+                doi = elem[len('doi:'):]
+            elif elem.startswith('pmid:'):
+                pmid = elem[len('pmid:'):]
+            elif elem.startswith('bibcode:'):
+                bibcode = elem[len('bibcode:'):]
+            elif elem.startswith('oai:'):
+                oai = elem[len('oai:'):]
+        for elem in openurl_data['rft_id']:
+            if elem.startswith('info:doi/'):
+                doi = elem[len('info:doi/'):]
+            elif elem.startswith('info:pmid/'):
+                pmid = elem[len('info:pmid/'):]
+            elif elem.startswith('info:bibcode/'):
+                bibcode = elem[len('info:bibcode/'):]
+            elif elem.startswith('info:oai/'):
+                oai = elem[len('info:oai/')]
+            elif elem.startswith('urn:ISBN:'):
+                isbn = elem[len('urn:ISBN:'):]
+            elif elem.startswith('urn:ISSN:'):
+                issn = elem[len('urn:ISSN:'):]
 
+        ## Building author query
         aulast = openurl_data['rft.aulast'] or openurl_data['aulast']
         aufirst = openurl_data['rft.aufirst'] or openurl_data['aufirst']
         auinit = openurl_data['rft.auinit'] or \
@@ -239,7 +269,6 @@ class Template:
                  openurl_data['rft.auinit1'] + ' ' + openurl_data['rft.auinitm'] or \
                  openurl_data['auinit1'] + ' ' + openurl_data['auinitm'] or  aufirst[:1]
         auinit = auinit.upper()
-
         if aulast and aufirst:
             author_query = 'author:"%s, %s" or author:"%s, %s"' % (aulast, aufirst, aulast, auinit)
         elif aulast and auinit:
@@ -247,96 +276,113 @@ class Template:
         else:
             author_query = ''
 
+        ## Building title query
         title = openurl_data['rft.atitle'] or \
                 openurl_data['atitle'] or \
                 openurl_data['rft.btitle'] or \
                 openurl_data['rft.title'] or \
                 openurl_data['title']
-
         if title:
             title_query = 'title:"%s"' % title
         else:
             title_query = ''
 
+        ## Building journal query
         jtitle = openurl_data['rft.stitle'] or \
                  openurl_data['stitle'] or \
                  openurl_data['rft.jtitle'] or \
                  openurl_data['title']
-
         if jtitle:
             journal_query = 'journal:"%s"' % jtitle
         else:
             journal_query = ''
 
-        isbn = openurl_data['rft.isbn'] or \
+        ## Building isbn query
+        isbn = isbn or openurl_data['rft.isbn'] or \
                openurl_data['isbn']
-
+        isbn = isbn.replace(' ', '').replace('-', '')
         if isbn:
-            isbn_query = '020__a:"%s"' % isbn
+            isbn_query = 'isbn:"%s"' % isbn
         else:
             isbn_query = ''
 
-        issn = openurl_data['rft.eissn'] or \
+        ## Building issn query
+        issn = issn or openurl_data['rft.eissn'] or \
                openurl_data['eissn'] or \
                openurl_data['rft.issn'] or \
                openurl_data['issn']
-
         if issn:
-            issn_query = '022__a:"%s"' % issn
+            issn_query = 'issn:"%s"' % issn
         else:
             issn_query = ''
 
+        ## Building coden query
         coden = openurl_data['rft.coden'] or openurl_data['coden']
-
         if coden:
-            coden_query = '030__a:"%s"' % coden
+            coden_query = 'coden:"%s"' % coden
         else:
             coden_query = ''
 
-        if openurl_data['rfr_id'].startswith('info:doi/'):
-            doi_query = '773__a:"%s"' % openurl_data['rfr_id'][len('info:doi/'):]
+        ## Building doi query
+        if False: #doi: #FIXME Temporaly disabled until doi field is properly setup
+            doi_query = 'doi:"%s"' % doi
         else:
             doi_query = ''
 
+        ## Trying possible searches
         if doi_query:
             if perform_request_search(p=doi_query):
-                return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
+                return '%s/search?%s' % (CFG_SITE_URL, urlencode({
                     'p' : doi_query,
                     'sc' : 1,
-                    'of' : 'hd'}, {}))
+                    'of' : 'hd'}))
         if isbn_query:
             if perform_request_search(p=isbn_query):
-                return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
+                return '%s/search?%s' % (CFG_SITE_URL, urlencode({
                     'p' : isbn_query,
                     'sc' : 1,
-                    'of' : 'hd'}, {}))
+                    'of' : 'hd'}))
         if coden_query:
             if perform_request_search(p=coden_query):
-                return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
+                return '%s/search?' % (CFG_SITE_URL, urlencode({
                     'p' : coden_query,
                     'sc' : 1,
-                    'of' : 'hd'}, {}))
+                    'of' : 'hd'}))
         if author_query and title_query:
             if perform_request_search(p='%s and %s' % (title_query, author_query)):
-                return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
+                return '%s/search?%s' % (CFG_SITE_URL, urlencode({
                     'p' : '%s and %s' % (title_query, author_query),
                     'sc' : 1,
-                    'of' : 'hd'}, {}))
+                    'of' : 'hd'}))
         if title_query:
             if perform_request_search(p=title_query):
-                return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
+                return '%s/search?%s' % (CFG_SITE_URL, urlencode({
                     'p' : title_query,
                     'sc' : 1,
-                    'of' : 'hb'}, {}))
+                    'of' : 'hb'}))
         if title:
-            return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
+            return '%s/search?%s' % (CFG_SITE_URL, urlencode({
                     'p' : title,
                     'sc' : 1,
-                    'of' : 'hb'}, {}))
-        return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
-                    'p' : 'recid:-1',
-                    'sc' : 1,
-                    'of' : 'hb'}, {}))
+                    'of' : 'hb'}))
+
+        ## Nothing worked, let's return a search that the user can improve
+        if author_query and title_query:
+            return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
+                'p' : '%s and %s' % (title_query, author_query),
+                'sc' : 1,
+                'of' : 'hd'}, {}))
+        elif title_query:
+            return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
+                'p' : title_query,
+                'sc' : 1,
+                'of' : 'hb'}, {}))
+        else:
+            ## Mmh. Too few information provided.
+            return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
+                        'p' : 'recid:-1',
+                        'sc' : 1,
+                        'of' : 'hb'}, {}))
 
     def build_search_url(self, known_parameters={}, **kargs):
         """ Helper for generating a canonical search
@@ -377,7 +423,7 @@ class Template:
 
         # Now, we only have the arguments which have _not_ their default value
         if c and c != CFG_SITE_NAME:
-            base = CFG_SITE_URL + '/collection/' + urllib.quote(c)
+            base = CFG_SITE_URL + '/collection/' + quote(c)
         else:
             base = CFG_SITE_URL
         return create_url(base, drop_default_urlargd(parameters, self.search_results_default_urlargd))
@@ -400,7 +446,7 @@ class Template:
             args = make_canonical_urlargd(argd, self.rss_default_urlargd)
             if c != []:
                 # Add collections
-                c = [urllib.quote(coll) for coll in c]
+                c = [quote(coll) for coll in c]
                 args += '&amp;c=' + '&amp;c='.join(c)
 
         return CFG_SITE_URL + '/rss' + args
@@ -2828,16 +2874,16 @@ class Template:
                 'similar': similar}
 
         if CFG_BIBRANK_SHOW_CITATION_GRAPHS and selfcited is not None:
-	    sc_scorelist = [] #a score list for print..
-	    for s in selfcited:
-		#copy weight from citations
-		weight = 0
-		for c in citinglist:
-			(crec,score) = c
-			if crec == s:
-				weight = score
-		tmp = [s,weight]
-		sc_scorelist.append(tmp)
+            sc_scorelist = [] #a score list for print..
+            for s in selfcited:
+                #copy weight from citations
+                weight = 0
+                for c in citinglist:
+                    (crec,score) = c
+                    if crec == s:
+                        weight = score
+                tmp = [s,weight]
+                sc_scorelist.append(tmp)
             scite = self.tmpl_print_record_list_for_similarity_boxen (
                 _(".. of which self-citations: %s records") % len (selfcited), sc_scorelist, ln)
             out += '<tr><td>'+scite+'</td></tr>'

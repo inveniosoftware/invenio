@@ -386,6 +386,56 @@ class WebSearchTestBrowse(unittest.TestCase):
         # set is not equal
         self.failUnlessEqual(batch_1[-2][1]['p'], batch_2[0][1]['p'])
 
+class WebSearchTestOpenURL(unittest.TestCase):
+
+    def test_isbn_01(self):
+        """ websearch - isbn query via OpenURL 0.1"""
+
+        browser = Browser()
+
+        # We do a precise search in an isolated collection
+        browser.open(make_url('/openurl', isbn='0387940758'))
+
+        dummy, current_q = parse_url(browser.geturl())
+
+        self.failUnlessEqual(current_q, {
+            'sc' : ['1'],
+            'p' : ['isbn:"0387940758"'],
+            'of' : ['hd']
+        })
+
+    def test_isbn_10_rft_id(self):
+        """ websearch - isbn query via OpenURL 1.0 - rft_id"""
+
+        browser = Browser()
+
+        # We do a precise search in an isolated collection
+        browser.open(make_url('/openurl', rft_id='urn:ISBN:0387940758'))
+
+        dummy, current_q = parse_url(browser.geturl())
+
+        self.failUnlessEqual(current_q, {
+            'sc' : ['1'],
+            'p' : ['isbn:"0387940758"'],
+            'of' : ['hd']
+        })
+
+    def test_isbn_10(self):
+        """ websearch - isbn query via OpenURL 1.0"""
+
+        browser = Browser()
+
+        # We do a precise search in an isolated collection
+        browser.open(make_url('/openurl?rft.isbn=0387940758'))
+
+        dummy, current_q = parse_url(browser.geturl())
+
+        self.failUnlessEqual(current_q, {
+            'sc' : ['1'],
+            'p' : ['isbn:"0387940758"'],
+            'of' : ['hd']
+        })
+
 
 class WebSearchTestSearch(unittest.TestCase):
 
@@ -1107,6 +1157,7 @@ class WebSearchExtSysnoQueryTest(unittest.TestCase):
 test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
+                             WebSearchTestOpenURL,
                              WebSearchTestCollections,
                              WebSearchTestRecord,
                              WebSearchTestLegacyURLs,
