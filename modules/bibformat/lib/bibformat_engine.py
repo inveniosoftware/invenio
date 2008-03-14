@@ -303,6 +303,10 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
     #Create a BibFormat Object to pass that contain record and context
     bfo = BibFormatObject(recID, ln, search_pattern, xml_record, user_info, of)
 
+    if len(bfo.get_record()) <= 1:
+        # Record only has recid: do not format
+        return ""
+
     #Find out which format template to use based on record and output format.
     template = decide_format_template(bfo, of)
     if verbose == 9 and template is not None:

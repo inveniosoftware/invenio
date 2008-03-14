@@ -263,7 +263,9 @@ def iterate_over_new(list, fmt):
        </datafield>
     </record>'''
 
-        formatted_records += prologue + encode_for_xml(formatted_record) + epilogue
+        if formatted_record != '':
+            # Skip this record if its value is empty.
+            formatted_records += prologue + encode_for_xml(formatted_record) + epilogue
 
         # every n_it_max record, upload all formatted records.
         # also upload if recID is last one
