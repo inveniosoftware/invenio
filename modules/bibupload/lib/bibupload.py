@@ -1094,7 +1094,11 @@ def insert_fmt_tags(record, rec_id, opt_mode):
     fmt_fields = record_get_field_instances(record, 'FMT')
     if fmt_fields:
         for fmt_field in fmt_fields:
-            # Get the f, g subfields of the FMT tag
+            # Get the d, f, g subfields of the FMT tag
+            try:
+                d_value = field_get_subfield_values(fmt_field, "d")[0]
+            except IndexError:
+                d_value = ""
             try:
                 f_value = field_get_subfield_values(fmt_field, "f")[0]
             except IndexError:
@@ -1104,7 +1108,7 @@ def insert_fmt_tags(record, rec_id, opt_mode):
             except IndexError:
                 g_value = ""
             # Update the format
-            res = update_bibfmt_format(rec_id, g_value, f_value)
+            res = update_bibfmt_format(rec_id, g_value, f_value, d_value)
             if res == 1:
                 write_message("   Failed: Error during update_bibfmt", verbose=1, stream=sys.stderr)
 
@@ -1136,19 +1140,23 @@ def update_bibrec_modif_date(now, bibrec_id):
         write_message("   Error during update_bibrec_modif_date function : %s" % error,
                       verbose=1, stream=sys.stderr)
 
-def update_bibfmt_format(id_bibrec, format_value, format_name):
+def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date):
     """Update the format in the table bibfmt"""
     # We check if the format is already in bibFmt
     nb_found = find_record_format(id_bibrec, format_name)
     if nb_found == 1:
         # we are going to update the format
+        try:
+            time.strptime(modification_date, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            modification_date = '1970-01-01 00:00:00'
         # get the current time
         now = convert_datestruct_to_datetext(time.localtime())
         # compress the format_value value
         pickled_format_value =  compress(format_value)
         # update the format:
         query = """UPDATE bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s"""
-        params = (now, pickled_format_value, id_bibrec, format_name)
+        params = (modification_date, pickled_format_value, id_bibrec, format_name)
         try:
             row_id  = run_sql(query, params)
             if row_id is None:
