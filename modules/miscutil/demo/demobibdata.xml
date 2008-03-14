@@ -6084,6 +6084,9 @@
         </datafield>
     </record>
     <record>
+        <datafield tag="020" ind1=" " ind2=" ">
+            <subfield code="a">0898710022</subfield>
+        </datafield>
         <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">eng</subfield>
         </datafield>
@@ -6134,6 +6137,9 @@
         </datafield>
     </record>
     <record>
+        <datafield tag="020" ind1=" " ind2=" ">
+            <subfield code="a">0844621951</subfield>
+        </datafield>
         <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">eng</subfield>
         </datafield>
@@ -6239,6 +6245,9 @@
         </datafield>
     </record>
     <record>
+        <datafield tag="020" ind1=" " ind2=" ">
+            <subfield code="a">1563964554</subfield>
+        </datafield>
         <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">eng</subfield>
         </datafield>
@@ -6287,6 +6296,9 @@
         </datafield>
     </record>
     <record>
+        <datafield tag="020" ind1=" " ind2=" ">
+            <subfield code="a">2225350574</subfield>
+        </datafield>
         <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">fre</subfield>
         </datafield>
@@ -6332,6 +6344,9 @@
         </datafield>
     </record>
     <record>
+        <datafield tag="020" ind1=" " ind2=" ">
+            <subfield code="a">2225350574</subfield>
+        </datafield>
         <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">fre</subfield>
         </datafield>
@@ -6377,6 +6392,9 @@
         </datafield>
     </record>
     <record>
+        <datafield tag="020" ind1=" " ind2=" ">
+            <subfield code="a">0023506709</subfield>
+        </datafield>
         <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">eng</subfield>
         </datafield>
@@ -6468,6 +6486,9 @@
         </datafield>
     </record>
     <record>
+        <datafield tag="020" ind1=" " ind2=" ">
+            <subfield code="a">0720421039</subfield>
+        </datafield>
         <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">eng</subfield>
         </datafield>
@@ -6607,6 +6628,9 @@
         </datafield>
     </record>
     <record>
+        <datafield tag="020" ind1=" " ind2=" ">
+            <subfield code="a">0471155039</subfield>
+        </datafield>
         <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">eng</subfield>
         </datafield>
@@ -6689,6 +6713,9 @@
         </datafield>
     </record>
     <record>
+        <datafield tag="020" ind1=" " ind2=" ">
+            <subfield code="a">0387940758</subfield>
+        </datafield>
         <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">eng</subfield>
         </datafield>
@@ -7032,7 +7059,7 @@
     </record>
     <record>
         <datafield tag="020" ind1=" " ind2=" ">
-            <subfield code="a">0-612-38205-2</subfield>
+            <subfield code="a">0612382052</subfield>
         </datafield>
         <datafield tag="041" ind1=" " ind2=" ">
             <subfield code="a">fre</subfield>
