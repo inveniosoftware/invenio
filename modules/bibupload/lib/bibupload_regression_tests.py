@@ -27,6 +27,7 @@ __revision__ = "$Id$"
 
 import re
 import unittest
+import datetime
 import os
 import time
 from urllib2 import urlopen
@@ -623,6 +624,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
          <datafield tag="FMT" ind1=" " ind2=" ">
           <subfield code="f">HB</subfield>
           <subfield code="g">Test. Okay.</subfield>
+          <subfield code="d">2008-03-14 15:14:00</subfield>
          </datafield>
          <datafield tag="100" ind1=" " ind2=" ">
           <subfield code="a">Bar, Baz</subfield>
@@ -718,6 +720,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
                                           self.expected_xm_after_inserting_new_xm_with_fmt.replace('123456789', str(new_recid))))
         self.failUnless(compare_hmbuffers(hm_after,
                                           self.expected_hm_after_inserting_new_xm_with_fmt.replace('123456789', str(new_recid))))
+        self.assertEqual(run_sql('SELECT last_updated from bibfmt WHERE id_bibrec=%s', (new_recid, ))[0][0], datetime.datetime(2008, 3, 14, 15, 14))
         self.failUnless(hb_after.startswith("Test. Okay."))
 
     def test_updating_existing_record_formats_in_format_mode(self):

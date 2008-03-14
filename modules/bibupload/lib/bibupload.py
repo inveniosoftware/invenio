@@ -593,16 +593,19 @@ def create_new_record():
             % error, verbose=1, stream=sys.stderr)
     return None
 
-def insert_bibfmt(id_bibrec, marc, format):
+def insert_bibfmt(id_bibrec, marc, format, modification_date='1970-01-01 00:00:00'):
     """Insert the format in the table bibfmt"""
     # compress the marc value
     pickled_marc =  compress(marc)
-    # get the current time
-    now = convert_datestruct_to_datetext(time.localtime())
+    try:
+        time.strptime(modification_date, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        modification_date = '1970-01-01 00:00:00'
+
     query = """INSERT INTO  bibfmt (id_bibrec, format, last_updated, value)
         VALUES (%s, %s, %s, %s)"""
     try:
-        row_id  = run_sql(query, (id_bibrec, format, now, pickled_marc))
+        row_id  = run_sql(query, (id_bibrec, format, modification_date, pickled_marc))
         return row_id
     except Error, error:
         write_message("   Error during the insert_bibfmt function : %s "
@@ -1140,18 +1143,17 @@ def update_bibrec_modif_date(now, bibrec_id):
         write_message("   Error during update_bibrec_modif_date function : %s" % error,
                       verbose=1, stream=sys.stderr)
 
-def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date):
+def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date='1970-01-01 00:00:00'):
     """Update the format in the table bibfmt"""
+    try:
+        time.strptime(modification_date, "%Y-%m-%d %H:%M:%S")
+    except ValueError:
+        modification_date = '1970-01-01 00:00:00'
+
     # We check if the format is already in bibFmt
     nb_found = find_record_format(id_bibrec, format_name)
     if nb_found == 1:
         # we are going to update the format
-        try:
-            time.strptime(modification_date, "%Y-%m-%d %H:%M:%S")
-        except ValueError:
-            modification_date = '1970-01-01 00:00:00'
-        # get the current time
-        now = convert_datestruct_to_datetext(time.localtime())
         # compress the format_value value
         pickled_format_value =  compress(format_value)
         # update the format:
@@ -1173,7 +1175,7 @@ def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date
         return 1
     else:
         # Insert the format information in BibFMT
-        res = insert_bibfmt(id_bibrec, format_value, format_name)
+        res = insert_bibfmt(id_bibrec, format_value, format_name, modification_date)
         if res is None:
             write_message("   Failed: Error during insert_bibfmt", verbose=1, stream=sys.stderr)
             return 1
