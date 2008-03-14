@@ -1143,12 +1143,15 @@ def update_bibrec_modif_date(now, bibrec_id):
         write_message("   Error during update_bibrec_modif_date function : %s" % error,
                       verbose=1, stream=sys.stderr)
 
-def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date='1970-01-01 00:00:00'):
+def update_bibfmt_format(id_bibrec, format_value, format_name, modification_date=None):
     """Update the format in the table bibfmt"""
-    try:
-        time.strptime(modification_date, "%Y-%m-%d %H:%M:%S")
-    except ValueError:
-        modification_date = '1970-01-01 00:00:00'
+    if modification_date is None:
+        modification_date = time.strftime('%Y-%m-%d %H:%M:%S')
+    else:
+        try:
+            time.strptime(modification_date, "%Y-%m-%d %H:%M:%S")
+        except ValueError:
+            modification_date = '1970-01-01 00:00:00'
 
     # We check if the format is already in bibFmt
     nb_found = find_record_format(id_bibrec, format_name)
