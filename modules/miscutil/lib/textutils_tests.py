@@ -125,13 +125,19 @@ class WrapTextInABoxTest(unittest.TestCase):
 **         result = \"""     **
 ** +--------+               **
 ** | foobar |               **
-** +--------+ \"""           **
+** +--------+\"""            **
 ******************************
 """
         self.assertEqual(wrap_text_in_a_box(text, min_col=0, max_col=30, break_long=True), result)
 
-    def test_removing_new_lines_add_a_space(self):
-        result = """"""
+    def test_single_new_line_wrap_text_in_a_box(self):
+        """textutils - wrap_text_in_a_box single new line."""
+        result = """
+**********************************************
+** ciao come và?                            **
+**********************************************
+"""
+        self.assertEqual(wrap_text_in_a_box("ciao\ncome và?"), result)
 
 
     def test_indented_box_wrap_text_in_a_box(self):

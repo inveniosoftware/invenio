@@ -103,9 +103,9 @@ def indent_text(text,
         return wrap_text_in_a_box(body=text, style='no_border',
             tab_str=tab_str, tab_num=nb_tabs)
 
-_RE_BEGINNING_SPACES = re.compile('^\s*')
-_RE_NEWLINES_CLEANER = re.compile('\n+')
-_RE_LONELY_NEWLINES = re.compile('\b\n\b')
+_RE_BEGINNING_SPACES = re.compile(r'^\s*')
+_RE_NEWLINES_CLEANER = re.compile(r'\n+')
+_RE_LONELY_NEWLINES = re.compile(r'\b\n\b')
 def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     """Return a nicely formatted text box:
         e.g.
@@ -166,6 +166,9 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
         text = _RE_LONELY_NEWLINES.sub(' \n', text)
         return _RE_NEWLINES_CLEANER.sub(lambda x: x.group()[:-1], text)
 
+    body = unicode(body, 'utf-8')
+    title = unicode(title, 'utf-8')
+
     astyle = dict(CFG_WRAP_TEXT_IN_A_BOX_STYLES['__DEFAULT'])
     if CFG_WRAP_TEXT_IN_A_BOX_STYLES.has_key(style):
         astyle.update(CFG_WRAP_TEXT_IN_A_BOX_STYLES[style])
@@ -182,7 +185,6 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     force_horiz = astyle['force_horiz']
     break_long = astyle['break_long']
 
-    body = _clean_newlines(body)
     body = _clean_newlines(body)
     tmp_rows = [_wrap_row(row, max_col, break_long)
                         for row in body.split('\n')]
@@ -236,7 +238,7 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     ret += body_rows
     if bottom_border:
         ret += [tab_str + bottom_border]
-    return prefix + '\n'.join(ret) + suffix
+    return (prefix + '\n'.join(ret) + suffix).encode('utf-8')
 
 def wait_for_user(msg):
     """Print MSG and prompt user for confirmation."""
