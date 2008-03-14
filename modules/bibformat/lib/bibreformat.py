@@ -232,6 +232,7 @@ def iterate_over_new(list, fmt):
     formatted_records = ''      # (string-)List of formatted record of an iteration
     tbibformat  = 0     # time taken up by external call
     tbibupload  = 0     # time taken up by external call
+    start_date = "1970-01-01 01:01:01" # Time at which the record was formatted
 
     for recID in list:
         total_rec += 1
@@ -244,6 +245,7 @@ def iterate_over_new(list, fmt):
         ### bibformat external call
         ###
         t1 = os.times()[4]
+        start_date = time.strftime('%Y-%m-%d %H:%M:%S')
         formatted_record = format_record(recID, fmt, on_the_fly=True)
         t2 = os.times()[4]
         tbibformat = tbibformat + (t2 - t1)
@@ -254,7 +256,8 @@ def iterate_over_new(list, fmt):
        <controlfield tag="001">%s</controlfield>
           <datafield tag="FMT" ind1=" " ind2=" ">
              <subfield code="f">%s</subfield>
-             <subfield code="g">''' % (recID, fmt)
+             <subfield code="d">%s</subfield>
+             <subfield code="g">''' % (recID, fmt, start_date)
         epilogue = '''
           </subfield>
        </datafield>
