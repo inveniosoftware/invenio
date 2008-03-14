@@ -105,6 +105,7 @@ def indent_text(text,
 
 _RE_BEGINNING_SPACES = re.compile('^\s*')
 _RE_NEWLINES_CLEANER = re.compile('\n+')
+_RE_LONELY_NEWLINES = re.compile('\b\n\b')
 def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     """Return a nicely formatted text box:
         e.g.
@@ -162,7 +163,7 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
             break_long_words=break_long)
 
     def _clean_newlines(text):
-        """Remove single new lines, decrement multiple newlines"""
+        text = _RE_LONELY_NEWLINES.sub(' \n', text)
         return _RE_NEWLINES_CLEANER.sub(lambda x: x.group()[:-1], text)
 
     astyle = dict(CFG_WRAP_TEXT_IN_A_BOX_STYLES['__DEFAULT'])
@@ -181,6 +182,7 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
     force_horiz = astyle['force_horiz']
     break_long = astyle['break_long']
 
+    body = _clean_newlines(body)
     body = _clean_newlines(body)
     tmp_rows = [_wrap_row(row, max_col, break_long)
                         for row in body.split('\n')]

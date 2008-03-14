@@ -147,7 +147,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 ## We put a large traceback only if requested
                 ## or the Exception is not an Invenio one.
                 tracestack = traceback.extract_stack()[-5:-2]
-                tracestack_data = "%sForced traceback (most recent call last)" % (' '*4,)
+                tracestack_data = "Forced traceback (most recent call last)"
                 for trace_tuple in tracestack:
                     tracestack_data += """
   File "%(file)s", line %(line)s, in %(function)s
@@ -177,24 +177,24 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 print >> email_stream, prefix
 
             print >> email_stream, "The following problem occurred on <%s>" % CFG_SITE_URL
-            print >> email_stream, ">>> Registered exception"
+            print >> email_stream, "\n>>> Registered exception\n"
 
             print >> log_stream, www_data
-            print >> email_stream, '%s\n' % www_data
+            print >> email_stream, www_data
 
-            print >> email_stream, ">>> User details"
+            print >> email_stream, "\n>>> User details\n"
 
             print >> log_stream, client_data
-            print >> email_stream, '%s\n' % client_data
+            print >> email_stream, client_data
 
-            print >> email_stream, ">>> Traceback details"
+            print >> email_stream, "\n>>> Traceback details\n"
 
             if tracestack_data:
                 print >> log_stream, tracestack_data
                 print >> email_stream, tracestack_data
 
             print >> log_stream, exception_data
-            print >> email_stream, '%s\n' % exception_data
+            print >> email_stream, exception_data
 
             ## If a suffix was requested let's print it
             if suffix:

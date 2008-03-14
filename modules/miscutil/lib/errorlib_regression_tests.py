@@ -64,13 +64,14 @@ class ErrorlibRegisterExceptionTest(unittest.TestCase):
 
     def test_alert_admin_register_exception(self):
         """errorlib - alerting admin with register_exception"""
+        text = 'test-exception that you should receive by email'
         try:
-            raise Exception('test-exception')
+            raise Exception(text)
         except:
             result = register_exception(alert_admin=True)
         log_content = open(os.path.join(CFG_LOGDIR, 'invenio.err')).read()
         self.failUnless('test_alert_admin_register_exception' in log_content)
-        self.failUnless('test-exception' in log_content)
+        self.failUnless(text in log_content)
         self.assertEqual(1, result, "register_exception have not returned 1")
 
 test_suite = make_test_suite(ErrorlibWebPagesAvailabilityTest,

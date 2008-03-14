@@ -350,17 +350,18 @@ def cli_cmd_reset_fieldnames(conf):
                             "division": _("division"),
                             "year": _("year"),
                             "experiment": _("experiment"),
-                            "record ID": _("record ID"),}
+                            "record ID": _("record ID")}
         ## update I18N names for every language:
         for (field_id, field_name) in field_id_name_list:
-            try:
-                run_sql("""INSERT INTO fieldname (id_field,ln,type,value) VALUES
-                            (%s,%s,%s,%s)""", (field_id, lang, 'ln',
-                                               field_name_names[field_name]))
-            except IntegrityError:
-                run_sql("""UPDATE fieldname SET value=%s
-                            WHERE id_field=%s AND ln=%s AND type=%s""",
-                        (field_name_names[field_name], field_id, lang, 'ln',))
+            if field_name_names.has_key(field_name):
+                try:
+                    run_sql("""INSERT INTO fieldname (id_field,ln,type,value) VALUES
+                                (%s,%s,%s,%s)""", (field_id, lang, 'ln',
+                                                field_name_names[field_name]))
+                except IntegrityError:
+                    run_sql("""UPDATE fieldname SET value=%s
+                                WHERE id_field=%s AND ln=%s AND type=%s""",
+                            (field_name_names[field_name], field_id, lang, 'ln',))
         ## ditto for rank methods:
         rankmethod_name_names = {"wrd": _("word similarity"),
                                  "demo_jif": _("journal impact factor"),
