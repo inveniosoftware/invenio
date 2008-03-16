@@ -353,6 +353,7 @@ class BibFormatMARCTest(unittest.TestCase):
         """Prepare some ideal outputs"""
 
         self.record_29_hm = '''000000029 001__ 29
+000000029 020__ $$a0720421039
 000000029 041__ $$aeng
 000000029 080__ $$a517.11
 000000029 100__ $$aKleene, Stephen Cole$$uUniversity of Wisconsin
