@@ -269,7 +269,8 @@ def iterate_over_new(list, fmt):
 
         # every n_it_max record, upload all formatted records.
         # also upload if recID is last one
-        if n_it_rec > n_it_max or total_rec == len(list):
+        if (n_it_rec > n_it_max or total_rec == len(list)) and \
+               formatted_records != '':
 
             #Save formatted records to disk for bibupload
             finalfilename = "%s/rec_fmt_%s.xml" % (CFG_TMPDIR, time.strftime('%Y%m%d_%H%M%S'))
