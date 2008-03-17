@@ -339,7 +339,12 @@ def format(xmltext, template_filename=None, template_source=None):
 
         # Transform
         result_object = processor.applyStylesheet(source, None)
-        result = processor.saveResultToString(result_object)
+        try:
+            result = processor.saveResultToString(result_object)
+        except SystemError :
+            # Catch an exception thrown when result is empty,
+            # due to a bug in libxslt
+            result = ''
 
         # Deallocate
         processor.freeStylesheet()
