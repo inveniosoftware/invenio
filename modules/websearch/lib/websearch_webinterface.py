@@ -58,6 +58,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
 from invenio.bibformat import format_records
+from invenio.bibformat_engine import get_output_formats
 from invenio.websearch_webcoll import mymkdir, get_collection
 from invenio.intbitset import intbitset
 from invenio.bibupload import find_record_from_sysno
@@ -67,7 +68,8 @@ websearch_templates = invenio.template.load('websearch')
 
 search_results_default_urlargd = websearch_templates.search_results_default_urlargd
 search_interface_default_urlargd = websearch_templates.search_interface_default_urlargd
-output_formats = ['xm', 'xd', 'hm', 'hx', 'hd', 'hb', 'xe', 'xn']
+output_formats = [output_format['attrs']['code'].lower() for output_format in \
+                   get_output_formats(with_attributes=True).values()]
 
 def wash_search_urlargd(form):
     """
