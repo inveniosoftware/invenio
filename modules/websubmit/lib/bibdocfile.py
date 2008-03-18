@@ -29,10 +29,18 @@ from datetime import datetime
 from xml.sax.saxutils import quoteattr
 from mimetypes import MimeTypes
 
+try:
+    set()
+except NameError:
+    from sets import Set as set
+
 from invenio.dbquery import run_sql, DatabaseError
 from invenio.errorlib import register_exception
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_URL, CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR, CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_URL,\
+    CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR,\
+    CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS, \
+    CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -48,10 +56,11 @@ _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
 _mimes.encodings_map.update({'.bz2' : 'bzip2'})
 _extensions = _mimes.encodings_map.keys() + \
               _mimes.suffix_map.keys() + \
-              _mimes.types_map[1].keys()
+              _mimes.types_map[1].keys() + \
+              CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS
 _extensions.sort()
 _extensions.reverse()
-_extensions = [ext.lower() for ext in _extensions]
+_extensions = set([ext.lower() for ext in _extensions])
 
 class InvenioWebSubmitFileError(Exception):
     pass
