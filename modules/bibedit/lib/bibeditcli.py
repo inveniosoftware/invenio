@@ -56,19 +56,21 @@ def print_version():
 
 def list_record_revisions(recid):
     """
-    Return list of all known MARCXML revisions for record RECID.
+    Return list of all known record revisions (=RECID.REVDATE) for
+    record RECID.
     """
     out = []
-    res =  run_sql("""SELECT DATE_FORMAT(job_date, '%%Y%%m%%d%%H%%i%%s')
+    res =  run_sql("""SELECT id_bibrec,
+                             DATE_FORMAT(job_date, '%%Y%%m%%d%%H%%i%%s')
                        FROM hstRECORD WHERE id_bibrec=%s""",
                    (recid,))
     for row in res:
-        out.append(recid + '.' + row[0])
+        out.append("%s.%s" % (row[0], row[1]))
     return out
 
 def revision_valid_p(revid):
     """
-    Predicate to test validity of revision ID.
+    Predicate to test validity of revision ID format (=RECID.REVDATE).
     """
     if _RE_RECORD_REVISION_FORMAT.match(revid):
         return True
@@ -76,9 +78,9 @@ def revision_valid_p(revid):
 
 def get_marcxml_of_record_revision(revid):
     """
-    Return MARCXML string with corresponding to revision REVID of a
-    record.  Return empty string if revision does not exist.  REVID is
-    assumed to be washed already.
+    Return MARCXML string with corresponding to revision REVID
+    (=RECID.REVDATE) of a record.  Return empty string if revision
+    does not exist.  REVID is assumed to be washed already.
     """
     out = ""
     match = _RE_RECORD_REVISION_FORMAT.match(revid)
@@ -97,14 +99,20 @@ def get_marcxml_of_record_revision(revid):
 
 def cli_list_revisions(recid):
     """
-    Print list of all known MARCXML revisions for record RECID.
+    Print list of all known record revisions (=RECID.REVDATE) for
+    record RECID.
     """
+    try:
+        recid = int(recid)
+    except ValueError:
+        print "ERROR: record ID must be integer, not %s." % recid
+        sys.exit(1)
     print "\n".join(list_record_revisions(recid))
 
 def cli_get_revision(revid):
     """
-    Return MARCXML revision REVID (=RECID.REVDATE) of a record.
-    Exit if things went wrong.
+    Return MARCXML for revision REVID (=RECID.REVDATE) of a record.
+    Exit if things go wrong.
     """
     if not revision_valid_p(revid):
         print "ERROR: revision %s is invalid; " \
@@ -119,7 +127,7 @@ def cli_get_revision(revid):
 def cli_diff_revisions(revid1, revid2):
     """
     Return diffs of MARCXML record revisions REVID1, REVID2.
-    Exit if things went wrong.
+    Exit if things go wrong.
     """
     for revid in [revid1, revid2]:
         if not revision_valid_p(revid):
