@@ -25,13 +25,13 @@ BibEdit CLI tool.
 Usage: bibedit [options]
 
 General options:
-   -h, --help               print this help
-   -V, --version            print version number
+   -h, --help                          print this help
+   -V, --version                       print version number
 
 Options to inspect record history:
-   --list-record-revisions [recid]            list all revisions of a record
-   --get-record-revision [recid.revdate]      print given record revision
-   --diff-record-revisions [recidA.revdateB]  print difference between record A
+   --list-revisions [recid]            list all revisions of a record
+   --get-revision [recid.revdate]      print MARCXML of given record revision
+   --diff-revisions [recidA.revdateB]  print MARCXML difference between record A
                     [recidC.revdateD]   dated B and record C dated D
 """
 
@@ -74,7 +74,7 @@ def revision_valid_p(revid):
         return True
     return False
 
-def get_record_revision(revid):
+def get_marcxml_of_record_revision(revid):
     """
     Return MARCXML string with corresponding to revision REVID of a
     record.  Return empty string if revision does not exist.  REVID is
@@ -95,39 +95,39 @@ def get_record_revision(revid):
             out += zlib.decompress(row[0]) + "\n"
     return out
 
-def cli_list_record_revisions(recid):
+def cli_list_revisions(recid):
     """
     Print list of all known MARCXML revisions for record RECID.
     """
     print "\n".join(list_record_revisions(recid))
 
-def cli_get_record_revision(revid):
+def cli_get_revision(revid):
     """
     Return MARCXML revision REVID (=RECID.REVDATE) of a record.
     Exit if things went wrong.
     """
     if not revision_valid_p(revid):
-        print "ERROR: revision %s is invalid; " + \
+        print "ERROR: revision %s is invalid; " \
               "must be NNN.YYYYMMDDhhmmss." % revid
         sys.exit(1)
-    out =  get_record_revision(revid)
+    out =  get_marcxml_of_record_revision(revid)
     if out:
         print out
     else:
         print "ERROR: Revision %s not found." % revid
 
-def cli_diff_record_revisions(revid1, revid2):
+def cli_diff_revisions(revid1, revid2):
     """
     Return diffs of MARCXML record revisions REVID1, REVID2.
     Exit if things went wrong.
     """
     for revid in [revid1, revid2]:
         if not revision_valid_p(revid):
-            print "ERROR: revision %s is invalid; " + \
+            print "ERROR: revision %s is invalid; " \
                   "must be NNN.YYYYMMDDhhmmss." % revid
             sys.exit(1)
-    xml1 = get_record_revision(revid1)
-    xml2 = get_record_revision(revid2)
+    xml1 = get_marcxml_of_record_revision(revid1)
+    xml2 = get_marcxml_of_record_revision(revid2)
     print "".join(difflib.unified_diff(xml1.splitlines(1),
                                        xml2.splitlines(1),
                                        revid1,
@@ -150,28 +150,28 @@ def main():
         except IndexError:
             print_usage()
             sys.exit(1)
-        if cmd == '--list-record-revisions':
+        if cmd == '--list-revisions':
             try:
                 recid = opts[0]
             except IndexError:
                 print_usage()
                 sys.exit(1)
-            cli_list_record_revisions(recid)
-        elif cmd == '--get-record-revision':
+            cli_list_revisions(recid)
+        elif cmd == '--get-revision':
             try:
                 revid = opts[0]
             except IndexError:
                 print_usage()
                 sys.exit(1)
-            cli_get_record_revision(revid)
-        elif cmd == '--diff-record-revisions':
+            cli_get_revision(revid)
+        elif cmd == '--diff-revisions':
             try:
                 revid1 = opts[0]
                 revid2 = opts[1]
             except IndexError:
                 print_usage()
                 sys.exit(1)
-            cli_diff_record_revisions(revid1, revid2)
+            cli_diff_revisions(revid1, revid2)
         else:
             print """ERROR: Please specify a command.  Please see '--help'."""
             sys.exit(1)
