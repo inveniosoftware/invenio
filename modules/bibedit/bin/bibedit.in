@@ -1,5 +1,7 @@
+#!@PYTHON@
+##
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -11,27 +13,23 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-pylibdir = $(libdir)/python/invenio
+"""
+BibEdit CLI tool.
+"""
 
-pylib_DATA = bibrecord_config.py \
-             bibrecord.py \
-             bibrecord_tests.py \
-             refextract_config.py \
-             refextract.py \
-             xmlmarc2textmarclib.py \
-             bibedit_config.py \
-             bibedit_engine.py \
-             bibedit_dblayer.py \
-             bibedit_templates.py \
-             bibedit_regression_tests.py \
-             bibeditcli.py
+__revision__ = "$Id$"
 
-EXTRA_DIST = $(pylib_DATA)
+try:
+    from invenio.bibeditcli import main
+except ImportError, e:
+    print "Error: %s" % e
+    import sys
+    sys.exit(1)
 
-CLEANFILES = *~ *.tmp *.pyc
+main()

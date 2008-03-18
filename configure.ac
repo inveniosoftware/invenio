@@ -22,8 +22,8 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.93.50.20080313, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080313)
+AC_INIT(cds-invenio, 0.93.50.20080318, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080318)
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with
@@ -438,6 +438,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibedit/bin/refextract \
 	  modules/bibedit/bin/xmlmarclint \
 	  modules/bibedit/bin/xmlmarc2textmarc \
+	  modules/bibedit/bin/bibedit \
 	  modules/bibedit/doc/Makefile \
 	  modules/bibedit/doc/admin/Makefile \
 	  modules/bibedit/doc/hacking/Makefile \
