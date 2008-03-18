@@ -24,12 +24,11 @@ etc_DATA = Default_HTML_captions.bft Picture_HTML_brief.bft \
 	   Picture_HTML_detailed.bft Default_HTML_brief.bft \
 	   BibTeX.bft MARCXML.bft Excel.bft \
 	   Default_HTML_similarity.bft \
-	   EndNote.bft EndNote.bfx \
-	   DC.bft DC.bfx \
-	   NLM.bft NLM.bfx \
+	   EndNote.bft \
+	   DC.bft \
+	   NLM.bft \
 	   NLM.xsl \
-	   RSS.bft RSS.bfx \
-	   MARCXML.bfx \
+	   RSS.bft \
 	   OAI_DC.xsl DC.xsl EndNote.xsl RSS.xsl \
 	   Default_HTML_references.bft Default_HTML_files.bft \
 	   Default_HTML_actions.bft
