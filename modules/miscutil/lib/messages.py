@@ -18,7 +18,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""CDS Invenio international messages functions, to be used by all
+"""
+CDS Invenio international messages functions, to be used by all
 I18N interfaces.  Typical usage in the caller code is:
 
    from messages import gettext_set_language
@@ -40,9 +41,12 @@ import gettext
 
 from invenio.config import CFG_LOCALEDIR, CFG_SITE_LANGS
 
-lang = {}
-for ln in CFG_SITE_LANGS:
-    lang[ln] = gettext.translation('cds-invenio', CFG_LOCALEDIR, languages = [ln], fallback = True)
+_LANG_GT_D = {}
+for _alang in CFG_SITE_LANGS:
+    _LANG_GT_D[_alang] = gettext.translation('cds-invenio',
+                                             CFG_LOCALEDIR,
+                                             languages = [_alang],
+                                             fallback = True)
 
 def gettext_set_language(ln):
     """
@@ -51,7 +55,7 @@ def gettext_set_language(ln):
       Usage::
         _ = gettext_set_language(ln)
     """
-    return lang[ln].gettext
+    return _LANG_GT_D[ln].gettext
 
 def wash_language(ln):
     """Look at language LN and check if it is one of allowed languages
@@ -74,27 +78,27 @@ def wash_languages(lns):
 
 def language_list_long():
     """Return list of [short name, long name] for all enabled languages."""
-    cfg_all_language_names = {'bg': 'Български',
-                              'ca': 'Català',
-                              'cs': 'Česky',
-                              'de': 'Deutsch',
-                              'el': 'Ελληνικά',
-                              'en': 'English',
-                              'es': 'Español',
-                              'fr': 'Français',
-                              'hr': 'Hrvatski',
-                              'it': 'Italiano',
-                              'ja': '日本語',
-                              'no': 'Norsk/Bokmål',
-                              'pl': 'Polski',
-                              'pt': 'Português',
-                              'ru': 'Русский',
-                              'sk': 'Slovensky',
-                              'sv': 'Svenska',
-                              'uk': 'Українська',
-                              'zh_CN': '中文(简)',
-                              'zh_TW': '中文(繁)',}
+    all_language_names = {'bg': 'Български',
+                          'ca': 'Català',
+                          'cs': 'Česky',
+                          'de': 'Deutsch',
+                          'el': 'Ελληνικά',
+                          'en': 'English',
+                          'es': 'Español',
+                          'fr': 'Français',
+                          'hr': 'Hrvatski',
+                          'it': 'Italiano',
+                          'ja': '日本語',
+                          'no': 'Norsk/Bokmål',
+                          'pl': 'Polski',
+                          'pt': 'Português',
+                          'ru': 'Русский',
+                          'sk': 'Slovensky',
+                          'sv': 'Svenska',
+                          'uk': 'Українська',
+                          'zh_CN': '中文(简)',
+                          'zh_TW': '中文(繁)',}
     enabled_lang_list = []
     for lang in CFG_SITE_LANGS:
-        enabled_lang_list.append([lang,cfg_all_language_names[lang]])
+        enabled_lang_list.append([lang, all_language_names[lang]])
     return enabled_lang_list
