@@ -779,7 +779,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             act = "register"
             title = _("Registration failure")
         elif ruid == 6:
-            mess = _("The site is having troubles in sending you an email for confirming your email address.") + _("The error has been logged and will be taken in consideration as soon as possibile.")
+            mess = _("The site is having troubles in sending you an email for confirming your email address.") + _("The error has been logged and will be taken in consideration as soon as possible.")
             act = "register"
             title = _("Registration failure")
         else:

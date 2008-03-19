@@ -115,7 +115,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 register_exception(req=req)
                 msg = "<p>%s</p><p>%s</p>" % (
                     _("The system has encountered an error in retrieving the list of files for this document."),
-                    _("The error has been logged and will be taken in consideration as soon as possibile."))
+                    _("The error has been logged and will be taken in consideration as soon as possible."))
                 return errorMsg(msg, req, CFG_SITE_NAME, ln)
 
             docname = ''
