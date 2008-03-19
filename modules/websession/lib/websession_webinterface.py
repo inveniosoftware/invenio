@@ -54,7 +54,7 @@ from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio import webgroup
 from invenio import webgroup_dblayer
-from invenio.messages import gettext_set_language
+from invenio.messages import gettext_set_language, wash_language
 from invenio.mailutils import send_email
 from invenio.access_control_mailcookie import mail_cookie_retrieve_kind, \
     mail_cookie_check_pw_reset, mail_cookie_delete_cookie, \
@@ -279,6 +279,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'group_records' : (int, None),
             'latestbox' : (int, None),
             'helpbox' : (int, None),
+            'lang' : (str, None),
             })
 
         uid = webuser.getUid(req)
@@ -355,7 +356,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                and uid2 != -1 and (uid2 == uid or uid2 == 0) \
                and uid_with_the_same_nickname != -1 and (uid_with_the_same_nickname == uid or uid_with_the_same_nickname == 0):
                 if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
-                    change = webuser.updateDataUser(uid,
+                    change = webuser.update_data_user(uid,
                                                     args['email'],
                                                     args['nickname'])
                 else:
@@ -419,6 +420,17 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             prefs['websearch_group_records'] = args['group_records']
             prefs['websearch_latestbox'] = args['latestbox']
             prefs['websearch_helpbox'] = args['helpbox']
+            webuser.set_user_preferences(uid, prefs)
+            title = _("Settings edited")
+            act = "display"
+            linkname = _("Show account")
+            mess = _("User settings saved correctly.")
+        elif args['lang']:
+            lang = wash_language(args['lang'])
+            prefs = webuser.get_user_preferences(uid)
+            prefs['preferred_lang'] = lang
+            args['ln'] = lang
+            _ = gettext_set_language(lang)
             webuser.set_user_preferences(uid, prefs)
             title = _("Settings edited")
             act = "display"
@@ -616,10 +628,13 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             'p_pw': (str, None),
             'login_method': (str, None),
             'action': (str, ''),
+            'remember_me' : (str, ''),
             'referer': (str, '')})
 
         if args['p_un']:
             args['p_un'] = args['p_un'].strip()
+
+        args['remember_me'] = args['remember_me'] != ''
 
         locals().update(args)
 
@@ -666,8 +681,9 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         else:
             # Fake parameters for p_un & p_pw because SSO takes them from the environment
             (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
+            args['remember_me'] = True
         if len(iden)>0:
-            uid = webuser.update_Uid(req, args['p_un'])
+            uid = webuser.update_Uid(req, args['p_un'], args['remember_me'])
             uid2 = webuser.getUid(req)
             if uid2 == -1:
                 webuser.logoutUser(req)

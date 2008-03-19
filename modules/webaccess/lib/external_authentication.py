@@ -62,7 +62,7 @@ class ExternalAuth:
         raise NotImplementedError
 
 
-    def fetch_user_groups_membership(self, username, password, req=None):
+    def fetch_user_groups_membership(self, username, password=None, req=None):
         """Given a username and a password, returns a dictionary of groups
         and their description to which the user is subscribed.
         Raise InvenioWebAccessExternalAuthError in case of troubles.
@@ -70,7 +70,7 @@ class ExternalAuth:
         raise NotImplementedError
         #return {}
 
-    def fetch_user_nickname(self, username, password, req=None):
+    def fetch_user_nickname(self, username, password=None, req=None):
         """Given a username and a password, returns the right nickname belonging
         to that user (username could be an email).
         """

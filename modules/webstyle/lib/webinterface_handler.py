@@ -49,6 +49,7 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG
 from invenio.messages import wash_language
 from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
+from invenio.webuser import get_preferred_user_language
 
 has_https_support = CFG_SITE_URL != CFG_SITE_SECURE_URL
 
@@ -188,7 +189,16 @@ class WebInterfaceDirectory(object):
             return obj._traverse(req, path)
 
         form = util.FieldStorage(req, keep_blank_values=True)
-
+        try:
+            # The auto recognition will work only with with mod_python-3.3.1
+            if not form.has_key('ln'):
+                ln = get_preferred_user_language(req)
+                form.add_field('ln', ln)
+        except:
+            form = dict(form)
+            if not form.has_key('ln'):
+                ln = get_preferred_user_language(req)
+                form['ln'] = ln
         result = obj(req, form)
         return _check_result(req, result)
 

@@ -21,7 +21,7 @@
 
 """External user authentication for EPFL's LDAP instance.
 
-This LDAP external authentication system relies on a collaborative LDAP 
+This LDAP external authentication system relies on a collaborative LDAP
 organized like this:
 
 o=EPFL, c=CH
@@ -46,7 +46,7 @@ o=EPFL, c=CH
     |         memberOf= id of another group
     |
     +
-              
+
 This example of an LDAP authentication should help you develop yours in your
 specific installation.
 """
@@ -82,7 +82,7 @@ class ExternalAuthLDAP(ExternalAuth):
 
     def _ldap_try (self, command):
         """ Try to run the specified command on the first LDAP server that
-        is not down."""    
+        is not down."""
         for server in CFG_EXTERNAL_AUTH_LDAP_SERVERS:
             try:
                 connection = ldap.initialize(server)
@@ -96,24 +96,24 @@ class ExternalAuthLDAP(ExternalAuth):
         """
         Check USERNAME and PASSWORD against the LDAP system.
         Return None if authentication failed, or the email address of the
-        person if the authentication was successful.  
+        person if the authentication was successful.
         Raise InvenioWebAccessExternalAuthError in case of external troubles.
         Note: for SSO the parameter are discarded and overloaded by Shibboleth
         variables
         """
         if not password:
             return None
-        
-        query = '(|' + ''.join (['(%s=%s)' % (attrib, username) 
-                                 for attrib in 
+
+        query = '(|' + ''.join (['(%s=%s)' % (attrib, username)
+                                 for attrib in
                                      CFG_EXTERNAL_AUTH_LDAP_USER_UID]) \
                  + ')'
-        
+
         def _check (connection):
-            users = connection.search_s(CFG_EXTERNAL_AUTH_LDAP_CONTEXT, 
-                                        ldap.SCOPE_SUBTREE, 
+            users = connection.search_s(CFG_EXTERNAL_AUTH_LDAP_CONTEXT,
+                                        ldap.SCOPE_SUBTREE,
                                         query)
-                
+
             # We pick the first result, as all the data we are interested
             # in should be the same in all the entries.
             if len(users):
@@ -127,7 +127,7 @@ class ExternalAuthLDAP(ExternalAuth):
                 # to be invalid
                 return None
             return user_info[CFG_EXTERNAL_AUTH_LDAP_MAIL_ENTRY][0]
-    
+
         return self._ldap_try(_check)
 
     def user_exists(self, email, req=None):
@@ -136,24 +136,24 @@ class ExternalAuthLDAP(ExternalAuth):
         """
         query = '(%s=%s)' % (CFG_EXTERNAL_AUTH_LDAP_MAIL_ENTRY, email)
         def _check (connection):
-            users = connection.search_s(CFG_EXTERNAL_AUTH_LDAP_CONTEXT, 
-                                        ldap.SCOPE_SUBTREE, 
+            users = connection.search_s(CFG_EXTERNAL_AUTH_LDAP_CONTEXT,
+                                        ldap.SCOPE_SUBTREE,
                                         query)
             return len(users) != 0
         return self._ldap_try(_check)
-    
-    def fetch_user_nickname(self, username, password, req=None):
+
+    def fetch_user_nickname(self, username, password=None, req=None):
         """Given a username and a password, returns the right nickname belonging
         to that user (username could be an email).
-        """    
-        query = '(|' + ''.join (['(%s=%s)' % (attrib, username) 
-                                 for attrib in 
+        """
+        query = '(|' + ''.join (['(%s=%s)' % (attrib, username)
+                                 for attrib in
                                      CFG_EXTERNAL_AUTH_LDAP_USER_UID]) \
                  + ')'
         def _get_nickname(connection):
-            users = connection.search_s(CFG_EXTERNAL_AUTH_LDAP_CONTEXT, 
-                                        ldap.SCOPE_SUBTREE, 
-                                        query)    
+            users = connection.search_s(CFG_EXTERNAL_AUTH_LDAP_CONTEXT,
+                                        ldap.SCOPE_SUBTREE,
+                                        query)
             # We pick the first result, as all the data we are interested
             # in should be the same in all the entries.
             if len(users):
@@ -171,19 +171,19 @@ class ExternalAuthLDAP(ExternalAuth):
                 nickname += ' - ' + right_part
             return nickname
         return self._ldap_try(_get_nickname)
-    
-    def fetch_user_groups_membership(self, username, password, req=None):
+
+    def fetch_user_groups_membership(self, username, password=None, req=None):
         """Given a username and a password, returns a dictionary of groups
         and their description to which the user is subscribed.
         Raise InvenioWebAccessExternalAuthError in case of troubles.
         """
-        query_person = '(|' + ''.join (['(%s=%s)' % (attrib, username) 
-                                 for attrib in 
+        query_person = '(|' + ''.join (['(%s=%s)' % (attrib, username)
+                                 for attrib in
                                      CFG_EXTERNAL_AUTH_LDAP_USER_UID]) \
                         + ')'
         def _get_groups(connection):
-            users = connection.search_s(CFG_EXTERNAL_AUTH_LDAP_CONTEXT, 
-                                        ldap.SCOPE_SUBTREE, 
+            users = connection.search_s(CFG_EXTERNAL_AUTH_LDAP_CONTEXT,
+                                        ldap.SCOPE_SUBTREE,
                                         query_person)
             if len(users):
                 user_dn, user_info = users [0]
@@ -195,7 +195,7 @@ class ExternalAuthLDAP(ExternalAuth):
                 query_group = '(%s=%s)' % (CFG_EXTERNAL_AUTH_LDAP_GROUP_UID,
                                            group_id)
                 ldap_group = connection.search_s(CFG_EXTERNAL_AUTH_LDAP_CONTEXT,
-                                                 ldap.SCOPE_SUBTREE, 
+                                                 ldap.SCOPE_SUBTREE,
                                                  query_group)
                 if len(ldap_group):
                     group_dn, group_infos = ldap_group[0]
@@ -205,7 +205,7 @@ class ExternalAuthLDAP(ExternalAuth):
                     groups[group_id] = group_name
             return groups
         return self._ldap_try(_get_groups)
-                         
+
     def fetch_user_preferences(self, username, password=None, req=None):
         """Given a username and a password, returns a dictionary of keys and
         values, corresponding to external infos and settings.
@@ -218,13 +218,13 @@ class ExternalAuthLDAP(ExternalAuth):
         name but starting with EXTERNAL). If a pref begins with HIDDEN_ it will
         be ignored.
         """
-        query = '(|' + ''.join (['(%s=%s)' % (attrib, username) 
-                                 for attrib in 
+        query = '(|' + ''.join (['(%s=%s)' % (attrib, username)
+                                 for attrib in
                                      CFG_EXTERNAL_AUTH_LDAP_USER_UID]) \
                  + ')'
         def _get_personal_infos(connection):
-            users = connection.search_s(CFG_EXTERNAL_AUTH_LDAP_CONTEXT, 
-                                        ldap.SCOPE_SUBTREE, 
+            users = connection.search_s(CFG_EXTERNAL_AUTH_LDAP_CONTEXT,
+                                        ldap.SCOPE_SUBTREE,
                                         query)
             if len(users):
                 user_dn, user_info = users [0]

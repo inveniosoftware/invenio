@@ -117,7 +117,7 @@ class ExternalAuthSSO(ExternalAuth):
         #return email.upper() in [user['email'].upper() for user in users]
 
 
-    def fetch_user_groups_membership(self, email, password, req=None):
+    def fetch_user_groups_membership(self, email, password=None, req=None):
         """Fetch user groups membership from the SSO system.
         @return a dictionary of groupname, group description
         Note: for SSO the parameter are discarded and overloaded by Shibboleth
@@ -137,7 +137,7 @@ class ExternalAuthSSO(ExternalAuth):
                                 or x + ' (Group)'), groups))
         return {}
 
-    def fetch_user_nickname(self, username, password, req=None):
+    def fetch_user_nickname(self, username, password=None, req=None):
         """Given a username and a password, returns the right nickname belonging
         to that user (username could be an email).
         Note: for SSO the parameter are discarded and overloaded by Shibboleth

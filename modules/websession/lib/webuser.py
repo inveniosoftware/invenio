@@ -39,12 +39,14 @@ except ImportError:
     pass
 
 from socket import gethostbyname
+from cgi import parse_qs
 import os
 import crypt
 import socket
 import smtplib
 import re
 import random
+import datetime
 import base64
 
 from invenio.config import \
@@ -72,7 +74,7 @@ from invenio.session import SessionError
 from invenio.access_control_admin import acc_find_user_role_actions, acc_get_role_id
 from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
 from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
-from invenio.messages import gettext_set_language
+from invenio.messages import gettext_set_language, wash_languages, wash_language
 from invenio.mailutils import send_email
 from invenio.errorlib import register_exception
 from invenio.webgroup_dblayer import get_groups
@@ -206,7 +208,8 @@ def getUid (req):
         s.setUid(createGuestUser())
         userId = s.getUid()
         guest = 1
-    sm.maintain_session(req, s)
+    remember_me = s.getRememberMe()
+    sm.maintain_session(req, s, remember_me)
 
     if guest == 0:
         guest = isGuestUser(userId)
@@ -238,7 +241,7 @@ def setApacheUser(req, apache_user):
     sm.maintain_session(req, s)
     return apache_user
 
-def setUid(req, uid):
+def setUid(req, uid, remember_me=False):
     """It sets the userId into the session, and raise the cookie to the client.
     """
     sm = session.MPSessionManager(pSession, pSessionMapping())
@@ -248,8 +251,17 @@ def setUid(req, uid):
         sm.revoke_session_cookie(req)
         s = sm.get_session(req)
     s.setUid(uid)
-    sm.maintain_session(req, s)
+    s.setRememberMe(remember_me)
+    sm.maintain_session(req, s, remember_me)
     return uid
+
+def get_last_login(uid):
+    """Return the last_login datetime for uid if any, otherwise return None."""
+    res = run_sql('SELECT last_login FROM user WHERE id=%s', (uid, ), 1)
+    if res:
+        return res[0][0]
+    else:
+        return datetime.datetime(1970, 1, 1)
 
 def get_user_info(uid, ln=CFG_SITE_LANG):
     """Get infos for a given user.
@@ -259,8 +271,8 @@ def get_user_info(uid, ln=CFG_SITE_LANG):
     _ = gettext_set_language(ln)
     query = """SELECT id, nickname
                FROM user
-               WHERE id=%i"""
-    res = run_sql(query%uid)
+               WHERE id=%s"""
+    res = run_sql(query, (uid, ))
     if res:
         if res[0]:
             user = list(res[0])
@@ -636,14 +648,14 @@ def nicknameUnique(p_nickname):
         return 0
     return -1
 
-def update_Uid(req, p_email):
+def update_Uid(req, p_email, remember_me=False):
     """It updates the userId of the session. It is used when a guest user is logged in succesfully in the system
     with a given email and password
     """
     query_ID = int(run_sql("select id from user where email=%s",
                            (p_email,))[0][0])
 
-    setUid(req, query_ID)
+    setUid(req, query_ID, remember_me)
     return query_ID
 
 def send_new_admin_account_warning(new_account_email, send_to, ln=CFG_SITE_LANG):
@@ -806,6 +818,56 @@ def get_default_user_preferences():
             break
     return user_preference
 
+def get_preferred_user_language(req):
+    def _get_language_from_req_header(accept_language_header):
+        """Extract langs info from req.headers_in['Accept-Language'] which
+        should be set to something similar to:
+        'fr,en-us;q=0.7,en;q=0.3'
+        """
+        tmp_langs = {}
+        for lang in accept_language_header.split(','):
+            lang = lang.split(';q=')
+            if len(lang) == 2:
+                tmp_langs[float(lang[1])] = lang[0]
+            else:
+                tmp_langs[1.0] = lang[0]
+        ret = []
+        priorities = tmp_langs.keys()
+        priorities.sort()
+        priorities.reverse()
+        for priority in priorities:
+            ret.append(tmp_langs[priority])
+        return ret
+
+    uid = getUid(req)
+    guest = isGuestUser(uid)
+    new_lang = None
+    preferred_lang = None
+
+    if not guest:
+        user_preferences = get_user_preferences(uid)
+        preferred_lang = new_lang = user_preferences.get('preferred_lang', None)
+
+    if not new_lang:
+        try:
+            new_lang = wash_languages(parse_qs(req.args)['ln'])
+        except (TypeError, AttributeError, KeyError):
+            pass
+
+    if not new_lang:
+        try:
+            new_lang = wash_languages(_get_language_from_req_header(req.headers_in['Accept-Language']))
+        except (TypeError, AttributeError, KeyError):
+            pass
+
+    new_lang = wash_language(new_lang)
+
+    if new_lang != preferred_lang and not guest:
+        user_preferences['preferred_lang'] = new_lang
+        set_user_preferences(uid, user_preferences)
+
+    return new_lang
+
 def collect_user_info(req):
     """Given the mod_python request object rec or a uid it returns a dictionary
     containing at least the keys uid, nickname, email, groups, plus any external keys in
@@ -827,7 +889,8 @@ def collect_user_info(req):
         'nickname' : '',
         'email' : '',
         'group' : [],
-        'guest' : '1'
+        'guest' : '1',
+        'last_login' : datetime.datetime(1970, 1, 1)
     }
 
     try:
@@ -852,7 +915,7 @@ def collect_user_info(req):
             user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
             user_info['remote_host'] = req.connection.remote_host or ''
             user_info['referer'] = req.headers_in.get('Referer', '')
-            user_info['uri'] = req.unparsed_uri or ''
+            user_info['uri'] = req.unparsed_uri or ()
             user_info['agent'] = req.headers_in.get('User-Agent', 'N/A')
             try:
                 user_info['apache_user'] = getApacheUser(req)
@@ -867,9 +930,42 @@ def collect_user_info(req):
         user_info['guest'] = str(isGuestUser(uid))
         if uid:
             user_info['group'] = [group[1] for group in get_groups(uid)]
+            user_info['last_login'] = get_last_login(uid)
             prefs = get_user_preferences(uid)
+            login_method = prefs['login_method']
+            login_object = CFG_EXTERNAL_AUTHENTICATION[login_method][0]
+            if login_object and ((datetime.datetime.now() - user_info['last_login']).days > 0):
+                ## The user uses an external authentication method and it's a bit since
+                ## she has not performed a login
+                try:
+                    groups = login_object.fetch_user_groups_membership(user_info['email'], req=req)
+                    # groups is a dictionary {group_name : group_description,}
+                    new_groups = {}
+                    for key, value in groups.items():
+                        new_groups[key + " [" + str(login_method) + "]"] = value
+                    groups = new_groups
+                except (AttributeError, NotImplementedError, TypeError, InvenioWebAccessExternalAuthError):
+                    pass
+                else: # Groups synchronization
+                    from invenio.webgroup import synchronize_external_groups
+                    synchronize_external_groups(uid, groups, login_method)
+                    user_info['group'] = [group[1] for group in get_groups(uid)]
+
+                try:
+                    # Importing external settings
+                    new_prefs = login_object.fetch_user_preferences(user_info['email'], req=req)
+                    for key, value in new_prefs.items():
+                        prefs['EXTERNAL_' + key] = value
+                except (AttributeError, NotImplementedError, TypeError, InvenioWebAccessExternalAuthError):
+                    pass
+                else:
+                    set_user_preferences(uid, prefs)
+                    prefs = get_user_preferences(uid)
+
+                run_sql('UPDATE user SET last_login=NOW() WHERE id=%s', (uid, ))
+                user_info['last_login'] = get_last_login(uid)
             if prefs:
-                for key, value in prefs.items():
+                for key, value in prefs.iteritems():
                     user_info[key.lower()] = value
     except Exception, e:
         register_exception()

@@ -219,24 +219,23 @@ def perform_set(email, ln, verbose=0):
                     current = current_login_method,
                     method_disabled = (CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS >= 4)
                 )
-    try:
-        current_group_records = prefs['websearch_group_records']
-    except KeyError:
-        current_group_records = 10
-    try:
-        show_latestbox = prefs['websearch_latestbox']
-    except KeyError:
-        show_latestbox = True
-    try:
-        show_helpbox = prefs['websearch_helpbox']
-    except KeyError:
-        show_helpbox = True
+
+    current_group_records = prefs.get('websearch_group_records', 10)
+    show_latestbox = prefs.get('websearch_latestbox', True)
+    show_helpbox = prefs.get('websearch_helpbox', True)
     out += websession_templates.tmpl_user_websearch_edit(
                 ln = ln,
                 current = current_group_records,
                 show_latestbox = show_latestbox,
                 show_helpbox = show_helpbox,
                 )
+
+    preferred_lang = prefs.get('preferred_lang', ln)
+    out += websession_templates.tmpl_user_lang_edit(
+                ln = ln,
+                preferred_lang = preferred_lang
+                )
+
     if verbose >= 9:
         for key, value in prefs.items():
             out += "<b>%s</b>:%s<br />" % (key, value)

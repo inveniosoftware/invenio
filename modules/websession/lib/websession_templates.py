@@ -41,7 +41,8 @@ from invenio.websession_config import \
         CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
         CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS
 from invenio.urlutils import make_canonical_urlargd
-from invenio.messages import gettext_set_language
+from invenio.htmlutils import escape_html
+from invenio.messages import gettext_set_language, language_list_long
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
 class Template:
     def tmpl_back_form(self, ln, message, act, link):
@@ -236,7 +237,30 @@ class Template:
         return out
 
 
-
+    def tmpl_user_lang_edit(self, ln, preferred_lang):
+        _ = gettext_set_language(ln)
+        out = """
+            <form method="post" action="%(sitesecureurl)s/youraccount/change" name="edit_lang_settings">
+              <p><big><strong class="headline">%(edit_lang_settings)s</strong></big></p>
+              <table>
+                <tr><td align="right"><select name="lang">
+        """ % {
+          'sitesecureurl' : CFG_SITE_SECURE_URL,
+          'edit_lang_settings' : _("Edit language-related settings"),
+        }
+        for short_ln, long_ln in language_list_long():
+            out += """<option %(selected)s value="%(short_ln)s">%(long_ln)s</option>""" % {
+                'selected' : preferred_lang == short_ln and 'selected="selected"' or '',
+                'short_ln' : short_ln,
+                'long_ln' : escape_html(long_ln)
+            }
+        out += """</select></td><td valign="top"><strong>%(select_lang)s</strong></td></tr>
+            <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
+        </table></form>""" % {
+            'select_lang' : _('Select the desired language to be used within the web interface.'),
+            'update_settings' : _('Update settings')
+        }
+        return out
 
     def tmpl_user_websearch_edit(self, ln, current = 10, show_latestbox = True, show_helpbox = True):
         _ = gettext_set_language(ln)
@@ -263,7 +287,7 @@ class Template:
                     'selected' : current == i and 'selected="selected"' or '',
                     'i' : i
                 }
-        out += """</select></td><td valign="top"><b>%(select_group_records)s</b></td></tr>
+        out += """</select></td><td valign="top"><strong>%(select_group_records)s</strong></td></tr>
               <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
               </table>
             </form>""" % {
@@ -803,11 +827,15 @@ class Template:
                   </tr>
                   <tr>
                    <td></td>
+                   <td align="left"><input type="checkbox" name="remember_me" /><em>%(remember_me)s</em></td>
+                  <tr>
+                   <td></td>
                    <td align="center" colspan="3"><code class="blocknote"><input class="formbutton" type="submit" name="action" value="%(login)s" /></code>""" % {
                        'ln': ln,
                        'referer' : cgi.escape(referer),
                        'username' : _("Username"),
                        'password' : _("Password"),
+                       'remember_me' : _("Remember the login on this browser."),
                        'login' : _("login"),
                        }
         if internal:

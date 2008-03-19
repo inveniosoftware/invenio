@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -30,7 +30,7 @@ There are two levels to CDS session management system:
 A SessionManager is responsible for creating sessions, setting and reading
 session cookies, maintaining the collection of all sessions, and so forth.
 There should be one SessionManager instance per process.
-SessionManager is a generic class borrowed from Quixote, the class 
+SessionManager is a generic class borrowed from Quixote, the class
 MPSessionManager provides the session management on top of mod_python requests.
 
 A Session is the umbrella object for a single session (notionally, a (user,
@@ -47,16 +47,18 @@ __revision__ = "$Id$"
 
 #default configuration values
 DEFAULT_SESSION_COOKIE_NAME = "CDSSESSION"
-DEFAULT_SESSION_COOKIE_DOMAIN = None 
+DEFAULT_SESSION_COOKIE_DOMAIN = None
 DEFAULT_SESSION_COOKIE_PATH = "/"
 DEFAULT_CHECK_SESSION_ADDR = 1
 
 import re
-from time import time, localtime, strftime, clock
+from time import time, gmtime, localtime, strftime, clock
 try:
     from mod_python import apache
 except ImportError:
     pass
+
+from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER
 
 _qparm_re = re.compile(r'([\0- ]*'
                        r'([^\0- ;,=\"]+)="([^"]*)"'
@@ -101,7 +103,7 @@ def packbytes(s):
         n <<= 8
         n |= ord(b)
     return n
-    
+
 try:
     # /dev/urandom is just as good as /dev/random for cookies (assuming
     # SHA-1 is secure) and it never blocks.
@@ -265,7 +267,7 @@ class SessionManager:
     # -- Configuration params--------------------------------------------
     # Some configurable aspects. It returns the default values provided
     #   by the module constants. Subclasses can override these methods
-    #   and set up the values at their convenience (example: from a 
+    #   and set up the values at their convenience (example: from a
     #   configuration object)
     def _getSessionCookieName(self):
         """Returns the preferred cookie name for the sessions
@@ -314,7 +316,7 @@ class SessionManager:
             return None
         else:
             return sessid
-            
+
     def _create_session (self, request):
         # Generate a session ID, which is just the value of the session
         # cookie we are about to drop on the user.  (It's also the key
@@ -375,7 +377,7 @@ class SessionManager:
 
     # get_session ()
 
-    def maintain_session (self, request, session):
+    def maintain_session (self, request, session, remember_me=False):
         """maintain_session(request : HTTPRequest, session : Session)
 
         Maintain session information.  This method is called by
@@ -394,11 +396,11 @@ class SessionManager:
                 self.revoke_session_cookie(request)
             return
 
-        if not self.has_session(session.id):
+        if not self.has_session(session.id) or session.is_dirty_remember_me():
             # This is the first time this session has had useful
             # info -- store it and set the session cookie.
             self[session.id] = session
-            self.set_session_cookie(request, session.id)
+            self.set_session_cookie(request, session.id, remember_me)
 
         elif session.is_dirty():
             # We have already stored this session, but it's dirty
@@ -408,13 +410,22 @@ class SessionManager:
             # repeatedly storing the same object in the same mapping.
             self[session.id] = session
 
-    def set_session_cookie (self, request, session_id):
+
+    def set_session_cookie (self, request, session_id, remember_me=False):
         """set_session_cookie(request : HTTPRequest, session_id : string)
 
         Ensure that a session cookie with value 'session_id' will be
         returned to the client via 'request.response'.
         """
-        request.response.set_cookie(self._getSessionCookieName(), session_id,
+        if remember_me:
+            ## Keep the cookie for one month.
+            request.response.set_cookie(self._getSessionCookieName(), session_id,
+                                    domain = self._getSessionCookieDomain(),
+                                    path = self._getSessionCookiePath(),
+                                    expires = strftime('%a, %d-%b-%Y %H:%M:%S GMT', gmtime(time() +
+                                    CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER*86400)))
+        else:
+            request.response.set_cookie(self._getSessionCookieName(), session_id,
                                     domain = self._getSessionCookieDomain(),
                                     path = self._getSessionCookiePath())
 
@@ -430,7 +441,7 @@ class SessionManager:
         response.set_cookie(self._getSessionCookieName(), "",
                             domain = self._getSessionCookieDomain(),
                             path = self._getSessionCookiePath(),
-                            max_age = 0)
+                            expires = 0)
         if request.cookies.has_key(self._getSessionCookieName()):
             del request.cookies[self._getSessionCookieName()]
 
@@ -525,7 +536,7 @@ class Session:
 
         Return true if this session has changed since it was last saved
         such that it needs to be saved again.
-        
+
         Default implementation always returns false since the default
         storage mechanism is an in-memory dictionary, and you don't have
         to put the same object into the same slot of a dictionary twice.
@@ -576,36 +587,36 @@ class Session:
 
 
 class MPSessionManager(SessionManager):
-    """Specialised SessionManager which allows to use Quixote's session 
+    """Specialised SessionManager which allows to use Quixote's session
        management system with mod_python request objects. The role of this
        class is basically convert mod_python request objects in other type
        of objects (RequestWrapper) which can be handled by the SessionManager
        class.
-       With this we are able to re-use the Quixote's code (very few 
+       With this we are able to re-use the Quixote's code (very few
        modifications have been done) in a very transparent way.
     """
-    
+
     def get_session (self, request):
-        """Proxy method to SessionManager get_session. It converts the 
+        """Proxy method to SessionManager get_session. It converts the
            mod_python request objects in a SessionManager compatible one
            and executes the parent implementation passing the compatible object
         """
-        
+
         rw = RequestWrapper.getWrapper( request )
         s = SessionManager.get_session( self, rw )
         rw.setSession( s )
         return s
-        
-    def maintain_session (self, request, session):
-        """Proxy method to SessionManager maintain_session. It converts the 
+
+    def maintain_session (self, request, session, remember_me=False):
+        """Proxy method to SessionManager maintain_session. It converts the
            mod_python request objects in a SessionManager compatible one
            and executes the parent implementation passing the compatible object
         """
         rw = RequestWrapper.getWrapper( request )
-        SessionManager.maintain_session( self, rw, session )
-        
+        SessionManager.maintain_session( self, rw, session, remember_me )
+
     def has_session_cookie (self, request, must_exist=0):
-        """Proxy method to SessionManager has_session_cookie. It converts the 
+        """Proxy method to SessionManager has_session_cookie. It converts the
            mod_python request objects in a SessionManager compatible one
            and executes the parent implementation passing the compatible object
         """
@@ -613,7 +624,7 @@ class MPSessionManager(SessionManager):
         return SessionManager.has_session_cookie( self, rw, must_exist )
 
     def expire_session (self, request):
-        """Proxy method to SessionManager expire_session. It converts the 
+        """Proxy method to SessionManager expire_session. It converts the
            mod_python request objects in a SessionManager compatible one
            and executes the parent implementation passing the compatible object
         """
@@ -626,7 +637,7 @@ class MPSessionManager(SessionManager):
            compatible one and executes the parent implementation
            passing the compatible object
         """
-        rw = RequestWrapper.getWrapper( request)
+        rw = RequestWrapper.getWrapper( request )
         SessionManager.revoke_session_cookie(self, rw)
 
 class RequestWrapper:
@@ -637,7 +648,7 @@ class RequestWrapper:
             __request: MPRequest
                 Reference to the wrapped mod_python request object
             cookies: Dictionary
-                Conatins the received cookies (these found in headers_in) 
+                Conatins the received cookies (these found in headers_in)
                 indexed by the cookie name
             environ: Dictionary
                 Contains a list of different variables or parameters of the
@@ -650,7 +661,7 @@ class RequestWrapper:
     """
 
     def __init__(self, request):
-        """Constructor of the class. Initialises the necessesary values. It 
+        """Constructor of the class. Initialises the necessesary values. It
             should never be used, use getWrapper method instead.
         """
         self.__request = request
@@ -671,9 +682,9 @@ class RequestWrapper:
 
     def getWrapper( req ):
         """Returns a RequestWrapper for a given request.
-            
-            The session manager modifies the contents of the wrapper and 
-            therefore its state must be kept. This method returns the request 
+
+            The session manager modifies the contents of the wrapper and
+            therefore its state must be kept. This method returns the request
             sticked wrapper (carrying the current status) and if it doesn't
             have any it creates a new one. The RequestWrapper initialisation
             method will take care of sticking any new wrapper to the request.
@@ -691,7 +702,7 @@ class RequestWrapper:
         return self.environ[name]
 
     def setSession(self, session):
-        """Sets the reference to a sessioni. It also sets this reference in the
+        """Sets the reference to a session. It also sets this reference in the
            mod_python request object so it can be kept for future requests.
         """
         self.session = session
@@ -704,10 +715,10 @@ class ResponseWrapper:
        objects to adapt it to Quixote's classes.
        Instance attributes:
             request: RequestWrapper
-                Reference to the request object to which this will represent 
+                Reference to the request object to which this will represent
                 the reply
     """
-    
+
     def __init__(self, request):
         """Constructor of the class.
         """
@@ -720,7 +731,7 @@ class ResponseWrapper:
         for (name, value) in attrs.items():
             if value is None:
                 continue
-            if name in ("max_age", "path"):
+            if name in ("expires", "path"):
                 name = name.replace("_", "-")
                 options += "; %s=%s" % (name, value)
             elif name =="secure" and value:

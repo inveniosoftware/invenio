@@ -41,6 +41,8 @@ from UserDict import UserDict
 from invenio.dbquery import run_sql, blob_to_string, \
      OperationalError, IntegrityError
 from invenio.session import Session
+from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, \
+    CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER
 
 class SessionNotInDb(Exception):
     """Exception to be raised when a requested session doesn't exist in the DB
@@ -65,16 +67,20 @@ class pSession(Session):
     """
 
     __tableName = "session"
-    __ExpireTime = 1050043127
 
     def __init__( self, request, id, uid=-1 ):
         Session.__init__( self, request, id )
         self.__uid = uid
         self.__dirty = 0
+        self.__dirty_remember_me = 0
         self.__apache_user = None
+        self.__remember_me = False
 
     def is_dirty( self ):
         return self.__dirty
+
+    def is_dirty_remember_me( self ):
+        return self.__dirty_remember_me
 
     def getUid( self ):
         return self.__uid
@@ -98,6 +104,14 @@ class pSession(Session):
         else:
             self.__apache_user = None
             self.__dirty = 1
+
+    def setRememberMe( self, remember_me ):
+        if remember_me != self.__remember_me:
+            self.__dirty_remember_me = 1
+            self.__remember_me = remember_me
+
+    def getRememberMe( self ):
+        return self.__remember_me
 
     def retrieve( cls, sessionId ):
         """method for retrieving a session from the DB for the given
@@ -134,12 +148,16 @@ class pSession(Session):
 
         sessrepr = self.__getRepr().replace("'", "\\\'")
         sessrepr = sessrepr.replace('"', '\\\"')
+        if self.__remember_me:
+            expiration_time = self.get_access_time()+86400*(CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER+1)
+        else:
+            expiration_time = self.get_access_time()+86400*(CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT+1)
         try:
             sql = """INSERT INTO %s
                      (session_key, session_expiry, session_object, uid)
                      VALUES ("%s","%s","%s","%s")""" % \
                   (self.__class__.__tableName, self.id,
-                   self.get_access_time()+60*60*24*2, sessrepr,
+                   expiration_time, sessrepr,
                    int(self.getUid()))
             run_sql(sql)
         except IntegrityError:
@@ -148,7 +166,7 @@ class pSession(Session):
                                        session_object="%s"
                                  WHERE session_key="%s" """ % \
                       (self.__class__.__tableName, int(self.getUid()),
-                       self.get_access_time()+60*60*24*2, sessrepr,
+                       expiration_time, sessrepr,
                        self.id)
                 run_sql(sql)
             except OperationalError:

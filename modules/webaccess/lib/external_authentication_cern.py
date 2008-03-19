@@ -130,7 +130,7 @@ class ExternalAuthCern(ExternalAuth):
         return email.upper() in [user['email'].upper() for user in users]
 
 
-    def fetch_user_groups_membership(self, email, password, req=None):
+    def fetch_user_groups_membership(self, email, password=None, req=None):
         """Fetch user groups membership from the CERN NICE/CRA account.
         @return a dictionary of groupname, group description
         """
