@@ -61,6 +61,16 @@ def wash_language(ln):
     else:
         return 'en'
 
+def wash_languages(lns):
+    """Look at LNS and check if there's at least one of the allowed languages
+       for the interface. Return it in case of success,
+       return the default language otherwise."""
+    for ln in lns:
+        if ln in CFG_SITE_LANGS:
+            return ln
+        else:
+            return 'en'
+
 def language_list_long():
     """Return list of [short name, long name] for all enabled languages."""
     cfg_all_language_names = {'bg': 'Български',
