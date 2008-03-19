@@ -57,12 +57,13 @@ def print_version():
 def list_record_revisions(recid):
     """
     Return list of all known record revisions (=RECID.REVDATE) for
-    record RECID.
+    record RECID in chronologically decreasing order (latest first).
     """
     out = []
     res =  run_sql("""SELECT id_bibrec,
                              DATE_FORMAT(job_date, '%%Y%%m%%d%%H%%i%%s')
-                       FROM hstRECORD WHERE id_bibrec=%s""",
+                        FROM hstRECORD WHERE id_bibrec=%s
+                    ORDER BY job_date DESC""",
                    (recid,))
     for row in res:
         out.append("%s.%s" % (row[0], row[1]))
