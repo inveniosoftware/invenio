@@ -621,6 +621,11 @@ class FormatTest(unittest.TestCase):
                                                       ln='fr',
                                                       xml_record=self.xml_text_3)
 
+        self.empty_record_xml = '''
+        <record>
+        <controlfield tag="001">555</controlfield>
+        </record>'''
+
     def test_decide_format_template(self):
         """ bibformat - choice made by function decide_format_template"""
         bibformat_engine.CFG_BIBFORMAT_OUTPUTS_PATH = CFG_BIBFORMAT_OUTPUTS_PATH
@@ -665,6 +670,23 @@ class FormatTest(unittest.TestCase):
         #Default formatting
         result = bibformat_engine.format_record(recID=None, ln='fr', of="test3", xml_record=self.xml_text_3)
         self.assertEqual(result,'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n''')
+
+    def test_empty_formatting(self):
+        """bibformat - formatting empty record"""
+        result = bibformat_engine.format_record(recID=0,
+                                                of='hb',
+                                                verbose=9,
+                                                xml_record=self.empty_record_xml)
+        self.assertEqual(result, '')
+
+        # FIXME: The commented test below currently fails, since xm
+        # format is generated from the database
+
+##         result = bibformat_engine.format_record(recID=0,
+##                                                 of='xm',
+##                                                 verbose=9,
+##                                                 xml_record=self.empty_record_xml)
+##         self.assertEqual(result, self.empty_record_xml)
 
     def test_format_with_format_template(self):
         """ bibformat - correct formatting with given template"""
