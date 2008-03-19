@@ -130,6 +130,10 @@ class pSession(Session):
                                  sessionId)
         try:
             s = cPickle.loads(blob_to_string(res[0][0]))
+            try: # For backward compatibility with old sessions
+                s.__remember_me
+            except AttributeError:
+                s.__remember_me = False
         except cPickle.UnpicklingError:
             raise SessionNotInDb("Session %s is broken" % \
                                  sessionId)
