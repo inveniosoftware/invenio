@@ -821,16 +821,16 @@ def usage(exitcode=1, msg=""):
     """Prints usage info."""
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
-    sys.stderr.write("Usage: %s [options] webdocfile\n" % sys.argv[0])
+    sys.stderr.write("Usage: %s [options] <webdocfile>\n" % sys.argv[0])
     sys.stderr.write("  -h,  --help                \t\t Print this help.\n")
     sys.stderr.write("  -V,  --version             \t\t Print version information.\n")
     sys.stderr.write("  -v,  --verbose=LEVEL       \t\t Verbose level (0=min,1=normal,9=max).\n")
     sys.stderr.write("  -l,  --language=LN1,LN2,.. \t\t Language(s) to process (default all)\n")
     sys.stderr.write("  -m,  --mode=MODE           \t\t Update cache mode(0=Never,1=if necessary,2=always) (default 2)\n")
     sys.stderr.write("\n")
-    sys.stderr.write(" Example: webdoc help-pages\n")
-    sys.stderr.write(" Example: webdoc -l en,fr help-pages\n")
-    sys.stderr.write(" Example: webdoc -m 1 help-pages")
+    sys.stderr.write(" Example: webdoc search-guide\n")
+    sys.stderr.write(" Example: webdoc -l en,fr search-guide\n")
+    sys.stderr.write(" Example: webdoc -m 1 search-guide")
     sys.stderr.write("\n")
 
     sys.exit(exitcode)
