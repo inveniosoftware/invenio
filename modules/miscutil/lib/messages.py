@@ -54,17 +54,18 @@ def gettext_set_language(ln):
     return lang[ln].gettext
 
 def wash_language(ln):
-    """Look at LN and check if it is one of allowed languages for the interface.
-       Return it in case of success, return the default language otherwise."""
+    """Look at language LN and check if it is one of allowed languages
+       for the interface.  Return it in case of success, return the
+       default language otherwise."""
     if ln in CFG_SITE_LANGS:
         return ln
     else:
         return 'en'
 
 def wash_languages(lns):
-    """Look at LNS and check if there's at least one of the allowed languages
-       for the interface. Return it in case of success,
-       return the default language otherwise."""
+    """Look at list of languages LNS and check if there's at least one
+       of the allowed languages for the interface. Return it in case
+       of success, return the default language otherwise."""
     for ln in lns:
         if ln in CFG_SITE_LANGS:
             return ln
