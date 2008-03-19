@@ -28,6 +28,7 @@
 <strong>3. <a href="#3">Edit records via command line</a></strong><br />
 <strong>4. <a href="#4">Delete records via command line</a></strong><br />
 <strong>5. <a href="#5">Delete all records</a></strong><br />
+<strong>6. <a href="#6">Access record history</a></strong><br />
 
 <a name="1"></a><h2>1. Overview</h2>
 
@@ -67,6 +68,9 @@ proper form <code>Ellis, J</code>.</p>
         <pre>
          $ wget -O z.xml 'http://your.site/search?p=Qllis%2C+J&f=author&of=xm&rg=5000'
         </pre>
+
+   Note also that you can access history of records as covered in
+   a <a href="#6">access record history</a> section below.<p/>
 
 <li> Edit the metadata as necessary:
 
@@ -198,3 +202,58 @@ be able to access it.
      submission counters in <code>/opt/cds-invenio/var/data</code>
      subdirectories, if you use WebSubmit.
     </p>
+
+<a name="6"></a><h2>6. Access record history</h2>
+
+<p>Every revision of the metadata of a record is stored in the
+"history" table containing all previous MARCXML master formats of the
+record.  You can access them via the <code>bibedit</code> command line
+utility.
+
+<p>To list previous revisions of record ID 1:
+
+     <pre>
+     $ /opt/cds-invenio/bin/bibedit --list-revisions 1
+     1.20080319193118
+     1.20080318172536
+     1.20080311020315
+     </pre>
+
+<p>To get MARCXML of the revision 1.20080318172536 (record ID 1,
+revision date 2008-03-18 17:25:36):
+
+     <pre>
+     $/opt/cds-invenio/bin/bibedit --get-revision 1.20080318172536 | head -5
+     &lt;record>
+       &lt;controlfield tag="001">1&lt;/controlfield>
+       &lt;datafield tag="037" ind1=" " ind2=" ">
+         &lt;subfield code="a">CERN-EX-0106015&lt;/subfield>
+       &lt;/datafield>
+     [...]
+     </pre>
+
+<p>To compare the differences between the two last revisions:
+
+     <pre>
+     $ /opt/cds-invenio/bin/bibedit --diff-revisions 1.20080318172536 1.20080319193118
+     --- 1.20080318172536
+     +++ 1.20080319193118
+     @@ -4,7 +4,7 @@
+          &lt;subfield code="a">CERN-EX-0106015&lt;/subfield>
+        &lt;/datafield>
+        &lt;datafield tag="100" ind1=" " ind2=" ">
+     -    &lt;subfield code="a">Photolab&lt;/subfield>
+     +    &lt;subfield code="a">Photolab SOME TEST EDIT HERE&lt;/subfield>
+        &lt;/datafield>
+        &lt;datafield tag="245" ind1=" " ind2=" ">
+          &lt;subfield code="a">ALEPH experiment: Candidate of Higgs boson production&lt;/subfield>
+     @@ -26,7 +26,7 @@
+        &lt;/datafield>
+        &lt;datafield tag="650" ind1="1" ind2="7">
+          &lt;subfield code="2">SzGeCERN&lt;/subfield>
+     -    &lt;subfield code="a">Experiments and Tracks&lt;/subfield>
+     +    &lt;subfield code="a">Experiments and Tracks SOME TEST EDIT THERE&lt;/subfield>
+        &lt;/datafield>
+        &lt;datafield tag="653" ind1="1" ind2=" ">
+          &lt;subfield code="a">LEP&lt;/subfield>
+     </pre>
