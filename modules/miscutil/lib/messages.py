@@ -39,7 +39,7 @@ __revision__ = "$Id$"
 
 import gettext
 
-from invenio.config import CFG_LOCALEDIR, CFG_SITE_LANGS
+from invenio.config import CFG_LOCALEDIR, CFG_SITE_LANG, CFG_SITE_LANGS
 
 _LANG_GT_D = {}
 for _alang in CFG_SITE_LANGS:
@@ -64,7 +64,7 @@ def wash_language(ln):
     if ln in CFG_SITE_LANGS:
         return ln
     else:
-        return 'en'
+        return CFG_SITE_LANG
 
 def wash_languages(lns):
     """Look at list of languages LNS and check if there's at least one
@@ -74,7 +74,7 @@ def wash_languages(lns):
         if ln in CFG_SITE_LANGS:
             return ln
         else:
-            return 'en'
+            return CFG_SITE_LANG
 
 def language_list_long():
     """Return list of [short name, long name] for all enabled languages."""
