@@ -401,7 +401,11 @@ def create_graph_trend(trend, path, settings):
             open(path, 'w').write(out)
 
     elif settings["format"] == 'gnuplot':
-        import Gnuplot
+        try:
+            import Gnuplot
+        except ImportError:
+            return
+
         g = Gnuplot.Gnuplot()
 
         g('set style data linespoints')

@@ -563,6 +563,13 @@ def _perform_display_event(data, name, settings, ln=CFG_SITE_LANG):
         if settings["format"] == "asciiart":
             return TEMPLATES.tmpl_display_event_trend_ascii(settings["title"], path, ln=ln)
         else:
+            if settings["format"] == "gnuplot":
+                try:
+                    import Gnuplot
+                except ImportError:
+                    return 'Gnuplot is not installed. Returning ACII art.' +\
+                           TEMPLATES.tmpl_display_event_trend_ascii(settings["title"], path, ln=ln)
+
             return TEMPLATES.tmpl_display_event_trend_image(settings["title"], path, ln=ln)
     else:
         path += "_asciidump"
