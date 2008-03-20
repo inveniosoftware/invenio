@@ -1471,12 +1471,12 @@ Examples:
   -i, --insert\t\tinsert the new record in the database
   -r, --replace\t\tthe existing record is entirely replaced by the new one
   -z, --reference\tupdate references (update only 999 fields)
-  -s, --stage=STAGE\tstage to start from in the algorithm (0: always done; 1: FMT tags;
+  -S, --stage=STAGE\tstage to start from in the algorithm (0: always done; 1: FMT tags;
 \t\t\t2: FFT tags; 3: BibFmt; 4: Metadata update; 5: time update)
   -n, --notimechange\tdo not change record last modification date when updating
 """,
             version=__revision__,
-            specific_params=("ircazs:fn",
+            specific_params=("ircazS:fn",
                  [
                    "insert",
                    "replace",
@@ -1543,6 +1543,18 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ("-f", "--format"):
         task_set_option('mode', 'format')
         task_set_option('file_path', os.path.abspath(args[0]))
+
+    # Stage
+    elif key in ("-S", "--stage"):
+        try:
+            value = int(value)
+        except ValueError:
+            print >> sys.stderr, """The value specified for --stage must be a valid integer, not %s""" % value
+            return False
+        if not (0 <= value <= 5):
+            print >> sys.stderr, """The value specified for --stage must be comprised between 0 and 5"""
+            return False
+        task_set_option('stage_to_start_from', value)
 
     else:
         return False
