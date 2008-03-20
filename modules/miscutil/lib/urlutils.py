@@ -125,7 +125,11 @@ def get_referer(req, replace_ampersands=False):
 def drop_default_urlargd(urlargd, default_urlargd):
     lndefault = {}
     lndefault.update(default_urlargd)
-    lndefault['ln'] = (str, CFG_SITE_LANG)
+
+    ## Commented out. An Invenio URL now should always specify the desired
+    ## language, in order not to raise the automatic language discovery
+    ## (client browser language can be used now in place of CFG_SITE_LANG)
+    # lndefault['ln'] = (str, CFG_SITE_LANG)
 
     canonical = {}
     canonical.update(urlargd)
