@@ -73,8 +73,7 @@ def wash_languages(lns):
     for ln in lns:
         if ln in CFG_SITE_LANGS:
             return ln
-        else:
-            return CFG_SITE_LANG
+    return CFG_SITE_LANG
 
 def language_list_long():
     """Return list of [short name, long name] for all enabled languages."""
