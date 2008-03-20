@@ -1833,23 +1833,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
 
     def test_writing_rights(self):
         """bibupload - FFT has writing rights"""
-        filename = os.path.join(CFG_WEBSUBMIT_FILEDIR, 'test.txt')
-        msg = ''
-        try:
-            open(filename, 'w').write('TEST')
-            result = open(filename, 'r').read() == 'TEST'
-            if not result:
-                msg = 'Error in reading %s' % filename
-        except Exception, msg:
-            result = False
-            msg = str(msg)
-
-        try:
-            os.remove(filename)
-        except OSError:
-            pass
-
-        self.failUnless(result, msg)
+        self.failUnless(bibupload.writing_rights_p())
 
     def test_simple_fft_insert(self):
         """bibupload - simple FFT insert"""
@@ -2094,8 +2078,8 @@ class BibUploadFFTModeTest(unittest.TestCase):
                                           testrec_expected_xm), '')
         self.assertEqual(compare_hmbuffers(inserted_hm,
                                           testrec_expected_hm), '')
-        self.assertEqual(try_url_download(testrec_expected_url1), '')
-        self.assertEqual(try_url_download(testrec_expected_url2), '')
+        self.failUnless(try_url_download(testrec_expected_url1))
+        self.failUnless(try_url_download(testrec_expected_url2))
 
         bibupload.wipe_out_record_from_all_tables(recid)
 
@@ -2266,9 +2250,6 @@ class BibUploadFFTModeTest(unittest.TestCase):
          </datafield>
          <datafield tag="FFT" ind1=" " ind2=" ">
           <subfield code="a">%(prefix)s/var/tmp/demobibdata.xml</subfield>
-         </datafield>
-         <datafield tag="FFT" ind1=" " ind2=" ">
-          <subfield code="a">/etc/passwd</subfield>
          </datafield>
         </record>
         """ % { 'prefix': CFG_PREFIX }

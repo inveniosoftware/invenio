@@ -58,7 +58,6 @@ import os
 import sys
 import time
 from zlib import compress
-import re
 import urllib2
 import tempfile
 
@@ -75,13 +74,12 @@ from invenio.bibrecord import create_records, \
                               record_get_field_values, \
                               field_get_subfield_values
 from invenio.dateutils import convert_datestruct_to_datetext
+from invenio.errorlib import register_exception
 from invenio.bibformat import format_record
 from invenio.config import CFG_WEBSUBMIT_FILEDIR, \
-                           CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, \
-                           CFG_TMPDIR, \
-                           CFG_PREFIX
-from invenio.bibtask import task_init, write_message, get_datetime, \
-    task_set_option, task_get_option, task_get_task_param, task_update_status, \
+                           CFG_TMPDIR
+from invenio.bibtask import task_init, write_message, \
+    task_set_option, task_get_option, task_update_status, \
     task_update_progress
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format
 
@@ -219,8 +217,21 @@ def bibupload(record, opt_tag=None, opt_mode=None,
     write_message("Stage 2: Start (Process FFT tags if exist).", verbose=2)
     if opt_stage_to_start_from <= 2 and \
         extract_tag_from_record(record, 'FFT') is not None:
-
-        record = elaborate_fft_tags(record, rec_id, opt_mode)
+        if not writing_rights_p():
+            write_message("   Stage 2 failed: Error no rights to write fulltext files",
+                verbose=1, stream=sys.stderr)
+            task_update_status("ERROR")
+            sys.exit(1)
+        try:
+            record = elaborate_fft_tags(record, rec_id, opt_mode)
+        except Exception, e:
+            write_message("   Stage 2 failed: Error while elaborating FFT tags: %s" % e,
+                verbose=1, stream=sys.stderr)
+            return (1, int(rec_id))
+        if record is None:
+            write_message("   Stage 2 failed: Error while elaborating FFT tags",
+                        verbose=1, stream=sys.stderr)
+            return (1, int(rec_id))
         write_message("   -Stage COMPLETED", verbose=2)
     else:
         write_message("   -Stage NOT NEEDED", verbose=2)
@@ -723,7 +734,7 @@ def elaborate_fft_tags(record, rec_id, mode):
         """Sinchronize the 8564 tags for record with actual files. descriptions
         should be a dictionary docname:description for the new description to be
         inserted."""
-        write_message("Synchronizing MARC of recid '%s' with:\n%s\nwith descriptions: %s\nand comments: %s\nand changed urls: %s" % (rec_id, record, descriptions, comments, changed), verbose=9, stream=sys.stderr)
+        write_message("Synchronizing MARC of recid '%s' with:\n%s\nwith descriptions: %s\nand comments: %s\nand changed urls: %s" % (rec_id, record, descriptions, comments, changed), verbose=9)
         tags8564s = record_get_field_instances(record, '856', '4', ' ')
         filtered_tags8564s = []
 
@@ -785,14 +796,16 @@ def elaborate_fft_tags(record, rec_id, mode):
         try:
             tmpurl = download_url(url, format)
             try:
-                bibdoc.add_file_new_format(tmpurl)
-            except StandardError, e:
-                write_message("('%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, format, docname, doctype, newname, e), stream=sys.stderr)
-            os.remove(tmpurl)
-            return False
+                try:
+                    bibdoc.add_file_new_format(tmpurl)
+                except StandardError, e:
+                    write_message("('%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, format, docname, doctype, newname, e), stream=sys.stderr)
+                    raise
+            finally:
+                os.remove(tmpurl)
         except Exception, e:
-            write_message("Error in downloading '%s' because of: %s" % (url, e))
-            return False
+            write_message("Error in downloading '%s' because of: %s" % (url, e), stream=sys.stderr)
+            raise
         return True
 
     def _add_new_version(bibdoc, url, format, docname, doctype, newname):
@@ -800,14 +813,16 @@ def elaborate_fft_tags(record, rec_id, mode):
         try:
             tmpurl = download_url(url, format)
             try:
-                bibdoc.add_file_new_version(tmpurl)
-            except StandardError, e:
-                write_message("('%s', '%s', '%s', '%s', '%s') not inserted because '%s'." % (url, format, docname, doctype, newname, e), stream=sys.stderr)
-            os.remove(tmpurl)
-            return False
+                try:
+                    bibdoc.add_file_new_version(tmpurl)
+                except StandardError, e:
+                    write_message("('%s', '%s', '%s', '%s', '%s') not inserted because '%s'." % (url, format, docname, doctype, newname, e), stream=sys.stderr)
+                    raise
+            finally:
+                os.remove(tmpurl)
         except Exception, e:
-            write_message("Error in downloading '%s' because of: %s" % (url, e))
-            return False
+            write_message("Error in downloading '%s' because of: %s" % (url, e), stream=sys.stderr)
+            raise
         return True
 
     def _add_new_icon(bibdoc, url, restriction):
@@ -821,16 +836,18 @@ def elaborate_fft_tags(record, rec_id, mode):
                 format = filename[len(file_strip_ext(filename)):].lower()
                 tmpurl = download_url(url, format)
                 try:
-                    icondoc = bibdoc.add_icon(tmpurl, 'icon-%s' % bibdoc.get_docname())
-                    if restriction and restriction != 'KEEP-OLD-VALUE':
-                        icondoc.set_status(restriction)
-                except StandardError, e:
-                    write_message("('%s', '%s') icon not added because '%s'." % (url, format, e), stream=sys.stderr)
-                os.remove(tmpurl)
-                return False
+                    try:
+                        icondoc = bibdoc.add_icon(tmpurl, 'icon-%s' % bibdoc.get_docname())
+                        if restriction and restriction != 'KEEP-OLD-VALUE':
+                            icondoc.set_status(restriction)
+                    except StandardError, e:
+                        write_message("('%s', '%s') icon not added because '%s'." % (url, format, e), stream=sys.stderr)
+                        raise
+                finally:
+                    os.remove(tmpurl)
             except Exception, e:
-                write_message("Error in downloading '%s' because of: %s" % (url, e))
-                return False
+                write_message("Error in downloading '%s' because of: %s" % (url, e), stream=sys.stderr)
+                raise
         return True
 
     tuple_list = extract_tag_from_record(record, 'FFT')
@@ -953,7 +970,7 @@ def elaborate_fft_tags(record, rec_id, mode):
             if newname != name:
                 changed['%s/record/%s/files/%s%s' % (CFG_SITE_URL, rec_id, newname, format)] = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, rec_id, name, format)
 
-        write_message('Result of FFT analysis:\n\tDocs: %s\n\tComments: %s\n\tDescriptions: %s' % (docs, comments, descriptions), verbose=9, stream=sys.stderr)
+        write_message('Result of FFT analysis:\n\tDocs: %s\n\tComments: %s\n\tDescriptions: %s' % (docs, comments, descriptions), verbose=9)
 
         # Let's remove all FFT tags
         record_delete_field(record, 'FFT', ' ', ' ')
@@ -967,7 +984,7 @@ def elaborate_fft_tags(record, rec_id, mode):
             bibrecdocs.build_bibdoc_list()
 
         for docname, (doctype, newname, restriction, icon, version, urls) in docs.iteritems():
-            write_message("Elaborating olddocname: '%s', newdocname: '%s', doctype: '%s', restriction: '%s', icon: '%s', urls: '%s', mode: '%s'" % (docname, newname, doctype, restriction, icon, urls, mode), verbose=9, stream=sys.stderr)
+            write_message("Elaborating olddocname: '%s', newdocname: '%s', doctype: '%s', restriction: '%s', icon: '%s', urls: '%s', mode: '%s'" % (docname, newname, doctype, restriction, icon, urls, mode), verbose=9)
             if mode in ('insert', 'replace'): # new bibdocs, new docnames, new marc
                 if newname in bibrecdocs.get_bibdoc_names(doctype):
                     write_message("('%s', '%s', '%s') not inserted because docname already exists." % (doctype, newname, urls), stream=sys.stderr)
@@ -979,9 +996,9 @@ def elaborate_fft_tags(record, rec_id, mode):
                     write_message("('%s', '%s', '%s') not inserted because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
                     break
                 for (url, format) in urls:
-                    _add_new_format(bibdoc, url, format, docname, doctype, newname)
+                    assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
                 if icon and not icon == 'KEEP-OLD-VALUE':
-                    _add_new_icon(bibdoc, icon, restriction)
+                    assert(_add_new_icon(bibdoc, icon, restriction))
             elif mode == 'replace_or_insert': # to be thought as correct_or_insert
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == docname:
@@ -991,7 +1008,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                                     bibdoc.change_name(newname)
                                 except StandardError, e:
                                     write_message(e, stream=sys.stderr)
-                                    break
+                                    raise
                 found_bibdoc = False
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == docname:
@@ -1006,7 +1023,8 @@ def elaborate_fft_tags(record, rec_id, mode):
                             try:
                                 bibdoc.revert(version)
                             except Exception, e:
-                                write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e))
+                                write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e), stream=sys.stderr)
+                                raise
                         else:
                             if restriction != 'KEEP-OLD-VALUE':
                                 bibdoc.set_status(restriction)
@@ -1029,6 +1047,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                     if icon and not icon == 'KEEP-OLD-VALUE':
                         _add_new_icon(bibdoc, icon, restriction)
             elif mode == 'correct':
+                super_break = False
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == docname:
                         if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT'):
@@ -1037,7 +1056,10 @@ def elaborate_fft_tags(record, rec_id, mode):
                                     bibdoc.change_name(newname)
                                 except StandardError, e:
                                     write_message(e, stream=sys.stderr)
+                                    super_break = True
                                     break
+                if super_break:
+                    break
                 found_bibdoc = False
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == newname:
@@ -1052,7 +1074,8 @@ def elaborate_fft_tags(record, rec_id, mode):
                             try:
                                 bibdoc.revert(version)
                             except Exception, e:
-                                write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e))
+                                write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e), stream=sys.stderr)
+                                raise
                         else:
                             if restriction != 'KEEP-OLD-VALUE':
                                 bibdoc.set_status(restriction)
@@ -1086,6 +1109,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                             _add_new_icon(bibdoc, icon, restriction)
                     except Exception, e:
                         write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
+                        raise
         write_message('Changed urls: %s' % str(changed), verbose=9, stream=sys.stderr)
         return _synchronize_8564(rec_id, record, descriptions, comments, changed)
     else:
@@ -1575,6 +1599,21 @@ def task_submit_check_options():
         return False
     return True
 
+def writing_rights_p():
+    """Return True in case bibupload has the proper rights to write in the
+    fulltext file folder."""
+    filename = os.path.join(CFG_WEBSUBMIT_FILEDIR, 'test.txt')
+    try:
+        if not os.path.exists(CFG_WEBSUBMIT_FILEDIR):
+            os.makedirs(CFG_WEBSUBMIT_FILEDIR)
+        open(filename, 'w').write('TEST')
+        assert(open(filename).read() == 'TEST')
+        os.remove(filename)
+    except:
+        register_exception()
+        return False
+    return True
+
 def task_run_core():
     """ Reimplement to add the body of the task."""
     error = 0
@@ -1603,6 +1642,14 @@ def task_run_core():
                         write_message("Record could not have been parsed",
                             stream=sys.stderr)
                     stat['nb_errors'] += 1
+                elif error[0] == 2:
+                    if record:
+                        write_message(record_xml_output(record),
+                            stream=sys.stderr)
+                    else:
+                        write_message("Record could not have been parsed",
+                            stream=sys.stderr)
+
                 task_update_progress("Done %d out of %d." % \
                                     (stat['nb_records_inserted'] + \
                                     stat['nb_records_updated'],
