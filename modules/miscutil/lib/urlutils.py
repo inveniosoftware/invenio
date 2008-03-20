@@ -222,8 +222,8 @@ def same_urls_p(a, b):
     ua = list(urlparse(a))
     ub = list(urlparse(b))
 
-    ua[4] = parse_qs(ua[4], True)
-    ub[4] = parse_qs(ub[4], True)
+    ua[4] = parse_qs(ua[4])
+    ub[4] = parse_qs(ub[4])
 
     return ua == ub
 

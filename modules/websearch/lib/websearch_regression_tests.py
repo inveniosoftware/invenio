@@ -150,24 +150,24 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
 
         # Use the root URL unless we need more
         check(make_url('/', c=CFG_SITE_NAME),
-              make_url('/'))
+              make_url('/', ln=CFG_SITE_LANG))
 
         # Other collections are redirected in the /collection area
         check(make_url('/', c='Poetry'),
-              make_url('/collection/Poetry'))
+              make_url('/collection/Poetry', ln=CFG_SITE_LANG))
 
         # Drop unnecessary arguments, like ln and as (when they are
         # the default value)
-        check(make_url('/', c='Poetry', as=0, ln=CFG_SITE_LANG),
-              make_url('/collection/Poetry'))
+        check(make_url('/', c='Poetry', as=0),
+              make_url('/collection/Poetry', ln=CFG_SITE_LANG))
 
         # Otherwise, keep them
-        check(make_url('/', c='Poetry', as=1, ln=CFG_SITE_LANG),
-              make_url('/collection/Poetry', as=1))
+        check(make_url('/', c='Poetry', as=1),
+              make_url('/collection/Poetry', as=1, ln=CFG_SITE_LANG))
 
         # Support the /index.py addressing too
         check(make_url('/index.py', c='Poetry'),
-              make_url('/collection/Poetry'))
+              make_url('/collection/Poetry', ln=CFG_SITE_LANG))
 
 
     def test_legacy_search(self):
@@ -258,7 +258,12 @@ class WebSearchTestCollections(unittest.TestCase):
                         args['as'] = as
 
                     url = make_url('/search', **args)
-                    browser.follow_link(url=url)
+                    try:
+                        browser.follow_link(url=url)
+                    except LinkNotFoundError:
+                        args['ln'] = CFG_SITE_LANG
+                        url = make_url('/search', **args)
+                        browser.follow_link(url=url)
 
         except LinkNotFoundError:
             self.fail('no link %r in %r' % (url, browser.geturl()))
@@ -284,6 +289,8 @@ class WebSearchTestCollections(unittest.TestCase):
                 kargs = {'as': 1}
             else:
                 kargs = {}
+
+            kargs['ln'] = CFG_SITE_LANG
 
             # We navigate from immediate son to immediate son...
             browser.open(make_url('/', **kargs))
@@ -482,6 +489,9 @@ class WebSearchTestSearch(unittest.TestCase):
             if to_drop in original:
                 del original[to_drop]
 
+        if 'ln' not in original:
+            original['ln'] = [CFG_SITE_LANG]
+
         # we should get a few searches back, which are identical
         # except for the p field being substituted (and the cc field
         # being dropped).
@@ -493,6 +503,9 @@ class WebSearchTestSearch(unittest.TestCase):
                 continue
 
             dummy, target = parse_url(link.url)
+
+            if 'ln' not in target:
+                target['ln'] = [CFG_SITE_LANG]
 
             original['p'] = [link.text]
             self.failUnlessEqual(original, target)
@@ -557,6 +570,8 @@ class WebSearchTestSearch(unittest.TestCase):
         for bsu in ('quasinormal', 'muon'):
             l = browser.find_link(text=bsu)
             q['p'] = bsu
+            if 'ln' in q:
+                del q['ln']
 
             if not same_urls_p(l.url, make_url('/search', **q)):
                 self.fail(repr((l.url, make_url('/search', **q))))
