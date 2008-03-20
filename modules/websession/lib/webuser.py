@@ -846,7 +846,7 @@ def get_preferred_user_language(req):
 
     if not guest:
         user_preferences = get_user_preferences(uid)
-        preferred_lang = new_lang = user_preferences.get('preferred_lang', None)
+        preferred_lang = new_lang = user_preferences.get('language', None)
 
     if not new_lang:
         try:
@@ -863,7 +863,7 @@ def get_preferred_user_language(req):
     new_lang = wash_language(new_lang)
 
     if new_lang != preferred_lang and not guest:
-        user_preferences['preferred_lang'] = new_lang
+        user_preferences['language'] = new_lang
         set_user_preferences(uid, user_preferences)
 
     return new_lang

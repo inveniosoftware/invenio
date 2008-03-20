@@ -230,7 +230,7 @@ def perform_set(email, ln, verbose=0):
                 show_helpbox = show_helpbox,
                 )
 
-    preferred_lang = prefs.get('preferred_lang', ln)
+    preferred_lang = prefs.get('language', ln)
     out += websession_templates.tmpl_user_lang_edit(
                 ln = ln,
                 preferred_lang = preferred_lang

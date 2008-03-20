@@ -428,7 +428,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         elif args['lang']:
             lang = wash_language(args['lang'])
             prefs = webuser.get_user_preferences(uid)
-            prefs['preferred_lang'] = lang
+            prefs['language'] = lang
             args['ln'] = lang
             _ = gettext_set_language(lang)
             webuser.set_user_preferences(uid, prefs)
