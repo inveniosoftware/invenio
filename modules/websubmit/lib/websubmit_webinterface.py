@@ -219,7 +219,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 filelist=filelist)
 
             cc = guess_primary_collection_of_a_record(self.recid)
-            unordered_tabs = get_detailed_page_tabs(get_colID(cc), self.recid)
+            unordered_tabs = get_detailed_page_tabs(get_colID(cc), self.recid, ln)
             ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
             ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
             link_ln = ''

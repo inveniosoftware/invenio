@@ -32,7 +32,8 @@ import os
 from invenio.config import \
      CFG_SITE_URL, \
      CFG_VERSION, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
@@ -1179,12 +1180,13 @@ class Template:
                    }
         for version in versions:
             if version['previous']:
-                versiontext =  """<br />(%(see)s <a href="%(siteurl)s/record/%(recID)s/files/?docname=%(docname)s&amp;version=all">%(previous)s</a>)""" % {
+                versiontext =  """<br />(%(see)s <a href="%(siteurl)s/record/%(recID)s/files/?docname=%(docname)s&amp;version=all%(ln_link)s">%(previous)s</a>)""" % {
                                  'see' : _("see"),
                                  'siteurl' : CFG_SITE_URL,
                                  'docname' : urllib.quote(docname),
                                  'recID': recid,
                                  'previous': _("previous"),
+                                 'ln_link': (ln != CFG_SITE_LANG and '&amp;ln=' + ln) or '',
                                }
             else:
                 versiontext = ""
@@ -1352,6 +1354,7 @@ class Template:
                   <input type="hidden" name="deletedId" />
                   <input type="hidden" name="deletedDoctype" />
                   <input type="hidden" name="deletedAction" />
+                  <input type="hidden" name="ln" value="%(ln)s"/>
                   <table class="searchbox" width="100%%" summary="" >
                     <tr>
                       <th class="portalboxheader"><small>%(for)s</small>&nbsp;
@@ -1361,6 +1364,7 @@ class Template:
                     'order' : order,
                     'for' : _("For"),
                     'alltype' : _("all types of document"),
+                    'ln' : ln,
                   }
         for doctype in doctypes:
             out += """<option value="%(id)s" %(sel)s>%(name)s</option>""" % {
@@ -1421,7 +1425,7 @@ class Template:
                          'last' : _("Last access"),
                        }
             if submission['pending']:
-                idtext = """<a href="submit/sub?access=%(id)s@%(action)s%(doctype)s">%(id)s</a>
+                idtext = """<a href="submit/sub?access=%(id)s@%(action)s%(doctype)s%(ln_link)s">%(id)s</a>
                             &nbsp;<a onclick='if (confirm("%(sure)s")){document.forms[0].deletedId.value="%(id)s";document.forms[0].deletedDoctype.value="%(doctype)s";document.forms[0].deletedAction.value="%(action)s";document.forms[0].submit();return true;}else{return false;}' href=''><img src="%(images)s/smallbin.gif" border="0" alt='%(delete)s' /></a>
                          """ % {
                            'images' : images,
@@ -1432,7 +1436,8 @@ class Template:
                            'delete' : _("Delete submission %(x_id)s in %(x_docname)s") % {
                                         'x_id' : str(submission['id']),
                                         'x_docname' : str(submission['docname'])
-                                      }
+                                      },
+                           'ln_link': (ln != CFG_SITE_LANG and '&amp;ln=' + ln) or ''
                          }
             else:
                 idtext = submission['id']
@@ -1523,17 +1528,19 @@ class Template:
             out += """<ul><li><b>%(docname)s</b><ul>""" % doctype
 
             if doctype ['categories'] is None:
-                out += '''<li><a href="publiline.py?doctype=%(doctype)s">%(generalref)s</a></li>''' % {
+                out += '''<li><a href="publiline.py?doctype=%(doctype)s%(ln_link)s">%(generalref)s</a></li>''' % {
                     'docname' : doctype['docname'],
                     'doctype' : doctype['doctype'],
-                    'generalref' : _("You are a general referee")}
+                    'generalref' : _("You are a general referee"),
+                    'ln_link': (ln != CFG_SITE_LANG and '&amp;ln=' + ln) or ''}
 
             else:
                 for category in doctype['categories']:
-                    out += """<li><a href="publiline.py?doctype=%(doctype)s&amp;categ=%(categ)s">%(referee)s</a></li>""" % {
+                    out += """<li><a href="publiline.py?doctype=%(doctype)s&amp;categ=%(categ)s%(ln_link)s">%(referee)s</a></li>""" % {
                         'referee' : _("You are a referee for category:") + ' ' + str(category['name']) + ' (' + str(category['id']) + ')',
 			'doctype' : doctype['doctype'],
-                        'categ' : category['id']}
+                        'categ' : category['id'],
+                        'ln_link': (ln != CFG_SITE_LANG and '&amp;ln=' + ln) or ''}
 
             out += "</ul><br /></li></ul>"
 
@@ -1666,6 +1673,7 @@ class Template:
                       <form action="publiline.py" method="get">
                           <input type="hidden" name="doctype" value="%(doctype)s" />
                           <input type="hidden" name="categ" value="" />
+                          <input type="hidden" name="ln" value="%(ln)s" />
                           </form>
                <table>
                  <tr>
@@ -1674,6 +1682,7 @@ class Template:
                  'doctype' : doctype,
                  'list_categ' : _("List of refereed categories"),
                  'choose_categ' : _("Please choose a category"),
+                 'ln' : ln,
                }
 
         for categ in categories:
