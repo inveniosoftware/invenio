@@ -20,11 +20,15 @@
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
-from invenio.config import CFG_BINDIR, CFG_WEBDIR, CFG_SITE_URL
+from invenio.config import \
+     CFG_BINDIR, \
+     CFG_WEBDIR, \
+     CFG_SITE_URL, \
+     CFG_SITE_LANG
 
 class Template:
 
-    def tmpl_welcome(self, ):
+    def tmpl_welcome(self, ln=CFG_SITE_LANG):
         """
         Generates a welcome page for the Webstat module.
         """
@@ -33,7 +37,7 @@ class Template:
                      raw data can be exported for offline processing. Further on, a general
                      overview is presented below under the label Current System Health.</p>"""
 
-    def tmpl_system_health(self, health_statistics):
+    def tmpl_system_health(self, health_statistics, ln=CFG_SITE_LANG):
         """
         Generates a box with current information from the system providing the administrator
         an easy way of overlooking the 'health', i.e. the current performance/efficency, of
@@ -56,20 +60,21 @@ class Template:
 
         return out
 
-    def tmpl_keyevent_list(self):
+    def tmpl_keyevent_list(self, ln=CFG_SITE_LANG):
         """
         Generates a list of available key statistics.
         """
         return """<h3>Key statistics</h3>
                   <p>Please choose a statistic from below to review it in detail.</p>
                   <ul>
-                    <li><a href="%s/stats/collection_population">Collection population</a></li>
-                    <li><a href="%s/stats/search_frequency">Search frequency</a></li>
-                    <li><a href="%s/stats/search_type_distribution">Search type distribution</a></li>
-                    <li><a href="%s/stats/download_frequency">Download frequency</a></li>
-                  </ul>""" % ((CFG_SITE_URL,)*4)
+                    <li><a href="%(CFG_SITE_URL)s/stats/collection_population%(ln_link)s">Collection population</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/search_frequency%(ln_link)s">Search frequency</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/search_type_distribution%(ln_link)s">Search type distribution</a></li>
+                    <li><a href="%(CFG_SITE_URL)s/stats/download_frequency%(ln_link)s">Download frequency</a></li>
+                  </ul>""" % {'CFG_SITE_URL': CFG_SITE_URL,
+                              'ln_link' : (CFG_SITE_LANG != ln and '?ln='+ln) or ''}
 
-    def tmpl_customevent_list(self, customevents):
+    def tmpl_customevent_list(self, customevents, ln=CFG_SITE_LANG):
         """
         Generates a list of available custom statistics.
         """
@@ -86,13 +91,13 @@ class Template:
             temp_out += """<li><a href="%s/stats/customevent?ids=%s">%s</a></li>""" \
                         % (CFG_SITE_URL, event[0], (event[1] is None) and event[0] or event[1])
         if len(customevents) == 0:
-            out += self.tmpl_error("There are currently no custom events available.")
+            out += self.tmpl_error("There are currently no custom events available.", ln=ln)
         else:
             out += "<ul>" + temp_out + "</ul>"
 
         return out
 
-    def tmpl_customevent_help(self):
+    def tmpl_customevent_help(self, ln=CFG_SITE_LANG):
         """
         Display help for custom events.
         """
@@ -137,13 +142,13 @@ register_customevent('test') </pre>
                   </ol>""" % { "bindir": CFG_BINDIR, }
 
 
-    def tmpl_error(self, msg):
+    def tmpl_error(self, msg, ln=CFG_SITE_LANG):
         """
         Provides a common way of outputting error messages.
         """
         return """<div class="important">%s</div>""" % msg
 
-    def tmpl_event_box(self, options, order, choosed):
+    def tmpl_event_box(self, options, order, choosed, ln=CFG_SITE_LANG):
         """
         Generates a FORM box with dropdowns for events.
 
@@ -157,7 +162,8 @@ register_customevent('test') </pre>
         @type options: { str: str }
         """
         # Create the FORM's header
-        formheader = """<form method="get">"""
+        formheader = """<form method="get">
+        <input type="hidden" name="ln"value="%s" />""" % ln
 
         # Create the headers using the options permutation
         headers = [options[param][0] for param in order]
@@ -167,26 +173,27 @@ register_customevent('test') </pre>
                                       " - select " + options[param][0], # first item info
                                       param,                            # name
                                       choosed[param],                   # selected value (perhaps several)
-                                      type(choosed[param]) is list)     # multiple box?
+                                      type(choosed[param]) is list,     # multiple box?
+                                      ln=ln)
                 for param in order]
 
         # Create all buttons
         buttons = []
         buttons.append("""<input class="formbutton" type="submit" name="action_gen" value="Generate">""")
 
-        return self._tmpl_box(formheader, headers, sels, buttons)
+        return self._tmpl_box(formheader, headers, sels, buttons, ln=ln)
 
-    def tmpl_display_event_trend_ascii(self, title, filename):
+    def tmpl_display_event_trend_ascii(self, title, filename, ln=CFG_SITE_LANG):
         """Displays an image graph representing a trend"""
-        return self.tmpl_display_trend(title, "<div><pre>%s</pre></div>" % open(filename, 'r').read())
+        return self.tmpl_display_trend(title, "<div><pre>%s</pre></div>" % open(filename, 'r').read(), ln=ln)
 
-    def tmpl_display_event_trend_image(self, title, filename):
+    def tmpl_display_event_trend_image(self, title, filename, ln=CFG_SITE_LANG):
         """Displays a ASCII graph represnting a trend"""
-        return self.tmpl_display_trend(title, """<div><img src="%s" /></div>""" % filename.replace(CFG_WEBDIR, CFG_SITE_URL))
+        return self.tmpl_display_trend(title, """<div><img src="%s" /></div>""" % filename.replace(CFG_WEBDIR, CFG_SITE_URL), ln=ln)
 
     # INTERNALS
 
-    def tmpl_display_trend(self, title, html):
+    def tmpl_display_trend(self, title, html, ln=CFG_SITE_LANG):
         """
         Generates a generic display box for showing graphs (ASCII and IMGs)
         alongside to some metainformational boxes.
@@ -196,7 +203,7 @@ register_customevent('test') </pre>
                    <tbody><tr><td class="narrowsearchboxbody" valign="top">%s</td></tr></tbody>
                   </table> """ % (title, html)
 
-    def _tmpl_box(self, formheader, headers, selectboxes, buttons):
+    def _tmpl_box(self, formheader, headers, selectboxes, buttons, ln=CFG_SITE_LANG):
         """
         Aggregates together the parameters in order to generate the
         corresponding box.
@@ -241,7 +248,7 @@ register_customevent('test') </pre>
 
         return out
 
-    def _tmpl_select_box(self, iterable, explaination, name, preselected, multiple=False):
+    def _tmpl_select_box(self, iterable, explaination, name, preselected, multiple=False, ln=CFG_SITE_LANG):
         """
         Generates a HTML SELECT drop-down menu.
 

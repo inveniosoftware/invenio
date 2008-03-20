@@ -22,7 +22,11 @@ __lastupdated__ = "$Date$"
 
 import os
 
-from invenio.config import CFG_TMPDIR, CFG_SITE_URL, CFG_SITE_NAME
+from invenio.config import \
+     CFG_TMPDIR, \
+     CFG_SITE_URL, \
+     CFG_SITE_NAME, \
+     CFG_SITE_LANG
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webpage import page
 from invenio import template
@@ -57,172 +61,204 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                  'download_frequency', 'customevent', 'customevent_help',
                  'export' ]
 
-    navtrail = navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL
+    navtrail = """<a class="navtrail" href="%s/stats/%%(ln_link)s">Statistics</a>""" % CFG_SITE_URL
 
-    def index(self, req, _):
+    def index(self, req, form):
         """Index page."""
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail,
+                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
                 text=auth_msg,
-                navmenuid='index')
+                navmenuid='index',
+                ln=ln)
 
         return page(title="Statistics",
-                    body=perform_request_index(),
+                    body=perform_request_index(ln=ln),
                     description="CDS, Statistics",
                     keywords="CDS, statistics",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='stats')
+                    navmenuid='stats',
+                    language=ln)
 
     # KEY EVENT SECTION
 
     def collection_population(self, req, form):
         """Collection population statistics page."""
+        argd = wash_urlargd(form, {'collection': (str, CFG_SITE_NAME),
+                                   'timespan': (str, "today"),
+                                   'format': (str, SUITABLE_GRAPH_FORMAT),
+                                   'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail,
+                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
                 text=auth_msg,
-                navmenuid='collection population')
-
-        argd = wash_urlargd(form, {'collection': (str, CFG_SITE_NAME),
-                                   'timespan': (str, "today"),
-                                   'format': (str, SUITABLE_GRAPH_FORMAT)})
+                navmenuid='collection population',
+                ln=ln)
 
         return page(title="Collection population",
-                    body=perform_display_keyevent('collection population', argd, req),
-                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
+                    body=perform_display_keyevent('collection population', argd, req, ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
                     description="CDS, Statistics, Collection population",
                     keywords="CDS, statistics, collection population",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='collection population')
+                    navmenuid='collection population',
+                    language=ln)
 
     def search_frequency(self, req, form):
         """Search frequency statistics page."""
+        argd = wash_urlargd(form, {'timespan': (str, "today"),
+                                   'format': (str, SUITABLE_GRAPH_FORMAT),
+                                   'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail,
+                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
                 text=auth_msg,
-                navmenuid='search frequency')
-
-        argd = wash_urlargd(form, {'timespan': (str, "today"),
-                                   'format': (str, SUITABLE_GRAPH_FORMAT)})
+                navmenuid='search frequency',
+                ln=ln)
 
         return page(title="Search frequency",
-                    body=perform_display_keyevent('search frequency', argd, req),
-                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
+                    body=perform_display_keyevent('search frequency', argd, req, ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
                     description="CDS, Statistics, Search frequency",
                     keywords="CDS, statistics, search frequency",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='search frequency')
+                    navmenuid='search frequency',
+                    language=ln)
 
     def search_type_distribution(self, req, form):
         """Search type distribution statistics page."""
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
+        argd = wash_urlargd(form, {'timespan': (str, "today"),
+                                   'format': (str, SUITABLE_GRAPH_FORMAT),
+                                   'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail,
+                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
                 text=auth_msg,
-                navmenuid='search type distribution')
-
-        argd = wash_urlargd(form, {'timespan': (str, "today"),
-                                   'format': (str, SUITABLE_GRAPH_FORMAT)})
+                navmenuid='search type distribution',
+                ln=ln)
 
         return page(title="Search type distribution",
-                    body=perform_display_keyevent('search type distribution', argd, req),
-                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
+                    body=perform_display_keyevent('search type distribution', argd, req, ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
                     description="CDS, Statistics, Search type distribution",
                     keywords="CDS, statistics, search type distribution",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='search type distribution')
+                    navmenuid='search type distribution',
+                    language=ln)
 
     def download_frequency(self, req, form):
         """Download frequency statistics page."""
+        argd = wash_urlargd(form, {'timespan': (str, "today"),
+                                   'format': (str, SUITABLE_GRAPH_FORMAT),
+                                   'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail,
+                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
                 text=auth_msg,
-                navmenuid='download frequency')
-
-        argd = wash_urlargd(form, {'timespan': (str, "today"),
-                                   'format': (str, SUITABLE_GRAPH_FORMAT)})
+                navmenuid='download frequency',
+                ln=ln)
 
         return page(title="Download frequency",
-                    body=perform_display_keyevent('download frequency', argd, req),
-                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
+                    body=perform_display_keyevent('download frequency', argd, req, ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
                     description="CDS, Statistics, Download frequency",
                     keywords="CDS, statistics, download frequency",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='download frequency')
+                    navmenuid='download frequency',
+                    language=ln)
 
     # CUSTOM EVENT SECTION
 
     def customevent(self, req, form):
         """Custom event statistics page"""
+        argd = wash_urlargd(form, {'ids': (list, []),
+                                   'timespan': (str, ""),
+                                   'format': (str, SUITABLE_GRAPH_FORMAT),
+                                   'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail,
+                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
                 text=auth_msg,
-                navmenuid='custom event')
-
-        argd = wash_urlargd(form, {'ids': (list, []),
-                                   'timespan': (str, ""),
-                                   'format': (str, SUITABLE_GRAPH_FORMAT)})
+                navmenuid='custom event',
+                ln=ln)
 
         return page(title="Custom event",
-                    body=perform_display_customevent(argd['ids'], argd, req=req),
-                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
+                    body=perform_display_customevent(argd['ids'], argd, req=req, ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
                     description="CDS Personalize, Statistics, Custom event",
                     keywords="CDS, statistics, custom event",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='custom event')
+                    navmenuid='custom event',
+                    language=ln)
 
     def customevent_help(self, req, form):
         """Custom event help page"""
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail,
+                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
                 text=auth_msg,
-                navmenuid='custom event help')
+                navmenuid='custom event help',
+                ln=ln)
 
         return page(title="Custom event help",
-                    body=perform_display_customevent_help(),
-                    navtrail="""<a class="navtrail" href="%s/stats">Statistics</a>""" % CFG_SITE_URL,
+                    body=perform_display_customevent_help(ln=ln),
+                    navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
+                    (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
                     description="CDS Personalize, Statistics, Custom event help",
                     keywords="CDS, statistics, custom event help",
                     req=req,
                     lastupdated=__lastupdated__,
-                    navmenuid='custom event help')
+                    navmenuid='custom event help',
+                    language=ln)
 
     # EXPORT SECTION
 
     def export(self, req, form):
         """Exports data"""
+        argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')
         if auth_code:
             return page_not_authorized(req,
-                navtrail=self.navtrail,
+                navtrail=self.navtrail % {'ln_link':(ln != CFG_SITE_LANG and '?ln='+ln) or ''},
                 text=auth_msg,
-                navmenuid='export')
+                navmenuid='export',
+                ln=ln)
 
         argd = wash_urlargd(form, {"filename": (str, ""),
                                    "mime": (str, "")})

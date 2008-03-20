@@ -23,7 +23,11 @@ __lastupdated__ = "$Date$"
 import os, time, re, datetime, cPickle, calendar
 
 from invenio import template
-from invenio.config import CFG_SITE_NAME, CFG_WEBDIR, CFG_TMPDIR
+from invenio.config import \
+     CFG_SITE_NAME, \
+     CFG_WEBDIR, \
+     CFG_TMPDIR, \
+     CFG_SITE_LANG
 from invenio.search_engine import get_alphabetically_ordered_collection_list
 from invenio.dbquery import run_sql
 from invenio.bibsched import is_task_scheduled, get_task_ids_by_descending_date, get_task_options
@@ -280,12 +284,12 @@ def cache_customevent_trend(ids=[]):
 
 # WEB
 
-def perform_request_index():
+def perform_request_index(ln=CFG_SITE_LANG):
     """
     Displays some informative text, the health box, and a the list of
     key/custom events.
     """
-    out = TEMPLATES.tmpl_welcome()
+    out = TEMPLATES.tmpl_welcome(ln=ln)
 
     # Prepare the health base data
     health_indicators = []
@@ -333,17 +337,17 @@ def perform_request_index():
     health_indicators.append(("Uptime cmd", get_keyevent_snapshot_uptime_cmd()))
 
     # Display the health box
-    out += TEMPLATES.tmpl_system_health(health_indicators)
+    out += TEMPLATES.tmpl_system_health(health_indicators, ln=ln)
 
     # Produce a list of the key statistics
-    out += TEMPLATES.tmpl_keyevent_list()
+    out += TEMPLATES.tmpl_keyevent_list(ln=ln)
 
     # Display the custom statistics
-    out += TEMPLATES.tmpl_customevent_list(_get_customevents())
+    out += TEMPLATES.tmpl_customevent_list(_get_customevents(), ln=ln)
 
     return out
 
-def perform_display_keyevent(id=None, args={}, req=None):
+def perform_display_keyevent(id=None, args={}, req=None, ln=CFG_SITE_LANG):
     """
     Display key events using a certain output type over the given time span.
 
@@ -368,7 +372,7 @@ def perform_display_keyevent(id=None, args={}, req=None):
     choosed = dict([(param, args[param]) for param in KEYEVENT_REPOSITORY[id]['extraparams']] +
                    [('timespan', args['timespan']), ('format', args['format'])])
     # Send to template to prepare event customization FORM box
-    out = TEMPLATES.tmpl_event_box(options, order, choosed)
+    out = TEMPLATES.tmpl_event_box(options, order, choosed, ln=ln)
 
     # Arguments OK?
 
@@ -380,7 +384,7 @@ def perform_display_keyevent(id=None, args={}, req=None):
     for param in choosed:
         if not choosed[param] in [x[0] for x in options[param][1]]:
             return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".'
-                                               % options[param][0] )
+                                               % options[param][0], ln=ln)
 
     # Arguments OK beyond this point!
 
@@ -421,9 +425,9 @@ def perform_display_keyevent(id=None, args={}, req=None):
                   "format": choosed['format'],
                   "multiple": KEYEVENT_REPOSITORY[id]['multiple'] }
 
-    return out + _perform_display_event(data, os.path.basename(filename), settings)
+    return out + _perform_display_event(data, os.path.basename(filename), settings, ln=ln)
 
-def perform_display_customevent(ids=[], args={}, req=None):
+def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
     """
     Display custom events using a certain output type over the given time span.
 
@@ -445,7 +449,7 @@ def perform_display_customevent(ids=[], args={}, req=None):
     # Build a dictionary for the selected parameters: { parameter name: argument internal name }
     choosed = { 'ids': ids, 'timespan': args['timespan'], 'format': args['format'] }
     # Send to template to prepare event customization FORM box
-    out = TEMPLATES.tmpl_event_box(options, order, choosed)
+    out = TEMPLATES.tmpl_event_box(options, order, choosed, ln=ln)
 
     # Arguments OK?
 
@@ -456,13 +460,13 @@ def perform_display_customevent(ids=[], args={}, req=None):
         if type(choosed[param]) is list:
             # If the argument is a list, like the content of 'ids' every value has to be checked
             if len(choosed[param]) == 0:
-                return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0] )
+                return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0], ln=ln)
             for arg in choosed[param]:
                 if not arg in legalvalues:
-                    return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0] )
+                    return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0], ln=ln)
         else:
             if not choosed[param] in legalvalues:
-                return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0] )
+                return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0], ln=ln)
 
     # Fetch time parameters from repository
     _, t_fullname, t_start, t_end, granularity, t_format, xtic_format = \
@@ -527,15 +531,15 @@ def perform_display_customevent(ids=[], args={}, req=None):
                  "format": choosed['format'],
                  "multiple": (type(ids) is list) and names or [] }
 
-    return out + _perform_display_event(data, os.path.basename(filename), settings)
+    return out + _perform_display_event(data, os.path.basename(filename), settings, ln=ln)
 
-def perform_display_customevent_help():
+def perform_display_customevent_help(ln=CFG_SITE_LANG):
     """Display the custom event help"""
-    return TEMPLATES.tmpl_customevent_help()
+    return TEMPLATES.tmpl_customevent_help(ln=ln)
 
 # INTERNALS
 
-def _perform_display_event(data, name, settings):
+def _perform_display_event(data, name, settings, ln=CFG_SITE_LANG):
     """
     Retrieves a graph.
 
@@ -557,13 +561,13 @@ def _perform_display_event(data, name, settings):
     if settings["format"] != "asciidump":
         create_graph_trend(data, path, settings)
         if settings["format"] == "asciiart":
-            return TEMPLATES.tmpl_display_event_trend_ascii(settings["title"], path)
+            return TEMPLATES.tmpl_display_event_trend_ascii(settings["title"], path, ln=ln)
         else:
-            return TEMPLATES.tmpl_display_event_trend_image(settings["title"], path)
+            return TEMPLATES.tmpl_display_event_trend_image(settings["title"], path, ln=ln)
     else:
         path += "_asciidump"
         create_graph_dump(data, path, settings)
-        return TEMPLATES.tmpl_display_event_trend_ascii(settings["title"], path)
+        return TEMPLATES.tmpl_display_event_trend_ascii(settings["title"], path, ln=ln)
 
 def _get_customevents():
     """
