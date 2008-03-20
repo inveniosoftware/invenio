@@ -567,7 +567,7 @@ def _perform_display_event(data, name, settings, ln=CFG_SITE_LANG):
                 try:
                     import Gnuplot
                 except ImportError:
-                    return 'Gnuplot is not installed. Returning ACII art.' +\
+                    return 'Gnuplot is not installed. Returning ASCII art.' +\
                            TEMPLATES.tmpl_display_event_trend_ascii(settings["title"], path, ln=ln)
 
             return TEMPLATES.tmpl_display_event_trend_image(settings["title"], path, ln=ln)
