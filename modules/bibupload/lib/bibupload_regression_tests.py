@@ -33,7 +33,8 @@ import time
 from urllib2 import urlopen
 from md5 import md5
 
-from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDIR
+from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDIR, \
+    CFG_WEBSUBMIT_FILEDIR
 from invenio import bibupload
 from invenio.bibupload_config import CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
                              CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
@@ -70,10 +71,9 @@ def compare_xmbuffers(xmbuffer1, xmbuffer2):
     xmbuffer2 = remove_blanks_from_xmbuffer(xmbuffer2)
 
     if xmbuffer1 != xmbuffer2:
-        print "\n=" + xmbuffer1 + "=\n"
-        print "\n=" + xmbuffer2 + "=\n"
+        return "\n=" + xmbuffer1 + "=\n" + '!=' + "\n=" + xmbuffer2 + "=\n"
 
-    return (xmbuffer1 == xmbuffer2)
+    return ''
 
 def remove_tag_001_from_hmbuffer(hmbuffer):
     """Remove tag 001 from HTML MARC buffer.  Useful for testing two
@@ -104,10 +104,9 @@ def compare_hmbuffers(hmbuffer1, hmbuffer2):
     compare_hmbuffers = hmbuffer1 == hmbuffer2
 
     if not compare_hmbuffers:
-        print "\n=" + hmbuffer1 + "=\n"
-        print "\n=" + hmbuffer2 + "=\n"
+        return "\n=" + hmbuffer1 + "=\n" + '!=' + "\n=" + hmbuffer2 + "=\n"
 
-    return compare_hmbuffers
+    return ''
 
 def try_url_download(url):
     """Try to download a given URL"""
@@ -217,10 +216,10 @@ class BibUploadInsertModeTest(unittest.TestCase):
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
         # Compare if the two MARCXML are the same
-        self.failUnless(compare_xmbuffers(remove_tag_001_from_xmbuffer(inserted_xm),
-                                          self.test))
-        self.failUnless(compare_hmbuffers(remove_tag_001_from_hmbuffer(inserted_hm),
-                                          self.test_hm))
+        self.assertEqual(compare_xmbuffers(remove_tag_001_from_xmbuffer(inserted_xm),
+                                          self.test), '')
+        self.assertEqual(compare_hmbuffers(remove_tag_001_from_hmbuffer(inserted_hm),
+                                          self.test_hm), '')
 
 class BibUploadAppendModeTest(unittest.TestCase):
     """Testing append mode."""
@@ -320,8 +319,8 @@ class BibUploadAppendModeTest(unittest.TestCase):
         after_append_xm = print_record(recid, 'xm')
         after_append_hm = print_record(recid, 'hm')
         # Compare if the two MARCXML are the same
-        self.failUnless(compare_xmbuffers(after_append_xm, self.test_expected_xm))
-        self.failUnless(compare_hmbuffers(after_append_hm, self.test_expected_hm))
+        self.assertEqual(compare_xmbuffers(after_append_xm, self.test_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(after_append_hm, self.test_expected_hm), '')
         # clean up after ourselves:
         bibupload.wipe_out_record_from_all_tables(self.test_recid)
         return
@@ -423,8 +422,8 @@ class BibUploadCorrectModeTest(unittest.TestCase):
         # test of the inserted record:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
-        self.failUnless(compare_xmbuffers(inserted_xm, self.testrec1_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm, self.testrec1_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm, self.testrec1_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm, self.testrec1_hm), '')
 
     def test_record_correction(self):
         """bibupload - correct mode, similar MARCXML tags/indicators"""
@@ -434,8 +433,8 @@ class BibUploadCorrectModeTest(unittest.TestCase):
         corrected_xm = print_record(recid, 'xm')
         corrected_hm = print_record(recid, 'hm')
         # did it work?
-        self.failUnless(compare_xmbuffers(corrected_xm, self.testrec1_corrected_xm))
-        self.failUnless(compare_hmbuffers(corrected_hm, self.testrec1_corrected_hm))
+        self.assertEqual(compare_xmbuffers(corrected_xm, self.testrec1_corrected_xm), '')
+        self.assertEqual(compare_hmbuffers(corrected_hm, self.testrec1_corrected_hm), '')
         # clean up after ourselves:
         bibupload.wipe_out_record_from_all_tables(recid)
         return
@@ -520,8 +519,8 @@ class BibUploadReplaceModeTest(unittest.TestCase):
         # test of the inserted record:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
-        self.failUnless(compare_xmbuffers(inserted_xm, self.testrec1_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm, self.testrec1_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm, self.testrec1_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm, self.testrec1_hm), '')
 
     def test_record_replace(self):
         """bibupload - replace mode, similar MARCXML tags/indicators"""
@@ -531,8 +530,8 @@ class BibUploadReplaceModeTest(unittest.TestCase):
         replaced_xm = print_record(recid, 'xm')
         replaced_hm = print_record(recid, 'hm')
         # did it work?
-        self.failUnless(compare_xmbuffers(replaced_xm, self.testrec1_replaced_xm))
-        self.failUnless(compare_hmbuffers(replaced_hm, self.testrec1_replaced_hm))
+        self.assertEqual(compare_xmbuffers(replaced_xm, self.testrec1_replaced_xm), '')
+        self.assertEqual(compare_hmbuffers(replaced_hm, self.testrec1_replaced_hm), '')
         # clean up after ourselves:
         bibupload.wipe_out_record_from_all_tables(recid)
         return
@@ -592,8 +591,8 @@ class BibUploadReferencesModeTest(unittest.TestCase):
         # test of the inserted record:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
-        self.failUnless(compare_xmbuffers(inserted_xm, self.test_insert))
-        self.failUnless(compare_hmbuffers(inserted_hm, self.test_insert_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm, self.test_insert), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm, self.test_insert_hm), '')
         self.test_recid = recid
 
     def test_reference_complete_xml_marc(self):
@@ -606,8 +605,8 @@ class BibUploadReferencesModeTest(unittest.TestCase):
         reference_xm = print_record(recid, 'xm')
         reference_hm = print_record(recid, 'hm')
         # Compare if the two MARCXML are the same
-        self.failUnless(compare_xmbuffers(reference_xm, self.test_reference_expected_xm))
-        self.failUnless(compare_hmbuffers(reference_hm, self.test_reference_expected_hm))
+        self.assertEqual(compare_xmbuffers(reference_xm, self.test_reference_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(reference_hm, self.test_reference_expected_hm), '')
         # clean up after ourselves:
         bibupload.wipe_out_record_from_all_tables(self.test_recid)
         return
@@ -706,8 +705,8 @@ class BibUploadFMTModeTest(unittest.TestCase):
         err, recid = bibupload.bibupload(recs[0], opt_mode='replace')
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
-        self.failUnless(compare_xmbuffers(inserted_xm, self.recid3_xm_before_all_the_tests))
-        self.failUnless(compare_hmbuffers(inserted_hm, self.recid3_hm_before_all_the_tests))
+        self.assertEqual(compare_xmbuffers(inserted_xm, self.recid3_xm_before_all_the_tests), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm, self.recid3_hm_before_all_the_tests), '')
 
     def test_inserting_new_record_containing_fmt_tag(self):
         """bibupload - FMT tag, inserting new record containing FMT tag"""
@@ -716,10 +715,10 @@ class BibUploadFMTModeTest(unittest.TestCase):
         xm_after = print_record(new_recid, 'xm')
         hm_after = print_record(new_recid, 'hm')
         hb_after = print_record(new_recid, 'hb')
-        self.failUnless(compare_xmbuffers(xm_after,
-                                          self.expected_xm_after_inserting_new_xm_with_fmt.replace('123456789', str(new_recid))))
-        self.failUnless(compare_hmbuffers(hm_after,
-                                          self.expected_hm_after_inserting_new_xm_with_fmt.replace('123456789', str(new_recid))))
+        self.assertEqual(compare_xmbuffers(xm_after,
+                                          self.expected_xm_after_inserting_new_xm_with_fmt.replace('123456789', str(new_recid))), '')
+        self.assertEqual(compare_hmbuffers(hm_after,
+                                          self.expected_hm_after_inserting_new_xm_with_fmt.replace('123456789', str(new_recid))), '')
         self.assertEqual(run_sql('SELECT last_updated from bibfmt WHERE id_bibrec=%s', (new_recid, ))[0][0], datetime.datetime(2008, 3, 14, 15, 14))
         self.failUnless(hb_after.startswith("Test. Okay."))
 
@@ -785,10 +784,10 @@ class BibUploadFMTModeTest(unittest.TestCase):
         xm_after = print_record(3, 'xm')
         hm_after = print_record(3, 'hm')
         hb_after = print_record(3, 'hb')
-        self.failUnless(compare_xmbuffers(xm_after,
-                                          '<record><controlfield tag="001">3</controlfield></record>'), 0)
-        self.failUnless(compare_hmbuffers(hm_after,
-                                          '000000003 001__ 3'), 0)
+        self.assertEqual(compare_xmbuffers(xm_after,
+                                          '<record><controlfield tag="001">3</controlfield></record>'), '')
+        self.assertEqual(compare_hmbuffers(hm_after,
+                                          '000000003 001__ 3'), '')
         self.failUnless(hb_after.startswith("Test. Let us see if this gets inserted well."))
         # now insert another format value and recheck:
         recs = bibupload.xml_marc_to_records(self.recid3_xm_with_fmt_only_second)
@@ -797,11 +796,11 @@ class BibUploadFMTModeTest(unittest.TestCase):
         hm_after = print_record(3, 'hm')
         hb_after = print_record(3, 'hb')
         hd_after = print_record(3, 'hd')
-        self.failUnless(compare_xmbuffers(xm_after, """
+        self.assertEqual(compare_xmbuffers(xm_after, """
                                            <record>
                                            <controlfield tag="001">3</controlfield>
-                                           </record>"""))
-        self.failUnless(compare_hmbuffers(hm_after, '000000003 001__ 3'))
+                                           </record>"""), '')
+        self.assertEqual(compare_hmbuffers(hm_after, '000000003 001__ 3'), '')
         self.failUnless(hb_after.startswith("Test. Yet another test, to be run after the first one."))
         self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
         # final insertion and recheck:
@@ -811,7 +810,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
         hm_after = print_record(3, 'hm')
         hb_after = print_record(3, 'hb')
         hd_after = print_record(3, 'hd')
-        self.failUnless(compare_xmbuffers(xm_after, """
+        self.assertEqual(compare_xmbuffers(xm_after, """
                                            <record>
                                            <controlfield tag="001">3</controlfield>
                                            <controlfield tag="003">SzGeCERN</controlfield>
@@ -823,13 +822,13 @@ class BibUploadFMTModeTest(unittest.TestCase):
                                            <subfield code="a">On the foos and bars</subfield>
                                            </datafield>
                                            </record>
-                                           """))
-        self.failUnless(compare_hmbuffers(hm_after, """
+                                           """), '')
+        self.assertEqual(compare_hmbuffers(hm_after, """
                                            001__ 3
                                            003__ SzGeCERN
                                            100__ $$aDoe, John$$uCERN
                                            245__ $$aOn the foos and bars
-                                           """))
+                                           """), '')
         self.failUnless(hb_after.startswith("Test. Here is some format value."))
         self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
         # restore original record 3:
@@ -997,10 +996,10 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         # use real recID when comparing whether it worked:
         self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
         self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                           self.xm_testrec1))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                           self.hm_testrec1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1), '')
         # insert record 2 first time:
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
@@ -1012,10 +1011,10 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         # use real recID when comparing whether it worked:
         self.xm_testrec2 =  self.xm_testrec2.replace('987654321', str(recid2))
         self.hm_testrec2 =  self.hm_testrec2.replace('987654321', str(recid2))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                           self.xm_testrec2))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                           self.hm_testrec2))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec2), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec2), '')
         # try to insert updated record 1, it should fail:
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
         task_set_option('verbose', 0)
@@ -1044,10 +1043,10 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         # use real recID in test buffers when comparing whether it worked:
         self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
         self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                           self.xm_testrec1))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          self.hm_testrec1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          self.hm_testrec1), '')
         # try to insert/replace updated record 1, it should be okay:
         task_set_option('verbose', self.verbose)
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
@@ -1059,10 +1058,10 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         # use real recID in test buffers when comparing whether it worked:
         self.xm_testrec1_updated =  self.xm_testrec1_updated.replace('123456789', str(recid1))
         self.hm_testrec1_updated =  self.hm_testrec1_updated.replace('123456789', str(recid1))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          self.xm_testrec1_updated))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          self.hm_testrec1_updated))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          self.xm_testrec1_updated), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          self.hm_testrec1_updated), '')
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
         bibupload.wipe_out_record_from_all_tables(recid1_updated)
@@ -1085,10 +1084,10 @@ class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
         # use real recID in test buffers when comparing whether it worked:
         self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
         self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                           self.xm_testrec1))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                           self.hm_testrec1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1), '')
         # try to replace record 2 it should fail:
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
@@ -1263,10 +1262,10 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
         # use real recID when comparing whether it worked:
         self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
         self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                           self.xm_testrec1))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                           self.hm_testrec1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1), '')
         # insert record 2 first time:
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
@@ -1277,10 +1276,10 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
         # use real recID when comparing whether it worked:
         self.xm_testrec2 =  self.xm_testrec2.replace('987654321', str(recid2))
         self.hm_testrec2 =  self.hm_testrec2.replace('987654321', str(recid2))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                           self.xm_testrec2))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                           self.hm_testrec2))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec2), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec2), '')
         # try to insert updated record 1, it should fail:
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
         err1_updated, recid1_updated = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -1308,10 +1307,10 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
         # use real recID in test buffers when comparing whether it worked:
         self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
         self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                           self.xm_testrec1))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          self.hm_testrec1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          self.hm_testrec1), '')
         # try to insert/replace updated record 1, it should be okay:
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
         err1_updated, recid1_updated = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
@@ -1321,10 +1320,10 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
         # use real recID in test buffers when comparing whether it worked:
         self.xm_testrec1_updated =  self.xm_testrec1_updated.replace('123456789', str(recid1))
         self.hm_testrec1_updated =  self.hm_testrec1_updated.replace('123456789', str(recid1))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          self.xm_testrec1_updated))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          self.hm_testrec1_updated))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          self.xm_testrec1_updated), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          self.hm_testrec1_updated), '')
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
         bibupload.wipe_out_record_from_all_tables(recid1_updated)
@@ -1347,10 +1346,10 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
         # use real recID in test buffers when comparing whether it worked:
         self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
         self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                           self.xm_testrec1))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                           self.hm_testrec1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1), '')
         # try to replace record 2 it should fail:
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
@@ -1522,10 +1521,10 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         # use real recID when comparing whether it worked:
         self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
         self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                           self.xm_testrec1))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                           self.hm_testrec1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1), '')
         # insert record 2 first time:
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
@@ -1536,10 +1535,10 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         # use real recID when comparing whether it worked:
         self.xm_testrec2 =  self.xm_testrec2.replace('987654321', str(recid2))
         self.hm_testrec2 =  self.hm_testrec2.replace('987654321', str(recid2))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                           self.xm_testrec2))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                           self.hm_testrec2))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec2), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec2), '')
         # try to insert updated record 1, it should fail:
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
         err1_updated, recid1_updated = bibupload.bibupload(recs[0], opt_mode='insert')
@@ -1563,10 +1562,10 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         # use real recID in test buffers when comparing whether it worked:
         self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
         self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                           self.xm_testrec1))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                           self.hm_testrec1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1), '')
         # try to insert/replace updated record 1, it should be okay:
         recs = bibupload.xml_marc_to_records(self.xm_testrec1_to_update)
         err1_updated, recid1_updated = bibupload.bibupload(recs[0], opt_mode='replace_or_insert')
@@ -1576,10 +1575,10 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         # use real recID in test buffers when comparing whether it worked:
         self.xm_testrec1_updated =  self.xm_testrec1_updated.replace('123456789', str(recid1))
         self.hm_testrec1_updated =  self.hm_testrec1_updated.replace('123456789', str(recid1))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          self.xm_testrec1_updated))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          self.hm_testrec1_updated))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          self.xm_testrec1_updated), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          self.hm_testrec1_updated), '')
         # delete test records
         bibupload.wipe_out_record_from_all_tables(recid1)
         bibupload.wipe_out_record_from_all_tables(recid1_updated)
@@ -1597,10 +1596,10 @@ class BibUploadRecordsWithOAIIDTest(unittest.TestCase):
         # use real recID in test buffers when comparing whether it worked:
         self.xm_testrec1 =  self.xm_testrec1.replace('123456789', str(recid1))
         self.hm_testrec1 =  self.hm_testrec1.replace('123456789', str(recid1))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                           self.xm_testrec1))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                           self.hm_testrec1))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                           self.xm_testrec1), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                           self.hm_testrec1), '')
         # try to replace record 2 it should fail:
         testrec_to_insert_first = self.xm_testrec2.replace('<controlfield tag="001">987654321</controlfield>',
                                                            '')
@@ -1654,10 +1653,10 @@ class BibUploadIndicatorsTest(unittest.TestCase):
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
-        self.failUnless(compare_xmbuffers(remove_tag_001_from_xmbuffer(inserted_xm),
-                                          self.testrec1_xm))
-        self.failUnless(compare_hmbuffers(remove_tag_001_from_hmbuffer(inserted_hm),
-                                          self.testrec1_hm))
+        self.assertEqual(compare_xmbuffers(remove_tag_001_from_xmbuffer(inserted_xm),
+                                          self.testrec1_xm), '')
+        self.assertEqual(compare_hmbuffers(remove_tag_001_from_hmbuffer(inserted_hm),
+                                          self.testrec1_hm), '')
         bibupload.wipe_out_record_from_all_tables(recid)
 
     def test_record_with_no_spaces_in_indicators(self):
@@ -1667,10 +1666,10 @@ class BibUploadIndicatorsTest(unittest.TestCase):
         err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
-        self.failUnless(compare_xmbuffers(remove_tag_001_from_xmbuffer(inserted_xm),
-                                          self.testrec2_xm))
-        self.failUnless(compare_hmbuffers(remove_tag_001_from_hmbuffer(inserted_hm),
-                                          self.testrec2_hm))
+        self.assertEqual(compare_xmbuffers(remove_tag_001_from_xmbuffer(inserted_xm),
+                                          self.testrec2_xm), '')
+        self.assertEqual(compare_hmbuffers(remove_tag_001_from_hmbuffer(inserted_hm),
+                                          self.testrec2_hm), '')
         bibupload.wipe_out_record_from_all_tables(recid)
 
 class BibUploadUpperLowerCaseTest(unittest.TestCase):
@@ -1722,14 +1721,14 @@ class BibUploadUpperLowerCaseTest(unittest.TestCase):
         recid2_inserted_xm = print_record(recid2, 'xm')
         recid2_inserted_hm = print_record(recid2, 'hm')
         # let us compare stuff now:
-        self.failUnless(compare_xmbuffers(remove_tag_001_from_xmbuffer(recid1_inserted_xm),
-                                          self.testrec1_xm))
-        self.failUnless(compare_hmbuffers(remove_tag_001_from_hmbuffer(recid1_inserted_hm),
-                                          self.testrec1_hm))
-        self.failUnless(compare_xmbuffers(remove_tag_001_from_xmbuffer(recid2_inserted_xm),
-                                          self.testrec2_xm))
-        self.failUnless(compare_hmbuffers(remove_tag_001_from_hmbuffer(recid2_inserted_hm),
-                                          self.testrec2_hm))
+        self.assertEqual(compare_xmbuffers(remove_tag_001_from_xmbuffer(recid1_inserted_xm),
+                                          self.testrec1_xm), '')
+        self.assertEqual(compare_hmbuffers(remove_tag_001_from_hmbuffer(recid1_inserted_hm),
+                                          self.testrec1_hm), '')
+        self.assertEqual(compare_xmbuffers(remove_tag_001_from_xmbuffer(recid2_inserted_xm),
+                                          self.testrec2_xm), '')
+        self.assertEqual(compare_hmbuffers(remove_tag_001_from_hmbuffer(recid2_inserted_hm),
+                                          self.testrec2_hm), '')
         # clean up after ourselves:
         bibupload.wipe_out_record_from_all_tables(recid1)
         bibupload.wipe_out_record_from_all_tables(recid2)
@@ -1805,8 +1804,8 @@ class BibUploadStrongTagsTest(unittest.TestCase):
         # test of the inserted record:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
-        self.failUnless(compare_xmbuffers(inserted_xm, self.testrec1_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm, self.testrec1_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm, self.testrec1_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm, self.testrec1_hm), '')
 
     def test_strong_tags_persistence(self):
         """bibupload - strong tags, persistence in replace mode"""
@@ -1816,8 +1815,8 @@ class BibUploadStrongTagsTest(unittest.TestCase):
         replaced_xm = print_record(recid, 'xm')
         replaced_hm = print_record(recid, 'hm')
         # did it work?
-        self.failUnless(compare_xmbuffers(replaced_xm, self.testrec1_replaced_xm))
-        self.failUnless(compare_hmbuffers(replaced_hm, self.testrec1_replaced_hm))
+        self.assertEqual(compare_xmbuffers(replaced_xm, self.testrec1_replaced_xm), '')
+        self.assertEqual(compare_hmbuffers(replaced_hm, self.testrec1_replaced_hm), '')
         # clean up after ourselves:
         bibupload.wipe_out_record_from_all_tables(recid)
         return
@@ -1831,6 +1830,26 @@ class BibUploadFFTModeTest(unittest.TestCase):
         res = run_sql('SELECT bd.status FROM bibrec_bibdoc as bb JOIN bibdoc as bd ON bb.id_bibdoc = bd.id WHERE bb.id_bibrec = %s AND bd.docname = %s', (recid, docname))
         self.failUnless(res)
         self.assertEqual(status, res[0][0])
+
+    def test_writing_rights(self):
+        """bibupload - FFT has writing rights"""
+        filename = os.path.join(CFG_WEBSUBMIT_FILEDIR, 'test.txt')
+        msg = ''
+        try:
+            open(filename, 'w').write('TEST')
+            result = open(filename, 'r').read() == 'TEST'
+            if not result:
+                msg = 'Error in reading %s' % filename
+        except Exception, msg:
+            result = False
+            msg = str(msg)
+
+        try:
+            os.remove(filename)
+        except OSError:
+            pass
+
+        self.failUnless(result, msg)
 
     def test_simple_fft_insert(self):
         """bibupload - simple FFT insert"""
@@ -1882,10 +1901,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
         self.failUnless(try_url_download(testrec_expected_url))
         bibupload.wipe_out_record_from_all_tables(recid)
 
@@ -1955,10 +1974,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
         self.assertEqual(urlopen(testrec_expected_url).read(), 'TEST')
         self.assertEqual(urlopen(testrec_expected_url2).read(), 'TEST')
         bibupload.wipe_out_record_from_all_tables(recid)
@@ -2071,12 +2090,12 @@ class BibUploadFFTModeTest(unittest.TestCase):
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
-        self.failUnless(try_url_download(testrec_expected_url1))
-        self.failUnless(try_url_download(testrec_expected_url2))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
+        self.assertEqual(try_url_download(testrec_expected_url1), '')
+        self.assertEqual(try_url_download(testrec_expected_url2), '')
 
         bibupload.wipe_out_record_from_all_tables(recid)
 
@@ -2142,10 +2161,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
 
         open_url = urlopen(testrec_expected_url)
         self.failUnless("This file is restricted" in open_url.read())
@@ -2215,10 +2234,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         # compare expected results:
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
 
         self.failUnless(try_url_download(testrec_expected_url))
         self.failUnless(try_url_download(testrec_expected_icon))
@@ -2308,10 +2327,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         # Using only html marc output is fine because a value is represented
         # by a single row, so a row to row comparison can be employed.
 
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
         for url in testrec_expected_urls:
             self.failUnless(try_url_download(url))
 
@@ -2389,10 +2408,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
         self.failUnless(try_url_download(testrec_expected_url))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
 
         self._test_bibdoc_status(recid, 'cds', '')
 
@@ -2482,10 +2501,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         inserted_hm = print_record(recid, 'hm')
 
         self.failUnless(try_url_download(testrec_expected_url))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
 
         self._test_bibdoc_status(recid, 'patata', '')
 
@@ -2574,10 +2593,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         inserted_hm = print_record(recid, 'hm')
 
         self.failUnless(try_url_download(testrec_expected_url))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
 
         self._test_bibdoc_status(recid, 'patata', '')
 
@@ -2657,10 +2676,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         inserted_hm = print_record(recid, 'hm')
 
         self.failUnless(try_url_download(testrec_expected_url))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
 
         self._test_bibdoc_status(recid, 'cds', '')
 
@@ -2755,10 +2774,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         inserted_hm = print_record(recid, 'hm')
 
         self.failUnless(try_url_download(testrec_expected_url))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
 
         self._test_bibdoc_status(recid, 'patata', 'New restricted')
 
@@ -2859,10 +2878,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
         self.failUnless(try_url_download(testrec_expected_url))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
 
         self._test_bibdoc_status(recid, 'cds', '')
         self._test_bibdoc_status(recid, 'head', '')
@@ -2960,10 +2979,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
         self.failUnless(try_url_download(testrec_expected_url))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
 
         self._test_bibdoc_status(recid, 'cds', '')
 
@@ -3058,10 +3077,10 @@ class BibUploadFFTModeTest(unittest.TestCase):
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
         self.failUnless(try_url_download(testrec_expected_url))
-        self.failUnless(compare_xmbuffers(inserted_xm,
-                                          testrec_expected_xm))
-        self.failUnless(compare_hmbuffers(inserted_hm,
-                                          testrec_expected_hm))
+        self.assertEqual(compare_xmbuffers(inserted_xm,
+                                          testrec_expected_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm,
+                                          testrec_expected_hm), '')
 
         expected_content_version = urlopen('%s/img/head.gif' % CFG_SITE_URL).read()
 
