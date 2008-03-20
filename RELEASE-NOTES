@@ -38,7 +38,9 @@ following steps:
      saying that upgrade is in progress, and restart Apache.
 
    - Take a backup of your current MySQL database and your CDS Invenio
-     installation directory (usually /opt/cds-invenio).
+     installation directory (usually /opt/cds-invenio).  Remove your
+     old /opt/cds-invenio/lib/python/invenio/magic and
+     /opt/cds-invenio/var/www/help directories.
 
    - First of all, note that CDS Invenio v0.99.0 must use MySQL server
      at least 4.1 and the database must be running in UTF-8 mode.  If
