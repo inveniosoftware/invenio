@@ -886,7 +886,8 @@ def main():
     except ValueError:
         usage(1, "Mode must be an integer")
 
-    options["webdoc"] = args[0]
+    if len(args) > 0:
+        options["webdoc"] = args[0]
 
     if not options.has_key("webdoc"):
         usage(0)
