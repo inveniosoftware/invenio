@@ -200,8 +200,8 @@ def get_webdoc_parts(webdoc,
                 webdoc_cached_part_path = get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, ln, part)
             elif os.path.exists(get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, CFG_SITE_LANG, part)):
                 # Check CFG_SITE_LANG
-                webdoc_cached_part_path = get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, 'en', part)
-            elif os.path.exists(get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, ln, part)):
+                webdoc_cached_part_path = get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, CFG_SITE_LANG, part)
+            elif os.path.exists(get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, 'en', part)):
                 # Check English
                 webdoc_cached_part_path = get_webdoc_cached_part_path(_web_doc_cache_dir, webdoc, 'en', part)
 
@@ -210,7 +210,8 @@ def get_webdoc_parts(webdoc,
                     webdoc_cached_part = file(webdoc_cached_part_path, 'r').read()
                     html_parts[part] = webdoc_cached_part
                 except IOError:
-                    # Could not read cache file. Generate on-the-fly
+                    # Could not read cache file. Generate on-the-fly,
+                    # get all the parts at the same time, and return
                     (webdoc_source_path, \
                      webdoc_cache_dir, \
                      webdoc_name,\
@@ -218,18 +219,22 @@ def get_webdoc_parts(webdoc,
                      webdoc_cache_modification_date) = get_webdoc_info(webdoc)
                     webdoc_source = file(webdoc_source_path, 'r').read()
                     htmls = transform(webdoc_source, languages=[ln])
-                    (lang, body, title, keywords, \
-                     navtrail, lastupdated, description) = htmls[-1]
-                    html_parts =  {'body': body or '',
-                                   'title': title or '',
-                                   'keywords': keywords or '',
-                                   'navtrail': navtrail or '',
-                                   'lastupdated': lastupdated or '',
-                                   'description': description or ''}
-                break
+                    if len(htmls) > 0:
+                        (lang, body, title, keywords, \
+                         navtrail, lastupdated, description) = htmls[-1]
+                        html_parts =  {'body': body or '',
+                                       'title': title or '',
+                                       'keywords': keywords or '',
+                                       'navtrail': navtrail or '',
+                                       'lastupdated': lastupdated or '',
+                                       'description': description or ''}
+                    # We then have all the parts, or there is no
+                    # translation for this file (if len(htmls)==0)
+                    break
             else:
                 # Could not find/read the folder where cache should
-                # be. Generate on-the-fly
+                # be. Generate on-the-fly, get all the parts at the
+                # same time, and return
                 (webdoc_source_path, \
                  webdoc_cache_dir, \
                  webdoc_name,\
@@ -239,18 +244,21 @@ def get_webdoc_parts(webdoc,
                     try:
                         webdoc_source = file(webdoc_source_path, 'r').read()
                         htmls = transform(webdoc_source, languages=[ln])
-                        (lang, body, title, keywords, \
-                         navtrail, lastupdated, description) = htmls[-1]
-                        html_parts =  {'body': body or '',
-                                       'title': title or '',
-                                       'keywords': keywords or '',
-                                       'navtrail': navtrail or '',
-                                       'lastupdated': lastupdated or '',
-                                       'description': description or ''}
+                        if len(htmls) > 0:
+                            (lang, body, title, keywords, \
+                             navtrail, lastupdated, description) = htmls[-1]
+                            html_parts =  {'body': body or '',
+                                           'title': title or '',
+                                           'keywords': keywords or '',
+                                           'navtrail': navtrail or '',
+                                           'lastupdated': lastupdated or '',
+                                           'description': description or ''}
+                        # We then have all the parts, or there is no
+                        # translation for this file (if len(htmls)==0)
                         break
                     except IOError:
                         # Nothing we can do..
-                        continue
+                        break
 
     return html_parts
 
@@ -291,7 +299,7 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
             for (lang, body, title, keywords, \
                  navtrail, lastupdated, description) in htmls:
                 # Body
-                if body is not None:
+                if body is not None or lang == CFG_SITE_LANG:
                     try:
                         write_cache_file('%(name)s.body%(lang)s.html' % \
                                          {'name': webdoc_name,
@@ -305,7 +313,7 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                         print e
 
                 # Title
-                if title is not None:
+                if title is not None or lang == CFG_SITE_LANG:
                     try:
                         write_cache_file('%(name)s.title%(lang)s.html' % \
                                          {'name': webdoc_name,
@@ -319,7 +327,7 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                         print e
 
                 # Keywords
-                if keywords is not None:
+                if keywords is not None or lang == CFG_SITE_LANG:
                     try:
                         write_cache_file('%(name)s.keywords%(lang)s.html' % \
                                          {'name': webdoc_name,
@@ -333,7 +341,7 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                         print e
 
                 # Navtrail
-                if navtrail is not None:
+                if navtrail is not None or lang == CFG_SITE_LANG:
                     try:
                         write_cache_file('%(name)s.navtrail%(lang)s.html' % \
                                          {'name': webdoc_name,
@@ -347,7 +355,7 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                         print e
 
                 # Description
-                if description is not None:
+                if description is not None or lang == CFG_SITE_LANG:
                     try:
                         write_cache_file('%(name)s.description%(lang)s.html' % \
                                          {'name': webdoc_name,
@@ -361,7 +369,7 @@ def update_webdoc_cache(webdoc, mode=1, verbose=0, languages=CFG_SITE_LANGS):
                         print e
 
                 # Last updated timestamp (CVS timestamp)
-                if lastupdated is not None:
+                if lastupdated is not None or lang == CFG_SITE_LANG:
                     try:
                         write_cache_file('%(name)s.lastupdated%(lang)s.html' % \
                                          {'name': webdoc_name,
@@ -715,6 +723,9 @@ def write_cache_file(filename, webdoc_cache_dir, filebody, verbose=0):
     # open file:
     mymkdir(webdoc_cache_dir)
     fullfilename = webdoc_cache_dir + os.sep + filename
+
+    if filebody is None:
+        filebody = ''
 
     os.umask(022)
     f = open(fullfilename, "w")
