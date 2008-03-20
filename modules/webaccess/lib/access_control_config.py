@@ -24,7 +24,8 @@ __revision__ = \
 
 # pylint: disable-msg=C0301
 
-from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE
+from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_LANG, \
+     CFG_SITE_SECURE_URL, CFG_SITE_SUPPORT_EMAIL, CFG_CERN_SITE
 import cPickle
 from zlib import compress
 from invenio.messages import gettext_set_language
@@ -165,8 +166,7 @@ DEF_DEMO_AUTHS = (
              ('bookadmin', 'referee', -1, 0, {'doctype': 'DEMOBOO', 'categ': '*'}),
             )
 
-
-_ = gettext_set_language('en')
+_ = gettext_set_language(CFG_SITE_LANG)
 CFG_ACC_ACTIVITIES_URLS = {
     'runbibedit' : (_("Run BibEdit"), "%s/admin/bibedit/bibeditadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),
