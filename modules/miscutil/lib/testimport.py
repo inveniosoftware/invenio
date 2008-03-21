@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -35,7 +35,7 @@ def deduce_site_packages_location():
        invenio module symlink."""
     out = "/usr/lib/python2.3/site-packages" # example directory
     for path in sys.path:
-        if path.endswith("site-package"):
+        if path.endswith("site-packages"):
             out = path # put proper directory instead of the example one
             break
     return out
@@ -46,7 +46,7 @@ except IndexError:
     print "Error: no argument passed."
     print "Usage: %s <prefix>" % sys.argv[0]
     sys.exit(1)
-    
+
 try:
     import invenio
     DUMMY = invenio # to make checkers happy
@@ -60,9 +60,9 @@ except ImportError, e:
     ** to your CDS Invenio installation directory?      **
     **                                                  **
     ** If yes, then please create it via:               **
-    **                                                  
+    **
     **    $ sudo ln -s %s/lib/python/invenio %s/invenio
-    **                                                  
+    **
     ** and continue with the 'make install' afterwards. **
     **                                                  **
     ** If not, then please inspect the above error      **
