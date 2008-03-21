@@ -739,44 +739,60 @@ def cli_cmd_list(conf):
         for option in conf.options(section):
             print option, '=', conf.get(section, option)
 
+def _grep_version_from_executable(path_to_exec, version_regexp):
+    """
+    Try to detect a program version by digging into its binary
+    PATH_TO_EXEC and looking for VERSION_REGEXP.  Return program
+    version as a string.  Return empty string if not succeeded.
+    """
+    exec_version = ""
+    if os.path.exists(path_to_exec):
+        dummy1, cmd2_out, dummy2 = run_command("strings %s | grep %s" % \
+                                               (path_to_exec, version_regexp))
+        if cmd2_out:
+            for cmd2_out_line in cmd2_out.split("\n"):
+                if len(cmd2_out_line) > len(exec_version):
+                    # the longest the better
+                    exec_version = cmd2_out_line
+    return exec_version
+
 def detect_apache_version():
     """
-    Try to detect Apache httpd version by localizing httpd or apache2
-    executables and digging into binary.  Return Apache version as a
-    string.  Return empty string if not succeed.
+    Try to detect Apache version by localizing httpd or apache
+    executables and grepping inside binaries.  Return list of all
+    found Apache versions and paths.  (For a given executable, the
+    returned format is 'apache_version [apache_path]'.)  Return empty
+    list if no success.
     """
-    apache_version = ""
-    dummy1, cmd_out, dummy2 = run_command("locate bin/httpd bin/apache2")
+    out = []
+    dummy1, cmd_out, dummy2 = run_command("locate bin/httpd bin/apache")
     for apache in cmd_out.split("\n"):
-        if os.path.exists(apache):
-            dummy3, cmd2_out, dummy4 = run_command("strings %s | grep ^Apache\/" % apache)
-            if cmd2_out:
-                for cmd2_out_line in cmd2_out.split("\n"):
-                    if len(cmd2_out_line) > len(apache_version):
-                        # the longest the better
-                        apache_version = cmd2_out_line
-    return apache_version
+        apache_version = _grep_version_from_executable(apache, '^Apache\/')
+        if apache_version:
+            out.append("%s [%s]" % (apache_version, apache))
+    return out
 
 def detect_modpython_version():
     """
-    Try to detect mod_python version.  Return mod_python version as a
-    string.  Return empty string if no success.
+    Try to detect mod_python version, either from mod_python import or
+    from grepping inside mod_python.so, like Apache.  Return list of
+    all found mod_python versions and paths.  Return empty list if no
+    success.
     """
+    out = []
     try:
         from mod_python import version
+        out.append(version)
     except ImportError:
         # try to detect via looking at mod_python.so:
         version = ""
         dummy1, cmd_out, dummy2 = run_command("locate /mod_python.so")
         for modpython in cmd_out.split("\n"):
-            if os.path.exists(modpython):
-                dummy3, cmd2_out, dummy4 = run_command("strings %s | grep ^mod_python\/" % modpython)
-                if cmd2_out:
-                    for cmd2_out_line in cmd2_out.split("\n"):
-                        if len(cmd2_out_line) > len(version):
-                            # the longest the better
-                            version = cmd2_out_line
-    return version
+            modpython_version = _grep_version_from_executable(modpython,
+                                                              '^mod_python\/')
+            if modpython_version:
+                out.append("%s [%s]" % (modpython_version, modpython))
+    return out
 
 def cli_cmd_detect_system_details(conf):
     """
@@ -788,8 +804,8 @@ def cli_cmd_detect_system_details(conf):
     print "* Hostname: " + socket.gethostname()
     print "* Invenio version: " + conf.get("Invenio", "CFG_VERSION")
     print "* Python version: " + sys.version.replace("\n", " ")
-    print "* Apache version: " + detect_apache_version()
-    print "* mod_python version: " + detect_modpython_version()
+    print "* Apache version: " + ";\n                  ".join(detect_apache_version())
+    print "* mod_python version: " + ";\n                  ".join(detect_modpython_version())
     print "* MySQLdb version: " + MySQLdb.__version__
     try:
         from invenio.dbquery import run_sql
