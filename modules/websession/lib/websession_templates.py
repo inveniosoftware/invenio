@@ -257,7 +257,7 @@ class Template:
         out += """</select></td><td valign="top"><strong>%(select_lang)s</strong></td></tr>
             <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
         </table></form>""" % {
-            'select_lang' : _('Select the desired language to be used within the web interface.'),
+            'select_lang' : _('Select desired language of the web interface.'),
             'update_settings' : _('Update settings')
         }
         return out
@@ -835,7 +835,7 @@ class Template:
                        'referer' : cgi.escape(referer),
                        'username' : _("Username"),
                        'password' : _("Password"),
-                       'remember_me' : _("Remember the login on this browser."),
+                       'remember_me' : _("Remember login on this computer."),
                        'login' : _("login"),
                        }
         if internal:
