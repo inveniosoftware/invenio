@@ -31,8 +31,12 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#3.1">Regression testing philosophy</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#3.2">Writing regression tests</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.3 <a href="#3.3">Running regression tests</a><br />
-<strong>4. <a href="#4">Conclusions</a></strong><br />
-<strong>5. <a href="#5">Additional information</a></strong><br />
+<strong>4. <a href="#4">Web testing (via real browser)</a></strong><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.1 <a href="#4.1">Web testing philosophy</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.2 <a href="#4.2">Writing web tests</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 4.3 <a href="#4.3">Running web tests</a><br />
+<strong>5. <a href="#5">Conclusions</a></strong><br />
+<strong>6. <a href="#6">Additional information</a></strong><br />
 
 <a name="1"></a><h2>1. General considerations</h2>
 
@@ -276,8 +280,8 @@ bug, see the 80/20 thumb rule cited above.)
 <p>Moreover, the regression test suite should be used when the
 functionality of the item we would like to test depends on
 extra-parametrical status, such as the database content.  Also, the
-regression framework is suitable for testing the web pages overall
-behaviour.  (In extreme programming, the regression testing is called
+regression framework is suitable for testing the overall behaviour of
+web pages.  (In extreme programming, the regression testing is called
 <em>acceptance testing</em>, the name that evolved from previous
 <em>functionality testing</em>.)
 </p>
@@ -285,7 +289,8 @@ behaviour.  (In extreme programming, the regression testing is called
 <p>Within the framework of the regression test suite, we have liberty
 to alter database content, unlike that of the unit testing framework.
 We can also simulate the web browser in order to test web
-applications.
+applications.  (Note that for real browser tests, we have yet
+another <a href="#4">web test suite</a> described below.)
 </p>
 
 <p>As an example of a regression test, we can test whether the web
@@ -390,6 +395,19 @@ except ValueError:
 <code>_regression_tests.py</code> files in the source distribution.
 </p>
 
+<p>It is to be noted that regression tests using the simple mechanize
+browser emulation (i) cannot test advanced web technologies such as
+JavaScript and AJAX.  Hence, for example, we cannot use them to test
+submission pages that are currently heavily replying on JavaScript.
+Moreover, with the mechanise browser emulation, it may be (ii)
+cumbersome to write tests for operations that require going through
+several pages etc.  For these purposes we use the <a href="#4">web
+test suite</a> that can run in a real browser.  We shall describe this
+test suite below.  Nevertheless, for quick testing of HTTP GET pages
+or other single-page web operations, the regression tests are very
+easy to write and more practical then using the below-described web
+test suite.</p>
+
 <a name="3.3"></a><h3>3.3 Running regression test suite</h3>
 
 <p>The regression test suite can be run by invoking:
@@ -454,7 +472,67 @@ the output similar to the unit test suite that was discussed
 previously.
 </p>
 
-<a name="4"></a><h2>4. Conclusions</h2>
+<a name="4"></a><h2>4. Web testing (via real browser)</h2>
+
+<a name="4.1"></a><h3>4.1 Web testing philosophy</h3>
+
+<p>Even though the regression test suite can take care of testing of
+simple, mostly single-page web operations, it is useful to distinguish
+between testing of web pages via an emulated browser (regression tests
+using mechanize) and testing of web pages via a real browser.  The
+latter tests run slower, but are closer to the end user environment,
+can easily use real JavaScript engine, and can generally more easily
+test more complex multi-page operations.</p>
+
+<p>CDS Invenio currently uses the
+<a href="http://www.mozilla.com/en-US/firefox/">Firefox</a> browser
+with the <a href="http://selenium-ide.openqa.org/">Selenium IDE</a>
+extension to automatize its real-browser web tests.</p>
+
+<a name="4.2"></a><h3>4.2 Writing web tests</h3>
+
+<p>Selenium IDE uses "Selenise HTML" to represent test cases via HTML
+tables with rows representing actions and expected results.  You can
+take a look at <code>test_search_ellis.html</code> example and emulate
+one.</p>
+
+<p>However, the most practical way to write web test cases might be to
+use Selenium IDE test recording capabilities: you surf in Firefox as a
+normal user would, and you add simple tests for the presence of
+certain text on the pages as you go.  Selenium IDE can record and
+store tests for further replaying.  (You can watch an explanatory
+movie
+on <a href="http://wiki.openqa.org/download/attachments/400/Selenium+IDE.swf">how
+to record a test</a>.)
+
+<p>(Note that sne inconvenience with recording test cases is that this
+is usually done <em>a posteriori</em> when the web pages are written
+already, which does not go well with with test-driven development
+practices.  But some of TDD goals can be developed by using regression
+test suite with mechanize instead.)</p>
+
+<p>When the test is recorded and the Selenese HTML test case is
+written, edit its source and pay attention to using default URLs
+as <code>http://localhost</code>, and install it into <code>web</code>
+directory following e.g. <code>websearch/web</code> example.
+
+<a name="4.3"></a><h3>4.3 Running web tests</h3>
+
+<p>Run web tests via:
+
+
+<blockquote>
+<pre>
+$ /opt/cds-invenio/bin/inveniocfg --run-web-tests
+</pre>
+</blockquote>
+
+<p>This will build complete web test suite out of
+module-specific <code>test_foo_bar.html</code> files, and will open a
+Firefox window with Selenium IDE running the built complete test
+suite.  Check the results there.
+
+<a name="5"></a><h2>5. Conclusions</h2>
 
 <p>A uniform testing technique and two test suites (unit test suite,
 regression test suite) were discussed.  Each programmer should plan to
@@ -464,7 +542,7 @@ application behaviour (regression tests).  The guidelines were given
 how to do so.
 </p>
 
-<a name="5"></a><h2>5. Additional information</h2>
+<a name="6"></a><h2>6. Additional information</h2>
 
 <dl>
 <dt>More information can be found on the URLs mentioned above:
@@ -475,6 +553,7 @@ how to do so.
 <a href="http://docs.python.org/lib/module-unittest.html">http://docs.python.org/lib/module-unittest.html</a>
 <a href="http://diveintopython.org/unit_testing/">http://diveintopython.org/unit_testing/</a>
 <a href="http://wwwsearch.sourceforge.net/mechanize/">http://wwwsearch.sourceforge.net/mechanize/</a>
+<a href="http://selenium.openqa.org/">http://selenium.openqa.org/</a>
 </pre>
 </dl>
 
