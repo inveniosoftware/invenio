@@ -24,7 +24,6 @@ WebDoc -- Transform webdoc sources into static html files
 __revision__ = \
     "$Id$"
 
-
 from invenio.config import \
      CFG_PREFIX, \
      CFG_SITE_LANG, \
@@ -431,7 +430,7 @@ def read_webdoc_source(webdoc):
 
 def get_webdoc_info(webdoc):
     """
-    Locate the file corresponding to given webdoc and returns its
+    Locate the file corresponding to given webdoc and return its
     path, the path to its cache directory (even if it does not exist
     yet), the last modification dates of the source and the cache, and
     the webdoc name (i.e. webdoc id)
@@ -439,8 +438,8 @@ def get_webdoc_info(webdoc):
     Parameters:
 
        webdoc - *string* the name of a webdoc that can be found in
-                 standard webdoc dir, or a webdoc filepath. Priority
-                 is given to filepath if both match.
+                 standard webdoc dirs.  (Without extension '.webdoc',
+                 hence 'search-guide', not'search-guide.webdoc'.)
 
     Returns: *tuple* (webdoc_source_path, webdoc_cache_dir,
                       webdoc_name webdoc_source_modification_date,
@@ -453,25 +452,18 @@ def get_webdoc_info(webdoc):
     webdoc_source_modification_date = 1
     webdoc_cache_modification_date  = 0
 
-    # Search at given path or in webdoc cache dir
-    if os.path.exists(os.path.abspath(webdoc)):
-        webdoc_source_path = os.path.abspath(webdoc)
-        (webdoc_cache_dir, webdoc_name) = os.path.split(webdoc_source_path)
-        (webdoc_name, extension) = os.path.splitext(webdoc_name)
-        webdoc_source_modification_date = os.stat(webdoc_source_path).st_mtime
-    else:
-        for (_webdoc_source_dir, _web_doc_cache_dir) in webdoc_dirs.values():
-            webdoc_source_path = _webdoc_source_dir + os.sep + \
-                                 webdoc + '.webdoc'
-            if os.path.exists(webdoc_source_path):
-                webdoc_cache_dir = _web_doc_cache_dir + os.sep + webdoc
-                webdoc_name = webdoc
-                webdoc_source_modification_date = os.stat(webdoc_source_path).st_mtime
-                break
-            else:
-                webdoc_source_path = None
-                webdoc_name = None
-                webdoc_source_modification_date = 1
+    for (_webdoc_source_dir, _web_doc_cache_dir) in webdoc_dirs.values():
+        webdoc_source_path = _webdoc_source_dir + os.sep + \
+                             webdoc + '.webdoc'
+        if os.path.exists(webdoc_source_path):
+            webdoc_cache_dir = _web_doc_cache_dir + os.sep + webdoc
+            webdoc_name = webdoc
+            webdoc_source_modification_date = os.stat(webdoc_source_path).st_mtime
+            break
+        else:
+            webdoc_source_path = None
+            webdoc_name = None
+            webdoc_source_modification_date = 1
 
     if webdoc_cache_dir is not None and \
            os.path.exists(webdoc_cache_dir + os.sep + 'last_updated'):
@@ -832,7 +824,7 @@ def usage(exitcode=1, msg=""):
     """Prints usage info."""
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
-    sys.stderr.write("Usage: %s [options] <webdocfile>\n" % sys.argv[0])
+    sys.stderr.write("Usage: %s [options] <webdocname>\n" % sys.argv[0])
     sys.stderr.write("  -h,  --help                \t\t Print this help.\n")
     sys.stderr.write("  -V,  --version             \t\t Print version information.\n")
     sys.stderr.write("  -v,  --verbose=LEVEL       \t\t Verbose level (0=min,1=normal,9=max).\n")
@@ -895,7 +887,7 @@ def main():
     # check if webdoc exists
     infos = get_webdoc_info(options["webdoc"])
     if infos[0] is None:
-        usage(1, "Could not find %s" %  options["webdoc"])
+        usage(1, "Could not find %s" % options["webdoc"])
 
     update_webdoc_cache(webdoc=options["webdoc"],
                         mode=options["mode"],
