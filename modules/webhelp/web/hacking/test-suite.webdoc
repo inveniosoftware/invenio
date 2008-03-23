@@ -476,13 +476,17 @@ previously.
 
 <a name="4.1"></a><h3>4.1 Web testing philosophy</h3>
 
-<p>Even though the regression test suite can take care of testing of
-simple, mostly single-page web operations, it is useful to distinguish
-between testing of web pages via an emulated browser (regression tests
-using mechanize) and testing of web pages via a real browser.  The
-latter tests run slower, but are closer to the end user environment,
-can easily use real JavaScript engine, and can generally more easily
-test more complex multi-page operations.</p>
+<p>The web test suite bears many similarities with the black-box
+functional acceptance testing that the regression test suite also
+provides.  We have seen that the regression test suite (using
+mechanize) can very well take care of testing of simple single-page
+web scenarios.  Nevertheless, it is useful to distinguish between
+testing of web pages via an emulated browser (mechanize) and testing
+of web pages via a real browser.  The latter tests run slower, but are
+closer to the end user environment, can use real JavaScript engine,
+and can generally more easily test various complex multi-page
+scenarios.  It is the latter type of acceptance tests that we are
+concerned with here.</p>
 
 <p>CDS Invenio currently uses the
 <a href="http://www.mozilla.com/en-US/firefox/">Firefox</a> browser
@@ -494,7 +498,7 @@ extension to automatize its real-browser web tests.</p>
 <p>Selenium IDE uses "Selenise HTML" to represent test cases via HTML
 tables with rows representing actions and expected results.  You can
 take a look at <code>test_search_ellis.html</code> example and emulate
-one.</p>
+it.</p>
 
 <p>However, the most practical way to write web test cases might be to
 use Selenium IDE test recording capabilities: you surf in Firefox as a
@@ -505,11 +509,11 @@ movie
 on <a href="http://wiki.openqa.org/download/attachments/400/Selenium+IDE.swf">how
 to record a test</a>.)
 
-<p>(Note that sne inconvenience with recording test cases is that this
+<p>(Note that one inconvenience with recording test cases is that this
 is usually done <em>a posteriori</em> when the web pages are written
 already, which does not go well with with test-driven development
-practices.  But some of TDD goals can be developed by using regression
-test suite with mechanize instead.)</p>
+practices.  But some of TDD goals can be met by using regression test
+suite with mechanize instead.)</p>
 
 <p>When the test is recorded and the Selenese HTML test case is
 written, edit its source and pay attention to using default URLs
