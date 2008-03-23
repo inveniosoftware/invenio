@@ -31,7 +31,7 @@ __revision__ = \
 from invenio.webinterface_handler import create_handler
 
 from invenio.websearch_webinterface import WebInterfaceSearchInterfacePages, \
-     WebInterfaceAuthorPage, WebInterfaceRSSFeedServicePages
+     WebInterfaceAuthorPages, WebInterfaceRSSFeedServicePages
 from invenio.websubmit_webinterface import websubmit_legacy_getfile, \
      WebInterfaceSubmitPages
 from invenio.websession_webinterface import WebInterfaceYourAccountPages, \
@@ -55,7 +55,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     the other modules."""
 
     _exports = WebInterfaceSearchInterfacePages._exports + \
-        WebInterfaceAuthorPage._exports + [
+        WebInterfaceAuthorPages._exports + [
         'youraccount',
         'youralerts',
         'yourbaskets',
@@ -76,7 +76,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         self.getfile = websubmit_legacy_getfile
         return
 
-    author = WebInterfaceAuthorPage()
+    author = WebInterfaceAuthorPages()
 
     submit = WebInterfaceSubmitPages()
 

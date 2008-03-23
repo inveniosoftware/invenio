@@ -102,8 +102,8 @@ def wash_search_urlargd(form):
     return argd
 
 
-class WebInterfaceAuthorPage(WebInterfaceDirectory):
-    """ Handle /author/Doe%2C+John etc """
+class WebInterfaceAuthorPages(WebInterfaceDirectory):
+    """ Handle /author/Doe%2C+John etc set of pages."""
 
     _exports = ['author']
 
@@ -113,7 +113,7 @@ class WebInterfaceAuthorPage(WebInterfaceDirectory):
 
     def _lookup(self, component, path):
         """This handler parses dynamic URLs (/author/John+Doe)."""
-        return WebInterfaceAuthorPage(component), path
+        return WebInterfaceAuthorPages(component), path
 
     def __call__(self, req, form):
         """Serve the page in the given language."""
