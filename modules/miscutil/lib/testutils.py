@@ -37,24 +37,44 @@ from urllib import urlencode
 from itertools import chain, repeat
 
 import invenio
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_LOGDIR
-from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, CFG_TESTS_REQUIRE_HTML_VALIDATION
+from invenio.config import CFG_PREFIX, \
+     CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_LOGDIR
+from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, \
+     CFG_TESTS_REQUIRE_HTML_VALIDATION
 
-def warn_user_about_tests():
-    """ Put a standard warning about running tests that might modify
-    user data"""
+def warn_user_about_tests(test_suite_type='regression'):
+    """
+    Display a standard warning about running tests that might modify
+    user data, and wait for user confirmation, unless --yes-i-know
+    was specified in the comman line.
+    """
 
     # Provide a command line option to avoid having to type the
     # confirmation every time during development.
     if '--yes-i-know' in sys.argv:
         return
 
+    if test_suite_type == 'web':
+        sys.stderr.write("""\
+**********************************************************************
+**                                                                  **
+**     A B O U T   T H E   W E B   T E S T   S U I T E              **
+**                                                                  **
+** The web test suite will be launched in Firefox.  You must have   **
+** the Selenium IDE extension installed to be able to run the web   **
+** test suite.  If you do, please check out the results of the web  **
+** test suite in the Selenium IDE window.                           **
+**                                                                  **
+**********************************************************************
+
+""")
+
     sys.stderr.write("""\
 **********************************************************************
 **                                                                  **
-**  ***  I M P O R T A N T   W A R N I N G  ***                     **
+**     I M P O R T A N T   W A R N I N G                            **
 **                                                                  **
-** The regression test suite needs to be run on a clean demo site   **
+** The %s test suite needs to be run on a clean demo site   **
 ** that you can obtain by doing:                                    **
 **                                                                  **
 **    $ inveniocfg --drop-demo-site \                               **
@@ -69,7 +89,7 @@ def warn_user_about_tests():
 **                                                                  **
 **********************************************************************
 
-Please confirm by typing "Yes, I know!": """)
+Please confirm by typing "Yes, I know!": """ % test_suite_type)
 
     answer = raw_input('')
     if answer != 'Yes, I know!':
@@ -315,3 +335,30 @@ def build_and_run_regression_test_suite():
 
     complete_suite = unittest.TestSuite(test_modules)
     unittest.TextTestRunner(verbosity=2).run(complete_suite)
+
+def build_and_run_web_test_suite():
+    """
+    Detect all Selenium web test cases, build a complete test suite of
+    them, and run it in a browser. (Requires Firefox with Selenium IDE
+    extension.)  Called by 'inveniocfg --run-web-tests'.
+    """
+    # warn user first:
+    warn_user_about_tests('web')
+    # build test suite with all web tests:
+    print ">>> Building complete web test suite..."
+    webtestdir = CFG_PREFIX +  '/lib/webtest/invenio'
+    fdesc = open(webtestdir + os.sep + "test_all.html", "w")
+    fdesc.write('<table>\n')
+    fdesc.write('<tr><td>Web test suite for the whole Invenio.</td></tr>\n')
+    for candidate in sorted(os.listdir(webtestdir)):
+        base, ext = os.path.splitext(candidate)
+        if ext != '.html' or base.endswith('_all'):
+            continue
+        fdesc.write('<tr><td><a target="testFrame" href="%s">%s</a></td></tr>\n' % (candidate, base))
+    fdesc.write('</table>\n')
+    fdesc.close()
+    # run this test suite:
+    cmd = "firefox -chrome 'chrome://selenium-ide/content/selenium/TestRunner.html?baseURL=%s&test=file://%s/test_all.html&auto=true' -height 800 -width 1200 &" % \
+          (CFG_SITE_URL, webtestdir)
+    print ">>> Launching Firefox with Selenium IDE, please check the web test results there."
+    os.system(cmd)

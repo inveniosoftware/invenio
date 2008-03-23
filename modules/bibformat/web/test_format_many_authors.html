@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="" />
+<title>test_format_many_authors</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">test_format_many_authors</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>http://localhost</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p</td>
+	<td>recid:10</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action_search</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Bruneliere, R ; et al </td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Detailed record</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Show all 315 authors</td>
+	<td></td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>link</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Zobernig, G</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Hide</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>

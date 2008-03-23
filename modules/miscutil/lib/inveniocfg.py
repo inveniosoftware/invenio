@@ -38,8 +38,9 @@ Options to set up and test a demo site:
    --load-demo-records      load demo records
    --remove-demo-records    remove demo records, keeping demo site
    --drop-demo-site         drop demo site configurations too
-   --run-unit-tests         run unit test suite (need DB connectivity)
-   --run-regression-tests   run regression test suite (need demo site)
+   --run-unit-tests         run unit test suite (needs deme site)
+   --run-regression-tests   run regression test suite (needs demo site)
+   --run-web-tests          run web tests in a browser (needs demo site, Firefox, Selenium IDE)
 
 Options to update config files in situ:
    --update-all             perform all the update options
@@ -577,6 +578,12 @@ def cli_cmd_run_regression_tests(conf):
     from invenio.testutils import build_and_run_regression_test_suite
     build_and_run_regression_test_suite()
 
+def cli_cmd_run_web_tests(conf):
+    """Run web tests in a browser. Requires Firefox with
+    Selenium IDE extension."""
+    from invenio.testutils import build_and_run_web_test_suite
+    build_and_run_web_test_suite()
+
 def cli_cmd_create_apache_conf(conf):
     """
     Create Apache conf files for this site, keeping previous
@@ -907,6 +914,9 @@ def main():
                 done = True
             elif opt == '--run-regression-tests':
                 cli_cmd_run_regression_tests(conf)
+                done = True
+            elif opt == '--run-web-tests':
+                cli_cmd_run_web_tests(conf)
                 done = True
             elif opt == '--update-all':
                 cli_cmd_update_config_py(conf)
