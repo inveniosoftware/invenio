@@ -36,6 +36,7 @@ from invenio import bibformat_config
 from invenio import bibformatadminlib
 from invenio import bibrecord
 from invenio.config import CFG_TMPDIR
+from invenio.testutils import make_test_suite, run_test_suite
 
 #CFG_BIBFORMAT_OUTPUTS_PATH = "..%setc%soutput_formats" % (os.sep, os.sep)
 #CFG_BIBFORMAT_TEMPLATES_PATH = "..%setc%sformat_templates" % (os.sep, os.sep)
@@ -703,15 +704,13 @@ class FormatTest(unittest.TestCase):
         self.assert_(isinstance(result, tuple))
         self.assertEqual(result[0],'''<h1>hi</h1> this is my template\ntest<bfe_non_existing_element must disappear/><test_1  non prefixed element must stay as any normal tag/>tfrgarbage\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n<br/>test me!<b>ok</b>a default valueeditor\n<br/>test me!&lt;b&gt;ok&lt;/b&gt;a default valueeditor\n99999''')
 
-def create_test_suite():
-    """Return test suite for the bibformat module"""
-    return unittest.TestSuite((unittest.makeSuite(FormatTemplateTest,'test'),
-                               unittest.makeSuite(OutputFormatTest,'test'),
-                               unittest.makeSuite(FormatElementTest,'test'),
-                               unittest.makeSuite(PatternTest,'test'),
-                               unittest.makeSuite(MiscTest,'test'),
-                               unittest.makeSuite(FormatTest,'test')))
+TEST_SUITE = make_test_suite(FormatTemplateTest,
+                             OutputFormatTest,
+                             FormatElementTest,
+                             PatternTest,
+                             MiscTest,
+                             FormatTest,)
 
 if __name__ == '__main__':
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 

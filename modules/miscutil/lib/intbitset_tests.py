@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.intbitset import intbitset
+from invenio.testutils import make_test_suite, run_test_suite
 
 try:
     set()
@@ -384,12 +385,8 @@ class IntBitSetTest(unittest.TestCase):
             self.assertEqual(intbitset1, intbitset2)
             self.assertEqual(intbitset1, intbitset3)
 
-def create_test_suite():
-    """Return test suite for the intbitset data structure."""
-    return unittest.TestSuite((
-        unittest.makeSuite(IntBitSetTest, 'test'),
-        ))
+TEST_SUITE = make_test_suite(IntBitSetTest,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 

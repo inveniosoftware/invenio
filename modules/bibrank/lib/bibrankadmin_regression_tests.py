@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.config import CFG_SITE_URL
-from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
+from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
 class BibRankAdminWebPagesAvailabilityTest(unittest.TestCase):
@@ -65,7 +65,7 @@ class BibRankAdminWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-test_suite = make_test_suite(BibRankAdminWebPagesAvailabilityTest)
+TEST_SUITE = make_test_suite(BibRankAdminWebPagesAvailabilityTest)
 
 if __name__ == "__main__":
-    warn_user_about_tests_and_run(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)

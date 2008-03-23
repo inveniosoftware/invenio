@@ -569,16 +569,13 @@ Press ENTER to proceed with this action."""))
 
 def cli_cmd_run_unit_tests(conf):
     """Run unit tests, usually on the working demo site."""
-    from invenio.config import CFG_PREFIX
-    os.system("%s/bin/testsuite" % CFG_PREFIX)
+    from invenio.testutils import build_and_run_unit_test_suite
+    build_and_run_unit_test_suite()
 
 def cli_cmd_run_regression_tests(conf):
     """Run regression tests, usually on the working demo site."""
-    from invenio.config import CFG_PREFIX
-    if '--yes-i-know' in sys.argv:
-        os.system("%s/bin/regressiontestsuite --yes-i-know" % CFG_PREFIX)
-    else:
-        os.system("%s/bin/regressiontestsuite" % CFG_PREFIX)
+    from invenio.testutils import build_and_run_regression_test_suite
+    build_and_run_regression_test_suite()
 
 def cli_cmd_create_apache_conf(conf):
     """

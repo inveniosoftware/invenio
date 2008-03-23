@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.config import CFG_SITE_URL
-from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
+from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content
 
 class TestFunctionTestWebPageContent(unittest.TestCase):
@@ -89,7 +89,7 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
             self.fail("Should not find link to ALEPH entitled ISOLDE.")
         return
 
-test_suite = make_test_suite(TestFunctionTestWebPageContent)
+TEST_SUITE = make_test_suite(TestFunctionTestWebPageContent)
 
 if __name__ == "__main__":
-    warn_user_about_tests_and_run(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)

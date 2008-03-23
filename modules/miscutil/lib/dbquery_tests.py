@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio import dbquery
+from invenio.testutils import make_test_suite, run_test_suite
 
 class TableUpdateTimesTest(unittest.TestCase):
     """Test functions related to the update_times of MySQL tables."""
@@ -84,13 +85,9 @@ class TableUpdateTimesTest(unittest.TestCase):
                          ('\xce\xb2', '\xce\xb2', 'CEB2', 'CEB2', 2L, 2L, 1L, 2L))
         dbquery.run_sql("DROP TEMPORARY TABLE test__invenio__utf8")
 
-def create_test_suite():
-    """Return test suite for the user handling."""
-    return unittest.TestSuite((
-        unittest.makeSuite(TableUpdateTimesTest,'test'),
-        ))
+TEST_SUITE = make_test_suite(TableUpdateTimesTest,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 
 

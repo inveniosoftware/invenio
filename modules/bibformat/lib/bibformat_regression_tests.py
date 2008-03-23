@@ -26,7 +26,7 @@ import unittest
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.testutils import make_test_suite, \
-                              warn_user_about_tests_and_run, \
+                              run_test_suite, \
                               test_web_page_content
 from invenio.bibformat import format_record
 
@@ -402,7 +402,7 @@ class BibFormatTitleFormattingTest(unittest.TestCase):
           test_web_page_content(CFG_SITE_URL + '/search?p=2nd&of=HD',
             expected_text="Introductory statistics: a decision map; 2nd ed"))
 
-test_suite = make_test_suite(BibFormatBibTeXTest,
+TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
                              BibFormatDetailedHTMLTest,
                              BibFormatBriefHTMLTest,
                              BibFormatNLMTest,
@@ -412,5 +412,5 @@ test_suite = make_test_suite(BibFormatBibTeXTest,
                              BibFormatTitleFormattingTest)
 
 if __name__ == "__main__":
-    warn_user_about_tests_and_run(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)
 

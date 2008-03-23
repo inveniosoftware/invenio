@@ -19,11 +19,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Unit tests for the user handling library."""
+"""Unit tests for the group handling library."""
 
 __revision__ = "$Id$"
 
 import unittest
+from invenio.testutils import make_test_suite, run_test_suite
 
 # Compatibility stuff for python 2.3. Warning: don't use fancy methods!
 try:
@@ -46,11 +47,7 @@ class WebGroupTests(unittest.TestCase):
         self.assertEqual(set([1,2,3]) | set([2,3,4]), set([1,2,3,4]))
         self.assertEqual(set([1,2,3]), set([3,2,1]))
 
-def create_test_suite():
-    """Return test suite for the user handling."""
-    return unittest.TestSuite((unittest.makeSuite(
-        WebGroupTests,'test'),
-                               ))
+TEST_SUITE = make_test_suite(WebGroupTests,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)

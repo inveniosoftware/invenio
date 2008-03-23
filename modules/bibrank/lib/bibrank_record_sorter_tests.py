@@ -27,6 +27,7 @@ import unittest
 
 from invenio import bibrank_record_sorter
 from invenio.search_engine import HitSet
+from invenio.testutils import make_test_suite, run_test_suite
 
 class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""
@@ -48,9 +49,7 @@ class TestListSetOperations(unittest.TestCase):
         self.assertEqual(({1: 7, 2: 7, 5: 5}, {1: 1, 2: 1, 5: 1}),  bibrank_record_sorter.calculate_record_relevance(("testterm", 2.0),
 {"Gi":(0, 50.0), 1: (3, 4.0), 2: (4, 5.0), 5: (1, 3.5)}, hitset, {}, {}, 0, None))
 
-def create_test_suite():
-    """Return test suite for the indexing engine."""
-    return unittest.TestSuite((unittest.makeSuite(TestListSetOperations,'test'),))
+TEST_SUITE = make_test_suite(TestListSetOperations,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)

@@ -159,36 +159,16 @@ class TestWashQueryParameters(unittest.TestCase):
 </p>
 
 <p>In addition, each test file is supposed to define a
-<code>create_test_suite()</code> function that will return test suite
-with all the tests available in this file:
+<code>TEST_SUITE</code> variable that will return test suite with all
+the tests available in this file:
 
 <blockquote>
 <pre>
 $ cat /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
 [...]
-def create_test_suite():
-    """Return test suite for the search engine."""
-    return unittest.TestSuite((unittest.makeSuite(TestWashQueryParameters,'test'),
-                               unittest.makeSuite(TestStripAccents,'test')))
-[...]
-</pre>
-</blockquote>
-</p>
-
-<p>This will enable us to later include this file into
-<code>testsuite</code> executable:
-
-<blockquote>
-<pre>
-$ cat ~/src/cds-invenio/modules/miscutil/bin/testsuite.in
-[...]
-from invenio import search_engine_tests
-    from invenio import bibindex_engine_tests
-
-def create_all_test_suites():
-    """Return all tests suites for all CDS Invenio modules."""
-    return unittest.TestSuite((search_engine_tests.create_test_suite(),
-                               bibindex_engine_tests.create_test_suite()))
+TEST_SUITE = make_test_suite(TestWashQueryParameters,
+                             TestStripAccents,
+                             TestQueryParser,)
 [...]
 </pre>
 </blockquote>
@@ -216,31 +196,22 @@ files in the source distribution.
 
 <a name="2.3"></a><h3>2.3 Running unit tests</h3>
 
-<p>CDS Invenio test suite can be run in the source directory:
+<p>CDS Invenio test suite can be run at any time via:
 
 <blockquote>
 <pre>
-$ make test
+$ /opt/cds-invenio/bin/inveniocfg --run-unit-tests
 </pre>
 </blockquote>
 
-or anytime after the installation:
-
-<blockquote>
-<pre>
-$ /opt/cds-invenio/bin/testsuite
-</pre>
-</blockquote>
-
-The ``testsuite'' executable will run all available unit tests
-provided with CDS Invenio.
+This command will run all available unit tests provided with CDS
+Invenio.
 </p>
 
 <p>The informative output is of the form:
 
 <blockquote>
 <pre>
-$ make test
 CDS Invenio v0.3.2.20040519 test suite results:
 ===========================================
 search engine washing of query patterns ... ok
@@ -425,7 +396,7 @@ except ValueError:
 
 <blockquote>
 <pre>
-$ /opt/cds-invenio/bin/regressiontestsuite
+$ /opt/cds-invenio/bin/inveniocfg --run-regression-tests
 </pre>
 </blockquote>
 
@@ -435,11 +406,11 @@ when compared to running the unit test suite is:
 
 <ul>
 
-<li><code>regressiontestsuite</code> script assumes the site to be in
-    demo mode (Atlantis Institute of Fictive Science)
+<li>we assume the site to be in demo mode (Atlantis Institute of
+    Fictive Science)
 
-<li><code>regressiontestsuite</code> will pollute the database with
-    test data as it sees fit for the regression testing purposes.
+<li>we shall pollute the database with test data as it seems fit for
+    the regression testing purposes.
 
 </ul>
 
@@ -452,8 +423,7 @@ abort the process:
 
 <blockquote>
 <pre>
-$ /opt/cds-invenio/bin/regressiontestsuite
-regressiontestsuite: detected 19 regression test modules
+$ /opt/cds-invenio/bin/inveniocfg --run-regression-tests
 **********************************************************************
 **                                                                  **
 **  ***  I M P O R T A N T   W A R N I N G  ***                     **

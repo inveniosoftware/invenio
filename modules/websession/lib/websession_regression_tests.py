@@ -30,7 +30,7 @@ import unittest
 
 from mechanize import Browser
 from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_ADMIN_EMAIL
-from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
+from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 from invenio.dbquery import run_sql
 
@@ -109,8 +109,8 @@ class WebSessionLostYourPasswordTest(unittest.TestCase):
         run_sql("UPDATE user SET password=AES_ENCRYPT(email, '')"
             "WHERE id=1")
 
-test_suite = make_test_suite(WebSessionWebPagesAvailabilityTest,
+TEST_SUITE = make_test_suite(WebSessionWebPagesAvailabilityTest,
                              WebSessionLostYourPasswordTest)
 
 if __name__ == "__main__":
-    warn_user_about_tests_and_run(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)

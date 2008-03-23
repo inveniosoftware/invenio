@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -28,6 +28,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.bibrank_citation_indexer import last_updated_result
+from invenio.testutils import make_test_suite, run_test_suite
 
 class TestCitationIndexer(unittest.TestCase):
     """Testing citation indexer."""
@@ -43,13 +44,9 @@ class TestCitationIndexer(unittest.TestCase):
         self.assert_(last_updated_result(self.rank_method_code,
                                          self.updated_recid_list))
 
-def create_test_suite():
-    """Return test suite for the bibrank citation indexer."""
-    return unittest.TestSuite((
-        unittest.makeSuite(TestCitationIndexer, 'test'),
-        ))
+TEST_SUITE = make_test_suite(TestCitationIndexer,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 
 

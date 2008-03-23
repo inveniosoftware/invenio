@@ -20,7 +20,7 @@
 
 """Testing functions for the external collections search.
 
-   More tests of the page getter module can be done with 
+   More tests of the page getter module can be done with
        websearch_external_collections_getter_tests.py
 """
 
@@ -30,9 +30,10 @@ import unittest
 
 from invenio.websearch_external_collections_searcher import external_collections_dictionary
 from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
+from invenio.testutils import make_test_suite, run_test_suite
 
 def download_and_parse():
-    """Try to make a query that always return results on all search engines. 
+    """Try to make a query that always return results on all search engines.
     Check that a page is well returned and that the result can be parsed.
 
     This test is not included in the general test suite.
@@ -83,18 +84,17 @@ def build_search_urls_test():
             url = engine.build_search_url(test)
             print "    Url: " + str(url)
 
-class TestSuite(unittest.TestCase):
-    """Test suite for websearch_external_collections_*"""
+class ExtCollTests(unittest.TestCase):
+    """Test cases for websearch_external_collections_*"""
 
     def test_download_and_parse(self):
         """websearch_external_collections - download_and_parse (not reliable, see docstring)"""
         self.assertEqual([], download_and_parse())
 
-def create_test_suite():
-    """Return test suite for the external collection tests."""
-    return unittest.TestSuite((unittest.makeSuite(TestSuite, 'test')))
+# FIXME: the above tests not plugged into global unit test suite
+TEST_SUITE = make_test_suite() #ExtCollTests,)
 
 if __name__ == "__main__":
     build_search_urls_test()
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 

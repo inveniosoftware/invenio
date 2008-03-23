@@ -22,8 +22,8 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.93.50.20080318, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080318)
+AC_INIT(cds-invenio, 0.93.50.20080323, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080323)
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with
@@ -530,8 +530,6 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/miscutil/Makefile \
 	  modules/miscutil/bin/Makefile \
 	  modules/miscutil/bin/dbexec \
-	  modules/miscutil/bin/testsuite \
-	  modules/miscutil/bin/regressiontestsuite \
 	  modules/miscutil/bin/inveniocfg \
 	  modules/miscutil/lib/Makefile \
 	  modules/miscutil/demo/Makefile \

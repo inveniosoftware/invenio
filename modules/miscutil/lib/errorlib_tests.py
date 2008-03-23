@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## $Id$
-## 
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -24,6 +24,8 @@
 __revision__ = "$Id$"
 
 from invenio.errorlib import get_msg_associated_to_code, get_msgs_for_code_list
+from invenio.testutils import make_test_suite, run_test_suite
+
 import unittest
 
 class TestInternalErrorlibErrors(unittest.TestCase):
@@ -31,13 +33,13 @@ class TestInternalErrorlibErrors(unittest.TestCase):
     Class for testing!
     """
     messages = []
-    
+
     def test_correct_association(self):
         """errorlib - code association: correct code"""
         # correct input
         input_err_code = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
         (output_err_code, dummy) = get_msg_associated_to_code(input_err_code,
-                                                              'error') 
+                                                              'error')
         self.assertEqual(output_err_code, input_err_code)
 
     def test_no_module(self):
@@ -66,7 +68,7 @@ class TestInternalErrorlibErrors(unittest.TestCase):
                                                               'error')
         expected_output_err_code = 'ERR_MISCUTIL_NO_MESSAGE_IN_DICT'
         self.assertEqual(output_err_code, expected_output_err_code)
-        
+
     def test_not_an_error(self):
         """errorlib - code association: badly named error"""
         # identifier does not begin with ERR or WRN
@@ -75,7 +77,7 @@ class TestInternalErrorlibErrors(unittest.TestCase):
                                                               'error')
         expected_output_err_code = 'ERR_MISCUTIL_UNDEFINED_ERROR'
         self.assertEqual(output_err_code, expected_output_err_code)
-        
+
     def test_correct_arg_validation(self):
         """errorlib - single argument"""
         # displayable error
@@ -110,7 +112,7 @@ class TestInternalErrorlibErrors(unittest.TestCase):
         self.assertEqual(2, len(output_list[0]))
         self.assertEqual(expected_error, output_list[0][0])
         # store error messages for further tests
-        self.messages.append(output_list[0][1])               
+        self.messages.append(output_list[0][1])
 
     def test_too_many_arguments(self):
         """errorlib - arguments: too many arguments"""
@@ -169,14 +171,8 @@ class TestInternalErrorlibErrors(unittest.TestCase):
         # string internationalization
         testmessages = reduce(lambda x, y: str(x) + str(y), self.messages)
         self.assertEqual(0, testmessages.count('_('))
-        
-def create_test_suite():
-    """
-    Return test suite for the search engine.
-    """
-    return unittest.TestSuite((unittest.makeSuite(\
-        TestInternalErrorlibErrors, 'test'),
-                               ))
+
+TEST_SUITE = make_test_suite(TestInternalErrorlibErrors,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)

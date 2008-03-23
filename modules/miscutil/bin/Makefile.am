@@ -17,8 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = dbexec testsuite regressiontestsuite inveniocfg
+bin_SCRIPTS = dbexec inveniocfg
 
-EXTRA_DIST = dbexec.in testsuite.in regressiontestsuite.in inveniocfg.in
+EXTRA_DIST = dbexec.in inveniocfg.in
 
 CLEANFILES = *~ *.tmp

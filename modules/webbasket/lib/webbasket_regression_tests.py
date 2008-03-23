@@ -28,7 +28,7 @@ import mechanize
 import re
 
 from invenio.config import CFG_SITE_URL
-from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
+from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, make_url, make_surl, merge_error_messages
 
 class WebBasketWebPagesAvailabilityTest(unittest.TestCase):
@@ -195,7 +195,7 @@ class WebBasketRecordsAdditionTest(unittest.TestCase):
         self._delete_basket(browser)
 
 
-test_suite = make_test_suite(WebBasketWebPagesAvailabilityTest, WebBasketRecordsAdditionTest)
+TEST_SUITE = make_test_suite(WebBasketWebPagesAvailabilityTest, WebBasketRecordsAdditionTest)
 
 if __name__ == "__main__":
-    warn_user_about_tests_and_run(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)

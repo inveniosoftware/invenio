@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,14 +27,14 @@ import unittest
 import time
 
 from invenio.config import CFG_SITE_URL, CFG_OAI_SLEEP
-from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
+from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
 class OAIRepositoryWebPagesAvailabilityTest(unittest.TestCase):
     """Check OAIRepository web pages whether they are up or not."""
 
     def test_your_baskets_pages_availability(self):
-        """oairepository - availability of OAI server pages""" 
+        """oairepository - availability of OAI server pages"""
 
         baseurl = CFG_SITE_URL + '/oai2d'
 
@@ -45,7 +45,7 @@ class OAIRepositoryWebPagesAvailabilityTest(unittest.TestCase):
                     '?verb=ListSets',
                     '?verb=ListRecords',
                     '?verb=GetRecord']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             if url.endswith('Identify') or \
@@ -55,7 +55,7 @@ class OAIRepositoryWebPagesAvailabilityTest(unittest.TestCase):
                 # some sleep required for verbs other than Identify
                 # and ListMetadataFormats, since oai2d refuses too
                 # frequent access:
-                time.sleep(CFG_OAI_SLEEP) 
+                time.sleep(CFG_OAI_SLEEP)
             error_messages.extend(test_web_page_content(url,
                                                         expected_text=
                                                         '</OAI-PMH>'))
@@ -63,7 +63,7 @@ class OAIRepositoryWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-test_suite = make_test_suite(OAIRepositoryWebPagesAvailabilityTest)
+TEST_SUITE = make_test_suite(OAIRepositoryWebPagesAvailabilityTest)
 
 if __name__ == "__main__":
-    warn_user_about_tests_and_run(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)

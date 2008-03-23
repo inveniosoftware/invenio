@@ -29,6 +29,7 @@ import re
 import time
 
 from invenio import oai_repository, search_engine
+from invenio.testutils import make_test_suite, run_test_suite
 
 from invenio.config import \
      CFG_OAI_LOAD, \
@@ -186,15 +187,11 @@ Limit: %s seconds""" % (t, self.number_of_records * allowed_seconds_per_record_o
 %s seconds.
 Limit: %s seconds""" % (t, self.number_of_records * allowed_seconds_per_record_marcxml))
 
-def create_test_suite():
-    """Return test suite for the oai repository."""
-
-
-    return unittest.TestSuite((unittest.makeSuite(TestVerbs, 'test'),
-                               unittest.makeSuite(TestErrorCodes, 'test'),
-                               unittest.makeSuite(TestEncodings, 'test'),
-                               unittest.makeSuite(TestSelectiveHarvesting, 'test'),
-                               unittest.makeSuite(TestPerformance, 'test')))
+TEST_SUITE = make_test_suite(TestVerbs,
+                             TestErrorCodes,
+                             TestEncodings,
+                             TestSelectiveHarvesting,
+                             TestPerformance,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)

@@ -26,6 +26,8 @@ __revision__ = "$Id$"
 import unittest
 import dateutils
 
+from invenio.testutils import make_test_suite, run_test_suite
+
 class ConvertFromDateCVSTest(unittest.TestCase):
     """
     Testing conversion of CVS dates.
@@ -93,14 +95,8 @@ class ConvertIntoDateGUITest(unittest.TestCase):
                                                            ln='sk')
         self.assertEqual(dategui_sk, dategui_sk_expected)
 
-def create_test_suite():
-    """
-    Return test suite for the dateutils.
-    """
-    return unittest.TestSuite((unittest.makeSuite(ConvertFromDateCVSTest,
-                                                  'test'),
-                               unittest.makeSuite(ConvertIntoDateGUITest,
-                                                 'test')))
+TEST_SUITE = make_test_suite(ConvertFromDateCVSTest,
+                             ConvertIntoDateGUITest,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)

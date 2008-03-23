@@ -4,6 +4,4 @@ z_*
 *.O
 *~
 dbexec
-testsuite
-regressiontestsuite
 inveniocfg

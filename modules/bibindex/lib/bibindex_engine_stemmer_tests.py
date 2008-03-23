@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio import bibindex_engine_stemmer
+from invenio.testutils import make_test_suite, run_test_suite
 
 class TestStemmer(unittest.TestCase):
     """Test stemmer."""
@@ -57,9 +58,7 @@ class TestStemmer(unittest.TestCase):
             self.assertEqual(expected_result,
                              bibindex_engine_stemmer.stem(test_word, "en"))
 
-def create_test_suite():
-    """Return test suite for the indexing engine."""
-    return unittest.TestSuite((unittest.makeSuite(TestStemmer,'test'),))
+TEST_SUITE = make_test_suite(TestStemmer,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)

@@ -116,7 +116,6 @@ modules/elmsubmit/lib/elmsubmit_richtext2txt.py
 modules/elmsubmit/lib/elmsubmit_submission_parser.py
 modules/elmsubmit/lib/myhtmlentitydefs.py
 modules/miscutil/bin/dbexec.in
-modules/miscutil/bin/testsuite.in
 modules/miscutil/lib/dateutils.py
 modules/miscutil/lib/errorlib.py
 modules/miscutil/lib/errorlib_tests.py

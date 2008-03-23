@@ -28,7 +28,7 @@ import os
 
 from invenio.errorlib import register_exception
 from invenio.config import CFG_SITE_URL, CFG_LOGDIR
-from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
+from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
 class ErrorlibWebPagesAvailabilityTest(unittest.TestCase):
@@ -74,8 +74,8 @@ class ErrorlibRegisterExceptionTest(unittest.TestCase):
         self.failUnless(text in log_content)
         self.assertEqual(1, result, "register_exception have not returned 1")
 
-test_suite = make_test_suite(ErrorlibWebPagesAvailabilityTest,
+TEST_SUITE = make_test_suite(ErrorlibWebPagesAvailabilityTest,
                              ErrorlibRegisterExceptionTest)
 
 if __name__ == "__main__":
-    warn_user_about_tests_and_run(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)

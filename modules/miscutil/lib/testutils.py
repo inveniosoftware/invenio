@@ -25,14 +25,9 @@ Helper functions for building and running test suites.
 
 __revision__ = "$Id$"
 
-# if verbose level is set to 9, many debugging messages will be
-# printed on stdout, so you may want to run:
-#   $ regressiontestsuite > /tmp/z.log
-# or even:
-#   $ regressiontestsuite > /tmp/z.log 2> /tmp/z.err
-
 CFG_TESTUTILS_VERBOSE = 1
 
+import os
 import string
 import sys
 import time
@@ -41,6 +36,7 @@ import unittest
 from urllib import urlencode
 from itertools import chain, repeat
 
+import invenio
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_LOGDIR
 from invenio.w3c_validator import w3c_validate, w3c_errors_to_str, CFG_TESTS_REQUIRE_HTML_VALIDATION
 
@@ -52,7 +48,6 @@ def warn_user_about_tests():
     # confirmation every time during development.
     if '--yes-i-know' in sys.argv:
         return
-
 
     sys.stderr.write("""\
 **********************************************************************
@@ -83,17 +78,19 @@ Please confirm by typing "Yes, I know!": """)
 
     return
 
-def warn_user_about_tests_and_run(testsuite):
-    """ Convenience function to embed in test suites """
-    warn_user_about_tests()
-    unittest.TextTestRunner(verbosity=2).run(testsuite)
-
-
 def make_test_suite(*test_cases):
     """ Build up a test suite given separate test cases"""
-
     return unittest.TestSuite([unittest.makeSuite(case, 'test')
                                for case in test_cases])
+
+def run_test_suite(testsuite, warn_user=False):
+    """
+    Convenience function to embed in test suites.  Run given testsuite
+    and eventually ask for confirmation of warn_user is True.
+    """
+    if warn_user:
+        warn_user_about_tests()
+    unittest.TextTestRunner(verbosity=2).run(testsuite)
 
 def make_url(path, **kargs):
     """ Helper to generate an absolute invenio URL with query
@@ -273,3 +270,48 @@ def merge_error_messages(error_messages):
     if error_messages:
         out = "\n*** " + string.join(error_messages, "\n*** ")
     return out
+
+def build_and_run_unit_test_suite():
+    """
+    Detect all Invenio modules with names ending by '*_tests.py' (and
+    not '_regression_tests.py'), build a complete test suite of them,
+    and run it.  Called by 'inveniocfg --run-unit-tests'.
+    """
+
+    test_modules = []
+
+    for candidate in os.listdir(os.path.dirname(invenio.__file__)):
+        base, ext = os.path.splitext(candidate)
+
+        if ext != '.py' or not (base.endswith('_tests') and not \
+                                base.endswith('_regression_tests')):
+            continue
+
+        module = __import__('invenio.' + base, globals(), locals(), ['TEST_SUITE'])
+        test_modules.append(module.TEST_SUITE)
+
+    complete_suite = unittest.TestSuite(test_modules)
+    unittest.TextTestRunner(verbosity=2).run(complete_suite)
+
+def build_and_run_regression_test_suite():
+    """
+    Detect all Invenio modules with names ending by
+    '*_regression_tests.py', build a complete test suite of them, and
+    run it.  Called by 'inveniocfg --run-regression-tests'.
+    """
+
+    test_modules = []
+
+    for candidate in os.listdir(os.path.dirname(invenio.__file__)):
+        base, ext = os.path.splitext(candidate)
+
+        if ext != '.py' or not base.endswith('_regression_tests'):
+            continue
+
+        module = __import__('invenio.' + base, globals(), locals(), ['TEST_SUITE'])
+        test_modules.append(module.TEST_SUITE)
+
+    warn_user_about_tests()
+
+    complete_suite = unittest.TestSuite(test_modules)
+    unittest.TextTestRunner(verbosity=2).run(complete_suite)

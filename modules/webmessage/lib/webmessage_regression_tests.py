@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -26,20 +26,20 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.config import CFG_SITE_URL
-from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
+from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
 class WebMessageWebPagesAvailabilityTest(unittest.TestCase):
     """Check WebMessage web pages whether they are up or not."""
 
     def test_your_baskets_pages_availability(self):
-        """webmessage - availability of Your Messages pages""" 
+        """webmessage - availability of Your Messages pages"""
 
         baseurl = CFG_SITE_URL + '/yourmessages/'
 
         _exports = ['', 'display', 'write', 'send', 'delete', 'delete_all',
                     'display_msg']
-        
+
         error_messages = []
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url))
@@ -47,7 +47,7 @@ class WebMessageWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-test_suite = make_test_suite(WebMessageWebPagesAvailabilityTest)
+TEST_SUITE = make_test_suite(WebMessageWebPagesAvailabilityTest)
 
 if __name__ == "__main__":
-    warn_user_about_tests_and_run(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)

@@ -29,6 +29,7 @@ from invenio.access_control_firerole import compile_role_definition, \
     serialize, deserialize, acc_firerole_check_user
 from invenio.access_control_config import InvenioWebAccessFireroleError, \
         CFG_ACC_EMPTY_ROLE_DEFINITION_SER
+from invenio.testutils import make_test_suite, run_test_suite
 
 class AccessControlFireRoleTest(unittest.TestCase):
     """Test functions related to the firewall like role definitions."""
@@ -132,12 +133,9 @@ class AccessControlFireRoleTest(unittest.TestCase):
         self.assertEqual(False, acc_firerole_check_user(self.user_info,
             compile_role_definition(None)))
 
-def create_test_suite():
-    """Return test suite for the user handling."""
-    return unittest.TestSuite((unittest.makeSuite(
-        AccessControlFireRoleTest,'test'),))
+TEST_SUITE = make_test_suite(AccessControlFireRoleTest,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 
 

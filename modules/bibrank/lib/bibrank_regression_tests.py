@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.config import CFG_SITE_URL
-from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
+from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
 class BibRankWebPagesAvailabilityTest(unittest.TestCase):
@@ -90,9 +90,9 @@ class BibRankCitationRankingTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&verbose=2',
                                                expected_text="find_citations retlist [[85, 0], [77, 2], [84, 3]]"))
 
-test_suite = make_test_suite(BibRankWebPagesAvailabilityTest,
+TEST_SUITE = make_test_suite(BibRankWebPagesAvailabilityTest,
                              BibRankWordSimilarityRankingTest,
                              BibRankCitationRankingTest)
 
 if __name__ == "__main__":
-    warn_user_about_tests_and_run(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)

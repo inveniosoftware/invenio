@@ -27,6 +27,7 @@ __revision__ = \
 import unittest
 
 from invenio import search_engine
+from invenio.testutils import make_test_suite, run_test_suite
 
 class TestWashQueryParameters(unittest.TestCase):
     """Test for washing of search query parameters."""
@@ -230,12 +231,9 @@ class TestQueryParser(unittest.TestCase):
                      ['+', 'ellis', 'author', 'w']])
 
 
-def create_test_suite():
-    """Return test suite for the search engine."""
-    return unittest.TestSuite((unittest.makeSuite(TestWashQueryParameters,
-                                                  'test'),
-                               unittest.makeSuite(TestStripAccents, 'test'),
-                               unittest.makeSuite(TestQueryParser, 'test')))
+TEST_SUITE = make_test_suite(TestWashQueryParameters,
+                             TestStripAccents,
+                             TestQueryParser,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)

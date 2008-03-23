@@ -34,7 +34,7 @@ from mechanize import Browser, LinkNotFoundError, HTTPError
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_NAME, CFG_SITE_LANG
 from invenio.testutils import make_test_suite, \
-                              warn_user_about_tests_and_run, \
+                              run_test_suite, \
                               make_url, test_web_page_content, \
                               merge_error_messages
 from invenio.urlutils import same_urls_p
@@ -1169,7 +1169,7 @@ class WebSearchExtSysnoQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?sysno=000289446CERRRR&of=id',
                                                expected_text="[]"))
 
-test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
+TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
                              WebSearchTestOpenURL,
@@ -1192,5 +1192,5 @@ test_suite = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchExtSysnoQueryTest)
 
 if __name__ == "__main__":
-    warn_user_about_tests_and_run(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)
 

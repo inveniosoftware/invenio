@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.textutils import wrap_text_in_a_box
+from invenio.testutils import make_test_suite, run_test_suite
 
 class WrapTextInABoxTest(unittest.TestCase):
     """Test functions related to wrap_text_in_a_box function."""
@@ -191,12 +192,8 @@ If you would like to try it out yourself, please feel free to download our lates
 """
         self.assertEqual(wrap_text_in_a_box(text), result)
 
-def create_test_suite():
-    """Return test suite for the wrap_text_in_a_box function."""
-    return unittest.TestSuite((
-        unittest.makeSuite(WrapTextInABoxTest, 'test'),
-        ))
+TEST_SUITE = make_test_suite(WrapTextInABoxTest,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 

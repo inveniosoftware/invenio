@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio import webuser
+from invenio.testutils import make_test_suite, run_test_suite
 
 class ApacheAuthenticationTests(unittest.TestCase):
     """Test functions related to the Apache authentication."""
@@ -80,13 +81,9 @@ class ApacheAuthenticationTests(unittest.TestCase):
         self.assertEqual([],
           webuser.auth_apache_user_in_groups('aoeui', self.apache_group_file))
 
-def create_test_suite():
-    """Return test suite for the user handling."""
-    return unittest.TestSuite((unittest.makeSuite(
-        ApacheAuthenticationTests,'test'),
-                               ))
+TEST_SUITE = make_test_suite(ApacheAuthenticationTests,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 
 

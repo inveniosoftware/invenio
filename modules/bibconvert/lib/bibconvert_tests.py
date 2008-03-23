@@ -14,7 +14,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,13 +27,14 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio import bibconvert
+from invenio.testutils import make_test_suite, run_test_suite
 
 class TestFormattingFunctions(unittest.TestCase):
     """Test bibconvert formatting functions."""
 
     def test_ff(self):
         """bibconvert - formatting functions"""
-        
+
         self.assertEqual("Hello world!", bibconvert.FormatField("ello world", "ADD(H,!)"))
         self.assertEqual("Hello world!", bibconvert.FormatField("Hello world", "ABR(11,!)"))
         self.assertEqual("Hello world!", bibconvert.FormatField("xHello world!x", "CUT(x,x)"))
@@ -57,7 +58,7 @@ class TestGlobalFormattingFunctions(unittest.TestCase):
 
     def test_gff(self):
         """bibconvert - global formatting functions"""
-    
+
         self.assertEqual("Hello world!", bibconvert.FormatField("Hello world!","DEFP()"))
 
 class TestGenerateValues(unittest.TestCase):
@@ -65,7 +66,7 @@ class TestGenerateValues(unittest.TestCase):
 
     def test_gv(self):
         """bibconvert - value generation"""
-        
+
         self.assertEqual("Hello world!", bibconvert.generate("VALUE(Hello world!)"))
 
 class TestParseData(unittest.TestCase):
@@ -73,7 +74,7 @@ class TestParseData(unittest.TestCase):
 
     def test_idp(self):
         """bibconvert - input data parsing"""
-        
+
         self.assertEqual(['A','B','C','D'], bibconvert.parse_field_definition("A---B---C---D"))
 
 class TestRegExp(unittest.TestCase):
@@ -81,7 +82,7 @@ class TestRegExp(unittest.TestCase):
 
     def test_regexp(self):
         """bibconvert - regular expressions"""
-        
+
         self.assertEqual("Hello world!", bibconvert.FormatField("Hello world!", "RE([A-Z][a-z].*!)"))
 
 class TestBCCL(unittest.TestCase):
@@ -98,7 +99,7 @@ class TestKnowledgeBase(unittest.TestCase):
 
     def xtest_enc(self):
         """bibconvert - knowledge base"""
-        
+
         # FIXME: put proper tests here
         self.assertEqual(1, 1)
 
@@ -107,7 +108,7 @@ class TestErrorCodes(unittest.TestCase):
 
     def xtest_enc(self):
         """bibconvert - error codes"""
-        
+
         # FIXME: put proper tests here
         self.assertEqual(1, 1)
 
@@ -116,24 +117,20 @@ class TestEncodings(unittest.TestCase):
 
     def xtest_enc(self):
         """bibconvert - encodings"""
-        
+
         # FIXME: put proper tests here
         self.assertEqual(1, 1)
 
 
-def create_test_suite():
-    """Return test suite for the bibconvert module."""
-
-    return unittest.TestSuite((unittest.makeSuite(TestFormattingFunctions, 'test'),
-                               unittest.makeSuite(TestGlobalFormattingFunctions, 'test'),
-                               unittest.makeSuite(TestGenerateValues, 'test'),
-                               unittest.makeSuite(TestParseData, 'test'),
-                               unittest.makeSuite(TestRegExp, 'test'),
-                               unittest.makeSuite(TestBCCL, 'test'),
-                               unittest.makeSuite(TestKnowledgeBase, 'test'),
-                               unittest.makeSuite(TestErrorCodes, 'test'),
-                               unittest.makeSuite(TestEncodings, 'test'),
-                               ))
+TEST_SUITE = make_test_suite(TestFormattingFunctions,
+                             TestGlobalFormattingFunctions,
+                             TestGenerateValues,
+                             TestParseData,
+                             TestRegExp,
+                             TestBCCL,
+                             TestKnowledgeBase,
+                             TestErrorCodes,
+                             TestEncodings,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## $Id$
-##                                              
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -24,5 +24,11 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio import webcomment
+from invenio.testutils import make_test_suite, run_test_suite
 
 # FIXME: Implement me!
+
+TEST_SUITE = make_test_suite()
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE)

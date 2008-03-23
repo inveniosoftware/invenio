@@ -26,6 +26,7 @@ from string import expandtabs, replace
 
 from invenio.config import CFG_TMPDIR, CFG_ETCDIR
 from invenio import bibrecord
+from invenio.testutils import make_test_suite, run_test_suite
 
 # pylint: disable-msg=C0301
 
@@ -805,18 +806,16 @@ class BibRecordPrintingTest(unittest.TestCase):
         self.assertEqual(bibrecord.create_records(bibrecord.print_recs(list_of_recs_elems, tags=["001", "037"]), 1, 1), list_of_recs_short)
         self.assertEqual(bibrecord.create_records(bibrecord.print_recs(list_of_recs_elems, tags=["037"]), 1, 1), list_of_recs_short)
 
-def create_test_suite():
-    """Return test suite for the bibrecord module"""
-    return unittest.TestSuite((unittest.makeSuite(BibRecordSanityTest, 'test'),
-                               unittest.makeSuite(BibRecordSuccessTest, 'test'),
-                               unittest.makeSuite(BibRecordBadInputTreatmentTest, 'test'),
-                               unittest.makeSuite(BibRecordGettingFieldValuesTest, 'test'),
-                               unittest.makeSuite(BibRecordGettingFieldValuesViaWildcardsTest, 'test'),
-                               unittest.makeSuite(BibRecordAddFieldTest, 'test'),
-                               unittest.makeSuite(BibRecordDeleteFieldTest, 'test'),
-                               unittest.makeSuite(BibRecordAccentedUnicodeLettersTest, 'test'),
-                               unittest.makeSuite(BibRecordSpecialTagParsingTest, 'test'),
-                               unittest.makeSuite(BibRecordPrintingTest, 'test'),
-                               ))
+TEST_SUITE = make_test_suite(BibRecordSanityTest,
+                             BibRecordSuccessTest,
+                             BibRecordBadInputTreatmentTest,
+                             BibRecordGettingFieldValuesTest,
+                             BibRecordGettingFieldValuesViaWildcardsTest,
+                             BibRecordAddFieldTest,
+                             BibRecordDeleteFieldTest,
+                             BibRecordAccentedUnicodeLettersTest,
+                             BibRecordSpecialTagParsingTest,
+                             BibRecordPrintingTest,)
+
 if __name__ == '__main__':
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)

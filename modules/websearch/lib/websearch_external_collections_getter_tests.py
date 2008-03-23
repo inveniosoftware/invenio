@@ -27,6 +27,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.websearch_external_collections_getter import HTTPAsyncPageGetter, async_download
+from invenio.testutils import make_test_suite, run_test_suite
 
 class AsyncDownloadTest(unittest.TestCase):
     """Test suite for websearch_external_collections_*"""
@@ -64,10 +65,8 @@ class AsyncDownloadTest(unittest.TestCase):
 
         self.assertEqual(errors, [])
 
-def create_test_suite():
-    """Return test suite for the external collection tests."""
-    return unittest.TestSuite((unittest.makeSuite(AsyncDownloadTest, 'test'),))
+TEST_SUITE = make_test_suite(AsyncDownloadTest,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 

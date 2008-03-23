@@ -29,11 +29,12 @@ import re
 import os
 import os.path
 from string import expandtabs, replace
-from invenio.config import CFG_TMPDIR
-import invenio.elmsubmit_config as elmsubmit_config
 import xml.dom.minidom
 
+from invenio.config import CFG_TMPDIR
+import invenio.elmsubmit_config as elmsubmit_config
 from invenio import elmsubmit
+from invenio.testutils import make_test_suite, run_test_suite
 
 class MarcTest(unittest.TestCase):
     """ elmsubmit - test for saniy """
@@ -228,14 +229,10 @@ class FileStorageTest(unittest.TestCase):
         except IOError:
             self.fail("WARNING: the test case file does not exist; test not run.")
 
-def create_test_suite():
-    """Return test suite for the elmsubmit module"""
-    return unittest.TestSuite((unittest.makeSuite(MarcTest,'test'), unittest.makeSuite(FileStorageTest,'test')))
-                              # unittest.makeSuite(BadInputTreatmentTest,'test'),
-                              # unittest.makeSuite(GettingFieldValuesTest,'test'),
-                              # unittest.makeSuite(AccentedUnicodeLettersTest,'test')))
+TEST_SUITE = make_test_suite(MarcTest,
+                             FileStorageTest,)
 
 if __name__ == '__main__':
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 
 

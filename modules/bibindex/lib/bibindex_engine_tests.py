@@ -27,6 +27,7 @@ __revision__ = \
 import unittest
 
 from invenio import bibindex_engine
+from invenio.testutils import make_test_suite, run_test_suite
 
 class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""
@@ -60,10 +61,8 @@ class TestWashIndexTerm(unittest.TestCase):
         self.assertEqual("ελληνικό αλφάβητο",
                          bibindex_engine.wash_index_term("Ελληνικό αλφάβητο"))
 
-def create_test_suite():
-    """Return test suite for the indexing engine."""
-    return unittest.TestSuite((unittest.makeSuite(TestListSetOperations,'test'),
-                               unittest.makeSuite(TestWashIndexTerm, 'test'),))
+TEST_SUITE = make_test_suite(TestListSetOperations,
+                             TestWashIndexTerm,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)

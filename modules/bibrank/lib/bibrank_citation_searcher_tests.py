@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio import bibrank_citation_searcher
+from invenio.testutils import make_test_suite, run_test_suite
 
 class TestCitationSearcher(unittest.TestCase):
 
@@ -35,11 +36,11 @@ class TestCitationSearcher(unittest.TestCase):
         self.recid = 339705
         self.recids = [339705, 339706]
         self.rank_method_code = 'citation'
-       
+
     def xtest_init_cited_by_dictionary(self):
         """bibrank citation searcher - init cited-by data"""
         # FIXME: test postponed
-        #self.assert_(bibrank_citation_searcher.init_cited_by_dictionary()) 
+        #self.assert_(bibrank_citation_searcher.init_cited_by_dictionary())
 
     def xtest_init_reference_list_dictionary(self):
         """bibrank citation searcher - init reference data"""
@@ -53,11 +54,9 @@ class TestCitationSearcher(unittest.TestCase):
     def xtest_calculate_co_cited_with_list(self):
         """bibrank citation searcher - get co-cited-with data"""
         # FIXME: test postponed
-            
-def create_test_suite():
-    """Return test suite for the citation searcher.""" 
-    return unittest.TestSuite((unittest.makeSuite(TestCitationSearcher,'test'),))
+
+TEST_SUITE = make_test_suite(TestCitationSearcher,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 

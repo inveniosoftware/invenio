@@ -27,6 +27,7 @@ import unittest
 
 from invenio import bibrank_tag_based_indexer
 from invenio.bibrank import split_ranges
+from invenio.testutils import make_test_suite, run_test_suite
 
 class TestListSetOperations(unittest.TestCase):
     """Test list set operations."""
@@ -39,9 +40,7 @@ class TestListSetOperations(unittest.TestCase):
         """bibrank tag based indexer - split ranges"""
         self.assertEqual([[0, 500], [600, 1000]], split_ranges("0-500,600-1000"))
 
-def create_test_suite():
-    """Return test suite for the indexing engine."""
-    return unittest.TestSuite((unittest.makeSuite(TestListSetOperations,'test'),))
+TEST_SUITE = make_test_suite(TestListSetOperations,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)

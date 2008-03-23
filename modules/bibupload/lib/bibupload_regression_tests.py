@@ -42,7 +42,7 @@ from invenio.bibupload_config import CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
 from invenio.search_engine import print_record
 from invenio.dbquery import run_sql
 from invenio.dateutils import convert_datestruct_to_datetext
-from invenio.testutils import make_test_suite, warn_user_about_tests_and_run
+from invenio.testutils import make_test_suite, run_test_suite
 from invenio.bibtask import task_set_option
 from invenio.bibdocfile import BibRecDocs
 
@@ -3076,7 +3076,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
         bibupload.wipe_out_record_from_all_tables(recid)
 
 
-test_suite = make_test_suite(BibUploadInsertModeTest,
+TEST_SUITE = make_test_suite(BibUploadInsertModeTest,
                              BibUploadAppendModeTest,
                              BibUploadCorrectModeTest,
                              BibUploadReplaceModeTest,
@@ -3090,7 +3090,7 @@ test_suite = make_test_suite(BibUploadInsertModeTest,
                              BibUploadStrongTagsTest,
                              BibUploadFFTModeTest)
 
-#test_suite = make_test_suite(BibUploadStrongTagsTest,)
+#TEST_SUITE = make_test_suite(BibUploadStrongTagsTest,)
 
 if __name__ == "__main__":
-    warn_user_about_tests_and_run(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)

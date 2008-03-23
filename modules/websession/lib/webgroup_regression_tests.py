@@ -31,7 +31,7 @@ from invenio.config import CFG_SITE_SECURE_URL, CFG_SITE_ADMIN_EMAIL
 from invenio.dbquery import run_sql
 from invenio.webgroup import synchronize_external_groups, synchronize_all_external_groups
 from invenio.webgroup_dblayer import get_external_groups, get_all_login_method_groups
-from invenio.testutils import make_test_suite, warn_user_about_tests_and_run, \
+from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 import unittest
 
@@ -195,7 +195,7 @@ class WebGroupTest(unittest.TestCase):
         run_sql("""DELETE FROM usergroup WHERE name=%s OR name=%s""", (self.goodgroup, self.badgroup,))
         run_sql("""DELETE FROM user_usergroup WHERE id_usergroup=%s OR id_usergroup=%s""", (self.goodid, self.badid,))
 
-test_suite = make_test_suite(WebGroupTest)
+TEST_SUITE = make_test_suite(WebGroupTest)
 
 if __name__ == "__main__":
-    warn_user_about_tests_and_run(test_suite)
+    run_test_suite(TEST_SUITE, warn_user=True)

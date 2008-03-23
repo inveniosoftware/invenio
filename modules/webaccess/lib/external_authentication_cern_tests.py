@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio import external_authentication_cern as cern
+from invenio.testutils import make_test_suite, run_test_suite
 
 class ExternalAuthenticationCernTest(unittest.TestCase):
     """Test functions related to the CERN authentication."""
@@ -38,30 +39,28 @@ class ExternalAuthenticationCernTest(unittest.TestCase):
         self.cern = cern.ExternalAuthCern()
 
     def test_auth_user_ok(self):
-        """external CERN - authorizing user through CERN system: should pass"""
+        """external authentication CERN - authorizing user through CERN system: should pass"""
         self.assertEqual(self.cern.auth_user(self.username, self.userpwd), \
                 self.useremail)
 
     def test_auth_user_fail(self):
-        """external CERN - authorizing user through CERN system: should fail"""
+        """external authentication CERN - authorizing user through CERN system: should fail"""
         self.assertEqual(self.cern.auth_user('patata', 'patata'), None)
 
     def test_fetch_user_groups_membership(self):
-        """external CERN - fetching user group membership at CERN"""
+        """external authentication CERN - fetching user group membership at CERN"""
         self.assertNotEqual(self.cern.fetch_user_groups_membership(self.useremail, self.userpwd), 0)
         self.assertEqual(self.cern.fetch_user_groups_membership('patata', 'patata'), {})
 
     def test_fetch_user_preferences(self):
-        """external CERN - fetching user setting from CERN"""
+        """external authentication CERN - fetching user setting from CERN"""
         self.assertEqual(self.cern.fetch_user_preferences(self.username, self.userpwd)['email'], self.useremail)
         #self.assertRaises(KeyError, self.cern.fetch_user_preferences('patata', 'patata')['email'])
 
-def create_test_suite():
-    """Return test suite for the user handling."""
-    return unittest.TestSuite((unittest.makeSuite(
-        ExternalAuthenticationCernTest,'test'),))
+# FIXME: the above tests not plugged into global unit test suite
+TEST_SUITE = make_test_suite() # ExternalAuthenticationCernTest,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 
 

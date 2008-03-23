@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,14 +27,15 @@ import unittest
 
 from invenio import dbquery
 from invenio.htmlutils import HTMLWasher
+from invenio.testutils import make_test_suite, run_test_suite
 
 class XSSEscapingTest(unittest.TestCase):
     """Test functions related to the prevention of XSS attacks."""
-    
+
     def __init__(self, methodName='test'):
         self.washer = HTMLWasher()
         unittest.TestCase.__init__(self, methodName)
-    
+
     def test_forbidden_formatting_tags(self):
         """htmlutils - washing of tags altering formatting of a page (e.g. </html>)"""
         test_str = """</html></body></div></pre>"""
@@ -43,7 +44,7 @@ class XSSEscapingTest(unittest.TestCase):
         self.assertEqual(self.washer.wash(html_buffer=test_str,
                                           render_unallowed_tags=True),
                          '&lt;/html&gt;&lt;/body&gt;&lt;/div&gt;&lt;/pre&gt;')
-                         
+
     def test_forbidden_script_tags(self):
         """htmlutils - washing of tags defining scripts (e.g. <script>)"""
         test_str = """<script>malicious_function();</script>"""
@@ -52,12 +53,12 @@ class XSSEscapingTest(unittest.TestCase):
         self.assertEqual(self.washer.wash(html_buffer=test_str,
                                           render_unallowed_tags=True),
                          '&lt;script&gt;malicious_function();&lt;/script&gt;')
-    
+
     def test_forbidden_attributes(self):
         """htmlutils - washing of forbidden attributes in allowed tags (e.g. onLoad)"""
         # onload
         test_str = """<p onload="javascript:malicious_functtion();">"""
-        self.assertEqual(self.washer.wash(html_buffer=test_str), '<p>') 
+        self.assertEqual(self.washer.wash(html_buffer=test_str), '<p>')
         # tricky: css calling a javascript
         test_str = """<p style="background: url('http://malicious_site.com/malicious_script.js');">"""
         self.assertEqual(self.washer.wash(html_buffer=test_str), '<p>')
@@ -79,14 +80,10 @@ class XSSEscapingTest(unittest.TestCase):
         test_str = """<a href="&#106;\n    a&#118;as\n  crI&#80;t :malicious_function();">link</a>"""
         self.assertEqual(self.washer.wash(html_buffer=test_str),
                          '<a href="">link</a>')
-                                 
-def create_test_suite():
-    """Return test suite for the user handling."""
-    return unittest.TestSuite((
-        unittest.makeSuite(XSSEscapingTest,'test'),
-        ))
+
+TEST_SUITE = make_test_suite(XSSEscapingTest,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
 
 

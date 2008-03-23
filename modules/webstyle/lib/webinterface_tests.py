@@ -23,6 +23,8 @@ __revision__ = "$Id$"
 
 import unittest, sys, cgi
 
+from invenio.testutils import make_test_suite, run_test_suite
+
 # SLIPPERY SLOPE AHEAD
 #
 # Trick mod_python into believing there is already an _apache module
@@ -131,9 +133,7 @@ class TestWashArgs(unittest.TestCase):
         self._check('jrec=12&jrec=foo', default, {'jrec': 12})
 
 
-def create_test_suite():
-    """Return test suite for the search engine."""
-    return unittest.TestSuite((unittest.makeSuite(TestWashArgs),))
+TEST_SUITE = make_test_suite(TestWashArgs,)
 
 if __name__ == "__main__":
-    unittest.TextTestRunner(verbosity=2).run(create_test_suite())
+    run_test_suite(TEST_SUITE)
