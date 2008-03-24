@@ -166,7 +166,9 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         elif uid > 0:
             pref = get_user_preferences(uid)
             try:
-                argd['rg'] = int(pref['websearch_group_records'])
+                if not form.has_key('rg'):
+                    # fetch user rg preference only if not overridden via URL
+                    argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
                 pass
 
@@ -235,7 +237,9 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         elif uid > 0:
             pref = get_user_preferences(uid)
             try:
-                argd['rg'] = int(pref['websearch_group_records'])
+                if not form.has_key('rg'):
+                    # fetch user rg preference only if not overridden via URL
+                    argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
                 pass
 
@@ -285,7 +289,9 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         elif uid > 0:
             pref = get_user_preferences(uid)
             try:
-                argd['rg'] = int(pref['websearch_group_records'])
+                if not form.has_key('rg'):
+                    # fetch user rg preference only if not overridden via URL
+                    argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
                 pass
 
@@ -394,7 +400,9 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         if uid > 0:
             pref = get_user_preferences(uid)
             try:
-                argd['rg'] = int(pref['websearch_group_records'])
+                if not form.has_key('rg'):
+                    # fetch user rg preference only if not overridden via URL
+                    argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
                 pass
 
@@ -797,7 +805,9 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
         elif uid > 0:
             pref = get_user_preferences(uid)
             try:
-                argd['rg'] = int(pref['websearch_group_records'])
+                if not form.has_key('rg'):
+                    # fetch user rg preference only if not overridden via URL
+                    argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
                 pass
 
