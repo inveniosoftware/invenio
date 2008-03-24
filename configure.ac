@@ -22,8 +22,8 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.93.50.20080323, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080323)
+AC_INIT(cds-invenio, 0.93.50.20080324, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.93.50.20080324)
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with
@@ -625,7 +625,6 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/webmessage/web/Makefile \
 	  modules/websubmit/Makefile \
 	  modules/websubmit/bin/Makefile \
-	  modules/websubmit/bin/thumbmaker \
 	  modules/websubmit/etc/Makefile \
 	  modules/websubmit/doc/Makefile \
 	  modules/websubmit/doc/admin/Makefile \
