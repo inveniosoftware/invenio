@@ -1,6 +1,1848 @@
 CDS Invenio v0.99.0 (released FIXME)
 =========================================
 
+2008-03-24  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/hacking/test-suite.webdoc: Fixed typo, and
+	some rephrasing.
+
+2008-03-24  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webhelp/web/hacking/test-suite.webdoc: Documented the web
+	test suite framework.  Mused on the differences with the regression
+	test suite fremework.  (The latter, using mechanize, suitable
+	mostly for testing simple single page operations; the former, using
+	Selenium IDE, suitable mostly for testing JavaScript or complex
+	multipage operations.)
+
+2008-03-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/web/.cvsignore,
+	modules/bibformat/web/Makefile.am,
+	modules/bibformat/web/test_format_many_authors.html,
+	modules/miscutil/lib/inveniocfg.py,
+	modules/miscutil/lib/testutils.py,
+	modules/websearch/web/Makefile.am,
+	modules/websearch/web/test_search_ellis.html,
+	modules/websubmit/web/.cvsignore,
+	modules/websubmit/web/Makefile.am, modules/websubmit/web/test.jpg,
+	modules/websubmit/web/test.pdf,
+	modules/websubmit/web/test_submit_article.html,
+	modules/websubmit/web/test_submit_picture.html,
+	modules/websubmit/web/test_submit_poetry.html: Initial release of
+	the web test suite infrastructure, to be run via 'inveniocfg
+	--run-web-tests'.  The web tests are run in a real browser,
+	currently Firefox with Selenium IDE extension.	The tests are
+	written in "Selenese HTML" or can be recorded via Selenium IDE.
+	This initial web test suite release includes an obligatory Ellis
+	test search example, and, more importantly, tests for
+	JavaScript-powered pages such as formatting many authors with
+	show/hide links, submitting a demo article, a picture, and a poem.
+	More tests to follow progressively.
+
+2008-03-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webstyle/lib/webdoc.py: Removed WML-like input mode
+	enabling to enter the full path of a webdoc file.
+
+2008-03-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/websearch_webinterface.py,
+	modules/webstyle/lib/webinterface_layout.py: Standardized
+	WebInterfaceAuthorPages web directory name.
+
+2008-03-23  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac,
+	modules/bibclassify/lib/bibclassify_regression_tests.py,
+	modules/bibconvert/lib/bibconvert_regression_tests.py,
+	modules/bibconvert/lib/bibconvert_tests.py,
+	modules/bibedit/lib/bibedit_regression_tests.py,
+	modules/bibedit/lib/bibrecord_tests.py,
+	modules/bibformat/lib/bibformat_engine_tests.py,
+	modules/bibformat/lib/bibformat_regression_tests.py,
+	modules/bibformat/lib/bibformatadmin_regression_tests.py,
+	modules/bibharvest/lib/bibharvestadmin_regression_tests.py,
+	modules/bibharvest/lib/oai_repository_regression_tests.py,
+	modules/bibharvest/lib/oai_repository_tests.py,
+	modules/bibharvest/lib/oaiarchiveadmin_regression_tests.py,
+	modules/bibindex/lib/bibindex_engine_stemmer_tests.py,
+	modules/bibindex/lib/bibindex_engine_tests.py,
+	modules/bibindex/lib/bibindexadmin_regression_tests.py,
+	modules/bibrank/lib/bibrank_citation_indexer_tests.py,
+	modules/bibrank/lib/bibrank_citation_searcher_tests.py,
+	modules/bibrank/lib/bibrank_downloads_indexer_tests.py,
+	modules/bibrank/lib/bibrank_record_sorter_tests.py,
+	modules/bibrank/lib/bibrank_regression_tests.py,
+	modules/bibrank/lib/bibrank_tag_based_indexer_tests.py,
+	modules/bibrank/lib/bibrankadmin_regression_tests.py,
+	modules/bibupload/lib/bibupload_regression_tests.py,
+	modules/elmsubmit/lib/elmsubmit_tests.py,
+	modules/miscutil/bin/.cvsignore, modules/miscutil/bin/Makefile.am,
+	modules/miscutil/bin/regressiontestsuite.in,
+	modules/miscutil/bin/testsuite.in,
+	modules/miscutil/lib/dateutils_tests.py,
+	modules/miscutil/lib/dbquery_tests.py,
+	modules/miscutil/lib/errorlib_regression_tests.py,
+	modules/miscutil/lib/errorlib_tests.py,
+	modules/miscutil/lib/htmlutils_tests.py,
+	modules/miscutil/lib/intbitset_tests.py,
+	modules/miscutil/lib/inveniocfg.py,
+	modules/miscutil/lib/testutils.py,
+	modules/miscutil/lib/testutils_regression_tests.py,
+	modules/miscutil/lib/textutils_tests.py,
+	modules/webaccess/lib/access_control_firerole_tests.py,
+	modules/webaccess/lib/external_authentication_cern_tests.py,
+	modules/webaccess/lib/webaccess_regression_tests.py,
+	modules/webalert/lib/webalert_regression_tests.py,
+	modules/webbasket/lib/webbasket_regression_tests.py,
+	modules/webcomment/lib/webcomment_regression_tests.py,
+	modules/webcomment/lib/webcomment_tests.py,
+	modules/webhelp/web/hacking/test-suite.webdoc,
+	modules/webmessage/lib/webmessage_regression_tests.py,
+	modules/websearch/lib/search_engine_tests.py,
+	modules/websearch/lib/websearch_external_collections_getter_tests.py,
+	modules/websearch/lib/websearch_external_collections_tests.py,
+	modules/websearch/lib/websearch_regression_tests.py,
+	modules/websearch/lib/websearchadmin_regression_tests.py,
+	modules/websession/lib/webgroup_regression_tests.py,
+	modules/websession/lib/webgroup_tests.py,
+	modules/websession/lib/websession_regression_tests.py,
+	modules/websession/lib/webuser_regression_tests.py,
+	modules/websession/lib/webuser_tests.py,
+	modules/webstyle/lib/webinterface_tests.py,
+	modules/websubmit/lib/websubmit_regression_tests.py,
+	modules/websubmit/lib/websubmitadmin_regression_tests.py,
+	po/POTFILES.in: Standardized unit and regression test suite
+	building and running techniques.  Phased out 'testsuite' and
+	'regressiontestsuite' executables as the test suites are now
+	runnable from 'inveniocfg'.
+
+2008-03-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/fr.po: Updated last translator to Jerome.
+
+2008-03-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/bg.po, po/ca.po, po/cds-invenio.pot, po/cs.po, po/de.po,
+	po/el.po, po/en.po, po/es.po, po/fr.po, po/hr.po, po/it.po,
+	po/ja.po, po/no.po, po/pl.po, po/pt.po, po/ru.po, po/sk.po,
+	po/sv.po, po/uk.po, po/zh_CN.po, po/zh_TW.po: Updated with new
+	phrases.
+
+2008-03-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/websession_templates.py: Updated two new
+	output messages.
+
+2008-03-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/testimport.py: Fixed deduction of the
+	'site-packages' location.  Removed trailing whitespace.
+
+2008-03-21  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/inveniocfg.py: When detecting Apache (and
+	mod_python) version from available executables, print information
+	for all executables found.
+
+2008-03-20  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/websession/lib/webaccount.py,
+	modules/websession/lib/websession_webinterface.py,
+	modules/websession/lib/webuser.py: Moved
+	user_preferences['preferred_lang'] to 'language'.
+
+2008-03-20  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/lib/urlutils.py,
+	modules/websearch/lib/websearch_regression_tests.py: Fixed
+	regression tests WRT recent changes to ln url parameter.
+
+2008-03-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES: Added note on the removal of 'magic' and 'help'
+	directories.
+
+2008-03-20  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/lib/messages.py: Fixed stupid bug.
+
+2008-03-20  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibupload/lib/bibupload.py,
+	modules/bibupload/lib/bibupload_regression_tests.py: Strengthened
+	FFT error checking. Improved regression tests.
+
+2008-03-20  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/webstyle/lib/webdoc.py: Print help if no webdoc
+	specified.
+
+2008-03-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webstat/lib/webstat.py: Fixed typo in an output message.
+
+2008-03-20  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* po/fr.po: Updated translation.
+
+2008-03-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/messages.py: Do not force English as
+	default, take CFG_SITE_LANG.
+
+2008-03-20  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webaccess/lib/access_control_config.py: Do not force
+	English, take CFG_SITE_LANG.
+
+2008-03-20  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/webstat/lib/webstat.py,
+	modules/webstat/lib/webstat_engine.py: Do not raise an exception if
+	Gnuplot is missing.
+
+2008-03-20  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/webstat/lib/webstat.py,
+	modules/webstat/lib/webstat_templates.py,
+	modules/webstat/lib/webstat_webinterface.py: Made webstat language
+	aware.
+
+2008-03-20  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibupload/lib/bibupload.py: Moved (-s, --stage) option to
+	(-S --stage) because of clashing with (-s --sleptime). Replugged
+	the --stage option to the new BibTask class.
+
+2008-03-20  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/lib/urlutils.py: If the language of the system
+	is e.g. en, and an Invenio URL contains ln=en, this is no more
+	stripped out since this would now trigger the automatic discovering
+	of the user language based on his browser settings or preference.
+
+2008-03-20  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibupload/lib/bibupload_regression_tests.py: Added
+	regression test to test for FFT writing rights and made regression
+	tests more verbose.
+
+2008-03-20  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/websubmit/lib/websubmit_templates.py,
+	modules/websubmit/lib/websubmit_webinterface.py: Better propagation
+	of language links.
+
+2008-03-20  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/webstyle/lib/webdoc.py: Reapplied patch from version
+	1.28, overwritten by previous commit.
+
+2008-03-20  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/webstyle/lib/webdoc.py: Fixed issue related to
+	translation of webdoc files.  A cache file is now created for all
+	parts of webdoc files, even if that part is absent from the webdoc
+	(only for CFG_SITE_LANG): this prevents on-the-fly generation when
+	a part is deliberately missing from a webdoc.
+
+2008-03-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibeditcli.py: When doing '--list-revisions',
+	return latest revisions first.
+
+2008-03-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/doc/admin/bibedit-admin-guide.webdoc: Added
+	documentation on how to access record history.
+
+2008-03-19  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/websession/lib/websession.py: Fixed session library to be
+	able to load old sessions (without __remember_me attribute).
+
+2008-03-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webstyle/lib/webdoc.py: Updated main webdoc help
+	(help-pages are no more, use search-guide in the example).
+
+2008-03-19  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* config/invenio.conf,
+	modules/webaccess/lib/external_authentication.py,
+	modules/webaccess/lib/external_authentication_cern.py,
+	modules/webaccess/lib/external_authentication_ldap.py,
+	modules/webaccess/lib/external_authentication_sso.py,
+	modules/websession/lib/session.py,
+	modules/websession/lib/webaccount.py,
+	modules/websession/lib/websession.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/websession_webinterface.py,
+	modules/websession/lib/webuser.py,
+	modules/webstyle/lib/webinterface_handler.py: Implemented permanent
+	sessions support - a.k.a Remember Me, automatic preferred language
+	discovery and language configuration in the user preferences.
+
+2008-03-19  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/websession/lib/websession_webinterface.py,
+	modules/websubmit/lib/websubmit_webinterface.py: Fixed typo in
+	string.
+
+2008-03-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/messages.py: Fixed variable shadowing
+	issues.
+
+2008-03-19  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/messages.py: Updated docstrings.
+
+2008-03-19  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/lib/messages.py: Added wash_languages to pick up
+	the first good language within a list.
+
+2008-03-19  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/bibformat_engine.py,
+	modules/bibformat/lib/bibformat_engine_tests.py: Do not return
+	empty string if there is only 1 field when of='xm'.  Added
+	corresponding test.
+
+2008-03-18  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibeditcli.py: Better argument checking for
+	'--list-revisions'.  General docstrings update.
+
+2008-03-18  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibeditcli.py: Fixed an error output string
+	and shortened command line options.
+
+2008-03-18  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac, modules/bibedit/bin/.cvsignore,
+	modules/bibedit/bin/Makefile.am, modules/bibedit/bin/bibedit.in,
+	modules/bibedit/lib/Makefile.am, modules/bibedit/lib/bibeditcli.py:
+	Initial release of the BibEdit command line tool.  Currently
+	implements three functions: '--list-record-revisions',
+	'--get-record-revision', and '--diff-record-revisions'.  See also
+	task #6566.
+
+2008-03-18  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/websession/lib/websession_templates.py: Fixed string.
+
+2008-03-18  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/lib/inveniocfg.py, config/invenio.conf,
+	modules/websubmit/lib/bibdocfile.py: Added
+	CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS.
+
+2008-03-18  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/etc/format_templates/Makefile.am: Removed
+	deleted BFX files.
+
+2008-03-17  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/websearch/lib/websearch_webinterface.py: List of output
+	formats exported through 'weburl/record/recid/export/' URL is no
+	longer hard-coded.
+
+2008-03-17  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/etc/format_templates/DC.bfx,
+	modules/bibformat/etc/format_templates/EndNote.bfx,
+	modules/bibformat/etc/format_templates/MARCXML.bfx,
+	modules/bibformat/etc/format_templates/NLM.bfx,
+	modules/bibformat/etc/format_templates/RSS.bfx: Removed bfx
+	templates.
+
+2008-03-17  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/bibreformat.py: Do no trigger a bibupload
+	task if there is no record to update.
+
+2008-03-17  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/bibformat_xslt_engine.py: Catch an
+	exception thrown when result is empty, due to a bug in libxslt.
+
+2008-03-16  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/lib/bibformat_regression_tests.py: Adapted the
+	"MARC output" test case to fit the new demo book record metadata
+	featuring new ISBN fields.
+
+2008-03-14  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/websearch/lib/websearch_regression_tests.py,
+	modules/websearch/lib/websearch_templates.py: Fixed dangling tabs
+	in source.  Improved OpenURL handler A.I.  Commented out DOI
+	support.  Added firt test cases for OpenURL. More to come.
+
+2008-03-14  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql: Commented out doi field.
+
+2008-03-14  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibupload/lib/bibupload.py: Restored original behaviour
+	of storing current time as last_update time when updating default
+	'xm' format.
+
+2008-03-14  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibedit/lib/bibrecord_tests.py: Updated tests after
+	changes to demo site.
+
+2008-03-14  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/bibformat_engine.py,
+	modules/bibformat/lib/bibreformat.py: If record is empty (or only
+	has one value, i.e. its recid controlfield), returns empty string.
+	BibReformat does not cache empty records.
+
+2008-03-14  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/lib/textutils.py,
+	modules/miscutil/lib/textutils_tests.py: Fixed bunch of errors.
+	Added test for single new line -> space, added support for non
+	ascii text.
+
+2008-03-14  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/bibreformat.py: Add time of formatting in
+	fmt__d field.
+
+2008-03-14  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibupload/lib/bibupload.py,
+	modules/bibupload/lib/bibupload_regression_tests.py: Completed
+	bibupload support for $d in FMT, plugged check in a test case.
+
+2008-03-14  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibupload/lib/bibupload.py: Added d field to FMT tag to
+	provide modification_date to bibupload.
+
+2008-03-14  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/lib/errorlib.py,
+	modules/miscutil/lib/errorlib_regression_tests.py,
+	modules/miscutil/lib/inveniocfg.py,
+	modules/miscutil/lib/textutils.py,
+	modules/miscutil/lib/textutils_tests.py: Fixed adding translation
+	for translatable field only.
+
+2008-03-14  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/demo/demobibdata.xml: Added isbn for books.
+
+2008-03-14  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql: Added isbn to books (when
+	possible).
+
+2008-03-14  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/websearch/lib/search_engine.py: Hidden warning message
+	when user print a jsMath enabled page with poor fonts support on
+	the browser.
+
+2008-03-14  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql: Updated the descriptions
+	of some of the DEMO* submission document types.
+
+2008-03-13  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* po/it.po: Resynchronized Italian translation.
+
+2008-03-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/bg.po, po/ca.po, po/cds-invenio.pot, po/cs.po, po/de.po,
+	po/el.po, po/en.po, po/es.po, po/fr.po, po/hr.po, po/it.po,
+	po/ja.po, po/no.po, po/pl.po, po/pt.po, po/ru.po, po/sk.po,
+	po/sv.po, po/uk.po, po/zh_CN.po, po/zh_TW.po: PO files regenerated
+	after addition/modification of I18N phrases.
+
+2008-03-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webaccess/lib/webaccessadmin_lib.py: Fixed I18N messages
+	(whitespace elimination, newline elimination).
+
+2008-03-13  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/web/publiline.py: Added a "tweak" to fix
+	refereeing for doctypes without a category.
+
+2008-03-13  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Is_Referee.py: Added a "tweak" to
+	fix refereeing for doctypes with no category.
+
+2008-03-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/POTFILES.in: Removed recently deleted files (magic,
+	bibformat).
+
+2008-03-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websession/lib/websession_templates.py,
+	modules/webstyle/lib/webdoc.py: Fixed I18N messages WRT the %s and
+	%(x_foo)s convention; see ABOUT-NLS.
+
+2008-03-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webstyle/lib/webdoc_webinterface.py: Harmonized output
+	messages WRT index/contents.  Fixed I18N message formatting
+	according to the x_* convention (see ABOUT-NLS).
+
+2008-03-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webaccess/lib/access_control_config.py: Added new demo
+	role 'bookadmin' with rights to approve/reject book submissions.
+	Attached Dorian Gray to the bookadmin role.  Fixed Dr. Jekyll's
+	email address.
+
+2008-03-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/inveniocfg.py: Added
+	'--detect-system-details' option that tries to detect and print
+	system details such as Apache/Python/MySQL versions.  Useful for
+	debugging problems on various operating systems.
+
+2008-03-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/inveniocfg.py: Removed extra printed
+	newline.
+
+2008-03-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/inveniocfg.py: Updated Apache vhost snippet
+	examples to include Listen directives and to remove https schema
+	from the ssl snippet.  The generated vhost conf files are now
+	directly usable on Gentoo "as is" by doing: $ ln -s
+	/opt/cds-invenio/etc/apache/invenio-apache-vhost.conf
+	/etc/apache2/vhosts.d/invenio-apache-vhost.conf $ ln -s
+	/opt/cds-invenio/etc/apache/invenio-apache-vhost-ssl.conf
+	/etc/apache2/vhosts.d/invenio-apache-vhost-ssl.conf
+
+2008-03-13  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/elements/bfe_server_info.py: Changed
+	variable names to match config variables.
+
+2008-03-13  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/bibformat_regression_tests.py: Fixed NLM
+	output test for XSL processors that don't group empty elements.
+
+2008-03-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/inveniocfg.py: Updated cosmetics WRT hints
+	on how to set up the database.
+
+2008-03-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac, modules/bibformat/bin/.cvsignore,
+	modules/bibformat/bin/Makefile.am,
+	modules/bibformat/bin/bibformat.in: Removed unneeded bibformat PHP
+	CLI, fixing "neverending test case" issue on SLC4.
+
+2008-03-13  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/websearch/lib/search_engine.py: Restrict record similary
+	search to 'cc' when 'cc' is specified.
+
+2008-03-13  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql: I misspelled Dorian's
+	surname - changed to gray. Sorry Dorian!
+
+2008-03-13  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql: + Added new demo site user
+	'Dorian Grey' (dorian.grey@cds.cern.ch; dorian).    He will be a
+	referee for the Demo Book submission (DEMOBOO);  + Changed the
+	email addresses of demo site users Jekyll and Hyde to use
+	'@cds.cern.ch' instead of '@cern.ch'.
+
+2008-03-13  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibsched/lib/bibtask.py: A workaround for some Python2.3
+	systems, e.g. SLC4, where importing this file under
+	Apache/mod_python environment causes an error.	A proper solution
+	would be not to import bibtask.py as a dependency from web-related
+	files, because we simply do not need it there...
+
+2008-03-13  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/websession/lib/webuser.py,
+	modules/webstat/lib/webstat_webinterface.py: Cleaned
+	page_not_authorized calls.
+
+2008-03-13  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/websession/lib/webuser.py: If the referer is not
+	specified for page_not_authorized it is guessed from req.
+
+2008-03-13  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webstat/lib/webstat_webinterface.py: Plugged checks for
+	runwebstatadmin action authorization to webstat.
+
+2008-03-13  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/websearch/lib/websearch_templates.py: When OpenURL does
+	not correspond to an existing record, return a search for recid:-1,
+	which already produces a nice "Requested record does not seems to
+	exist." message.
+
+2008-03-13  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webstat/lib/webstat_webinterface.py: Forcing
+	authentication for users who wants to check the stats.
+
+2008-03-13  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/websession/lib/webuser.py: Registered exception when
+	OperationalError during getUid.
+
+2008-03-13  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webstyle/lib/webpage.py: uid is used by page function in
+	order correctly build the page. It is sometimes not passed, but
+	usually the req is passed by. Hence when no uid is passed, but req
+	is, uid is set to getUid(req).
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/doc/submit-guide.webdoc: Some small edits.
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/doc/submit-guide.webdoc: First draft of the new
+	user guide.
+
+2008-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/lib/websubmitadmin_dblayer.py: Removed
+	extraneous definition of update_doctype_details().
+
+2008-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/inveniocfg.py: Synchronized creation of SSL
+	and non-SSL Apache conf snippet ("/author" missing in SSL).
+
+2008-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/inveniocfg.py: Fixed CFG_SITE_SECURE_URL
+	name.
+
+2008-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/inveniocfg.py: Added /stats URL to the
+	Apache LocationMatch.
+
+2008-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibclassify/doc/admin/bibclassify-admin-guide.webdoc,
+	modules/bibclassify/doc/hacking/bibclassify-extraction-algorithm.webdoc,
+	modules/bibclassify/doc/hacking/bibclassify-hep-taxonomy.webdoc,
+	modules/bibclassify/doc/hacking/bibclassify-internals.webdoc,
+	modules/bibclassify/lib/bibclassify_regression_tests.py,
+	modules/bibconvert/doc/admin/bibconvert-admin-guide.webdoc,
+	modules/bibconvert/doc/hacking/bibconvert-api.webdoc,
+	modules/bibconvert/doc/hacking/bibconvert-internals.webdoc,
+	modules/bibconvert/lib/bibconvert_regression_tests.py,
+	modules/bibconvert/lib/bibconvert_xslt_engine.py,
+	modules/bibedit/doc/admin/bibedit-admin-guide.webdoc,
+	modules/bibedit/lib/bibedit_regression_tests.py,
+	modules/bibedit/lib/bibedit_templates.py,
+	modules/bibedit/web/admin/bibeditadmin.py,
+	modules/bibformat/doc/admin/bibformat-admin-guide.webdoc,
+	modules/bibformat/doc/hacking/bibformat-api.webdoc,
+	modules/bibformat/doc/hacking/bibformat-internals.webdoc,
+	modules/bibformat/etc/format_templates/Default_HTML_actions.bft,
+	modules/bibformat/lib/bibformat.py,
+	modules/bibformat/lib/bibformat_regression_tests.py,
+	modules/bibformat/lib/bibformat_templates.py,
+	modules/bibformat/lib/bibformat_xslt_engine.py,
+	modules/bibformat/lib/bibformatadmin_regression_tests.py,
+	modules/bibformat/lib/bibformatadminlib.py,
+	modules/bibformat/lib/bibreformat.py,
+	modules/bibformat/lib/elements/bfe_abstract.py,
+	modules/bibformat/lib/elements/bfe_addresses.py,
+	modules/bibformat/lib/elements/bfe_authors.py,
+	modules/bibformat/lib/elements/bfe_cited_by.py,
+	modules/bibformat/lib/elements/bfe_contact.py,
+	modules/bibformat/lib/elements/bfe_edit_record.py,
+	modules/bibformat/lib/elements/bfe_editors.py,
+	modules/bibformat/lib/elements/bfe_fulltext.py,
+	modules/bibformat/lib/elements/bfe_fulltext_mini.py,
+	modules/bibformat/lib/elements/bfe_keywords.py,
+	modules/bibformat/lib/elements/bfe_photo_resources_brief.py,
+	modules/bibformat/lib/elements/bfe_references.py,
+	modules/bibformat/lib/elements/bfe_server_info.py,
+	modules/bibformat/lib/elements/bfe_title.py,
+	modules/bibformat/web/admin/bibformatadmin.py,
+	modules/bibharvest/doc/admin/bibharvest-admin-guide.webdoc,
+	modules/bibharvest/lib/bibharvest_templates.py,
+	modules/bibharvest/lib/bibharvestadmin_regression_tests.py,
+	modules/bibharvest/lib/bibharvestadminlib.py,
+	modules/bibharvest/lib/oai_repository.py,
+	modules/bibharvest/lib/oai_repository_regression_tests.py,
+	modules/bibharvest/lib/oaiarchiveadmin_regression_tests.py,
+	modules/bibharvest/lib/oaiarchiveadminlib.py,
+	modules/bibharvest/web/admin/bibharvestadmin.py,
+	modules/bibharvest/web/admin/oaiarchiveadmin.py,
+	modules/bibindex/doc/admin/bibindex-admin-guide.webdoc,
+	modules/bibindex/lib/bibindex_engine.py,
+	modules/bibindex/lib/bibindexadmin_regression_tests.py,
+	modules/bibindex/lib/bibindexadminlib.py,
+	modules/bibindex/web/admin/bibindexadmin.py,
+	modules/bibmatch/doc/admin/bibmatch-admin-guide.webdoc,
+	modules/bibrank/doc/admin/bibrank-admin-guide.webdoc,
+	modules/bibrank/doc/hacking/bibrank-api.webdoc,
+	modules/bibrank/doc/hacking/bibrank-bibrankgkb.webdoc,
+	modules/bibrank/doc/hacking/bibrank-internals.webdoc,
+	modules/bibrank/doc/hacking/bibrank-single-tag-rank.webdoc,
+	modules/bibrank/doc/hacking/bibrank-word-similarity.webdoc,
+	modules/bibrank/lib/bibrank_citation_grapher.py,
+	modules/bibrank/lib/bibrank_downloads_grapher.py,
+	modules/bibrank/lib/bibrank_regression_tests.py,
+	modules/bibrank/lib/bibrankadmin_regression_tests.py,
+	modules/bibrank/lib/bibrankadminlib.py,
+	modules/bibrank/web/admin/bibrankadmin.py,
+	modules/bibsched/doc/admin/bibsched-admin-guide.webdoc,
+	modules/bibupload/doc/admin/bibupload-admin-guide.webdoc,
+	modules/bibupload/lib/bibupload.py,
+	modules/bibupload/lib/bibupload_regression_tests.py,
+	modules/elmsubmit/doc/admin/elmsubmit-admin-guide.webdoc,
+	modules/elmsubmit/lib/elmsubmit_config.py,
+	modules/miscutil/doc/hacking/miscutil-dateutils.webdoc,
+	modules/miscutil/doc/hacking/miscutil-dbquery.webdoc,
+	modules/miscutil/doc/hacking/miscutil-errorlib.webdoc,
+	modules/miscutil/doc/hacking/miscutil-internals.webdoc,
+	modules/miscutil/lib/errorlib.py,
+	modules/miscutil/lib/errorlib_regression_tests.py,
+	modules/miscutil/lib/errorlib_webinterface.py,
+	modules/miscutil/lib/inveniocfg.py,
+	modules/miscutil/lib/mailutils.py,
+	modules/miscutil/lib/testutils.py,
+	modules/miscutil/lib/testutils_regression_tests.py,
+	modules/miscutil/lib/urlutils.py,
+	modules/webaccess/doc/hacking/webaccess-admin-internals.webdoc,
+	modules/webaccess/doc/hacking/webaccess-api.webdoc,
+	modules/webaccess/doc/hacking/webaccess-firerole-api.webdoc,
+	modules/webaccess/doc/hacking/webaccess-internals.webdoc,
+	modules/webaccess/doc/hacking/webaccess-table-structure.webdoc,
+	modules/webaccess/lib/access_control_config.py,
+	modules/webaccess/lib/webaccess_regression_tests.py,
+	modules/webaccess/lib/webaccessadmin_lib.py,
+	modules/webalert/doc/admin/webalert-admin-guide.webdoc,
+	modules/webalert/lib/alert_engine.py,
+	modules/webalert/lib/webalert_regression_tests.py,
+	modules/webalert/lib/webalert_templates.py,
+	modules/webalert/lib/webalert_webinterface.py,
+	modules/webbasket/doc/admin/webbasket-admin-guide.webdoc,
+	modules/webbasket/lib/webbasket.py,
+	modules/webbasket/lib/webbasket_regression_tests.py,
+	modules/webbasket/lib/webbasket_templates.py,
+	modules/webbasket/lib/webbasket_webinterface.py,
+	modules/webcomment/doc/admin/webcomment-admin-guide.webdoc,
+	modules/webcomment/lib/webcomment.py,
+	modules/webcomment/lib/webcomment_regression_tests.py,
+	modules/webcomment/lib/webcomment_templates.py,
+	modules/webcomment/lib/webcomment_webinterface.py,
+	modules/webcomment/lib/webcommentadminlib.py,
+	modules/webcomment/web/admin/webcommentadmin.py,
+	modules/webhelp/web/admin/admin.webdoc,
+	modules/webhelp/web/admin/howto/howto-marc.webdoc,
+	modules/webhelp/web/admin/howto/howto-migrate.webdoc,
+	modules/webhelp/web/admin/howto/howto-run.webdoc,
+	modules/webhelp/web/admin/howto/howto.webdoc,
+	modules/webhelp/web/hacking/coding-style.webdoc,
+	modules/webhelp/web/hacking/common-concepts.webdoc,
+	modules/webhelp/web/hacking/directory-organization.webdoc,
+	modules/webhelp/web/hacking/hacking.webdoc,
+	modules/webhelp/web/hacking/modules-overview.webdoc,
+	modules/webhelp/web/hacking/release-numbering.webdoc,
+	modules/webhelp/web/hacking/test-suite.webdoc,
+	modules/webjournal/lib/webjournal.py,
+	modules/webjournal/lib/webjournal_config.py,
+	modules/webjournal/lib/webjournal_templates.py,
+	modules/webjournal/lib/webjournal_utils.py,
+	modules/webjournal/lib/webjournal_webinterface.py,
+	modules/webmessage/doc/admin/webmessage-admin-guide.webdoc,
+	modules/webmessage/lib/webmessage_regression_tests.py,
+	modules/webmessage/lib/webmessage_templates.py,
+	modules/webmessage/lib/webmessage_webinterface.py,
+	modules/websearch/doc/search-guide.webdoc,
+	modules/websearch/doc/search-tips.webdoc,
+	modules/websearch/doc/admin/websearch-admin-guide.webdoc,
+	modules/websearch/doc/hacking/search-engine-api.webdoc,
+	modules/websearch/doc/hacking/search-engine-internals.webdoc,
+	modules/websearch/doc/hacking/search-engine-stages.webdoc,
+	modules/websearch/lib/search_engine.py,
+	modules/websearch/lib/websearch_regression_tests.py,
+	modules/websearch/lib/websearch_templates.py,
+	modules/websearch/lib/websearch_webcoll.py,
+	modules/websearch/lib/websearch_webinterface.py,
+	modules/websearch/lib/websearchadmin_regression_tests.py,
+	modules/websearch/lib/websearchadminlib.py,
+	modules/websearch/web/admin/websearchadmin.py,
+	modules/websession/doc/admin/websession-admin-guide.webdoc,
+	modules/websession/lib/webaccount.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/websession_webinterface.py,
+	modules/websession/lib/webuser.py,
+	modules/webstat/doc/admin/webstat-admin-guide.webdoc,
+	modules/webstat/lib/webstat_engine.py,
+	modules/webstat/lib/webstat_templates.py,
+	modules/webstat/lib/webstat_webinterface.py,
+	modules/webstyle/doc/admin/webstyle-admin-guide.webdoc,
+	modules/webstyle/lib/webdoc.py,
+	modules/webstyle/lib/webdoc_webinterface.py,
+	modules/webstyle/lib/webinterface_handler.py,
+	modules/webstyle/lib/webpage.py,
+	modules/webstyle/lib/webstyle_templates.py,
+	modules/websubmit/doc/submit-guide.webdoc,
+	modules/websubmit/doc/admin/websubmit-admin-guide.webdoc,
+	modules/websubmit/lib/bibdocfile.py,
+	modules/websubmit/lib/websubmit_engine.py,
+	modules/websubmit/lib/websubmit_regression_tests.py,
+	modules/websubmit/lib/websubmit_templates.py,
+	modules/websubmit/lib/websubmit_webinterface.py,
+	modules/websubmit/lib/websubmitadmin_config.py,
+	modules/websubmit/lib/websubmitadmin_regression_tests.py,
+	modules/websubmit/lib/websubmitadmin_templates.py,
+	modules/websubmit/lib/functions/Mail_New_Record_Notification.py,
+	modules/websubmit/lib/functions/Send_Modify_Mail.py,
+	modules/websubmit/lib/functions/Send_SRV_Mail.py,
+	modules/websubmit/web/yoursubmissions.py,
+	modules/websubmit/web/admin/referees.py: Updated codebase to use
+	CFG_SITE_URL instead of weburl everywhere.  Updated client code
+	that was shadowing this variable.  (Please don't shadow variables!)
+	This concludes the massive CFG_* variable renaming in the
+	codebase.
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql: The DEMOTXT submission was
+	renamed to DEMOART. Accordingly, all of the associated fields were
+	renamed.
+
+2008-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/lib/bibformat_templates.py,
+	modules/miscutil/lib/inveniocfg.py,
+	modules/miscutil/lib/testutils.py,
+	modules/webaccess/lib/access_control_config.py,
+	modules/webaccess/lib/access_control_engine.py,
+	modules/webaccess/lib/access_control_mailcookie.py,
+	modules/webaccess/lib/webaccessadmin_lib.py,
+	modules/webalert/lib/webalert_webinterface.py,
+	modules/webbasket/lib/webbasket_templates.py,
+	modules/webcomment/lib/webcomment_templates.py,
+	modules/webcomment/lib/webcomment_webinterface.py,
+	modules/webhelp/web/hacking/test-suite.webdoc,
+	modules/webmessage/lib/webmessage_webinterface.py,
+	modules/websearch/lib/websearch_webinterface.py,
+	modules/websearch/web/admin/websearchadmin.py,
+	modules/websession/lib/webaccount.py,
+	modules/websession/lib/webgroup_regression_tests.py,
+	modules/websession/lib/websession_regression_tests.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/websession_webinterface.py,
+	modules/websession/lib/webuser.py,
+	modules/websession/lib/webuser_regression_tests.py,
+	modules/webstyle/lib/webdoc.py,
+	modules/webstyle/lib/webinterface_handler.py,
+	modules/webstyle/lib/webstyle_templates.py,
+	modules/websubmit/lib/bibdocfile.py,
+	modules/websubmit/web/publiline.py,
+	modules/websubmit/web/yourapprovals.py,
+	modules/websubmit/web/yoursubmissions.py: Updated codebase to use
+	CFG_SITE_SECURE_URL instead of sweburl everywhere.  The only other
+	lowercase legacy variable is now weburl; an update will follow.
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/etc/Makefile.am: The DEMOTXT submission was
+	renamed to DEMOART. Accordingly, all DEMOTXT* bibconvert templates
+	were renamed to DEMOART*.
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/etc/DEMOTXT.tpl,
+	modules/websubmit/etc/DEMOTXTcreate.tpl,
+	modules/websubmit/etc/DEMOTXTmodify.tpl: The Demo Textual Document
+	submission (DEMOTXT) was renamed to Demo Article submission
+	(DEMOART). These bibconvert configuration templates were renamed to
+	DEMOART*.
+
+2008-03-12  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine.py: Hopefully fixed "[must
+	be sys.stdout or sys.stderr] spurious messages.
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/etc/DEMOART.tpl,
+	modules/websubmit/etc/DEMOARTcreate.tpl,
+	modules/websubmit/etc/DEMOARTmodify.tpl: The Demo Textual Document
+	submission (DEMOTXT) was renamed to Demo Article submission
+	(DEMOART). These are the associated bibconvert configuration
+	templates that used to be called DEMOTXT*.
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/etc/Makefile.am: Added DEMOPOE.tpl
+	DEMOPOEcreate.tpl and DEMOPOEmodify.tpl for the new Demo Poetry
+	submission (DEMOPOE).
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/etc/DEMOPOE.tpl,
+	modules/websubmit/etc/DEMOPOEcreate.tpl,
+	modules/websubmit/etc/DEMOPOEmodify.tpl: First version of the
+	bibconvert configuration templates for the new Demo Poetry
+	submission (DEMOPOE).
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql: Updated the format of the
+	DEMOTXT report number. Moved away from:     +
+	DEMO-TEXT-<PA>categ</PA>-<PA>yy</PA> ... in favour of:
+	DEMO-<PA>categ</PA>-<PA>yy</PA>
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/etc/Makefile.am: Dropped the TEXT and RTEXT
+	document types and all associated configuration files.
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/etc/EDSRTEXT.tpl,
+	modules/websubmit/etc/EDSRTEXTcreate.tpl,
+	modules/websubmit/etc/EDSRTEXTmodify.tpl,
+	modules/websubmit/etc/EDSTEXT.tpl,
+	modules/websubmit/etc/EDSTEXTcreate.tpl,
+	modules/websubmit/etc/EDSTEXTmodify.tpl: Dropped the "TEXT" and
+	"RTEXT" document types and their configuration information.
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql: Dropped the configuration
+	information for the "RTEXT" and "TEXT" document types. They are no
+	longer needed.
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql: + Added configuration
+	information for the Demo Poetry Submission (DEMOPOE).  + Removed
+	the POETRY category of the DEMOTXT submission in favour of REPORT.
+
+2008-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/lib/bibdocfile.py,
+	modules/websubmit/lib/websubmit_templates.py: Fixed a template
+	argument name (imagepath->imageurl).
+
+2008-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/search_engine.py,
+	modules/websearch/lib/websearch_templates.py,
+	modules/webstyle/lib/webstyle_templates.py: Fixed some template
+	argument names (modifydate->modificationdate).
+
+2008-03-12  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* po/it.po: Resynchronized Italian translation.
+
+2008-03-12  Tibor Simko <tibor.simko@cern.ch>
+
+	*
+	modules/bibformat/etc/format_templates/Default_HTML_similarity.bft,
+	modules/bibformat/lib/bibformat_engine.py,
+	modules/bibformat/lib/elements/bfe_bibtex.py,
+	modules/websearch/lib/websearch_templates.py,
+	modules/websubmit/lib/functions/Get_Recid.py: Fixed Frenglish
+	cosmetics (notice->record).
+
+2008-03-12  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webaccess/lib/webaccessadmin_lib.py,
+	modules/websession/lib/websession_webinterface.py,
+	modules/websession/lib/webuser.py: send_email used in place of
+	local smtplib calls. Bug fixes and restyling applied here and
+	there.
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql: Made the "DEMOBOO_FILE"
+	field of the DEMOBOO (SBI) submission optional.  (I.e. it's
+	optional to upload a file for a book.)
+
+2008-03-12  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/etc/DEMOBOOcreate.tpl: Made the fulltext field
+	optional.
+
+2008-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine.py: Fixed verbosity of some
+	necessary output messages.
+
+2008-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibrank/lib/bibrank_downloads_similarity.py: Avoid NULL
+	client_host values when calculating reading similarity lists.
+	Thanks to Devin Bougie for reporting the problem.
+
+2008-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/elmsubmit/lib/elmsubmit_filename_generator.py: Fixed
+	English in a comment.
+
+2008-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/lib/elements/bfe_server_info.py,
+	modules/bibrank/lib/bibrank_grapher.py,
+	modules/bibupload/lib/bibupload.py,
+	modules/miscutil/lib/inveniocfg.py,
+	modules/websubmit/lib/bibdocfile.py,
+	modules/websubmit/lib/websubmit_engine.py,
+	modules/websubmit/lib/websubmit_templates.py,
+	modules/websubmit/lib/websubmit_webinterface.py,
+	modules/websubmit/lib/functions/Mail_Submitter.py,
+	modules/websubmit/lib/functions/Send_APP_Mail.py,
+	modules/websubmit/lib/functions/Send_Approval_Request.py,
+	modules/websubmit/lib/functions/Send_Modify_Mail.py,
+	modules/websubmit/lib/functions/Send_Request_For_Direct_Approval.py,
+	modules/websubmit/lib/functions/Send_Request_For_Publication.py,
+	modules/websubmit/lib/functions/Send_Request_For_Refereeing_Process.py,
+	modules/websubmit/lib/functions/Send_SRV_Mail.py,
+	modules/websubmit/lib/functions/Upload_Files.py,
+	modules/websubmit/web/approve.py,
+	modules/websubmit/web/publiline.py,
+	modules/websubmit/web/yoursubmissions.py,
+	modules/websubmit/web/admin/referees.py: Phased out legacy
+	variables 'accessurl', 'urlpath', 'images', 'htdocsurl' used in
+	WebSubmit.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/elmsubmit/lib/elmsubmit.py,
+	modules/elmsubmit/lib/elmsubmit_filename_generator.py: Fixed
+	support for system-provided magic library.
+
+2008-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* configure.ac: Removed path to now-deleted elmsubmit/lib/magic
+	directory.
+
+2008-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/lib/elements/bfe_server_info.py,
+	modules/bibharvest/lib/oai_repository.py,
+	modules/bibindex/doc/admin/bibindex-admin-guide.webdoc,
+	modules/bibsched/doc/admin/bibsched-admin-guide.webdoc,
+	modules/miscutil/lib/errorlib.py,
+	modules/miscutil/lib/errorlib_webinterface.py,
+	modules/miscutil/lib/inveniocfg.py,
+	modules/miscutil/lib/mailutils.py,
+	modules/webaccess/doc/hacking/webaccess-table-structure.webdoc,
+	modules/webaccess/lib/access_control_admin.py,
+	modules/webaccess/lib/access_control_config.py,
+	modules/webaccess/lib/webaccessadmin_lib.py,
+	modules/webalert/bin/alertengine.in,
+	modules/webalert/doc/admin/webalert-admin-guide.webdoc,
+	modules/webalert/lib/alert_engine.py,
+	modules/webalert/lib/alert_engine_config.py,
+	modules/webalert/lib/webalert_templates.py,
+	modules/webjournal/lib/webjournal_config.py,
+	modules/webjournal/lib/webjournal_templates.py,
+	modules/webmessage/bin/webmessageadmin.in,
+	modules/websearch/doc/admin/websearch-admin-guide.webdoc,
+	modules/websearch/lib/websearch_templates.py,
+	modules/websession/doc/admin/websession-admin-guide.webdoc,
+	modules/websession/lib/webaccount.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/websession_webinterface.py,
+	modules/websession/lib/webuser.py,
+	modules/webstyle/doc/admin/webstyle-admin-guide.webdoc,
+	modules/webstyle/lib/webdoc.py, modules/webstyle/lib/webpage.py,
+	modules/webstyle/lib/webstyle_templates.py,
+	modules/websubmit/lib/fulltext_files_migration_kit.py,
+	modules/websubmit/lib/functions/Allocate_ALEPH_SYS.py,
+	modules/websubmit/lib/functions/Is_Referee.py,
+	modules/websubmit/lib/functions/Mail_New_Record_Notification.py,
+	modules/websubmit/lib/functions/Mail_Submitter.py,
+	modules/websubmit/lib/functions/Send_APP_Mail.py,
+	modules/websubmit/lib/functions/Send_Approval_Request.py,
+	modules/websubmit/lib/functions/Send_Modify_Mail.py,
+	modules/websubmit/lib/functions/Send_Request_For_Direct_Approval.py,
+	modules/websubmit/lib/functions/Send_Request_For_Publication.py,
+	modules/websubmit/lib/functions/Send_Request_For_Refereeing_Process.py,
+	modules/websubmit/lib/functions/Send_SRV_Mail.py,
+	modules/websubmit/web/publiline.py: Updated codebase to use
+	CFG_SITE_SUPPORT_EMAIL instead of supportemail everywhere.  Updated
+	some outdated page() etc docstrings.  Other lowercase legacy
+	variable updates to follow.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/elmsubmit/lib/Makefile.am,
+	modules/elmsubmit/lib/elmsubmit_filename_generator.py: [no log
+	message]
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibindex/lib/bibindex_engine.py,
+	modules/websubmit/web/publiline.py,
+	modules/websubmit/web/yourapprovals.py,
+	modules/websubmit/web/yoursubmissions.py,
+	modules/websubmit/web/admin/referees.py: Different small fixes
+	after pylint.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webstyle/lib/webinterface_handler.py: Fixed string.
+
+2008-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibformat/lib/elements/bfe_server_info.py,
+	modules/bibharvest/lib/bibharvest.py,
+	modules/bibharvest/lib/oai_repository.py,
+	modules/elmsubmit/lib/elmsubmit_config.py,
+	modules/miscutil/lib/errorlib.py,
+	modules/miscutil/lib/inveniocfg.py,
+	modules/miscutil/lib/mailutils.py,
+	modules/webaccess/doc/hacking/webaccess-table-structure.webdoc,
+	modules/webcomment/lib/webcomment.py,
+	modules/webhelp/web/admin/howto/howto.webdoc,
+	modules/webjournal/lib/webjournal_config.py,
+	modules/webjournal/lib/webjournal_templates.py,
+	modules/webjournal/lib/webjournal_utils.py,
+	modules/websearch/doc/search-guide.webdoc,
+	modules/websearch/lib/websearch_webinterface.py,
+	modules/websession/lib/webgroup_regression_tests.py,
+	modules/websession/lib/websession_regression_tests.py,
+	modules/websession/lib/webuser.py,
+	modules/websession/lib/webuser_regression_tests.py,
+	modules/webstyle/lib/webdoc.py,
+	modules/websubmit/doc/admin/websubmit-admin-guide.webdoc,
+	modules/websubmit/lib/functions/Allocate_ALEPH_SYS.py,
+	modules/websubmit/lib/functions/Mail_New_Record_Notification.py,
+	modules/websubmit/lib/functions/Mail_Submitter.py,
+	modules/websubmit/lib/functions/Send_APP_Mail.py,
+	modules/websubmit/lib/functions/Send_Approval_Request.py,
+	modules/websubmit/lib/functions/Send_Modify_Mail.py,
+	modules/websubmit/lib/functions/Send_Request_For_Direct_Approval.py,
+	modules/websubmit/lib/functions/Send_Request_For_Publication.py,
+	modules/websubmit/lib/functions/Send_Request_For_Refereeing_Process.py,
+	modules/websubmit/lib/functions/Send_SRV_Mail.py,
+	modules/websubmit/web/publiline.py: Updated codebase to use
+	CFG_SITE_ADMIN_EMAIL instead of adminemail everywhere.	Other
+	lowercase legacy variable updates to follow.
+
+2008-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibindex/lib/bibindexadminlib.py: Fixed indentation.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibclassify/doc/hacking/bibclassify-internals.webdoc,
+	modules/bibformat/doc/admin/bibformat-admin-guide.webdoc,
+	modules/bibrank/doc/admin/bibrank-admin-guide.webdoc,
+	modules/bibrank/doc/hacking/bibrank-internals.webdoc,
+	modules/bibupload/doc/admin/bibupload-admin-guide.webdoc,
+	modules/webaccess/doc/admin/webaccess-admin-guide.webdoc,
+	modules/webaccess/doc/hacking/webaccess-internals.webdoc,
+	modules/webhelp/web/admin/admin.webdoc,
+	modules/websearch/doc/admin/websearch-admin-guide.webdoc,
+	modules/webstyle/doc/admin/webstyle-admin-guide.webdoc: Fixed <br>
+	in *.webdoc.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/websubmit/lib/bibdocfile.py: Fixed code WRT pylint
+	errors.
+
+2008-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* ABOUT-NLS, modules/bibedit/web/admin/bibeditadmin.py,
+	modules/bibformat/doc/hacking/bibformat-api.webdoc,
+	modules/bibformat/lib/bibformat.py,
+	modules/bibformat/lib/bibformat_dblayer.py,
+	modules/bibformat/lib/bibformat_engine.py,
+	modules/bibformat/lib/bibformat_regression_tests.py,
+	modules/bibformat/lib/bibformatadminlib.py,
+	modules/bibformat/lib/elements/bfe_bibtex.py,
+	modules/bibformat/lib/elements/bfe_server_info.py,
+	modules/bibformat/web/admin/bibformatadmin.py,
+	modules/bibharvest/lib/bibharvestadminlib.py,
+	modules/bibharvest/lib/oaiarchiveadminlib.py,
+	modules/bibharvest/web/admin/bibharvestadmin.py,
+	modules/bibharvest/web/admin/oaiarchiveadmin.py,
+	modules/bibindex/lib/bibindexadminlib.py,
+	modules/bibindex/web/admin/bibindexadmin.py,
+	modules/bibrank/lib/bibrank_citation_grapher.py,
+	modules/bibrank/lib/bibrank_downloads_grapher.py,
+	modules/bibrank/lib/bibrank_record_sorter.py,
+	modules/bibrank/lib/bibrank_tag_based_indexer.py,
+	modules/bibrank/lib/bibrank_word_indexer.py,
+	modules/bibrank/lib/bibrankadminlib.py,
+	modules/bibrank/web/admin/bibrankadmin.py,
+	modules/miscutil/doc/hacking/miscutil-dateutils.webdoc,
+	modules/miscutil/doc/hacking/miscutil-errorlib.webdoc,
+	modules/miscutil/lib/dateutils.py,
+	modules/miscutil/lib/errorlib.py,
+	modules/miscutil/lib/inveniocfg.py,
+	modules/miscutil/lib/mailutils.py,
+	modules/miscutil/lib/messages.py, modules/miscutil/lib/urlutils.py,
+	modules/webaccess/lib/access_control_admin.py,
+	modules/webaccess/lib/access_control_mailcookie.py,
+	modules/webaccess/lib/webaccessadmin_lib.py,
+	modules/webalert/lib/webalert.py,
+	modules/webalert/lib/webalert_webinterface.py,
+	modules/webbasket/lib/webbasket.py,
+	modules/webbasket/lib/webbasket_templates.py,
+	modules/webbasket/lib/webbasket_webinterface.py,
+	modules/webcomment/lib/webcomment.py,
+	modules/webcomment/lib/webcomment_templates.py,
+	modules/webcomment/lib/webcomment_webinterface.py,
+	modules/webcomment/lib/webcommentadminlib.py,
+	modules/webcomment/web/admin/webcommentadmin.py,
+	modules/webjournal/lib/webjournal_config.py,
+	modules/webjournal/lib/webjournal_templates.py,
+	modules/webjournal/lib/webjournal_utils.py,
+	modules/webjournal/lib/webjournal_washer.py,
+	modules/webjournal/lib/webjournal_webinterface.py,
+	modules/webmessage/lib/webmessage.py,
+	modules/webmessage/lib/webmessage_templates.py,
+	modules/websearch/doc/hacking/search-engine-api.webdoc,
+	modules/websearch/lib/search_engine.py,
+	modules/websearch/lib/websearch_external_collections.py,
+	modules/websearch/lib/websearch_external_collections_searcher.py,
+	modules/websearch/lib/websearch_external_collections_templates.py,
+	modules/websearch/lib/websearch_regression_tests.py,
+	modules/websearch/lib/websearch_templates.py,
+	modules/websearch/lib/websearch_webcoll.py,
+	modules/websearch/lib/websearch_webinterface.py,
+	modules/websearch/lib/websearchadminlib.py,
+	modules/websearch/web/admin/websearchadmin.py,
+	modules/websession/lib/webaccount.py,
+	modules/websession/lib/webgroup.py,
+	modules/websession/lib/webgroup_dblayer.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/webuser.py,
+	modules/webstyle/doc/admin/webstyle-admin-guide.webdoc,
+	modules/webstyle/lib/webdoc.py,
+	modules/webstyle/lib/webdoc_webinterface.py,
+	modules/webstyle/lib/webinterface_handler.py,
+	modules/webstyle/lib/webinterface_tests.py,
+	modules/webstyle/lib/webpage.py,
+	modules/webstyle/lib/webstyle_templates.py,
+	modules/websubmit/lib/bibdocfile.py,
+	modules/websubmit/lib/websubmit_engine.py,
+	modules/websubmit/lib/websubmit_webinterface.py,
+	modules/websubmit/lib/websubmitadmin_engine.py,
+	modules/websubmit/lib/websubmitadmin_templates.py,
+	modules/websubmit/web/approve.py,
+	modules/websubmit/web/publiline.py,
+	modules/websubmit/web/yourapprovals.py,
+	modules/websubmit/web/yoursubmissions.py,
+	modules/websubmit/web/admin/referees.py,
+	modules/websubmit/web/admin/websubmitadmin.py: Updated codebase to
+	use CFG_SITE_LANG and CFG_SITE_LANGS instead of cdslang and
+	cdslangs everywhere.  Fixed language argument passing in some
+	client code.  Removed trailing whitespace in some client code.
+	Other lowercase legacy variable updates to follow.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibrank/lib/bibrank_record_sorter.py: Correctly plugged
+	intbitset in place of HitSet.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webjournal/lib/webjournal_config.py: Fixed typos in code.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webjournal/lib/webjournal.py,
+	modules/webjournal/lib/webjournal_washer.py: Added missing import.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webjournal/lib/webjournal_webinterface.py: Removed
+	obsoleted main function.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py:
+	Fixed typo bug.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webjournal/lib/webjournal_utils.py: Fixed Null->None.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webalert/lib/htmlparser.py: Removed obsoleted main
+	function.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibclassify/lib/bibclassifylib.py,
+	modules/bibedit/web/admin/bibeditadmin.py,
+	modules/bibformat/lib/bibformat_templates.py,
+	modules/bibformat/lib/bibformatadminlib.py,
+	modules/bibharvest/web/admin/oaiarchiveadmin.py,
+	modules/bibindex/doc/admin/bibindex-admin-guide.webdoc,
+	modules/bibindex/lib/bibindexadminlib.py,
+	modules/bibindex/web/admin/bibindexadmin.py,
+	modules/bibrank/doc/admin/bibrank-admin-guide.webdoc,
+	modules/bibrank/lib/bibrank_record_sorter.py,
+	modules/bibrank/lib/bibrankadminlib.py,
+	modules/bibrank/web/admin/bibrankadmin.py,
+	modules/webaccess/lib/access_control_config.py,
+	modules/webaccess/lib/webaccessadmin_lib.py,
+	modules/webcomment/lib/webcomment.py,
+	modules/webcomment/lib/webcomment_templates.py,
+	modules/webcomment/lib/webcomment_webinterface.py,
+	modules/webcomment/lib/webcommentadminlib.py,
+	modules/webjournal/lib/webjournal_utils.py,
+	modules/websearch/lib/search_engine.py,
+	modules/websearch/lib/websearch_external_collections_parser.py,
+	modules/websearch/lib/websearch_external_collections_utils.py,
+	modules/websearch/lib/websearch_webinterface.py,
+	modules/websearch/lib/websearchadminlib.py,
+	modules/websearch/web/admin/websearchadmin.py,
+	modules/websession/lib/webaccount.py,
+	modules/websession/lib/websession_webinterface.py,
+	modules/webstyle/lib/webinterface_handler.py,
+	modules/websubmit/lib/websubmitadmin_templates.py,
+	modules/websubmit/lib/functions/Create_Modify_Interface.py,
+	modules/websubmit/lib/functions/Print_Success.py,
+	modules/websubmit/lib/functions/Print_Success_CPLX.py,
+	modules/websubmit/lib/functions/Print_Success_DEL.py,
+	modules/websubmit/lib/functions/Print_Success_MBI.py,
+	modules/websubmit/lib/functions/Print_Success_SRV.py,
+	modules/websubmit/lib/functions/Upload_Files.py,
+	modules/websubmit/web/publiline.py: Fixed a bunch of XHTML errors.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/lib/testutils.py: Added logging of w3c-validator
+	output.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/lib/mailutils.py: Fixed docstring.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/lib/errorlib.py: Prettyfied the registered
+	exception logging.
+
+2008-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/POTFILES.in: Removed deleted
+	bibformat_migration_kit_assistant.py.
+
+2008-03-11  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/web/admin/bibformat_migration_kit_assistant.py:
+	Removed.
+
+2008-03-11  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/doc/admin/bibformat-admin-guide.webdoc,
+	modules/bibformat/web/admin/Makefile.am: Removed remaining
+	bibformat migration kit file. Updated doc accordingly.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibformat/lib/elements/bfe_fulltext.py,
+	modules/bibformat/lib/elements/bfe_fulltext_mini.py: Added gettext
+	support to bfe_fulltext(_mini)
+
+2008-03-11  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/invenio.conf, modules/bibedit/lib/refextract_config.py,
+	modules/bibedit/lib/xmlmarc2textmarclib.py,
+	modules/bibformat/lib/bibreformat.py,
+	modules/bibformat/lib/elements/bfe_server_info.py,
+	modules/bibformat/web/admin/bibformat_migration_kit_assistant.py,
+	modules/bibformat/web/admin/bibformatadmin.py,
+	modules/bibharvest/lib/bibharvest.py,
+	modules/bibharvest/lib/oai_repository.py,
+	modules/bibharvest/lib/oaiarchive_engine.py,
+	modules/bibharvest/web/admin/bibharvestadmin.py,
+	modules/bibindex/lib/bibindex_engine_config.py,
+	modules/bibindex/web/admin/bibindexadmin.py,
+	modules/bibrank/web/admin/bibrankadmin.py,
+	modules/elmsubmit/lib/elmsubmit.py,
+	modules/elmsubmit/lib/elmsubmit_config.py,
+	modules/miscutil/lib/errorlib.py,
+	modules/miscutil/lib/inveniocfg.py,
+	modules/miscutil/lib/mailutils.py,
+	modules/webaccess/doc/admin/webaccess-admin-guide.webdoc,
+	modules/webaccess/lib/access_control_config.py,
+	modules/webaccess/lib/webaccessadmin_lib.py,
+	modules/webalert/doc/admin/webalert-admin-guide.webdoc,
+	modules/webalert/lib/webalert_templates.py,
+	modules/webalert/lib/webalert_webinterface.py,
+	modules/webcomment/lib/webcomment.py,
+	modules/webcomment/lib/webcomment_templates.py,
+	modules/webcomment/web/admin/webcommentadmin.py,
+	modules/webhelp/web/help-central.webdoc,
+	modules/webhelp/web/admin/admin.webdoc,
+	modules/websearch/doc/search-guide.webdoc,
+	modules/websearch/doc/admin/websearch-admin-guide.webdoc,
+	modules/websearch/doc/hacking/search-engine-api.webdoc,
+	modules/websearch/lib/search_engine.py,
+	modules/websearch/lib/websearch_regression_tests.py,
+	modules/websearch/lib/websearch_templates.py,
+	modules/websearch/lib/websearch_webcoll.py,
+	modules/websearch/lib/websearch_webinterface.py,
+	modules/websearch/lib/websearchadminlib.py,
+	modules/websearch/web/admin/websearchadmin.py,
+	modules/websession/doc/admin/websession-admin-guide.webdoc,
+	modules/websession/lib/webaccount.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/websession_webinterface.py,
+	modules/websession/lib/webuser.py, modules/webstat/lib/webstat.py,
+	modules/webstat/lib/webstat_webinterface.py,
+	modules/webstyle/doc/admin/webstyle-admin-guide.webdoc,
+	modules/webstyle/lib/webdoc.py,
+	modules/webstyle/lib/webdoc_webinterface.py,
+	modules/webstyle/lib/webstyle_templates.py,
+	modules/websubmit/lib/websubmit_engine.py,
+	modules/websubmit/lib/websubmit_webinterface.py,
+	modules/websubmit/lib/functions/Allocate_ALEPH_SYS.py,
+	modules/websubmit/lib/functions/Mail_New_Record_Notification.py,
+	modules/websubmit/lib/functions/Mail_Submitter.py,
+	modules/websubmit/lib/functions/Print_Success.py,
+	modules/websubmit/lib/functions/Print_Success_MBI.py,
+	modules/websubmit/lib/functions/Send_APP_Mail.py,
+	modules/websubmit/lib/functions/Send_Approval_Request.py,
+	modules/websubmit/lib/functions/Send_Modify_Mail.py,
+	modules/websubmit/lib/functions/Send_Request_For_Direct_Approval.py,
+	modules/websubmit/lib/functions/Send_Request_For_Publication.py,
+	modules/websubmit/lib/functions/Send_Request_For_Refereeing_Process.py,
+	modules/websubmit/lib/functions/Send_SRV_Mail.py,
+	modules/websubmit/web/approve.py,
+	modules/websubmit/web/publiline.py,
+	modules/websubmit/web/yourapprovals.py,
+	modules/websubmit/web/yoursubmissions.py,
+	modules/websubmit/web/admin/referees.py, po/bg.po, po/ca.po,
+	po/cds-invenio.pot, po/cs.po, po/de.po, po/el.po, po/en.po,
+	po/es.po, po/fr.po, po/hr.po, po/it.po, po/ja.po, po/no.po,
+	po/pl.po, po/pt.po, po/ru.po, po/sk.po, po/sv.po, po/uk.po,
+	po/zh_CN.po, po/zh_TW.po: Updated codebase to use CFG_SITE_NAME and
+	CFG_SITE_NAME_INTL instead of cdsname and cdsnameintl everywhere.
+	Other lowercase legacy variable updates to follow.
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webalert/lib/webalert_webinterface.py: Typo "self" vs.
+	"left".
+
+2008-03-11  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webalert/lib/alert_engine.py,
+	modules/webalert/lib/webalert_templates.py: Fixed webalert to be up
+	to date with centralized send_email tool.
+
+2008-03-11  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/websubmit_engine.py: Added some filename
+	washing for uploaded files (paths, e.g. DFS paths) will now be
+	stripped from the name before it is saved - i.e. a basename for the
+	file will be saved.
+
+2008-03-11  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/bibformat.py: Indicate encoding when
+	exporting to Excel.
+
+2008-03-10  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Stamp_Uploaded_Files.py: The
+	InvenioWebSubmitFileStamperError exception was moved from
+	websubmit_file_stamper into websubmit_config so now importing it
+	from there.
+
+2008-03-10  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/websubmit_file_stamper.py: Moved exception
+	InvenioWebSubmitFileStamperError into websubmit_config.
+
+2008-03-10  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/websubmit_config.py: + Added calls to
+	__init__ method of base-class Exception for the following
+	exceptions:    * InvenioWebSubmitFunctionError	  *
+	InvenioWebSubmitFunctionStop	* InvenioWebSubmitFunctionWarning +
+	Moved exception InvenioWebSubmitFileStamperError from
+	websubmit_file_stamper	 into websubmit_config.
+
+2008-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/miscutil/lib/inveniocfg.py: Do not require presence of
+	invenio-local.conf.
+
+2008-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* INSTALL, RELEASE-NOTES, config/invenio-autotools.conf.in,
+	config/invenio.conf, modules/bibclassify/lib/bibclassify_daemon.py,
+	modules/bibclassify/lib/bibclassifylib.py,
+	modules/bibconvert/lib/bibconvert.py,
+	modules/bibconvert/lib/bibconvert_bfx_engine.py,
+	modules/bibconvert/lib/bibconvert_xslt_engine.py,
+	modules/bibedit/lib/bibedit_engine.py,
+	modules/bibedit/lib/bibrecord_config.py,
+	modules/bibedit/lib/bibrecord_tests.py,
+	modules/bibedit/lib/refextract_config.py,
+	modules/bibformat/lib/bibformat_bfx_engine.py,
+	modules/bibformat/lib/bibformat_bfx_engine_config.py,
+	modules/bibformat/lib/bibformat_config.py,
+	modules/bibformat/lib/bibformat_engine.py,
+	modules/bibformat/lib/bibformat_engine_tests.py,
+	modules/bibformat/lib/bibformat_templates.py,
+	modules/bibformat/lib/bibformatadminlib.py,
+	modules/bibformat/lib/bibreformat.py,
+	modules/bibformat/lib/elements/bfe_server_info.py,
+	modules/bibharvest/lib/bibharvest.py,
+	modules/bibharvest/lib/bibharvest_templates.py,
+	modules/bibharvest/lib/bibharvestadminlib.py,
+	modules/bibharvest/lib/oai_repository.py,
+	modules/bibharvest/lib/oai_repository_webinterface.py,
+	modules/bibharvest/lib/oaiarchive_engine.py,
+	modules/bibharvest/lib/oaiarchiveadminlib.py,
+	modules/bibharvest/lib/oaiharvestlib.py,
+	modules/bibindex/lib/bibindex_engine.py,
+	modules/bibindex/lib/bibindex_engine_config.py,
+	modules/bibindex/lib/bibindexadminlib.py,
+	modules/bibmatch/lib/bibmatch_engine.py,
+	modules/bibrank/lib/bibrank.py,
+	modules/bibrank/lib/bibrank_grapher.py,
+	modules/bibrank/lib/bibrank_record_sorter.py,
+	modules/bibrank/lib/bibrank_tag_based_indexer.py,
+	modules/bibrank/lib/bibrank_word_indexer.py,
+	modules/bibrank/lib/bibrankadminlib.py,
+	modules/bibrank/lib/bibrankgkb.py,
+	modules/bibsched/lib/bibsched.py,
+	modules/bibupload/lib/bibupload.py,
+	modules/bibupload/lib/bibupload_config.py,
+	modules/bibupload/lib/bibupload_regression_tests.py,
+	modules/elmsubmit/lib/elmsubmit.py,
+	modules/elmsubmit/lib/elmsubmit_tests.py,
+	modules/miscutil/bin/testsuite.in, modules/miscutil/lib/dbquery.py,
+	modules/miscutil/lib/errorlib.py,
+	modules/miscutil/lib/errorlib_regression_tests.py,
+	modules/miscutil/lib/inveniocfg.py,
+	modules/miscutil/lib/mailutils.py,
+	modules/miscutil/lib/messages.py,
+	modules/webaccess/doc/admin/webaccess-admin-guide.webdoc,
+	modules/webaccess/lib/access_control_engine.py,
+	modules/webaccess/lib/external_authentication_cern_wrapper.py,
+	modules/webalert/bin/alertengine.in,
+	modules/webalert/lib/alert_engine.py,
+	modules/webalert/lib/webalert_templates.py,
+	modules/webbasket/lib/webbasket_webinterface.py,
+	modules/webcomment/lib/webcomment.py,
+	modules/webjournal/lib/webjournal.py,
+	modules/webjournal/lib/webjournal_config.py,
+	modules/webjournal/lib/webjournal_templates.py,
+	modules/webjournal/lib/webjournal_utils.py,
+	modules/webjournal/lib/webjournal_webinterface.py,
+	modules/webjournal/lib/widgets/bfe_webjournal_widget_seminars.py,
+	modules/webjournal/lib/widgets/bfe_webjournal_widget_weather.py,
+	modules/websearch/lib/search_engine.py,
+	modules/websearch/lib/websearch_templates.py,
+	modules/websearch/lib/websearch_webcoll.py,
+	modules/websearch/lib/websearch_webinterface.py,
+	modules/websearch/lib/websearchadminlib.py,
+	modules/websession/lib/inveniogc.py,
+	modules/websession/lib/webaccount.py,
+	modules/websession/lib/webgroup_dblayer.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/webuser.py, modules/webstat/lib/webstat.py,
+	modules/webstat/lib/webstat_engine.py,
+	modules/webstat/lib/webstat_templates.py,
+	modules/webstat/lib/webstat_webinterface.py,
+	modules/webstyle/lib/webdoc.py,
+	modules/webstyle/lib/webinterface_handler.py,
+	modules/webstyle/lib/webstyle_templates.py,
+	modules/websubmit/lib/bibdocfile.py,
+	modules/websubmit/lib/fulltext_files_migration_kit.py,
+	modules/websubmit/lib/websubmit_engine.py,
+	modules/websubmit/lib/websubmit_file_stamper.py,
+	modules/websubmit/lib/websubmit_templates.py,
+	modules/websubmit/lib/websubmit_webinterface.py,
+	modules/websubmit/lib/websubmitadmin_engine.py,
+	modules/websubmit/lib/functions/Allocate_ALEPH_SYS.py,
+	modules/websubmit/lib/functions/Convert_RecXML_to_RecALEPH.py,
+	modules/websubmit/lib/functions/Format_Record.py,
+	modules/websubmit/lib/functions/Insert_Modify_Record.py,
+	modules/websubmit/lib/functions/Insert_Record.py,
+	modules/websubmit/lib/functions/Make_Dummy_MARC_XML_Record.py,
+	modules/websubmit/lib/functions/Make_Modify_Record.py,
+	modules/websubmit/lib/functions/Make_Record.py,
+	modules/websubmit/lib/functions/Move_From_Pending.py,
+	modules/websubmit/lib/functions/Move_to_Done.py,
+	modules/websubmit/lib/functions/Move_to_Pending.py,
+	modules/websubmit/lib/functions/Report_Number_Generation.py,
+	modules/websubmit/lib/functions/Upload_Files.py,
+	modules/websubmit/web/approve.py,
+	modules/websubmit/web/publiline.py,
+	modules/websubmit/web/yourapprovals.py,
+	modules/websubmit/web/yoursubmissions.py: Updated conf files.
+	Replaced old style variable names (e.g. WEBURL) with new style ones
+	(e.g. CFG_SITE_URL).  Used CFG_* prefix for all derived variables
+	everywhere.  Phased out some unused variables (e.g. bibupload),
+	cleaned some derived variables.  Fixed a couple of syntactical
+	errors spotted during the client code editing.	Please update your
+	invenio-local.conf.  More cleaning to come before the release.
+
+2008-03-10  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/websubmit_file_stamper.py: Added quoting
+	for all shell arguments. Crazy filenames should now be handled OK.
+
+2008-03-10  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* po/it.po: Completed Italian translation.
+
+2008-03-10  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/webjournal/lib/webjournal_utils.py: Small text fix.
+
+2008-03-10  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/elements/bfe_fulltext.py: Fixed syntax
+	error.
+
+2008-03-10  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/bibformat/lib/elements/bfe_date.py: Fixed syntax. Default
+	date format is '%d %B %Y' now instead of empty.
+
+2008-03-10  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/miscutil/lib/errorlib.py: Reformatted output for
+	registered exception sent via email.
+
+2008-03-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/webaccess/lib/webaccessadmin_lib.py: Lowered Demo Site
+	output message.
+
+2008-03-09  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/web/publiline.py: Deprecated the following 3
+	functions:   + getInfo	 + getInPending   + getInAlice
+
+	They basically search for details of an item that has at some point
+	been submitted for referee-approval. getInPending looks for those
+	details in the WebSubmit pending dir, whereas getInAlice looks for
+	the details in the CDS Invenio repository.  getInfo was some glue
+	that first called getInPending, then getInAlice if that failed to
+	find anything.
+
+	The way they were used was like this:
+
+	try:	 (authors,title,sysno,newrn) = getInfo(doctype,categ,RN)
+	except TypeError:     return _("Unable to display document.")
+
+	It's ugly because the function(s) either returns a 4-element tuple
+	or integer 0, catching a type-error to realise that it found
+	nothing.
+
+	Another problem (the major motivation for these changes) was that
+	"getInPending" searches in the pending directory for the following
+	hard-coded filenames:	+ TI   + TIF   + AU   + SN This basically
+	means that the Invenio admin isn't free to call her form fields for
+	title, etc as she likes, which isn't very nice. To get around this,
+	I added 3 new functions:   + get_pending_item_details (replaces
+	getInfo)   + get_brief_doc_details_from_pending (replaces
+	getInPending)	+ get_brief_doc_details_from_repository (replaces
+	getInAlice)
+
+	The idea is that in the "submit" stage of the item, a WebSubmit
+	function "Make_Dummy_MARC_XML_Record" should be called. This will
+	create a MARC XML record containing the metadata. This record can
+	then be parsed here, and fields like title, authors, etc extracted
+	from it.
+
+	For backward compatibility reasons, "get_pending_item_details"
+	fails to find anything, the old "getInfo" is called. This should
+	probably be removed though.
+
+2008-03-09  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/etc/DEMOBOO.tpl,
+	modules/websubmit/etc/DEMOTXT.tpl,
+	modules/websubmit/etc/DEMOTXTcreate.tpl,
+	modules/websubmit/etc/DEMOTXTmodify.tpl,
+	modules/websubmit/etc/DEMOBOOcreate.tpl,
+	modules/websubmit/etc/DEMOBOOmodify.tpl: First versions of the
+	bibconvert configuration templates for the new "DEMOTXT" and
+	"DEMOBOO" submissions.
+
+2008-03-09  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/etc/DEMOTHE.tpl: Corrected the definition of
+	the "day" field of the "DEMOTHE_DATE" element.
+
+2008-03-09  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/etc/Makefile.am: Added the bibconvert
+	configuration templates for record-creation in the new DEMOTXT and
+	DEMOBOO submissions.
+
+2008-03-09  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Print_Success_APP.py: Wanted to
+	add a new parameter "decision_file", because the function
+	previously looked for the hard-coded filename "decision", which
+	meant that any referee's decision field on the form had to be
+	called "decision".  Anyway, because the function was so short, and
+	a mess, I decided to rewrite it. Sadly, it's still not perfect
+	because it needs to make use of the global variable "rn" in the
+	message.  Although it now has some exception-registering, it still
+	needs work in the situation where it wasn't possible to read from
+	the referee's decision file at all, yet should still return a
+	message to be deisplayed in the user's browser (I'd have liked to
+	have raised an InvenioWebSubmitFunctionWarning there, but that
+	would prevent the return of a string for the user. So, this needs
+	to be touched-up at some point . . . )
+
+2008-03-09  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Send_APP_Mail.py: + Corrected a
+	bug encountered when using a regexp to search in the report-
+	number for category. (If <CATEG> wasn't in the string, i.e. there
+	is no	category in the report number, a non-existent match-group
+	was referenced.) + Added two new parameters:	 - decision_file
+	The name of the file in which the referee's decision is stored.
+	Previously, it looked for the hard-coded filename
+	"decision", which	  meant that the form element for the
+	referee's decision had to be called	    'decision'. Not nice -
+	now the admin can call it whatever (s)he wants, 	e.g.
+	"DEMOBOO_DESCN" in the ATLANTIS Demo Book submission.	      For
+	backward-compatibility reasons, if no value is provided for
+	the "decision_file" parameter, the function will look for
+	"decision".	 - comments_file	 The name of the file in
+	which the referee's comments are stored.	 Previously, it
+	looked for the hard-coded filename "COM", which 	meant that
+	the form element for the referee's comments had to be called
+	"COM". Not nice - now the admin can call it whatever (s)he wants,
+	e.g. "DEMOBOO_COMNT" in the ATLANTIS Demo Book submission.
+	For backward-compatibility reasons, if no value is provided
+	for	    the "comments_file" parameter, the function will look
+	for "COM".
+
+2008-03-09  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/miscutil/demo/democfgdata.sql: Added the configuration
+	information for two new demo submissions:   + "Demo Textual
+	Document Submission" (DEMOTXT);   + "Demo Book Submission
+	(Refereed)" (DEMOBOO);
+
+2008-03-09  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql: + Added "decision_file"
+	parameter to functions "Update_Approval_DB",   "Send_APP_Mail" and
+	"Print_Success_APP".  + Added "comments_file" parameter to function
+	"Send_APP_Mail".
+
+2008-03-09  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Update_Approval_DB.py: Fixed a
+	variable-name error.
+
+2008-03-07  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/miscutil/sql/tabfill.sql: Added details of the
+	"Make_Dummy_MARC_XML_Record" function.
+
+2008-03-07  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Makefile.am: Added the
+	Make_Dummy_MARC_XML_Record.py function
+
+2008-03-07  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Make_Dummy_MARC_XML_Record.py:
+	First version of a function to make a 'dummy' MARC XML record.
+	This record could have various uses later during a submission (e.g.
+	creating a preview with bibconvert, enabling the publiline system
+	to identify fields like title without having to know the filenames
+	of these fields, etc.)
+
+2008-03-07  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/functions/Send_Approval_Request.py,
+	modules/websubmit/lib/functions/Update_Approval_DB.py: Fixed some
+	bad handling of groups in regexp searches.
+
+2008-03-07  Nicholas Robinson <nicholas.robinson@cern.ch>
+
+	* modules/websubmit/lib/websubmit_templates.py: Fixed a bug:
+	contcatenation of str and long types when moving between submission
+	pages with the number-tabs at the top of the pages.
+
+2008-03-07  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/websubmit/lib/bibdocfile.py: Added check for existence of
+	md5sum (e.g. it doesn't exist on MacOS X).
+
+2008-03-07  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* po/it.po: Partially updated the Italian translation.
+
+2008-03-07  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/websearch/lib/websearch_templates.py,
+	modules/websession/lib/websession_templates.py,
+	modules/websession/lib/websession_webinterface.py: Fixed some
+	strings.
+
+2008-03-07  Tibor Simko <tibor.simko@cern.ch>
+
+	* AUTHORS: Added Joel.
+
+2008-03-07  Tibor Simko <tibor.simko@cern.ch>
+
+	* AUTHORS: Added Tony, Rado, and Marcus.  Updated some information.
+
+2008-03-07  Tibor Simko <tibor.simko@cern.ch>
+
+	* ChangeLog, NEWS, RELEASE-NOTES, configure.ac: Preliminary release
+	and upgrade instructions in view of forthcoming CDS Invenio
+	v0.99.0.  Populated ChangeLog history.	Instructions to be updated,
+	NEWS to be written.
+
+2008-03-07  Samuele Kaplun <samuele.kaplun@cern.ch>
+
+	* modules/bibupload/lib/bibupload.py,
+	modules/bibupload/lib/bibupload_regression_tests.py: Fixed lowering
+	of format bug. Now a file with extension .ps.Z can be happily
+	uploaded.  Added regression test to test this and appending.
+
 2008-03-07  Tibor Simko <tibor.simko@cern.ch>
 
 	* INSTALL: Bumped up the version number.
