@@ -240,13 +240,15 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
         ret += [tab_str + bottom_border]
     return (prefix + '\n'.join(ret) + suffix).encode('utf-8')
 
-def wait_for_user(msg):
-    """Print MSG and prompt user for confirmation."""
-    try:
-        raw_input(msg)
-    except KeyboardInterrupt:
-        print "\n\nAborted."
-        sys.exit(1)
-    except EOFError:
-        print " (continuing in batch mode)"
+def wait_for_user(msg="Please confirm by typing 'Yes, I know!': "):
+    """
+    Print MSG and wait for user's confirmation, unless silent
+    '--yes-i-know' command line option was used.
+    """
+    if '--yes-i-know' in sys.argv:
         return
+    answer = raw_input(msg)
+    if answer != 'Yes, I know!':
+        sys.stderr.write("ERROR: Aborted.\n")
+        sys.exit(1)
+    return
