@@ -164,7 +164,6 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
     # display
     t += websubmit_templates.tmpl_yoursubmissions(
            ln = ln,
-           images = CFG_SITE_URL + '/img',
            order = order,
            doctypes = doctypes,
            submissions = submissions,

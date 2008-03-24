@@ -589,10 +589,8 @@ def interface(req,
                          radio = radio,
                          curpage = curpage,
                          nbpages = nbpages,
-                         images = CFG_SITE_URL + '/img',
                          returnto = returnto,
                        ),
-          images = CFG_SITE_URL + '/img',
           mainmenu = mainmenu,
          )
 
@@ -960,7 +958,6 @@ def endaction(req,
           indir = indir,
           mainmenu = mainmenu,
           finished = finished,
-          images = CFG_SITE_URL + '/img',
           function_content = function_content,
           next_action = next_action,
         )

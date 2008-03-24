@@ -378,7 +378,7 @@ class Template:
 
         return """<center><font color="red">%s</font></center>""" % msg
 
-    def tmpl_page_interface(self, ln, docname, actname, curpage, nbpages, file, nextPg, access, nbPg, doctype, act, indir, fields, javascript, images, mainmenu):
+    def tmpl_page_interface(self, ln, docname, actname, curpage, nbpages, file, nextPg, access, nbPg, doctype, act, indir, fields, javascript, mainmenu):
         """
         Produces a page with the specified fields (in the submit chain)
 
@@ -433,8 +433,6 @@ class Template:
               - 'typename' *string* - the long name of the type
 
           - 'javascript' *string* - the javascript code to insert in the page
-
-          - 'images' *string* - the path to the images
 
           - 'mainmenu' *string* - the url of the main menu
 
@@ -518,7 +516,7 @@ class Template:
                        </td>
             """ % {
               'prpage' : int(curpage) - 1,
-              'images' : images,
+              'images' : CFG_SITE_URL + '/img',
               'prevpage' : _("Previous page"),
             }
         else:
@@ -538,7 +536,7 @@ class Template:
                        </td>
             """ % {
               'nxpage' : int(curpage) + 1,
-              'images' : images,
+              'images' : CFG_SITE_URL + '/img',
               'nextpage' : _("Next page"),
             }
         else:
@@ -557,7 +555,7 @@ class Template:
                  'surequit' : _("Are you sure you want to quit this submission?"),
                  'back' : _("Back to main menu"),
                  'mainmenu' : mainmenu,
-                 'images' : images,
+                 'images' : CFG_SITE_URL + '/img',
                  'take_note' : '(1) ' + _("This is your submission access number. It can be used to continue with an interrupted submission in case of problems."),
                  'explain_summary' : '(2) ' + _("Mandatory fields appear in red in the SUMMARY window."),
                }
@@ -630,7 +628,7 @@ class Template:
 
         return text
 
-    def tmpl_page_interface_js(self, ln, upload, field, fieldhtml, txt, check, level, curdir, values, select, radio, curpage, nbpages, images, returnto):
+    def tmpl_page_interface_js(self, ln, upload, field, fieldhtml, txt, check, level, curdir, values, select, radio, curpage, nbpages, returnto):
         """
         Produces the javascript for validation and value filling for a submit interface page
 
@@ -661,8 +659,6 @@ class Template:
           - 'curpage' *int* - the current page
 
           - 'nbpages' *int* - the total number of pages
-
-          - 'images' *int* - the path to the images
 
           - 'returnto' *array* - a structure with 'field' and 'page', if a mandatory field on antoher page was not completed
         """
@@ -822,7 +818,7 @@ class Template:
         out += """</script>"""
         return out
 
-    def tmpl_page_endaction(self, ln, file, nextPg, startPg, access, curpage, nbPg, nbpages, doctype, act, docname, actname, indir, mainmenu, finished, function_content, next_action, images):
+    def tmpl_page_endaction(self, ln, file, nextPg, startPg, access, curpage, nbPg, nbpages, doctype, act, docname, actname, indir, mainmenu, finished, function_content, next_action):
         """
         Produces the pages after all the fields have been submitted.
 
@@ -857,8 +853,6 @@ class Template:
           - 'mainmenu' *string* - the url of the main menu
 
           - 'finished' *bool* - if the submission is finished
-
-          - 'images' *string* - the path to the images
 
           - 'function_content' *string* - HTML code produced by some function executed
 
@@ -968,7 +962,7 @@ class Template:
                        <br /><br />""" % {
                            'surequit' : _("Are you sure you want to quit this submission?"),
                            'back' : _("Back to main menu"),
-                           'images' : images,
+                           'images' : CFG_SITE_URL + '/img',
                            'mainmenu' : mainmenu
                            }
         else:
@@ -976,7 +970,7 @@ class Template:
                        <img src="%(images)s/mainmenu.gif" border="0" alt="%(back)s" align="right" /></a>
                        <br /><br />""" % {
                      'back' : _("Back to main menu"),
-                     'images' : images,
+                     'images' : CFG_SITE_URL + '/img',
                      'mainmenu' : mainmenu,
                    }
 
@@ -1247,7 +1241,7 @@ class Template:
                       'size' : size
                     }
 
-    def tmpl_submit_summary (self, ln, values, images):
+    def tmpl_submit_summary (self, ln, values):
         """
         Displays the summary for the submit procedure.
 
@@ -1264,15 +1258,13 @@ class Template:
                 - 'value' *string* - The inserted value
 
                 - 'page' *int* - The submit page on which the field is entered
-
-          - 'images' *string* - the path to the images
         """
 
         # load the right message language
         _ = gettext_set_language(ln)
 
         out = """<body style="background-image: url(%(images)s/header_background.gif);"><table border="0">""" % \
-              { 'images' : images }
+              { 'images' : CFG_SITE_URL + '/img' }
 
         for value in values:
             if value['mandatory']:
@@ -1299,15 +1291,13 @@ class Template:
         out += "</table>"
         return out
 
-    def tmpl_yoursubmissions(self, ln, images, order, doctypes, submissions):
+    def tmpl_yoursubmissions(self, ln, order, doctypes, submissions):
         """
         Displays the list of the user's submissions.
 
         Parameters:
 
           - 'ln' *string* - The language to display the interface in
-
-          - 'images' *string* - the path to the images
 
           - 'order' *string* - The ordering parameter
 
@@ -1420,7 +1410,7 @@ class Template:
                          'status' : _("Status"),
                          'id' : _("Id"),
                          'reference' : _("Reference"),
-                         'images' : images,
+                         'images' : CFG_SITE_URL + '/img',
                          'first' : _("First access"),
                          'last' : _("Last access"),
                        }
@@ -1428,7 +1418,7 @@ class Template:
                 idtext = """<a href="submit/sub?access=%(id)s@%(action)s%(doctype)s%(ln_link)s">%(id)s</a>
                             &nbsp;<a onclick='if (confirm("%(sure)s")){document.forms[0].deletedId.value="%(id)s";document.forms[0].deletedDoctype.value="%(doctype)s";document.forms[0].deletedAction.value="%(action)s";document.forms[0].submit();return true;}else{return false;}' href=''><img src="%(images)s/smallbin.gif" border="0" alt='%(delete)s' /></a>
                          """ % {
-                           'images' : images,
+                           'images' : CFG_SITE_URL + '/img',
                            'id' : submission['id'],
                            'action' : submission['act'],
                            'doctype' : submission['doctype'],
@@ -1633,7 +1623,7 @@ class Template:
         <a href="publiline.py">Go to general approval workflow.</a>"""
         return out
 
-    def tmpl_publiline_selectcateg(self, ln, doctype, title, categories, images):
+    def tmpl_publiline_selectcateg(self, ln, doctype, title, categories):
         """
         Displays the categories from a doctype that the user can select
 
@@ -1644,8 +1634,6 @@ class Template:
           - 'doctype' *string* - The doctype
 
           - 'title' *string* - The doctype name
-
-          - 'images' *string* - the path to the images
 
           - 'categories' *array* - All the categories that the user can select:
 
@@ -1702,19 +1690,19 @@ class Template:
                 out += """| %(waiting)s <img alt="%(pending)s" src="%(images)s/waiting_or.gif" border="0" />""" % {
                           'waiting' : categ['waiting'],
                           'pending' : _("Pending"),
-                          'images' : images,
+                          'images' : CFG_SITE_URL + '/img',
                         }
             if categ['approved'] != 0:
                 out += """| %(approved)s<img alt="%(approved_text)s" src="%(images)s/smchk_gr.gif" border="0" />""" % {
                           'approved' : categ['approved'],
                           'approved_text' : _("Approved"),
-                          'images' : images,
+                          'images' : CFG_SITE_URL + '/img',
                         }
             if categ['rejected'] != 0:
                 out += """| %(rejected)s<img alt="%(rejected_text)s" src="%(images)s/cross_red.gif" border="0" />""" % {
                           'rejected' : categ['rejected'],
                           'rejected_text' : _("Rejected"),
-                          'images' : images,
+                          'images' : CFG_SITE_URL + '/img',
                         }
             out += ")</small><br />"
 
@@ -1743,7 +1731,7 @@ class Template:
             </table>""" % {
               'key' : _("Key"),
               'pending' : _("Pending"),
-              'images' : images,
+              'images' : CFG_SITE_URL + '/img',
               'waiting' : _("Waiting for approval"),
               'approved' : _("Approved"),
               'already_approved' : _("Already approved"),
@@ -1753,7 +1741,7 @@ class Template:
             }
         return out
 
-    def tmpl_publiline_selectcplxcateg(self, ln, doctype, title, types, images):
+    def tmpl_publiline_selectcplxcateg(self, ln, doctype, title, types):
         """
         Displays the categories from a doctype that the user can select
 
@@ -1764,8 +1752,6 @@ class Template:
           - 'doctype' *string* - The doctype
 
           - 'title' *string* - The doctype name
-
-          - 'images' *string* - the path to the images
 
           - 'categories' *array* - All the categories that the user can select:
 
@@ -1852,25 +1838,25 @@ class Template:
                     out += """| %(waiting)s <img alt="%(pending)s" src="%(images)s/waiting_or.gif" border="0" />""" % {
                               'waiting' : categ['waiting'],
                               'pending' : _("Pending"),
-                              'images' : images,
+                              'images' : CFG_SITE_URL + '/img',
                             }
                 if categ['approved'] != 0:
                     out += """| %(approved)s<img alt="%(approved_text)s" src="%(images)s/smchk_gr.gif" border="0" />""" % {
                               'approved' : categ['approved'],
                               'approved_text' : _("Approved"),
-                              'images' : images,
+                              'images' : CFG_SITE_URL + '/img',
                             }
                 if categ['rejected'] != 0:
                     out += """| %(rejected)s<img alt="%(rejected_text)s" src="%(images)s/cross_red.gif" border="0" />""" % {
                               'rejected' : categ['rejected'],
                               'rejected_text' : _("Rejected"),
-                              'images' : images,
+                              'images' : CFG_SITE_URL + '/img',
                             }
                 if categ['cancelled'] != 0:
                     out += """| %(cancelled)s<img alt="%(cancelled_text)s" src="%(images)s/smchk_rd.gif" border="0" />""" % {
                               'cancelled' : categ['cancelled'],
                               'cancelled_text' : _("Cancelled"),
-                              'images' : images,
+                              'images' : CFG_SITE_URL + '/img',
                             }
                 out += ")</small><br />"
 
@@ -1906,7 +1892,7 @@ class Template:
             </table>""" % {
               'key' : _("Key"),
               'pending' : _("Pending"),
-              'images' : images,
+              'images' : CFG_SITE_URL + '/img',
               'waiting' : _("Waiting for approval"),
               'approved' : _("Approved"),
               'already_approved' : _("Already approved"),
@@ -1918,7 +1904,7 @@ class Template:
             }
         return out
 
-    def tmpl_publiline_selectdocument(self, ln, doctype, title, categ, images, docs):
+    def tmpl_publiline_selectdocument(self, ln, doctype, title, categ, docs):
         """
         Displays the documents that the user can select in the specified category
 
@@ -1929,8 +1915,6 @@ class Template:
           - 'doctype' *string* - The doctype
 
           - 'title' *string* - The doctype name
-
-          - 'images' *string* - the path to the images
 
           - 'categ' *string* - the category
 
@@ -1993,7 +1977,7 @@ class Template:
                           </tr>
                        """ % {
                          'rn' : doc['RN'],
-                         'images' : images,
+                         'images' : CFG_SITE_URL + '/img',
                        }
             elif status == "rejected":
                 out += """<tr>
@@ -2006,7 +1990,7 @@ class Template:
                           </tr>
                        """ % {
                          'rn' : doc['RN'],
-                         'images' : images,
+                         'images' : CFG_SITE_URL + '/img',
                        }
             elif status == "approved":
                 out += """<tr>
@@ -2019,7 +2003,7 @@ class Template:
                           </tr>
                        """ % {
                          'rn' : doc['RN'],
-                         'images' : images,
+                         'images' : CFG_SITE_URL + '/img',
                        }
         out += """  </table>
                     </blockquote>
@@ -2028,7 +2012,7 @@ class Template:
                  </table>"""
         return out
 
-    def tmpl_publiline_selectcplxdocument(self, ln, doctype, title, categ, categname, images, docs, apptype):
+    def tmpl_publiline_selectcplxdocument(self, ln, doctype, title, categ, categname, docs, apptype):
         """
         Displays the documents that the user can select in the specified category
 
@@ -2039,8 +2023,6 @@ class Template:
           - 'doctype' *string* - The doctype
 
           - 'title' *string* - The doctype name
-
-          - 'images' *string* - the path to the images
 
           - 'categ' *string* - the category
 
@@ -2118,7 +2100,7 @@ class Template:
                           </tr>
                        """ % {
                          'rn' : doc['RN'],
-                         'images' : images,
+                         'images' : CFG_SITE_URL + '/img',
                        }
             elif status == "rejected":
                 out += """<tr>
@@ -2132,7 +2114,7 @@ class Template:
                           </tr>
                        """ % {
                          'rn' : doc['RN'],
-                         'images' : images,
+                         'images' : CFG_SITE_URL + '/img',
                        }
             elif status == "approved":
                 out += """<tr>
@@ -2146,7 +2128,7 @@ class Template:
                           </tr>
                        """ % {
                          'rn' : doc['RN'],
-                         'images' : images,
+                         'images' : CFG_SITE_URL + '/img',
                        }
             elif status == "cancelled":
                 out += """<tr>
@@ -2160,7 +2142,7 @@ class Template:
                           </tr>
                        """ % {
                          'rn' : doc['RN'],
-                         'images' : images,
+                         'images' : CFG_SITE_URL + '/img',
                        }
         out += """  </table>
                     </blockquote>
@@ -2169,7 +2151,7 @@ class Template:
                  </table>"""
         return out
 
-    def tmpl_publiline_displaydoc(self, ln, doctype, docname, categ, rn, status, dFirstReq, dLastReq, dAction, access, images, confirm_send, auth_code, auth_message, authors, title, sysno, newrn):
+    def tmpl_publiline_displaydoc(self, ln, doctype, docname, categ, rn, status, dFirstReq, dLastReq, dAction, access, confirm_send, auth_code, auth_message, authors, title, sysno, newrn):
         """
         Displays the categories from a doctype that the user can select
 
@@ -2193,8 +2175,6 @@ class Template:
 
           - 'dAction' *string* - The date of the last action (approval or rejection)
 
-          - 'images' *string* - the path to the images
-
           - 'confirm_send' *bool* - must display a confirmation message about sending approval email
 
           - 'auth_code' *bool* - authorised to referee this document
@@ -2214,11 +2194,11 @@ class Template:
         _ = gettext_set_language(ln)
 
         if status == "waiting":
-            image = """<img src="%s/waiting_or.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/waiting_or.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         elif status == "approved":
-            image = """<img src="%s/smchk_gr.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/smchk_gr.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         elif status == "rejected":
-            image = """<img src="%s/iconcross.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/iconcross.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         else:
             image = ""
         out = """
@@ -2315,19 +2295,19 @@ class Template:
                   </table>"""
         return out
 
-    def tmpl_publiline_displaycplxdoc(self, ln, doctype, docname, categ, rn, apptype, status, dates, images, isPubCom, isEdBoard, isReferee, isProjectLeader, isAuthor, authors, title, sysno, newrn):
+    def tmpl_publiline_displaycplxdoc(self, ln, doctype, docname, categ, rn, apptype, status, dates, isPubCom, isEdBoard, isReferee, isProjectLeader, isAuthor, authors, title, sysno, newrn):
 
         # load the right message language
         _ = gettext_set_language(ln)
 
         if status == "waiting":
-            image = """<img src="%s/waiting_or.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/waiting_or.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         elif status == "approved":
-            image = """<img src="%s/smchk_gr.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/smchk_gr.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         elif status == "rejected":
-            image = """<img src="%s/iconcross.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/iconcross.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         elif status == "cancelled":
-            image = """<img src="%s/smchk_rd.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/smchk_rd.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         else:
             image = ""
         out = """
@@ -2619,17 +2599,17 @@ class Template:
              'validation' : validation,
             }
 
-    def tmpl_publiline_displaydocplxaction(self, ln, doctype, categ, rn, apptype, action, status, images, authors, title, sysno, subtitle1, email_user_pattern, stopon1, users, extrausers, stopon2, subtitle2, usersremove, stopon3, validate_btn):
+    def tmpl_publiline_displaydocplxaction(self, ln, doctype, categ, rn, apptype, action, status, authors, title, sysno, subtitle1, email_user_pattern, stopon1, users, extrausers, stopon2, subtitle2, usersremove, stopon3, validate_btn):
 
         # load the right message language
         _ = gettext_set_language(ln)
 
         if status == "waiting":
-            image = """<img src="%s/waiting_or.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/waiting_or.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         elif status == "approved":
-            image = """<img src="%s/smchk_gr.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/smchk_gr.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         elif status == "rejected":
-            image = """<img src="%s/iconcross.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/iconcross.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         else:
             image = ""
         out = """
@@ -2796,17 +2776,17 @@ class Template:
 
         return out
 
-    def tmpl_publiline_displaycplxrecom(self, ln, doctype, categ, rn, apptype, action, status, images, authors, title, sysno,  msg_to, msg_to_group, msg_subject):
+    def tmpl_publiline_displaycplxrecom(self, ln, doctype, categ, rn, apptype, action, status, authors, title, sysno,  msg_to, msg_to_group, msg_subject):
 
         # load the right message language
         _ = gettext_set_language(ln)
 
         if status == "waiting":
-            image = """<img src="%s/waiting_or.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/waiting_or.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         elif status == "approved":
-            image = """<img src="%s/smchk_gr.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/smchk_gr.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         elif status == "rejected":
-            image = """<img src="%s/iconcross.gif" alt="" align="right" />""" % images
+            image = """<img src="%s/iconcross.gif" alt="" align="right" />""" % (CFG_SITE_URL + '/img')
         else:
             image = ""
         out = """

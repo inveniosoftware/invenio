@@ -482,7 +482,6 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         return websubmit_templates.tmpl_submit_summary(
                  ln = args['ln'],
                  values = values,
-                 images = CFG_SITE_URL + '/img',
                )
 
     def index(self, req, form):

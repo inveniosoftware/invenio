@@ -222,7 +222,6 @@ def selectCateg(doctype, ln = CFG_SITE_LANG):
           categories = categories,
           doctype = doctype,
           title = title,
-          images = CFG_SITE_URL + '/img',
         )
     return t
 
@@ -249,7 +248,6 @@ def selectCplxCateg(doctype, ln = CFG_SITE_LANG):
           types = types,
           doctype = doctype,
           title = title,
-          images = CFG_SITE_URL + '/img',
         )
     return t
 
@@ -273,7 +271,6 @@ def selectDocument(doctype,categ, ln = CFG_SITE_LANG):
           doctype = doctype,
           title = title,
           categ = categ,
-          images = CFG_SITE_URL + '/img',
           docs = docs,
         )
     return t
@@ -303,7 +300,6 @@ def selectCplxDocument(doctype,categ,apptype, ln = CFG_SITE_LANG):
           title = title,
           categ = categ,
           categname = categname,
-          images = CFG_SITE_URL + '/img',
           docs = docs,
           apptype = apptype,
         )
@@ -386,7 +382,6 @@ def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
           dLastReq = dLastReq,
           dAction = dAction,
           access = access,
-          images = CFG_SITE_URL + '/img',
           confirm_send = confirm_send,
           auth_code = auth_code,
           auth_message = auth_message,
@@ -473,7 +468,6 @@ def displayCplxDocument(req, doctype,categ,RN,apptype, ln = CFG_SITE_LANG):
           apptype = apptype,
           status = status,
           dates = dates,
-          images = CFG_SITE_URL + '/img',
           isPubCom = isPubCom,
           isEdBoard = isEdBoard,
           isReferee = isReferee,
@@ -741,7 +735,6 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
               apptype = apptype,
               action = action,
               status = status,
-              images = CFG_SITE_URL + '/img',
               authors = authors,
               title = title,
               sysno = sysno,
@@ -843,7 +836,6 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
               apptype = apptype,
               action = action,
               status = status,
-              images = CFG_SITE_URL + '/img',
               authors = authors,
               title = title,
               sysno = sysno,
@@ -929,7 +921,6 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
               apptype = apptype,
               action = action,
               status = status,
-              images = CFG_SITE_URL + '/img',
               authors = authors,
               title = title,
               sysno = sysno,
@@ -971,7 +962,6 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
               apptype = apptype,
               action = action,
               status = status,
-              images = CFG_SITE_URL + '/img',
               authors = authors,
               title = title,
               sysno = sysno,
@@ -1021,7 +1011,6 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
               apptype = apptype,
               action = action,
               status = status,
-              images = CFG_SITE_URL + '/img',
               authors = authors,
               title = title,
               sysno = sysno,
