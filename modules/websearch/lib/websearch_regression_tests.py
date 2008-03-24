@@ -958,26 +958,26 @@ class WebSearchSortResultsTest(unittest.TestCase):
     def test_sort_results_default(self):
         """websearch - search results sorting, default method"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=cern&rg=1',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1',
                                                expected_text="[hep-th/9809057]"))
 
     def test_sort_results_ascending(self):
         """websearch - search results sorting, ascending field"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=cern&rg=1&sf=reportnumber&so=a',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1&sf=reportnumber&so=a',
                                                expected_text="ISOLTRAP"))
 
     def test_sort_results_descending(self):
         """websearch - search results sorting, descending field"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=cern&rg=1&sf=reportnumber&so=d',
-                                               expected_text="SCAN-9605071"))
+                         test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1&sf=reportnumber&so=d',
+                                               expected_text=" [SCAN-9605071]"))
 
     def test_sort_results_sort_pattern(self):
         """websearch - search results sorting, preferential sort pattern"""
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=cern&rg=1&sf=reportnumber&so=d&sp=cern',
-                                               expected_text="CERN-TH-4036"))
+                         test_web_page_content(CFG_SITE_URL + '/search?p=of&f=title&rg=1&sf=reportnumber&so=d&sp=cern',
+                                               expected_text="[CERN-TH-2002-069]"))
 
 class WebSearchSearchResultsXML(unittest.TestCase):
     """Test search results in various output"""
