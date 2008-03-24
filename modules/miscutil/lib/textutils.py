@@ -240,14 +240,17 @@ def wrap_text_in_a_box(body='', title='', style='double_star', **args):
         ret += [tab_str + bottom_border]
     return (prefix + '\n'.join(ret) + suffix).encode('utf-8')
 
-def wait_for_user(msg="Please confirm by typing 'Yes, I know!': "):
+def wait_for_user(msg=""):
     """
-    Print MSG and wait for user's confirmation, unless silent
-    '--yes-i-know' command line option was used.
+    Print MSG and a confirmation prompt, waiting for user's
+    confirmation, unless silent '--yes-i-know' command line option was
+    used, in which case the function returns immediately without
+    printing anything.
     """
     if '--yes-i-know' in sys.argv:
         return
-    answer = raw_input(msg)
+    print msg
+    answer = raw_input("Please confirm by typing 'Yes, I know!': ")
     if answer != 'Yes, I know!':
         sys.stderr.write("ERROR: Aborted.\n")
         sys.exit(1)
