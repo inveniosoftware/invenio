@@ -185,7 +185,6 @@ modules/webstyle/lib/webpage.py
 modules/webstyle/lib/webstyle_templates.py
 modules/webstyle/lib/webdoc.py
 modules/webstyle/lib/webdoc_webinterface.py
-modules/websubmit/bin/thumbmaker.in
 modules/websubmit/lib/file.py
 modules/websubmit/lib/functions/Add_Files.py
 modules/websubmit/lib/functions/CaseEDS.py
