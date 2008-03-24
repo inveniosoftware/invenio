@@ -32,7 +32,9 @@ test_DATA = test.pdf \
             test.jpg \
             test_submit_article.html \
             test_submit_poetry.html \
-            test_submit_picture.html
+            test_submit_picture.html \
+            test_submit_book.html \
+            test_submit_book_approval.html 
 
 EXTRA_DIST = $(doc_DATA) $(test_DATA)
 
