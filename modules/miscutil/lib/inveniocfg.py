@@ -542,8 +542,8 @@ WARNING: You are going to destroy your records and documents!\n
 
 Press Ctrl-C if you want to abort this action.\n
 Press ENTER to proceed with this action."""))
-    if os.path.exists(CFG_PREFIX + os.sep + 'var' + os.sep + 'data' + os.sep + 'files'):
-        shutil.rmtree(CFG_PREFIX + os.sep + 'var' + os.sep + 'data' + os.sep + 'files')
+    if os.path.exists(CFG_PREFIX + os.sep + 'var' + os.sep + 'data'):
+        shutil.rmtree(CFG_PREFIX + os.sep + 'var' + os.sep + 'data')
     run_sql("TRUNCATE schTASK")
     for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/tabbibclean.sql" % (CFG_PREFIX, CFG_PREFIX),
                 "%s/bin/webcoll -u admin" % CFG_PREFIX,
