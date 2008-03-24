@@ -89,7 +89,7 @@ def warn_user_about_tests(test_suite_type='regression'):
 **                                                                  **
 **********************************************************************
 
-Please confirm by typing "Yes, I know!": """ % test_suite_type)
+Please confirm by typing 'Yes, I know!': """ % test_suite_type)
 
     answer = raw_input('')
     if answer != 'Yes, I know!':
