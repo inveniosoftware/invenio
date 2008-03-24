@@ -481,12 +481,8 @@ def cli_cmd_drop_tables(conf):
     print ">>> Going to drop tables..."
     from invenio.config import CFG_PREFIX
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
-    if '--yes-i-know' not in sys.argv:
-        wait_for_user(wrap_text_in_a_box("""\
-WARNING: You are going to destroy your database tables!\n
-
-Press Ctrl-C if you want to abort this action.\n
-Press ENTER to proceed with this action."""))
+    wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy
+your database tables!"""))
     cmd = "%s/bin/dbexec < %s/lib/sql/invenio/tabdrop.sql" % (CFG_PREFIX, CFG_PREFIX)
     if os.system(cmd):
         print "ERROR: failed execution of", cmd
@@ -536,12 +532,8 @@ def cli_cmd_remove_demo_records(conf):
     from invenio.config import CFG_PREFIX
     from invenio.dbquery import run_sql
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
-    if '--yes-i-know' not in sys.argv:
-        wait_for_user(wrap_text_in_a_box("""\
-WARNING: You are going to destroy your records and documents!\n
-
-Press Ctrl-C if you want to abort this action.\n
-Press ENTER to proceed with this action."""))
+    wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy
+your records and documents!"""))
     if os.path.exists(CFG_PREFIX + os.sep + 'var' + os.sep + 'data'):
         shutil.rmtree(CFG_PREFIX + os.sep + 'var' + os.sep + 'data')
     run_sql("TRUNCATE schTASK")
@@ -557,12 +549,8 @@ def cli_cmd_drop_demo_site(conf):
     """Drop demo site completely.  Useful when you are finished testing."""
     print ">>> Going to drop demo site..."
     from invenio.textutils import wrap_text_in_a_box, wait_for_user
-    if '--yes-i-know' not in sys.argv:
-        wait_for_user(wrap_text_in_a_box("""\
-WARNING: You are going to destroy your site and documents!\n
-
-Press Ctrl-C if you want to abort this action.\n
-Press ENTER to proceed with this action."""))
+    wait_for_user(wrap_text_in_a_box("""WARNING: You are going to destroy
+your site and documents!"""))
     cli_cmd_drop_tables(conf)
     cli_cmd_create_tables(conf)
     cli_cmd_remove_demo_records(conf)
