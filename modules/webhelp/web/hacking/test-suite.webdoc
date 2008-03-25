@@ -194,7 +194,7 @@ $ python /opt/cds-invenio/lib/python/invenio/search_engine_tests.py
 </p>
 
 <p>For full-scale examples, you may follow
-<code>search_engine_tests.py<code> and other <code>_tests.py</code>
+<code>search_engine_tests.py</code> and other <code>_tests.py</code>
 files in the source distribution.
 </p>
 
@@ -391,7 +391,7 @@ except ValueError:
 </blockquote>
 
 <p>For full-scale examples, you may follow
-<code>websearch_regression_tests.py<code> and other
+<code>websearch_regression_tests.py</code> and other
 <code>_regression_tests.py</code> files in the source distribution.
 </p>
 
@@ -524,7 +524,6 @@ directory following e.g. <code>websearch/web</code> example.
 
 <p>Run web tests via:
 
-
 <blockquote>
 <pre>
 $ /opt/cds-invenio/bin/inveniocfg --run-web-tests
@@ -535,6 +534,17 @@ $ /opt/cds-invenio/bin/inveniocfg --run-web-tests
 module-specific <code>test_foo_bar.html</code> files, and will open a
 Firefox window with Selenium IDE running the built complete test
 suite.  Check the results there.
+
+<p>Note that if you want to web-test a remote Invenio demo site (say
+<code>foo.site.com</code>) using your local Firefox with Selenium IDE,
+you can install a local Invenio site as usual, and then do:</p>
+
+<blockquote>
+<pre>
+$ sudo -u apache perl -pi -e 's,localhost,foo.site.com,g' /opt/cds-invenio/lib/webtest/invenio/test*html
+$ /opt/cds-invenio/bin/inveniocfg --run-web-tests --yes-i-know
+</pre>
+</blockquote>
 
 <a name="5"></a><h2>5. Conclusions</h2>
 
