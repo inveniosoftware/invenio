@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-03-21 17:03+0100\n"
-"PO-Revision-Date: 2008-03-21 17:14+0100\n"
+"PO-Revision-Date: 2008-03-25 13:59+0100\n"
 "Last-Translator: Jerome Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -4474,13 +4474,12 @@ msgstr ""
 "CERN%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:249
-#, fuzzy
 msgid "Edit language-related settings"
-msgstr "Modifier les préférences de recherche"
+msgstr "Modifier les préférences de langue"
 
 #: modules/websession/lib/websession_templates.py:260
 msgid "Select desired language of the web interface."
-msgstr ""
+msgstr "Choisir la langue de l'interface."
 
 #: modules/websession/lib/websession_templates.py:261
 #: modules/websession/lib/websession_templates.py:294
@@ -4536,7 +4535,6 @@ msgid "Email address"
 msgstr "Adresse email"
 
 #: modules/websession/lib/websession_templates.py:381
-#, fuzzy
 msgid "Send password reset link"
 msgstr "Envoyer le lien de réinitialisation"
 
@@ -4834,7 +4832,7 @@ msgstr "Mot de passe"
 
 #: modules/websession/lib/websession_templates.py:838
 msgid "Remember login on this computer."
-msgstr ""
+msgstr "Mémoriser ma session sur cet ordinateur."
 
 #: modules/websession/lib/websession_templates.py:839
 #: modules/websession/lib/websession_templates.py:1081
@@ -4847,7 +4845,7 @@ msgstr "identification"
 #: modules/websession/lib/websession_templates.py:844
 #: modules/websession/lib/websession_webinterface.py:468
 msgid "Lost your password?"
-msgstr "Perdu le mot de passe?"
+msgstr "Vous avez perdu votre mot de passe?"
 
 #: modules/websession/lib/websession_templates.py:852
 msgid "You can use your nickname or your email address to login."
@@ -5646,7 +5644,6 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:798
 #: modules/websubmit/lib/websubmit_webinterface.py:118
-#, fuzzy
 msgid ""
 "The error has been logged and will be taken in consideration as soon as "
 "possible."
@@ -5752,7 +5749,7 @@ msgstr ""
 #: modules/webstyle/lib/webdoc.py:550
 #, fuzzy, python-format
 msgid "%(category)s Pages"
-msgstr "Pages \"%(x_category)s\""
+msgstr "Pages \"%(category)s\""
 
 #: modules/webstyle/lib/webdoc_webinterface.py:146
 #: modules/webstyle/lib/webdoc_webinterface.py:151
