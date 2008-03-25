@@ -1169,6 +1169,24 @@ class WebSearchExtSysnoQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?sysno=000289446CERRRR&of=id',
                                                expected_text="[]"))
 
+class WebSearchResultsRecordGroupingTest(unittest.TestCase):
+    """Test search results page record grouping (rg)."""
+
+    def test_search_results_rg_guest(self):
+        """websearch - search results, records in groups of, guest"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?rg=17',
+                                               expected_text="1 - 17"))
+
+    def test_search_results_rg_nonguest(self):
+        """websearch - search results, records in groups of, non-guest"""
+        # This test used to fail due to saved user preference fetching
+        # not overridden by URL rg argument.
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?rg=17',
+                                               username='admin',
+                                               expected_text="1 - 17"))
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -1189,7 +1207,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSearchResultsXML,
                              WebSearchUnicodeQueryTest,
                              WebSearchMARCQueryTest,
-                             WebSearchExtSysnoQueryTest)
+                             WebSearchExtSysnoQueryTest,
+                             WebSearchResultsRecordGroupingTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
