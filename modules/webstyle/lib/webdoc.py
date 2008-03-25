@@ -51,11 +51,11 @@ import sys
 import time
 
 # List of (webdoc_source_dir, webdoc_cache_dir)
-webdoc_dirs = {'help':('%s/lib/webdoc/help' % CFG_PREFIX, \
+webdoc_dirs = {'help':('%s/lib/webdoc/invenio/help' % CFG_PREFIX, \
                        '%s/webdoc/help-pages' % CFG_CACHEDIR),
-               'admin':('%s/lib/webdoc/admin' % CFG_PREFIX, \
+               'admin':('%s/lib/webdoc/invenio/admin' % CFG_PREFIX, \
                         '%s/webdoc/admin-pages' % CFG_CACHEDIR),
-               'hacking':('%s/lib/webdoc/hacking' % CFG_PREFIX, \
+               'hacking':('%s/lib/webdoc/invenio/hacking' % CFG_PREFIX, \
                           '%s/webdoc/hacking-pages' % CFG_CACHEDIR)}
 
 # Regular expression for finding text to be translated
