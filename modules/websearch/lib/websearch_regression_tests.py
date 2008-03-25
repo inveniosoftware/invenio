@@ -240,6 +240,43 @@ class WebSearchTestRecord(unittest.TestCase):
 
         return
 
+    def test_exported_formats(self):
+        """ websearch - check formats exported through /record/%i/export/ URLs"""
+
+        browser = Browser()
+
+        self.assertEqual([],
+                         test_web_page_content(make_url('/record/1/export/hm'),
+                                               expected_text='245__ $$aALEPH experiment'))
+        self.assertEqual([],
+                         test_web_page_content(make_url('/record/1/export/hd'),
+                                               expected_text='<strong>ALEPH experiment'))
+        self.assertEqual([],
+                         test_web_page_content(make_url('/record/1/export/xm'),
+                                               expected_text='<subfield code="a">ALEPH experiment'))
+        self.assertEqual([],
+                         test_web_page_content(make_url('/record/1/export/xd'),
+                                               expected_text='<dc:title>ALEPH experiment'))
+        self.assertEqual([],
+                         test_web_page_content(make_url('/record/1/export/hs'),
+                                               expected_text='<a href="/record/1?ln=%s">ALEPH experiment' % \
+                                               CFG_SITE_LANG))
+        self.assertEqual([],
+                         test_web_page_content(make_url('/record/1/export/hx'),
+                                               expected_text='title        = "ALEPH experiment'))
+        self.assertEqual([],
+                         test_web_page_content(make_url('/record/1/export/t?ot=245'),
+                                               expected_text='245__ $$aALEPH experiment'))
+        self.assertNotEqual([],
+                         test_web_page_content(make_url('/record/1/export/t?ot=245'),
+                                               expected_text='001__'))
+        self.assertEqual([],
+                         test_web_page_content(make_url('/record/1/export/h?ot=245'),
+                                               expected_text='245__ $$aALEPH experiment'))
+        self.assertNotEqual([],
+                         test_web_page_content(make_url('/record/1/export/h?ot=245'),
+                                               expected_text='001__'))
+        return
 
 class WebSearchTestCollections(unittest.TestCase):
 

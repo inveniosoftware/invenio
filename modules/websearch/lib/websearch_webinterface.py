@@ -70,6 +70,7 @@ search_results_default_urlargd = websearch_templates.search_results_default_urla
 search_interface_default_urlargd = websearch_templates.search_interface_default_urlargd
 output_formats = [output_format['attrs']['code'].lower() for output_format in \
                    get_output_formats(with_attributes=True).values()]
+output_formats.extend(['hm', 't', 'h'])
 
 def wash_search_urlargd(form):
     """
