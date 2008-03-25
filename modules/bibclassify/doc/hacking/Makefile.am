@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-webdoclibdir = $(libdir)/webdoc/hacking
+webdoclibdir = $(libdir)/webdoc/invenio/hacking
 
 webdoclib_DATA = \
 	bibclassify-internals.webdoc \

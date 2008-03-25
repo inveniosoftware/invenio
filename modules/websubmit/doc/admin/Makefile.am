@@ -29,7 +29,7 @@ img_DATA = websubmit-admin-guide-elements.png \
 	websubmit-admin-guide-main_menu.png \
 	websubmit-admin-guide-menu_page.png
 
-webdoclibdir = $(libdir)/webdoc/admin
+webdoclibdir = $(libdir)/webdoc/invenio/admin
 
 webdoclib_DATA = websubmit-admin-guide.webdoc
 

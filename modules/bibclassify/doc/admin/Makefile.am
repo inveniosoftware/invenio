@@ -21,7 +21,7 @@ imgdir = $(localstatedir)/www/img/admin
 
 img_DATA = bibclassify-admin-guide-cloud.jpeg
 
-webdoclibdir = $(libdir)/webdoc/admin
+webdoclibdir = $(libdir)/webdoc/invenio/admin
 
 webdoclib_DATA = bibclassify-admin-guide.webdoc
 

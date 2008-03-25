@@ -23,7 +23,7 @@ doc_DATA = cdsware.el
 imgdir = $(localstatedir)/www/img/hacking
 img_DATA = modules-overview-diagram.jpeg
 
-webdoclibdir = $(libdir)/webdoc/hacking
+webdoclibdir = $(libdir)/webdoc/invenio/hacking
 webdoclib_DATA = \
 	hacking.webdoc \
 	modules-overview.webdoc \

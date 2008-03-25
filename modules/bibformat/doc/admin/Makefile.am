@@ -33,7 +33,7 @@ img_DATA = bibformat-guide-bfo_attributes.png \
            bibformat-guide-url_bar.png \
            bibformat-guide-bfe.gif
 
-webdoclibdir = $(libdir)/webdoc/admin
+webdoclibdir = $(libdir)/webdoc/invenio/admin
 
 webdoclib_DATA = bibformat-admin-guide.webdoc
 

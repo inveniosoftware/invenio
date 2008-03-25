@@ -19,7 +19,7 @@
 
 SUBDIRS = howto
 
-webdoclibdir = $(libdir)/webdoc/admin
+webdoclibdir = $(libdir)/webdoc/invenio/admin
 
 webdoclib_DATA = \
 	admin.webdoc

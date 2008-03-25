@@ -19,7 +19,7 @@
 
 SUBDIRS = admin hacking
 
-webdoclibdir = $(libdir)/webdoc/help
+webdoclibdir = $(libdir)/webdoc/invenio/help
 
 webdoclib_DATA = \
 	submit-guide.webdoc
