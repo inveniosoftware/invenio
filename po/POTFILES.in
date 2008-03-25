@@ -62,6 +62,8 @@ modules/bibformat/bin/bibreformat.in
 modules/bibformat/lib/bibformat_templates.py
 modules/bibformat/lib/bibformatadminlib.py
 modules/bibformat/lib/elements/bfe_authors.py
+modules/bibformat/lib/elements/bfe_fulltext.py
+modules/bibformat/lib/elements/bfe_fulltext_mini.py
 modules/bibformat/web/admin/bibformatadmin.py
 modules/bibharvest/bin/bibharvest.in
 modules/bibharvest/bin/oaiharvest.in
