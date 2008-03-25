@@ -65,7 +65,7 @@ Shortcomings:
   > that all the mechanisms defined here allow for the omission of
   > language labels so as to be able to accommodate this possible future
   > usage.
- 
+
 """
 
 __revision__ = "$Id$"
@@ -110,7 +110,7 @@ cfg_elmsubmit_have_rtflib = 0
 try:
     import rtf.Rtf2Txt
     from rtf.RtfParser import RtfException as _RtfException
-    cfg_elmsubmit_have_rtflib = 1 
+    cfg_elmsubmit_have_rtflib = 1
 except ImportError:
     pass
 
@@ -138,7 +138,7 @@ _default_handling_hints = { 'generate_filename' : 'always',
                             'archive_multipart_parallel': True,
                             'archive_multipart_related': True,
                             'generate_filename' : 'if_missing' }
-                            
+
 class ParseMessage(object):
 
     """
@@ -154,12 +154,12 @@ class ParseMessage(object):
     Instance properties:
 
     self.headers
-        
+
         Returns the headers of the message as a Python dictionary
         object.
 
         The data structure _headers might look as follows:
-        
+
          _headers = { 'to' : [u"alice@example.com, bob@example.org"],
                       'recieved' : [u"from cernfe02.cern.ch ([137.138 etc...",
                                     u"from client.cern.ch ([137.138. etc..."],
@@ -178,7 +178,7 @@ class ParseMessage(object):
         unicode strings. Note that the _keys_ are just regular ascii
         strings, since we should be able to rely on header keys being
         7-bit ascii only.
-                                                           
+
     self.received_data
     self.primary_message
 
@@ -187,7 +187,7 @@ class ParseMessage(object):
     self.original_message
 
         Returns the orignal message as supplied to the constructor.
-        
+
     self.attachments
     self.inline_attachments
     self.from_header
@@ -196,7 +196,7 @@ class ParseMessage(object):
     self.from_email
     self.message_id
     self.date_sent_utc
-        
+
         Returns an ISO8601 formatted unicode string of the date the
         email was sent (in UST/GMT).  ISO8601 strings look like this:
         "YYYY-MM-DD HH:MM:SS". If the Date: header is not present or
@@ -211,7 +211,7 @@ class ParseMessage(object):
 
         # Save the original message string (can be accessed later by
         # self.origMessage method)
-        
+
         self.original_message = message_string
 
         # Create an email.Message object from the plain text.
@@ -235,11 +235,11 @@ class ParseMessage(object):
             from_header = self.headers['from'][0] # If mutliple From: fields, use 1st.
 
             self.from_addr = from_header
-            
+
             # from_header could be None if we are operating with
             # strict=False and we failed to decode the header:
             if from_header is None: raise FromHeaderParsingError(msg)
-            
+
             (from_name, from_email) = _parse_from_header(msg, from_header)
         except KeyError:
             if strict:
@@ -276,19 +276,19 @@ class ParseMessage(object):
             # in strict mode or not?
             # I think not, since people can save email locally without sending it.
             self.received_data = None
-        
+
         # Now calculate _date_sent_utc. Test to see if there actually
         # is a date header and if we can parse it. If running in
         # strict mode, then we throw an error. If not, then simply use
         # the localtime.
-        
+
         try:
             date_in_rfc2822_format = self.headers['date'][0]
             remote_struct_time_with_utc_offset = email.Utils.parsedate_tz(date_in_rfc2822_format)
 
             # email.Utils.parsedate_tz returns None on failure.
             if remote_struct_time_with_utc_offset is None: raise _ParseDateError()
-            
+
             remote_struct_time = remote_struct_time_with_utc_offset[0:9]
             (remote_offset_from_utc_in_seconds,) = remote_struct_time_with_utc_offset[9:10]
 
@@ -306,12 +306,12 @@ class ParseMessage(object):
 
 #         filter(lambda x: x is None: date_time_args)
 #         if filter != []: raise ParseDateError(msg)
-        
+
         remote_time = datetime.datetime(*date_time_args)
         remote_utc_delta = datetime.timedelta(seconds=remote_offset_from_utc_in_seconds)
 
 #       local_utc_delta = datetime.timedelta(seconds= -time.timezone)
-        
+
         utc_time = remote_time - remote_utc_delta
 #       local_time = utc_time + local_utc_delta
 
@@ -320,9 +320,9 @@ class ParseMessage(object):
         # object. Since the ISO8601 string will only contain us-ascii,
         # this conversion should not fail and so we need not check for
         # decoding errors.
-        
+
         self.date_sent_utc = unicode(utc_time.isoformat(sep=' '), 'us-ascii')
-        
+
 #       self._date_sent_local = local_time.isoformat(sep=' ')
 
         # Now we parse the email and attempt to calculate what the
@@ -335,7 +335,7 @@ class ParseMessage(object):
 
 
 def contents(filename):
-    
+
     f = file(filename, "r")
 
     p = email.Parser.Parser()
@@ -344,7 +344,7 @@ def contents(filename):
     def walk_email(msg,indent=0):
 
         print "-"*indent, msg.get_content_type()
-        
+
         if msg.is_multipart():
             for part in msg.get_payload():
                 walk_email(part,indent+8)
@@ -354,7 +354,7 @@ def contents(filename):
     f.close()
 
 ####### __main__
-    
+
 # f = open('blower.eml','r')
 # e = f.read()
 
@@ -424,7 +424,7 @@ def _received_ip_and_host(received_header):
                            ((?:\d{1,3}\.){3} # match three octets with dots
                            \d{1,3})      # match a single octet with no dot
                            [])]                # match the closing bracket/parenthesis
-                           """, re.VERBOSE|re.IGNORECASE)    
+                           """, re.VERBOSE|re.IGNORECASE)
 
     host_match = host_re.search(received_header)
     if host_match is not None:
@@ -441,8 +441,8 @@ def _received_ip_and_host(received_header):
     return (host, ipad)
 
 def _basic_email_info(msg):
-    
-    """    
+
+    """
     Takes an email.Message object and returns a dictionary, formatted
     like the following example, containing a basic subset of
     information about the message:
@@ -493,10 +493,10 @@ def _basic_email_info(msg):
                                      basic_decoded_headers.items()))
 
     try:
-        
+
         # If the from header is missing this access will cause
         # KeyError:
-        
+
         from_value = basic_decoded_headers['from']
 
         # If from_header is None, we couldn't decode it and so can't
@@ -505,12 +505,12 @@ def _basic_email_info(msg):
 
         if from_value is None: raise TypeError
 
-        # Could cause FromHeaderParsingError:        
+        # Could cause FromHeaderParsingError:
         (from_name, from_email) = _parse_from_header(msg, from_value)
 
         return_dict.update({ 'from_name': from_name,
                              'from_email': from_email })
-        
+
     except (TypeError, KeyError, FromHeaderParsingError):
         return_dict.update({ 'from_name': None,
                              'from_email': None })
@@ -525,7 +525,7 @@ def _basic_email_info(msg):
 
     for header in basic_headers:
         value = basic_decoded_headers.get(header, None)
-        
+
         if value is None:
             value = msg.get(header, None)
 
@@ -550,7 +550,7 @@ def _native2unicode(value_nc, native_charset=None, strict=True):
 
     # Non-RFC2047 encoded parts return charset as None; we assume then
     # that they are us-ascii bytes.
-    
+
     if native_charset is None: native_charset = 'us-ascii'
 
     # Remove RFC2123 language specification from document if present.
@@ -563,7 +563,7 @@ def _native2unicode(value_nc, native_charset=None, strict=True):
     # aren't just calling .decode(charset)!
 
     native_charset = re.sub(r'\*.*$', '', native_charset)
-    
+
     # Search this document for RFC2123 for more information.
 
     # unicode function might not recognize the native_charset and
@@ -576,7 +576,7 @@ def _native2unicode(value_nc, native_charset=None, strict=True):
         raise _UnicodeDecodingError(value_nc, native_charset)
 
 def _process_headers(msg, header_value_pairs, force_processing=False):
-        
+
     return reduce(lambda headers, (header,value): \
                      _process_header(msg, headers, header, value, force_processing),
                   header_value_pairs, {})
@@ -594,7 +594,7 @@ def _decode_rfc2231_tuple(msg, value):
 
             # Data was not RFC2231 encoded. ie. value should be just an
             # ascii-string.
-            
+
             # Note however that some broken email clients mistakenly use
             # RFC2047 encoding in parameterized header fields such as
             # Content-Type and Content-Disposition. This is disallowed by
@@ -636,7 +636,7 @@ def _decode_and_join_structured_header_pair(msg, key, value):
         decoded_key = _native2unicode(key, 'us-ascii')
     except _UnicodeDecodingError:
         raise _StructuredHeaderPairError(key, value)
-    
+
     if value == '':
         # We have a structured entry that is not in key=value form. eg. The multipart/mixed in
         # 'Content-Type: multipart/mixed; boundary="------------050902070901080909090201"'
@@ -661,18 +661,18 @@ def _decode_rfc2231_header(msg, header, value, force_processing=False):
     # the email.ParseMessage class's get_params method. This method deals
     # with all of the RFC2231 decoding for us, and so we just have to
     # reconstruct the tuples it gives us into a unicode string.
-    
+
     # This means these headers are no longer suitable for parsing by
     # machine, but does make them suitable for display (which is
     # prefered from two mutually incompatable options; if you want to
     # start parsing Content-Type parameters, then you want to be using
     # the Python email package directly!).
-    
+
 #     Take a value that looks like:
-#     value = 
+#     value =
 #     And turn it into a unicode string that looks like:
 #     u'"This is even more ***fun*** isn't it!"'
-    
+
 #     The values in the tuple are from left to right are a charset,
 #     language specification and string of encoded text.
 
@@ -685,7 +685,7 @@ def _decode_rfc2231_header(msg, header, value, force_processing=False):
     # param should never return failobj None since we have already
     # verified the header we are requesting exists.
     if params is None: raise _EmailPackageError
-    
+
     try:
 
         f = lambda (k,v): _decode_and_join_structured_header_pair(msg, k, v)
@@ -734,7 +734,7 @@ def _decode_rfc2047_header(msg, header, value, force_processing=False):
 
         # Since all members of decoded_parts are now in unicode we can
         # concatenate them into a single header value string.
-        
+
         unicode_value = u''.join(unicode_decoded_parts)
 
     except email.Errors.HeaderParseError:
@@ -768,33 +768,33 @@ def _process_header(msg, headers, header, value, force_processing=False):
         unicode_value = _decode_rfc2231_header(msg, header, value, force_processing)
     else:
         unicode_value = _decode_rfc2047_header(msg, header, value, force_processing)
-    
+
     # Repeated header keys are legal, so we store dictionary
     # values as a list. Therefore we must check if this header
     # key has already been initialized in the dictionary.
 
-    header = header.lower() 
+    header = header.lower()
     headers.setdefault(header, []) # If key header isn't present, add it with value []
     headers[header].append(unicode_value)
 
-    return headers    
+    return headers
 
 def _parse_from_header(msg, from_header):
 
     ### !!! Need to do some thinking about internationalized email
     ### !!! addresses and domain names to check what problems
     ### !!! these may cause.
-        
+
     (from_name, from_email) = email.Utils.parseaddr(from_header)
 
     # Check we were able to parse the From: field
     # (email.Utils.parseaddr returns ('','') on failure) and that
     # from_email is not empty. Otherwise raise a FromHeaderParsingError
-    
+
     # empty from_name is OK, since we just use from_email as the
     # author's 'name'.
 
-    if (from_name, from_email) == ('','') or from_email == '': 
+    if (from_name, from_email) == ('','') or from_email == '':
         raise FromHeaderParsingError(msg)
     elif from_name == '':
         from_name = from_email
@@ -828,13 +828,13 @@ def _get_msg_structure(msg, strict, hints):
             attachments.append(item)
 
     return (attachments, inline_attachments, primary_msg)
-            
+
 def _force_ends_in_newline(string):
 
     if string == '' or string[-1] != '\n':
         return string + '\n'
     else:
-        return string            
+        return string
 
 def _get_mime_handler(maintype, subtype):
 
@@ -870,7 +870,7 @@ def _get_mime_handler(maintype, subtype):
 
             # Make sure text data has unix newline conventions.
             mhe.decoded_payload = _cr2lf(mhe.decoded_payload)
-            
+
             try:
                 mhe.file = _native2unicode(mhe.decoded_payload, mhe.charset, strict)
             except _UnicodeDecodingError:
@@ -885,7 +885,7 @@ def _get_mime_handler(maintype, subtype):
 # Generate filename values: never, always, if_missing
 
 def _format_msg_part_data(mhe, hints):
-    
+
     part_info = {}
     part_info['file'] = mhe.file #'UNCOMMENT THIS TO SEE FILE!!!!!' #mhe.file
     part_info['downgrading_to_text'] = mhe.downgrading_to_text
@@ -935,7 +935,7 @@ def _get_part_disposition(msg_part):
 
     # This dictates that the disposition-type must be the first element in
     # the header. get_params returns something like this:
-    
+
     # >>> msg_part.get_params(None, 'Content-Disposition')
     # [('inline', ''), ('filename', 'email.txt')]
 
@@ -962,7 +962,7 @@ def _get_part_filename(msg_part):
     # Content-Disposition header for the filename parameter whereas we
     # would like to support crufty old clients which are still using
     # the Content-Type name parameter.
-    
+
     missing = []
 
     #First try content-disposition:
@@ -977,9 +977,9 @@ def _get_part_filename(msg_part):
     else:
 
         # If filename parameter of content-disposition is not
-        # available, try name parameter of content-type:        
+        # available, try name parameter of content-type:
         filename = msg_part.get_param('name', missing, 'content-type')
-        
+
         if filename != missing:
             filename = _decode_rfc2231_tuple(msg_part, filename)
             if filename is None:
@@ -1002,9 +1002,9 @@ def _cte_decode(msg_part):
     # undecoded payload. This makes it hard to tell if there has been
     # success or not. Initially I thought decoding failure could be
     # identified by checking if:
-    
+
     # msg_part.get_payload(decode=True) == msg_part.get_payload(decode=False)
-    
+
     # But this method would flag false errors. For example, if text
     # contains no 'nasty characters' it will be the same both before
     # and after quoted-printable encoding (see the quoted-printable
@@ -1023,19 +1023,19 @@ def _cte_decode(msg_part):
     cte = msg_part.get('content-transfer-encoding', '').lower()
 
     try:
-        
+
         if cte == 'quoted-printable':
             # Could cause binascii.Error/Incomplete
             payload = quopri.decodestring(payload)
         elif cte == 'base64':
-            # Could cause 
+            # Could cause
             payload = _base64decode(payload)
         elif cte in ('x-uuencode', 'uuencode', 'uue', 'x-uue'):
             sfp = StringIO()
 
             uu.decode(StringIO(payload+'\n'), sfp)
             payload = sfp.getvalue()
-            
+
     except (binascii.Error, binascii.Incomplete, uu.Error):
         raise _CTEDecodingError
 
@@ -1049,7 +1049,7 @@ def _base64decode(s):
     # This is a cut and paste of email.Utils._bdecode.  We can't call
     # _bdecode directly, because its a private function of the Utils
     # modules and therefore not safe to import.
-    
+
     # We can't quite use base64.encodestring() since it tacks on a "courtesy
     # newline".  Blech!
     if not s:
@@ -1058,7 +1058,7 @@ def _base64decode(s):
     if not s.endswith('\n') and value.endswith('\n'):
         return value[:-1]
     return value
-    
+
 # MIME Handlers:
 
 def _get_flattened_payload(msg_part, with_mime_headers=False):
@@ -1097,7 +1097,7 @@ def _email_structure_to_directory_structure(email_structure, directory_base=''):
                                   'unamed_part_' + _get_unused_random(lambda: _random_alphanum_string(length=8), used_random)]
             available_filenames = filter(lambda x: x is not None, possible_filenames)
             filename = available_filenames[0]
-            
+
             if item['file'] is not None:
                 files.append((os.path.join(directory_base, filename), item['file']))
             else:
@@ -1112,13 +1112,13 @@ def _archive_part(msg, mhe, strict, hints):
 
     processed_parts = _get_mime_handler('multipart', 'mixed')(msg, mhe, strict, hints)
     files = _email_structure_to_directory_structure(processed_parts)
-    
+
     mhe.file = elmsubmit_EZArchive.create(files, input_disposition='named_byte_strings',
                                           compress_to='byte_string',
                                           compression=hints['archive_format'],
                                           force_file_permissions=0664,
                                           force_dir_permissions=0775)
-    
+
     mhe.filename = '_'.join([_random_alphanum_string(length=8), mhe.maintype, mhe.subtype,
                              'archive.' + hints['archive_format']])
 
@@ -1139,7 +1139,7 @@ def multipart_alternative_sort(part1, part2):
     # application/rtf, score 1
 
     # (the later five we make use of their 'downgrading_to_text')
-    
+
     # Although text/richtext is a simpler format than text/html, it
     # has theoretically been obsoleted by text/enriched and so comes
     # lower in order of preference.
@@ -1149,7 +1149,7 @@ def multipart_alternative_sort(part1, part2):
 
     # - RFC1341 defines a simple text markup for mime type
     # 'text/richtext'.
-    
+
     # - RFC1896 (and some RFCS before it which 1896 obsoletes) defines
     #   'text/enriched' which is designed to solve the shortcomings of
     #   'text/richtext'; use of 'text/richtext' is deprecated in
@@ -1163,7 +1163,7 @@ def multipart_alternative_sort(part1, part2):
     # application (ie. needs to be parsed to make any sense of)!
 
     # Some useful reading:
-    
+
     # http://mango.human.cornell.edu/kens/etf.html (text/enriched primer)
     # http://www.faqs.org/rfcs/rfc1896.html (text/enriched RFC)
     # http://www.faqs.org/rfcs/rfc1341.html (text/richtext RFC)
@@ -1250,7 +1250,7 @@ def _mime_handler_application_octetstream(msg, mhe, strict, hints):
 
     mhe.file = mhe.decoded_payload
     return [ _format_msg_part_data(mhe, hints) ]
-    
+
 def _mime_handler_application_pgpencrypted(msg, mhe, strict, hints):
     return [{mhe.maintype : 'not implemented yet', mhe.subtype : 'problems!'}]
 def _mime_handler_application_pgpkeys(msg, mhe, strict, hints):
@@ -1258,7 +1258,7 @@ def _mime_handler_application_pgpkeys(msg, mhe, strict, hints):
 def _mime_handler_application_pgpsignature(msg, mhe, strict, hints):
     return [{mhe.maintype : 'not implemented yet', mhe.subtype : 'problems!'}]
 def _mime_handler_application_rtf(msg, mhe, strict, hints):
-    
+
     # application/rtf is same as text/rtf, so call _get_mime_handler
     # to retrieve correct handler.
 
@@ -1274,9 +1274,9 @@ def _mime_handler_message_externalbody(msg, mhe, strict, hints):
 # def _mime_handler_message_news(msg, mhe, strict, hints):
 #     pass
 # Currently just treat as application/octet-stream.
-    
+
 def _mime_handler_message_partial(msg, mhe, strict, hints):
-    
+
     if strict:
         raise MIMEPartError(msg, mhe, 'not_implemented')
     else:
@@ -1291,17 +1291,17 @@ def _mime_handler_message_rfc822(msg, mhe, strict, hints):
         # Descend into the message as if it were a multipart/mixed
         # type.
         return _get_mime_handler('multipart', 'mixed')(msg, mhe, strict, hints)
-    
+
 def _mime_handler_multipart_alternative(msg, mhe, strict, hints):
 
     # We handle multipart alternative just like multipart mixed, but
     # then pick our prefered alternative, storing the remaining
     # alternatives in mhe.rejected_alternatives.
-    
+
     (prefered, rejects) = _pick_from_alternatives(_get_mime_handler('multipart', 'mixed')(msg, mhe, strict, hints))
     prefered['rejected_alternatives'] = rejects
     return [ prefered ]
-    
+
 def _mime_handler_multipart_appledouble(msg, mhe, strict, hints):
     return [{mhe.maintype : 'not implemented yet', mhe.subtype : 'problems!'}]
 def _mime_handler_multipart_encrypted(msg, mhe, strict, hints):
@@ -1378,13 +1378,13 @@ def _mime_handler_text_html(msg, mhe, strict, hints):
             raise MIMEPartError(msg, mhe, 'downgrading_to_text')
         else:
             mhe.downgrading_to_text = None
-    
+
     return [ _format_msg_part_data(mhe, hints) ]
 
 def _mime_handler_text_plain(msg, mhe, strict, hints):
-   
+
     return [ _format_msg_part_data(mhe, hints) ]
-    
+
 def _mime_handler_text_richtext(msg, mhe, strict, hints):
 
     # Covert the text/richtext data to plain text and store it. We
@@ -1400,14 +1400,14 @@ def _mime_handler_text_richtext(msg, mhe, strict, hints):
             raise MIMEPartError(msg, mhe, 'downgrading_to_text')
         else:
             mhe.downgrading_to_text = None
-    
+
     return [ _format_msg_part_data(mhe, hints) ]
 
 def _mime_handler_text_rtf(msg, mhe, strict, hints):
-    
+
     # Note: This parser has some unicode issues which need to be
     # fixed! The project seems fairly active...
-    
+
     # Use RtfLib to convert rtf string to text.
     try:
         mhe.downgrading_to_text = rtf.Rtf2Txt.getTxt(_native2unicode(mhe.decoded_payload, native_charset=mhe.charset, strict=strict))
@@ -1416,7 +1416,7 @@ def _mime_handler_text_rtf(msg, mhe, strict, hints):
             raise MIMEPartError(msg, mhe, 'downgrading_to_text')
         else:
             mhe.downgrading_to_text = None
-            
+
     return [ _format_msg_part_data(mhe, hints) ]
 
 # Content-Type to Handler mappings:
@@ -1535,13 +1535,13 @@ def CreateMessage(_from,
     _from: Either:   1. An ascii string already suitable for inclusion
                         in this email header (eg. a string you have
                         torn directory out of another email.
-                      
+
                      2. A 2-tuple (name, email_address), where name is
                         a persons name and email_address is their
                         email address. name must be a unicode object.
                         email_address can be either a unicode object
                         or a byte string.
-                        
+
     to,
     cc,
     bcc: Either:     1. An ascii string already suitable for inclusion
@@ -1572,18 +1572,18 @@ def CreateMessage(_from,
     in_reply_to:        A list of objects defined like argument message_id.
 
     date:               A ascii string containing an rfc822 formatted date string.
-    
+
     wrap_message:       True/False whether you want to have the message body
                         wrapped to the width given in argument cols.
 
     cols:               A integer column width.
     """
-    
+
     if message is not None:
         mime_message = [_mimeify_message(message, wrap_message, cols)]
     else:
         mime_message = []
-    
+
     mime_attached_messages = map(_mimeify_attach_message, attach_messages)
     mime_attached_files = map(_mimeify_attach_file, attach_files)
 
@@ -1614,7 +1614,7 @@ def CreateMessage(_from,
 
         if value is None:
             continue
-        
+
         if isinstance(value, str):
             main_part[header] = eH(value).encode()
         else:
@@ -1653,7 +1653,7 @@ def _mimeify_message(message, wrap_message, cols):
         charset = 'us-ascii'
     else:
         charset = 'utf8'
-    
+
     msg_part = email.MIMEText.MIMEText(_text=message.encode(charset),
                                        _subtype='plain',
                                        _charset=charset)
@@ -1669,7 +1669,7 @@ def _mimeify_attach_message(message_rfc822):
 
 def _mimeify_attach_file((filename_unicode, fh)):
     # fh = python file handle
-    
+
     # Guess the content type based on file extension.
     content_type, encoding = mimetypes.guess_type(filename_unicode)
 
@@ -1690,13 +1690,13 @@ def _mimeify_attach_file((filename_unicode, fh)):
         content_type = 'application/octet-stream'
 
     maintype, subtype = content_type.split('/', 1)
-    
+
     if maintype == 'text':
 
         # This is what we should be doing:
-        
+
         # msg_part = email.MIMEText.MIMEText(fh.read(), _subtype=subtype)
-        
+
         # but until I gather together character encoding detection,
         # everything text is going to be attached as
         # application/octet-stream.
@@ -1706,7 +1706,7 @@ def _mimeify_attach_file((filename_unicode, fh)):
 
         # Encode the payload using Base64
         email.Encoders.encode_base64(msg_part)
-        
+
     elif maintype == 'image':
         msg_part = email.MIMEImage.MIMEImage(fh.read(), _subtype=subtype)
     elif maintype == 'audio':
@@ -1756,9 +1756,9 @@ def _mimeify_unstructured(string):
         return str(email.Header.make_header([(string.encode('utf8'), 'utf8')]))
 
 def _just_ascii(unicode_string):
-    # Are are the objects in the unicode string ascii character?:    
+    # Are are the objects in the unicode string ascii character?:
     return unicode_string.encode('utf8') == unicode_string.encode('us-ascii', 'ignore')
-    
+
 # Error classes.
 
 class _EmailPackageError(Exception):
@@ -1775,24 +1775,24 @@ class EZEmailParseError(EZEmailError):
     """
     An emtpy parent class for all public errors in this module.
     """
-    
+
     def __init__(self, msg):
 
         """
         """
-        
+
         self.basic_email_info = _basic_email_info(msg)
         Exception.__init__(self)
 
-class EZEmailCreateError(Exception):
+class EZEmailCreateError(EZEmailError):
     pass
-        
+
 class _EZEmailPrivateError(Exception):
 
     """
     An emtpy parent class for all private errors in this module.
     """
-    
+
     pass
 
 class _UnicodeDecodingError(_EZEmailPrivateError):
@@ -1804,10 +1804,10 @@ class _UnicodeDecodingError(_EZEmailPrivateError):
     """
 
     def __init__(self, value, charset):
-        
+
         """
         Constructor takes single argument; a string giving the name of
-        the problem charset.         
+        the problem charset.
         """
 
         self.value = value
@@ -1833,7 +1833,7 @@ class HeaderRFC2231Error(EZEmailParseError):
     This error is raised if we can't decode a structured header
     (eg. Content-Type or Content-Disposition) successfully.
     """
-    
+
     def __init__(self, msg, header, header_value, key, key_value):
 
         self.header = header
@@ -1845,13 +1845,13 @@ class HeaderRFC2231Error(EZEmailParseError):
 
 class HeaderCharsetError(EZEmailParseError):
 
-    """    
+    """
     This error is raised if we can't recognize one of the charsets
     used in a particular header.
     """
 
     def __init__(self, msg, header, header_value, problem_part, charset):
-    
+
         """
         Constructor takes an email.Message message object and header,
         value and charset (in their original rfc2047 encoding) as
@@ -1876,13 +1876,13 @@ class HeaderRFC2047Error(EZEmailParseError):
     """
 
     def __init__(self, msg, header, value):
-    
+
         """
-        
+
         Constructor takes an email.Message message object and header,
         value and charset (in their original rfc2047 encoding) as
         arguments and stores them.
-        
+
         """
 
         self.header = header
@@ -1915,23 +1915,23 @@ class FromHeaderMissingError(EZEmailParseError):
 class _ParseDateError(_EZEmailPrivateError):
 
     """
-    
+
     Private error raised when email.Utils.parsedate or
     email.Utils.parsedate_tz fails to parse a date header value.
-    
+
     """
-    
+
     pass
 
 class ParseDateError(EZEmailParseError):
 
     """
-    
+
     Public error raised when email.Utils.parsedate or
     email.Utils.parsedate_tz fails to parse a date header value.
-    
+
     """
-    
+
     pass
 
 class _CTEDecodingError(_EZEmailPrivateError):
@@ -1977,10 +1977,6 @@ class MIMEPartError(EZEmailParseError):
     def __str__(self):
 
         return "maintype: %s\nsubtype: %s\nfilename: %s\nsample: %s\nerror_type: %s" % (self.maintype, self.subtype, self.filename, self.sample, self.error_type)
-
-class EZEmailCreateError(EZEmailError):
-    pass
-
 
 if __name__ == "__main__":
     import sys
