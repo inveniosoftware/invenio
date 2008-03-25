@@ -105,6 +105,15 @@ def get_list_of_python_regression_test_files(modulesdir, modulename):
     pipe.close()
     return out
 
+def get_list_of_web_test_files(modulesdir, modulename):
+    """Return list of HTML Selenese web test files for MODULENAME in MODULESDIR."""
+    out = []
+    (dummy, pipe, dummy) = os.popen3("find %s/%s/ -name 'test_*.html'" % \
+                                     (modulesdir, modulename))
+    out.extend([filename.strip() for filename in pipe.readlines()])
+    pipe.close()
+    return out
+
 def get_nb_lines_in_file(filename):
     """Return number of lines in FILENAME."""
     return len(open(filename).readlines())
@@ -172,28 +181,31 @@ def get_nb_pychecker_warnings(filename):
     return nb_warnings_found
 
 def calculate_module_kwalitee(modulesdir, modulename):
-    """Run kwalitee tests for MODULENAME in MODULESDIR
-       and return kwalitee dict with keys modulename, nb_loc,
-       nb_unit_tests, nb_regression_tests, nb_pychecker_warnings,
+    """Run kwalitee tests for MODULENAME in MODULESDIR and return
+       kwalitee dict with keys modulename, nb_loc, nb_unit_tests,
+       nb_regression_tests, nb_web_tests, nb_pychecker_warnings,
        nb_missing_docstrings, avg_pylint_score.
     """
     files_code = get_list_of_python_code_files(modulesdir, modulename)
-    files_unit = get_list_of_python_unit_test_files(modulesdir, modulename)
-    files_regression = get_list_of_python_regression_test_files(modulesdir,
+    files_unitt = get_list_of_python_unit_test_files(modulesdir, modulename)
+    files_regressiont = get_list_of_python_regression_test_files(modulesdir,
                                                                 modulename)
+    files_webt = get_list_of_web_test_files(modulesdir, modulename)
     # 1 - calculate LOC:
     nb_loc = 0
     for filename in files_code:
         nb_loc += get_nb_lines_in_file(filename)
     # 2 - calculate # unit tests:
     nb_unit_tests = 0
-    for filename in files_unit:
+    for filename in files_unitt:
         nb_unit_tests += get_nb_test_cases_in_file(filename)
     # 3 - calculate # regression tests:
     nb_regression_tests = 0
-    for filename in files_regression:
+    for filename in files_regressiont:
         nb_regression_tests += get_nb_test_cases_in_file(filename)
-    # 4 - calculate pylint results and score:
+    # 4 - calculate # regression tests:
+    nb_web_tests = len(files_webt)
+    # 5 - calculate pylint results and score:
     total_nb_missing_docstrings = 0
     total_pylint_score = 0.0
     total_nb_msg_convention = 0
@@ -201,7 +213,7 @@ def calculate_module_kwalitee(modulesdir, modulename):
     total_nb_msg_warning = 0
     total_nb_msg_error = 0
     total_nb_msg_fatal = 0
-    files_for_pylinting = files_code + files_unit + files_regression
+    files_for_pylinting = files_code + files_unitt + files_regressiont
     files_for_pylinting = wash_list_of_python_files_for_pylinting(files_for_pylinting)
     for filename in files_for_pylinting:
         (filename_nb_missing_docstrings, filename_pylint_score,
@@ -229,6 +241,7 @@ def calculate_module_kwalitee(modulesdir, modulename):
             'nb_loc': nb_loc,
             'nb_unit_tests': nb_unit_tests,
             'nb_regression_tests': nb_regression_tests,
+            'nb_web_tests': nb_web_tests,
             'nb_missing_docstrings': total_nb_missing_docstrings,
             'nb_pychecker_warnings': nb_pychecker_warnings,
             'avg_pylint_score': avg_pylint_score,
@@ -268,6 +281,7 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
                          'nb_loc': 0,
                          'nb_unit_tests': 0,
                          'nb_regression_tests': 0,
+                         'nb_web_tests': 0,
                          'nb_missing_docstrings': 0,
                          'nb_pychecker_warnings': 0,
                          'avg_pylint_score': 0,
@@ -284,21 +298,22 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
         usage()
         sys.exit(1)
     # print header
-    print "="*80
-    print "CDS Invenio Python Code Kwalitee Check %41s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    print "="*80
+    print "="*112
+    print "CDS Invenio Python Code Kwalitee Check %73s" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    print "="*112
     print ""
-    print "%(modulename)13s %(nb_loc)8s %(nb_unit)6s %(nb_regression)6s %(nb_tests_per_1k_loc)8s %(nb_missing_docstrings)8s %(nb_pychecker_warnings)12s %(avg_pylint_score)11s %(pylint_details)s" % \
+    print "%(modulename)13s %(nb_loc)8s %(nb_unitt)6s %(nb_regressiont)6s %(nb_webt)6s %(nb_tests_per_1k_loc)8s %(nb_missing_docstrings)8s %(nb_pychecker_warnings)12s %(avg_pylint_score)11s %(pylint_details)s" % \
           { 'modulename': 'Module',
             'nb_loc': '#LOC',
-            'nb_unit': '#UnitT',
-            'nb_regression': '#RegrT',
+            'nb_unitt': '#UnitT',
+            'nb_regressiont': '#RegrT',
+            'nb_webt': '#WebT',
             'nb_tests_per_1k_loc': '#T/1kLOC',
             'nb_missing_docstrings': '#MissDoc',
             'nb_pychecker_warnings': '#PyChk/1kSRC',
             'avg_pylint_score': 'PyLintScore',
             'pylint_details': 'PyLintDetails'}
-    print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*8, "-"*8, "-"*12, "-"*11, "-"*25
+    print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*6, "-"*8, "-"*8, "-"*12, "-"*11, "-"*25
     for modulename in modulenames:
         # calculate kwalitee for this modulename:
         kwalitee[modulename] = calculate_module_kwalitee(modulesdir, modulename)
@@ -306,6 +321,7 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
         kwalitee['TOTAL']['nb_loc'] += kwalitee[modulename]['nb_loc']
         kwalitee['TOTAL']['nb_unit_tests'] += kwalitee[modulename]['nb_unit_tests']
         kwalitee['TOTAL']['nb_regression_tests'] += kwalitee[modulename]['nb_regression_tests']
+        kwalitee['TOTAL']['nb_web_tests'] += kwalitee[modulename]['nb_web_tests']
         kwalitee['TOTAL']['nb_pychecker_warnings'] += kwalitee[modulename]['nb_pychecker_warnings']
         kwalitee['TOTAL']['nb_missing_docstrings'] += kwalitee[modulename]['nb_missing_docstrings']
         kwalitee['TOTAL']['avg_pylint_score'] += kwalitee[modulename]['avg_pylint_score']
@@ -315,13 +331,14 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
         kwalitee['TOTAL']['nb_msg_error'] += kwalitee[modulename]['nb_msg_error']
         kwalitee['TOTAL']['nb_msg_fatal'] += kwalitee[modulename]['nb_msg_fatal']
         # print results for this modulename:
-        print "%(modulename)13s %(nb_loc)8d %(nb_unit)6d %(nb_regression)6d %(nb_tests_per_1k_loc)8.2f %(nb_missing_docstrings)8d %(nb_pychecker_warnings)12.3f %(avg_pylint_score)8.2f/10 %(pylint_details)s" % \
+        print "%(modulename)13s %(nb_loc)8d %(nb_unitt)6d %(nb_regressiont)6d %(nb_webt)6d %(nb_tests_per_1k_loc)8.2f %(nb_missing_docstrings)8d %(nb_pychecker_warnings)12.3f %(avg_pylint_score)8.2f/10 %(pylint_details)s" % \
               { 'modulename': kwalitee[modulename]['modulename'],
                 'nb_loc': kwalitee[modulename]['nb_loc'],
-                'nb_unit': kwalitee[modulename]['nb_unit_tests'],
-                'nb_regression': kwalitee[modulename]['nb_regression_tests'],
+                'nb_unitt': kwalitee[modulename]['nb_unit_tests'],
+                'nb_regressiont': kwalitee[modulename]['nb_regression_tests'],
+                'nb_webt': kwalitee[modulename]['nb_web_tests'],
                 'nb_tests_per_1k_loc': kwalitee[modulename]['nb_loc'] != 0 and \
-                     (kwalitee[modulename]['nb_unit_tests'] + kwalitee[modulename]['nb_regression_tests'] + 0.0) / kwalitee[modulename]['nb_loc'] * 1000.0 or \
+                     (kwalitee[modulename]['nb_unit_tests'] + kwalitee[modulename]['nb_regression_tests'] + kwalitee[modulename]['nb_web_tests'] + 0.0) / kwalitee[modulename]['nb_loc'] * 1000.0 or \
                      0,
                 'nb_missing_docstrings': kwalitee[modulename]['nb_missing_docstrings'],
                 'nb_pychecker_warnings': kwalitee[modulename]['nb_loc'] != 0 and \
@@ -336,14 +353,15 @@ def generate_kwalitee_stats_for_all_modules(modulesdir):
 
               }
     # print totals:
-    print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*8, "-"*8, "-"*12, "-"*11, "-"*25
-    print "%(modulename)13s %(nb_loc)8d %(nb_unit)6d %(nb_regression)6d %(nb_tests_per_1k_loc)8.2f %(nb_missing_docstrings)8d %(nb_pychecker_warnings)12.3f %(avg_pylint_score)8.2f/10 %(pylint_details)s" % \
+    print " ", "-"*11, "-"*8, "-"*6, "-"*6, "-"*6, "-"*8, "-"*8, "-"*12, "-"*11, "-"*25
+    print "%(modulename)13s %(nb_loc)8d %(nb_unitt)6d %(nb_regressiont)6d %(nb_webt)6d %(nb_tests_per_1k_loc)8.2f %(nb_missing_docstrings)8d %(nb_pychecker_warnings)12.3f %(avg_pylint_score)8.2f/10 %(pylint_details)s" % \
               { 'modulename': kwalitee['TOTAL']['modulename'],
                 'nb_loc': kwalitee['TOTAL']['nb_loc'],
-                'nb_unit': kwalitee['TOTAL']['nb_unit_tests'],
-                'nb_regression': kwalitee['TOTAL']['nb_regression_tests'],
+                'nb_unitt': kwalitee['TOTAL']['nb_unit_tests'],
+                'nb_regressiont': kwalitee['TOTAL']['nb_regression_tests'],
+                'nb_webt': kwalitee['TOTAL']['nb_web_tests'],
                 'nb_tests_per_1k_loc': kwalitee['TOTAL']['nb_loc'] != 0 and \
-                     (kwalitee['TOTAL']['nb_unit_tests'] + kwalitee['TOTAL']['nb_regression_tests'] + 0.0) / kwalitee['TOTAL']['nb_loc']*1000.0 or \
+                     (kwalitee['TOTAL']['nb_unit_tests'] + kwalitee['TOTAL']['nb_regression_tests'] + kwalitee['TOTAL']['nb_web_tests'] + 0.0) / kwalitee['TOTAL']['nb_loc']*1000.0 or \
                      0,
                 'nb_missing_docstrings': kwalitee['TOTAL']['nb_missing_docstrings'],
                 'nb_pychecker_warnings': kwalitee['TOTAL']['nb_loc'] != 0 and \
@@ -362,6 +380,7 @@ Legend:
   #LOC = number of lines of code (excl. test files, incl. comments/blanks)
   #UnitT = number of unit test cases
   #RegrT = number of regression test cases
+  #WebT = number of web test cases
   #T/1kLOC = number of tests per 1k lines of code [desirable: > 10]
   #MissDoc = number of missing docstrings [desirable: 0]
   #PyChk/1kSRC = number of PyChecker warnings per 1k sources [desirable: 0]
