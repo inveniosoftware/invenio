@@ -305,7 +305,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
     """
     pubrefntag = record_pri_number_tag = config.get(config.get("rank_method", "function"),"publication_reference_number_tag")
     pubreftag = record_pri_number_tag = config.get(config.get("rank_method", "function"),"publication_reference_tag")
-    #pubrefntab is prob 999C5r, pubreftab 999c5s
+    #pubrefntag is prob 999C5r, pubreftag 999c5s
     citation_list = initial_citationlist
     reference_list = initial_referencelist
     result = initialresult
@@ -366,7 +366,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
         else:
             recs_modified = recs[:tmp]
         p = recs_modified
-        rec_ids = get_recids_matching_query(p, pubreftab)
+        rec_ids = get_recids_matching_query(p, pubreftag)
         if rec_ids:
             for rec_id in rec_ids:
                 if not rec_id in citation_list[recid]:
