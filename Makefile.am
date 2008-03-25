@@ -49,6 +49,9 @@ kwalitee-check-errors-only:
 kwalitee-check-variables:
 	@find $(top_srcdir) -name '*.py' -exec pylint --reports=n --enable-checker=variables {} \; 2> /dev/null
 
+kwalitee-check-indentation:
+	@find $(top_srcdir) -name '*.py' -exec pylint --reports=n --enable-checker=format {} 2> /dev/null \; | grep -E '(^\*|indentation)'
+
 kwalitee-check-sql-queries:
 	@echo "* Listing potentially dangerous SQL queries:"
 	@echo "** SQL SELECT queries without explicit column list:"
