@@ -41,7 +41,7 @@ from invenio.websession_config import \
         CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
         CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS
 from invenio.urlutils import make_canonical_urlargd
-from invenio.htmlutils import escape_html
+from invenio.htmlutils import escape_html, nmtoken_from_string
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
 class Template:
@@ -131,7 +131,7 @@ class Template:
                 <p>%(change_user)s</p>
                 <table>
                   <tr><td align="right" valign="top"><strong>
-                      %(nickname_label)s:</strong><br />
+                      <label for="nickname">%(nickname_label)s:</label></strong><br />
                       <small class="important">(%(mandatory)s)</small>
                     </td><td valign="top">
                       %(nickname_prefix)s%(nickname)s%(nickname_suffix)s<br />
@@ -141,10 +141,10 @@ class Template:
                     </td>
                   </tr>
                   <tr><td align="right"><strong>
-                      %(new_email)s:</strong><br />
+                      <label for="email">%(new_email)s:</label></strong><br />
                       <small class="important">(%(mandatory)s)</small>
                     </td><td>
-                      <input type="text" size="25" name="email" %(email_disabled)s value="%(email)s" /><br />
+                      <input type="text" size="25" name="email" id="email" %(email_disabled)s value="%(email)s" /><br />
                       <small><span class="quicknote">%(example)s:</span>
                         <span class="example">john.doe@example.com</span>
                       </small>
@@ -161,7 +161,7 @@ class Template:
                 'edit_params' : _("Edit login credentials"),
                 'nickname_label' : _("Nickname"),
                 'nickname' : nickname,
-                'nickname_prefix' : nickname=='' and '<input type="text" size="25" name="nickname" value=""' or '',
+                'nickname_prefix' : nickname=='' and '<input type="text" size="25" name="nickname" id="nickname" value=""' or '',
                 'nickname_suffix' : nickname=='' and '" /><br /><small><span class="quicknote">'+_("Example")+':</span><span class="example">johnd</span></small>' or '',
                 'new_email' : _("New email address"),
                 'mandatory' : _("mandatory"),
@@ -180,29 +180,29 @@ class Template:
                 <p>%(change_pass)s</p>
                 <table>
                   <tr>
-                    <td align="right"><strong>%(old_password)s:</strong><br />
+                    <td align="right"><strong><label for="old_password">%(old_password)s:</label></strong><br />
                       <small class="important">(%(mandatory)s)</small>
                     </td><td align="left">
-                      <input type="password" size="25" name="old_password" %(password_disabled)s /><br />
+                      <input type="password" size="25" name="old_password" id="old_password" %(password_disabled)s /><br />
                       <small><span class="quicknote">%(note)s:</span>
                        %(old_password_note)s
                       </small>
                     </td>
                   </tr>
                   <tr>
-                    <td align="right"><strong>%(new_password)s:</strong><br />
+                    <td align="right"><strong><label for="new_password">%(new_password)s:</label></strong><br />
                       <small class="quicknote">(%(optional)s)</small>
                     </td><td align="left">
-                      <input type="password" size="25" name="password" %(password_disabled)s /><br />
+                      <input type="password" size="25" name="password" id="new_password" %(password_disabled)s /><br />
                       <small><span class="quicknote">%(note)s:</span>
                        %(password_note)s
                       </small>
                     </td>
                   </tr>
                   <tr>
-                    <td align="right"><strong>%(retype_password)s:</strong></td>
+                    <td align="right"><strong><label for="new_password2">%(retype_password)s:</label></strong></td>
                     <td align="left">
-                      <input type="password" size="25" name="password2" %(password_disabled)s value="" />
+                      <input type="password" size="25" name="password2" id="new_password2" %(password_disabled)s value="" />
                     </td>
                   </tr>
                   <tr><td></td><td align="left">
@@ -243,7 +243,7 @@ class Template:
             <form method="post" action="%(sitesecureurl)s/youraccount/change" name="edit_lang_settings">
               <p><big><strong class="headline">%(edit_lang_settings)s</strong></big></p>
               <table>
-                <tr><td align="right"><select name="lang">
+                <tr><td align="right"><select name="lang" id="lang">
         """ % {
           'sitesecureurl' : CFG_SITE_SECURE_URL,
           'edit_lang_settings' : _("Edit language-related settings"),
@@ -254,7 +254,7 @@ class Template:
                 'short_ln' : short_ln,
                 'long_ln' : escape_html(long_ln)
             }
-        out += """</select></td><td valign="top"><strong>%(select_lang)s</strong></td></tr>
+        out += """</select></td><td valign="top"><strong><label for="lang">%(select_lang)s</label></strong></td></tr>
             <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
         </table></form>""" % {
             'select_lang' : _('Select desired language of the web interface.'),
@@ -268,11 +268,11 @@ class Template:
             <form method="post" action="%(sitesecureurl)s/youraccount/change" name="edit_websearch_settings">
               <p><big><strong class="headline">%(edit_websearch_settings)s</strong></big></p>
               <table>
-                <tr><td align="right"><input type="checkbox" %(checked_latestbox)s value="1" name="latestbox" /></td>
-                <td valign="top"><b>%(show_latestbox)s</b></td></tr>
-                <tr><td align="right"><input type="checkbox" %(checked_helpbox)s value="1" name="helpbox" /></td>
-                <td valign="top"><b>%(show_helpbox)s</b></td></tr>
-                <tr><td align="right"><select name="group_records">
+                <tr><td align="right"><input type="checkbox" %(checked_latestbox)s value="1" name="latestbox" id="latestbox"/></td>
+                <td valign="top"><b><label for="latestbox">%(show_latestbox)s</label></b></td></tr>
+                <tr><td align="right"><input type="checkbox" %(checked_helpbox)s value="1" name="helpbox" id="helpbox"/></td>
+                <td valign="top"><b><label for="helpbox">%(show_helpbox)s</label></b></td></tr>
+                <tr><td align="right"><select name="group_records" id="group_records">
         """ % {
           'sitesecureurl' : CFG_SITE_SECURE_URL,
           'edit_websearch_settings' : _("Edit search-related settings"),
@@ -287,7 +287,7 @@ class Template:
                     'selected' : current == i and 'selected="selected"' or '',
                     'i' : i
                 }
-        out += """</select></td><td valign="top"><strong>%(select_group_records)s</strong></td></tr>
+        out += """</select></td><td valign="top"><strong><label for="group_records">%(select_group_records)s</label></strong></td></tr>
               <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
               </table>
             </form>""" % {
@@ -328,10 +328,11 @@ class Template:
                  'sitesecureurl': CFG_SITE_SECURE_URL,
                }
         for system in methods:
-            out += """<input type="radio" name="login_method" value="%(system)s" %(disabled)s %(selected)s />%(system)s<br />""" % {
+            out += """<input type="radio" name="login_method" value="%(system)s" id="%(id)s" %(disabled)s %(selected)s /><label for="%(id)s">%(system)s</label><br />""" % {
                      'system' : system,
                      'disabled' : method_disabled and 'disabled="disabled"' or "",
                      'selected' : current == system and 'checked="checked"' or "",
+                     'id' : nmtoken_from_string(system),
                    }
         out += """  </td></tr>
                    <tr><td>&nbsp;</td>
@@ -362,8 +363,8 @@ class Template:
           <form  method="post" action="../youraccount/send_email">
           <table>
                 <tr>
-              <td align="right"><strong>%(email)s:</strong></td>
-              <td><input type="text" size="25" name="p_email" value="" />
+              <td align="right"><strong><label for="p_email">%(email)s:</label></strong></td>
+              <td><input type="text" size="25" name="p_email" id="p_email" value="" />
                   <input type="hidden" name="ln" value="%(ln)s" />
                   <input type="hidden" name="action" value="lost" />
               </td>
@@ -771,7 +772,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         if msg is "":
-            out = "<p>%(please_login)s" % {
+            out = "<p>%(please_login)s</p>" % {
                     'please_login' : _("If you already have an account, please login using the form below.")
                 }
 
@@ -794,7 +795,7 @@ class Template:
                """
         if len(methods) > 1:
             # more than one method, must make a select
-            login_select = """<select name="login_method">"""
+            login_select = """<select name="login_method" id="login_method">"""
             for method in methods:
                 login_select += """<option value="%(method)s" %(selected)s>%(method)s</option>""" % {
                                   'method' : method,
@@ -803,7 +804,7 @@ class Template:
             login_select += "</select>"
             out += """
                    <tr>
-                      <td align="right"><strong>%(login_title)s</strong></td>
+                      <td align="right"><strong><label for="login_method">%(login_title)s</label></strong></td>
                       <td>%(login_select)s</td>
                    </tr>""" % {
                      'login_title' : _("Login method:"),
@@ -811,23 +812,23 @@ class Template:
                    }
         else:
             # only one login method available
-            out += """<input type="hidden" name="login_method" value="%s">""" % (methods[0])
+            out += """<input type="hidden" name="login_method" value="%s" />""" % (methods[0])
 
         out += """<tr>
                    <td align="right">
                      <input type="hidden" name="ln" value="%(ln)s" />
                      <input type="hidden" name="referer" value="%(referer)s" />
-                     <strong>%(username)s:</strong>
+                     <strong><label for="p_un">%(username)s:</label></strong>
                    </td>
-                   <td><input type="text" size="25" name="p_un" value="" /></td>
+                   <td><input type="text" size="25" name="p_un" id="p_un" value="" /></td>
                   </tr>
                   <tr>
-                   <td align="right"><strong>%(password)s:</strong></td>
-                   <td align="left"><input type="password" size="25" name="p_pw" value="" /></td>
+                   <td align="right"><strong><label for="p_pw">%(password)s:</label></strong></td>
+                   <td align="left"><input type="password" size="25" name="p_pw" id="p_pw" value="" /></td>
                   </tr>
                   <tr>
                    <td></td>
-                   <td align="left"><input type="checkbox" name="remember_me" /><em>%(remember_me)s</em></td>
+                   <td align="left"><input type="checkbox" name="remember_me" id="remember_me"/><em><label for="remember_me">%(remember_me)s</label></em></td>
                   <tr>
                    <td></td>
                    <td align="center" colspan="3"><code class="blocknote"><input class="formbutton" type="submit" name="action" value="%(login)s" /></code>""" % {
@@ -878,16 +879,16 @@ class Template:
         if msg:
             out += """<p class='warning'>%s</p>""" % msg
         out += """
-<form method='post' action='../youraccount/resetpassword?ln=%(ln)s'>
-<input type='hidden' name='k' value='%(reset_key)s' />
-<input type='hidden' name='e' value='%(email)s' />
-<input type='hidden' name='reset' value='1' />
+<form method="post" action="../youraccount/resetpassword?ln=%(ln)s">
+<input type="hidden" name="k" value="%(reset_key)s" />
+<input type="hidden" name="e" value="%(email)s" />
+<input type="hidden" name="reset" value="1" />
 <table>
-<tr><td align='right'><strong>%(set_password_for)s</strong>:</td><td><em>%(email)s</em></td></tr>
-<tr><td align='right'><strong>%(type_new_password)s</strong>:</td>
-<td><input type='password' name='password' value='123' /></td></tr>
-<tr><td align='right'><strong>%(type_it_again)s</strong>:</td>
-<td><input type='password' name='password2' value='' /></td></tr>
+<tr><td align="right"><strong>%(set_password_for)s</strong>:</td><td><em>%(email)s</em></td></tr>
+<tr><td align="right"><strong><label for="password">%(type_new_password)s:</label></strong></td>
+<td><input type="password" name="password" id="password" value="123" /></td></tr>
+<tr><td align="right"><strong><label for="password2">%(type_it_again)s:</label></strong></td>
+<td><input type="password" name="password2" id="password2" value="" /></td></tr>
 <tr><td align="center" colspan="2">
 <input class="formbutton" type="submit" name="action" value="%(set_new_password)s" />
 </td></tr>
@@ -929,31 +930,31 @@ class Template:
               <input type="hidden" name="referer" value="%(referer)s" />
               <table>
                 <tr>
-                 <td align="right"><strong>%(email_address)s:</strong><br /><small class="important">(%(mandatory)s)</small></td>
-                 <td><input type="text" size="25" name="p_email" value="" /><br />
+                 <td align="right"><strong><label for="p_email">%(email_address)s:</label></strong><br /><small class="important">(%(mandatory)s)</small></td>
+                 <td><input type="text" size="25" name="p_email" id="p_email" value="" /><br />
                      <small><span class="quicknote">%(example)s:</span>
                      <span class="example">john.doe@example.com</span></small>
                  </td>
                  <td></td>
                 </tr>
                 <tr>
-                 <td align="right"><strong>%(nickname)s:</strong><br /><small class="important">(%(mandatory)s)</small></td>
-                 <td><input type="text" size="25" name="p_nickname" value="" /><br />
+                 <td align="right"><strong><label for="p_nickname">%(nickname)s:</label></strong><br /><small class="important">(%(mandatory)s)</small></td>
+                 <td><input type="text" size="25" name="p_nickname" id="p_nickname" value="" /><br />
                      <small><span class="quicknote">%(example)s:</span>
                      <span class="example">johnd</span></small>
                  </td>
                  <td></td>
                 </tr>
                 <tr>
-                 <td align="right"><strong>%(password)s:</strong><br /><small class="quicknote">(%(optional)s)</small></td>
-                 <td align="left"><input type="password" size="25" name="p_pw" value="" /><br />
+                 <td align="right"><strong><label for="p_pw">%(password)s:</label></strong><br /><small class="quicknote">(%(optional)s)</small></td>
+                 <td align="left"><input type="password" size="25" name="p_pw" id="p_pw" value="" /><br />
                     <small><span class="quicknote">%(note)s:</span> %(password_contain)s</small>
                  </td>
                  <td></td>
                 </tr>
                 <tr>
-                 <td align="right"><strong>%(retype)s:</strong></td>
-                 <td align="left"><input type="password" size="25" name="p_pw2" value="" /></td>
+                 <td align="right"><strong><label for="p_pw2">%(retype)s:</label></strong></td>
+                 <td align="left"><input type="password" size="25" name="p_pw2" id="p_pw2" value="" /></td>
                  <td></td>
                 </tr>
                 <tr>
@@ -1491,15 +1492,15 @@ class Template:
         <td colspan="2">
           <table>
             <tr>
-              <td>%(name_label)s</td>
+              <td><label for="group_name">%(name_label)s</label></td>
               <td>
-               <input type="text" name="group_name" value="%(group_name)s" />
+               <input type="text" name="group_name" id="group_name" value="%(group_name)s" />
               </td>
             </tr>
             <tr>
-              <td>%(description_label)s</td>
+              <td><label for="group_description">%(description_label)s</label></td>
               <td>
-               <input type="text" name="group_description" value="%(group_description)s" />
+               <input type="text" name="group_description" id="group_description" value="%(group_description)s" />
               </td>
             </tr>
             <tr>
@@ -1617,8 +1618,8 @@ class Template:
               </td>
             </tr>
             <tr>
-              <td><br />%(label2)s</td>
-              <td><br /><input type="text" name="group_name" value="%(group_name)s" /></td>
+              <td><br /><label for="group_name">%(label2)s</label></td>
+              <td><br /><input type="text" name="group_name" id="group_name" value="%(group_name)s" /></td>
               <td><br />
                <input type="submit" name="find_button" value="%(find_label)s" class="nonsubmitbutton" />
               </td>
