@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2008-03-21 17:03+0100\n"
+"POT-Creation-Date: 2008-03-25 17:45+0100\n"
 "PO-Revision-Date: 2008-02-29 15:28+0100\n"
 "Last-Translator: Toru Tsuboyama <toru.tsuboyama@kek.jp>\n"
 "Language-Team: JA <cds.support@cern.ch>\n"
@@ -104,7 +104,7 @@ msgstr "検索のヒント"
 #: modules/websearch/doc/search-guide.webdoc:741
 #: modules/websearch/doc/search-guide.webdoc:776
 #: modules/websearch/doc/search-guide.webdoc:811
-#: modules/miscutil/lib/inveniocfg.py:344
+#: modules/miscutil/lib/inveniocfg.py:345
 msgid "abstract"
 msgstr "概要"
 
@@ -120,7 +120,7 @@ msgstr "概要"
 #: modules/websearch/doc/search-guide.webdoc:746
 #: modules/websearch/doc/search-guide.webdoc:781
 #: modules/websearch/doc/search-guide.webdoc:816
-#: modules/miscutil/lib/inveniocfg.py:349
+#: modules/miscutil/lib/inveniocfg.py:350
 msgid "fulltext"
 msgstr "フルテキスト"
 
@@ -170,7 +170,7 @@ msgstr "すべての単語:"
 #: modules/websearch/doc/search-guide.webdoc:749
 #: modules/websearch/doc/search-guide.webdoc:784
 #: modules/websearch/doc/search-guide.webdoc:819
-#: modules/miscutil/lib/inveniocfg.py:346
+#: modules/miscutil/lib/inveniocfg.py:347
 msgid "report number"
 msgstr "レポート数"
 
@@ -193,7 +193,7 @@ msgstr "レポート数"
 #: modules/websearch/doc/search-guide.webdoc:752
 #: modules/websearch/doc/search-guide.webdoc:787
 #: modules/websearch/doc/search-guide.webdoc:822
-#: modules/miscutil/lib/inveniocfg.py:352
+#: modules/miscutil/lib/inveniocfg.py:353
 msgid "year"
 msgstr "年"
 
@@ -209,7 +209,7 @@ msgstr "年"
 #: modules/websearch/doc/search-guide.webdoc:750
 #: modules/websearch/doc/search-guide.webdoc:785
 #: modules/websearch/doc/search-guide.webdoc:820
-#: modules/miscutil/lib/inveniocfg.py:347
+#: modules/miscutil/lib/inveniocfg.py:348
 msgid "subject"
 msgstr "ﾂ 主題"
 
@@ -242,7 +242,7 @@ msgstr "部分的な句:"
 #: modules/websearch/doc/search-guide.webdoc:748
 #: modules/websearch/doc/search-guide.webdoc:783
 #: modules/websearch/doc/search-guide.webdoc:818
-#: modules/miscutil/lib/inveniocfg.py:348
+#: modules/miscutil/lib/inveniocfg.py:349
 msgid "reference"
 msgstr "参照"
 
@@ -459,7 +459,7 @@ msgstr "参照"
 #: modules/websearch/doc/search-guide.webdoc:5210
 #: modules/websearch/doc/search-guide.webdoc:5225
 #: modules/websearch/doc/search-guide.webdoc:5245
-#: modules/miscutil/lib/inveniocfg.py:343
+#: modules/miscutil/lib/inveniocfg.py:344
 msgid "author"
 msgstr "著者"
 
@@ -481,7 +481,7 @@ msgstr "ガイドを見てください"
 #: modules/websearch/doc/search-guide.webdoc:745
 #: modules/websearch/doc/search-guide.webdoc:780
 #: modules/websearch/doc/search-guide.webdoc:815
-#: modules/miscutil/lib/inveniocfg.py:353
+#: modules/miscutil/lib/inveniocfg.py:354
 msgid "experiment"
 msgstr "実験"
 
@@ -514,7 +514,7 @@ msgstr "どれかの単語:"
 #: modules/websearch/doc/search-guide.webdoc:744
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
-#: modules/miscutil/lib/inveniocfg.py:351
+#: modules/miscutil/lib/inveniocfg.py:352
 msgid "division"
 msgstr "部"
 
@@ -943,7 +943,7 @@ msgstr "検索"
 #: modules/websearch/doc/search-guide.webdoc:5208
 #: modules/websearch/doc/search-guide.webdoc:5223
 #: modules/websearch/doc/search-guide.webdoc:5243
-#: modules/miscutil/lib/inveniocfg.py:341
+#: modules/miscutil/lib/inveniocfg.py:342
 msgid "any field"
 msgstr "すべての分野"
 
@@ -992,7 +992,7 @@ msgstr "不正使用の報告"
 #: modules/websearch/doc/search-guide.webdoc:743
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
-#: modules/miscutil/lib/inveniocfg.py:350
+#: modules/miscutil/lib/inveniocfg.py:351
 msgid "collection"
 msgstr "コレクション"
 
@@ -1063,7 +1063,7 @@ msgstr "そして"
 #: modules/websearch/doc/search-guide.webdoc:747
 #: modules/websearch/doc/search-guide.webdoc:782
 #: modules/websearch/doc/search-guide.webdoc:817
-#: modules/miscutil/lib/inveniocfg.py:345
+#: modules/miscutil/lib/inveniocfg.py:346
 msgid "keyword"
 msgstr "キーワード"
 
@@ -1277,7 +1277,7 @@ msgstr "キーワード"
 #: modules/websearch/doc/search-guide.webdoc:5209
 #: modules/websearch/doc/search-guide.webdoc:5224
 #: modules/websearch/doc/search-guide.webdoc:5244
-#: modules/miscutil/lib/inveniocfg.py:342
+#: modules/miscutil/lib/inveniocfg.py:343
 msgid "title"
 msgstr "タイトル"
 
@@ -1302,7 +1302,7 @@ msgid "No fulltext"
 msgstr "フルテキスト"
 
 #: modules/websearch/doc/search-tips.webdoc:291
-#: modules/websubmit/lib/websubmit_templates.py:1078
+#: modules/websubmit/lib/websubmit_templates.py:1072
 msgid "or"
 msgstr "または"
 
@@ -1331,10 +1331,10 @@ msgstr "冗長"
 #: modules/bibedit/lib/bibedit_templates.py:130
 #: modules/webstyle/lib/webstyle_templates.py:375
 #: modules/webstyle/lib/webstyle_templates.py:443
-#: modules/websubmit/lib/websubmit_engine.py:603
-#: modules/websubmit/lib/websubmit_engine.py:972
-#: modules/websubmit/lib/websubmit_engine.py:1018
-#: modules/websubmit/lib/websubmit_engine.py:1244
+#: modules/websubmit/lib/websubmit_engine.py:601
+#: modules/websubmit/lib/websubmit_engine.py:969
+#: modules/websubmit/lib/websubmit_engine.py:1015
+#: modules/websubmit/lib/websubmit_engine.py:1241
 msgid "Submit"
 msgstr "アップロード"
 
@@ -1346,14 +1346,14 @@ msgstr "アップロード"
 #: modules/webbasket/lib/webbasket_templates.py:1236
 #: modules/webbasket/lib/webbasket_templates.py:1341
 #: modules/webbasket/lib/webbasket_templates.py:1441
-#: modules/websession/lib/websession_templates.py:1546
-#: modules/websession/lib/websession_templates.py:1654
-#: modules/websession/lib/websession_templates.py:1839
-#: modules/websession/lib/websession_templates.py:1922
-#: modules/websubmit/lib/websubmit_templates.py:2422
+#: modules/websession/lib/websession_templates.py:1547
+#: modules/websession/lib/websession_templates.py:1655
+#: modules/websession/lib/websession_templates.py:1840
+#: modules/websession/lib/websession_templates.py:1923
+#: modules/websubmit/lib/websubmit_templates.py:2402
+#: modules/websubmit/lib/websubmit_templates.py:2465
 #: modules/websubmit/lib/websubmit_templates.py:2485
-#: modules/websubmit/lib/websubmit_templates.py:2505
-#: modules/websubmit/web/publiline.py:1174
+#: modules/websubmit/web/publiline.py:1163
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -1377,7 +1377,7 @@ msgstr "削除"
 #: modules/webalert/lib/webalert_templates.py:326
 #: modules/webalert/lib/webalert_templates.py:446
 #: modules/webmessage/lib/webmessage_templates.py:90
-#: modules/websubmit/lib/websubmit_templates.py:1419
+#: modules/websubmit/lib/websubmit_templates.py:1409
 msgid "Action"
 msgstr "アクション"
 
@@ -1459,8 +1459,8 @@ msgstr "このレコードを削除しますか？"
 #: modules/webcomment/lib/webcomment_templates.py:1325
 #: modules/webcomment/lib/webcomment_templates.py:1350
 #: modules/webmessage/lib/webmessage_templates.py:509
-#: modules/websession/lib/websession_templates.py:1961
-#: modules/websession/lib/websession_templates.py:2000
+#: modules/websession/lib/websession_templates.py:1962
+#: modules/websession/lib/websession_templates.py:2001
 msgid "Yes"
 msgstr "はい"
 
@@ -1471,8 +1471,8 @@ msgstr "はい"
 #: modules/webcomment/lib/webcomment_templates.py:1325
 #: modules/webcomment/lib/webcomment_templates.py:1350
 #: modules/webmessage/lib/webmessage_templates.py:510
-#: modules/websession/lib/websession_templates.py:1962
-#: modules/websession/lib/websession_templates.py:2001
+#: modules/websession/lib/websession_templates.py:1963
+#: modules/websession/lib/websession_templates.py:2002
 msgid "No"
 msgstr "いいえ"
 
@@ -1571,9 +1571,9 @@ msgstr "名前"
 #: modules/bibformat/lib/bibformat_templates.py:392
 #: modules/bibformat/lib/bibformat_templates.py:925
 #: modules/bibformat/lib/bibformat_templates.py:1052
-#: modules/websession/lib/websession_templates.py:1269
-#: modules/websession/lib/websession_templates.py:1343
-#: modules/websession/lib/websession_templates.py:1406
+#: modules/websession/lib/websession_templates.py:1270
+#: modules/websession/lib/websession_templates.py:1344
+#: modules/websession/lib/websession_templates.py:1407
 msgid "Description"
 msgstr "説明"
 
@@ -1596,7 +1596,7 @@ msgstr "ドキュメントを非表示"
 
 #: modules/bibformat/lib/bibformat_templates.py:927
 #: modules/bibformat/lib/bibformat_templates.py:1053
-#: modules/websubmit/lib/websubmit_templates.py:1420
+#: modules/websubmit/lib/websubmit_templates.py:1410
 msgid "Status"
 msgstr "状態"
 
@@ -1770,6 +1770,70 @@ msgstr "隠す"
 #, python-format
 msgid "Show all %i authors"
 msgstr "%i 人のオーサーを表示"
+
+#: modules/bibformat/lib/elements/bfe_fulltext.py:56
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:68
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:71
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:96
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:99
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:115
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:117
+#, fuzzy
+msgid "Download fulltext"
+msgstr "フルテキスト"
+
+#: modules/bibformat/lib/elements/bfe_fulltext.py:65
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:57
+msgid "additional files"
+msgstr ""
+
+#: modules/bibformat/lib/elements/bfe_fulltext.py:69
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:61
+#, fuzzy
+msgid "older versions"
+msgstr "バージョン"
+
+#: modules/bibformat/lib/elements/bfe_fulltext.py:89
+#: modules/bibformat/lib/elements/bfe_fulltext.py:98
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:103
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:120
+#, fuzzy
+msgid "link"
+msgstr "中の"
+
+#: modules/bibformat/lib/elements/bfe_fulltext.py:89
+#: modules/bibformat/lib/elements/bfe_fulltext.py:98
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:103
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:120
+#, fuzzy
+msgid "links"
+msgstr "ログイン"
+
+#: modules/bibformat/lib/elements/bfe_fulltext.py:90
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:104
+#, python-format
+msgid "CERN %(link_or_links)s"
+msgstr ""
+
+#: modules/bibformat/lib/elements/bfe_fulltext.py:99
+#, python-format
+msgid "External %(link_or_links)s"
+msgstr ""
+
+#: modules/bibformat/lib/elements/bfe_fulltext.py:177
+#: modules/websearch/lib/websearchadminlib.py:3205
+msgid "Fulltext"
+msgstr "フルテキスト"
+
+#: modules/bibformat/lib/elements/bfe_fulltext.py:197
+#, fuzzy
+msgid "Main file(s)"
+msgstr "ファイル"
+
+#: modules/bibformat/lib/elements/bfe_fulltext_mini.py:121
+#, python-format
+msgid "external %(link_or_links)s"
+msgstr ""
 
 #: modules/bibformat/web/admin/bibformatadmin.py:178
 #: modules/bibformat/web/admin/bibformatadmin.py:246
@@ -2165,19 +2229,19 @@ msgstr "前のページに戻るにはbackボタンを押してください。"
 msgid "Thank you!"
 msgstr "ありがとう！"
 
-#: modules/miscutil/lib/inveniocfg.py:354
+#: modules/miscutil/lib/inveniocfg.py:355
 msgid "record ID"
 msgstr "記録的なID"
 
-#: modules/miscutil/lib/inveniocfg.py:367
+#: modules/miscutil/lib/inveniocfg.py:368
 msgid "word similarity"
 msgstr ""
 
-#: modules/miscutil/lib/inveniocfg.py:368
+#: modules/miscutil/lib/inveniocfg.py:369
 msgid "journal impact factor"
 msgstr ""
 
-#: modules/miscutil/lib/inveniocfg.py:369
+#: modules/miscutil/lib/inveniocfg.py:370
 #, fuzzy
 msgid "times cited"
 msgstr "編集された設定"
@@ -2196,52 +2260,52 @@ msgid "Need human intervention?  Contact"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:171
-#: modules/websession/lib/websession_templates.py:1022
+#: modules/websession/lib/websession_templates.py:1023
 msgid "Run BibEdit"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:172
-#: modules/websession/lib/websession_templates.py:1024
+#: modules/websession/lib/websession_templates.py:1025
 msgid "Configure BibFormat"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:173
-#: modules/websession/lib/websession_templates.py:1026
+#: modules/websession/lib/websession_templates.py:1027
 msgid "Configure BibHarvest"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:174
-#: modules/websession/lib/websession_templates.py:1028
+#: modules/websession/lib/websession_templates.py:1029
 msgid "Configure OAI Repository"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:175
-#: modules/websession/lib/websession_templates.py:1030
+#: modules/websession/lib/websession_templates.py:1031
 msgid "Configure BibIndex"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:176
-#: modules/websession/lib/websession_templates.py:1032
+#: modules/websession/lib/websession_templates.py:1033
 msgid "Configure BibRank"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:177
-#: modules/websession/lib/websession_templates.py:1034
+#: modules/websession/lib/websession_templates.py:1035
 msgid "Configure WebAccess"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:178
-#: modules/websession/lib/websession_templates.py:1036
+#: modules/websession/lib/websession_templates.py:1037
 msgid "Configure WebComment"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:179
-#: modules/websession/lib/websession_templates.py:1038
+#: modules/websession/lib/websession_templates.py:1039
 msgid "Configure WebSearch"
 msgstr ""
 
 #: modules/webaccess/lib/access_control_config.py:180
-#: modules/websession/lib/websession_templates.py:1040
+#: modules/websession/lib/websession_templates.py:1041
 msgid "Configure WebSubmit"
 msgstr ""
 
@@ -2564,8 +2628,8 @@ msgstr "検索の表示"
 #: modules/webbasket/lib/webbasket_webinterface.py:548
 #: modules/webbasket/lib/webbasket_webinterface.py:607
 #: modules/webmessage/lib/webmessage_templates.py:467
-#: modules/websession/lib/websession_templates.py:569
-#: modules/websession/lib/websession_templates.py:2074
+#: modules/websession/lib/websession_templates.py:570
+#: modules/websession/lib/websession_templates.py:2075
 #: modules/websession/lib/websession_webinterface.py:208
 #: modules/websession/lib/websession_webinterface.py:225
 #: modules/websession/lib/websession_webinterface.py:261
@@ -2583,7 +2647,7 @@ msgstr "検索の表示"
 #: modules/websubmit/web/publiline.py:132
 #: modules/websubmit/web/publiline.py:153
 #: modules/websubmit/web/yourapprovals.py:97
-#: modules/websubmit/web/yoursubmissions.py:176
+#: modules/websubmit/web/yoursubmissions.py:175
 msgid "Your Account"
 msgstr "あなたのアカウント"
 
@@ -2839,7 +2903,7 @@ msgstr "並べ替え："
 
 #: modules/webbasket/lib/webbasket_templates.py:697
 #: modules/webbasket/lib/webbasket_templates.py:925
-#: modules/websubmit/lib/websubmit_templates.py:2611
+#: modules/websubmit/lib/websubmit_templates.py:2591
 msgid "Title"
 msgstr "タイトル"
 
@@ -2853,7 +2917,7 @@ msgstr "日付"
 #: modules/webcomment/lib/webcomment_templates.py:454
 #: modules/webcomment/lib/webcomment_webinterface.py:159
 #: modules/webcomment/lib/webcomment_webinterface.py:241
-#: modules/websubmit/lib/websubmit_templates.py:2559
+#: modules/websubmit/lib/websubmit_templates.py:2539
 msgid "Comments"
 msgstr "コメント"
 
@@ -2866,7 +2930,7 @@ msgstr "コメントの数：%i"
 #: modules/webbasket/lib/webbasket_webinterface.py:181
 #: modules/webcomment/lib/webcomment_templates.py:90
 #: modules/webcomment/lib/webcomment_templates.py:574
-#: modules/websubmit/lib/websubmit_templates.py:2561
+#: modules/websubmit/lib/websubmit_templates.py:2541
 msgid "Write a comment"
 msgstr "コメントを核"
 
@@ -2899,8 +2963,8 @@ msgstr "コメントを削除"
 #: modules/webbasket/lib/webbasket_templates.py:924
 #: modules/webbasket/lib/webbasket_templates.py:929
 #: modules/webcomment/lib/webcomment_webinterface.py:287
-#: modules/websubmit/lib/websubmit_templates.py:2555
-#: modules/websubmit/lib/websubmit_templates.py:2556
+#: modules/websubmit/lib/websubmit_templates.py:2535
+#: modules/websubmit/lib/websubmit_templates.py:2536
 msgid "Add Comment"
 msgstr "コメントを追加"
 
@@ -2909,7 +2973,7 @@ msgstr "コメントを追加"
 #: modules/webcomment/lib/webcomment_templates.py:807
 #: modules/webcomment/lib/webcomment_templates.py:1191
 #: modules/webcomment/lib/webcomment_templates.py:1257
-#: modules/websubmit/lib/websubmit_templates.py:2613
+#: modules/websubmit/lib/websubmit_templates.py:2593
 msgid "Comment"
 msgstr "コメント"
 
@@ -3099,7 +3163,7 @@ msgstr "他のグループにバスケットを共有させる"
 
 # TSUBOYAMA -- I may misunderstand.
 #: modules/webbasket/lib/webbasket_templates.py:1464
-#: modules/websession/lib/websession_templates.py:482
+#: modules/websession/lib/websession_templates.py:483
 msgid ""
 "You are logged in as a guest user, so your baskets will disappear at the end "
 "of the current session."
@@ -3107,7 +3171,7 @@ msgstr "ゲストユーザが作ったバスケットはセッションが終わ
 
 #: modules/webbasket/lib/webbasket_templates.py:1465
 #: modules/webbasket/lib/webbasket_templates.py:1480
-#: modules/websession/lib/websession_templates.py:485
+#: modules/websession/lib/websession_templates.py:486
 #, python-format
 msgid ""
 "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
@@ -3129,8 +3193,8 @@ msgid "Display baskets"
 msgstr "バスケットの表示"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:335
-#: modules/websession/lib/websession_templates.py:439
-#: modules/websession/lib/websession_templates.py:571
+#: modules/websession/lib/websession_templates.py:440
+#: modules/websession/lib/websession_templates.py:572
 msgid "Your Baskets"
 msgstr "あなたのバスケット"
 
@@ -3432,7 +3496,7 @@ msgstr ""
 #: modules/webcomment/lib/webcomment_templates.py:1138
 #: modules/webcomment/lib/webcomment_templates.py:1167
 #: modules/websession/lib/websession_templates.py:162
-#: modules/websession/lib/websession_templates.py:968
+#: modules/websession/lib/websession_templates.py:969
 msgid "Nickname"
 msgstr "ニックネーム"
 
@@ -3584,8 +3648,8 @@ msgstr ""
 #: modules/webcomment/web/admin/webcommentadmin.py:125
 #: modules/webcomment/web/admin/webcommentadmin.py:159
 #: modules/webcomment/web/admin/webcommentadmin.py:196
-#: modules/websearch/lib/websearch_webinterface.py:596
-#: modules/websearch/lib/websearch_webinterface.py:674
+#: modules/websearch/lib/websearch_webinterface.py:608
+#: modules/websearch/lib/websearch_webinterface.py:686
 #: modules/websearch/web/admin/websearchadmin.py:1070
 #: modules/websession/lib/websession_webinterface.py:803
 #: modules/webstyle/lib/webstyle_templates.py:522
@@ -3667,7 +3731,7 @@ msgstr "メッセージは送られました。"
 #: modules/webmessage/lib/webmessage_webinterface.py:84
 #: modules/webmessage/lib/webmessage_webinterface.py:280
 #: modules/webmessage/lib/webmessage_webinterface.py:322
-#: modules/websession/lib/websession_templates.py:570
+#: modules/websession/lib/websession_templates.py:571
 msgid "Your Messages"
 msgstr "メッセージ"
 
@@ -3704,7 +3768,7 @@ msgid "Send later?"
 msgstr "後で送りますか？"
 
 #: modules/webmessage/lib/webmessage_templates.py:283
-#: modules/websubmit/lib/websubmit_templates.py:2947
+#: modules/websubmit/lib/websubmit_templates.py:2927
 msgid "To:"
 msgstr ""
 
@@ -3718,17 +3782,17 @@ msgstr ""
 
 #: modules/webmessage/lib/webmessage_templates.py:286
 #: modules/webmessage/lib/webmessage_templates.py:448
-#: modules/websubmit/lib/websubmit_templates.py:2948
+#: modules/websubmit/lib/websubmit_templates.py:2928
 msgid "Subject:"
 msgstr ""
 
 #: modules/webmessage/lib/webmessage_templates.py:287
-#: modules/websubmit/lib/websubmit_templates.py:2949
+#: modules/websubmit/lib/websubmit_templates.py:2929
 msgid "Message:"
 msgstr ""
 
 #: modules/webmessage/lib/webmessage_templates.py:288
-#: modules/websubmit/lib/websubmit_templates.py:2950
+#: modules/websubmit/lib/websubmit_templates.py:2930
 msgid "SEND"
 msgstr "送る"
 
@@ -3786,7 +3850,7 @@ msgid "No matching user"
 msgstr "該当ユーザーなし"
 
 #: modules/webmessage/lib/webmessage_templates.py:625
-#: modules/websession/lib/websession_templates.py:1584
+#: modules/websession/lib/websession_templates.py:1585
 msgid "No matching group"
 msgstr "外同グループなし"
 
@@ -3973,10 +4037,6 @@ msgstr "会議"
 msgid "Usage statistics"
 msgstr ""
 
-#: modules/websearch/lib/websearchadminlib.py:3205
-msgid "Fulltext"
-msgstr "フルテキスト"
-
 #: modules/websearch/lib/websearch_templates.py:584
 #, python-format
 msgid "Search %s records for:"
@@ -4153,7 +4213,7 @@ msgid "begin"
 msgstr "開始"
 
 #: modules/websearch/lib/websearch_templates.py:2092
-#: modules/websubmit/lib/websubmit_templates.py:1188
+#: modules/websubmit/lib/websubmit_templates.py:1182
 msgid "previous"
 msgstr "直前"
 
@@ -4195,19 +4255,19 @@ msgid "See also: similar author names"
 msgstr "似た著者名："
 
 #: modules/websearch/lib/websearch_templates.py:2708
-#: modules/websearch/lib/websearch_webinterface.py:611
+#: modules/websearch/lib/websearch_webinterface.py:623
 #, python-format
 msgid "Collection %s Not Found"
 msgstr "コレクション %s が見つかりません。"
 
 #: modules/websearch/lib/websearch_templates.py:2720
-#: modules/websearch/lib/websearch_webinterface.py:609
+#: modules/websearch/lib/websearch_webinterface.py:621
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
 msgstr "%s というコレクションは存在しません。"
 
 #: modules/websearch/lib/websearch_templates.py:2722
-#: modules/websearch/lib/websearch_webinterface.py:610
+#: modules/websearch/lib/websearch_webinterface.py:622
 #, python-format
 msgid "You may want to start browsing from %s."
 msgstr "%s の閲覧から始めてください。"
@@ -4247,12 +4307,12 @@ msgstr ""
 msgid "Co-cited with: %s records"
 msgstr "%s レコードと相互引用"
 
-#: modules/websearch/lib/websearch_webinterface.py:283
+#: modules/websearch/lib/websearch_webinterface.py:291
 #, fuzzy
 msgid "You are not authorized to view this area."
 msgstr "あなたはこのバスケットの所有者ではありません"
 
-#: modules/websearch/lib/websearch_webinterface.py:613
+#: modules/websearch/lib/websearch_webinterface.py:625
 msgid "Not found"
 msgstr "見つかりません"
 
@@ -4355,7 +4415,7 @@ msgstr "ログイン情報の編集"
 
 #: modules/websession/lib/websession_templates.py:165
 #: modules/websession/lib/websession_templates.py:168
-#: modules/websession/lib/websession_templates.py:972
+#: modules/websession/lib/websession_templates.py:973
 msgid "Example"
 msgstr "例"
 
@@ -4365,14 +4425,14 @@ msgstr "新Ｅメイルアドレス"
 
 #: modules/websession/lib/websession_templates.py:167
 #: modules/websession/lib/websession_templates.py:216
-#: modules/websession/lib/websession_templates.py:970
+#: modules/websession/lib/websession_templates.py:971
 msgid "mandatory"
 msgstr "必須"
 
 #: modules/websession/lib/websession_templates.py:169
 #: modules/websession/lib/websession_templates.py:220
-#: modules/websession/lib/websession_templates.py:851
-#: modules/websession/lib/websession_templates.py:973
+#: modules/websession/lib/websession_templates.py:852
+#: modules/websession/lib/websession_templates.py:974
 msgid "Note"
 msgstr "注意"
 
@@ -4402,12 +4462,12 @@ msgid "New password"
 msgstr "新パスワード"
 
 #: modules/websession/lib/websession_templates.py:219
-#: modules/websession/lib/websession_templates.py:971
+#: modules/websession/lib/websession_templates.py:972
 msgid "optional"
 msgstr "オプション"
 
 #: modules/websession/lib/websession_templates.py:221
-#: modules/websession/lib/websession_templates.py:974
+#: modules/websession/lib/websession_templates.py:975
 msgid "The password phrase may contain punctuation, spaces, etc."
 msgstr "パスワードにはピリオド、カンマ、空白などを使ってもかまいません。"
 
@@ -4480,11 +4540,11 @@ msgid ""
 msgstr "自分を認証するためのログイン方法を選んでください"
 
 #: modules/websession/lib/websession_templates.py:327
-#: modules/websession/lib/websession_templates.py:340
+#: modules/websession/lib/websession_templates.py:341
 msgid "Select method"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:358
+#: modules/websession/lib/websession_templates.py:359
 #, fuzzy, python-format
 msgid ""
 "If you have lost the password for your %(sitename)s %(x_fmt_open)sinternal "
@@ -4494,17 +4554,17 @@ msgstr ""
 "CDS Indicoのパスワードをお忘れならば、以下にあなたのＥメイルアドレスを書いて"
 "お送りください。パスワードをお送りします。"
 
-#: modules/websession/lib/websession_templates.py:380
-#: modules/websession/lib/websession_templates.py:967
+#: modules/websession/lib/websession_templates.py:381
+#: modules/websession/lib/websession_templates.py:968
 msgid "Email address"
 msgstr "Ｅメイルアドレス"
 
-#: modules/websession/lib/websession_templates.py:381
+#: modules/websession/lib/websession_templates.py:382
 #, fuzzy
 msgid "Send password reset link"
 msgstr "パスワードを送る"
 
-#: modules/websession/lib/websession_templates.py:385
+#: modules/websession/lib/websession_templates.py:386
 #, python-format
 msgid ""
 "If you have been using the %(x_fmt_open)sCERN login system%(x_fmt_close)s, "
@@ -4512,7 +4572,7 @@ msgid ""
 "authentication system%(x_url_close)s."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:388
+#: modules/websession/lib/websession_templates.py:389
 #, fuzzy
 msgid ""
 "Note that if you have been using an external login system, then we cannot do "
@@ -4520,14 +4580,14 @@ msgid ""
 msgstr ""
 "もし外部ログインシステムをおつかいならば、所属機関に問い合わせてください。"
 
-#: modules/websession/lib/websession_templates.py:389
+#: modules/websession/lib/websession_templates.py:390
 #, python-format
 msgid ""
 "Alternatively, you can ask %s to change your login system from external to "
 "internal."
 msgstr "内部ログインシステムにアカウントを変更することも可能です。%s"
 
-#: modules/websession/lib/websession_templates.py:416
+#: modules/websession/lib/websession_templates.py:417
 #, python-format
 msgid ""
 "%s offers you the possibility to personalize the interface, to set up your "
@@ -4537,28 +4597,28 @@ msgstr ""
 "%s のインターフェース設定：個人ライブラリの設定、定期的に検索をおこない結果を"
 "Ｅメイルで送るための自動通知の設定。"
 
-#: modules/websession/lib/websession_templates.py:426
+#: modules/websession/lib/websession_templates.py:427
 #: modules/websession/lib/websession_webinterface.py:258
 msgid "Your Settings"
 msgstr "あなたの設定"
 
-#: modules/websession/lib/websession_templates.py:427
+#: modules/websession/lib/websession_templates.py:428
 msgid ""
 "Set or change your account email address or password. Specify your "
 "preferences about the look and feel of the interface."
 msgstr ""
 "Ｅメイルアドレスやパスワードの設定・変更。インターフェースの外観の設定。"
 
-#: modules/websession/lib/websession_templates.py:437
-#: modules/websession/lib/websession_templates.py:573
+#: modules/websession/lib/websession_templates.py:438
+#: modules/websession/lib/websession_templates.py:574
 msgid "Your Searches"
 msgstr "検索"
 
-#: modules/websession/lib/websession_templates.py:438
+#: modules/websession/lib/websession_templates.py:439
 msgid "View all the searches you performed during the last 30 days."
 msgstr "過去３０日間にあなたが行った検索を見る。"
 
-#: modules/websession/lib/websession_templates.py:440
+#: modules/websession/lib/websession_templates.py:441
 msgid ""
 "With baskets you can define specific collections of items, store interesting "
 "records you want to access later or share with others."
@@ -4566,11 +4626,11 @@ msgstr ""
 "バスケット：自分のコレクション・興味を持ったレコードを自分あるいは共有のため"
 "に使えます。"
 
-#: modules/websession/lib/websession_templates.py:448
+#: modules/websession/lib/websession_templates.py:449
 msgid "Your Alerts"
 msgstr "あなたの通知"
 
-#: modules/websession/lib/websession_templates.py:449
+#: modules/websession/lib/websession_templates.py:450
 msgid ""
 "Subscribe to a search which will be run periodically by our service. The "
 "result can be sent to you via Email or stored in one of your baskets."
@@ -4578,23 +4638,23 @@ msgstr ""
 "定期的に行う検索を設定します。結果はＥメイルでおくったり、自分のバスケットに"
 "蓄積します。"
 
-#: modules/websession/lib/websession_templates.py:458
+#: modules/websession/lib/websession_templates.py:459
 msgid "Your Loans"
 msgstr "貸し出し"
 
-#: modules/websession/lib/websession_templates.py:459
+#: modules/websession/lib/websession_templates.py:460
 msgid ""
 "Check out book you have on loan, submit borrowing requests, etc. Requires "
 "CERN ID."
 msgstr "貸与品などのかんりをします。ＣＥＲＮＩＤが必要です"
 
-#: modules/websession/lib/websession_templates.py:484
+#: modules/websession/lib/websession_templates.py:485
 msgid ""
 "You are logged in as a guest user, so your alerts will disappear at the end "
 "of the current session."
 msgstr "ゲストユーザはログアウトするとアラートが消失します。"
 
-#: modules/websession/lib/websession_templates.py:507
+#: modules/websession/lib/websession_templates.py:508
 #, python-format
 msgid ""
 "You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%"
@@ -4604,58 +4664,58 @@ msgstr ""
 "%(x_user)s　さん、つぎはa) %(x_url1_open)sログアウト または %(x_url1_close)s"
 "　b) %(x_url2_open)sアカウント設定の編集 %(x_url2_close)s　をしてください。"
 
-#: modules/websession/lib/websession_templates.py:572
+#: modules/websession/lib/websession_templates.py:573
 msgid "Your Alert Searches"
 msgstr "アラートの検索"
 
 # Tsuboyama the following administration related items do not have to translated to Japanese.
-#: modules/websession/lib/websession_templates.py:574
+#: modules/websession/lib/websession_templates.py:575
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
 "administering or are a member of."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:577
-#: modules/websession/lib/websession_templates.py:2072
+#: modules/websession/lib/websession_templates.py:578
+#: modules/websession/lib/websession_templates.py:2073
 #: modules/websession/lib/websession_webinterface.py:847
 msgid "Your Groups"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:578
+#: modules/websession/lib/websession_templates.py:579
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
 "and inquire about their status."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:581
-#: modules/websubmit/web/yoursubmissions.py:173
+#: modules/websession/lib/websession_templates.py:582
+#: modules/websubmit/web/yoursubmissions.py:172
 msgid "Your Submissions"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:582
+#: modules/websession/lib/websession_templates.py:583
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
 "the documents you approved or refereed."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:585
+#: modules/websession/lib/websession_templates.py:586
 #: modules/websubmit/web/yourapprovals.py:94
 msgid "Your Approvals"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:586
+#: modules/websession/lib/websession_templates.py:587
 #: modules/websession/lib/websession_webinterface.py:564
 msgid "Your Administrative Activities"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:613
+#: modules/websession/lib/websession_templates.py:614
 msgid "Try again"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:635
+#: modules/websession/lib/websession_templates.py:636
 #, python-format
 msgid ""
 "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
@@ -4663,23 +4723,23 @@ msgid ""
 "for the account \"%(x_email)s\"."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:643
+#: modules/websession/lib/websession_templates.py:644
 msgid "If you want to reset the password for this account, please go to:"
-msgstr ""
-
-#: modules/websession/lib/websession_templates.py:649
-#: modules/websession/lib/websession_templates.py:686
-msgid "in order to confirm the validity of this request."
 msgstr ""
 
 #: modules/websession/lib/websession_templates.py:650
 #: modules/websession/lib/websession_templates.py:687
+msgid "in order to confirm the validity of this request."
+msgstr ""
+
+#: modules/websession/lib/websession_templates.py:651
+#: modules/websession/lib/websession_templates.py:688
 #, python-format
 msgid ""
 "Please note that this URL will remain valid for about %(days)s days only."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:672
+#: modules/websession/lib/websession_templates.py:673
 #, python-format
 msgid ""
 "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
@@ -4687,25 +4747,25 @@ msgid ""
 "for the email address \"%(x_email)s\"."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:680
+#: modules/websession/lib/websession_templates.py:681
 msgid "If you want to complete this account registration, please go to:"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:706
+#: modules/websession/lib/websession_templates.py:707
 #, fuzzy, python-format
 msgid "Okay, a password reset link has been emailed to %s."
 msgstr "パスワードを %s に送りました。"
 
-#: modules/websession/lib/websession_templates.py:721
+#: modules/websession/lib/websession_templates.py:722
 msgid "Deleting your account"
 msgstr "あなたのアカウントを消去します。"
 
-#: modules/websession/lib/websession_templates.py:735
+#: modules/websession/lib/websession_templates.py:736
 #, fuzzy
 msgid "You are no longer recognized by our system."
 msgstr "あなたはもう認証されません。"
 
-#: modules/websession/lib/websession_templates.py:737
+#: modules/websession/lib/websession_templates.py:738
 #, python-format
 msgid ""
 "You are still recognized by the centralized\n"
@@ -4713,16 +4773,16 @@ msgid ""
 "                %(x_url_open)slogout from SSO%(x_url_close)s, too."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:744
+#: modules/websession/lib/websession_templates.py:745
 #, python-format
 msgid "If you wish you can %(x_url_open)slogin here%(x_url_close)s."
 msgstr "%(x_url_open)sここにログインしますか%(x_url_close)s？"
 
-#: modules/websession/lib/websession_templates.py:775
+#: modules/websession/lib/websession_templates.py:776
 msgid "If you already have an account, please login using the form below."
 msgstr "すでにアカウントをお持ちなら、以下のフォームをお使いください。"
 
-#: modules/websession/lib/websession_templates.py:779
+#: modules/websession/lib/websession_templates.py:780
 #, fuzzy, python-format
 msgid ""
 "If you don't own a CERN account yet, you can register a %(x_url_open)snew "
@@ -4731,7 +4791,7 @@ msgstr ""
 "アカウントを持っていないならば、%(x_url_open)s登録%(x_url_close)sをしてくださ"
 "い。"
 
-#: modules/websession/lib/websession_templates.py:782
+#: modules/websession/lib/websession_templates.py:783
 #, python-format
 msgid ""
 "If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)"
@@ -4740,94 +4800,94 @@ msgstr ""
 "アカウントを持っていないならば、%(x_url_open)s登録%(x_url_close)sをしてくださ"
 "い。"
 
-#: modules/websession/lib/websession_templates.py:786
+#: modules/websession/lib/websession_templates.py:787
 #, python-format
 msgid ""
 "It is not possible to create an account yourself. Contact %s if you want an "
 "account."
 msgstr "アカウントを作れません。%sに連絡をしてください。"
 
-#: modules/websession/lib/websession_templates.py:809
+#: modules/websession/lib/websession_templates.py:810
 msgid "Login method:"
 msgstr "ログイン方法"
 
-#: modules/websession/lib/websession_templates.py:836
+#: modules/websession/lib/websession_templates.py:837
 msgid "Username"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:837
-#: modules/websession/lib/websession_templates.py:969
+#: modules/websession/lib/websession_templates.py:838
+#: modules/websession/lib/websession_templates.py:970
 msgid "Password"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:838
+#: modules/websession/lib/websession_templates.py:839
 msgid "Remember login on this computer."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:839
-#: modules/websession/lib/websession_templates.py:1081
+#: modules/websession/lib/websession_templates.py:840
+#: modules/websession/lib/websession_templates.py:1082
 #: modules/websession/lib/websession_webinterface.py:103
 #: modules/websession/lib/websession_webinterface.py:190
 #: modules/websession/lib/websession_webinterface.py:706
 msgid "login"
 msgstr "ログイン"
 
-#: modules/websession/lib/websession_templates.py:844
+#: modules/websession/lib/websession_templates.py:845
 #: modules/websession/lib/websession_webinterface.py:468
 msgid "Lost your password?"
 msgstr "パスワードを忘れましたか？"
 
-#: modules/websession/lib/websession_templates.py:852
+#: modules/websession/lib/websession_templates.py:853
 msgid "You can use your nickname or your email address to login."
 msgstr "ログインにはニックネームまたはＥメイルアドレスを使います"
 
-#: modules/websession/lib/websession_templates.py:876
+#: modules/websession/lib/websession_templates.py:877
 msgid ""
 "Your request is valid. Please set the new desired password in the following "
 "form."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:899
+#: modules/websession/lib/websession_templates.py:900
 #, fuzzy
 msgid "Set a new password for"
 msgstr "新しいアラートの設定"
 
 # Tsuboyama: There are various japanese words against mandatory. 
-#: modules/websession/lib/websession_templates.py:900
+#: modules/websession/lib/websession_templates.py:901
 #, fuzzy
 msgid "Type the new password"
 msgstr "新パスワード"
 
-#: modules/websession/lib/websession_templates.py:901
+#: modules/websession/lib/websession_templates.py:902
 msgid "Type again the new password"
 msgstr ""
 
 # Tsuboyama: There are various japanese words against mandatory. 
-#: modules/websession/lib/websession_templates.py:902
+#: modules/websession/lib/websession_templates.py:903
 #, fuzzy
 msgid "Set the new password"
 msgstr "新パスワード"
 
-#: modules/websession/lib/websession_templates.py:924
+#: modules/websession/lib/websession_templates.py:925
 msgid "Please enter your email address and desired nickname and password:"
 msgstr "自分のＥメイルアドレス、ニックネーム、パスワードを入力してください"
 
-#: modules/websession/lib/websession_templates.py:926
+#: modules/websession/lib/websession_templates.py:927
 msgid ""
 "It will not be possible to use the account before it has been verified and "
 "activated."
 msgstr "アカウントは確認・有効化しないと使えません。"
 
-#: modules/websession/lib/websession_templates.py:975
+#: modules/websession/lib/websession_templates.py:976
 msgid "Retype Password"
 msgstr "パスワードの再入力"
 
-#: modules/websession/lib/websession_templates.py:976
+#: modules/websession/lib/websession_templates.py:977
 #: modules/websession/lib/websession_webinterface.py:808
 msgid "register"
 msgstr "登録"
 
-#: modules/websession/lib/websession_templates.py:977
+#: modules/websession/lib/websession_templates.py:978
 #, python-format
 msgid ""
 "Please do not use valuable passwords such as your Unix, AFS or NICE "
@@ -4841,27 +4901,27 @@ msgstr ""
 "ることを禁じます。Ｅメイルアドレスがあなたを同定することにもちいられており %"
 "s、新しいプレプリントを検索し通知メイルを送る機能などに用いられます。"
 
-#: modules/websession/lib/websession_templates.py:1004
+#: modules/websession/lib/websession_templates.py:1005
 #, python-format
 msgid ""
 "You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
 "first."
 msgstr "最初に%(x_url_open)sログイン%(x_url_close)sしてください。"
 
-#: modules/websession/lib/websession_templates.py:1010
+#: modules/websession/lib/websession_templates.py:1011
 msgid "You are not authorized to access administrative functions."
 msgstr "あなたは管理機能を実行することはできません。"
 
-#: modules/websession/lib/websession_templates.py:1013
+#: modules/websession/lib/websession_templates.py:1014
 #, fuzzy, python-format
 msgid "You are enabled to the following roles: %(x_role)s."
 msgstr "あなたは以下のグループのメンバーです"
 
-#: modules/websession/lib/websession_templates.py:1016
+#: modules/websession/lib/websession_templates.py:1017
 msgid "Here are some interesting web admin links for you:"
 msgstr "ここを見て下さい。"
 
-#: modules/websession/lib/websession_templates.py:1041
+#: modules/websession/lib/websession_templates.py:1042
 #, python-format
 msgid ""
 "For more admin-level activities, see the complete %(x_url_open)sAdmin Area%"
@@ -4870,200 +4930,200 @@ msgstr ""
 "%(x_url_open)sAdmin Area%(x_url_close)s には管理者レベルのページがさらにあり"
 "ます。"
 
-#: modules/websession/lib/websession_templates.py:1077
+#: modules/websession/lib/websession_templates.py:1078
 msgid "guest"
 msgstr "ゲスト"
 
-#: modules/websession/lib/websession_templates.py:1078
+#: modules/websession/lib/websession_templates.py:1079
 msgid "session"
 msgstr "会議"
 
-#: modules/websession/lib/websession_templates.py:1079
-#: modules/websession/lib/websession_templates.py:1097
+#: modules/websession/lib/websession_templates.py:1080
+#: modules/websession/lib/websession_templates.py:1098
 msgid "alerts"
 msgstr "アラート"
 
-#: modules/websession/lib/websession_templates.py:1080
-#: modules/websession/lib/websession_templates.py:1099
+#: modules/websession/lib/websession_templates.py:1081
+#: modules/websession/lib/websession_templates.py:1100
 msgid "baskets"
 msgstr "バスケット"
 
-#: modules/websession/lib/websession_templates.py:1096
+#: modules/websession/lib/websession_templates.py:1097
 msgid "account"
 msgstr "アカウント"
 
-#: modules/websession/lib/websession_templates.py:1098
+#: modules/websession/lib/websession_templates.py:1099
 msgid "messages"
 msgstr "メッセージ"
 
-#: modules/websession/lib/websession_templates.py:1100
+#: modules/websession/lib/websession_templates.py:1101
 msgid "groups"
 msgstr "グループ"
 
-#: modules/websession/lib/websession_templates.py:1101
+#: modules/websession/lib/websession_templates.py:1102
 msgid "statistics"
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:1107
+#: modules/websession/lib/websession_templates.py:1108
 msgid "submissions"
 msgstr "参加希望"
 
-#: modules/websession/lib/websession_templates.py:1113
+#: modules/websession/lib/websession_templates.py:1114
 msgid "approvals"
 msgstr "承認"
 
-#: modules/websession/lib/websession_templates.py:1119
+#: modules/websession/lib/websession_templates.py:1120
 msgid "administration"
 msgstr "管理"
 
-#: modules/websession/lib/websession_templates.py:1124
+#: modules/websession/lib/websession_templates.py:1125
 msgid "logout"
 msgstr "ログアウト"
 
-#: modules/websession/lib/websession_templates.py:1249
+#: modules/websession/lib/websession_templates.py:1250
 msgid "You are an administrator of the following groups:"
 msgstr "あなたは以下のグループの管理者です"
 
-#: modules/websession/lib/websession_templates.py:1269
-#: modules/websession/lib/websession_templates.py:1343
-#: modules/websession/lib/websession_templates.py:1406
-#: modules/websubmit/lib/websubmit_templates.py:2887
-#: modules/websubmit/lib/websubmit_templates.py:2893
+#: modules/websession/lib/websession_templates.py:1270
+#: modules/websession/lib/websession_templates.py:1344
+#: modules/websession/lib/websession_templates.py:1407
+#: modules/websubmit/lib/websubmit_templates.py:2867
+#: modules/websubmit/lib/websubmit_templates.py:2873
 msgid "Group"
 msgstr "グループ"
 
-#: modules/websession/lib/websession_templates.py:1276
+#: modules/websession/lib/websession_templates.py:1277
 msgid "You are not an administrator of any groups."
 msgstr "あなたはどのグループの管理者でもありません"
 
-#: modules/websession/lib/websession_templates.py:1283
+#: modules/websession/lib/websession_templates.py:1284
 msgid "Edit group"
 msgstr "グループを編集"
 
-#: modules/websession/lib/websession_templates.py:1290
+#: modules/websession/lib/websession_templates.py:1291
 #, python-format
 msgid "Edit %s members"
 msgstr "%s のメンバーの編集"
 
-#: modules/websession/lib/websession_templates.py:1313
-#: modules/websession/lib/websession_templates.py:1453
-#: modules/websession/lib/websession_templates.py:1455
+#: modules/websession/lib/websession_templates.py:1314
+#: modules/websession/lib/websession_templates.py:1454
+#: modules/websession/lib/websession_templates.py:1456
 #: modules/websession/lib/websession_webinterface.py:902
 msgid "Create new group"
 msgstr "新しいグループを作る"
 
-#: modules/websession/lib/websession_templates.py:1327
+#: modules/websession/lib/websession_templates.py:1328
 msgid "You are a member of the following groups:"
 msgstr "あなたは以下のグループのメンバーです"
 
-#: modules/websession/lib/websession_templates.py:1350
+#: modules/websession/lib/websession_templates.py:1351
 msgid "You are not a member of any groups."
 msgstr "あなたはどのグループのメンバーでもありません"
 
-#: modules/websession/lib/websession_templates.py:1374
+#: modules/websession/lib/websession_templates.py:1375
 msgid "Join new group"
 msgstr "グループに参加する"
 
-#: modules/websession/lib/websession_templates.py:1375
-#: modules/websession/lib/websession_templates.py:1910
-#: modules/websession/lib/websession_templates.py:1921
+#: modules/websession/lib/websession_templates.py:1376
+#: modules/websession/lib/websession_templates.py:1911
+#: modules/websession/lib/websession_templates.py:1922
 msgid "Leave group"
 msgstr "グループを離脱する"
 
-#: modules/websession/lib/websession_templates.py:1390
+#: modules/websession/lib/websession_templates.py:1391
 msgid "You are a member of the following external groups:"
 msgstr "あなたは以下の外部グループのメンバーです"
 
-#: modules/websession/lib/websession_templates.py:1413
+#: modules/websession/lib/websession_templates.py:1414
 msgid "You are not a member of any external groups."
 msgstr "あなたはどの外部グループのメンバーでもありません"
 
-#: modules/websession/lib/websession_templates.py:1461
+#: modules/websession/lib/websession_templates.py:1462
 msgid "Update group"
 msgstr "グループの更新"
 
-#: modules/websession/lib/websession_templates.py:1463
+#: modules/websession/lib/websession_templates.py:1464
 #, python-format
 msgid "Edit group %s"
 msgstr "グループ%sを編集"
 
-#: modules/websession/lib/websession_templates.py:1465
+#: modules/websession/lib/websession_templates.py:1466
 msgid "Delete group"
 msgstr "グループを削除"
 
-#: modules/websession/lib/websession_templates.py:1538
+#: modules/websession/lib/websession_templates.py:1539
 msgid "Group name:"
 msgstr "グループ名"
 
-#: modules/websession/lib/websession_templates.py:1540
+#: modules/websession/lib/websession_templates.py:1541
 msgid "Group description:"
 msgstr "グループの説明"
 
-#: modules/websession/lib/websession_templates.py:1541
+#: modules/websession/lib/websession_templates.py:1542
 msgid "Group join policy:"
 msgstr "グループ参加条件"
 
-#: modules/websession/lib/websession_templates.py:1582
-#: modules/websession/lib/websession_templates.py:1655
-#: modules/websession/lib/websession_templates.py:1796
-#: modules/websession/lib/websession_templates.py:1805
-#: modules/websession/lib/websession_templates.py:1908
-#: modules/websession/lib/websession_templates.py:2018
+#: modules/websession/lib/websession_templates.py:1583
+#: modules/websession/lib/websession_templates.py:1656
+#: modules/websession/lib/websession_templates.py:1797
+#: modules/websession/lib/websession_templates.py:1806
+#: modules/websession/lib/websession_templates.py:1909
+#: modules/websession/lib/websession_templates.py:2019
 msgid "Please select:"
 msgstr "選択してください"
 
-#: modules/websession/lib/websession_templates.py:1648
+#: modules/websession/lib/websession_templates.py:1649
 msgid "Join group"
 msgstr "グループに参加"
 
-#: modules/websession/lib/websession_templates.py:1650
+#: modules/websession/lib/websession_templates.py:1651
 msgid "or find it"
 msgstr "または検索"
 
-#: modules/websession/lib/websession_templates.py:1651
+#: modules/websession/lib/websession_templates.py:1652
 msgid "Choose group:"
 msgstr "グループの選択"
 
-#: modules/websession/lib/websession_templates.py:1653
+#: modules/websession/lib/websession_templates.py:1654
 msgid "Find group"
 msgstr "または検索"
 
-#: modules/websession/lib/websession_templates.py:1801
+#: modules/websession/lib/websession_templates.py:1802
 msgid "Remove member"
 msgstr "メンバーの削除"
 
-#: modules/websession/lib/websession_templates.py:1803
+#: modules/websession/lib/websession_templates.py:1804
 msgid "No members."
 msgstr "メンバーなし"
 
-#: modules/websession/lib/websession_templates.py:1813
+#: modules/websession/lib/websession_templates.py:1814
 msgid "Accept member"
 msgstr "メンバーを許可"
 
-#: modules/websession/lib/websession_templates.py:1813
+#: modules/websession/lib/websession_templates.py:1814
 msgid "Reject member"
 msgstr "メンバーを拒否"
 
-#: modules/websession/lib/websession_templates.py:1815
+#: modules/websession/lib/websession_templates.py:1816
 msgid "No members awaiting approval."
 msgstr "承諾を待つ人はいません"
 
-#: modules/websession/lib/websession_templates.py:1817
-#: modules/websession/lib/websession_templates.py:1834
+#: modules/websession/lib/websession_templates.py:1818
+#: modules/websession/lib/websession_templates.py:1835
 msgid "Current members"
 msgstr "現行のメンバー"
 
-#: modules/websession/lib/websession_templates.py:1818
-#: modules/websession/lib/websession_templates.py:1835
+#: modules/websession/lib/websession_templates.py:1819
+#: modules/websession/lib/websession_templates.py:1836
 msgid "Members awaiting approval"
 msgstr "承諾を待つメンバー"
 
-#: modules/websession/lib/websession_templates.py:1819
-#: modules/websession/lib/websession_templates.py:1836
+#: modules/websession/lib/websession_templates.py:1820
+#: modules/websession/lib/websession_templates.py:1837
 msgid "Invite new members"
 msgstr "新しいメンバーを招待"
 
-#: modules/websession/lib/websession_templates.py:1822
+#: modules/websession/lib/websession_templates.py:1823
 #, python-format
 msgid ""
 "If you want to invite new members to join your group, please use the %"
@@ -5072,89 +5132,89 @@ msgstr ""
 "新しいメンバーを勧誘するために %(x_url_open)sweb message%(x_url_close)s シス"
 "テムを使ってください。"
 
-#: modules/websession/lib/websession_templates.py:1826
+#: modules/websession/lib/websession_templates.py:1827
 #, python-format
 msgid "Group: %s"
 msgstr "グループ：%s"
 
-#: modules/websession/lib/websession_templates.py:1909
+#: modules/websession/lib/websession_templates.py:1910
 msgid "Group list"
 msgstr "グループリスト"
 
-#: modules/websession/lib/websession_templates.py:1912
+#: modules/websession/lib/websession_templates.py:1913
 msgid "You are not member of any group."
 msgstr "あなたはどこのグループのメンバーでもない。"
 
-#: modules/websession/lib/websession_templates.py:1959
+#: modules/websession/lib/websession_templates.py:1960
 msgid "Are you sure you want to delete this group?"
 msgstr "本当にこのグループを削除してよいですか？"
 
-#: modules/websession/lib/websession_templates.py:1998
+#: modules/websession/lib/websession_templates.py:1999
 msgid "Are you sure you want to leave this group?"
 msgstr "本当にこのグループから離脱しますか？"
 
-#: modules/websession/lib/websession_templates.py:2014
+#: modules/websession/lib/websession_templates.py:2015
 msgid "Visible and open for new members"
 msgstr "新メンバから見ることと変更が可能"
 
-#: modules/websession/lib/websession_templates.py:2016
+#: modules/websession/lib/websession_templates.py:2017
 msgid "Visible but new members need approval"
 msgstr "見ることは可能だが、新メンバは"
 
-#: modules/websession/lib/websession_templates.py:2101
+#: modules/websession/lib/websession_templates.py:2102
 #, python-format
 msgid "Group %s: New membership request"
 msgstr "グループ　%s：新しいメンバーの条件"
 
-#: modules/websession/lib/websession_templates.py:2105
+#: modules/websession/lib/websession_templates.py:2106
 #, python-format
 msgid "A user wants to join the group %s."
 msgstr "ユーザーがグループ %s に参加しようとしています"
 
-#: modules/websession/lib/websession_templates.py:2106
+#: modules/websession/lib/websession_templates.py:2107
 #, python-format
 msgid ""
 "Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
 msgstr ""
 "このユーザーの要求を%(x_url_open)s承諾または拒否%(x_url_close)sしてください"
 
-#: modules/websession/lib/websession_templates.py:2123
+#: modules/websession/lib/websession_templates.py:2124
 #, python-format
 msgid "Group %s: Join request has been accepted"
 msgstr "グループ%s:参加希望を承諾"
 
-#: modules/websession/lib/websession_templates.py:2124
+#: modules/websession/lib/websession_templates.py:2125
 #, python-format
 msgid "Your request for joining group %s has been accepted."
 msgstr "あなたのグループ %s への参加希望は承諾されました"
 
-#: modules/websession/lib/websession_templates.py:2126
+#: modules/websession/lib/websession_templates.py:2127
 #, python-format
 msgid "Group %s: Join request has been rejected"
 msgstr "グループ %s： あなたの参加要求は拒否されました"
 
-#: modules/websession/lib/websession_templates.py:2127
+#: modules/websession/lib/websession_templates.py:2128
 #, python-format
 msgid "Your request for joining group %s has been rejected."
 msgstr "グループ %s： あなたの参加要求は拒否されました"
 
-#: modules/websession/lib/websession_templates.py:2130
-#: modules/websession/lib/websession_templates.py:2148
+#: modules/websession/lib/websession_templates.py:2131
+#: modules/websession/lib/websession_templates.py:2149
 #, python-format
 msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s."
 msgstr ""
 
-#: modules/websession/lib/websession_templates.py:2144
+#: modules/websession/lib/websession_templates.py:2145
 #, python-format
 msgid "Group %s has been deleted"
 msgstr "グループ %s は削除されました"
 
-#: modules/websession/lib/websession_templates.py:2146
+#: modules/websession/lib/websession_templates.py:2147
 #, python-format
 msgid "Group %s has been deleted by its administrator."
 msgstr "グループ %s は管理者により削除されました"
 
-#: modules/websession/lib/websession_templates.py:2163
+#: modules/websession/lib/websession_templates.py:2164
 #, python-format
 msgid ""
 "You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)"
@@ -5593,8 +5653,8 @@ msgstr "この場所は次の言語でまた利用できる:"
 #: modules/webstyle/lib/webstyle_templates.py:520
 #: modules/webstyle/lib/webstyle_templates.py:557
 #: modules/webstyle/lib/webstyle_templates.py:559
-#: modules/websubmit/lib/websubmit_engine.py:1534
-#: modules/websubmit/lib/websubmit_webinterface.py:540
+#: modules/websubmit/lib/websubmit_engine.py:1531
+#: modules/websubmit/lib/websubmit_webinterface.py:539
 msgid "Error"
 msgstr "エラー"
 
@@ -5638,7 +5698,7 @@ msgid ""
 msgstr ""
 "レコード　生成： %(x_date_creation)s, 最終変更： %(x_date_modification)s"
 
-#: modules/webstyle/lib/webdoc.py:550
+#: modules/webstyle/lib/webdoc.py:542
 #, python-format
 msgid "%(category)s Pages"
 msgstr ""
@@ -5697,33 +5757,33 @@ msgstr ""
 "いまから%(x_url_open)sアカウントが%(x_url_close)sつかえるようになります。"
 
 #: modules/websubmit/lib/websubmit_engine.py:186
-#: modules/websubmit/lib/websubmit_engine.py:713
+#: modules/websubmit/lib/websubmit_engine.py:711
 #: modules/websubmit/web/yoursubmissions.py:73
 msgid "Sorry, you must log in to perform this action."
 msgstr "ログインしてください。"
 
 #: modules/websubmit/lib/websubmit_engine.py:193
-#: modules/websubmit/lib/websubmit_engine.py:720
+#: modules/websubmit/lib/websubmit_engine.py:718
 msgid "Invalid parameter"
 msgstr "不正なパラメータ"
 
 #: modules/websubmit/lib/websubmit_engine.py:224
-#: modules/websubmit/lib/websubmit_engine.py:746
+#: modules/websubmit/lib/websubmit_engine.py:744
 msgid "Unable to find the submission directory."
 msgstr "ディレクトリがありません。"
 
 #: modules/websubmit/lib/websubmit_engine.py:233
-#: modules/websubmit/lib/websubmit_engine.py:849
+#: modules/websubmit/lib/websubmit_engine.py:847
 msgid "Unknown document type"
 msgstr "ドキュメントタイプが不明です。"
 
 #: modules/websubmit/lib/websubmit_engine.py:239
-#: modules/websubmit/lib/websubmit_engine.py:855
+#: modules/websubmit/lib/websubmit_engine.py:853
 msgid "Unknown action"
 msgstr "アクションが不明です。"
 
 #: modules/websubmit/lib/websubmit_engine.py:247
-#: modules/websubmit/lib/websubmit_engine.py:864
+#: modules/websubmit/lib/websubmit_engine.py:862
 msgid "Unable to determine the number of submission pages."
 msgstr "ページ数が不明です。"
 
@@ -5732,7 +5792,7 @@ msgid "Unable to create a directory for this submission."
 msgstr "ディレクトリーが作れません。"
 
 #: modules/websubmit/lib/websubmit_engine.py:343
-#: modules/websubmit/lib/websubmit_engine.py:759
+#: modules/websubmit/lib/websubmit_engine.py:757
 msgid "Cannot create submission directory."
 msgstr "ディレクトリーが作れません。"
 
@@ -5744,16 +5804,16 @@ msgstr ""
 msgid "Unknown form field found on one of the submission pages."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_engine.py:1209
+#: modules/websubmit/lib/websubmit_engine.py:1206
 msgid "Unable to find document type."
 msgstr "ドキュメントタイプが不明です。"
 
-#: modules/websubmit/lib/websubmit_engine.py:1469
+#: modules/websubmit/lib/websubmit_engine.py:1466
 msgid "The chosen action is not supported by the document type."
 msgstr "このコレクションはまだ文書を含んでいない"
 
-#: modules/websubmit/lib/websubmit_engine.py:1547
-#: modules/websubmit/lib/websubmit_webinterface.py:553
+#: modules/websubmit/lib/websubmit_engine.py:1544
+#: modules/websubmit/lib/websubmit_webinterface.py:552
 msgid "Warning"
 msgstr "警告"
 
@@ -5800,84 +5860,84 @@ msgstr ""
 msgid "GO"
 msgstr "実行"
 
-#: modules/websubmit/lib/websubmit_templates.py:485
-#: modules/websubmit/lib/websubmit_templates.py:928
+#: modules/websubmit/lib/websubmit_templates.py:483
+#: modules/websubmit/lib/websubmit_templates.py:922
 msgid "SUMMARY"
 msgstr "サマリー"
 
-#: modules/websubmit/lib/websubmit_templates.py:522
+#: modules/websubmit/lib/websubmit_templates.py:520
 msgid "Previous page"
 msgstr "前のページ"
 
-#: modules/websubmit/lib/websubmit_templates.py:528
+#: modules/websubmit/lib/websubmit_templates.py:526
 msgid "Submission number"
 msgstr "提出アクセス番号"
 
-#: modules/websubmit/lib/websubmit_templates.py:542
+#: modules/websubmit/lib/websubmit_templates.py:540
 msgid "Next page"
 msgstr "次のページ"
 
-#: modules/websubmit/lib/websubmit_templates.py:557
-#: modules/websubmit/lib/websubmit_templates.py:969
+#: modules/websubmit/lib/websubmit_templates.py:555
+#: modules/websubmit/lib/websubmit_templates.py:963
 msgid "Are you sure you want to quit this submission?"
 msgstr "提出を中止しますか？"
 
-#: modules/websubmit/lib/websubmit_templates.py:558
-#: modules/websubmit/lib/websubmit_templates.py:970
-#: modules/websubmit/lib/websubmit_templates.py:978
+#: modules/websubmit/lib/websubmit_templates.py:556
+#: modules/websubmit/lib/websubmit_templates.py:964
+#: modules/websubmit/lib/websubmit_templates.py:972
 msgid "Back to main menu"
 msgstr "メインメニューへ"
 
-#: modules/websubmit/lib/websubmit_templates.py:561
+#: modules/websubmit/lib/websubmit_templates.py:559
 msgid ""
 "This is your submission access number. It can be used to continue with an "
 "interrupted submission in case of problems."
 msgstr "提出アクセス番号（提出に失敗したときなどに用います。）"
 
-#: modules/websubmit/lib/websubmit_templates.py:562
+#: modules/websubmit/lib/websubmit_templates.py:560
 msgid "Mandatory fields appear in red in the SUMMARY window."
 msgstr "サマリーウインドウに必須フィールドがあります。"
 
-#: modules/websubmit/lib/websubmit_templates.py:710
+#: modules/websubmit/lib/websubmit_templates.py:706
 #, python-format
 msgid "The field %s is mandatory."
 msgstr "フィールド %s は必須です。"
 
-#: modules/websubmit/lib/websubmit_templates.py:710
+#: modules/websubmit/lib/websubmit_templates.py:706
 msgid "Please make a choice in the select box"
 msgstr "選択ボックスから一つ選んでください。"
 
-#: modules/websubmit/lib/websubmit_templates.py:724
+#: modules/websubmit/lib/websubmit_templates.py:720
 msgid "Please press a button."
 msgstr "ボタンを押してください"
 
-#: modules/websubmit/lib/websubmit_templates.py:732
+#: modules/websubmit/lib/websubmit_templates.py:728
 #, python-format
 msgid "The field %s is mandatory. Please fill it in."
 msgstr "フィールド %s は必須です。"
 
-#: modules/websubmit/lib/websubmit_templates.py:808
+#: modules/websubmit/lib/websubmit_templates.py:804
 #, python-format
 msgid "The field %(field)s is mandatory."
 msgstr "フィールド %(field)s は必須です。"
 
-#: modules/websubmit/lib/websubmit_templates.py:809
+#: modules/websubmit/lib/websubmit_templates.py:805
 msgid "Going back to page"
 msgstr "戻る"
 
-#: modules/websubmit/lib/websubmit_templates.py:919
+#: modules/websubmit/lib/websubmit_templates.py:913
 msgid "finished!"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:927
+#: modules/websubmit/lib/websubmit_templates.py:921
 msgid "end of action"
 msgstr "終了"
 
-#: modules/websubmit/lib/websubmit_templates.py:951
+#: modules/websubmit/lib/websubmit_templates.py:945
 msgid "Submission no"
 msgstr "提出番号"
 
-#: modules/websubmit/lib/websubmit_templates.py:1021
+#: modules/websubmit/lib/websubmit_templates.py:1015
 #, python-format
 msgid ""
 "Here is the %(x_action)s function list for %(x_doctype)s documents at level %"
@@ -5885,487 +5945,487 @@ msgid ""
 msgstr ""
 "ドキュメント %(x_doctype)s のレベル%(x_step)s の%(x_action)s の機能のリスト"
 
-#: modules/websubmit/lib/websubmit_templates.py:1026
+#: modules/websubmit/lib/websubmit_templates.py:1020
 msgid "Function"
 msgstr "機能"
 
-#: modules/websubmit/lib/websubmit_templates.py:1027
+#: modules/websubmit/lib/websubmit_templates.py:1021
 msgid "Score"
 msgstr "評価"
 
-#: modules/websubmit/lib/websubmit_templates.py:1028
+#: modules/websubmit/lib/websubmit_templates.py:1022
 msgid "Running function"
 msgstr "実行中の機能"
 
-#: modules/websubmit/lib/websubmit_templates.py:1034
+#: modules/websubmit/lib/websubmit_templates.py:1028
 #, python-format
 msgid "Function %s does not exist."
 msgstr "機能%sはありません。"
 
-#: modules/websubmit/lib/websubmit_templates.py:1073
+#: modules/websubmit/lib/websubmit_templates.py:1067
 msgid "You must now"
 msgstr "次にすること："
 
-#: modules/websubmit/lib/websubmit_templates.py:1105
+#: modules/websubmit/lib/websubmit_templates.py:1099
 msgid "record"
 msgstr "レコード"
 
-#: modules/websubmit/lib/websubmit_templates.py:1107
+#: modules/websubmit/lib/websubmit_templates.py:1101
 msgid "document"
 msgstr "ドキュメント"
 
-#: modules/websubmit/lib/websubmit_templates.py:1109
-#: modules/websubmit/lib/websubmit_templates.py:1200
+#: modules/websubmit/lib/websubmit_templates.py:1103
+#: modules/websubmit/lib/websubmit_templates.py:1194
 msgid "version"
 msgstr "バージョン"
 
-#: modules/websubmit/lib/websubmit_templates.py:1139
+#: modules/websubmit/lib/websubmit_templates.py:1133
 msgid "file(s)"
 msgstr "ファイル"
 
-#: modules/websubmit/lib/websubmit_templates.py:1184
+#: modules/websubmit/lib/websubmit_templates.py:1178
 msgid "see"
 msgstr "参照："
 
-#: modules/websubmit/lib/websubmit_templates.py:1365
+#: modules/websubmit/lib/websubmit_templates.py:1355
 msgid "For"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1366
+#: modules/websubmit/lib/websubmit_templates.py:1356
 msgid "all types of document"
 msgstr "すべてのタイプのドキュメント"
 
-#: modules/websubmit/lib/websubmit_templates.py:1421
+#: modules/websubmit/lib/websubmit_templates.py:1411
 msgid "Id"
 msgstr "ＩＤ"
 
-#: modules/websubmit/lib/websubmit_templates.py:1422
+#: modules/websubmit/lib/websubmit_templates.py:1412
 msgid "Reference"
 msgstr "参照："
 
-#: modules/websubmit/lib/websubmit_templates.py:1424
+#: modules/websubmit/lib/websubmit_templates.py:1414
 msgid "First access"
 msgstr "最初のアクセス"
 
-#: modules/websubmit/lib/websubmit_templates.py:1425
+#: modules/websubmit/lib/websubmit_templates.py:1415
 msgid "Last access"
 msgstr "最後のアクセス"
 
-#: modules/websubmit/lib/websubmit_templates.py:1435
+#: modules/websubmit/lib/websubmit_templates.py:1425
 msgid "Are you sure you want to delete this submission?"
 msgstr "この提出を削除しますか"
 
-#: modules/websubmit/lib/websubmit_templates.py:1436
+#: modules/websubmit/lib/websubmit_templates.py:1426
 #, python-format
 msgid "Delete submission %(x_id)s in %(x_docname)s"
 msgstr "%(x_docname)s の %(x_id)s の提出を削除。"
 
-#: modules/websubmit/lib/websubmit_templates.py:1453
+#: modules/websubmit/lib/websubmit_templates.py:1443
 msgid "Reference not yet given"
 msgstr "参照（番号）がまだ与えられません。"
 
-#: modules/websubmit/lib/websubmit_templates.py:1524
+#: modules/websubmit/lib/websubmit_templates.py:1514
 msgid "Refereed Documents"
 msgstr "参照ドキュメント"
 
-#: modules/websubmit/lib/websubmit_templates.py:1534
+#: modules/websubmit/lib/websubmit_templates.py:1524
 msgid "You are a general referee"
 msgstr "あなたはgeneral referee です。"
 
-#: modules/websubmit/lib/websubmit_templates.py:1540
+#: modules/websubmit/lib/websubmit_templates.py:1530
 msgid "You are a referee for category:"
 msgstr "あなたはレフリーです。カテゴリー："
 
-#: modules/websubmit/lib/websubmit_templates.py:1578
-#: modules/websubmit/lib/websubmit_templates.py:1621
+#: modules/websubmit/lib/websubmit_templates.py:1568
+#: modules/websubmit/lib/websubmit_templates.py:1611
 msgid "List of refereed types of documents"
 msgstr "参照ドキュメントのリスト"
 
-#: modules/websubmit/lib/websubmit_templates.py:1579
-#: modules/websubmit/lib/websubmit_templates.py:1622
+#: modules/websubmit/lib/websubmit_templates.py:1569
+#: modules/websubmit/lib/websubmit_templates.py:1612
 msgid ""
 "Select one of the following types of documents to check the documents status."
 msgstr "ドキュメント状態を調べたいものを選んでください。"
 
-#: modules/websubmit/lib/websubmit_templates.py:1683
+#: modules/websubmit/lib/websubmit_templates.py:1671
 msgid "List of refereed categories"
 msgstr "査読 カテゴリーのリスト"
 
-#: modules/websubmit/lib/websubmit_templates.py:1684
-#: modules/websubmit/lib/websubmit_templates.py:1833
+#: modules/websubmit/lib/websubmit_templates.py:1672
+#: modules/websubmit/lib/websubmit_templates.py:1819
 msgid "Please choose a category"
 msgstr "カテゴリーを選択して下さい。"
 
-#: modules/websubmit/lib/websubmit_templates.py:1704
-#: modules/websubmit/lib/websubmit_templates.py:1745
-#: modules/websubmit/lib/websubmit_templates.py:1854
-#: modules/websubmit/lib/websubmit_templates.py:1908
-#: modules/websubmit/lib/websubmit_templates.py:1975
-#: modules/websubmit/lib/websubmit_templates.py:2100
+#: modules/websubmit/lib/websubmit_templates.py:1692
+#: modules/websubmit/lib/websubmit_templates.py:1733
+#: modules/websubmit/lib/websubmit_templates.py:1840
+#: modules/websubmit/lib/websubmit_templates.py:1894
+#: modules/websubmit/lib/websubmit_templates.py:1959
+#: modules/websubmit/lib/websubmit_templates.py:2082
 msgid "Pending"
 msgstr "ペンディング"
 
-#: modules/websubmit/lib/websubmit_templates.py:1710
-#: modules/websubmit/lib/websubmit_templates.py:1748
-#: modules/websubmit/lib/websubmit_templates.py:1860
-#: modules/websubmit/lib/websubmit_templates.py:1911
-#: modules/websubmit/lib/websubmit_templates.py:1976
-#: modules/websubmit/lib/websubmit_templates.py:2101
+#: modules/websubmit/lib/websubmit_templates.py:1698
+#: modules/websubmit/lib/websubmit_templates.py:1736
+#: modules/websubmit/lib/websubmit_templates.py:1846
+#: modules/websubmit/lib/websubmit_templates.py:1897
+#: modules/websubmit/lib/websubmit_templates.py:1960
+#: modules/websubmit/lib/websubmit_templates.py:2083
 msgid "Approved"
 msgstr "承認"
 
-#: modules/websubmit/lib/websubmit_templates.py:1716
-#: modules/websubmit/lib/websubmit_templates.py:1750
-#: modules/websubmit/lib/websubmit_templates.py:1751
-#: modules/websubmit/lib/websubmit_templates.py:1866
-#: modules/websubmit/lib/websubmit_templates.py:1913
-#: modules/websubmit/lib/websubmit_templates.py:1914
-#: modules/websubmit/lib/websubmit_templates.py:1977
-#: modules/websubmit/lib/websubmit_templates.py:2102
+#: modules/websubmit/lib/websubmit_templates.py:1704
+#: modules/websubmit/lib/websubmit_templates.py:1738
+#: modules/websubmit/lib/websubmit_templates.py:1739
+#: modules/websubmit/lib/websubmit_templates.py:1852
+#: modules/websubmit/lib/websubmit_templates.py:1899
+#: modules/websubmit/lib/websubmit_templates.py:1900
+#: modules/websubmit/lib/websubmit_templates.py:1961
+#: modules/websubmit/lib/websubmit_templates.py:2084
 msgid "Rejected"
 msgstr "却下"
 
-#: modules/websubmit/lib/websubmit_templates.py:1744
-#: modules/websubmit/lib/websubmit_templates.py:1907
+#: modules/websubmit/lib/websubmit_templates.py:1732
+#: modules/websubmit/lib/websubmit_templates.py:1893
 msgid "Key"
 msgstr "キー"
 
-#: modules/websubmit/lib/websubmit_templates.py:1747
-#: modules/websubmit/lib/websubmit_templates.py:1910
+#: modules/websubmit/lib/websubmit_templates.py:1735
+#: modules/websubmit/lib/websubmit_templates.py:1896
 msgid "Waiting for approval"
 msgstr "承認待ち"
 
-#: modules/websubmit/lib/websubmit_templates.py:1749
-#: modules/websubmit/lib/websubmit_templates.py:1912
+#: modules/websubmit/lib/websubmit_templates.py:1737
+#: modules/websubmit/lib/websubmit_templates.py:1898
 msgid "Already approved"
 msgstr "承認済み"
 
-#: modules/websubmit/lib/websubmit_templates.py:1752
-#: modules/websubmit/lib/websubmit_templates.py:1917
+#: modules/websubmit/lib/websubmit_templates.py:1740
+#: modules/websubmit/lib/websubmit_templates.py:1903
 msgid "Some documents are pending."
 msgstr "ペンディングのドキュメントあり"
 
-#: modules/websubmit/lib/websubmit_templates.py:1793
+#: modules/websubmit/lib/websubmit_templates.py:1779
 msgid "List of specific approvals"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:1798
+#: modules/websubmit/lib/websubmit_templates.py:1784
 #, fuzzy
 msgid "List of refereing categories"
 msgstr "査読 カテゴリーのリスト"
 
-#: modules/websubmit/lib/websubmit_templates.py:1802
+#: modules/websubmit/lib/websubmit_templates.py:1788
 #, fuzzy
 msgid "List of publication categories"
 msgstr "公開バスケットのリスト"
 
-#: modules/websubmit/lib/websubmit_templates.py:1806
+#: modules/websubmit/lib/websubmit_templates.py:1792
 #, fuzzy
 msgid "List of direct approval categories"
 msgstr "査読 カテゴリーのリスト"
 
 # Probably context dependent
-#: modules/websubmit/lib/websubmit_templates.py:1872
-#: modules/websubmit/lib/websubmit_templates.py:1915
-#: modules/websubmit/lib/websubmit_templates.py:1916
-#: modules/websubmit/lib/websubmit_templates.py:2103
+#: modules/websubmit/lib/websubmit_templates.py:1858
+#: modules/websubmit/lib/websubmit_templates.py:1901
+#: modules/websubmit/lib/websubmit_templates.py:1902
+#: modules/websubmit/lib/websubmit_templates.py:2085
 #, fuzzy
 msgid "Cancelled"
 msgstr "キャンセル"
 
-#: modules/websubmit/lib/websubmit_templates.py:1972
-#: modules/websubmit/lib/websubmit_templates.py:2061
+#: modules/websubmit/lib/websubmit_templates.py:1956
+#: modules/websubmit/lib/websubmit_templates.py:2043
 msgid "List of refereed documents"
 msgstr "査読ドキュメントのリスト"
 
-#: modules/websubmit/lib/websubmit_templates.py:1973
-#: modules/websubmit/lib/websubmit_templates.py:2097
+#: modules/websubmit/lib/websubmit_templates.py:1957
+#: modules/websubmit/lib/websubmit_templates.py:2079
 msgid "Click on a report number for more information."
 msgstr "詳細情報：リポート番号をクリック"
 
-#: modules/websubmit/lib/websubmit_templates.py:1974
-#: modules/websubmit/lib/websubmit_templates.py:2099
+#: modules/websubmit/lib/websubmit_templates.py:1958
+#: modules/websubmit/lib/websubmit_templates.py:2081
 msgid "Report Number"
 msgstr "リポート番号"
 
-#: modules/websubmit/lib/websubmit_templates.py:2063
+#: modules/websubmit/lib/websubmit_templates.py:2045
 #, fuzzy
 msgid "List of publication documents"
 msgstr "公開バスケットのリスト"
 
-#: modules/websubmit/lib/websubmit_templates.py:2065
+#: modules/websubmit/lib/websubmit_templates.py:2047
 #, fuzzy
 msgid "List of direct approval documents"
 msgstr "査読ドキュメントのリスト"
 
-#: modules/websubmit/lib/websubmit_templates.py:2236
+#: modules/websubmit/lib/websubmit_templates.py:2216
 msgid "Your request has been sent to the referee."
 msgstr "要求はレフリーに送信されました。"
 
-#: modules/websubmit/lib/websubmit_templates.py:2250
-#: modules/websubmit/lib/websubmit_templates.py:2359
-#: modules/websubmit/lib/websubmit_templates.py:2649
-#: modules/websubmit/lib/websubmit_templates.py:2826
+#: modules/websubmit/lib/websubmit_templates.py:2230
+#: modules/websubmit/lib/websubmit_templates.py:2339
+#: modules/websubmit/lib/websubmit_templates.py:2629
+#: modules/websubmit/lib/websubmit_templates.py:2806
 msgid "Title:"
 msgstr "タイトル"
 
-#: modules/websubmit/lib/websubmit_templates.py:2256
-#: modules/websubmit/lib/websubmit_templates.py:2365
-#: modules/websubmit/lib/websubmit_templates.py:2655
-#: modules/websubmit/lib/websubmit_templates.py:2832
+#: modules/websubmit/lib/websubmit_templates.py:2236
+#: modules/websubmit/lib/websubmit_templates.py:2345
+#: modules/websubmit/lib/websubmit_templates.py:2635
+#: modules/websubmit/lib/websubmit_templates.py:2812
 msgid "Author:"
 msgstr "著者"
 
-#: modules/websubmit/lib/websubmit_templates.py:2264
-#: modules/websubmit/lib/websubmit_templates.py:2373
-#: modules/websubmit/lib/websubmit_templates.py:2663
-#: modules/websubmit/lib/websubmit_templates.py:2840
+#: modules/websubmit/lib/websubmit_templates.py:2244
+#: modules/websubmit/lib/websubmit_templates.py:2353
+#: modules/websubmit/lib/websubmit_templates.py:2643
+#: modules/websubmit/lib/websubmit_templates.py:2820
 msgid "More information:"
 msgstr "情報"
 
-#: modules/websubmit/lib/websubmit_templates.py:2265
-#: modules/websubmit/lib/websubmit_templates.py:2374
-#: modules/websubmit/lib/websubmit_templates.py:2664
-#: modules/websubmit/lib/websubmit_templates.py:2841
+#: modules/websubmit/lib/websubmit_templates.py:2245
+#: modules/websubmit/lib/websubmit_templates.py:2354
+#: modules/websubmit/lib/websubmit_templates.py:2644
+#: modules/websubmit/lib/websubmit_templates.py:2821
 msgid "Click here"
 msgstr "クリック"
 
-#: modules/websubmit/lib/websubmit_templates.py:2271
+#: modules/websubmit/lib/websubmit_templates.py:2251
 #, python-format
 msgid ""
 "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
 msgstr "ドキュメントは%(x_fmt_open)s承認待ちです%(x_fmt_close)s。"
 
+#: modules/websubmit/lib/websubmit_templates.py:2254
 #: modules/websubmit/lib/websubmit_templates.py:2274
-#: modules/websubmit/lib/websubmit_templates.py:2294
-#: modules/websubmit/lib/websubmit_templates.py:2304
+#: modules/websubmit/lib/websubmit_templates.py:2284
 msgid "It was first sent for approval on:"
 msgstr "承認の請求日付："
 
+#: modules/websubmit/lib/websubmit_templates.py:2256
+#: modules/websubmit/lib/websubmit_templates.py:2258
 #: modules/websubmit/lib/websubmit_templates.py:2276
 #: modules/websubmit/lib/websubmit_templates.py:2278
-#: modules/websubmit/lib/websubmit_templates.py:2296
-#: modules/websubmit/lib/websubmit_templates.py:2298
-#: modules/websubmit/lib/websubmit_templates.py:2306
-#: modules/websubmit/lib/websubmit_templates.py:2308
+#: modules/websubmit/lib/websubmit_templates.py:2286
+#: modules/websubmit/lib/websubmit_templates.py:2288
 msgid "Last approval email was sent on:"
 msgstr "最新の承認メイルが届いた日付："
 
-#: modules/websubmit/lib/websubmit_templates.py:2279
+#: modules/websubmit/lib/websubmit_templates.py:2259
 msgid ""
 "You can send an approval request email again by clicking the following "
 "button:"
 msgstr "次のボタンを押すと、承認請求メイルが再送信されます。"
 
-#: modules/websubmit/lib/websubmit_templates.py:2281
-#: modules/websubmit/web/publiline.py:360
+#: modules/websubmit/lib/websubmit_templates.py:2261
+#: modules/websubmit/web/publiline.py:356
 msgid "Send Again"
 msgstr "再送信"
 
-#: modules/websubmit/lib/websubmit_templates.py:2282
+#: modules/websubmit/lib/websubmit_templates.py:2262
 msgid "WARNING! Upon confirmation, an email will be sent to the referee."
 msgstr "注意：確認するとＥメイルがレフリーに送られます。"
 
-#: modules/websubmit/lib/websubmit_templates.py:2285
+#: modules/websubmit/lib/websubmit_templates.py:2265
 msgid ""
 "As a referee for this document, you may click this button to approve or "
 "reject it."
 msgstr "このドキュメントのレフリーとして、承認か却下のボタンを押してください・"
 
-#: modules/websubmit/lib/websubmit_templates.py:2287
+#: modules/websubmit/lib/websubmit_templates.py:2267
 msgid "Approve/Reject"
 msgstr "承認／却下"
 
-#: modules/websubmit/lib/websubmit_templates.py:2291
+#: modules/websubmit/lib/websubmit_templates.py:2271
 #, python-format
 msgid "This document has been %(x_fmt_open)sapproved%(x_fmt_close)s."
 msgstr "このドキュメントは%(x_fmt_open)s承認されました%(x_fmt_close)s。"
 
-#: modules/websubmit/lib/websubmit_templates.py:2293
+#: modules/websubmit/lib/websubmit_templates.py:2273
 msgid "Its approved reference is:"
 msgstr "承認番号："
 
-#: modules/websubmit/lib/websubmit_templates.py:2299
+#: modules/websubmit/lib/websubmit_templates.py:2279
 msgid "It was approved on:"
 msgstr "承認日付："
 
-#: modules/websubmit/lib/websubmit_templates.py:2301
+#: modules/websubmit/lib/websubmit_templates.py:2281
 #, python-format
 msgid "This document has been %(x_fmt_open)srejected%(x_fmt_close)s."
 msgstr "このドキュメントは%(x_fmt_open)s却下されました%(x_fmt_close)s。"
 
-#: modules/websubmit/lib/websubmit_templates.py:2309
+#: modules/websubmit/lib/websubmit_templates.py:2289
 msgid "It was rejected on:"
 msgstr "却下日付："
 
-#: modules/websubmit/lib/websubmit_templates.py:2382
-#: modules/websubmit/lib/websubmit_templates.py:2426
-#: modules/websubmit/lib/websubmit_templates.py:2489
+#: modules/websubmit/lib/websubmit_templates.py:2362
+#: modules/websubmit/lib/websubmit_templates.py:2406
+#: modules/websubmit/lib/websubmit_templates.py:2469
 msgid "It has first been asked for refereing process on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2384
-#: modules/websubmit/lib/websubmit_templates.py:2428
+#: modules/websubmit/lib/websubmit_templates.py:2364
+#: modules/websubmit/lib/websubmit_templates.py:2408
 msgid "Last request e-mail was sent to the publication committee chair on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2387
+#: modules/websubmit/lib/websubmit_templates.py:2367
 msgid "A referee has been selected by the publication committee on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2389
-#: modules/websubmit/lib/websubmit_templates.py:2444
+#: modules/websubmit/lib/websubmit_templates.py:2369
+#: modules/websubmit/lib/websubmit_templates.py:2424
 #, fuzzy
 msgid "No referee has been selected yet."
 msgstr "このレコードは削除されました。"
 
-#: modules/websubmit/lib/websubmit_templates.py:2391
-#: modules/websubmit/lib/websubmit_templates.py:2446
+#: modules/websubmit/lib/websubmit_templates.py:2371
+#: modules/websubmit/lib/websubmit_templates.py:2426
 #, fuzzy
 msgid "Select a referee"
 msgstr "評価を選んでください"
 
-#: modules/websubmit/lib/websubmit_templates.py:2395
+#: modules/websubmit/lib/websubmit_templates.py:2375
 msgid ""
 "The referee has sent his final recommendations to the publication committee "
 "on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2397
-#: modules/websubmit/lib/websubmit_templates.py:2452
+#: modules/websubmit/lib/websubmit_templates.py:2377
+#: modules/websubmit/lib/websubmit_templates.py:2432
 msgid "No recommendation from the referee yet."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2399
-#: modules/websubmit/lib/websubmit_templates.py:2407
-#: modules/websubmit/lib/websubmit_templates.py:2454
-#: modules/websubmit/lib/websubmit_templates.py:2462
-#: modules/websubmit/lib/websubmit_templates.py:2470
+#: modules/websubmit/lib/websubmit_templates.py:2379
+#: modules/websubmit/lib/websubmit_templates.py:2387
+#: modules/websubmit/lib/websubmit_templates.py:2434
+#: modules/websubmit/lib/websubmit_templates.py:2442
+#: modules/websubmit/lib/websubmit_templates.py:2450
 #, fuzzy
 msgid "Send a recommendation"
 msgstr "コメントを核"
 
-#: modules/websubmit/lib/websubmit_templates.py:2403
-#: modules/websubmit/lib/websubmit_templates.py:2466
+#: modules/websubmit/lib/websubmit_templates.py:2383
+#: modules/websubmit/lib/websubmit_templates.py:2446
 msgid ""
 "The publication committee has sent his final recommendations to the project "
 "leader on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2405
-#: modules/websubmit/lib/websubmit_templates.py:2468
+#: modules/websubmit/lib/websubmit_templates.py:2385
+#: modules/websubmit/lib/websubmit_templates.py:2448
 msgid "No recommendation from the publication committee yet."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2411
+#: modules/websubmit/lib/websubmit_templates.py:2391
+#: modules/websubmit/lib/websubmit_templates.py:2454
 #: modules/websubmit/lib/websubmit_templates.py:2474
-#: modules/websubmit/lib/websubmit_templates.py:2494
 msgid "It has been cancelled by the author on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2414
+#: modules/websubmit/lib/websubmit_templates.py:2394
+#: modules/websubmit/lib/websubmit_templates.py:2457
 #: modules/websubmit/lib/websubmit_templates.py:2477
-#: modules/websubmit/lib/websubmit_templates.py:2497
 msgid "It has been approved by the project leader on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2416
+#: modules/websubmit/lib/websubmit_templates.py:2396
+#: modules/websubmit/lib/websubmit_templates.py:2459
 #: modules/websubmit/lib/websubmit_templates.py:2479
-#: modules/websubmit/lib/websubmit_templates.py:2499
 msgid "It has been rejected by the project leader on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2418
+#: modules/websubmit/lib/websubmit_templates.py:2398
+#: modules/websubmit/lib/websubmit_templates.py:2461
 #: modules/websubmit/lib/websubmit_templates.py:2481
-#: modules/websubmit/lib/websubmit_templates.py:2501
 msgid "No final decision taken yet."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2420
+#: modules/websubmit/lib/websubmit_templates.py:2400
+#: modules/websubmit/lib/websubmit_templates.py:2463
 #: modules/websubmit/lib/websubmit_templates.py:2483
-#: modules/websubmit/lib/websubmit_templates.py:2503
-#: modules/websubmit/web/publiline.py:1082
-#: modules/websubmit/web/publiline.py:1092
+#: modules/websubmit/web/publiline.py:1071
+#: modules/websubmit/web/publiline.py:1081
 msgid "Take a decision"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2431
+#: modules/websubmit/lib/websubmit_templates.py:2411
 msgid ""
 "An editorial board has been selected by the publication committee on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2433
+#: modules/websubmit/lib/websubmit_templates.py:2413
 msgid "Add an author list"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2436
+#: modules/websubmit/lib/websubmit_templates.py:2416
 #, fuzzy
 msgid "No editorial board has been selected yet."
 msgstr "このレコードは削除されました。"
 
-#: modules/websubmit/lib/websubmit_templates.py:2438
+#: modules/websubmit/lib/websubmit_templates.py:2418
 msgid "Select an editorial board"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2442
+#: modules/websubmit/lib/websubmit_templates.py:2422
 msgid "A referee has been selected by the editorial board on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2450
+#: modules/websubmit/lib/websubmit_templates.py:2430
 msgid ""
 "The referee has sent his final recommendations to the editorial board on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2458
+#: modules/websubmit/lib/websubmit_templates.py:2438
 msgid ""
 "The editorial board has sent his final recommendations to the publication "
 "committee on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2460
+#: modules/websubmit/lib/websubmit_templates.py:2440
 msgid "No recommendation from the editorial board yet."
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2491
+#: modules/websubmit/lib/websubmit_templates.py:2471
 msgid "Last request e-mail was sent to the project leader on the "
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2585
+#: modules/websubmit/lib/websubmit_templates.py:2565
 #, fuzzy
 msgid "Comments overview"
 msgstr "コメント"
 
-#: modules/websubmit/lib/websubmit_templates.py:2700
+#: modules/websubmit/lib/websubmit_templates.py:2680
 msgid "search for user"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2702
+#: modules/websubmit/lib/websubmit_templates.py:2682
 msgid "search for users"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2705
-#: modules/websubmit/lib/websubmit_templates.py:2707
-#: modules/websubmit/lib/websubmit_templates.py:2758
-#: modules/websubmit/lib/websubmit_templates.py:2760
+#: modules/websubmit/lib/websubmit_templates.py:2685
+#: modules/websubmit/lib/websubmit_templates.py:2687
+#: modules/websubmit/lib/websubmit_templates.py:2738
+#: modules/websubmit/lib/websubmit_templates.py:2740
 #, fuzzy
 msgid "select user"
 msgstr "バスケットを選択"
 
-#: modules/websubmit/lib/websubmit_templates.py:2716
+#: modules/websubmit/lib/websubmit_templates.py:2696
 msgid "connected"
 msgstr ""
 
-#: modules/websubmit/lib/websubmit_templates.py:2719
+#: modules/websubmit/lib/websubmit_templates.py:2699
 #, fuzzy
 msgid "add this user"
 msgstr "ユーザーに追加"
 
-#: modules/websubmit/lib/websubmit_templates.py:2767
+#: modules/websubmit/lib/websubmit_templates.py:2747
 #, fuzzy
 msgid "remove this user"
 msgstr "該当ユーザーなし"
 
-#: modules/websubmit/lib/websubmit_templates.py:2878
+#: modules/websubmit/lib/websubmit_templates.py:2858
 #, fuzzy
 msgid "User"
 msgstr "ユーザー"
@@ -6395,109 +6455,109 @@ msgstr "フルテキストへのアクセス"
 msgid "Parameter docid missing"
 msgstr "docimパラメータがありません。"
 
-#: modules/websubmit/web/publiline.py:332
-#: modules/websubmit/web/publiline.py:428
-#: modules/websubmit/web/publiline.py:632
+#: modules/websubmit/web/publiline.py:328
+#: modules/websubmit/web/publiline.py:423
+#: modules/websubmit/web/publiline.py:626
 msgid "Approval has never been requested for this document."
 msgstr "承認の要求はありません。"
 
-#: modules/websubmit/web/publiline.py:357
-#: modules/websubmit/web/publiline.py:452
-#: modules/websubmit/web/publiline.py:657
+#: modules/websubmit/web/publiline.py:353
+#: modules/websubmit/web/publiline.py:447
+#: modules/websubmit/web/publiline.py:651
 msgid "Unable to display document."
 msgstr "表示不可能です。"
 
-#: modules/websubmit/web/publiline.py:661
-#: modules/websubmit/web/publiline.py:780
-#: modules/websubmit/web/publiline.py:892
-#: modules/websubmit/web/publiline.py:945
-#: modules/websubmit/web/publiline.py:987
-#: modules/websubmit/web/publiline.py:1037
-#: modules/websubmit/web/publiline.py:1098
-#: modules/websubmit/web/publiline.py:1148
+#: modules/websubmit/web/publiline.py:655
+#: modules/websubmit/web/publiline.py:773
+#: modules/websubmit/web/publiline.py:884
+#: modules/websubmit/web/publiline.py:936
+#: modules/websubmit/web/publiline.py:977
+#: modules/websubmit/web/publiline.py:1026
+#: modules/websubmit/web/publiline.py:1087
+#: modules/websubmit/web/publiline.py:1137
 #, fuzzy
 msgid "Action unauthorized for this document."
 msgstr "このドキュメントタイプにタイするアクションが未定義です。"
 
-#: modules/websubmit/web/publiline.py:664
-#: modules/websubmit/web/publiline.py:783
-#: modules/websubmit/web/publiline.py:895
-#: modules/websubmit/web/publiline.py:948
-#: modules/websubmit/web/publiline.py:990
-#: modules/websubmit/web/publiline.py:1040
-#: modules/websubmit/web/publiline.py:1101
-#: modules/websubmit/web/publiline.py:1151
+#: modules/websubmit/web/publiline.py:658
+#: modules/websubmit/web/publiline.py:776
+#: modules/websubmit/web/publiline.py:887
+#: modules/websubmit/web/publiline.py:939
+#: modules/websubmit/web/publiline.py:980
+#: modules/websubmit/web/publiline.py:1029
+#: modules/websubmit/web/publiline.py:1090
+#: modules/websubmit/web/publiline.py:1140
 #, fuzzy
 msgid "Action unavailable for this document."
 msgstr "表示不可能です。"
 
-#: modules/websubmit/web/publiline.py:674
+#: modules/websubmit/web/publiline.py:668
 #, fuzzy
 msgid "Adding users to the editorial board"
 msgstr "これらのバスケットに %i レコードを追加"
 
-#: modules/websubmit/web/publiline.py:696
-#: modules/websubmit/web/publiline.py:816
+#: modules/websubmit/web/publiline.py:690
+#: modules/websubmit/web/publiline.py:809
 msgid "no qualified users, try new search."
 msgstr ""
 
-#: modules/websubmit/web/publiline.py:698
-#: modules/websubmit/web/publiline.py:818
+#: modules/websubmit/web/publiline.py:692
+#: modules/websubmit/web/publiline.py:811
 #, fuzzy
 msgid "hits"
 msgstr "ヒット"
 
-#: modules/websubmit/web/publiline.py:698
-#: modules/websubmit/web/publiline.py:818
+#: modules/websubmit/web/publiline.py:692
+#: modules/websubmit/web/publiline.py:811
 msgid "too many qualified users, specify more narrow search."
 msgstr ""
 
-#: modules/websubmit/web/publiline.py:698
-#: modules/websubmit/web/publiline.py:818
+#: modules/websubmit/web/publiline.py:692
+#: modules/websubmit/web/publiline.py:811
 msgid "limit"
 msgstr ""
 
-#: modules/websubmit/web/publiline.py:714
+#: modules/websubmit/web/publiline.py:708
 msgid "users in brackets are already attached to the role, try another one..."
 msgstr ""
 
-#: modules/websubmit/web/publiline.py:720
+#: modules/websubmit/web/publiline.py:714
 msgid "Removing users from the editorial board"
 msgstr ""
 
-#: modules/websubmit/web/publiline.py:757
+#: modules/websubmit/web/publiline.py:750
 msgid "Validate the editorial board selection"
 msgstr ""
 
-#: modules/websubmit/web/publiline.py:800
+#: modules/websubmit/web/publiline.py:793
 #, fuzzy
 msgid "Referee selection"
 msgstr "参照（番号）がまだ与えられません。"
 
-#: modules/websubmit/web/publiline.py:885
-#: modules/websubmit/web/publiline.py:1054
+#: modules/websubmit/web/publiline.py:877
+#: modules/websubmit/web/publiline.py:1043
 #, fuzzy
 msgid "Come back to the document"
 msgstr "このドキュメントの評価"
 
-#: modules/websubmit/web/publiline.py:1079
+#: modules/websubmit/web/publiline.py:1068
 #, fuzzy
 msgid "Select:"
 msgstr "選択"
 
-#: modules/websubmit/web/publiline.py:1080
-#: modules/websubmit/web/publiline.py:1140
+#: modules/websubmit/web/publiline.py:1069
+#: modules/websubmit/web/publiline.py:1129
 #, fuzzy
 msgid "Approve"
 msgstr "承認"
 
-#: modules/websubmit/web/publiline.py:1081
-#: modules/websubmit/web/publiline.py:1141
+#: modules/websubmit/web/publiline.py:1070
+#: modules/websubmit/web/publiline.py:1130
 #, fuzzy
 msgid "Reject"
 msgstr "却下"
 
-#: modules/websubmit/web/publiline.py:1179
+#: modules/websubmit/web/publiline.py:1168
 #, fuzzy
 msgid "Wrong action for this document."
 msgstr "このドキュメントの評価"
