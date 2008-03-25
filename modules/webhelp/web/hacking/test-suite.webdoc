@@ -548,12 +548,12 @@ $ /opt/cds-invenio/bin/inveniocfg --run-web-tests --yes-i-know
 
 <a name="5"></a><h2>5. Conclusions</h2>
 
-<p>A uniform testing technique and two test suites (unit test suite,
-regression test suite) were discussed.  Each programmer should plan to
-write the test code alongside the core code development to test the
-building blocks of his/her code (unit tests) as well as the overall
-application behaviour (regression tests).  The guidelines were given
-how to do so.
+<p>A uniform testing technique and three test suites (unit test suite,
+regression test suite, web test suite) were discussed.  Each
+programmer should plan to write the test code alongside the core code
+development to test the building blocks of his/her code (unit tests)
+as well as the overall application behaviour (regression tests, web
+tests).  The guidelines were given how to do so.
 </p>
 
 <a name="6"></a><h2>6. Additional information</h2>
