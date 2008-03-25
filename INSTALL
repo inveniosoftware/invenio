@@ -212,6 +212,7 @@ Contents
       $ /opt/cds-invenio/bin/inveniocfg --load-demo-records
       $ /opt/cds-invenio/bin/inveniocfg --run-unit-tests
       $ /opt/cds-invenio/bin/inveniocfg --run-regression-tests
+      $ /opt/cds-invenio/bin/inveniocfg --run-web-tests
       $ /opt/cds-invenio/bin/inveniocfg --remove-demo-records
       $ /opt/cds-invenio/bin/inveniocfg --drop-demo-site
       $ firefox http://your.site.com/help/admin/howto-run
@@ -524,6 +525,14 @@ Contents
            also that running the regression test suite may alter the
            database content with junk data, so that rebuilding the
            demo site is strongly recommended afterwards.
+
+      $ /opt/cds-invenio/bin/inveniocfg --run-web-tests
+
+           Optionally, you can run additional automated web tests
+           running in a real browser.  This requires to have Firefox
+           with the Selenium IDE extension installed.
+           <http://en.www.mozilla.com/en/firefox/>
+           <http://selenium-ide.openqa.org/>
 
       $ /opt/cds-invenio/bin/inveniocfg --remove-demo-records
 
