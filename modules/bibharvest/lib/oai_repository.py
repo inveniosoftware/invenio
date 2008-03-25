@@ -866,10 +866,25 @@ def parse_args(args=""):
 
     return out_args
 
-def check_args(arguments):
-    "Check OAI arguments"
+def check_argd(arguments):
+    """
+    Check OAI arguments
+    Also transform them from lists to strings.
+    """
 
     out = ""
+
+## no several times the same argument
+#
+#
+    for param, value in arguments.iteritems():
+        if len(value) > 1 and not 'The request includes illegal arguments' in out:
+            out = out + oai_error("badArgument", "The request includes illegal arguments")
+            bad_arguments_error = True
+        if len(value) > 0:
+            arguments[param] = value[0]
+        else:
+            arguments[param] = ''
 
 ## principal argument required
 #
@@ -883,7 +898,8 @@ def check_args(arguments):
 #
 #
     for param in arguments.keys():
-        if not param in verbs.get(arguments['verb'], []) and param != 'verb':
+        if not param in verbs.get(arguments['verb'], []) and param != 'verb' \
+               and not 'The request includes illegal arguments' in out:
             out = out + oai_error("badArgument", "The request includes illegal arguments")
             break # Indicate only once
 
@@ -891,7 +907,8 @@ def check_args(arguments):
 #
 #
     if arguments.get('resumptionToken', '') != "" and \
-           len(arguments.keys()) != 2:
+           len(arguments.keys()) != 2 and \
+           not 'The request includes illegal arguments' in out:
         out = out + oai_error("badArgument",
                               "The request includes illegal arguments")
 
@@ -950,7 +967,6 @@ def check_args(arguments):
         out = out + oai_error("badArgument",
                               "Missing metadataPrefix")
 
-
 ## parameters for ListRecords and ListIdentifiers
 #
 #
@@ -964,8 +980,6 @@ def check_args(arguments):
     if arguments.has_key('metadataPrefix') and \
            not arguments['metadataPrefix'] in params['metadataPrefix']:
         out = out + oai_error("cannotDisseminateFormat", "Chosen format is not supported")
-
-
 
     return out
 

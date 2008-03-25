@@ -38,18 +38,20 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
     def __call__(self, req, form):
         "OAI repository interface"
 
-        # FIXME: wash_urlargd will clean cases where the same
-        # arguments is specified several times. Eg:
+        # Clean input arguments. The protocol specifies that an error
+        # has to be returned if the same argument is specified several
+        # times. Eg:
         # oai2d?verb=ListIdentifiers&metadataPrefix=marcxml&metadataPrefix=marcxml
-        # This is not good since we would like to be able to raise an
-        # error. Once fixed, update the unit tests.
-        argd = wash_urlargd(form, {'verb': (str, ""),
-                                   'metadataPrefix': (str, ""),
-                                   'from': (str, ""),
-                                   'until': (str, ""),
-                                   'set': (str, ""),
-                                   'identifier': (str, ""),
-                                   'resumptionToken': (str, ""),
+        # So keep the arguments as list for now so that check_argd can
+        # return an error if needed (check_argd also transforms these
+        # lists into strings)
+        argd = wash_urlargd(form, {'verb': (list, []),
+                                   'metadataPrefix': (list, []),
+                                   'from': (list, []),
+                                   'until': (list, []),
+                                   'set': (list, []),
+                                   'identifier': (list, []),
+                                   'resumptionToken': (list, []),
                                    })
 
         ## wash_urlargd(..) function cleaned everything, but also added
@@ -61,15 +63,22 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
         ## wash_urlargd(..) function also removed unknown parameters
         ## that we would like to keep in order to send back an error
         ## as required by the protocol. But we do not need that value,
-        ## so set it to empty string
+        ## so set it to empty string.
         for param in form.keys():
             if param not in argd.keys():
                 argd[param] = ''
 
-        ## construct args (argd string equivalent) for the
-        ## oai_repository business logic (later it may be good if it
-        ## takes argd directly):
-        args = urllib.urlencode(argd)
+        ## Remove the 'ln' parameter, which is automatically added to
+        ## all requests in CDS Invenio. A 'badArgument' error should
+        ## be returned according to the protocol if someone uses 'ln'
+        ## in the request, but we cannot distinct from 'ln'
+        ## automatically added. In practice this should not be a
+        ## problem.
+        del argd['ln']
+
+        ## check request for OAI compliancy
+        ## also transform all the list arguments into string
+        oai_error = oai_repository.check_argd(argd)
 
         ## check availability (OAI requests for Identify, ListSets and
         ## ListMetadataFormats are served immediately, otherwise we
@@ -84,10 +93,10 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
         command = "touch %s/RTdata/RTdata" % CFG_CACHEDIR
         os.system(command)
 
-        ## check request for OAI compliancy
-
-        oai_error = oai_repository.check_args(argd)
-
+        ## construct args (argd string equivalent) for the
+        ## oai_repository business logic (later it may be good if it
+        ## takes argd directly):
+        args = urllib.urlencode(argd)
 
         ## create OAI response
 
