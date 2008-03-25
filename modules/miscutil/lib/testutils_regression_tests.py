@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content
 
@@ -69,7 +69,7 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
         # should find link to ALEPH:
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL,
-                              expected_link_target=CFG_SITE_URL+"/collection/ALEPH"))
+                                               expected_link_target=CFG_SITE_URL + "/collection/ALEPH?ln=" + CFG_SITE_LANG))
         # should find link entitled ISOLDE:
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL,
@@ -77,11 +77,11 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
         # should find link to ISOLDE entitled ISOLDE:
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL,
-                              expected_link_target=CFG_SITE_URL+"/collection/ISOLDE",
+                              expected_link_target=CFG_SITE_URL + "/collection/ISOLDE?ln=" + CFG_SITE_LANG,
                               expected_link_label="ISOLDE"))
         # should not find link to ALEPH entitled ISOLDE:
         errmsgs = test_web_page_content(CFG_SITE_URL,
-                              expected_link_target=CFG_SITE_URL+"/collection/ALEPH",
+                              expected_link_target=CFG_SITE_URL + "/collection/ALEPH?ln=" + CFG_SITE_LANG,
                               expected_link_label="ISOLDE")
         if errmsgs[0].find(" does not contain link to ") > -1:
             pass
