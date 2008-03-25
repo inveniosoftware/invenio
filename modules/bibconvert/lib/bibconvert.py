@@ -1841,26 +1841,6 @@ def match_in_database(record, query_string):
 
     return recID_list
 
-def parse_query_string(query_string):
-    """Parse query string, e.g.:
-Input: 245__a::REP(-, )::SHAPE::SUP(SPACE, )::MINL(4)::MAXL(8)::EXPW(PUNCT)::WORDS(4,L)::SHAPE::SUP(SPACE, )||700__a::MINL(2)::REP(COMMA,).
-Output:[['245__a','REP(-,)','SHAPE','SUP(SPACE, )','MINL(4)','MAXL(8)','EXPW(PUNCT)','WORDS(4,L)','SHAPE','SUP(SPACE, )'],['700__a','MINL(2)','REP(COMMA,)']]
-    """
-
-    query_string_out    = []
-    query_string_out_in = []
-
-    query_string_split_1 = query_string.split('||')
-
-    for item_1 in query_string_split_1:
-        query_string_split_2 = item_1.split('::')
-        query_string_out_in = []
-        for item in query_string_split_2:
-            query_string_out_in.append(item)
-        query_string_out.append(query_string_out_in)
-
-    return query_string_out
-
 
 def exit_on_error(error_message):
     "exit when error occured"
