@@ -68,8 +68,11 @@ websearch_templates = invenio.template.load('websearch')
 
 search_results_default_urlargd = websearch_templates.search_results_default_urlargd
 search_interface_default_urlargd = websearch_templates.search_interface_default_urlargd
-output_formats = [output_format['attrs']['code'].lower() for output_format in \
-                   get_output_formats(with_attributes=True).values()]
+try:
+    output_formats = [output_format['attrs']['code'].lower() for output_format in \
+                      get_output_formats(with_attributes=True).values()]
+except KeyError:
+    output_formats = ['xd', 'xm', 'hd', 'hb', 'hs', 'hx']
 output_formats.extend(['hm', 't', 'h'])
 
 def wash_search_urlargd(form):
