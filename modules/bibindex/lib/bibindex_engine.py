@@ -275,8 +275,8 @@ def get_words_from_local_fulltext(path, ext='', stemming_language=None):
                     cmd = "%s %s > %s" % \
                             (conv_program, tmp_name, tmp_dst_name)
             elif os.path.basename(conv_program) == "html2text":
-                    cmd = "%s %s > %s" % \
-                            (conv_program, tmp_name, tmp_dst_name)
+                cmd = "%s %s > %s" % \
+                      (conv_program, tmp_name, tmp_dst_name)
             else:
                 sys.stderr.write("Error: Do not know how to handle %s conversion program.\n" % conv_program)
             # try to run it:
@@ -455,8 +455,8 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                         cmd = "%s %s > %s" % \
                               (conv_program, tmp_name, tmp_dst_name)
                 elif os.path.basename(conv_program) == "html2text":
-                        cmd = "%s %s > %s" % \
-                              (conv_program, tmp_name, tmp_dst_name)
+                    cmd = "%s %s > %s" % \
+                          (conv_program, tmp_name, tmp_dst_name)
                 else:
                     sys.stderr.write("Error: Do not know how to handle %s conversion program.\n" % conv_program)
                 # try to run it:

@@ -3805,7 +3805,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             # okay, some work ahead to union hits across collections:
             results_final_for_all_selected_colls = HitSet()
             for coll in results_final.keys():
-               results_final_for_all_selected_colls.union_update(results_final[coll])
+                results_final_for_all_selected_colls.union_update(results_final[coll])
             results_final_nb_total = len(results_final_for_all_selected_colls)
 
         if results_final_nb_total == 0:

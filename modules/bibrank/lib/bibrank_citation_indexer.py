@@ -56,9 +56,9 @@ def get_citation_weight(rank_method_code, config):
     """
     begin_time = time.time()
     last_update_time = get_bibrankmethod_lastupdate(rank_method_code)
-    #if task_get_option('verbose') >= 3:	
+    #if task_get_option('verbose') >= 3:
     last_modified_records = get_last_modified_rec(last_update_time)
-    write_message("Last update "+str(last_update_time)+" records: "+str(len(last_modified_records)), sys.stderr)	
+    write_message("Last update "+str(last_update_time)+" records: "+str(len(last_modified_records)), sys.stderr)
 
     if last_modified_records:
         updated_recid_list = create_recordid_list(last_modified_records)
@@ -68,9 +68,9 @@ def get_citation_weight(rank_method_code, config):
         citation_list_intermediate = result_intermediate[1]
         reference_list_intermediate = result_intermediate[2]
         citation_informations = get_citation_informations(updated_recid_list, config)
-	#write_message("citation_informations: "+str(citation_informations),sys.stderr)
+        #write_message("citation_informations: "+str(citation_informations),sys.stderr)
         dic = ref_analyzer(citation_informations, citation_weight_dic_intermediate, citation_list_intermediate, reference_list_intermediate,config) #dic is docid-numberofreferences like {1: 2, 2: 0, 3: 1}
-	#write_message("Docid-number of known references "+str(dic),sys.stderr)
+        #write_message("Docid-number of known references "+str(dic),sys.stderr)
         end_time = time.time()
         print "Total time of software: ", (end_time - begin_time)
     else:
@@ -185,7 +185,7 @@ def get_citation_informations(recid_list, config):
     """returns a 3-part dictionary that contains the citation information of cds records
        examples: [ {} {} {} ]
                  [ { 93: ['astro-ph/9812088']},{ 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
-	         part 1: parsed from fulltext  part 2: parsed from record
+                 part 1: parsed from fulltext  part 2: parsed from record
     """
     begin_time = os.times()[4]
     d_reports_numbers = {}
@@ -252,52 +252,52 @@ def get_citation_informations(recid_list, config):
     return citation_informations
 
 def get_self_citations(citationdic,config):
-   """Check which items have been cited by one of the authors of the
-      citing item
-   """
-   selfcites = {}
-   keys = citationdic.keys()
-   for k in keys:
-	#get the author of k
-	xml = print_record(int(k),'xm')
+    """Check which items have been cited by one of the authors of the
+    citing item
+    """
+    selfcites = {}
+    keys = citationdic.keys()
+    for k in keys:
+        #get the author of k
+        xml = print_record(int(k),'xm')
         rs = create_records(xml)
         recs = map((lambda x:x[0]), rs)
-	for rec in recs:
-		#author tag
-		author = record_get_field_value(rec,"100","","","a")
-		otherauthors = record_get_field_values(rec,"700","","","a")
-		moreauthors = record_get_field_values(rec,"720","","","a")
-		authorlist = [author]
-		authorlist.extend(otherauthors)
-		authorlist.extend(moreauthors)
-		#print "record "+str(k)+" by "+str(authorlist)
-		#print "is cited by"
-		#get the "x-cites-this" list
-		xct = citationdic[k]
-		for c in xct:
-			cxml = print_record(int(c),'xm')
-			crs = create_records(cxml)
-			crecs = map((lambda x:x[0]), crs)
-			for crec in crecs:
-				cauthor = record_get_field_value(crec,"100","","","a")
-				cotherauthors = record_get_field_values(crec,"700","","","a")
-				cmoreauthors = record_get_field_values(crec,"720","","","a")
-				cauthorlist = [cauthor]
-				cauthorlist.extend(cotherauthors)
-				cauthorlist.extend(cmoreauthors)
-				#print str(c)+" by "+str(cauthorlist)
-				for ca in cauthorlist:
-					if (ca in authorlist):
-						if selfcites.has_key(k):
-							val = selfcites[k]
-							#add only if not there already
-							if val:
-								if not c in val:
-									val.append(c)
-							selfcites[k] = val
-						else:
-							selfcites[k] = [c]
-   return selfcites
+        for rec in recs:
+            #author tag
+            author = record_get_field_value(rec,"100","","","a")
+            otherauthors = record_get_field_values(rec,"700","","","a")
+            moreauthors = record_get_field_values(rec,"720","","","a")
+            authorlist = [author]
+            authorlist.extend(otherauthors)
+            authorlist.extend(moreauthors)
+            #print "record "+str(k)+" by "+str(authorlist)
+            #print "is cited by"
+            #get the "x-cites-this" list
+            xct = citationdic[k]
+            for c in xct:
+                cxml = print_record(int(c),'xm')
+                crs = create_records(cxml)
+                crecs = map((lambda x:x[0]), crs)
+                for crec in crecs:
+                    cauthor = record_get_field_value(crec,"100","","","a")
+                    cotherauthors = record_get_field_values(crec,"700","","","a")
+                    cmoreauthors = record_get_field_values(crec,"720","","","a")
+                    cauthorlist = [cauthor]
+                    cauthorlist.extend(cotherauthors)
+                    cauthorlist.extend(cmoreauthors)
+                    #print str(c)+" by "+str(cauthorlist)
+                    for ca in cauthorlist:
+                        if (ca in authorlist):
+                            if selfcites.has_key(k):
+                                val = selfcites[k]
+                                #add only if not there already
+                                if val:
+                                    if not c in val:
+                                        val.append(c)
+                                selfcites[k] = val
+                            else:
+                                selfcites[k] = [c]
+    return selfcites
 
 def ref_analyzer(citation_informations, initialresult, initial_citationlist, initial_referencelist,config):
     """Analyze the citation informations and calculate the citation weight
@@ -327,10 +327,10 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
                     citation_list[rec_id[0]].append(recid)
                 else:
                     citation_list[rec_id[0]] = [recid]
-		if reference_list.has_key(recid):
-	            reference_list[recid].append(rec_id[0])
+                if reference_list.has_key(recid):
+                    reference_list[recid].append(rec_id[0])
                 else:
-		    reference_list[recid] = [rec_id[0]]
+                    reference_list[recid] = [rec_id[0]]
     t2 = os.times()[4]
     for recid, refss in d_references_s.iteritems():
         for refs in refss:
@@ -349,13 +349,13 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
             recid_list = get_recids_matching_query(p, pubrefntag)
             if recid_list:
                 for recid in recid_list:
-		    if not citation_list.has_key(rec_id):
-			citation_list[rec_id] = []
+                    if not citation_list.has_key(rec_id):
+                        citation_list[rec_id] = []
                     if not recid in citation_list[rec_id]:
                         result[rec_id] += 1
                         citation_list[rec_id].append(recid)
-		    if not reference_list.has_key(recid):
-			reference_list[recid] = []
+                    if not reference_list.has_key(recid):
+                        reference_list[recid] = []
                     if not rec_id in reference_list[recid]:
                         reference_list[recid].append(rec_id)
     t4 = os.times()[4]
@@ -378,13 +378,13 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
     #remove empty lists in citation and reference
     keys = citation_list.keys()
     for k in keys:
-	if not citation_list[k]:
-		del citation_list[k]
+        if not citation_list[k]:
+            del citation_list[k]
 
     keys = reference_list.keys()
     for k in keys:
-	if not reference_list[k]:
-		del reference_list[k]
+        if not reference_list[k]:
+            del reference_list[k]
 
     selfdic = get_self_citations(citation_list,config)
     #selfdic consists of
@@ -394,20 +394,20 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
     #create a reverse "x cited by y" self cit dict
     selfcitedbydic = {}
     for k in selfdic.keys():
-	vlist = selfdic[k]
-	for v in vlist:
-		if selfcitedbydic.has_key(v):
-			tmplist = selfcitedbydic[v]
-			tmplist.append(k)
-		else:
-			tmplist = [k]
-		selfcitedbydic[v] = tmplist
+        vlist = selfdic[k]
+        for v in vlist:
+            if selfcitedbydic.has_key(v):
+                tmplist = selfcitedbydic[v]
+                tmplist.append(k)
+            else:
+                tmplist = [k]
+            selfcitedbydic[v] = tmplist
 
-    if task_get_option('verbose') >= 9:		
-    	write_message("citation_list (x is cited by y): "+str(citation_list),sys.stderr)	
-	write_message("reference_list (x cites y): "+str(reference_list),sys.stderr)	
-	write_message("selfcitedbydic (x is cited by y and one of the authors of x same as y's): "+str(selfcitedbydic),sys.stderr)	
-	write_message("selfdic (x cites y and one of the authors of x same as y's): "+str(selfdic),sys.stderr)	
+    if task_get_option('verbose') >= 9:
+        write_message("citation_list (x is cited by y): "+str(citation_list),sys.stderr)
+        write_message("reference_list (x cites y): "+str(reference_list),sys.stderr)
+        write_message("selfcitedbydic (x is cited by y and one of the authors of x same as y's): "+str(selfcitedbydic),sys.stderr)
+        write_message("selfdic (x cites y and one of the authors of x same as y's): "+str(selfdic),sys.stderr)
     insert_cit_ref_list_intodb(citation_list, reference_list, selfcitedbydic, selfdic)
 
     t5 = os.times()[4]

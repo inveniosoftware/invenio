@@ -334,25 +334,25 @@ class Template:
 	''' % {'ln':ln,
 	       'filename':filename}
 
-	if new:
-	    #Offer the possibility to make a duplicate of existing format template code
-	    out += '''
-	     <table><tr>
-	     <th class="adminheaderleft">Make a copy of format template:&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#addFormatTemplate">?</a>]</th>
-	     </tr>
-	    <tr>
-	    <td><select tabindex="1" name="duplicate" id="duplicate" %(readonly)s>
-	    <option value="">None (Blank Page)</option>
-	    <option value="" disabled="disabled">-------------</option>
-	    ''' %  {'siteurl': CFG_SITE_URL,
-		    'readonly':readonly}
-	    for (o_filename, o_name) in all_templates:
-		out += '''<option value="%(template_filename)s">%(template_name)s</option>''' % {'template_name':o_name,
-												 'template_filename': o_filename}
-	    out += ''' </select>
-	    </td></tr></table>'''
+        if new:
+            #Offer the possibility to make a duplicate of existing format template code
+            out += '''
+             <table><tr>
+             <th class="adminheaderleft">Make a copy of format template:&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#addFormatTemplate">?</a>]</th>
+             </tr>
+            <tr>
+            <td><select tabindex="1" name="duplicate" id="duplicate" %(readonly)s>
+            <option value="">None (Blank Page)</option>
+            <option value="" disabled="disabled">-------------</option>
+            ''' %  {'siteurl': CFG_SITE_URL,
+                    'readonly':readonly}
+            for (o_filename, o_name) in all_templates:
+                out += '''<option value="%(template_filename)s">%(template_name)s</option>''' % {'template_name':o_name,
+                                                                                                 'template_filename': o_filename}
+            out += ''' </select>
+            </td></tr></table>'''
 
-	out += '''
+        out += '''
         <table><tr>
         <th colspan="2" class="adminheaderleft">%(name)s attributes&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#attrsFormatTemplate">?</a>]</th>
         </tr>
@@ -365,16 +365,16 @@ class Template:
         <input type="hidden" value="%(filename)s"/>
         </td>
         </tr>
-	''' % {"name": name,
-	       'ln':ln,
-	       'filename':filename,
-	       'disabled':disabled,
-	       'readonly':readonly,
-	       'name_label': _("Name"),
-	       'siteurl':CFG_SITE_URL
-	       }
+        ''' % {"name": name,
+               'ln':ln,
+               'filename':filename,
+               'disabled':disabled,
+               'readonly':readonly,
+               'name_label': _("Name"),
+               'siteurl':CFG_SITE_URL
+               }
 
-	out += '''
+        out += '''
         <tr>
         <td class="admintdright" valign="top"><label for="description">%(description_label)s</label>:&nbsp;</td>
         <td><textarea tabindex="3" name="description" id="description" rows="4" cols="25" %(readonly)s>%(description)s</textarea> </td>

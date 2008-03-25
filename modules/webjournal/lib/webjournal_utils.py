@@ -188,10 +188,10 @@ def get_rule_string_from_rule_list(rule_list, category):
     i = 0
     current_category_in_list = 0
     for rule_string in rule_list:
-                category_from_config = rule_string.split(",")[0]
-                if category_from_config.lower() == category.lower():
-                    current_category_in_list = i
-                i+=1
+        category_from_config = rule_string.split(",")[0]
+        if category_from_config.lower() == category.lower():
+            current_category_in_list = i
+        i+=1
     try:
         rule_string = rule_list[current_category_in_list]
     except:
@@ -761,70 +761,70 @@ def parse_url_string(req):
 ######################## EMAIL HELPER FUNCTIONS ###############################
 
 def createhtmlmail (html, text, subject, toaddr):
-        """
-        Create a mime-message that will render HTML in popular
-        MUAs, text in better ones.
-        """
-        import MimeWriter
-        import mimetools
-        import cStringIO
+    """
+    Create a mime-message that will render HTML in popular
+    MUAs, text in better ones.
+    """
+    import MimeWriter
+    import mimetools
+    import cStringIO
 
-        out = cStringIO.StringIO() # output buffer for our message
-        htmlin = cStringIO.StringIO(html)
-        txtin = cStringIO.StringIO(text)
+    out = cStringIO.StringIO() # output buffer for our message
+    htmlin = cStringIO.StringIO(html)
+    txtin = cStringIO.StringIO(text)
 
-        writer = MimeWriter.MimeWriter(out)
-        #
-        # set up some basic headers... we put subject here
-        # because smtplib.sendmail expects it to be in the
-        # message body
-        #
-        writer.addheader("Subject", subject)
-        writer.addheader("MIME-Version", "1.0")
-        writer.addheader("To", toaddr)
-        #
-        # start the multipart section of the message
-        # multipart/alternative seems to work better
-        # on some MUAs than multipart/mixed
-        #
-        writer.startmultipartbody("alternative")
-        writer.flushheaders()
-        #
-        # the plain text section
-        #
-        subpart = writer.nextpart()
-        subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
-        #pout = subpart.startbody("text/plain", [("charset", 'us-ascii')])
-        pout = subpart.startbody("text/plain", [("charset", 'utf-8')])
-        mimetools.encode(txtin, pout, 'quoted-printable')
-        txtin.close()
-        #
-        # start the html subpart of the message
-        #
-        subpart = writer.nextpart()
-        subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
-        txtin.close()
-        #
-        # start the html subpart of the message
-        #
-        subpart = writer.nextpart()
-        subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
-        #
-        # returns us a file-ish object we can write to
-        #
-        #pout = subpart.startbody("text/html", [("charset", 'us-ascii')])
-        pout = subpart.startbody("text/html", [("charset", 'utf-8')])
-        mimetools.encode(htmlin, pout, 'quoted-printable')
-        htmlin.close()
-        #
-        # Now that we're done, close our writer and
-        # return the message body
-        #
-        writer.lastpart()
-        msg = out.getvalue()
-        out.close()
-        print msg
-        return msg
+    writer = MimeWriter.MimeWriter(out)
+    #
+    # set up some basic headers... we put subject here
+    # because smtplib.sendmail expects it to be in the
+    # message body
+    #
+    writer.addheader("Subject", subject)
+    writer.addheader("MIME-Version", "1.0")
+    writer.addheader("To", toaddr)
+    #
+    # start the multipart section of the message
+    # multipart/alternative seems to work better
+    # on some MUAs than multipart/mixed
+    #
+    writer.startmultipartbody("alternative")
+    writer.flushheaders()
+    #
+    # the plain text section
+    #
+    subpart = writer.nextpart()
+    subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
+    #pout = subpart.startbody("text/plain", [("charset", 'us-ascii')])
+    pout = subpart.startbody("text/plain", [("charset", 'utf-8')])
+    mimetools.encode(txtin, pout, 'quoted-printable')
+    txtin.close()
+    #
+    # start the html subpart of the message
+    #
+    subpart = writer.nextpart()
+    subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
+    txtin.close()
+    #
+    # start the html subpart of the message
+    #
+    subpart = writer.nextpart()
+    subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
+    #
+    # returns us a file-ish object we can write to
+    #
+    #pout = subpart.startbody("text/html", [("charset", 'us-ascii')])
+    pout = subpart.startbody("text/html", [("charset", 'utf-8')])
+    mimetools.encode(htmlin, pout, 'quoted-printable')
+    htmlin.close()
+    #
+    # Now that we're done, close our writer and
+    # return the message body
+    #
+    writer.lastpart()
+    msg = out.getvalue()
+    out.close()
+    print msg
+    return msg
 
 def put_css_in_file(html_message, journal_name):
     """

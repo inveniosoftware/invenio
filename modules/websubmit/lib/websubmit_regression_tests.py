@@ -77,7 +77,7 @@ class WebSubmitWebPagesAvailabilityTest(unittest.TestCase):
 
     def test_help_page_availability(self):
         """websubmit - availability of WebSubmit help page"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/submit-guide',
                                                expected_text="Submit Guide"))
 
@@ -86,7 +86,7 @@ class WebSubmitTestLegacyURLs(unittest.TestCase):
 
     def test_legacy_help_page_link(self):
         """websubmit - legacy Submit Guide page link"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/submit',
                                                expected_text="Submit Guide"))
         self.assertEqual([],

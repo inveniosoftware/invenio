@@ -162,10 +162,10 @@ def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=[]):
     # Query already in the cache?
     if not _db_cache.has_key(key) or \
            (affected_tables and _db_cache[key][1] < max([get_table_update_time(table) for table in affected_tables])):
-            # Let's update the cache
-            result = run_sql(sql, param, n, with_desc)
-            _db_cache[key] = (result, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-            ### log_sql_query_cached(key, result, False) ### UNCOMMENT ONLY IF you REALLY want to log all queries
+        # Let's update the cache
+        result = run_sql(sql, param, n, with_desc)
+        _db_cache[key] = (result, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+        ### log_sql_query_cached(key, result, False) ### UNCOMMENT ONLY IF you REALLY want to log all queries
 
     else:
         result = _db_cache[key][0]

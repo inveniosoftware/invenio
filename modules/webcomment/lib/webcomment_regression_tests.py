@@ -69,7 +69,7 @@ class WebCommentWebPagesAvailabilityTest(unittest.TestCase):
 
     def test_webcomment_admin_guide_availability(self):
         """webcomment - availability of WebComment Admin Guide"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/admin/webcomment-admin-guide',
                                                expected_text="WebComment Admin Guide"))
         return

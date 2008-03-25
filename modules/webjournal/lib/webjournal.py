@@ -348,8 +348,8 @@ def perform_request_issue_control(req, journal_name, issue_numbers,
         try:
             release_journal_issue(publish_issues, journal_name, language)
         except InvenioWebJournalJournalIdNotFoundDBError, e:
-                register_exception(req=req)
-                return e.user_box()
+            register_exception(req=req)
+            return e.user_box()
         output = tmpl_webjournal_issue_control_success_msg(language,
                                               publish_issues, journal_name)
 
@@ -365,8 +365,8 @@ def perform_request_issue_control(req, journal_name, issue_numbers,
         try:
             release_journal_update(update_issue, journal_name, language)
         except InvenioWebJournalJournalIdNotFoundDBError, e:
-                register_exception(req=req)
-                return e.user_box()
+            register_exception(req=req)
+            return e.user_box()
         output = tmpl_webjournal_updated_issue_msg(language, update_issue,
                                                    journal_name)
 

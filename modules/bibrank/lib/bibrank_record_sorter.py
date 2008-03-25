@@ -341,17 +341,17 @@ def find_citations(rank_method_code, recID, hitset, verbose):
     recisint = True
     recidint = 0
     try:
-	recidint = int(recID)
+        recidint = int(recID)
     except:
-	recisint = False
+        recisint = False
     ret = []
     if recisint:
         myrecords = get_cited_by(recidint) #this is a simple list
         for r in myrecords:
             ret.append([r,0])
     else:
-         ret = get_cited_by_list(hitset)
-         ret.sort(lambda x,y:cmp(x[1],y[1]))      #ascending by the second member of the tuples
+        ret = get_cited_by_list(hitset)
+        ret.sort(lambda x,y:cmp(x[1],y[1]))      #ascending by the second member of the tuples
 
     if verbose > 0:
         voutput = voutput+"\nrecID "+str(recID)+" hitset "+str(hitset)+"\n"+"find_citations retlist "+str(ret)

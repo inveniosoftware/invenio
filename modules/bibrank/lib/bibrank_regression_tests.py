@@ -65,13 +65,13 @@ class BibRankWordSimilarityRankingTest(unittest.TestCase):
 
     def test_search_results_ranked_by_similarity(self):
         """bibrank - search results ranked by word similarity"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellis&rm=wrd&of=id',
                                                expected_text="[8, 10, 11, 12, 47, 17, 13, 16, 18, 9, 14, 15]"))
 
     def test_similar_records_link(self):
         """bibrank - 'Similar records' link"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A77&rm=wrd&of=id',
                                                expected_text="[84, 95, 85, 77]"))
 
@@ -80,13 +80,13 @@ class BibRankCitationRankingTest(unittest.TestCase):
 
     def test_search_results_ranked_by_citations(self):
         """bibrank - search results ranked by number of citations"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&of=id',
                                                expected_text="[85, 77, 84]"))
 
     def test_search_results_ranked_by_citations_verbose(self):
         """bibrank - search results ranked by number of citations, verbose output"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&verbose=2',
                                                expected_text="find_citations retlist [[85, 0], [77, 2], [84, 3]]"))
 

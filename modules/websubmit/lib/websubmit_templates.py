@@ -2250,8 +2250,8 @@ class Template:
         if status == "waiting":
             out += _("This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">',
                                                                                                      'x_fmt_close': '</strong>'}
-	    out += "<br /><br />"
-	    out += _("It was first sent for approval on:") + ' <strong class="headline">' + str(dFirstReq) + '</strong><br />'
+            out += "<br /><br />"
+            out += _("It was first sent for approval on:") + ' <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
                 out += _("Last approval email was sent on:") + ' <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             else:

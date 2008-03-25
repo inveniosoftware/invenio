@@ -119,7 +119,7 @@ def mail_cookie_check_generic(cookie, delete=False):
         res = run_sql("SELECT kind, AES_DECRYPT(data,%s), onetime, status FROM accMAILCOOKIE WHERE "
             "id=%s AND expiration>=NOW()", (password, cookie_id))
         if not res:
-             raise StandardError
+            raise StandardError
     except StandardError:
         raise InvenioWebAccessMailCookieError, "Cookie doesn't exist"
     (kind, data, onetime, status) = res[0]

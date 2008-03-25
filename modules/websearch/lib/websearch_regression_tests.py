@@ -107,28 +107,28 @@ class WebSearchWebPagesAvailabilityTest(unittest.TestCase):
 
     def test_help_page_availability(self):
         """websearch - availability of Help Central page"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help',
                                                expected_text="Help Central"))
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/?ln=fr',
                                                expected_text="Centre d'aide"))
 
     def test_search_tips_page_availability(self):
         """websearch - availability of Search Tips"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/search-tips',
                                                expected_text="Search Tips"))
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/search-tips?ln=fr',
                                                expected_text="Conseils de recherche"))
 
     def test_search_guide_page_availability(self):
         """websearch - availability of Search Guide"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/search-guide',
                                                expected_text="Search Guide"))
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/search-guide?ln=fr',
                                                expected_text="Guide de recherche"))
 
@@ -192,19 +192,19 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
 
     def test_legacy_search_help_link(self):
         """websearch - legacy Search Help page link"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/search/index.en.html',
                                                expected_text="Help Central"))
 
     def test_legacy_search_tips_link(self):
         """websearch - legacy Search Tips page link"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/search/tips.fr.html',
                                                expected_text="Conseils de recherche"))
 
     def test_legacy_search_guide_link(self):
         """websearch - legacy Search Guide page link"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/search/guide.en.html',
                                                expected_text="Search Guide"))
 
@@ -232,11 +232,11 @@ class WebSearchTestRecord(unittest.TestCase):
             else:
                 # non-hd HTML formats should have a link back to
                 # the main detailed record
-                 target = make_url('/record/1')
-                 try:
-                     browser.find_link(url=target)
-                 except LinkNotFoundError:
-                     self.fail('link %r should be in page' % target)
+                target = make_url('/record/1')
+                try:
+                    browser.find_link(url=target)
+                except LinkNotFoundError:
+                    self.fail('link %r should be in page' % target)
 
         return
 

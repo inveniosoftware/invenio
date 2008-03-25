@@ -35,7 +35,7 @@ class BibConvertWebPagesAvailabilityTest(unittest.TestCase):
 
     def test_availability_bibconvert_admin_guide(self):
         """bibconvert - availability of BibConvert Admin Guide page"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/admin/bibconvert-admin-guide',
                                                expected_text="BibConvert Admin Guide"))
         return
@@ -54,10 +54,10 @@ class BibConvertWebPagesAvailabilityTest(unittest.TestCase):
 
     def test_availability_bibconvert_hacking_pages(self):
         """bibconvert - availability of BibConvert Hacking Guide pages"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/hacking/bibconvert-internals',
                                                expected_text="BibConvert Internals"))
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/hacking/bibconvert-api',
                                                expected_text="BibConvert API"))
         return

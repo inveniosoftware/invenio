@@ -36,10 +36,10 @@ def init_db_dictionary(dname):
         compressed_sc_dic = []
     sc_dic = None
     if compressed_sc_dic and compressed_sc_dic[0] and compressed_sc_dic[0][0]:
-	try:
-        	sc_dic = marshal.loads(decompress(compressed_sc_dic[0][0]))
-	except error:
-                sc_dic = []
+        try:
+            sc_dic = marshal.loads(decompress(compressed_sc_dic[0][0]))
+        except error:
+            sc_dic = []
     return sc_dic
 
 cache_cited_by_dictionary = init_db_dictionary("citationdict")
@@ -50,13 +50,13 @@ cache_reference_list_dictionary = init_db_dictionary("reversedict")
 def get_cited_by(recordid):
     """Return a list of records that cite recordid"""
     citation_dic = {} #one should always init variables
-    query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"	
+    query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"
     compressed_citation_dic = run_sql(query)
     if compressed_citation_dic and compressed_citation_dic[0]:
-        try: 
+        try:
             citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
         except error:
-            citation_dic = {}  
+            citation_dic = {}
     ret = [] #empty list
     if citation_dic.has_key(recordid):
         ret = citation_dic[recordid]
@@ -64,7 +64,7 @@ def get_cited_by(recordid):
 
 def get_cited_by_list(recordlist):
     """Return a tuple of ([recid,citation_weight],...) for all the
-       records in recordlist. 
+       records in recordlist.
     """
     result = []
     query = "select relevance_data from rnkMETHODDATA, rnkMETHOD WHERE rnkMETHOD.id=rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.name='citation'"
@@ -73,13 +73,13 @@ def get_cited_by_list(recordlist):
         citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
     rdic = {} #return this, based on values in citation_dic
     for recid in recordlist:
-	if citation_dic  and citation_dic.has_key(recid) and citation_dic[recid]:
+        if citation_dic  and citation_dic.has_key(recid) and citation_dic[recid]:
             tmp = [recid, citation_dic[recid]]
-	else:
+        else:
             tmp = [recid, 0]
         result.append(tmp)
     return result
-	
+
 
 def calculate_cited_by_list(record_id, sort_order="d"):
     """Return a tuple of ([recid,citation_weight],...) for all the
@@ -98,7 +98,7 @@ def calculate_cited_by_list(record_id, sort_order="d"):
         #has to be prepared for corrupted data!
         try:
             citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
-	    #citation_dic is {1: 0, .. 81: 4, 82: 0, 83: 0, 84: 3} etc, e.g. recnum-weight
+            #citation_dic is {1: 0, .. 81: 4, 82: 0, 83: 0, 84: 3} etc, e.g. recnum-weight
             for id in citation_list:
                 tmp = [id, citation_dic[id]]
                 result.append(tmp)
@@ -122,9 +122,9 @@ def get_self_cited_by(record_id):
     result = []
     sc = init_db_dictionary("selfcitdict")
     if sc and sc.has_key(record_id):
-	result.extend(sc[record_id])
+        result.extend(sc[record_id])
     if (len(result) == 0):
-	return None
+        return None
     return result
 
 def get_self_cited_in(record_id):
@@ -134,9 +134,9 @@ def get_self_cited_in(record_id):
     result = []
     sc = init_db_dictionary("selfcitedbydict")
     if sc and sc.has_key(record_id):
-	result.extend(sc[record_id])
+        result.extend(sc[record_id])
     if (len(result) == 0):
-	return None
+        return None
     return result
 
 def calculate_co_cited_with_list(record_id, sort_order="d"):

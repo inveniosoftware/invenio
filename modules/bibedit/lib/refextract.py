@@ -142,7 +142,7 @@ def change_otag_format(out):
               <subfield code="s">Phys. Rep. 345 (2001) 61</subfield>
            </datafield>
            """
-                                                        
+
     tag_lines=[]
     in_lines = out.split('\n')
     for line in in_lines:
@@ -166,16 +166,16 @@ def change_otag_format(out):
             o_tag=line
         elif lc > 2 and tag_lines[lc - 2] == '5' and tag_lines[lc - 1] == 'o' and tag_lines[lc] == 'a':
             new_rec_lines.pop()  # remove previous '5' line and current 'a' line also not written
-        elif lc > 2 and tag_lines[lc -1] == '5' and tag_lines[lc] == 't':                                 
+        elif lc > 2 and tag_lines[lc -1] == '5' and tag_lines[lc] == 't':
             new_rec_lines.append(o_tag) # add o_tag here
             new_rec_lines.append(line)
         else:
             new_rec_lines.append(line)
     new_out = ''
-    for rec in new_rec_lines:                          
+    for rec in new_rec_lines:
         rec = rec.rstrip()
         if rec:
-           new_out += rec + '\n'
+            new_out += rec + '\n'
     return new_out
 
 def squeeze_m(reference_lines):
@@ -188,29 +188,29 @@ def squeeze_m(reference_lines):
     filter = []
     m_squeezed = 0
     for i in range(len(reference_lines)): ## set up initial filter
-        filter.append(1)                      
-    for i in range(len(reference_lines)):  
+        filter.append(1)
+    for i in range(len(reference_lines)):
         if m_tag.search(reference_lines[i]):
             if end_tag.search(reference_lines[i + 1]):  ## If this is true then its a solitary "m" tag
-                    mlength= len(m_tag.search(reference_lines[i]).group(1))
-                    if mlength < min_length or mlength > max_length:
-                        filter[i-1] = filter[i] = filter[i+1] = 0
-                        m_squeezed += 1
+                mlength= len(m_tag.search(reference_lines[i]).group(1))
+                if mlength < min_length or mlength > max_length:
+                    filter[i-1] = filter[i] = filter[i+1] = 0
+                    m_squeezed += 1
     new_reference_lines = []
     for i in range(len(reference_lines)):
-        if filter[i]: 
+        if filter[i]:
             new_reference_lines.append(reference_lines[i])
     return m_squeezed,new_reference_lines
 
 def squeeze_o(reference_lines):
     """ squeeze out consecutive o tags - which are already present but are made
-        worse by squeezing out m tags """                            
+        worse by squeezing out m tags """
     o_tag=re.compile('\<subfield code=\"o\"\>(.*?)\<\/subfield\>')
     o_squeezed = 0
     filter = []
-    for i in range(len(reference_lines)):  
-        filter.append(1)                      
-    for i in range(len(reference_lines)):  
+    for i in range(len(reference_lines)):
+        filter.append(1)
+    for i in range(len(reference_lines)):
         if o_tag.search(reference_lines[i]):
             if i+3 < len(reference_lines):
                 if  o_tag.search(reference_lines[i+3]): ## if this is true then its 2 "o" tags in a row
@@ -218,7 +218,7 @@ def squeeze_o(reference_lines):
                     o_squeezed += 1
     new_reference_lines = []
     for i in range(len(reference_lines)):
-        if filter[i]: 
+        if filter[i]:
             new_reference_lines.append(reference_lines[i])
     return o_squeezed,new_reference_lines
 
@@ -246,11 +246,11 @@ def filter_processed_references(out):
                 break
     new_out = ''
     len_filtered = 0
-    for rec in ref_lines:                          
+    for rec in ref_lines:
         rec = rec.rstrip()
         if rec:
-           new_out += rec + '\n'
-           len_filtered += 1
+            new_out += rec + '\n'
+            len_filtered += 1
     if cli_opts['verbosity'] >= 1 and len(reference_lines) != len_filtered:
         sys.stdout.write("-----Filter results: unfilter references line length is %d and filtered length is %d\n" \
               %  (len(reference_lines),len_filtered))
@@ -1708,7 +1708,7 @@ def limit_m_tags(xml_file, length_limit):
             last_ind = line_dec.find('</subfield>')
             if last_ind != -1:
                 ## This line contains the end-tag for the "m" section
-                leng = last_ind-start_ind - 19 
+                leng = last_ind-start_ind - 19
                 if leng > length_limit:
                     ## want to truncate on a blank to avoid problems..
                     end = start_ind + 19 + length_limit

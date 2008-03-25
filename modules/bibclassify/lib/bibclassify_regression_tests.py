@@ -35,7 +35,7 @@ class BibClassifyWebPagesAvailabilityTest(unittest.TestCase):
 
     def test_availability_bibclassify_admin_guide(self):
         """bibclassify - availability of BibClassify Admin Guide page"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/admin/bibclassify-admin-guide',
                                                expected_text="BibClassify Admin Guide"))
         return
@@ -46,13 +46,13 @@ class BibClassifyWebPagesAvailabilityTest(unittest.TestCase):
 
     def test_availability_bibclassify_hacking_pages(self):
         """bibclassify - availability of BibClassify Hacking Guide pages"""
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/hacking/bibclassify-internals',
                                                expected_text="BibClassify Internals"))
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/hacking/bibclassify-hep-taxonomy',
                                                expected_text="The HEP taxonomy: rationale and extensions"))
-	self.assertEqual([],
+        self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/help/hacking/bibclassify-extraction-algorithm',
                                                expected_text="The code behind BibClassify: the extraction algorithm"))
         return

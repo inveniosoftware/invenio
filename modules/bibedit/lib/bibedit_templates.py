@@ -65,18 +65,18 @@ class Template:
                 #tag[:3] == 100x is never true, of course. This functionality TBD
                 #and will be used in enrichment editing
                 if str(tag[:3]) == "100x": #FIXME
-                            link_edit_100 = self.tmpl_link(
-                                ln, _("Edit institute"), bibediturl, 'edit',
-                                {'recid'      : str(recid),
-                                 'tag'        : tag[:3],
-                                 'num_field'  : str(num_field),
-                                 'format_tag' : format_tag,
-                                 'temp'       : 'true',
-                                 'add'        : 1})
-                            print_action_edit_100 = """ %(field)s:
-                                                        %(link_edit_100)s
-                                                        """ % {'field'              : _("Field"),
-                                                               'link_edit_100' : link_edit_100}
+                    link_edit_100 = self.tmpl_link(
+                        ln, _("Edit institute"), bibediturl, 'edit',
+                        {'recid'      : str(recid),
+                         'tag'        : tag[:3],
+                         'num_field'  : str(num_field),
+                         'format_tag' : format_tag,
+                         'temp'       : 'true',
+                         'add'        : 1})
+                    print_action_edit_100 = """ %(field)s:
+                                                %(link_edit_100)s
+                                                """ % {'field'              : _("Field"),
+                                                       'link_edit_100' : link_edit_100}
 
 
 

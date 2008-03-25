@@ -380,25 +380,25 @@ class BibFormatTitleFormattingTest(unittest.TestCase):
 
     def test_subtitle_in_html_brief(self):
         """bibformat - title subtitle in HTML brief formats"""
-	self.assertEqual([],
+        self.assertEqual([],
           test_web_page_content(CFG_SITE_URL + '/search?p=statistics+computer',
             expected_text="Statistics: a computer approach"))
 
     def test_subtitle_in_html_detailed(self):
         """bibformat - title subtitle in HTML detailed formats"""
-	self.assertEqual([],
+        self.assertEqual([],
           test_web_page_content(CFG_SITE_URL + '/search?p=statistics+computer&of=HD',
             expected_text="Statistics: a computer approach"))
 
     def test_title_edition_in_html_brief(self):
         """bibformat - title edition in HTML brief formats"""
-	self.assertEqual([],
+        self.assertEqual([],
           test_web_page_content(CFG_SITE_URL + '/search?p=2nd',
             expected_text="Introductory statistics: a decision map; 2nd ed"))
 
     def test_title_edition_in_html_detailed(self):
         """bibformat - title edition in HTML detailed formats"""
-	self.assertEqual([],
+        self.assertEqual([],
           test_web_page_content(CFG_SITE_URL + '/search?p=2nd&of=HD',
             expected_text="Introductory statistics: a decision map; 2nd ed"))
 
@@ -413,4 +413,3 @@ TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
-
