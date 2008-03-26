@@ -34,6 +34,7 @@ from invenio.config import \
      CFG_LOGDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_URL
+from invenio.webbasket_dblayer import get_basket_owner_id, add_to_basket
 from invenio.search_engine import perform_request_search
 from invenio.webinterface_handler import wash_urlargd
 from invenio.dbquery import run_sql
@@ -61,43 +62,20 @@ def get_alerts(query, frequency):
     r = run_sql('select id_user, id_query, id_basket, frequency, date_lastrun, alert_name, notification from user_query_basket where id_query=%s and frequency=%s;', (query['id_query'], frequency,))
     return {'alerts': r, 'records': query['records'], 'argstr': query['argstr'], 'date_from': query['date_from'], 'date_until': query['date_until']}
 
-
-# def add_record_to_basket(record_id, basket_id):
-#     if CFG_WEBALERT_DEBUG_LEVEL > 0:
-#         print "-> adding record %s into basket %s" % (record_id, basket_id)
-#     try:
-#         return run_sql('insert into basket_record (id_basket, id_record) values(%s, %s);', (basket_id, record_id,))
-#     except:
-#         return 0
-
-
-# def add_records_to_basket(record_ids, basket_id):
-#     # TBD: generate the list and all all records in one step (see below)
-#     for i in record_ids:
-#         add_record_to_basket(i, basket_id)
-
 # Optimized version:
 def add_records_to_basket(record_ids, basket_id):
-
     nrec = len(record_ids)
     if nrec > 0:
-        vals = '(%s,%s)' % (basket_id, record_ids[0])
-        if nrec > 1:
-            for i in record_ids[1:]:
-                vals += ',(%s, %s)' % (basket_id, i)
         if CFG_WEBALERT_DEBUG_LEVEL > 0:
-            print "-> adding %s records into basket %s: %s" % (nrec, basket_id, vals)
+            print "-> adding %s records into basket %s: %s" % (nrec, basket_id, record_ids)
         try:
             if CFG_WEBALERT_DEBUG_LEVEL < 4:
-                return run_sql('insert into basket_record (id_basket, id_record) values %s;' % vals) # Cannot use the run_sql(<query>, (<arg>,)) form for some reason
+                owner_uid = get_basket_owner_id(basket_id)
+                add_to_basket(owner_uid, record_ids, [basket_id])
             else:
                 print '   NOT ADDED, DEBUG LEVEL == 4'
-                return 0
         except Exception:
             register_exception()
-            return 0
-    else:
-        return 0
 
 
 def get_query(alert_id):
