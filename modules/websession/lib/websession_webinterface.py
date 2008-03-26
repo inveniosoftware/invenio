@@ -40,8 +40,8 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_URL, \
-     CFG_CERN_SITE
-from invenio.websession_config import CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
+     CFG_CERN_SITE, \
+     CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
 from invenio import webuser
 from invenio.webpage import page
 from invenio import webaccount

@@ -34,11 +34,10 @@ from urllib2 import urlopen
 from md5 import md5
 
 from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDIR, \
-    CFG_WEBSUBMIT_FILEDIR
+     CFG_WEBSUBMIT_FILEDIR, \
+     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 from invenio import bibupload
-from invenio.bibupload_config import CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
-                             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
-                             CFG_BIBUPLOAD_STRONG_TAGS
 from invenio.search_engine import print_record
 from invenio.dbquery import run_sql
 from invenio.dateutils import convert_datestruct_to_datetext

@@ -37,10 +37,6 @@ CFG_WEBSESSION_USERGROUP_STATUS = {'ADMIN':  'A',
                                    'PENDING':'P'
                                    }
 
-CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS = 3
-CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS = 3
-CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS = 10
-
 CFG_WEBSESSION_ERROR_MESSAGES = {
     'ERR_WEBSESSION_DB_ERROR': '_("Sorry there was an error with the database.")',
     'ERR_WEBSESSION_GROUP_NO_RIGHTS': '_("Sorry, You don\'t have sufficient rights on this group.")'

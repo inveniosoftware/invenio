@@ -61,7 +61,12 @@ from zlib import compress
 import urllib2
 import tempfile
 
-from invenio.config import CFG_OAI_ID_FIELD, CFG_SITE_URL
+from invenio.config import CFG_OAI_ID_FIELD, CFG_SITE_URL, \
+     CFG_BIBUPLOAD_REFERENCE_TAG, \
+     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
+     CFG_BIBUPLOAD_STRONG_TAGS
+
 from invenio.bibupload_config import *
 from invenio.dbquery import run_sql, \
                             Error

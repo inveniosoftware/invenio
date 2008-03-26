@@ -34,12 +34,11 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
+     CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO
-from invenio.websession_config import \
-        CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
-        CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS
 from invenio.urlutils import make_canonical_urlargd
 from invenio.htmlutils import escape_html, nmtoken_from_string
 from invenio.messages import gettext_set_language, language_list_long

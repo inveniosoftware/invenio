@@ -49,7 +49,6 @@ CFG_WEBBASKET_ACTIONS = {'DELETE': 'delete',
                          'DOWN': 'movedown',
                          'COPY': 'copy'}
 
-CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS = 20
 
 CFG_WEBBASKET_WARNING_MESSAGES = {
     'ERR_WEBBASKET_CMTID_INVALID': '_("%i is an invalid comment ID")',

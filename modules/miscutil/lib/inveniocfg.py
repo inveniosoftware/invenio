@@ -111,10 +111,18 @@ def convert_conf_option(option_name, option_value):
     option_name = option_name.upper()
 
     ## 2) convert option value to int or string:
-    try:
-        option_value = int(option_value)
-    except ValueError:
+    if option_name in ['CFG_BIBUPLOAD_REFERENCE_TAG',
+                       'CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG',
+                       'CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG',
+                       'CFG_BIBUPLOAD_STRONG_TAGS']:
+        # some options are supposed be string even when they look like
+        # numeric
         option_value = '"' + option_value + '"'
+    else:
+        try:
+            option_value = int(option_value)
+        except ValueError:
+            option_value = '"' + option_value + '"'
 
     ## 3a) special cases: regexps
     if option_name in ['CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS',
@@ -132,7 +140,8 @@ def convert_conf_option(option_name, option_value):
     ## 3d) special cases: comma-separated lists
     if option_name in ['CFG_SITE_LANGS',
                        'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
-                       'CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS']:
+                       'CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS',
+                       'CFG_BIBUPLOAD_STRONG_TAGS',]:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:

@@ -27,9 +27,9 @@ import invenio.webmessage_dblayer as db
 from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
                                       CFG_WEBMESSAGE_RESULTS_FIELD, \
                                       CFG_WEBMESSAGE_SEPARATOR, \
-                                      CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE, \
                                       CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA
-from invenio.config import CFG_SITE_LANG
+from invenio.config import CFG_SITE_LANG, \
+     CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE
 from invenio.messages import gettext_set_language
 from invenio.dateutils import datetext_default, get_datetext
 from invenio.htmlutils import escape_html

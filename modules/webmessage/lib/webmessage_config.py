@@ -52,13 +52,7 @@ CFG_WEBMESSAGE_RESULTS_FIELD = \
 # separator used in every list of recipients
 CFG_WEBMESSAGE_SEPARATOR = ','
 
-# max length of a message
-CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE = 20000
-
-# quota for messages for users (admins, see below)
-CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES = 30
-
 # list of roles (find them in accROLE table) without quota
 CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA = ['superadmin']
 
-CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS = 60
+

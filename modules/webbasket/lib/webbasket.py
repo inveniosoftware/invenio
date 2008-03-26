@@ -24,7 +24,8 @@ __revision__ = "$Id$"
 import cgi
 from zlib import decompress
 
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
+     CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui, \
                               convert_datetext_to_datestruct,\
@@ -33,8 +34,7 @@ from invenio.bibformat import format_record
 from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
                                      CFG_WEBBASKET_CATEGORIES, \
-                                     CFG_WEBBASKET_WARNING_MESSAGES, \
-                                     CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
+                                     CFG_WEBBASKET_WARNING_MESSAGES
 from invenio.webuser import isGuestUser
 from invenio.search_engine import record_exists
 

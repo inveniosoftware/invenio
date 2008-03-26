@@ -27,10 +27,10 @@ from invenio.config import \
      CFG_WEBALERT_ALERT_ENGINE_EMAIL, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
 from invenio.messages import gettext_set_language
 from invenio.htmlparser import get_as_text, wrap
-from invenio.alert_engine_config import CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
 
 class Template:
     def tmpl_errorMsg(self, ln, error_msg, rest = ""):

@@ -25,11 +25,13 @@ __revision__ = "$Id$"
 
 from time import localtime, mktime
 
+
+from invenio.config import \
+     CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
+     CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS
 from invenio.dbquery import run_sql
 from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
-                                      CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
-                                      CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA, \
-                                      CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS
+                                      CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA
 from invenio.dateutils import datetext_default, \
                               convert_datestruct_to_datetext
 from invenio.webuser import list_users_in_roles

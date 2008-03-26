@@ -33,7 +33,9 @@ import datetime
 from invenio.config import \
      CFG_LOGDIR, \
      CFG_SITE_SUPPORT_EMAIL, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES, \
+     CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES
 from invenio.webbasket_dblayer import get_basket_owner_id, add_to_basket
 from invenio.search_engine import perform_request_search
 from invenio.webinterface_handler import wash_urlargd
@@ -41,9 +43,8 @@ from invenio.dbquery import run_sql
 from invenio.webuser import get_email
 from invenio.mailutils import send_email
 from invenio.errorlib import register_exception
-from invenio.alert_engine_config import CFG_WEBALERT_DEBUG_LEVEL, \
-    CFG_WEBALERT_SEND_EMAIL_NUMBER_OF_TRIES, \
-    CFG_WEBALERT_SEND_EMAIL_SLEEPTIME_BETWEEN_TRIES
+from invenio.alert_engine_config import CFG_WEBALERT_DEBUG_LEVEL
+
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 webalert_templates = invenio.template.load('webalert')

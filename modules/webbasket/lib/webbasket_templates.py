@@ -26,10 +26,10 @@ import cgi
 from invenio.messages import gettext_set_language
 from invenio.webbasket_config import \
                        CFG_WEBBASKET_CATEGORIES, \
-                       CFG_WEBBASKET_SHARE_LEVELS, \
-                       CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
+                       CFG_WEBBASKET_SHARE_LEVELS
 from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_LANG
+from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_LANG, \
+     CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
 

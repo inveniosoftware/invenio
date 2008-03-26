@@ -27,7 +27,7 @@ from HTMLParser import HTMLParser
 from string import split
 import textwrap
 
-from invenio.alert_engine_config import CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL
+from invenio.config import CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL
 from invenio.bibformat import format_record
 from invenio.bibindex_engine import re_html
 

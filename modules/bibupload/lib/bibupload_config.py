@@ -34,27 +34,3 @@ CFG_BIBUPLOAD_SPECIAL_TAGS = ['FMT', 'FFT']
 
 CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS = ('/tmp', '/home', '/afs', CFG_TMPDIR)
 
-CFG_BIBUPLOAD_REFERENCE_TAG = '999'
-
-CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG = '970__a' # useful for matching when
-                                            # our records come from an
-                                            # external digital library
-                                            # system
-
-CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG = '035__a' # useful for matching when
-                                            # we harvest stuff via OAI
-                                            # that we do not want to
-                                            # reexport via Invenio
-                                            # OAI; so records may have
-                                            # only the source OAI ID
-                                            # stored in this tag (kind
-                                            # of like external system
-                                            # number too)
-
-CFG_BIBUPLOAD_STRONG_TAGS = ['964'] # The list of tags that are strong
-                                    # enough to resist the replace
-                                    # mode.  Useful for tags that
-                                    # might be created from an
-                                    # external non-metadata-like
-                                    # source, e.g. the information
-                                    # about the number of copies left.

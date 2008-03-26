@@ -22,7 +22,7 @@ __revision__ = "$Id$"
 import os
 import time
 import cPickle
-from invenio.config import CFG_BINDIR, CFG_TMPDIR
+from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_BIBEDIT_TIMEOUT
 from invenio.bibedit_dblayer import marc_to_split_tag
 from invenio.bibedit_config import *
 from invenio.search_engine import print_record, record_exists

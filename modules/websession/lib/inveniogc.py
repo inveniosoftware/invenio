@@ -32,10 +32,10 @@ import os
 try:
     from invenio.dbquery import run_sql
     from invenio.config import CFG_LOGDIR, CFG_TMPDIR, CFG_CACHEDIR, \
-        CFG_WEBSEARCH_RSS_TTL
-    from invenio.websession_config import CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
+         CFG_WEBSEARCH_RSS_TTL, \
+         CFG_WEBSESSION_NOT_CONFIRMED_EMAIL_ADDRESS_EXPIRE_IN_DAYS
     from invenio.bibtask import task_init, task_set_option, task_get_option, \
-        write_message, write_messages
+         write_message, write_messages
     from invenio.access_control_mailcookie import mail_cookie_gc
     from invenio.bibdocfile import BibDoc
 except ImportError, e:
