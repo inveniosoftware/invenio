@@ -43,6 +43,7 @@ modules/webbasket/doc/admin/webbasket-admin-guide.webdoc
 modules/webcomment/doc/admin/webcomment-admin-guide.webdoc
 modules/websession/doc/admin/websession-admin-guide.webdoc
 modules/webstyle/doc/admin/webstyle-admin-guide.webdoc
+modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc
 modules/elmsubmit/doc/admin/elmsubmit-admin-guide.webdoc
 modules/bibformat/etc/format_templates/Default_HTML_files.bft
 modules/bibformat/etc/format_templates/Default_HTML_actions.bft
