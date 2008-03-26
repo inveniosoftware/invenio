@@ -47,9 +47,12 @@ def nmtoken_from_string(text):
     Nmtoken is the type that is a mixture of characters supported in
     attributes such as 'name' in HTML 'a' tag. For example,
     <a name="Articles%20%26%20Preprints"> should be tranformed to
-    <a name="Articles%20%26%20Preprints"> using this function.
+    <a name="Articles372037263720Preprints"> using this function.
     http://www.w3.org/TR/2000/REC-xml-20001006#NT-Nmtoken
 
+    Also note that this function filters more characters than
+    specified by the definition of Nmtoken ('CombiningChar' and
+    'Extender' charsets are filtered out).
     """
     text = text.replace('-', '--')
     return ''.join( [( ((not char.isalnum() and not char in ['.', '-', '_', ':']) and str(ord(char))) or char)
