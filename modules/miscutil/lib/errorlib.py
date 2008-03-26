@@ -170,6 +170,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             log_stream = StringIO()
             email_stream = StringIO()
 
+            print >> email_stream, '\n',
 
             ## If a prefix was requested let's print it
             if prefix:
@@ -204,6 +205,9 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
             log_text = log_stream.getvalue()
             email_text = email_stream.getvalue()
 
+            if email_text.endswith('\n'):
+                email_text = email_text[:-1]
+
             ## Preparing the exception dump
             stream = stream=='error' and 'err' or 'log'
 
@@ -217,7 +221,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 if alert_admin or not written_to_log:
                     ## If requested or if it's impossible to write in the log
                     from invenio.mailutils import send_email
-                    send_email(CFG_SITE_ADMIN_EMAIL, CFG_SITE_ADMIN_EMAIL, subject='Registered exception at %s' % CFG_SITE_URL, content=email_text, header='', footer='')
+                    send_email(CFG_SITE_ADMIN_EMAIL, CFG_SITE_ADMIN_EMAIL, subject='Registered exception at %s' % CFG_SITE_URL, content=email_text)
             return 1
         else:
             return 0
