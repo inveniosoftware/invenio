@@ -248,7 +248,7 @@ class Manager:
             except IOError:
                 pass
             tmpfile.close()
-            if CFG_BIBSCHED_LOG_PAGER:
+            if CFG_BIBSCHED_LOG_PAGER and os.path.exists(CFG_BIBSCHED_LOG_PAGER):
                 pager = CFG_BIBSCHED_LOG_PAGER
             else:
                 pager = os.environ.get('PAGER', '/bin/more')
