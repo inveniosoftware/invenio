@@ -48,7 +48,7 @@ WEBACCESSADMINROLE  = 'webaccessadmin'
 WEBACCESSACTION     = 'cfgwebaccess'
 
 # name of the action allowing roles to access the web administrator interface
-VIEWRESTRCOLL     = 'accrestrcoll'
+VIEWRESTRCOLL     = 'viewrestrcoll'
 
 
 # name of the action allowing roles to delegate the rights to other roles

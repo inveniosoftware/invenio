@@ -301,7 +301,7 @@ to access the restricted collection.</p>
 facility of CDS Invenio.</p>
 
 <p>In order to restrict access to a collection you just have to create
-at least an authorization for the action <code>accrestrcoll</code>
+at least an authorization for the action <code>viewrestrcoll</code>
 specifying the name of the collection as the parameter</p>
 
 <p>If you have just upgraded your installation from <em>CDS
