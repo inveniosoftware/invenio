@@ -723,6 +723,16 @@ def get_basket_general_infos(bskid):
         return res[0]
     return ()
 
+def get_basket_owner_id(bskid):
+    """Return the uid of the owner."""
+    query = """SELECT id_owner
+    FROM   bskBASKET
+    WHERE id=%s"""
+    res = run_sql(query, (bskid, ))
+    if res:
+        return res[0][0]
+    return -1
+
 def count_public_baskets():
     """return number of public baskets"""
     query = """SELECT count(id_bskBASKET)
