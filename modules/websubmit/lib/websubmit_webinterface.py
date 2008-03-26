@@ -38,6 +38,7 @@ from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
+     CFG_SITE_NAME_INTL, \
      CFG_SITE_URL, \
      CFG_WEBSUBMIT_STORAGEDIR, \
      CFG_VERSION, \
@@ -116,7 +117,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 msg = "<p>%s</p><p>%s</p>" % (
                     _("The system has encountered an error in retrieving the list of files for this document."),
                     _("The error has been logged and will be taken in consideration as soon as possible."))
-                return errorMsg(msg, req, CFG_SITE_NAME, ln)
+                return errorMsg(str(msg), req, ln)
 
             docname = ''
             format = ''
@@ -155,7 +156,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             docfile = doc.get_file(format, version)
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req)
-                            return errorMsg(str(msg), req, CFG_SITE_NAME, ln)
+                            return errorMsg(str(msg), req, ln)
 
                         if docfile.get_status() == '':
                             # The file is not resticted, let's check for
@@ -177,7 +178,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             return docfile.stream(req)
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req)
-                            return errorMsg(str(msg), req, CFG_SITE_NAME, ln)
+                            return errorMsg(str(msg), req, ln)
 
                     elif doc.get_icon() is not None and doc.get_icon().docname in filename:
                         icon = doc.get_icon()
@@ -185,7 +186,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             iconfile = icon.get_file('gif', args['version'])
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req)
-                            return errorMsg(msg, req, CFG_SITE_NAME, ln)
+                            return errorMsg(str(msg), req, ln)
 
                         if iconfile.get_status() == '':
                             # The file is not resticted, let's check for
@@ -207,7 +208,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             return iconfile.stream(req)
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req)
-                            return errorMsg(msg, req, c, ln)
+                            return errorMsg(str(msg), req, ln)
 
             filelist = bibarchive.display("", args['version'], ln=ln)
 
@@ -293,7 +294,7 @@ def websubmit_legacy_getfile(req, form):
                                            navmenuid='submit')
             uid_email = get_email(uid)
         except Error, e:
-            return errorMsg(e.value,req)
+            return errorMsg(str(e), req, ln)
 
         filelist=""
 
@@ -301,25 +302,25 @@ def websubmit_legacy_getfile(req, form):
         # if we only have a docid, and no file supplied?)
         if name!="":
             if docid=="":
-                return errorMsg(_("Parameter docid missing"), req, c, ln)
+                return errorMsg(_("Parameter docid missing"), req, ln)
 
             try:
                 doc = BibDoc(docid=docid)
             except InvenioWebSubmitFileError, msg:
                 register_exception(req=req)
-                return errorMsg(msg, req, c, ln)
+                return errorMsg(str(msg), req, ln)
             try:
                 docfile = doc.get_file(format,version)
             except InvenioWebSubmitFileError, msg:
                 register_exception(req=req)
-                return errorMsg(msg, req, c, ln)
+                return errorMsg(str(msg), req, ln)
 
             # redirect to this specific file, possibly dropping
             # the version if we are referring to the latest one.
             target = '%s/record/%d/files/%s%s' % (
                 CFG_SITE_URL, doc.recid, quote(docfile.name), docfile.format)
 
-            if version and int(version) == int(doc.getLatestVersion()):
+            if version and int(version) == int(doc.get_latest_version()):
                 version = ''
 
             target += make_canonical_urlargd({
@@ -337,7 +338,7 @@ def websubmit_legacy_getfile(req, form):
                 bibdoc = BibDoc(docid=docid)
             except InvenioWebSubmitFileError, msg:
                 register_exception(req=req)
-                return errorMsg(msg, req, CFG_SITE_NAME, ln)
+                return errorMsg(str(msg), req, ln)
             recid = bibdoc.get_recid()
             filelist = bibdoc.display(version, ln=ln)
 
@@ -383,10 +384,10 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
         myQuery = req.args
         if sub == "":
-            return errorMsg("Sorry parameter missing...",req)
+            return errorMsg("Sorry parameter missing...", req)
         res = run_sql("select docname,actname from sbmIMPLEMENT where subname=%s", (sub,))
         if len(res)==0:
-            return errorMsg("Sorry. Cannot analyse parameter",req)
+            return errorMsg("Sorry. Cannot analyse parameter", req)
         else:
             # get document type
             doctype = res[0][0]
@@ -532,9 +533,12 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
     # Answer to both /submit/ and /submit
     __call__ = index
 
-def errorMsg(title, req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
+def errorMsg(title, req, c=None, ln=CFG_SITE_LANG):
     # load the right message language
     _ = gettext_set_language(ln)
+
+    if c is None:
+        c = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
 
     return page(title = _("Error"),
                 body = create_error_box(req, title=title, verbose=0, ln=ln),
@@ -545,9 +549,12 @@ def errorMsg(title, req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
                 req=req,
                 navmenuid='submit')
 
-def warningMsg(title, req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
+def warningMsg(title, req, c=None, ln=CFG_SITE_LANG):
     # load the right message language
     _ = gettext_set_language(ln)
+
+    if c is None:
+        c = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
 
     return page(title = _("Warning"),
                 body = title,
