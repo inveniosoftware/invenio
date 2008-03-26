@@ -88,5 +88,8 @@ API, etc.</dd>
 <dd>Describes information useful to understand the access control process
 internals, its API, etc.</dd>
 
+<dt><a href="webstyle-internals">WebStyle Internals</a></dt>
+<dd>Describes how to customize WebDoc files, etc.</dd>
+
 </dl>
 </blockquote>
