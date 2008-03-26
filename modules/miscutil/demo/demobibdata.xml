@@ -536,7 +536,6 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/astro-ph/9812/9812226.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/astro-ph/9812/9812226.fig1.ps.gz</subfield>
@@ -1838,11 +1837,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch/archive/electronic/cern/preprints/ep/ep-2001-094.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch/archive/electronic/cern/preprints/ep/ep-2001-094.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="y">2002</subfield>
@@ -2141,11 +2138,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/astro-ph/0101/0101431.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/astro-ph/0101/0101431.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/astro-ph/0101/0101431.fig1.ps.gz</subfield>
@@ -2317,11 +2312,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0105/0105155.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0105/0105155.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="y">2001</subfield>
@@ -4858,11 +4851,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/astro-ph/0104/0104076.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/astro-ph/0104/0104076.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="y">2001</subfield>
@@ -7356,11 +7347,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/gr-qc/0204/0204045.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/gr-qc/0204/0204045.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -7493,12 +7482,10 @@
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://arxiv.org/pdf/gr-qc/0204046</subfield>
             <subfield code="f">.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://arxiv.org/ps/gr-qc/0204046</subfield>
             <subfield code="f">.ps</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="y">2002</subfield>
@@ -7552,11 +7539,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0204/0204098.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0204/0204098.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="y">2002</subfield>
@@ -7624,11 +7609,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0204/0204099.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0204/0204099.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -7844,11 +7827,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204132.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204132.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -8309,11 +8290,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204133.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204133.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -8744,11 +8723,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204134.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204134.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -9231,11 +9208,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204135.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204135.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="y">2002</subfield>
@@ -9310,11 +9285,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204136.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204136.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -9888,11 +9861,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204137.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204137.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -10190,11 +10161,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204138.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204138.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -10444,11 +10413,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204139.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204139.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -10789,11 +10756,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204140.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204140.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -11438,11 +11403,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204141.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204141.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -11837,11 +11800,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0204/0204100.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0204/0204100.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -12160,11 +12121,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204142.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204142.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -12655,11 +12614,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204143.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-ph/0204/0204143.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -12892,11 +12849,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0204/0204101.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0204/0204101.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -13224,11 +13179,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0204/0204102.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0204/0204102.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -13500,12 +13453,10 @@
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://arxiv.org/pdf/nucl-th/0204031</subfield>
             <subfield code="f">.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://arxiv.org/ps/nucl-th/0204031</subfield>
             <subfield code="f">.ps</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="b">11</subfield>
@@ -13571,11 +13522,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/nucl-th/0204/0204032.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/nucl-th/0204/0204032.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="y">2002</subfield>
@@ -13635,11 +13584,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/nucl-th/0204/0204033.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/nucl-th/0204/0204033.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -13988,11 +13935,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/nucl-th/0204/0204034.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/nucl-th/0204/0204034.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="y">2002</subfield>
@@ -14057,11 +14002,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch/cgi-bin/conversion/scripts/tif2pdf/tif2pdf.sh?file=/archive/electronic//scan/9605/SCAN-9605068.tif</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch/archive/electronic//scan/9605/SCAN-9605068.tif</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="b">13</subfield>
@@ -14196,11 +14139,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0003/0003289.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0003/0003289.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="y">2000</subfield>
@@ -14801,11 +14742,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0003/0003291.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0003/0003291.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="y">2000</subfield>
@@ -14928,11 +14867,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch/cgi-bin/conversion/scripts/tif2pdf/tif2pdf.sh?file=/archive/electronic//scan/9605/SCAN-9605071.tif</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch/archive/electronic//scan/9605/SCAN-9605071.tif</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="0">
             <subfield code="y">1996</subfield>
@@ -15000,11 +14937,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0003/0003293.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0003/0003293.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -15200,11 +15135,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0003/0003294.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0003/0003294.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="909" ind1="C" ind2="5">
             <subfield code="b">CER</subfield>
@@ -15317,11 +15250,9 @@
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0003/0003295.pdf</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0003/0003295.ps.gz</subfield>
-            <subfield code="d">Fulltext</subfield>
         </datafield>
         <datafield tag="FFT" ind1=" " ind2=" ">
             <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0003/0003295.fig1.ps.gz</subfield>
@@ -15750,11 +15681,9 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0210/0210114.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
  <datafield tag="FFT" ind1=" " ind2=" ">
      <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0210/0210114.ps.gz</subfield>
-     <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">klebanov@feynman.princeton.edu</subfield>
@@ -16022,11 +15951,9 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0201/0201100.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
  <datafield tag="FFT" ind1=" " ind2=" ">
      <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0201/0201100.ps.gz</subfield>
-     <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">wolfgang.mueck@na.infn.it</subfield>
@@ -16182,11 +16109,9 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0205/0205061.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
  <datafield tag="FFT" ind1=" " ind2=" ">
      <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0205/0205061.ps.gz</subfield>
-     <subfield code="d">Access to fulltext document</subfield>
  </datafield>  <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">d.martelli@qmul.ac.uk</subfield>
  </datafield>
@@ -16464,11 +16389,9 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0207/0207111.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
  <datafield tag="FFT" ind1=" " ind2=" ">
      <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0207/0207111.ps.gz</subfield>
-     <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">ramgosk@het.brown.edu</subfield>
@@ -16759,11 +16682,9 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0209/0209226.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
  <datafield tag="FFT" ind1=" " ind2=" ">
      <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0209/0209226.ps.gz</subfield>
-     <subfield code="d">Access to fulltext document</subfield>
  </datafield><datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">evas@slac.stanford.edu</subfield>
  </datafield>
@@ -17042,11 +16963,9 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0209/0209257.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
  <datafield tag="FFT" ind1=" " ind2=" ">
      <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0209/0209257.ps.gz</subfield>
-     <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">berkooz@wisemail.weizmann.ac.il</subfield>
@@ -17442,11 +17361,9 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0210/0210075.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
  <datafield tag="FFT" ind1=" " ind2=" ">
      <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0210/0210075.ps.gz</subfield>
-     <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">serone@he.sissa.it</subfield>
@@ -17791,11 +17708,9 @@
  </datafield>
  <datafield tag="FFT" ind1=" " ind2=" ">
      <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0212/0212138.ps.gz</subfield>
-     <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0212/0212138.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">ssgubser@Princeton.EDU</subfield>
@@ -17895,11 +17810,9 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0212/0212181.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
  <datafield tag="FFT" ind1=" " ind2=" ">
      <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0212/0212181.ps.gz</subfield>
-     <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">alberto.zaffaroni@mib.infn.it</subfield>
@@ -18167,11 +18080,9 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0212/0212314.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
  <datafield tag="FFT" ind1=" " ind2=" ">
      <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0212/0212314.ps.gz</subfield>
-     <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">matsu@yukawa.kyoto-u.ac.jp</subfield>
@@ -18998,11 +18909,9 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0304/0304229.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
  <datafield tag="FFT" ind1=" " ind2=" ">
      <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0304/0304229.ps.gz</subfield>
-     <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">barvin@lpi.ru</subfield>
@@ -19258,11 +19167,9 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0307/0307041.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
  <datafield tag="FFT" ind1=" " ind2=" ">
      <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0307/0307041.ps.gz</subfield>
-     <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">witten@ias.edu</subfield>
@@ -19607,7 +19514,6 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0402/0402130.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="916" ind1=" " ind2=" ">
     <subfield code="s">n</subfield>
@@ -19877,7 +19783,6 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0501/0501145.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="901" ind1=" " ind2=" ">
     <subfield code="u">LPTHE</subfield>
@@ -20307,7 +20212,6 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0606/0606038.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="916" ind1=" " ind2=" ">
     <subfield code="s">n</subfield>
@@ -20749,7 +20653,6 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0606/0606096.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="916" ind1=" " ind2=" ">
     <subfield code="s">n</subfield>
@@ -21101,7 +21004,6 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/0703/0703265.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">yunes@gravity.psu.edu> Uploader Engine &lt;uploader@sundh99.cern.ch</subfield>
@@ -21294,7 +21196,6 @@
  </datafield>
   <datafield tag="FFT" ind1=" " ind2=" ">
       <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/9611/9611103.pdf</subfield>
-    <subfield code="d">Access to fulltext document</subfield>
  </datafield>
   <datafield tag="859" ind1=" " ind2=" ">
     <subfield code="f">vipul@viper.princeton.edu</subfield>
