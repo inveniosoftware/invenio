@@ -42,7 +42,9 @@ from invenio.config import \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
      CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
      CFG_SITE_URL, CFG_TMPDIR
-from invenio.bibindex_engine_config import *
+from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
+    CFG_MYSQL_THREAD_TIMEOUT, CONV_PROGRAMS, CONV_PROGRAMS_HELPERS, \
+    CFG_CHECK_MYSQL_THREADS
 from invenio.bibdocfile import bibdocfile_url_to_fullpath, bibdocfile_url_p, decompose_bibdocfile_url
 from invenio.search_engine import perform_request_search, strip_accents, wash_index_term, get_index_stemming_language
 from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
@@ -357,7 +359,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                     cmd = "%s %s > %s" % \
                           (conv_program, tmp_name, tmp_dst_name)
                 else:
-                    sys.stderr.write("Error: Do not know how to handle %s conversion program.\n" % conv_program)
+                    write_message("Error: Do not know how to handle %s conversion program.\n" % conv_program, sys.stderr)
                 # try to run it:
                 try:
                     write_message("..... launching %s" % cmd, verbose=9)
@@ -367,9 +369,9 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                         bingo = 1
                         break # bingo!
                     else:
-                        write_message("Error while running %s for %s.\n" % (cmd, url_direct), sys.stderr)
+                        write_message("Error while running %s for %s." % (cmd, url_direct), sys.stderr)
                 except:
-                    write_message("Error running %s for %s.\n" % (cmd, url_direct), sys.stderr)
+                    write_message("Error running %s for %s." % (cmd, url_direct), sys.stderr)
 
         # were we successful?
         if bingo:
@@ -380,7 +382,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                         words[word] = 1
             tmp_name_txt_file.close()
         else:
-            write_message("No conversion success for %s.\n" % (url_direct), sys.stderr)
+            write_message("No conversion for %s." % (url_direct), sys.stderr, verbose=2)
 
         # delete temp files (they might not exist):
         try:
