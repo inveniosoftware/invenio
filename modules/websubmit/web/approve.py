@@ -52,7 +52,10 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
     ln = wash_language(ln)
     form = req.form
     if form.keys():
-        access = form.keys()[0]
+        # form keys can be a list of 'access pw' and ln, so remove 'ln':
+        for key in form.keys():
+            if key != 'ln':
+                access = key
         if access == "":
             return errorMsg("approve.py: cannot determine document reference",req)
         res = run_sql("select doctype,rn from sbmAPPROVAL where access=%s",(access,))
