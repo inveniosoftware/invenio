@@ -48,6 +48,7 @@ Options to update config files in situ:
    --update-dbquery-py      update dbquery.py with DB credentials from invenio.conf
    --update-dbexec          update dbexec with DB credentials from invenio.conf
    --update-bibconvert-tpl  update bibconvert templates with CFG_SITE_URL from invenio.conf
+   --update-web-tests       update web test cases with CFG_SITE_URL from invenio.conf
 
 Options to update DB tables:
    --reset-all              perform all the reset options
@@ -251,8 +252,8 @@ def cli_cmd_update_dbexec(conf):
 def cli_cmd_update_bibconvert_tpl(conf):
     """
     Update bibconvert/config/*.tpl files looking for 856
-    http://.../record/ lines, replacing URL with CDSWEB taken from
-    conf file.  Note: this edits tpl files in situ, taking a
+    http://.../record/ lines, replacing URL with CFG_SITE_URL taken
+    from conf file.  Note: this edits tpl files in situ, taking a
     backup first.  Use only when you know what you are doing.
     """
     print ">>> Going to update bibconvert templates..."
@@ -278,6 +279,38 @@ def cli_cmd_update_bibconvert_tpl(conf):
             fdesc.write(out)
             fdesc.close()
     print ">>> bibconvert templates updated successfully."
+
+def cli_cmd_update_web_tests(conf):
+    """
+    Update web test cases lib/webtest/test_*.html looking for
+    <td>http://.+?[</] strings and replacing them with CFG_SITE_URL
+    taken from conf file.  Note: this edits test files in situ, taking
+    a backup first.  Use only when you know what you are doing.
+    """
+    print ">>> Going to update web tests..."
+    ## location where test_*.html files are:
+    testdir = conf.get("Invenio", 'CFG_PREFIX') + os.sep + \
+             'lib' + os.sep + 'webtest' + os.sep + 'invenio'
+    ## find all test_*.html files:
+    for testfilename in os.listdir(testdir):
+        if testfilename.startswith("test_") and \
+               testfilename.endswith(".html"):
+            ## change test file:
+            testfile = testdir + os.sep + testfilename
+            shutil.copy(testfile, testfile + '.OLD')
+            out = ''
+            for line in open(testfile, 'r').readlines():
+                match = re.search(r'^(.*<td>)http://.+?([</].*)$', line)
+                if match:
+                    out += "%s%s%s\n" % (match.group(1),
+                                         conf.get("Invenio", 'CFG_SITE_URL'),
+                                         match.group(2))
+                else:
+                    out += line
+            fdesc = open(testfile, 'w')
+            fdesc.write(out)
+            fdesc.close()
+    print ">>> web tests updated successfully."
 
 def cli_cmd_reset_sitename(conf):
     """
@@ -916,6 +949,7 @@ def main():
                 cli_cmd_update_dbquery_py(conf)
                 cli_cmd_update_dbexec(conf)
                 cli_cmd_update_bibconvert_tpl(conf)
+                cli_cmd_update_web_tests(conf)
                 done = True
             elif opt == '--update-config-py':
                 cli_cmd_update_config_py(conf)
@@ -928,6 +962,9 @@ def main():
                 done = True
             elif opt == '--update-bibconvert-tpl':
                 cli_cmd_update_bibconvert_tpl(conf)
+                done = True
+            elif opt == '--update-web-tests':
+                cli_cmd_update_web_tests(conf)
                 done = True
             elif opt == '--reset-all':
                 cli_cmd_reset_sitename(conf)
