@@ -122,7 +122,7 @@ will be replaced by "Book" if the user has chosen to display the English version
 <p>The advantage of not using raw HTML for these static pages is that
 they can for example reuse the header and footer that you have defined
 for dynamic pages, and make use of the variables you have defined in
-the config.py file. In that way you should not need to adapt them to
+your invenio.conf file. In that way you should not need to adapt them to
 your needs: <b>they</b> will adapt themselves to your needs.</p>
 
 <p>Any modification should be immediatly visible when looking at the
