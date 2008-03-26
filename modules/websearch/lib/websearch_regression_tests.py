@@ -241,7 +241,7 @@ class WebSearchTestRecord(unittest.TestCase):
         return
 
     def test_exported_formats(self):
-        """ websearch - check formats exported through /record/%i/export/ URLs"""
+        """ websearch - check formats exported through /record/1/export/ URLs"""
 
         browser = Browser()
 
