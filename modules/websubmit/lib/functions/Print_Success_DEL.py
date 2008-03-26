@@ -20,12 +20,12 @@
 __revision__ = "$Id$"
 
    ## Description:   function Print_Success_DEL
-   ##                This function displays a message telling the user the 
+   ##                This function displays a message telling the user the
    ##                record has actually been deleted
    ## Author:         T.Baron
    ## PARAMETERS:    -
 
-def Print_Success_DEL(parameters, curdir, form, user_info=None): 
+def Print_Success_DEL(parameters, curdir, form, user_info=None):
     global rn
     t="<br /><br /><b>Document %s was successfully deleted.</b>" % rn
     return t

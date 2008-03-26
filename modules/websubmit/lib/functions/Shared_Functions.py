@@ -82,7 +82,7 @@ def createIcon(fullpath, iconsize):
         return iconpath
     else:
         return None
-    
+
 def get_dictionary_from_string(dict_string):
     """Given a string version of a "dictionary", split the string into a
        python dictionary.
@@ -99,7 +99,7 @@ def get_dictionary_from_string(dict_string):
     """
     ## First, strip off the leading and trailing spaces and braces:
     dict_string = dict_string.strip(" {}")
-    
+
     ## Next, split the string on commas (,) that have not been escaped
     ## So, the following string: """'hello' : 'world', 'click' : 'here'""" will be split
     ## into the following list: ["'hello' : 'world'", " 'click' : 'here'"]

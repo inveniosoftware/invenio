@@ -123,11 +123,11 @@ def _verify_filename(name, seen_filenames, filename_collision, num_random_bits, 
         times = seen_filenames[name]
 
         (dirname, basename) = os.path.split(name)
-        
+
         if filename_collision == 'throw_error':
             raise EZArchiveError('filename collision: %s' % (name))
         elif filename_collision == 'rename_similar':
-        
+
             # Just in case archive contains a list of
             # filenames that follow the same pattern as this
             # incrementing, we need to check the increment
@@ -136,12 +136,12 @@ def _verify_filename(name, seen_filenames, filename_collision, num_random_bits, 
             while seen_filenames.has_key(os.path.join(dirname, incremented_basename)):
                 times += 1
                 incremented_basename = str(times) + '.' + basename
-        
+
             # Make a note of how many increments we've had to
             # do:
             seen_filenames[name] = times
             name = os.path.join(dirname, incremented_basename)
-            
+
         elif filename_collision == 'rename_random':
             # Just in case of random collision, we introduce the while loop.
             randbasename = _random_alphanum_string(num_random_bits, chars=rename_from_set)
@@ -163,7 +163,7 @@ def _verify_filename(name, seen_filenames, filename_collision, num_random_bits, 
         seen_filenames[name] = 0
 
     return name
-                  
+
 def extract(input, # byte string of file location
             input_disposition='byte_string', # ['byte_string', 'file_location']
             compression_hint=None, # [None, 'gz', 'bz2', 'tar', 'tar.gz', 'tar.bz2', 'zip']
@@ -188,7 +188,7 @@ def extract(input, # byte string of file location
             num_random_bits=8, # number of random bits to use in the random filename.
 
             allow_clobber=False, # [True, False]
-            
+
             on_find_dotdot_path='throw_error', # ['throw_error', 'skip', 'allow']
             on_find_absolute_path='throw_error' # ['throw_error', 'skip', 'allow']
 
@@ -229,29 +229,29 @@ def extract(input, # byte string of file location
                 # Check that the input file location we've been given exists;
                 # stat will throw the right error for us:
                 os.stat(input)
-        
+
                 # Check it is a file:
                 if not os.path.isfile(input):
                     raise ValueError("argument input must be a path to an archive file if input_disposition='file_location': %s"
                                      % (input))
                 input_file_loc = input
-            
+
             # Make sure we know what type of file we're dealing with:
             if compression_hint is None:
                 compression_ext = _calculate_filename_extension(filename=input_file_loc)
                 compression_ext = _pick_compression_type(compression_ext)
             else:
                 compression_ext = compression_hint
-        
+
             # Select approriate archive/compression tool:
             try:
                 tool_class = available_tools[compression_ext]
             except KeyError:
                 raise EZArchiveError('Unrecognized archive type: %s' % (compression_ext))
-                
+
             # Instantiate the tool:
             archive = tool_class(input_file_loc, mode='r', allow_clobber=allow_clobber)
-        
+
             if extract_to == 'byte_strings':
                 # If extract_to == byte_strings, permissions mean nothing.
                 # However, because we use a temp directory to load the files
@@ -259,12 +259,12 @@ def extract(input, # byte string of file location
                 # liberal inside the temp dir:
                 force_file_permissions = 0700
                 force_dir_permissions = 0700
-        
+
             # Get extraction_root:
             if extract_to == 'byte_strings' or extract_to == 'temp_directory':
                 # Need a temp directory to work in.
                 extraction_root = tempfile.mkdtemp()
-        
+
                 if extract_to == 'byte_strings':
                     _remember_write(extraction_root, error_only=False)
                 else:
@@ -272,59 +272,59 @@ def extract(input, # byte string of file location
                     _remember_write(extraction_root, error_only=True)
             else:
                 # extract_to == 'my_directory':
-        
+
                 if my_directory is None:
                     raise ValueError("my_directory must be specified if extract_to='my_directory'")
-                
+
                 # Make given directory into a nice sane one.
                 my_directory = os.path.abspath(os.path.expanduser(os.path.normpath(my_directory)))
-                
+
                 # Check it exists, and we can stat it:
                 # stat will throw the right error for us:
                 os.stat(my_directory)
-                
+
                 # Check it is a dir.
                 if not os.path.isdir(my_directory):
                     raise ValueError("argument my_directory must be a directory: %s" % (my_directory))
-        
+
                 # If we've been asked to back it up, do so:
                 if backup_extension is not None:
                     backup_dir = my_directory + backup_extension
                     if _backup_directory(my_directory, backup_dir) is not None:
                         raise EZArchiveError('creation of backup directory using GNU mirrordir failed: %s' % (backup_dir))
-        
+
                 # Finally set the extraction root:
                 extraction_root = my_directory
-            
+
                 # Logically we would also check we have write permissions
                 # here.  But this is acutally better served by letting
                 # builtin/other functions raise EnvironmentErrors when we fail
                 # to write: Checking for write permissions is actually quite
                 # complex: e.g. you'd have to check group membership to see if
                 # the group bits allow write.
-                    
+
             # If we haven't been given a umask, use take the system umask as a
             # default. If we have been given a umask, set the system umask to
             # it, so all calls to builtin open/file apply the given umask:
             if umask is None:
                 # It doesn't seem possible to read the umask without also
                 # setting it. Hence this fudge:
-                umask = os.umask(0777)        
+                umask = os.umask(0777)
                 os.umask(umask)
-        
+
             # Used in the extraction for loop to check for filename collisions
             # when flattening directory structure:
             seen_filenames = {}
-        
+
             # Collect the returned file information here:
             return_data = []
-            
+
             for mem in archive.list_all_members():
                 name = mem['name']
                 dir = mem['dir']
                 file_type = mem['file_type']
                 identity_object = mem['identity_object']
-        
+
                 # Check it is an allowed file type:
                 if file_type not in allow_file_types:
                     if on_find_invalid_file_type=='skip':
@@ -332,7 +332,7 @@ def extract(input, # byte string of file location
                     else:
                         # on_find_invalid_file_type='throw_error':
                         raise EZArchiveError("found disallowed file type '%s': %s" % (file_type, os.path.join(dir, name)))
-        
+
                 # Deal with dotdot paths:
                 if on_find_dotdot_path == 'allow':
                     pass
@@ -347,7 +347,7 @@ def extract(input, # byte string of file location
                             # on_find_dotdot_path == 'skip'
                             # next file please:
                             continue
-        
+
                 # Deal with absolute paths in a similar way:
                 if on_find_absolute_path == 'allow':
                     pass
@@ -361,14 +361,14 @@ def extract(input, # byte string of file location
                             # on_find_absolute_path == 'skip'
                             # next file please:
                             continue
-        
+
                 # Deal with flattening of directories:
                 if directory_structure == 'flatten':
                     dir = ''
-        
+
                     if file_type == 'dir':
                         continue
-                    
+
                 # tars allow multiple entries for same path/file:
                 # extracting such tarballs with GNU/tar will just
                 # cause the second entry to overwrite the first.  We
@@ -377,21 +377,21 @@ def extract(input, # byte string of file location
                 verified_fullname = _verify_filename(name=os.path.join(dir, name), seen_filenames=seen_filenames,
                                                      filename_collision=filename_collision, num_random_bits=num_random_bits,
                                                      rename_from_set=rename_from_set)
-                
+
                 if verified_fullname == ['skip']: continue
                 name = os.path.basename(verified_fullname)
-        
+
                 archive.extract_member(identity_object=identity_object, root_dir=extraction_root, dir=dir, new_filename=name,
                                        umask=umask, force_file_permissions=force_file_permissions, force_dir_permissions=force_dir_permissions,
                                        allow_clobber=allow_clobber)
-        
+
                 fullname = os.path.join(extraction_root, dir, name)
-        
+
                 file_info = {}
                 file_info['basename'] = name
                 file_info['tar_dir'] = dir
                 file_info['file_type'] = file_type
-                
+
                 if extract_to == 'byte_strings':
                     if file_type == 'regular':
                         file_info['file'] = open(fullname, 'rb').read()
@@ -399,20 +399,20 @@ def extract(input, # byte string of file location
                     # extract_to in ['my_directory', 'temp_directory']
                     file_info['fullname'] = fullname
                     file_info['dirname'] = os.path.join(extraction_root, dir)
-        
+
                     if file_type == 'regular':
                         if file_handle == 'py':
                             file_info['fh'] = open(fullname, file_handle_mode)
                         elif file_handle == 'os':
                             file_info['fh'] = os.open(fullname, file_handle_mode)
-        
+
                 return_data.append(file_info)
 
             if extract_to == 'temp_directory':
                 return (extraction_root, return_data)
             else:
                 return return_data
-            
+
         except:
             # Clean up non-temporary file if we get an error:
             _delete_files(_remove_on_error)
@@ -429,7 +429,7 @@ def create(input, # list of files or named ([['name', 'data...'], ...]) or anony
            compress_to = 'byte_string', # ['byte_string', 'my_file', 'temp_file']
            my_file=None, # name of output archive, if compress_to='my_file'
            recurse_dirs=True, # [True, False]
-           
+
            directory_structure='retain', # ['retain', 'flatten']
            use_compression_root='calculate_minimum', # ['calculate_minimum', 'this_root']
            this_root=None, # root path for compression of files.
@@ -451,7 +451,7 @@ def create(input, # list of files or named ([['name', 'data...'], ...]) or anony
     # then all files given in input are put into a single archive.  If
     # we are told to output compressed files (gz, bz2) then we must be
     # given a maximum of one archive file.
-    
+
     # If we are given anonymous byte strings with no filename, we use
     # filename_generator.generate_filename() to provide a random
     # filename with hopefully a correct file extension.
@@ -464,7 +464,7 @@ def create(input, # list of files or named ([['name', 'data...'], ...]) or anony
 
     # Validate arguments.
     # ??????????????????
-    
+
     # From here on, we start writing things out to disk, so we wrap it
     # in a try loop and catch all exceptions. This allows us to clean
     # up the disk if we didn't succeed with the whole of the
@@ -474,63 +474,63 @@ def create(input, # list of files or named ([['name', 'data...'], ...]) or anony
         # try/except/finally cannot be combined, so we have to nest:
         try:
             # Write input to a temp file if we are given a byte string.
-            
+
             # Work out where the output archive file is going to go:
             if compress_to == 'my_file':
                 if my_file is None:
                     raise ValueError("if compress_to == 'my_file' then argument my_file must be specified. got None.")
-        
+
                 # Make given file into a nice sane one:
                 archive_fullname = os.path.abspath(os.path.expanduser(os.path.normpath(my_file)))
-        
+
                 # Should we remember this file or not?  If we get an error in
                 # the middle of processing, should we delete a user specified
                 # archive file? The decision is not so clear cut as with
                 # temporary files (see next). My choice is not to remember
                 # (and so not to delete on error)
-        
+
             else:
                 # compress_to in ['temp_file', 'byte_string']
                 (tf, tf_name) = _open_tempfile(mode='wb')
-        
+
                 # close filehandle because we don't need it:
                 tf.close()
-                
+
                 # delete the empty tempfile that open_tempfile
                 # created, so we don't get ClobberError
                 os.unlink(tf_name)
                 del tf
-                
+
                 if compress_to == 'temp_file':
                     _remember_write(tf_name, error_only=True)
                 else:
                     # compress_to == 'byte_string'
                     _remember_write(tf_name, error_only=False)
-        
+
                 archive_fullname = tf_name
-        
+
             # Get an archive/compress tool:
             tool_class = available_tools[compression]
             archive = tool_class(file_loc=archive_fullname, mode='w', allow_clobber=allow_clobber)
-        
+
             # Deal with the input:
             # We do this as follows:
-        
+
             # 1. Take anonymous byte strings and turn them into byte strings
             # by generating a filename for each string, then set
             # input=[new list of named byte strings]
             # input_disposition='named_byte_strings'
-            
+
             # 2. Take named byte strings and write them to a temporary
             # directory, chdir to this directory and set:
             # input = [glob of temp dir]
             # input_diposition = 'file_locations'
-        
+
             if input_disposition == 'anonymous_byte_strings':
                 # If input is anonymous byte strings, we need generate a filename
                 # for each of the strings:
                 seen_rand_names = []
-                
+
                 def f(bytstr):
                     rand_name = _random_alphanum_string(num_random_bits, chars=rename_from_set)
                     tries = 1
@@ -541,15 +541,15 @@ def create(input, # list of files or named ([['name', 'data...'], ...]) or anony
                             raise EZArchiveError('20 random filename selections collided: perhaps you need to increase num_rand_bits?')
                     seen_rand_names.append(rand_name)
                     return [rand_name, bytstr]
-        
+
                 input = map(f, input)
                 input_disposition = 'named_byte_strings'
-            
+
             if input_disposition == 'named_byte_strings':
                 # Write the byte strings out to the temporary directory.
                 temp_dir = tempfile.mkdtemp()
                 _remember_write(temp_dir, error_only=False)
-                
+
                 if this_root is not None:
                     # santize:
                     this_root = os.path.abspath(os.path.expanduser(os.path.normpath(this_root)))
@@ -558,43 +558,43 @@ def create(input, # list of files or named ([['name', 'data...'], ...]) or anony
                     # rejig the root dir to reflect the fact we've shoved
                     # everything under a psuedo-root temp directory:
                     this_root = os.path.join(temp_dir, this_root)
-        
+
                 new_input = []
                 seen_filenames = {}
-        
+
                 for filename, bytestr in input:
                     # Sanitize the filename we've been given:
                     filename = os.path.abspath(os.path.expanduser(os.path.normpath(filename)))
                     # chop off the root slashes:
                     filename = re.sub(r'^/+', '', string=filename, count=1)
-                    
+
                     dirname = os.path.dirname(filename)
-        
+
                     # Use temp_dir as a 'fake_root': (There is some possible
                     # dodginess here if the user names one of the files as if
                     # it were inside the not yet existant temp directory:
                     # unlikely scenario; should we work around it? I haven't.
                     _mkdir_parents(os.path.join(temp_dir, dirname))
-        
+
                     filename = _verify_filename(name=filename, seen_filenames=seen_filenames,
                                                 filename_collision=filename_collision, num_random_bits=num_random_bits,
                                                 rename_from_set=rename_from_set)
                     if filename == ['skip']: continue
-        
+
                     tempfile_fullname = os.path.join(temp_dir, filename)
-                    
+
                     open(tempfile_fullname, 'wb').write(bytestr)
                     new_input.append(tempfile_fullname)
-        
+
                 input = new_input
                 input_disposition='file_locations'
-        
+
             # At this point, input_disposition='file_locations' and input contains a list of filenames.
 
             # sanitize the list of filenames
             f = lambda x: os.path.abspath(os.path.expanduser(os.path.normpath(x)))
             input = map(f, input)
-        
+
             # Expand any directories into filenames (excluding symlinks):
             new_input = []
             for item in input:
@@ -605,7 +605,7 @@ def create(input, # list of files or named ([['name', 'data...'], ...]) or anony
                 else:
                     new_input.append(item)
             input = new_input
-                    
+
             # calculate the compression root:
             if use_compression_root == 'calculate_minimum':
                 first_input = input[0]
@@ -623,47 +623,47 @@ def create(input, # list of files or named ([['name', 'data...'], ...]) or anony
                 # use_compression_root == 'this_root':
                 if this_root is None:
                     raise EZArchiveError("if compression_root=='this_root' then argument this_root must be specified")
-        
+
                 this_root = os.path.abspath(os.path.expanduser(os.path.normpath(this_root)))
-        
+
                 # check that this_root is indeed a prefix of all of the input
                 # files we've been given:
                 if input != filter(lambda file: this_root in _dirtree(file), input):
                     raise EZArchiveError('not all files specified in argument input are children of argument this_root')
                 # get rid of the entries that are exactly this_root:
                 input = filter(lambda file: file != this_root, input)
-        
+
                 compression_root = this_root
-                
+
                 # Chop off this_root from input:
                 if this_root == '/' or this_root == '//':
                     this_root_len = len(this_root)
                 else:
                     this_root_len = len(this_root + '/')
                 files_to_compress = map(lambda file: file[this_root_len:], input)
-                
+
             old_cwd = os.getcwd()
             os.chdir(compression_root)
-        
+
             seen_filenames = {}
             for file_to_compress in files_to_compress:
-        
+
                 if directory_structure == 'flatten':
                     if os.path.isdir(file_to_compress):
                         continue
-        
+
                     archive_name = os.path.basename(file_to_compress)
-                    
+
                     archive_name = _verify_filename(name=archive_name, seen_filenames=seen_filenames,
                                                     filename_collision=filename_collision,
                                                     num_random_bits=num_random_bits,
                                                     rename_from_set=rename_from_set)
                     if archive_name == ['skip']: continue
-        
+
                     archive.add_member(file_loc=file_to_compress, archive_name=archive_name,
                                        force_file_permissions=force_file_permissions,
                                        force_dir_permissions=force_dir_permissions)
-                    
+
                 else:
                     # directory_structure == 'retain':
                     archive.add_member(file_loc=file_to_compress, archive_name=None,
@@ -675,7 +675,7 @@ def create(input, # list of files or named ([['name', 'data...'], ...]) or anony
             # not closing this would prevent us from seeing what
             # has been written to the files.
             del archive
-            
+
             # now see if we need to return anything:
             if compress_to == 'my_file':
                 return None
@@ -707,9 +707,9 @@ class ArchiveTool:
         # { filename =
         #   tar_location =
         #   new_location =
-        #   file_type = 
+        #   file_type =
         # }
-        
+
     def extract_member(self, identity_object, root_dir, dir, new_filename, umask, force_file_permissions=None,
                        force_dir_permissions=None, allow_clobber=False):
         raise Exception("method must be overided in child class")
@@ -725,9 +725,9 @@ class tarArchiveTool(ArchiveTool):
 
     def _mode_string(string):
         return string + ':'
-    
+
     _mode_string = staticmethod(_mode_string)
-    
+
     def __init__(self, file_loc, mode, allow_clobber=False):
         if mode not in ('r', 'w'): raise ValueError('mode argument must equal "r" or "w"')
 
@@ -738,13 +738,13 @@ class tarArchiveTool(ArchiveTool):
         # Set adjusted mode to reflect whether we are dealing with a
         # tar.gz tar.bz2 or just a tar.
         adjusted_mode = self._mode_string(mode)
-        
+
         self._tarfile_obj = tarfile.open(name=file_loc, mode=adjusted_mode)
         self._tarfile_obj.errorlevel=2
         self._mode = mode
         self._filename = os.path.basename(file_loc)
         self._file_loc = file_loc
-        
+
     def list_all_members(self):
         _check_mode(self._mode, 'r')
 
@@ -752,7 +752,7 @@ class tarArchiveTool(ArchiveTool):
                                    'dir' : os.path.dirname(os.path.normpath(tarinfo_obj.name)),
                                    'file_type' : _file_type(tarinfo_obj),
                                    'identity_object' : tarinfo_obj }
-        
+
         return map(f, self._tarfile_obj.getmembers())
 
     def extract_member(self, identity_object, root_dir, dir, new_filename, umask, force_file_permissions=None,
@@ -760,7 +760,7 @@ class tarArchiveTool(ArchiveTool):
         _check_mode(self._mode, 'r')
 
         tarinfo_obj = identity_object
-        
+
         output_location = os.path.join(root_dir, dir, new_filename)
 
         if os.path.exists(output_location) and not allow_clobber:
@@ -809,8 +809,8 @@ class tarArchiveTool(ArchiveTool):
                 _provide_dir_with_perms_then_exec(dir=os.path.join(root_dir, dir), function=f, perms=0700, barrier_dir=barrier_dir)
             else:
                 raise
-            
-        tarinfo_obj.name = saved_name            
+
+        tarinfo_obj.name = saved_name
         tarinfo_obj.mode = saved_mode
 
         # If we've been asked to force permissions, do so:
@@ -826,7 +826,7 @@ class tarArchiveTool(ArchiveTool):
                         _provide_dir_with_perms_then_exec(dir=os.path.join(root_dir, dir), function=f, perms=0700, barrier_dir=root_dir)
                     else:
                         raise
-                        
+
         elif type == 'dir':
             if force_dir_permissions is not None:
                 try:
@@ -840,7 +840,7 @@ class tarArchiveTool(ArchiveTool):
         else:
             # We don't attempt to play with permissions of special
             # file types.
-            pass 
+            pass
 
     def add_member(self, file_loc, archive_name=None, force_file_permissions=None, force_dir_permissions=None):
         _check_mode(self._mode, 'w')
@@ -849,15 +849,15 @@ class tarArchiveTool(ArchiveTool):
             archive_name = file_loc
 
         tarinfo_obj = self._tarfile_obj.gettarinfo(name=file_loc, arcname=archive_name)
-        
+
         if tarinfo_obj is None:
             if WARN_SKIP:
                 sys.stderr.write("Skipping unsupported file type (eg. socket): %s\n" % (file_loc))
             return None
-        
+
         if os.path.isdir(file_loc) and force_dir_permissions is not None:
             tarinfo_obj.mode = force_dir_permissions
-            
+
         if os.path.isfile(file_loc) and force_file_permissions is not None:
             tarinfo_obj.mode = force_file_permissions
 
@@ -865,19 +865,19 @@ class tarArchiveTool(ArchiveTool):
             self._tarfile_obj.addfile(tarinfo_obj, open(file_loc, 'rb'))
         else:
             self._tarfile_obj.addfile(tarinfo_obj)
-    
+
 class targzArchiveTool(tarArchiveTool):
 
     def _mode_string(string):
         return string + ':gz'
 
     _mode_string = staticmethod(_mode_string)
-    
+
 class tarbz2ArchiveTool(tarArchiveTool):
 
     def _mode_string(string):
         return string + ':bz2'
-    
+
     _mode_string = staticmethod(_mode_string)
 
 class zipArchiveTool(ArchiveTool):
@@ -892,12 +892,12 @@ class CompressTool:
     def __init__(self, file_loc, mode, allow_clobber=False):
         """
         Overided child methods must set class properties:
-        self._fh 
+        self._fh
         self._filename
         self._file_loc
-        self._mode 
+        self._mode
         """
-        
+
         raise Exception("method must be overided in child class")
 
     def list_all_members(self):
@@ -922,14 +922,14 @@ class CompressTool:
             # unlink instead of just overwriting: this makes sure the
             # file permissions take the umask into account:
             os.unlink(output_location)
-        
+
         output_fh = open(output_location, 'wb')
         output_fh.write(self._fh.read())
         output_fh.close()
 
         # See if we need to force the file permissions.  Otherwise, we
         # do nothing, since open call above will have obeyed the
-        # system umask.        
+        # system umask.
         if force_file_permissions is not None:
             os.chmod(output_location, force_file_permissions)
 
@@ -937,7 +937,7 @@ class CompressTool:
 
         if not os.path.isfile(file_loc):
             raise EZArchiveError("%s file format only supports compression of regular files: %s" % (self._ext, file_loc))
-        
+
         if not self._write_protected:
             input_fh = open(file_loc, 'rb')
             self._fh.write(input_fh.read())
@@ -950,7 +950,7 @@ class CompressTool:
             raise EZArchiveError('tried to compress more than one file into a single %s file' % (self._ext))
 
 class gzCompressTool(CompressTool):
-    
+
     def __init__(self, file_loc, mode, allow_clobber=False):
         if mode not in ('r', 'w'): raise ValueError('mode argument must equal "r" or "w"')
 
@@ -963,7 +963,7 @@ class gzCompressTool(CompressTool):
         self._file_loc = file_loc
         self._mode = mode
         self._ext = 'gz'
-        
+
 class bz2CompressTool(CompressTool):
     def __init__(self, file_loc, mode, allow_clobber=False):
         if mode not in ('r', 'w'): raise ValueError('mode argument must equal "r" or "w"')
@@ -977,7 +977,7 @@ class bz2CompressTool(CompressTool):
         self._fh = bz2.BZ2File(file_loc, mode=mode+'b')
         self._filename = os.path.basename(file_loc)
         self._file_loc = file_loc
-        self._mode = mode        
+        self._mode = mode
         self._ext = 'bz2'
 
 available_tools = { 'tar' : tarArchiveTool,
@@ -1031,7 +1031,7 @@ def tester(tar):
         name = mem['name']
         dir = mem['dir']
         identity_object = mem['identity_object']
-        
+
         t.extract_member(identity_object=identity_object, root_dir='/tmp', dir=dir, new_filename=name,
                          umask=0002, force_file_permissions=None, force_dir_permissions=None, allow_clobber=False)
 

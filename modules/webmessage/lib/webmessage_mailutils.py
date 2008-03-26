@@ -53,7 +53,7 @@ def email_quoted_txt2html(text,
           No. Now, go away, or I shall taunt you a second time-a!
         </div>
         I think we're not going to be friends!
-        
+
     @param text: the text in quoted format
     @param tabs_before: number of tabulations before each line
     @param indent_txt: quote separator in email (default:'>>')
@@ -74,14 +74,14 @@ def email_quoted_txt2html(text,
                 new_nb_indent += 1
                 line = line[len(indent_txt):]
             else:
-                break        
+                break
         if (new_nb_indent > nb_indent):
             for dummy in range(nb_indent, new_nb_indent):
                 final_body += tabs_before*"\t" + indent_html[0] + "\n"
                 tabs_before += 1
         elif (new_nb_indent < nb_indent):
             for dummy in range(new_nb_indent, nb_indent):
-                tabs_before -= 1 
+                tabs_before -= 1
                 final_body += (tabs_before)*"\t" + indent_html[1] + "\n"
         else:
             final_body += (tabs_before)*"\t"
@@ -112,7 +112,7 @@ def email_quote_txt(text,
         >>Un cadeau.
         >>>>What?
         >>A present.
-        >>>>Oh, un cadeau.   
+        >>>>Oh, un cadeau.
     @param text: the string to quote
     @param indent_txt: the string used for quoting (default: '>>')
     @param linebreak_input: in the text param, string used for linebreaks
@@ -128,25 +128,25 @@ def email_quote_txt(text,
     for line in lines:
         text += indent_txt + line + linebreak_output
     return text
-    
+
 def escape_email_quoted_text(text, indent_txt='>>', linebreak_txt='\n'):
     """Escape text using an email-like indenting rule.
     As an example, this text:
-    
-    >>Brave Sir Robin ran away... 
-    <img src="malicious_script />*No!* 
-    >>bravely ran away away... 
-    I didn't!*<script>malicious code</script> 
-    >>When danger reared its ugly head, he bravely turned his tail and fled. 
-    <form onload="malicious"></form>*I never did!* 
-    
+
+    >>Brave Sir Robin ran away...
+    <img src="malicious_script />*No!*
+    >>bravely ran away away...
+    I didn't!*<script>malicious code</script>
+    >>When danger reared its ugly head, he bravely turned his tail and fled.
+    <form onload="malicious"></form>*I never did!*
+
     will be escaped like this:
-    >>Brave Sir Robin ran away... 
-    &lt;img src="malicious_script /&gt;*No!* 
-    >>bravely ran away away... 
-    I didn't!*&lt;script&gt;malicious code&lt;/script&gt; 
-    >>When danger reared its ugly head, he bravely turned his tail and fled. 
-    &lt;form onload="malicious"&gt;&lt;/form&gt;*I never did!* 
+    >>Brave Sir Robin ran away...
+    &lt;img src="malicious_script /&gt;*No!*
+    >>bravely ran away away...
+    I didn't!*&lt;script&gt;malicious code&lt;/script&gt;
+    >>When danger reared its ugly head, he bravely turned his tail and fled.
+    &lt;form onload="malicious"&gt;&lt;/form&gt;*I never did!*
     """
     washer = HTMLWasher()
     lines = text.split(linebreak_txt)

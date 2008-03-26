@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,7 +27,7 @@ import cgi
 def format(bfo, separator='; '):
     """
     Prints a list of records citing this record
-    
+
     @param separator a separator between citations
     """
     from urllib import quote
@@ -41,7 +41,7 @@ def format(bfo, separator='; '):
                          '&amp;ln='+ bfo.lang +'">' + \
                          cgi.escape(report_number) + '</a>' \
                          for report_number in primary_report_numbers]
-    
+
     additional_citations = ['<a href="' + CFG_SITE_URL + \
                             '/search?f=reference&amp;p=' + quote(report_number)+ \
                             '&amp;ln='+ bfo.lang + '">' + \

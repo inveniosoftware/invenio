@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -26,14 +26,14 @@ __revision__ = "$Id$"
 def format(bfo, limit, separator=" "):
     """
     Prints the additional report numbers of the record
-    
+
     @param separator the separator between report numbers.
     @param limit the max number of report numbers to display
     """
-    
+
     numbers = bfo.fields("088__a")
 
     if limit.isdigit() and int(limit) <= len(numbers):
         numbers = numbers[:int(limit)]
-    
+
     return separator.join(numbers)

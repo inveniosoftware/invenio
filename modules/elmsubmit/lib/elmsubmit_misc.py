@@ -39,15 +39,15 @@ def concat(list_of_lists):
     return [item for list in list_of_lists for item in list]
 
 def cleave_pair(list):
-    
+
     # Should really generalize this to the nth case; but I only need
     # pairs right now!
-    
+
     """
     [1,2,3,4,5,6,7]
-    
+
     becomes
-    
+
     ([1,3,5,7], [2,4,6])
     """
 
@@ -71,7 +71,7 @@ def merge_pair(lefts, rights):
 
     k = (lefts, rights)
     list = []
-    
+
     for x in range(0, len(lefts) + len(rights)):
         (d, m) = divmod(x, 2)
         list.append(k[m][d])
@@ -90,19 +90,19 @@ def cr2lf(file):
 # Directory backup using mirrordir:
 
 def backup_directory(original_directory, backup_directory):
-    
+
     # Backing up the directory requires GNU mirrordir to be installed;
     # shutil.copytree won't do the job if there are pipes or fifos
     # etc. in my_directory.
-    
+
     # Implementing mirrordir directly in python would be a
     # good project!
-        
+
     # mkdir will throw the correct errors for us:
     os.mkdir(backup_directory)
-                    
+
     commandline = 'mirrordir ' + original_directory + ' ' + backup_directory
-        
+
     # Run the process using popen3; possibly dodgy on Windows!
     # Need popen3 rather other popen function because we want to
     # grab stderr and hide it from the clients console.
@@ -110,7 +110,7 @@ def backup_directory(original_directory, backup_directory):
     # Close straight away; mirrordir expects no input.
 
     # return the exist status:
-    return stdout.close()        
+    return stdout.close()
 
 # Tempfile stuff:
 
@@ -194,7 +194,7 @@ def dict2file(dictionary, directory):
     def f((path, dictionary_or_data)):
 
         fullpath = os.path.join(directory, path)
-        
+
         try:
             dictionary_or_data.has_key
         except AttributeError:
@@ -238,7 +238,7 @@ def split_common_path(thePaths):
     # sanitze paths:
     f = lambda x: os.path.normpath(os.path.expanduser(x))
     thePaths = map(f, thePaths)
-    
+
     # thePaths is a list of paths (strings)
     thePaths = map(lambda p: p.split(os.sep), thePaths)
 
@@ -287,7 +287,7 @@ def _dirtree(dir):
 
     # POSIX allows // or / for the root dir.
     # And it seems the rules say you aren't allowed to collapse // into /.
-    # I don't know why this is!    
+    # I don't know why this is!
     if dir == '//' or dir == '/':
         return [dir]
     elif dir == '':
@@ -300,9 +300,9 @@ def provide_dir_with_perms_then_exec(dir, function, perms, barrier_dir):
     # permissions: if your going to be changing the permissions on
     # your root directory, you probably need to do it more carefully
     # than with a python function!
-    
+
     # sanitize path:
-    dir = os.path.abspath(os.path.normpath(os.path.expanduser(dir)))    
+    dir = os.path.abspath(os.path.normpath(os.path.expanduser(dir)))
 
     # Check to see if we're already in the state we want to be in:
     try:
@@ -332,7 +332,7 @@ def provide_dir_with_perms_then_exec(dir, function, perms, barrier_dir):
 
     # Get a list of all of the dirs parents:
     dir_list = dirtree(dir)
-    
+
     if barrier_dir is not None:
         # sanitize path:
         barrier_dir = os.path.abspath(os.path.normpath(os.path.expanduser(barrier_dir)))
@@ -340,12 +340,12 @@ def provide_dir_with_perms_then_exec(dir, function, perms, barrier_dir):
         # Check the barrier dir is one of the parents of dir:
         if not barrier_dir in dir_list[1:]:
             raise ValueError('argument barrier_dir must be a proper parent directory of argument dir')
-        
+
         # Get a list of all the directories that lie between the
         # barrier dir and the target dir, including the barrier dir,
         # but excluding the target dir:
         barrier_dir_list = dirtree(barrier_dir)
-        
+
         g = lambda d: (d == barrier_dir) or (not (d in barrier_dir_list or d == dir))
         operable_parent_dirs = filter(g, dir_list)
     else:
@@ -390,7 +390,7 @@ def provide_dir_with_perms_then_exec(dir, function, perms, barrier_dir):
         raise OSError("Directory structure %s altered during processing: permissions changed during processing" % (dir_list))
 
     try:
-        # Now permissions are open, exec our function:    
+        # Now permissions are open, exec our function:
         return_value = function()
     finally:
         # Close up the permissions we had to open:
@@ -406,12 +406,12 @@ def _get_perms_on(dirlist, perms=0300):
     # another process is attempting to alter the directory strucutre
     # at the same time as us - this function _must not_ be used if
     # such a situation is possible.
-    
+
     # User perms < rx doesn't make sense for this function. You need
     # at least wx bits on a directory to change the permissions on its
     # child directories.
     if perms < 0300: raise ValueError("argument perms must be >= 3 in the user byte")
-    
+
     dir = dirlist[0]
     remaining_dirs = dirlist[1:]
 
@@ -523,7 +523,7 @@ def _get_perms_on(dirlist, perms=0300):
         except OSError:
             # race condition:
             raise OSError("Directory structure %s altered during processing: permissions changed during processing" % (dirlist))
-        return [[dir, targets_current_perms]] + parents_old_states    
+        return [[dir, targets_current_perms]] + parents_old_states
 
 def _safely_chmod_dirlist(dirlist):
     return [os.chmod(dir, perms) for dir, perms in dirlist]

@@ -54,7 +54,7 @@ import time
 import urlparse
 
 def async_download(pagegetter_list, finish_function=None, datastructure_list=None, timeout=15):
-    """Download web pages asynchronously with timeout. 
+    """Download web pages asynchronously with timeout.
     pagegetter_list : list of HTTPAsyncPageGetter objects
     finish_function : function called when a web page is downloaded;
         prototype def funct(pagetter, datastructure, current_time)
@@ -69,7 +69,7 @@ def async_download(pagegetter_list, finish_function=None, datastructure_list=Non
     for pagegetter in pagegetter_list:
         if pagegetter and not pagegetter.done:
             nb_remaining += 1
- 
+
     while (time.time() - time_start < timeout) and nb_remaining > 0:
         if sys.hexversion < 0x2040000:
             asyncore.poll(0.01)
@@ -87,7 +87,7 @@ def async_download(pagegetter_list, finish_function=None, datastructure_list=Non
                     current_time = time.time() - time_start
                     finish_function(pagegetter_list[i], datastructure, current_time)
                 finished_list[i] = True
-                
+
     return finished_list
 
 class HTTPAsyncPageGetter(asyncore.dispatcher_with_send):
@@ -145,7 +145,7 @@ def build_request(uri):
 
     scheme, host, path, params, query, fragment = urlparse.urlparse(uri)
     assert scheme == "http", "only supports HTTP requests (uri = " + uri + ")"
-    
+
     host, port = decode_host_port(host)
     path = encode_path(path, params, query)
 
@@ -154,7 +154,7 @@ def build_request(uri):
         "Accept: text/html, image/jpeg, image/png, text/*, image/*, */*\r\n" + \
         "Accept-Charset: utf-8, utf-8;q=0.5, *;q=0.5\r\n" + \
         "Host: %s\r\n" % (host) + \
-        "Connection: close\r\n\r\n" 
+        "Connection: close\r\n\r\n"
 
     return (request, host, port)
 
@@ -192,7 +192,7 @@ def decode_header(data):
         size = 2
         if i == -1:
             return (None, None, data)
-         
+
     # parse header
     header_fp = StringIO.StringIO(data[:i+size])
     # status line is "HTTP/version status message"

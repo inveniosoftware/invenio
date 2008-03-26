@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -31,14 +31,14 @@ def format(bfo):
     out = ""
     for resource in resources:
 
-        if resource.get("x", "") == "icon" and resource.get("u", "") == "": 
-            out += '<br /><br /><img src="' + resource.get("q", "").replace(" ","") + '" alt="" />' 
+        if resource.get("x", "") == "icon" and resource.get("u", "") == "":
+            out += '<br /><br /><img src="' + resource.get("q", "").replace(" ","") + '" alt="" />'
 
         if resource.get("x", "") == "1":
             out += '<br />High resolution: <a href="'+resource.get("q", "") +'">'+ resource.get("q", "") +"</a>"
 
     out += '<br /><font size="-2"><b>© CERN Geneva</b></font>'
-    out += '<br /> <a href="'+bfo.field("8564_u")+'">'+ bfo.field("8564_z") + "</a>" 
+    out += '<br /> <a href="'+bfo.field("8564_u")+'">'+ bfo.field("8564_z") + "</a>"
     return out
 
 def escape_values(bfo):

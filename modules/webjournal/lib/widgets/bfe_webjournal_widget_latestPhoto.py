@@ -59,7 +59,7 @@ def get_widget_HTML(language, number):
         except KeyError:
             # todo: exception, picture with no title
             title = ""
-    # first try to get the images from dfs, this should be the format they are in!        
+    # first try to get the images from dfs, this should be the format they are in!
     icon_url = {}
     i = 1
     dfs_images = latest_photo_record.fields('8567_')
@@ -87,7 +87,7 @@ def get_widget_HTML(language, number):
         # oh well, no dfs data... try to go for doc machine
         doc_machine_images = latest_photo_record.fields('8564_')
         # todo: implement parsing for external doc machine pages!
-    html_out = ""    
+    html_out = ""
     if icon_url == "":
         html_out = get_widget_HTML("en", number+1)
     else:

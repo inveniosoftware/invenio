@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -29,14 +29,14 @@ def format(bfo, template='DC'):
     Formats the record according to a template.
 
     For further details, please read the documentation.
-    
+
     @param template the name of the template file without the bfx extension
     """
     output = ""
     recIDs = [bfo.recID]
     outFile = StringIO() # a virtual file-like object to write in
     format_with_bfx(recIDs, outFile, template)
-    output = outFile.getvalue()        
+    output = outFile.getvalue()
     return output
 
 def escape_values(bfo):

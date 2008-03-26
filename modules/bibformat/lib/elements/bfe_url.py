@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -32,7 +32,7 @@ def format(bfo, style, separator='; '):
     urls_u = bfo.fields("8564_u")
     if style != "":
         style = 'class="'+style+'"'
-        
+
     urls = ['<a '+ style + \
             'href="' + url + '">' + url +'</a>'
             for url in urls_u]

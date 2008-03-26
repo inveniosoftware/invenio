@@ -30,13 +30,13 @@ def generate_marc(submission_dict):
     """ method generates a marc xml file from the submission dict
     """
     marc_dict = {}
-    
-    
+
+
     for field in submission_dict.keys():
         # print "field", field, submission_dict[field]
 
         # marc_dict should cotain a dictionary {'marc_code', value, ...}
-        
+
         generate_data_field(field, submission_dict[field], marc_dict)
 
     # generate an xml file from marc_dict
@@ -69,10 +69,10 @@ def print_marc(marc_dict):
         if key in elmsubmit_config.CFG_ELMSUBMIT_MARC_FIELDS_JOINED.keys():
 
             tuple_list = marc_dict[key]
-            
+
             prefix_list = []
             prefix_dict = {}
-            
+
             # make a list and a dictionary with occurance numbers
             for subfield_tuple in marc_dict[key]:
                 prefix_list.append(subfield_tuple[0])
@@ -90,7 +90,7 @@ def print_marc(marc_dict):
 
                     marc_text = marc_text + '<datafield tag ="' + tag + '" ind1="' + ind1 + '" ind2="' + ind2 + '">\n'
 
-                    for prefix in linked_prefix_list:    
+                    for prefix in linked_prefix_list:
 
                         tuple_index = prefix_list.index(prefix)
 
@@ -106,10 +106,10 @@ def print_marc(marc_dict):
 
 
                     marc_text = marc_text + '</datafield>\n'
-                    
+
             # append the actual datafields
             for sub_tuple in tuple_list:
-                
+
                 marc_text = marc_text + '<datafield tag ="' + tag + '" ind1="' + ind1 +'" ind2="' + ind2 + '">\n'
 
                 marc_text = marc_text + '<subfield code="' + sub_tuple[0] + '">' + sub_tuple[1] + '</subfield>\n'
@@ -123,7 +123,7 @@ def print_marc(marc_dict):
             del tuple_list
             del prefix_list
 
-            
+
         else:
 
             # simply create the datafield
@@ -137,7 +137,7 @@ def print_marc(marc_dict):
 
 def contains_elements(small_list, big_list):
     """function checking if all elements of list a are in list b
-    """ 
+    """
     for element in small_list:
         try:
             a = big_list.index(element)
@@ -145,21 +145,21 @@ def contains_elements(small_list, big_list):
             return False
 
     return True
-            
+
 
 
 
 def generate_data_field(field, value, marc_dict):
     """ for a given data field, determine if it is in the marc dictionary dictionary and update marc_dict accordingly
     """
-    
+
     if (field in elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING):
         # print "field:", field
 
         # field is a normal field
-        
+
         if not isinstance(elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING[field], list):
-            
+
             for value_part in value:
                 (datafield, subfield) = process_marc(elmsubmit_config.CFG_ELMSUBMIT_MARC_MAPPING[field])
                 if marc_dict.has_key(datafield) == 1:
@@ -199,4 +199,4 @@ def process_marc(marc_code):
     subfield = marc_code[5]
     # print "datafield", datafield, "subfield", subfield
     return (datafield, subfield)
-    
+

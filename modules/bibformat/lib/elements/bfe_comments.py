@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,7 +27,7 @@ from invenio.webcomment import get_first_comments_or_remarks
 def format(bfo, nbReviews='all', nbComments='all'):
     """
     Prints comments posted for the record.
-    
+
     @param nbReviews The max number of reviews to print
     @param nbComments The max number of comments to print
     """
@@ -37,8 +37,8 @@ def format(bfo, nbReviews='all', nbComments='all'):
         nb_reviews = int(nb_reviews)
     nb_comments = nbComments
     if nb_comments.isdigit():
-        nb_comments = int(nb_comments)   
-    
+        nb_comments = int(nb_comments)
+
     (comments, reviews) = get_first_comments_or_remarks(recID=bfo.recID,
                                                         ln=bfo.lang,
                                                         nb_comments=nb_comments,
@@ -46,7 +46,7 @@ def format(bfo, nbReviews='all', nbComments='all'):
                                                         voted=-1,
                                                         reported=-1)
 
-    
+
     return comments + reviews
 
 def escape_values(bfo):

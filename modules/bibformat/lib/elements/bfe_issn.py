@@ -13,12 +13,12 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibFormat element - Print ISSN corresponding to given journal name 
+"""BibFormat element - Print ISSN corresponding to given journal name
 """
 
 __revision__ = "$Id$"
@@ -923,17 +923,17 @@ def format(bfo):
     Note that you HAVE to pre-generate the correspondances
     journal->ISSN if you want this element
     to return something (Run <code>python bfe_issn.py -h</code> to get help).
-    """   
-      
+    """
+
     journal_name = bfo.field(journal_name_tag)
-        
+
     # Here you might want to process journal name
     # by doing the same operation that has been
     # done when saving the mappings
     journal_name = journal_name.lower().strip()
     if journal_name.endswith("[online]"):
         journal_name = journal_name[:-8].rstrip()
-    
+
     return issns.get(journal_name, '')
 
 def build_issns_from_distant_site(url):
@@ -952,7 +952,7 @@ def build_issns_from_distant_site(url):
     """
     ## Parse the results of the http request:
     ## http://cdsweb.cern.ch/search?cc=Periodicals&ot=022,210&of=tm&rg=9000
-    
+
     pattern_field = re.compile(r'''
     \D*(?P<docid>\d*)              #document id
     \s(?P<tag>\d*)__\s\$\$a        #tag
@@ -964,10 +964,10 @@ def build_issns_from_distant_site(url):
     except IOError:
         sys.stderr.write("Error: Could not connect to %s.\n" % url)
         sys.exit(0)
-        
+
     last_doc_id = None
     last_issn = None
-    
+
     built_issns = {}
     #built_issns = issns # Uncomment this to extend existing issns dict
                          # (e.g. in case of manual addition)
@@ -978,12 +978,12 @@ def build_issns_from_distant_site(url):
             if doc_id != last_doc_id:
                 # Reset saved ISSN if we parse new document
                 last_issn = None
-                
+
             tag = result.group('tag')
             if tag == '022':
                 # Remember this ISSN
                 last_issn = result.group('value')
-            
+
             elif tag == '210' and last_issn is not None:
                 # Found a journal name and issn exists.
                 # Depending on how journal names are entered into the
@@ -993,13 +993,13 @@ def build_issns_from_distant_site(url):
                 journal = journal.lower().strip()
                 if journal.endswith("[online]"):
                     journal = journal[:-8].rstrip()
-                
+
                 built_issns[journal] = last_issn
 
             last_doc_id = doc_id
-   
+
     prtyp = pprint.PrettyPrinter(indent=4)
-    prtyp.pprint(built_issns)      
+    prtyp.pprint(built_issns)
 
 def build_issns_from_local_site():
     """
@@ -1013,7 +1013,7 @@ def build_issns_from_local_site():
 
     Print the result as Python dict structure.
     """
-    
+
     rec_id_list = perform_request_search(cc='Periodicals',
                                          of='id')
     built_issns = {}
@@ -1032,7 +1032,7 @@ def build_issns_from_local_site():
                     journal_name = journal_name[:-8].rstrip()
 
                 built_issns[journal_name] = issn
-    
+
     prtyp = pprint.PrettyPrinter(indent=4)
     prtyp.pprint(built_issns)
 
@@ -1042,19 +1042,19 @@ def print_info():
     """
     print """ Collects ISSN and corresponding journal names from local repository
  and prints archive as dict structure.
-   
+
  Usage: python bfe_issn.py [Options] [url]
  Example: python bew_issn.py http://cdsweb.cern.ch/
- 
+
  Options:
    -h, --help      print this help
    -u, --url       the URL to collect ISSN from
    -v, --version   print version number
-   
+
  If 'url' is not given, collect from local database, using a faster method.
 
  Returned structure can then be copied into bfe_issn.py
- 'format' function.    
+ 'format' function.
     """
 if __name__ == '__main__':
     try:
@@ -1066,7 +1066,7 @@ if __name__ == '__main__':
     except getopt.error:
         print_info()
         sys.exit(0)
-            
+
     url_arg = None
     for opt, opt_value in opts:
 
@@ -1078,8 +1078,8 @@ if __name__ == '__main__':
         else:
             print_info()
             sys.exit(0)
-            
+
     if url_arg is not None:
         build_issns_from_distant_site(url_arg)
     else:
-        build_issns_from_local_site() 
+        build_issns_from_local_site()

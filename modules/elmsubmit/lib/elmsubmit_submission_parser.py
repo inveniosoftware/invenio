@@ -71,7 +71,7 @@ Dear Sir,
 
 Here is the rest of the email.
 
-Sincerely, 
+Sincerely,
 Jonathon Bloggs.
 
 --
@@ -105,11 +105,11 @@ process the following OK:
 ----------------
  cdson:::
 
-         _language_       
-                eng    
+         _language_
+                eng
 
-                                                _type_     
-                                                
+                                                _type_
+
 
 
         test
@@ -156,7 +156,7 @@ def parse_submission(string):
     list_of_lines =  map(lambda x: x.strip(), list_of_lines)
 
     # throw out the empty lines
-    
+
     list_of_lines = filter(None, list_of_lines)
 
     submission_dict = {}
@@ -170,7 +170,7 @@ def parse_submission(string):
     # current keyword
     current_keyword = ''
 
-    
+
     for line in list_of_lines:
 
         # end of submission

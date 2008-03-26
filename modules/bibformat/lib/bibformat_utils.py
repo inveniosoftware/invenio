@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -45,29 +45,29 @@ def highlight(text, keywords=[], prefix_tag='<strong>', suffix_tag="</strong>"):
     Returns text with all words highlighted with given tags (this
     function places 'prefix_tag' and 'suffix_tag' before and after
     words from 'keywords' in 'text').
-    
+
     for example set prefix_tag='<b style="color: black; background-color: rgb(255, 255, 102);">' and suffix_tag="</b>"
 
     @param text the text to modify
     @param keywords a list of string
     @return highlighted text
     """
-    
+
     if keywords == []:
         return text
-    
+
     #FIXME decide if non english accentuated char should be desaccentuaded
     def replace_highlight(match):
         """ replace match.group() by prefix_tag + match.group() + suffix_tag"""
         return prefix_tag + match.group() + suffix_tag
-    
+
     #Build a pattern of the kind keyword1 | keyword2 | keyword3
     pattern = '|'.join(keywords)
     compiled_pattern = re.compile(pattern, re.IGNORECASE)
 
     #Replace and return keywords with prefix+keyword+suffix
-    return compiled_pattern.sub(replace_highlight, text) 
-    
+    return compiled_pattern.sub(replace_highlight, text)
+
 def get_contextual_content(text, keywords, max_lines=2):
     """
     Returns some lines from a text contextually to the keywords in
@@ -78,7 +78,7 @@ def get_contextual_content(text, keywords, max_lines=2):
     @param max_lines the maximum number of line to return from the record
     @return a string
     """
-    
+
     def grade_line(text_line, keywords):
         """
         Grades a line according to keywords.
@@ -95,7 +95,7 @@ def get_contextual_content(text, keywords, max_lines=2):
     lines = text.split('.')
     #print 'lines: ',lines
     weights = [grade_line(line, keywords) for line in lines]
-    
+
     #print 'line weights: ', weights
     def grade_region(lines_weight):
         """
@@ -107,12 +107,12 @@ def get_contextual_content(text, keywords, max_lines=2):
         for weight in lines_weight:
             grade += weight
         return grade
-    
+
     if max_lines > 1:
         region_weights = []
         for index_weight in range(len(weights)- max_lines + 1):
             region_weights.append(grade_region(weights[index_weight:(index_weight+max_lines)]))
-            
+
         weights = region_weights
     #print 'region weights: ',weights
     #Returns line with maximal weight, and (max_lines - 1) following lines.
@@ -125,7 +125,7 @@ def get_contextual_content(text, keywords, max_lines=2):
             highest_weight = weight
         i += 1
     #print 'highest weight', highest_weight
-    
+
     if index_with_highest_weight+max_lines > len(lines):
         return lines[index_with_highest_weight:]
     else:
@@ -141,7 +141,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
 
     'format' allows to define the flavour of XML:
         - 'xm' for standard XML
-        - 'marcxml' for MARC XML 
+        - 'marcxml' for MARC XML
         - 'oai_dc' for OAI Dublin Core
         - 'xd' for XML Dublin Core
 
@@ -152,7 +152,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
     @return the xml string of the record
     """
     from invenio.search_engine import record_exists
-    
+
     def get_fieldvalues(recID, tag):
         """Return list of field values for field TAG inside record RECID."""
         out = []
@@ -188,7 +188,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
         return out
 
     #_ = gettext_set_language(ln)
-    
+
     out = ""
 
     # sanity check:
@@ -329,7 +329,7 @@ def record_get_xml(recID, format='xm', decompress=zlib.decompress,
             out += "        <date>%s</date>\n" % get_creation_date(recID)
         out += "    </dc>\n"
 
-  
+
     # print record closing tags, if needed:
     if format == "marcxml" or format == "oai_dc":
         out += "   </metadata>\n"
@@ -357,9 +357,9 @@ def parse_tag(tag):
     Any of the chars can be replaced by wildcard %
 
     THE FUNCTION DOES NOT CHECK WELLFORMNESS OF 'tag'
-    
+
     Any empty chars is not considered
-    
+
     For example:
     >> parse_tag('245COc') = ['245', 'C', 'O', 'c']
     >> parse_tag('245C_c') = ['245', 'C', '', 'c']
@@ -392,29 +392,29 @@ def parse_tag(tag):
     tag = tag.replace("$", "") # Remove $ characters
     tag = tag.replace(".", "") # Remove . characters
     #tag = tag.replace("_", "") # Remove _ characters
-    
+
     p_tag[0] = tag[0:3] # tag
     if len(tag) == 4:
         p_tag[3] = tag[3] # subfield
-        
+
     elif len(tag) == 5:
         ind1 = tag[3] # indicator 1
         if ind1 != "_":
             p_tag[1] = ind1
-            
+
         ind2 = tag[4] # indicator 2
         if ind2 != "_":
             p_tag[2] = ind2
-            
+
     elif len(tag) == 6:
         p_tag[3] = tag[5] # subfield
-        
+
         ind1 = tag[3] # indicator 1
         if ind1 != "_":
             p_tag[1] = ind1
-            
+
         ind2 = tag[4] # indicator 2
         if ind2 != "_":
             p_tag[2] = ind2
-            
+
     return p_tag

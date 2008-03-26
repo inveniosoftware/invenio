@@ -20,12 +20,12 @@
 __revision__ = "$Id$"
 
    ## Description:   function Print_Success_SRV
-   ##                This function displays a message telling the user the 
+   ##                This function displays a message telling the user the
    ##             revised files have been correctly received
    ## Author:         T.Baron
    ## PARAMETERS:    -
 
-def Print_Success_SRV(parameters, curdir, form, user_info=None): 
+def Print_Success_SRV(parameters, curdir, form, user_info=None):
     global rn
     t="<br /><br /><b>Document %s was successfully revised.</b>" % rn
     return t

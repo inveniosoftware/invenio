@@ -64,7 +64,7 @@ class ExternalCollectionHit:
 
     def __init__(self, html=None):
         self.html = html
-    
+
 class ExternalCollectionResultsParser(object):
     """Mother class for parsers."""
 
@@ -92,7 +92,7 @@ class ExternalCollectionResultsParser(object):
 
     def add_html_result(self, html):
         """Add a new html code as result. The urls in the html code will be corrected."""
-        
+
         if not html:
             return
 
@@ -194,7 +194,7 @@ class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
             if len(self.results) >= CFG_EXTERNAL_COLLECTION_MAXRESULTS:
                 return
             data = result.group()
-            
+
             title_match = self.title.match(data)
             if title_match:
                 self.add_html_result(html)
@@ -209,7 +209,7 @@ class KISSBooksExternalCollectionResultsParser(ExternalCollectionResultsParser):
                 if info_line_match:
                     info = info_line_match.group(1)
                     html += info + '<br />'
-        
+
         self.add_html_result(html)
 
 class GoogleExternalCollectionResultsParser(ExternalCollectionResultsParser):
@@ -252,7 +252,7 @@ class GoogleScholarExternalCollectionResultsParser(GoogleExternalCollectionResul
 
 class GoogleBooksExternalCollectionResultsParser(GoogleExternalCollectionResultsParser):
     """Parser for Google Books."""
-    
+
     num_results_regex = re.compile(r' with <b>([0-9]+?)</b> pages on ')
 
     def __init__(self, host = "books.google.com", path=""):
@@ -300,7 +300,7 @@ class SCIRUSExternalCollectionResultsParser(ExternalCollectionResultsParser):
     def parse(self):
         """Parse buffer to extract records."""
         data = self.buffer.replace('\n', ' ')
-        
+
         for element in self.result_separator.finditer(data):
             data = element.group(1)
             parsed_line = self.result_decode.match(data)
@@ -309,7 +309,7 @@ class SCIRUSExternalCollectionResultsParser(ExternalCollectionResultsParser):
                 date = parsed_line.group(2)
                 comments = parsed_line.group(3)
                 similar = parsed_line.group(4)
-                html = "%(link)s - %(date)s <br /> %(comments)s <br /> %(similar)s <br />" % {'link' : link, 
+                html = "%(link)s - %(date)s <br /> %(comments)s <br /> %(similar)s <br />" % {'link' : link,
                     'date' : date, 'comments' : comments, 'similar' : similar}
             else:
                 html = self.cleaning.sub("", data) + '<br />'

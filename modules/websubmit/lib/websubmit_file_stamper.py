@@ -89,7 +89,7 @@ def copy_template_files_to_stampdir(path_workingdir, latex_template):
                + Images included within the LaTeX file are sought in the
                  same way. Full path is used if provided; if not, current
                  dir and failing that ~invenio/etc/websubmit/latex.
-       
+
        @param path_workingdir: (string) - the working directory into which the
         latex templates should be copied.
        @param latex_template: (string) - the name of the LaTeX template to copy
@@ -338,7 +338,7 @@ def create_final_latex_template(working_dirname, \
                         ## Take replacement_term as a literal string
                         ## to be inserted into the template at this point.
                         replacement = replacement_term
-                        
+
                     ## Now substitute replacement into the line of the template:
                     line = line[0:replacement_marker.start()] + replacement \
                            + line[replacement_marker.end():]
@@ -616,7 +616,7 @@ def apply_stamp_first_page(path_workingdir, \
             else:
                 ## Do we have just one page?
                 if number_pages_in_subject_file == 1:
-                    ## There was only one page in the subject file. 
+                    ## There was only one page in the subject file.
                     ## copy the version that was stamped on the first page to
                     ## the output_file filename:
                     try:
@@ -796,7 +796,7 @@ def apply_stamp_to_file(path_workingdir,
             msg = "Error: Unable to correctly convert PostScript file [%s] to" \
                   " PDF. Cannot stamp file." % subject_file
             raise InvenioWebSubmitFileStamperError(msg)
-        
+
         ## Now assign the name of the created PDF file to subject_file:
         subject_file = created_pdfname
 
@@ -1195,7 +1195,7 @@ def get_cli_options():
                     ## The variable name was not empty - keep it:
                     options["latex-template-var"]["%s" % split_varstring[0]] = \
                         "%s" % split_varstring[1]
-                
+
 
     ## Return the input options:
     return options
@@ -1247,7 +1247,7 @@ def stamp_file(options):
     """
     ## SANITY CHECKS:
     ## Does the options dictionary contain all expected keys?
-    ## 
+    ##
     ## A list of the names of the expected options:
     expected_option_names = ["latex-template", \
                              "latex-template-var", \
@@ -1259,7 +1259,7 @@ def stamp_file(options):
     ## A list of the option names that have been received:
     received_option_names = options.keys()
     received_option_names.sort()
- 
+
     if expected_option_names != received_option_names:
         ## Error: he dictionary of options had an illegal structure:
         msg = """Error: Unexpected value received for "options" parameter."""
@@ -1279,7 +1279,7 @@ def stamp_file(options):
         raise InvenioWebSubmitFileStamperError(msg)
 
     ## OK - begin the document stamping process:
-    ## 
+    ##
     ## Get the output file:
     (dummy, name_outfile) = os.path.split(options["output-file"])
     if name_outfile != "":

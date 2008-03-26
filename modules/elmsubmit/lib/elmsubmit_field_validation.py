@@ -28,14 +28,14 @@ def author(value):
     The author list must be in the following format:
     Put one author per line, and a comma ',' (with no preceding
     space) between the name and the firstname initial letters.
-    
+
     The name is going first, followed by the firstname initial
     letters.  Precede each initial by a single space.  Place only a
     single space between surnames.
-    
+
     Example: Put
-    
-    Le Meur, J Y 
+
+    Le Meur, J Y
     Baron, T
 
     for
@@ -45,7 +45,7 @@ def author(value):
 
     # Strip each line of leading/trainling whitespace and remove blank lines.
     value = '\n'.join(filter(lambda line: line != '', map(lambda line: line.strip(), value.splitlines())))
-    
+
     # txt = txt.replace("\r\n", "\n") # Change to unix newline conventions.
 
     # Allow names like:
@@ -59,7 +59,7 @@ def author(value):
 
     # Allow multiline list with no trailing spaces, and only single
     # (optional) terminating newline:
-    
+
     author_list = r'(?u)^%s(\n%s)*?$' % (author_re, author_re)
 
     if re.compile(author_list).search(value):
@@ -78,7 +78,7 @@ def date(value):
     day = '(3[01]|[12][0-9]|0[1-9])'
     month = '(1[012]|0[1-9])'
     year = '(\d\d\d\d)'
-    date_re = r'^%s/%s/%s(?!\n)$' % (day, month, year) 
+    date_re = r'^%s/%s/%s(?!\n)$' % (day, month, year)
 
     if re.compile(date_re).search(value):
         return (date.__doc__, value, True)

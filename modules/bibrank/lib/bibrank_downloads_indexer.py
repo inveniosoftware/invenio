@@ -30,7 +30,7 @@ from invenio.dbquery import run_sql
 
 def append_to_file(path, content):
     """print result in a file"""
-    
+
     if os.path.exists(path):
         file_dest = open(path,"a")
         file_dest.write("Hit on %s reads:" % time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
@@ -38,7 +38,7 @@ def append_to_file(path, content):
         file_dest.write("\n")
         file_dest.close()
         return content
-    
+
 def get_download_weight_filtering_user(dic, keys):
     """ update the dictionnary.Without duplicates.Count maximum one hit per user per hour"""
     for k in keys:
@@ -50,8 +50,8 @@ def get_download_weight_filtering_user(dic, keys):
     return dic
 
 def get_download_weight_total(dic, keys):
-    """ update the dictionnary.Count all the hit""" 
-    for k in keys:     
+    """ update the dictionnary.Count all the hit"""
+    for k in keys:
         values = run_sql("select count(*) from rnkDOWNLOADS where id_bibrec=%s %s" % (k,";"))
         dic[k] = values[0][0]
     return dic
@@ -64,30 +64,30 @@ def uniq(alist):
     return set.keys()
 
 def database_tuples_to_single_list(tuples):
-    """convert a tuple extracted from the database into a list""" 
+    """convert a tuple extracted from the database into a list"""
     return [elem[0] for elem in tuples]
-    
+
 
 def new_downloads_to_index (last_updated):
     """id_bibrec of documents downloaded since the last run of bibrank """
     id_bibrec_list = database_tuples_to_single_list(run_sql("select id_bibrec from rnkDOWNLOADS where download_time >=\"%s\"" % last_updated))
     res = uniq(id_bibrec_list)
     return res
-    
+
 def filter_downloads_per_hour_with_docid (keys, last_updated):
     """filter all the duplicate downloads per user for each hour intervall"""
     for k in keys:
         id_bibdocs = run_sql("select distinct id_bibdoc from rnkDOWNLOADS where id_bibrec=%s" % k)
         for bibdoc in id_bibdocs:
             values = run_sql("""select  DATE_FORMAT(download_time,"%%Y-%%m-%%d %%H"), client_host from rnkDOWNLOADS where id_bibrec=%s and id_bibdoc=%s and download_time >=\"%s\";""" % (k, bibdoc[0], last_updated))
-	    			
+
             for val in values:
                 date_res = val[0]
                 date1 = "%s:00:00" % (date_res)
                 date2 = compute_next_hour(date_res)
                 duplicates = (run_sql("select count(*) from rnkDOWNLOADS where id_bibrec=%s and id_bibdoc=%s and download_time>='%s' and download_time<'%s' and client_host=%s;" % (k, bibdoc[0], date1, date2, val[1]))[0][0])-1
                 run_sql("delete from rnkDOWNLOADS where id_bibrec=%s and id_bibdoc=%s and download_time>='%s' and download_time<'%s' and client_host=%s limit %s;" % (k, bibdoc[0], date1, date2, val[1], duplicates))
-                
+
 def filter_downloads_per_hour (keys, last_updated):
     """filter all the duplicate downloads per user for each hour intervall"""
     for k in keys:
@@ -98,18 +98,18 @@ def filter_downloads_per_hour (keys, last_updated):
             date2 = compute_next_hour(date_res)
             duplicates = (run_sql("select count(*) from rnkDOWNLOADS where id_bibrec=%s and download_time>='%s' and download_time<'%s' and client_host=%s;" % (k, date1, date2, val[1]))[0][0])-1
             run_sql("delete from rnkDOWNLOADS where id_bibrec=%s and download_time>='%s' and download_time<'%s' and client_host=%s limit %s;" % (k, date1, date2, val[1], duplicates))
-                
+
 def compute_next_hour(date_res):
     """treat the change of the year, of (special)month etc.. and return the date in database format"""
     next_date = ""
-    date_res, date_hour = string.split(date_res, " ") 
-    date_hour = string.atoi(date_hour)	
+    date_res, date_hour = string.split(date_res, " ")
+    date_hour = string.atoi(date_hour)
 
     if date_hour == 23:
         date_year, date_month, date_day = string.split(date_res, "-")
         date_year = string.atoi(date_year)
         date_month = string.atoi(date_month)
-        date_day = string.atoi(date_day)	
+        date_day = string.atoi(date_day)
         if date_month == 12 and date_day == 31:
             next_date = "%s-%s-%s 00:00:00" % (date_year + 1, 01, 01)
         elif calendar.monthrange(date_year, date_month)[1] == date_day:
@@ -121,7 +121,7 @@ def compute_next_hour(date_res):
         next_hour = date_hour + 1
         next_date = "%s %s:00:00" % (date_res, next_hour)
     return next_date
-    
+
 
 def get_file_similarity_by_times_downloaded(dic, id_bibrec_list):
     """For each id_bibrec, get the client_host and see which other id_bibrec these users have also downloaded.
@@ -150,7 +150,7 @@ def get_file_similarity_by_times_downloaded(dic, id_bibrec_list):
                 list_client_host_value = []
                 list_client_host_value.append(client_host_value)
                 dic_news[id_bibrec_key] = list_client_host_value
-        #compute occurence of client_host 
+        #compute occurence of client_host
         for j in dic_news.keys():
             list_tuple = []
             tuple_client_host = str(tuple(dic_news[j]))
@@ -159,8 +159,8 @@ def get_file_similarity_by_times_downloaded(dic, id_bibrec_list):
             res2 = run_sql("select id_bibrec,count(*) from rnkDOWNLOADS where client_host in %s and id_bibrec in %s and id_bibrec != %s group by id_bibrec;" %  (tuple_client_host, tuple_string_id_bibrec_list, j)) #0.0023 par requete
             list_tuple.append(list(res2))
             dic_result[j] = list_tuple[0]
-    #merge new values with old dictionnary 
-    return merge_with_old_dictionnary(dic, dic_result)  
+    #merge new values with old dictionnary
+    return merge_with_old_dictionnary(dic, dic_result)
 
 def merge_with_old_dictionnary(old_dic, new_dic):
     """For each key id_bibrec in new_dic add the old values contained in old_dic
@@ -170,7 +170,7 @@ def merge_with_old_dictionnary(old_dic, new_dic):
         if key in old_dic.keys():
             old_dic_value_dic = dict(old_dic[key])
             tuple_list = []
-            old_dic_value_dic_keys = old_dic_value_dic.keys() 
+            old_dic_value_dic_keys = old_dic_value_dic.keys()
             for val in value:
                 if val[0] in old_dic_value_dic_keys:
                     tuple_list.append((val[0], val[1]+ old_dic_value_dic[val[0]]))
@@ -183,7 +183,7 @@ def merge_with_old_dictionnary(old_dic, new_dic):
             union_dic[key] = tuple_list
         else :
             union_dic[key] = value
-    
+
     for (key, value) in old_dic.iteritems():
         if key not in union_dic.keys():
             union_dic[key] = value

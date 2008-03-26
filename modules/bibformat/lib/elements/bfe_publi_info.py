@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -30,10 +30,10 @@ def format(bfo):
     Displays inline publication information with html link to ejournal
     (when available).
     """
-    
-    
+
+
     out = ''
-    
+
     publication_info = bfo.field('909C4')
     if publication_info == "":
         return ""
@@ -55,9 +55,9 @@ def format(bfo):
         number = cgi.escape(number)
     if pages is not None:
         pages = cgi.escape(pages)
-        
+
     if journal != '' and volume is not None:
-        
+
         out += '<a href="http://weblib.cern.ch/cgi-bin/ejournals?publication='
         out += quote(journal_source)
         out += '&amp;volume=' + volume
@@ -73,16 +73,16 @@ def format(bfo):
     else:
         out += journal_source + ': '
         if volume is not None:
-            out +=  volume 
+            out +=  volume
         if year is not None:
             out += ' (' + year + ') '
         if number is not None:
             out += 'no. ' + number + ', '
         if pages is not None:
             out += 'pp. ' + pages
-         
+
     return out
-      
+
 def escape_values(bfo):
     """
     Called by BibFormat in order to check if output of this element

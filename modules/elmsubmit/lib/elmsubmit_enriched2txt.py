@@ -88,9 +88,9 @@ charset is allowed in any text/enriched file. Quoting RFC1896:
 __revision__ = "$Id$"
 
 def enriched2txt(string):
-   
+
     # f and g will be our input/output streams.
-    
+
     # We instantiate them as cStringIO objects for speed if the input
     # string is not unicode (ie. its a normal string type). Otherwise
     # we make them StringIO objects.
@@ -120,13 +120,13 @@ def enriched2txt(string):
     # STDOUT -> object g
     # EOF -> ''
     # ungetc -> seek(-1,1)
-    
+
     paramct = 0
     newlinect = 0
     nofill = 0
 
     c = f.read(1)
-    
+
     while c != '':
         if (c == '<'):
             if newlinect == 1: g.write(' ')
@@ -138,7 +138,7 @@ def enriched2txt(string):
                 f.seek(-1,1)
                 token = ""
                 c = f.read(1)
-                
+
                 while c != '' and c!= '>':
                     token += c
                     c = f.read(1)
@@ -170,7 +170,7 @@ def enriched2txt(string):
         c = f.read(1)
 
     g.write('\n')
-            
+
     return g.getvalue()
 
 # The original C code direct from RFC1896 appendix.

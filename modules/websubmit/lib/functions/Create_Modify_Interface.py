@@ -119,7 +119,7 @@ def Create_Modify_Interface(parameters, curdir, form, user_info=None):
             fields = [x for x in fields if x not in ("Select", "select")]
         else:
             raise InvenioWebSubmitFunctionError("cannot find fields to modify")
-    #output some text    
+    #output some text
     t = t+"<CENTER bgcolor=\"white\">The document <B>%s</B> has been found in the database.</CENTER><br />Please modify the following fields:<br />Then press the 'END' button at the bottom of the page<br />\n" % rn
     for field in fields:
         subfield = ""

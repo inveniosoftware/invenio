@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -39,13 +39,13 @@ def format(bfo, note_suffix, note_prefix='Note: ', separator='; '):
         notes_group_1 = separator.join(notes_group_1)
         notes.append(notes_group_1)
 
-    notes_group_2 = bfo.fields('500__a')  
+    notes_group_2 = bfo.fields('500__a')
     if len(notes_group_2) > 0:
         notes_group_2 = separator.join(notes_group_2)
         notes.append(notes_group_2)
 
 
-    notes_group_3 = bfo.fields('502__a')    
+    notes_group_3 = bfo.fields('502__a')
     notes_group_3.extend(bfo.fields('909CCr'))
     notes_group_3.extend(bfo.fields('909CPn'))
     notes_group_3.extend(bfo.fields('711__a'))
@@ -54,13 +54,13 @@ def format(bfo, note_suffix, note_prefix='Note: ', separator='; '):
         notes.append(notes_group_3)
 
     notes_group_4 = bfo.fields('596__a')
-    
+
     if len(notes_group_4) > 0:
         notes_group_4 = separator.join(notes_group_4)
         notes.append(notes_group_4)
 
     if len(notes) > 0:
-        
+
         notes  = [note_prefix + cgi.escape(x) + note_suffix
                   for x in notes]
         return "".join(notes)

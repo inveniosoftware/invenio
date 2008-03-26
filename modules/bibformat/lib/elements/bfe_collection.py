@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,13 +27,13 @@ def format(bfo, kb):
     """
     Prints the collection identifier.
     Translate using given knowledge base.
-    
+
     @param kb a knowledge base use to translate the collection identifier
     """
 
     collection_identifier = bfo.field("980__a")
 
-    
+
     translated_collection_identifier = bfo.kb(kb, collection_identifier)
 
     return translated_collection_identifier

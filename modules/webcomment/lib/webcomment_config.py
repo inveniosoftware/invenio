@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## $Id$
-## 
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -47,7 +47,7 @@ CFG_WEBCOMMENT_WARNING_MESSAGES = \
     'WRN_WEBCOMMENT_FEEDBACK_RECORDED': '_("Your feedback has been recorded, many thanks")',
     'WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED': '_("Your feedback could not be recorded, please try again")',
     'WRN_WEBCOMMENT_ALREADY_VOTED': '_("Sorry, you have already voted. This vote hasn\'t been recorded.")',
-    'WRN_WEBCOMMENT_ALREADY_REPORTED': '_("You have already reported an abuse for this comment.")', 
+    'WRN_WEBCOMMENT_ALREADY_REPORTED': '_("You have already reported an abuse for this comment.")',
     'WRN_WEBCOMMENT_ADD_NO_TITLE': '_("You must enter a title")',
     'WRN_WEBCOMMENT_ADD_NO_SCORE': '_("You must choose a score")',
     'WRN_WEBCOMMENT_ADD_NO_BODY': '_("You must enter a text")',
@@ -63,7 +63,7 @@ CFG_WEBCOMMENT_WARNING_MESSAGES = \
     'WRN_WEBCOMMENT_CANNOT_REVIEW_TWICE': '_("You already wrote a review for this record.")'
 }
 
-CFG_WEBCOMMENT_ACTION_CODE = {    
+CFG_WEBCOMMENT_ACTION_CODE = {
     'ADD_COMMENT': 'C',
     'ADD_REVIEW': 'R',
     'VOTE': 'V',

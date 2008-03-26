@@ -22,77 +22,77 @@ __revision__ = "$Id$"
 from invenio.dbquery import run_sql
 
 def get_name_tag(tag):
-    
+
     """ This function return a textual name of tag """
-    
+
     result = run_sql("SELECT name FROM tag WHERE value='%s'" % tag)
-    
+
     if len(result) != 0:
         return result[0][0]
-    
+
     else:
         return tag
 
 
 def get_tag_name(name):
-    
+
     """ This function return a tag from the name of this tag """
-    
+
     result = run_sql("SELECT value FROM tag WHERE name LIKE '%s'" % name)
-    
+
     if len(result) != 0:
         return result[0][0]
-    
+
     else:
-        return name 
+        return name
 
 
 def split_tag_to_marc(tag, ind1='', ind2='', subcode=''):
-    
+
     """ This function make a marc tag with tag, ind1, ind2 and subcode. """
-    
+
     tag = get_tag_name(tag)
-    
+
     if len(tag) > 3:
         tag = tag[:3]
-        
+
     if ind1 == ' ' or ind1 == '':
         ind1 = '_'
-        
+
     if ind2 == ' ' or ind2 == '':
         ind2 = '_'
-        
+
     if subcode == ' ' or subcode == '':
         subcode = '_'
-        
-    return "%s%s%s%s" % (tag, ind1, ind2, subcode)    
+
+    return "%s%s%s%s" % (tag, ind1, ind2, subcode)
 
 
 def marc_to_split_tag(tag):
-    
+
     """ The inverse of split_tag_to_marc function. """
-    
+
     tag = get_tag_name(tag)
     ind1 = ' '
     ind2 = ' '
     subcode = ''
     len_tag = len(tag)
-    
+
     if len_tag > 3:
-        
+
         ind1 = tag[3]
         if ind1 == '_' or ind1 == '':
             ind1 = ' '
-            
+
         if len_tag > 4:
-            
+
             ind2 = tag[4]
             if ind2 == '_' or ind2 == '':
                 ind2 = ' '
-                
+
             if len_tag > 5:
                 subcode = tag[5]
-                                   
+
     tag = tag[:3]
-    
+
     return (tag, ind1, ind2, subcode)

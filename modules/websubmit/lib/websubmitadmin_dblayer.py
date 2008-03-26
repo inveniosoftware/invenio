@@ -866,7 +866,7 @@ def move_submission_function_from_one_position_to_another_position(doctype, acti
             exist in WebSubmit
           InvenioWebSubmitAdminWarningNoUpdate - when the function was not moved because there would have been no
             change in its position, or because the function could not be moved for some reason
-          
+
     """
     ## first check that there is a function "movefuncname"->"movefuncfromstep";"movefuncfromscore"
     numrows_movefunc = \
@@ -1154,7 +1154,7 @@ def move_position_submissionfunction_down(doctype, action, function, funccurstep
 def get_names_of_all_functions():
     """Return a list of the names of all WebSubmit functions (as strings).
        The function names will be sorted in ascending alphabetical order.
-       @return: a list of strings 
+       @return: a list of strings
     """
     q = """SELECT function FROM sbmALLFUNCDESCR ORDER BY function ASC"""
     res = run_sql(q)
@@ -1177,7 +1177,7 @@ def get_function_usage_details(function):
          - action name: the long name of this action
          - function step: the step in which the instance of function usage occurs
          - function score: the score (of the above-mentioned step) at which the function is called
-         
+
        @param function: (string) the name of the function whose WebSubmit usage is to be examined.
        @return: tuple of tuples whereby each tuple represents one instance of the function's usage:
             (doctype, docname, action id, action name, function-step, function-score)
@@ -1302,7 +1302,7 @@ def get_all_element_names():
     """
     q = """SELECT DISTINCT(name) FROM sbmFIELDDESC ORDER BY name"""
     res = run_sql(q)
-    return map(lambda x: str(x[0]), res)    
+    return map(lambda x: str(x[0]), res)
 
 def get_element_details(elname):
     """Get and return a tuple of tuples for all ELEMENTS with the element name "elname".
@@ -1683,7 +1683,7 @@ def move_category_to_new_score(doctype, sourcecateg, destinationcatg):
     ## now re-order all category scores correctly:
     normalize_doctype_category_scores(doctype)
     return 0 ## return success
-    
+
 def move_category_by_one_place_in_score(doctype, categsname, direction):
     """Move a category up or down in score by one place.
        @param doctype: (string) - the ID of the document type to which the category belongs.
@@ -1697,7 +1697,7 @@ def move_category_by_one_place_in_score(doctype, categsname, direction):
     ## get the (categid, lname, score) of all categories for this document type:
     res_all_categs = get_all_categories_of_doctype_ordered_by_score_lname(doctype=doctype)
     num_categs = len(res_all_categs)
-    
+
     ## if the category scores are not ordered properly (1,2,3,4,...), correct them
     ## Also, get the row-count (therefore score-position) of the categ to be moved
     for row_idx in xrange(0, num_categs):
@@ -1711,7 +1711,7 @@ def move_category_by_one_place_in_score(doctype, categsname, direction):
             update_score_of_doctype_category(doctype=doctype,
                                              categid=current_categid,
                                              newscore=current_row_score)
-            
+
         if current_categid == categsname:
             ## this is the category to be moved:
             move_categ_score = current_row_score
@@ -2268,7 +2268,7 @@ def insert_function_into_submission_at_step_and_score(doctype, action, function,
         raise InvenioWebSubmitAdminWarningReferentialIntegrityViolation(msg)
 
 def clone_functions_foraction_fromdoctype_todoctype(fromdoctype, todoctype, action):
-    ## delete all functions that 
+    ## delete all functions that
     error_code = delete_all_functions_foraction_doctype(doctype=todoctype, action=action)
     if error_code == 0:
         ## all functions for todoctype/action deleted - no clone those of "fromdoctype"
@@ -2290,7 +2290,7 @@ def clone_functions_foraction_fromdoctype_todoctype(fromdoctype, todoctype, acti
     else:
         ## unable to delete "todoctype"'s functions for action
         return 1
-    
+
 def get_number_functionparameters_for_action_doctype(action, doctype):
     """Get the number of parameters associated with a given action of a given document type.
        @param action: the action of the doctype, with which the parameters are associated
@@ -2357,7 +2357,7 @@ def update_value_of_function_parameter_for_doctype(doctype, paramname, paramval)
            InvenioWebSubmitAdminNoRowsFound - when no rows found for parameter
     """
     q = """UPDATE sbmPARAMETERS SET value=%s WHERE doctype=%s AND name=%s"""
-    ## get number of rows found for the parameter: 
+    ## get number of rows found for the parameter:
     numrows_param = get_numberparams_doctype_paramname(doctype=doctype, paramname=paramname)
     if numrows_param == 1:
         run_sql(q, (paramval, doctype, paramname))
@@ -2798,7 +2798,7 @@ def swap_elements_adjacent_pages_doctype_action(doctype, action, page1, page2):
     if page1 > num_pages or page2 > num_pages or page1 < 1 or page2 < 1:
         ## atl least one page is out of range of legal pages:
         return 2
-    
+
     q = """UPDATE sbmFIELD SET pagenb=%s WHERE subname=%s AND pagenb=%s"""
 
     ## move fields from p1 to tmp
@@ -2976,7 +2976,7 @@ def delete_a_field_from_submissionpage_then_reorder_fields_below_to_fill_vacant_
     else:
         ## could not delete field! return an appropriate error message
         return delete_res
-        
+
 def update_modification_date_for_submission(doctype, action):
     """Update the "last-modification" date for a submission to the current date (today).
        @param doctype: (string) the unique ID of a document type

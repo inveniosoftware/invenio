@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## $Id$
-## 
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##

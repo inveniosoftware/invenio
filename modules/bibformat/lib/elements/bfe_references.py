@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -25,15 +25,15 @@ __revision__ = "$Id$"
 def format(bfo, reference_prefix, reference_suffix):
     """
     Prints the references of this record
-    
+
     @param reference_prefix a prefix displayed before each reference
     @param reference_suffix a suffix displayed after each reference
     """
     from invenio.config import CFG_SITE_URL
-    
+
     references = bfo.fields("999C5", escape=1)
     out = ""
-    
+
     for reference in references:
         ref_out = ''
 

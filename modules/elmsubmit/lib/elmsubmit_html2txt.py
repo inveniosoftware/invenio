@@ -69,7 +69,7 @@ class NativeParser:
 
         p.close()
 
-        return file.getvalue() 
+        return file.getvalue()
 
 class CLParser:
 
@@ -102,7 +102,7 @@ class CLParser:
         # Run the process using popen3; possibly dodgy on Windows!
         # Need popen3 rather other popen function because we want to
         # grab stderr and hide it from the clients console.
-        
+
         (stdin, stdout, stderr) = os.popen3(commandline, 'r')
 
         utf8output = stdout.read()
@@ -113,7 +113,7 @@ class CLParser:
 
         # Check the return code:
         if exit_status is not None: raise HTMLParsingFailed
-        
+
         # Convert back to unicode object and return:
         try:
             output = unicode(utf8output, 'utf8')
@@ -140,7 +140,7 @@ parser_native = NativeParser()
 # parser_lynx = CLParser(['lynx -dump -force-html -width=', ['cols'], ' file://', ['filename']])
 
 # elinks works OK, except it appear not to support &#{unicoderef} tags, but these are rare(ish):
-# Actually, trying 
+# Actually, trying
 # parser_elinks = CLParser([ 'elinks -dump -dump-charset "utf-8" -force-html -dump-width ', ['cols'], ' file://', ['filename']])
 
 # The version (2.1pre13) on my system of the other 'famous' command

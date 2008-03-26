@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes"):
     """
     Prints the list of editors of a record.
-    
+
     @param limit the maximum number of editors to display
     @param separator the separator between editors.
     @param extension a text printed if more editors than 'limit' exist
@@ -34,9 +34,9 @@ def format(bfo, limit, separator=' ; ', extension='[...]', print_links="yes"):
     from urllib import quote
     from invenio.config import CFG_SITE_URL
     from invenio import bibrecord
-    
+
     authors = bibrecord.record_get_field_instances(bfo.get_record(), '100')
-    
+
     editors = [bibrecord.field_get_subfield_values(author, 'a')[0]
                for author in authors if len(bibrecord.field_get_subfield_values(author, "e")) > 0 and bibrecord.field_get_subfield_values(author, "e")[0]=="ed." ]
 

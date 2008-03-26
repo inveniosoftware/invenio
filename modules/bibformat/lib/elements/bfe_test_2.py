@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 def format(bfo, param1, param2='default value'):
     """
     Prints test
-    
+
     @param param1 desc 1
     @param param2 desc 2
     @param unknown_param desc3

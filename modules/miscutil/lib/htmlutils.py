@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,7 +27,7 @@ import re
 import cgi
 
 # List of allowed tags (tags that won't create any XSS risk)
-cfg_html_buffer_allowed_tag_whitelist = ['a', 
+cfg_html_buffer_allowed_tag_whitelist = ['a',
                                          'p', 'br', 'blockquote',
                                          'strong', 'b', 'u', 'i', 'em',
                                          'ul', 'ol', 'li', 'sub', 'sup']
@@ -39,7 +39,7 @@ def nmtoken_from_string(text):
     """
     Returns a Nmtoken from a string.
     It is useful to produce XHTML valid values for the 'name'
-    attribute of an anchor. 
+    attribute of an anchor.
 
     CAUTION: the function is surjective: 2 different texts might lead to
     the same result. This is improbable on a single page.
@@ -54,7 +54,7 @@ def nmtoken_from_string(text):
     text = text.replace('-', '--')
     return ''.join( [( ((not char.isalnum() and not char in ['.', '-', '_', ':']) and str(ord(char))) or char)
             for char in text] )
-    
+
 def escape_html(text, escape_quotes=False):
     """Escape all HTML tags, avoiding XSS attacks.
     < => &lt;
@@ -75,13 +75,13 @@ def escape_html(text, escape_quotes=False):
 
 class HTMLWasher(HTMLParser):
     """
-    Creates a washer for HTML, avoiding XSS attacks. See wash function for 
+    Creates a washer for HTML, avoiding XSS attacks. See wash function for
     details on parameters.
-    
+
     Usage: from invenio.htmlutils import HTMLWasher
            washer = HTMLWasher()
            escaped_text = washer.wash(unescaped_text)
-           
+
     Examples:
         a.wash('Spam and <b><blink>eggs</blink></b>')
         => 'Spam and <b>eggs&lt;u&gt;</b>'
@@ -94,7 +94,7 @@ class HTMLWasher(HTMLParser):
         a.wash('Spam and <b><a href="jaVas  cRipt:xss();">poilu</a></b>')
         =>'Spam and <b><a href="">eggs</a></b>'
     """
-    
+
     def __init__(self):
         """ Constructor; initializes washer """
         HTMLParser.__init__(self)
@@ -116,7 +116,7 @@ class HTMLWasher(HTMLParser):
                                 "\s*(p|&#112;|&#80;)"\
                                 "\s*(t|&#112;|&#84)"\
                                 "\s*(:|&#58;).*", re.IGNORECASE | re.DOTALL)
-        # vbscript:                           
+        # vbscript:
         self.re_vb = re.compile( ".*(v|&#118;|&#86;)"\
                                 "\s*(b|&#98;|&#66;)"\
                                 "\s*(s|&#115;|&#83;)"\
@@ -127,7 +127,7 @@ class HTMLWasher(HTMLParser):
                                 "\s*(t|&#112;|&#84;)"\
                                 "\s*(:|&#58;).*", re.IGNORECASE | re.DOTALL)
 
-    def wash(self, html_buffer, 
+    def wash(self, html_buffer,
              render_unallowed_tags=False,
              allowed_tag_whitelist=cfg_html_buffer_allowed_tag_whitelist,
              allowed_attribute_whitelist=\
@@ -148,7 +148,7 @@ class HTMLWasher(HTMLParser):
         self.allowed_attribute_whitelist = allowed_attribute_whitelist
         HTMLParser.feed(self, html_buffer)
         return self.result
-    
+
     def handle_starttag(self, tag, attrs):
         """Function called for new opening tags"""
         if tag.lower() in self.allowed_tag_whitelist:
@@ -165,11 +165,11 @@ class HTMLWasher(HTMLParser):
                     self.result += ' %s="%s"' % \
                                      (attr, cgi.escape(value, True))
                 self.result += '&gt;'
-        
+
     def handle_data(self, data):
         """Function called for text nodes"""
         self.result += cgi.escape(data, True)
-    
+
     def handle_endtag(self, tag):
         """Function called for ending of tags"""
         if tag.lower() in self.allowed_tag_whitelist:
@@ -177,9 +177,9 @@ class HTMLWasher(HTMLParser):
         else:
             if self.render_unallowed_tags:
                 self.result += '&lt;/' + cgi.escape(tag) + '&gt;'
-    
+
     def handle_startendtag(self, tag, attrs):
-        """Function called for empty tags (e.g. <br />)""" 
+        """Function called for empty tags (e.g. <br />)"""
         if tag.lower() in self.allowed_tag_whitelist:
             self.result  += '<' + tag
             for (attr, value) in attrs:
@@ -194,7 +194,7 @@ class HTMLWasher(HTMLParser):
                     self.result += ' %s="%s"' % \
                                      (attr, cgi.escape(value, True))
                 self.result += ' /&gt;'
-                                
+
     def handle_attribute_value(self, value):
         """Check attribute. Especially designed for avoiding URLs in the form:
         javascript:myXSSFunction();"""

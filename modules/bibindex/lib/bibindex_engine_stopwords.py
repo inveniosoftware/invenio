@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -39,14 +39,14 @@ def create_stopwords(filename=CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE):
 
 stopwords = create_stopwords()
 
-def is_stopword(word, force_check=0): 
+def is_stopword(word, force_check=0):
     """Return true if WORD is found among stopwords, false otherwise.
        Also, return false if BibIndex wasn't configured to use
        stopwords.  However, if FORCE_CHECK is set to 1, then do not
        pay attention to whether the admin disabled stopwords
        functionality, but look up the word anyway.  This mode is
        useful for ranking.
-    """    
+    """
     # note: input word is assumed to be in lowercase
     if (CFG_BIBINDEX_REMOVE_STOPWORDS or force_check) and \
            stopwords.has_key(word):

@@ -364,7 +364,7 @@ def get_dictionary_from_string(dict_string):
     """
     ## First, strip off the leading and trailing spaces and braces:
     dict_string = dict_string.strip(" {}")
-    
+
     ## Next, split the string on commas (,) that have not been escaped
     ## So, the following string: """'hello' : 'world', 'click' : 'here'"""
     ## will be split into the following list:

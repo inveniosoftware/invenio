@@ -122,9 +122,9 @@ def _richtext2txt(string, charset='us-ascii', convert_iso_8859_tags=False, force
                   recursive=False, just_closed_para=True, output_file=None):
 
     if type(string) == unicode and convert_iso_8859_tags:
-        
+
         # Doesn't make sense to have a unicode string
-        # containing mixed charsets.        
+        # containing mixed charsets.
         raise ValueError("function richtext2txt cannot have both unicode input string and convert_iso_8859_tags=True.")
 
     # f and g will be our input/output streams.
@@ -147,17 +147,17 @@ def _richtext2txt(string, charset='us-ascii', convert_iso_8859_tags=False, force
     # ungetc -> seek(-1,1)
 
     # If we're not calling ourself from ISO-8859-X tag, then eat
-    # leading newlines:    
+    # leading newlines:
 
     if not recursive: _eat_all(f,'\n')
 
     c = f.read(1)
 
     # compile re for use in if then else. Matches 'iso-8859-XX' tags
-    # where xx are digits.    
+    # where xx are digits.
     iso_re = re.compile(r'^iso-8859-([1-9][0-9]?)$', re.IGNORECASE)
     iso_close_re = re.compile(r'^/iso-8859-([1-9][0-9]?)$', re.IGNORECASE)
-    
+
     while c != '':
         if c == '<':
 
@@ -170,7 +170,7 @@ def _richtext2txt(string, charset='us-ascii', convert_iso_8859_tags=False, force
 
                 just_closed_para = False
             elif token == 'nl':
-                
+
                 g.write('\n')
 
                 # Discard all 'soft newlines' following <nl> token:
@@ -184,15 +184,15 @@ def _richtext2txt(string, charset='us-ascii', convert_iso_8859_tags=False, force
                 _eat_all(f,'\n')
 
                 just_closed_para = True
-                
+
             elif token == 'paragraph':
 
                 # If we haven't just closed a paragraph tag, or done
                 # equivalent (eg. output an <np> tag) then produce
                 # newlines to offset paragraph:
-                
+
                 if not just_closed_para: g.write('\n\n')
-                
+
             elif token == '/paragraph':
                 g.write('\n\n')
 
@@ -200,12 +200,12 @@ def _richtext2txt(string, charset='us-ascii', convert_iso_8859_tags=False, force
                 _eat_all(f,'\n')
 
                 just_closed_para = True
-                
+
             elif token == 'comment':
                 commct=1
 
                 while commct > 0:
-                    
+
                     c = _throw_away_until(f,'<') # Bin characters until we get a '<'
 
                     if c == '': break
@@ -242,7 +242,7 @@ def _richtext2txt(string, charset='us-ascii', convert_iso_8859_tags=False, force
                         c, next_str = _read_to_next_token(f)
 
                         iso_str += next_str
-                        
+
                         if c == '': break
 
                         c, next_token = _read_token(f)
@@ -266,7 +266,7 @@ def _richtext2txt(string, charset='us-ascii', convert_iso_8859_tags=False, force
                     _richtext2txt(iso_str, charset, convert_iso_8859_tags, force_conversion,
                                   True, just_closed_para, output_file=g)
                                  #^^^^ = recursive
-                    
+
             elif iso_close_re.match(token):
 
                 if force_conversion:
@@ -279,19 +279,19 @@ def _richtext2txt(string, charset='us-ascii', convert_iso_8859_tags=False, force
             else:
                 # Ignore unrecognized token.
                 pass
-            
+
         elif c == '\n':
 
             # Read in contiguous string of newlines and output them as
             # single space, unless we hit EOF, in which case output
             # nothing.
 
-            _eat_all(f,'\n')              
+            _eat_all(f,'\n')
 
             if _next_char(f) == '': break
 
             # If we have just written a newline out, soft newlines
-            # should do nothing:            
+            # should do nothing:
             if _last_char(g) != '\n': g.write(' ')
 
         else:
@@ -303,7 +303,7 @@ def _richtext2txt(string, charset='us-ascii', convert_iso_8859_tags=False, force
         c = f.read(1)
 
     # Only output the terminating newline if we aren't being called
-    # recursively.    
+    # recursively.
     if not recursive:
         g.write('\n')
 
@@ -315,9 +315,9 @@ def _read_token(f):
     """
 
     token = ""
-    
+
     c = f.read(1)
-            
+
     while c != '' and c!= '>':
         token += c
         c = f.read(1)
@@ -335,20 +335,20 @@ def _read_to_next_token(f):
         out += c
         c = f.read(1)
 
-    return c, out        
+    return c, out
 
 def _eat_all(f,d):
 
     """
     Discard all characters from input stream f of type d until we hit
     a character that is not of type d. Return the most recent bit read
-    from the file.    
+    from the file.
     """
 
     got_char = False
 
     if _next_char(f) == d: got_char = True
-        
+
     while _next_char(f) == d: f.read(1)
 
     if got_char:
@@ -412,7 +412,7 @@ class RichTextConversionError(Exception):
     """
     An emtpy parent class for all errors in this module.
     """
-    
+
     pass
 
 class ISO8859TagError(RichTextConversionError):

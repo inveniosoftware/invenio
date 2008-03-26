@@ -13,7 +13,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -29,15 +29,15 @@ from invenio.config import CFG_SITE_URL
 def format(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
     """
     Display keywords of the record.
-    
+
     @param keyword_prefix a prefix before each keyword
     @param keyword_suffix a suffix after each keyword
     @param separator a separator between keywords
     @param link links the keywords if 'yes' (HTML links)
     """
-    
+
     keywords = bfo.fields('6531_a')
-    
+
     if len(keywords) > 0:
         if link == 'yes':
             keywords = ['<a href="' + CFG_SITE_URL + '/search?f=keyword&amp;p='+ \
@@ -48,7 +48,7 @@ def format(bfo, keyword_prefix, keyword_suffix, separator=' ; ', link='yes'):
         else:
             keywords = [cgi.escape(keyword)
                         for keyword in keywords]
-            
+
         keywords = [keyword_prefix + keyword + keyword_suffix
                     for keyword in keywords]
         return separator.join(keywords)

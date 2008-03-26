@@ -30,15 +30,15 @@ CFG_EXTERNAL_COLLECTION_TIMEOUT = 5
 CFG_EXTERNAL_COLLECTION_MAXRESULTS = 10
 
 CFG_EXTERNAL_COLLECTIONS = {
-    'Amazon': 
+    'Amazon':
         {'engine': 'Amazon'},
-    'CERN Indico': 
+    'CERN Indico':
         {'engine': 'CDSIndico'},
     'CERN Intranet':
         {'base_url': "http://www.iso.org", 'search_url': "http://search.cern.ch/query.html?qt="},
     'CERN EDMS':
         {'engine': 'CERNEDMS'},
-    'CiteSeer': 
+    'CiteSeer':
         {'engine': 'Citeseer'},
     'Google Web':
         {'engine': 'Google'},
