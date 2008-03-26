@@ -47,7 +47,7 @@ from thread import get_ident
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
     CFG_MISCUTIL_SQL_MAX_CACHED_QUERIES, CFG_MISCUTIL_SQL_USE_SQLALCHEMY
 
-if CFG_MISCUTIL_USE_SQLALCHEMY:
+if CFG_MISCUTIL_SQL_USE_SQLALCHEMY:
     try:
         import sqlalchemy.pool as pool
         import MySQLdb as mysqldb
