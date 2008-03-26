@@ -125,17 +125,18 @@ def convert_conf_option(option_name, option_value):
     if option_value in ['"True"', '"False"', '"None"']:
         option_value = option_value[1:-1]
 
-    ## 3c) special cases: dicts or lists
-    if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT',
-                       'CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS',
-                       'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS']:
+    ## 3c) special cases: dicts
+    if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT',]:
         option_value = option_value[1:-1]
 
-    ## 3d) special cases: CFG_SITE_LANGS
-    if option_name == 'CFG_SITE_LANGS':
+    ## 3d) special cases: comma-separated lists
+    if option_name in ['CFG_SITE_LANGS',
+                       'CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS',
+                       'CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS']:
         out = "["
-        for lang in option_value[1:-1].split(","):
-            out += "'%s', " % lang
+        for elem in option_value[1:-1].split(","):
+            if elem:
+                out += "'%s', " % elem
         out += "]"
         option_value = out
 
