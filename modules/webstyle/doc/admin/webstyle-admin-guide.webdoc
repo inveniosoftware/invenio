@@ -117,7 +117,7 @@ will be replaced by "Book" if the user has chosen to display the English version
  "Livre" in French or "Buch" in German.
 </li>
 </ul>
-<p>Read the (FIXME) to learn more about details of the WebDoc syntax</p>
+<p>Read the <a href="<CFG_SITE_URL>/help/hacking/webstyle-webdoc-syntax">WebDoc syntax guide</a> to learn more about details of the WebDoc syntax.</p>
 
 <p>The advantage of not using raw HTML for these static pages is that
 they can for example reuse the header and footer that you have defined
@@ -127,7 +127,7 @@ your needs: <b>they</b> will adapt themselves to your needs.</p>
 
 <p>Any modification should be immediatly visible when looking at the
 pages from the web: the pages are built "dynamically" and then cached.
-If you want to force the cache of the pages, use the WebDoc utility.
+If you want to force the cache of the pages, use the WebDoc CLI.
 Read (FIXME) to learn more about it.</p>
 
 <h4><a name="overview_page_layout_dyn">1.2.2 Layout of Python Dynamic Pages</a></h4>
