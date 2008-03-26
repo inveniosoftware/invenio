@@ -1,3 +1,4 @@
+## -*- mode: html; coding: utf-8; -*-
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -17,12 +18,17 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-webdoclibdir = $(libdir)/webdoc/invenio/hacking
+<!-- WebDoc-Page-Title: WebStyle Internals -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
 
-webdoclib_DATA = \
-	webstyle-internals.webdoc \
-	webstyle-webdoc-syntax.webdoc
 
-EXTRA_DIST = $(webdoclib_DATA)
+<p>This page summarizes all the advanced techniques to customize the
+style of your installation.</p>
 
-CLEANFILES = *~ *.tmp
+<blockquote>
+<dl>
+<dt><a href="webstyle-webdoc-syntax">WebDoc syntax</a>
+<dd>Learn the syntax used in WebDoc files.</dd>
+</dt>
+</dl>
+</blockquote>

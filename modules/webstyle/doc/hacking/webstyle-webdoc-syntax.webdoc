@@ -72,7 +72,7 @@ file:</p>
 <h4><a name="translation1">1.1 Using &lt;lang>...&lt;/lang> syntax</a></h4>
 
 <p>You specify the various translations using the
-<code>&lt;lang></code> tag, as well as the various language codes tag
+<code>&lt;lang></code> tag, as well as the various language codes tags
 such as <code>&lt;en>, &lt;fr>, &lt;de>,</code> etc.</p>
 
 <pre class="codeBox">
