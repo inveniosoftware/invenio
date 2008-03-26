@@ -231,33 +231,37 @@ def get_webdoc_parts(webdoc,
                     # translation for this file (if len(htmls)==0)
                     break
             else:
-                # Could not find/read the folder where cache should
-                # be. Generate on-the-fly, get all the parts at the
-                # same time, and return
-                (webdoc_source_path, \
-                 webdoc_cache_dir, \
-                 webdoc_name,\
-                 webdoc_source_modification_date, \
-                 webdoc_cache_modification_date) = get_webdoc_info(webdoc)
-                if webdoc_source_path is not None:
-                    try:
-                        webdoc_source = file(webdoc_source_path, 'r').read()
-                        htmls = transform(webdoc_source, languages=[ln])
-                        if len(htmls) > 0:
-                            (lang, body, title, keywords, \
-                             navtrail, lastupdated, description) = htmls[-1]
-                            html_parts =  {'body': body or '',
-                                           'title': title or '',
-                                           'keywords': keywords or '',
-                                           'navtrail': navtrail or '',
-                                           'lastupdated': lastupdated or '',
-                                           'description': description or ''}
-                        # We then have all the parts, or there is no
-                        # translation for this file (if len(htmls)==0)
-                        break
-                    except IOError:
-                        # Nothing we can do..
-                        break
+                # Look in other categories
+                continue
+
+        if html_parts == {}:
+            # Could not find/read the folder where cache should
+            # be. Generate on-the-fly, get all the parts at the
+            # same time, and return
+            (webdoc_source_path, \
+             webdoc_cache_dir, \
+             webdoc_name,\
+             webdoc_source_modification_date, \
+             webdoc_cache_modification_date) = get_webdoc_info(webdoc)
+            if webdoc_source_path is not None:
+                try:
+                    webdoc_source = file(webdoc_source_path, 'r').read()
+                    htmls = transform(webdoc_source, languages=[ln])
+                    if len(htmls) > 0:
+                        (lang, body, title, keywords, \
+                         navtrail, lastupdated, description) = htmls[-1]
+                        html_parts =  {'body': body or '',
+                                       'title': title or '',
+                                       'keywords': keywords or '',
+                                       'navtrail': navtrail or '',
+                                       'lastupdated': lastupdated or '',
+                                       'description': description or ''}
+                    # We then have all the parts, or there is no
+                    # translation for this file (if len(htmls)==0)
+                    break
+                except IOError:
+                    # Nothing we can do..
+                    pass
 
     return html_parts
 
