@@ -807,10 +807,15 @@ def cli_cmd_detect_system_details(conf):
                 run_sql("SHOW VARIABLES LIKE 'collat%'"):
             if False:
                 print "    - %s: %s" % (key, val)
-            elif key in ['version', 'character_set_connection',
+            elif key in ['version',
+                         'character_set_client',
+                         'character_set_connection',
                          'character_set_database',
+                         'character_set_results',
                          'character_set_server',
-                         'collation_connection', 'collation_database',
+                         'character_set_system',
+                         'collation_connection',
+                         'collation_database',
                          'collation_server']:
                 print "    - %s: %s" % (key, val)
     except ImportError:
