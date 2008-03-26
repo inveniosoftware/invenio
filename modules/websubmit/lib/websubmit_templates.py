@@ -81,6 +81,7 @@ class Template:
                         <td width="50%%" class="narrowsearchboxbody">
                           <form method="get" action="/submit">
                             <input type="hidden" name="doctype" />
+                            <input type="hidden" name="ln" value="%(ln)s" />
                               %(catalogues)s
                           </form>
                         </td>
@@ -90,8 +91,9 @@ class Template:
               </tr>
             </table>""" % {
               'document_types' : _("Document types available for submission"),
-              'please_select' : _("Please select the type of document you want to submit."),
+              'please_select' : _("Please select the type of document you want to submit"),
               'catalogues' : catalogues,
+              'ln' : ln,
             }
 
     def tmpl_submit_home_catalog_no_content(self, ln):
@@ -278,8 +280,9 @@ class Template:
 
                 <input type="hidden" name="act" />
                 <input type="hidden" name="startPg" value="1" />
-                <input type="hidden" name="mainmenu" value="/submit?doctype=%(doctype)s" />
+                <input type="hidden" name="mainmenu" value="/submit?doctype=%(doctype)s&amp;ln=%(ln)s" />
 
+                <input type="hidden" name="ln" value="%(ln)s" />
                 <table class="searchbox" width="100%%" summary="">
                   <tr>
                     <th class="portalboxheader">%(docfulldesc)s</th>
@@ -300,6 +303,7 @@ class Template:
                       'pid' : pid,
                       'docfulldesc' : docfulldesc,
                       'description' : description,
+                      'ln' : ln,
                     }
 
         if len(snameCateg) :
@@ -348,6 +352,7 @@ class Template:
                     <td width="100%%">
                     <small>Access Number: <input size="15" name="AN" />
                       <input type="hidden" name="doctype" value="%(doctype)s" />
+                      <input type="hidden" name="ln" value="%(ln)s" />
                       <input class="adminbutton" type="submit" value=" %(go)s " />
                     </small>
                     </td></tr>
@@ -358,6 +363,7 @@ class Template:
                 'continue_explain' : _("To continue with a previously interrupted submission, enter an access number into the box below:"),
                   'doctype' : doctype,
                   'go' : _("GO"),
+                  'ln' : ln,
                 }
 
         return out
@@ -464,7 +470,7 @@ class Template:
         out += """        <td class="submitEmptyPage">&nbsp;&nbsp;
                         </td></tr></table>
                     </td>
-                    <td class="submitHeader" align="right">&nbsp;<a href='' onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;indir=%(indir)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>
+                    <td class="submitHeader" align="right">&nbsp;<a href="" onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;indir=%(indir)s&amp;ln=%(ln)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>
                   </tr>
                   <tr><td colspan="5" class="submitHeader">
                     <table border="0" cellspacing="0" cellpadding="15" width="100%%" class="submitBody"><tr><td>
@@ -479,6 +485,7 @@ class Template:
                      <input type="hidden" name="indir" value="%(indir)s" />
                      <input type="hidden" name="mode" value="U" />
                      <input type="hidden" name="step" value="0" />
+                     <input type="hidden" name="ln" value="%(ln)s" />
                 """ % {
                  'summary' : _("SUMMARY"),
                  'doctype' : doctype,
@@ -489,6 +496,7 @@ class Template:
                  'nextPg' : nextPg,
                  'curpage' : curpage,
                  'nbPg' : nbPg,
+                 'ln' : ln,
                }
 
         for field in fields:
@@ -882,6 +890,7 @@ class Template:
           <input type="hidden" name="file_path" value="" />
           <input type="hidden" name="userfile_name" value="" />
 
+          <input type="hidden" name="ln" value="%(ln)s" />
           <center><table cellspacing="0" cellpadding="0" border="0"><tr>
              <td class="submitHeader"><b>%(docname)s&nbsp;</b></td>
              <td class="submitHeader"><small>&nbsp;%(actname)s&nbsp;</small></td>
@@ -901,6 +910,7 @@ class Template:
                 'actname' : actname,
                 'indir' : indir,
                 'mainmenu' : mainmenu,
+                'ln' : ln,
               }
 
         if finished == 1:
@@ -917,13 +927,14 @@ class Template:
                 out += """<td class="submitPage"><small>&nbsp;
                             <a href='' onclick="document.forms[0].curpage.value=%s;document.forms[0].action='/submit';document.forms[0].step.value=0;document.forms[0].submit();return false;">%s</a>&nbsp;</small></td>""" % (i,i)
             out += """<td class="submitCurrentPage">%(end_action)s</td><td class="submitEmptyPage">&nbsp;&nbsp;</td></tr></table></td>
-                      <td class="submitHeader" align="right">&nbsp;<a href='' onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;indir=%(indir)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>""" % {
+                      <td class="submitHeader" align="right">&nbsp;<a href='' onclick="window.open('/submit/summary?doctype=%(doctype)s&amp;act=%(act)s&amp;access=%(access)s&amp;indir=%(indir)s&amp;ln=%(ln)s','summary','scrollbars=yes,menubar=no,width=500,height=250');return false;"><font color="white"><small>%(summary)s(2)</small></font></a>&nbsp;</td>""" % {
                         'end_action' : _("end of action"),
                         'summary' : _("SUMMARY"),
                         'doctype' : doctype,
                         'act' : act,
                         'access' : access,
                         'indir' : indir,
+                        'ln' : ln,
                       }
         out += """</tr>
                   <tr>
@@ -1274,7 +1285,7 @@ class Template:
             out += """<tr>
                         <td align="right">
                           <small>
-                            <a href='' onclick="window.opener.document.forms[0].curpage.value='%(page)s';window.opener.document.forms[0].action='/submit';window.opener.document.forms[0].submit();return false;">
+                            <a href='' onclick="window.opener.document.forms[0].curpage.value='%(page)s';window.opener.document.forms[0].action='/submit?ln=%(ln)s';window.opener.document.forms[0].submit();return false;">
                               <font color="%(color)s">%(name)s</font>
                             </a>
                           </small>
@@ -1286,7 +1297,8 @@ class Template:
                         'color' : color,
                         'name' : value['name'],
                         'value' : value['value'],
-                        'page' : value['page']
+                        'page' : value['page'],
+                        'ln' : ln
                       }
         out += "</table>"
         return out
@@ -1566,18 +1578,20 @@ class Template:
             </small>
             <blockquote>""" % {
               'list' : _("List of refereed types of documents"),
-              'select' : _("Select one of the following types of documents to check the documents status."),
+              'select' : _("Select one of the following types of documents to check the documents status"),
             }
 
         for doc in docs:
-            out += "<li><a href='publiline.py?doctype=%(doctype)s'>%(docname)s</a></li><br />" % doc
+            params = {'ln' : ln}
+            params.update(doc)
+            out += '<li><a href="publiline.py?doctype=%(doctype)s&amp;ln=%(ln)s">%(docname)s</a></li><br />' % params
 
         out += """</blockquote>
                 </td>
             </tr>
         </table>
 
-        <a href="publiline.py?flow=cplx&amp;ln=%s">%s</a>""" % (ln, _("Go to specific approval workflow."))
+        <a href="publiline.py?flow=cplx&amp;ln=%s">%s</a>""" % (ln, _("Go to specific approval workflow"))
         return out
 
     def tmpl_publiline_selectcplxdoctype(self, ln, docs):
@@ -1609,18 +1623,20 @@ class Template:
             </small>
             <blockquote>""" % {
               'list' : _("List of refereed types of documents"),
-              'select' : _("Select one of the following types of documents to check the documents status."),
+              'select' : _("Select one of the following types of documents to check the documents status"),
             }
 
         for doc in docs:
-            out += "<li><a href='publiline.py?flow=cplx&doctype=%(doctype)s'>%(docname)s</a></li><br />" % doc
+            params = {'ln' : ln}
+            params.update(doc)
+            out += '<li><a href="publiline.py?flow=cplx&doctype=%(doctype)s&amp;ln=%(ln)s">%(docname)s</a></li><br />' % params
 
         out += """</blockquote>
                 </td>
             </tr>
         </table>
 
-        <a href="publiline.py?ln=%s">%s</a>""" % (ln, _("Go to general approval workflow."))
+        <a href="publiline.py?ln=%s">%s</a>""" % (ln, _("Go to general approval workflow"))
         return out
 
     def tmpl_publiline_selectcateg(self, ln, doctype, title, categories):
@@ -1809,6 +1825,7 @@ class Template:
                                       <input type="hidden" name="doctype" value="%(doctype)s" />
                                       <input type="hidden" name="categ" value="" />
                                       <input type="hidden" name="apptype" value="%(apptype)s" />
+                                      <input type="hidden" name="ln" value="%(ln)s" />
                                       </form>
                            <table>
                              <tr>
@@ -1817,6 +1834,7 @@ class Template:
                              'apptype' : column['apptype'],
                              'list_categ' : column['list_categ'],
                              'choose_categ' : _("Please choose a category"),
+                             'ln' : ln,
                    }
 
             for categ in types[column['apptype']]:
@@ -1941,6 +1959,7 @@ class Template:
                         <input type="hidden" name="doctype" value="%(doctype)s" />
                         <input type="hidden" name="categ" value="%(categ)s" />
                         <input type="hidden" name="RN" value="" />
+                        <input type="hidden" name="ln" value="%(ln)s">
                         </form>
                   <table class="searchbox">
                     <tr>
@@ -1959,6 +1978,7 @@ class Template:
                 'pending' : _("Pending"),
                 'approved' : _("Approved"),
                 'rejected' : _("Rejected"),
+                'ln': ln,
               }
 
         for doc in docs:
@@ -2061,6 +2081,7 @@ class Template:
                         <input type="hidden" name="categ" value="%(categ)s" />
                         <input type="hidden" name="RN" value="" />
                         <input type="hidden" name="apptype" value="%(apptype)s" />
+                        <input type="hidden" name="ln" value="%(ln)s" />
                         </form>
                   <table class="searchbox">
                     <tr>
@@ -2083,6 +2104,7 @@ class Template:
                 'approved' : _("Approved"),
                 'rejected' : _("Rejected"),
                 'cancelled' : _("Cancelled"),
+                'ln': ln,
               }
 
         for doc in docs:
@@ -2220,10 +2242,12 @@ class Template:
                     <input type="hidden" name="RN" value="%(rn)s" />
                     <input type="hidden" name="categ" value="%(categ)s" />
                     <input type="hidden" name="doctype" value="%(doctype)s" />
+                    <input type="hidden" name="ln" value="%(ln)s" />
                   <small>""" % {
                  'rn' : rn,
                  'categ' : categ,
                  'doctype' : doctype,
+                 'ln' : ln,
                }
         if title != "unknown":
             out += """<strong class="headline">%(title_text)s</strong>%(title)s<br /><br />""" % {
@@ -2238,13 +2262,14 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(siteurl)s/record/%(sysno)s">%(click)s</a>
+                        <a href="%(siteurl)s/record/%(sysno)s?ln=%(ln)s">%(click)s</a>
                         <br /><br />
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
                      'siteurl' : CFG_SITE_URL,
                      'sysno' : sysno,
+                     'ln' : ln,
                    }
 
         if status == "waiting":
@@ -2262,10 +2287,11 @@ class Template:
                      'warning' : _("WARNING! Upon confirmation, an email will be sent to the referee.")
                    }
             if auth_code == 0:
-                out += "<br />" + _("As a referee for this document, you may click this button to approve or reject it.") + ":<br />" +\
-                       """<input class="adminbutton" type="submit" name="approval" value="%(approve)s" onclick="window.location='approve.py?%(access)s';return false;" />""" % {
+                out += "<br />" + _("As a referee for this document, you may click this button to approve or reject it") + ":<br />" +\
+                       """<input class="adminbutton" type="submit" name="approval" value="%(approve)s" onclick="window.location='approve.py?%(access)s&amp;ln=%(ln)s';return false;" />""" % {
                          'approve' : _("Approve/Reject"),
-                         'access' : access
+                         'access' : access,
+                         'ln' : ln
                        }
         if status == "approved":
             out += _("This document has been %(x_fmt_open)sapproved%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">',
@@ -2328,11 +2354,13 @@ class Template:
                     <input type="hidden" name="RN" value="%(rn)s" />
                     <input type="hidden" name="apptype" value="%(apptype)s" />
                     <input type="hidden" name="action" value="" />
+                    <input type="hidden" name="ln" value="%(ln)s" />
                   <small>""" % {
                  'rn' : rn,
                  'categ' : categ,
                  'doctype' : doctype,
                  'apptype' : apptype,
+                 'ln': ln,
                }
         if title != "unknown":
             out += """<strong class="headline">%(title_text)s</strong>%(title)s<br /><br />""" % {
@@ -2347,13 +2375,14 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(siteurl)s/record/%(sysno)s">%(click)s</a>
+                        <a href="%(siteurl)s/record/%(sysno)s?ln=%(ln)s">%(click)s</a>
                         <br /><br />
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
                      'siteurl' : CFG_SITE_URL,
                      'sysno' : sysno,
+                     'ln' : ln,
                    }
 
         out += "<br /><br />"
@@ -2581,6 +2610,7 @@ class Template:
     <input type="hidden" name="RN" value="%(rn)s" />
     <input type="hidden" name="apptype" value="%(apptype)s" />
     <input type="hidden" name="action" value="%(action)s" />
+    <input type="hidden" name="ln" value="%(ln)s" />
     <p class="bsklabel">%(title_label)s:</p>
     <input type="text" name="msg_subject" size="80" value="%(title)s"/>
     <p class="bsklabel">%(comment_label)s:</p>
@@ -2597,6 +2627,7 @@ class Template:
              'apptype' : apptype,
              'action' : action,
              'validation' : validation,
+             'ln' : ln,
             }
 
     def tmpl_publiline_displaydocplxaction(self, ln, doctype, categ, rn, apptype, action, status, authors, title, sysno, subtitle1, email_user_pattern, stopon1, users, extrausers, stopon2, subtitle2, usersremove, stopon3, validate_btn):
@@ -2637,13 +2668,14 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(siteurl)s/record/%(sysno)s">%(click)s</a>
+                        <a href="%(siteurl)s/record/%(sysno)s?ln=%(ln)s">%(click)s</a>
                         <br /><br />
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
                      'siteurl' : CFG_SITE_URL,
                      'sysno' : sysno,
+                     'ln' : ln,
                    }
 
         out += """      </small>
@@ -2669,12 +2701,14 @@ class Template:
                         <input type="hidden" name="categ" value="%(categ)s" />
                         <input type="hidden" name="RN" value="%(rn)s" />
                         <input type="hidden" name="apptype" value="%(apptype)s" />
-                        <input type="hidden" name="action" value="%(action)s" />""" % {
+                        <input type="hidden" name="action" value="%(action)s" />
+                        <input type="hidden" name="ln" value="%(ln)s" />""" % {
                      'rn' : rn,
                      'categ' : categ,
                      'doctype' : doctype,
                      'apptype' : apptype,
                      'action' : action,
+                     'ln': ln,
                    }
 
             out += ' <span class="adminlabel">1. %s </span>\n' % _("search for user")
@@ -2727,12 +2761,14 @@ class Template:
                             <input type="hidden" name="categ" value="%(categ)s" />
                             <input type="hidden" name="RN" value="%(rn)s" />
                             <input type="hidden" name="apptype" value="%(apptype)s" />
-                            <input type="hidden" name="action" value="%(action)s" />""" % {
+                            <input type="hidden" name="action" value="%(action)s" />
+                            <input type="hidden" name="ln" value="%(ln)s" />""" % {
                          'rn' : rn,
                          'categ' : categ,
                          'doctype' : doctype,
                          'apptype' : apptype,
                          'action' : action,
+                         'ln': ln,
                        }
 
                 out += ' <span class="adminlabel">1. %s </span>\n' % _("select user")
@@ -2764,6 +2800,7 @@ class Template:
                             <input type="hidden" name="apptype" value="%(apptype)s" />
                             <input type="hidden" name="action" value="%(action)s" />
                             <input type="hidden" name="validate" value="go" />
+                            <input type="hidden" name="ln" value="%(ln)s" />
                             <input class="adminbutton" type="submit" value="%(validate_btn)s" />
                           </form>""" % {
                          'rn' : rn,
@@ -2772,6 +2809,7 @@ class Template:
                          'apptype' : apptype,
                          'action' : action,
                          'validate_btn' : validate_btn,
+                         'ln': ln,
                        }
 
         return out
@@ -2814,13 +2852,14 @@ class Template:
                    }
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(siteurl)s/record/%(sysno)s">%(click)s</a>
+                        <a href="%(siteurl)s/record/%(sysno)s?ln=%(ln)s">%(click)s</a>
                         <br /><br />
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
                      'siteurl' : CFG_SITE_URL,
                      'sysno' : sysno,
+                     'ln' : ln,
                    }
 
         out += """      </small>
@@ -2843,6 +2882,7 @@ class Template:
   <input type="hidden" name="apptype" value="%(apptype)s" />
   <input type="hidden" name="action" value="%(action)s" />
   <input type="hidden" name="validate" value="go" />
+  <input type="hidden" name="ln" value="%(ln)s" />
   <div style="float: left; vertical-align:text-top; margin-right: 10px;">
     <table class="mailbox">
       <thead class="mailboxheader">
@@ -2928,6 +2968,7 @@ class Template:
                                  'subject_label': _("Subject:"),
                                  'message_label': _("Message:"),
                                  'send_label': _("SEND"),
+                                 'ln': ln,
                                 }
 
         out += write_box

@@ -374,8 +374,10 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
     def direct(self, req, form):
 
-        args = wash_urlargd(form, {'sub': (str, '')})
+        args = wash_urlargd(form, {'sub': (str, ''),
+                                   'ln': (str, CFG_SITE_LANG)})
         sub = args['sub']
+        ln = args['ln']
 
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
@@ -412,8 +414,8 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             mainmenu = req.headers_in['Referer']
         except:
             mainmenu = ""
-        url = "/submit?doctype=%s&dir=%s&access=%s&act=%s&startPg=1%s&mainmenu=%s" % (
-            doctype,dir,access,action,params,quote(mainmenu))
+        url = "/submit?doctype=%s&dir=%s&access=%s&act=%s&startPg=1%s&mainmenu=%s&ln=%s" % (
+            doctype,dir,access,action,params,quote(mainmenu), ln)
         req.err_headers_out.add("Location", url)
         raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
         return ""

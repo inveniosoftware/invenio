@@ -597,10 +597,11 @@ def interface(req,
     # start display:
     req.content_type = "text/html"
     req.send_http_header()
-    p_navtrail = """<a href="/submit" class="navtrail">%(submit)s</a>&nbsp;>&nbsp;<a href="/submit?doctype=%(doctype)s" class="navtrail">%(docname)s</a>&nbsp;""" % {
+    p_navtrail = """<a href="/submit?ln=%(ln)s" class="navtrail">%(submit)s</a>&nbsp;>&nbsp;<a href="/submit?doctype=%(doctype)s&amp;ln=%(ln)s" class="navtrail">%(docname)s</a>&nbsp;""" % {
                    'submit'  : _("Submit"),
                    'doctype' : doctype,
                    'docname' : docname,
+                   'ln' : ln
                  }
     return page(title= actname,
                 body = t,
@@ -966,10 +967,11 @@ def endaction(req,
     req.content_type = "text/html"
     req.send_http_header()
 
-    p_navtrail = """<a href="/submit" class="navtrail">""" + _("Submit") +\
-                 """</a>&nbsp;>&nbsp;<a href="/submit?doctype=%(doctype)s" class="navtrail">%(docname)s</a>""" % {
+    p_navtrail = '<a href="/submit?ln='+ln+'" class="navtrail">' + _("Submit") +\
+                 """</a>&nbsp;>&nbsp;<a href="/submit?doctype=%(doctype)s&amp;ln=%(ln)s" class="navtrail">%(docname)s</a>""" % {
                    'doctype' : doctype,
                    'docname' : docname,
+                   'ln' : ln,
                  }
     return page(title= actname,
                 body = t,
@@ -1238,7 +1240,8 @@ def action(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG, doctype=""):
           statustext = statustext,
         )
 
-    p_navtrail = """<a href="/submit" class="navtrail">%(submit)s</a>""" % {'submit' : _("Submit")}
+    p_navtrail = """<a href="/submit?ln=%(ln)s" class="navtrail">%(submit)s</a>""" % {'submit' : _("Submit"),
+                                                                                      'ln' : ln}
 
     return page(title = docFullDesc,
                 body=t,

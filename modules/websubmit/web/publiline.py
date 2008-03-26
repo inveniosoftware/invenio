@@ -126,7 +126,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
             t = displayCplxDocument(req, doctype, categ, RN, apptype, ln)
         else:
             t = doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, ln)
-        return page(title="specific publication line",
+        return page(title=_("Specific Approval and Refereeing Workflow"),
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display">%(account)s</a>""" % {
                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'account' : _("Your Account"),
@@ -147,7 +147,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
             t = selectDocument(doctype, categ, ln)
         else:
             t = displayDocument(req, doctype, categ, RN, send, ln)
-        return page(title="publication line",
+        return page(title="Approval and Refereeing Workflow",
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display">%(account)s</a>""" % {
                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'account' : _("Your Account"),
