@@ -45,7 +45,7 @@ import marshal
 from zlib import compress, decompress
 from thread import get_ident
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
-    CFG_MAX_CACHED_QUERIES, CFG_MISCUTIL_USE_SQLALCHEMY
+    CFG_MISCUTIL_SQL_MAX_CACHED_QUERIES, CFG_MISCUTIL_SQL_USE_SQLALCHEMY
 
 if CFG_MISCUTIL_USE_SQLALCHEMY:
     try:
@@ -54,7 +54,7 @@ if CFG_MISCUTIL_USE_SQLALCHEMY:
         mysqldb = pool.manage(mysqldb, use_threadlocal=True)
         connect = mysqldb.connect
     except ImportError:
-        CFG_MISCUTIL_USE_SQLALCHEMY = False
+        CFG_MISCUTIL_SQL_USE_SQLALCHEMY = False
         from MySQLdb import connect
 else:
     from MySQLdb import connect
@@ -86,7 +86,7 @@ def _db_login(relogin = 0):
     ## older MySQLdb versions here, since we are recommending to
     ## upgrade to more recent versions anyway.
 
-    if CFG_MISCUTIL_USE_SQLALCHEMY:
+    if CFG_MISCUTIL_SQL_USE_SQLALCHEMY:
         return connect(host=CFG_DATABASE_HOST, db=CFG_DATABASE_NAME,
                        user=CFG_DATABASE_USER, passwd=CFG_DATABASE_PASS,
                        use_unicode=False, charset='utf8')
@@ -156,7 +156,7 @@ def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=[]):
     key = repr((sql, param, n, with_desc))
 
     # Garbage collecting needed?
-    if len(_db_cache) >= CFG_MAX_CACHED_QUERIES:
+    if len(_db_cache) >= CFG_MISCUTIL_SQL_MAX_CACHED_QUERIES:
         _db_cache = {}
 
     # Query already in the cache?
