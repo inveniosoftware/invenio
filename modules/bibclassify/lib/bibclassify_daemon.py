@@ -28,21 +28,18 @@ This is not clean and should be fixed.
 __revision__ = "$Id$"
 
 import sys
+import time
+import os
 
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
     task_update_progress
 from invenio.bibclassifylib import generate_keywords_rdf
-from invenio.config import *
-from os import popen, remove, listdir
-import sys
+from invenio.config import CFG_BINDIR, CFG_ETCDIR, CFG_TMPDIR, CFG_PATH_PDFTOTEXT
 from invenio.intbitset import intbitset
 from invenio.search_engine import get_collection_reclist
 from invenio.bibdocfile import BibRecDocs
-import time
-import os
-
 
 def get_recids_foreach_ontology():
     """Returns an array containing hash objects containing the collection, its
@@ -91,10 +88,10 @@ def task_run_core():
         errcode = 0
         try:
             errcode = os.system(cmd)
-        except OSError, e:
-            print 'command' + cmd + ' failed  ',e
+        except OSError, exc:
+            print 'command' + cmd + ' failed  ', exc
         if errcode != 0:
-            write_message("WARNING, %s failed, error code is %s" % (cmd,errcode))
+            write_message("WARNING, %s failed, error code is %s" % (cmd, errcode))
             return 0
     update_date_of_last_run()
     return 1
@@ -105,7 +102,7 @@ def analyse_documents(recs, ontology, collection, outfilename, outfiledesc):
     time_now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     did_something = False
     counter = 1
-    max = len(recs)
+    amax = len(recs)
     # store running time:
     # see which records we'll have to process:
     #recIDs = get_recIDs_of_modified_records_since_last_run()
@@ -138,7 +135,7 @@ def analyse_documents(recs, ontology, collection, outfilename, outfiledesc):
                     write_message('Generating keywords for %s' % f.get_full_path())
                     print >> outfiledesc, generate_keywords_rdf(temp_text, CFG_ETCDIR + '/bibclassify/' + ontology + '.rdf', 2, 70, 25, 0, False, verbose=0, ontology=ontology)
                 print >> outfiledesc, '</record>'
-            task_update_progress("Done %s of %s for collction  %s." % (counter, max, collection))
+            task_update_progress("Done %s of %s for collction  %s." % (counter, amax, collection))
             counter += 1
     else:
         write_message("Nothing to be done, move along")
@@ -146,8 +143,8 @@ def analyse_documents(recs, ontology, collection, outfilename, outfiledesc):
 
 def cleanup_tmp():
     """Remove old temporary files created by this module"""
-    for f in listdir(CFG_TMPDIR):
-        if 'bibclassify' in f: remove(CFG_TMPDIR + '/' +f)
+    for f in os.listdir(CFG_TMPDIR):
+        if 'bibclassify' in f: os.remove(CFG_TMPDIR + '/' +f)
 
 def main():
     """Constructs the bibclassifyd bibtask."""
