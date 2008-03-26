@@ -359,7 +359,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                     cmd = "%s %s > %s" % \
                           (conv_program, tmp_name, tmp_dst_name)
                 else:
-                    write_message("Error: Do not know how to handle %s conversion program.\n" % conv_program, sys.stderr)
+                    write_message("Error: Do not know how to handle %s conversion program." % conv_program, sys.stderr)
                 # try to run it:
                 try:
                     write_message("..... launching %s" % cmd, verbose=9)
