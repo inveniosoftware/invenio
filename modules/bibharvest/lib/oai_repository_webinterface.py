@@ -68,14 +68,6 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
             if param not in argd.keys():
                 argd[param] = ''
 
-        ## Remove the 'ln' parameter, which is automatically added to
-        ## all requests in CDS Invenio. A 'badArgument' error should
-        ## be returned according to the protocol if someone uses 'ln'
-        ## in the request, but we cannot distinct from 'ln'
-        ## automatically added. In practice this should not be a
-        ## problem.
-        del argd['ln']
-
         ## check request for OAI compliancy
         ## also transform all the list arguments into string
         oai_error = oai_repository.check_argd(argd)

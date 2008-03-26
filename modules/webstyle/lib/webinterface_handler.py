@@ -56,6 +56,11 @@ has_https_support = CFG_SITE_URL != CFG_SITE_SECURE_URL
 
 DEBUG = False
 
+# List of URIs for which the 'ln' argument must not be added
+# automatically
+no_lang_recognition_uris = ['/rss',
+                            '/oai2d']
+
 def _debug(msg):
     if DEBUG:
         apache.log_error(msg, apache.APLOG_WARNING)
@@ -191,12 +196,14 @@ class WebInterfaceDirectory(object):
         form = util.FieldStorage(req, keep_blank_values=True)
         try:
             # The auto recognition will work only with with mod_python-3.3.1
-            if not form.has_key('ln'):
+            if not form.has_key('ln') and \
+                   req.uri not in no_lang_recognition_uris:
                 ln = get_preferred_user_language(req)
                 form.add_field('ln', ln)
         except:
             form = dict(form)
-            if not form.has_key('ln'):
+            if not form.has_key('ln') and \
+                   req.uri not in no_lang_recognition_uris:
                 ln = get_preferred_user_language(req)
                 form['ln'] = ln
         result = obj(req, form)
