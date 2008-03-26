@@ -356,7 +356,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                and uid2 != -1 and (uid2 == uid or uid2 == 0) \
                and uid_with_the_same_nickname != -1 and (uid_with_the_same_nickname == uid or uid_with_the_same_nickname == 0):
                 if CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
-                    change = webuser.update_data_user(uid,
+                    change = webuser.updateDataUser(uid,
                                                     args['email'],
                                                     args['nickname'])
                 else:
