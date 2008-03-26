@@ -47,4 +47,4 @@ if [ "$1" = "-V" ] || [ "$1" = "--version" ]; then
 fi 
  
 ## okay, call MySQL client:
-$MYSQL -B --host="$CFG_DATABASE_HOST" --user="$CFG_DATABASE_USER" --password="$CFG_DATABASE_PASS" $CFG_DATABASE_NAME
+$MYSQL -B --default-character-set="utf8" --host="$CFG_DATABASE_HOST" --user="$CFG_DATABASE_USER" --password="$CFG_DATABASE_PASS" $CFG_DATABASE_NAME
