@@ -11,7 +11,257 @@ consult ChangeLog.
 CDS Invenio v0.99.0 -- released FIXME
 ------------------------------------------
 
-FIXME
+ *) new Invenio configuration language, new inveniocfg configuration
+    tool permitting more runtime changes and enabling separate local
+    customizations (MiscUtil)
+
+ *) phased out WML dependency everywhere (all modules)
+
+ *) new common RSS cache implementation (WebSearch)
+
+ *) improved access control to the detailed record pages (WebSearch)
+
+ *) when searching non-existing collections, do not revert to
+    searching in public Home anymore (WebSearch)
+
+ *) strict calculation of number of hits per multiple collections
+    (WebSearch)
+
+ *) propagate properly language environment in browse pages, thanks to
+    Ferran Jorba (WebSearch)
+
+ *) search results sorting made accentless, thanks to Ferran Jorba
+    (WebSearch)
+
+ *) new OpenURL interface (WebSearch)
+
+ *) added new search engine API argument to limit searches to record
+    creation/modification dates and times instead of hitherto creation
+    dates only (WebSearch)
+
+ *) do not allow HTTP POST method for searches to prevent hidden
+    mining (WebSearch)
+
+ *) added alert and RSS teaser for search engine queries (WebSearch)
+
+ *) new optimized index structure for fast integer bit vector
+    operations, leading to significant indexing time improvements
+    (MiscUtil, BibIndex, WebSearch)
+
+ *) new tab-based organisation of detailed record pages, with new URL
+    schema (/record/1/usage) and related CSS changes (BibFormat,
+    MiscUtil, WebComment, WebSearch, WebStyle, WebSubmit)
+
+ *) phased out old PHP based code; migration to Python-based output
+    formats recommended (BibFormat, WebSubmit)
+
+ *) new configurability to show/hide specific output formats for
+    specific collections (BibFormat, WebSearch)
+
+ *) new configurability to have specific stemming settings for
+    specific indexes (BibIndex, WebSearch)
+
+ *) optional removal of LaTeX markup for indexer (BibIndex, WebSearch)
+
+ *) performance optimization for webcoll and optional arguments to
+    refresh only parts of collection cache (WebSearch)
+
+ *) optional verbosity argument propagation to the output formatter
+    (BibFormat, WebSearch)
+
+ *) new convenient reindex option to the indexer (BibIndex)
+
+ *) fixed problem with indexing of some lengthy UTF-8 accented names,
+    thanks to Theodoros Theodoropoulos for reporting the problem
+    (BibIndex)
+
+ *) fixed full-text indexing of HTML pages (BibIndex)
+
+ *) new Stemmer module dependency, fixes issues on 64-bit systems
+    (BibIndex)
+
+ *) fixed download history graph display (BibRank)
+
+ *) improved citation ranking and history graphs, introduced
+    self-citation distinction, added new demo records (BibRank)
+
+ *) fixed range redefinition and output message printing problems in
+    the ranking indexer, thanks to Mike Marino (BibRank)
+
+ *) new XSLT output formatter support; phased out old BFX formats
+    (BibFormat)
+
+ *) I18N output messages are now translated in the output formatter
+    templates (BibFormat)
+
+ *) formats fixed to allow multiple author affiliations (BibFormat)
+
+ *) improved speed of the record output reformatter in case of large
+    sets (BibFormat)
+
+ *) support for displaying LaTeX forumas via JavaScript (BibFormat)
+
+ *) new and improved output formatter elements (BibFormat)
+
+ *) new escaping modes for format elements (BibFormat)
+
+ *) output format template editor cache and element dependency
+    checker improvements (BibFormat)
+
+ *) output formatter speed improvements in PHP-compatible mode
+    (BibFormat)
+
+ *) new demo submission configuration and approval workflow examples
+    (WebSubmit)
+
+ *) new submission full-text file stamper utility (WebSubmit)
+
+ *) new submission icon-creation utility (WebSubmit)
+
+ *) separated submission engine and database layer (WebSubmit)
+
+ *) submission functions can now access user information (WebSubmit)
+
+ *) implemented support for restricted icons (WebSubmit, WebAccess)
+
+ *) new full-text file URL and cleaner storage facility; requires file
+    names to be unique within a given record (WebSearch, WebSubmit)
+
+ *) experimental release of the complex approval and refereeing
+    workflow (WebSubmit)
+
+ *) new end-submission functions to move files to storage space
+    (WebSubmit)
+
+ *) added support for MD5 checking of full-text files (WebSubmit)
+
+ *) improved behaviour of the submission system with respect to the
+    browser "back" button (WebSubmit)
+
+ *) removed support for submission "cookies" (WebSubmit)
+
+ *) flexible report number generation during submission (WebSubmit)
+
+ *) added support for optional filtering step in the OAI harvesting
+    chain (BibHarvest)
+
+ *) new text-oriented converter functions IFDEFP, JOINMULTILINES
+    (BibConvert)
+
+ *) selective harvesting improvements, sets, non-standard responses,
+    safer resumption token handling (BibHarvest)
+
+ *) OAI archive configuration improvements: collections retrieval,
+    multiple set definitions, new clean mode, timezones, and more
+    (BibHarvest)
+
+ *) OAI gateway improvements: XSLT used to produce configurable output
+    (BibHarvest)
+
+ *) added support for "strong tags" that can resist metadata replace
+    mode (BibUpload)
+
+ *) added external OAI ID tag support to the uploader (BibUpload)
+
+ *) added support for full-text file transfer during uploading
+    (BibUpload)
+
+ *) preserving full history of all MARCXML versions of a record
+    (BibEdit, BibUpload)
+
+ *) XMLMARC to TextMarc improvements: empty indicators and more
+    (BibEdit)
+
+ *) numerous reference extraction tool improvements: year handling,
+    LaTeX handling, URLs, journal titles, output methods, and more
+    (BibEdit)
+
+ *) new classification daemon (BibClassify)
+
+ *) classification taxonomy caching resulting in speed optimization
+    (BibClassify)
+
+ *) new possibility to define more than one keyword taxonomy per
+    collection (BibClassify)
+
+ *) fixed non-standalone keyword detection, thanks to Annette Holtkamp
+    (BibClassify)
+
+ *) new embedded page generation profiler (WebStyle)
+
+ *) new /help pages layout and webdoc formatting tool (WebStyle)
+
+ *) new custom style template verification tool (WebStyle)
+
+ *) added support for the XML page() output format, suitable for AJAX
+    interfaces (WebStyle)
+
+ *) introduction of navigation menus (WebStyle)
+
+ *) general move from HTML to XHTML markup (all modules)
+
+ *) fixed alert deletion tool vulnerability (WebAlert)
+
+ *) do not advertise baskets/alerts much for guest users; show only
+    the login link (WebSession)
+
+ *) password reset interface improvements (WebSession)
+
+ *) new permanent "remember login" mechanism (WebSession, WebAccess)
+
+ *) local user passwords are now encrypted (WebSession, WebAccess)
+
+ *) new LDAP external authentication plugin (WebAccess)
+
+ *) new password reset mechanism using new secure mail cookies and
+    temporary role membership facilities (WebAccess, WebSession)
+
+ *) added support for Single Sign-On Shibboleth based authentication
+    method (WebAccess)
+
+ *) new firewall-like based role definition language, new demo
+    examples (WebAccess)
+
+ *) external authentication and groups improvements: nicknames,
+    account switching, and more (WebSession, WebAccess)
+
+ *) task log viewer integrated in the task monitor (BibSched)
+
+ *) new journal creation module (WebJournal)
+
+ *) new generic statistic gathering and display facility (WebStat)
+
+ *) deployed new common email sending facility (MiscUtil, WebAlert,
+    WebComment, WebSession, WebSubmit)
+
+ *) dropped support for MySQL-4.0, permitting to use clean and strict
+    UTF-8 storage methods; upgrade of MySQLdb to at least 1.2.1_p2
+    required (MiscUtil)
+
+ *) uncatched exceptions are now being sent by email to the
+    administrator (MiscUtil, WebStyle)
+
+ *) new general garbage collector with a possibility to run via the
+    task scheduler and a possibility to clean unreferenced
+    bibliographic values (MiscUtil)
+
+ *) new generic SQL and data cacher (MiscUtil)
+
+ *) new HTML page validator plugin (MiscUtil)
+
+ *) new web test suite running in a real browser (MiscUtil)
+
+ *) improved code kwalitee checker (MiscUtil)
+
+ *) translation updates: Spanish and Catalan (thanks to Ferran Jorba),
+    Japanese (Toru Tsuboyama), German (Benedikt Koeppel), Polish
+    (Zbigniew Szklarz and Zbigniew Leonowicz), Greek (Theodoros
+    Theodoropoulos), Russian (Yana Osborne), Swedish, Italian, French
+
+ *) new translations: Chinese traditional and Chinese simplified
+    (thanks to Kam-ming Ku)
+
+ *) ... plus many other minor bug fixes and improvements
 
 CDS Invenio v0.92.1 -- released 2007-02-20
 ------------------------------------------
