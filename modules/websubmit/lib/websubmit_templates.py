@@ -1577,7 +1577,7 @@ class Template:
             </tr>
         </table>
 
-        <a href="publiline.py?flow=cplx">Go to specific approval workflow.</a>"""
+        <a href="publiline.py?flow=cplx&amp;ln=%s">%s</a>""" % (ln, _("Go to specific approval workflow."))
         return out
 
     def tmpl_publiline_selectcplxdoctype(self, ln, docs):
@@ -1620,7 +1620,7 @@ class Template:
             </tr>
         </table>
 
-        <a href="publiline.py">Go to general approval workflow.</a>"""
+        <a href="publiline.py?ln=%s">%s</a>""" % (ln, _("Go to general approval workflow."))
         return out
 
     def tmpl_publiline_selectcateg(self, ln, doctype, title, categories):
