@@ -50,6 +50,10 @@ sources get installed to, what is the visible URL policy, etc.</dd>
 <dt><a href="test-suite">Test Suite</a></dt>
 <dd>Describes our unit and regression test suites.</dd>
 
+<p>For more developer-related information, be sure to
+visit <a href="https://twiki.cern.ch/twiki/bin/view/CDS/Invenio">Invenio
+wiki</a>.</p>
+
 </dl>
 </blockquote>
 
