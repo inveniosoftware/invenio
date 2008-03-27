@@ -147,7 +147,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
             t = selectDocument(doctype, categ, ln)
         else:
             t = displayDocument(req, doctype, categ, RN, send, ln)
-        return page(title="Approval and Refereeing Workflow",
+        return page(title=_("Approval and Refereeing Workflow"),
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display">%(account)s</a>""" % {
                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'account' : _("Your Account"),
