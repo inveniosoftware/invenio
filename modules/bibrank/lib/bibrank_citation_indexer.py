@@ -674,7 +674,7 @@ def get_initial_author_dict():
 	   dict[a] = deserialize_via_marshal(h)
         return dict
     except:
-        print "Critical error: could not read "+name+" from db"
+        print "Critical error: could not read rnkAUTHORDATAR"
         traceback.print_tb(sys.exc_info()[2])
         dict = {}
         return dict
@@ -683,15 +683,15 @@ def get_initial_author_dict():
 def insert_into_missing(recid,report):
     """put the referingrecordnum-publicationstring into the "we are missing these" table"""
     report.replace('"','\'')
-    sql = "select id_bibrec from rnkCITATIONDATAEXT where id_bibrec="+str(recid)+" and pubinfo=\""+report+"\""
-    wasalready = run_sql(sql)
-    if not wasalready:
-        sql = "insert into rnkCITATIONDATAEXT(id_bibrec,pubinfo) values ("+str(recid)+",\""+report+"\")"
-        try:
+    try:
+        sql = "select id_bibrec from rnkCITATIONDATAEXT where id_bibrec="+str(recid)+" and pubinfo=\""+report+"\""
+        wasalready = run_sql(sql)
+        if not wasalready:
+            sql = "insert into rnkCITATIONDATAEXT(id_bibrec,pubinfo) values ("+str(recid)+",\""+report+"\")"
             run_sql(sql)
-        except:
-            #we should complain but it can result to million lines of warnings so just pass..
-            pass
+    except:
+        #we should complain but it can result to million lines of warnings so just pass..
+        pass
         
 def remove_from_missing(report):
     """remove the recid-ref -pairs from the "missing" table for report x: prob
