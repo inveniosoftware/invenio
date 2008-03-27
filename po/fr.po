@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-03-27 09:54+0100\n"
-"PO-Revision-Date: 2008-03-27 07:43+0100\n"
+"PO-Revision-Date: 2008-03-27 10:21+0100\n"
 "Last-Translator: Jerome Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -6582,9 +6582,8 @@ msgid "Specific Approval and Refereeing Workflow"
 msgstr "Processus Spécifique d'Approbation et d'Examination"
 
 #: modules/websubmit/web/publiline.py:150
-#, fuzzy
 msgid "Approval and Refereeing Workflow"
-msgstr "Processus Spécifique d'Approbation et d'Examination"
+msgstr "Processus d'Approbation et d'Examination"
 
 #: modules/websubmit/web/publiline.py:328
 #: modules/websubmit/web/publiline.py:423
