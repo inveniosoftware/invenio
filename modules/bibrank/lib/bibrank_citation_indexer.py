@@ -658,6 +658,8 @@ def get_cit_dict(name):
         if dict and dict[0] and dict[0][0]:
             dict_from_db = marshal.loads(decompress(dict[0][0]))
             return dict_from_db
+        else:
+            return {}
     except:
         print "Critical error: could not read "+name+" from db"
         traceback.print_tb(sys.exc_info()[2])       
