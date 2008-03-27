@@ -20,7 +20,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: it\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2008-03-27 00:29+0100\n"
+"POT-Creation-Date: 2008-03-27 09:54+0100\n"
 "PO-Revision-Date: 2008-03-26 15:07+0100\n"
 "Last-Translator: Samuele Kaplun <Samuele.Kaplun@cern.ch>\n"
 "Language-Team:  <cds.support@cern.ch>\n"
@@ -6585,6 +6585,10 @@ msgstr "Manca il parametro docid"
 
 #: modules/websubmit/web/publiline.py:129
 msgid "Specific Approval and Refereeing Workflow"
+msgstr ""
+
+#: modules/websubmit/web/publiline.py:150
+msgid "Approval and Refereeing Workflow"
 msgstr ""
 
 #: modules/websubmit/web/publiline.py:328

@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2008-03-27 00:29+0100\n"
+"POT-Creation-Date: 2008-03-27 09:54+0100\n"
 "PO-Revision-Date: 2008-02-29 15:28+0100\n"
 "Last-Translator: Toru Tsuboyama <toru.tsuboyama@kek.jp>\n"
 "Language-Team: JA <cds.support@cern.ch>\n"
@@ -6472,6 +6472,10 @@ msgstr "docimパラメータがありません。"
 
 #: modules/websubmit/web/publiline.py:129
 msgid "Specific Approval and Refereeing Workflow"
+msgstr ""
+
+#: modules/websubmit/web/publiline.py:150
+msgid "Approval and Refereeing Workflow"
 msgstr ""
 
 #: modules/websubmit/web/publiline.py:328

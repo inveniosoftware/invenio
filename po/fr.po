@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2008-03-27 00:29+0100\n"
+"POT-Creation-Date: 2008-03-27 09:54+0100\n"
 "PO-Revision-Date: 2008-03-27 07:43+0100\n"
 "Last-Translator: Jerome Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
@@ -6157,7 +6157,9 @@ msgstr "Liste des types de documents relus"
 #: modules/websubmit/lib/websubmit_templates.py:1626
 msgid ""
 "Select one of the following types of documents to check the documents status"
-msgstr "Choisissez l'un des types de documents suivants pour vérifier le statut des documents"
+msgstr ""
+"Choisissez l'un des types de documents suivants pour vérifier le statut des "
+"documents"
 
 #: modules/websubmit/lib/websubmit_templates.py:1594
 msgid "Go to specific approval workflow"
@@ -6347,7 +6349,9 @@ msgstr "ATTENTION! Un email sera envoyé à votre relecteur si vous confirmez."
 msgid ""
 "As a referee for this document, you may click this button to approve or "
 "reject it"
-msgstr "En tant que relecteur de ce document, vous pouvez cliquer sur le bouton pour l'approuver ou le rejeter"
+msgstr ""
+"En tant que relecteur de ce document, vous pouvez cliquer sur le bouton pour "
+"l'approuver ou le rejeter"
 
 #: modules/websubmit/lib/websubmit_templates.py:2292
 msgid "Approve/Reject"
@@ -6384,7 +6388,9 @@ msgstr "Le processus de relecture a été demandé pour le première fois le "
 #: modules/websubmit/lib/websubmit_templates.py:2393
 #: modules/websubmit/lib/websubmit_templates.py:2437
 msgid "Last request e-mail was sent to the publication committee chair on the "
-msgstr "Le dernière requête a été envoyée par email au responsable du comité de publication le "
+msgstr ""
+"Le dernière requête a été envoyée par email au responsable du comité de "
+"publication le "
 
 #: modules/websubmit/lib/websubmit_templates.py:2396
 msgid "A referee has been selected by the publication committee on the "
@@ -6404,7 +6410,9 @@ msgstr "Sélectionner un relecteur"
 msgid ""
 "The referee has sent his final recommendations to the publication committee "
 "on the "
-msgstr "Le relecteur a envoyé ses recommandations finales au comité de publication le "
+msgstr ""
+"Le relecteur a envoyé ses recommandations finales au comité de publication "
+"le "
 
 #: modules/websubmit/lib/websubmit_templates.py:2406
 #: modules/websubmit/lib/websubmit_templates.py:2461
@@ -6424,7 +6432,9 @@ msgstr "Envoyer une recommandation"
 msgid ""
 "The publication committee has sent his final recommendations to the project "
 "leader on the "
-msgstr "Le comité de publication a envoyé ses recommandations finales au chef de projet le "
+msgstr ""
+"Le comité de publication a envoyé ses recommandations finales au chef de "
+"projet le "
 
 #: modules/websubmit/lib/websubmit_templates.py:2414
 #: modules/websubmit/lib/websubmit_templates.py:2477
@@ -6466,7 +6476,8 @@ msgstr "Prendre une décision"
 #: modules/websubmit/lib/websubmit_templates.py:2440
 msgid ""
 "An editorial board has been selected by the publication committee on the "
-msgstr "Un comité rédactionnel a été sélectionné par le comité de publication le "
+msgstr ""
+"Un comité rédactionnel a été sélectionné par le comité de publication le "
 
 #: modules/websubmit/lib/websubmit_templates.py:2442
 msgid "Add an author list"
@@ -6494,7 +6505,9 @@ msgstr ""
 msgid ""
 "The editorial board has sent his final recommendations to the publication "
 "committee on the "
-msgstr "Le comité rédactionnel a envoyé ses recommandation finales au comité de publication le "
+msgstr ""
+"Le comité rédactionnel a envoyé ses recommandation finales au comité de "
+"publication le "
 
 #: modules/websubmit/lib/websubmit_templates.py:2469
 msgid "No recommendation from the editorial board yet."
@@ -6566,6 +6579,11 @@ msgstr "Le paramètre docid n'a pas été fourni"
 
 #: modules/websubmit/web/publiline.py:129
 msgid "Specific Approval and Refereeing Workflow"
+msgstr "Processus Spécifique d'Approbation et d'Examination"
+
+#: modules/websubmit/web/publiline.py:150
+#, fuzzy
+msgid "Approval and Refereeing Workflow"
 msgstr "Processus Spécifique d'Approbation et d'Examination"
 
 #: modules/websubmit/web/publiline.py:328

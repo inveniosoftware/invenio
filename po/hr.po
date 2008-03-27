@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2008-03-27 00:29+0100\n"
+"POT-Creation-Date: 2008-03-27 09:54+0100\n"
 "PO-Revision-Date: 2008-02-29 15:34+0100\n"
 "Last-Translator: Alen Vodopijevec <alen@irb.hr>\n"
 "Language-Team: HR <cds.support@cern.ch>\n"
@@ -6577,6 +6577,10 @@ msgstr "Nedostaje parametar docid"
 
 #: modules/websubmit/web/publiline.py:129
 msgid "Specific Approval and Refereeing Workflow"
+msgstr ""
+
+#: modules/websubmit/web/publiline.py:150
+msgid "Approval and Refereeing Workflow"
 msgstr ""
 
 #: modules/websubmit/web/publiline.py:328
