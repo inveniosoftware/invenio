@@ -1,6 +1,32 @@
 CDS Invenio v0.99.0 (released 2008-03-27)
 =========================================
 
+2008-03-27  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/it.po: Standardized Language-Team.
+
+2008-03-27  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/pt.po: Updated Portuguese translation, thanks to Joaquim.
+
+2008-03-27  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websubmit/web/test_submit_tar_gz.html: Altered document
+	title in order to be able to distinguish this test easily from the
+	article test submission.
+
+2008-03-27  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/it.po: Fixed header, Project-Id-Version and friends.
+
+2008-03-27  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/it.po: Release of v0.99.0.
+
+2008-03-27  Tibor Simko <tibor.simko@cern.ch>
+
+	* ChangeLog: Updated ChangeLog.
+
 2008-03-27  Jerome Caffaro <jerome.caffaro@cern.ch>
 
 	* po/fr.po: Updated translation
