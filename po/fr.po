@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-03-27 00:29+0100\n"
-"PO-Revision-Date: 2008-03-25 13:59+0100\n"
+"PO-Revision-Date: 2008-03-27 07:43+0100\n"
 "Last-Translator: Jerome Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1774,47 +1774,43 @@ msgstr "Afficher les %i auteurs"
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:99
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:115
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:117
-#, fuzzy
 msgid "Download fulltext"
-msgstr "Aucun fichier"
+msgstr "Télécharger le document"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:65
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:57
 msgid "additional files"
-msgstr ""
+msgstr "Fichiers additionnels"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:69
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:61
-#, fuzzy
 msgid "older versions"
-msgstr "version"
+msgstr "anciennes versions"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:89
 #: modules/bibformat/lib/elements/bfe_fulltext.py:98
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:103
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:120
-#, fuzzy
 msgid "link"
-msgstr "dans"
+msgstr "lien"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:89
 #: modules/bibformat/lib/elements/bfe_fulltext.py:98
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:103
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:120
-#, fuzzy
 msgid "links"
-msgstr "identification"
+msgstr "liens"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:90
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:104
 #, python-format
 msgid "CERN %(link_or_links)s"
-msgstr ""
+msgstr "%(link_or_links)s CERN"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:99
 #, python-format
 msgid "External %(link_or_links)s"
-msgstr ""
+msgstr "%(link_or_links)s externes"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:177
 #: modules/websearch/lib/websearchadminlib.py:3205
@@ -1822,14 +1818,13 @@ msgid "Fulltext"
 msgstr "Fichiers"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:197
-#, fuzzy
 msgid "Main file(s)"
-msgstr "fichier(s)"
+msgstr "fichier(s) principal(aux)"
 
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:121
 #, python-format
 msgid "external %(link_or_links)s"
-msgstr ""
+msgstr "%(link_or_links)s externes"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:178
 #: modules/bibformat/web/admin/bibformatadmin.py:246
@@ -2235,7 +2230,7 @@ msgstr "similarité de mots"
 
 #: modules/miscutil/lib/inveniocfg.py:412
 msgid "journal impact factor"
-msgstr ""
+msgstr "journal impact factor"
 
 #: modules/miscutil/lib/inveniocfg.py:413
 msgid "times cited"
@@ -2811,7 +2806,7 @@ msgstr "S'abonner"
 
 #: modules/webbasket/lib/webbasket_templates.py:377
 msgid "There is currently no publicly accessible basket"
-msgstr "Il n'y a pas de panier public actuellement."
+msgstr "Il n'y a pas de panier public actuellement"
 
 #: modules/webbasket/lib/webbasket_templates.py:389
 #, python-format
@@ -3299,7 +3294,7 @@ msgstr "Évaluer ce document"
 #: modules/webcomment/lib/webcomment_templates.py:296
 #: modules/webcomment/lib/webcomment_templates.py:586
 msgid "Be the first to review this document."
-msgstr "Soyez le premier à noter ce document"
+msgstr "Soyez le premier à évaluer ce document."
 
 #: modules/webcomment/lib/webcomment_templates.py:324
 #: modules/webcomment/lib/webcomment_templates.py:366
@@ -3453,7 +3448,7 @@ msgstr "Supprimer un/une commentaire/évaluation (par identifiant)"
 
 #: modules/webcomment/lib/webcomment_templates.py:1029
 msgid "View all users who have been reported"
-msgstr "Voir tous les utilisateurs qui ont été signalés."
+msgstr "Voir tous les utilisateurs qui ont été signalés"
 
 #: modules/webcomment/lib/webcomment_templates.py:1031
 msgid "Guide"
@@ -5811,7 +5806,7 @@ msgstr ""
 "Notice créée le %(x_date_creation)s, modifiée le %(x_date_modification)s"
 
 #: modules/webstyle/lib/webdoc.py:546
-#, fuzzy, python-format
+#, python-format
 msgid "%(category)s Pages"
 msgstr "Pages \"%(category)s\""
 
@@ -5932,9 +5927,8 @@ msgid "Document types available for submission"
 msgstr "Types de documents disponibles pour la soumission"
 
 #: modules/websubmit/lib/websubmit_templates.py:94
-#, fuzzy
 msgid "Please select the type of document you want to submit"
-msgstr "Veuillez choisir le type de document que vous souhaitez soumettre."
+msgstr "Veuillez choisir le type de document que vous souhaitez soumettre"
 
 #: modules/websubmit/lib/websubmit_templates.py:111
 msgid "No document types available."
@@ -6161,21 +6155,17 @@ msgstr "Liste des types de documents relus"
 
 #: modules/websubmit/lib/websubmit_templates.py:1581
 #: modules/websubmit/lib/websubmit_templates.py:1626
-#, fuzzy
 msgid ""
 "Select one of the following types of documents to check the documents status"
-msgstr ""
-"Choisissez l'un des types de documents suivants pour vérifier le statut des "
-"documents."
+msgstr "Choisissez l'un des types de documents suivants pour vérifier le statut des documents"
 
 #: modules/websubmit/lib/websubmit_templates.py:1594
-#, fuzzy
 msgid "Go to specific approval workflow"
-msgstr "Liste des approbations spécifiques"
+msgstr "Aller au processus d'approbation spécifique"
 
 #: modules/websubmit/lib/websubmit_templates.py:1639
 msgid "Go to general approval workflow"
-msgstr ""
+msgstr "Aller au processus d'approbation général"
 
 #: modules/websubmit/lib/websubmit_templates.py:1687
 msgid "List of refereed categories"
@@ -6354,13 +6344,10 @@ msgid "WARNING! Upon confirmation, an email will be sent to the referee."
 msgstr "ATTENTION! Un email sera envoyé à votre relecteur si vous confirmez."
 
 #: modules/websubmit/lib/websubmit_templates.py:2290
-#, fuzzy
 msgid ""
 "As a referee for this document, you may click this button to approve or "
 "reject it"
-msgstr ""
-"En tant que relecteur de ce document, vous pouvez cliquer sur le bouton pour "
-"l'approuver ou le rejeter."
+msgstr "En tant que relecteur de ce document, vous pouvez cliquer sur le bouton pour l'approuver ou le rejeter"
 
 #: modules/websubmit/lib/websubmit_templates.py:2292
 msgid "Approve/Reject"
@@ -6397,7 +6384,7 @@ msgstr "Le processus de relecture a été demandé pour le première fois le "
 #: modules/websubmit/lib/websubmit_templates.py:2393
 #: modules/websubmit/lib/websubmit_templates.py:2437
 msgid "Last request e-mail was sent to the publication committee chair on the "
-msgstr "Le dernière requête a été envoyée par email au comité de lecture le "
+msgstr "Le dernière requête a été envoyée par email au responsable du comité de publication le "
 
 #: modules/websubmit/lib/websubmit_templates.py:2396
 msgid "A referee has been selected by the publication committee on the "
@@ -6417,8 +6404,7 @@ msgstr "Sélectionner un relecteur"
 msgid ""
 "The referee has sent his final recommendations to the publication committee "
 "on the "
-msgstr ""
-"Le relecteur a envoyé ses recommandations finales au comité de lecture le "
+msgstr "Le relecteur a envoyé ses recommandations finales au comité de publication le "
 
 #: modules/websubmit/lib/websubmit_templates.py:2406
 #: modules/websubmit/lib/websubmit_templates.py:2461
@@ -6438,14 +6424,12 @@ msgstr "Envoyer une recommandation"
 msgid ""
 "The publication committee has sent his final recommendations to the project "
 "leader on the "
-msgstr ""
-"Le comité de lecture a envoyé ses recommandations finales au chef de projet "
-"le "
+msgstr "Le comité de publication a envoyé ses recommandations finales au chef de projet le "
 
 #: modules/websubmit/lib/websubmit_templates.py:2414
 #: modules/websubmit/lib/websubmit_templates.py:2477
 msgid "No recommendation from the publication committee yet."
-msgstr "Aucune recommandation du comité de lecture pour l'instant."
+msgstr "Aucune recommandation du comité de publication pour l'instant."
 
 #: modules/websubmit/lib/websubmit_templates.py:2420
 #: modules/websubmit/lib/websubmit_templates.py:2483
@@ -6482,7 +6466,7 @@ msgstr "Prendre une décision"
 #: modules/websubmit/lib/websubmit_templates.py:2440
 msgid ""
 "An editorial board has been selected by the publication committee on the "
-msgstr "Un comité rédactionnel a été sélectionné par le comité de lecture"
+msgstr "Un comité rédactionnel a été sélectionné par le comité de publication le "
 
 #: modules/websubmit/lib/websubmit_templates.py:2442
 msgid "Add an author list"
@@ -6510,9 +6494,7 @@ msgstr ""
 msgid ""
 "The editorial board has sent his final recommendations to the publication "
 "committee on the "
-msgstr ""
-"Le comité rédactionnel a envoyé ses recommandation finales au comité de "
-"lecture le "
+msgstr "Le comité rédactionnel a envoyé ses recommandation finales au comité de publication le "
 
 #: modules/websubmit/lib/websubmit_templates.py:2469
 msgid "No recommendation from the editorial board yet."
@@ -6580,11 +6562,11 @@ msgstr "Accès au texte intégral"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:305
 msgid "Parameter docid missing"
-msgstr "Le paramètre docid n'a pas été fourni."
+msgstr "Le paramètre docid n'a pas été fourni"
 
 #: modules/websubmit/web/publiline.py:129
 msgid "Specific Approval and Refereeing Workflow"
-msgstr ""
+msgstr "Processus Spécifique d'Approbation et d'Examination"
 
 #: modules/websubmit/web/publiline.py:328
 #: modules/websubmit/web/publiline.py:423
@@ -6683,7 +6665,7 @@ msgstr "Rejeter"
 
 #: modules/websubmit/web/publiline.py:1168
 msgid "Wrong action for this document."
-msgstr "Mauvaise action sur ce document"
+msgstr "Mauvaise action sur ce document."
 
 #: modules/webjournal/lib/webjournal_utils.py:144
 msgid "Please login to perform this action."
@@ -6765,7 +6747,7 @@ msgstr "Il n'y a pas de format configuré pour le \"popup\" de ces journaux"
 
 #: modules/webjournal/lib/webjournal_config.py:194
 msgid "No journal articles"
-msgstr "Aucun article."
+msgstr "Aucun article"
 
 #: modules/webjournal/lib/webjournal_config.py:195
 #: modules/webjournal/lib/webjournal_config.py:233
@@ -6787,7 +6769,7 @@ msgstr "Nous n'avons pas pu trouver l'article demandé"
 
 #: modules/webjournal/lib/webjournal_config.py:303
 msgid "No journals available"
-msgstr "Aucun journal disponible."
+msgstr "Aucun journal disponible"
 
 #: modules/webjournal/lib/webjournal_config.py:304
 msgid "We could not provide you any journals"
