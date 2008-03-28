@@ -75,7 +75,7 @@ def get_citation_weight(rank_method_code, config):
             first = id[0][0]
             last = id[0][1]
 	    #make range
-            updated_recid_list = range(first,last)
+            updated_recid_list = range(first, last)
         else: 
             updated_recid_list = create_recordid_list(last_modified_records)
     
@@ -304,47 +304,37 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
         i = i+1
         if task_get_option('verbose') >= 3:     
             if (i % 100 == 0):
-                write_message("Done "+str(i)+" records",sys.stderr)
+                write_message("Done "+str(i)+" records", sys.stderr)
         #get the author of k
-        xml = print_record(int(k),'xm')
+        xml = print_record(int(k), 'xm')
         rs = create_records(xml)
         recs = map((lambda x:x[0]), rs)
-        for rec in recs:
-            #author tag
-            author = record_get_field_value(rec,"100","","","a")
-            otherauthors = record_get_field_values(rec,"700","","","a")
-            moreauthors = record_get_field_values(rec,"720","","","a")
-            authorlist = [author]
-            authorlist.extend(otherauthors)
-            authorlist.extend(moreauthors)
-            #print "record "+str(k)+" by "+str(authorlist)
-            #print "is cited by"
-            #get the "x-cites-this" list
-            if citationdic.has_key(k):
-                xct = citationdic[k]
-                for c in xct:
-                    cxml = print_record(int(c),'xm')
-                    crs = create_records(cxml)
-                    crecs = map((lambda x:x[0]), crs)
-                    for crec in crecs:
-                        cauthor = record_get_field_value(crec,"100","","","a")
-                        cotherauthors = record_get_field_values(crec,"700","","","a")
-                        cmoreauthors = record_get_field_values(crec,"720","","","a")
-                        cauthorlist = [cauthor]
-                        cauthorlist.extend(cotherauthors)
-                        cauthorlist.extend(cmoreauthors)
-                        #print str(c)+" by "+str(cauthorlist)
-                        for ca in cauthorlist:
-                            if (ca in authorlist):
-                                if selfcites.has_key(k):
-                                    val = selfcites[k]
-                                    #add only if not there already
-                                    if val:
-                                        if not c in val:
-                                            val.append(c)
-                                    selfcites[k] = val
-                            else:
-                                selfcites[k] = [c]
+        authorlist = get_authors_in_records(recs)
+        #author tag 
+        #print "record "+str(k)+" by "+str(authorlist)
+        #print "is cited by"
+        #get the "x-cites-this" list
+        if citationdic.has_key(k):
+            xct = citationdic[k]
+            for c in xct:
+                cxml = print_record(int(c), 'xm')
+                crs = create_records(cxml)
+                crecs = map((lambda x:x[0]), crs)
+                cauthorlist = get_authors_in_records(crecs)
+                #print str(c)+" by "+str(cauthorlist)
+                for ca in cauthorlist:
+                    if (ca in authorlist):
+			#found!
+                        if selfcites.has_key(k):
+                            val = selfcites[k]
+                            #add only if not there already
+                            if val:
+                                if not c in val:
+                                    val.append(c)
+                            selfcites[k] = val
+                        else:
+			    #new key for selfcites
+                            selfcites[k] = [c]
     return selfcites
 
 def get_author_citations(updated_redic_list, citedbydict, initial_author_dict):
@@ -412,33 +402,37 @@ def get_authors_in_records(recs):
     """An aux function to avoid code duplication"""
     authors = []
     for rec in recs:
-       #make a list of entries in all author tags
-       author = record_get_field_value(rec,"100","","","a")
-       otherauthors = record_get_field_values(rec,"700","","","a")
-       moreauthors = record_get_field_values(rec,"720","","","a")
-       authors = moreauthors
-       authors.extend(otherauthors)
-       authors.append(author)
+        #make a list of entries in all author tags
+        author = record_get_field_value(rec, "100", "", "", "a")
+        otherauthors = record_get_field_values(rec, "700", "", "", "a")
+        moreauthors = record_get_field_values(rec, "720", "", "", "a")
+        authors = moreauthors
+        authors.extend(otherauthors)
+        authors.append(author)
     return authors
 
 
-def ref_analyzer(citation_informations, initialresult, initial_citationlist, initial_referencelist,config, updated_rec_list ):
+def ref_analyzer(citation_informations, initialresult, initial_citationlist, 
+                 initial_referencelist,config, updated_rec_list ):
     """Analyze the citation informations and calculate the citation weight
        and cited by list dictionary.
     """
-    pubrefntag = record_pri_number_tag = config.get(config.get("rank_method", "function"),"publication_reference_number_tag")
-    pubreftag = record_pri_number_tag = config.get(config.get("rank_method", "function"),"publication_reference_tag")
+    pubrefntag = record_pri_number_tag = config.get(config.get("rank_method", "function"),
+                                                    "publication_reference_number_tag")
+    pubreftag = record_pri_number_tag = config.get(config.get("rank_method", "function"),
+                                                    "publication_reference_tag")
     #pubrefntab is prob 999C5r, pubreftab 999c5s
     citation_list = initial_citationlist
     reference_list = initial_referencelist
     result = initialresult
     d_reports_numbers = citation_informations[0]
     d_references_report_numbers = citation_informations[1]
-    d_references_s = citation_informations[2] #of type: {77: ['Nucl. Phys. B 72 (1974) 461','blah blah'], 93: ['..'], ..}
+    d_references_s = citation_informations[2] 
+       #of type: {77: ['Nucl. Phys. B 72 (1974) 461','blah blah'], 93: ['..'], ..}
     d_records_s = citation_informations[3]
     t1 = os.times()[4]
     if task_get_option('verbose') >= 1:
-	write_message("Phase 1: d_references_report_numbers",sys.stderr)
+        write_message("Phase 1: d_references_report_numbers",sys.stderr)
     #d_references_report_numbers: e.g 8 -> ([astro-ph/9889],[hep-ph/768])
     #meaning: rec 8 contains these in bibliography
 
@@ -450,67 +444,67 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
 
     for recid, refnumbers in d_references_report_numbers.iteritems():
         for refnumber in refnumbers:
-	    if refnumber:
-               p = refnumber
-               f = 'reportnumber'
-               #sanitise p
-               p.replace("\n",'')
-               #search for "hep-th/5644654 or such" in existing records
-               rec_id = get_recids_matching_query(p, f)
-               if rec_id and rec_id[0]:
-		   write_citer_cited(recid,rec_id[0])
-                   remove_from_missing(p)
-                   if result.has_key(rec_id[0]):
-                       result[rec_id[0]] += 1
-                   # Citation list should have rec_id[0] but check anyway
-                   if citation_list.has_key(rec_id[0]):
-                       citation_list[rec_id[0]].append(recid)
-                   else:
-                       citation_list[rec_id[0]] = [recid]
-		   if reference_list.has_key(recid):
-	               reference_list[recid].append(rec_id[0])
-                   else:
-		       reference_list[recid] = [rec_id[0]]
-               else:
-                   #the reference we wanted was not found among our records.
-                   #put the reference in the "missing"
-	       	   insert_into_missing(recid,p) 
+            if refnumber:
+                p = refnumber
+                f = 'reportnumber'
+                #sanitise p
+                p.replace("\n",'')
+                #search for "hep-th/5644654 or such" in existing records
+                rec_id = get_recids_matching_query(p, f)
+                if rec_id and rec_id[0]:
+                    write_citer_cited(recid,rec_id[0])
+                    remove_from_missing(p)
+                    if result.has_key(rec_id[0]):
+                        result[rec_id[0]] += 1
+                    # Citation list should have rec_id[0] but check anyway
+                    if citation_list.has_key(rec_id[0]):
+                        citation_list[rec_id[0]].append(recid)
+                    else:
+                        citation_list[rec_id[0]] = [recid]
+                    if reference_list.has_key(recid):
+                        reference_list[recid].append(rec_id[0])
+                    else:
+                        reference_list[recid] = [rec_id[0]]
+                else:
+                    #the reference we wanted was not found among our records.
+                    #put the reference in the "missing"
+                    insert_into_missing(recid,p) 
     t2 = os.times()[4]
     if task_get_option('verbose') >= 1:
-	write_message("Phase 2: d_references_s",sys.stderr)
+        write_message("Phase 2: d_references_s",sys.stderr)
     for recid, refss in d_references_s.iteritems():
         for refs in refss:
             if refs:
-               p = refs
-               f = 'publref'
-               rec_id = get_recids_matching_query(p, f)
-               if rec_id and not recid in citation_list[rec_id[0]]:
-                   result[rec_id[0]] += 1
-                   citation_list[rec_id[0]].append(recid)
-               if rec_id and not rec_id[0] in reference_list[recid]:
-                   reference_list[recid].append(rec_id[0])
+                p = refs
+                f = 'publref'
+                rec_id = get_recids_matching_query(p, f)
+                if rec_id and not recid in citation_list[rec_id[0]]:
+                    result[rec_id[0]] += 1
+                    citation_list[rec_id[0]].append(recid)
+                if rec_id and not rec_id[0] in reference_list[recid]:
+                    reference_list[recid].append(rec_id[0])
     t3 = os.times()[4]
     if task_get_option('verbose') >= 1:
-	write_message("Phase 3: d_reports_numbers",sys.stderr)
+        write_message("Phase 3: d_reports_numbers",sys.stderr)
 
     for rec_id, recnumbers in d_reports_numbers.iteritems():
         for recnumber in recnumbers:
-	    if recnumber:
-               p = recnumber
-               recid_list = get_recids_matching_query(p, pubrefntag)
-               if recid_list:
-                   for recid in recid_list:
-		       if not citation_list.has_key(rec_id):
-			   citation_list[rec_id] = []
-                       if not recid in citation_list[rec_id]:
-                           result[rec_id] += 1
-                           citation_list[rec_id].append(recid)
-		       if not reference_list.has_key(recid):
-			   reference_list[recid] = []
-                       if not rec_id in reference_list[recid]:
-                           reference_list[recid].append(rec_id)
+            if recnumber:
+                p = recnumber
+                recid_list = get_recids_matching_query(p, pubrefntag)
+                if recid_list:
+                    for recid in recid_list:
+                        if not citation_list.has_key(rec_id):
+                            citation_list[rec_id] = []
+                        if not recid in citation_list[rec_id]:
+                            result[rec_id] += 1
+                            citation_list[rec_id].append(recid)
+                        if not reference_list.has_key(recid):
+                            reference_list[recid] = []
+                        if not rec_id in reference_list[recid]:
+                            reference_list[recid].append(rec_id)
     if task_get_option('verbose') >= 1:
-	write_message("Phase 4: d_records_s",sys.stderr)
+        write_message("Phase 4: d_records_s",sys.stderr)
     t4 = os.times()[4]
     for recid, recs in d_records_s.iteritems():
         tmp = recs.find("-")
@@ -529,21 +523,21 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
                     reference_list[rec_id].append(recid)
 
     if task_get_option('verbose') >= 1:
-	write_message("Phase 5: reverse lists",sys.stderr)
+        write_message("Phase 5: reverse lists",sys.stderr)
 
     #remove empty lists in citation and reference
     keys = citation_list.keys()
     for k in keys:
-	if not citation_list[k]:
-		del citation_list[k]
+        if not citation_list[k]:
+            del citation_list[k]
 
     keys = reference_list.keys()
     for k in keys:
-	if not reference_list[k]:
-		del reference_list[k]
+        if not reference_list[k]:
+            del reference_list[k]
 
     if task_get_option('verbose') >= 1:
-	write_message("Phase 6: self-citations",sys.stderr)
+        write_message("Phase 6: self-citations",sys.stderr)
     selfdic = {}
     #get the initial self citation dict
     initial_self_dict = get_cit_dict("selfcitdict") 
@@ -556,17 +550,17 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
     #create a reverse "x cited by y" self cit dict
     selfcitedbydic = {}
     for k in selfdic.keys():
-	vlist = selfdic[k]
-	for v in vlist:
-		if selfcitedbydic.has_key(v):
-			tmplist = selfcitedbydic[v]
-			tmplist.append(k)
-		else:
-			tmplist = [k]
-		selfcitedbydic[v] = tmplist
+        vlist = selfdic[k]
+        for v in vlist:
+            if selfcitedbydic.has_key(v):
+                tmplist = selfcitedbydic[v]
+                tmplist.append(k)
+            else:
+                tmplist = [k]
+            selfcitedbydic[v] = tmplist
 
     if task_get_option('verbose') >= 1:
-	write_message("Getting author citations",sys.stderr)
+        write_message("Getting author citations",sys.stderr)
 
 
     #get author citations for records in updated_rec_list
@@ -574,39 +568,42 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist, ini
     authorcitdic = get_author_citations(updated_rec_list, citation_list, initial_author_dict) 
 
 
-    if task_get_option('verbose') >= 3:		
-	#print only 100 first to prevent flood
-	tmpdict = {}
-	tmp =citation_list.keys()[0:100]
-	for t in tmp:
+    if task_get_option('verbose') >= 3:         
+        #print only X first to prevent flood
+        tmpdict = {}
+        tmp = citation_list.keys()[0:10]
+        for t in tmp:
             tmpdict[t] = citation_list[t]
-        write_message("citation_list (x is cited by y): "+str(tmpdict),sys.stderr)
-        write_message("size: "+str(len(citation_list.keys())),sys.stderr)
-	tmp = reference_list.keys()[0:100]
-	tmpdict = {}
-	for t in tmp:
+        write_message("citation_list (x is cited by y): "+str(tmpdict), sys.stderr)
+        write_message("size: "+str(len(citation_list.keys())), sys.stderr)
+        tmp = reference_list.keys()[0:10]
+        tmpdict = {}
+        for t in tmp:
             tmpdict[t] = reference_list[t]
-	write_message("reference_list (x cites y): "+str(tmpdict),sys.stderr)	
-        write_message("size: "+str(len(reference_list.keys())),sys.stderr)
-	tmp = selfcitedbydic.keys()[0:100]
-	tmpdict = {}
-	for t in tmp:
+        write_message("reference_list (x cites y): "+str(tmpdict), sys.stderr)   
+        write_message("size: "+str(len(reference_list.keys())), sys.stderr)
+        tmp = selfcitedbydic.keys()[0:10]
+        tmpdict = {}
+        for t in tmp:
             tmpdict[t] = selfcitedbydic[t]
-        write_message("selfcitedbydic (x is cited by y and one of the authors of x same as y's): "+str(tmpdict),sys.stderr)	
-        write_message("size: "+str(len(selfcitedbydic.keys())),sys.stderr)
-	tmp = selfdic.keys()[0:100]
-	tmpdict = {}
-	for t in tmp:
+        write_message("selfcitedbydic (x is cited by y and one  \
+                       of the authors of x same as y's): "+str(tmpdict), sys.stderr)     
+        write_message("size: "+str(len(selfcitedbydic.keys())), sys.stderr)
+        tmp = selfdic.keys()[0:100]
+        tmpdict = {}
+        for t in tmp:
             tmpdict[t] = selfdic[t]
-	write_message("selfdic (x cites y and one of the authors of x same as y's): "+str(tmpdict),sys.stderr)	
-        write_message("size: "+str(len(selfdic.keys())),sys.stderr)
-	tmp = authorcitdic.keys()[0:100]
-	tmpdict = {}
-	for t in tmp:
+        write_message("selfdic (x cites y and one of the authors \
+                       of x same as y's): "+str(tmpdict), sys.stderr)  
+        write_message("size: "+str(len(selfdic.keys())), sys.stderr)
+        tmp = authorcitdic.keys()[0:10]
+        tmpdict = {}
+        for t in tmp:
             tmpdict[t] = authorcitdic[t]
-	write_message("authorcitdic (author is cited in recs): "+str(tmpdict),sys.stderr)	
-        write_message("size: "+str(len(authorcitdic.keys())),sys.stderr)
-    insert_cit_ref_list_intodb(citation_list, reference_list, selfcitedbydic, selfdic, authorcitdic)
+        write_message("authorcitdic (author is cited in recs): "+str(tmpdict), sys.stderr)       
+        write_message("size: "+str(len(authorcitdic.keys())), sys.stderr)
+    insert_cit_ref_list_intodb(citation_list, reference_list, 
+                               selfcitedbydic, selfdic, authorcitdic)
 
     t5 = os.times()[4]
     print "\nExecution time for analyzing the citation information generating the dictionary: "
@@ -623,7 +620,8 @@ def get_decompressed_xml(xml):
     decompressed_xml = create_records(decompress(xml))
     return decompressed_xml
 
-def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,selfdic, authorcitdic):
+def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,
+                               selfdic, authorcitdic):
     """Insert the reference and citation list into the database"""
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     insert_into_cit_db(reference_dic,"reversedict")
@@ -640,28 +638,31 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,selfdic, a
         pass
 
     for a in authorcitdic.keys():
-	lserarr = (serialize_via_marshal(authorcitdic[a]))
-	#author name: replace " with something else
-	a.replace('"','\'')
-	a = unicode(a,'utf-8')
+        lserarr = (serialize_via_marshal(authorcitdic[a]))
+        #author name: replace " with something else
+        a.replace('"','\'')
+        a = unicode(a,'utf-8')
         try:
-	    ablob = run_sql('select hitlist from rnkAUTHORDATAR where aterm ="'+a+'"')
-	    if not (ablob):
-		#print "insert into rnkAUTHORDATAR(aterm,hitlist) values (%s,%s)" , (a,lserarr)
-		run_sql("insert into rnkAUTHORDATAR(aterm,hitlist) values (%s,%s)" , (a,lserarr))
-	    else:
-		#print "UPDATE rnkAUTHORDATAR SET hitlist  = %s where aterm=%s""" , (lserarr,a)
-		run_sql("UPDATE rnkAUTHORDATAR SET hitlist  = %s where aterm=%s""" , (lserarr,a))
+            ablob = run_sql('select hitlist from rnkAUTHORDATAR where aterm ="'+a+'"')
+            if not (ablob):
+                #print "insert into rnkAUTHORDATAR(aterm,hitlist) values (%s,%s)" , (a,lserarr)
+                run_sql("insert into rnkAUTHORDATAR(aterm,hitlist) values (%s,%s)", 
+                         (a,lserarr))
+            else:
+                #print "UPDATE rnkAUTHORDATAR SET hitlist  = %s where aterm=%s""" , (lserarr,a)
+                run_sql("UPDATE rnkAUTHORDATAR SET hitlist  = %s where aterm=%s", 
+                        (lserarr,a))
         except:
-            print "Critical error: could not write rnkAUTHORDATAR into db. aterm="+a+" hitlist="+str(lsearr)
-        traceback.print_tb(sys.exc_info()[2])
+            print "Critical error: could not write rnkAUTHORDATAR "
+            print "into db. aterm="+a+" hitlist="+str(lsearr)+"\n"
+            traceback.print_tb(sys.exc_info()[2])
 
 def insert_into_cit_db(dic,name):
     """an aux thing to avoid repeating code"""
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     try:
-	s = serialize_via_marshal(dic)
-	print "size of "+name+" "+str(len(s))
+        s = serialize_via_marshal(dic)
+        print "size of "+name+" "+str(len(s))
         run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name='"+name+"'", (s, ))
         run_sql("UPDATE rnkCITATIONDATA SET last_updated = '"+date+"' where object_name='"+name+"'")
     except:
@@ -673,7 +674,7 @@ def get_cit_dict(name):
     """get a named citation dict from the db"""
     dict = {}
     try:
-	query = "select object_value from rnkCITATIONDATA where object_name='"+name+"'"
+        query = "select object_value from rnkCITATIONDATA where object_name='"+name+"'"
         dict = run_sql(query)
         if dict and dict[0] and dict[0][0]:
             dict_from_db = marshal.loads(decompress(dict[0][0]))
@@ -691,7 +692,7 @@ def get_initial_author_dict():
     try:
         ah = run_sql("select aterm,hitlist from rnkAUTHORDATAR") 
         for (a,h) in ah:
-	   dict[a] = deserialize_via_marshal(h)
+            dict[a] = deserialize_via_marshal(h)
         return dict
     except:
         print "Critical error: could not read rnkAUTHORDATAR"
@@ -701,7 +702,8 @@ def get_initial_author_dict():
 
 
 def insert_into_missing(recid,report):
-    """put the referingrecordnum-publicationstring into the "we are missing these" table"""
+    """put the referingrecordnum-publicationstring into 
+       the "we are missing these" table"""
     report.replace('"','\'')
     try:
         sql = "select id_bibrec from rnkCITATIONDATAEXT where id_bibrec="+str(recid)+" and pubinfo=\""+report+"\""
