@@ -43,8 +43,14 @@ Usage: %s [options]
  -S, --stat                show statistics for a method
 
  -R, --recalculate         recalculate weigth data, used by word frequency
-                           method should be used if ca 1% of the document
-                           has been changed since last time -R was used
+                           and citation methods, should be used if ca 1% 
+                           of the document has been changed since last 
+                           time -R was used
+
+ -P, --print-missing       print the top entries of 'missing' table. These
+                           are entries that should be entered in your
+                           collection, since they have been cited many
+                           times by other records.
 
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)
@@ -184,15 +190,23 @@ def main():
  -S, --stat                show statistics for a method
 
  -R, --recalculate         recalculate weigth data, used by word frequency
-                           method should be used if ca 1%% of the document has
-                           been changed since last time -R was used
+                           and citation methods, should be used if ca 1% 
+                           of the document has been changed since last 
+                           time -R was used
+
+ -P, --print-missing       print the top entries of 'missing' table. These
+                           are entries that should be entered in your
+                           collection, since they have been cited many
+                           times by other records
+
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)
                            check if update of ranking data is necessary
  -r, --repair              try to repair all records in the table(s)
 """,
             version=__revision__,
-            specific_params=("ladSi:m:c:kUrRM:f:w:", [
+            specific_params=("PladSi:m:c:kUrRM:f:w:", [
+                "print-missing",
                 "lastupdate",
                 "add",
                 "del",
@@ -225,6 +239,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy):
             task_get_option('run').append(run[run_key])
     elif key in ("-r", "--repair"):
         task_set_option("cmd", "repair")
+    elif key in ("-P", "--print-missing"):
+        task_set_option("cmd", "print-missing")
     elif key in ("-d", "--del"):
         task_set_option("cmd", "del")
     elif key in ("-k", "--check"):
