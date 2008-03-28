@@ -752,3 +752,14 @@ def write_citer_cited(citer, cited):
         run_sql("insert into tmpcit(citer, cited) values (%s,%s)",(citer,cited))
     except:
         pass
+
+def print_missing():
+    """Print the contents of rnkCITATIONDATAEXT for records that are needed more than 50 times"""
+    try:
+      sql = "select count(id_bibrec), pubinfo from rnkCITATIONDATAEXT "
+      sql = sql+"group by id_bibrec having count(id_bibrec) > 50"
+      res = run_sql(sql)
+      for (cnt,brec) in res:
+	print str(cnt)+"\t"+brec
+    except:
+        pass
