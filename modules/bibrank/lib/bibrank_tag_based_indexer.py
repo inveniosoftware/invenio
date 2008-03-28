@@ -32,7 +32,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_ETCDIR
 from invenio.search_engine import perform_request_search, HitSet
-from invenio.bibrank_citation_indexer import get_citation_weight
+from invenio.bibrank_citation_indexer import get_citation_weight, print_missing
 from invenio.bibrank_downloads_indexer import *
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibtask import task_get_option, write_message
@@ -41,7 +41,10 @@ from invenio.bibtask import task_get_option, write_message
 options = {}
 
 def citation_exec(rank_method_code, name, config):
-    """Creating the rank method data for citation"""
+    """Rank method for citation analysis"""
+    #first check if this is a specific task
+    if task_get_option("cmd") == "print-missing":
+        print_missing()
     dict = get_citation_weight(rank_method_code, config)
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if dict: intoDB(dict, date, rank_method_code)
@@ -58,7 +61,8 @@ def file_similarity_by_times_downloaded(run):
 
 def download_weight_filtering_user_exec (rank_method_code, name, config):
     """Ranking by number of downloads per User.
-    Only one full Text Download is taken in account for one specific userIP address"""
+    Only one full Text Download is taken in account for one 
+    specific userIP address"""
     time1 = time.time()
     dic = fromDB(rank_method_code)
     last_updated = get_lastupdated(rank_method_code)
@@ -113,7 +117,8 @@ def single_tag_rank(config):
     kb_data = {}
     records = []
 
-    write_message("Reading knowledgebase file: %s" % config.get(config.get("rank_method", "function"), "kb_src"))
+    write_message("Reading knowledgebase file: %s" % \
+                   config.get(config.get("rank_method", "function"), "kb_src"))
     input = open(config.get(config.get("rank_method", "function"), "kb_src"), 'r')
     data = input.readlines()
     for line in data:
@@ -275,7 +280,7 @@ def bibrank_engine(run):
         psyco.bind(serialize_via_marshal)
         psyco.bind(deserialize_via_marshal)
     except StandardError, e:
-        print "Psyco ERROR", e
+        pass
 
     startCreate = time.time()
     sets = {}
@@ -330,6 +335,9 @@ def bibrank_engine(run):
                 rank_method_code_statistics(rank_method_code)
             elif task_get_option("cmd") == "check":
                 check_method(rank_method_code)
+            elif task_get_option("cmd") == "print-missing":
+                func_object = globals().get(cfg_function)
+                func_object(rank_method_code, cfg_name, config)                
             elif task_get_option("cmd") == "repair":
                 pass
             else:
