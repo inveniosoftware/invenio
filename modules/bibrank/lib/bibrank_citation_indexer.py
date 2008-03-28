@@ -625,7 +625,6 @@ def get_decompressed_xml(xml):
 def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,
                                selfdic, authorcitdic):
     """Insert the reference and citation list into the database"""
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     insert_into_cit_db(reference_dic,"reversedict")
     insert_into_cit_db(citation_dic,"citationdict")
     insert_into_cit_db(selfcbdic,"selfcitedbydict")
@@ -642,10 +641,10 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,
     for a in authorcitdic.keys():
         lserarr = (serialize_via_marshal(authorcitdic[a]))
         #author name: replace " with something else
-        a.replace('"','\'')
-        a = unicode(a,'utf-8')
+        a.replace('"', '\'')
+        a = unicode(a, 'utf-8')
         try:
-            ablob = run_sql('select hitlist from rnkAUTHORDATAR where aterm ="'+a+'"')
+            ablob = run_sql("select hitlist from rnkAUTHORDATAR where aterm = %s", (a,))
             if not (ablob):
                 #print "insert into rnkAUTHORDATAR(aterm,hitlist) values (%s,%s)" , (a,lserarr)
                 run_sql("insert into rnkAUTHORDATAR(aterm,hitlist) values (%s,%s)", 
@@ -661,12 +660,14 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,
 
 def insert_into_cit_db(dic, name):
     """an aux thing to avoid repeating code"""
-    date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    ndate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     try:
         s = serialize_via_marshal(dic)
         print "size of "+name+" "+str(len(s))
-        run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name='"+name+"'", (s, ))
-        run_sql("UPDATE rnkCITATIONDATA SET last_updated = '"+date+"' where object_name='"+name+"'")
+        run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name = %s", 
+                (s, name))
+        run_sql("UPDATE rnkCITATIONDATA SET last_updated = %s where object_name = %s", 
+                 (ndate,name))
     except:
         print "Critical error: could not write "+name+" into db"
         traceback.print_tb(sys.exc_info()[2])       
@@ -674,12 +675,12 @@ def insert_into_cit_db(dic, name):
 
 def get_cit_dict(name):
     """get a named citation dict from the db"""
-    dict = {}
+    cdict = {}
     try:
-        query = "select object_value from rnkCITATIONDATA where object_name='"+name+"'"
-        dict = run_sql(query)
-        if dict and dict[0] and dict[0][0]:
-            dict_from_db = marshal.loads(decompress(dict[0][0]))
+        cdict = run_sql("select object_value from rnkCITATIONDATA where object_name = %s",
+                       (name,))
+        if cdict and cdict[0] and cdict[0][0]:
+            dict_from_db = marshal.loads(decompress(cdict[0][0]))
             return dict_from_db
         else:
             return {}
@@ -708,11 +709,12 @@ def insert_into_missing(recid, report):
        the "we are missing these" table"""
     report.replace('"','\'')
     try:
-        sql = "select id_bibrec from rnkCITATIONDATAEXT where id_bibrec="+str(recid)+" and pubinfo=\""+report+"\""
-        wasalready = run_sql(sql)
+        srecid = str(recid)
+        wasalready = run_sql("select id_bibrec from rnkCITATIONDATAEXT where id_bibrec = %s and pubinfo = %s",
+                              (srecid,report))
         if not wasalready:
-            sql = "insert into rnkCITATIONDATAEXT(id_bibrec,pubinfo) values ("+str(recid)+",\""+report+"\")"
-            run_sql(sql)
+            run_sql("insert into rnkCITATIONDATAEXT(id_bibrec,pubinfo) values (%s,%s)",
+                   (srecid,report))
     except:
         #we should complain but it can result to million lines of warnings so just pass..
         pass
@@ -721,9 +723,8 @@ def remove_from_missing(report):
     """remove the recid-ref -pairs from the "missing" table for report x: prob
        in the case ref got in our library collection"""
     report.replace('"','\'')
-    sql = "delete from rnkCITATIONDATAEXT where pubinfo=\""+report+"\""
     try:
-        run_sql(sql)
+        run_sql("delete from rnkCITATIONDATAEXT where pubinfo= %s", (report,))
     except:
         #we should complain but it can result to million lines of warnings so just pass..
         pass
@@ -745,8 +746,9 @@ def create_analysis_tables():
 
 def write_citer_cited(citer, cited):
     """write an entry to tmp table"""
-    sql = "insert into tmpcit(citer, cited) values ("+str(citer)+","+str(cited)+")"
+    sciter = str(citer)
+    scited = str(cited)
     try:
-        run_sql(sql)
+        run_sql("insert into tmpcit(citer, cited) values (%s,%s)",(citer,cited))
     except:
         pass
