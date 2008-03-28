@@ -357,53 +357,53 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict):
     """
     author_cited_in = initial_author_dict
     if citedbydict:
-	i = 0 #just a counter for debug
-	write_message("Checking records referred to in new records",sys.stderr)
-	for u in updated_redic_list:
+        i = 0 #just a counter for debug
+        write_message("Checking records referred to in new records",sys.stderr)
+        for u in updated_redic_list:
             if citedbydict.has_key(u):
-		these_cite_k = citedbydict[u]
-		if (these_cite_k is None):
-			these_cite_k = [] #verify it is an empty list, not None
-		xml = print_record(int(u),'xm')
-	        rs = create_records(xml)
-        	recs = map((lambda x:x[0]), rs)
+                these_cite_k = citedbydict[u]
+                if (these_cite_k is None):
+                    these_cite_k = [] #verify it is an empty list, not None
+                xml = print_record(int(u),'xm')
+                rs = create_records(xml)
+                recs = map((lambda x:x[0]), rs)
                 authors = get_authors_in_records(recs)
-	        for a in authors:
-	            if a and author_cited_in.has_key(a):
+                for a in authors:
+                    if a and author_cited_in.has_key(a):
                         #add all elements in these_cite_k
-			#that are not there already
-			for citer in these_cite_k:
-				tmplist = author_cited_in[a]
-				if (tmplist.count(citer) == 0):
-					tmplist.append(citer)
-					author_cited_in[a] = tmplist
-				else:
-					author_cited_in[a] = these_cite_k
+                        #that are not there already
+                        for citer in these_cite_k:
+                            tmplist = author_cited_in[a]
+                            if (tmplist.count(citer) == 0):
+                                tmplist.append(citer)
+                                author_cited_in[a] = tmplist
+                            else:
+                                author_cited_in[a] = these_cite_k
     
         #go through the dictionary again: all keys but search only if new records are cited
-	write_message("Checking authors in new records",sys.stderr)
+        write_message("Checking authors in new records",sys.stderr)
         for k in citedbydict.keys():
-                these_cite_k = citedbydict[k]
-                if (these_cite_k is None):
-                        these_cite_k = [] #verify it is an empty list, not None
-                #do things only if these_cite_k contains any new stuff
-                intersec_list = list(set(these_cite_k)&set(updated_redic_list))
-                if intersec_list:
-                    xml = print_record(int(u),'xm')
-                    rs = create_records(xml)
-                    recs = map((lambda x:x[0]), rs)
-                    authors = get_authors_in_records(recs)
-                    for a in authors:
-                        if a and author_cited_in.has_key(a):
-                           #add all elements in these_cite_k
-                           #that are not there already
-                           for citer in these_cite_k:
-                                tmplist = author_cited_in[a]
-                                if (tmplist.count(citer) == 0):
-                                        tmplist.append(citer)
-                                        author_cited_in[a] = tmplist
-                                else:
-                                        author_cited_in[a] = these_cite_k
+            these_cite_k = citedbydict[k]
+            if (these_cite_k is None):
+                these_cite_k = [] #verify it is an empty list, not None
+            #do things only if these_cite_k contains any new stuff
+            intersec_list = list(set(these_cite_k)&set(updated_redic_list))
+            if intersec_list:
+                xml = print_record(int(u), 'xm')
+                rs = create_records(xml)
+                recs = map((lambda x:x[0]), rs)
+                authors = get_authors_in_records(recs)
+                for a in authors:
+                    if a and author_cited_in.has_key(a):
+                        #add all elements in these_cite_k
+                        #that are not there already
+                        for citer in these_cite_k:
+                            tmplist = author_cited_in[a]
+                            if (tmplist.count(citer) == 0):
+                                tmplist.append(citer)
+                                author_cited_in[a] = tmplist
+                            else:
+                                author_cited_in[a] = these_cite_k
 
     return author_cited_in
 
