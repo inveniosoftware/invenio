@@ -121,13 +121,15 @@ def get_last_modified_rec(bibrank_method_lastupdate):
     """ return the list of recods which have been modified after the last execution
         of bibrank method. The result is expected to have ascending numerical order.
     """
-    query = """SELECT id FROM bibrec WHERE modification_date>= '%s' """ % bibrank_method_lastupdate
+    query = """SELECT id FROM bibrec 
+               WHERE modification_date >= '%s' """ % bibrank_method_lastupdate
     query += "order by id ASC"
     list = run_sql(query)
     return list
 
 def create_recordid_list(rec_ids):
-    """Create a list of record ids out of RECIDS. The result is expected to have ascending numerical order.
+    """Create a list of record ids out of RECIDS. 
+       The result is expected to have ascending numerical order.
     """
     rec_list = []
     for row in rec_ids:
@@ -156,7 +158,8 @@ def last_updated_result(rank_method_code, recid_list):
     """
     result = make_initial_result()
     query = """select relevance_data from rnkMETHOD, rnkMETHODDATA where
-               rnkMETHOD.id = rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.Name = '%s'"""% rank_method_code
+               rnkMETHOD.id = rnkMETHODDATA.id_rnkMETHOD 
+               and rnkMETHOD.Name = '%s'"""% rank_method_code
     dict = run_sql(query)
     if dict and dict[0] and dict[0][0]:
         #has to be prepared for corrupted data!
@@ -170,7 +173,8 @@ def last_updated_result(rank_method_code, recid_list):
         if cit_compressed and cit_compressed[0] and cit_compressed[0][0]:
             cit = marshal.loads(decompress(cit_compressed[0][0]))
             if cit:
-                query = "select object_value from rnkCITATIONDATA where object_name='reversedict'"
+                query = """select object_value from rnkCITATIONDATA 
+                           where object_name='reversedict'"""
                 ref_compressed = run_sql(query)
                 if ref_compressed and ref_compressed[0] and ref_compressed[0][0]:
                     ref = marshal.loads(decompress(ref_compressed[0][0]))
@@ -214,8 +218,10 @@ def make_initial_result():
 def get_citation_informations(recid_list, config):
     """returns a 3-part dictionary that contains the citation information of cds records
        examples: [ {} {} {} ]
-                 [ { 93: ['astro-ph/9812088']},{ 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
-	NB: stuff here is for analysing new or changed records. see "ref_analyzer" for more.
+                 [ { 93: ['astro-ph/9812088']},
+                   { 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
+	NB: stuff here is for analysing new or changed records. 
+        see "ref_analyzer" for more.
     """
     begin_time = os.times()[4]
     d_reports_numbers = {}
@@ -223,11 +229,16 @@ def get_citation_informations(recid_list, config):
     d_references_s = {}
     d_records_s = {}
     citation_informations = []
-    record_pri_number_tag = config.get(config.get("rank_method", "function"),"publication_primary_number_tag")
-    record_add_number_tag = config.get(config.get("rank_method", "function"),"publication_aditional_number_tag")
-    reference_number_tag = config.get(config.get("rank_method", "function"),"publication_reference_number_tag")
-    reference_tag = config.get(config.get("rank_method", "function"),"publication_reference_tag")
-    record_publication_info_tag = config.get(config.get("rank_method", "function"),"publication_info_tag")
+    record_pri_number_tag = config.get(config.get("rank_method", "function"),
+                                       "publication_primary_number_tag")
+    record_add_number_tag = config.get(config.get("rank_method", "function"),
+                                       "publication_aditional_number_tag")
+    reference_number_tag = config.get(config.get("rank_method", "function"),
+                                      "publication_reference_number_tag")
+    reference_tag = config.get(config.get("rank_method", "function"),
+                               "publication_reference_tag")
+    record_publication_info_tag = config.get(config.get("rank_method", "function"),
+                                             "publication_info_tag")
 
     p_record_pri_number_tag = parse_tag(record_pri_number_tag)
     p_record_add_number_tag = parse_tag(record_add_number_tag)
@@ -236,7 +247,7 @@ def get_citation_informations(recid_list, config):
     p_record_publication_info_tag = parse_tag(record_publication_info_tag)
     
     for recid in recid_list:
-        xml = print_record(int(recid),'xm')
+        xml = print_record(int(recid), 'xm')
         rs = create_records(xml)
         recs = map((lambda x:x[0]), rs)
         l_report_numbers = []
@@ -278,62 +289,63 @@ def get_citation_informations(recid_list, config):
     citation_informations.append(d_references_s)
     citation_informations.append(d_records_s)
     end_time = os.times()[4]
-    print "Execution time for generating citation informations by parsing xml contents: ", (end_time - begin_time)
+    print "Execution time for generating \
+           citation informations by parsing xml contents: ", (end_time - begin_time)
     return citation_informations
 
 def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config):
-   """Check which items have been cited by one of the authors of the
-      citing item: go through id's in new_record_list, use citationdic to get citations,
-      update "selfcites". Selfcites is originally initial_selfcitdict. Return selfcites.
-   """
-   i = 0 #just for debugging ..
-   selfcites = initial_selfcitdict
-   for k in new_record_list:
-	i = i+1
-	if task_get_option('verbose') >= 3:	
-	   if (i % 100 == 0):
-		write_message("Done "+str(i)+" records",sys.stderr)
-	#get the author of k
-	xml = print_record(int(k),'xm')
+    """Check which items have been cited by one of the authors of the
+       citing item: go through id's in new_record_list, use citationdic to get citations,
+       update "selfcites". Selfcites is originally initial_selfcitdict. Return selfcites.
+    """
+    i = 0 #just for debugging ..
+    selfcites = initial_selfcitdict
+    for k in new_record_list:
+        i = i+1
+        if task_get_option('verbose') >= 3:     
+            if (i % 100 == 0):
+                write_message("Done "+str(i)+" records",sys.stderr)
+        #get the author of k
+        xml = print_record(int(k),'xm')
         rs = create_records(xml)
         recs = map((lambda x:x[0]), rs)
-	for rec in recs:
-		#author tag
-		author = record_get_field_value(rec,"100","","","a")
-		otherauthors = record_get_field_values(rec,"700","","","a")
-		moreauthors = record_get_field_values(rec,"720","","","a")
-		authorlist = [author]
-		authorlist.extend(otherauthors)
-		authorlist.extend(moreauthors)
-		#print "record "+str(k)+" by "+str(authorlist)
-		#print "is cited by"
-		#get the "x-cites-this" list
-                if citationdic.has_key(k):
-                    xct = citationdic[k]
-		    for c in xct:
-			cxml = print_record(int(c),'xm')
-			crs = create_records(cxml)
-			crecs = map((lambda x:x[0]), crs)
-			for crec in crecs:
-				cauthor = record_get_field_value(crec,"100","","","a")
-				cotherauthors = record_get_field_values(crec,"700","","","a")
-				cmoreauthors = record_get_field_values(crec,"720","","","a")
-				cauthorlist = [cauthor]
-				cauthorlist.extend(cotherauthors)
-				cauthorlist.extend(cmoreauthors)
-				#print str(c)+" by "+str(cauthorlist)
-				for ca in cauthorlist:
-					if (ca in authorlist):
-						if selfcites.has_key(k):
-							val = selfcites[k]
-							#add only if not there already
-							if val:
-								if not c in val:
-									val.append(c)
-							selfcites[k] = val
-						else:
-							selfcites[k] = [c]
-   return selfcites
+        for rec in recs:
+            #author tag
+            author = record_get_field_value(rec,"100","","","a")
+            otherauthors = record_get_field_values(rec,"700","","","a")
+            moreauthors = record_get_field_values(rec,"720","","","a")
+            authorlist = [author]
+            authorlist.extend(otherauthors)
+            authorlist.extend(moreauthors)
+            #print "record "+str(k)+" by "+str(authorlist)
+            #print "is cited by"
+            #get the "x-cites-this" list
+            if citationdic.has_key(k):
+                xct = citationdic[k]
+                for c in xct:
+                    cxml = print_record(int(c),'xm')
+                    crs = create_records(cxml)
+                    crecs = map((lambda x:x[0]), crs)
+                    for crec in crecs:
+                        cauthor = record_get_field_value(crec,"100","","","a")
+                        cotherauthors = record_get_field_values(crec,"700","","","a")
+                        cmoreauthors = record_get_field_values(crec,"720","","","a")
+                        cauthorlist = [cauthor]
+                        cauthorlist.extend(cotherauthors)
+                        cauthorlist.extend(cmoreauthors)
+                        #print str(c)+" by "+str(cauthorlist)
+                        for ca in cauthorlist:
+                            if (ca in authorlist):
+                                if selfcites.has_key(k):
+                                    val = selfcites[k]
+                                    #add only if not there already
+                                    if val:
+                                        if not c in val:
+                                            val.append(c)
+                                    selfcites[k] = val
+                            else:
+                                selfcites[k] = [c]
+    return selfcites
 
 def get_author_citations(updated_redic_list, citedbydict, initial_author_dict):
     """Traverses citedbydict in order to build "which author is quoted where" dict.
