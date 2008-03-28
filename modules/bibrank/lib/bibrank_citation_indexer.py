@@ -30,9 +30,7 @@ from zlib import decompress, error
 
 from invenio.dbquery import run_sql, serialize_via_marshal, \
                             deserialize_via_marshal
-from invenio.search_engine import print_record, search_pattern
-from invenio.bibrecord import create_records, record_get_field_values, \
-                              record_get_field_value
+from invenio.search_engine import print_record, search_pattern, get_fieldvalues
 from invenio.bibformat_utils import parse_tag
 from invenio.bibtask import write_message, task_get_option
 
@@ -240,50 +238,33 @@ def get_citation_informations(recid_list, config):
     record_publication_info_tag = config.get(config.get("rank_method", "function"),
                                              "publication_info_tag")
 
-    p_record_pri_number_tag = parse_tag(record_pri_number_tag)
-    p_record_add_number_tag = parse_tag(record_add_number_tag)
-    p_reference_number_tag = parse_tag(reference_number_tag)
-    p_reference_tag = parse_tag(reference_tag)
-    p_record_publication_info_tag = parse_tag(record_publication_info_tag)
+    p_record_pri_number_tag = tagify(parse_tag(record_pri_number_tag))
+    p_record_add_number_tag = tagify(parse_tag(record_add_number_tag))
+    p_reference_number_tag = tagify(parse_tag(reference_number_tag))
+    p_reference_tag = tagify(parse_tag(reference_tag))
+    p_record_publication_info_tag = tagify(parse_tag(record_publication_info_tag))
     
     for recid in recid_list:
-        xml = print_record(int(recid), 'xm')
-        rs = create_records(xml)
-        recs = map((lambda x:x[0]), rs)
-        l_report_numbers = []
-        for rec in recs:
-            pri_report_number = record_get_field_values(rec, p_record_pri_number_tag[0],
-                                                        ind1=p_record_pri_number_tag[1],
-                                                        ind2=p_record_pri_number_tag[2],
-                                                        code=record_pri_number_tag[3])
-            add_report_numbers = record_get_field_values(rec, p_record_add_number_tag[0],
-                                                         ind1=p_record_add_number_tag[1],
-                                                         ind2=p_record_add_number_tag[2],
-                                                         code=record_add_number_tag[3])
-            if pri_report_number:
-                l_report_numbers.extend(pri_report_number)
-            if add_report_numbers:
-                l_report_numbers.extend(add_report_numbers)
-            d_reports_numbers[recid] = l_report_numbers
-            reference_report_number = record_get_field_values(rec, p_reference_number_tag[0],
-                                                              ind1=p_reference_number_tag[1],
-                                                              ind2=p_reference_number_tag[2],
-                                                              code=p_reference_number_tag[3])
-            if reference_report_number:
-                d_references_report_numbers[recid] = reference_report_number
-            references_s = record_get_field_values(rec, p_reference_tag[0],
-                                                   ind1=p_reference_tag[1],
-                                                   ind2=p_reference_tag[2],
-                                                   code=p_reference_tag[3])
-            if references_s:
-                d_references_s[recid] = references_s
-            record_s = record_get_field_values(rec,
-                                               p_record_publication_info_tag[0],
-                                               ind1=p_record_publication_info_tag[1],
-                                               ind2=p_record_publication_info_tag[2],
-                                               code=p_record_publication_info_tag[3])
-            if record_s:
-                d_records_s[recid] = record_s[0]
+        pri_report_numbers = get_fieldvalues(recid, p_record_pri_number_tag)
+        add_report_numbers = get_fieldvalues(recid, p_record_add_number_tag)
+        reference_report_numbers = get_fieldvalues(recid, p_reference_number_tag)
+        references_s = get_fieldvalues(recid, p_reference_tag)
+        
+        l_report_numbers = pri_report_numbers
+        l_report_numbers.extend(add_report_numbers)
+        d_reports_numbers[recid] = l_report_numbers
+
+        if reference_report_numbers:
+            d_references_report_numbers[recid] = reference_report_numbers
+   
+        references_s = get_fieldvalues(recid, p_reference_tag)
+        if references_s:
+            d_references_s[recid] = references_s
+
+        record_s = get_fieldvalues(recid, p_record_publication_info_tag)
+        if record_s:
+            d_records_s[recid] = record_s[0]
+
     citation_informations.append(d_reports_numbers)
     citation_informations.append(d_references_report_numbers)
     citation_informations.append(d_references_s)
@@ -299,6 +280,15 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
        update "selfcites". Selfcites is originally initial_selfcitdict. Return selfcites.
     """
     i = 0 #just for debugging ..
+    #get the tags for main author, coauthors, ext authors from config
+    r_mainauthortag = config.get(config.get("rank_method", "function"), "main_author_tag")
+    r_coauthortag = config.get(config.get("rank_method", "function"), "coauthor_tag")
+    r_extauthortag = config.get(config.get("rank_method", "function"), "extauthor_tag")
+    #parse the tags
+    mainauthortag = tagify(parse_tag(r_mainauthortag))
+    coauthortag = tagify(parse_tag(r_coauthortag))
+    extauthortag = tagify(parse_tag(r_extauthortag))
+
     selfcites = initial_selfcitdict
     for k in new_record_list:
         i = i+1
@@ -306,10 +296,11 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
             if (i % 100 == 0):
                 write_message("Done "+str(i)+" records", sys.stderr)
         #get the author of k
-        xml = print_record(int(k), 'xm')
-        rs = create_records(xml)
-        recs = map((lambda x:x[0]), rs)
-        authorlist = get_authors_in_records(recs)
+        authorlist = get_fieldvalues(k, mainauthortag)
+        coauthl = get_fieldvalues(k, coauthortag)
+        extauthl = get_fieldvalues(k, extauthortag)
+        authorlist.append(coauthl)
+        authorlist.append(extauthl)
         #author tag 
         #print "record "+str(k)+" by "+str(authorlist)
         #print "is cited by"
@@ -317,10 +308,12 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
         if citationdic.has_key(k):
             xct = citationdic[k]
             for c in xct:
-                cxml = print_record(int(c), 'xm')
-                crs = create_records(cxml)
-                crecs = map((lambda x:x[0]), crs)
-                cauthorlist = get_authors_in_records(crecs)
+                #get authors of c
+                cauthorlist = get_fieldvalues(c, mainauthortag)
+                coauthl = get_fieldvalues(c, coauthortag)
+                extauthl = get_fieldvalues(c, extauthortag)
+                cauthorlist.extend(coauthl)
+                cauthorlist.extend(extauthl)
                 #print str(c)+" by "+str(cauthorlist)
                 for ca in cauthorlist:
                     if (ca in authorlist):
@@ -337,7 +330,7 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
                             selfcites[k] = [c]
     return selfcites
 
-def get_author_citations(updated_redic_list, citedbydict, initial_author_dict):
+def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, config):
     """Traverses citedbydict in order to build "which author is quoted where" dict.
        The keys of this are author names. An entry like "Apollinaire"->[1,2,3] means
        Apollinaire is cited in records 1,2 and 3.
@@ -345,6 +338,16 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict):
               the dicts from the database.
        Output: authorciteddict. It is initially set to initial_author_dict
     """
+
+    #sorry bout repeated code to get the tags
+    r_mainauthortag = config.get(config.get("rank_method", "function"), "main_author_tag")
+    r_coauthortag = config.get(config.get("rank_method", "function"), "coauthor_tag")
+    r_extauthortag = config.get(config.get("rank_method", "function"), "extauthor_tag")
+    #parse the tags
+    mainauthortag = tagify(parse_tag(r_mainauthortag))
+    coauthortag = tagify(parse_tag(r_coauthortag))
+    extauthortag = tagify(parse_tag(r_extauthortag))
+
     author_cited_in = initial_author_dict
     if citedbydict:
         i = 0 #just a counter for debug
@@ -354,10 +357,11 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict):
                 these_cite_k = citedbydict[u]
                 if (these_cite_k is None):
                     these_cite_k = [] #verify it is an empty list, not None
-                xml = print_record(int(u), 'xm')
-                rs = create_records(xml)
-                recs = map((lambda x:x[0]), rs)
-                authors = get_authors_in_records(recs)
+                authors = get_fieldvalues(u, mainauthortag)
+                coauthl = get_fieldvalues(u, coauthortag)
+                extauthl = get_fieldvalues(u, extauthortag)
+                authors.extend(coauthl)
+                authors.extend(extauthl)
                 for a in authors:
                     if a and author_cited_in.has_key(a):
                         #add all elements in these_cite_k
@@ -379,10 +383,11 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict):
             #do things only if these_cite_k contains any new stuff
             intersec_list = list(set(these_cite_k)&set(updated_redic_list))
             if intersec_list:
-                xml = print_record(int(u), 'xm')
-                rs = create_records(xml)
-                recs = map((lambda x:x[0]), rs)
-                authors = get_authors_in_records(recs)
+                authors = get_fieldvalues(k, mainauthortag)
+                coauthl = get_fieldvalues(k, coauthortag)
+                extauthl = get_fieldvalues(k, extauthortag)
+                authors.extend(coauthl)
+                authors.extend(extauthl)
                 for a in authors:
                     if a and author_cited_in.has_key(a):
                         #add all elements in these_cite_k
@@ -398,20 +403,6 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict):
     return author_cited_in
 
 
-def get_authors_in_records(recs):
-    """An aux function to avoid code duplication"""
-    authors = []
-    for rec in recs:
-        #make a list of entries in all author tags
-        author = record_get_field_value(rec, "100", "", "", "a")
-        otherauthors = record_get_field_values(rec, "700", "", "", "a")
-        moreauthors = record_get_field_values(rec, "720", "", "", "a")
-        authors = moreauthors
-        authors.extend(otherauthors)
-        authors.append(author)
-    return authors
-
-
 def ref_analyzer(citation_informations, initialresult, initial_citationlist, 
                  initial_referencelist,config, updated_rec_list ):
     """Analyze the citation informations and calculate the citation weight
@@ -421,7 +412,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                                                     "publication_reference_number_tag")
     pubreftag = record_pri_number_tag = config.get(config.get("rank_method", "function"),
                                                     "publication_reference_tag")
-    #pubrefntab is prob 999C5r, pubreftab 999c5s
+    #pubrefntag is prob 999C5r, pubreftag 999c5s
     citation_list = initial_citationlist
     reference_list = initial_referencelist
     result = initialresult
@@ -513,7 +504,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         else:
             recs_modified = recs[:tmp]
         p = recs_modified
-        rec_ids = get_recids_matching_query(p, pubreftab)
+        rec_ids = get_recids_matching_query(p, pubreftag)
         if rec_ids:
             for rec_id in rec_ids:
                 if not rec_id in citation_list[recid]:
@@ -567,7 +558,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     #get author citations for records in updated_rec_list
     initial_author_dict = get_initial_author_dict()
     authorcitdic = get_author_citations(updated_rec_list, citation_list, 
-                                        initial_author_dict) 
+                                        initial_author_dict, config) 
 
 
     if task_get_option('verbose') >= 3:         
@@ -749,17 +740,26 @@ def write_citer_cited(citer, cited):
     sciter = str(citer)
     scited = str(cited)
     try:
-        run_sql("insert into tmpcit(citer, cited) values (%s,%s)",(citer,cited))
+        run_sql("insert into tmpcit(citer, cited) values (%s,%s)", (sciter,scited))
     except:
         pass
 
 def print_missing():
     """Print the contents of rnkCITATIONDATAEXT for records that are needed more than 50 times"""
     try:
-      sql = "select count(id_bibrec), pubinfo from rnkCITATIONDATAEXT "
-      sql = sql+"group by id_bibrec having count(id_bibrec) > 50"
-      res = run_sql(sql)
-      for (cnt,brec) in res:
-	print str(cnt)+"\t"+brec
+        sql = "select count(id_bibrec), pubinfo from rnkCITATIONDATAEXT "
+        sql = sql+"group by id_bibrec having count(id_bibrec) > 50"
+        res = run_sql(sql)
+        for (cnt, brec) in res:
+            print str(cnt)+"\t"+brec
     except:
         pass
+
+def tagify(parsedtag):
+    """aux auf to make '100__a' out of ['100','','','a']"""
+    tag = ""
+    for t in parsedtag:
+        if t == '':
+            t = '_'
+        tag = tag+t
+    return tag
