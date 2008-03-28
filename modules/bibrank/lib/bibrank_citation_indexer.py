@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- Coding: utf-8 -*-
 ##
 ## $Id$
 ##
@@ -64,25 +64,28 @@ def get_citation_weight(rank_method_code, config):
     #records Y cite them. But this kind of situation is not detected 
     #unless you go though all the records Y+X.
     if task_get_option("quick") == "no":
-	last_update_time = "0000-00-00 00:00:00"
+        last_update_time = "0000-00-00 00:00:00"
     #if task_get_option('verbose') >= 3:	
     last_modified_records = get_last_modified_rec(last_update_time)
-    #id option forces re-indexing a certain range even if there are no new records
+    #id option forces re-indexing a certain range even if there are no new recs
     if last_modified_records or task_get_option("id"):
-	if task_get_option("id"):
-	   #construct a range of records to index
-           id = task_get_option("id")
-           first = id[0][0]
-           last = id[0][1]
-	   #make range
-	   updated_recid_list = range(first,last)
+        if task_get_option("id"):
+	    #construct a range of records to index
+            id = task_get_option("id")
+            first = id[0][0]
+            last = id[0][1]
+	    #make range
+            updated_recid_list = range(first,last)
         else: 
-           updated_recid_list = create_recordid_list(last_modified_records)
+            updated_recid_list = create_recordid_list(last_modified_records)
     
-	write_message("Last update "+str(last_update_time)+" records: "+str(len(last_modified_records))+" updates: "+str(len(updated_recid_list)), sys.stderr)	
+        write_message("Last update "+str(last_update_time)+" records: "+ \
+                       str(len(last_modified_records))+" updates: "+ \
+                       str(len(updated_recid_list)), sys.stderr)	
 
-	#write_message("updated_recid_list: "+str(updated_recid_list),sys.stderr)
-        result_intermediate = last_updated_result(rank_method_code, updated_recid_list)
+	#write_message("updated_recid_list: "+str(updated_recid_list), sys.stderr)
+        result_intermediate = last_updated_result(rank_method_code, 
+                                                  updated_recid_list)
         #result_intermed should be warranted to exists!
         citation_weight_dic_intermediate = result_intermediate[0]
         citation_list_intermediate = result_intermediate[1]
@@ -90,7 +93,12 @@ def get_citation_weight(rank_method_code, config):
         citation_informations = get_citation_informations(updated_recid_list, config)
 	#write_message("citation_informations: "+str(citation_informations),sys.stderr)
 	#create_analysis_tables() #temporary.. needed to test how much faster in-mem indexing is
-        dic = ref_analyzer(citation_informations, citation_weight_dic_intermediate, citation_list_intermediate, reference_list_intermediate,config,updated_recid_list) #dic is docid-numberofreferences like {1: 2, 2: 0, 3: 1}
+        dic = ref_analyzer(citation_informations, 
+                           citation_weight_dic_intermediate, 
+                           citation_list_intermediate, 
+                           reference_list_intermediate,
+                           config,updated_recid_list) 
+                    #dic is docid-numberofreferences like {1: 2, 2: 0, 3: 1}
 	#write_message("Docid-number of known references "+str(dic),sys.stderr)
         end_time = time.time()
         print "Total time of software: ", (end_time - begin_time)
