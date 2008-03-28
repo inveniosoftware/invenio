@@ -26,7 +26,7 @@ import sys
 import os
 import marshal
 import traceback
-from zlib import decompress, compress, error
+from zlib import decompress, error
 
 from invenio.dbquery import run_sql, serialize_via_marshal, \
                             deserialize_via_marshal
@@ -348,13 +348,13 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict):
     author_cited_in = initial_author_dict
     if citedbydict:
         i = 0 #just a counter for debug
-        write_message("Checking records referred to in new records",sys.stderr)
+        write_message("Checking records referred to in new records", sys.stderr)
         for u in updated_redic_list:
             if citedbydict.has_key(u):
                 these_cite_k = citedbydict[u]
                 if (these_cite_k is None):
                     these_cite_k = [] #verify it is an empty list, not None
-                xml = print_record(int(u),'xm')
+                xml = print_record(int(u), 'xm')
                 rs = create_records(xml)
                 recs = map((lambda x:x[0]), rs)
                 authors = get_authors_in_records(recs)
@@ -371,7 +371,7 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict):
                                 author_cited_in[a] = these_cite_k
     
         #go through the dictionary again: all keys but search only if new records are cited
-        write_message("Checking authors in new records",sys.stderr)
+        write_message("Checking authors in new records", sys.stderr)
         for k in citedbydict.keys():
             these_cite_k = citedbydict[k]
             if (these_cite_k is None):
@@ -432,7 +432,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     d_records_s = citation_informations[3]
     t1 = os.times()[4]
     if task_get_option('verbose') >= 1:
-        write_message("Phase 1: d_references_report_numbers",sys.stderr)
+        write_message("Phase 1: d_references_report_numbers", sys.stderr)
     #d_references_report_numbers: e.g 8 -> ([astro-ph/9889],[hep-ph/768])
     #meaning: rec 8 contains these in bibliography
 
@@ -452,7 +452,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 #search for "hep-th/5644654 or such" in existing records
                 rec_id = get_recids_matching_query(p, f)
                 if rec_id and rec_id[0]:
-                    write_citer_cited(recid,rec_id[0])
+                    write_citer_cited(recid, rec_id[0])
                     remove_from_missing(p)
                     if result.has_key(rec_id[0]):
                         result[rec_id[0]] += 1
@@ -468,10 +468,10 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 else:
                     #the reference we wanted was not found among our records.
                     #put the reference in the "missing"
-                    insert_into_missing(recid,p) 
+                    insert_into_missing(recid, p) 
     t2 = os.times()[4]
     if task_get_option('verbose') >= 1:
-        write_message("Phase 2: d_references_s",sys.stderr)
+        write_message("Phase 2: d_references_s", sys.stderr)
     for recid, refss in d_references_s.iteritems():
         for refs in refss:
             if refs:
@@ -485,7 +485,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                     reference_list[recid].append(rec_id[0])
     t3 = os.times()[4]
     if task_get_option('verbose') >= 1:
-        write_message("Phase 3: d_reports_numbers",sys.stderr)
+        write_message("Phase 3: d_reports_numbers", sys.stderr)
 
     for rec_id, recnumbers in d_reports_numbers.iteritems():
         for recnumber in recnumbers:
@@ -504,7 +504,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                         if not rec_id in reference_list[recid]:
                             reference_list[recid].append(rec_id)
     if task_get_option('verbose') >= 1:
-        write_message("Phase 4: d_records_s",sys.stderr)
+        write_message("Phase 4: d_records_s", sys.stderr)
     t4 = os.times()[4]
     for recid, recs in d_records_s.iteritems():
         tmp = recs.find("-")
@@ -523,7 +523,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                     reference_list[rec_id].append(recid)
 
     if task_get_option('verbose') >= 1:
-        write_message("Phase 5: reverse lists",sys.stderr)
+        write_message("Phase 5: reverse lists", sys.stderr)
 
     #remove empty lists in citation and reference
     keys = citation_list.keys()
@@ -537,12 +537,13 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             del reference_list[k]
 
     if task_get_option('verbose') >= 1:
-        write_message("Phase 6: self-citations",sys.stderr)
+        write_message("Phase 6: self-citations", sys.stderr)
     selfdic = {}
     #get the initial self citation dict
     initial_self_dict = get_cit_dict("selfcitdict") 
     #add new records to selfdic 
-    selfdic = get_self_citations(updated_rec_list, citation_list, initial_self_dict, config)
+    selfdic = get_self_citations(updated_rec_list, citation_list, 
+                                 initial_self_dict, config)
     #selfdic consists of
     #key k -> list of values [v1,v2,..]
     #where k is a record with author A and k cites v1,v2.. and A appears in v1,v2..
@@ -560,12 +561,13 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             selfcitedbydic[v] = tmplist
 
     if task_get_option('verbose') >= 1:
-        write_message("Getting author citations",sys.stderr)
+        write_message("Getting author citations", sys.stderr)
 
 
     #get author citations for records in updated_rec_list
     initial_author_dict = get_initial_author_dict()
-    authorcitdic = get_author_citations(updated_rec_list, citation_list, initial_author_dict) 
+    authorcitdic = get_author_citations(updated_rec_list, citation_list, 
+                                        initial_author_dict) 
 
 
     if task_get_option('verbose') >= 3:         
@@ -654,10 +656,10 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,
                         (lserarr,a))
         except:
             print "Critical error: could not write rnkAUTHORDATAR "
-            print "into db. aterm="+a+" hitlist="+str(lsearr)+"\n"
+            print "into db. aterm="+a+" hitlist="+str(lserarr)+"\n"
             traceback.print_tb(sys.exc_info()[2])
 
-def insert_into_cit_db(dic,name):
+def insert_into_cit_db(dic, name):
     """an aux thing to avoid repeating code"""
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     try:
@@ -691,7 +693,7 @@ def get_initial_author_dict():
     dict = {}
     try:
         ah = run_sql("select aterm,hitlist from rnkAUTHORDATAR") 
-        for (a,h) in ah:
+        for (a, h) in ah:
             dict[a] = deserialize_via_marshal(h)
         return dict
     except:
@@ -701,7 +703,7 @@ def get_initial_author_dict():
         return dict
 
 
-def insert_into_missing(recid,report):
+def insert_into_missing(recid, report):
     """put the referingrecordnum-publicationstring into 
        the "we are missing these" table"""
     report.replace('"','\'')
@@ -730,7 +732,7 @@ def remove_from_missing(report):
 def create_analysis_tables():
     """temporary simple table + index"""
     sql1 = "CREATE TABLE IF NOT EXISTS tmpcit (citer mediumint(10), cited mediumint(10)) TYPE=MyISAM"
-    sql2 = "CREATE UNIQUE INDEX citercited on tmpcit(citer,cited)"
+    sql2 = "CREATE UNIQUE INDEX citercited on tmpcit(citer, cited)"
     sql3 = "CREATE INDEX citer on tmpcit(citer)"
     sql4 = "CREATE INDEX cited on tmpcit(cited)"
     try:
@@ -741,9 +743,9 @@ def create_analysis_tables():
     except:
         pass
 
-def write_citer_cited(citer,cited):
+def write_citer_cited(citer, cited):
     """write an entry to tmp table"""
-    sql = "insert into tmpcit(citer,cited) values ("+str(citer)+","+str(cited)+")"
+    sql = "insert into tmpcit(citer, cited) values ("+str(citer)+","+str(cited)+")"
     try:
         run_sql(sql)
     except:
