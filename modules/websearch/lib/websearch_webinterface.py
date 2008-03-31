@@ -1,7 +1,7 @@
 ## $Id$
 ##
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -27,6 +27,11 @@ import datetime
 from urllib import quote
 from mod_python import apache
 
+#maximum number of collaborating authors etc shown in GUI
+MAX_COLLAB_LIST = 10
+MAX_KEYWORD_LIST = 10
+MAX_VENUE_LIST = 10
+
 try:
     Set = set
 except NameError:
@@ -41,10 +46,10 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
      CFG_WEBSEARCH_RSS_TTL, \
-     CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS
+     CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS 
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd
+from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
     collect_user_info, http_check_credentials
 from invenio import search_engine
@@ -53,7 +58,8 @@ from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.webpage import page, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine import get_colID, get_coll_i18nname, \
-    check_user_can_view_record, collection_restricted_p, restricted_collection_cache
+    check_user_can_view_record, collection_restricted_p, restricted_collection_cache, \
+    get_fieldvalues
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_config import VIEWRESTRCOLL
 from invenio.access_control_mailcookie import mail_cookie_create_authorize_action
@@ -62,6 +68,9 @@ from invenio.bibformat_engine import get_output_formats
 from invenio.websearch_webcoll import mymkdir, get_collection
 from invenio.intbitset import intbitset
 from invenio.bibupload import find_record_from_sysno
+from invenio.bibrank_citation_searcher import get_author_cited_by, get_cited_by_list
+from invenio.bibrank_downloads_indexer import get_download_weight_total
+from invenio.search_engine_summarizer import summarize
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -119,13 +128,117 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         """This handler parses dynamic URLs (/author/John+Doe)."""
         return WebInterfaceAuthorPages(component), path
 
+    
     def __call__(self, req, form):
         """Serve the page in the given language."""
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
+        ln = argd['ln']
         req.argd = argd #needed since perform_req_search
         #wants to check it in case of no results
         self.authorname = self.authorname.replace("+"," ")
-        search_engine.perform_request_search(req=req, p=self.authorname, f="author", of="hb")
+        citelist = get_author_cited_by(self.authorname)
+        req.content_type = "text/html"
+        req.send_http_header()
+        uid = getUid(req)
+
+        search_engine.page_start(req, "hb", "", "", ln, uid)
+
+        
+        #search the publications by this author
+        pubs = search_engine.perform_request_search(req=req, p=self.authorname, f="author")
+        #get most frequent first authors of these pubs
+        authors = search_engine.get_most_popular_values_for_code(pubs, "100", "", "", "a")
+        #and affiliates 
+        collabs = search_engine.get_most_popular_values_for_code(pubs, "700", "", "", "a")
+        #and publication venues
+        venuedict =  search_engine.get_values_for_code_dict(pubs, "909", "C", "4", "p")
+        #and keywords
+        kwdict = search_engine.get_values_for_code_dict(pubs, "653", "1", "", "a")
+        
+        #construct a simple list of tuples that contains keywords that appear more than once
+        #moreover, limit the length of the list to MAX_KEYWORD_LIST
+        kwtuples = []
+        for k in kwdict.keys():
+            if kwdict[k] > 1:
+                mytuple = (kwdict[k],k)
+                kwtuples.append(mytuple)
+        #sort ..
+        kwtuples.sort()
+        kwtuples.reverse()
+        kwtuples = kwtuples[0:MAX_KEYWORD_LIST]
+        
+        #same for venues
+        vtuples = []
+        
+        for k in venuedict.keys():
+            if venuedict[k] > 1:
+                mytuple = (venuedict[k],k)
+                vtuples.append(mytuple)
+        #sort ..
+        vtuples.sort()
+        vtuples.reverse()
+        vtuples = vtuples[0:MAX_VENUE_LIST]
+
+        
+        authors.extend(collabs) #join
+        #remove the author in question from authors: they are associates
+        if (authors.count(self.authorname) > 0):
+                authors.remove(self.authorname)
+        
+        authors = authors[0:MAX_COLLAB_LIST] #cut extra
+        
+        #a dict. keys: affiliations, values: lists of publications      
+        author_aff_pubs = self.get_institute_pub_dict(pubs)
+        authoraffs = author_aff_pubs.keys()
+        
+        #find out how many times these records have been downloaded
+        recsloads = {}
+        recsloads = get_download_weight_total(recsloads, pubs)
+        #sum up
+        totaldownloads = 0
+        for k in recsloads.keys():
+            totaldownloads = totaldownloads + recsloads[k]
+
+        #get cited by..
+        citedbylist = get_cited_by_list(pubs)
+        #finally all stuff there, call the template
+        websearch_templates.tmpl_author_information(req,pubs,self.authorname,
+                                                    totaldownloads,author_aff_pubs, 
+                                                    citedbylist,kwtuples,authors,vtuples,ln)
+        
+        #cited-by summary       
+        out = summarize(pubs, 'hbcs', ln)
+        req.write(out)
+                
+        simauthbox = search_engine.create_similarly_named_authors_link_box(self.authorname)
+        req.write(simauthbox)
+
+    def get_institute_pub_dict(mee,recids):
+        #return a dictionary consisting of institute -> list of publications            
+        affus = [] #list of insts from the record
+        author_aff_pubs = {} #the disct to be build
+        for recid in recids:
+           #iterate all so that we get first author's intitute
+           #if this the first author OR
+           #"his" institute if he is an affliate author
+           mainauthors = get_fieldvalues(recid,"100__a")
+           mainauthor = " "
+           if mainauthors:
+               mainauthor = mainauthors[0]
+           if (mainauthor == mee.authorname):
+                affus = get_fieldvalues(recid,"100__u")
+           #if this is empty, add a dummy " " value
+           if (affus == []):
+                affus = [" "]
+           for a in affus:
+                #add in author_aff_pubs
+                if (author_aff_pubs.has_key(a)):
+                    tmp = author_aff_pubs[a]
+                    tmp.append(recid)
+                    author_aff_pubs[a] = tmp
+                else:
+                    author_aff_pubs[a] = [recid]
+        return author_aff_pubs
 
     index = __call__
 
@@ -133,7 +246,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /record/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'usage',
+    _exports = ['', 'files', 'reviews', 'comments', 'statistics',
                 'references', 'export', 'citations']
 
     #_exports.extend(output_formats)
@@ -147,7 +260,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.files = WebInterfaceFilesPages(self.recid)
         self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
         self.comments = WebInterfaceCommentsPages(self.recid)
-        self.usage = self
+        self.statistics = self
         self.references = self
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
@@ -204,7 +317,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'usage',
+    _exports = ['', 'files', 'reviews', 'comments', 'statistics',
                 'references', 'export', 'citations']
 
     #_exports.extend(output_formats)
@@ -217,7 +330,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.files = WebInterfaceFilesPages(self.recid)
         self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
         self.comments = WebInterfaceCommentsPages(self.recid)
-        self.usage = self
+        self.statistics = self
         self.references = self
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
@@ -498,7 +611,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             tab = ''
             try:
                 if path[1] in ['', 'files', 'reviews', 'comments',
-                               'usage', 'references', 'citations']:
+                               'statistics', 'references', 'citations']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''
