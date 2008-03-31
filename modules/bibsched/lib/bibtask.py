@@ -26,18 +26,21 @@ BibTask class.
 
 __revision__ = "$Id$"
 
-import sys
-from invenio.dbquery import run_sql, _db_login, _db_logout
-from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_PREFIX, CFG_BINDIR
 import getopt
 import getpass
 import marshal
-import signal
+import os
 import re
+import signal
+import sys
 import time
 import traceback
-import os
+
+from invenio.dbquery import run_sql, _db_login, _db_logout
+from invenio.access_control_engine import acc_authorize_action
+from invenio.config import CFG_PREFIX, CFG_BINDIR
+from invenio.errorlib import register_exception
+
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
     CFG_EXTERNAL_AUTHENTICATION
 from invenio.webuser import get_user_preferences, get_email
