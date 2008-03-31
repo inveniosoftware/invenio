@@ -72,6 +72,8 @@ def bibsched_low_level_task_submission(name, user, *argv):
         if not name in CFG_BIBTASK_VALID_TASKS:
             raise StandardError('%s is not a valid task name' % name)
 
+        argv = tuple([os.path.join(CFG_BINDIR, name)] + list(argv))
+
         ## submit task:
         task_id = run_sql("""INSERT INTO schTASK (proc,user,
                                             runtime,sleeptime,status,arguments)
