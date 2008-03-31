@@ -31,8 +31,12 @@ from mod_python import apache
 MAX_COLLAB_LIST = 10
 MAX_KEYWORD_LIST = 10
 MAX_VENUE_LIST = 10
+#tag constants
 AUTHOR_TAG = "100__a"
+COAUTHOR_TAG = "700_a"
 AUTHOR_INST_TAG = "100__u"
+VENUE_TAG = "909C4p"
+KEYWORD_TAG = "6531_a"
 
 try:
     Set = set
@@ -149,13 +153,13 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         #search the publications by this author
         pubs = search_engine.perform_request_search(req=req, p=self.authorname, f="author")
         #get most frequent first authors of these pubs
-        authors = search_engine.get_most_popular_values_for_code(pubs, "100", "", "", "a")
+        authors = search_engine.get_most_popular_values_for_code(pubs, AUTHOR_TAG)
         #and affiliates 
-        collabs = search_engine.get_most_popular_values_for_code(pubs, "700", "", "", "a")
+        collabs = search_engine.get_most_popular_values_for_code(pubs, COAUTHOR_TAG)
         #and publication venues
-        venuedict =  search_engine.get_values_for_code_dict(pubs, "909", "C", "4", "p")
+        venuedict =  search_engine.get_values_for_code_dict(pubs, VENUE_TAG)
         #and keywords
-        kwdict = search_engine.get_values_for_code_dict(pubs, "653", "1", "", "a")
+        kwdict = search_engine.get_values_for_code_dict(pubs, KEYWORD_TAG)
         
         #construct a simple list of tuples that contains keywords that appear more than once
         #moreover, limit the length of the list to MAX_KEYWORD_LIST
