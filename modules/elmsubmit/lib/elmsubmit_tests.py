@@ -87,7 +87,7 @@ class MarcTest(unittest.TestCase):
             self.assertEqual(new_x,new_y)
 
         except IOError:
-            self.fail("WARNING: the test case file does not exist; test not run.")
+            self.fail("SKIPPED: the test case file does not exist; test skipped.")
 
     def test_complex_marc(self):
         """elmsubmit - parsing complex email with multiple fields"""
@@ -178,7 +178,7 @@ class MarcTest(unittest.TestCase):
             # compare the two xml marcs
             self.assertEqual(new_x,new_y)
         except IOError:
-            self.fail("WARNING: the test case file does not exist; test not run.")
+            self.fail("SKIPPED: the test case file does not exist; test skipped.")
 
 class FileStorageTest(unittest.TestCase):
     """ testing proper storage of files """
@@ -227,7 +227,7 @@ class FileStorageTest(unittest.TestCase):
             y = """some attachment\n"""
             self.assertEqual(x,y)
         except IOError:
-            self.fail("WARNING: the test case file does not exist; test not run.")
+            self.fail("SKIPPED: the test case file does not exist; test skipped.")
 
 TEST_SUITE = make_test_suite(MarcTest,
                              FileStorageTest,)
