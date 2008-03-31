@@ -115,7 +115,7 @@ def get_records_with_num_cites(numstr):
 
 
 def get_cited_by_list(recordlist):
-    """Return a tuple of ([recid,citation_weight],...) for all the
+    """Return a tuple of ([recid,list_of_citing_records],...) for all the
        records in recordlist.
     """
     result = []
@@ -132,6 +132,22 @@ def get_cited_by_list(recordlist):
             tmp = [recid, 0]
         result.append(tmp)
     return result
+
+def get_cited_by_weight(recordlist):
+    """Return a tuple of ([recid,number_of_citing_records],...) for all the
+       records in recordlist.
+    """
+    result = []
+    tuples = get_cited_by_list(recordlist)
+    for recid, rlist in tuples:
+        #just return recid - lenght
+        if rlist:
+            tmp = [recid, len(rlist)]
+        else:
+            tmp = [recid, 0]
+        result.append(tmp)
+    return result
+
 
 
 def calculate_cited_by_list(record_id, sort_order="d"):
