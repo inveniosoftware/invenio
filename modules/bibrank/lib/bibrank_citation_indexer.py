@@ -747,7 +747,7 @@ def write_citer_cited(citer, cited):
 def print_missing(num):
     """Print the contents of rnkCITATIONDATAEXT for records that are needed more than num times"""
     if not num:
-	num = 50
+        num = 50
     try:
         res = run_sql("select count(id_bibrec), extcitepubinfo from rnkCITATIONDATAEXT \
                        group by id_bibrec having count(id_bibrec) >= %s \
