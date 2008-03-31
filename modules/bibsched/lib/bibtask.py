@@ -76,13 +76,13 @@ def bibsched_low_level_task_submission(name, user, *argv):
         task_id = run_sql("""INSERT INTO schTASK (proc,user,
                                             runtime,sleeptime,status,arguments)
                                             VALUES (%s,%s,NOW(),'','WAITING',%s)""",
-            (name, user, options["runtime"], marshal.dumps(argv)))
+            (name, user, marshal.dumps(argv)))
 
     except Exception:
         register_exception()
         if task_id:
             run_sql("""DELETE FROM schTASK WHERE id=%s""", (task_id, ))
-        return None
+        raise
     return task_id
 
 def task_init(
@@ -137,9 +137,9 @@ def task_init(
         task_submit_elaborate_specific_parameter_fnc,
         task_submit_check_options_fnc)
 
-    write_message('argv=%s' % argv, verbose=9)
-    write_message('_options=%s' % _options, verbose=9)
-    write_message('_task_params=%s' % _task_params, verbose=9)
+    write_message('argv=%s' % (argv, ), verbose=9)
+    write_message('_options=%s' % (_options, ), verbose=9)
+    write_message('_task_params=%s' % (_task_params, ), verbose=9)
 
     if to_be_submitted:
         _task_submit(argv, authorization_action, authorization_msg)
@@ -409,7 +409,7 @@ def _task_get_options(task_id, task_name):
         write_message("Error: %s task %d does not seem to exist." \
             % (task_name, task_id), sys.stderr)
         sys.exit(1)
-    write_message('Options retrieved: %s' % out, verbose=9)
+    write_message('Options retrieved: %s' % (out, ), verbose=9)
     return out
 
 def _task_run(task_run_fnc):
