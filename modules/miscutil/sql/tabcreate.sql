@@ -2158,10 +2158,12 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
 -- program occasionally to check if some publication has been
 -- cited more than 50 times (or such): record for that should
 -- be created
--- refererid is the id of the record. pubinfo is publication inf
+-- id_bibrec is the id of the record. extcitepubinfo is publication inf
+-- that looks in general like hep-th/0112088
 CREATE TABLE IF NOT EXISTS rnkCITATIONDATAEXT (
-  id_bibrec int(10) unsigned,
-  pubinfo varchar(255)
+  id_bibrec int(8) unsigned,
+  extcitepubinfo varchar(255) NOT NULL,
+  PRIMARY KEY (id_bibrec, extcitepubinfo)
 ) TYPE=MyISAM;
 
 
