@@ -134,6 +134,7 @@ class pSession(Session):
                 s.__remember_me
             except AttributeError:
                 s.__remember_me = False
+                s.__dirty_remember_me = True
         except cPickle.UnpicklingError:
             raise SessionNotInDb("Session %s is broken" % \
                                  sessionId)
