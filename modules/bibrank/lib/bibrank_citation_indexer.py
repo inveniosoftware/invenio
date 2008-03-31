@@ -701,11 +701,11 @@ def insert_into_missing(recid, report):
     report.replace('"','\'')
     try:
         srecid = str(recid)
-        wasalready = run_sql("select id_bibrec from rnkCITATIONDATAEXT where id_bibrec = %s and pubinfo = %s",
+        wasalready = run_sql("select id_bibrec from rnkCITATIONDATAEXT where id_bibrec = %s and extcitepubinfo = %s",
                               (srecid,report))
         if not wasalready:
-            run_sql("insert into rnkCITATIONDATAEXT(id_bibrec,pubinfo) values (%s,%s)",
-                   (srecid,report))
+            run_sql("insert into rnkCITATIONDATAEXT(id_bibrec, extcitepubinfo) values (%s,%s)",
+                   (srecid, report))
     except:
         #we should complain but it can result to million lines of warnings so just pass..
         pass
@@ -715,7 +715,7 @@ def remove_from_missing(report):
        in the case ref got in our library collection"""
     report.replace('"','\'')
     try:
-        run_sql("delete from rnkCITATIONDATAEXT where pubinfo= %s", (report,))
+        run_sql("delete from rnkCITATIONDATAEXT where extcitepubinfo= %s", (report,))
     except:
         #we should complain but it can result to million lines of warnings so just pass..
         pass
@@ -749,7 +749,7 @@ def print_missing(num):
     if not num:
 	num = 50
     try:
-        res = run_sql("select count(id_bibrec), pubinfo from rnkCITATIONDATAEXT \
+        res = run_sql("select count(id_bibrec), extcitepubinfo from rnkCITATIONDATAEXT \
                        group by id_bibrec having count(id_bibrec) >= %s \
                        order by count(id_bibrec)",(num,))
         for (cnt, brec) in res:
