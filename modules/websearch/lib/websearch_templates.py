@@ -3015,7 +3015,7 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        outp = "<table>"+ \
+        out = "<table>"+ \
             "<tr><td>"+"<strong>"+_("Citation summary")+"</strong></td><td></td></tr>" + \
             "<tr><td>"+"<strong>"+_("Citations")+"</strong></td><td>"+totalcites+"</td></tr>" + \
             "<tr><td>"+"<strong>"+_("Avg cit per record")+"</strong></td><td>"+avgstr+"</td></tr>"
@@ -3025,3 +3025,4 @@ class Template:
             reclist = reciddict[k]
             out += "<tr><td>"+_(rowtitle)+"</td><td>"+str(len(reclist))+"</td></tr>"
         out += '</table>'
+        return out
