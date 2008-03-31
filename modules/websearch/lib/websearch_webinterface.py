@@ -1,7 +1,7 @@
 ## $Id$
 ##
 ## This file is part of CDS Invenio.
-## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
 ## CDS Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -31,6 +31,8 @@ from mod_python import apache
 MAX_COLLAB_LIST = 10
 MAX_KEYWORD_LIST = 10
 MAX_VENUE_LIST = 10
+AUTHOR_TAG = "100__a"
+AUTHOR_INST_TAG = "100__u"
 
 try:
     Set = set
@@ -160,7 +162,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         kwtuples = []
         for k in kwdict.keys():
             if kwdict[k] > 1:
-                mytuple = (kwdict[k],k)
+                mytuple = (kwdict[k], k)
                 kwtuples.append(mytuple)
         #sort ..
         kwtuples.sort()
@@ -172,7 +174,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         
         for k in venuedict.keys():
             if venuedict[k] > 1:
-                mytuple = (venuedict[k],k)
+                mytuple = (venuedict[k], k)
                 vtuples.append(mytuple)
         #sort ..
         vtuples.sort()
@@ -183,7 +185,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         authors.extend(collabs) #join
         #remove the author in question from authors: they are associates
         if (authors.count(self.authorname) > 0):
-                authors.remove(self.authorname)
+            authors.remove(self.authorname)
         
         authors = authors[0:MAX_COLLAB_LIST] #cut extra
         
@@ -202,9 +204,9 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         #get cited by..
         citedbylist = get_cited_by_list(pubs)
         #finally all stuff there, call the template
-        websearch_templates.tmpl_author_information(req,pubs,self.authorname,
-                                                    totaldownloads,author_aff_pubs, 
-                                                    citedbylist,kwtuples,authors,vtuples,ln)
+        websearch_templates.tmpl_author_information(req, pubs, self.authorname,
+                                                    totaldownloads, author_aff_pubs, 
+                                                    citedbylist, kwtuples, authors, vtuples, ln)
         
         #cited-by summary       
         out = summarize(pubs, 'hbcs', ln)
@@ -213,24 +215,24 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         simauthbox = search_engine.create_similarly_named_authors_link_box(self.authorname)
         req.write(simauthbox)
 
-    def get_institute_pub_dict(mee,recids):
+    def get_institute_pub_dict(mee, recids):
         #return a dictionary consisting of institute -> list of publications            
         affus = [] #list of insts from the record
         author_aff_pubs = {} #the disct to be build
         for recid in recids:
-           #iterate all so that we get first author's intitute
-           #if this the first author OR
-           #"his" institute if he is an affliate author
-           mainauthors = get_fieldvalues(recid,"100__a")
-           mainauthor = " "
-           if mainauthors:
-               mainauthor = mainauthors[0]
-           if (mainauthor == mee.authorname):
-                affus = get_fieldvalues(recid,"100__u")
-           #if this is empty, add a dummy " " value
-           if (affus == []):
+            #iterate all so that we get first author's intitute
+            #if this the first author OR
+            #"his" institute if he is an affliate author
+            mainauthors = get_fieldvalues(recid, AUTHOR_TAG)
+            mainauthor = " "
+            if mainauthors:
+                mainauthor = mainauthors[0]
+            if (mainauthor == mee.authorname):
+                affus = get_fieldvalues(recid, AUTHOR_INST_TAG)
+            #if this is empty, add a dummy " " value
+            if (affus == []):
                 affus = [" "]
-           for a in affus:
+            for a in affus:
                 #add in author_aff_pubs
                 if (author_aff_pubs.has_key(a)):
                     tmp = author_aff_pubs[a]
@@ -246,7 +248,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /record/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'statistics',
+    _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations']
 
     #_exports.extend(output_formats)
@@ -260,7 +262,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.files = WebInterfaceFilesPages(self.recid)
         self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
         self.comments = WebInterfaceCommentsPages(self.recid)
-        self.statistics = self
+        self.usage = self
         self.references = self
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
@@ -317,7 +319,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
-    _exports = ['', 'files', 'reviews', 'comments', 'statistics',
+    _exports = ['', 'files', 'reviews', 'comments', 'usage',
                 'references', 'export', 'citations']
 
     #_exports.extend(output_formats)
@@ -330,7 +332,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.files = WebInterfaceFilesPages(self.recid)
         self.reviews = WebInterfaceCommentsPages(self.recid, reviews=1)
         self.comments = WebInterfaceCommentsPages(self.recid)
-        self.statistics = self
+        self.usage = self
         self.references = self
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
@@ -611,7 +613,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             tab = ''
             try:
                 if path[1] in ['', 'files', 'reviews', 'comments',
-                               'statistics', 'references', 'citations']:
+                               'usage', 'references', 'citations']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''
