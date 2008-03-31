@@ -2093,6 +2093,7 @@ CREATE TABLE IF NOT EXISTS rnkMETHODDATA (
   PRIMARY KEY  (id_rnkMETHOD)
 ) TYPE=MyISAM;
 
+
 CREATE TABLE IF NOT EXISTS collection_rnkMETHOD (
   id_collection mediumint(9) unsigned NOT NULL,
   id_rnkMETHOD mediumint(9) unsigned NOT NULL,
@@ -2113,6 +2114,12 @@ CREATE TABLE IF NOT EXISTS rnkWORD01R (
   termlist longblob,
   type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
   PRIMARY KEY  (id_bibrec,type)
+) TYPE=MyISAM;
+
+CREATE TABLE IF NOT EXISTS rnkAUTHORDATAR (
+  aterm varchar(50) default NULL,
+  hitlist longblob,
+  UNIQUE KEY aterm (aterm)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS rnkPAGEVIEWS (
@@ -2145,6 +2152,18 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
   last_updated datetime NOT NULL default '0000-00-00',
   PRIMARY KEY object_name (object_name)
 ) TYPE=MyISAM;
+
+
+-- a table for missing citations. This should be scanned by a
+-- program occasionally to check if some publication has been
+-- cited more than 50 times (or such): record for that should
+-- be created
+-- refererid is the id of the record. pubinfo is publication inf
+CREATE TABLE IF NOT EXISTS rnkCITATIONDATAEXT (
+  id_bibrec int(10) unsigned,
+  pubinfo varchar(255)
+) TYPE=MyISAM;
+
 
 -- tables for collections and collection tree:
 
