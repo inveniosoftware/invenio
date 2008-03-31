@@ -21,6 +21,7 @@
 
 __revision__ = "$Id$"
 
+import re
 import marshal
 from zlib import decompress, error
 
@@ -62,12 +63,63 @@ def get_cited_by(recordid):
         ret = citation_dic[recordid]
     return ret
 
+def get_records_with_num_cites(numstr):
+    """returns records are cited X times, X defined in numstr.
+      Warning: numstr is string and may not be numeric! It can be 10,0-100,500+ etc"""
+    matches = []
+    #once again, check that the parameter is a string
+    if not (type(numstr) == type("thisisastring")):
+	return []
+    numstr = numstr.replace(" ",'')    
+    numstr = numstr.replace('"','')    
+    #get the cited-by dictionary
+    citedbydict = init_db_dictionary("citationdict")
+
+    num = 0
+    #first, check if numstr is just a number
+    singlenum = re.findall("(^\d+$)", numstr)        
+    if singlenum:
+	num = int(singlenum[0])
+        for k in citedbydict.keys():
+           li = citedbydict[k]
+	   if len(li) == num:	
+               matches.append(k)
+        return matches    
+
+    #try to get 1-10 or such
+    firstsec = re.findall("(\d+)-(\d+)", numstr)
+    if firstsec:
+        first = 0
+        sec = -1
+        try:
+	    first = int(firstsec[0][0])
+            sec = int(firstsec[0][1])
+        except:
+	    return []
+        if (first <= sec):
+            for k in citedbydict.keys():
+                li = citedbydict[k]
+	        if len(li) >= first:
+                   if len(li) <= sec:	
+                       matches.append(k)
+            return matches    
+    
+    firstsec = re.findall("(\d+)\+", numstr)
+    if firstsec:
+	first = firstsec[0]
+        for k in citedbydict.keys():
+           li = citedbydict[k]
+	   if len(li) > int(first):
+               matches.append(k)
+    return matches 
+
+
 def get_cited_by_list(recordlist):
     """Return a tuple of ([recid,citation_weight],...) for all the
        records in recordlist.
     """
     result = []
-    query = "select relevance_data from rnkMETHODDATA, rnkMETHOD WHERE rnkMETHOD.id=rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.name='citation'"
+    query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"	
     compressed_citation_weight_dic = run_sql(query)
     if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
         citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
@@ -100,8 +152,9 @@ def calculate_cited_by_list(record_id, sort_order="d"):
             citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
             #citation_dic is {1: 0, .. 81: 4, 82: 0, 83: 0, 84: 3} etc, e.g. recnum-weight
             for id in citation_list:
-                tmp = [id, citation_dic[id]]
-                result.append(tmp)
+		if citation_dic.has_key(id):
+                   tmp = [id, citation_dic[id]]
+                   result.append(tmp)
         except error:
             for id in citation_list:
                 tmp = [id, 1]
@@ -114,6 +167,24 @@ def calculate_cited_by_list(record_id, sort_order="d"):
             result.sort(lambda x, y: cmp(x[1], y[1]))
 
     return result
+
+def get_author_cited_by(authorstring):
+    """Return a list of doc ids [y1,y2,..] for the
+       author given as param, such that y1,y2.. cite that author
+    """
+    citations = []
+    #quote authorstring in case there are authors like 't Hoof
+    authorstring = authorstring.replace("'","\\'")
+    query = """select hitlist from rnkAUTHORDATAR where aterm ='%s'""" % authorstring
+    ablob = run_sql(query)
+    if ablob and ablob[0] and ablob[0][0]:
+        #has to be prepared for corrupted data!
+        try:
+            citations = marshal.loads(decompress(ablob[0][0]))
+	except Error:
+	    citations = []
+    return citations
+
 
 def get_self_cited_by(record_id):
     """Return a list of doc ids [y1,y2,..] for the
