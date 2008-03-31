@@ -27,14 +27,14 @@ __revision__ = " "
 
 from invenio.bibrank_citation_searcher import get_cited_by_list
 import invenio.template
-template = invenio.template.load('search_engine_summarizer')
+websearch_templates = invenio.template.load('websearch')
 
-def summarize(recids, of):
-    """Produces a report in the format defined by of"""
+def summarize(recids, of, ln):
+    """Produces a report in the format defined by of in language ln"""
     if of == 'hbcs':
         #this is a html cite summary
         citedbylist = get_cited_by_list(recids)
-        return print_citation_summary_html(citedbylist)
+        return print_citation_summary_html(citedbylist, ln)
     if of == 'xcs':
         #this is an xml cite summary
         citedbylist = get_cited_by_list(recids)
@@ -76,17 +76,16 @@ def print_citation_summary_xml(citedbylist):
     return outp #just to return something
     
     
-def print_citation_summary_html(req, citedbylist, criteria=""):
+def print_citation_summary_html(citedbylist, ln, criteria=""):
     """Prints citation summary in html.
        The criteria, if any, is added to the link"""
-    lang = req.lang
     alldict = calculate_citations(tresholdsNames, citedbylist)
     avgstr = str(alldict['avgcites'])
     totalcites = str(alldict['totalcites'])
     #format avg so that it does not span 10 digits 
     avgstr = avgstr[0:4]
     reciddict = alldict['reciddict']
-    return template.citesummary_html(lang, totalcites, avgstr, reciddict)
+    return websearch_templates.tmpl_citesummary_html(ln, totalcites, avgstr, reciddict)
                     
     
     
