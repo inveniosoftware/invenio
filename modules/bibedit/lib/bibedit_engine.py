@@ -185,7 +185,7 @@ def save_xml_record(recid):
     file_temp = open("%s.xml" % file_path, 'w')
     file_temp.write(record_xml_output(get_temp_record("%s.tmp" % file_path)[1]))
     file_temp.close()
-    bibsched_low_level_task_submission('bibupload', 'bibedit', '-r', '%s.xml' % file_path))
+    bibsched_low_level_task_submission('bibupload', 'bibedit', '-r', '%s.xml' % file_path)
     os.system("rm %s.tmp" % file_path)
 
 def save_temp_record(record, uid, file_path):
