@@ -186,6 +186,11 @@ def cli_cmd_update_config_py(conf):
     for lang in conf.get("Invenio", "CFG_SITE_LANGS").split(","):
         fdesc.write("CFG_SITE_NAME_INTL['%s'] = \"%s\"\n" % (lang, conf.get("Invenio",
                                                                             "CFG_SITE_NAME_INTL_" + lang)))
+    ## special treatment for CFG_SITE_SECURE_URL that may be empty, in
+    ## which case it should be put equal to CFG_SITE_URL:
+    if not conf.get("Invenio", "CFG_SITE_SECURE_URL"):
+        conf.set("Invenio", "CFG_SITE_SECURE_URL",
+                 conf.get("Invenio", "CFG_SITE_URL"))
     ## process all the options normally:
     for section in conf.sections():
         for option in conf.options(section):
