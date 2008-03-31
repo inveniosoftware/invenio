@@ -53,6 +53,7 @@ from invenio.config import \
      CFG_LOGDIR, \
      CFG_SITE_URL
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES, InvenioWebSearchUnknownCollectionError
+from invenio.bibrecord import create_records, record_get_field_value, record_get_field_values
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
@@ -75,7 +76,8 @@ import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 webcomment_templates = invenio.template.load('webcomment')
 
-from invenio.bibrank_citation_searcher import calculate_cited_by_list, calculate_co_cited_with_list, get_self_cited_in, get_self_cited_by
+from invenio.bibrank_citation_searcher import calculate_cited_by_list, \
+calculate_co_cited_with_list, get_self_cited_in, get_self_cited_by, get_records_with_num_cites
 from invenio.bibrank_citation_grapher import create_citation_history_graph_and_box
 
 from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time, Error
@@ -1528,6 +1530,17 @@ def browse_in_bibwords(req, p, f, ln=CFG_SITE_LANG):
     ))
     return
 
+
+def search_special_fields(bsu_p, bsu_f, bsu_m):
+    """Stuff that actually cannot be found from just one record goes here.
+       Example: give records that have been cited 200 times: cites=200"""
+    if bsu_f == "cites":
+        #search.. bsu_p will look like "200" or "0-9" or "5000+"
+        numstr = "\""+bsu_p+"\""
+        x = get_records_with_num_cites(numstr)
+        return HitSet(x)
+    return HitSet([])
+
 def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG):
     """Search for complex pattern 'p' within field 'f' according to
        matching type 'm'.  Return hitset of recIDs.
@@ -1580,6 +1593,9 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     for idx_unit in range(0, len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
+        if not basic_search_unit_hitset:
+            #stuff like "search by number of citations" i.e. cites>500 or such goes here
+            basic_search_unit_hitset = search_special_fields(bsu_p, bsu_f, bsu_m)
         if verbose >= 9 and of.startswith("h"):
             print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (bsu_p, list(basic_search_unit_hitset)))
         if len(basic_search_unit_hitset) > 0 or \
@@ -3733,7 +3749,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
         # search stage 5: apply search option limits and restrictions:
         if datetext1 != "":
             if verbose and of.startswith("h"):
-                print_warning(req, "Search stage 5: applying time limits, from %s until %s..." % (datetext1, datetext2))
+                print_warning(req, "Search stage 5: applying time etc limits, from %s until %s..." % (datetext1, datetext2))
             try:
                 results_final = intersect_results_with_hitset(req,
                                                               results_final,
@@ -4014,6 +4030,33 @@ def perform_request_log(req, date=""):
         req.write("</table>")
     req.write("</html>")
     return "\n"
+
+
+def get_values_for_code_dict(recids, tag):
+    """ gets values of tag for records, puts them in dictionary that contains their frequency"""
+    valuefreqdict = {}
+    for recid in recids:
+        vals = get_fieldvalues(recid, tag)
+        for v in vals:
+            if valuefreqdict.has_key(v):
+                valuefreqdict[v] = valuefreqdict[v]+1
+            else:
+                valuefreqdict[v] = 1
+    return valuefreqdict
+              
+def get_most_popular_values_for_code(recids, tag):
+    """returns a sorted tuple list of the popular values for a given tag"""
+    valuefreqdict = get_values_for_code_dict(recids, tag)
+    tmppairs = []
+    for k,v in valuefreqdict.items():
+        tmppairs.append((v,k))
+    tmppairs.sort()
+    tmppairs.reverse()
+    #take only the keys and return them
+    sortedvalues = []
+    for (v,k) in tmppairs:
+        sortedvalues.append(k)
+    return sortedvalues
 
 def profile(p="", f="", c=CFG_SITE_NAME):
     """Profile search time."""
