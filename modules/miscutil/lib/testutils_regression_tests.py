@@ -44,7 +44,7 @@ class TestFunctionTestWebPageContent(unittest.TestCase):
                                         username="admin",
                                         password="foo",
                                         expected_text="</html>")
-        if errmsgs[0].find("ERROR: Cannot login as admin, test skipped.") > -1:
+        if errmsgs[0].find("ERROR: Cannot login as admin.") > -1:
             pass
         else:
             self.fail("Should not be able to login as admin with foo password.")

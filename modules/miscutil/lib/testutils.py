@@ -186,7 +186,7 @@ def test_web_page_content(url,
     try:
         import mechanize
     except ImportError:
-        return ['WARNING: Cannot import mechanize, test skipped.']
+        return ['ERROR: Cannot import mechanize.']
     browser = mechanize.Browser()
     try:
         # firstly login:
@@ -204,7 +204,7 @@ def test_web_page_content(url,
                              "You are logged in as %s." % username)
             except ValueError:
                 raise InvenioTestUtilsBrowserException, \
-                      'ERROR: Cannot login as %s, test skipped.' % username
+                      'ERROR: Cannot login as %s.' % username
 
         # secondly read page body:
         browser.open(url)
