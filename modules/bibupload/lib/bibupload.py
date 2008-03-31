@@ -84,7 +84,7 @@ from invenio.bibformat import format_record
 from invenio.config import CFG_WEBSUBMIT_FILEDIR, \
                            CFG_TMPDIR
 from invenio.bibtask import task_init, write_message, \
-    task_set_option, task_get_option, task_update_status, \
+    task_set_option, task_get_option, task_get_task_param, task_update_status, \
     task_update_progress
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format
 
@@ -1228,7 +1228,7 @@ def archive_marcxml_for_history(recID):
         if res:
             run_sql("""INSERT INTO hstRECORD (id_bibrec, marcxml, job_id, job_name, job_person, job_date, job_details)
                                       VALUES (%s,%s,%s,%s,%s,%s,%s)""",
-                    (res[0][0], res[0][1], task_get_option('task', 0), 'bibupload', task_get_option('user','UNKNOWN'), res[0][2],
+                    (res[0][0], res[0][1], task_get_task_param('task_id', 0), 'bibupload', task_get_task_param('user','UNKNOWN'), res[0][2],
                      'mode: ' + task_get_option('mode','UNKNOWN') + '; file: ' + task_get_option('file_path','UNKNOWN') + '.'))
     except Error, error:
         write_message("   Error during archive_marcxml_for_history: %s " % error,
@@ -1657,7 +1657,7 @@ def task_run_core():
             write_message("   Error bibupload failed: No record found",
                         verbose=1, stream=sys.stderr)
 
-    if task_get_option('verbose') >= 1:
+    if task_get_task_param('verbose') >= 1:
         # Print out the statistics
         print_out_bibupload_statistics()
 

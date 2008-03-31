@@ -219,19 +219,32 @@ def _task_build_params(
 
 def task_set_option(key, value):
     """Set an value to key in the option dictionary of the task"""
-    _options[key] = value
+    global _options
+    try:
+        _options[key] = value
+    except NameError:
+        _options = {key : value}
 
 def task_get_option(key, default=None):
     """Returns the value corresponding to key in the option dictionary of the task"""
-    return _options.get(key, default)
+    try:
+        return _options.get(key, default)
+    except NameError:
+        return default
 
 def task_has_option(key):
     """Map the has_key query to _options"""
-    return _options.has_key(key)
+    try:
+        return _options.has_key(key)
+    except NameError:
+        return False
 
-def task_get_task_param(key):
+def task_get_task_param(key, default=None):
     """Returns the value corresponding to the particular task param"""
-    return _task_params.get(key)
+    try:
+        return _task_params.get(key, default)
+    except NameError:
+        return default
 
 def task_set_task_param(key, value):
     """Set the value corresponding to the particular task param"""
