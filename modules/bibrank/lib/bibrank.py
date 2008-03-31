@@ -47,10 +47,11 @@ Usage: %s [options]
                            of the document has been changed since last 
                            time -R was used
 
- -P, --print-missing       print the top entries of 'missing' table. These
-                           are entries that should be entered in your
+ -E, --print-extcites      print the top entries of the external cites table. 
+                           These are entries that should be entered in your
                            collection, since they have been cited many
-                           times by other records.
+                           times by other records. Useful for cataloguers to
+                           input external papers manually.
 
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)
@@ -194,10 +195,11 @@ def main():
                            of the document has been changed since last 
                            time -R was used
 
- -P, --print-missing       print the top entries of 'missing' table. These
-                           are entries that should be entered in your
+ -E, --print-extcites      print the top entries of the external cites table. 
+                           These are entries that should be entered in your
                            collection, since they have been cited many
-                           times by other records
+                           times by other records. Useful for cataloguers to
+                           input external papers manually. 
 
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)
@@ -205,8 +207,8 @@ def main():
  -r, --repair              try to repair all records in the table(s)
 """,
             version=__revision__,
-            specific_params=("PladSi:m:c:kUrRM:f:w:", [
-                "print-missing",
+            specific_params=("EladSi:m:c:kUrRM:f:w:", [
+                "print-extcites",
                 "lastupdate",
                 "add",
                 "del",
@@ -239,7 +241,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy):
             task_get_option('run').append(run[run_key])
     elif key in ("-r", "--repair"):
         task_set_option("cmd", "repair")
-    elif key in ("-P", "--print-missing"):
+    elif key in ("-E", "--print-extcites"):
         task_set_option("cmd", "print-missing")
     elif key in ("-d", "--del"):
         task_set_option("cmd", "del")

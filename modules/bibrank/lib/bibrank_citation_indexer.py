@@ -744,12 +744,14 @@ def write_citer_cited(citer, cited):
     except:
         pass
 
-def print_missing():
-    """Print the contents of rnkCITATIONDATAEXT for records that are needed more than 50 times"""
+def print_missing(num):
+    """Print the contents of rnkCITATIONDATAEXT for records that are needed more than num times"""
+    if not num:
+	num = 50
     try:
-        sql = "select count(id_bibrec), pubinfo from rnkCITATIONDATAEXT "
-        sql = sql+"group by id_bibrec having count(id_bibrec) > 50"
-        res = run_sql(sql)
+        res = run_sql("select count(id_bibrec), pubinfo from rnkCITATIONDATAEXT \
+                       group by id_bibrec having count(id_bibrec) >= %s \
+                       order by count(id_bibrec)",(num,))
         for (cnt, brec) in res:
             print str(cnt)+"\t"+brec
     except:

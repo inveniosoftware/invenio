@@ -44,7 +44,8 @@ def citation_exec(rank_method_code, name, config):
     """Rank method for citation analysis"""
     #first check if this is a specific task
     if task_get_option("cmd") == "print-missing":
-        print_missing()
+        num = task_get_option("num")
+        print_missing(num)
     dict = get_citation_weight(rank_method_code, config)
     date = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if dict: intoDB(dict, date, rank_method_code)
