@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import unittest
 import dateutils
 
+from invenio.config import CFG_SITE_LANGS
 from invenio.testutils import make_test_suite, run_test_suite
 
 class ConvertFromDateCVSTest(unittest.TestCase):
@@ -65,6 +66,8 @@ class ConvertIntoDateGUITest(unittest.TestCase):
 
     def test_convert_good_to_dategui_en(self):
         """dateutils - conversion of good text date into English GUI date"""
+        if 'en' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: English language not configured, test skipped.")
         datetext = "2006-07-16 18:36:01"
         dategui_en_expected = "16 Jul 2006, 18:36"
         dategui_en = dateutils.convert_datetext_to_dategui(datetext,
@@ -73,6 +76,8 @@ class ConvertIntoDateGUITest(unittest.TestCase):
 
     def test_convert_good_to_dategui_sk(self):
         """dateutils - conversion of good text date into Slovak GUI date"""
+        if 'sk' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: Slovak language not configured, test skipped.")
         datetext = "2006-07-16 18:36:01"
         dategui_sk_expected = "16 júl 2006, 18:36"
         dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
@@ -81,6 +86,8 @@ class ConvertIntoDateGUITest(unittest.TestCase):
 
     def test_convert_bad_to_dategui_en(self):
         """dateutils - conversion of bad text date into English GUI date"""
+        if 'en' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: English language not configured, test skipped.")
         datetext = "2006-02-AA 18:36:01"
         dategui_sk_expected = "N/A"
         dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
@@ -89,6 +96,8 @@ class ConvertIntoDateGUITest(unittest.TestCase):
 
     def test_convert_bad_to_dategui_sk(self):
         """dateutils - conversion of bad text date into Slovak GUI date"""
+        if 'sk' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: Slovak language not configured, test skipped.")
         datetext = "2006-02-AA 18:36:01"
         dategui_sk_expected = "nepríst."
         dategui_sk = dateutils.convert_datetext_to_dategui(datetext,
