@@ -2917,8 +2917,8 @@ class Template:
 
         return out
 
-    def tmpl_author_information(self,req,pubs,authorname,num_downloads,aff_pubdict,citedbylist,
-                                kwtuples,authors,vtuples,ln):
+    def tmpl_author_information(self, req, pubs, authorname, num_downloads, aff_pubdict,
+                                citedbylist, kwtuples, authors, vtuples, ln):
         """Prints stuff about the author given as authorname.
            1. Author name + his/her institutes. Each institute I has a link
               to papers where the auhtor has I as institute.
@@ -2955,34 +2955,33 @@ class Template:
         line1 = _("Author")+": <i>"+authorname+"</i>"+authoraff
         line2 = _("Publications")+": "+searchstr+" ("+_("downloaded")+" "
         line2 += str(num_downloads)+" "+_("times")+")"
-        banner = self.tmpl_print_searchresultbox(line1,line2)
+        banner = self.tmpl_print_searchresultbox(line1, line2)
         req.write(banner)       
 
         #keywords, collaborations
         keywstr = ""
         collabstr = ""
         if (kwtuples):
-            for (freq,kw) in kwtuples:
+            for (freq, kw) in kwtuples:
                 #create a link in author=x, keyword=y
                 searchstr = create_html_link(self.build_search_url(
                                                 p1=authorname,
-                                                f1='author',p2=kw,f2='keyword',m1='e',op1='a',m2='e'),
+                                                f1='author',
+                                                p2=kw, f2='keyword', m1='e', op1='a', m2='e'),
                                                 {}, kw+" ("+str(freq)+")", {'class':"google"})
                 keywstr = keywstr+" "+searchstr
-            banner = self.tmpl_print_searchresultbox(_("Frequent keywords"),keywstr)
+            banner = self.tmpl_print_searchresultbox(_("Frequent keywords"), keywstr)
             req.write(banner)
         if (authors):
             for c in authors:
                 collabstr = collabstr + " <a href=\"/author/"+c+"\">"+c+"</a>"
-            banner = self.tmpl_print_searchresultbox(_("Author collaborations"),collabstr)
+            banner = self.tmpl_print_searchresultbox(_("Author collaborations"), collabstr)
             req.write(banner)
                 
         if (vtuples):
-            banner = self.tmpl_print_searchresultbox(_("Publishes in"),str(vtuples))
+            banner = self.tmpl_print_searchresultbox(_("Publishes in"), str(vtuples))
             req.write(banner)       
-        
-        
-        
+                        
     
     def tmpl_detailed_record_references(self, recID, ln, content):
         """Returns the discussion page of a record
