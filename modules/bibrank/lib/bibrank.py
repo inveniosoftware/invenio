@@ -43,11 +43,11 @@ Usage: %s [options]
  -S, --stat                show statistics for a method
 
  -R, --recalculate         recalculate weigth data, used by word frequency
-                           and citation methods, should be used if ca 1% 
-                           of the document has been changed since last 
+                           and citation methods, should be used if ca 1%
+                           of the document has been changed since last
                            time -R was used
 
- -E, --print-extcites      print the top entries of the external cites table. 
+ -E, --print-extcites      print the top entries of the external cites table.
                            These are entries that should be entered in your
                            collection, since they have been cited many
                            times by other records. Useful for cataloguers to
@@ -122,6 +122,9 @@ def task_run_core():
     queue row, containing if, arguments, etc.
     Return 1 in case of success and 0 in case of failure.
     """
+    if not task_get_option("run"):
+        task_set_option("run", [name[0] for name in run_sql("SELECT name from rnkMETHOD")])
+
     try:
         for key in task_get_option("run"):
             write_message("")
@@ -156,20 +159,6 @@ def task_run_core():
 
 def main():
     """Main that construct all the bibtask."""
-    task_set_option('quick', 'yes')
-    task_set_option('cmd', 'add')
-    task_set_option("flush", 100000)
-    task_set_option('collection', [])
-    task_set_option("id", [])
-    task_set_option("check", "")
-    task_set_option("stat", "")
-    task_set_option("modified", "")
-    task_set_option("last_updated", "last_updated")
-    task_set_option("run", [])
-    res = run_sql("SELECT name from rnkMETHOD")
-    for (name,) in res:
-        task_get_option("run").append(name)
-
     task_init(authorization_action='runbibrank',
             authorization_msg="BibRank Task Submission",
             description="""Ranking examples:
@@ -191,15 +180,15 @@ def main():
  -S, --stat                show statistics for a method
 
  -R, --recalculate         recalculate weigth data, used by word frequency
-                           and citation methods, should be used if ca 1% 
-                           of the document has been changed since last 
+                           and citation methods, should be used if ca 1%
+                           of the document has been changed since last
                            time -R was used
 
- -E, --print-extcites      print the top entries of the external cites table. 
+ -E, --print-extcites      print the top entries of the external cites table.
                            These are entries that should be entered in your
                            collection, since they have been cited many
                            times by other records. Useful for cataloguers to
-                           input external papers manually. 
+                           input external papers manually.
 
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)

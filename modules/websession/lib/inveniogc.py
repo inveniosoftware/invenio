@@ -402,11 +402,6 @@ def guest_user_garbage_collector():
 
 def main():
     """Main that construct all the bibtask."""
-    task_set_option('logs', False)
-    task_set_option('guests', False)
-    task_set_option('bibxxx', False)
-    task_set_option('documents', False)
-    task_set_option('cache', False)
     task_init(authorization_action='runinveniogc',
             authorization_msg="InvenioGC Task Submission",
             help_specific_usage="  -l, --logs\t\tClean old logs and temporary files.\n" \

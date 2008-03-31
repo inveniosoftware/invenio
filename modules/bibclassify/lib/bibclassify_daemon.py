@@ -33,7 +33,7 @@ import os
 
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, write_message, get_datetime, \
-    task_set_option, task_get_option, task_get_task_param, task_update_status, \
+    task_set_option, task_get_option, task_update_status, \
     task_update_progress
 from invenio.bibclassifylib import generate_keywords_rdf
 from invenio.config import CFG_BINDIR, CFG_ETCDIR, CFG_TMPDIR, CFG_PATH_PDFTOTEXT

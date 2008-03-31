@@ -24,16 +24,6 @@
 
 __revision__ = "$Id$"
 
-### -- local configuration section starts here ---
-
-# which tasks are recognized as valid?
-cfg_valid_processes = ["bibindex", "bibupload", "bibreformat",
-                       "webcoll", "bibtaskex", "bibrank",
-                       "oaiharvest", "oaiarchive", "inveniogc",
-                       "webstatadmin", "bibclassifyd"]
-
-### -- local configuration section ends here ---
-
 import os
 import string
 import sys
@@ -47,6 +37,7 @@ from curses.wrapper import wrapper
 from socket import gethostname
 import signal
 
+from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS
 from invenio.config import \
      CFG_PREFIX, \
      CFG_BIBSCHED_REFRESHTIME, \
@@ -55,13 +46,13 @@ from invenio.config import \
      CFG_LOGDIR
 from invenio.dbquery import run_sql
 
+shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     """Returns a date string according to the format string.
        It can handle normal date strings and shifts with respect
        to now."""
     try:
         date = time.time()
-        shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
         factors = {"d":24*3600, "h":3600, "m":60, "s":1}
         m = shift_re.match(var)
         if m:
@@ -130,7 +121,7 @@ def get_task_options(task_id):
 
 class Manager:
     def __init__(self):
-        self.helper_modules = cfg_valid_processes
+        self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.running = 1
         self.footer_move_mode = "[KeyUp/KeyDown Move] [M Select mode] [Q Quit]"
         self.footer_auto_mode = "[A Manual mode] [1/2 Display Type] [P Purge Done] [Q Quit]"
@@ -606,7 +597,7 @@ class Manager:
 
 class BibSched:
     def __init__(self):
-        self.helper_modules = cfg_valid_processes
+        self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.running = {}
         self.sleep_done = {}
         self.sleep_sent = {}
@@ -675,14 +666,9 @@ class BibSched:
                 self.running[task_id] = get_task_pid(proc, task_id)
             if sleeptime:
                 new_runtime = get_datetime(sleeptime)
-                new_task_arguments = marshal.loads(arguments)
-                new_task_arguments["runtime"] = new_runtime
                 new_task_id = run_sql("INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status)"\
                                       " VALUES (%s,%s,%s,%s,%s,'WAITING')",
                                       (proc, user, new_runtime, sleeptime, arguments))
-                new_task_arguments["task"] = new_task_id
-                run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""",
-                        (marshal.dumps(new_task_arguments), new_task_id))
 
     def watch_loop(self):
         running_process = self.get_running_processes()

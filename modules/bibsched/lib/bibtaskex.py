@@ -32,9 +32,6 @@ import time
 from invenio.bibtask import task_init, write_message, task_set_option, \
         task_get_option, task_update_progress, task_has_option, task_get_task_param
 
-
-cfg_n_default = 30 # how many Fibonacci numbers to calculate if none submitted?
-
 def fib(n):
     """Returns Fibonacci number for 'n'."""
     out = 1
@@ -80,7 +77,6 @@ def task_run_core():
 
 def main():
     """Main that construct all the bibtask."""
-    task_set_option('number', cfg_n_default)
     task_init(authorization_action='runbibtaskex',
             authorization_msg="BibTaskEx Task Submission",
             help_specific_usage="""  -n,  --number            Print Fibonacci numbers for up to NUM. [default=30]\n""",

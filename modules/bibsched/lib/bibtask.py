@@ -29,7 +29,7 @@ __revision__ = "$Id$"
 import sys
 from invenio.dbquery import run_sql, _db_login, _db_logout
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_PREFIX
+from invenio.config import CFG_PREFIX, CFG_BINDIR
 import getopt
 import getpass
 import marshal
@@ -41,25 +41,46 @@ import os
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
     CFG_EXTERNAL_AUTHENTICATION
 from invenio.webuser import get_user_preferences, get_email
+from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
+    CFG_BIBTASK_DEFAULT_TASK_SETTINGS
 
 # Which tasks don't need to ask the user for authorization?
-cfg_valid_processes_no_auth_needed = ("bibupload")
+cfg_valid_processes_no_auth_needed = ("bibupload", )
 
-# Global variables
-_options = {'verbose' : 1, 'name' : ''}
-try:
-    _task_params = {"task_name" : os.path.basename(sys.argv[0])}
-except AttributeError:
-    # A workaround for some Python2.3 systems, e.g. SLC4, where
-    # importing this file under Apache/mod_python environment causes
-    # the following error:
-    #
-    #   "AttributeError: 'module' object has no attribute 'argv'".
-    #
-    # This workaround prevents it, but a proper solution would be not
-    # to import bibtask.py as a dependency from web-related files,
-    # because we simply do not need it there...
-    _task_params = {}
+def bibsched_low_level_task_submission(name, user, *argv):
+    """Let special lowlevel enqueuing of a task on the bibsche queue.
+    @param name is the name of the bibtask. It must be a valid executable under
+                CFG_BINDIR.
+    @param user is a string that will appear as the "user" submitting the task.
+                Since task are submitted via API it make sense to set the
+                user to the name of the module/function that called
+                bibsched_low_level_task_submission.
+    @param argv will be merged with the default setting of the given task as
+                they can be found in bibtask_config. In order to know which
+                variable are valid and which is the semantic, please have
+                a glimpse at bibtask_config and to the source of the
+                task_submit_elaborate_specific_parameter function of the
+                desired bibtask.
+    @return the task_id when the task is correctly enqueued.
+    Use with care!
+    """
+    task_id = None
+    try:
+        if not name in CFG_BIBTASK_VALID_TASKS:
+            raise StandardError('%s is not a valid task name' % name)
+
+        ## submit task:
+        task_id = run_sql("""INSERT INTO schTASK (proc,user,
+                                            runtime,sleeptime,status,arguments)
+                                            VALUES (%s,%s,NOW(),'','WAITING',%s)""",
+            (name, user, options["runtime"], marshal.dumps(argv)))
+
+    except Exception:
+        register_exception()
+        if task_id:
+            run_sql("""DELETE FROM schTASK WHERE id=%s""", (task_id, ))
+        return None
+    return task_id
 
 def task_init(
     authorization_action="",
@@ -90,66 +111,111 @@ def task_init(
     @param task_run_fnc will be called as the main core function. Must return
     False in case of errors.
     """
-    _options["runtime"] = time.strftime("%Y-%m-%d %H:%M:%S")
-    _options["sleeptime"] = ""
-    _options["verbose"] = 1
-    _options["version"] = version
-    _task_params["task_stop_helper_fnc"] = task_stop_helper_fnc
+    global _task_params, _options
+    _task_params = {
+        "version" : version,
+        "task_stop_helper_fnc" : task_stop_helper_fnc,
+        "task_name" : os.path.basename(sys.argv[0]),
+        "user" : '',
+        "verbose" : 1,
+        "sleeptime" : '',
+        "runtime" : time.strftime("%Y-%m-%d %H:%M:%S"),
+    }
+    to_be_submitted = True
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
-        ## A - run the task
         _task_params['task_id'] = int(sys.argv[1])
-        _options["task"] = _task_params['task_id']
+        argv = _task_get_options(_task_params['task_id'], _task_params['task_name'])
+        to_be_submitted = False
+    else:
+        argv = sys.argv
+
+    _task_build_params(_task_params['task_name'], argv, description,
+        help_specific_usage, version, specific_params,
+        task_submit_elaborate_specific_parameter_fnc,
+        task_submit_check_options_fnc)
+
+    write_message('argv=%s' % argv, verbose=9)
+    write_message('_options=%s' % _options, verbose=9)
+    write_message('_task_params=%s' % _task_params, verbose=9)
+
+    if to_be_submitted:
+        _task_submit(argv, authorization_action, authorization_msg)
+    else:
         try:
             if not _task_run(task_run_fnc):
                 write_message("Error occurred.  Exiting.", sys.stderr)
-        except StandardError, e:
+        except Exception, e:
             write_message("Unexpected error occurred: %s." % e, sys.stderr)
             write_message("Traceback is:", sys.stderr)
             traceback.print_tb(sys.exc_info()[2])
             write_message("Exiting.", sys.stderr)
             task_update_status("ERROR")
-    else:
-        ## B - submit the task
-        # set user-defined options:
-        try:
-            (short_params, long_params) = specific_params
-            opts, args = getopt.getopt(sys.argv[1:], "hVv:u:s:t:" +
-                short_params, [
-                    "help",
-                    "version",
-                    "verbose=",
-                    "user=",
-                    "sleep=",
-                    "time="
-                ] + long_params)
-        except getopt.GetoptError, err:
-            _usage(1, err, help_specific_usage=help_specific_usage, description=description)
-        try:
-            for opt in opts:
-                if opt[0] in ["-h", "--help"]:
-                    _usage(0, help_specific_usage=help_specific_usage, description=description)
-                elif opt[0] in ["-V", "--version"]:
-                    print _options["version"]
-                    sys.exit(0)
-                elif opt[0] in [ "-u", "--user"]:
-                    _options["user"] = opt[1]
-                elif opt[0] in ["-v", "--verbose"]:
-                    _options["verbose"] = int(opt[1])
-                elif opt[0] in [ "-s", "--sleeptime" ]:
-                    get_datetime(opt[1]) # see if it is a valid shift
-                    _options["sleeptime"] = opt[1]
-                elif opt[0] in [ "-t", "--runtime" ]:
-                    _options["runtime"] = get_datetime(opt[1])
-                elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
-                    not task_submit_elaborate_specific_parameter_fnc(opt[0],
-                        opt[1], opts, args):
-                    _usage(1, help_specific_usage=help_specific_usage, description=description)
-        except StandardError, e:
-            _usage(e, help_specific_usage=help_specific_usage, description=description)
-        if callable(task_submit_check_options_fnc):
-            if not task_submit_check_options_fnc():
+
+def _task_build_params(
+    task_name,
+    argv,
+    description="",
+    help_specific_usage="",
+    version=__revision__,
+    specific_params=("", []),
+    task_submit_elaborate_specific_parameter_fnc=None,
+    task_submit_check_options_fnc=None):
+    """ Build the BibTask params.
+    @param argv a list of string as in sys.argv
+    @param description is the generic description printed in the usage page;
+    @param help_specific_usage is the specific parameter help
+    @param task_submit_elaborate_specific_parameter_fnc will be called passing
+    a key and a value, for parsing specific cli parameters. Must return True if
+    it has recognized the parameter. Must eventually update the options with
+    bibtask_set_option;
+    @param task_submit_check_options must check the validity of options (via
+    bibtask_get_option) once all the options where parsed;
+    """
+    global _task_params, _options
+    _options = {}
+
+    if task_name in CFG_BIBTASK_DEFAULT_TASK_SETTINGS:
+        _options.update(CFG_BIBTASK_DEFAULT_TASK_SETTINGS[task_name])
+
+    # set user-defined options:
+    try:
+        (short_params, long_params) = specific_params
+        opts, args = getopt.getopt(argv[1:], "hVv:u:s:t:" +
+            short_params, [
+                "help",
+                "version",
+                "verbose=",
+                "user=",
+                "sleep=",
+                "time="
+            ] + long_params)
+    except getopt.GetoptError, err:
+        _usage(1, err, help_specific_usage=help_specific_usage, description=description)
+    try:
+        for opt in opts:
+            if opt[0] in ["-h", "--help"]:
+                _usage(0, help_specific_usage=help_specific_usage, description=description)
+            elif opt[0] in ["-V", "--version"]:
+                print _task_params["version"]
+                sys.exit(0)
+            elif opt[0] in [ "-u", "--user"]:
+                _task_params["user"] = opt[1]
+            elif opt[0] in ["-v", "--verbose"]:
+                _task_params["verbose"] = int(opt[1])
+            elif opt[0] in [ "-s", "--sleeptime" ]:
+                get_datetime(opt[1]) # see if it is a valid shift
+                _task_params["sleeptime"] = opt[1]
+            elif opt[0] in [ "-t", "--runtime" ]:
+                _task_params["runtime"] = get_datetime(opt[1])
+            elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
+                not task_submit_elaborate_specific_parameter_fnc(opt[0],
+                    opt[1], opts, args):
                 _usage(1, help_specific_usage=help_specific_usage, description=description)
-        _task_submit(authorization_action, authorization_msg)
+    except StandardError, e:
+        _usage(e, help_specific_usage=help_specific_usage, description=description)
+    if callable(task_submit_check_options_fnc):
+        if not task_submit_check_options_fnc():
+            _usage(1, help_specific_usage=help_specific_usage, description=description)
 
 def task_set_option(key, value):
     """Set an value to key in the option dictionary of the task"""
@@ -167,19 +233,25 @@ def task_get_task_param(key):
     """Returns the value corresponding to the particular task param"""
     return _task_params.get(key)
 
+def task_set_task_param(key, value):
+    """Set the value corresponding to the particular task param"""
+    global _task_params
+    try:
+        _task_params[key] = value
+    except NameError:
+        _task_params = {key : value}
+
 def task_update_progress(msg):
     """Updates progress information in the BibSched task table."""
-    if _options["verbose"] >= 9:
-        write_message("Updating task progress to %s." % msg)
+    write_message("Updating task progress to %s." % msg, verbose=9)
     return run_sql("UPDATE schTASK SET progress=%s where id=%s",
-        (msg, _options["task"]))
+        (msg, _task_params["task_id"]))
 
 def task_update_status(val):
     """Updates status information in the BibSched task table."""
-    if _options["verbose"] >= 9:
-        write_message("Updating task status to %s." % val)
+    write_message("Updating task status to %s." % val, verbose=9)
     return run_sql("UPDATE schTASK SET status=%s where id=%s",
-        (val, _options["task"]))
+        (val, _task_params["task_id"]))
 
 def task_read_status():
     """Read status information in the BibSched task table."""
@@ -191,7 +263,6 @@ def task_read_status():
         out = 'UNKNOWN'
     return out
 
-
 def write_messages(msgs, stream=sys.stdout, verbose=1):
     """Write many messages through write_message"""
     for msg in msgs.split('\n'):
@@ -200,7 +271,7 @@ def write_messages(msgs, stream=sys.stdout, verbose=1):
 def write_message(msg, stream=sys.stdout, verbose=1):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
     Useful for debugging stuff."""
-    if msg and _options['verbose'] >= verbose:
+    if msg and _task_params['verbose'] >= verbose:
         if stream == sys.stdout or stream == sys.stderr:
             stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ",
                 time.localtime()))
@@ -212,14 +283,14 @@ def write_message(msg, stream=sys.stdout, verbose=1):
         else:
             sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
 
+_shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     """Returns a date string according to the format string.
        It can handle normal date strings and shifts with respect
        to now."""
     date = time.time()
-    shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
     factors = {"d":24*3600, "h":3600, "m":60, "s":1}
-    m = shift_re.match(var)
+    m = _shift_re.match(var)
     if m:
         sign = m.groups()[0] == "-" and -1 or 1
         factor = factors[m.groups()[2]]
@@ -239,8 +310,7 @@ def authenticate(user, authorization_action, authorization_msg=""):
     do system exit upon authorization failure.
     """
     # With SSO it's impossible to check for pwd
-    if CFG_EXTERNAL_AUTH_USING_SSO or \
-            _task_params.get('task_name', '') in cfg_valid_processes_no_auth_needed:
+    if CFG_EXTERNAL_AUTH_USING_SSO or _task_params.get('task_name', '') in cfg_valid_processes_no_auth_needed:
         return user
     if authorization_msg:
         print authorization_msg
@@ -290,57 +360,50 @@ def authenticate(user, authorization_action, authorization_msg=""):
                 sys.exit(1)
             return user
 
-def _task_submit(authorization_action, authorization_msg):
+def _task_submit(argv, authorization_action, authorization_msg):
     """Submits task to the BibSched task queue.  This is what people will
         be invoking via command line."""
     ## sanity check: remove eventual "task" option:
-    if _options.has_key("task"):
-        del _options["task"]
 
     ## authenticate user:
-    _options['user'] = authenticate(_options.get("user", ""), authorization_action, authorization_msg)
+    _task_params['user'] = authenticate(_task_params["user"], authorization_action, authorization_msg)
 
     ## submit task:
-    if _options["verbose"] >= 9:
-        print ""
-        write_message("storing task options %s\n" % _options)
+    write_message("storing task options %s\n" % argv, verbose=9)
     _task_params['task_id'] = run_sql("""INSERT INTO schTASK (id,proc,user,
                                            runtime,sleeptime,status,arguments)
                                          VALUES (NULL,%s,%s,%s,%s,'WAITING',%s)""",
-        (_task_params['task_name'], _options['user'], _options["runtime"],
-         _options["sleeptime"], marshal.dumps(_options)))
+        (_task_params['task_name'], _task_params['user'], _task_params["runtime"],
+         _task_params["sleeptime"], marshal.dumps(argv)))
 
     ## update task number:
-    _options["task"] = _task_params['task_id']
-    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""",
-        (marshal.dumps(_options), _task_params['task_id']))
     write_message("Task #%d submitted." % _task_params['task_id'])
     return _task_params['task_id']
 
 
-def _task_get_options():
+def _task_get_options(task_id, task_name):
     """Returns options for the task 'id' read from the BibSched task
     queue table."""
     out = {}
     res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc=%s",
-        (_task_params['task_id'], _task_params['task_name']))
+        (task_id, task_name))
     try:
         out = marshal.loads(res[0][0])
     except:
         write_message("Error: %s task %d does not seem to exist." \
-            % (_task_params['task_name'], _task_params['task_id']), sys.stderr)
+            % (task_name, task_id), sys.stderr)
         sys.exit(1)
     write_message('Options retrieved: %s' % out, verbose=9)
     return out
 
-def _task_run(task_run_fnc=None):
+def _task_run(task_run_fnc):
     """Runs the task by fetching arguments from the BibSched task queue.
     This is what BibSched will be invoking via daemon call.
     The task prints Fibonacci numbers for up to NUM on the stdout, and some
     messages on stderr.
     @param task_run_fnc will be called as the main core function. Must return
     False in case of errors.
-    Return 1 in case of success and 0 in case of failure."""
+    Return True in case of success and False in case of failure."""
 
     ## We prepare the pid file inside /prefix/var/run/taskname_id.pid
     global _options
@@ -350,12 +413,6 @@ def _task_run(task_run_fnc=None):
     pidfile.write(str(os.getpid()))
     pidfile.close()
 
-    _options = _task_get_options() # get options from BibSched task table
-    ## check task id:
-    if not _options.has_key("task"):
-        write_message("Error: The task #%d does not seem to be a %s task."
-            % (_task_params['task_id'], _task_params['task_name']), sys.stderr)
-        return False
     ## check task status:
     task_status = task_read_status()
     if task_status != "WAITING":
@@ -363,8 +420,7 @@ def _task_run(task_run_fnc=None):
             (_task_params['task_id'], task_status), sys.stderr)
         return False
     ## we can run the task now:
-    if _options["verbose"]:
-        write_message("Task #%d started." % _task_params['task_id'])
+    write_message("Task #%d started." % _task_params['task_id'])
     task_update_status("RUNNING")
     ## initialize signal handler:
     signal.signal(signal.SIGUSR1, _task_sig_sleep)
@@ -380,8 +436,7 @@ def _task_run(task_run_fnc=None):
         task_update_status("DONE WITH ERRORS")
 
     ## we are done:
-    if _options["verbose"]:
-        write_message("Task #%d finished." % _task_params['task_id'])
+    write_message("Task #%d finished." % _task_params['task_id'])
     ## Removing the pid
     os.remove(pidfile_name)
     return True

@@ -39,7 +39,8 @@ try:
     from invenio.bibformat_utils import encode_for_xml
     from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
     from invenio.bibtask import task_init, write_message, task_set_option, \
-            task_get_option, task_update_progress, task_has_option
+            task_get_option, task_update_progress, task_has_option, \
+            bibsched_low_level_task_submission
     import sys
     import os
     import time
@@ -286,8 +287,7 @@ def iterate_over_new(list, fmt):
             message = "START bibupload external call"
             write_message(message, verbose=9)
 
-            command = "%s/bibupload -f %s" % (CFG_BINDIR, finalfilename)
-            os.system(command)
+            bibsched_low_level_task_submission('bibupload', 'bibreformat', '-f', finalfilename)
 
             t2 = os.times()[4]
             tbibupload = tbibupload + (t2 - t1)
@@ -368,8 +368,7 @@ def iterate_over_old(list, fmt):
                 message = "START bibupload external call"
                 write_message(message, verbose=9)
 
-                command = "%s/bibupload -f %s" % (CFG_BINDIR, finalfilename)
-                os.system(command)
+                bibsched_low_level_task_submission('bibupload', 'bibreformat', '-f', finalfilename)
 
                 t22 = os.times()[4]
                 message = "END bibupload external call (time elapsed:%2f)" % (t22-t11)
@@ -416,8 +415,7 @@ def iterate_over_old(list, fmt):
         message = "START bibupload external call"
         write_message(message, verbose=9)
 
-        command = "%s/bibupload -f %s" % (CFG_BINDIR, finalfilename)
-        os.system(command)
+        bibsched_low_level_task_submission('bibupload', 'bibreformat', '-f', finalfilename)
 
         t22 = os.times()[4]
         message = "END bibupload external call (time elapsed:%2f)" % (t22 - t11)
@@ -483,7 +481,6 @@ def task_run_core():
 
 def main():
     """Main that construct all the bibtask."""
-    task_set_option('format', 'hb')
     task_init(authorization_action='runbibformat',
             authorization_msg="BibReformat Task Submission",
             description="""

@@ -1481,12 +1481,6 @@ def delete_bibrec_bibdoc(id_bibrec):
                       verbose=1, stream=sys.stderr)
 def main():
     """Main that construct all the bibtask."""
-    task_set_option('mode', None)
-    task_set_option('verbose', 1)
-    task_set_option("tag", None)
-    task_set_option("file_path", None)
-    task_set_option("notimechange", 0)
-    task_set_option("stage_to_start_from", 1)
     task_init(authorization_action='runbibupload',
             authorization_msg="BibUpload Task Submission",
             description="""Receive MARC XML file and update appropriate database

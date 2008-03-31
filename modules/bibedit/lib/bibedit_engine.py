@@ -28,6 +28,7 @@ from invenio.bibedit_config import *
 from invenio.search_engine import print_record, record_exists
 from invenio.bibrecord import record_xml_output, create_record, field_add_subfield, record_add_field
 import invenio.template
+from invenio.bibtask import bibsched_low_level_task_submission
 
 bibedit_templates = invenio.template.load('bibedit')
 
@@ -184,8 +185,7 @@ def save_xml_record(recid):
     file_temp = open("%s.xml" % file_path, 'w')
     file_temp.write(record_xml_output(get_temp_record("%s.tmp" % file_path)[1]))
     file_temp.close()
-
-    os.system("%s/bibupload -u bibedit -r %s.xml" % (CFG_BINDIR, file_path))
+    bibsched_low_level_task_submission('bibupload', 'bibedit', '-r', '%s.xml' % file_path))
     os.system("rm %s.tmp" % file_path)
 
 def save_temp_record(record, uid, file_path):

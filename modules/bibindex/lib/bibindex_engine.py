@@ -1244,14 +1244,6 @@ def test_fulltext_indexing():
 
 def main():
     """Main that construct all the bibtask."""
-    task_set_option('cmd', 'add')
-    task_set_option('id', [])
-    task_set_option("modified", [])
-    task_set_option("collection", [])
-    task_set_option("maxmem", 0)
-    task_set_option("flush", 10000)
-    task_set_option("windex", ','.join(get_all_indexes()))
-    task_set_option("reindex", False)
     task_init(authorization_action='runbibindex',
             authorization_msg="BibIndex Task Submission",
             description="""Examples:

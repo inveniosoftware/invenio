@@ -27,6 +27,7 @@ from invenio.config import \
      CFG_BINDIR, \
      CFG_TMPDIR
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
+from invenio.bibtask import bibsched_low_level_task_submission
 
 def Insert_Record(parameters, curdir, form, user_info=None):
     global rn
@@ -37,5 +38,5 @@ def Insert_Record(parameters, curdir, form, user_info=None):
     initialfile = "%s/%s" % (curdir,recfile)
     finalfile = "%s/%s_%s" % (CFG_TMPDIR,rn,time.strftime("%Y-%m-%d_%H:%M:%S"))
     shutil.copy(initialfile,finalfile)
-    os.system("%s/bibupload -r -i %s" % (CFG_BINDIR,finalfile))
+    bibsched_low_level_task_submission('bibupload', 'websumit.Insert_Record', '-r', '-i', finalfile)
     return ""

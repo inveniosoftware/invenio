@@ -563,10 +563,6 @@ def oaiarchive_task():
 
 def main():
     """Main that construct all the bibtask."""
-    task_set_option('upload', 0)
-    task_set_option('mode', 0)
-    task_set_option('oaiset', 0)
-    task_set_option('nice', 0)
     task_init(authorization_action='runoaiarchive',
             authorization_msg="OAI Archive Task Submission",
             description="Examples:\n"
