@@ -69,22 +69,22 @@ def get_records_with_num_cites(numstr):
     matches = []
     #once again, check that the parameter is a string
     if not (type(numstr) == type("thisisastring")):
-	return []
-    numstr = numstr.replace(" ",'')    
-    numstr = numstr.replace('"','')    
+        return []
+    numstr = numstr.replace(" ",'')
+    numstr = numstr.replace('"','')
     #get the cited-by dictionary
     citedbydict = init_db_dictionary("citationdict")
 
     num = 0
     #first, check if numstr is just a number
-    singlenum = re.findall("(^\d+$)", numstr)        
+    singlenum = re.findall("(^\d+$)", numstr)
     if singlenum:
-	num = int(singlenum[0])
+        num = int(singlenum[0])
         for k in citedbydict.keys():
-           li = citedbydict[k]
-	   if len(li) == num:	
-               matches.append(k)
-        return matches    
+            li = citedbydict[k]
+            if len(li) == num:
+                matches.append(k)
+        return matches
 
     #try to get 1-10 or such
     firstsec = re.findall("(\d+)-(\d+)", numstr)
@@ -92,26 +92,26 @@ def get_records_with_num_cites(numstr):
         first = 0
         sec = -1
         try:
-	    first = int(firstsec[0][0])
+            first = int(firstsec[0][0])
             sec = int(firstsec[0][1])
         except:
-	    return []
+            return []
         if (first <= sec):
             for k in citedbydict.keys():
                 li = citedbydict[k]
-	        if len(li) >= first:
-                   if len(li) <= sec:	
-                       matches.append(k)
-            return matches    
-    
+                if len(li) >= first:
+                    if len(li) <= sec:
+                        matches.append(k)
+            return matches
+
     firstsec = re.findall("(\d+)\+", numstr)
     if firstsec:
-	first = firstsec[0]
+        first = firstsec[0]
         for k in citedbydict.keys():
-           li = citedbydict[k]
-	   if len(li) > int(first):
-               matches.append(k)
-    return matches 
+            li = citedbydict[k]
+            if len(li) > int(first):
+                matches.append(k)
+    return matches
 
 
 def get_cited_by_list(recordlist):
@@ -119,7 +119,7 @@ def get_cited_by_list(recordlist):
        records in recordlist.
     """
     result = []
-    query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"	
+    query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"
     compressed_citation_weight_dic = run_sql(query)
     citation_dic = {} #init variable here in case of compr failure
     if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
@@ -169,9 +169,9 @@ def calculate_cited_by_list(record_id, sort_order="d"):
             citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
             #citation_dic is {1: 0, .. 81: 4, 82: 0, 83: 0, 84: 3} etc, e.g. recnum-weight
             for id in citation_list:
-		if citation_dic.has_key(id):
-                   tmp = [id, citation_dic[id]]
-                   result.append(tmp)
+                if citation_dic.has_key(id):
+                    tmp = [id, citation_dic[id]]
+                    result.append(tmp)
         except error:
             for id in citation_list:
                 tmp = [id, 1]
@@ -198,8 +198,8 @@ def get_author_cited_by(authorstring):
         #has to be prepared for corrupted data!
         try:
             citations = marshal.loads(decompress(ablob[0][0]))
-	except Error:
-	    citations = []
+        except Error:
+            citations = []
     return citations
 
 
