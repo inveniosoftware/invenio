@@ -121,6 +121,7 @@ def get_cited_by_list(recordlist):
     result = []
     query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"	
     compressed_citation_weight_dic = run_sql(query)
+    citation_dic = {} #init variable here in case of compr failure
     if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
         citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
     rdic = {} #return this, based on values in citation_dic
