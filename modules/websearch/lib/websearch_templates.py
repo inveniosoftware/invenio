@@ -2348,6 +2348,16 @@ class Template:
         out += "</td></tr></tbody></table>"
         return out
 
+
+    def tmpl_print_searchresultbox(self, header, body):
+        """print a nicely formatted box for search results """
+        #_ = gettext_set_language(ln)
+
+        # first find total number of hits:
+        out = '<table class="searchresultsbox"><thead><tr><th class="searchresultsboxheader">'+header+'</th></tr></thead><tbody><tr><td class="searchresultsboxbody">'+body+'</td></tr></tbody></table>'
+        return out
+
+
     def tmpl_search_no_boolean_hits(self, ln, nearestterms):
         """No hits found, proposes alternative boolean queries
 
@@ -2907,6 +2917,73 @@ class Template:
 
         return out
 
+    def tmpl_author_information(self,req,pubs,authorname,num_downloads,aff_pubdict,citedbylist,
+                                kwtuples,authors,vtuples,ln):
+        """Prints stuff about the author given as authorname.
+           1. Author name + his/her institutes. Each institute I has a link
+              to papers where the auhtor has I as institute.
+           2. Publications, number: link to search by author.
+           3. Keywords
+           4. Author collabs
+           5. Publication venues like journals
+           The parameters are data structures needed to produce 1-6, as follows:
+           req - request
+           pubs - list of recids, probably the records that have the author as an author
+           authorname - evident
+           num_downloads - evident
+           aff_pubdict - a dictionary where keys are inst names and values lists of recordids
+           citedbylist - list of recs that cite pubs
+           kwtuples - keyword tuples like ('HIGGS BOSON',[3,4]) where 3 and 4 are recids
+           authors - a list of authors that have collaborated with authorname
+        """
+        _ = gettext_set_language(ln)
+        #make a authoraff string that looks like CERN (1), Caltech (2) etc
+        authoraff = ""
+        for a in aff_pubdict.keys():
+            recids = "+or+".join(map(str,aff_pubdict[a]))
+            searchstr = "<a href=\"../search?f=recid&p="+recids+"\">"+str(len(aff_pubdict[a]))+"</a>"
+            if (a == ' '):
+                authoraff = authoraff+" "+_("unknown")+" ("+searchstr+")"
+            else:
+                authoraff = authoraff+" "+a+" ("+searchstr+")"
+
+        #construct a string for searching a=thisauthor
+        searchstr = create_html_link(self.build_search_url(p=authorname,
+                                     f='author'),
+                                     {}, str(len(pubs)), {'class':"google"})
+        #print a "general" banner about the author
+        line1 = _("Author")+": <i>"+authorname+"</i>"+authoraff
+        line2 = _("Publications")+": "+searchstr+" ("+_("downloaded")+" "
+        line2 += str(num_downloads)+" "+_("times")+")"
+        banner = self.tmpl_print_searchresultbox(line1,line2)
+        req.write(banner)       
+
+        #keywords, collaborations
+        keywstr = ""
+        collabstr = ""
+        if (kwtuples):
+            for (freq,kw) in kwtuples:
+                #create a link in author=x, keyword=y
+                searchstr = create_html_link(self.build_search_url(
+                                                p1=authorname,
+                                                f1='author',p2=kw,f2='keyword',m1='e',op1='a',m2='e'),
+                                                {}, kw+" ("+str(freq)+")", {'class':"google"})
+                keywstr = keywstr+" "+searchstr
+            banner = self.tmpl_print_searchresultbox(_("Frequent keywords"),keywstr)
+            req.write(banner)
+        if (authors):
+            for c in authors:
+                collabstr = collabstr + " <a href=\"/author/"+c+"\">"+c+"</a>"
+            banner = self.tmpl_print_searchresultbox(_("Author collaborations"),collabstr)
+            req.write(banner)
+                
+        if (vtuples):
+            banner = self.tmpl_print_searchresultbox(_("Publishes in"),str(vtuples))
+            req.write(banner)       
+        
+        
+        
+    
     def tmpl_detailed_record_references(self, recID, ln, content):
         """Returns the discussion page of a record
 
@@ -2926,3 +3003,25 @@ class Template:
             out += content
 
         return out
+
+    def tmpl_citesummary_html(self, ln, totalcites, avgstr, reciddict):
+        """A template for citation summary -- output in HTML.
+           Parameters: 
+               - ln *string* = language, 
+               - totalcites *string* = total number of citations,
+               - avgstr *string* = average number of citations per records,
+               - reciddict is a dictionary as follows: 
+                   "string description of the citation class" -> [id1,id2,..] """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        outp = "<table>"+ \
+            "<tr><td>"+"<strong>"+_("Citation summary")+"</strong></td><td></td></tr>" + \
+            "<tr><td>"+"<strong>"+_("Citations")+"</strong></td><td>"+totalcites+"</td></tr>" + \
+            "<tr><td>"+"<strong>"+_("Avg cit per record")+"</strong></td><td>"+avgstr+"</td></tr>"
+        #print the stuff in reciddict
+        for k in reciddict.keys():
+            rowtitle = k
+            reclist = reciddict[k]
+            out += "<tr><td>"+_(rowtitle)+"</td><td>"+str(len(reclist))+"</td></tr>"
+        out += '</table>'
