@@ -97,7 +97,8 @@ def calculate_citations(tresholdsNames, citedbylist):
     totalcites = 0
     avgcites = 0
     reciddict = {}
-    for recid, numcites in citedbylist:
+    for recid, cites in citedbylist:
+        numcites = len(cites)
         totalcites = totalcites + numcites
         #take the numbers in tresholdsNames
         for low, high, name in tresholdsNames:
