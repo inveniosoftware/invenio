@@ -200,6 +200,8 @@ class Manager:
                 self.change_select_mode()
             elif chr in (ord("p"), ord("P")):
                 self.purge_done()
+            elif chr in (ord("o"), ord("O")):
+                self.display_task_options()
             elif chr == ord("1"):
                 self.display = 1
                 self.first_visible_line = 0
@@ -247,6 +249,42 @@ class Manager:
             os.spawnlp(os.P_WAIT, pager, pager, tmpname)
             os.remove(tmpname)
             curses.panel.update_panels()
+
+    def display_task_options(self):
+        """Nicely display information about current process."""
+        msg =  '        id : %i\n' % self.currentrow[0]
+        msg += '      proc : %s\n' % self.currentrow[1]
+        msg += '      user : %s\n' % self.currentrow[2]
+        msg += '   runtime : %s\n' % self.currentrow[3].strftime("%Y-%m-%d %H:%M:%S")
+        msg += ' sleeptime : %s\n' % self.currentrow[4]
+        msg += '    status : %s\n' % self.currentrow[5]
+        msg += '  progress : %s\n' % self.currentrow[6]
+        arguments = marshal.loads(self.currentrow[7])
+        if type(arguments) is dict:
+            # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
+            msg += '   options : %s\n' % arguments
+        else:
+            msg += 'executable : %s\n' % arguments[0]
+            msg += ' arguments : %s\n' % ' '.join(arguments[1:])
+        msg += '\nPress a key to continue...'
+        rows = msg.split('\n')
+        height = len(rows) + 2
+        width = max([len(row) for row in rows]) + 4
+        self.win = curses.newwin(
+            height,
+            width,
+            (self.height - height) / 2 + 1,
+            (self.width - width) / 2 + 1
+            )
+        self.panel = curses.panel.new_panel( self.win )
+        self.panel.top()
+        self.win.border()
+        i = 1
+        for row in rows:
+            self.win.addstr(i, 2, row)
+            i += 1
+        self.win.refresh()
+        self.win.getch()
 
     def count_processes(self, status):
         out = 0
@@ -750,7 +788,6 @@ def error (msg):
     print >> sys.stderr, "error: " + msg
     sys.exit (1)
 
-
 def server_pid ():
     # The pid must be stored on the filesystem
     try:
@@ -766,7 +803,6 @@ def server_pid ():
         return None
 
     return pid
-
 
 def start (verbose = True):
     """ Fork this process in the background and start processing

@@ -55,7 +55,7 @@ import sys
 import time
 import traceback
 
-from invenio.dbquery import run_sql, _db_login, _db_logout
+from invenio.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_PREFIX, CFG_BINDIR
 from invenio.errorlib import register_exception
@@ -339,6 +339,21 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         date = time.strftime(format_string, date)
     return date
 
+def task_sleep_now_if_required(can_stop_too=False):
+    """This function should be called during safe state of BibTask,
+    e.g. after flushing caches or outside of run_sql calls.
+    """
+    if _task_params['signal_request'] == 'sleep':
+        _task_params['signal_request'] = None
+        write_message("sleeping...")
+        task_update_status("SLEEPING")
+        signal.pause() # wait for wake-up signal
+    elif _task_params['signal_request'] == 'stop' and can_stop_too:
+        _task_params['signal_request'] = None
+        write_message("stopped")
+        task_update_status("STOPPED")
+        sys.exit(0)
+
 def authenticate(user, authorization_action, authorization_msg=""):
     """Authenticate the user against the user database.
     Check for its password, if it exists.
@@ -443,7 +458,7 @@ def _task_run(task_run_fnc):
     Return True in case of success and False in case of failure."""
 
     ## We prepare the pid file inside /prefix/var/run/taskname_id.pid
-    global _options
+    global _options, _sig_ctrlz_default_handler
     pidfile_name = os.path.join(CFG_PREFIX, 'var', 'run',
         'bibsched_task_%d.pid' % _task_params['task_id'])
     pidfile = open(pidfile_name, 'w')
@@ -460,7 +475,9 @@ def _task_run(task_run_fnc):
     write_message("Task #%d started." % _task_params['task_id'])
     task_update_status("RUNNING")
     ## initialize signal handler:
+    _task_params['signal_request'] = None
     signal.signal(signal.SIGUSR1, _task_sig_sleep)
+    signal.signal(signal.SIGTSTP, _task_sig_sleep)
     signal.signal(signal.SIGTERM, _task_sig_stop)
     signal.signal(signal.SIGABRT, _task_sig_suicide)
     signal.signal(signal.SIGCONT, _task_sig_wakeup)
@@ -507,16 +524,14 @@ def _task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     write_message("task_sig_sleep(), got signal %s frame %s"
             % (sig, frame), verbose=9)
-    # _db_logout() #FIXME Not sure this can do more evil than good things.
-    write_message("sleeping...")
-    task_update_status("SLEEPING")
-    signal.pause() # wait for wake-up signal
+    write_message("sleeping as soon as possible...")
+    _task_params['signal_request'] = 'sleep'
 
 def _task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
     write_message("task_sig_wakeup(), got signal %s frame %s"
             % (sig, frame), verbose=9)
-    # _db_login(1) #FIXME Not sure this can do more evil than good things.
+    _db_login(1) #FIXME Not sure this can do more evil than good things.
     write_message("continuing...")
     task_update_status("CONTINUING")
 
@@ -524,21 +539,9 @@ def _task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
     write_message("task_sig_stop(), got signal %s frame %s"
             % (sig, frame), verbose=9)
-    write_message("stopping...")
+    write_message("stopping as soon as possible...")
     task_update_status("STOPPING")
-    if callable(_task_params['task_stop_helper_fnc']):
-        try:
-            write_message("flushing cache or whatever...")
-            _task_params['task_stop_helper_fnc']()
-            time.sleep(3)
-        except StandardError, err:
-            write_message("Error during stopping! %e" % err)
-            task_update_status("STOPPINGFAILED")
-            sys.exit(1)
-    # _db_logout() #FIXME Not sure this can do more evil than good things.
-    write_message("stopped")
-    task_update_status("STOPPED")
-    sys.exit(0)
+    _task_params['signal_request'] = 'stop'
 
 def _task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
@@ -546,7 +549,6 @@ def _task_sig_suicide(sig, frame):
             % (sig, frame), verbose=9)
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
-    _db_logout()
     write_message("suicided")
     task_update_status("SUICIDED")
     sys.exit(0)

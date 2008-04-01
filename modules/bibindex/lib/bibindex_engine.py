@@ -52,7 +52,7 @@ from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
-    task_update_progress
+    task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
 
@@ -1347,6 +1347,7 @@ def task_run_core():
             wordTable = WordTable(index_id, index_tags, 'idxWORD%02dF', get_words_from_phrase, {'8564_u': get_words_from_fulltext})
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
+            task_sleep_now_if_required(can_stop_too=True)
         _last_word_table = None
         return True
 
@@ -1357,6 +1358,7 @@ def task_run_core():
                 wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
                 _last_word_table = wordTable
                 wordTable.report_on_table_consistency()
+                task_sleep_now_if_required(can_stop_too=True)
             _last_word_table = None
             return True
 
@@ -1364,9 +1366,13 @@ def task_run_core():
         if task_get_option("windex"):
             for index_name in task_get_option("windex").split(','):
                 truncate_index_table(index_name)
+                task_sleep_now_if_required()
+
         else:
             for index_name in get_all_indexes():
                 truncate_index_table(index_name)
+                task_sleep_now_if_required()
+
 
     # Let's work on single words!
     wordTables = get_word_tables(task_get_option("windex"))
@@ -1419,7 +1425,7 @@ def task_run_core():
             sys.exit(1)
 
         wordTable.report_on_table_consistency()
-
+        task_sleep_now_if_required(can_stop_too=True)
 
     if False: # FIXME: remove when idxPHRASE will be plugged to search_engine
         # Let's work on phrases now
