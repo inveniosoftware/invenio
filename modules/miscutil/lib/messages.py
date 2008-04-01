@@ -64,7 +64,7 @@ def wash_language(ln):
     ln = ln.replace('-', '_')
     if ln in CFG_SITE_LANGS:
         return ln
-    elif ln[:2] in CFG_SITE_LANG:
+    elif ln[:2] in CFG_SITE_LANGS:
         return ln[:2]
     else:
         return CFG_SITE_LANG
