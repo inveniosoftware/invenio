@@ -1361,8 +1361,12 @@ def task_run_core():
             return True
 
     if task_get_option("reindex"):
-        for index_name in task_get_option("windex").split(','):
-            truncate_index_table(index_name)
+        if task_get_option("windex"):
+            for index_name in task_get_option("windex").split(','):
+                truncate_index_table(index_name)
+        else:
+            for index_name in get_all_indexes():
+                truncate_index_table(index_name)
 
     # Let's work on single words!
     wordTables = get_word_tables(task_get_option("windex"))
