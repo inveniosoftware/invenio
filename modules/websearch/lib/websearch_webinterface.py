@@ -52,7 +52,7 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
      CFG_WEBSEARCH_RSS_TTL, \
-     CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS 
+     CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
@@ -134,7 +134,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         """This handler parses dynamic URLs (/author/John+Doe)."""
         return WebInterfaceAuthorPages(component), path
 
-    
+
     def __call__(self, req, form):
         """Serve the page in the given language."""
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
@@ -149,18 +149,18 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
 
         search_engine.page_start(req, "hb", "", "", ln, uid)
 
-        
+
         #search the publications by this author
         pubs = search_engine.perform_request_search(req=req, p=self.authorname, f="author")
         #get most frequent first authors of these pubs
         authors = search_engine.get_most_popular_values_for_code(pubs, AUTHOR_TAG)
-        #and affiliates 
+        #and affiliates
         collabs = search_engine.get_most_popular_values_for_code(pubs, COAUTHOR_TAG)
         #and publication venues
         venuedict =  search_engine.get_values_for_code_dict(pubs, VENUE_TAG)
         #and keywords
         kwdict = search_engine.get_values_for_code_dict(pubs, KEYWORD_TAG)
-        
+
         #construct a simple list of tuples that contains keywords that appear more than once
         #moreover, limit the length of the list to MAX_KEYWORD_LIST
         kwtuples = []
@@ -172,10 +172,10 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         kwtuples.sort()
         kwtuples.reverse()
         kwtuples = kwtuples[0:MAX_KEYWORD_LIST]
-        
+
         #same for venues
         vtuples = []
-        
+
         for k in venuedict.keys():
             if venuedict[k] > 1:
                 mytuple = (venuedict[k], k)
@@ -185,18 +185,18 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         vtuples.reverse()
         vtuples = vtuples[0:MAX_VENUE_LIST]
 
-        
+
         authors.extend(collabs) #join
         #remove the author in question from authors: they are associates
         if (authors.count(self.authorname) > 0):
             authors.remove(self.authorname)
-        
+
         authors = authors[0:MAX_COLLAB_LIST] #cut extra
-        
-        #a dict. keys: affiliations, values: lists of publications      
+
+        #a dict. keys: affiliations, values: lists of publications
         author_aff_pubs = self.get_institute_pub_dict(pubs)
         authoraffs = author_aff_pubs.keys()
-        
+
         #find out how many times these records have been downloaded
         recsloads = {}
         recsloads = get_download_weight_total(recsloads, pubs)
@@ -209,18 +209,18 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         citedbylist = get_cited_by_list(pubs)
         #finally all stuff there, call the template
         websearch_templates.tmpl_author_information(req, pubs, self.authorname,
-                                                    totaldownloads, author_aff_pubs, 
+                                                    totaldownloads, author_aff_pubs,
                                                     citedbylist, kwtuples, authors, vtuples, ln)
-        
-        #cited-by summary       
+
+        #cited-by summary
         out = summarize(pubs, 'hbcs', ln)
         req.write(out)
-                
+
         simauthbox = search_engine.create_similarly_named_authors_link_box(self.authorname)
         req.write(simauthbox)
 
     def get_institute_pub_dict(mee, recids):
-        #return a dictionary consisting of institute -> list of publications            
+        #return a dictionary consisting of institute -> list of publications
         affus = [] #list of insts from the record
         author_aff_pubs = {} #the disct to be build
         for recid in recids:

@@ -2956,7 +2956,7 @@ class Template:
         line2 = _("Publications")+": "+searchstr+" ("+_("downloaded")+" "
         line2 += str(num_downloads)+" "+_("times")+")"
         banner = self.tmpl_print_searchresultbox(line1, line2)
-        req.write(banner)       
+        req.write(banner)
 
         #keywords, collaborations
         keywstr = ""
@@ -2977,12 +2977,12 @@ class Template:
                 collabstr = collabstr + " <a href=\"/author/"+c+"\">"+c+"</a>"
             banner = self.tmpl_print_searchresultbox(_("Author collaborations"), collabstr)
             req.write(banner)
-                
+
         if (vtuples):
             banner = self.tmpl_print_searchresultbox(_("Publishes in"), str(vtuples))
-            req.write(banner)       
-                        
-    
+            req.write(banner)
+
+
     def tmpl_detailed_record_references(self, recID, ln, content):
         """Returns the discussion page of a record
 
@@ -3005,11 +3005,11 @@ class Template:
 
     def tmpl_citesummary_html(self, ln, totalcites, avgstr, reciddict):
         """A template for citation summary -- output in HTML.
-           Parameters: 
-               - ln *string* = language, 
+           Parameters:
+               - ln *string* = language,
                - totalcites *string* = total number of citations,
                - avgstr *string* = average number of citations per records,
-               - reciddict is a dictionary as follows: 
+               - reciddict is a dictionary as follows:
                    "string description of the citation class" -> [id1,id2,..] """
         # load the right message language
         _ = gettext_set_language(ln)

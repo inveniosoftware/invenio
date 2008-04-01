@@ -25,7 +25,7 @@ The sentences to translate are marked with the following tag:
 
  Blah blah _(To be translated)_ blah.
 
-These tags can span several lines. Extra whitespace is discarded. 
+These tags can span several lines. Extra whitespace is discarded.
 """
 
 __revision__ = "$Id$"
@@ -46,7 +46,7 @@ Description: Extract translatable strings from the list of files read
     return
 
 def quote(text):
-    """Normalize and quote a string for inclusion in the po file."""    
+    """Normalize and quote a string for inclusion in the po file."""
     return text.\
            replace('\\', '\\\\').\
            replace('\n', '\\\\n').\
@@ -119,7 +119,7 @@ def extract_from_wml_files(dirname, potfiles_filename):
 
     '''
 
-    ## print po content from db:    
+    ## print po content from db:
     for original, refs in db.items():
 
         for ref in refs:
@@ -148,4 +148,4 @@ if __name__ == "__main__":
     else:
         print_usage()
 
-    
+

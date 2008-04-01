@@ -23,7 +23,7 @@ tag:
 
  Blah blah _(To be translated)_ blah.
 
-These tags can span several lines. Extra whitespace is discarded. 
+These tags can span several lines. Extra whitespace is discarded.
 """
 
 __revision__ = "$Id$"
@@ -45,7 +45,7 @@ podir = os.path.dirname(__file__)
 
 translation_file = os.path.join(podir, lang+'.gmo')
 translation = gettext.GNUTranslations(open(translation_file))
-    
+
 
 # This matches the strings to be translated
 _tag_re = re.compile(r'_\((.*?)\)_', re.DOTALL)
@@ -60,7 +60,7 @@ def replace(match):
     """
     text = match.group(1).decode(charset)
     text = _ws_re.sub(' ', text.strip())
-    
+
     return translation.ugettext(text).encode('utf-8')
 
 for filename in files:

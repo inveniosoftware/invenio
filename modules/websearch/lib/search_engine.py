@@ -4043,7 +4043,7 @@ def get_values_for_code_dict(recids, tag):
             else:
                 valuefreqdict[v] = 1
     return valuefreqdict
-              
+
 def get_most_popular_values_for_code(recids, tag):
     """returns a sorted tuple list of the popular values for a given tag"""
     valuefreqdict = get_values_for_code_dict(recids, tag)

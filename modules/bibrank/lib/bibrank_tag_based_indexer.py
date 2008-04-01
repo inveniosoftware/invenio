@@ -62,7 +62,7 @@ def file_similarity_by_times_downloaded(run):
 
 def download_weight_filtering_user_exec (rank_method_code, name, config):
     """Ranking by number of downloads per User.
-    Only one full Text Download is taken in account for one 
+    Only one full Text Download is taken in account for one
     specific userIP address"""
     time1 = time.time()
     dic = fromDB(rank_method_code)
@@ -338,7 +338,7 @@ def bibrank_engine(run):
                 check_method(rank_method_code)
             elif task_get_option("cmd") == "print-missing":
                 func_object = globals().get(cfg_function)
-                func_object(rank_method_code, cfg_name, config)                
+                func_object(rank_method_code, cfg_name, config)
             elif task_get_option("cmd") == "repair":
                 pass
             else:

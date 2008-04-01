@@ -59,11 +59,11 @@ def get_citation_weight(rank_method_code, config):
     last_update_time = get_bibrankmethod_lastupdate(rank_method_code)
     #addition: YOU DO NEED TO RUN WITH OPTION -R SOMETIMES. This is
     #because among the new set (X) there can be records such that the old
-    #records Y cite them. But this kind of situation is not detected 
+    #records Y cite them. But this kind of situation is not detected
     #unless you go though all the records Y+X.
     if task_get_option("quick") == "no":
         last_update_time = "0000-00-00 00:00:00"
-    #if task_get_option('verbose') >= 3:	
+    #if task_get_option('verbose') >= 3:
     last_modified_records = get_last_modified_rec(last_update_time)
     #id option forces re-indexing a certain range even if there are no new recs
     if last_modified_records or task_get_option("id"):
@@ -74,15 +74,15 @@ def get_citation_weight(rank_method_code, config):
             last = id[0][1]
 	    #make range
             updated_recid_list = range(first, last)
-        else: 
+        else:
             updated_recid_list = create_recordid_list(last_modified_records)
-    
+
         write_message("Last update "+str(last_update_time)+" records: "+ \
                        str(len(last_modified_records))+" updates: "+ \
-                       str(len(updated_recid_list)), sys.stderr)	
+                       str(len(updated_recid_list)), sys.stderr)
 
 	#write_message("updated_recid_list: "+str(updated_recid_list), sys.stderr)
-        result_intermediate = last_updated_result(rank_method_code, 
+        result_intermediate = last_updated_result(rank_method_code,
                                                   updated_recid_list)
         #result_intermed should be warranted to exists!
         citation_weight_dic_intermediate = result_intermediate[0]
@@ -91,11 +91,11 @@ def get_citation_weight(rank_method_code, config):
         citation_informations = get_citation_informations(updated_recid_list, config)
 	#write_message("citation_informations: "+str(citation_informations),sys.stderr)
 	#create_analysis_tables() #temporary.. needed to test how much faster in-mem indexing is
-        dic = ref_analyzer(citation_informations, 
-                           citation_weight_dic_intermediate, 
-                           citation_list_intermediate, 
+        dic = ref_analyzer(citation_informations,
+                           citation_weight_dic_intermediate,
+                           citation_list_intermediate,
                            reference_list_intermediate,
-                           config,updated_recid_list) 
+                           config,updated_recid_list)
                     #dic is docid-numberofreferences like {1: 2, 2: 0, 3: 1}
 	#write_message("Docid-number of known references "+str(dic),sys.stderr)
         end_time = time.time()
@@ -119,14 +119,14 @@ def get_last_modified_rec(bibrank_method_lastupdate):
     """ return the list of recods which have been modified after the last execution
         of bibrank method. The result is expected to have ascending numerical order.
     """
-    query = """SELECT id FROM bibrec 
+    query = """SELECT id FROM bibrec
                WHERE modification_date >= '%s' """ % bibrank_method_lastupdate
     query += "order by id ASC"
     list = run_sql(query)
     return list
 
 def create_recordid_list(rec_ids):
-    """Create a list of record ids out of RECIDS. 
+    """Create a list of record ids out of RECIDS.
        The result is expected to have ascending numerical order.
     """
     rec_list = []
@@ -156,7 +156,7 @@ def last_updated_result(rank_method_code, recid_list):
     """
     result = make_initial_result()
     query = """select relevance_data from rnkMETHOD, rnkMETHODDATA where
-               rnkMETHOD.id = rnkMETHODDATA.id_rnkMETHOD 
+               rnkMETHOD.id = rnkMETHODDATA.id_rnkMETHOD
                and rnkMETHOD.Name = '%s'"""% rank_method_code
     dict = run_sql(query)
     if dict and dict[0] and dict[0][0]:
@@ -171,7 +171,7 @@ def last_updated_result(rank_method_code, recid_list):
         if cit_compressed and cit_compressed[0] and cit_compressed[0][0]:
             cit = marshal.loads(decompress(cit_compressed[0][0]))
             if cit:
-                query = """select object_value from rnkCITATIONDATA 
+                query = """select object_value from rnkCITATIONDATA
                            where object_name='reversedict'"""
                 ref_compressed = run_sql(query)
                 if ref_compressed and ref_compressed[0] and ref_compressed[0][0]:
@@ -218,7 +218,7 @@ def get_citation_informations(recid_list, config):
        examples: [ {} {} {} ]
                  [ { 93: ['astro-ph/9812088']},
                    { 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
-	NB: stuff here is for analysing new or changed records. 
+	NB: stuff here is for analysing new or changed records.
         see "ref_analyzer" for more.
     """
     begin_time = os.times()[4]
@@ -243,20 +243,20 @@ def get_citation_informations(recid_list, config):
     p_reference_number_tag = tagify(parse_tag(reference_number_tag))
     p_reference_tag = tagify(parse_tag(reference_tag))
     p_record_publication_info_tag = tagify(parse_tag(record_publication_info_tag))
-    
+
     for recid in recid_list:
         pri_report_numbers = get_fieldvalues(recid, p_record_pri_number_tag)
         add_report_numbers = get_fieldvalues(recid, p_record_add_number_tag)
         reference_report_numbers = get_fieldvalues(recid, p_reference_number_tag)
         references_s = get_fieldvalues(recid, p_reference_tag)
-        
+
         l_report_numbers = pri_report_numbers
         l_report_numbers.extend(add_report_numbers)
         d_reports_numbers[recid] = l_report_numbers
 
         if reference_report_numbers:
             d_references_report_numbers[recid] = reference_report_numbers
-   
+
         references_s = get_fieldvalues(recid, p_reference_tag)
         if references_s:
             d_references_s[recid] = references_s
@@ -292,7 +292,7 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
     selfcites = initial_selfcitdict
     for k in new_record_list:
         i = i+1
-        if task_get_option('verbose') >= 3:     
+        if task_get_option('verbose') >= 3:
             if (i % 100 == 0):
                 write_message("Done "+str(i)+" records", sys.stderr)
         #get the author of k
@@ -301,7 +301,7 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
         extauthl = get_fieldvalues(k, extauthortag)
         authorlist.append(coauthl)
         authorlist.append(extauthl)
-        #author tag 
+        #author tag
         #print "record "+str(k)+" by "+str(authorlist)
         #print "is cited by"
         #get the "x-cites-this" list
@@ -373,7 +373,7 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, c
                                 author_cited_in[a] = tmplist
                             else:
                                 author_cited_in[a] = these_cite_k
-    
+
         #go through the dictionary again: all keys but search only if new records are cited
         write_message("Checking authors in new records", sys.stderr)
         for k in citedbydict.keys():
@@ -403,7 +403,7 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, c
     return author_cited_in
 
 
-def ref_analyzer(citation_informations, initialresult, initial_citationlist, 
+def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                  initial_referencelist,config, updated_rec_list ):
     """Analyze the citation informations and calculate the citation weight
        and cited by list dictionary.
@@ -418,7 +418,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     result = initialresult
     d_reports_numbers = citation_informations[0]
     d_references_report_numbers = citation_informations[1]
-    d_references_s = citation_informations[2] 
+    d_references_s = citation_informations[2]
        #of type: {77: ['Nucl. Phys. B 72 (1974) 461','blah blah'], 93: ['..'], ..}
     d_records_s = citation_informations[3]
     t1 = os.times()[4]
@@ -459,7 +459,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 else:
                     #the reference we wanted was not found among our records.
                     #put the reference in the "missing"
-                    insert_into_missing(recid, p) 
+                    insert_into_missing(recid, p)
     t2 = os.times()[4]
     if task_get_option('verbose') >= 1:
         write_message("Phase 2: d_references_s", sys.stderr)
@@ -531,9 +531,9 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         write_message("Phase 6: self-citations", sys.stderr)
     selfdic = {}
     #get the initial self citation dict
-    initial_self_dict = get_cit_dict("selfcitdict") 
-    #add new records to selfdic 
-    selfdic = get_self_citations(updated_rec_list, citation_list, 
+    initial_self_dict = get_cit_dict("selfcitdict")
+    #add new records to selfdic
+    selfdic = get_self_citations(updated_rec_list, citation_list,
                                  initial_self_dict, config)
     #selfdic consists of
     #key k -> list of values [v1,v2,..]
@@ -557,11 +557,11 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
 
     #get author citations for records in updated_rec_list
     initial_author_dict = get_initial_author_dict()
-    authorcitdic = get_author_citations(updated_rec_list, citation_list, 
-                                        initial_author_dict, config) 
+    authorcitdic = get_author_citations(updated_rec_list, citation_list,
+                                        initial_author_dict, config)
 
 
-    if task_get_option('verbose') >= 3:         
+    if task_get_option('verbose') >= 3:
         #print only X first to prevent flood
         tmpdict = {}
         tmp = citation_list.keys()[0:10]
@@ -573,29 +573,29 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         tmpdict = {}
         for t in tmp:
             tmpdict[t] = reference_list[t]
-        write_message("reference_list (x cites y): "+str(tmpdict), sys.stderr)   
+        write_message("reference_list (x cites y): "+str(tmpdict), sys.stderr)
         write_message("size: "+str(len(reference_list.keys())), sys.stderr)
         tmp = selfcitedbydic.keys()[0:10]
         tmpdict = {}
         for t in tmp:
             tmpdict[t] = selfcitedbydic[t]
         write_message("selfcitedbydic (x is cited by y and one  \
-                       of the authors of x same as y's): "+str(tmpdict), sys.stderr)     
+                       of the authors of x same as y's): "+str(tmpdict), sys.stderr)
         write_message("size: "+str(len(selfcitedbydic.keys())), sys.stderr)
         tmp = selfdic.keys()[0:100]
         tmpdict = {}
         for t in tmp:
             tmpdict[t] = selfdic[t]
         write_message("selfdic (x cites y and one of the authors \
-                       of x same as y's): "+str(tmpdict), sys.stderr)  
+                       of x same as y's): "+str(tmpdict), sys.stderr)
         write_message("size: "+str(len(selfdic.keys())), sys.stderr)
         tmp = authorcitdic.keys()[0:10]
         tmpdict = {}
         for t in tmp:
             tmpdict[t] = authorcitdic[t]
-        write_message("authorcitdic (author is cited in recs): "+str(tmpdict), sys.stderr)       
+        write_message("authorcitdic (author is cited in recs): "+str(tmpdict), sys.stderr)
         write_message("size: "+str(len(authorcitdic.keys())), sys.stderr)
-    insert_cit_ref_list_intodb(citation_list, reference_list, 
+    insert_cit_ref_list_intodb(citation_list, reference_list,
                                selfcitedbydic, selfdic, authorcitdic)
 
     t5 = os.times()[4]
@@ -638,11 +638,11 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,
             ablob = run_sql("select hitlist from rnkAUTHORDATAR where aterm = %s", (a,))
             if not (ablob):
                 #print "insert into rnkAUTHORDATAR(aterm,hitlist) values (%s,%s)" , (a,lserarr)
-                run_sql("insert into rnkAUTHORDATAR(aterm,hitlist) values (%s,%s)", 
+                run_sql("insert into rnkAUTHORDATAR(aterm,hitlist) values (%s,%s)",
                          (a,lserarr))
             else:
                 #print "UPDATE rnkAUTHORDATAR SET hitlist  = %s where aterm=%s""" , (lserarr,a)
-                run_sql("UPDATE rnkAUTHORDATAR SET hitlist  = %s where aterm=%s", 
+                run_sql("UPDATE rnkAUTHORDATAR SET hitlist  = %s where aterm=%s",
                         (lserarr,a))
         except:
             print "Critical error: could not write rnkAUTHORDATAR "
@@ -655,13 +655,13 @@ def insert_into_cit_db(dic, name):
     try:
         s = serialize_via_marshal(dic)
         print "size of "+name+" "+str(len(s))
-        run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name = %s", 
+        run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name = %s",
                 (s, name))
-        run_sql("UPDATE rnkCITATIONDATA SET last_updated = %s where object_name = %s", 
+        run_sql("UPDATE rnkCITATIONDATA SET last_updated = %s where object_name = %s",
                  (ndate,name))
     except:
         print "Critical error: could not write "+name+" into db"
-        traceback.print_tb(sys.exc_info()[2])       
+        traceback.print_tb(sys.exc_info()[2])
 
 
 def get_cit_dict(name):
@@ -677,14 +677,14 @@ def get_cit_dict(name):
             return {}
     except:
         print "Critical error: could not read "+name+" from db"
-        traceback.print_tb(sys.exc_info()[2])       
+        traceback.print_tb(sys.exc_info()[2])
     return dict
 
 def get_initial_author_dict():
     """read author->citedinlist dict from the db"""
     dict = {}
     try:
-        ah = run_sql("select aterm,hitlist from rnkAUTHORDATAR") 
+        ah = run_sql("select aterm,hitlist from rnkAUTHORDATAR")
         for (a, h) in ah:
             dict[a] = deserialize_via_marshal(h)
         return dict
@@ -696,7 +696,7 @@ def get_initial_author_dict():
 
 
 def insert_into_missing(recid, report):
-    """put the referingrecordnum-publicationstring into 
+    """put the referingrecordnum-publicationstring into
        the "we are missing these" table"""
     report.replace('"','\'')
     try:
@@ -709,7 +709,7 @@ def insert_into_missing(recid, report):
     except:
         #we should complain but it can result to million lines of warnings so just pass..
         pass
-        
+
 def remove_from_missing(report):
     """remove the recid-ref -pairs from the "missing" table for report x: prob
        in the case ref got in our library collection"""
@@ -719,7 +719,7 @@ def remove_from_missing(report):
     except:
         #we should complain but it can result to million lines of warnings so just pass..
         pass
-                                                          
+
 
 def create_analysis_tables():
     """temporary simple table + index"""
