@@ -22,6 +22,25 @@
 """CDS Invenio Bibliographic Task Class.
 
 BibTask class.
+
+A BibTask is an executable under CFG_BINDIR, whose name is stored in
+bibtask_config.CFG_BIBTASK_VALID_TASKS.
+A valid task must call the task_init function with the proper parameters.
+Generic task related parameters (user, sleeptime, runtime, task_id, task_name
+verbose)
+go to _task_params global dictionary accessible through task_get_task_param.
+Option specific to the particular BibTask go to _options global dictionary
+and are accessible via task_get_option/task_set_option.
+
+In order to log something properly, just use write_message(s) with the desired
+verbose level.
+
+task_update_status and task_update_progress can be used to update the status
+of the task (DONE, FAILED, DONE WITH ERRORS...) and it's progress
+(1 out 100..) within the bibsched monitor.
+
+It is possible to enqueue a BibTask via API call by means of
+bibsched_low_level_task_submission.
 """
 
 __revision__ = "$Id$"
