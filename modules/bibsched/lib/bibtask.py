@@ -40,7 +40,7 @@ of the task (DONE, FAILED, DONE WITH ERRORS...) and it's progress
 (1 out 100..) within the bibsched monitor.
 
 It is possible to enqueue a BibTask via API call by means of
-bibsched_low_level_task_submission.
+task_low_level_submission.
 """
 
 __revision__ = "$Id$"
@@ -69,14 +69,14 @@ from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
 # Which tasks don't need to ask the user for authorization?
 cfg_valid_processes_no_auth_needed = ("bibupload", )
 
-def bibsched_low_level_task_submission(name, user, *argv):
+def task_low_level_submission(name, user, *argv):
     """Let special lowlevel enqueuing of a task on the bibsche queue.
     @param name is the name of the bibtask. It must be a valid executable under
                 CFG_BINDIR.
     @param user is a string that will appear as the "user" submitting the task.
                 Since task are submitted via API it make sense to set the
                 user to the name of the module/function that called
-                bibsched_low_level_task_submission.
+                task_low_level_submission.
     @param argv will be merged with the default setting of the given task as
                 they can be found in bibtask_config. In order to know which
                 variable are valid and which is the semantic, please have
