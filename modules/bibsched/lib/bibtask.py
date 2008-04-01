@@ -153,10 +153,16 @@ def task_init(
     else:
         argv = sys.argv
 
-    _task_build_params(_task_params['task_name'], argv, description,
-        help_specific_usage, version, specific_params,
-        task_submit_elaborate_specific_parameter_fnc,
-        task_submit_check_options_fnc)
+    if type(argv) is dict:
+        # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
+        # This is needed for old task submitted before CLI parameters
+        # where stored in DB and _options dictionary was stored instead.
+        _options = argv
+    else:
+        _task_build_params(_task_params['task_name'], argv, description,
+            help_specific_usage, version, specific_params,
+            task_submit_elaborate_specific_parameter_fnc,
+            task_submit_check_options_fnc)
 
     write_message('argv=%s' % (argv, ), verbose=9)
     write_message('_options=%s' % (_options, ), verbose=9)
