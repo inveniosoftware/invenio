@@ -48,6 +48,7 @@ from invenio.config import \
      CFG_BIBSCHED_GC_TASKS_TO_REMOVE, \
      CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE
 from invenio.dbquery import run_sql, escape_string
+from invenio.textutils import wrap_text_in_a_box
 
 shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
@@ -131,6 +132,8 @@ def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
     if statuses is None:
         statuses = ['DONE']
 
+    statuses = [status.upper() for status in statuses if status.upper() != 'RUNNING']
+
     date = get_datetime(since)
 
     status_query = 'status in (%s)' % ','.join([repr(escape_string(status)) for status in statuses])
@@ -141,13 +144,13 @@ def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
                              runtime<%%s""" % status_query, (task, date))
             write_message('Deleted %s %s tasks (created before %s) with %s' % (res, task, date, status_query))
         elif task in CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE:
-            res = run_sql("""INSERT INTO hstTASK(id,proc,host,user,
+            run_sql("""INSERT INTO hstTASK(id,proc,host,user,
                     runtime,sleeptime,arguments,status,progress)
                 SELECT id,proc,host,user,
                     runtime,sleeptime,arguments,status,progress
                 FROM schTASK WHERE proc=%%s AND %s AND
                     runtime<%%s""" % status_query, (task, date))
-            run_sql("""DELETE FROM schTASK WHERE proc=%%s AND %s AND
+            res = run_sql("""DELETE FROM schTASK WHERE proc=%%s AND %s AND
                              runtime<%%s""" % status_query, (task, date))
             write_message('Archived %s %s tasks (created before %s) with %s' % (res, task, date, status_query))
 
@@ -156,8 +159,8 @@ class Manager:
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.running = 1
         self.footer_move_mode = "[KeyUp/KeyDown Move] [M Select mode] [Q Quit]"
-        self.footer_auto_mode = "[A Manual mode] [1/2 Display Type] [P Purge Done] [Q Quit]"
-        self.footer_select_mode = "[KeyUp/KeyDown/PgUp/PgDown Select] [L View Log] [1/2 Display Type] [M Move mode] [A Auto mode] [Q Quit]"
+        self.footer_auto_mode = "[A Manual mode] [1/2/3 Display] [P Purge Done] [Q Quit]"
+        self.footer_select_mode = "[KeyUp/KeyDown/PgUp/PgDown Select] [L View Log] [1/2/3 Display Type] [M Move mode] [A Auto mode] [Q Quit]"
         self.footer_waiting_item = "[R Run] [D Delete]"
         self.footer_running_item = "[S Sleep] [T Stop] [K Kill]"
         self.footer_stopped_item = "[I Initialise] [D Delete]"
@@ -244,6 +247,11 @@ class Manager:
                 self.first_visible_line = 0
                 self.selected_line = 2
                 self.display_in_footer("only not done processes are displayed")
+            elif chr == ord("3"):
+                self.display = 3
+                self.first_visible_line = 0
+                self.selected_line = 2
+                self.display_in_footer("only archived processes are displayed")
             elif chr in (ord("q"), ord("Q")):
                 if curses.panel.top_panel() == self.panel:
                     self.panel.bottom()
@@ -284,21 +292,22 @@ class Manager:
 
     def display_task_options(self):
         """Nicely display information about current process."""
-        msg =  '        id : %i\n' % self.currentrow[0]
-        msg += '      proc : %s\n' % self.currentrow[1]
-        msg += '      user : %s\n' % self.currentrow[2]
-        msg += '   runtime : %s\n' % self.currentrow[3].strftime("%Y-%m-%d %H:%M:%S")
-        msg += ' sleeptime : %s\n' % self.currentrow[4]
-        msg += '    status : %s\n' % self.currentrow[5]
-        msg += '  progress : %s\n' % self.currentrow[6]
+        msg =  '        id : %i\n\n' % self.currentrow[0]
+        msg += '      proc : %s\n\n' % self.currentrow[1]
+        msg += '      user : %s\n\n' % self.currentrow[2]
+        msg += '   runtime : %s\n\n' % self.currentrow[3].strftime("%Y-%m-%d %H:%M:%S")
+        msg += ' sleeptime : %s\n\n' % self.currentrow[4]
+        msg += '    status : %s\n\n' % self.currentrow[5]
+        msg += '  progress : %s\n\n' % self.currentrow[6]
         arguments = marshal.loads(self.currentrow[7])
         if type(arguments) is dict:
             # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
-            msg += '   options : %s\n' % arguments
+            msg += '   options : %s\n\n' % arguments
         else:
-            msg += 'executable : %s\n' % arguments[0]
-            msg += ' arguments : %s\n' % ' '.join(arguments[1:])
-        msg += '\nPress a key to continue...'
+            msg += 'executable : %s\n\n' % arguments[0]
+            msg += ' arguments : %s\n\n' % ' '.join(arguments[1:])
+        msg += '\n\nPress a key to continue...'
+        msg = wrap_text_in_a_box(msg, style='no_border')
         rows = msg.split('\n')
         height = len(rows) + 2
         width = max([len(row) for row in rows]) + 4
@@ -344,6 +353,7 @@ class Manager:
 
     def _display_YN_box(self, msg):
         msg += ' (Y/N)'
+        msg = wrap_text_in_a_box(msg, style='no_border')
         rows = msg.split('\n')
         height = len(rows) + 2
         width = max([len(row) for row in rows]) + 4
@@ -369,9 +379,9 @@ class Manager:
                 return False
 
     def purge_done(self):
-        if self._display_YN_box("You are going to purge the list of DONE tasks.\n"
-            "%s tasks, submitted since %s days, will be archived.\n"
-            "%s tasks, submitted since %s days, will be deleted.\n"
+        if self._display_YN_box("You are going to purge the list of DONE tasks.\n\n"
+            "%s tasks, submitted since %s days, will be archived.\n\n"
+            "%s tasks, submitted since %s days, will be deleted.\n\n"
             "Are you sure?" % (
                 ','.join(CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE),
                 CFG_BIBSCHED_GC_TASKS_OLDER_THAN,
@@ -661,12 +671,19 @@ class Manager:
             self.handle_keys(char)
             if ring == 4:
                 if self.display == 1:
+                    table = "schTASK"
                     where = "and status='DONE'"
                     order = "DESC"
-                else:
+                elif self.display == 2:
+                    table = "schTASK"
                     where = "and status!='DONE'"
                     order = "ASC"
-                self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s""" % (where, order))
+                else:
+                    table = "hstTASK"
+                    order = "ASC"
+                    where = ''
+                    print "3 display"
+                self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM %s WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s""" % (table, where, order))
                 ring = 0
                 self.repaint()
 
