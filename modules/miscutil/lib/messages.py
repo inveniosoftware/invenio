@@ -61,6 +61,8 @@ def wash_language(ln):
     """Look at language LN and check if it is one of allowed languages
        for the interface.  Return it in case of success, return the
        default language otherwise."""
+    if not ln:
+        return CFG_SITE_LANG
     ln = ln.replace('-', '_')
     if ln in CFG_SITE_LANGS:
         return ln
@@ -74,11 +76,12 @@ def wash_languages(lns):
        of the allowed languages for the interface. Return it in case
        of success, return the default language otherwise."""
     for ln in lns:
-        ln = ln.replace('-', '_')
-        if ln in CFG_SITE_LANGS:
-            return ln
-        elif ln[:2] in CFG_SITE_LANGS:
-            return ln[:2]
+        if ln:
+            ln = ln.replace('-', '_')
+            if ln in CFG_SITE_LANGS:
+                return ln
+            elif ln[:2] in CFG_SITE_LANGS:
+                return ln[:2]
     return CFG_SITE_LANG
 
 def language_list_long():
