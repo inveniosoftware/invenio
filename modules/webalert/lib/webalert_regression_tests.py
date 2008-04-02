@@ -28,6 +28,7 @@ import unittest
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
+from invenio.htmlparser import get_as_text
 
 class WebAlertWebPagesAvailabilityTest(unittest.TestCase):
     """Check WebAlert web pages whether they are up or not."""
@@ -47,7 +48,19 @@ class WebAlertWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-TEST_SUITE = make_test_suite(WebAlertWebPagesAvailabilityTest)
+class WebAlertHTMLToTextTest(unittest.TestCase):
+    """Check that HTML is properly converted to text."""
+
+    def test_your_alerts_pages_availability(self):
+        """webalert - HTML to text conversion"""
+
+        self.assertEqual("High energy cosmic rays striking atoms at the top of the atmosphere give the rise to showers of particles striking the Earth's surface \nDes rayons cosmiques de haute energie heurtent des atomes dans la haute atmosphere et donnent ainsi naissance a des gerbes de particules projetees sur la surface terrestre  \n 10 May 1999        \nPicture number: CERN-DI-9905005", get_as_text(5))
+
+        self.assertEqual("Introducion to Nuclear Physics: course; 2006 ed.  / Chomaz, P      \nAtomic nuclei are made of nucleons, protons and neutrons, composed by quarks strongly interacting via gluons. [...]   \nExternal links: Fulltext : <Talk 06 Jul 2006>; Fulltext : <Talk 06 Jul 2006>; Fulltext : <Talk 07 Jul 2006>; Fulltext : <Talk 07 Jul 2006>; Fulltext : <Talk 10 Jul 2006>; Fulltext : <Talk 10 Jul 2006>; Fulltext : <Talk 11 Jul 2006>; Fulltext : <More information>", get_as_text(97))
+
+
+TEST_SUITE = make_test_suite(WebAlertWebPagesAvailabilityTest,
+                             WebAlertHTMLToTextTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
