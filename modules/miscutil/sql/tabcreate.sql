@@ -2951,6 +2951,21 @@ CREATE TABLE IF NOT EXISTS schTASK (
   KEY runtime (runtime)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS hstTASK (
+  id int(15) unsigned NOT NULL,
+  proc varchar(20) NOT NULL,
+  host varchar(255) NOT NULL,
+  user varchar(50) NOT NULL,
+  runtime datetime NOT NULL,
+  sleeptime varchar(20),
+  arguments mediumblob,
+  status varchar(50),
+  progress varchar(255),
+  PRIMARY KEY  (id),
+  KEY status (status),
+  KEY runtime (runtime)
+) TYPE=MyISAM;
+
 -- External collections
 
 CREATE TABLE IF NOT EXISTS collection_externalcollection (

@@ -38,6 +38,7 @@ try:
          write_message, write_messages
     from invenio.access_control_mailcookie import mail_cookie_gc
     from invenio.bibdocfile import BibDoc
+    from invenio.bibsched import gc_tasks
 except ImportError, e:
     print "Error: %s" % (e, )
     sys.exit(1)
@@ -409,9 +410,10 @@ def main():
                 "  -b, --bibxxx\t\tClean unreferenced bibliographic values in bibXXx tables.\n" \
                 "  -c, --cache\t\tClean cache by removing old files.\n" \
                 "  -d, --documents\tClean deleted documents and revisions older than %s days.\n" \
+                "  -T, --tasks\t\tClean the BibSched queue removing/archiving old DONE tasks.\n" \
                 "  -a, --all\t\tClean all of the above.\n" % CFG_DELETED_BIBDOC_MAXLIFE,
             version=__revision__,
-            specific_params=("lgbdac", ["logs", "guests", "bibxxx", "documents", "all", "cache"]),
+            specific_params=("lgbdacT", ["logs", "guests", "bibxxx", "documents", "all", "cache", "tasks"]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_submit_check_options_fnc=task_submit_check_options,
             task_run_fnc=task_run_core)
@@ -421,7 +423,8 @@ def task_submit_check_options():
        not task_get_option('guests') and \
        not task_get_option('bibxxx') and \
        not task_get_option('documents') and \
-       not task_get_option('cache'):
+       not task_get_option('cache') and \
+       not task_get_option('tasks'):
         task_set_option('sessions', True)
     return True
 
@@ -451,12 +454,16 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ('-c', '--cache'):
         task_set_option('cache', True)
         return True
+    elif key in ('-t', '--tasks'):
+        task_set_option('tasks', True)
+        return True
     elif key in ('-a', '--all'):
         task_set_option('logs', True)
         task_set_option('guests', True)
         task_set_option('bibxxx', True)
         task_set_option('documents', True)
         task_set_option('cache', True)
+        task_set_option('tasks', True)
         return True
     return False
 
@@ -472,6 +479,8 @@ def task_run_core():
         clean_documents()
     if task_get_option('cache'):
         clean_cache()
+    if task_get_option('tasks'):
+        gc_tasks()
     return True
 
 if __name__ == '__main__':

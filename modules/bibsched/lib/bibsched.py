@@ -43,7 +43,10 @@ from invenio.config import \
      CFG_BIBSCHED_REFRESHTIME, \
      CFG_BIBSCHED_LOG_PAGER, \
      CFG_BINDIR, \
-     CFG_LOGDIR
+     CFG_LOGDIR, \
+     CFG_BIBSCHED_GC_TASKS_OLDER_THAN, \
+     CFG_BIBSCHED_GC_TASKS_TO_REMOVE, \
+     CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE
 from invenio.dbquery import run_sql, escape_string
 
 shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
@@ -118,6 +121,35 @@ def get_task_options(task_id):
         return marshal.loads(res[0][0])
     except IndexError:
         return {}
+
+def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
+    """Garbage collect the task queue."""
+    if tasks is None:
+        tasks = CFG_BIBSCHED_GC_TASKS_TO_REMOVE + CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE
+    if since is None:
+        since = '-%id' % CFG_BIBSCHED_GC_TASKS_OLDER_THAN
+    if statuses is None:
+        statuses = ['DONE']
+
+    date = get_datetime(since)
+
+    status_query = 'status in (%s)' % ','.join([repr(escape_string(status)) for status in statuses])
+
+    for task in tasks:
+        if task in CFG_BIBSCHED_GC_TASKS_TO_REMOVE:
+            res = run_sql("""DELETE FROM schTASK WHERE proc=%%s AND %s AND
+                             runtime<%%s""" % status_query, (task, date))
+            write_message('Deleted %s %s tasks (created before %s) with %s' % (res, task, date, status_query))
+        elif task in CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE:
+            res = run_sql("""INSERT INTO hstTASK(id,proc,host,user,
+                    runtime,sleeptime,arguments,status,progress)
+                SELECT id,proc,host,user,
+                    runtime,sleeptime,arguments,status,progress
+                FROM schTASK WHERE proc=%%s AND %s AND
+                    runtime<%%s""" % status_query, (task, date))
+            run_sql("""DELETE FROM schTASK WHERE proc=%%s AND %s AND
+                             runtime<%%s""" % status_query, (task, date))
+            write_message('Archived %s %s tasks (created before %s) with %s' % (res, task, date, status_query))
 
 class Manager:
     def __init__(self):
@@ -337,9 +369,15 @@ class Manager:
                 return False
 
     def purge_done(self):
-        if self._display_YN_box("You are going to purge all the list of DONE tasks.\n"
-            "This will definitely alter your task history.\nAre you sure?"):
-            run_sql("DELETE FROM schTASK WHERE status='DONE'")
+        if self._display_YN_box("You are going to purge the list of DONE tasks.\n"
+            "%s tasks, submitted since %s days, will be archived.\n"
+            "%s tasks, submitted since %s days, will be deleted.\n"
+            "Are you sure?" % (
+                ','.join(CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE),
+                CFG_BIBSCHED_GC_TASKS_OLDER_THAN,
+                ','.join(CFG_BIBSCHED_GC_TASKS_TO_REMOVE),
+                CFG_BIBSCHED_GC_TASKS_OLDER_THAN)):
+            gc_tasks()
             curses.panel.update_panels()
             self.display_in_footer("DONE processes purged")
         else:
@@ -771,6 +809,7 @@ The following commands are available for bibsched:
    restart    restart a running bibsched
    monitor    enter the interactive monitor
    status     get report about current status of the queue
+   purge      purge the scheduler queue from old tasks
 
 Command options:
   -d, --daemon     \t Launch BibSched in the daemon mode (deprecated, use 'start')
@@ -783,7 +822,14 @@ Status options:
   is all)
   -t, --tasks=LIST\t Comma separated list of BibTask to consider (default
                   \t is all)
-""" % sys.argv [0])
+Purge options:
+  -s, --status=LIST\t Which BibTask status should be considered (default is DONE)
+  -S, --since=TIME\t Since how long time to consider tasks e.g.: 30m, 2h, 1d (default
+  is %s days)
+  -t, --tasks=LIST\t Comma separated list of BibTask to consider (default
+                  \t is %s)
+
+""" % (sys.argv[0], CFG_BIBSCHED_GC_TASKS_OLDER_THAN, ','.join(CFG_BIBSCHED_GC_TASKS_TO_REMOVE + CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE)))
 
     #sys.stderr.write("  -v, --verbose=LEVEL \t Verbose level (0=min, 1=default, 9=max).\n")
     sys.exit(exitcode)
@@ -901,6 +947,7 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
         if since is None:
             since_query = ''
         else:
+            # We're not interested in future task
             if since.startswith('+') or since.startswith('-'):
                 since = since[1:]
             since = '-' + since
@@ -983,11 +1030,12 @@ def main():
     except IndexError: cmd = 'monitor'
 
     try:
-        if cmd in ('status'):
+        if cmd in ('status', 'purge'):
             { 'status' : report_queue_status,
+              'purge' : gc_tasks,
             } [cmd] (verbose, status, since, tasks)
         else:
-            { 'start':   start,
+            {'start':   start,
             'stop':    stop,
             'restart': restart,
             'monitor': monitor} [cmd] (verbose)

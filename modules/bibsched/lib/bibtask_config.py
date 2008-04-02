@@ -23,13 +23,14 @@
 
 __revision__ = "$Id$"
 
-# which tasks are recognized as valid?
-CFG_BIBTASK_VALID_TASKS = ["bibindex", "bibupload", "bibreformat",
+# Which tasks are recognized as valid?
+CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "webcoll", "bibtaskex", "bibrank",
                            "oaiharvest", "oaiarchive", "inveniogc",
-                           "webstatadmin", "bibclassifyd"]
+                           "webstatadmin", "bibclassifyd")
 
-
+# Task that should not be reinstatiated
+CFG_BIBTASK_NON_REPETITIVE_TASK = ('bibupload')
 
 ## Default options for each bibtasks
 # for each bibtask name are specified those settings that the bibtask expects
@@ -42,6 +43,7 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
         'bibxxx' : False,
         'documents' : False,
         'cache' : False,
+        'tasks' : False,
     },
     'oaiharvest' : {
         'repository' : None,
