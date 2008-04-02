@@ -53,7 +53,9 @@ class TestStemmer(unittest.TestCase):
                               ['experimentalists', 'experimentalist'],
                               ['GeV', 'GeV'],
                               ['$\Omega$', '$\Omega$'],
-                              ['e^-', 'e^-']]
+                              ['e^-', 'e^-'],
+                              ['C#', 'C#'],
+                              ['C++', 'C++']]
         for test_word, expected_result in english_test_cases:
             self.assertEqual(expected_result,
                              bibindex_engine_stemmer.stem(test_word, "en"))
