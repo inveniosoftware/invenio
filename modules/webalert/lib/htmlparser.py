@@ -27,9 +27,12 @@ from HTMLParser import HTMLParser
 from string import split
 import textwrap
 
-from invenio.config import CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL
+from invenio.config import \
+     CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL, \
+     CFG_SITE_LANG
 from invenio.bibformat import format_record
 from invenio.bibindex_engine import re_html
+from invenio.messages import gettext_set_language
 
 def wrap(text):
     """Limits the number of characters per line in given text.
@@ -82,7 +85,6 @@ class RecordHTMLParser(HTMLParser):
                     self.printURL = 1
                 if (self.printURL == 1) and (f[0] == 'href'):
                     self.result += '<' + f[1] + '>'
-
         elif tag == 'br':
             self.result += '\n'
         elif tag == 'style' or tag == 'script':
@@ -100,17 +102,21 @@ class RecordHTMLParser(HTMLParser):
             self.silent = False
 
     def handle_data(self, data):
-        if data == 'Detailed record':
+        if data.lower() in  ['detailed record', 'similar record', 'cited by']:
             pass
         elif self.silent == False:
             self.result += data
 
     def handle_comment(self, data):
-        pass
+        if 'START_DO_NOT_DISPLAY_IN_TEXTUAL_FORMAT' == data.upper().strip():
+            self.silent = True
+        elif 'END_DO_NOT_DISPLAY_IN_TEXTUAL_FORMAT' == data.upper().strip():
+            self.silent = False
 
 
-def get_as_text(record_id):
-    """Return the plain text from RecordHTMLParser of the record."""
+def get_as_text(record_id, ln=CFG_SITE_LANG):
+    """Return the record in a textual format"""
+    _ = gettext_set_language(ln)
     out = ""
     rec_in_hb = format_record(record_id, of="hb")
     rec_in_hb = rec_in_hb.replace('\n', ' ')
@@ -120,7 +126,8 @@ def get_as_text(record_id):
         out = htparser.result
     except:
         out = re_html.sub(' ', rec_in_hb)
-    out = re.sub(r"[\-:]?\s*Detailed record\s*[\-:]?", "", out)
-    out = re.sub(r"[\-:]?\s*Similar records\s*[\-:]?", "", out)
+    out = re.sub(r"[\-:]?\s*%s\s*[\-:]?" % _("Detailed record"), "", out)
+    out = re.sub(r"[\-:]?\s*%s\s*[\-:]?" % _("Similar records"), "", out)
+    out = re.sub(r"[\-:]?\s*%s\s*[\-:]?" % _("Cited by"), "", out)
     return out.strip()
 
