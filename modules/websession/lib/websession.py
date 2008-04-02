@@ -130,7 +130,7 @@ class pSession(Session):
                                  sessionId)
         try:
             s = cPickle.loads(blob_to_string(res[0][0]))
-            try: # For backward compatibility with old sessions
+            try: # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
                 s.__remember_me
             except AttributeError:
                 s.__remember_me = False
