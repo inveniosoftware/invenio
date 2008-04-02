@@ -68,6 +68,7 @@ from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
 
 # Which tasks don't need to ask the user for authorization?
 cfg_valid_processes_no_auth_needed = ("bibupload", )
+cfg_task_is_not_a_deamon = ("bibupload", )
 
 def task_low_level_submission(name, user, *argv):
     """Let special lowlevel enqueuing of a task on the bibsche queue.
@@ -233,8 +234,9 @@ def _task_build_params(
             elif opt[0] in ["-v", "--verbose"]:
                 _task_params["verbose"] = int(opt[1])
             elif opt[0] in [ "-s", "--sleeptime" ]:
-                get_datetime(opt[1]) # see if it is a valid shift
-                _task_params["sleeptime"] = opt[1]
+                if task_name not in cfg_task_is_not_a_deamon:
+                    get_datetime(opt[1]) # see if it is a valid shift
+                    _task_params["sleeptime"] = opt[1]
             elif opt[0] in [ "-t", "--runtime" ]:
                 _task_params["runtime"] = get_datetime(opt[1])
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
