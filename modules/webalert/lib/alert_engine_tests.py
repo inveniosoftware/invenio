@@ -26,7 +26,6 @@ __revision__ = \
 
 import unittest
 from invenio.config import CFG_SITE_URL
-from invenio import search_engine
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.htmlparser import RecordHTMLParser
 
