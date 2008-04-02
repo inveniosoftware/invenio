@@ -44,7 +44,7 @@ from invenio.config import \
      CFG_BIBSCHED_LOG_PAGER, \
      CFG_BINDIR, \
      CFG_LOGDIR
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 
 shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
@@ -773,11 +773,17 @@ The following commands are available for bibsched:
    status     get report about current status of the queue
 
 Command options:
-  -d, --daemon\t Launch BibSched in the daemon mode (deprecated, use 'start')
+  -d, --daemon     \t Launch BibSched in the daemon mode (deprecated, use 'start')
 General options:
-  -h, --help      \t\t Print this help.
-  -V, --version   \t\t Print version information.
-  """ % sys.argv [0])
+  -h, --help       \t Print this help.
+  -V, --version    \t Print version information.
+Status options:
+  -s, --status=LIST\t Which BibTask status should be considered (default is Running,waiting)
+  -S, --since=TIME\t Since how long time to consider tasks e.g.: 30m, 2h, 1d (default
+  is all)
+  -t, --tasks=LIST\t Comma separated list of BibTask to consider (default
+                  \t is all)
+""" % sys.argv [0])
 
     #sys.stderr.write("  -v, --verbose=LEVEL \t Verbose level (0=min, 1=default, 9=max).\n")
     sys.exit(exitcode)
@@ -878,18 +884,36 @@ def write_message(msg, stream=sys.stdout, verbose=1):
         else:
             sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
 
-def report_queue_status(verbose=True):
+def report_queue_status(verbose=True, status=None, since=None, tasks=None):
     """
     Report about the current status of BibSched queue on standard output.
     """
 
-    def report_about_processes(status='RUNNING'):
+    def report_about_processes(status='RUNNING', since=None, tasks=None):
         """
         Helper function to report about processes with the given status.
         """
+        if tasks is None:
+            task_query = ''
+        else:
+            task_query = 'AND proc IN (%s)' % (
+                ','.join([repr(escape_string(task)) for task in tasks]))
+        if since is None:
+            since_query = ''
+        else:
+            if since.startswith('+') or since.startswith('-'):
+                since = since[1:]
+            since = '-' + since
+            since_query = "AND runtime >= '%s'" % get_datetime(since)
+
         res = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress
-                           FROM schTASK WHERE status=%s ORDER BY id ASC""",
-                      (status,))
+                        FROM schTASK WHERE status=%%s %(task_query)s
+                        %(since_query)s ORDER BY id ASC""" % {
+                            'task_query' : task_query,
+                            'since_query' : since_query
+                        },
+                    (status,))
+
         write_message("%s processes: %d" % (status, len(res)))
         for (proc_id, proc_proc, proc_user, proc_runtime, proc_sleeptime,
              proc_status, proc_progress) in res:
@@ -899,8 +923,12 @@ def report_queue_status(verbose=True):
         return
 
     write_message("BibSched queue status report for %s:" % gethostname())
-    report_about_processes('Running')
-    report_about_processes('Waiting')
+    if status is None:
+        report_about_processes('Running', since, tasks)
+        report_about_processes('Waiting', since, tasks)
+    else:
+        for state in status:
+            report_about_processes(state, since, tasks)
     write_message("Done.")
     return
 
@@ -911,10 +939,13 @@ def restart(verbose = True):
 
 def main():
     verbose = True
+    status = None
+    since = None
+    tasks = None
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVdq", [
-            "help","version","daemon", "quiet"])
+        opts, args = getopt.gnu_getopt(sys.argv[1:], "hVdqS:s:t:", [
+            "help","version","daemon", "quiet", "since=", "status=", "task="])
     except getopt.GetoptError, err:
         Log ("Error: %s" % err)
         usage(1, err)
@@ -936,6 +967,15 @@ def main():
         elif opt in ['-q', '--quiet']:
             verbose = False
 
+        elif opt in ['-s', '--status']:
+            status = arg.split(',')
+
+        elif opt in ['-S', '--since']:
+            since = arg
+
+        elif opt in ['-t', '--task']:
+            tasks = arg.split(',')
+
         else:
             usage(1)
 
@@ -943,12 +983,14 @@ def main():
     except IndexError: cmd = 'monitor'
 
     try:
-        { 'start':   start,
-          'stop':    stop,
-          'restart': restart,
-          'monitor': monitor,
-          'status': report_queue_status, } [cmd] (verbose)
-
+        if cmd in ('status'):
+            { 'status' : report_queue_status,
+            } [cmd] (verbose, status, since, tasks)
+        else:
+            { 'start':   start,
+            'stop':    stop,
+            'restart': restart,
+            'monitor': monitor} [cmd] (verbose)
     except KeyError:
         usage (1, 'unkown command: %s' % `cmd`)
 
