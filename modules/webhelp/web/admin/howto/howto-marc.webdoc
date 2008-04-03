@@ -1939,6 +1939,8 @@ this technic is mainly used, when AL500 proposes an alpha-tag like "BAS"
 
       Subfield Code(s)
          $a   Internal note (NR) - [CER base=3n]
+         $c   Modification date (NR) - [CER base=16,58]
+         $f   E-mail (NR) - [CER base=16,58]
 
       [Additional field(s)/tag(s): PNI,595,909CV]
       [PNI * -> 595 $a -> 909CV $a -> 937 $a]
