@@ -38,7 +38,7 @@ from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine import beautify_range_list, \
     kill_sleepy_mysql_threads, create_range_list
 from invenio.bibtask import write_message, task_get_option, task_update_progress, \
-    task_update_status
+    task_update_status, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 
 options = {} # global variable to hold task options
@@ -756,6 +756,7 @@ def word_index(run):
     options["run"] = []
     options["run"].append(run)
     for rank_method_code in options["run"]:
+        task_sleep_now_if_required(can_stop_too=True)
         method_starting_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         write_message("Running rank method: %s" % getName(rank_method_code))
         try:
@@ -765,7 +766,6 @@ def word_index(run):
         except StandardError, e:
             write_message("Cannot find configurationfile: %s" % file, sys.stderr)
             raise StandardError
-
         options["current_run"] = rank_method_code
         options["modified_words"] = {}
         options["table"] = config.get(config.get("rank_method", "function"), "table")
@@ -780,6 +780,7 @@ def word_index(run):
             if task_get_option("cmd") == "del":
                 if task_get_option("id"):
                     wordTable.del_recIDs(task_get_option("id"))
+                    task_sleep_now_if_required(can_stop_too=True)
                 elif task_get_option("collection"):
                     l_of_colls = task_get_option("collection").split(",")
                     recIDs = perform_request_search(c=l_of_colls)
@@ -787,6 +788,7 @@ def word_index(run):
                     for recID in recIDs:
                         recIDs_range.append([recID,recID])
                     wordTable.del_recIDs(recIDs_range)
+                    task_sleep_now_if_required(can_stop_too=True)
                 else:
                     write_message("Missing IDs of records to delete from index %s.", wordTable.tablename,
                                   sys.stderr)
@@ -794,6 +796,7 @@ def word_index(run):
             elif task_get_option("cmd") == "add":
                 if task_get_option("id"):
                     wordTable.add_recIDs(task_get_option("id"))
+                    task_sleep_now_if_required(can_stop_too=True)
                 elif task_get_option("collection"):
                     l_of_colls = task_get_option("collection").split(",")
                     recIDs = perform_request_search(c=l_of_colls)
@@ -801,27 +804,35 @@ def word_index(run):
                     for recID in recIDs:
                         recIDs_range.append([recID,recID])
                     wordTable.add_recIDs(recIDs_range)
+                    task_sleep_now_if_required(can_stop_too=True)
                 elif task_get_option("last_updated"):
                     wordTable.add_recIDs_by_date("")
                     # only update last_updated if run via automatic mode:
                     wordTable.update_last_updated(rank_method_code, method_starting_time)
+                    task_sleep_now_if_required(can_stop_too=True)
                 elif task_get_option("modified"):
                     wordTable.add_recIDs_by_date(task_get_option("modified"))
+                    task_sleep_now_if_required(can_stop_too=True)
                 else:
                     wordTable.add_recIDs([[0,max_recid]])
+                    task_sleep_now_if_required(can_stop_too=True)
             elif task_get_option("cmd") == "repair":
                 wordTable.repair()
                 check_rnkWORD(options["table"])
+                task_sleep_now_if_required(can_stop_too=True)
             elif task_get_option("cmd") == "check":
                 check_rnkWORD(options["table"])
                 options["modified_words"] = {}
+                task_sleep_now_if_required(can_stop_too=True)
             elif task_get_option("cmd") == "stat":
                 rank_method_code_statistics(options["table"])
+                task_sleep_now_if_required(can_stop_too=True)
             else:
                 write_message("Invalid command found processing %s" % \
                      wordTable.tablename, sys.stderr)
                 raise StandardError
             update_rnkWORD(options["table"], options["modified_words"])
+            task_sleep_now_if_required(can_stop_too=True)
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
             if task_get_option("verbose") >= 9:
