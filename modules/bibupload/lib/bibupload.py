@@ -85,7 +85,7 @@ from invenio.config import CFG_WEBSUBMIT_FILEDIR, \
                            CFG_TMPDIR
 from invenio.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
-    task_update_progress
+    task_update_progress, task_sleep_now_if_required
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format
 
 #Statistic variables
@@ -1624,9 +1624,11 @@ def task_run_core():
         recs = xml_marc_to_records(open_marc_file(task_get_option('file_path')))
         stat['nb_records_to_upload'] = len(recs)
         write_message("   -Open XML marc: DONE", verbose=2)
+        task_sleep_now_if_required(can_stop_too=True)
         if recs is not None:
             # We proceed each record by record
             for record in recs:
+                task_sleep_now_if_required(can_stop_too=True)
                 error = bibupload(
                     record,
                     opt_tag=task_get_option('tag'),
