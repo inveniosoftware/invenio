@@ -55,7 +55,7 @@ import sys
 import time
 import traceback
 
-from invenio.dbquery import run_sql, _db_login
+from invenio.dbquery import run_sql, _db_login, _db_logout
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_PREFIX, CFG_BINDIR
 from invenio.errorlib import register_exception
@@ -351,11 +351,26 @@ def task_sleep_now_if_required(can_stop_too=False):
     """This function should be called during safe state of BibTask,
     e.g. after flushing caches or outside of run_sql calls.
     """
+    write_message('Entering task_sleep_now_if_required with signal_request=%s' % _task_params['signal_request'], verbose=9)
     if _task_params['signal_request'] == 'sleep':
         _task_params['signal_request'] = None
         write_message("sleeping...")
         task_update_status("SLEEPING")
         signal.pause() # wait for wake-up signal
+    elif _task_params['signal_request'] == 'ctrlz':
+        _task_params['signal_request'] = None
+        signal.signal(signal.SIGTSTP, signal.SIG_DFL)
+        write_message("sleeping...")
+        task_update_status("SLEEPING")
+        os.kill(os.getpid(), signal.SIGTSTP)
+        time.sleep(1)
+    elif _task_params['signal_request'] == 'ctrlc' and can_stop_too:
+        _task_params['signal_request'] = None
+        signal.signal(signal.SIGINT, signal.SIG_DFL)
+        write_message("stopped")
+        task_update_status("STOPPED")
+        os.kill(os.getpid(), signal.SIGINT)
+        time.sleep(1)
     elif _task_params['signal_request'] == 'stop' and can_stop_too:
         _task_params['signal_request'] = None
         write_message("stopped")
@@ -485,11 +500,13 @@ def _task_run(task_run_fnc):
     ## initialize signal handler:
     _task_params['signal_request'] = None
     signal.signal(signal.SIGUSR1, _task_sig_sleep)
-    signal.signal(signal.SIGTSTP, _task_sig_sleep)
+    signal.signal(signal.SIGTSTP, _task_sig_ctrlz)
     signal.signal(signal.SIGTERM, _task_sig_stop)
+    signal.signal(signal.SIGQUIT, _task_sig_stop)
     signal.signal(signal.SIGABRT, _task_sig_suicide)
     signal.signal(signal.SIGCONT, _task_sig_wakeup)
-    signal.signal(signal.SIGINT, _task_sig_unknown)
+    signal.signal(signal.SIGINT, _task_sig_ctrlc)
+    #signal.signal(signal.SIGINT, _task_sig_unknown)
     ## run the task:
     _task_params['task_starting_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if callable(task_run_fnc) and task_run_fnc():
@@ -527,7 +544,6 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
         sys.stderr.write(description)
     sys.exit(exitcode)
 
-
 def _task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
     write_message("task_sig_sleep(), got signal %s frame %s"
@@ -535,19 +551,36 @@ def _task_sig_sleep(sig, frame):
     write_message("sleeping as soon as possible...")
     _task_params['signal_request'] = 'sleep'
 
+def _task_sig_ctrlz(sig, frame):
+    """Signal handler for the 'ctrlz' signal sent by BibSched."""
+    write_message("task_sig_ctrlz(), got signal %s frame %s"
+            % (sig, frame), verbose=9)
+    write_message("sleeping as soon as possible...")
+    _task_params['signal_request'] = 'ctrlz'
+
 def _task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
+    signal.signal(signal.SIGTSTP, _task_sig_ctrlz)
     write_message("task_sig_wakeup(), got signal %s frame %s"
             % (sig, frame), verbose=9)
-    _db_login(1) #FIXME Not sure this can do more evil than good things.
     write_message("continuing...")
     task_update_status("CONTINUING")
+
+def _task_sig_ctrlc(sig, frame):
+    """Signal handler for the 'stop' signal sent by BibSched."""
+    write_message("task_sig_ctrlc(), got signal %s frame %s"
+            % (sig, frame), verbose=9)
+    write_message("stopping as soon as possible...")
+    _db_login(1) # To avoid concurrency with an interrupted run_sql call
+    task_update_status("STOPPING")
+    _task_params['signal_request'] = 'ctrlc'
 
 def _task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
     write_message("task_sig_stop(), got signal %s frame %s"
             % (sig, frame), verbose=9)
     write_message("stopping as soon as possible...")
+    _db_login(1) # To avoid concurrency with an interrupted run_sql call
     task_update_status("STOPPING")
     _task_params['signal_request'] = 'stop'
 
