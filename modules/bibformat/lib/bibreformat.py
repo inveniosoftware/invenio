@@ -40,7 +40,7 @@ try:
     from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
     from invenio.bibtask import task_init, write_message, task_set_option, \
             task_get_option, task_update_progress, task_has_option, \
-            task_low_level_submission, task_sleep_now_if_requested
+            task_low_level_submission, task_sleep_now_if_required
     import sys
     import os
     import time
@@ -245,12 +245,12 @@ def iterate_over_new(list, fmt):
 
         ### bibformat external call
         ###
-        task_sleep_now_if_requested(can_stop_too=True)
+        task_sleep_now_if_required(can_stop_too=True)
         t1 = os.times()[4]
         start_date = time.strftime('%Y-%m-%d %H:%M:%S')
         formatted_record = format_record(recID, fmt, on_the_fly=True)
         t2 = os.times()[4]
-        task_sleep_now_if_requested(can_stop_too=True)
+        task_sleep_now_if_required(can_stop_too=True)
         tbibformat = tbibformat + (t2 - t1)
 
         # Encapsulate record in xml tags that bibupload understands
@@ -347,7 +347,7 @@ def iterate_over_old(list, fmt):
 
 ### bibformat external call
 ###
-                task_sleep_now_if_requested(can_stop_too=True)
+                task_sleep_now_if_required(can_stop_too=True)
                 t11 = os.times()[4]
                 message = "START bibformat external call"
                 write_message(message, verbose=9)
@@ -357,7 +357,7 @@ def iterate_over_old(list, fmt):
                 t22 = os.times()[4]
                 message = "END bibformat external call (time elapsed:%2f)" % (t22-t11)
                 write_message(message, verbose=9)
-                task_sleep_now_if_requested(can_stop_too=True)
+                task_sleep_now_if_required(can_stop_too=True)
                 tbibformat = tbibformat + (t22 - t11)
 
 
