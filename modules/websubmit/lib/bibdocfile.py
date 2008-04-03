@@ -25,12 +25,16 @@ import shutil
 import md5
 import filecmp
 import time
+import socket
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 from mimetypes import MimeTypes
 
+## Let's set a reasonable timeout for URL request (e.g. FFT)
+socket.setdefaulttimeout(10)
+
 try:
-    set()
+    set
 except NameError:
     from sets import Set as set
 

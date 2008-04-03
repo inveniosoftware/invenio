@@ -60,6 +60,7 @@ import time
 from zlib import compress
 import urllib2
 import tempfile
+import socket
 
 from invenio.config import CFG_OAI_ID_FIELD, CFG_SITE_URL, \
      CFG_BIBUPLOAD_REFERENCE_TAG, \
@@ -95,6 +96,9 @@ stat['nb_records_updated'] = 0
 stat['nb_records_inserted'] = 0
 stat['nb_errors'] = 0
 stat['exectime'] = time.localtime()
+
+## Let's set a reasonable timeout for URL request (e.g. FFT)
+socket.setdefaulttimeout(10)
 
 ### bibupload engine functions:
 def bibupload(record, opt_tag=None, opt_mode=None,
