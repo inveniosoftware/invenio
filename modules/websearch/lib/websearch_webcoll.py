@@ -51,7 +51,8 @@ from invenio.websearch_external_collections import \
      dico_collection_external_searches, \
      external_collection_sort_engine_by_name
 from invenio.bibtask import task_init, task_get_option, task_set_option, \
-    write_message, task_has_option, task_update_progress
+    write_message, task_has_option, task_update_progress, \
+    task_sleep_now_if_required
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 
@@ -861,8 +862,10 @@ def task_run_core():
                 i += 1
                 write_message("%s / reclist cache update" % coll.name)
                 coll.calculate_reclist()
+                task_sleep_now_if_required()
                 coll.update_reclist()
                 task_update_progress("Part 1/2: done %d/%d" % (i, len(colls)))
+                task_sleep_now_if_required(can_stop_too=True)
         # thirdly, update collection webpage cache:
         if task_get_option("part", 2) == 2:
             i = 0
@@ -871,6 +874,7 @@ def task_run_core():
                 write_message("%s / webpage cache update" % coll.name)
                 coll.update_webpage_cache()
                 task_update_progress("Part 2/2: done %d/%d" % (i, len(colls)))
+                task_sleep_now_if_required(can_stop_too=True)
 
         # finally update the cache last updated timestamp:
         # (but only when all collections were updated, not when only
