@@ -85,9 +85,9 @@ def print_citation_summary_html(citedbylist, ln, criteria=""):
     #format avg so that it does not span 10 digits
     avgstr = avgstr[0:4]
     reciddict = alldict['reciddict']
-    return websearch_templates.tmpl_citesummary_html(ln, totalcites, avgstr, reciddict)
-
-
+    return websearch_templates.tmpl_citesummary_html(ln,
+                                                     totalcites, avgstr,
+                                                     reciddict)
 
 def calculate_citations(tresholdsNames, citedbylist):
     """calculates records in classes of citations
@@ -98,7 +98,9 @@ def calculate_citations(tresholdsNames, citedbylist):
     avgcites = 0
     reciddict = {}
     for recid, cites in citedbylist:
-        numcites = len(cites)
+        numcites = 0
+        if cites:
+            numcites = len(cites)
         totalcites = totalcites + numcites
         #take the numbers in tresholdsNames
         for low, high, name in tresholdsNames:
