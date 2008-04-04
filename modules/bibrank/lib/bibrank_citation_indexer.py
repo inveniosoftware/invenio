@@ -651,11 +651,19 @@ def insert_into_cit_db(dic, name):
     ndate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     try:
         s = serialize_via_marshal(dic)
-        print "size of "+name+" "+str(len(s))
-        run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name = %s",
-                (s, name))
+        write_message("size of "+name+" "+str(len(s)), sys.stderr)
+        #check that this column really exists
+        testres = run_sql("select object_name from rnkCITATIONDATA where object_name = %s",
+                       (name,))
+        if testres:
+            run_sql("UPDATE rnkCITATIONDATA SET object_value = %s where object_name = %s",
+                    (s, name))
+        else:
+            #there was no entry for name, let's force..
+            run_sql("INSERT INTO rnkCITATIONDATA(object_name,object_value) values (%s,%s)",
+                     (name,s))
         run_sql("UPDATE rnkCITATIONDATA SET last_updated = %s where object_name = %s",
-                 (ndate,name))
+               (ndate,name))
     except:
         print "Critical error: could not write "+name+" into db"
         traceback.print_tb(sys.exc_info()[2])
