@@ -872,6 +872,18 @@ class BibDoc:
         else:
             raise InvenioWebSubmitFileError, "Strange just undeleted docname isn't called DELETED-somedate-docname but %s" % self.docname
 
+    def get_history(self):
+        """Return a string with a line for each row in the history for the
+        given docid."""
+        ret = []
+        hst = run_sql("""SELECT action, docname, docformat, docversion,
+                docsize, docchecksum, doctimestamp
+                FROM hstDOCUMENT
+                WHERE id_bibdoc=%s ORDER BY doctimestamp ASC""", (self.id, ))
+        for row in hst:
+            ret.append("%s %s '%s', format: '%s', version: %i, size: %s, checksum: '%s'" % (row[6].strftime('%Y-%m-%d %H:%M:%S'), row[0], row[1], row[2], row[3], nice_size(row[4]), row[5]))
+        return ret
+
     def _build_file_list(self, context=''):
         """Lists all files attached to the bibdoc. This function should be
         called everytime the bibdoc is modified.
@@ -894,7 +906,6 @@ class BibDoc:
                     run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, docformat, docversion, docsize, docchecksum, doctimestamp) VALUES(%s, %s, %s, %s, %s, %s, %s, NOW())', (action, docid, docname, format, version, size, checksum))
             except DatabaseError:
                 register_exception()
-
 
         def make_removed_added_bibdocfiles(previous_file_list):
             """Internal function for build the log of changed files."""
@@ -1060,6 +1071,7 @@ class BibDocFile:
         self.name = name
         self.format = normalize_format(format)
         self.dir = os.path.dirname(fullpath)
+        self.url = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, self.name, self.format)
         if format == "":
             self.mime = "text/plain"
             self.encoding = ""
@@ -1083,6 +1095,7 @@ class BibDocFile:
         out += '%s:%s:%s:%s:creation time=%s\n' % (self.recid, self.docid, self.version, self.format, self.cd)
         out += '%s:%s:%s:%s:modification time=%s\n' % (self.recid, self.docid, self.version, self.format, self.md)
         out += '%s:%s:%s:%s:encoding=%s\n' % (self.recid, self.docid, self.version, self.format, self.encoding)
+        out += '%s:%s:%s:%s:url=%s\n' % (self.recid, self.docid, self.version, self.format, self.url)
         return out
 
     def display(self, ln = CFG_SITE_LANG):
@@ -1104,6 +1117,9 @@ class BibDocFile:
             return (1, 'File has ben deleted')
         else:
             return (0, '')
+
+    def get_url(self):
+        return self.url
 
     def get_type(self):
         return self.doctype
@@ -1147,6 +1163,10 @@ class BibDocFile:
         """Returns the status of the file, i.e. either '', 'DELETED' or a
         restriction keyword."""
         return self.status
+
+    def check(self):
+        """Return True if the checksum corresponds to the file."""
+        return calculate_md5(self.fullpath) == self.checksum
 
     def stream(self, req):
         """Stream the file."""
@@ -1235,18 +1255,19 @@ class Md5Folder:
     def update(self, only_new = True):
         """Update the .md5 file with the current files. If only_new
         is specified then only not already calculated file are calculated."""
+        if not only_new:
+            self.md5s = {}
         if os.path.exists(self.folder):
             for filename in os.listdir(self.folder):
-                if not only_new or self.md5s.get(filename, None) is None and \
-                        not filename.startswith('.'):
-                    self.md5s[filename] = calculate_md5("%s/%s" %                          (self.folder, filename))
+                if filename not in self.md5s and not filename.startswith('.'):
+                    self.md5s[filename] = calculate_md5(os.path.join(self.folder, filename))
         self.store()
 
     def store(self):
         """Store the current md5 dictionary into .md5"""
         try:
             old_umask = os.umask(022)
-            md5file = open("%s/.md5" % self.folder, "w")
+            md5file = open(os.path.join(self.folder, ".md5"), "w")
             for key, value in self.md5s.items():
                 md5file.write('%s *%s\n' % (value, key))
             os.umask(old_umask)
@@ -1258,7 +1279,7 @@ class Md5Folder:
         """Load .md5 into the md5 dictionary"""
         self.md5s = {}
         try:
-            for row in open("%s/.md5" % self.folder, "r"):
+            for row in open(os.path.join(self.folder, ".md5"), "r"):
                 md5hash = row[:32]
                 filename = row[34:].strip()
                 self.md5s[filename] = md5hash
@@ -1273,19 +1294,18 @@ class Md5Folder:
         for being coherent with the stored hash."""
         if filename and filename in self.md5s.keys():
             try:
-                return self.md5s[filename] == calculate_md5("%s/%s" %
-                        (self.folder, filename))
+                return self.md5s[filename] == calculate_md5(os.path.join(self.folder, filename))
             except Exception, e:
                 register_exception()
-                raise InvenioWebSubmitFileError, "Encountered an exception while loading '%s/%s': '%s'" % (self.folder, filename, e)
+                raise InvenioWebSubmitFileError, "Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e)
         else:
             for filename, md5hash in self.md5s.items():
                 try:
-                    if calculate_md5("%s/%s" % (self.folder, filename)) != md5hash:
+                    if calculate_md5(os.path.join(self.folder, filename)) != md5hash:
                         return False
                 except Exception, e:
                     register_exception()
-                    raise InvenioWebSubmitFileError, "Encountered an exception while loading '%s/%s': '%s'" % (self.folder, filename, e)
+                    raise InvenioWebSubmitFileError, "Encountered an exception while loading '%s': '%s'" % (os.path.join(self.folder, filename), e)
             return True
 
     def get_checksum(self, filename):
@@ -1392,4 +1412,4 @@ def nice_size(size):
             if size > 1024:
                 size /= 1024.0
                 unit = 'GB'
-    return '%s %s' % (websearch_templates.tmpl_nice_number(size, max_ndigits_after_dot=3), unit)
+    return '%s %s' % (websearch_templates.tmpl_nice_number(size, max_ndigits_after_dot=2), unit)

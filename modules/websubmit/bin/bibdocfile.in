@@ -1,5 +1,7 @@
+#!@PYTHON@
+##
 ## $Id$
-
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -17,26 +19,17 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = functions
+"""
+BibDocFile CLI tool.
+"""
 
-pylibdir = $(libdir)/python/invenio
+__revision__ = "$Id$"
 
-pylib_DATA = websubmit_config.py websubmit_engine.py file.py	\
-             websubmit_dblayer.py \
-             websubmit_webinterface.py \
-             websubmit_templates.py \
-             websubmit_regression_tests.py \
-             websubmitadmin_config.py \
-             websubmitadmin_dblayer.py \
-             websubmitadmin_engine.py \
-             websubmitadmin_templates.py \
-             websubmitadmin_regression_tests.py \
-             websubmit_file_stamper.py \
-             bibdocfile.py \
-             bibdocfilecli.py
+try:
+    from invenio.bibdocfilecli import main
+except ImportError, e:
+    print "Error: %s" % e
+    import sys
+    sys.exit(1)
 
-noinst_DATA = fulltext_files_migration_kit.py
-
-EXTRA_DIST = $(pylib_DATA) $(noinst_DATA)
-
-CLEANFILES = *~ *.tmp
+main()
