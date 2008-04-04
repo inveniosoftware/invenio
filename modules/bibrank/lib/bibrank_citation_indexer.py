@@ -27,7 +27,7 @@ import os
 import marshal
 import traceback
 from zlib import decompress, error
-
+from sets import Set
 from invenio.dbquery import run_sql, serialize_via_marshal, \
                             deserialize_via_marshal
 from invenio.search_engine import print_record, search_pattern, get_fieldvalues
