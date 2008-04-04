@@ -268,6 +268,13 @@ def perform_request_alert(req, journal_name, issue_number, language,
 
         message = createhtmlmail(html_string, plain_text,
                                  subject, recipients)
+
+        ## Transform the recipients string into a list for the mail server:
+        to_addresses = [raw_address.strip() for raw_address in \
+                        recipients.split(",")]
+        recipients = to_addresses
+
+        ## Send the mail:
         server = smtplib.SMTP("localhost", 25)
         server.sendmail('Bulletin-Support@cern.ch', recipients, message)
         # todo: has to go to some messages config
