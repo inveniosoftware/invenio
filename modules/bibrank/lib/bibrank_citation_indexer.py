@@ -621,14 +621,6 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,
     insert_into_cit_db(selfcbdic,"selfcitedbydict")
     insert_into_cit_db(selfdic,"selfcitdict")
 
-    #update author-citations.. but make sure the table exists
-    sql = """CREATE TABLE IF NOT EXISTS rnkAUTHORDATAR (aterm varchar(50) default NULL,
-             hitlist longblob, UNIQUE KEY aterm (aterm))"""
-    try:
-        run_sql(sql)
-    except:
-        pass
-
     for a in authorcitdic.keys():
         lserarr = (serialize_via_marshal(authorcitdic[a]))
         #author name: replace " with something else
@@ -645,8 +637,8 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,
                 run_sql("UPDATE rnkAUTHORDATAR SET hitlist  = %s where aterm=%s",
                         (lserarr,a))
         except:
-            print "Critical error: could not write rnkAUTHORDATAR "
-            print "into db. aterm="+a+" hitlist="+str(lserarr)+"\n"
+            print "Critical error: could not read/write rnkAUTHORDATAR "
+            print "aterm="+a+" hitlist="+str(lserarr)+"\n"
             traceback.print_tb(sys.exc_info()[2])
 
 def insert_into_cit_db(dic, name):
