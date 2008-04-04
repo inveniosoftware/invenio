@@ -1927,4 +1927,5 @@ INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES
 INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES ('THESIS','phdthesis', '3');
 INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES ('POETRY','unpublished', '3');
 
+-- UPDATE idxINDEX SET stemming_language='en' WHERE name in ('global','abstract','keyword','title','fulltext');
 -- end of file
