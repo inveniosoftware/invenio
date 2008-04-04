@@ -445,8 +445,8 @@ def add_oai_src(oai_src_name, oai_src_baseurl, oai_src_prefix, oai_src_frequency
         else:
             lastrun_mode = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
             # lastrun_mode = "'"+lastrun_mode+"'"
-        sql = "INSERT INTO oaiHARVEST (id, baseurl, metadataprefix, arguments, comment,  bibconvertcfgfile,  name,  lastrun,  frequency,  postprocess,  bibfilterprogram,  setspecs) VALUES (0, %s, %s, NULL, NULL, %s, %s, %s, %s, %s, %s, %s)", (oai_src_baseurl, oai_src_prefix, oai_src_config, oai_src_name, lastrun_mode, oai_src_frequency, oai_src_post, oai_src_bibfilter, " ".join(oai_src_sets))
-        res = run_sql(sql)
+        run_sql("INSERT INTO oaiHARVEST (id, baseurl, metadataprefix, arguments, comment,  bibconvertcfgfile,  name,  lastrun,  frequency,  postprocess,  bibfilterprogram,  setspecs) VALUES (0, %s, %s, NULL, NULL, %s, %s, %s, %s, %s, %s, %s)", \
+                (oai_src_baseurl, oai_src_prefix, oai_src_config, oai_src_name, lastrun_mode, oai_src_frequency, oai_src_post, oai_src_bibfilter, " ".join(oai_src_sets)))
         return (1, "")
     except StandardError, e:
         return (0, e)
