@@ -35,7 +35,7 @@ from invenio.search_engine import perform_request_search, HitSet
 from invenio.bibrank_citation_indexer import get_citation_weight, print_missing
 from invenio.bibrank_downloads_indexer import *
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
-from invenio.bibtask import task_get_option, write_message
+from invenio.bibtask import task_get_option, write_message, task_sleep_now_if_required
 
 
 options = {}
@@ -134,6 +134,7 @@ def single_tag_rank(config):
 
     records = []
     for (recids, recide) in options["recid_range"]:
+        task_sleep_now_if_required(can_stop_too=True)
         write_message("......Processing records #%s-%s" % (recids, recide))
         recs = run_sql("SELECT id_bibrec, value FROM bib%sx, bibrec_bib%sx WHERE tag=%%s AND id_bibxxx=id and id_bibrec >=%%s and id_bibrec<=%%s" % (tag[0:2], tag[0:2]), (tag, recids, recide))
         valid = HitSet(trailing_bits=1)
@@ -289,6 +290,7 @@ def bibrank_engine(run):
         options["run"] = []
         options["run"].append(run)
         for rank_method_code in options["run"]:
+            task_sleep_now_if_required(can_stop_too=True)
             cfg_name = getName(rank_method_code)
             write_message("Running rank method: %s." % cfg_name)
 
