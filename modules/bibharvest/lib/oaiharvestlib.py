@@ -34,7 +34,7 @@ from invenio.config import \
      CFG_TMPDIR
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_get_option, task_set_option, write_message, \
-    task_update_status, task_init
+    task_update_status, task_init, task_sleep_now_if_required
 
 ## precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')
@@ -91,6 +91,7 @@ def task_run_core():
 
     error_happened_p = False
     for repos in reposlist:
+        task_sleep_now_if_required()
         postmode = str(repos[0][9])
         setspecs = str(repos[0][10])
         harvested_files = []
@@ -183,6 +184,7 @@ def task_run_core():
         if postmode == "h-u":
             res = 0
             for harvested_file in harvested_files:
+                task_sleep_now_if_required()
                 res += call_bibupload(harvested_file)
                 if res == 0:
                     write_message("material harvested from source " +
@@ -200,6 +202,7 @@ def task_run_core():
             converted_files = []
             i = 0
             for harvested_file in harvested_files:
+                task_sleep_now_if_required()
                 converted_file = convertpath+".%07d" % i
                 converted_files.append(converted_file)
                 res = call_bibconvert(config=str(repos[0][5]),
@@ -225,6 +228,7 @@ def task_run_core():
         if postmode == "h-c-u":
             res = 0
             for converted_file in converted_files:
+                task_sleep_now_if_required()
                 res += call_bibupload(converted_file)
             if res == 0:
                 write_message("material harvested from source " +
@@ -239,6 +243,7 @@ def task_run_core():
             # first call bibfilter:
             res = 0
             for converted_file in converted_files:
+                task_sleep_now_if_required()
                 res += call_bibfilter(str(repos[0][11]), converted_file)
             if res == 0:
                 write_message("material harvested from source " +
@@ -258,7 +263,9 @@ def task_run_core():
                     get_nb_records_in_file(converted_file + ".correct.xml")))
             # only then call upload:
             for converted_file in converted_files:
+                task_sleep_now_if_required()
                 res += call_bibupload(converted_file + ".insert.xml", "-i")
+                task_sleep_now_if_required()
                 res += call_bibupload(converted_file + ".correct.xml", "-c")
             if res == 0:
                 write_message("material harvested from source " +

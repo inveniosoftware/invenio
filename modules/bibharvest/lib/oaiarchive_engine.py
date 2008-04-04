@@ -41,7 +41,7 @@ from invenio.config import \
 from invenio.search_engine import perform_request_search
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_get_option, task_set_option, write_message, \
-    task_update_progress, task_init
+    task_update_progress, task_init, task_sleep_now_if_required
 
 def all_sets():
     """
@@ -205,7 +205,7 @@ def oaiarchive_task():
         write_message("-" * 73)
 
         for _set in all_oai_sets:
-
+            task_sleep_now_if_required(can_stop_too=True)
             oai_sets = get_set_descriptions(_set[2])
             setSpec, setName, setCoverage, recID_list = \
                 get_recID_list(oai_sets, _set)
@@ -236,6 +236,7 @@ def oaiarchive_task():
 
     set_number = 0
     for set in sets:
+        task_sleep_now_if_required(can_stop_too=True)
         set_number += 1
 
         # Reset some variables
