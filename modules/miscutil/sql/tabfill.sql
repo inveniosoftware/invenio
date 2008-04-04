@@ -22,10 +22,10 @@
 INSERT INTO rnkMETHOD (id,name,last_updated) VALUES (1,'wrd','0000-00-00 00:00:00');
 INSERT INTO collection_rnkMETHOD (id_collection,id_rnkMETHOD,score) VALUES (1,1,100);
 
-INSERT INTO rnkCITATIONDATA VALUES (1,'citationdict','','');
-INSERT INTO rnkCITATIONDATA VALUES (2,'reversedict','','');
-INSERT INTO rnkCITATIONDATA VALUES (3,'selfcitdict','','');
-INSERT INTO rnkCITATIONDATA VALUES (4,'selfcitedbydict','','');
+INSERT INTO rnkCITATIONDATA VALUES (1,'citationdict',NULL,'0000-00-00');
+INSERT INTO rnkCITATIONDATA VALUES (2,'reversedict',NULL,'0000-00-00');
+INSERT INTO rnkCITATIONDATA VALUES (3,'selfcitdict',NULL,'0000-00-00');
+INSERT INTO rnkCITATIONDATA VALUES (4,'selfcitedbydict',NULL,'0000-00-00');
 
 INSERT INTO field VALUES (1,'any field','anyfield');
 INSERT INTO field VALUES (2,'title','title');

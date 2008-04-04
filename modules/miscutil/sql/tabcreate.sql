@@ -2146,7 +2146,7 @@ CREATE TABLE IF NOT EXISTS rnkDOWNLOADS (
 -- a table for citations. record-cites-record
 
 CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
-  id mediumint(8) unsigned default NULL,
+  id mediumint(8) unsigned NOT NULL auto_increment,
   object_name varchar(255) NOT NULL,
   object_value longblob,
   last_updated datetime NOT NULL default '0000-00-00',
