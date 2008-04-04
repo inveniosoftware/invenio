@@ -781,7 +781,12 @@ def createhtmlmail (html, text, subject, toaddr):
     #
     writer.addheader("Subject", subject)
     writer.addheader("MIME-Version", "1.0")
-    writer.addheader("To", toaddr)
+
+    ## Instead of a comma-separated "To" field, add a new "To" header for
+    ## each of the addresses:
+    to_addresses = [raw_address.strip() for raw_address in toaddr.split(",")]
+    for to_address in to_addresses:
+        writer.addheader("To", to_address)
     #
     # start the multipart section of the message
     # multipart/alternative seems to work better
