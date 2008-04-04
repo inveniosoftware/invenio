@@ -200,7 +200,7 @@ def tmpl_webjournal_alert_interface(language, journal_name, subject,
         <p>Recipients:</p>
         <input type="text" name="recipients" value="bulletin-alert-eng@cern.ch,bulletin-alert-fre@cern.ch,cern-staff@cern.ch,cern-fellows@cern.ch" />
         <p>Subject:</p>
-        <input type="text" name="subject" value="%s" />
+        <input type="text" name="subject" value="%s" readonly />
         <p>Plain Text Message:</p>
         <textarea name="plainText" wrap="soft" rows="25" cols="50">%s</textarea>
         <p> Send Homepage as html:
