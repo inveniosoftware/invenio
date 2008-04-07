@@ -784,10 +784,10 @@ def main():
     this collection only.  If the collection name is immediately followed
     by a plus sign, it will also update all its desdendants.  The
     top-level collection name may be entered as the void string.\n""",
-            help_specific_usage="  -c, --collection\t Update cache for the given"
+            help_specific_usage="  -c, --collection\t Update cache for the given "
                      "collection only. [all]\n"
-                    "  -f, --force\t Force update even if cache is up to date. [no]\n"
-                    "  -p, --part\t Update only certain cache parts (1=reclist,"
+                    "  -f, --force\t\t Force update even if cache is up to date. [no]\n"
+                    "  -p, --part\t\t Update only certain cache parts (1=reclist,"
                     " 2=webpage). [both]\n"
                     "  -l, --language\t Update pages in only certain language"
                     " (e.g. fr). [all]\n",
