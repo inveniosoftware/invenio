@@ -227,32 +227,41 @@ def task_run_core():
 
         if postmode == "h-c-u":
             res = 0
+            uploaded = False
             for converted_file in converted_files:
                 task_sleep_now_if_required()
-                res += call_bibupload(converted_file)
-            if res == 0:
-                write_message("material harvested from source " +
-                    str(repos[0][6]) + " was successfully uploaded")
-            else:
-                write_message("an error occurred while uploading "
-                    "harvest from " + str(repos[0][6]))
-                error_happened_p = True
-                continue
+                if get_nb_records_in_file(converted_file) > 0:
+                    res += call_bibupload(converted_file)
+                    uploaded = True
+            if len(converted_files) > 0:
+                if res == 0:
+                    if uploaded:
+                        write_message("material harvested from source " +
+                                      str(repos[0][6]) + " was successfully uploaded")
+                    else:
+                        write_message("nothing to upload")
+                else:
+                    write_message("an error occurred while uploading "
+                                  "harvest from " + str(repos[0][6]))
+                    error_happened_p = True
+                    continue
 
         elif postmode == "h-c-f-u":
             # first call bibfilter:
             res = 0
+            uploaded = False
             for converted_file in converted_files:
                 task_sleep_now_if_required()
                 res += call_bibfilter(str(repos[0][11]), converted_file)
-            if res == 0:
-                write_message("material harvested from source " +
-                    str(repos[0][6]) + " was successfully bibfiltered")
-            else:
-                write_message("an error occurred while uploading "
-                    "harvest from " + str(repos[0][6]))
-                error_happened_p = True
-                continue
+            if len(converted_files) > 0:
+                if res == 0:
+                    write_message("material harvested from source " +
+                                  str(repos[0][6]) + " was successfully bibfiltered")
+                else:
+                    write_message("an error occurred while bibfiltering "
+                                  "harvest from " + str(repos[0][6]))
+                    error_happened_p = True
+                    continue
             # print stats:
             for converted_file in converted_files:
                 write_message("File %s contains %i records." % \
@@ -264,17 +273,25 @@ def task_run_core():
             # only then call upload:
             for converted_file in converted_files:
                 task_sleep_now_if_required()
-                res += call_bibupload(converted_file + ".insert.xml", "-i")
+                if get_nb_records_in_file(converted_file + ".insert.xml") > 0:
+                    res += call_bibupload(converted_file + ".insert.xml", "-i")
+                    uploaded = True
                 task_sleep_now_if_required()
-                res += call_bibupload(converted_file + ".correct.xml", "-c")
-            if res == 0:
-                write_message("material harvested from source " +
-                    str(repos[0][6]) + " was successfully uploaded")
-            else:
-                write_message("an error occurred while uploading "
-                    "harvest from " + str(repos[0][6]))
-                error_happened_p = True
-                continue
+                if get_nb_records_in_file(converted_file + ".correct.xml") > 0:
+                    res += call_bibupload(converted_file + ".correct.xml", "-c")
+                    uploaded = True
+            if len(converted_files) > 0:
+                if res == 0:
+                    if uploaded:
+                        write_message("material harvested from source " +
+                                      str(repos[0][6]) + " was successfully uploaded")
+                    else:
+                        write_message("nothing to upload")
+                else:
+                    write_message("an error occurred while uploading "
+                                  "harvest from " + str(repos[0][6]))
+                    error_happened_p = True
+                    continue
 
         elif postmode not in ["h", "h-c", "h-u",
                 "h-c-u", "h-c-f-u"]: ### this should not happen
@@ -550,7 +567,7 @@ def main():
     oaiharvest -r pubmed -d 2005-05-05:2005-05-10 -t 10m\n""",
             help_specific_usage='  -r, --repository=REPOS_ONE, "REPOS TWO"     '
                 'name of the OAI repositories to be harvested (default=all)\n'
-                ' -d, --dates=yyyy-mm-dd:yyyy-mm-dd          '
+                '  -d, --dates=yyyy-mm-dd:yyyy-mm-dd          '
                 'harvest repositories between specified dates '
                 '(overrides repositories\' last updated timestamps)\n',
             version=__revision__,
@@ -562,7 +579,7 @@ def main():
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """Elaborate specific cli parameters for oaiharvest."""
     if key in ("-r", "--repository"):
-        task_set_option('repositories', get_repository_names(value))
+        task_set_option('repository', get_repository_names(value))
     elif key in ("-d", "--dates"):
         task_set_option('dates', get_dates(value))
         if value is not None and task_get_option("dates") is None:
