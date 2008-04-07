@@ -682,7 +682,6 @@ class Manager:
                     table = "hstTASK"
                     order = "ASC"
                     where = ''
-                    print "3 display"
                 self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM %s WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s""" % (table, where, order))
                 ring = 0
                 self.repaint()
