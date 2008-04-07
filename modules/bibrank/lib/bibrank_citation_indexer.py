@@ -750,17 +750,24 @@ def write_citer_cited(citer, cited):
         pass
 
 def print_missing(num):
-    """Print the contents of rnkCITATIONDATAEXT for records that are needed more than num times"""
+    """
+    Print the contents of rnkCITATIONDATAEXT table containing external
+    records that were cited by NUM or more internal records.
+
+    NUM is by default taken from the -E command line option.
+    """
     if not num:
-        num = 50
-    try:
-        res = run_sql("select count(id_bibrec), extcitepubinfo from rnkCITATIONDATAEXT \
-                       group by id_bibrec having count(id_bibrec) >= %s \
-                       order by count(id_bibrec)",(num,))
-        for (cnt, brec) in res:
-            print str(cnt)+"\t"+brec
-    except:
-        pass
+        num = task_get_option("print-extcites")
+
+    write_message("Listing external papers cited by %i or more internal records:" % num)
+
+    res = run_sql("SELECT COUNT(id_bibrec), extcitepubinfo FROM rnkCITATIONDATAEXT \
+                   GROUP BY extcitepubinfo HAVING COUNT(id_bibrec) >= %s \
+                   ORDER BY COUNT(id_bibrec) DESC", (num,))
+    for (cnt, brec) in res:
+        print str(cnt)+"\t"+brec
+
+    write_message("Listing done.")
 
 def tagify(parsedtag):
     """aux auf to make '100__a' out of ['100','','','a']"""

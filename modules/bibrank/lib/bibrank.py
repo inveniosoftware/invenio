@@ -1,4 +1,3 @@
-#!@PYTHON@
 ## -*- mode: python; coding: utf-8; -*-
 ##
 ## $Id$
@@ -23,12 +22,12 @@
 """
 BibRank ranking daemon.
 
-Usage: %s [options]
+Usage: bibrank [options]
      Ranking examples:
-       %s -wjif -a --id=0-30000,30001-860000 --verbose=9
-       %s -wjif -d --modified='2002-10-27 13:57:26'
-       %s -wwrd --rebalance --collection=Articles
-       %s -wwrd -a -i 234-250,293,300-500 -u admin
+       bibrank -wjif -a --id=0-30000,30001-860000 --verbose=9
+       bibrank -wjif -d --modified='2002-10-27 13:57:26'
+       bibrank -wwrd --rebalance --collection=Articles
+       bibrank -wwrd -a -i 234-250,293,300-500 -u admin
 
  Ranking options:
  -w, --run=r1[,r2]         runs each rank method in the order given
@@ -47,11 +46,12 @@ Usage: %s [options]
                            of the document has been changed since last
                            time -R was used
 
- -E, --print-extcites      print the top entries of the external cites table.
-                           These are entries that should be entered in your
-                           collection, since they have been cited many
-                           times by other records. Useful for cataloguers to
-                           input external papers manually.
+ -E, --extcites=NUM        print the top entries of the external cites table.
+                           These are entries that should be entered in
+                           your collection, since they have been cited
+                           by NUM or more other records present in the
+                           system.  Useful for cataloguers to input
+                           external papers manually.
 
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)
@@ -164,10 +164,11 @@ def main():
     task_init(authorization_action='runbibrank',
             authorization_msg="BibRank Task Submission",
             description="""Ranking examples:
-       %s -wjif -a --id=0-30000,30001-860000 --verbose=9
-       %s -wjif -d --modified='2002-10-27 13:57:26'
-       %s -wjif --rebalance --collection=Articles
-       %s -wsbr -a -i 234-250,293,300-500 -u admin
+       bibrank -wjif -a --id=0-30000,30001-860000 --verbose=9
+       bibrank -wjif -d --modified='2002-10-27 13:57:26'
+       bibrank -wjif --rebalance --collection=Articles
+       bibrank -wsbr -a -i 234-250,293,300-500 -u admin
+       bibrank -u admin -w citation -E 10
 """,
             help_specific_usage="""Ranking options:
  -w, --run=r1[,r2]         runs each rank method in the order given
@@ -186,11 +187,12 @@ def main():
                            of the document has been changed since last
                            time -R was used
 
- -E, --print-extcites      print the top entries of the external cites table.
-                           These are entries that should be entered in your
-                           collection, since they have been cited many
-                           times by other records. Useful for cataloguers to
-                           input external papers manually.
+ -E, --extcites=NUM        print the top entries of the external cites table.
+                           These are entries that should be entered in
+                           your collection, since they have been cited
+                           by NUM or more other records present in the
+                           system.  Useful for cataloguers to input
+                           external papers manually.
 
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)
@@ -198,8 +200,8 @@ def main():
  -r, --repair              try to repair all records in the table(s)
 """,
             version=__revision__,
-            specific_params=("EladSi:m:c:kUrRM:f:w:", [
-                "print-extcites",
+            specific_params=("E:ladSi:m:c:kUrRM:f:w:", [
+                "print-extcites=",
                 "lastupdate",
                 "add",
                 "del",
@@ -233,6 +235,10 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy):
     elif key in ("-r", "--repair"):
         task_set_option("cmd", "repair")
     elif key in ("-E", "--print-extcites"):
+        try:
+            task_set_option("print-extcites", int(value))
+        except:
+            task_set_option("print-extcites", 10) # default fallback value
         task_set_option("cmd", "print-missing")
     elif key in ("-d", "--del"):
         task_set_option("cmd", "del")

@@ -45,6 +45,14 @@ Usage: %s [options]
  -R, --recalculate         recalculate weigth data, used by word frequency method
                            should be used if ca 1% of the document has been changed
                            since last time -R was used
+
+ -E, --extcites=NUM        print the top entries of the external cites table.
+                           These are entries that should be entered in
+                           your collection, since they have been cited
+                           by NUM or more other records present in the
+                           system.  Useful for cataloguers to input
+                           external papers manually.
+
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)
                            check if update of ranking data is necessary
