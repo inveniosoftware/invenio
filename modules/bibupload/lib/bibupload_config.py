@@ -25,12 +25,9 @@ BibUpload Engine configuration.
 
 __revision__ = "$Id$"
 
-from invenio.config import CFG_TMPDIR
-
 CFG_BIBUPLOAD_CONTROLFIELD_TAGS = ['001', '002', '003', '004',
                                    '005', '006', '007', '008']
 
 CFG_BIBUPLOAD_SPECIAL_TAGS = ['FMT', 'FFT']
 
-CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS = ('/tmp', '/home', '/afs', CFG_TMPDIR)
 
