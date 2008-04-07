@@ -26,6 +26,9 @@ import md5
 import filecmp
 import time
 import socket
+import urllib2
+import urllib
+import tempfile
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 from mimetypes import MimeTypes
@@ -44,7 +47,9 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_URL,\
     CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR,\
     CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS, \
-    CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL
+    CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL, \
+    CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS, \
+    CFG_TMPDIR
 
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -1071,7 +1076,7 @@ class BibDocFile:
         self.name = name
         self.format = normalize_format(format)
         self.dir = os.path.dirname(fullpath)
-        self.url = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, self.name, self.format)
+        self.url = '%s/record/%s/files/%s%s?version=%i' % (CFG_SITE_URL, self.recid, self.name, self.format, self.version)
         if format == "":
             self.mime = "text/plain"
             self.encoding = ""
@@ -1413,3 +1418,64 @@ def nice_size(size):
                 size /= 1024.0
                 unit = 'GB'
     return '%s %s' % (websearch_templates.tmpl_nice_number(size, max_ndigits_after_dot=2), unit)
+
+def get_docname_from_url(url):
+    """Return a potential docname given a url"""
+    path = urllib2.urlparse.urlsplit(url)[2]
+    filename = os.path.split(path)[-1]
+    return file_strip_ext(filename)
+
+def get_format_from_url(url):
+    """Return a potential format given a url"""
+    path = urllib2.urlparse.urlsplit(url)[2]
+    filename = os.path.split(path)[-1]
+    return filename[len(file_strip_ext(filename)):]
+
+def clean_url(url):
+    """Given a local url e.g. a local path it render it a realpath."""
+    protocol = urllib2.urlparse.urlsplit(url)[0]
+    if protocol in ('', 'file'):
+        path = urllib2.urlparse.urlsplit(url)[2]
+        return os.path.realpath(path)
+    else:
+        return url
+
+def check_valid_url(url):
+    """Check for validity of a url or a file."""
+    try:
+        protocol = urllib2.urlparse.urlsplit(url)[0]
+        if protocol in ('', 'file'):
+            path = urllib2.urlparse.urlsplit(url)[2]
+            if os.path.realpath(path) != path:
+                raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
+            for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR]:
+                if path.startswith(allowed_path):
+                    open(path)
+                    return
+            raise StandardError, "%s is not in one of the allowed paths." % path
+        else:
+            urllib2.urlopen(url)
+    except Exception, e:
+        raise StandardError, "%s is not a correct url: %s" % (url, e)
+
+def download_url(url, format):
+    """Download a url (if it corresponds to a remote file) and return a local url
+    to it."""
+    protocol = urllib2.urlparse.urlsplit(url)[0]
+    tmppath = tempfile.mkstemp(suffix=format, dir=CFG_TMPDIR)[1]
+    try:
+        if protocol in ('', 'file'):
+            path = urllib2.urlparse.urlsplit(url)[2]
+            if os.path.realpath(path) != path:
+                raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
+            for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR]:
+                if path.startswith(allowed_path):
+                    shutil.copy(path, tmppath)
+                    return tmppath
+            raise StandardError, "%s is not in one of the allowed paths." % path
+        else:
+            urllib.urlretrieve(url, tmppath)
+            return tmppath
+    except:
+        os.remove(tmppath)
+        raise
