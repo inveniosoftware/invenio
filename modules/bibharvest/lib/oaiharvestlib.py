@@ -33,8 +33,14 @@ from invenio.config import \
      CFG_BINDIR, \
      CFG_TMPDIR
 from invenio.dbquery import run_sql
-from invenio.bibtask import task_get_option, task_set_option, write_message, \
-    task_update_status, task_init, task_sleep_now_if_required
+from invenio.bibtask import \
+     task_get_option, \
+     task_set_option, \
+     write_message, \
+     task_update_status, \
+     task_init, \
+     task_sleep_now_if_required, \
+     task_update_progress
 
 ## precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')
@@ -90,7 +96,9 @@ def task_run_core():
             datelist.append(element)
 
     error_happened_p = False
+    j = 0
     for repos in reposlist:
+        j += 1
         task_sleep_now_if_required()
         postmode = str(repos[0][9])
         setspecs = str(repos[0][10])
@@ -102,6 +110,12 @@ def task_run_core():
             harvestpath = CFG_TMPDIR + "/oaiharvest" + str(os.getpid())
 
             if dateflag == 1:
+                task_update_progress("Harvesting %s from %s to %s (%i/%i)" % \
+                                     (str(repos[0][6]),\
+                                      str(datelist[0]),
+                                      str(datelist[1]),
+                                      j, \
+                                      len(reposlist)))
                 res = call_bibharvest(prefix=repos[0][2],
                                       baseurl=repos[0][1],
                                       harvestpath=harvestpath,
@@ -124,6 +138,10 @@ def task_run_core():
                 write_message("source " + str(repos[0][6]) + \
                               " was never harvested before - harvesting whole "
                               "repository")
+                task_update_progress("Harvesting %s (%i/%i)" % \
+                                     (str(repos[0][6]),
+                                      j, \
+                                      len(reposlist)))
                 res = call_bibharvest(prefix=repos[0][2],
                                       baseurl=repos[0][1],
                                       harvestpath=harvestpath,
@@ -152,6 +170,10 @@ def task_run_core():
                     fromdate = str(repos[0][7])
                     fromdate = fromdate.split()[0] # get rid of time
                                                    # of the day for the moment
+                    task_update_progress("Harvesting %s (%i/%i)" % \
+                                         (str(repos[0][6]),
+                                         j, \
+                                         len(reposlist)))
                     res = call_bibharvest(prefix=repos[0][2],
                                           baseurl=repos[0][1],
                                           harvestpath=harvestpath,
@@ -183,8 +205,14 @@ def task_run_core():
 
         if postmode == "h-u":
             res = 0
+            i = 0
             for harvested_file in harvested_files:
+                i += 1
                 task_sleep_now_if_required()
+                task_update_progress("Uploading records harvested from %s (%i/%i)" % \
+                                     (str(repos[0][6]),\
+                                      i, \
+                                      len(harvested_files)))
                 res += call_bibupload(harvested_file)
                 if res == 0:
                     write_message("material harvested from source " +
@@ -202,13 +230,17 @@ def task_run_core():
             converted_files = []
             i = 0
             for harvested_file in harvested_files:
+                i += 1
                 task_sleep_now_if_required()
                 converted_file = convertpath+".%07d" % i
                 converted_files.append(converted_file)
+                task_update_progress("Converting material harvested from %s (%i/%i)" % \
+                                     (str(repos[0][6]), \
+                                      i, \
+                                      len(harvested_files)))
                 res = call_bibconvert(config=str(repos[0][5]),
                                       harvestpath=harvested_file,
                                       convertpath=converted_file)
-                i += 1
 
                 if res == 0:
                     write_message("material harvested from source " +
@@ -227,10 +259,16 @@ def task_run_core():
 
         if postmode == "h-c-u":
             res = 0
+            i = 0
             uploaded = False
             for converted_file in converted_files:
+                i += 1
                 task_sleep_now_if_required()
                 if get_nb_records_in_file(converted_file) > 0:
+                    task_update_progress("Uploading records harvested from %s (%i/%i)" % \
+                                         (str(repos[0][6]),\
+                                          i, \
+                                          len(converted_files)))
                     res += call_bibupload(converted_file)
                     uploaded = True
             if len(converted_files) > 0:
@@ -250,8 +288,14 @@ def task_run_core():
             # first call bibfilter:
             res = 0
             uploaded = False
+            i = 0
             for converted_file in converted_files:
+                i += 1
                 task_sleep_now_if_required()
+                task_update_progress("Filtering material harvested from %s (%i/%i)" % \
+                                     (str(repos[0][6]), \
+                                      i,\
+                                      len(converted_files)))
                 res += call_bibfilter(str(repos[0][11]), converted_file)
             if len(converted_files) > 0:
                 if res == 0:
@@ -271,13 +315,23 @@ def task_run_core():
                     (converted_file + ".correct.xml",
                     get_nb_records_in_file(converted_file + ".correct.xml")))
             # only then call upload:
+            i = 0
             for converted_file in converted_files:
                 task_sleep_now_if_required()
+                i += 1
                 if get_nb_records_in_file(converted_file + ".insert.xml") > 0:
+                    task_update_progress("Uploading new records harvested from %s (%i/%i)" % \
+                                         (str(repos[0][6]),\
+                                          i, \
+                                          len(converted_files)))
                     res += call_bibupload(converted_file + ".insert.xml", "-i")
                     uploaded = True
                 task_sleep_now_if_required()
                 if get_nb_records_in_file(converted_file + ".correct.xml") > 0:
+                    task_update_progress("Uploading corrections for records harvested from %s (%i/%i)" % \
+                                         (str(repos[0][6]),\
+                                          i, \
+                                          len(converted_files)))
                     res += call_bibupload(converted_file + ".correct.xml", "-c")
                     uploaded = True
             if len(converted_files) > 0:
