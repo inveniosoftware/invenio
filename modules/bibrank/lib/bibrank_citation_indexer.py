@@ -73,11 +73,11 @@ def get_citation_weight(rank_method_code, config):
     #id option forces re-indexing a certain range even if there are no new recs
     if last_modified_records or task_get_option("id"):
         if task_get_option("id"):
-	    #construct a range of records to index
+            #construct a range of records to index
             id = task_get_option("id")
             first = id[0][0]
             last = id[0][1]
-	    #make range
+            #make range
             updated_recid_list = range(first, last)
         else:
             updated_recid_list = create_recordid_list(last_modified_records)
@@ -86,7 +86,7 @@ def get_citation_weight(rank_method_code, config):
                        str(len(last_modified_records))+" updates: "+ \
                        str(len(updated_recid_list)), sys.stderr)
 
-	#write_message("updated_recid_list: "+str(updated_recid_list), sys.stderr)
+        #write_message("updated_recid_list: "+str(updated_recid_list), sys.stderr)
         result_intermediate = last_updated_result(rank_method_code,
                                                   updated_recid_list)
         #result_intermed should be warranted to exists!
@@ -94,15 +94,15 @@ def get_citation_weight(rank_method_code, config):
         citation_list_intermediate = result_intermediate[1]
         reference_list_intermediate = result_intermediate[2]
         citation_informations = get_citation_informations(updated_recid_list, config)
-	#write_message("citation_informations: "+str(citation_informations),sys.stderr)
-	#create_analysis_tables() #temporary.. needed to test how much faster in-mem indexing is
+        #write_message("citation_informations: "+str(citation_informations),sys.stderr)
+        #create_analysis_tables() #temporary.. needed to test how much faster in-mem indexing is
         dic = ref_analyzer(citation_informations,
                            citation_weight_dic_intermediate,
                            citation_list_intermediate,
                            reference_list_intermediate,
                            config,updated_recid_list)
                     #dic is docid-numberofreferences like {1: 2, 2: 0, 3: 1}
-	#write_message("Docid-number of known references "+str(dic),sys.stderr)
+        #write_message("Docid-number of known references "+str(dic),sys.stderr)
         end_time = time.time()
         print "Total time of software: ", (end_time - begin_time)
     else:
@@ -223,7 +223,7 @@ def get_citation_informations(recid_list, config):
        examples: [ {} {} {} ]
                  [ { 93: ['astro-ph/9812088']},
                    { 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
-	NB: stuff here is for analysing new or changed records.
+        NB: stuff here is for analysing new or changed records.
         see "ref_analyzer" for more.
     """
     begin_time = os.times()[4]
@@ -322,7 +322,7 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
                 #print str(c)+" by "+str(cauthorlist)
                 for ca in cauthorlist:
                     if (ca in authorlist):
-			#found!
+                        #found!
                         if selfcites.has_key(k):
                             val = selfcites[k]
                             #add only if not there already
@@ -331,7 +331,7 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
                                     val.append(c)
                             selfcites[k] = val
                         else:
-			    #new key for selfcites
+                            #new key for selfcites
                             selfcites[k] = [c]
     return selfcites
 
@@ -435,7 +435,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     #debug: add ref lit to tmpcit
     #for k in reference_list.keys():
     #    li = reference_list[k]
-    #	for l in li:
+    #        for l in li:
     #   write_citer_cited(k,l)
 
     for recid, refnumbers in d_references_report_numbers.iteritems():
