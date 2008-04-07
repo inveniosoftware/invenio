@@ -68,7 +68,8 @@ from invenio.config import CFG_OAI_ID_FIELD, CFG_SITE_URL, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
      CFG_BIBUPLOAD_STRONG_TAGS
 
-from invenio.bibupload_config import *
+from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
+    CFG_BIBUPLOAD_SPECIAL_TAGS
 from invenio.dbquery import run_sql, \
                             Error
 from invenio.bibrecord import create_records, \
@@ -87,7 +88,8 @@ from invenio.config import CFG_WEBSUBMIT_FILEDIR, \
 from invenio.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
     task_update_progress, task_sleep_now_if_required
-from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format
+from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
+    get_docname_from_url, get_format_from_url, check_valid_url, download_url
 
 #Statistic variables
 stat = {}
@@ -691,38 +693,6 @@ def insert_record_bibrec_bibxxx(table_name, id_bibxxx,
             " function 2nd query : %s " % error, verbose=1, stream=sys.stderr)
     return res
 
-def download_url(url, format):
-    """Download a url (if it corresponds to a remote file) and return a local url
-    to it."""
-    protocol = urllib2.urlparse.urlsplit(url)[0]
-    (tmp, tmppath) = tempfile.mkstemp(suffix=format, dir=CFG_TMPDIR)
-    tmp = os.fdopen(tmp, 'w')
-    try:
-        if protocol in ('', 'file'):
-            path = urllib2.urlparse.urlsplit(url)[2]
-            for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS:
-                if path.startswith(allowed_path):
-                    tmp.write(open(path).read())
-                    return tmppath
-            raise StandardError, "%s is not in one of the allowed paths." % path
-        else:
-            tmp.write(urllib2.urlopen(url).read())
-            return tmppath
-    except Exception, e:
-        tmp.close()
-        os.remove(tmppath)
-        raise e
-
-def make_mark_url(recid, docname, format):
-    """Return a url valid to be used for MARC."""
-    return '%s/record/%s/files/%s%s' % (CFG_SITE_URL, recid, docname, format)
-
-def get_docname_from_url(url):
-    """Return a potential docname given a url"""
-    path = urllib2.urlparse.urlsplit(url)[2]
-    filename = os.path.split(path)[-1]
-    return file_strip_ext(filename)
-
 def elaborate_fft_tags(record, rec_id, mode):
     """
     Process FFT tags that should contain $a with file pathes or URLs
@@ -879,6 +849,10 @@ def elaborate_fft_tags(record, rec_id, mode):
             url = field_get_subfield_values(fft, 'a')
             if url:
                 url = url[0]
+                try:
+                    check_valid_url(url)
+                except StandardError, e:
+                    raise StandardError, "fft '%s' specify an url ('%s') with problems: %s" % (fft, url, e)
             else:
                 url = ''
             # Let's discover the description
@@ -896,8 +870,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                 if url:
                     name = get_docname_from_url(url)
                 else:
-                    write_message("fft '%s' doesn't specifies neither a url nor a name" % str(fft), stream=sys.stderr)
-                    break
+                    raise StandardError, "fft '%s' doesn't specifies neither a url nor a name" % str(fft)
 
             # Let's discover the desired new docname in case we want to change it
             newname = field_get_subfield_values(fft, 'm')
@@ -912,9 +885,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                 format = format[0]
             else:
                 if url:
-                    path = urllib2.urlparse.urlsplit(url)[2]
-                    filename = os.path.split(path)[-1]
-                    format = filename[len(file_strip_ext(filename)):]
+                    format = get_format_from_url(url)
                 else:
                     format = ''
 
@@ -924,6 +895,11 @@ def elaborate_fft_tags(record, rec_id, mode):
             icon = field_get_subfield_values(fft, 'x')
             if icon:
                 icon = icon[0]
+                if icon != 'KEEP-OLD-VALUE':
+                    try:
+                        check_valid_url(icon)
+                    except StandardError, e:
+                        raise StandardError, "fft '%s' specify an icon ('%s') with problems: %s" % (fft, icon, e)
             else:
                 icon = ''
 
@@ -950,23 +926,18 @@ def elaborate_fft_tags(record, rec_id, mode):
             if docs.has_key(name): # new format considered
                 (doctype2, newname2, restriction2, icon2, version2, urls) = docs[name]
                 if doctype2 != doctype:
-                    write_message("fft '%s' specifies a different doctype from previous fft with docname '%s'" % (str(fft), name), stream=sys.stderr)
-                    break
+                    raise StandardError, "fft '%s' specifies a different doctype from previous fft with docname '%s'" % (str(fft), name)
                 if newname2 != newname:
-                    write_message("fft '%s' specifies a different newname from previous fft with docname '%s'" % (str(fft), name), stream=sys.stderr)
-                    break
+                    raise StandardError, "fft '%s' specifies a different newname from previous fft with docname '%s'" % (str(fft), name)
                 if restriction2 != restriction:
-                    write_message("fft '%s' specifies a different restriction from previous fft with docname '%s'" % (str(fft), name), stream=sys.stderr)
-                    break
+                    raise StandardError, "fft '%s' specifies a different restriction from previous fft with docname '%s'" % (str(fft), name)
                 if icon2 != icon:
-                    write_message("fft '%x' specifies a different icon than the previous fft with docname '%s'" % (str(fft), name), stream=sys.stderr)
-                    break
+                    raise StandardError, "fft '%x' specifies a different icon than the previous fft with docname '%s'" % (str(fft), name)
                 if version2 != version:
-                    write_message("fft '%x' specifies a different version than the previous fft with docname '%s'" % (str(fft), name), stream=sys.stderr)
-                    break
+                    raise StandardError, "fft '%x' specifies a different version than the previous fft with docname '%s'" % (str(fft), name)
                 for (url2, format2) in urls:
                     if format == format2:
-                        write_message("fft '%s' specifies a second file '%s' with the same format '%s' from previous fft with docname '%s'" % (str(fft), url, format, name), stream=sys.stderr)
+                        raise StandardError, "fft '%s' specifies a second file '%s' with the same format '%s' from previous fft with docname '%s'" % (str(fft), url, format, name)
                 if url:
                     urls.append((url, format))
             else:
@@ -995,8 +966,8 @@ def elaborate_fft_tags(record, rec_id, mode):
         for docname, (doctype, newname, restriction, icon, version, urls) in docs.iteritems():
             write_message("Elaborating olddocname: '%s', newdocname: '%s', doctype: '%s', restriction: '%s', icon: '%s', urls: '%s', mode: '%s'" % (docname, newname, doctype, restriction, icon, urls, mode), verbose=9)
             if mode in ('insert', 'replace'): # new bibdocs, new docnames, new marc
-                if newname in bibrecdocs.get_bibdoc_names(doctype):
-                    write_message("('%s', '%s', '%s') not inserted because docname already exists." % (doctype, newname, urls), stream=sys.stderr)
+                if newname in bibrecdocs.get_bibdoc_names():
+                    write_message("('%s', '%s') not inserted because docname already exists." % (newname, urls), stream=sys.stderr)
                     break
                 try:
                     bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
@@ -1043,18 +1014,17 @@ def elaborate_fft_tags(record, rec_id, mode):
                             if urls:
                                 (first_url, first_format) = urls[0]
                                 other_urls = urls[1:]
-                                if not _add_new_version(bibdoc, first_url, first_format, docname, doctype, newname):
-                                    continue
+                                assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname))
                                 for (url, format) in other_urls:
-                                    _add_new_format(bibdoc, url, format, docname, doctype, newname)
+                                    assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
                         if icon != 'KEEP-OLD-VALUE':
-                            _add_new_icon(bibdoc, icon, restriction)
+                            assert(_add_new_icon(bibdoc, icon, restriction))
                 if not found_bibdoc:
                     bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
                     for (url, format) in urls:
-                        _add_new_format(bibdoc, url, format, docname, doctype, newname)
+                        assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
                     if icon and not icon == 'KEEP-OLD-VALUE':
-                        _add_new_icon(bibdoc, icon, restriction)
+                        assert(_add_new_icon(bibdoc, icon, restriction))
             elif mode == 'correct':
                 super_break = False
                 for bibdoc in bibrecdocs.list_bibdocs():
@@ -1091,31 +1061,31 @@ def elaborate_fft_tags(record, rec_id, mode):
                             if urls:
                                 (first_url, first_format) = urls[0]
                                 other_urls = urls[1:]
-                                if not _add_new_version(bibdoc, first_url, first_format, docname, doctype, newname):
-                                    continue
+                                assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname))
                                 for (url, format) in other_urls:
-                                    _add_new_format(bibdoc, url, format, docname, description, doctype, newname)
+                                    assert(_add_new_format(bibdoc, url, format, docname, description, doctype, newname))
                         if icon != 'KEEP-OLD-VALUE':
                             _add_new_icon(bibdoc, icon, restriction)
                 if not found_bibdoc:
                     write_message("('%s', '%s', '%s') not added because '%s' docname didn't existed." % (doctype, newname, urls, docname), stream=sys.stderr)
+                    raise StandardError
             elif mode == 'append':
                 found_bibdoc = False
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == docname:
                         found_bibdoc = True
                         for (url, format) in urls:
-                            _add_new_format(bibdoc, url, format, docname, doctype, newname)
+                            assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
                         if icon not in ('', 'KEEP-OLD-VALUE'):
-                            _add_new_icon(bibdoc, icon, restriction)
+                            assert(_add_new_icon(bibdoc, icon, restriction))
                 if not found_bibdoc:
                     try:
                         bibdoc = bibrecdocs.add_bibdoc(doctype, docname)
                         bibdoc.set_status(restriction)
                         for (url, format) in urls:
-                            _add_new_format(bibdoc, url, format, docname, doctype, newname)
+                            assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
                         if icon and not icon == 'KEEP-OLD-VALUE':
-                            _add_new_icon(bibdoc, icon, restriction)
+                            assert(_add_new_icon(bibdoc, icon, restriction))
                     except Exception, e:
                         write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
                         raise
