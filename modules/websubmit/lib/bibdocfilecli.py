@@ -25,16 +25,23 @@ BibDocAdmin CLI administration tool
 
 __revision__ = "$Id$"
 
+import sys
+import os
+import time
 from optparse import OptionParser, OptionGroup
+from tempfile import mkstemp
+
+from invenio.config import CFG_TMPDIR
 from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioWebSubmitFileError, \
-    nice_size
+    nice_size, check_valid_url, clean_url, get_docname_from_url, get_format_from_url
 from invenio.intbitset import intbitset
 from invenio.search_engine import perform_request_search
 from invenio.textutils import wrap_text_in_a_box, wait_for_user
 from invenio.dbquery import run_sql
+from invenio.bibtask import task_low_level_submission
 
 def _xml_mksubfield(key, subfield, fft):
-    return fft.has_key(key) and '\t\t<subfield code="a">%s</subfield>\n' % fft[key] or ''
+    return fft.get(key, None) and '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, fft[key]) or ''
 
 def _xml_fft_creator(fft):
     """Transform an fft dictionary (made by keys url, docname, format,
@@ -50,10 +57,10 @@ def _xml_fft_creator(fft):
     out += _xml_mksubfield('comment', 'c', fft)
     out += _xml_mksubfield('restriction', 'r', fft)
     out += _xml_mksubfield('icon', 'x', fft)
-    out += '\t</datafield>'
+    out += '\t</datafield>\n'
     return out
 
-def ffts_to_xmls(ffts):
+def ffts_to_xml(ffts):
     """Transform a dictionary: recid -> ffts where ffts is a list of fft dictionary
     into xml.
     """
@@ -70,9 +77,8 @@ def get_usage():
     """Return a nicely formatted string for printing the help of bibdocadmin"""
     return """usage: %prog <query> <action> [options]
   <query>: --pattern <pattern>, --collection <collection>, --recid <recid>,
-           --recid2 <recid>, --doctype <doctype>, --docid <docid>,
-           --docid2 <docid>, --docname <docname>, --revision <revision>,
-           --format <format>, --url <url>,
+           --recid2 <recid>, --docid <docid>,
+           --docid2 <docid>, --docname <docname>,
  <action>: --get-info, --get-stats, --get-usage, --get-docnames
            --get-docids, --get-recids, --get-doctypes, --get-revisions,
            --get-last-revisions, --get-formats, --get-comments,
@@ -124,7 +130,7 @@ _actions_with_parameter = {
     #'set-comment' : 'comment',
     #'set-description' : 'description',
     #'set-restriction' : 'restriction',
-    #'append' : 'append_path',
+    'append' : 'append_path',
     #'revise' : 'revise_path',
 }
 
@@ -147,9 +153,13 @@ takes precedence over pattern/collection search.""",
     query_options.add_option('-d', '--docid', type='int', dest='docid')
     query_options.add_option('--docid2', type='int', dest='docid2')
     query_options.add_option('--docname', dest='docname')
-    query_options.add_option('--url', dest='url')
-    query_options.add_option('--revision', dest='revision', default='last')
+    query_options.add_option('--doctype', dest='doctype')
     query_options.add_option('--format', dest='format')
+    query_options.add_option('--icon', dest='icon')
+    query_options.add_option('--description', dest='description')
+    query_options.add_option('--comment', dest='comment')
+    query_options.add_option('--restriction', dest='restriction')
+
     parser.add_option_group(query_options)
     action_options = OptionGroup(parser, 'Actions')
     for action in _actions:
@@ -158,7 +168,7 @@ takes precedence over pattern/collection search.""",
     action_with_parameters = OptionGroup(parser, 'Actions with parameter')
     for action, dest in _actions_with_parameter.iteritems():
         action_with_parameters.add_option('--%s' % action, dest=dest)
-    #parser.add_option_group(action_with_parameters)
+    parser.add_option_group(action_with_parameters)
     parser.add_option('-v', '--verbose', type='int', dest='verbose', default=1)
     return parser
 
@@ -219,6 +229,69 @@ def get_docids_from_query(recid_set, docid, docid2):
 def print_info(recid, docid, info):
     """Nicely print info about a recid, docid pair."""
     print '%i:%i:%s' % (recid, docid, info)
+
+def cli_append(recid=None, docid=None, docname=None, doctype=None, url=None, format=None, icon=None, description=None, comment=None, restriction=None):
+    """Create a bibupload FFT task submission for appending a format."""
+    if docid is not None:
+        bibdoc = BibDoc(docid)
+        if recid is not None and recid != bibdoc.get_recid():
+            print >> sys.stderr, "Provided recid %i is not linked with provided docid %i" % (recid, docid)
+            return False
+        if docname is not None and docname != bibdoc.get_docname():
+            print >> sys.stderr, "Provided docid %i is not named as the provided docname %s" % (docid, docname)
+            return False
+        recid = bibdoc.get_recid()
+        docname = bibdoc.get_docname()
+    elif recid is None:
+        print >> sys.stderr, "Not enough information to identify the record and desired document"
+        return False
+    try:
+        url = clean_url(url)
+        check_valid_url(url)
+    except StandardError, e:
+        print >> sys.stderr, "Not a valid url has been specified: %s" % e
+        return False
+    if docname is None:
+        docname = get_docname_from_url(url)
+    if not docname:
+        print >> sys.stderr, "Not enough information to decide a docname!"
+        return False
+    if format is None:
+        format = get_format_from_url(url)
+    if not format:
+        print >> sys.stderr, "Not enough information to decide a format!"
+        return False
+    if icon is None:
+        icon = 'KEEP-OLD-VALUE'
+    elif icon != 'KEEP-OLD-VALUE':
+        try:
+            icon = clean_url(icon)
+            check_valid_url(url)
+        except StandardError, e:
+            print >> sys.stderr, "Not a valid url has been specified for the icon: %s" % e
+            return False
+    if doctype is None:
+        doctype = 'Main'
+
+    fft = {
+        'url' : url,
+        'docname' : docname,
+        'format' :format,
+        'icon' : icon,
+        'comment' : comment,
+        'description' : description,
+        'restriction' : restriction,
+        'doctype' : doctype
+    }
+    ffts = {recid : [fft]}
+    xml = ffts_to_xml(ffts)
+    print xml
+    tmp_file = os.path.join(CFG_TMPDIR, "bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"))
+    open(tmp_file, 'w').write(xml)
+    wait_for_user("This will be appended via BibUpload")
+    task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file, '-v9')
+    print "BibUpload append submitted with id %s" % task
+    return False
 
 def cli_get_history(docid_set):
     """Print the history of a docid_set."""
@@ -303,6 +376,13 @@ def main():
         cli_check_md5(docid_set)
     elif options.action == 'update-md5':
         cli_update_md5(docid_set)
+    elif options.append_path:
+        res = cli_append(options.recid, options.docid, options.docname, options.doctype, options.append_path, options.format, options.icon, options.description, options.comment, options.restriction)
+        if not res:
+            sys.exit(1)
+    else:
+        print >> sys.stderr, "Action %s is not valid" % options.action
+        sys.exit(1)
 
 if __name__=='__main__':
     main()
