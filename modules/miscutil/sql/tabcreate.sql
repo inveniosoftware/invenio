@@ -2150,15 +2150,17 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
   object_name varchar(255) NOT NULL,
   object_value longblob,
   last_updated datetime NOT NULL default '0000-00-00',
-  PRIMARY KEY object_name (object_name)
+  PRIMARY KEY id (id),
+  UNIQUE KEY object_name (object_name)
 ) TYPE=MyISAM;
 
 
--- a table for missing citations. This should be scanned by a
--- program occasionally to check if some publication has been
--- cited more than 50 times (or such): record for that should
--- be created
--- id_bibrec is the id of the record. extcitepubinfo is publication inf
+-- a table for missing citations. This should be scanned by a program
+-- occasionally to check if some publication has been cited more than
+-- 50 times (or such), and alert cataloguers to create record for that
+-- external citation
+-- 
+-- id_bibrec is the id of the record. extcitepubinfo is publication info
 -- that looks in general like hep-th/0112088
 CREATE TABLE IF NOT EXISTS rnkCITATIONDATAEXT (
   id_bibrec int(8) unsigned,
