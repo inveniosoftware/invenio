@@ -3026,7 +3026,7 @@ class Template:
                       'msg_recs': _("Total number of papers analyzed:"),
                       'nb_recs': totalrecs,
                       'msg_cites': _("Total number of citations:"),
-                      'msg_avgcit': _("Average citations per record:"),
+                      'msg_avgcit': _("Average citations per paper:"),
                       'nb_cites': totalcites,
                       'nb_avgcit': avgstr,
                       'msg_breakdown': _("Breakdown of papers by citations:"),}
