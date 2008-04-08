@@ -601,6 +601,12 @@ INSERT INTO collection_format VALUES (1,2,90);
 INSERT INTO collection_format VALUES (1,3,80);
 INSERT INTO collection_format VALUES (1,4,70);
 INSERT INTO collection_format VALUES (1,5,60);
+INSERT INTO collection_format VALUES (15,1,100);
+INSERT INTO collection_format VALUES (15,2,90);
+INSERT INTO collection_format VALUES (15,18,85);
+INSERT INTO collection_format VALUES (15,3,80);
+INSERT INTO collection_format VALUES (15,4,70);
+INSERT INTO collection_format VALUES (15,5,60);
 
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,1,'en','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,2,'en','rt',90);
