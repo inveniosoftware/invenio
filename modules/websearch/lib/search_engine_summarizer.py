@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+## $Id$
 
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
@@ -17,21 +18,22 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+Search Engine Summarizer, producing summary formats such as citesummary.
+The main API is summarize_records().
+"""
 
-"""CDS Invenio Search Engine Summarizer: Produce summary formats,
-   like CiteSummary"""
+__lastupdated__ = """$Date$"""
 
-__lastupdated__ = """ """
-
-__revision__ = " "
+__revision__ = "$Id$"
 
 from invenio.bibrank_citation_searcher import get_cited_by_list
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 
-def summarize(recids, of, ln):
+def summarize_records(recids, of, ln):
     """Produces a report in the format defined by of in language ln"""
-    if of == 'hbcs':
+    if of == 'hcs':
         #this is a html cite summary
         citedbylist = get_cited_by_list(recids)
         return print_citation_summary_html(citedbylist, ln)
@@ -40,22 +42,18 @@ def summarize(recids, of, ln):
         citedbylist = get_cited_by_list(recids)
         return print_citation_summary_xml(citedbylist)
 
+CFG_CITESUMMARY_THRESHOLD_NAMES = [(0, 0, 'Unknown papers (0)'),
+                                   (1, 9, 'Less known papers (1-9)'),
+                                   (10, 49, 'Known papers (10-49)'),
+                                   (50, 99, 'Well-known papers (50-99)'),
+                                   (100, 249, 'Very well-known papers (100-249)'),
+                                   (250, 499, 'Famous papers (250-499)'),
+                                   (500, 1000000, 'Renowned papers (500+)'),]
 
-tresholdsNames = [    (500, 1000000,'Renowned papers (500+)'),
-		      (250, 499,'Famous papers (250-499)'),
-		      (100, 249,'Very well-known papers (100-249)'),
-		      (50, 99,'Well-known papers (50-99)'),
-		      (10, 49,'Known papers (10-49)'),
-                      (1, 9,'Less known papers (0-9)'),
-		      (0, 0,'Unknown papers (0)')
-]
-
-
-
-#for citation summary, code xcs/hbcs (unless changed)
+#for citation summary, code xcs/hcs (unless changed)
 def print_citation_summary_xml(citedbylist):
     """Prints citation summary in xml."""
-    alldict = calculate_citations(tresholdsNames, citedbylist)
+    alldict = calculate_citations(citedbylist)
     avgstr = str(alldict['avgcites'])
     totalcites = str(alldict['totalcites'])
     #format avg so that it does not span 10 digits
@@ -64,7 +62,7 @@ def print_citation_summary_xml(citedbylist):
     #output formatting
     outp = "<citationsummary records=\""+str(len(citedbylist))
     outp += "\" citations=\""+str(totalcites)+"\">"
-    for low, high, name in tresholdsNames:
+    for low, high, name in CFG_CITESUMMARY_THRESHOLD_NAMES:
         #get the name, print the value
         if reciddict.has_key(name):
             recs = reciddict[name]
@@ -79,7 +77,7 @@ def print_citation_summary_xml(citedbylist):
 def print_citation_summary_html(citedbylist, ln, criteria=""):
     """Prints citation summary in html.
        The criteria, if any, is added to the link"""
-    alldict = calculate_citations(tresholdsNames, citedbylist)
+    alldict = calculate_citations(citedbylist)
     avgstr = str(alldict['avgcites'])
     totalcites = str(alldict['totalcites'])
     #format avg so that it does not span 10 digits
@@ -89,11 +87,11 @@ def print_citation_summary_html(citedbylist, ln, criteria=""):
                                                      totalcites, avgstr,
                                                      reciddict)
 
-def calculate_citations(tresholdsNames, citedbylist):
+def calculate_citations(citedbylist):
     """calculates records in classes of citations
-       defined by tresholds. returns a dictionary that
+       defined by thresholds. returns a dictionary that
        contains total, avg, records and a dictionary
-       of treshold names and number corresponding to it"""
+       of threshold names and number corresponding to it"""
     totalcites = 0
     avgcites = 0
     reciddict = {}
@@ -102,8 +100,8 @@ def calculate_citations(tresholdsNames, citedbylist):
         if cites:
             numcites = len(cites)
         totalcites = totalcites + numcites
-        #take the numbers in tresholdsNames
-        for low, high, name in tresholdsNames:
+        #take the numbers in CFG_CITESUMMARY_THRESHOLD_NAMES
+        for low, high, name in CFG_CITESUMMARY_THRESHOLD_NAMES:
             if (numcites >= low) and (numcites <= high):
                 if reciddict.has_key(name):
                     tmp = reciddict[name]

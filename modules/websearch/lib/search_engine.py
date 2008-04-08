@@ -53,6 +53,7 @@ from invenio.config import \
      CFG_LOGDIR, \
      CFG_SITE_URL
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES, InvenioWebSearchUnknownCollectionError
+from invenio.search_engine_summarizer import summarize_records
 from invenio.bibrecord import create_records, record_get_field_value, record_get_field_values
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
@@ -3857,57 +3858,61 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             if of.startswith("x"):
                 req.write("<!-- Search-Engine-Total-Number-Of-Results: %s -->\n" % results_final_nb_total)
             # print records:
-            if len(colls_to_search)>1:
-                cpu_time = -1 # we do not want to have search time printed on each collection
-            print_records_prologue(req, of)
-            for coll in colls_to_search:
-                if results_final.has_key(coll) and len(results_final[coll]):
-                    if of.startswith("h"):
-                        req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
-                                                    jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
-                                                    sc, pl_in_url,
-                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
-                    results_final_recIDs = list(results_final[coll])
-                    results_final_relevances = []
-                    results_final_relevances_prologue = ""
-                    results_final_relevances_epilogue = ""
-                    if sf: # do we have to sort?
-                        results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of)
-                    elif rm: # do we have to rank?
-                        results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
-                                                     rank_records(rm, 0, results_final[coll],
-                                                                  string.split(p) + string.split(p1) +
-                                                                  string.split(p2) + string.split(p3), verbose)
+            if of in ['hcs']:
+                req.write(summarize_records(results_final_for_all_selected_colls, 'hcs', ln))
+            else:
+                if len(colls_to_search)>1:
+                    cpu_time = -1 # we do not want to have search time printed on each collection
+                print_records_prologue(req, of)
+                for coll in colls_to_search:
+                    if results_final.has_key(coll) and len(results_final[coll]):
                         if of.startswith("h"):
-                            print_warning(req, results_final_comments)
-                        if results_final_recIDs_ranked:
-                            results_final_recIDs = results_final_recIDs_ranked
-                        else:
-                            # rank_records failed and returned some error message to display:
-                            print_warning(req, results_final_relevances_prologue)
-                            print_warning(req, results_final_relevances_epilogue)
-                    print_records(req, results_final_recIDs, jrec, rg, of, ot, ln,
-                                  results_final_relevances,
-                                  results_final_relevances_prologue,
-                                  results_final_relevances_epilogue,
-                                  search_pattern=p,
-                                  print_records_prologue_p=False,
-                                  print_records_epilogue_p=False,
-                                  verbose=verbose)
-                    if of.startswith("h"):
-                        req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
-                                                    jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
-                                                    sc, pl_in_url,
-                                                    d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
-            print_records_epilogue(req, of)
-            if f == "author" and of.startswith("h"):
-                req.write(create_similarly_named_authors_link_box(p, ln))
+                            req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
+                                                        jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                        sc, pl_in_url,
+                                                        d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time))
+                        results_final_recIDs = list(results_final[coll])
+                        results_final_relevances = []
+                        results_final_relevances_prologue = ""
+                        results_final_relevances_epilogue = ""
+                        if sf: # do we have to sort?
+                            results_final_recIDs = sort_records(req, results_final_recIDs, sf, so, sp, verbose, of)
+                        elif rm: # do we have to rank?
+                            results_final_recIDs_ranked, results_final_relevances, results_final_relevances_prologue, results_final_relevances_epilogue, results_final_comments = \
+                                                         rank_records(rm, 0, results_final[coll],
+                                                                      string.split(p) + string.split(p1) +
+                                                                      string.split(p2) + string.split(p3), verbose)
+                            if of.startswith("h"):
+                                print_warning(req, results_final_comments)
+                            if results_final_recIDs_ranked:
+                                results_final_recIDs = results_final_recIDs_ranked
+                            else:
+                                # rank_records failed and returned some error message to display:
+                                print_warning(req, results_final_relevances_prologue)
+                                print_warning(req, results_final_relevances_epilogue)
+                        print_records(req, results_final_recIDs, jrec, rg, of, ot, ln,
+                                      results_final_relevances,
+                                      results_final_relevances_prologue,
+                                      results_final_relevances_epilogue,
+                                      search_pattern=p,
+                                      print_records_prologue_p=False,
+                                      print_records_epilogue_p=False,
+                                      verbose=verbose)
+                        if of.startswith("h"):
+                            req.write(print_search_info(p, f, sf, so, sp, rm, of, ot, coll, results_final_nb[coll],
+                                                        jrec, rg, as, ln, p1, p2, p3, f1, f2, f3, m1, m2, m3, op1, op2,
+                                                        sc, pl_in_url,
+                                                        d1y, d1m, d1d, d2y, d2m, d2d, dt, cpu_time, 1))
+                print_records_epilogue(req, of)
+                if f == "author" and of.startswith("h"):
+                    req.write(create_similarly_named_authors_link_box(p, ln))
             # log query:
             try:
                 id_query = log_query(req.get_remote_host(), req.args, uid)
                 if of.startswith("h") and id_query:
-                    # Alert/RSS teaser:
-                    req.write(websearch_templates.tmpl_alert_rss_teaser_box_for_query(id_query, ln=ln))
+                    if not of in ['hcs']:
+                        # display aalert/RSS teaser for non-summary formats:
+                        req.write(websearch_templates.tmpl_alert_rss_teaser_box_for_query(id_query, ln=ln))
             except:
                 # do not log query if req is None (used by CLI interface)
                 pass
@@ -3915,7 +3920,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
 
     # External searches
     if of.startswith("h"):
-        perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
+        if not of in ['hcs']:
+            perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
 
     return page_end(req, of, ln)
 

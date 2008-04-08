@@ -76,7 +76,7 @@ from invenio.intbitset import intbitset
 from invenio.bibupload import find_record_from_sysno
 from invenio.bibrank_citation_searcher import get_author_cited_by, get_cited_by_list
 from invenio.bibrank_downloads_indexer import get_download_weight_total
-from invenio.search_engine_summarizer import summarize
+from invenio.search_engine_summarizer import summarize_records
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -213,7 +213,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                                     citedbylist, kwtuples, authors, vtuples, ln)
 
         #cited-by summary
-        out = summarize(pubs, 'hbcs', ln)
+        out = summarize_records(pubs, 'hcs', ln)
         req.write(out)
 
         simauthbox = search_engine.create_similarly_named_authors_link_box(self.authorname)
