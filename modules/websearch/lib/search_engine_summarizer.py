@@ -79,11 +79,12 @@ def print_citation_summary_html(citedbylist, ln, criteria=""):
        The criteria, if any, is added to the link"""
     alldict = calculate_citations(citedbylist)
     avgstr = str(alldict['avgcites'])
+    totalrecs = str(alldict['records'])
     totalcites = str(alldict['totalcites'])
     #format avg so that it does not span 10 digits
     avgstr = avgstr[0:4]
     reciddict = alldict['reciddict']
-    return websearch_templates.tmpl_citesummary_html(ln,
+    return websearch_templates.tmpl_citesummary_html(ln, totalrecs,
                                                      totalcites, avgstr,
                                                      reciddict)
 

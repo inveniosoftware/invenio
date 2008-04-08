@@ -3003,21 +3003,34 @@ class Template:
 
         return out
 
-    def tmpl_citesummary_html(self, ln, totalcites, avgstr, reciddict):
-        """A template for citation summary -- output in HTML.
+    def tmpl_citesummary_html(self, ln, totalrecs, totalcites, avgstr, reciddict):
+        """A template for citation summary output in HTML.
            Parameters:
                - ln *string* = language,
-               - totalcites *string* = total number of citations,
-               - avgstr *string* = average number of citations per records,
+               - totalrecs *string* = total number of records analyzed
+               - totalcites *string* = total number of citations
+               - avgstr *string* = average number of citations per records
                - reciddict is a dictionary as follows:
-                   "string description of the citation class" -> [id1,id2,..] """
+                   'string description of the citation class' -> [id1,id2,..]
+        """
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = "<table>"+ \
-            "<tr><td>"+"<strong>"+_("Citation summary")+"</strong></td><td></td></tr>" + \
-            "<tr><td>"+"<strong>"+_("Citations")+"</strong></td><td>"+totalcites+"</td></tr>" + \
-            "<tr><td>"+"<strong>"+_("Avg cit per record")+"</strong></td><td>"+avgstr+"</td></tr>"
+        out = """<table>
+                 <tr><td><strong class="headline">%(msg_title)s</strong></td><td></td></tr>
+                 <tr><td><strong>%(msg_recs)s</strong></td><td>%(nb_recs)s</td></tr>
+                 <tr><td><strong>%(msg_cites)s</strong></td><td>%(nb_cites)s</td></tr>
+                 <tr><td><strong>%(msg_avgcit)s</strong></td><td>%(nb_avgcit)s</td></tr>
+                 <tr><td><strong>%(msg_breakdown)s</strong></td><td></td></tr>
+              """ % { 'msg_title': _("Citation summary results"),
+                      'msg_recs': _("Total number of papers analyzed:"),
+                      'nb_recs': totalrecs,
+                      'msg_cites': _("Total number of citations:"),
+                      'msg_avgcit': _("Average citations per record:"),
+                      'nb_cites': totalcites,
+                      'nb_avgcit': avgstr,
+                      'msg_breakdown': _("Breakdown of papers by citations:"),}
+
         #print the stuff in reciddict
         for k in reciddict.keys():
             rowtitle = k
