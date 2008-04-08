@@ -26,6 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio.config import CFG_SITE_URL
+from invenio.dbquery import run_sql
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
 
@@ -90,9 +91,61 @@ class BibRankCitationRankingTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?cc=Articles+%26+Preprints&p=Klebanov&rm=citation&verbose=2',
                                                expected_text="find_citations retlist [[85, 0], [77, 2], [84, 3]]"))
 
+class BibRankExtCitesTest(unittest.TestCase):
+    """Check BibRank citation ranking tools with respect to the external cites."""
+
+    def _detect_extcite_info(self, extcitepubinfo):
+        """
+        Helper function to return list of recIDs citing given
+        extcitepubinfo.  Could be move to the business logic, if
+        interesting for other callers.
+        """
+        res = run_sql("""SELECT id_bibrec FROM rnkCITATIONDATAEXT
+                          WHERE extcitepubinfo=%s""",
+                      (extcitepubinfo,))
+        return [int(x[0]) for x in res]
+
+    def test_extcite_via_report_number(self):
+        """bibrank - external cites, via report number"""
+        # The external paper hep-th/0112258 is cited by 9 demo
+        # records: you can find out via 999:"hep-th/0112258", and we
+        # could eventually automatize this query, but it is maybe
+        # safer to leave it manual in case queries fail for some
+        # reason.
+        test_case_repno = "hep-th/0112258"
+        test_case_repno_cited_by = [77, 78, 81, 82, 85, 86, 88, 90, 91]
+        self.assertEqual(self._detect_extcite_info(test_case_repno),
+                         test_case_repno_cited_by)
+
+    def test_extcite_via_publication_reference(self):
+        """bibrank - external cites, via publication reference"""
+        # The external paper "J. Math. Phys. 4 (1963) 915" does not
+        # have any report number, and is cited by 1 demo record.
+        test_case_pubinfo = "J. Math. Phys. 4 (1963) 915"
+        test_case_pubinfo_cited_by = [90]
+        self.assertEqual(self._detect_extcite_info(test_case_pubinfo),
+                         test_case_pubinfo_cited_by)
+
+    def test_intcite_via_report_number(self):
+        """bibrank - external cites, no internal papers via report number"""
+        # The internal paper hep-th/9809057 is cited by 2 demo
+        # records, but it also exists as a demo record, so it should
+        # not be found in the extcite table.
+        test_case_repno = "hep-th/9809057"
+        test_case_repno_cited_by = []
+        self.assertEqual(self._detect_extcite_info(test_case_repno),
+                         test_case_repno_cited_by)
+
+    def test_intcite_via_publication_reference(self):
+        """bibrank - external cites, no internal papers via publication reference"""
+        # FIXME: do we have an internal paper having only pubinfo, no
+        # repno, that is cited by some demo records via its pubinfo?
+        self.fail("SKIPPED: Not yet implemented.")
+
 TEST_SUITE = make_test_suite(BibRankWebPagesAvailabilityTest,
                              BibRankWordSimilarityRankingTest,
-                             BibRankCitationRankingTest)
+                             BibRankCitationRankingTest,
+                             BibRankExtCitesTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
