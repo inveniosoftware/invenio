@@ -51,7 +51,7 @@ def format(bfo, var=''):
         out = CFG_SITE_ADMIN_EMAIL
     elif var in ['support_email', 'CFG_SITE_SUPPORT_EMAIL']:
         out = CFG_SITE_SUPPORT_EMAIL
-    elif var == 'CFG_SITE_URL':
+    elif var in ['weburl', 'CFG_SITE_URL']:
         out = CFG_SITE_URL
         if not out.endswith('/'):
             out += '/'
