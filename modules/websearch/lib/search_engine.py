@@ -3852,8 +3852,9 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                         recIDs = results_final_for_all_colls_rank_records_output[0]
                 return recIDs
             elif of.startswith("h"):
-                req.write(print_results_overview(req, colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln, ec))
-                selected_external_collections_infos = print_external_results_overview(req, cc, [p, p1, p2, p3], f, ec, verbose, ln)
+                if of not in ['hcs']:
+                    req.write(print_results_overview(req, colls_to_search, results_final_nb_total, results_final_nb, cpu_time, ln, ec))
+                    selected_external_collections_infos = print_external_results_overview(req, cc, [p, p1, p2, p3], f, ec, verbose, ln)
             # print number of hits found for XML outputs:
             if of.startswith("x"):
                 req.write("<!-- Search-Engine-Total-Number-Of-Results: %s -->\n" % results_final_nb_total)
