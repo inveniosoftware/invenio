@@ -546,8 +546,13 @@ def cli_cmd_create_demo_site(conf):
     from invenio.config import CFG_PREFIX
     from invenio.dbquery import run_sql
     run_sql("TRUNCATE schTASK")
-    for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/democfgdata.sql" % (CFG_PREFIX, CFG_PREFIX),
-                "%s/bin/webaccessadmin -u admin -c -r -D" % CFG_PREFIX,
+    for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/democfgdata.sql" % \
+                   (CFG_PREFIX, CFG_PREFIX),]:
+        if os.system(cmd):
+            print "ERROR: failed execution of", cmd
+            sys.exit(1)
+    cli_cmd_reset_fieldnames(conf) # needed for I18N demo ranking method names
+    for cmd in ["%s/bin/webaccessadmin -u admin -c -r -D" % CFG_PREFIX,
                 "%s/bin/webcoll -u admin" % CFG_PREFIX,
                 "%s/bin/webcoll 1" % CFG_PREFIX,]:
         if os.system(cmd):
