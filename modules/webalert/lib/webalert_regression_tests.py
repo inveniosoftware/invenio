@@ -56,7 +56,7 @@ class WebAlertHTMLToTextTest(unittest.TestCase):
 
         self.assertEqual("High energy cosmic rays striking atoms at the top of the atmosphere give the rise to showers of particles striking the Earth's surface \nDes rayons cosmiques de haute energie heurtent des atomes dans la haute atmosphere et donnent ainsi naissance a des gerbes de particules projetees sur la surface terrestre  \n 10 May 1999        \nPicture number: CERN-DI-9905005", get_as_text(5))
 
-        self.assertEqual("Introducion to Nuclear Physics: course; 2006 ed.  / Chomaz, P      \nAtomic nuclei are made of nucleons, protons and neutrons, composed by quarks strongly interacting via gluons. [...]   \nExternal links: Fulltext : <Talk 06 Jul 2006>; Fulltext : <Talk 06 Jul 2006>; Fulltext : <Talk 07 Jul 2006>; Fulltext : <Talk 07 Jul 2006>; Fulltext : <Talk 10 Jul 2006>; Fulltext : <Talk 10 Jul 2006>; Fulltext : <Talk 11 Jul 2006>; Fulltext : <More information>", get_as_text(97))
+        self.assertEqual("Quasinormal modes of Reissner-Nordstrom Anti-de Sitter Black Holes  / Wang, B ; Lin, C Y ; Abdalla, E     [hep-th/0003295]   \nComplex frequencies associated with quasinormal modes for large Reissner-Nordstr$\\ddot{o}$m Anti-de Sitter black holes have been computed. [...]   \nFulltext: Fulltext : <PDF>; Fulltext : <PS.GZ> (Fulltext : <additional files>)", get_as_text(74))
 
 
 TEST_SUITE = make_test_suite(WebAlertWebPagesAvailabilityTest,
