@@ -61,6 +61,18 @@ class BibRankWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
+class BibRankIntlMethodNames(unittest.TestCase):
+    """Check BibRank I18N ranking method names."""
+
+    def test_i18n_ranking_method_names(self):
+        """bibrank - I18N ranking method names"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/collection/Articles%20%26%20Preprints?as=1',
+                                               expected_text="times cited"))
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/collection/Articles%20%26%20Preprints?as=1',
+                                               expected_text="journal impact factor"))
+
 class BibRankWordSimilarityRankingTest(unittest.TestCase):
     """Check BibRank word similarity ranking tools."""
 
@@ -143,6 +155,7 @@ class BibRankExtCitesTest(unittest.TestCase):
         self.fail("SKIPPED: Not yet implemented.")
 
 TEST_SUITE = make_test_suite(BibRankWebPagesAvailabilityTest,
+                             BibRankIntlMethodNames,
                              BibRankWordSimilarityRankingTest,
                              BibRankCitationRankingTest,
                              BibRankExtCitesTest)
