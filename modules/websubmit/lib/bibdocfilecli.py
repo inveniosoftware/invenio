@@ -137,14 +137,8 @@ _actions_with_parameter = {
 def prepare_option_parser():
     """Parse the command line options."""
     parser = OptionParser(usage="usage: %prog <query> <action> [options]",
-    epilog="""With <query> you select the range of record/docnames/single files to work on.
-Note that some actions e.g. delete, append, revise etc. works at the docname
-level, while others like --set-comment, --set-description, at single file level
-and other can be applied in an iterative way to many records in a single run.
-
-Note that specifing docid(2) takes precedence over recid(2) which in turns
-takes precedence over pattern/collection search.""",
- version=__revision__)
+    #epilog="""With <query> you select the range of record/docnames/single files to work on. Note that some actions e.g. delete, append, revise etc. works at the docname level, while others like --set-comment, --set-description, at single file level and other can be applied in an iterative way to many records in a single run. Note that specifing docid(2) takes precedence over recid(2) which in turns takes precedence over pattern/collection search.""",
+        version=__revision__)
     query_options = OptionGroup(parser, 'Query parameters')
     query_options.add_option('-p', '--pattern', dest='pattern')
     query_options.add_option('-c', '--collection', dest='collection')
