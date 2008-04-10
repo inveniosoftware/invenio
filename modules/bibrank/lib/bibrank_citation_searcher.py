@@ -52,7 +52,7 @@ def get_cited_by(recordid):
     """Return a list of records that cite recordid"""
     citation_dic = {} #one should always init variables
     query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"
-    compressed_citation_dic = run_sql(query)
+    compressed_citation_dic = run_sql_cached(query)
     if compressed_citation_dic and compressed_citation_dic[0]:
         try:
             citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
