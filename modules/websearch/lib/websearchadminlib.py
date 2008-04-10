@@ -3232,9 +3232,10 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         if bfe_references.format(bfo, '', '') == '':
             tabs['references']['enabled'] = False
         # Disable citations if not citations found
-        if len(get_cited_by(recID)) == 0:
-            # TODO: Also check for cocitations
-            tabs['citations']['enabled'] = False
+        #Will be done later since reading the dictionary in get_cited_by is too slow..
+        #if len(get_cited_by(recID)) == 0:
+        #    # TODO: Also check for cocitations
+        #    tabs['citations']['enabled'] = False
         # Disable fulltext if no file found
         brd =  BibRecDocs(recID)
         if len(brd.list_bibdocs()) == 0:
