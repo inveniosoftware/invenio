@@ -559,10 +559,14 @@ INSERT INTO collection_field_fieldvalue VALUES (8,2,NULL,'sew',50,0);
 INSERT INTO collection_field_fieldvalue VALUES (8,3,NULL,'sew',40,0);
 INSERT INTO collection_field_fieldvalue VALUES (8,5,NULL,'sew',20,0);
 INSERT INTO collection_field_fieldvalue VALUES (8,4,NULL,'sew',30,0);
-INSERT INTO collection_field_fieldvalue VALUES (6,2,NULL,'soo',40,0);
-INSERT INTO collection_field_fieldvalue VALUES (6,3,NULL,'soo',30,0);
-INSERT INTO collection_field_fieldvalue VALUES (6,6,NULL,'soo',20,0);
-INSERT INTO collection_field_fieldvalue VALUES (6,12,NULL,'soo',10,0);
+INSERT INTO collection_field_fieldvalue VALUES (1,2,NULL,'soo',40,0);
+INSERT INTO collection_field_fieldvalue VALUES (1,3,NULL,'soo',30,0);
+INSERT INTO collection_field_fieldvalue VALUES (1,6,NULL,'soo',20,0);
+INSERT INTO collection_field_fieldvalue VALUES (1,12,NULL,'soo',10,0);
+INSERT INTO collection_field_fieldvalue VALUES (3,2,NULL,'soo',40,0);
+INSERT INTO collection_field_fieldvalue VALUES (3,3,NULL,'soo',30,0);
+INSERT INTO collection_field_fieldvalue VALUES (3,15,NULL,'soo',20,0);
+INSERT INTO collection_field_fieldvalue VALUES (3,12,NULL,'soo',10,0);
 
 INSERT INTO collection_format VALUES (6,1,100);
 INSERT INTO collection_format VALUES (6,2,90);
