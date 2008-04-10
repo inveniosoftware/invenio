@@ -2845,7 +2845,7 @@ class Template:
 
     def tmpl_detailed_record_citations(self, recID, ln,
                                        citinglist, citationhistory,
-                                       cociting,selfcited):
+                                       cociting, selfcited):
         """Returns the citations page of a record
 
         Parameters:
@@ -3003,7 +3003,7 @@ class Template:
 
         return out
 
-    def tmpl_citesummary_html(self, ln, totalrecs, totalcites, avgstr, reciddict):
+    def tmpl_citesummary_html(self, ln, totalrecs, totalcites, avgstr, reciddict, criteria=""):
         """A template for citation summary output in HTML.
            Parameters:
                - ln *string* = language,
@@ -3012,6 +3012,7 @@ class Template:
                - avgstr *string* = average number of citations per records
                - reciddict is a dictionary as follows:
                    'string description of the citation class' -> [id1,id2,..]
+               - criteria is added to the link
         """
         # load the right message language
         _ = gettext_set_language(ln)
@@ -3035,6 +3036,12 @@ class Template:
         for k in reciddict.keys():
             rowtitle = k
             reclist = reciddict[k]
-            out += "<tr><td>"+_(rowtitle)+"</td><td>"+str(len(reclist))+"</td></tr>"
+            out += "<tr><td>"+_(rowtitle)+"</td><td>"
+            #construct a link..
+            if criteria:
+                out += "<a href="+criteria+">"+str(len(reclist))+"</a>"
+            else:
+                out += str(len(reclist))
+        out += "</td></tr>"
         out += '</table>'
         return out

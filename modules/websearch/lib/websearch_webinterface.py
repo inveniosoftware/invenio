@@ -213,7 +213,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                                     citedbylist, kwtuples, authors, vtuples, ln)
 
         #cited-by summary
-        out = summarize_records(pubs, 'hcs', ln)
+        out = summarize_records(pubs, 'hcs', ln, "../search/f=author&p="+self.authorname)
         req.write(out)
 
         simauthbox = search_engine.create_similarly_named_authors_link_box(self.authorname)
@@ -311,6 +311,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
                 navmenuid='search')
 
         # mod_python does not like to return [] in case when of=id:
+        raise str(**argd)
         out = search_engine.perform_request_search(req, **argd)
         if out == []:
             return str(out)

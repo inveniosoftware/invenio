@@ -31,12 +31,14 @@ from invenio.bibrank_citation_searcher import get_cited_by_list
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 
-def summarize_records(recids, of, ln):
-    """Produces a report in the format defined by of in language ln"""
+def summarize_records(recids, of, ln, defstring=""):
+    """Produces a report in the format defined by of in language ln
+       defstring is a part of url added to point out how recids were selected
+       for instance f=author&p=Smith, Paul"""
     if of == 'hcs':
         #this is a html cite summary
         citedbylist = get_cited_by_list(recids)
-        return print_citation_summary_html(citedbylist, ln)
+        return print_citation_summary_html(citedbylist, ln, defstring)
     if of == 'xcs':
         #this is an xml cite summary
         citedbylist = get_cited_by_list(recids)
@@ -86,7 +88,7 @@ def print_citation_summary_html(citedbylist, ln, criteria=""):
     reciddict = alldict['reciddict']
     return websearch_templates.tmpl_citesummary_html(ln, totalrecs,
                                                      totalcites, avgstr,
-                                                     reciddict)
+                                                     reciddict, criteria)
 
 def calculate_citations(citedbylist):
     """calculates records in classes of citations
