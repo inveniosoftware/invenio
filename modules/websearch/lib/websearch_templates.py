@@ -504,11 +504,11 @@ class Template:
 
           - 'te_portalbox' *string* - The HTML code for the portalbox on top of search
 
-          - 'searchfor' *string* - The HTML code for the search options
+          - 'searchfor' *string* - The HTML code for the search for box
 
           - 'np_portalbox' *string* - The HTML code for the portalbox on bottom of search
 
-          - 'searchfor' *string* - The HTML code for the search categories (left bottom of page)
+          - 'narrowsearch' *string* - The HTML code for the search categories (left bottom of page)
 
           - 'focuson' *string* - The HTML code for the "focuson" categories (right bottom of page)
 
