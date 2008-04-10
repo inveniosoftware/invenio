@@ -137,3 +137,26 @@ class InvenioWebSubmitFileStamperError(Exception):
            @return: (string)
         """
         return str(self.value)
+
+
+class InvenioWebSubmitIconCreatorError(Exception):
+    """This exception should be raised by websubmit_icon_creator when an
+       error is encoutered that prevents an icon from being created.
+       When caught, this exception should be used to stop processing with a
+       failure signal.
+
+       Extends: Exception.
+    """
+    def __init__(self, value):
+        """Set the internal "value" attribute to that of the passed "value"
+           parameter.
+           @param value: (string) - a string to write to the log.
+        """
+        Exception.__init__(self)
+        self.value = value
+    def __str__(self):
+        """Return oneself as a string (actually, return the contents of
+           self.value).
+           @return: (string)
+        """
+        return str(self.value)
