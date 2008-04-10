@@ -772,20 +772,6 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                                'text' : '*** %s ***' % _("any collection")
                              }] + colls_nice)
 
-    sort_fields = [{
-                      'value' : '',
-                      'text' : _("latest first")
-                    }]
-    query = """SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
-                WHERE cff.type='soo' AND cff.id_field=f.id
-                ORDER BY cff.score DESC, f.name ASC"""
-    res = run_sql(query)
-    for code, name in res:
-        sort_fields.append({
-                              'value' : code,
-                              'text' : name,
-                            })
-
     ## ranking methods
     ranks = [{
                'value' : '',
@@ -838,7 +824,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
              coll_selects = coll_selects,
              d1y = d1y, d2y = d2y, d1m = d1m, d2m = d2m, d1d = d1d, d2d = d2d,
              dt = dt,
-             sort_fields = sort_fields,
+             sort_fields = get_sortby_fields(ln=ln, colID=cc_colID),
              sf = sf,
              so = so,
              ranks = ranks,
@@ -880,6 +866,35 @@ def get_searchwithin_fields(ln='en', colID=None):
     fields = [{
                 'value' : '',
                 'text' : get_field_i18nname("any field", ln)
+              }]
+    for field_code, field_name in res:
+        if field_code and field_code != "anyfield":
+            fields.append({ 'value' : field_code,
+                            'text' : get_field_i18nname(field_name, ln)
+                          })
+    return fields
+
+def get_sortby_fields(ln='en', colID=None):
+    """Retrieves the fields name used in the 'sort by' selection box for the collection ID colID."""
+    _ = gettext_set_language(ln)
+    res = None
+    if colID:
+        res = run_sql_cached("""SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
+                                 WHERE cff.type='soo' AND cff.id_collection=%s AND cff.id_field=f.id
+                              ORDER BY cff.score DESC, f.name ASC""", (colID,))
+    if not res:
+        # no sort fields defined for this colID, try to take Home collection:
+        res = run_sql_cached("""SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
+                                 WHERE cff.type='soo' AND cff.id_collection=%s AND cff.id_field=f.id
+                                 ORDER BY cff.score DESC, f.name ASC""", (1,))
+    if not res:
+        # no sort fields defined for the Home collection, take all sort fields defined wherever they are:
+        res = run_sql_cached("""SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
+                                 WHERE cff.type='soo' AND cff.id_field=f.id
+                                 ORDER BY cff.score DESC, f.name ASC""")
+    fields = [{
+                'value' : '',
+                'text' : _("latest first")
               }]
     for field_code, field_name in res:
         if field_code and field_code != "anyfield":
