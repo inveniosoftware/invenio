@@ -463,7 +463,7 @@ class Collection:
                                ORDER BY cff.score_fieldvalue DESC, cff.score DESC, fv.name ASC""" % (self.id, field_id)
                 res_bis = run_sql(query_bis)
                 if res_bis:
-                    values = [{'value' : '', 'text' : 'any' + field_name}] # FIXME: internationalisation of "any"
+                    values = [{'value' : '', 'text' : 'any' + ' ' + field_name}] # FIXME: internationalisation of "any"
                     for row_bis in res_bis:
                         values.append({'value' : cgi.escape(row_bis[0], 1), 'text' : row_bis[1]})
 
