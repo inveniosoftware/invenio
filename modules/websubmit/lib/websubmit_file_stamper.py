@@ -945,7 +945,7 @@ def create_working_directory():
        (InvenioWebSubmitFileStamperError) will be raised.
        The working directory will have the prefix
        "websubmit_file_stamper_", and could be given a name something like:
-                 - websubmit_file_stamperTzs3St
+                 - websubmit_file_stamper_Tzs3St
        @return: (string) - the full path to the working directory.
        @Exceptions raised: InvenioWebSubmitFileStamperError.
     """
@@ -1286,9 +1286,8 @@ def stamp_file(options):
         ## Take just the basename component of outfile:
         options["output-file"] = name_outfile
 
-    ## From the PID and the current timestamp, create the name of a temporary
-    ## directory in which to store the latex/PDF files for stamping.
-    ## Create the working directory and get the full path to it:
+    ## Create a working directory (in which to store the various files used and
+    ## created during the stamping process) and get the full path to it:
     path_workingdir = create_working_directory()
 
     ## Copy the file to be stamped into the working directory:
