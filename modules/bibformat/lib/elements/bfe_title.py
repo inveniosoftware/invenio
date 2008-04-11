@@ -23,9 +23,6 @@
 __revision__ = "$Id$"
 
 import cgi
-from urllib import quote
-from invenio.config import CFG_SITE_URL
-import re
 
 def format(bfo, separator=" ", highlight='no'):
     """
@@ -39,12 +36,17 @@ def format(bfo, separator=" ", highlight='no'):
     title = bfo.field('245__a')
     title_remainder = bfo.field('245__b')
     edition_statement = bfo.field('250__a')
+    title_tome = bfo.field('245__n')
+    title_part = bfo.field('245__p')
 
     if len(title) > 0:
         if title_remainder:
-            titles.append( title + ': ' + title_remainder )
-        else:
-            titles.append( title )
+            title += ': ' + title_remainder
+        if len(title_tome) > 0:
+            title += ", " + title_tome
+        if len(title_part) > 0:
+            title += ": " + title_part
+        titles.append( title )
 
     title = bfo.field('0248_a')
     if len(title) > 0:

@@ -36,6 +36,8 @@ def format(bfo, highlight="no", multilang='no'):
     else:
         title = bfo.field('245__a')
     title_remainder = bfo.field('245__b')
+    title_tome = bfo.field('245__n')
+    title_part = bfo.field('245__p')
     edition_statement = bfo.field('250__a')
 
     out = title
@@ -43,6 +45,10 @@ def format(bfo, highlight="no", multilang='no'):
         out += ": " + title_remainder
     if len(edition_statement) > 0:
         out += "; " + edition_statement
+    if len(title_tome) > 0:
+        out += ", " + title_tome
+    if len(title_part) > 0:
+        out += ": " + title_part
 
     #Try to display 'Conference' title if other titles were not found
     if out == '':
