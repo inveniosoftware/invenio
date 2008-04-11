@@ -88,7 +88,7 @@ def print_citation_summary_html(citedbylist, ln, criteria=""):
     reciddict = alldict['reciddict']
     return websearch_templates.tmpl_citesummary_html(ln, totalrecs,
                                                      totalcites, avgstr,
-                                                     reciddict, criteria)
+                                                     reciddict, CFG_CITESUMMARY_THRESHOLD_NAMES, criteria)
 
 def calculate_citations(citedbylist):
     """calculates records in classes of citations
