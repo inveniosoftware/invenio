@@ -1,8 +1,8 @@
 <name>Default HTML detailed</name>
 <description>This is the default HTML detailed format.</description>
 
-<BFE_TOPBANNER 
-prefix='<div style="padding-left:10px;padding-right:10px">' 
+<BFE_TOPBANNER
+prefix='<div style="padding-left:10px;padding-right:10px">'
 suffix='</div><hr/>'/>
 
 <div style="padding-left:10px;padding-right:10px">
@@ -14,7 +14,7 @@ suffix='</div><hr/>'/>
 <BFE_DATE prefix="<br />" suffix="<br />"/>
 <BFE_PUBLISHER prefix="<small>" suffix="</small>"/>
 <BFE_PLACE prefix="<small>" suffix="</small>"/>
-
+<BFE_ISBN prefix="<br />ISBN: " />
 </p>
 
 <p style="margin-left: 15%; width: 70%">
