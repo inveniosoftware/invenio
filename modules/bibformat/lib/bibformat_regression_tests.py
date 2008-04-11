@@ -402,6 +402,28 @@ class BibFormatTitleFormattingTest(unittest.TestCase):
           test_web_page_content(CFG_SITE_URL + '/search?p=2nd&of=HD',
             expected_text="Introductory statistics: a decision map; 2nd ed"))
 
+    def test_title_part_in_html_brief(self):
+        """bibformat - title part in HTML brief formats"""
+        self.assertEqual([],
+          test_web_page_content(CFG_SITE_URL + '/search?p=analyse+informatique',
+            expected_text="Analyse informatique, t.2"))
+
+    def test_title_part_in_html_detailed(self):
+        """bibformat - title part in HTML detailed formats"""
+        self.assertEqual([],
+          test_web_page_content(CFG_SITE_URL + '/search?p=analyse+informatique&of=HD',
+            expected_text="Analyse informatique, t.2: L'accomplissement"))
+
+class BibFormatISBNFormattingTest(unittest.TestCase):
+    """Check ISBN formatting produced by BibFormat."""
+
+    def test_isbn_in_html_detailed(self):
+        """bibformat - ISBN in HTML detailed formats"""
+        self.assertEqual([],
+          test_web_page_content(CFG_SITE_URL + '/search?p=analyse+informatique&of=HD',
+            expected_text="ISBN: 2225350574"))
+
+
 TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
                              BibFormatDetailedHTMLTest,
                              BibFormatBriefHTMLTest,
@@ -409,7 +431,8 @@ TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
                              BibFormatMARCTest,
                              BibFormatMARCXMLTest,
                              BibFormatAPITest,
-                             BibFormatTitleFormattingTest)
+                             BibFormatTitleFormattingTest,
+                             BibFormatISBNFormattingTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
