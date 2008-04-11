@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+##
 ## $Id$
 ##
 ## This file is part of CDS Invenio.
@@ -17,11 +19,38 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""Helper functions that could be useful when interacting with the shell.
+"""
+Helper functions that could be useful when interacting with the shell.
 """
 
 __revision__ = "$Id$"
 
+import os
+import tempfile
+
+def run_shell_command(cmd):
+    """
+    Run operating system command CMD (assumed to be properly escaped
+    already!) in a sub-shell and return tuple (exit status code, out
+    stream text, err stream text).
+
+    Note: uses temporary files to store out/err output, not pipes due
+    to potential pipe race condition on some systems.
+    """
+    cmd_out = ''
+    cmd_err = ''
+    file_cmd_out = tempfile.mkstemp("invenio-shellutils-cmd-out")[1]
+    file_cmd_err = tempfile.mkstemp("invenio-shellutils-cmd-err")[1]
+    cmd_exit_code = os.system("%s > %s 2> %s" % (cmd,
+                                                 file_cmd_out,
+                                                 file_cmd_err))
+    if os.path.exists(file_cmd_out):
+        cmd_out = open(file_cmd_out).read()
+        os.remove(file_cmd_out)
+    if os.path.exists(file_cmd_err):
+        cmd_err = open(file_cmd_err).read()
+        os.remove(file_cmd_err)
+    return cmd_exit_code, cmd_out, cmd_err
 
 def escape_shell_arg(shell_arg):
     """Escape a shell argument by placing it within single-quotes. Any single-
@@ -37,8 +66,8 @@ def escape_shell_arg(shell_arg):
        <http://mail.python.org/pipermail/python-list/2005-October/346957.html>
     """
     if type(shell_arg) is not str:
-        msg = "ERROR: \"escape_shell_arg\" function expected parameter of " \
-              "string type. Got: %s." % type(shell_arg)
+        msg = "ERROR: escape_shell_arg() expected string argument but " \
+              "got '%s' of type '%s'." % (repr(shell_arg), type(shell_arg))
         raise TypeError(msg)
 
     return "'%s'" % shell_arg.replace("'", r"'\''")
