@@ -71,7 +71,6 @@ import re
 import shutil
 import socket
 import sys
-import tempfile
 
 def print_usage():
     """Print help."""
@@ -80,26 +79,6 @@ def print_usage():
 def print_version():
     """Print version information."""
     print __revision__
-
-def run_command(cmd):
-    """
-    Run operating system command CMD (assumed to be washed already)
-    and return tuple (exit status code, out stream, err stream).
-    """
-    cmd_out = ''
-    cmd_err = ''
-    file_cmd_out = tempfile.mkstemp("inveniocfg-cmd-out")[1]
-    file_cmd_err = tempfile.mkstemp("inveniocfg-cmd-err")[1]
-    cmd_exit_code = os.system("%s > %s 2> %s" % (cmd,
-                                                 file_cmd_out,
-                                                 file_cmd_err))
-    if os.path.exists(file_cmd_out):
-        cmd_out = open(file_cmd_out).read()
-        os.remove(file_cmd_out)
-    if os.path.exists(file_cmd_err):
-        cmd_err = open(file_cmd_err).read()
-        os.remove(file_cmd_err)
-    return cmd_exit_code, cmd_out, cmd_err
 
 def convert_conf_option(option_name, option_value):
     """
@@ -134,7 +113,7 @@ def convert_conf_option(option_name, option_value):
         option_value = option_value[1:-1]
 
     ## 3c) special cases: dicts
-    if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT',]:
+    if option_name in ['CFG_WEBSEARCH_FIELDS_CONVERT', ]:
         option_value = option_value[1:-1]
 
     ## 3d) special cases: comma-separated lists
@@ -793,9 +772,10 @@ def _grep_version_from_executable(path_to_exec, version_regexp):
     PATH_TO_EXEC and looking for VERSION_REGEXP.  Return program
     version as a string.  Return empty string if not succeeded.
     """
+    from invenio.shellutils import run_shell_command
     exec_version = ""
     if os.path.exists(path_to_exec):
-        dummy1, cmd2_out, dummy2 = run_command("strings %s | grep %s" % \
+        dummy1, cmd2_out, dummy2 = run_shell_command("strings %s | grep %s" % \
                                                (path_to_exec, version_regexp))
         if cmd2_out:
             for cmd2_out_line in cmd2_out.split("\n"):
@@ -812,8 +792,9 @@ def detect_apache_version():
     returned format is 'apache_version [apache_path]'.)  Return empty
     list if no success.
     """
+    from invenio.shellutils import run_shell_command
     out = []
-    dummy1, cmd_out, dummy2 = run_command("locate bin/httpd bin/apache")
+    dummy1, cmd_out, dummy2 = run_shell_command("locate bin/httpd bin/apache")
     for apache in cmd_out.split("\n"):
         apache_version = _grep_version_from_executable(apache, '^Apache\/')
         if apache_version:
@@ -833,8 +814,9 @@ def detect_modpython_version():
         out.append(version)
     except ImportError:
         # try to detect via looking at mod_python.so:
+        from invenio.shellutils import run_shell_command
         version = ""
-        dummy1, cmd_out, dummy2 = run_command("locate /mod_python.so")
+        dummy1, cmd_out, dummy2 = run_shell_command("locate /mod_python.so")
         for modpython in cmd_out.split("\n"):
             modpython_version = _grep_version_from_executable(modpython,
                                                               '^mod_python\/')
