@@ -50,23 +50,11 @@ from invenio.config import \
      CFG_PATH_DISTILLER, \
      CFG_PATH_PDFTK, \
      CFG_PATH_CONVERT
+from invenio.shellutils import escape_shell_arg
 from invenio.websubmit_config import InvenioWebSubmitIconCreatorError
 
 CFG_ALLOWED_FILE_EXTENSIONS = ["pdf", "gif", "jpg", \
                                "jpeg", "ps", "png", "bmp"]
-
-def quote_shell_arg(shell_arg):
-    """Quote a shell argument with single-quotes. This basically means putting
-       single quotes around it and escaping any single-quotes within it.
-       E.g.:
-          hello         ---> 'hello'
-          hello'world   ---> 'hello'\''world'
-       @param shell_arg: (string) - the item to be quoted.
-       @return: (string) - the single-quoted string.
-       Details of this were found here:
-       <http://mail.python.org/pipermail/python-list/2005-October/346957.html>
-    """
-    return "'%s'" % shell_arg.replace("'", r"'\''")
 
 
 ## ***** Functions related to the icon creation process: *****
@@ -205,10 +193,10 @@ def build_icon(path_workingdir,
         cmd_distill = """%(distiller)s %(ps-file-path)s """ \
                       """%(pdf-file-path)s 2>/dev/null""" % \
                       { 'distiller'     : CFG_PATH_DISTILLER,
-                        'ps-file-path'  : quote_shell_arg("%s/%s" % \
+                        'ps-file-path'  : escape_shell_arg("%s/%s" % \
                                                           (path_workingdir, \
                                                            source_filename)),
-                        'pdf-file-path' : quote_shell_arg("%s/%s" % \
+                        'pdf-file-path' : escape_shell_arg("%s/%s" % \
                                                           (path_workingdir, \
                                                            created_pdfname)),
                       }
@@ -270,9 +258,9 @@ def build_icon(path_workingdir,
              "cat A1 output %(first-page-path)s " \
              "2>/dev/null" \
              % { 'pdftk'            : CFG_PATH_PDFTK,
-                 'source-file-path' : quote_shell_arg("%s/%s" % \
+                 'source-file-path' : escape_shell_arg("%s/%s" % \
                                            (path_workingdir, source_filename)),
-                 'first-page-path'  : quote_shell_arg("%s/%s" % \
+                 'first-page-path'  : escape_shell_arg("%s/%s" % \
                                            (path_workingdir, \
                                             source_file_first_page)),
                }
@@ -300,20 +288,21 @@ def build_icon(path_workingdir,
     if source_filetype in ("ps", "pdf") and \
            icon_filetype == "gif" and multipage_icon:
         ## Include delay information:
-        delay_info = "-delay %s" % quote_shell_arg(str(multipage_icon_delay))
+        delay_info = "-delay %s" % escape_shell_arg(str(multipage_icon_delay))
 
     ## Command for icon creation:
     cmd_create_icon = "%(convert)s -scale %(scale)s %(delay)s " \
                       "%(source-file-path)s %(icon-file-path)s 2>/dev/null" \
                       % { 'convert'          : CFG_PATH_CONVERT,
-                          'scale'            : quote_shell_arg(str(icon_scale)),
+                          'scale'            : \
+                                             escape_shell_arg(str(icon_scale)),
                           'delay'            : delay_info,
                           'source-file-path' : \
-                                      quote_shell_arg("%s/%s" \
+                                      escape_shell_arg("%s/%s" \
                                                       % (path_workingdir, \
                                                          source_filename)),
                           'icon-file-path'   : \
-                                      quote_shell_arg("%s/%s" \
+                                      escape_shell_arg("%s/%s" \
                                                       % (path_workingdir, \
                                                          icon_name)),
                         }
