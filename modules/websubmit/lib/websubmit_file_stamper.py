@@ -48,21 +48,8 @@ CFG_WEBSUBMIT_FILE_STAMPER_TEMPLATES_DIR = \
                         "%s/websubmit/file_stamper_templates" % CFG_ETCDIR
 from invenio.config import CFG_PATH_PDFTK
 from invenio.config import CFG_PATH_PDF2PS
+from invenio.shellutils import escape_shell_arg
 from invenio.websubmit_config import InvenioWebSubmitFileStamperError
-
-
-def quote_shell_arg(shell_arg):
-    """Quote a shell argument with single-quotes. This basically means putting
-       single quotes around it and escaping any single-quotes within it.
-       E.g.:
-          hello         ---> 'hello'
-          hello'world   ---> 'hello'\''world'
-       @param shell_arg: (string) - the item to be quoted.
-       @return: (string) - the single-quoted string.
-       Details of this were found here:
-       <http://mail.python.org/pipermail/python-list/2005-October/346957.html>
-    """
-    return "'%s'" % shell_arg.replace("'", r"'\''")
 
 
 ## ***** Functions related to the creation of the PDF Stamp file: *****
@@ -169,7 +156,7 @@ def copy_template_files_to_stampdir(path_workingdir, latex_template):
     cmd_findgraphics = \
        """grep includegraphic %s | """ \
        """sed -n 's/^[^{]*{\\([^}]\\{1,\\}\\)}.*$/\\1/p'""" \
-       % quote_shell_arg("%s/%s" % (path_workingdir, template_name))
+       % escape_shell_arg("%s/%s" % (path_workingdir, template_name))
 
     fh_findgraphics = os.popen(cmd_findgraphics, "r")
     graphic_names = fh_findgraphics.readlines()
@@ -387,13 +374,13 @@ def create_pdf_stamp(path_workingdir, latex_template, latex_template_var):
     cmd_latex = """cd %(workingdir)s; /usr/bin/pdflatex """ \
                 """-interaction=batchmode """ \
                 """%(template-path)s > /dev/null 2>&1""" \
-                % { 'template-path' : quote_shell_arg("%s/%s" \
+                % { 'template-path' : escape_shell_arg("%s/%s" \
                                           % (path_workingdir, final_template)),
                     'workingdir'    : path_workingdir,
                   }
     ## Log the latex command
-    os.system("""echo %s > %s""" % (quote_shell_arg(cmd_latex), \
-                                    quote_shell_arg("%s/latex_cmd" \
+    os.system("""echo %s > %s""" % (escape_shell_arg(cmd_latex), \
+                                    escape_shell_arg("%s/latex_cmd" \
                                                     % path_workingdir)))
     ## Run the latex command
     errcode_latex = os.system("%s" % cmd_latex)
@@ -434,13 +421,13 @@ def apply_stamp_cover_page(path_workingdir, \
                 """cat output %(stamped-file-path)s """ \
                 """2>/dev/null"""% \
                   { 'pdftk'              : CFG_PATH_PDFTK,
-                    'cover-page-path'    : quote_shell_arg("%s/%s" \
+                    'cover-page-path'    : escape_shell_arg("%s/%s" \
                                                 % (path_workingdir, \
                                                    stamp_file_name)),
-                    'file-to-stamp-path' : quote_shell_arg("%s/%s" \
+                    'file-to-stamp-path' : escape_shell_arg("%s/%s" \
                                                 % (path_workingdir, \
                                                    subject_file)),
-                    'stamped-file-path'  : quote_shell_arg("%s/%s" \
+                    'stamped-file-path'  : escape_shell_arg("%s/%s" \
                                                 % (path_workingdir, \
                                                    output_file)),
                   }
@@ -498,9 +485,9 @@ def apply_stamp_first_page(path_workingdir, \
              "cat A1 output %(first-page-path)s " \
              "2>/dev/null" \
              % { 'pdftk'         : CFG_PATH_PDFTK,
-                 'file-to-stamp-path' : quote_shell_arg("%s/%s" % \
+                 'file-to-stamp-path' : escape_shell_arg("%s/%s" % \
                                               (path_workingdir, subject_file)),
-                 'first-page-path'    : quote_shell_arg("%s/%s" % \
+                 'first-page-path'    : escape_shell_arg("%s/%s" % \
                                               (path_workingdir, \
                                                output_file_first_page)),
                }
@@ -522,13 +509,13 @@ def apply_stamp_first_page(path_workingdir, \
              "%(stamp-file-path)s output " \
              "%(stamped-first-page-path)s 2>/dev/null" \
              % { 'pdftk'                   : CFG_PATH_PDFTK,
-                 'first-page-path'         : quote_shell_arg("%s/%s" % \
+                 'first-page-path'         : escape_shell_arg("%s/%s" % \
                                               (path_workingdir, \
                                                output_file_first_page)),
-                 'stamp-file-path'         : quote_shell_arg("%s/%s" % \
+                 'stamp-file-path'         : escape_shell_arg("%s/%s" % \
                                               (path_workingdir, \
                                                stamp_file_name)),
-                 'stamped-first-page-path' : quote_shell_arg("%s/%s" % \
+                 'stamped-first-page-path' : escape_shell_arg("%s/%s" % \
                                               (path_workingdir, \
                                                stamped_output_file_first_page)),
                }
@@ -550,13 +537,13 @@ def apply_stamp_first_page(path_workingdir, \
              "B=%(original-file-path)s cat A1 B2-end output " \
              "%(stamped-file-path)s 2>/dev/null" \
              % { 'pdftk'              : CFG_PATH_PDFTK,
-                 'stamped-first-page-path' : quote_shell_arg("%s/%s" % \
+                 'stamped-first-page-path' : escape_shell_arg("%s/%s" % \
                                               (path_workingdir, \
                                                stamped_output_file_first_page)),
-                 'original-file-path'      : quote_shell_arg("%s/%s" % \
+                 'original-file-path'      : escape_shell_arg("%s/%s" % \
                                               (path_workingdir, \
                                                subject_file)),
-                 'stamped-file-path'       : quote_shell_arg("%s/%s" % \
+                 'stamped-file-path'       : escape_shell_arg("%s/%s" % \
                                               (path_workingdir, \
                                                output_file)),
                }
@@ -580,7 +567,7 @@ def apply_stamp_first_page(path_workingdir, \
            """grep NumberOfPages | """ \
            """sed -n 's/^NumberOfPages: \\([0-9]\\{1,\\}\\)$/\\1/p'""" \
              % { 'pdftk'              : CFG_PATH_PDFTK,
-                 'original-file-path' : quote_shell_arg("%s/%s" % \
+                 'original-file-path' : escape_shell_arg("%s/%s" % \
                                                         (path_workingdir, \
                                                          subject_file)),
                }
@@ -681,13 +668,13 @@ def apply_stamp_all_pages(path_workingdir, \
              "%(stamp-file-path)s output " \
              "%(stamped-file-all-pages-path)s 2>/dev/null" \
              % { 'pdftk'                       : CFG_PATH_PDFTK,
-                 'file-to-stamp-path'          : quote_shell_arg("%s/%s" % \
+                 'file-to-stamp-path'          : escape_shell_arg("%s/%s" % \
                                                   (path_workingdir, \
                                                    subject_file)),
-                 'stamp-file-path'             : quote_shell_arg("%s/%s" % \
+                 'stamp-file-path'             : escape_shell_arg("%s/%s" % \
                                                   (path_workingdir, \
                                                    stamp_file_name)),
-                 'stamped-file-all-pages-path' : quote_shell_arg("%s/%s" % \
+                 'stamped-file-all-pages-path' : escape_shell_arg("%s/%s" % \
                                                   (path_workingdir, \
                                                    output_file)),
                }
@@ -714,7 +701,7 @@ def apply_stamp_to_file(path_workingdir,
     ## Using the file command, test for the file-type of "subject_file":
     cmd_gfile = "%(gfile)s %(file-to-stamp-path)s 2> /dev/null" \
                 % { 'gfile'              : CFG_PATH_GFILE,
-                    'file-to-stamp-path' : quote_shell_arg("%s/%s" % \
+                    'file-to-stamp-path' : escape_shell_arg("%s/%s" % \
                                                            (path_workingdir, \
                                                             subject_file)),
                   }
@@ -778,10 +765,10 @@ def apply_stamp_to_file(path_workingdir,
         cmd_distill = """%(distiller)s %(ps-file-path)s """ \
                       """%(pdf-file-path)s 2>/dev/null""" % \
                       { 'distiller'     : CFG_PATH_DISTILLER,
-                        'ps-file-path'  : quote_shell_arg("%s/%s" % \
+                        'ps-file-path'  : escape_shell_arg("%s/%s" % \
                                                           (path_workingdir, \
                                                            subject_file)),
-                        'pdf-file-path' : quote_shell_arg("%s/%s" % \
+                        'pdf-file-path' : escape_shell_arg("%s/%s" % \
                                                           (path_workingdir, \
                                                            created_pdfname)),
                       }
@@ -875,10 +862,10 @@ def apply_stamp_to_file(path_workingdir,
 
         ## Build the conversion command:
         cmd_pdf2ps = "%s %s %s 2>/dev/null" % (CFG_PATH_PDF2PS,
-                                               quote_shell_arg("%s/%s" % \
+                                               escape_shell_arg("%s/%s" % \
                                                      (path_workingdir, \
                                                       output_file)),
-                                               quote_shell_arg("%s/%s" % \
+                                               escape_shell_arg("%s/%s" % \
                                                      (path_workingdir, \
                                                       stamped_psname)))
         errcode_pdf2ps = os.system(cmd_pdf2ps)
