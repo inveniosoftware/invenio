@@ -41,7 +41,8 @@ pylib_DATA = __init__.py \
              urlutils.py \
              w3c_validator.py \
              intbitset_tests.py \
-             inveniocfg.py
+             inveniocfg.py \
+             shellutils.py
 
 noinst_DATA = testimport.py \
               kwalitee.py
