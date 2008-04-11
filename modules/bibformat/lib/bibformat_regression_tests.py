@@ -423,6 +423,20 @@ class BibFormatISBNFormattingTest(unittest.TestCase):
           test_web_page_content(CFG_SITE_URL + '/search?p=analyse+informatique&of=HD',
             expected_text="ISBN: 2225350574"))
 
+class BibFormatPublInfoFormattingTest(unittest.TestCase):
+    """Check publication reference info formatting produced by BibFormat."""
+
+    def test_publinfo_in_html_brief(self):
+        """bibformat - publication reference info in HTML brief formats"""
+        self.assertEqual([],
+          test_web_page_content(CFG_SITE_URL + '/search?p=recid%3A84',
+            expected_text="Nucl. Phys. B: 656 (2003) pp. 23-36"))
+
+    def test_publinfo_in_html_detailed(self):
+        """bibformat - publication reference info in HTML detailed formats"""
+        self.assertEqual([],
+          test_web_page_content(CFG_SITE_URL + '/record/84',
+            expected_text="Nucl. Phys. B: 656 (2003) pp. 23-36"))
 
 TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
                              BibFormatDetailedHTMLTest,
@@ -432,7 +446,8 @@ TEST_SUITE = make_test_suite(BibFormatBibTeXTest,
                              BibFormatMARCXMLTest,
                              BibFormatAPITest,
                              BibFormatTitleFormattingTest,
-                             BibFormatISBNFormattingTest)
+                             BibFormatISBNFormattingTest,
+                             BibFormatPublInfoFormattingTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
