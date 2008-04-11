@@ -2979,7 +2979,12 @@ class Template:
             req.write(banner)
 
         if (vtuples):
-            banner = self.tmpl_print_searchresultbox(_("Publishes in"), str(vtuples))
+            #get the second member: that's the journal name
+            pubinfo = ""
+            for t in vtuples:
+                (times, journal) = t
+                pubinfo += journal+" ("+str(times)+") "
+            banner = self.tmpl_print_searchresultbox(_("Publishes in"), pubinfo)
             req.write(banner)
 
 
@@ -3003,7 +3008,7 @@ class Template:
 
         return out
 
-    def tmpl_citesummary_html(self, ln, totalrecs, totalcites, avgstr, reciddict, criteria=""):
+    def tmpl_citesummary_html(self, ln, totalrecs, totalcites, avgstr, reciddict, tresholds_names, criteria=""):
         """A template for citation summary output in HTML.
            Parameters:
                - ln *string* = language,
@@ -3012,6 +3017,7 @@ class Template:
                - avgstr *string* = average number of citations per records
                - reciddict is a dictionary as follows:
                    'string description of the citation class' -> [id1,id2,..]
+               - tresholds_names is a list of tuples (min,max,'string description of the citation class')
                - criteria is added to the link
         """
         # load the right message language
@@ -3039,7 +3045,19 @@ class Template:
             out += "<tr><td>"+_(rowtitle)+"</td><td>"
             #construct a link..
             if criteria:
-                out += "<a href="+criteria+">"+str(len(reclist))+"</a>"
+                #check the corresponding entry in tresholds_names
+                mymin = -1
+                mymax = -1
+                for (min, max, name) in tresholds_names:
+                    if (rowtitle == name):
+                        #found
+                        mymin = min
+                        mymax = max
+                        break
+                if (mymin > -1):
+                    #the citing min/max was found, append criteria
+                    link = criteria+"&op1=a&m2=a&f2=cites&p2="+str(mymin)+"-"+str(mymax)
+                out += "<a href="+link+">"+str(len(reclist))+"</a>"
             else:
                 out += str(len(reclist))
         out += "</td></tr>"
