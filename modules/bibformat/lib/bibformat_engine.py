@@ -97,7 +97,7 @@ pattern_lang = re.compile(r'''
 
 # Builds regular expression for finding each known language in <lang> tags
 ln_pattern_text = r"<("
-for lang in language_list_long():
+for lang in language_list_long(enabled_langs_only=False):
     ln_pattern_text += lang[0] +r"|"
 
 ln_pattern_text = ln_pattern_text.rstrip(r"|")
