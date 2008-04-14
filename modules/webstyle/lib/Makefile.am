@@ -19,15 +19,15 @@
 
 pylibdir=$(libdir)/python/invenio
 
-pylib_DATA = 			\
-        webdoc.py               \
-        webdoc_webinterface.py  \
-	webpage.py 		\
-	template.py 		\
-	webstyle_templates.py 	\
-	webinterface_handler.py \
-	webinterface_tests.py 	\
-	webinterface_layout.py
+pylib_DATA = webdoc.py \
+             webdoc_tests.py \
+             webdoc_webinterface.py \
+             webpage.py \
+             template.py \
+             webstyle_templates.py \
+             webinterface_handler.py \
+             webinterface_tests.py \
+             webinterface_layout.py
 
 EXTRA_DIST = $(pylib_DATA)
 
