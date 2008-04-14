@@ -289,7 +289,8 @@ def iterate_over_new(list, fmt):
             message = "START bibupload external call"
             write_message(message, verbose=9)
 
-            task_low_level_submission('bibupload', 'bibreformat', '-f', finalfilename)
+            task_id = task_low_level_submission('bibupload', 'bibreformat', '-f', finalfilename)
+            write_message("Task #%s submitted" % task_id)
 
             t2 = os.times()[4]
             tbibupload = tbibupload + (t2 - t1)
@@ -368,7 +369,8 @@ def iterate_over_old(list, fmt):
                 message = "START bibupload external call"
                 write_message(message, verbose=9)
 
-                task_low_level_submission('bibupload', 'bibreformat', '-f', finalfilename)
+                task_id = task_low_level_submission('bibupload', 'bibreformat', '-f', finalfilename)
+                write_message("Task #%s submitted" % task_id)
 
                 t22 = os.times()[4]
                 message = "END bibupload external call (time elapsed:%2f)" % (t22-t11)
@@ -415,7 +417,8 @@ def iterate_over_old(list, fmt):
         message = "START bibupload external call"
         write_message(message, verbose=9)
 
-        task_low_level_submission('bibupload', 'bibreformat', '-f', finalfilename)
+        task_id = task_low_level_submission('bibupload', 'bibreformat', '-f', finalfilename)
+        write_message("Task #%s submitted" % task_id)
 
         t22 = os.times()[4]
         message = "END bibupload external call (time elapsed:%2f)" % (t22 - t11)
