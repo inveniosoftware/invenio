@@ -84,8 +84,11 @@ def wash_languages(lns):
                 return ln[:2]
     return CFG_SITE_LANG
 
-def language_list_long():
-    """Return list of [short name, long name] for all enabled languages."""
+def language_list_long(enabled_langs_only=True):
+    """Return list of [short name, long name] for all enabled
+       languages (if 'enabled_langs_only' is set to True) or all
+       existing languages (if 'enabled_langs_only' is set to False).
+    """
     all_language_names = {'bg': 'Български',
                           'ca': 'Català',
                           'cs': 'Česky',
@@ -106,7 +109,7 @@ def language_list_long():
                           'uk': 'Українська',
                           'zh_CN': '中文(简)',
                           'zh_TW': '中文(繁)',}
-    enabled_lang_list = []
-    for lang in CFG_SITE_LANGS:
-        enabled_lang_list.append([lang, all_language_names[lang]])
-    return enabled_lang_list
+
+    return [[lang, lang_long] for lang, lang_long in all_language_names.iteritems() \
+            if lang in CFG_SITE_LANGS or enabled_langs_only == False]
+
