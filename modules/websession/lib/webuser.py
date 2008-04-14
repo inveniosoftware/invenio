@@ -258,7 +258,7 @@ def setUid(req, uid, remember_me=False):
 def get_last_login(uid):
     """Return the last_login datetime for uid if any, otherwise return None."""
     res = run_sql('SELECT last_login FROM user WHERE id=%s', (uid, ), 1)
-    if res:
+    if res and res[0][0]:
         return res[0][0]
     else:
         return datetime.datetime(1970, 1, 1)
