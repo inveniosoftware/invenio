@@ -24,15 +24,23 @@ __revision__ = "$Id$"
 
 import unittest
 
+from invenio.config import CFG_SITE_LANGS
 from invenio.testutils import make_test_suite, \
                               run_test_suite
 from invenio.webdoc import transform
 
-class WebDocLanguages(unittest.TestCase):
-    """Check that WebDoc correctly translates files"""
+class WebDocLangTest(unittest.TestCase):
+    """Check that WebDoc correctly supports <lang> translation directive"""
 
     def test_language_filtering(self):
         """webdoc - language filtering"""
+
+        if 'en' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: English language not configured, test skipped.")
+        elif 'fr' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: French language not configured, test skipped.")
+        elif 'de' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: German language not configured, test skipped.")
 
         result = transform('''
         <strong>
@@ -50,7 +58,7 @@ class WebDocLanguages(unittest.TestCase):
         self.assert_('Livre' not in result[0][1])
         self.assert_('Book' not in result[0][1])
 
-TEST_SUITE = make_test_suite(WebDocLanguages)
+TEST_SUITE = make_test_suite(WebDocLangTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
