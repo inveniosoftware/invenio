@@ -111,5 +111,5 @@ def language_list_long(enabled_langs_only=True):
                           'zh_TW': '中文(繁)',}
 
     return [[lang, lang_long] for lang, lang_long in all_language_names.iteritems() \
-            if lang in CFG_SITE_LANGS or enabled_langs_only == False]
+            if lang in CFG_SITE_LANGS or not enabled_langs_only]
 
