@@ -42,7 +42,8 @@ from invenio.dateutils import \
      convert_datecvs_to_datestruct
 from invenio.messages import \
      gettext_set_language, \
-     wash_language
+     wash_language, \
+     language_list_long
 
 import re
 import getopt
@@ -121,7 +122,8 @@ pattern_CFG_SITE_LANG = re.compile(r"<("+CFG_SITE_LANG+ \
 
 # Builds regular expression for finding each known language in <lang> tags
 ln_pattern_text = r"<(?P<lang>"
-ln_pattern_text += r"|".join(CFG_SITE_LANGS)
+ln_pattern_text += r"|".join([lang[0] for lang in \
+                              language_list_long(enabled_langs_only=False)])
 ln_pattern_text += r')\s*(revision="[^"]"\s*)?>(?P<translation>.*?)</\1>'
 ln_pattern =  re.compile(ln_pattern_text, re.IGNORECASE | re.DOTALL)
 
