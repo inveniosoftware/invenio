@@ -32,57 +32,57 @@ class EscapeShellArgTest(unittest.TestCase):
     """Testing escaping of shell arguments."""
 
     def test_escape_simple_strings(self):
-        """shellutils::escape_shell_arg - escaping simple strings"""
+        """shellutils - escaping simple strings"""
         self.assertEqual("'hello'",
                          escape_shell_arg("hello"))
 
     def test_escape_backtick_strings(self):
-        """shellutils::escape_shell_arg - escaping strings containing backticks"""
+        """shellutils - escaping strings containing backticks"""
         self.assertEqual(r"'hello `world`'",
                          escape_shell_arg(r'hello `world`'))
 
     def test_escape_quoted_strings(self):
-        """shellutils::escape_shell_arg - escaping strings containing single quotes"""
+        """shellutils - escaping strings containing single quotes"""
         self.assertEqual("'hello'\\''world'",
                          escape_shell_arg("hello'world"))
 
     def test_escape_double_quoted_strings(self):
-        """shellutils::escape_shell_arg - escaping strings containing double-quotes"""
+        """shellutils - escaping strings containing double-quotes"""
         self.assertEqual("""'"hello world"'""",
                          escape_shell_arg('"hello world"'))
 
     def test_escape_complex_quoted_strings(self):
-        """shellutils::escape_shell_arg - escaping strings containing complex quoting"""
+        """shellutils - escaping strings containing complex quoting"""
         self.assertEqual(r"""'"Who is this `Eve'\'', Bob?", asked Alice.'""",
              escape_shell_arg(r""""Who is this `Eve', Bob?", asked Alice."""))
 
     def test_escape_windows_style_path(self):
-        """shellutils::escape_shell_arg - escaping strings containing windows-style file paths"""
+        """shellutils - escaping strings containing windows-style file paths"""
         self.assertEqual(r"'C:\Users\Test User\My Documents\funny file name (for testing).pdf'",
                          escape_shell_arg(r'C:\Users\Test User\My Documents\funny file name (for testing).pdf'))
 
     def test_escape_unix_style_path(self):
-        """shellutils::escape_shell_arg - escaping strings containing unix-style file paths"""
+        """shellutils - escaping strings containing unix-style file paths"""
         self.assertEqual(r"'/tmp/z_temp.txt'",
                          escape_shell_arg(r'/tmp/z_temp.txt'))
 
     def test_escape_number_sign(self):
-        """shellutils::escape_shell_arg - escaping strings containing the number sign"""
+        """shellutils - escaping strings containing the number sign"""
         self.assertEqual(r"'Python comments start with #.'",
                          escape_shell_arg(r'Python comments start with #.'))
 
     def test_escape_ampersand_string(self):
-        """shellutils::escape_shell_arg - escaping strings containing ampersand"""
+        """shellutils - escaping strings containing ampersand"""
         self.assertEqual(r"'Today the weather is hot & sunny'",
                          escape_shell_arg(r'Today the weather is hot & sunny'))
 
     def test_escape_greater_that_strings(self):
-        """shellutils::escape_shell_arg - escaping strings containing the greater-than sign"""
+        """shellutils - escaping strings containing the greater-than sign"""
         self.assertEqual(r"'10 > 5'",
                          escape_shell_arg(r'10 > 5'))
 
     def test_escape_less_that_strings(self):
-        """shellutils::escape_shell_arg - escaping strings containing the less-than sign"""
+        """shellutils - escaping strings containing the less-than sign"""
         self.assertEqual(r"'5 < 10'",
                          escape_shell_arg(r'5 < 10'))
 
