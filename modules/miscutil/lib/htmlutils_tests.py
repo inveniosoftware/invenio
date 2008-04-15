@@ -26,7 +26,7 @@ __revision__ = "$Id$"
 import unittest
 
 from invenio import dbquery
-from invenio.htmlutils import HTMLWasher
+from invenio.htmlutils import HTMLWasher, nmtoken_from_string
 from invenio.testutils import make_test_suite, run_test_suite
 
 class XSSEscapingTest(unittest.TestCase):
@@ -81,7 +81,23 @@ class XSSEscapingTest(unittest.TestCase):
         self.assertEqual(self.washer.wash(html_buffer=test_str),
                          '<a href="">link</a>')
 
-TEST_SUITE = make_test_suite(XSSEscapingTest,)
+class CharactersEscapingTest(unittest.TestCase):
+    """Test functions related to escaping reserved or forbidden characters """
+
+    def test_convert_string_to_nmtoken(self):
+        """htmlutils - converting string to Nmtoken"""
+
+        # TODO: possibly extend this test to include 'extenders' and
+        # 'combining characters' as defined in
+        # http://www.w3.org/TR/2000/REC-xml-20001006#NT-Nmtoken
+
+        ascii_str = "".join([chr(i) for i in range(0, 256)])
+        nmtoken = nmtoken_from_string(ascii_str)
+        for char in nmtoken:
+            self.assert_(char in ['.', '-', '_', ':'] or char.isalnum())
+
+TEST_SUITE = make_test_suite(XSSEscapingTest,
+                             CharactersEscapingTest,)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
