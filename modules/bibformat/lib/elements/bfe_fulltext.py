@@ -194,7 +194,7 @@ def get_files(bfo):
                             additionals = True
                         else:
                             if not descr:
-                                descr = _('Main file(s)')
+                                descr = _('Fulltext')
                             if not parsed_urls['main_urls'].has_key(descr):
                                 parsed_urls['main_urls'][descr] = []
                             parsed_urls['main_urls'][descr].append((url, name, format))
