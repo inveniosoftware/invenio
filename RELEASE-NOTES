@@ -373,12 +373,6 @@ your bibliographic tables.  Please follow the following steps:
 
    - You have also to run manually several migration scripts:
 
-        $ python ./modules/webaccess/lib/collection_restrictions_migration_kit.py
-
-           This script will migrate restricted collections that used
-           Apache user groups to a new firewall-like role definition
-           language.
-
         $ python ./modules/websubmit/lib/fulltext_files_migration_kit.py
 
            This script will check and update your fulltext file
@@ -389,6 +383,19 @@ your bibliographic tables.  Please follow the following steps:
 
            This script will update your local user table in order to
            use encrypted passwords for more security.
+
+        $ /opt/cds-invenio/bin/webaccessadmin -u admin -a
+
+           After the migration of user passwords, you have to add
+           access control engine's new actions, roles and
+           authorizations.
+
+        $ python ./modules/webaccess/lib/collection_restrictions_migration_kit.py
+
+           After the access control engine's new actions have been
+           added, you have to migrate the restricted collection
+           definitions that used the Apache user groups to the new
+           firewall-like role definition language.
 
    - CDS Invenio v0.99.0 uses new, faster word indexer.  You will have
      to reindex all your indexes by running:
