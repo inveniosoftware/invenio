@@ -48,14 +48,16 @@ class MessagesLanguageTest(unittest.TestCase):
             self.assertEqual(lang[0],
                              cfg_lang)
 
-    def test_wash_language(self):
-        """messages - washing single language"""
+    def test_wash_invalid_language(self):
+        """messages - washing invalid language code"""
         self.assertEqual(messages.wash_language('python'),
                          CFG_SITE_LANG)
 
+    def test_wash_dashed_language(self):
+        """messages - washing dashed language code (fr-ca)"""
         if 'fr' not in CFG_SITE_LANGS:
             self.assertEqual(messages.wash_language('fr-ca'),
-                             'en')
+                             CFG_SITE_LANG)
         else:
             self.assertEqual(messages.wash_language('fr-ca'),
                              'fr')
