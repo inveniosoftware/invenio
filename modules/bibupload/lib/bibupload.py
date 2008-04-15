@@ -87,7 +87,7 @@ from invenio.config import CFG_WEBSUBMIT_FILEDIR, \
                            CFG_TMPDIR
 from invenio.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
-    task_update_progress, task_sleep_now_if_required
+    task_update_progress, task_sleep_now_if_required, fix_argv_paths
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, get_format_from_url, check_valid_url, download_url
 
@@ -855,6 +855,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                     raise StandardError, "fft '%s' specify an url ('%s') with problems: %s" % (fft, url, e)
             else:
                 url = ''
+
             # Let's discover the description
             description = field_get_subfield_values(fft, 'd')
             if description:
@@ -1070,25 +1071,25 @@ def elaborate_fft_tags(record, rec_id, mode):
                     write_message("('%s', '%s', '%s') not added because '%s' docname didn't existed." % (doctype, newname, urls, docname), stream=sys.stderr)
                     raise StandardError
             elif mode == 'append':
-                found_bibdoc = False
-                for bibdoc in bibrecdocs.list_bibdocs():
-                    if bibdoc.get_docname() == docname:
-                        found_bibdoc = True
+                    found_bibdoc = False
+                    for bibdoc in bibrecdocs.list_bibdocs():
+                        if bibdoc.get_docname() == docname:
+                            found_bibdoc = True
                         for (url, format) in urls:
                             assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
                         if icon not in ('', 'KEEP-OLD-VALUE'):
-                            assert(_add_new_icon(bibdoc, icon, restriction))
-                if not found_bibdoc:
-                    try:
-                        bibdoc = bibrecdocs.add_bibdoc(doctype, docname)
-                        bibdoc.set_status(restriction)
+                                assert(_add_new_icon(bibdoc, icon, restriction))
+                    if not found_bibdoc:
+                        try:
+                            bibdoc = bibrecdocs.add_bibdoc(doctype, docname)
+                            bibdoc.set_status(restriction)
                         for (url, format) in urls:
                             assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
                         if icon and not icon == 'KEEP-OLD-VALUE':
-                            assert(_add_new_icon(bibdoc, icon, restriction))
-                    except Exception, e:
-                        write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
-                        raise
+                                assert(_add_new_icon(bibdoc, icon, restriction))
+                        except Exception, e:
+                            write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
+                            raise
         write_message('Changed urls: %s' % str(changed), verbose=9, stream=sys.stderr)
         return _synchronize_8564(rec_id, record, descriptions, comments, changed)
     else:
@@ -1510,7 +1511,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
             task_set_option('mode', 'replace_or_insert')
         else:
             task_set_option('mode', 'insert')
-        task_set_option('file_path', os.path.abspath(args[0]))
+        fix_argv_paths([args[0]])
+        task_set_option('file_path', os.path.realpath(args[0]))
 
     # Replace mode option
     elif key in ("-r", "--replace"):
@@ -1519,27 +1521,32 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
             task_set_option('mode', 'replace_or_insert')
         else:
             task_set_option('mode', 'replace')
-        task_set_option('file_path', os.path.abspath(args[0]))
+        fix_argv_paths([args[0]])
+        task_set_option('file_path', os.path.realpath(args[0]))
 
     # Correct mode option
     elif key in ("-c", "--correct"):
         task_set_option('mode', 'correct')
-        task_set_option('file_path', os.path.abspath(args[0]))
+        fix_argv_paths([args[0]])
+        task_set_option('file_path', os.path.realpath(args[0]))
 
     # Append mode option
     elif key in ("-a", "--append"):
         task_set_option('mode', 'append')
-        task_set_option('file_path', os.path.abspath(args[0]))
+        fix_argv_paths([args[0]])
+        task_set_option('file_path', os.path.realpath(args[0]))
 
     # Reference mode option
     elif key in ("-z", "--reference"):
         task_set_option('mode', 'reference')
-        task_set_option('file_path', os.path.abspath(args[0]))
+        fix_argv_paths([args[0]])
+        task_set_option('file_path', os.path.realpath(args[0]))
 
     # Format mode option
     elif key in ("-f", "--format"):
         task_set_option('mode', 'format')
-        task_set_option('file_path', os.path.abspath(args[0]))
+        fix_argv_paths([args[0]])
+        task_set_option('file_path', os.path.realpath(args[0]))
 
     # Stage
     elif key in ("-S", "--stage"):
