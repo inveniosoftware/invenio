@@ -99,6 +99,7 @@ def task_low_level_submission(name, user, *argv):
                 desired bibtask.
     @return the task_id when the task is correctly enqueued.
     Use with care!
+    Please use absolute paths in argv!
     """
     task_id = None
     try:
