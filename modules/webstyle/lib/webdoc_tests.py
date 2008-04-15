@@ -24,22 +24,22 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.config import CFG_SITE_LANGS
+from invenio.config import CFG_SITE_LANG, \
+                           CFG_SITE_LANGS, \
+                           CFG_SITE_URL
+from invenio.messages import gettext_set_language
 from invenio.testutils import make_test_suite, \
                               run_test_suite
 from invenio.webdoc import transform
 
-class WebDocLangTest(unittest.TestCase):
-    """Check that WebDoc correctly supports <lang> translation directive"""
+class WebDocLanguageTest(unittest.TestCase):
+    """Check that WebDoc correctly supports <lang> translation
+       directives and _()_ syntax"""
 
     def test_language_filtering(self):
         """webdoc - language filtering"""
 
-        if 'en' not in CFG_SITE_LANGS:
-            self.fail("SKIPPED: English language not configured, test skipped.")
-        elif 'fr' not in CFG_SITE_LANGS:
-            self.fail("SKIPPED: French language not configured, test skipped.")
-        elif 'de' not in CFG_SITE_LANGS:
+        if 'de' not in CFG_SITE_LANGS:
             self.fail("SKIPPED: German language not configured, test skipped.")
 
         result = transform('''
@@ -53,12 +53,103 @@ class WebDocLangTest(unittest.TestCase):
         </strong>
         ''', languages=['de'])
 
+        # German is kept
         self.assertEqual(result[0][0], 'de')
         self.assert_('<blue>Buch</blue>' in result[0][1])
+
+        # English and French must be filtered out in any case
         self.assert_('Livre' not in result[0][1])
         self.assert_('Book' not in result[0][1])
 
-TEST_SUITE = make_test_suite(WebDocLangTest)
+        # Python is not considered as a language, so the string is
+        # kept as it is
+        self.assert_('<python>{}</python' in result[0][1])
+
+    def test_string_translation(self):
+        """webdoc - string translation"""
+        result = transform('my_string: _(Search)_ (end)',
+                           languages=[CFG_SITE_LANG])
+        _ = gettext_set_language(CFG_SITE_LANG)
+        self.assertEqual(result[0][1],
+                         'my_string: %s (end)' % _("Search"))
+
+class WebDocPartsTest(unittest.TestCase):
+    """Check that WebDoc correctly returns values for the different
+       parts of webdoc files"""
+
+    def test_parts(self):
+        """webdoc - retrieving parts of webdoc file (title, navtrail,
+        etc.)"""
+
+        _ = gettext_set_language(CFG_SITE_LANG)
+
+        result = transform('''
+        <!-- WebDoc-Page-Title: _(Help Central)_  -->
+        <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="webstyle-internals">WebStyle Internals</a> -->
+        <!-- WebDoc-Page-Revision: $Id$ -->
+        <!-- WebDoc-Page-Description: A description -->''',
+                           languages=[CFG_SITE_LANG])
+
+        # Title
+        self.assertEqual(result[0][2], _("Help Central"))
+
+        # Keywords. None in our sample
+        self.assertEqual(result[0][3], None)
+
+        # Navtrail
+        self.assertEqual(result[0][4], '<a class="navtrail" href="%s/help/hacking">Hacking CDS Invenio</a> &gt; <a class="navtrail" href="webstyle-internals">WebStyle Internals</a>' % CFG_SITE_URL)
+
+        # Revision. Keep date & time only
+        self.assert_(result[0][5].replace('-', '/') in \
+                     '$Id$ -->')
+
+        # Description
+        self.assertEqual(result[0][6], 'A description')
+
+class WebDocVariableReplacementTest(unittest.TestCase):
+    """Check that WebDoc correctly replaces variables with their
+       values"""
+
+    def test_CFG_SITE_URL_variable_replacement(self):
+        """webdoc - replacing <CFG_SITE_URL> in webdoc files"""
+
+        result = transform('<CFG_SITE_URL>', languages=[CFG_SITE_LANG])
+
+        self.assertEqual(result[0][1], CFG_SITE_URL)
+
+    def test_language_tags_replacement(self):
+        """webdoc - replacing <lang:link /> and <lang:current /> in
+        webdoc files"""
+
+        result = transform('<lang:current />', languages=[CFG_SITE_LANG])
+        self.assertEqual(result[0][1], CFG_SITE_LANG)
+
+        # ?ln=.. is returned only if not CFG_SITE_LANG
+        result = transform('<lang:link />', languages=[CFG_SITE_LANG])
+        self.assertEqual(result[0][1], '')
+
+        if 'fr' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: French language not configured, test skipped.")
+
+        result = transform('<lang:link />', languages=['fr'])
+        self.assertEqual(result[0][1], '?ln=fr')
+
+class WebDocCommentsFiltering(unittest.TestCase):
+    """Check that comments are correctly removed from webdoc files"""
+
+    def test_comments_filtering(self):
+        """webdoc - removing comments"""
+        result = transform('''# -*- coding: utf-8 -*-
+## $Id$
+##''',
+                           languages=[CFG_SITE_LANG])
+
+        self.assertEqual(result[0][1], '')
+
+TEST_SUITE = make_test_suite(WebDocLanguageTest,
+                             WebDocPartsTest,
+                             WebDocVariableReplacementTest,
+                             WebDocCommentsFiltering,)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
