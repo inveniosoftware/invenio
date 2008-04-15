@@ -46,39 +46,45 @@ def migrate_passwords():
         sys.exit(1)
     admin_pwd = __get_admin_pwd()
     print "There are %i passwords to migrate (including guest users)" % __count_current_passwords()
-    print "==============================="
+    print "========================================================="
     print "Creating backup...",
+    sys.stdout.flush()
     if __creating_backup():
-        print " Ok"
+        print "OK"
     else:
         __print_error()
     print "Migrating all Null password to ''...",
+    sys.stdout.flush()
     if __migrate_passwords_from_null_to_empty_quotes():
-        print " Ok"
+        print "OK"
     else:
         __print_error(True)
     print "Changing the column type from string to blob...",
+    sys.stdout.flush()
     if __migrate_column_from_string_to_blob():
-        print " Ok"
+        print "OK"
     else:
         __print_error(True)
     print "Encrypting passwords...",
+    sys.stdout.flush()
     if __encrypt_password():
-        print " Ok"
+        print "OK"
     else:
         __print_error(True)
     print "Checking that admin could enter...",
+    sys.stdout.flush()
     if __check_admin(admin_pwd):
-        print " Ok"
+        print "OK"
     else:
         __print_error(True)
     print "Removing backup...",
+    sys.stdout.flush()
     if __removing_backup():
-        print " Ok"
+        print "OK"
     else:
         __print_error()
-    print "==============================="
-    print "Migration to encrypted local password has been successful."
+    print "========================================================="
+    print "Migration to encrypted local passwords has been successful."
 
 def __check_update_possibility():
     res = run_sql("SHOW COLUMNS FROM user LIKE 'password'");
