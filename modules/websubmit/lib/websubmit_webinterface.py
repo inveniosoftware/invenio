@@ -507,6 +507,9 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
             })
 
         req.form = form
+        ## Strip whitespace from beginning and end of doctype and action:
+        args["doctype"] = args["doctype"].strip()
+        args["act"] = args["act"].strip()
 
         def _index(req, c, ln, doctype, act, startPg, indir, access,
                    mainmenu, fromdir, file, nextPg, nbPg, curpage, step,
