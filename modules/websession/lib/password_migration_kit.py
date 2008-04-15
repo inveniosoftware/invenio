@@ -101,11 +101,11 @@ def __get_admin_pwd():
     return run_sql(query)[0][0]
 
 def __migrate_passwords_from_null_to_empty_quotes():
-    query = "UPDATE user SET password='' WHERE password=NULL"
+    query = "UPDATE user SET password='' WHERE password IS NULL"
     try:
         run_sql(query)
     except Exception, msg:
-        print msg
+        print 'The query "%s" produced: %s' % (query, msg)
         return False
     return True
 
@@ -114,7 +114,7 @@ def __migrate_column_from_string_to_blob():
     try:
         run_sql(query)
     except Exception, msg:
-        print msg
+        print 'The query "%s" produced: %s' % (query, msg)
         return False
     return True
 
@@ -123,7 +123,7 @@ def __encrypt_password():
     try:
         run_sql(query)
     except Exception, msg:
-        print msg
+        print 'The query "%s" produced: %s' % (query, msg)
         return False
     return True
 
@@ -135,7 +135,7 @@ def __check_admin(admin_pwd):
         else:
             return False
     except Exception, msg:
-        print msg
+        print 'The query "%s" produced: %s' % (query, msg)
         return False
 
 def __creating_backup():
@@ -143,7 +143,7 @@ def __creating_backup():
     try:
         run_sql(query)
     except Exception, msg:
-        print msg
+        print 'The query "%s" produced: %s' % (query, msg)
         return False
     return True
 
@@ -152,7 +152,7 @@ def __removing_backup():
     try:
         run_sql(query)
     except Exception, msg:
-        print msg
+        print 'The query "%s" produced: %s' % (query, msg)
         return False
     return True
 
@@ -161,19 +161,19 @@ def __restoring_from_backup():
     try:
         run_sql(query)
     except Exception, msg:
-        print msg
+        print 'The query "%s" produced: %s' % (query, msg)
         return False
     query = "ALTER TABLE user CHANGE password password varchar(20) NULL default NULL"
     try:
         run_sql(query)
     except Exception, msg:
-        print msg
+        print 'The query "%s" produced: %s' % (query, msg)
         return False
     query = "UPDATE user,user_backup SET user.password=user_backup.password WHERE user.id=user_backup.id AND user.nickname=user_backup.nickname"
     try:
         run_sql(query)
     except Exception, msg:
-        print msg
+        print 'The query "%s" produced: %s' % (query, msg)
         return False
     return True
 
