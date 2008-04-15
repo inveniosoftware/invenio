@@ -23,8 +23,11 @@ Apache-only method (column restricted in the collection table) to
 enhanced FireRole/WebAccess aware mode.
 """
 
+import sys
+
 from invenio.dbquery import run_sql
-from invenio.access_control_admin import acc_add_authorization, acc_add_role
+from invenio.access_control_admin import acc_add_authorization, acc_add_role, \
+    acc_get_action_id
 from invenio.access_control_firerole import compile_role_definition, serialize
 from invenio.access_control_config import VIEWRESTRCOLL
 try:
@@ -73,8 +76,18 @@ def migrate_restricted_collection(collection_name, role_name):
     acc_add_authorization(role_name, VIEWRESTRCOLL, collection=collection_name)
     print "OK!"
 
+def check_viewrestrcoll_exists():
+    """Security check for VIEWRESTRCOLL to exist."""
+    res = acc_get_action_id(VIEWRESTRCOLL)
+    if not res:
+        print "ERROR: %s action does not exist!" % VIEWRESTRCOLL
+        print "Please run first webaccessadmin -a in order to update the system"
+        print "to newly added actions."
+        sys.exit(1)
+
 def migrate():
     """Core."""
+    check_viewrestrcoll_exists()
     restrictions = retrieve_restricted_collection()
     apache_groups = set(restrictions.values())
 
