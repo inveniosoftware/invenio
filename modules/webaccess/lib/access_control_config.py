@@ -118,7 +118,8 @@ DEF_DEMO_ROLES = (('photoadmin', 'Photo collection administrator', 'deny any'),
 
 DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
                        ('dorian.gray@cds.cern.ch', 'bookadmin'),
-                       ('ulysses@cds.cern.ch', 'restrictedpicturesviewer'))
+                       ('romeo.montague@cds.cern.ch', 'restrictedpicturesviewer'),
+                       ('juliet.capulet@cds.cern.ch', 'restrictedpicturesviewer'))
 
 # users
 # list of e-mail addresses
