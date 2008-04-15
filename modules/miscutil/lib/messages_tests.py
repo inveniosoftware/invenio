@@ -35,7 +35,7 @@ class MessagesLanguageTest(unittest.TestCase):
     """
 
     def test_lang_list_long_ordering(self):
-        """messages - languages ordering is preserved"""
+        """messages - preserving language order"""
         lang_list_long = messages.language_list_long()
 
         # Preliminary test: same number of languages in both lists
