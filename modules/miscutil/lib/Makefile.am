@@ -30,6 +30,7 @@ pylib_DATA = __init__.py \
              mailutils.py \
              miscutil_config.py \
              messages.py \
+             messages_tests.py \
              textutils.py \
              textutils_tests.py \
              dateutils.py \
