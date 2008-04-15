@@ -38,7 +38,7 @@ try:
 except ImportError:
     pass
 
-from socket import gethostbyname
+from socket import gethostbyname, gaierror
 from cgi import parse_qs
 import os
 import crypt
@@ -912,7 +912,11 @@ def collect_user_info(req):
             return user_info
         else:
             uid = getUid(req)
-            user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
+            try:
+                user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
+            except gaierror:
+                #FIXME: we should support IPV6 too. (hint for FireRole)
+                pass
             user_info['remote_host'] = req.connection.remote_host or ''
             user_info['referer'] = req.headers_in.get('Referer', '')
             user_info['uri'] = req.unparsed_uri or ()
