@@ -25,7 +25,7 @@ import re
 import marshal
 from zlib import decompress, error
 
-from invenio.dbquery import run_sql, OperationalError
+from invenio.dbquery import run_sql, run_sql_cached, OperationalError
 
 def init_db_dictionary(dname):
     """return a dictionary from rnkCITATIONDATA
@@ -52,7 +52,7 @@ def get_cited_by(recordid):
     """Return a list of records that cite recordid"""
     citation_dic = {} #one should always init variables
     query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"
-    compressed_citation_dic = run_sql_cached(query)
+    compressed_citation_dic = run_sql_cached(query, affected_tables=['rnkCITATIONDATA'])
     if compressed_citation_dic and compressed_citation_dic[0]:
         try:
             citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
