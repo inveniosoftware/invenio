@@ -33,7 +33,8 @@ from tempfile import mkstemp
 
 from invenio.config import CFG_TMPDIR
 from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioWebSubmitFileError, \
-    nice_size, check_valid_url, clean_url, get_docname_from_url, get_format_from_url
+    nice_size, check_valid_url, clean_url, get_docname_from_url, \
+    get_format_from_url, KEEP_OLD_VALUE
 from invenio.intbitset import intbitset
 from invenio.search_engine import perform_request_search
 from invenio.textutils import wrap_text_in_a_box, wait_for_user
@@ -133,7 +134,7 @@ _actions_with_parameter = {
     #'set-description' : 'description',
     #'set-restriction' : 'restriction',
     'append' : 'append_path',
-    #'revise' : 'revise_path',
+    'revise' : 'revise_path',
 }
 
 def prepare_option_parser():
@@ -150,6 +151,7 @@ def prepare_option_parser():
     query_options.add_option('-d', '--docid', type='int', dest='docid')
     query_options.add_option('--docid2', type='int', dest='docid2')
     query_options.add_option('--docname', dest='docname')
+    query_options.add_option('--new-docname', dest='newdocname')
     query_options.add_option('--doctype', dest='doctype')
     query_options.add_option('--format', dest='format')
     query_options.add_option('--icon', dest='icon')
@@ -227,6 +229,22 @@ def print_info(recid, docid, info):
     """Nicely print info about a recid, docid pair."""
     print '%i:%i:%s' % (recid, docid, info)
 
+def bibupload_ffts(ffts, append=False):
+    """Given an ffts dictionary it creates the xml and submit it."""
+    xml = ffts_to_xml(ffts)
+    print xml
+    tmp_file = os.path.join(CFG_TMPDIR, "bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"))
+    open(tmp_file, 'w').write(xml)
+    if append:
+        wait_for_user("This will be appended via BibUpload")
+        task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file)
+        print "BibUpload append submitted with id %s" % task
+    else:
+        wait_for_user("This will be corrected via BibUpload")
+        task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file)
+        print "BibUpload correct submitted with id %s" % task
+    return True
+
 def cli_append(recid=None, docid=None, docname=None, doctype=None, url=None, format=None, icon=None, description=None, comment=None, restriction=None):
     """Create a bibupload FFT task submission for appending a format."""
     if docid is not None:
@@ -258,9 +276,7 @@ def cli_append(recid=None, docid=None, docname=None, doctype=None, url=None, for
     if not format:
         print >> sys.stderr, "ERROR: Not enough information to decide a format!"
         return False
-    if icon is None:
-        icon = 'KEEP-OLD-VALUE'
-    elif icon != 'KEEP-OLD-VALUE':
+    if icon is not None and icon != KEEP_OLD_VALUE:
         try:
             icon = clean_url(icon)
             check_valid_url(url)
@@ -281,14 +297,66 @@ def cli_append(recid=None, docid=None, docname=None, doctype=None, url=None, for
         'doctype' : doctype
     }
     ffts = {recid : [fft]}
-    xml = ffts_to_xml(ffts)
-    print xml
-    tmp_file = os.path.join(CFG_TMPDIR, "bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"))
-    open(tmp_file, 'w').write(xml)
-    wait_for_user("This will be appended via BibUpload")
-    task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file)
-    print "BibUpload append submitted with id %s" % task
-    return True
+    return bibupload_ffts(ffts, append=True)
+
+def cli_revise(recid=None, docid=None, docname=None, new_docname=None, doctype=None, url=None, format=None, icon=None, description=None, comment=None, restriction=None):
+    """Create a bibupload FFT task submission for appending a format."""
+    if docid is not None:
+        bibdoc = BibDoc(docid)
+        if recid is not None and recid != bibdoc.get_recid():
+            print >> sys.stderr, "ERROR: Provided recid %i is not linked with provided docid %i" % (recid, docid)
+            return False
+        if docname is not None and docname != bibdoc.get_docname():
+            print >> sys.stderr, "ERROR: Provided docid %i is not named as the provided docname %s" % (docid, docname)
+            return False
+        recid = bibdoc.get_recid()
+        docname = bibdoc.get_docname()
+    elif recid is None:
+        print >> sys.stderr, "ERROR: Not enough information to identify the record and desired document"
+        return False
+    if url is not None:
+        try:
+            url = clean_url(url)
+            check_valid_url(url)
+        except StandardError, e:
+            print >> sys.stderr, "ERROR: Not a valid url has been specified: %s" % e
+            return False
+    if docname is None and url is not None:
+        docname = get_docname_from_url(url)
+    if not docname:
+        print >> sys.stderr, "ERROR: Not enough information to decide a docname!"
+        return False
+    if docname not in BibRecDocs(recid).get_bibdoc_names():
+        print >> sys.stderr, "ERROR: docname %s is not connected with recid %s!" % (docname, recid)
+        return False
+    if format is None and url is not None:
+        format = get_format_from_url(url)
+    if not format:
+        print >> sys.stderr, "ERROR: Not enough information to decide a format!"
+        return False
+    if icon is not None and icon != KEEP_OLD_VALUE:
+        try:
+            icon = clean_url(icon)
+            check_valid_url(url)
+        except StandardError, e:
+            print >> sys.stderr, "ERROR: Not a valid url has been specified for the icon: %s" % e
+            return False
+    if doctype is None:
+        doctype = 'Main'
+
+    fft = {
+        'url' : url,
+        'docname' : docname,
+        'newdocname' : new_docname,
+        'format' :format,
+        'icon' : icon,
+        'comment' : comment,
+        'description' : description,
+        'restriction' : restriction,
+        'doctype' : doctype
+    }
+    ffts = {recid : [fft]}
+    return bibupload_ffts(ffts, append=False)
 
 def cli_get_history(docid_set):
     """Print the history of a docid_set."""
@@ -305,14 +373,7 @@ def cli_fix(recid_set):
         ffts[recid] = []
         for docname in BibRecDocs(recid).get_bibdoc_names():
             ffts[recid].append({'docname' : docname, 'doctype' : 'FIX'})
-    xml = ffts_to_xml(ffts)
-    print xml
-    tmp_file = os.path.join(CFG_TMPDIR, "bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"))
-    open(tmp_file, 'w').write(xml)
-    wait_for_user("This will be corrected via BibUpload")
-    task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file)
-    print "BibUpload correct submitted with id %s" % task
-    return True
+    return bibupload_ffts(ffts, append=False)
 
 def cli_get_info(recid_set):
     """Print all the info of a recid_set."""
@@ -398,6 +459,12 @@ def main():
         cli_fix(recid_set)
     elif options.append_path:
         res = cli_append(options.recid, options.docid, options.docname, options.doctype, options.append_path, options.format, options.icon, options.description, options.comment, options.restriction)
+        if not res:
+            sys.exit(1)
+    elif options.revise_path:
+        res = cli_revise(options.recid, options.docid, options.docname,
+        options.newdocname, options.doctype, options.revise_path, options.format,
+        options.icon, options.description, options.comment, options.restriction)
         if not res:
             sys.exit(1)
     else:

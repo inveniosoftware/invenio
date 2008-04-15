@@ -655,6 +655,8 @@ class BibDoc:
     def set_status(self, new_status):
         """Set a new status."""
         if new_status != KEEP_OLD_VALUE:
+            if new_status == 'DELETED':
+                raise InvenioWebSubmitFileError('DELETED is a reserved word and can not be used for setting the status')
             run_sql('UPDATE bibdoc SET status=%s WHERE id=%s', (new_status, self.id))
             self.status = new_status
             self.touch()
