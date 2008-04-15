@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://pcdh23.cern.ch/admin/bibharvest/bibharvestadmin.py?ln=en" />
+<title>test_insert_oai_source</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">test_insert_oai_source</td></tr>
+</thead><tbody>
+<tr>
+	<td>open</td>
+	<td>/admin/bibharvest/bibharvestadmin.py?ln=en</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=add new OAI source</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>oai_src_baseurl</td>
+	<td>http://cdsware.cern.ch:8000/oai2d.py</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Validate']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>oai_src_name</td>
+	<td>AtlantisOAI</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>oai_src_prefix</td>
+	<td>label=marcxml</td>
+</tr>
+<tr>
+	<td>click</td>
+	<td>cern:theory1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>oai_src_frequency</td>
+	<td>label=never</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>oai_src_lastrun</td>
+	<td>label=from beginning</td>
+</tr>
+<tr>
+	<td>select</td>
+	<td>oai_src_post</td>
+	<td>label=harvest and convert (h-c)</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Add OAI Source']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>oai_src_config</td>
+	<td>oaimarc2marcxml.xsl</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>//input[@value='Add OAI Source']</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=Go back to the OAI sources overview</td>
+	<td></td>
+</tr>
+<tr>
+	<td>verifyTextPresent</td>
+	<td>AtlantisOAI</td>
+	<td></td>
+</tr>
+
+</tbody></table>
+</body>
+</html>
