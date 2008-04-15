@@ -21,8 +21,8 @@ INSERT INTO user VALUES (2,'jekyll@cds.cern.ch',AES_ENCRYPT(email,'j123ekyll'),'
 INSERT INTO user VALUES (3,'hyde@cds.cern.ch',AES_ENCRYPT(email,'h123yde'),'1',NULL,'hyde','');
 INSERT INTO user VALUES (4,'dorian.gray@cds.cern.ch',AES_ENCRYPT(email,'d123orian'),'1',NULL,'dorian','');
 INSERT INTO user VALUES (5,'romeo.montague@cds.cern.ch',AES_ENCRYPT(email,'r123omeo'),'1','NULL','romeo','');
-(6,'juliet.capulet@cds.cern.ch',AES_ENCRYPT(email,'j123uliet'),'1','NULL','juliet','');
-(7,'benvolio.montague@cds.cern.ch',AES_ENCRYPT(email,'b123envolio'),'1','NULL','benvolio','');
+INSERT INTO user VALUES (6,'juliet.capulet@cds.cern.ch',AES_ENCRYPT(email,'j123uliet'),'1','NULL','juliet','');
+INSERT INTO user VALUES (7,'benvolio.montague@cds.cern.ch',AES_ENCRYPT(email,'b123envolio'),'1','NULL','benvolio','');
 INSERT INTO usergroup VALUES (1,'Theses viewers','Theses viewers internal group','VO','INTERNAL');
 INSERT INTO user_usergroup VALUES (2,1,'M',NOW());
 
