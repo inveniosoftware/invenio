@@ -776,7 +776,8 @@ def filter_languages(text, ln='en', defined_tags=None):
         """
         current_lang = ln
 
-        # If <lang keep=all> is used, keep all languages
+        # If <lang keep=all> is used, keep all empty line (this is
+        # currently undocumented and behaviour might change)
         keep = False
         if match.group("keep") is not None:
             keep = True
