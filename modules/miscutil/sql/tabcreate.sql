@@ -2159,7 +2159,7 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
 -- occasionally to check if some publication has been cited more than
 -- 50 times (or such), and alert cataloguers to create record for that
 -- external citation
--- 
+--
 -- id_bibrec is the id of the record. extcitepubinfo is publication info
 -- that looks in general like hep-th/0112088
 CREATE TABLE IF NOT EXISTS rnkCITATIONDATAEXT (
@@ -2366,6 +2366,7 @@ CREATE TABLE IF NOT EXISTS bibdoc (
   docname varchar(250) NOT NULL default 'file',
   creation_date datetime NOT NULL default '0000-00-00',
   modification_date datetime NOT NULL default '0000-00-00',
+  more_info mediumblob NULL default NULL,
   PRIMARY KEY  (id),
   KEY docname (docname),
   KEY creation_date (creation_date),

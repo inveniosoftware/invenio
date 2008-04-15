@@ -49,7 +49,7 @@ def fix_recid(recid, logfile):
     try:
         for docname in docnames:
             print docname,
-            new_bibdocs = bibrec.fix(docname)
+            new_bibdocs = bibrec.fix(docname, True)
             new_bibdocnames = [bibdoc.get_docname() for bibdoc in new_bibdocs]
             if new_bibdocnames:
                 print "(created bibdocs: '%s')" % "', '".join(new_bibdocnames),

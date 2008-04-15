@@ -2564,7 +2564,6 @@ class BibUploadFFTModeTest(unittest.TestCase):
         test_to_correct = test_to_correct.replace('123456789',
                                                           str(recid))
         # correct test record with new FFT:
-        task_set_task_param('verbose', 0)
         recs = bibupload.xml_marc_to_records(test_to_correct)
         bibupload.bibupload(recs[0], opt_mode='correct')
 

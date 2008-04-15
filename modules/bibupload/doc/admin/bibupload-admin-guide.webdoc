@@ -293,6 +293,11 @@ effectively disappear, please use the correct mode with $n docname
 and $t EXPUNGE as the special keyword.
 </p>
 
+<p>In order to fix a record (i.e. put all its linked documents in a coherent state)
+and synchronize the MARC to the table, please use the correct mode with $n
+docname and $t FIX as the special keyword.
+</p>
+
 <p>In order to revert to a previous file revision (i.e. to create a new revision with
 the same content as some previous revision had), please use the correct mode with
 $n docname, $t REVERT as the special keyword and $v the number corresponding

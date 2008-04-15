@@ -66,18 +66,19 @@ def ffts_to_xml(ffts):
     """
     out = ''
     for recid, ffts in ffts.iteritems():
-        out += '<record>\n'
-        out += '\t<controlfield tag="001">%i</controlfield>\n' % recid
-        for fft in ffts:
-            out += _xml_fft_creator(fft)
-        out += '</record>\n'
+        if ffts:
+            out += '<record>\n'
+            out += '\t<controlfield tag="001">%i</controlfield>\n' % recid
+            for fft in ffts:
+                out += _xml_fft_creator(fft)
+            out += '</record>\n'
     return out
 
 def get_usage():
     """Return a nicely formatted string for printing the help of bibdocadmin"""
     return """usage: %prog <query> <action> [options]
   <query>: --pattern <pattern>, --collection <collection>, --recid <recid>,
-           --recid2 <recid>, --docid <docid>,
+           --recid2 <recid>, --docid <docid>, --all
            --docid2 <docid>, --docname <docname>,
  <action>: --get-info, --get-stats, --get-usage, --get-docnames
            --get-docids, --get-recids, --get-doctypes, --get-revisions,
@@ -104,7 +105,7 @@ takes precedence over pattern/collection search.
 
 _actions = ['get-info',
             #'get-stats',
-            'get-usage',
+            'get-disk-usage',
             'get-docnames',
             #'get-docids',
             #'get-recids',
@@ -122,7 +123,8 @@ _actions = ['get-info',
             #'purge',
             #'expunge',
             'check-md5',
-            'update-md5']
+            'update-md5',
+            'fix']
 
 _actions_with_parameter = {
     #'set-doctype' : 'doctype',
@@ -140,6 +142,7 @@ def prepare_option_parser():
     #epilog="""With <query> you select the range of record/docnames/single files to work on. Note that some actions e.g. delete, append, revise etc. works at the docname level, while others like --set-comment, --set-description, at single file level and other can be applied in an iterative way to many records in a single run. Note that specifing docid(2) takes precedence over recid(2) which in turns takes precedence over pattern/collection search.""",
         version=__revision__)
     query_options = OptionGroup(parser, 'Query parameters')
+    query_options.add_option('-a', '--all', action='store_true', dest='all')
     query_options.add_option('-p', '--pattern', dest='pattern')
     query_options.add_option('-c', '--collection', dest='collection')
     query_options.add_option('-r', '--recid', type='int', dest='recid')
@@ -229,31 +232,31 @@ def cli_append(recid=None, docid=None, docname=None, doctype=None, url=None, for
     if docid is not None:
         bibdoc = BibDoc(docid)
         if recid is not None and recid != bibdoc.get_recid():
-            print >> sys.stderr, "Provided recid %i is not linked with provided docid %i" % (recid, docid)
+            print >> sys.stderr, "ERROR: Provided recid %i is not linked with provided docid %i" % (recid, docid)
             return False
         if docname is not None and docname != bibdoc.get_docname():
-            print >> sys.stderr, "Provided docid %i is not named as the provided docname %s" % (docid, docname)
+            print >> sys.stderr, "ERROR: Provided docid %i is not named as the provided docname %s" % (docid, docname)
             return False
         recid = bibdoc.get_recid()
         docname = bibdoc.get_docname()
     elif recid is None:
-        print >> sys.stderr, "Not enough information to identify the record and desired document"
+        print >> sys.stderr, "ERROR: Not enough information to identify the record and desired document"
         return False
     try:
         url = clean_url(url)
         check_valid_url(url)
     except StandardError, e:
-        print >> sys.stderr, "Not a valid url has been specified: %s" % e
+        print >> sys.stderr, "ERROR: Not a valid url has been specified: %s" % e
         return False
     if docname is None:
         docname = get_docname_from_url(url)
     if not docname:
-        print >> sys.stderr, "Not enough information to decide a docname!"
+        print >> sys.stderr, "ERROR: Not enough information to decide a docname!"
         return False
     if format is None:
         format = get_format_from_url(url)
     if not format:
-        print >> sys.stderr, "Not enough information to decide a format!"
+        print >> sys.stderr, "ERROR: Not enough information to decide a format!"
         return False
     if icon is None:
         icon = 'KEEP-OLD-VALUE'
@@ -262,7 +265,7 @@ def cli_append(recid=None, docid=None, docname=None, doctype=None, url=None, for
             icon = clean_url(icon)
             check_valid_url(url)
         except StandardError, e:
-            print >> sys.stderr, "Not a valid url has been specified for the icon: %s" % e
+            print >> sys.stderr, "ERROR: Not a valid url has been specified for the icon: %s" % e
             return False
     if doctype is None:
         doctype = 'Main'
@@ -283,22 +286,36 @@ def cli_append(recid=None, docid=None, docname=None, doctype=None, url=None, for
     tmp_file = os.path.join(CFG_TMPDIR, "bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"))
     open(tmp_file, 'w').write(xml)
     wait_for_user("This will be appended via BibUpload")
-    task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file, '-v9')
+    task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file)
     print "BibUpload append submitted with id %s" % task
-    return False
+    return True
 
 def cli_get_history(docid_set):
     """Print the history of a docid_set."""
-    print wrap_text_in_a_box(title="BibDocs history", style='conclusion'),
     for docid in docid_set:
         bibdoc = BibDoc(docid)
         history = bibdoc.get_history()
         for row in history:
             print_info(bibdoc.get_recid(), docid, row)
 
+def cli_fix(recid_set):
+    """Fix all the records of a recid_set."""
+    ffts = {}
+    for recid in recid_set:
+        ffts[recid] = []
+        for docname in BibRecDocs(recid).get_bibdoc_names():
+            ffts[recid].append({'docname' : docname, 'doctype' : 'FIX'})
+    xml = ffts_to_xml(ffts)
+    print xml
+    tmp_file = os.path.join(CFG_TMPDIR, "bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"))
+    open(tmp_file, 'w').write(xml)
+    wait_for_user("This will be corrected via BibUpload")
+    task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file)
+    print "BibUpload correct submitted with id %s" % task
+    return True
+
 def cli_get_info(recid_set):
     """Print all the info of a recid_set."""
-    print wrap_text_in_a_box(title="BibRecDocs info", style='conclusion'),
     for recid in recid_set:
         print BibRecDocs(recid)
 
@@ -308,7 +325,7 @@ def cli_get_docnames(docid_set):
         bibdoc = BibDoc(docid)
         print_info(bibdoc.get_recid(), docid, bibdoc.get_docname())
 
-def cli_get_usage(docid_set):
+def cli_get_disk_usage(docid_set):
     """Print the space usage of a docid_set."""
     total_size = 0
     total_latest_size = 0
@@ -353,10 +370,17 @@ def cli_update_md5(docid_set):
             wait_for_user('Updating the md5s of this document can hide real problems.')
             bibdoc.md5s.update(only_new=False)
 
+def get_all_recids():
+    """Return all the existing recids."""
+    return intbitset(run_sql('select id from bibrec'))
+
 def main():
     parser = prepare_option_parser()
     (options, args) = parser.parse_args()
-    recid_set = get_recids_from_query(options.pattern, options.collection, options.recid, options.recid2, options.docid, options.docid2)
+    if options.all:
+        recid_set = get_all_recids()
+    else:
+        recid_set = get_recids_from_query(options.pattern, options.collection, options.recid, options.recid2, options.docid, options.docid2)
     docid_set = get_docids_from_query(recid_set, options.docid, options.docid2)
     if options.action == 'get-history':
         cli_get_history(docid_set)
@@ -364,12 +388,14 @@ def main():
         cli_get_info(recid_set)
     elif options.action == 'get-docnames':
         cli_get_docnames(docid_set)
-    elif options.action == 'get-usage':
-        cli_get_usage(docid_set)
+    elif options.action == 'get-disk-usage':
+        cli_get_disk_usage(docid_set)
     elif options.action == 'check-md5':
         cli_check_md5(docid_set)
     elif options.action == 'update-md5':
         cli_update_md5(docid_set)
+    elif options.action == 'fix':
+        cli_fix(recid_set)
     elif options.append_path:
         res = cli_append(options.recid, options.docid, options.docname, options.doctype, options.append_path, options.format, options.icon, options.description, options.comment, options.restriction)
         if not res:

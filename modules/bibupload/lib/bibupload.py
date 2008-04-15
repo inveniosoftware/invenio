@@ -59,10 +59,10 @@ import sys
 import time
 from zlib import compress
 import urllib2
-import tempfile
 import socket
 
 from invenio.config import CFG_OAI_ID_FIELD, CFG_SITE_URL, \
+     CFG_SITE_SECURE_URL, \
      CFG_BIBUPLOAD_REFERENCE_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
@@ -83,13 +83,13 @@ from invenio.bibrecord import create_records, \
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
 from invenio.bibformat import format_record
-from invenio.config import CFG_WEBSUBMIT_FILEDIR, \
-                           CFG_TMPDIR
+from invenio.config import CFG_WEBSUBMIT_FILEDIR
 from invenio.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
     task_update_progress, task_sleep_now_if_required, fix_argv_paths
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
-    get_docname_from_url, get_format_from_url, check_valid_url, download_url
+    get_docname_from_url, get_format_from_url, check_valid_url, download_url, \
+    KEEP_OLD_VALUE
 
 #Statistic variables
 stat = {}
@@ -236,6 +236,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         try:
             record = elaborate_fft_tags(record, rec_id, opt_mode)
         except Exception, e:
+            register_exception()
             write_message("   Stage 2 failed: Error while elaborating FFT tags: %s" % e,
                 verbose=1, stream=sys.stderr)
             return (1, int(rec_id))
@@ -709,29 +710,21 @@ def elaborate_fft_tags(record, rec_id, mode):
     """
 
     # Let's define some handy sub procedure.
-    def _synchronize_8564(rec_id, record, descriptions, comments, changed):
+    def _synchronize_8564(rec_id, record):
         """Sinchronize the 8564 tags for record with actual files. descriptions
         should be a dictionary docname:description for the new description to be
         inserted."""
-        write_message("Synchronizing MARC of recid '%s' with:\n%s\nwith descriptions: %s\nand comments: %s\nand changed urls: %s" % (rec_id, record, descriptions, comments, changed), verbose=9)
+        write_message("Synchronizing MARC of recid '%s' with:\n%s" % (rec_id, record), verbose=9)
         tags8564s = record_get_field_instances(record, '856', '4', ' ')
         filtered_tags8564s = []
-
-        old_comments = {}
-        old_descriptions = {}
 
         # Let's discover all the previous internal urls, in order to rebuild them!
         for field in tags8564s:
             to_be_removed = False
-            for value in field_get_subfield_values(field, 'u'):
-                if value.startswith('%s/record/%s/files/' % (CFG_SITE_URL, rec_id)):
+            for value in field_get_subfield_values(field, 'u') + field_get_subfield_values(field, 'q'):
+                if value.startswith('%s/record/%s/files/' % (CFG_SITE_URL, rec_id)) or \
+                    value.startswith('%s/record/%s/files/' % (CFG_SITE_SECURE_URL, rec_id)):
                     to_be_removed = True
-                    description = field_get_subfield_values(field, 'y')
-                    if description:
-                        old_descriptions[value] = description[0]
-                    comment = field_get_subfield_values(field, 'z')
-                    if comment:
-                        old_comments[value] = comment[0]
             if not to_be_removed:
                 filtered_tags8564s.append(field)
 
@@ -743,17 +736,13 @@ def elaborate_fft_tags(record, rec_id, mode):
         # Now we refresh with existing internal 8564
         bibrecdocs = BibRecDocs(rec_id)
         latest_files = bibrecdocs.list_latest_files()
-        for file in latest_files:
-            new_url = '%s/record/%s/files/%s' % (CFG_SITE_URL, rec_id, file.get_full_name())
-            new_subfield = [('u', new_url)]
-            description = descriptions.get(new_url, '')
-            if description == 'KEEP-OLD-VALUE':
-                description = old_descriptions.get(changed.get(new_url, new_url), '')
+        for afile in latest_files:
+            url = afile.get_url()
+            description = afile.get_description()
+            comment = afile.get_comment()
+            new_subfield = [('u', url)]
             if description:
                 new_subfield.append(('y', description))
-            comment = comments.get(new_url, '')
-            if comment == 'KEEP-OLD-VALUE':
-                comment = old_comments.get(changed.get(new_url, new_url), '')
             if comment:
                 new_subfield.append(('z', comment))
             record_add_field(record, '856', '4', ' ', '', new_subfield)
@@ -764,21 +753,24 @@ def elaborate_fft_tags(record, rec_id, mode):
             if icon:
                 icon = icon.list_all_files()
                 if icon:
-                    icon = icon[0].get_full_name()
-                    new_subfield = [('q', '%s/record/%s/files/%s' % (CFG_SITE_URL, rec_id, icon))]
+                    url = icon[0].get_url() ## The 1st format found should be ok
+                    new_subfield = [('q', url)]
                     new_subfield.append(('x', 'icon'))
                     record_add_field(record, '856', '4', ' ', '', new_subfield)
         return record
 
-    def _add_new_format(bibdoc, url, format, docname, doctype, newname):
+    def _add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment):
         """Adds a new format for a given bibdoc. Returns True when everything's fine."""
+        write_message('Add new format to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s' % (repr(bibdoc), url, format, docname, doctype, newname, description, comment), verbose=9)
         try:
+            if not url: # Not requesting a new url. Just updating comment & description
+                return _update_description_and_comment(bibdoc, docname, format, description, comment)
             tmpurl = download_url(url, format)
             try:
                 try:
-                    bibdoc.add_file_new_format(tmpurl)
+                    bibdoc.add_file_new_format(tmpurl, description=description, comment=comment)
                 except StandardError, e:
-                    write_message("('%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, format, docname, doctype, newname, e), stream=sys.stderr)
+                    write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because format already exists (%s)." % (url, format, docname, doctype, newname, description, comment, e), stream=sys.stderr)
                     raise
             finally:
                 os.remove(tmpurl)
@@ -787,20 +779,34 @@ def elaborate_fft_tags(record, rec_id, mode):
             raise
         return True
 
-    def _add_new_version(bibdoc, url, format, docname, doctype, newname):
+    def _add_new_version(bibdoc, url, format, docname, doctype, newname, description, comment):
         """Adds a new version for a given bibdoc. Returns True when everything's fine."""
+        write_message('Add new version to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s' % (repr(bibdoc), url, format, docname, doctype, newname, description, comment))
         try:
+            if not url:
+                return _update_description_and_comment(bibdoc, docname, format, description, comment)
             tmpurl = download_url(url, format)
             try:
                 try:
-                    bibdoc.add_file_new_version(tmpurl)
+                    bibdoc.add_file_new_version(tmpurl, description=description, comment=comment)
                 except StandardError, e:
-                    write_message("('%s', '%s', '%s', '%s', '%s') not inserted because '%s'." % (url, format, docname, doctype, newname, e), stream=sys.stderr)
+                    write_message("('%s', '%s', '%s', '%s', '%s', '%s', '%s') not inserted because '%s'." % (url, format, docname, doctype, newname, description, comment, e), stream=sys.stderr)
                     raise
             finally:
                 os.remove(tmpurl)
         except Exception, e:
             write_message("Error in downloading '%s' because of: %s" % (url, e), stream=sys.stderr)
+            raise
+        return True
+
+    def _update_description_and_comment(bibdoc, docname, format, description, comment):
+        """Directly update comments and descriptions."""
+        write_message('Just updating description and comment for %s with format %s with description %s and comment %s' % (docname, format, description, comment), verbose=9)
+        try:
+            bibdoc.set_description(description, format)
+            bibdoc.set_comment(comment, format)
+        except StandardError, e:
+            write_message("('%s', '%s', '%s', '%s') description and comment not updated because '%s'." % (docname, format, description, comment, e))
             raise
         return True
 
@@ -812,12 +818,12 @@ def elaborate_fft_tags(record, rec_id, mode):
             try:
                 path = urllib2.urlparse.urlsplit(url)[2]
                 filename = os.path.split(path)[-1]
-                format = filename[len(file_strip_ext(filename)):].lower()
+                format = filename[len(file_strip_ext(filename)):]
                 tmpurl = download_url(url, format)
                 try:
                     try:
                         icondoc = bibdoc.add_icon(tmpurl, 'icon-%s' % bibdoc.get_docname())
-                        if restriction and restriction != 'KEEP-OLD-VALUE':
+                        if restriction and restriction != KEEP_OLD_VALUE:
                             icondoc.set_status(restriction)
                     except StandardError, e:
                         write_message("('%s', '%s') icon not added because '%s'." % (url, format, e), stream=sys.stderr)
@@ -833,12 +839,11 @@ def elaborate_fft_tags(record, rec_id, mode):
     if tuple_list: # FFT Tags analysis
         write_message("FFTs: "+str(tuple_list), verbose=9)
         docs = {} # docnames and their data
-        comments = {} # files and their comments
-        descriptions = {} # docnames and their descriptions
-        changed = {} # local urls changed because of docname->newname
 
         for fft in record_get_field_instances(record, 'FFT', ' ', ' '):
             # Let's discover the type of the document
+            # This is a legacy field and will not be enforced any particular
+            # check on it.
             doctype = field_get_subfield_values(fft, 't')
             if doctype:
                 doctype = doctype[0]
@@ -855,9 +860,10 @@ def elaborate_fft_tags(record, rec_id, mode):
                     raise StandardError, "fft '%s' specify an url ('%s') with problems: %s" % (fft, url, e)
             else:
                 url = ''
+
             # Let's discover the description
             description = field_get_subfield_values(fft, 'd')
-            if description:
+            if description != []:
                 description = description[0]
             else:
                 description = ''
@@ -893,29 +899,29 @@ def elaborate_fft_tags(record, rec_id, mode):
 
             # Let's discover the icon
             icon = field_get_subfield_values(fft, 'x')
-            if icon:
+            if icon != []:
                 icon = icon[0]
-                if icon != 'KEEP-OLD-VALUE':
+                if icon != KEEP_OLD_VALUE:
                     try:
                         check_valid_url(icon)
                     except StandardError, e:
                         raise StandardError, "fft '%s' specify an icon ('%s') with problems: %s" % (fft, icon, e)
             else:
-                icon = ''
+                icon = KEEP_OLD_VALUE
 
             # Let's discover the comment
             comment = field_get_subfield_values(fft, 'z')
-            if comment:
+            if comment != []:
                 comment = comment[0]
             else:
-                comment = ''
+                comment = KEEP_OLD_VALUE
 
             # Let's discover the restriction
             restriction = field_get_subfield_values(fft, 'r')
-            if restriction:
+            if restriction != []:
                 restriction = restriction[0]
             else:
-                restriction = ''
+                restriction = KEEP_OLD_VALUE
 
             version = field_get_subfield_values(fft, 'v')
             if version:
@@ -935,22 +941,18 @@ def elaborate_fft_tags(record, rec_id, mode):
                     raise StandardError, "fft '%x' specifies a different icon than the previous fft with docname '%s'" % (str(fft), name)
                 if version2 != version:
                     raise StandardError, "fft '%x' specifies a different version than the previous fft with docname '%s'" % (str(fft), name)
-                for (url2, format2) in urls:
+                for (url2, format2, description2, comment2) in urls:
                     if format == format2:
                         raise StandardError, "fft '%s' specifies a second file '%s' with the same format '%s' from previous fft with docname '%s'" % (str(fft), url, format, name)
-                if url:
-                    urls.append((url, format))
+                if url or format:
+                    urls.append((url, format, description, comment))
             else:
-                if url:
-                    docs[name] = (doctype, newname, restriction, icon, version, [(url, format)])
+                if url or format:
+                    docs[name] = (doctype, newname, restriction, icon, version, [(url, format, description, comment)])
                 else:
                     docs[name] = (doctype, newname, restriction, icon, version, [])
-            comments['%s/record/%s/files/%s%s' % (CFG_SITE_URL, rec_id, newname, format)] = comment
-            descriptions['%s/record/%s/files/%s%s' % (CFG_SITE_URL, rec_id, newname, format)] = description
-            if newname != name:
-                changed['%s/record/%s/files/%s%s' % (CFG_SITE_URL, rec_id, newname, format)] = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, rec_id, name, format)
 
-        write_message('Result of FFT analysis:\n\tDocs: %s\n\tComments: %s\n\tDescriptions: %s' % (docs, comments, descriptions), verbose=9)
+        write_message('Result of FFT analysis:\n\tDocs: %s' % (docs,), verbose=9)
 
         # Let's remove all FFT tags
         record_delete_field(record, 'FFT', ' ', ' ')
@@ -968,77 +970,27 @@ def elaborate_fft_tags(record, rec_id, mode):
             if mode in ('insert', 'replace'): # new bibdocs, new docnames, new marc
                 if newname in bibrecdocs.get_bibdoc_names():
                     write_message("('%s', '%s') not inserted because docname already exists." % (newname, urls), stream=sys.stderr)
-                    break
+                    raise StandardError
                 try:
                     bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
                     bibdoc.set_status(restriction)
                 except Exception, e:
                     write_message("('%s', '%s', '%s') not inserted because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
-                    break
-                for (url, format) in urls:
-                    assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
-                if icon and not icon == 'KEEP-OLD-VALUE':
+                    raise StandardError
+                for (url, format, description, comment) in urls:
+                    assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment))
+                if icon and not icon == KEEP_OLD_VALUE:
                     assert(_add_new_icon(bibdoc, icon, restriction))
             elif mode == 'replace_or_insert': # to be thought as correct_or_insert
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == docname:
-                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT'):
+                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT', 'FIX'):
                             if newname != docname:
                                 try:
                                     bibdoc.change_name(newname)
                                 except StandardError, e:
                                     write_message(e, stream=sys.stderr)
                                     raise
-                found_bibdoc = False
-                for bibdoc in bibrecdocs.list_bibdocs():
-                    if bibdoc.get_docname() == docname:
-                        found_bibdoc = True
-                        if doctype == 'PURGE':
-                            bibdoc.purge()
-                        elif doctype == 'DELETE':
-                            bibdoc.delete()
-                        elif doctype == 'EXPUNGE':
-                            bibdoc.expunge()
-                        elif doctype == 'REVERT':
-                            try:
-                                bibdoc.revert(version)
-                            except Exception, e:
-                                write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e), stream=sys.stderr)
-                                raise
-                        else:
-                            if restriction != 'KEEP-OLD-VALUE':
-                                bibdoc.set_status(restriction)
-                            # Since the docname already existed we have to first
-                            # bump the version by pushing the first new file
-                            # then pushing the other files.
-                            if urls:
-                                (first_url, first_format) = urls[0]
-                                other_urls = urls[1:]
-                                assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname))
-                                for (url, format) in other_urls:
-                                    assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
-                        if icon != 'KEEP-OLD-VALUE':
-                            assert(_add_new_icon(bibdoc, icon, restriction))
-                if not found_bibdoc:
-                    bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
-                    for (url, format) in urls:
-                        assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
-                    if icon and not icon == 'KEEP-OLD-VALUE':
-                        assert(_add_new_icon(bibdoc, icon, restriction))
-            elif mode == 'correct':
-                super_break = False
-                for bibdoc in bibrecdocs.list_bibdocs():
-                    if bibdoc.get_docname() == docname:
-                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT'):
-                            if newname != docname:
-                                try:
-                                    bibdoc.change_name(newname)
-                                except StandardError, e:
-                                    write_message(e, stream=sys.stderr)
-                                    super_break = True
-                                    break
-                if super_break:
-                    break
                 found_bibdoc = False
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == newname:
@@ -1049,6 +1001,8 @@ def elaborate_fft_tags(record, rec_id, mode):
                             bibdoc.delete()
                         elif doctype == 'EXPUNGE':
                             bibdoc.expunge()
+                        elif doctype == 'FIX':
+                            bibrecdocs.fix(docname, True)
                         elif doctype == 'REVERT':
                             try:
                                 bibdoc.revert(version)
@@ -1056,41 +1010,93 @@ def elaborate_fft_tags(record, rec_id, mode):
                                 write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e), stream=sys.stderr)
                                 raise
                         else:
-                            if restriction != 'KEEP-OLD-VALUE':
+                            if restriction != KEEP_OLD_VALUE:
+                                bibdoc.set_status(restriction)
+                            # Since the docname already existed we have to first
+                            # bump the version by pushing the first new file
+                            # then pushing the other files.
+                            if urls:
+                                (first_url, first_format, first_description, first_comment) = urls[0]
+                                other_urls = urls[1:]
+                                assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment))
+                                for (url, format, description, comment) in other_urls:
+                                    assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment))
+                        if icon != KEEP_OLD_VALUE:
+                            assert(_add_new_icon(bibdoc, icon, restriction))
+                if not found_bibdoc:
+                    bibdoc = bibrecdocs.add_bibdoc(doctype, newname)
+                    for (url, format, description, comment) in urls:
+                        assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment))
+                    if icon and not icon == KEEP_OLD_VALUE:
+                        assert(_add_new_icon(bibdoc, icon, restriction))
+            elif mode == 'correct':
+                for bibdoc in bibrecdocs.list_bibdocs():
+                    if bibdoc.get_docname() == docname:
+                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT', 'FIX'):
+                            if newname != docname:
+                                try:
+                                    bibdoc.change_name(newname)
+                                except StandardError, e:
+                                    write_message('Error in renaming %s to %s: %s' % (docname, newname, e), stream=sys.stderr)
+                                    raise
+                found_bibdoc = False
+                for bibdoc in bibrecdocs.list_bibdocs():
+                    if bibdoc.get_docname() == newname:
+                        found_bibdoc = True
+                        if doctype == 'PURGE':
+                            bibdoc.purge()
+                        elif doctype == 'DELETE':
+                            bibdoc.delete()
+                        elif doctype == 'EXPUNGE':
+                            bibdoc.expunge()
+                        elif doctype == 'FIX':
+                            bibrecdocs.fix(newname, True)
+                        elif doctype == 'REVERT':
+                            try:
+                                bibdoc.revert(version)
+                            except Exception, e:
+                                write_message('(%s, %s) not correctly reverted: %s' % (newname, version, e), stream=sys.stderr)
+                                raise
+                        else:
+                            if restriction != KEEP_OLD_VALUE:
                                 bibdoc.set_status(restriction)
                             if urls:
-                                (first_url, first_format) = urls[0]
+                                (first_url, first_format, first_description, first_comment) = urls[0]
                                 other_urls = urls[1:]
-                                assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname))
-                                for (url, format) in other_urls:
-                                    assert(_add_new_format(bibdoc, url, format, docname, description, doctype, newname))
-                        if icon != 'KEEP-OLD-VALUE':
+                                assert(_add_new_version(bibdoc, first_url, first_format, docname, doctype, newname, first_description, first_comment))
+                                for (url, format, description, comment) in other_urls:
+                                    assert(_add_new_format(bibdoc, url, format, docname, description, doctype, newname, description, comment))
+                        if icon != KEEP_OLD_VALUE:
                             _add_new_icon(bibdoc, icon, restriction)
                 if not found_bibdoc:
                     write_message("('%s', '%s', '%s') not added because '%s' docname didn't existed." % (doctype, newname, urls, docname), stream=sys.stderr)
                     raise StandardError
             elif mode == 'append':
-                found_bibdoc = False
-                for bibdoc in bibrecdocs.list_bibdocs():
-                    if bibdoc.get_docname() == docname:
-                        found_bibdoc = True
-                        for (url, format) in urls:
-                            assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
-                        if icon not in ('', 'KEEP-OLD-VALUE'):
-                            assert(_add_new_icon(bibdoc, icon, restriction))
-                if not found_bibdoc:
-                    try:
-                        bibdoc = bibrecdocs.add_bibdoc(doctype, docname)
-                        bibdoc.set_status(restriction)
-                        for (url, format) in urls:
-                            assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
-                        if icon and not icon == 'KEEP-OLD-VALUE':
-                            assert(_add_new_icon(bibdoc, icon, restriction))
-                    except Exception, e:
-                        write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
-                        raise
-        write_message('Changed urls: %s' % str(changed), verbose=9, stream=sys.stderr)
-        return _synchronize_8564(rec_id, record, descriptions, comments, changed)
+                try:
+                    found_bibdoc = False
+                    for bibdoc in bibrecdocs.list_bibdocs():
+                        if bibdoc.get_docname() == docname:
+                            found_bibdoc = True
+                            for (url, format, description, comment) in urls:
+                                assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment))
+                            if icon not in ('', KEEP_OLD_VALUE):
+                                assert(_add_new_icon(bibdoc, icon, restriction))
+                    if not found_bibdoc:
+                        try:
+                            bibdoc = bibrecdocs.add_bibdoc(doctype, docname)
+                            bibdoc.set_status(restriction)
+                            for (url, format, description, comment) in urls:
+                                assert(_add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment))
+                            if icon and not icon == KEEP_OLD_VALUE:
+                                assert(_add_new_icon(bibdoc, icon, restriction))
+                        except Exception, e:
+                            register_exception()
+                            write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
+                            raise
+                except:
+                    register_exception()
+                    raise
+        return _synchronize_8564(rec_id, record)
     else:
         return record
 
