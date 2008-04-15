@@ -41,6 +41,8 @@ class WebDocLanguageTest(unittest.TestCase):
 
         if 'de' not in CFG_SITE_LANGS:
             self.fail("SKIPPED: German language not configured, test skipped.")
+        elif 'en' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: English language not configured, test skipped.")
 
         result = transform('''
         <strong>
