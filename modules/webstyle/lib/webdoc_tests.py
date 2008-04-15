@@ -38,7 +38,6 @@ class WebDocLanguageTest(unittest.TestCase):
 
     def test_language_filtering(self):
         """webdoc - language filtering"""
-
         if 'de' not in CFG_SITE_LANGS:
             self.fail("SKIPPED: German language not configured, test skipped.")
         elif 'en' not in CFG_SITE_LANGS:
@@ -69,6 +68,9 @@ class WebDocLanguageTest(unittest.TestCase):
 
     def test_string_translation(self):
         """webdoc - string translation"""
+        if 'en' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: English language not configured, test skipped.")
+
         result = transform('my_string: _(Search)_ (end)',
                            languages=[CFG_SITE_LANG])
         _ = gettext_set_language(CFG_SITE_LANG)
@@ -82,6 +84,8 @@ class WebDocPartsTest(unittest.TestCase):
     def test_parts(self):
         """webdoc - retrieving parts of webdoc file (title, navtrail,
         etc.)"""
+        if 'en' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: English language not configured, test skipped.")
 
         _ = gettext_set_language(CFG_SITE_LANG)
 
@@ -114,6 +118,8 @@ class WebDocVariableReplacementTest(unittest.TestCase):
 
     def test_CFG_SITE_URL_variable_replacement(self):
         """webdoc - replacing <CFG_SITE_URL> in webdoc files"""
+        if 'en' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: English language not configured, test skipped.")
 
         result = transform('<CFG_SITE_URL>', languages=[CFG_SITE_LANG])
 
@@ -122,6 +128,8 @@ class WebDocVariableReplacementTest(unittest.TestCase):
     def test_language_tags_replacement(self):
         """webdoc - replacing <lang:link /> and <lang:current /> in
         webdoc files"""
+        if 'en' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: English language not configured, test skipped.")
 
         result = transform('<lang:current />', languages=[CFG_SITE_LANG])
         self.assertEqual(result[0][1], CFG_SITE_LANG)
@@ -141,6 +149,9 @@ class WebDocCommentsFiltering(unittest.TestCase):
 
     def test_comments_filtering(self):
         """webdoc - removing comments"""
+        if 'en' not in CFG_SITE_LANGS:
+            self.fail("SKIPPED: English language not configured, test skipped.")
+
         result = transform('''# -*- coding: utf-8 -*-
 ## $Id$
 ##''',
