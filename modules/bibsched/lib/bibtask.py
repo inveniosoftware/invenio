@@ -70,12 +70,14 @@ from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
 cfg_valid_processes_no_auth_needed = ("bibupload", )
 cfg_task_is_not_a_deamon = ("bibupload", )
 
-def fix_argv_paths(paths, argv=sys.argv):
+def fix_argv_paths(paths, argv=None):
     """Given the argv vector of cli parameters, and a list of path that
     can be relative and may have been specified within argv,
     it substitute all the occurencies of these paths in argv.
     argv is changed in place and returned.
     """
+    if argv is None:
+        argv = sys.argv
     for path in paths:
         for count in xrange(len(argv)):
             if path == argv[count]:
