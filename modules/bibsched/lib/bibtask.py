@@ -70,6 +70,19 @@ from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
 cfg_valid_processes_no_auth_needed = ("bibupload", )
 cfg_task_is_not_a_deamon = ("bibupload", )
 
+def fix_argv_paths(paths, argv=sys.argv):
+    """Given the argv vector of cli parameters, and a list of path that
+    can be relative and may have been specified within argv,
+    it substitute all the occurencies of these paths in argv.
+    argv is changed in place and returned.
+    """
+    for path in paths:
+        for count in xrange(len(argv)):
+            if path == argv[count]:
+                argv[count] = os.path.realpath(path)
+    return argv
+
+
 def task_low_level_submission(name, user, *argv):
     """Let special lowlevel enqueuing of a task on the bibsche queue.
     @param name is the name of the bibtask. It must be a valid executable under
@@ -211,7 +224,7 @@ def _task_build_params(
     # set user-defined options:
     try:
         (short_params, long_params) = specific_params
-        opts, args = getopt.getopt(argv[1:], "hVv:u:s:t:" +
+        opts, args = getopt.gnu_getopt(argv[1:], "hVv:u:s:t:" +
             short_params, [
                 "help",
                 "version",
