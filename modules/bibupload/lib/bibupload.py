@@ -855,7 +855,6 @@ def elaborate_fft_tags(record, rec_id, mode):
                     raise StandardError, "fft '%s' specify an url ('%s') with problems: %s" % (fft, url, e)
             else:
                 url = ''
-
             # Let's discover the description
             description = field_get_subfield_values(fft, 'd')
             if description:
@@ -1071,25 +1070,25 @@ def elaborate_fft_tags(record, rec_id, mode):
                     write_message("('%s', '%s', '%s') not added because '%s' docname didn't existed." % (doctype, newname, urls, docname), stream=sys.stderr)
                     raise StandardError
             elif mode == 'append':
-                    found_bibdoc = False
-                    for bibdoc in bibrecdocs.list_bibdocs():
-                        if bibdoc.get_docname() == docname:
-                            found_bibdoc = True
+                found_bibdoc = False
+                for bibdoc in bibrecdocs.list_bibdocs():
+                    if bibdoc.get_docname() == docname:
+                        found_bibdoc = True
                         for (url, format) in urls:
                             assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
                         if icon not in ('', 'KEEP-OLD-VALUE'):
-                                assert(_add_new_icon(bibdoc, icon, restriction))
-                    if not found_bibdoc:
-                        try:
-                            bibdoc = bibrecdocs.add_bibdoc(doctype, docname)
-                            bibdoc.set_status(restriction)
+                            assert(_add_new_icon(bibdoc, icon, restriction))
+                if not found_bibdoc:
+                    try:
+                        bibdoc = bibrecdocs.add_bibdoc(doctype, docname)
+                        bibdoc.set_status(restriction)
                         for (url, format) in urls:
                             assert(_add_new_format(bibdoc, url, format, docname, doctype, newname))
                         if icon and not icon == 'KEEP-OLD-VALUE':
-                                assert(_add_new_icon(bibdoc, icon, restriction))
-                        except Exception, e:
-                            write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
-                            raise
+                            assert(_add_new_icon(bibdoc, icon, restriction))
+                    except Exception, e:
+                        write_message("('%s', '%s', '%s') not appended because: '%s'." % (doctype, newname, urls, e), stream=sys.stderr)
+                        raise
         write_message('Changed urls: %s' % str(changed), verbose=9, stream=sys.stderr)
         return _synchronize_8564(rec_id, record, descriptions, comments, changed)
     else:
