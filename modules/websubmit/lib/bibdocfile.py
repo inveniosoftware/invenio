@@ -145,13 +145,17 @@ def propose_unique_name(file, use_version=False):
 
 class BibRecDocs:
     """this class represents all the files attached to one record"""
-    def __init__(self, recid):
+    def __init__(self, recid, deleted_too=False):
         self.id = recid
+        self.deleted_too = deleted_too
         self.bibdocs = []
         self.build_bibdoc_list()
 
     def __repr__(self):
-        return 'BibRecDocs(%s)' % self.id
+        if self.deleted_too:
+            return 'BibRecDocs(%s, True)' % self.id
+        else:
+            return 'BibRecDocs(%s)' % self.id
 
     def __str__(self):
         out = '%i::::total bibdocs attached=%i\n' % (self.id, len(self.bibdocs))
@@ -211,7 +215,12 @@ class BibRecDocs:
         recid is added, removed or modified.
         """
         self.bibdocs = []
-        res = run_sql("""SELECT id_bibdoc, type, status FROM bibrec_bibdoc JOIN
+        if self.deleted_too:
+            res = run_sql("""SELECT id_bibdoc, type FROM bibrec_bibdoc JOIN
+                         bibdoc ON id=id_bibdoc WHERE id_bibrec=%s
+                         ORDER BY docname ASC""", (self.id,))
+        else:
+            res = run_sql("""SELECT id_bibdoc, type FROM bibrec_bibdoc JOIN
                          bibdoc ON id=id_bibdoc WHERE id_bibrec=%s AND
                          status<>'DELETED' ORDER BY docname ASC""", (self.id,))
         for row in res:
@@ -645,11 +654,12 @@ class BibDoc:
 
     def set_status(self, new_status):
         """Set a new status."""
-        run_sql('UPDATE bibdoc SET status=%s WHERE id=%s', (new_status, self.id))
-        self.status = new_status
-        self.touch()
-        self._build_file_list()
-        self._build_related_file_list()
+        if new_status != KEEP_OLD_VALUE:
+            run_sql('UPDATE bibdoc SET status=%s WHERE id=%s', (new_status, self.id))
+            self.status = new_status
+            self.touch()
+            self._build_file_list()
+            self._build_related_file_list()
 
     def add_file_new_version(self, filename, description=None, comment=None):
         """Add a new version of a file."""
