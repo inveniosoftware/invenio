@@ -753,7 +753,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
         for c in colls:
             if c:
                 temp = []
-                temp.append({ 'value' : '',
+                temp.append({ 'value' : CFG_SITE_NAME,
                               'text' : '*** %s ***' % _("any collection")
                             })
                 for val in colls_nice:
@@ -768,7 +768,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                                'text' : '*** %s ***' % _("add another collection")
                              }] + colls_nice)
     else: # we searched in CFG_SITE_NAME, so print 'any collection' heading
-        coll_selects.append([{ 'value' : '',
+        coll_selects.append([{ 'value' : CFG_SITE_NAME,
                                'text' : '*** %s ***' % _("any collection")
                              }] + colls_nice)
 
