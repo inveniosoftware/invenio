@@ -866,7 +866,13 @@ def elaborate_fft_tags(record, rec_id, mode):
             if description != []:
                 description = description[0]
             else:
-                description = ''
+                if mode == 'correct':
+                    ## If the user require to correct, and do not specify
+                    ## a description this means she really want to
+                    ## modify the description.
+                    description = ''
+                else:
+                    description = KEEP_OLD_VALUE
 
             # Let's discover the desired docname to be created/altered
             name = field_get_subfield_values(fft, 'n')
@@ -907,21 +913,33 @@ def elaborate_fft_tags(record, rec_id, mode):
                     except StandardError, e:
                         raise StandardError, "fft '%s' specify an icon ('%s') with problems: %s" % (fft, icon, e)
             else:
-                icon = KEEP_OLD_VALUE
+                if mode == 'correct':
+                    ## See comment on description
+                    icon = ''
+                else:
+                    icon = KEEP_OLD_VALUE
 
             # Let's discover the comment
             comment = field_get_subfield_values(fft, 'z')
             if comment != []:
                 comment = comment[0]
             else:
-                comment = KEEP_OLD_VALUE
+                if mode == 'correct':
+                    ## See comment on description
+                    comment = ''
+                else:
+                    comment = KEEP_OLD_VALUE
 
             # Let's discover the restriction
             restriction = field_get_subfield_values(fft, 'r')
             if restriction != []:
                 restriction = restriction[0]
             else:
-                restriction = KEEP_OLD_VALUE
+                if mode == 'correct':
+                    ## See comment on description
+                    restriction = ''
+                else:
+                    restriction = KEEP_OLD_VALUE
 
             version = field_get_subfield_values(fft, 'v')
             if version:
