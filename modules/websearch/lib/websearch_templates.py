@@ -582,7 +582,7 @@ class Template:
 
 
         header = _("Search %s records for:") % \
-                 self.tmpl_nbrecs_info(record_count, "","")
+                 self.tmpl_nbrecs_info(record_count, "", "")
         asearchurl = self.build_search_interface_url(c=collection_id, as=1, ln=ln)
 
         # print commentary start:
@@ -677,7 +677,7 @@ class Template:
 
 
         header = _("Search %s records for") % \
-                 self.tmpl_nbrecs_info(record_count, "","")
+                 self.tmpl_nbrecs_info(record_count, "", "")
         header += ':'
         ssearchurl = self.build_search_interface_url(c=collection_id, as=0, ln=ln)
 
@@ -2940,7 +2940,7 @@ class Template:
         #make a authoraff string that looks like CERN (1), Caltech (2) etc
         authoraff = ""
         for a in aff_pubdict.keys():
-            recids = "+or+".join(map(str,aff_pubdict[a]))
+            recids = "+or+".join(map(str, aff_pubdict[a]))
             searchstr = "<a href=\"../search?f=recid&p="+recids+"\">"+str(len(aff_pubdict[a]))+"</a>"
             if (a == ' '):
                 authoraff = authoraff+" "+_("unknown")+" ("+searchstr+")"
@@ -3038,28 +3038,20 @@ class Template:
                       'nb_avgcit': avgstr,
                       'msg_breakdown': _("Breakdown of papers by citations:"),}
 
-        #print the stuff in reciddict
-        for k in reciddict.keys():
-            rowtitle = k
-            reclist = reciddict[k]
-            out += "<tr><td>"+_(rowtitle)+"</td><td>"
-            #construct a link..
-            if criteria:
-                #check the corresponding entry in tresholds_names
-                mymin = -1
-                mymax = -1
-                for (min, max, name) in tresholds_names:
-                    if (rowtitle == name):
-                        #found
-                        mymin = min
-                        mymax = max
-                        break
-                if (mymin > -1):
+        #print the stuff in reciddict, but sort according to tresholds_names
+        for (mincites, maxcites, name) in tresholds_names:
+            if reciddict.has_key(name):
+                rowtitle = name
+                reclist = reciddict[name]
+                out += "<tr><td>"+_(rowtitle)+"</td><td>"
+                #construct a link..
+                if criteria:
                     #the citing min/max was found, append criteria
-                    link = criteria+"&op1=a&m2=a&f2=cites&p2="+str(mymin)+"-"+str(mymax)
-                out += "<a href="+link+">"+str(len(reclist))+"</a>"
-            else:
-                out += str(len(reclist))
+                    link = criteria+"&op1=a&m2=a&f2=cites&p2="+\
+                           str(mincites)+"-"+str(maxcites)
+                    out += "<a href="+link+">"+str(len(reclist))+"</a>"
+                else:
+                    out += str(len(reclist))
         out += "</td></tr>"
         out += '</table>'
         return out

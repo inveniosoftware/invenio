@@ -44,13 +44,15 @@ def summarize_records(recids, of, ln, defstring=""):
         citedbylist = get_cited_by_list(recids)
         return print_citation_summary_xml(citedbylist)
 
-CFG_CITESUMMARY_THRESHOLD_NAMES = [(0, 0, 'Unknown papers (0)'),
-                                   (1, 9, 'Less known papers (1-9)'),
-                                   (10, 49, 'Known papers (10-49)'),
-                                   (50, 99, 'Well-known papers (50-99)'),
-                                   (100, 249, 'Very well-known papers (100-249)'),
+CFG_CITESUMMARY_THRESHOLD_NAMES = [
+                                   (500, 1000000, 'Renowned papers (500+)'),
                                    (250, 499, 'Famous papers (250-499)'),
-                                   (500, 1000000, 'Renowned papers (500+)'),]
+                                   (100, 249, 'Very well-known papers (100-249)'),
+                                   (50, 99, 'Well-known papers (50-99)'),
+                                   (10, 49, 'Known papers (10-49)'),
+                                   (1, 9, 'Less known papers (1-9)'),
+                                   (0, 0, 'Unknown papers (0)')
+                                   ]
 
 #for citation summary, code xcs/hcs (unless changed)
 def print_citation_summary_xml(citedbylist):
