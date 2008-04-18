@@ -28,8 +28,13 @@ __lastupdated__ = """$Date$"""
 __revision__ = "$Id$"
 
 from invenio.bibrank_citation_searcher import get_cited_by_list
+#from invenio.search_engine_utils import get_fieldvalues
+#TODO: factoring invenio.search_engine and invenio.search_engine_utils
+from invenio.dbquery import run_sql
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
+
+COLLECTION_TAG = "980__b"
 
 def summarize_records(recids, of, ln, defstring=""):
     """Produces a report in the format defined by of in language ln
@@ -38,7 +43,18 @@ def summarize_records(recids, of, ln, defstring=""):
     if of == 'hcs':
         #this is a html cite summary
         citedbylist = get_cited_by_list(recids)
-        return print_citation_summary_html(citedbylist, ln, defstring)
+        #divide the list into sublists according to the collection (980__b) info of the recs
+        collections_citedbys = {}
+        for recid in recids:
+            vals = tmp_get_fieldvalues(recid, COLLECTION_TAG)
+            for v in vals:
+                if collections_citedbys.has_key(v):
+                    #appned this record in the existing list
+                    collections_citedbys[v].append(recid)
+                else:
+                    collections_citedbys[v] = [recid]
+
+        return print_citation_summary_html(citedbylist, ln, defstring, collections_citedbys)
     if of == 'xcs':
         #this is an xml cite summary
         citedbylist = get_cited_by_list(recids)
@@ -78,7 +94,7 @@ def print_citation_summary_xml(citedbylist):
     return outp #just to return something
 
 
-def print_citation_summary_html(citedbylist, ln, criteria=""):
+def print_citation_summary_html(citedbylist, ln, criteria="", dict_of_lists = {}):
     """Prints citation summary in html.
        The criteria, if any, is added to the link"""
     alldict = calculate_citations(citedbylist)
@@ -90,7 +106,8 @@ def print_citation_summary_html(citedbylist, ln, criteria=""):
     reciddict = alldict['reciddict']
     return websearch_templates.tmpl_citesummary_html(ln, totalrecs,
                                                      totalcites, avgstr,
-                                                     reciddict, CFG_CITESUMMARY_THRESHOLD_NAMES, criteria)
+                                                     reciddict, CFG_CITESUMMARY_THRESHOLD_NAMES,
+                                                     criteria, dict_of_lists)
 
 def calculate_citations(citedbylist):
     """calculates records in classes of citations
@@ -126,3 +143,31 @@ def calculate_citations(citedbylist):
     alldict['avgcites'] = avgcites
     alldict['reciddict'] = reciddict
     return alldict
+
+
+
+def tmp_get_fieldvalues(recID, tag):
+    """Return list of field values for field TAG inside record RECID."""
+    out = []
+    if tag == "001___":
+        # we have asked for recID that is not stored in bibXXx tables
+        out.append(str(recID))
+    else:
+        # we are going to look inside bibXXx tables
+        digits = tag[0:2]
+        try:
+            intdigits = int(digits)
+            if intdigits < 0 or intdigits > 99:
+                raise ValueError
+        except ValueError:
+            # invalid tag value asked for
+            return []
+        bx = "bib%sx" % digits
+        bibx = "bibrec_bib%sx" % digits
+        query = "SELECT bx.value FROM %s AS bx, %s AS bibx " \
+                " WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s' " \
+                " ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
+        res = run_sql(query)
+        for row in res:
+            out.append(row[0])
+    return out
