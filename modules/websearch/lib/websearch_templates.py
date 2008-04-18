@@ -3024,6 +3024,8 @@ class Template:
                    'string description of the citation class' -> [id1,id2,..]
                - tresholds_names is a list of tuples (min,max,'string description of the citation class')
                - criteria is added to the link
+               - dict_of_lists is a dictionary that holds the category ("collection" in SPIRES, 980__b)
+                 and the record ids in it. Example 'Published'->[1,2,3],'Conference'->[5,6,7]
         """
         # load the right message language
         _ = gettext_set_language(ln)
@@ -3059,13 +3061,11 @@ class Template:
                         collstr += str(k)+":"+str(len(intersec_list))+" "
                 out += "<tr><td>"+_(rowtitle)+"</td><td>"
                 #construct a link..
+                link = "../search?p=cited%3A"+str(mincites)+"-%3E"+str(maxcites)
                 if criteria:
                     #the citing min/max was found, append criteria
-                    link = "../search?p=cited%3A"+\
-                           str(mincites)+"-%3E"+str(maxcites)+"%20"+criteria
-                    out += "<a href="+link+">"+str(len(reclist))+"</a> "+collstr
-                else:
-                    out += str(len(reclist))
+                    link += "%20"+criteria
+                out += "<a href="+link+">"+str(len(reclist))+"</a> "+collstr
         out += "</td></tr>"
         out += '</table>'
         return out
