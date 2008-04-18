@@ -86,8 +86,8 @@ def get_records_with_num_cites(numstr):
                 matches.append(k)
         return matches
 
-    #try to get 1-10 or such
-    firstsec = re.findall("(\d+)-(\d+)", numstr)
+    #try to get 1->10 or such
+    firstsec = re.findall("(\d+)->(\d+)", numstr)
     if firstsec:
         first = 0
         sec = -1
