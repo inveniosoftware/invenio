@@ -1206,6 +1206,7 @@ class BibDoc:
         for bibdocfile in self.docfiles:
             if bibdocfile.get_version() > version:
                 version = bibdocfile.get_version()
+        return version
 
     def get_file_number(self):
         """Return the total number of files."""
@@ -1427,7 +1428,7 @@ def order_files_with_version(docfile1, docfile2):
 def _make_base_dir(docid):
     """Given a docid it returns the complete path that should host its files."""
     group = "g" + str(int(int(docid) / CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT))
-    return os.path.join(CFG_WEBSUBMIT_FILEDIR, group, docid)
+    return os.path.join(CFG_WEBSUBMIT_FILEDIR, group, str(docid))
 
 
 class Md5Folder:
