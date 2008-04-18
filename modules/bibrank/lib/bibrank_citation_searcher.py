@@ -25,6 +25,12 @@ import re
 import marshal
 from zlib import decompress, error
 
+
+try:
+    Set = set
+except NameError:
+    from sets import Set
+
 from invenio.dbquery import run_sql, run_sql_cached, OperationalError
 
 def init_db_dictionary(dname):
@@ -63,9 +69,9 @@ def get_cited_by(recordid):
         ret = citation_dic[recordid]
     return ret
 
-def get_records_with_num_cites(numstr):
+def get_records_with_num_cites(numstr, allrecs = []):
     """returns records are cited X times, X defined in numstr.
-      Warning: numstr is string and may not be numeric! It can be 10,0-100,500+ etc"""
+      Warning: numstr is string and may not be numeric! It can be 10,0->100 etc"""
     matches = []
     #once again, check that the parameter is a string
     if not (type(numstr) == type("thisisastring")):
@@ -80,6 +86,9 @@ def get_records_with_num_cites(numstr):
     singlenum = re.findall("(^\d+$)", numstr)
     if singlenum:
         num = int(singlenum[0])
+        if num == 0:
+            #we return recids that are not in keys
+            return list(Set(allrecs)-Set(citedbydict.keys()))
         for k in citedbydict.keys():
             li = citedbydict[k]
             if len(li) == num:
@@ -96,6 +105,9 @@ def get_records_with_num_cites(numstr):
             sec = int(firstsec[0][1])
         except:
             return []
+        if (first == 0):
+            #start with those that have no cites..
+            matches = list(Set(allrecs)-Set(citedbydict.keys()))
         if (first <= sec):
             for k in citedbydict.keys():
                 li = citedbydict[k]

@@ -1553,7 +1553,15 @@ def search_special_fields(bsu_p, bsu_f, bsu_m):
     if bsu_f == "cited":
         #search.. bsu_p will look like "200" or "0->9"
         numstr = "\""+bsu_p+"\""
-        x = get_records_with_num_cites(numstr)
+        #this is sort of stupid but since we may need to
+        #get the records that do _not_ have cites, we have to
+        #know the ids of all records, too
+        #but this is needed only if bsu_p is 0 or 0 or 0->0
+        allrecs = []
+        if bsu_p == 0 or bsu_p == "0" or \
+                bsu_p.startswith("0->") or bsu_p.endswith("->0"):
+            allrecs = perform_request_search(of="id")
+        x = get_records_with_num_cites(numstr, allrecs)
         return HitSet(x)
     return HitSet([])
 
