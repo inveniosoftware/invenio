@@ -1550,8 +1550,8 @@ def browse_in_bibwords(req, p, f, ln=CFG_SITE_LANG):
 def search_special_fields(bsu_p, bsu_f, bsu_m):
     """Stuff that actually cannot be found from just one record goes here.
        Example: give records that have been cited 200 times: cites=200"""
-    if bsu_f == "cites":
-        #search.. bsu_p will look like "200" or "0-9" or "5000+"
+    if bsu_f == "cited":
+        #search.. bsu_p will look like "200" or "0->9"
         numstr = "\""+bsu_p+"\""
         x = get_records_with_num_cites(numstr)
         return HitSet(x)
