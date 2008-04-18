@@ -213,7 +213,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                                     citedbylist, kwtuples, authors, vtuples, ln)
 
         #cited-by summary
-        out = summarize_records(pubs, 'hcs', ln, "../search?f=author&p=" + \
+        out = summarize_records(pubs, 'hcs', ln, "author:" + \
                                 quote(self.authorname))
         req.write(out)
 
