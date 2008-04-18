@@ -29,6 +29,11 @@ import string
 import locale
 from urllib import quote, urlencode
 
+try:
+    Set = set
+except NameError:
+    from sets import Set
+
 from invenio.config import \
      CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH, \
      CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD, \
@@ -3008,7 +3013,7 @@ class Template:
 
         return out
 
-    def tmpl_citesummary_html(self, ln, totalrecs, totalcites, avgstr, reciddict, tresholds_names, criteria=""):
+    def tmpl_citesummary_html(self, ln, totalrecs, totalcites, avgstr, reciddict, tresholds_names, criteria="", dict_of_lists = {}):
         """A template for citation summary output in HTML.
            Parameters:
                - ln *string* = language,
@@ -3043,13 +3048,22 @@ class Template:
             if reciddict.has_key(name):
                 rowtitle = name
                 reclist = reciddict[name]
+                #check in which collections the items of reclist lie
+                #and print their numbers in collstr as collname: number
+                collstr = ""
+                for k in dict_of_lists.keys():
+                    recs_in_coll = dict_of_lists[k]
+                    #intersect with reclist to get "of these records in this coll"
+                    intersec_list = list(Set(recs_in_coll)&Set(reclist))
+                    if len(intersec_list) > 0:
+                        collstr += str(k)+":"+str(len(intersec_list))+" "
                 out += "<tr><td>"+_(rowtitle)+"</td><td>"
                 #construct a link..
                 if criteria:
                     #the citing min/max was found, append criteria
-                    link = criteria+"&op1=a&m2=a&f2=cites&p2="+\
-                           str(mincites)+"-"+str(maxcites)
-                    out += "<a href="+link+">"+str(len(reclist))+"</a>"
+                    link = "../search?p=cited%3A"+\
+                           str(mincites)+"-%3E"+str(maxcites)+"%20"+criteria
+                    out += "<a href="+link+">"+str(len(reclist))+"</a> "+collstr
                 else:
                     out += str(len(reclist))
         out += "</td></tr>"
