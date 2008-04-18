@@ -516,6 +516,7 @@ def _task_run(task_run_fnc):
     ## initialize signal handler:
     _task_params['signal_request'] = None
     signal.signal(signal.SIGUSR1, _task_sig_sleep)
+    signal.signal(signal.SIGUSR2, _task_sig_ping)
     signal.signal(signal.SIGTSTP, _task_sig_ctrlz)
     signal.signal(signal.SIGTERM, _task_sig_stop)
     signal.signal(signal.SIGQUIT, _task_sig_stop)
@@ -580,6 +581,7 @@ def _task_sig_wakeup(sig, frame):
     write_message("task_sig_wakeup(), got signal %s frame %s"
             % (sig, frame), verbose=9)
     write_message("continuing...")
+    _db_login(1)
     task_update_status("CONTINUING")
 
 def _task_sig_ctrlc(sig, frame):
@@ -600,6 +602,11 @@ def _task_sig_stop(sig, frame):
     task_update_status("STOPPING")
     _task_params['signal_request'] = 'stop'
 
+def _task_sig_ping(sig, frame):
+    """Signal handler for the 'ping' signal sent by BibSched."""
+    write_message("task_sig_ping(), got signal %s frame %s"
+            % (sig, frame), verbose=9)
+
 def _task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
     write_message("task_sig_suicide(), got signal %s frame %s"
@@ -607,6 +614,7 @@ def _task_sig_suicide(sig, frame):
     write_message("suiciding myself now...")
     task_update_status("SUICIDING")
     write_message("suicided")
+    _db_login(1)
     task_update_status("SUICIDED")
     sys.exit(0)
 

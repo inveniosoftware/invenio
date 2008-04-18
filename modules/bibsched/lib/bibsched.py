@@ -88,16 +88,11 @@ def get_task_pid(task_name, task_id):
     """Return the pid of task_name/task_id"""
     try:
         pid = int(open(os.path.join(CFG_PREFIX, 'var', 'run', 'bibsched_task_%d.pid' % task_id)).read())
-    except IOError:
+        os.kill(pid, signal.SIGUSR2)
+        return pid
+    except (OSError, IOError):
+        register_exception()
         return get_my_pid(task_name, str(task_id))
-
-    try:
-        os.kill(pid, signal.SIGCONT)
-    except OSError:
-        return get_my_pid(task_name, str(task_id))
-
-    return pid
-
 
 def get_output_channelnames(task_id):
     "Construct and return filename for stdout and stderr for the task 'task_id'."
