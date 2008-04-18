@@ -169,6 +169,17 @@ class BibRecDocs:
         """Return a snippet of XML representing the 8564 corresponding to the
         current state"""
         out = ''
+        xml = format_record(self.id, of='xm')
+        record = create_record(xml)[0]
+        fields = record_get_field_instances(record, '856', '4', ' ')
+        for field in fields:
+            url = field_get_subfield_values(field, 'u')
+            if not bibdocfile_url_p(url):
+                out += '\t<datafield tag="856" ind1="4" ind2=" ">\n'
+                for subfield, value in field_get_subfield_instances(field):
+                    out += '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, value)
+                out += '\t</datafield>\n'
+
         for afile in self.list_latest_files():
             out += '\t<datafield tag="856" ind1="4" ind2=" ">\n'
             url = afile.get_url()
@@ -929,6 +940,7 @@ class BibDoc:
         if version is None:
             version = self.get_latest_version()
         self.more_info.set_comment(comment, format, version)
+        self.touch()
         self._build_file_list('init')
 
     def set_description(self, description, format, version=None):
@@ -936,6 +948,7 @@ class BibDoc:
         if version is None:
             version = self.get_latest_version()
         self.more_info.set_description(description, format, version)
+        self.touch()
         self._build_file_list('init')
 
     def get_comment(self, format, version=None):
@@ -1024,6 +1037,20 @@ class BibDoc:
         else:
             raise InvenioWebSubmitFileError, "Strange just undeleted docname isn't called DELETED-somedate-docname but %s" % self.docname
 
+    def delete_file(self, format, version):
+        """Delete on the filesystem the particular format version.
+        Note, this operation is not reversible!"""
+        try:
+            afile = self.get_file(format, version)
+        except InvenioWebSubmitFileError:
+            return
+        try:
+            os.remove(afile.get_full_path())
+        except OSError:
+            pass
+        self.touch()
+        self._build_file_list()
+
     def get_history(self):
         """Return a string with a line for each row in the history for the
         given docid."""
@@ -1091,13 +1118,13 @@ class BibDoc:
             self.md5s = Md5Folder(self.basedir)
             files = os.listdir(self.basedir)
             files.sort()
-            for fil in files:
-                if not fil.startswith('.'):
+            for afile in files:
+                if not afile.startswith('.'):
                     try:
-                        filepath = "%s/%s" % (self.basedir, fil)
-                        fileversion = int(re.sub(".*;", "", fil))
-                        fullname = fil.replace(";%s" % fileversion, "")
-                        checksum = self.md5s.get_checksum(fil)
+                        filepath = os.path.join(self.basedir, afile)
+                        fileversion = int(re.sub(".*;", "", afile))
+                        fullname = afile.replace(";%s" % fileversion, "")
+                        checksum = self.md5s.get_checksum(afile)
                         (dirname, basename, format) = decompose_file(fullname)
                         comment = self.more_info.get_comment(format, fileversion)
                         description = self.more_info.get_description(format, fileversion)
@@ -1175,11 +1202,10 @@ class BibDoc:
         """ Returns the latest existing version number for the given bibdoc.
         If no file is associated to this bibdoc, returns '0'.
         """
-        if len(self.docfiles) > 0:
-            self.docfiles.sort(order_files_with_version)
-            return self.docfiles[0].get_version()
-        else:
-            return 0
+        version = 0
+        for bibdocfile in self.docfiles:
+            if bibdocfile.get_version() > version:
+                version = bibdocfile.get_version()
 
     def get_file_number(self):
         """Return the total number of files."""
@@ -1401,7 +1427,7 @@ def order_files_with_version(docfile1, docfile2):
 def _make_base_dir(docid):
     """Given a docid it returns the complete path that should host its files."""
     group = "g" + str(int(int(docid) / CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT))
-    return "%s/%s/%s" % (CFG_WEBSUBMIT_FILEDIR, group, docid)
+    return os.path.join(CFG_WEBSUBMIT_FILEDIR, group, docid)
 
 
 class Md5Folder:
@@ -1484,7 +1510,7 @@ def calculate_md5_external(filename):
     """Calculate the md5 of a physical file through md5sum Command Line Tool.
     This is suitable for file larger than 256Kb."""
     try:
-        md5_result = os.popen('md5sum --binary "%s"' % filename)
+        md5_result = os.popen('md5sum -b "%s"' % filename)
         ret = md5_result.read()[:32]
         md5_result.close()
         if len(ret) != 32:
