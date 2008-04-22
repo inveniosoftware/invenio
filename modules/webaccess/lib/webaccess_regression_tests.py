@@ -28,7 +28,8 @@ import unittest
 from invenio.dbquery import run_sql
 from invenio.access_control_admin import acc_add_role, acc_delete_role, \
     acc_get_role_definition
-from invenio.access_control_firerole import compile_role_definition, serialize
+from invenio.access_control_firerole import compile_role_definition, \
+    serialize, deserialize
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
@@ -86,9 +87,9 @@ class WebAccessFireRoleTest(unittest.TestCase):
 
     def test_webaccess_firerole_serialization(self):
         """firerole - role definition correctly serialized"""
-        def_ser = serialize(compile_role_definition(self.role_definition))
+        def_ser = compile_role_definition(self.role_definition)
         tmp_def_ser = acc_get_role_definition(self.role_id)
-        self.assertEqual(def_ser, tmp_def_ser)
+        self.assertEqual(def_ser, deserialize(tmp_def_ser))
 
 TEST_SUITE = make_test_suite(WebAccessWebPagesAvailabilityTest,
                              WebAccessFireRoleTest)
