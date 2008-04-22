@@ -238,4 +238,7 @@ update-v0.92.1-tables:
 	echo "INSERT INTO rnkCITATIONDATA VALUES (2,'reversedict','','');" | ${prefix}/bin/dbexec
 	echo "INSERT INTO rnkCITATIONDATA VALUES (3,'selfcitdict','','');" | ${prefix}/bin/dbexec
 
+update-v0.99.0-tables:
+	echo "ALTER TABLE bibdoc ADD COLUMN more_info mediumblob NULL default NULL;" | ${prefix}/bin/dbexec
+
 CLEANFILES = *~
