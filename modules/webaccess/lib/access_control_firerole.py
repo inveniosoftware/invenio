@@ -30,7 +30,7 @@ webaccess to connect user to roles using every infos about users.
 
 from invenio.webgroup_dblayer import get_groups
 from invenio.access_control_config import InvenioWebAccessFireroleError
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, blob_to_string
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
         CFG_ACC_EMPTY_ROLE_DEFINITION_SER
 from socket import gethostbyname
@@ -132,12 +132,12 @@ def load_role_definition(role_id):
     res = run_sql("SELECT firerole_def_ser FROM accROLE WHERE id=%s", (role_id, ), 1)
     if res:
         try:
-            return cPickle.loads(decompress(res[0][0]))
+            return cPickle.loads(decompress(blob_to_string(res[0][0])))
         except Exception:
             repair_role_definitions()
             res = run_sql("SELECT firerole_def_ser FROM accROLE WHERE id=%s", (role_id, ), 1)
             if res:
-                return cPickle.loads(decompress(res[0][0]))
+                return cPickle.loads(decompress(blob_to_string(res[0][0])))
             else:
                 return (False, ())
     else:
