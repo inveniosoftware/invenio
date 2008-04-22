@@ -237,12 +237,15 @@ def blob_to_string(ablob):
     """Return string representation of ABLOB.  Useful to treat MySQL
     BLOBs in the same way for both recent and old MySQLdb versions.
     """
-    if type(ablob) is str:
-        # BLOB is already a string in MySQLdb 0.9.2
-        return ablob
+    if ablob:
+        if type(ablob) is str:
+            # BLOB is already a string in MySQLdb 0.9.2
+            return ablob
+        else:
+            # BLOB is array.array in MySQLdb 1.0.0 and later
+            return ablob.tostring()
     else:
-        # BLOB is array.array in MySQLdb 1.0.0 and later
-        return ablob.tostring()
+        return ablob
 
 def log_sql_query_cached(key, result, hit_p):
     """Log SQL query cached into prefix/var/log/dbquery.log log file.  In order
