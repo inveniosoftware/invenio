@@ -53,7 +53,7 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_URL, \
     CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL, \
     CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS, \
     CFG_TMPDIR
-
+from invenio.bibformat import format_record
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
 websearch_templates = invenio.template.load('websearch')
@@ -117,24 +117,24 @@ def normalize_version(version):
     return str(version)
 
 _path_re = re.compile(r'.*[\\/:]')
-def decompose_file(file):
+def decompose_file(afile):
     """Decompose a file into dirname, basename and extension"""
-    basename = _path_re.sub('', file)
-    dirname = file[:-len(basename)-1]
+    basename = _path_re.sub('', afile)
+    dirname = afile[:-len(basename)-1]
     base = file_strip_ext(basename)
     extension = basename[len(base) + 1:]
     if extension:
         extension = '.' + extension
     return (dirname, base, extension)
 
-def propose_unique_name(file, use_version=False):
+def propose_unique_name(afile, use_version=False):
     """Propose a unique name, taking in account the version"""
     if use_version:
-        version = ';'+re.sub('.*;', '', file)
-        file = file[:-len(version)]
+        version = ';'+re.sub('.*;', '', afile)
+        afile = afile[:-len(version)]
     else:
         version = ''
-    (basedir, basename, extension) = decompose_file(file)
+    (basedir, basename, extension) = decompose_file(afile)
     goodname = "%s%s%s" % (basename, extension, version)
     i = 1
     listdir = os.listdir(basedir)
@@ -260,17 +260,17 @@ class BibRecDocs:
         files = self.list_latest_files()
 
         # Let's consider all the latest files with same size
-        potential = [file for file in files if file.get_size() == size]
+        potential = [afile for afile in files if afile.get_size() == size]
 
         if potential:
             checksum = calculate_md5(path)
 
             # Let's consider all the latest files with the same size and the
             # same checksum
-            potential = [file for file in potential if file.get_checksum() == checksum]
+            potential = [afile for afile in potential if afile.get_checksum() == checksum]
 
             if potential:
-                potential = [file for file in potential if filecmp.cmp(file.get_full_path(), path)]
+                potential = [afile for afile in potential if filecmp.cmp(afile.get_full_path(), path)]
 
                 if potential:
                     return True
@@ -437,7 +437,7 @@ class BibRecDocs:
                 )
         return t
 
-    def fix(self, docname, sync_from_marc=False):
+    def fix(self, docname):
         """Algorithm that transform an a broken/old bibdoc into a coherent one:
         i.e. the corresponding folder will have files named after the bibdoc
         name. Proper .recid, .type, .md5 files will be created/updated.
@@ -522,8 +522,10 @@ class BibRecDocs:
         bibdoc._build_file_list()
         self.build_bibdoc_list()
 
-        if sync_from_marc:
-            for bibdoc in self.bibdocs:
+        for bibdoc in self.bibdocs:
+            if not run_sql('SELECT more_info FROM bibdoc WHERE id=%s', (bibdoc.id,)):
+                ## Import from MARC only if the bibdoc has never had
+                ## its more_info initialized.
                 try:
                     bibdoc.import_descriptions_and_comments_from_marc()
                 except Exception, e:
@@ -690,11 +692,11 @@ class BibDoc:
                     os.chmod(destination, 0644)
                 except Exception, e:
                     register_exception()
-                    raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (file, destination, e)
+                    raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
                 self.more_info.set_description(description, format, myversion)
                 self.more_info.set_comment(comment, format, myversion)
             else:
-                raise InvenioWebSubmitFileError, "'%s' does not exists!" % file
+                raise InvenioWebSubmitFileError, "'%s' does not exists!" % filename
         finally:
             self.touch()
             Md5Folder(self.basedir).update()
@@ -746,7 +748,7 @@ class BibDoc:
                     self.more_info.set_description(self.more_info.get_description(docfile.get_format(), version), docfile.get_format(), new_version)
                 except Exception, e:
                     register_exception()
-                    raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (file, destination, e)
+                    raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (docfile.get_full_path(), destination, e)
         finally:
             Md5Folder(self.basedir).update()
             self.touch()
@@ -754,8 +756,6 @@ class BibDoc:
 
     def import_descriptions_and_comments_from_marc(self):
         """Import description & comment from the corresponding marc."""
-        from invenio.bibformat import format_record
-
         ## Let's get the record
         xml = format_record(self.id, of='xm')
         record = create_record(xml)[0]
@@ -822,11 +822,11 @@ class BibDoc:
                     os.chmod(destination, 0644)
                 except Exception, e:
                     register_exception()
-                    raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (file, destination, e)
+                    raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
                 self.more_info.set_comment(comment, format, version)
                 self.more_info.set_description(description, format, version)
             else:
-                raise InvenioWebSubmitFileError, "'%s' does not exists!" % file
+                raise InvenioWebSubmitFileError, "'%s' does not exists!" % filename
         finally:
             Md5Folder(self.basedir).update()
             self.touch()
@@ -1245,9 +1245,9 @@ class BibDocFile:
         self.description = description
         self.comment = comment
         self.size = os.path.getsize(fullpath)
-        self.md = os.path.getmtime(fullpath)
+        self.md = datetime.fromtimestamp(os.path.getmtime(fullpath))
         try:
-            self.cd = os.path.getctime(fullpath)
+            self.cd = datetime.fromtimestamp(os.path.getctime(fullpath))
         except OSError:
             self.cd = self.md
         self.name = name
