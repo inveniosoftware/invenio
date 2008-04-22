@@ -42,7 +42,7 @@ try:
 except NameError:
     from sets import Set as set
 
-from invenio.dbquery import run_sql, DatabaseError
+from invenio.dbquery import run_sql, DatabaseError, blob_to_string
 from invenio.errorlib import register_exception
 from invenio.bibrecord import create_record, record_get_field_instances, \
     field_get_subfield_values, field_get_subfield_instances
@@ -581,7 +581,7 @@ class BibDoc:
                 self.docname = res[0][2]
                 self.id = docid
                 self.status = res[0][1]
-                self.more_info = BibDocMoreInfo(docid, res[0][5])
+                self.more_info = BibDocMoreInfo(docid, blob_to_string(res[0][5]))
                 self.basedir = _make_base_dir(self.id)
             else:
                 # this bibdoc doesn't exist
@@ -1675,8 +1675,8 @@ class BibDocMoreInfo:
             try:
                 if more_info is None:
                     res = run_sql('SELECT more_info FROM bibdoc WHERE id=%s', (docid, ))
-                    if res:
-                        self.more_info = cPickle.loads(res[0][0])
+                    if res and res[0][0]:
+                        self.more_info = cPickle.loads(blob_to_string(res[0][0]))
                     else:
                         self.more_info = {}
                 else:
