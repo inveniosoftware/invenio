@@ -28,12 +28,10 @@ __lastupdated__ = """$Date$"""
 webaccess to connect user to roles using every infos about users.
 """
 
-from invenio.webgroup_dblayer import get_groups
 from invenio.access_control_config import InvenioWebAccessFireroleError
 from invenio.dbquery import run_sql, blob_to_string
 from invenio.access_control_config import CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, \
         CFG_ACC_EMPTY_ROLE_DEFINITION_SER
-from socket import gethostbyname
 import re
 import cPickle
 from zlib import compress, decompress
@@ -210,17 +208,17 @@ def acc_firerole_check_user(user_info, firerole_def_obj):
         raise InvenioWebAccessFireroleError, msg
     return default_allow_p # By default we allow ;-) it'an OpenSource project
 
-def serialize(firerole_def_src):
+def serialize(firerole_def_ser):
     """ Serialize and compress a definition."""
-    if firerole_def_src:
-        return compress(cPickle.dumps(firerole_def_src, -1))
+    if firerole_def_ser:
+        return compress(cPickle.dumps(firerole_def_ser, -1))
     else:
         return CFG_ACC_EMPTY_ROLE_DEFINITION_SER
 
 def deserialize(firerole_def_ser):
     """ Deserialize and decompress a definition."""
     if firerole_def_ser:
-        return cPickle.loads(decompress(firerole_def_ser))
+        return cPickle.loads(decompress(blob_to_string(firerole_def_ser)))
     else:
         return cPickle.loads(decompress(CFG_ACC_EMPTY_ROLE_DEFINITION_SER))
 
@@ -240,7 +238,8 @@ _expressions_re = re.compile(r'(?<!\\)\'.+?(?<!\\)\'|(?<!\\)\".+?(?<!\\)\"|(?<!\
 def _mkip (ip):
     """ Compute a numerical value for a dotted IP """
     num = 0L
-    for i in map (int, ip.split ('.')): num = (num << 8) + i
+    for i in map (int, ip.split ('.')):
+        num = (num << 8) + i
     return num
 
 _full = 2L ** 32 - 1

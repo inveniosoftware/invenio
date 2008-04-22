@@ -25,6 +25,10 @@ __revision__ = "$Id$"
 
 import unittest
 
+from invenio.dbquery import run_sql
+from invenio.access_control_admin import acc_add_role, acc_delete_role, \
+    acc_get_role_definition
+from invenio.access_control_firerole import compile_role_definition, serialize
 from invenio.config import CFG_SITE_URL
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, merge_error_messages
@@ -63,7 +67,31 @@ class WebAccessWebPagesAvailabilityTest(unittest.TestCase):
             self.fail(merge_error_messages(error_messages))
         return
 
-TEST_SUITE = make_test_suite(WebAccessWebPagesAvailabilityTest)
+class WebAccessFireRoleTest(unittest.TestCase):
+    """Check WebAccess behaviour WRT FireRole."""
+
+    def setUp(self):
+        """Create a fake role."""
+        self.role_name = 'test'
+        self.role_description = 'test role'
+        self.role_definition = 'allow email /.*@cern.ch/'
+        self.role_id, dummy, dummy, dummy = acc_add_role(self.role_name,
+            self.role_description,
+            serialize(compile_role_definition(self.role_definition)),
+            self.role_definition)
+
+    def tearDown(self):
+        """Drop the fake role."""
+        acc_delete_role(self.role_id)
+
+    def test_webaccess_firerole_serialization(self):
+        """firerole - role definition correctly serialized"""
+        def_ser = serialize(compile_role_definition(self.role_definition))
+        tmp_def_ser = acc_get_role_definition(self.role_id)
+        self.assertEqual(def_ser, tmp_def_ser)
+
+TEST_SUITE = make_test_suite(WebAccessWebPagesAvailabilityTest,
+                             WebAccessFireRoleTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
