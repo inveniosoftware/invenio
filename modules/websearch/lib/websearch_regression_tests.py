@@ -1231,7 +1231,7 @@ class WebSearchSpecialTermsQueryTest(unittest.TestCase):
         """websearch - query for special terms, U(1)"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=U%281%29',
-                                               expected_text="[57, 79, 88]"))
+                                               expected_text="[57, 79, 80, 88]"))
 
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
