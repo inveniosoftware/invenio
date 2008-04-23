@@ -593,7 +593,7 @@ class Collection:
                 for tmp in ['title', 'author', 'abstract', 'report number', 'year']:
                     values.append({'value' : tmp.replace(' ', ''), 'text' : get_field_i18nname(tmp, ln)})
             else:
-                for tmp in ['title', 'author', 'abstract', 'keyword', 'report number', 'year', 'fulltext', 'reference']:
+                for tmp in ['title', 'author', 'abstract', 'keyword', 'report number', 'journal', 'year', 'fulltext', 'reference']:
                     values.append({'value' : tmp.replace(' ', ''), 'text' : get_field_i18nname(tmp, ln)})
 
         return websearch_templates.tmpl_searchwithin_select(

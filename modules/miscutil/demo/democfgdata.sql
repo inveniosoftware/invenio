@@ -504,6 +504,7 @@ INSERT INTO collection_field_fieldvalue VALUES (6,8,NULL,'sew',2,0);
 INSERT INTO collection_field_fieldvalue VALUES (2,7,1,'seo',10,24);
 INSERT INTO collection_field_fieldvalue VALUES (6,4,NULL,'sew',4,70);
 INSERT INTO collection_field_fieldvalue VALUES (6,2,NULL,'sew',3,70);
+INSERT INTO collection_field_fieldvalue VALUES (6,19,NULL,'sew',3,65);
 INSERT INTO collection_field_fieldvalue VALUES (6,5,NULL,'sew',1,70);
 INSERT INTO collection_field_fieldvalue VALUES (6,11,25,'seo',1,1);
 INSERT INTO collection_field_fieldvalue VALUES (6,11,26,'seo',1,2);

@@ -381,6 +381,7 @@ def cli_cmd_reset_fieldnames(conf):
                             "collection": _("collection"),
                             "division": _("division"),
                             "year": _("year"),
+                            "journal": _("journal"),
                             "experiment": _("experiment"),
                             "record ID": _("record ID")}
         ## update I18N names for every language:

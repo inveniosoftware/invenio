@@ -45,6 +45,7 @@ INSERT INTO field VALUES (15,'isbn','isbn');
 INSERT INTO field VALUES (16,'issn','issn');
 INSERT INTO field VALUES (17,'coden','coden');
 -- INSERT INTO field VALUES (18,'doi','doi');
+INSERT INTO field VALUES (19,'journal','journal');
 
 INSERT INTO field_tag VALUES (1,100,10);
 INSERT INTO field_tag VALUES (1,102,10);
@@ -175,6 +176,7 @@ INSERT INTO field_tag VALUES (15,118,100);
 INSERT INTO field_tag VALUES (16,119,100);
 INSERT INTO field_tag VALUES (17,120,100);
 -- INSERT INTO field_tag VALUES (18,121,100);
+INSERT INTO field_tag VALUES (19,131,100);
 
 INSERT INTO format VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
@@ -325,6 +327,7 @@ INSERT INTO tag VALUES (127,'855x','855%');
 INSERT INTO tag VALUES (128,'857x','857%');
 INSERT INTO tag VALUES (129,'858x','858%');
 INSERT INTO tag VALUES (130,'859x','859%');
+INSERT INTO tag VALUES (131,'journal','909C4%');
 
 INSERT INTO idxINDEX VALUES (1,'global','This index contains words/phrases from global fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (2,'collection','This index contains words/phrases from collection identifiers fields.','0000-00-00 00:00:00', '');
@@ -336,6 +339,7 @@ INSERT INTO idxINDEX VALUES (7,'reportnumber','This index contains words/phrases
 INSERT INTO idxINDEX VALUES (8,'title','This index contains words/phrases from title fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (9,'fulltext','This index contains words/phrases from fulltext fields.','0000-00-00 00:00:00', '');
 INSERT INTO idxINDEX VALUES (10,'year','This index contains words/phrases from year fields.','0000-00-00 00:00:00', '');
+INSERT INTO idxINDEX VALUES (11,'journal','This index contains words/phrases from journal publication information fields.','0000-00-00 00:00:00', '');
 
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (1,1);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (2,10);
@@ -347,6 +351,7 @@ INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (7,6);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (8,2);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (9,9);
 INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (10,12);
+INSERT INTO idxINDEX_field (id_idxINDEX, id_field) VALUES (11,19);
 
 INSERT INTO oaiARCHIVE VALUES (1,'','global','','','',NULL,'','','','','','','','','');
 
