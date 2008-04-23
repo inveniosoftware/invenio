@@ -1224,6 +1224,15 @@ class WebSearchResultsRecordGroupingTest(unittest.TestCase):
                                                username='admin',
                                                expected_text="1 - 17"))
 
+class WebSearchSpecialTermsQueryTest(unittest.TestCase):
+    """Test of the search results for queries containing special terms."""
+
+    def test_special_terms_u1(self):
+        """websearch - query for special terms, U(1)"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=U%281%29',
+                                               expected_text="[57]"))
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -1245,7 +1254,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchUnicodeQueryTest,
                              WebSearchMARCQueryTest,
                              WebSearchExtSysnoQueryTest,
-                             WebSearchResultsRecordGroupingTest)
+                             WebSearchResultsRecordGroupingTest,
+                             WebSearchSpecialTermsQueryTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
