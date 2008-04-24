@@ -153,6 +153,10 @@ def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=[]):
 
     global _db_cache
 
+    if CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
+        # do not connect to the database as the site is closed for maintenance:
+        return []
+
     key = repr((sql, param, n, with_desc))
 
     # Garbage collecting needed?
