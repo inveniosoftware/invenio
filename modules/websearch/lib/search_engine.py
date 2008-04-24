@@ -85,6 +85,7 @@ from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time, Erro
 from invenio.webuser import getUid, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly, create_error_box
 from invenio.messages import gettext_set_language
+from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, InvenioWebSearchQueryParserException
 
 try:
     from mod_python import apache
@@ -1719,6 +1720,56 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         print_warning(req, "Search stage 3: boolean query gave %d hits." % len(hitset_in_any_collection))
         print_warning(req, "Search stage 3: execution took %.2f seconds." % (t2 - t1))
     return hitset_in_any_collection
+
+def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG):
+    """Search for complex pattern 'p' containing parenthesis within field 'f' according to
+       matching type 'm'.  Return hitset of recIDs.
+
+       For more details on the parameters see 'search_pattern'
+    """
+    # Try searching with parentheses
+    try:
+        parser = SearchQueryParenthesisedParser()
+
+        # get a hitset with all recids
+        result_hitset = get_collection_reclist(CFG_SITE_NAME)
+
+        # parse the query. The result is list of [op1, expr1, op2, expr2, ..., opN, exprN]
+        parsing_result = parser.parse_query(p)
+
+        # go through every pattern
+        # calculate hitset for it
+        # combine pattern's hitset with the result using the corresponding operator
+        for index in xrange(0, len(parsing_result)-1, 2 ):
+            current_operator = parsing_result[index]
+            current_pattern = parsing_result[index+1]
+
+            # obtain a hitset for the current patter
+            current_hitset = search_pattern(req, current_pattern, f, m, ap, of, verbose, ln)
+
+            # combine the current hitset with resulting hitset using the current operator
+            if current_operator == '+':
+                result_hitset = result_hitset & current_hitset
+            elif current_operator == '-':
+                result_hitset = result_hitset - current_hitset
+            elif current_operator == '|':
+                result_hitset = result_hitset | current_hitset
+            else:
+                assert False, "Unknown operator in search_pattern_parenthesised()"
+
+            return result_hitset
+
+    # If searching with parenteses fails, perform search ignoring parentheses
+    except InvenioWebSearchQueryParserException:
+
+        print_warning(req, "Nested or mismatched parethneses. Continue search ignoring paretheses.")
+
+        # remove the parentheses in the query. Current implementation removes all the parentheses,
+        # but it could be improved to romove only these that are not insede quotes
+        p = p.replace('(', ' ')
+        p = p.replace(')', ' ')
+
+        return search_pattern(req, p, f, m, ap, of, verbose, ln)
 
 def search_unit(p, f=None, m=None):
     """Search for basic search unit defined by pattern 'p' and field
@@ -3685,7 +3736,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                         print_records_epilogue(req, of)
                     return page_end(req, of, ln)
                 if p2:
-                    results_tmp = search_pattern(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln)
+                    results_tmp = search_pattern_parenthesised(req, p2, f2, m2, ap=ap, of=of, verbose=verbose, ln=ln)
                     if op1 == "a": # add
                         results_in_any_collection.intersection_update(results_tmp)
                     elif op1 == "o": # or
@@ -3704,7 +3755,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                             print_records_epilogue(req, of)
                         return page_end(req, of, ln)
                 if p3:
-                    results_tmp = search_pattern(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln)
+                    results_tmp = search_pattern_parenthesised(req, p3, f3, m3, ap=ap, of=of, verbose=verbose, ln=ln)
                     if op2 == "a": # add
                         results_in_any_collection.intersection_update(results_tmp)
                     elif op2 == "o": # or
@@ -3727,7 +3778,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
         else:
             ## 3B - simple search
             try:
-                results_in_any_collection = search_pattern(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln)
+                results_in_any_collection = search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln)
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
@@ -3801,7 +3852,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             try:
                 results_final = intersect_results_with_hitset(req,
                                                               results_final,
-                                                              search_pattern(req, pl, ap=0, ln=ln),
+                                                              search_pattern_parenthesised(req, pl, ap=0, ln=ln),
                                                               ap,
                                                               aptext=_("No match within your search limits, "
                                                                        "discarding this condition..."),
