@@ -1757,7 +1757,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
             else:
                 assert False, "Unknown operator in search_pattern_parenthesised()"
 
-            return result_hitset
+        return result_hitset
 
     # If searching with parenteses fails, perform search ignoring parentheses
     except InvenioWebSearchQueryParserException:
@@ -3726,7 +3726,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
         if as == 1 or (p1 or p2 or p3):
             ## 3A - advanced search
             try:
-                results_in_any_collection = search_pattern(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln)
+                results_in_any_collection = search_pattern_parenthesised(req, p1, f1, m1, ap=ap, of=of, verbose=verbose, ln=ln)
                 if len(results_in_any_collection) == 0:
                     if of.startswith("h"):
                         perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
