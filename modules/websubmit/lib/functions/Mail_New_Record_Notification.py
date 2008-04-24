@@ -280,6 +280,12 @@ Thank you for submitting your item into %(sitename)s.
         send_email(CFG_EMAIL_FROM_ADDRESS, owners_email, \
                    "[%s] Submitted" % reference_numbers, \
                    email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
+    elif managers_email != "":
+        ## Although it's not desirable to mail the submitters, if "managers"
+        ## have been given, it is reasonable to mail them:
+        send_email(CFG_EMAIL_FROM_ADDRESS, managers_email, \
+                   "[%s] Submitted" % reference_numbers, \
+                   email_txt, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     elif CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN:
         ## We don't want to mail the "owners". Let's mail the admin instead:
         send_email(CFG_EMAIL_FROM_ADDRESS, CFG_SITE_ADMIN_EMAIL, \
