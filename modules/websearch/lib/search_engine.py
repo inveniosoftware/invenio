@@ -645,11 +645,14 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
 """
         else:
             metaheaderadd = ''
-        if tab != '' or ((of != '' or of.lower() != 'hd') and of != 'hb'):
+        if (tab != '' or ((of != '' or of.lower() != 'hd') and of != 'hb')) and \
+               recID != -1:
             # If we are not in information tab in HD format, customize
             # the nav. trail to have a link back to main record. (Due
             # to the way perform_request_search() works, hb
             # (lowercase) is equal to hd)
+            if navtrail != '':
+                navtrail += ' &gt; '
             if (of != '' or of.lower() != 'hd') and of != 'hb':
                 # Export
                 format_name = of
@@ -657,12 +660,12 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
                 res = run_sql(query, (of,))
                 if res:
                     format_name = res[0][0]
-                navtrail += ' &gt; <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
+                navtrail += ' <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
                             (CFG_SITE_URL, recID, title_message, format_name)
             else:
                 # Discussion, citations, etc. tabs
                 tab_label = get_detailed_page_tabs(cc, ln=ln)[tab]['label']
-                navtrail += ' &gt; <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
+                navtrail += ' <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
                             (CFG_SITE_URL, recID, title_message, _(tab_label))
             navtrail_append_title_p = 0
 
