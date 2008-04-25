@@ -38,43 +38,43 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
         parser = search_engine_query_parser.SearchQueryParenthesisedParser()
 
         # test if normal queries are parsed
-        self.assertEqual(['+', 'op1'],
-                         parser.parse_query('op1'))
+        self.assertEqual(parser.parse_query('expr1'),
+                         ['+', 'expr1'])
 
-        self.assertEqual(['+', 'op1'],
-                         parser.parse_query('(op1)'))
+        self.assertEqual(parser.parse_query('(expr1)'),
+                         ['+', 'expr1'])
 
-        self.assertEqual(['+', 'op1', '-', 'op2'],
-                         parser.parse_query("op1 - (op2)"))
+        self.assertEqual(parser.parse_query("expr1 - (expr2)"),
+                         ['+', 'expr1', '-', 'expr2'])
 
-        self.assertEqual(['+', 'op1', '-', 'op2'],
-                         parser.parse_query("+ op1 - (op2)"))
+        self.assertEqual(parser.parse_query("+ expr1 - (expr2)"),
+                         ['+', 'expr1', '-', 'expr2'])
 
-        self.assertEqual(['+', 'op1', '+', 'op2'],
-                         parser.parse_query("op1 (op2)"))
+        self.assertEqual(parser.parse_query("expr1 (expr2)"),
+                         ['+', 'expr1', '+', 'expr2'])
 
-        self.assertEqual(['+', 'op1', '-', 'op2'],
-                         parser.parse_query("(op1) - op2"))
+        self.assertEqual(['+', 'expr1', '-', 'expr2'],
+                         parser.parse_query("(expr1) - expr2"))
 
-        self.assertEqual(['+', 'op1', '-', 'op2'],
-                         parser.parse_query("(op1)-(op2)"))
+        self.assertEqual(parser.parse_query("(expr1)-(expr2)"),
+                         ['+', 'expr1', '-', 'expr2'])
 
-        self.assertEqual(['-', 'op1', '-', 'op2'],
-                         parser.parse_query("-(op1)-(op2)"))
+        self.assertEqual(parser.parse_query("-(expr1)-(expr2)"),
+                         ['-', 'expr1', '-', 'expr2'])
 
-        self.assertEqual(['+', 'op1', '-', 'op2', '+', 'op3', '|', 'op4'],
-                         parser.parse_query('(op1) - op2 + (op3) | op4'))
+        self.assertEqual(parser.parse_query('(expr1) - expr2 + (expr3) | expr4'),
+                         ['+', 'expr1', '-', 'expr2', '+', 'expr3', '|', 'expr4'])
 
-        self.assertEqual(['+', 'op1', '-', 'op2', '+', 'op3'],
-                         parser.parse_query('(op1) - op2 + (op3)'))
+        self.assertEqual(parser.parse_query('(expr1) - expr2 + (expr3)'),
+                         ['+', 'expr1', '-', 'expr2', '+', 'expr3'])
 
-        self.assertEqual(['+', 'op1', '-', 'op2', '+', 'op3 | op4', '|', '"op5 + op6"'],
-                         parser.parse_query('(op1) - op2 + (op3 | op4) | "op5 + op6"'))
+        self.assertEqual(parser.parse_query('(expr1) - expr2 + (expr3 | expr4) | "expr5 + expr6"'),
+                         ['+', 'expr1', '-', 'expr2', '+', 'expr3 | expr4', '|', '"expr5 + expr6"'])
 
         # test parsing of queries with missing operators.
         # in this case default operator + should be included on place of the missing one
-        self.assertEqual(['+', 'op1', '+', 'op2', '+', 'op3', '|', 'op4'],
-                         parser.parse_query('(op1) op2 (op3) | op4'))
+        self.assertEqual(parser.parse_query('(expr1) expr2 (expr3) | expr4'),
+                         ['+', 'expr1', '+', 'expr2', '+', 'expr3', '|', 'expr4'])
 
     def test_parsing_of_nested_or_mismatched_parentheses(self):
         """parentheses parser - Test parsing of queries containing nested or mismatched parentheses"""
@@ -83,24 +83,33 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
 
         # test nested parentheses - they are not supported
         self.failUnlessRaises(search_engine_query_parser.InvenioWebSearchQueryParserException,
-                              parser.parse_query,"((op))")
+                              parser.parse_query,"((expr))")
         # test mismatched parentheses
         self.failUnlessRaises(search_engine_query_parser.InvenioWebSearchQueryParserException,
-                              parser.parse_query,"(op")
+                              parser.parse_query,"(expr")
 
     def test_parsing_of_and_or_and_not_operators(self):
-        """parentheses parser - Test parsing of queries containing AND, OR, AND NOT operators"""
+        """parentheses parser - Test parsing of queries containing AND, OR, NOT operators"""
 
         parser = search_engine_query_parser.SearchQueryParenthesisedParser()
 
-        self.assertEqual(['+', 'op1', '-', 'op2', '+', 'op3', '|', 'op4'],
-                         parser.parse_query('(op1) and not op2 and (op3) or op4'))
+        self.assertEqual(parser.parse_query('(expr1) not expr2 and (expr3) or expr4'),
+                         ['+', 'expr1', '-', 'expr2', '+', 'expr3', '|', 'expr4'])
 
-        self.assertEqual(['+', 'op1', '-', 'op2 | "expressions and not in and quotes | (are) not - parsed "', '-', 'op3', '|', 'op4'],
-                         parser.parse_query('(op1) and not op2 | "expressions and not in and quotes | (are) not - parsed " - (op3) or op4'))
+        self.assertEqual(parser.parse_query('(expr1) not expr2 | "expressions not in and quotes | (are) not - parsed " - (expr3) or expr4'),
+                         ['+', 'expr1', '-', 'expr2 | "expressions not in and quotes | (are) not - parsed "', '-', 'expr3', '|', 'expr4'])
 
-        self.assertEqual(['+', 'op1 \\" op2', '+', 'op3', '-', 'op4 \\"', '+', 'op5'],
-                         parser.parse_query('op1 \\" op2 and(op3) and not op4 \\" and (op5)'))
+        self.assertEqual(parser.parse_query('expr1 \\" expr2 and(expr3) not expr4 \\" and (expr5)'),
+                         ['+', 'expr1 \\" expr2', '+', 'expr3', '-', 'expr4 \\"', '+', 'expr5'])
+
+        self.assertEqual(parser.parse_query('(expr1 and expr2) or expr3'),
+                         ['+', 'expr1 + expr2','|', 'expr3'])
+
+        self.assertEqual(parser.parse_query('(expr1 and expr2) or expr3'),
+                         parser.parse_query('(expr1 + expr2) | expr3'))
+
+        self.assertEqual(parser.parse_query('(expr1 and expr2) or expr3'),
+                         parser.parse_query('(expr1 + expr2) or expr3'))
 
     def test_parsing_of_quotes(self):
         """parentheses parser - Test parsing of queries containing single and double quotes"""
@@ -110,25 +119,25 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
         #The content inside quotes should not be parsed
 
         # test double quotes
-        self.assertEqual(['+', 'op1', '-', 'op2 | "expressions - in + quotes | (are) not - parsed "', '-', 'op3', '|', 'op4'],
-                         parser.parse_query('(op1) - op2 | "expressions - in + quotes | (are) not - parsed " - (op3) | op4'))
+        self.assertEqual(parser.parse_query('(expr1) - expr2 | "expressions - in + quotes | (are) not - parsed " - (expr3) | expr4'),
+                         ['+', 'expr1', '-', 'expr2 | "expressions - in + quotes | (are) not - parsed "', '-', 'expr3', '|', 'expr4'])
         # test single quotes
-        self.assertEqual(['+', 'op1', '-', "op2 | 'expressions - in + quotes | (are) not - parsed '", '-', 'op3', '|', 'op4'],
-                         parser.parse_query("(op1) - op2 | 'expressions - in + quotes | (are) not - parsed ' - (op3) | op4"))
+        self.assertEqual(parser.parse_query("(expr1) - expr2 | 'expressions - in + quotes | (are) not - parsed ' - (expr3) | expr4"),
+                         ['+', 'expr1', '-', "expr2 | 'expressions - in + quotes | (are) not - parsed '", '-', 'expr3', '|', 'expr4'])
 
         # test escaping quotes
         # escaping single quotes
-        self.assertEqual(['+', "op1 \\' op2", '+', 'op3', '-', "op4 \\'", '+', 'op5'],
-                         parser.parse_query("op1 \\' op2 +(op3) -op4 \\' + (op5)"))
+        self.assertEqual(parser.parse_query("expr1 \\' expr2 +(expr3) -expr4 \\' + (expr5)"),
+                         ['+', "expr1 \\' expr2", '+', 'expr3', '-', "expr4 \\'", '+', 'expr5'])
         # escaping double quotes
-        self.assertEqual(['+', 'op1 \\" op2', '+', 'op3', '-', 'op4 \\"', '+', 'op5'],
-                         parser.parse_query('op1 \\" op2 +(op3) -op4 \\" + (op5)'))
+        self.assertEqual(parser.parse_query('expr1 \\" expr2 +(expr3) -expr4 \\" + (expr5)'),
+                         ['+', 'expr1 \\" expr2', '+', 'expr3', '-', 'expr4 \\"', '+', 'expr5'])
 
         # test parsing of quotes in the beginning of the query
-        self.assertEqual(['+', '"expr1"', '-', 'expr2'],
-                         parser.parse_query('"expr1" - (expr2)'))
-        self.assertEqual(['-', '"expr1"', '-', 'expr2'],
-                         parser.parse_query('-"expr1" - (expr2)'))
+        self.assertEqual(parser.parse_query('"expr1" - (expr2)'),
+                         ['+', '"expr1"', '-', 'expr2'])
+        self.assertEqual(parser.parse_query('-"expr1" - (expr2)'),
+                         ['-', '"expr1"', '-', 'expr2'])
 
 
 

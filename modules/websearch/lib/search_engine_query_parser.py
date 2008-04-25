@@ -128,9 +128,7 @@ class SearchQueryParenthesisedParser:
         """Replaces some of the content of the query with equivalent content
         (e.g. replace 'AND' operator with '+' operator) for easier processing after that."""
 
-        # replace first the appearances of AND NOT, and after that appearances of NOT
-        query = self._replace_word_case_insensitive(query, "and not", "-")
-        # the order here does matter. Replacement of AND should be after replacement of AND NOT
+        query = self._replace_word_case_insensitive(query, "not", "-")
         query = self._replace_word_case_insensitive(query, "and", "+")
         query = self._replace_word_case_insensitive(query, "or", "|")
 
