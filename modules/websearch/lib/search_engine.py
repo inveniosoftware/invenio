@@ -1734,7 +1734,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
         parser = SearchQueryParenthesisedParser()
 
         # get a hitset with all recids
-        result_hitset = get_collection_reclist(CFG_SITE_NAME)
+        result_hitset = HitSet(trailing_bits=1)
 
         # parse the query. The result is list of [op1, expr1, op2, expr2, ..., opN, exprN]
         parsing_result = parser.parse_query(p)
