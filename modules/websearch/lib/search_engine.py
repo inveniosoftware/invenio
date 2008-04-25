@@ -1727,6 +1727,8 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
 
        For more details on the parameters see 'search_pattern'
     """
+    _ = gettext_set_language(ln)
+
     # Try searching with parentheses
     try:
         parser = SearchQueryParenthesisedParser()
@@ -1762,7 +1764,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
     # If searching with parenteses fails, perform search ignoring parentheses
     except InvenioWebSearchQueryParserException:
 
-        print_warning(req, "Nested or mismatched parethneses. Continue search ignoring paretheses.")
+        print_warning(req, _("Nested or mismatched parentheses detected. Ignoring all parentheses in the query..."))
 
         # remove the parentheses in the query. Current implementation removes all the parentheses,
         # but it could be improved to romove only these that are not insede quotes
