@@ -161,6 +161,7 @@ def task_init(
         "verbose" : 1,
         "sleeptime" : '',
         "runtime" : time.strftime("%Y-%m-%d %H:%M:%S"),
+        "priority" : 0,
     }
     to_be_submitted = True
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
@@ -227,14 +228,15 @@ def _task_build_params(
     # set user-defined options:
     try:
         (short_params, long_params) = specific_params
-        opts, args = getopt.gnu_getopt(argv[1:], "hVv:u:s:t:" +
+        opts, args = getopt.gnu_getopt(argv[1:], "hVv:u:s:t:P:" +
             short_params, [
                 "help",
                 "version",
                 "verbose=",
                 "user=",
                 "sleep=",
-                "time="
+                "time=",
+                "priority="
             ] + long_params)
     except getopt.GetoptError, err:
         _usage(1, err, help_specific_usage=help_specific_usage, description=description)
@@ -255,6 +257,8 @@ def _task_build_params(
                     _task_params["sleeptime"] = opt[1]
             elif opt[0] in [ "-t", "--runtime" ]:
                 _task_params["runtime"] = get_datetime(opt[1])
+            elif opt[0] in ("-P", "--priority"):
+                _task_params["priority"] = int(opt[1])
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                     opt[1], opts, args):
@@ -462,10 +466,10 @@ def _task_submit(argv, authorization_action, authorization_msg):
     ## submit task:
     write_message("storing task options %s\n" % argv, verbose=9)
     _task_params['task_id'] = run_sql("""INSERT INTO schTASK (id,proc,user,
-                                           runtime,sleeptime,status,arguments)
-                                         VALUES (NULL,%s,%s,%s,%s,'WAITING',%s)""",
+                                           runtime,sleeptime,status,arguments,priority)
+                                         VALUES (NULL,%s,%s,%s,%s,'WAITING',%s, %s)""",
         (_task_params['task_name'], _task_params['user'], _task_params["runtime"],
-         _task_params["sleeptime"], marshal.dumps(argv)))
+         _task_params["sleeptime"], marshal.dumps(argv), _task_params['priority']))
 
     ## update task number:
     write_message("Task #%d submitted." % _task_params['task_id'])
@@ -510,9 +514,6 @@ def _task_run(task_run_fnc):
         write_message("Error: The task #%d is %s.  I expected WAITING." %
             (_task_params['task_id'], task_status), sys.stderr)
         return False
-    ## we can run the task now:
-    write_message("Task #%d started." % _task_params['task_id'])
-    task_update_status("RUNNING")
     ## initialize signal handler:
     _task_params['signal_request'] = None
     signal.signal(signal.SIGUSR1, _task_sig_sleep)
@@ -523,7 +524,9 @@ def _task_run(task_run_fnc):
     signal.signal(signal.SIGABRT, _task_sig_suicide)
     signal.signal(signal.SIGCONT, _task_sig_wakeup)
     signal.signal(signal.SIGINT, _task_sig_ctrlc)
-    #signal.signal(signal.SIGINT, _task_sig_unknown)
+    ## we can run the task now:
+    write_message("Task #%d started." % _task_params['task_id'])
+    task_update_status("RUNNING")
     ## run the task:
     _task_params['task_starting_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     if callable(task_run_fnc) and task_run_fnc():
@@ -552,6 +555,7 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
         " task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26\n")
     sys.stderr.write("  -s, --sleeptime=SLEEP\tSleeping frequency after"
         " which to repeat task (no), e.g.: 30m, 2h, 1d\n")
+    sys.stderr.write("  -P, --priority=PRIORITY\tPriority level (an integer, 0 is default)\n")
     sys.stderr.write("General options:\n")
     sys.stderr.write("  -h, --help\t\tPrint this help.\n")
     sys.stderr.write("  -V, --version\t\tPrint version information.\n")

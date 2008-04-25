@@ -2979,9 +2979,11 @@ CREATE TABLE IF NOT EXISTS schTASK (
   arguments mediumblob,
   status varchar(50),
   progress varchar(255),
+  priority tinyint(4) NOT NULL default 0,
   PRIMARY KEY  (id),
   KEY status (status),
-  KEY runtime (runtime)
+  KEY runtime (runtime),
+  KEY priority (priority)
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS hstTASK (
@@ -2994,9 +2996,11 @@ CREATE TABLE IF NOT EXISTS hstTASK (
   arguments mediumblob,
   status varchar(50),
   progress varchar(255),
+  priority tinyint(4) NOT NULL default 0,
   PRIMARY KEY  (id),
   KEY status (status),
-  KEY runtime (runtime)
+  KEY runtime (runtime),
+  KEY priority (priority)
 ) TYPE=MyISAM;
 
 -- External collections

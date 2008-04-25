@@ -28,6 +28,7 @@ import os
 import string
 import sys
 import time
+import datetime
 import re
 import marshal
 import getopt
@@ -36,6 +37,7 @@ import curses.panel
 from curses.wrapper import wrapper
 from socket import gethostname
 import signal
+from tempfile import NamedTemporaryFile
 
 from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS
 from invenio.config import \
@@ -44,11 +46,13 @@ from invenio.config import \
      CFG_BIBSCHED_LOG_PAGER, \
      CFG_BINDIR, \
      CFG_LOGDIR, \
+     CFG_TMPDIR, \
      CFG_BIBSCHED_GC_TASKS_OLDER_THAN, \
      CFG_BIBSCHED_GC_TASKS_TO_REMOVE, \
      CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE
 from invenio.dbquery import run_sql, escape_string
 from invenio.textutils import wrap_text_in_a_box
+from invenio.errorlib import register_exception
 
 shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
@@ -168,7 +172,7 @@ class Manager:
         self.first_visible_line = 0
         self.move_mode = 0
         self.auto_mode = 0
-        self.currentrow = ["", "", "", "", "", "", ""]
+        self.currentrow = None
         wrapper(self.start)
 
     def handle_keys(self, chr):
@@ -177,7 +181,7 @@ class Manager:
         if self.auto_mode and (chr not in (curses.KEY_UP, curses.KEY_DOWN,
                                            curses.KEY_PPAGE, curses.KEY_NPAGE,
                                            ord("q"), ord("Q"), ord("a"),
-                                           ord("A"), ord("1"), ord("2"),
+                                           ord("A"), ord("1"), ord("2"), ord("3"),
                                            ord("p"), ord("P"))):
             self.display_in_footer("in automatic mode")
             self.stdscr.refresh()
@@ -264,36 +268,36 @@ class Manager:
     def openlog(self):
         task_id = self.currentrow[0]
         status = self.currentrow[5]
-        if status != 'WAITING':
-            tmpname = os.tmpnam()
-            tmpfile = open(tmpname, "w")
-            try:
-                tmpfile.write(open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % task_id)).read())
-            except IOError:
-                pass
-            try:
-                tmpfile.write(open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % task_id)).read())
-            except IOError:
-                pass
-            tmpfile.close()
-            if CFG_BIBSCHED_LOG_PAGER and os.path.exists(CFG_BIBSCHED_LOG_PAGER):
-                pager = CFG_BIBSCHED_LOG_PAGER
-            else:
-                pager = os.environ.get('PAGER', '/bin/more')
+        tmpfile = NamedTemporaryFile(dir=CFG_TMPDIR)
+        try:
+            tmpfile.write('bibsched_task_%d.log content\n' % task_id)
+            tmpfile.write('-----------------------------------\n')
+            tmpfile.write(open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % task_id)).read())
+        except IOError:
+            pass
+        try:
+            tmpfile.write('bibsched_task_%d.err content\n' % task_id)
+            tmpfile.write('-----------------------------------\n')
+            tmpfile.write(open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % task_id)).read())
+        except IOError:
+            pass
+        tmpfile.flush()
+        pager = CFG_BIBSCHED_LOG_PAGER or os.environ.get('PAGER', '/bin/less')
+        if os.path.exists(pager):
             curses.endwin()
-            os.spawnlp(os.P_WAIT, pager, pager, tmpname)
-            os.remove(tmpname)
+            os.spawnlp(os.P_WAIT, pager, pager, tmpfile.name)
             curses.panel.update_panels()
 
     def display_task_options(self):
         """Nicely display information about current process."""
-        msg =  '        id : %i\n\n' % self.currentrow[0]
-        msg += '      proc : %s\n\n' % self.currentrow[1]
-        msg += '      user : %s\n\n' % self.currentrow[2]
-        msg += '   runtime : %s\n\n' % self.currentrow[3].strftime("%Y-%m-%d %H:%M:%S")
-        msg += ' sleeptime : %s\n\n' % self.currentrow[4]
-        msg += '    status : %s\n\n' % self.currentrow[5]
-        msg += '  progress : %s\n\n' % self.currentrow[6]
+        msg =  '        id: %i\n\n' % self.currentrow[0]
+        msg += '  priority: %s\n\n' % self.currentrow[8]
+        msg += '      proc: %s\n\n' % self.currentrow[1]
+        msg += '      user: %s\n\n' % self.currentrow[2]
+        msg += '   runtime: %s\n\n' % self.currentrow[3].strftime("%Y-%m-%d %H:%M:%S")
+        msg += ' sleeptime: %s\n\n' % self.currentrow[4]
+        msg += '    status: %s\n\n' % self.currentrow[5]
+        msg += '  progress: %s\n\n' % self.currentrow[6]
         arguments = marshal.loads(self.currentrow[7])
         if type(arguments) is dict:
             # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
@@ -406,10 +410,10 @@ class Manager:
                     new_runtime = get_datetime(sleeptime)
                     new_task_arguments = marshal.loads(self.currentrow[7])
                     new_task_arguments["runtime"] = new_runtime
-                    new_task_id = run_sql("INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status)"\
-                                          " VALUES (%s,%s,%s,%s,%s,'WAITING')",
+                    new_task_id = run_sql("INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status,priority)"\
+                                          " VALUES (%s,%s,%s,%s,%s,'WAITING',%s)",
                                           (process, self.currentrow[2], new_runtime, sleeptime,
-                                           self.currentrow[7]))
+                                           self.currentrow[7], self.currentrow[8]))
                     new_task_arguments["task"] = new_task_id
                     run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""",
                             (marshal.dumps(new_task_arguments), new_task_id))
@@ -437,7 +441,6 @@ class Manager:
     def kill(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1]
-        #status = self.currentrow[5]
         mypid = get_task_pid(process, task_id)
         if mypid != 0:
             os.kill(mypid, signal.SIGKILL)
@@ -451,7 +454,6 @@ class Manager:
     def stop(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1]
-        #status = self.currentrow[5]
         mypid = get_task_pid(process, task_id)
         if mypid != 0:
             os.kill(mypid, signal.SIGTERM)
@@ -463,9 +465,8 @@ class Manager:
 
     def delete(self):
         task_id = self.currentrow[0]
-        #process = self.currentrow[1]
         status = self.currentrow[5]
-        if status != 'RUNNING' and status != 'CONTINUING' and status != 'SLEEPING':
+        if status not in ('RUNNING', 'CONTINUING', 'SLEEPING'):
             self.set_status(task_id, "%s_DELETED" % status)
             self.display_in_footer("process deleted")
             self.selected_line = max(self.selected_line, 2)
@@ -475,7 +476,6 @@ class Manager:
 
     def init(self):
         task_id = self.currentrow[0]
-        #process = self.currentrow[1]
         status = self.currentrow[5]
         if status != 'RUNNING' and status != 'CONTINUING' and status != 'SLEEPING':
             self.set_status(task_id, "WAITING")
@@ -490,7 +490,7 @@ class Manager:
             self.move_mode = 0
         else:
             status = self.currentrow[5]
-            if status in ( "RUNNING" , "CONTINUING" , "SLEEPING" ):
+            if status in ("RUNNING" , "CONTINUING" , "SLEEPING"):
                 self.display_in_footer("cannot move running processes!")
             else:
                 self.move_mode = 1
@@ -520,8 +520,8 @@ class Manager:
         self.display_in_footer("not implemented yet")
         self.stdscr.refresh()
 
-    def put_line(self, row):
-        col_w = [ 5 , 11 , 21 , 21 , 7 , 11 , 25 ]
+    def put_line(self, row, header=False):
+        col_w = [5 , 6, 11 , 15 , 21 , 7 , 11 , 25]
         maxx = self.width
         if self.y == self.selected_line - self.first_visible_line and self.y > 1:
             if self.auto_mode:
@@ -551,13 +551,25 @@ class Manager:
             attr = curses.color_pair(2) + curses.A_BOLD
         else:
             attr = curses.A_BOLD
-        myline = str(row[0]).ljust(col_w[0])
-        myline += str(row[1]).ljust(col_w[1])
-        myline += str(row[2]).ljust(col_w[2])
-        myline += str(row[3])[:19].ljust(col_w[3])
-        myline += str(row[4]).ljust(col_w[4])
-        myline += str(row[5]).ljust(col_w[5])
-        myline += str(row[6]).ljust(col_w[6])
+        if header: # Dirty hack. put_line should be better refactored.
+            # row contains one less element: arguments
+            myline = str(row[0]).ljust(col_w[0])
+            myline += str(row[1]).ljust(col_w[1])
+            myline += str(row[2]).ljust(col_w[2])
+            myline += str(row[3])[:19].ljust(col_w[3])
+            myline += str(row[4]).ljust(col_w[4])
+            myline += str(row[5]).ljust(col_w[5])
+            myline += str(row[6]).ljust(col_w[6])
+            myline += str(row[7]).ljust(col_w[7])
+        else:
+            myline = str(row[0]).ljust(col_w[0])
+            myline += str(row[8]).ljust(col_w[1])
+            myline += str(row[1]).ljust(col_w[2])
+            myline += str(row[2]).ljust(col_w[3])
+            myline += str(row[3])[:19].ljust(col_w[4])
+            myline += str(row[4]).ljust(col_w[5])
+            myline += str(row[5]).ljust(col_w[6])
+            myline += str(row[6]).ljust(col_w[7])
         myline = myline.ljust(maxx)
         self.stdscr.addnstr(self.y, 0, myline, maxx, attr)
         self.y = self.y+1
@@ -581,15 +593,14 @@ class Manager:
         self.height, self.width = self.stdscr.getmaxyx()
         maxy = self.height - 2
         #maxx = self.width
-        self.put_line( ("ID", "PROC", "USER", "RUNTIME", "SLEEP", "STATUS", "PROGRESS") )
-        self.put_line( ("---", "----", "----", "-------------------", "-----", "-----", "--------") )
+        self.put_line(("ID", "PRI", "PROC", "USER", "RUNTIME", "SLEEP", "STATUS", "PROGRESS"), True)
+        self.put_line(("---", "----", "----", "----", "-------------------", "-----", "-----", "--------"), True)
         if self.selected_line > maxy + self.first_visible_line - 1:
             self.first_visible_line = self.selected_line - maxy + 1
         if self.selected_line < self.first_visible_line + 2:
             self.first_visible_line = self.selected_line - 2
         for row in self.rows[self.first_visible_line:self.first_visible_line+maxy-2]:
-            task_id, proc, user, runtime, sleeptime, status, progress, arguments = row
-            self.put_line( row )
+            self.put_line(row)
         self.y = self.stdscr.getmaxyx()[0] - 1
         if self.auto_mode:
             self.display_in_footer(self.footer_auto_mode, print_time_p=1)
@@ -610,7 +621,6 @@ class Manager:
         self.stdscr.refresh()
 
     def start(self, stdscr):
-        ring = 0
         if curses.has_colors():
             curses.start_color()
             curses.init_pair(8, curses.COLOR_WHITE, curses.COLOR_BLACK)
@@ -621,24 +631,32 @@ class Manager:
             curses.init_pair(5, curses.COLOR_BLUE, curses.COLOR_BLACK)
             curses.init_pair(6, curses.COLOR_CYAN, curses.COLOR_BLACK)
             curses.init_pair(7, curses.COLOR_YELLOW, curses.COLOR_BLACK)
-
         self.stdscr = stdscr
         self.base_panel = curses.panel.new_panel( self.stdscr )
         self.base_panel.bottom()
         curses.panel.update_panels()
         self.height, self.width = stdscr.getmaxyx()
         self.stdscr.clear()
-        if server_pid (): self.auto_mode = 1
-        if self.display == 1:
-            where = "and status='DONE'"
-            order = "DESC"
-        else:
-            where = "and status!='DONE'"
-            order = "ASC"
-        self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM schTASK WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s""" % (where, order))
-        self.repaint()
-        ring = 0
+        if server_pid():
+            self.auto_mode = 1
+        ring = 4
         while self.running:
+            if ring == 4:
+                if self.display == 1:
+                    table = "schTASK"
+                    where = "and status='DONE'"
+                    order = "runtime DESC"
+                elif self.display == 2:
+                    table = "schTASK"
+                    where = "and status<>'DONE'"
+                    order = "priority DESC, runtime ASC"
+                else:
+                    table = "hstTASK"
+                    order = "runtime DESC"
+                    where = ''
+                self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments,priority FROM %s WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY %s""" % (table, where, order))
+                ring = 0
+                self.repaint()
             ring += 1
             char = -1
             try:
@@ -664,22 +682,6 @@ class Manager:
             except TimedOutExc:
                 char = -1
             self.handle_keys(char)
-            if ring == 4:
-                if self.display == 1:
-                    table = "schTASK"
-                    where = "and status='DONE'"
-                    order = "DESC"
-                elif self.display == 2:
-                    table = "schTASK"
-                    where = "and status!='DONE'"
-                    order = "ASC"
-                else:
-                    table = "hstTASK"
-                    order = "ASC"
-                    where = ''
-                self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments FROM %s WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY runtime %s""" % (table, where, order))
-                ring = 0
-                self.repaint()
 
 
 class BibSched:
@@ -694,84 +696,108 @@ class BibSched:
     def set_status(self, task_id, status):
         return run_sql("UPDATE schTASK set status=%s WHERE id=%s", (status, task_id))
 
-    def can_run( self, proc ):
-        return len( self.running.keys() ) == 0
+    def incompatible_with(self, proc):
+        """Return the the subset of self.running corresponding to the
+        tasks incompatibile with the given one."""
+        return self.running
 
     def get_running_processes(self):
-        row = None
-        res = run_sql("SELECT id,proc,user,UNIX_TIMESTAMP(runtime),sleeptime,arguments,status FROM schTASK "\
-                      " WHERE status='RUNNING' or status='CONTINUING' LIMIT 1")
-        try:
-            row = res[0]
-        except:
-            pass
-        return row
+        return run_sql("SELECT id,proc,user,UNIX_TIMESTAMP(runtime),sleeptime,arguments,status FROM schTASK "\
+                      " WHERE status='RUNNING' or status='CONTINUING'")
 
-    def handle_row( self, row ):
-        task_id, proc, user, runtime, sleeptime, arguments, status = row
+    def handle_row(self, row):
+        """Perform needed action of the row representing a task."""
+        task_id, proc, user, runtime, sleeptime, arguments, status, priority = row
         if status == "SLEEP":
-            if task_id in self.running.keys():
-                self.set_status( task_id, "SLEEP SENT" )
-                os.kill( self.running[task_id], signal.SIGUSR1 )
+            if task_id in self.running:
+                self.set_status(task_id, "SLEEP SENT")
+                os.kill(self.running[task_id][0], signal.SIGUSR1)
                 self.sleep_sent[task_id] = self.running[task_id]
         elif status == "SLEEPING":
-            if task_id in self.sleep_sent.keys():
+            if task_id in self.sleep_sent:
                 self.sleep_done[task_id] = self.sleep_sent[task_id]
                 del self.sleep_sent[task_id]
         if status == "WAKEUP":
-            if task_id in self.sleep_done.keys():
+            if task_id in self.sleep_done:
                 self.running[task_id] = self.sleep_done[task_id]
                 del self.sleep_done[task_id]
-                os.kill( self.running[task_id], signal.SIGCONT )
-                self.set_status( task_id, "RUNNING" )
+                os.kill(self.running[task_id][0], signal.SIGCONT)
+                self.set_status(task_id, "RUNNING")
         elif status == "STOP":
-            if task_id in self.running.keys():
-                self.set_status( task_id, "STOP SENT" )
-                os.kill( self.running[task_id], signal.SIGTERM )
+            if task_id in self.running:
+                self.set_status(task_id, "STOP SENT")
+                os.kill(self.running[task_id][0], signal.SIGTERM)
                 self.stop_sent[task_id] = self.running[task_id]
+        elif status == "STOPPED" and task_id in self.stop_sent:
+            if task_id in self.running:
                 del self.running[task_id]
-        elif status == "STOPPED" and task_id in self.stop_sent.keys():
             del self.stop_sent[task_id]
-        elif status == "SUICIDE":
-            if task_id in self.running.keys():
-                self.set_status( task_id, "SUICIDE SENT" )
-                os.kill( self.running[task_id], signal.SIGABRT )
-                self.suicide_sent[task_id] = self.running[task_id]
-                del self.running[task_id]
-        elif status == "SUICIDED" and task_id in self.suicide_sent.keys():
-            del self.suicide_sent[task_id]
-        elif status.find("DONE") > -1 and task_id in self.running.keys():
-            del self.running[task_id]
-        elif self.can_run(proc) and status == "WAITING" and runtime <= time.time():
-            if proc in self.helper_modules:
-                program = os.path.join(CFG_BINDIR, proc)
-                fdout, fderr = get_output_channelnames(task_id)
-                COMMAND = "%s %s >> %s 2>> %s" % (program, str(task_id), fdout, fderr)
-                Log("task #%d (%s) started" % (task_id, proc))
-                os.system(COMMAND)
-                Log("task #%d (%s) ended" % (task_id, proc))
-                self.running[task_id] = get_task_pid(proc, task_id)
             if sleeptime:
                 new_runtime = get_datetime(sleeptime)
-                new_task_id = run_sql("INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status)"\
-                                      " VALUES (%s,%s,%s,%s,%s,'WAITING')",
-                                      (proc, user, new_runtime, sleeptime, arguments))
+                run_sql("INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status,priority VALUES (%s,%s,%s,%s,%s,'WAITING',%s)", (proc, user, new_runtime, sleeptime, arguments, priority))
+        elif status == "SUICIDE":
+            if task_id in self.running:
+                self.set_status(task_id, "SUICIDE SENT")
+                os.kill(self.running[task_id][0], signal.SIGABRT)
+                self.suicide_sent[task_id] = self.running[task_id]
+        elif status == "SUICIDED" and task_id in self.suicide_sent:
+            if task_id in self.running:
+                del self.running[task_id]
+            del self.suicide_sent[task_id]
+            if sleeptime:
+                new_runtime = get_datetime(sleeptime)
+                run_sql("INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status,priority VALUES (%s,%s,%s,%s,%s,'WAITING',%s)", (proc, user, new_runtime, sleeptime, arguments, priority))
+        elif 'DONE' in status and task_id in self.running:
+            del self.running[task_id]
+            if sleeptime:
+                new_runtime = get_datetime(sleeptime)
+                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING' WHERE id=%s", (new_runtime, task_id))
+        elif status in ("WAITING", "SLEEPING") and runtime <= datetime.datetime.now():
+            incompatibilities = self.incompatible_with(proc)
+            if not incompatibilities:
+                if status == "SLEEPING":
+                    if task_id in self.sleep_done:
+                        self.running[task_id] = self.sleep_done[task_id]
+                        del self.sleep_done[task_id]
+                        os.kill( self.running[task_id][0], signal.SIGCONT )
+                        self.set_status( task_id, "RUNNING" )
+                elif proc in self.helper_modules:
+                    program = os.path.join(CFG_BINDIR, proc)
+                    fdout, fderr = get_output_channelnames(task_id)
+                    COMMAND = "%s %s >> %s 2>> %s" % (program, str(task_id), fdout, fderr)
+                    Log("task #%d (%s) started" % (task_id, proc))
+                    os.system(COMMAND)
+                    Log("task #%d (%s) ended" % (task_id, proc))
+                    self.running[task_id] = (get_task_pid(proc, task_id), priority)
+            else:
+                ok = True
+                for other_task_id, (other_pid, other_priority) in incompatibilities.iteritems():
+                    if other_priority >= priority:
+                        # There is at least an incompatible task with higher
+                        # priority.
+                        ok = False
+                        break
+                if ok:
+                    for other_task_id, (other_pid, other_priority) in incompatibilities.iteritems():
+                        if other_task_id not in self.sleep_sent:
+                            self.set_status( other_pid, "SLEEP SENT" )
+                            os.kill( other_pid, signal.SIGUSR1 )
+                            self.sleep_sent[task_id] = self.running[other_task_id]
 
     def watch_loop(self):
         running_process = self.get_running_processes()
         if running_process:
-            proc = running_process[ 1 ]
-            task_id   = running_process[ 0 ]
-            if get_task_pid(proc, task_id):
-                self.running[task_id] = get_task_pid(proc, task_id)
-            else:
-                self.set_status(task_id,"ERROR")
+            for task_id, proc in running_process:
+                if get_task_pid(proc, task_id):
+                    self.running[task_id] = get_task_pid(proc, task_id)
+                else:
+                    self.set_status(task_id,"ERROR")
         rows = []
         while 1:
+            rows = run_sql("SELECT id,proc,user,runtime,sleeptime,arguments,status,priority FROM schTASK ORDER BY priority DESC, runtime ASC")
             for row in rows:
-                self.handle_row( row )
+                self.handle_row(row)
             time.sleep(CFG_BIBSCHED_REFRESHTIME)
-            rows = run_sql("SELECT id,proc,user,UNIX_TIMESTAMP(runtime),sleeptime,arguments,status FROM schTASK ORDER BY runtime ASC")
 
 class TimedOutExc(Exception):
     def __init__(self, value = "Timed Out"):
@@ -810,7 +836,7 @@ def usage(exitcode=1, msg=""):
     if msg:
         sys.stderr.write("Error: %s.\n" % msg)
 
-    sys.stderr.write ("""\
+    sys.stderr.write("""\
 Usage: %s [options] [start|stop|restart|monitor|status]
 
 The following commands are available for bibsched:
@@ -847,78 +873,79 @@ Purge options:
 
 pidfile = os.path.join(CFG_PREFIX, 'var', 'run', 'bibsched.pid')
 
-def error (msg):
+def error(msg):
     print >> sys.stderr, "error: " + msg
-    sys.exit (1)
+    sys.exit(1)
 
-def server_pid ():
+def server_pid():
     # The pid must be stored on the filesystem
     try:
-        pid = int (open (pidfile).read ())
+        pid = int(open(pidfile).read())
     except IOError:
         return None
 
     # Even if the pid is available, we check if it corresponds to an
     # actual process, as it might have been killed externally
     try:
-        os.kill (pid, signal.SIGCONT)
+        os.kill(pid, signal.SIGCONT)
     except OSError:
         return None
 
     return pid
 
-def start (verbose = True):
+def start(verbose = True):
     """ Fork this process in the background and start processing
     requests. The process PID is stored in a pid file, so that it can
     be stopped later on."""
 
     if verbose:
-        sys.stdout.write ("starting bibsched: ")
-        sys.stdout.flush ()
+        sys.stdout.write("starting bibsched: ")
+        sys.stdout.flush()
 
-    pid = server_pid ()
+    pid = server_pid()
     if pid:
-        error ("another instance of bibsched (pid %d) is running" % pid)
+        error("another instance of bibsched (pid %d) is running" % pid)
 
     # start the child process using the "double fork" technique
-    pid = os.fork ()
-    if pid > 0: sys.exit (0)
+    pid = os.fork()
+    if pid > 0: sys.exit(0)
 
-    os.setsid ()
-    os.chdir ('/')
+    os.setsid()
+    os.chdir('/')
 
-    pid = os.fork ()
+    pid = os.fork()
 
     if pid > 0:
         if verbose:
-            sys.stdout.write ('pid %d\n' % pid)
+            sys.stdout.write('pid %d\n' % pid)
 
-        Log ("daemon started (pid %d)" % pid)
-        open (pidfile, 'w').write ('%d' % pid)
+        Log("daemon started (pid %d)" % pid)
+        open(pidfile, 'w').write('%d' % pid)
         return
 
-    sys.stdin.close ()
-    redirect_stdout_and_stderr ()
+    sys.stdin.close()
+    redirect_stdout_and_stderr()
 
     sched = BibSched()
-    sched.watch_loop ()
+    sched.watch_loop()
 
     return
 
-def stop (verbose = True):
-
-    pid = server_pid ()
+def stop(verbose = True):
+    pid = server_pid()
     if not pid:
-        error ('bibsched seems not to be running.')
+        error('bibsched seems not to be running.')
 
-    try: os.kill (pid, signal.SIGKILL)
+    try:
+        os.kill(pid, signal.SIGKILL)
     except OSError:
         print >> sys.stderr, 'no bibsched process found'
 
-    Log ("daemon stopped (pid %d)" % pid)
+    Log("daemon stopped (pid %d)" % pid)
 
-    if verbose: print "stopping bibsched: pid %d" % pid
-    os.unlink (pidfile)
+    if verbose:
+        print "stopping bibsched: pid %d" % pid
+    os.unlink(pidfile)
     return
 
 def monitor(verbose = True):
@@ -964,7 +991,7 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
             since = '-' + since
             since_query = "AND runtime >= '%s'" % get_datetime(since)
 
-        res = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress
+        res = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,priority
                         FROM schTASK WHERE status=%%s %(task_query)s
                         %(since_query)s ORDER BY id ASC""" % {
                             'task_query' : task_query,
@@ -974,9 +1001,9 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
 
         write_message("%s processes: %d" % (status, len(res)))
         for (proc_id, proc_proc, proc_user, proc_runtime, proc_sleeptime,
-             proc_status, proc_progress) in res:
-            write_message(' * ID="%s" PROC="%s" USER="%s" RUNTIME="%s" SLEEPTIME="%s" STATUS="%s" PROGRESS="%s"' % \
-                          (proc_id, proc_proc, proc_user, proc_runtime,
+             proc_status, proc_progress, proc_priority) in res:
+            write_message(' * ID="%s" PRIORITY="%s" PROC="%s" USER="%s" RUNTIME="%s" SLEEPTIME="%s" STATUS="%s" PROGRESS="%s"' % \
+                          (proc_id, proc_priority, proc_proc, proc_user, proc_runtime,
                            proc_sleeptime, proc_status, proc_progress))
         return
 
@@ -1005,19 +1032,19 @@ def main():
         opts, args = getopt.gnu_getopt(sys.argv[1:], "hVdqS:s:t:", [
             "help","version","daemon", "quiet", "since=", "status=", "task="])
     except getopt.GetoptError, err:
-        Log ("Error: %s" % err)
+        Log("Error: %s" % err)
         usage(1, err)
 
     for opt, arg in opts:
         if opt in ["-h", "--help"]:
-            usage (0)
+            usage(0)
 
         elif opt in ["-V", "--version"]:
             print __revision__
             sys.exit(0)
 
         elif opt in ["-d", "--daemon"]:
-            redirect_stdout_and_stderr ()
+            redirect_stdout_and_stderr()
             sched = BibSched()
             Log("daemon started")
             sched.watch_loop()
@@ -1051,7 +1078,7 @@ def main():
             'restart': restart,
             'monitor': monitor} [cmd] (verbose)
     except KeyError:
-        usage (1, 'unkown command: %s' % `cmd`)
+        usage(1, 'unkown command: %s' % `cmd`)
 
     return
 
