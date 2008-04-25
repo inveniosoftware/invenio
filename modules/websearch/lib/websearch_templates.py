@@ -3030,12 +3030,16 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
+        #check the keys of dict_of_lists so that we can make column headers
+        columnfill = ""
+        for col in dict_of_lists.keys():
+            columnfill += "<td> </td>"
         out = """<table>
-                 <tr><td><strong class="headline">%(msg_title)s</strong></td><td></td></tr>
-                 <tr><td><strong>%(msg_recs)s</strong></td><td>%(nb_recs)s</td></tr>
-                 <tr><td><strong>%(msg_cites)s</strong></td><td>%(nb_cites)s</td></tr>
-                 <tr><td><strong>%(msg_avgcit)s</strong></td><td>%(nb_avgcit)s</td></tr>
-                 <tr><td><strong>%(msg_breakdown)s</strong></td><td></td></tr>
+                 <tr><td><strong class="headline">%(msg_title)s</strong></td><td>%(cf)s</td></tr>
+                 <tr><td><strong>%(msg_recs)s</strong></td><td>%(nb_recs)s</td>%(cf)s</tr>
+                 <tr><td><strong>%(msg_cites)s</strong></td><td>%(nb_cites)s</td>%(cf)s</tr>
+                 <tr><td><strong>%(msg_avgcit)s</strong></td><td>%(nb_avgcit)s</td>%(cf)s</tr>
+                 <tr><td><strong>%(msg_breakdown)s</strong></td><td></td>%(cf)s</tr>
               """ % { 'msg_title': _("Citation summary results"),
                       'msg_recs': _("Total number of papers analyzed:"),
                       'nb_recs': totalrecs,
@@ -3043,6 +3047,7 @@ class Template:
                       'msg_avgcit': _("Average citations per paper:"),
                       'nb_cites': totalcites,
                       'nb_avgcit': avgstr,
+                      'cf': columnfill,
                       'msg_breakdown': _("Breakdown of papers by citations:"),}
 
         #print the stuff in reciddict, but sort according to tresholds_names
@@ -3058,7 +3063,8 @@ class Template:
                     #intersect with reclist to get "of these records in this coll"
                     intersec_list = list(Set(recs_in_coll)&Set(reclist))
                     if len(intersec_list) > 0:
-                        collstr += str(k)+":"+str(len(intersec_list))+" "
+                        #add stuff like Published:5
+                        collstr += "<td>"+str(k)+": "+str(len(intersec_list))+"</td> "
                 out += "<tr><td>"+_(rowtitle)+"</td><td>"
                 #construct a link..
                 link = "../search?p=cited%3A"+str(mincites)+"-%3E"+str(maxcites)
@@ -3066,6 +3072,6 @@ class Template:
                     #the citing min/max was found, append criteria
                     link += "%20"+criteria
                 out += "<a href="+link+">"+str(len(reclist))+"</a> "+collstr
-        out += "</td></tr>"
+        out += "</td></tr>\n"
         out += '</table>'
         return out
