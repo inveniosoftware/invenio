@@ -43,7 +43,7 @@ except:
     CFG_CITESUMMARY_COLLECTIONS = []
 
 
-COLLECTION_TAG = "980__b"
+COLLECTION_TAG = "980__a"
 
 def summarize_records(recids, of, ln, defstring=""):
     """Produces a report in the format defined by of in language ln
@@ -61,8 +61,6 @@ def summarize_records(recids, of, ln, defstring=""):
             #intersect recids and recsinc
             intersec_list = list(Set(recids)&Set(recsinc))
             collections_citedbys[coll] = intersec_list
-
-
         return print_citation_summary_html(citedbylist, ln, defstring, collections_citedbys)
     if of == 'xcs':
         #this is an xml cite summary
