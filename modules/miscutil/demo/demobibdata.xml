@@ -20819,11 +20819,13 @@
  </datafield>
   <datafield tag="999" ind1="C" ind2="5">
     <subfield code="o">[22]</subfield>
+    <subfield code="s">Phys.Rev. D65 (2002) 084006</subfield>
     <subfield code="m">B. Wang, E. Abdalla and R. B. Mann, [arXiv</subfield>
     <subfield code="r">hep-th/0107243</subfield>
  </datafield>
   <datafield tag="999" ind1="C" ind2="5">
     <subfield code="o">[23]</subfield>
+    <subfield code="s">Phys.Rev. D65 (2002) 084006</subfield>
     <subfield code="m">R. B. Mann, [arXiv</subfield>
     <subfield code="r">gr-qc/9709039</subfield>
  </datafield>
@@ -20859,12 +20861,14 @@
  </datafield>
   <datafield tag="999" ind1="C" ind2="5">
     <subfield code="o">[29]</subfield>
+    <subfield code="s">Phys.Rev. D74 (2006) 044028</subfield>
     <subfield code="m">C. Martinez, J. P. Staforelli and R. Troncoso, [arXiv</subfield>
     <subfield code="r">hep-th/0512022</subfield>
  </datafield>
   <datafield tag="999" ind1="C" ind2="5">
     <subfield code="o">[29]</subfield>
     <subfield code="m">C. Martinez and R. Troncoso, [arXiv</subfield>
+    <subfield code="s">Phys.Rev. D74 (2006) 064007</subfield>
     <subfield code="r">hep-th/0606130</subfield>
  </datafield>
   <datafield tag="999" ind1="C" ind2="5">
@@ -20888,6 +20892,7 @@
   <datafield tag="999" ind1="C" ind2="5">
     <subfield code="o">[31]</subfield>
     <subfield code="m">I. Papadimitriou, [arXiv</subfield>
+    <subfield code="s">JHEP 0702 (2007) 008</subfield>
     <subfield code="r">hep-th/0606038</subfield>
  </datafield>
   <datafield tag="999" ind1="C" ind2="5">
@@ -21085,6 +21090,7 @@
   <datafield tag="999" ind1="C" ind2="5">
     <subfield code="o">[11]</subfield>
     <subfield code="m">D. Guarrera and Astron. J. Hariton (2007),</subfield>
+    <subfield code="s">Phys. Rev. D 76 (2007) 044011</subfield>
     <subfield code="r">gr-qc/0702029</subfield>
  </datafield>
   <datafield tag="999" ind1="C" ind2="5">
