@@ -490,7 +490,7 @@ def loginUser(req, p_un, p_pw, login_method):
 
     if CFG_EXTERNAL_AUTHENTICATION[login_method][0]: # External Authenthication
         try:
-            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw, req)
+            p_email = CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_email, p_pw, req) or CFG_EXTERNAL_AUTHENTICATION[login_method][0].auth_user(p_un, p_pw, req) ## We try to login with either the email of the nickname
             if p_email:
                 p_email = p_email.lower()
             else:
