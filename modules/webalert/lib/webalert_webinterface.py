@@ -75,7 +75,12 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                         make_canonical_urlargd(argd, {})),
                     "ln" : argd['ln']}, {})))
 
-        return page(title=_("Display searches"),
+        if argd['p'] == 'y':
+            _title = _("Popular Searches")
+        else:
+            _title = _("Your Searches")
+
+        return page(title=_title,
                     body=webalert.perform_display(argd['p'], uid, ln=argd['ln']),
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
@@ -215,7 +220,7 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         # load the right message language
         _ = gettext_set_language(argd['ln'])
 
-        return page(title=_("Display alerts"),
+        return page(title=_("Your Alerts"),
                     body=webalert.perform_list_alerts(uid, ln = argd['ln']),
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
