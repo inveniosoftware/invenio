@@ -55,7 +55,7 @@ import sys
 import time
 import traceback
 
-from invenio.dbquery import run_sql, _db_login, _db_logout
+from invenio.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_PREFIX, CFG_BINDIR
 from invenio.errorlib import register_exception
@@ -83,7 +83,6 @@ def fix_argv_paths(paths, argv=None):
             if path == argv[count]:
                 argv[count] = os.path.realpath(path)
     return argv
-
 
 def task_low_level_submission(name, user, *argv):
     """Let special lowlevel enqueuing of a task on the bibsche queue.
@@ -157,6 +156,7 @@ def task_init(
         "version" : version,
         "task_stop_helper_fnc" : task_stop_helper_fnc,
         "task_name" : os.path.basename(sys.argv[0]),
+        "task_specific_name" : '',
         "user" : '',
         "verbose" : 1,
         "sleeptime" : '',
@@ -228,7 +228,7 @@ def _task_build_params(
     # set user-defined options:
     try:
         (short_params, long_params) = specific_params
-        opts, args = getopt.gnu_getopt(argv[1:], "hVv:u:s:t:P:" +
+        opts, args = getopt.gnu_getopt(argv[1:], "hVv:u:s:t:P:N:" +
             short_params, [
                 "help",
                 "version",
@@ -237,6 +237,7 @@ def _task_build_params(
                 "sleep=",
                 "time=",
                 "priority="
+                "task_specific_name="
             ] + long_params)
     except getopt.GetoptError, err:
         _usage(1, err, help_specific_usage=help_specific_usage, description=description)
@@ -259,6 +260,8 @@ def _task_build_params(
                 _task_params["runtime"] = get_datetime(opt[1])
             elif opt[0] in ("-P", "--priority"):
                 _task_params["priority"] = int(opt[1])
+            elif opt[0] in ("-N", "--task_name"):
+                _task_params["task_specific_name"] = opt[1]
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                     opt[1], opts, args):
@@ -464,11 +467,15 @@ def _task_submit(argv, authorization_action, authorization_msg):
     _task_params['user'] = authenticate(_task_params["user"], authorization_action, authorization_msg)
 
     ## submit task:
+    if _task_params['task_specific_name']:
+        task_name = '%s:%s' % (_task_params['task_name'], _task_params['task_specific_name'])
+    else:
+        task_name = _task_params['task_name']
     write_message("storing task options %s\n" % argv, verbose=9)
-    _task_params['task_id'] = run_sql("""INSERT INTO schTASK (id,proc,user,
+    _task_params['task_id'] = run_sql("""INSERT INTO schTASK (proc,user,
                                            runtime,sleeptime,status,arguments,priority)
-                                         VALUES (NULL,%s,%s,%s,%s,'WAITING',%s, %s)""",
-        (_task_params['task_name'], _task_params['user'], _task_params["runtime"],
+                                         VALUES (%s,%s,%s,%s,'WAITING',%s, %s)""",
+        (task_name, _task_params['user'], _task_params["runtime"],
          _task_params["sleeptime"], marshal.dumps(argv), _task_params['priority']))
 
     ## update task number:
@@ -501,7 +508,6 @@ def _task_run(task_run_fnc):
     Return True in case of success and False in case of failure."""
 
     ## We prepare the pid file inside /prefix/var/run/taskname_id.pid
-    global _options, _sig_ctrlz_default_handler
     pidfile_name = os.path.join(CFG_PREFIX, 'var', 'run',
         'bibsched_task_%d.pid' % _task_params['task_id'])
     pidfile = open(pidfile_name, 'w')
@@ -529,15 +535,36 @@ def _task_run(task_run_fnc):
     task_update_status("RUNNING")
     ## run the task:
     _task_params['task_starting_time'] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    if callable(task_run_fnc) and task_run_fnc():
-        task_update_status("DONE")
-    else:
-        task_update_status("DONE WITH ERRORS")
 
-    ## we are done:
-    write_message("Task #%d finished." % _task_params['task_id'])
-    ## Removing the pid
-    os.remove(pidfile_name)
+    sleeptime = _task_params['sleeptime']
+    try:
+        if callable(task_run_fnc) and task_run_fnc():
+            task_update_status("DONE")
+        else:
+            task_update_status("DONE WITH ERRORS")
+    finally:
+        task_status = task_read_status()
+        if sleeptime:
+            new_runtime = get_datetime(sleeptime)
+            ## The task is a daemon. We resubmit it
+            if task_status == 'DONE':
+                ## It has finished in a good way. We recicle the database row
+                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING' WHERE id=%s", (new_runtime, _task_params['task_id']))
+                write_message("Task #%d finished and resubmitted." % _task_params['task_id'])
+            else:
+                ## We keep the bad result and we resubmit with another id.
+                proc, user, sleeptime, arguments, priority = run_sql('SELECT proc,user,sleeptime,arguments,priority FROM schTASK WHERE id=%s', (_task_params['task_id'], ))
+                run_sql("""INSERT INTO schTASK (proc,user,
+                        runtime,sleeptime,status,arguments,priority)
+                        VALUES (%s,%s,%s,%s,'WAITING',%s, %s)""",
+                        (proc, user, new_runtime, sleeptime, arguments, priority))
+                write_message("Task #%d finished (%s) and resubmitted." % (_task_params['task_id'], task_status))
+
+        else:
+            ## we are done:
+            write_message("Task #%d finished (%s)." % (_task_params['task_id'], task_status))
+        ## Removing the pid
+        os.remove(pidfile_name)
     return True
 
 def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
@@ -556,6 +583,7 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     sys.stderr.write("  -s, --sleeptime=SLEEP\tSleeping frequency after"
         " which to repeat task (no), e.g.: 30m, 2h, 1d\n")
     sys.stderr.write("  -P, --priority=PRIORITY\tPriority level (an integer, 0 is default)\n")
+    sys.stderr.write("  -N, --task_specific_name=TASK_SPECIFIC_NAME\tAdvanced option\n")
     sys.stderr.write("General options:\n")
     sys.stderr.write("  -h, --help\t\tPrint this help.\n")
     sys.stderr.write("  -V, --version\t\tPrint version information.\n")
