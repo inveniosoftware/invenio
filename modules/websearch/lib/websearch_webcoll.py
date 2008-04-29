@@ -415,6 +415,10 @@ class Collection:
         if self.restricted_p():
             return websearch_templates.tmpl_box_restricted_content(ln = ln)
 
+        if rg == 0:
+            # do not show latest additions box
+            return ""
+
         # FIXME: temporary hack in order not to display latest
         # additions box for some CERN collections:
         if CFG_CERN_SITE and self.name in ['Periodicals', 'Electronic Journals']:
