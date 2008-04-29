@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-03-27 09:54+0100\n"
-"PO-Revision-Date: 2008-03-27 10:21+0100\n"
+"PO-Revision-Date: 2008-04-29 12:00+0200\n"
 "Last-Translator: Jerome Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -2606,7 +2606,7 @@ msgstr "Définir une nouvelle alerte"
 
 #: modules/webalert/lib/webalert_webinterface.py:78
 msgid "Display searches"
-msgstr "Afficher requêtes"
+msgstr "Afficher les recherches"
 
 #: modules/webalert/lib/webalert_webinterface.py:83
 #: modules/webalert/lib/webalert_webinterface.py:134
@@ -2646,7 +2646,7 @@ msgstr "Afficher requêtes"
 #: modules/websubmit/web/yourapprovals.py:97
 #: modules/websubmit/web/yoursubmissions.py:175
 msgid "Your Account"
-msgstr "Votre compte"
+msgstr "Votre Compte"
 
 #: modules/webalert/lib/webalert_webinterface.py:85
 #, python-format
@@ -3192,7 +3192,7 @@ msgstr "Afficher paniers"
 #: modules/websession/lib/websession_templates.py:439
 #: modules/websession/lib/websession_templates.py:571
 msgid "Your Baskets"
-msgstr "Vos paniers"
+msgstr "Vos Paniers"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:337
 msgid "Add records to baskets"
@@ -4640,7 +4640,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:426
 #: modules/websession/lib/websession_webinterface.py:258
 msgid "Your Settings"
-msgstr "Vos paramètres"
+msgstr "Vos Paramètres"
 
 #: modules/websession/lib/websession_templates.py:427
 msgid ""
@@ -4653,7 +4653,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:437
 #: modules/websession/lib/websession_templates.py:573
 msgid "Your Searches"
-msgstr "Vos requêtes"
+msgstr "Vos Recherches"
 
 #: modules/websession/lib/websession_templates.py:438
 msgid "View all the searches you performed during the last 30 days."
@@ -4672,7 +4672,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:448
 msgid "Your Alerts"
-msgstr "Vos alertes"
+msgstr "Vos Alertes"
 
 #: modules/websession/lib/websession_templates.py:449
 msgid ""
@@ -4685,7 +4685,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:458
 msgid "Your Loans"
-msgstr "Vos prêts"
+msgstr "Vos Prêts"
 
 #: modules/websession/lib/websession_templates.py:459
 msgid ""
@@ -4716,7 +4716,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_templates.py:572
 msgid "Your Alert Searches"
-msgstr "Vos alertes"
+msgstr "Vos Alertes"
 
 #: modules/websession/lib/websession_templates.py:574
 #, python-format
@@ -4745,7 +4745,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:581
 #: modules/websubmit/web/yoursubmissions.py:172
 msgid "Your Submissions"
-msgstr "Vos soumissions"
+msgstr "Vos Soumissions"
 
 #: modules/websession/lib/websession_templates.py:582
 #, python-format
@@ -4760,12 +4760,12 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:585
 #: modules/websubmit/web/yourapprovals.py:94
 msgid "Your Approvals"
-msgstr "Vos approbations"
+msgstr "Vos Approbations"
 
 #: modules/websession/lib/websession_templates.py:586
 #: modules/websession/lib/websession_webinterface.py:564
 msgid "Your Administrative Activities"
-msgstr "Vos activités administratives"
+msgstr "Vos Activités Administratives"
 
 #: modules/websession/lib/websession_templates.py:613
 msgid "Try again"
@@ -5422,7 +5422,7 @@ msgstr ""
 #: modules/websession/lib/websession_webinterface.py:262
 #, python-format
 msgid "%s Personalize, Your Settings"
-msgstr "%s Personnaliser, Vos paramètres"
+msgstr "%s Personnaliser, Vos Paramètres"
 
 #: modules/websession/lib/websession_webinterface.py:301
 #: modules/websession/lib/websession_webinterface.py:369
