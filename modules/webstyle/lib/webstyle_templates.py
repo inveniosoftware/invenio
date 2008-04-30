@@ -643,6 +643,9 @@ URI: http://%(host)s%(page)s
                                   modificationdate=None, show_short_rec_p=True):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
+        Returns content as it is if the number of tabs for this record
+        is smaller than 2
+
            Parameters:
 
          - content *string* - the content displayed inside the box
@@ -658,7 +661,7 @@ URI: http://%(host)s%(page)s
         _ = gettext_set_language(ln)
 
         # If no tabs, simply returns the content
-        if len(tabs) == 0:
+        if len(tabs) <= 1:
             return content
 
         # Build the tabs at the top of the page
