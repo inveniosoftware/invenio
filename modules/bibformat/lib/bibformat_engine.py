@@ -229,30 +229,30 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
 ##         # Here is a temporary workaround until the issue is solved.
 ##         if platform.python_compiler().find('Red Hat') > -1:
 ##             # use os.system
-##             (result_code, result_path) = tempfile.mkstemp()
-##             command = "( %s/bibformat otype=%s )  > %s" % (CFG_BINDIR, format, result_path)
-##             (xm_code, xm_path) = tempfile.mkstemp()
-##             xm_file = open(xm_path, "w")
-##             xm_file.write(xm_record)
-##             xm_file.close()
-##             command = command + " <" + xm_path
-##             os.system(command)
-##             result_file = open(result_path,"r")
-##             bibformat_output = result_file.read()
-##             result_file.close()
-##             os.remove(result_path)
-##             os.remove(xm_path)
+        (result_code, result_path) = tempfile.mkstemp()
+        command = "( %s/bibformat otype=%s )  > %s" % (CFG_BINDIR, format, result_path)
+        (xm_code, xm_path) = tempfile.mkstemp()
+        xm_file = open(xm_path, "w")
+        xm_file.write(xm_record)
+        xm_file.close()
+        command = command + " <" + xm_path
+        os.system(command)
+        result_file = open(result_path,"r")
+        bibformat_output = result_file.read()
+        result_file.close()
+        os.remove(result_path)
+        os.remove(xm_path)
 ##         else:
 ##             # use popen
-        pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % CFG_BINDIR,
-                                                         "otype=%s" % format],
-                                                        'rw')
-        pipe_input.write(xm_record)
-        pipe_input.flush()
-        pipe_input.close()
-        bibformat_output = pipe_output.read()
-        pipe_output.close()
-        pipe_error.close()
+##         pipe_input, pipe_output, pipe_error = os.popen3(["%s/bibformat" % CFG_BINDIR,
+##                                                          "otype=%s" % format],
+##                                                         'rw')
+##         pipe_input.write(xm_record)
+##         pipe_input.flush()
+##         pipe_input.close()
+##         bibformat_output = pipe_output.read()
+##         pipe_output.close()
+##         pipe_error.close()
 
         if bibformat_output.startswith("<record>"):
             dom = minidom.parseString(bibformat_output)
