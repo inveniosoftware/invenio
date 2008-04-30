@@ -66,7 +66,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
             factor = factors[m.groups()[2]]
             value = float(m.groups()[1])
             date = time.localtime(date + sign * factor * value)
-            date = time.strftime(format_string, date)
+            #date = time.strftime(format_string, date)
         else:
             date = time.strptime(var, format_string)
             date = time.strftime(format_string, date)
@@ -711,21 +711,23 @@ class BibSched:
         """Among the task_set (built after the set of tasks with lower priority
         than proc), return the dict of task to stop and the dict of task to sleep.
         """
-        if len(task_set) < CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
-            return {}, {}
         min_prio = None
         min_task_id = None
         min_proc = None
         to_stop = {}
         for this_task_id, (this_proc, this_priority) in task_set.iteritems():
-            if self.task_safe_p(proc, this_proc):
+            if self.tasks_safe_p(proc, this_proc):
                 if min_prio is None or this_priority < min_prio:
                     min_prio = this_priority
                     min_task_id = this_task_id
                     min_proc = this_proc
             else:
                 to_stop[this_task_id] = (this_proc, this_priority)
-        return to_stop, {min_task_id : (min_proc, min_prio)}
+        if len(task_set) < CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS and not to_stop:
+            ## All the task are safe and there are enough resources
+            return {}, {}
+        else:
+            return to_stop, {min_task_id : (min_proc, min_prio)}
 
     def split_running_tasks_by_priority(self, task_id, priority):
         """Return two sets (by dict): the set of task_ids with lower priority and
@@ -745,17 +747,11 @@ class BibSched:
         return run_sql("SELECT id,proc,priority FROM schTASK "\
                       "WHERE status IN ('RUNNING', 'CONTINUING')")
 
-    def running_bibupload_is_safe_p(self, task_id, runtime):
-        """Return True if running running a bibupload is safe, which means
-        there are no other bibupload instances running/scheduled in the queue."""
-        res = run_sql("SELECT id FROM schTASK WHERE runtime<=%s AND status in ('RUNNING', 'CONTINUING', 'SLEEPING', 'SCHEDULED', 'SUICIDE', 'STOP', 'STOP_SENT', 'SLEEP', 'SLEEP SENT', 'SUICIDE SENT') AND proc LIKE 'bibupload%%'", (runtime, ))
-        if res:
-            for aid in res:
-                if task_id != aid[0]:
-                    return False
-        return True
+    def bibupload_in_the_queue(self, task_id):
+        """Check if bibupload is scheduled/running before runtime."""
+        return run_sql("SELECT id, status FROM schTASK WHERE proc='bibupload' AND id<%s AND status in ('RUNNING', 'WAITING', 'CONTINUING', 'SLEEPING', 'SCHEDULED', 'SUICIDE', 'STOP', 'STOP_SENT', 'SLEEP', 'SLEEP SENT', 'SUICIDE SENT')", (task_id, ))
 
-    def handle_row(self, task_id, proc, user, runtime, sleeptime, arguments, status, priority):
+    def handle_row(self, task_id, proc, runtime, status, priority):
         """Perform needed action of the row representing a task."""
         if status == "SLEEP":
             if task_id in self.running:
@@ -794,10 +790,21 @@ class BibSched:
         elif 'DONE' in status and task_id in self.running:
             del self.running[task_id]
         elif status == "SCHEDULED" or (status in ("WAITING", "SLEEPING") and runtime <= datetime.datetime.now()):
-            if proc.startswith('bibupload') and not self.running_bibupload_is_safe_p(task_id, runtime):
-                return
             if self.scheduled is not None and self.scheduled != task_id:
+                ## Another task is scheduled for running.
                 return
+
+            res = self.bibupload_in_the_queue(task_id)
+            if res:
+                ## All bibupload must finish before.
+                for (atask_id, astatus) in res:
+                    if astatus in ('STOP', 'SUICIDED', 'ERROR'):
+                        raise StandardError('BibSched had to halt because a bibupload with id %s has status %s. Please do your checks and delete/reinitialize the failed bibupload.' % (atask_id, astatus))
+                return
+
+            self.scheduled = task_id
+            ## Schedule the task for running.
+
             lower, higher = self.split_running_tasks_by_priority(task_id, priority)
             for other_task_id, (other_proc, dummy) in higher.iteritems():
                 if not self.tasks_safe_p(proc, other_proc):
@@ -805,6 +812,7 @@ class BibSched:
                     ## can not run at the same time of the given task.
                     ## We give up
                     return
+
             ## No higer priority task have issue with the given task.
             if len(higher) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
                 ## Not enough resources.
@@ -815,8 +823,8 @@ class BibSched:
             tasks_to_stop, tasks_to_sleep = self.get_tasks_to_sleep_and_stop(proc, lower)
 
             if tasks_to_stop and priority < 10:
-                """Only tasks with priority higher than 10 have the power
-                to put task to stop."""
+                ## Only tasks with priority higher than 10 have the power
+                ## to put task to stop.
                 return
 
             procname = proc.split(':')[0]
@@ -842,16 +850,16 @@ class BibSched:
                 self.set_status(task_id, "SCHEDULED")
                 self.scheduled = task_id
 
-            for other_task_id in tasks_to_stop:
-                if other_task_id not in self.stop_sent:
-                    self.set_status(task_id, "STOP SENT")
-                    self.send_signal(task_id, signal.SIGTERM)
-                    self.stop_sent[task_id] = self.running[task_id]
-            for other_task_id in tasks_to_sleep:
-                if other_task_id not in self.sleep_sent:
-                    self.set_status(task_id, "SLEEP SENT")
-                    self.send_signal(task_id, signal.SIGUSR1)
-                    self.sleep_sent[task_id] = self.running[task_id]
+                for other_task_id in tasks_to_stop:
+                    if other_task_id not in self.stop_sent:
+                        self.set_status(task_id, "STOP SENT")
+                        self.send_signal(task_id, signal.SIGTERM)
+                        self.stop_sent[task_id] = self.running[task_id]
+                for other_task_id in tasks_to_sleep:
+                    if other_task_id not in self.sleep_sent:
+                        self.set_status(task_id, "SLEEP SENT")
+                        self.send_signal(task_id, signal.SIGUSR1)
+                        self.sleep_sent[task_id] = self.running[task_id]
 
     def send_signal(self, task_id, signal):
         """Send a signal to a given task."""
@@ -872,16 +880,17 @@ class BibSched:
                     self.set_status(task_id, "ERROR")
             rows = []
             while 1:
-                rows = run_sql("SELECT id,proc,user,runtime,sleeptime,arguments,status,priority FROM schTASK ORDER BY priority DESC, runtime ASC")
+                rows = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE '%%DELETED%%' ORDER BY priority DESC, runtime ASC")
                 for row in rows:
                     self.handle_row(*row)
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
         except:
-            register_exception()
+            register_exception(alert_admin=True)
             raise
 
 class TimedOutExc(Exception):
     def __init__(self, value = "Timed Out"):
+        Exception.__init__(self)
         self.value = value
     def __str__(self):
         return repr(self.value)
