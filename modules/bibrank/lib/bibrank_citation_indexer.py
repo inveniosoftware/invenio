@@ -16,7 +16,7 @@
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## along with CDS Invenio; if not, writeto the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 __revision__ = "$Id$"
@@ -32,7 +32,7 @@ from invenio.dbquery import run_sql, serialize_via_marshal, \
                             deserialize_via_marshal
 from invenio.search_engine import print_record, search_pattern, get_fieldvalues
 from invenio.bibformat_utils import parse_tag
-from invenio.bibtask import write_message, task_get_option
+from invenio.bibtask import write_message, task_get_option, task_update_progress
 
 try:
     Set = set
@@ -93,6 +93,8 @@ def get_citation_weight(rank_method_code, config):
         citation_weight_dic_intermediate = result_intermediate[0]
         citation_list_intermediate = result_intermediate[1]
         reference_list_intermediate = result_intermediate[2]
+        #call the procedure that does the hard work by scanning
+        #citations and references in the updated_recid's
         citation_informations = get_citation_informations(updated_recid_list, config)
         #write_message("citation_informations: "+str(citation_informations),sys.stderr)
         #create_analysis_tables() #temporary.. needed to test how much faster in-mem indexing is
@@ -105,6 +107,7 @@ def get_citation_weight(rank_method_code, config):
         #write_message("Docid-number of known references "+str(dic),sys.stderr)
         end_time = time.time()
         print "Total time of software: ", (end_time - begin_time)
+        task_update_progress("citation analysis done")
     else:
         dic = {}
         print "No new records added since last time this rank method was executed"
@@ -219,7 +222,9 @@ def make_initial_result():
     return [dic, cit, ref]
 
 def get_citation_informations(recid_list, config):
-    """returns a 3-part dictionary that contains the citation information of cds records
+    """scans the collections searching citations and references for
+       items in the recid_list
+       returns a 3-part dictionary that contains the citation information of cds records
        examples: [ {} {} {} ]
                  [ { 93: ['astro-ph/9812088']},
                    { 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
@@ -249,7 +254,15 @@ def get_citation_informations(recid_list, config):
     p_reference_tag = tagify(parse_tag(reference_tag))
     p_record_publication_info_tag = tagify(parse_tag(record_publication_info_tag))
 
+    done = 0 #for status reporting
+    numrecs = len(recid_list)
     for recid in recid_list:
+        if (done % 1000 == 0):
+            mesg = "get cit.inf done "+str(done)+" of "+str(numrecs)
+            write_message(mesg)
+            task_update_progress(mesg)
+        done = done+1
+
         pri_report_numbers = get_fieldvalues(recid, p_record_pri_number_tag)
         add_report_numbers = get_fieldvalues(recid, p_record_add_number_tag)
         reference_report_numbers = get_fieldvalues(recid, p_reference_number_tag)
@@ -296,10 +309,11 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
 
     selfcites = initial_selfcitdict
     for k in new_record_list:
+        if (i % 1000 == 0):
+            mesg = "Selfcites done "+str(i)+" of "+str(len(new_record_list))+" records"
+            write_message(mesg)
+            task_update_progress(mesg)
         i = i+1
-        if task_get_option('verbose') >= 3:
-            if (i % 100 == 0):
-                write_message("Done "+str(i)+" records", sys.stderr)
         #get the author of k
         authorlist = get_fieldvalues(k, mainauthortag)
         coauthl = get_fieldvalues(k, coauthortag)
@@ -358,6 +372,12 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, c
         i = 0 #just a counter for debug
         write_message("Checking records referred to in new records", sys.stderr)
         for u in updated_redic_list:
+            if (i % 1000 == 0):
+                mesg = "Author ref done "+str(i)+" of "+str(len(updated_redic_list))+" records"
+                write_message(mesg)
+                task_update_progress(mesg)
+            i = i + 1
+
             if citedbydict.has_key(u):
                 these_cite_k = citedbydict[u]
                 if (these_cite_k is None):
@@ -381,7 +401,14 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, c
 
         #go through the dictionary again: all keys but search only if new records are cited
         write_message("Checking authors in new records", sys.stderr)
+        i = 0
         for k in citedbydict.keys():
+            if (i % 1000 == 0):
+                mesg = "Author cit done "+str(i)+" of "+str(len(citedbydict.keys()))+" records"
+                write_message(mesg)
+                task_update_progress(mesg)
+            i = i + 1
+
             these_cite_k = citedbydict[k]
             if (these_cite_k is None):
                 these_cite_k = [] #verify it is an empty list, not None
@@ -438,7 +465,15 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     #        for l in li:
     #   write_citer_cited(k,l)
 
+    done = 0
+    numrecs = len(d_references_report_numbers)
     for recid, refnumbers in d_references_report_numbers.iteritems():
+        if (done % 1000 == 0):
+            mesg =  "d_references_report_numbers done "+str(done)+" of "+str(numrecs)
+            write_message(mesg)
+            task_update_progress(mesg)
+        done = done+1
+
         for refnumber in refnumbers:
             if refnumber:
                 p = refnumber
@@ -466,9 +501,18 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                     #put the reference in the "missing"
                     insert_into_missing(recid, p)
     t2 = os.times()[4]
+
     if task_get_option('verbose') >= 1:
         write_message("Phase 2: d_references_s", sys.stderr)
+    done = 0
+    numrecs = len(d_references_s)
     for recid, refss in d_references_s.iteritems():
+        if (done % 1000 == 0):
+            mesg = "d_references_s done "+str(done)+" of "+str(numrecs)
+            write_message(mesg)
+            task_update_progress(mesg)
+        done = done+1
+
         for refs in refss:
             if refs:
                 p = refs
@@ -479,11 +523,21 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                     citation_list[rec_id[0]].append(recid)
                 if rec_id and not rec_id[0] in reference_list[recid]:
                     reference_list[recid].append(rec_id[0])
+
     t3 = os.times()[4]
+    done = 0
+    numrecs = len(d_reports_numbers)
     if task_get_option('verbose') >= 1:
         write_message("Phase 3: d_reports_numbers", sys.stderr)
 
     for rec_id, recnumbers in d_reports_numbers.iteritems():
+
+        if (done % 1000 == 0):
+            mesg = "d_report_numbers done "+str(done)+" of "+str(numrecs)
+            write_message(mesg)
+            task_update_progress(mesg)
+        done = done+1
+
         for recnumber in recnumbers:
             if recnumber:
                 p = recnumber
@@ -501,8 +555,16 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                             reference_list[recid].append(rec_id)
     if task_get_option('verbose') >= 1:
         write_message("Phase 4: d_records_s", sys.stderr)
+    done = 0
+    numrecs = len(d_records_s)
     t4 = os.times()[4]
     for recid, recs in d_records_s.iteritems():
+        if (done % 1000 == 0):
+            mesg = "d_records done "+str(done)+" of "+str(numrecs)
+            write_message(mesg)
+            task_update_progress(mesg)
+        done = done+1
+
         tmp = recs.find("-")
         if tmp < 0:
             recs_modified = recs
