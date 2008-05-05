@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-03-27 09:54+0100\n"
-"PO-Revision-Date: 2008-05-05 07:50+0200\n"
+"PO-Revision-Date: 2008-05-05 08:48+0200\n"
 "Last-Translator: Jerome Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -3896,17 +3896,17 @@ msgstr "Résultats de la recherche"
 #: modules/websearch/lib/search_engine.py:699
 #: modules/websearch/lib/websearch_templates.py:924
 msgid "any day"
-msgstr "tous les jours"
+msgstr "jour quelconque"
 
 #: modules/websearch/lib/search_engine.py:705
 #: modules/websearch/lib/websearch_templates.py:936
 msgid "any month"
-msgstr "tous les mois"
+msgstr "mois quelconque"
 
 #: modules/websearch/lib/search_engine.py:713
 #: modules/websearch/lib/websearch_templates.py:950
 msgid "any year"
-msgstr "toutes les années"
+msgstr "année quelconque"
 
 #: modules/websearch/lib/search_engine.py:754
 #: modules/websearch/lib/search_engine.py:769
