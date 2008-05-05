@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-03-27 09:54+0100\n"
-"PO-Revision-Date: 2008-05-05 08:48+0200\n"
+"PO-Revision-Date: 2008-05-05 09:13+0200\n"
 "Last-Translator: Jerome Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -5840,7 +5840,7 @@ msgstr "Table des matières des pages \"%(x_category)s\"."
 
 #: modules/webstyle/lib/webdoc_webinterface.py:166
 msgid "See also"
-msgstr "Voir également:"
+msgstr "Voir également"
 
 #: modules/webstyle/lib/webdoc_webinterface.py:181
 #, python-format
