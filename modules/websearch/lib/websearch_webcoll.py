@@ -284,7 +284,7 @@ class Collection:
                              np_portalbox = self.create_portalbox(lang, 'np'),
                              narrowsearch = self.create_narrowsearch(as, lang, 'r'),
                              focuson = self.create_narrowsearch(as, lang, "v") + \
-                                       self.create_external_collections_box(),
+                                       self.create_external_collections_box(lang),
                              instantbrowse = self.create_instant_browse(as=as, ln=lang),
                              ne_portalbox = self.create_portalbox(lang, 'ne')
                            )
