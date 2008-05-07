@@ -38,6 +38,7 @@ from invenio.config import \
      CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH, \
      CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD, \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
+     CFG_WEBSEARCH_SPLIT_BY_COLLECTION, \
      CFG_BIBRANK_SHOW_READING_STATS, \
      CFG_BIBRANK_SHOW_DOWNLOAD_STATS, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
@@ -339,54 +340,54 @@ class Template:
             if perform_request_search(p=doi_query):
                 return '%s/search?%s' % (CFG_SITE_URL, urlencode({
                     'p' : doi_query,
-                    'sc' : 1,
+                    'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                     'of' : 'hd'}))
         if isbn_query:
             if perform_request_search(p=isbn_query):
                 return '%s/search?%s' % (CFG_SITE_URL, urlencode({
                     'p' : isbn_query,
-                    'sc' : 1,
+                    'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                     'of' : 'hd'}))
         if coden_query:
             if perform_request_search(p=coden_query):
                 return '%s/search?' % (CFG_SITE_URL, urlencode({
                     'p' : coden_query,
-                    'sc' : 1,
+                    'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                     'of' : 'hd'}))
         if author_query and title_query:
             if perform_request_search(p='%s and %s' % (title_query, author_query)):
                 return '%s/search?%s' % (CFG_SITE_URL, urlencode({
                     'p' : '%s and %s' % (title_query, author_query),
-                    'sc' : 1,
+                    'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                     'of' : 'hd'}))
         if title_query:
             if perform_request_search(p=title_query):
                 return '%s/search?%s' % (CFG_SITE_URL, urlencode({
                     'p' : title_query,
-                    'sc' : 1,
+                    'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                     'of' : 'hb'}))
         if title:
             return '%s/search?%s' % (CFG_SITE_URL, urlencode({
                     'p' : title,
-                    'sc' : 1,
+                    'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                     'of' : 'hb'}))
 
         ## Nothing worked, let's return a search that the user can improve
         if author_query and title_query:
             return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
                 'p' : '%s and %s' % (title_query, author_query),
-                'sc' : 1,
+                'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                 'of' : 'hd'}, {}))
         elif title_query:
             return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
                 'p' : title_query,
-                'sc' : 1,
+                'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                 'of' : 'hb'}, {}))
         else:
             ## Mmh. Too few information provided.
             return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
                         'p' : 'recid:-1',
-                        'sc' : 1,
+                        'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                         'of' : 'hb'}, {}))
 
     def build_search_url(self, known_parameters={}, **kargs):
@@ -578,7 +579,7 @@ class Template:
         <!--create_searchfor_simple()-->
         '''
 
-        argd = drop_default_urlargd({'ln': ln, 'cc': collection_id, 'sc': 1},
+        argd = drop_default_urlargd({'ln': ln, 'cc': collection_id, 'sc': CFG_WEBSEARCH_SPLIT_BY_COLLECTION},
                                     self.search_results_default_urlargd)
 
         # Only add non-default hidden values
@@ -673,7 +674,7 @@ class Template:
         <!--create_searchfor_advanced()-->
         '''
 
-        argd = drop_default_urlargd({'ln': ln, 'as': 1, 'cc': collection_id, 'sc': 1},
+        argd = drop_default_urlargd({'ln': ln, 'as': 1, 'cc': collection_id, 'sc': CFG_WEBSEARCH_SPLIT_BY_COLLECTION},
                                     self.search_results_default_urlargd)
 
         # Only add non-default hidden values
