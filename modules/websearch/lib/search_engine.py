@@ -514,6 +514,12 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 # secondly, determine search pattern and field:
                 if string.find(pi, ":") > 0:
                     fi, pi = string.split(pi, ":", 1)
+                    # test whether fi is a real index code or a MARC-tag defined code:
+                    if fi in get_fieldcodes() or '0' <= fi <= '9':
+                        pass
+                    else:
+                        # it is not, so joint it back:
+                        fi, pi = f, fi + ":" + pi
                 else:
                     fi, pi = f, pi
                 # look also for old ALEPH field names:
