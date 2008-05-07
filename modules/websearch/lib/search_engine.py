@@ -1556,25 +1556,6 @@ def browse_in_bibwords(req, p, f, ln=CFG_SITE_LANG):
     ))
     return
 
-
-def search_special_fields(bsu_p, bsu_f, bsu_m):
-    """Stuff that actually cannot be found from just one record goes here.
-       Example: give records that have been cited 200 times: cites=200"""
-    if bsu_f == "cited":
-        #search.. bsu_p will look like "200" or "0->9"
-        numstr = "\""+bsu_p+"\""
-        #this is sort of stupid but since we may need to
-        #get the records that do _not_ have cites, we have to
-        #know the ids of all records, too
-        #but this is needed only if bsu_p is 0 or 0 or 0->0
-        allrecs = []
-        if bsu_p == 0 or bsu_p == "0" or \
-                bsu_p.startswith("0->") or bsu_p.endswith("->0"):
-            allrecs = perform_request_search(of="id")
-        x = get_records_with_num_cites(numstr, allrecs)
-        return HitSet(x)
-    return HitSet([])
-
 def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, ln=CFG_SITE_LANG):
     """Search for complex pattern 'p' within field 'f' according to
        matching type 'm'.  Return hitset of recIDs.
@@ -1627,9 +1608,6 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     for idx_unit in range(0, len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
-        if not basic_search_unit_hitset:
-            #stuff like "search by number of citations" i.e. cites>500 or such goes here
-            basic_search_unit_hitset = search_special_fields(bsu_p, bsu_f, bsu_m)
         if verbose >= 9 and of.startswith("h"):
             print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (bsu_p, basic_search_unit_hitset))
         if len(basic_search_unit_hitset) > 0 or \
@@ -1801,6 +1779,9 @@ def search_unit(p, f=None, m=None):
     if m == 'a' or m == 'r':
         # we are doing either direct bibxxx search or phrase search or regexp search
         set = search_unit_in_bibxxx(p, f, m)
+    elif p.startswith("cited:"):
+        # we are doing search by the citation count
+        set = search_unit_by_times_cited(p[6:])
     else:
         # we are doing bibwords search by default
         set = search_unit_in_bibwords(p, f)
@@ -1941,6 +1922,22 @@ def search_unit_in_bibrec(datetext1, datetext2, type='c'):
     for row in res:
         set += row[0]
     return set
+
+def search_unit_by_times_cited(p):
+    """
+    Return histset of recIDs found that are cited P times.
+    Usually P looks like '10->23'.
+    """
+    numstr = '"'+p+'"'
+    #this is sort of stupid but since we may need to
+    #get the records that do _not_ have cites, we have to
+    #know the ids of all records, too
+    #but this is needed only if bsu_p is 0 or 0 or 0->0
+    allrecs = []
+    if p == 0 or p == "0" or \
+       p.startswith("0->") or p.endswith("->0"):
+        allrecs = HitSet(run_sql_cached("SELECT id FROM bibrec", affected_tables=['bibrec']))
+    return get_records_with_num_cites(numstr, allrecs)
 
 def intersect_results_with_collrecs(req, hitset_in_any_collection, colls, ap=0, of="hb", verbose=0, ln=CFG_SITE_LANG):
     """Return dict of hitsets given by intersection of hitset with the collection universes."""
