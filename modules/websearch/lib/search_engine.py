@@ -1631,7 +1631,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             #stuff like "search by number of citations" i.e. cites>500 or such goes here
             basic_search_unit_hitset = search_special_fields(bsu_p, bsu_f, bsu_m)
         if verbose >= 9 and of.startswith("h"):
-            print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (bsu_p, list(basic_search_unit_hitset)))
+            print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (bsu_p, basic_search_unit_hitset))
         if len(basic_search_unit_hitset) > 0 or \
            ap==0 or \
            bsu_o=="|" or \
