@@ -181,12 +181,12 @@ class SearchQueryParenthesisedParser:
 
             # process the quotes if they are not escaped
             if character in quotes_symbols and previous_character != '\\':
-                # if we are not inside this should be a begining of the quotes
+                # if we are not inside this should be a beginning of the quotes
                 if not inside_quotes:
                     inside_quotes = True
                     current_quotes_symbol = character
                     self._assign_default_values_for_operators_if_necessary()
-                # in case we are insede quotes this is the closing quote
+                # in case we are inside quotes this is the closing quote
                 elif inside_quotes and character == current_quotes_symbol:
                     inside_quotes = False
                     current_quotes_symbol = ""
@@ -382,7 +382,190 @@ class SearchQueryParenthesisedParser:
         raise InvenioWebSearchQueryParserException(error_message_text)
 
 class InvenioWebSearchQueryParserException(Exception):
-    """Exception for bad collection."""
+    """Exception for parsing errors."""
     def __init__(self, message):
         """Initialization."""
         self.message = message
+
+class SpiresToInvenioSyntaxConverter:
+    """Converts queries defined with SPIRES search syntax into queries
+    that use Invenio search syntax.
+    """
+
+    # Dictionary containing the matches between SPIRES keywords
+    # and their corresponding Invenio keywords or fields
+    # SPIRES keyword : Invenio keyword or field
+    _SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS = {
+        # affiliation
+            ' affiliation ' : ' 700__u:',
+            ' affil ' : ' 700__u:',
+            ' aff ' : ' 700__u:',
+            ' af ' : ' 700__u:',
+            ' institution ' : ' 700__u:',
+            ' inst ' : ' 700__u:',
+        # any field
+            ' any ' : ' anyfield:',
+        # bulletin
+            ' bb ' : ' 037__a:',
+            ' bbn ' : ' 037__a:',
+            ' bull ' : ' 037__a:',
+            ' bulletin-bd ' : ' 037__a:',
+            ' bulletin-bd-no ' : ' 037__a:',
+            ' eprint ' : ' 037__a:',
+        # citation / reference
+            ' c ' : ' reference:',
+            ' citation ' : ' reference:',
+            ' cited ' : ' reference:',
+            ' jour-vol-page ' : ' reference:',
+            ' jvp ' : ' reference:',
+        # collaboration
+            ' collaboration ' : ' 710__g:',
+            ' collab-name ' : ' 710__g:',
+            ' cn ' : ' 710__g:',
+        # conference number
+            ' conf-number ' : ' 111__g:',
+            ' cnum ' : ' 111__g:',
+        # country
+            ' cc ' : ' 044__a:',
+            ' country ' : ' 044__a:',
+        # date
+            ' date ' : ' 269__c:',
+            ' d ' : ' 269__c:',
+        # date added
+            ' date-added ' : ' 961__x:',
+            ' dadd ' : ' 961__x:',
+            ' da ' : ' 961__x:',
+        # date updated
+            ' date-updated ' : ' 961__c:',
+            ' dupd ' : ' 961__c:',
+            ' du ' : ' 961__c:',
+        # first author
+            ' fa ' : ' 100__a:',
+            ' first-author ' : ' 100__a:',
+        # author
+            ' a ':' author:',
+            ' au ':' author:',
+            ' author ':' author:',
+            ' name ':' author:',
+        # experiment
+            ' exp ' : ' experiment:',
+            ' experiment ' : ' experiment:',
+            ' expno ' : ' experiment:',
+            ' sd ' : ' experiment:',
+            ' se ' : ' experiment:',
+        # journal page
+            ' journal-page ' : ' 773__c:',
+            ' jp ' : ' 773__c:',
+        # journal year
+            ' journal-year ' : ' 773__y:',
+            ' jy ' : ' 773__y:',
+        # key
+            ' key ' : ' 970__a:',
+            ' irn ' : ' 970__a:',
+            ' record ' : ' 970__a:',
+            ' document ' : ' 970__a:',
+            ' documents ' : ' 970__a:',
+        # keywords
+            ' k ' : ' keyword:',
+            ' keywords ' : ' keyword:',
+        # note
+            ' note ' : ' 500__a:',
+            ' n ' : ' 500__a:',
+        # old title
+            ' old-title ' : ' 246__a:',
+            ' old-t ' : ' 246__a:',
+            ' ex-ti ' : ' 246__a:',
+            ' et ' : ' 246__a:',
+        # ppf subject
+            ' ppf-subject ' : ' 650__a:',
+            ' ps ' : ' 650__a:',
+            ' scl ' : ' 650__a:',
+            ' status ' : ' 650__a:',
+        # report number
+            ' r ' : ' reportnumber:',
+            ' rn ' : ' reportnumber:',
+            ' rept ' : ' reportnumber:',
+            ' report ' : ' reportnumber:',
+            ' report-num ' : ' reportnumber:',
+        # title
+            ' t ' : ' title:',
+            ' ti ' : ' title:',
+            ' title ' : ' title:',
+            ' with-language ' : ' title:',
+        # topic
+            ' topic ' : ' 653__a:',
+            ' tp ' : ' 653__a:',
+            ' hep-topic ' : ' 653__a:',
+            ' desy-keyword ' : ' 653__a:',
+            ' dk ' : ' 653__a:',
+        # truncation
+            '#':'*'
+        }
+
+    def convertQuery(self, query):
+        """Converts the query from SPIRES syntax to Invenio syntax
+
+        Queries are assumed SPIRES queries only if they start with FIND or F"""
+
+        # assume that only queries starting with FIND are SPIRES queries
+        if query.startswith("find "):
+            query = self._replace_spires_keywords_with_invenio_keywords(query)
+            # remove FIND in the beginning of the query as it is not necessary in Invenio
+            query = query[5:]
+
+        return query
+
+    def _replace_spires_keywords_with_invenio_keywords(self, query):
+        """Replaces SPIRES keywords that have directly
+        corresponding Invenio keywords
+
+        Replacements are done only in content that is not in quotes."""
+
+        # regular expression that matches the contents in single and double quotes
+        # taking in mind if they are escaped.
+        # if this became bottleneck at some moment, the compilation of the expression
+        # can be moved outside in order to be compiled only once.
+        re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
+
+        # result of the replacement
+        result = ""
+        current_position = 0
+
+        for match in re_quotes_match.finditer(query):
+            # clean the content after the previous quotes and before current quotes
+            cleanable_content = query[current_position : match.start()]
+            cleanable_content = self._replace_all_pires_keywords_in_string(cleanable_content)
+
+            # get the content in the quotas
+            quoted_content = match.group(0)
+
+            # append the processed content to the result
+            result = result + cleanable_content + quoted_content
+
+            # move current position at the end of the processed content
+            current_position = match.end()
+
+        # clean the content from the last appearance of quotes till the end of the query
+        cleanable_content = query[current_position : len(query)]
+        cleanable_content = self._replace_all_pires_keywords_in_string(cleanable_content)
+        result = result + cleanable_content
+
+        return result
+
+    def _replace_all_pires_keywords_in_string(self, query):
+        """Replaces all SPIRES keywords in the string with their
+        corresponding Invenio keywords"""
+
+        for spires_keyword, invenio_keyword in self._SPIRES_TO_INVENIO_KEYWORDS_MATCHINGS.iteritems():
+            query = self._replace_keyword(query, spires_keyword, invenio_keyword)
+
+        return query
+
+    def _replace_keyword(self, query, old_keyword, new_keyword):
+        """Replaces old keyword in the query with a new keyword"""
+
+        # perform case insensitive replacement with regular expression
+        regular_expression = re.compile(old_keyword, re.IGNORECASE)
+        result = regular_expression.sub(new_keyword, query)
+
+        return result
