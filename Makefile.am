@@ -241,7 +241,7 @@ update-v0.92.1-tables:
 update-v0.99.0-tables:
 	echo "ALTER TABLE bibdoc ADD COLUMN more_info mediumblob NULL default NULL;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK ADD COLUMN priority tinyint(4) NOT NULL default 0;" | ${prefix}/bin/dbexec
-	echo "ALTER TABLE hstTASK ADD COLUMN more_info tinyint(4) NOT NULL default 0;" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE hstTASK ADD COLUMN priority tinyint(4) NOT NULL default 0;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK ADD KEY priority (priority);" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE hstTASK ADD KEY priority (priority);" | ${prefix}/bin/dbexec
 
