@@ -25,13 +25,8 @@ import re
 import marshal
 from zlib import decompress, error
 
-
-try:
-    Set = set
-except NameError:
-    from sets import Set
-
 from invenio.dbquery import run_sql, run_sql_cached, OperationalError
+from invenio.intbitset import intbitset
 
 def init_db_dictionary(dname):
     """return a dictionary from rnkCITATIONDATA
@@ -69,13 +64,16 @@ def get_cited_by(recordid):
         ret = citation_dic[recordid]
     return ret
 
-def get_records_with_num_cites(numstr, allrecs = []):
-    """returns records are cited X times, X defined in numstr.
-      Warning: numstr is string and may not be numeric! It can be 10,0->100 etc"""
-    matches = []
+def get_records_with_num_cites(numstr, allrecs = intbitset([])):
+    """Return an intbitset of record IDs that are cited X times,
+       X defined in numstr.
+       Warning: numstr is string and may not be numeric! It can
+       be 10,0->100 etc
+    """
+    matches = intbitset([])
     #once again, check that the parameter is a string
     if not (type(numstr) == type("thisisastring")):
-        return []
+        return intbitset([])
     numstr = numstr.replace(" ",'')
     numstr = numstr.replace('"','')
     #get the cited-by dictionary
@@ -88,11 +86,11 @@ def get_records_with_num_cites(numstr, allrecs = []):
         num = int(singlenum[0])
         if num == 0:
             #we return recids that are not in keys
-            return list(Set(allrecs)-Set(citedbydict.keys()))
+            return allrecs - intbitset(citedbydict.keys())
         for k in citedbydict.keys():
             li = citedbydict[k]
             if len(li) == num:
-                matches.append(k)
+                matches.add(k)
         return matches
 
     #try to get 1->10 or such
@@ -104,16 +102,16 @@ def get_records_with_num_cites(numstr, allrecs = []):
             first = int(firstsec[0][0])
             sec = int(firstsec[0][1])
         except:
-            return []
+            return intbitset([])
         if (first == 0):
             #start with those that have no cites..
-            matches = list(Set(allrecs)-Set(citedbydict.keys()))
+            matches = allrecs - intbitset(citedbydict.keys())
         if (first <= sec):
             for k in citedbydict.keys():
                 li = citedbydict[k]
                 if len(li) >= first:
                     if len(li) <= sec:
-                        matches.append(k)
+                        matches.add(k)
             return matches
 
     firstsec = re.findall("(\d+)\+", numstr)
@@ -122,9 +120,8 @@ def get_records_with_num_cites(numstr, allrecs = []):
         for k in citedbydict.keys():
             li = citedbydict[k]
             if len(li) > int(first):
-                matches.append(k)
+                matches.add(k)
     return matches
-
 
 def get_cited_by_list(recordlist):
     """Return a tuple of ([recid,list_of_citing_records],...) for all the
