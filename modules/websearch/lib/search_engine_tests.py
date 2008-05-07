@@ -213,6 +213,21 @@ class TestQueryParser(unittest.TestCase):
         self._check("muon+kaon|ellis-cern", '', None,
                     [['+', 'muon+kaon|ellis-cern', '', 'w']])
 
+    def test_parsing_structured_query_existing(self):
+        "search engine - parsing structured query, existing index"
+        self._check("title:muon", '', None,
+                    [['+', 'muon', 'title', 'w']])
+
+    def test_parsing_structured_query_nonexisting(self):
+        "search engine - parsing structured query, non-existing index"
+        self._check("foo:muon", '', None,
+                    [['+', 'foo:muon', '', 'w']])
+
+    def test_parsing_structured_query_marc(self):
+        "search engine - parsing structured query, MARC-tag defined index"
+        self._check("245:muon", '', None,
+                    [['+', 'muon', '245', 'a']])
+
     def test_parsing_combined_structured_query(self):
         "search engine - parsing combined structured query"
         self._check("title:muon author:ellis", '', None,
