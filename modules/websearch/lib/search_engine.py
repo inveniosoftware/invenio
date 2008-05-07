@@ -515,7 +515,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 if string.find(pi, ":") > 0:
                     fi, pi = string.split(pi, ":", 1)
                     # test whether fi is a real index code or a MARC-tag defined code:
-                    if fi in get_fieldcodes() or '0' <= fi <= '9':
+                    if fi in get_fieldcodes() or '00' <= fi[:2] <= '99':
                         pass
                     else:
                         # it is not, so joint it back:
