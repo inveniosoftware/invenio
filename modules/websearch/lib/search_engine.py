@@ -122,6 +122,7 @@ re_pattern_regexp_quotes = re.compile("\/(.*?)\/")
 re_pattern_short_words = re.compile(r'([\s\"]\w{1,3})[\*\%]+')
 re_pattern_space = re.compile("__SPACE__")
 re_pattern_today = re.compile("\$TODAY\$")
+re_pattern_parens = re.compile(r'\([^\)]+\s+[^\)]+\)')
 re_unicode_lowercase_a = re.compile(unicode(r"(?u)[áàäâãå]", "utf-8"))
 re_unicode_lowercase_ae = re.compile(unicode(r"(?u)[æ]", "utf-8"))
 re_unicode_lowercase_e = re.compile(unicode(r"(?u)[éèëê]", "utf-8"))
@@ -158,8 +159,6 @@ re_latex_uppercase_u = re.compile("\\\\[\"H'`~^vu=k]\\{?U\\}?")
 re_latex_uppercase_y = re.compile("\\\\[\"']\\{?Y\\}?")
 re_latex_uppercase_c = re.compile("\\\\['uc]\\{?C\\}?")
 re_latex_uppercase_n = re.compile("\\\\[c'~^vu]\\{?N\\}?")
-
-
 
 class RestrictedCollectionDataCacher(DataCacher):
     def __init__(self):
@@ -1716,6 +1715,11 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
     """
     _ = gettext_set_language(ln)
 
+    # sanity check: do not call parenthesised parser for search terms
+    # like U(1):
+    if not re_pattern_parens.search(p):
+        return search_pattern(req, p, f, m, ap, of, verbose, ln)
+
     # Try searching with parentheses
     try:
         parser = SearchQueryParenthesisedParser()
@@ -1725,6 +1729,8 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
 
         # parse the query. The result is list of [op1, expr1, op2, expr2, ..., opN, exprN]
         parsing_result = parser.parse_query(p)
+        if verbose  and of.startswith("h"):
+            print_warning(req, "Search stage 1: search_pattern_parenthesised() returned %s." % repr(parsing_result))
 
         # go through every pattern
         # calculate hitset for it
