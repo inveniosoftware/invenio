@@ -224,7 +224,7 @@ def make_initial_result():
 def get_citation_informations(recid_list, config):
     """scans the collections searching citations and references for
        items in the recid_list
-       returns a 3-part dictionary that contains the citation information of cds records
+       returns a 3 list of dictionaries that contains the citation information of cds records
        examples: [ {} {} {} ]
                  [ { 93: ['astro-ph/9812088']},
                    { 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
@@ -261,6 +261,7 @@ def get_citation_informations(recid_list, config):
             mesg = "get cit.inf done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
+            #write interim stuff in the db so that the process can be stopped
         done = done+1
 
         pri_report_numbers = get_fieldvalues(recid, p_record_pri_number_tag)
@@ -288,8 +289,8 @@ def get_citation_informations(recid_list, config):
     citation_informations.append(d_references_s)
     citation_informations.append(d_records_s)
     end_time = os.times()[4]
-    print "Execution time for generating \
-           citation informations by parsing xml contents: ", (end_time - begin_time)
+    print "Execution time for generating citation info from record: ", \
+          (end_time - begin_time)
     return citation_informations
 
 def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config):
@@ -445,6 +446,8 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     pubreftag = record_pri_number_tag = config.get(config.get("rank_method", "function"),
                                                     "publication_reference_tag")
     #pubrefntag is prob 999C5r, pubreftag 999c5s
+
+
     citation_list = initial_citationlist
     reference_list = initial_referencelist
     result = initialresult
@@ -498,10 +501,25 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                         reference_list[recid] = [rec_id[0]]
                 else:
                     #the reference we wanted was not found among our records.
-                    #put the reference in the "missing"
-                    insert_into_missing(recid, p)
+                    #put the reference in the "missing".. however, it will look
+                    #bad.. gfhgf/1254312, so  get the corresponding 999C5s (full ref) too
+                    #This should really be done in the next loop d_references_s
+                    #but the 999C5s fields are not yet normalized
+                    rectext = print_record(recid, format='hm')
+                    lines = rectext.split("\n")
+                    rpart = p #to be used..
+                    for l in lines:
+                        if (l.find(p) > 0): #the gfhgf/1254312 was found.. get the s-part of it
+                            st = l.find('$s')
+                            if (st > 0):
+                                end = l.find('$',st)
+                                if (end == st):
+                                    end = len(l)
+                                rpart = l[st+2:end]
+                    insert_into_missing(recid, rpart)
     t2 = os.times()[4]
 
+    #try to find references based on 999C5s, like Phys.Rev.Lett. 53 (1986) 2285
     if task_get_option('verbose') >= 1:
         write_message("Phase 2: d_references_s", sys.stderr)
     done = 0
