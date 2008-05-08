@@ -84,9 +84,9 @@ def get_citation_weight(rank_method_code, config):
 
         write_message("Last update "+str(last_update_time)+" records: "+ \
                        str(len(last_modified_records))+" updates: "+ \
-                       str(len(updated_recid_list)), sys.stderr)
+                       str(len(updated_recid_list)))
 
-        #write_message("updated_recid_list: "+str(updated_recid_list), sys.stderr)
+        #write_message("updated_recid_list: "+str(updated_recid_list))
         result_intermediate = last_updated_result(rank_method_code,
                                                   updated_recid_list)
         #result_intermed should be warranted to exists!
@@ -96,7 +96,7 @@ def get_citation_weight(rank_method_code, config):
         #call the procedure that does the hard work by scanning
         #citations and references in the updated_recid's
         citation_informations = get_citation_informations(updated_recid_list, config)
-        #write_message("citation_informations: "+str(citation_informations),sys.stderr)
+        #write_message("citation_informations: "+str(citation_informations))
         #create_analysis_tables() #temporary.. needed to test how much faster in-mem indexing is
         dic = ref_analyzer(citation_informations,
                            citation_weight_dic_intermediate,
@@ -104,13 +104,13 @@ def get_citation_weight(rank_method_code, config):
                            reference_list_intermediate,
                            config,updated_recid_list)
                     #dic is docid-numberofreferences like {1: 2, 2: 0, 3: 1}
-        #write_message("Docid-number of known references "+str(dic),sys.stderr)
+        #write_message("Docid-number of known references "+str(dic))
         end_time = time.time()
-        print "Total time of software: ", (end_time - begin_time)
+        write_message("Total time of get_citation_weight(): %.2f sec" % (end_time - begin_time))
         task_update_progress("citation analysis done")
     else:
         dic = {}
-        print "No new records added since last time this rank method was executed"
+        write_message("No new records added since last time this rank method was executed")
     return dic
 
 def get_bibrankmethod_lastupdate(rank_method_code):
@@ -284,13 +284,17 @@ def get_citation_informations(recid_list, config):
         if record_s:
             d_records_s[recid] = record_s[0]
 
+    mesg = "get cit.inf done fully"
+    write_message(mesg)
+    task_update_progress(mesg)
+
     citation_informations.append(d_reports_numbers)
     citation_informations.append(d_references_report_numbers)
     citation_informations.append(d_references_s)
     citation_informations.append(d_records_s)
     end_time = os.times()[4]
-    print "Execution time for generating citation info from record: ", \
-          (end_time - begin_time)
+    write_message("Execution time for generating citation info from record: %.2f sec" % \
+                  (end_time - begin_time))
     return citation_informations
 
 def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config):
@@ -348,6 +352,11 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
                         else:
                             #new key for selfcites
                             selfcites[k] = [c]
+
+    mesg = "Selfcites done fully"
+    write_message(mesg)
+    task_update_progress(mesg)
+
     return selfcites
 
 def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, config):
@@ -371,7 +380,7 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, c
     author_cited_in = initial_author_dict
     if citedbydict:
         i = 0 #just a counter for debug
-        write_message("Checking records referred to in new records", sys.stderr)
+        write_message("Checking records referred to in new records")
         for u in updated_redic_list:
             if (i % 1000 == 0):
                 mesg = "Author ref done "+str(i)+" of "+str(len(updated_redic_list))+" records"
@@ -400,8 +409,12 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, c
                             else:
                                 author_cited_in[a] = these_cite_k
 
+        mesg = "Author ref done fully"
+        write_message(mesg)
+        task_update_progress(mesg)
+
         #go through the dictionary again: all keys but search only if new records are cited
-        write_message("Checking authors in new records", sys.stderr)
+        write_message("Checking authors in new records")
         i = 0
         for k in citedbydict.keys():
             if (i % 1000 == 0):
@@ -433,6 +446,10 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, c
                             else:
                                 author_cited_in[a] = these_cite_k
 
+        mesg = "Author cit done fully"
+        write_message(mesg)
+        task_update_progress(mesg)
+
     return author_cited_in
 
 
@@ -458,7 +475,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     d_records_s = citation_informations[3]
     t1 = os.times()[4]
     if task_get_option('verbose') >= 1:
-        write_message("Phase 1: d_references_report_numbers", sys.stderr)
+        write_message("Phase 1: d_references_report_numbers")
     #d_references_report_numbers: e.g 8 -> ([astro-ph/9889],[hep-ph/768])
     #meaning: rec 8 contains these in bibliography
 
@@ -517,11 +534,16 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                                     end = len(l)
                                 rpart = l[st+2:end]
                     insert_into_missing(recid, rpart)
+
+    mesg = "d_references_report_numbers done fully"
+    write_message(mesg)
+    task_update_progress(mesg)
+
     t2 = os.times()[4]
 
     #try to find references based on 999C5s, like Phys.Rev.Lett. 53 (1986) 2285
     if task_get_option('verbose') >= 1:
-        write_message("Phase 2: d_references_s", sys.stderr)
+        write_message("Phase 2: d_references_s")
     done = 0
     numrecs = len(d_references_s)
     for recid, refss in d_references_s.iteritems():
@@ -542,11 +564,15 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 if rec_id and not rec_id[0] in reference_list[recid]:
                     reference_list[recid].append(rec_id[0])
 
+    mesg = "d_references_s done fully"
+    write_message(mesg)
+    task_update_progress(mesg)
+
     t3 = os.times()[4]
     done = 0
     numrecs = len(d_reports_numbers)
     if task_get_option('verbose') >= 1:
-        write_message("Phase 3: d_reports_numbers", sys.stderr)
+        write_message("Phase 3: d_reports_numbers")
 
     for rec_id, recnumbers in d_reports_numbers.iteritems():
 
@@ -571,8 +597,13 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                             reference_list[recid] = []
                         if not rec_id in reference_list[recid]:
                             reference_list[recid].append(rec_id)
+
+    mesg = "d_report_numbers done fully"
+    write_message(mesg)
+    task_update_progress(mesg)
+
     if task_get_option('verbose') >= 1:
-        write_message("Phase 4: d_records_s", sys.stderr)
+        write_message("Phase 4: d_records_s")
     done = 0
     numrecs = len(d_records_s)
     t4 = os.times()[4]
@@ -598,8 +629,12 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 if not recid in reference_list[rec_id]:
                     reference_list[rec_id].append(recid)
 
+    mesg = "d_records_s done fully"
+    write_message(mesg)
+    task_update_progress(mesg)
+
     if task_get_option('verbose') >= 1:
-        write_message("Phase 5: reverse lists", sys.stderr)
+        write_message("Phase 5: reverse lists")
 
     #remove empty lists in citation and reference
     keys = citation_list.keys()
@@ -613,7 +648,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             del reference_list[k]
 
     if task_get_option('verbose') >= 1:
-        write_message("Phase 6: self-citations", sys.stderr)
+        write_message("Phase 6: self-citations")
     selfdic = {}
     #get the initial self citation dict
     initial_self_dict = get_cit_dict("selfcitdict")
@@ -637,7 +672,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             selfcitedbydic[v] = tmplist
 
     if task_get_option('verbose') >= 1:
-        write_message("Getting author citations", sys.stderr)
+        write_message("Getting author citations")
 
 
     #get author citations for records in updated_rec_list
@@ -652,44 +687,44 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         tmp = citation_list.keys()[0:10]
         for t in tmp:
             tmpdict[t] = citation_list[t]
-        write_message("citation_list (x is cited by y): "+str(tmpdict), sys.stderr)
-        write_message("size: "+str(len(citation_list.keys())), sys.stderr)
+        write_message("citation_list (x is cited by y): "+str(tmpdict))
+        write_message("size: "+str(len(citation_list.keys())))
         tmp = reference_list.keys()[0:10]
         tmpdict = {}
         for t in tmp:
             tmpdict[t] = reference_list[t]
-        write_message("reference_list (x cites y): "+str(tmpdict), sys.stderr)
-        write_message("size: "+str(len(reference_list.keys())), sys.stderr)
+        write_message("reference_list (x cites y): "+str(tmpdict))
+        write_message("size: "+str(len(reference_list.keys())))
         tmp = selfcitedbydic.keys()[0:10]
         tmpdict = {}
         for t in tmp:
             tmpdict[t] = selfcitedbydic[t]
         write_message("selfcitedbydic (x is cited by y and one  \
-                       of the authors of x same as y's): "+str(tmpdict), sys.stderr)
-        write_message("size: "+str(len(selfcitedbydic.keys())), sys.stderr)
+                       of the authors of x same as y's): "+str(tmpdict))
+        write_message("size: "+str(len(selfcitedbydic.keys())))
         tmp = selfdic.keys()[0:100]
         tmpdict = {}
         for t in tmp:
             tmpdict[t] = selfdic[t]
         write_message("selfdic (x cites y and one of the authors \
-                       of x same as y's): "+str(tmpdict), sys.stderr)
-        write_message("size: "+str(len(selfdic.keys())), sys.stderr)
+                       of x same as y's): "+str(tmpdict))
+        write_message("size: "+str(len(selfdic.keys())))
         tmp = authorcitdic.keys()[0:10]
         tmpdict = {}
         for t in tmp:
             tmpdict[t] = authorcitdic[t]
-        write_message("authorcitdic (author is cited in recs): "+str(tmpdict), sys.stderr)
-        write_message("size: "+str(len(authorcitdic.keys())), sys.stderr)
+        write_message("authorcitdic (author is cited in recs): "+str(tmpdict))
+        write_message("size: "+str(len(authorcitdic.keys())))
     insert_cit_ref_list_intodb(citation_list, reference_list,
                                selfcitedbydic, selfdic, authorcitdic)
 
     t5 = os.times()[4]
-    print "\nExecution time for analyzing the citation information generating the dictionary: "
-    print "checking ref number: ", (t2-t1)
-    print "checking ref ypvt: ", (t3-t2)
-    print "checking rec number: ", (t4-t3)
-    print "checking rec ypvt: ", (t5-t4)
-    print "total time of ref_analyze: ", (t5-t1)
+    write_message("Execution time for analyzing the citation information generating the dictionary:")
+    write_message("... checking ref number: %.2f sec" % (t2-t1))
+    write_message("... checking ref ypvt: %.2f sec" % (t3-t2))
+    write_message("... checking rec number: %.2f sec" % (t4-t3))
+    write_message("... checking rec ypvt: %.2f sec" % (t5-t4))
+    write_message("... total time of ref_analyze: %.2f sec" % (t5-t1))
     return result
 
 def get_decompressed_xml(xml):
@@ -731,7 +766,7 @@ def insert_into_cit_db(dic, name):
     ndate = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     try:
         s = serialize_via_marshal(dic)
-        write_message("size of "+name+" "+str(len(s)), sys.stderr)
+        write_message("size of "+name+" "+str(len(s)))
         #check that this column really exists
         testres = run_sql("select object_name from rnkCITATIONDATA where object_name = %s",
                        (name,))
