@@ -85,7 +85,8 @@ from invenio.dbquery import run_sql, run_sql_cached, get_table_update_time, Erro
 from invenio.webuser import getUid, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly, create_error_box
 from invenio.messages import gettext_set_language
-from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, InvenioWebSearchQueryParserException
+from invenio.search_engine_query_parser import SearchQueryParenthesisedParser, \
+InvenioWebSearchQueryParserException, SpiresToInvenioSyntaxConverter
 
 try:
     from mod_python import apache
@@ -1714,6 +1715,10 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
        For more details on the parameters see 'search_pattern'
     """
     _ = gettext_set_language(ln)
+
+    # if the pattern uses SPIRES search syntax, convert it to Invenio syntax
+    spires_syntax_converter = SpiresToInvenioSyntaxConverter()
+    p = spires_syntax_converter.convertQuery(p)
 
     # sanity check: do not call parenthesised parser for search terms
     # like U(1):

@@ -508,7 +508,7 @@ class SpiresToInvenioSyntaxConverter:
         Queries are assumed SPIRES queries only if they start with FIND or F"""
 
         # assume that only queries starting with FIND are SPIRES queries
-        if query.startswith("find "):
+        if query.lower().startswith("find "):
             query = self._replace_spires_keywords_with_invenio_keywords(query)
             # remove FIND in the beginning of the query as it is not necessary in Invenio
             query = query[5:]
@@ -534,7 +534,7 @@ class SpiresToInvenioSyntaxConverter:
         for match in re_quotes_match.finditer(query):
             # clean the content after the previous quotes and before current quotes
             cleanable_content = query[current_position : match.start()]
-            cleanable_content = self._replace_all_pires_keywords_in_string(cleanable_content)
+            cleanable_content = self._replace_all_spires_keywords_in_string(cleanable_content)
 
             # get the content in the quotas
             quoted_content = match.group(0)
@@ -547,12 +547,12 @@ class SpiresToInvenioSyntaxConverter:
 
         # clean the content from the last appearance of quotes till the end of the query
         cleanable_content = query[current_position : len(query)]
-        cleanable_content = self._replace_all_pires_keywords_in_string(cleanable_content)
+        cleanable_content = self._replace_all_spires_keywords_in_string(cleanable_content)
         result = result + cleanable_content
 
         return result
 
-    def _replace_all_pires_keywords_in_string(self, query):
+    def _replace_all_spires_keywords_in_string(self, query):
         """Replaces all SPIRES keywords in the string with their
         corresponding Invenio keywords"""
 
