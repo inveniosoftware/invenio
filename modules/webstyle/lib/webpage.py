@@ -27,16 +27,17 @@ from invenio.config import \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTBOTTOM, \
      CFG_WEBSTYLE_CDSPAGEBOXRIGHTTOP, \
      CFG_SITE_LANG, \
-     CFG_SITE_SUPPORT_EMAIL, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_SITE_SECURE_URL
+from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import gettext_set_language
-from invenio.webuser import create_userinfobox_body, getUid
+from invenio.webuser import create_userinfobox_body, getUid, isGuestUser
 from invenio.errorlib import get_msgs_for_code_list, register_errors
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 
-from xml.dom.minidom import parseString, getDOMImplementation
+from xml.dom.minidom import getDOMImplementation
 
 def create_navtrailbox_body(title,
                             previous_links,
@@ -58,7 +59,7 @@ def create_navtrailbox_body(title,
                                                     prolog = prolog,
                                                     epilog = epilog)
 
-def page(title, body, navtrail="", description="", keywords="", uid=0,
+def page(title, body, navtrail="", description="", keywords="", uid=None,
          cdspageheaderadd="", cdspageboxlefttopadd="",
          cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
          cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
@@ -94,8 +95,18 @@ def page(title, body, navtrail="", description="", keywords="", uid=0,
     """
 
     _ = gettext_set_language(language)
-    if req and not uid:
+    if req and uid is None:
         uid = getUid(req)
+        if CFG_EXTERNAL_AUTH_USING_SSO and not isGuestUser(uid):
+            ## If the user is logged in and we are using SSO
+            ## this trick will keep the SSO session alive
+            ## (SSO session need an https connection)
+            body += """<img src="%s/img/keep_sso_connection_alive.gif"
+                    alt=" " width="0" height="0"
+                    style="visibility : hidden;" />""" % CFG_SITE_SECURE_URL
+    elif uid is None:
+        ## 0 means generic guest user.
+        uid = 0
     if of == 'xx':
         #xml output (e.g. AJAX calls) => of=xx
         req.content_type = 'text/xml'
