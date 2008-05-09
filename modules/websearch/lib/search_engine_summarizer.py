@@ -45,10 +45,14 @@ except:
 
 COLLECTION_TAG = "980__a"
 
-def summarize_records(recids, of, ln, defstring=""):
+def summarize_records(recids, of, ln, defstring="", req=""):
     """Produces a report in the format defined by of in language ln
        defstring is a part of url added to point out how recids were selected
-       for instance f=author&p=Smith, Paul"""
+       for instance f=author&p=Smith, Paul
+       req is the request. It is passed to print_citation_summary_html where
+       it can be used for just-in-time printing
+    """
+
     if of == 'hcs':
         #this is a html cite summary
         citedbylist = get_cited_by_list(recids)
@@ -61,7 +65,7 @@ def summarize_records(recids, of, ln, defstring=""):
             #intersect recids and recsinc
             intersec_list = list(Set(recids)&Set(recsinc))
             collections_citedbys[coll] = intersec_list
-        return print_citation_summary_html(citedbylist, ln, defstring, collections_citedbys)
+        return print_citation_summary_html(citedbylist, ln, defstring, collections_citedbys, req)
     if of == 'xcs':
         #this is an xml cite summary
         citedbylist = get_cited_by_list(recids)
@@ -101,7 +105,7 @@ def print_citation_summary_xml(citedbylist):
     return outp #just to return something
 
 
-def print_citation_summary_html(citedbylist, ln, criteria="", dict_of_lists = {}):
+def print_citation_summary_html(citedbylist, ln, criteria="", dict_of_lists = {}, req=""):
     """Prints citation summary in html.
        The criteria, if any, is added to the link"""
     alldict = calculate_citations(citedbylist)
@@ -114,7 +118,7 @@ def print_citation_summary_html(citedbylist, ln, criteria="", dict_of_lists = {}
     return websearch_templates.tmpl_citesummary_html(ln, totalrecs,
                                                      totalcites, avgstr,
                                                      reciddict, CFG_CITESUMMARY_THRESHOLD_NAMES,
-                                                     criteria, dict_of_lists)
+                                                     criteria, dict_of_lists, req)
 
 def calculate_citations(citedbylist):
     """calculates records in classes of citations

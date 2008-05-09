@@ -3953,7 +3953,11 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                 req.write("<!-- Search-Engine-Total-Number-Of-Results: %s -->\n" % results_final_nb_total)
             # print records:
             if of in ['hcs']:
-                req.write(summarize_records(results_final_for_all_selected_colls, 'hcs', ln))
+                #feed the current search as criteria .. this should be done with a proper search string
+                criteria = ""
+                if p:
+                    criteria = p
+                summarize_records(results_final_for_all_selected_colls, 'hcs', ln, criteria, req)
             else:
                 if len(colls_to_search)>1:
                     cpu_time = -1 # we do not want to have search time printed on each collection

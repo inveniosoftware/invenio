@@ -3014,7 +3014,7 @@ class Template:
 
         return out
 
-    def tmpl_citesummary_html(self, ln, totalrecs, totalcites, avgstr, reciddict, tresholds_names, criteria="", dict_of_lists = {}):
+    def tmpl_citesummary_html(self, ln, totalrecs, totalcites, avgstr, reciddict, tresholds_names, criteria="", dict_of_lists = {}, req=""):
         """A template for citation summary output in HTML.
            Parameters:
                - ln *string* = language,
@@ -3027,6 +3027,7 @@ class Template:
                - criteria is added to the link
                - dict_of_lists is a dictionary that holds the category ("collection" in SPIRES, 980__b)
                  and the record ids in it. Example 'Published'->[1,2,3],'Conference'->[5,6,7]
+               - req the request. If it is not '' it can used for direct printing.
         """
         # load the right message language
         _ = gettext_set_language(ln)
@@ -3035,7 +3036,7 @@ class Template:
         columnfill = ""
         for col in dict_of_lists.keys():
             columnfill += "<td> </td>"
-        out = """<table>
+        thead = """<table>
                  <tr><td><strong class="headline">%(msg_title)s</strong></td><td>%(cf)s</td></tr>
                  <tr><td><strong>%(msg_recs)s</strong></td><td>%(nb_recs)s</td>%(cf)s</tr>
                  <tr><td><strong>%(msg_cites)s</strong></td><td>%(nb_cites)s</td>%(cf)s</tr>
@@ -3050,7 +3051,9 @@ class Template:
                       'nb_avgcit': avgstr,
                       'cf': columnfill,
                       'msg_breakdown': _("Breakdown of papers by citations:"),}
-
+        out = thead
+        if req:
+            req.write(thead)
         #print the stuff in reciddict, but sort according to tresholds_names
         for (mincites, maxcites, name) in tresholds_names:
             if reciddict.has_key(name):
@@ -3066,13 +3069,16 @@ class Template:
                     if len(intersec_list) > 0:
                         #add stuff like Published:5
                         collstr += "<td>"+str(k)+": "+str(len(intersec_list))+"</td> "
-                out += "<tr><td>"+_(rowtitle)+"</td><td>"
+                tline = "<tr><td>"+_(rowtitle)+"</td><td>"
                 #construct a link..
                 link = "../search?p=cited%3A"+str(mincites)+"-%3E"+str(maxcites)
                 if criteria:
                     #the citing min/max was found, append criteria
                     link += "%20"+criteria
-                out += "<a href="+link+">"+str(len(reclist))+"</a> "+collstr
-        out += "</td></tr>\n"
-        out += '</table>'
+                tline += "<a href="+link+">"+str(len(reclist))+"</a> "+collstr
+                out += tline
+                if req:
+                    req.write(tline)
+        tend = "</td></tr>\n<table>"
+        out += tend
         return out
