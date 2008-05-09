@@ -32,7 +32,8 @@ from invenio.dbquery import run_sql, serialize_via_marshal, \
                             deserialize_via_marshal
 from invenio.search_engine import print_record, search_pattern, get_fieldvalues
 from invenio.bibformat_utils import parse_tag
-from invenio.bibtask import write_message, task_get_option, task_update_progress
+from invenio.bibtask import write_message, task_get_option, task_update_progress, \
+                            task_sleep_now_if_required
 
 try:
     Set = set
@@ -93,11 +94,12 @@ def get_citation_weight(rank_method_code, config):
         citation_weight_dic_intermediate = result_intermediate[0]
         citation_list_intermediate = result_intermediate[1]
         reference_list_intermediate = result_intermediate[2]
-        #call the procedure that does the hard work by scanning
-        #citations and references in the updated_recid's
+        #call the procedure that does the hard work by reading fields of
+        #citations and references in the updated_recid's (but nothing else)!
         citation_informations = get_citation_informations(updated_recid_list, config)
         #write_message("citation_informations: "+str(citation_informations))
         #create_analysis_tables() #temporary.. needed to test how much faster in-mem indexing is
+        #call the analyser that uses the citation_informations to really search x-cites-y in the coll..
         dic = ref_analyzer(citation_informations,
                            citation_weight_dic_intermediate,
                            citation_list_intermediate,
@@ -222,12 +224,12 @@ def make_initial_result():
     return [dic, cit, ref]
 
 def get_citation_informations(recid_list, config):
-    """scans the collections searching citations and references for
+    """scans the collections searching references (999C5x -fields) and citations for
        items in the recid_list
-       returns a 3 list of dictionaries that contains the citation information of cds records
-       examples: [ {} {} {} ]
-                 [ { 93: ['astro-ph/9812088']},
-                   { 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
+       returns a 4 list of dictionaries that contains the citation information of cds records
+       examples: [ {} {} {} {} ]
+                 [ {5: 'SUT-DP-92-70-5'}, { 93: ['astro-ph/9812088']}, { 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
+
         NB: stuff here is for analysing new or changed records.
         see "ref_analyzer" for more.
     """
@@ -249,19 +251,43 @@ def get_citation_informations(recid_list, config):
                                              "publication_info_tag")
 
     p_record_pri_number_tag = tagify(parse_tag(record_pri_number_tag))
+    #037a: contains (often) the "hep-ph/0501084" tag of THIS record
     p_record_add_number_tag = tagify(parse_tag(record_add_number_tag))
+    #088a: additional short identifier for the record
     p_reference_number_tag = tagify(parse_tag(reference_number_tag))
+    #999C5r. this is in the reference list, refers to other records. Looks like: hep-ph/0408002
     p_reference_tag = tagify(parse_tag(reference_tag))
+    #999C5s. A standardized way of writing a reference in the reference list. Like: Nucl. Phys. B 710 (2000) 371
     p_record_publication_info_tag = tagify(parse_tag(record_publication_info_tag))
+    #909s field in THIS record, should be canonical publication string like Nucl. Phys. B 710 (2000) 371
+    #however, this does not exist, do the following tags are needed..
+    publication_pages_tag = ""
+    publication_year_tag = ""
+    publication_journal_tag = ""
+    publication_volume_tag = ""
+    try:
+        tag = config.get(config.get("rank_method", "function"), "publication_pages_tag")
+        publication_pages_tag = tagify(parse_tag(tag))
+        tag = config.get(config.get("rank_method", "function"), "publication_year_tag")
+        publication_year_tag = tagify(parse_tag(tag))
+        tag = config.get(config.get("rank_method", "function"), "publication_journal_tag")
+        publication_journal_tag = tagify(parse_tag(tag))
+        tag = config.get(config.get("rank_method", "function"), "publication_volume_tag")
+        publication_volume_tag = tagify(parse_tag(tag))
+    except:
+        pass
 
     done = 0 #for status reporting
     numrecs = len(recid_list)
     for recid in recid_list:
+        if (done % 10 == 0):
+            task_sleep_now_if_required()
+            #in fact we can sleep any time here
+
         if (done % 1000 == 0):
             mesg = "get cit.inf done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
-            #write interim stuff in the db so that the process can be stopped
         done = done+1
 
         pri_report_numbers = get_fieldvalues(recid, p_record_pri_number_tag)
@@ -280,9 +306,36 @@ def get_citation_informations(recid_list, config):
         if references_s:
             d_references_s[recid] = references_s
 
+        #insert "this was published in"
         record_s = get_fieldvalues(recid, p_record_publication_info_tag)
         if record_s:
             d_records_s[recid] = record_s[0]
+        else:
+            #a "standard" pub field is not always maintained so get a combination of
+            #journal vol (year) pages
+            if publication_pages_tag and publication_journal_tag and \
+               publication_volume_tag and publication_year_tag:
+                pubinfo = ""
+                tmp = get_fieldvalues(recid, publication_journal_tag)
+                if tmp:
+                    pubinfo = tmp[0]
+                    tmp = get_fieldvalues(recid, publication_volume_tag)
+                    if tmp:
+                        pubinfo += " "+tmp[0]
+                        tmp = tmp = get_fieldvalues(recid, publication_year_tag)
+                        if tmp:
+                            pubinfo += "  ("+tmp[0]+")"
+                            tmp = tmp = get_fieldvalues(recid, publication_pages_tag)
+                            if tmp:
+                                #if the page numbers have "x-y" take just x
+                                pages = tmp[0]
+                                hpos = pages.find("-")
+                                if hpos > 0:
+                                    pages = pages[:hpos-1]
+                                    pubinfo += " "+pages
+                                    #finally, remove double spaces
+                                    pubinfo = pubinfo.replace("  "," ")
+                                    d_records_s[recid] = pubinfo
 
     mesg = "get cit.inf done fully"
     write_message(mesg)
@@ -479,12 +532,6 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     #d_references_report_numbers: e.g 8 -> ([astro-ph/9889],[hep-ph/768])
     #meaning: rec 8 contains these in bibliography
 
-    #debug: add ref lit to tmpcit
-    #for k in reference_list.keys():
-    #    li = reference_list[k]
-    #        for l in li:
-    #   write_citer_cited(k,l)
-
     done = 0
     numrecs = len(d_references_report_numbers)
     for recid, refnumbers in d_references_report_numbers.iteritems():
@@ -492,6 +539,11 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             mesg =  "d_references_report_numbers done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
+            #write to db!
+            insert_into_cit_db(reference_list, "reversedict")
+            insert_into_cit_db(citation_list, "citationdict")
+            #it's ok to sleep too, we got something done
+            task_sleep_now_if_required()
         done = done+1
 
         for refnumber in refnumbers:
@@ -551,6 +603,11 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             mesg = "d_references_s done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
+            #write to db!
+            insert_into_cit_db(reference_list, "reversedict")
+            insert_into_cit_db(citation_list, "citationdict")
+            task_sleep_now_if_required()
+
         done = done+1
 
         for refs in refss:
@@ -559,6 +616,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 f = 'publref'
                 rec_id = get_recids_matching_query(p, f)
                 if rec_id and not recid in citation_list[rec_id[0]]:
+                    #somebody has this in the references..
                     result[rec_id[0]] += 1
                     citation_list[rec_id[0]].append(recid)
                 if rec_id and not rec_id[0] in reference_list[recid]:
@@ -574,8 +632,8 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     if task_get_option('verbose') >= 1:
         write_message("Phase 3: d_reports_numbers")
 
+    #search for stuff like CERN-TH-4859/87 in list of refs
     for rec_id, recnumbers in d_reports_numbers.iteritems():
-
         if (done % 1000 == 0):
             mesg = "d_report_numbers done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
@@ -602,6 +660,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     write_message(mesg)
     task_update_progress(mesg)
 
+    #find this record's pubinfo in other records' references
     if task_get_option('verbose') >= 1:
         write_message("Phase 4: d_records_s")
     done = 0
@@ -609,17 +668,11 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     t4 = os.times()[4]
     for recid, recs in d_records_s.iteritems():
         if (done % 1000 == 0):
-            mesg = "d_records done "+str(done)+" of "+str(numrecs)
+            mesg = "d_records_s done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
         done = done+1
-
-        tmp = recs.find("-")
-        if tmp < 0:
-            recs_modified = recs
-        else:
-            recs_modified = recs[:tmp]
-        p = recs_modified
+        p = recs
         rec_ids = get_recids_matching_query(p, pubreftag)
         if rec_ids:
             for rec_id in rec_ids:
@@ -719,12 +772,14 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                                selfcitedbydic, selfdic, authorcitdic)
 
     t5 = os.times()[4]
+
     write_message("Execution time for analyzing the citation information generating the dictionary:")
     write_message("... checking ref number: %.2f sec" % (t2-t1))
     write_message("... checking ref ypvt: %.2f sec" % (t3-t2))
     write_message("... checking rec number: %.2f sec" % (t4-t3))
     write_message("... checking rec ypvt: %.2f sec" % (t5-t4))
     write_message("... total time of ref_analyze: %.2f sec" % (t5-t1))
+
     return result
 
 def get_decompressed_xml(xml):
