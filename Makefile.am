@@ -244,5 +244,6 @@ update-v0.99.0-tables:
 	echo "ALTER TABLE hstTASK ADD COLUMN priority tinyint(4) NOT NULL default 0;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK ADD KEY priority (priority);" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE hstTASK ADD KEY priority (priority);" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE rnkCITATIONDATAEXT ADD KEY extcitepubinfo (extcitepubinfo);" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~
