@@ -549,7 +549,7 @@ def _task_run(task_run_fnc):
             ## The task is a daemon. We resubmit it
             if task_status == 'DONE':
                 ## It has finished in a good way. We recicle the database row
-                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING' WHERE id=%s", (new_runtime, _task_params['task_id']))
+                run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress='' WHERE id=%s", (new_runtime, _task_params['task_id']))
                 write_message("Task #%d finished and resubmitted." % _task_params['task_id'])
             else:
                 ## We keep the bad result and we resubmit with another id.

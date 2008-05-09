@@ -152,10 +152,11 @@ def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
             write_message('Archived %s %s tasks (created before %s) with %s' % (res, task, date, status_query))
 
 class Manager:
-    def __init__(self):
+    def __init__(self, old_stdout):
         import curses
         import curses.panel
         from curses.wrapper import wrapper
+        self.old_stdout = old_stdout
         self.curses = curses
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.running = 1
@@ -292,6 +293,9 @@ class Manager:
         if os.path.exists(pager):
             self.curses.endwin()
             os.system('%s %s' % (pager, tmpfile.name))
+            print >> self.old_stdout, "Press ENTER to continue",
+            self.old_stdout.flush()
+            raw_input()
             self.curses.panel.update_panels()
 
     def display_task_options(self):
@@ -402,28 +406,15 @@ class Manager:
         task_id = self.currentrow[0]
         process = self.currentrow[1]
         status = self.currentrow[5]
-        sleeptime = self.currentrow[4]
-        if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
-            self.display_in_footer("a process is already running!")
-        elif status == "STOPPED" or status == "WAITING":
+        #if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
+            #self.display_in_footer("a process is already running!")
+        if status == "STOPPED" or status == "WAITING":
             if process in self.helper_modules:
                 program = os.path.join(CFG_BINDIR, process)
                 fdout, fderr = get_output_channelnames(task_id)
                 COMMAND = "%s %s >> %s 2>> %s &" % (program, str(task_id), fdout, fderr)
                 os.system(COMMAND)
                 Log("manually running task #%d (%s)" % (task_id, process))
-                if sleeptime:
-                    new_runtime = get_datetime(sleeptime)
-                    new_task_arguments = marshal.loads(self.currentrow[7])
-                    new_task_arguments["runtime"] = new_runtime
-                    new_task_id = run_sql("INSERT INTO schTASK (proc,user,runtime,sleeptime,arguments,status,priority)"\
-                                          " VALUES (%s,%s,%s,%s,%s,'WAITING',%s)",
-                                          (process, self.currentrow[2], new_runtime, sleeptime,
-                                           self.currentrow[7], self.currentrow[8]))
-                    new_task_arguments["task"] = new_task_id
-                    run_sql("""UPDATE schTASK SET arguments=%s WHERE id=%s""",
-                            (marshal.dumps(new_task_arguments), new_task_id))
-
         else:
             self.display_in_footer("process status should be STOPPED or WAITING!")
         self.stdscr.refresh()
@@ -753,6 +744,7 @@ class BibSched:
 
     def handle_row(self, task_id, proc, runtime, status, priority):
         """Perform needed action of the row representing a task."""
+        #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s" % (task_id, proc, runtime, status, priority))
         if status == "SLEEP":
             if task_id in self.running:
                 self.set_status(task_id, "SLEEP SENT")
@@ -790,8 +782,12 @@ class BibSched:
         elif 'DONE' in status and task_id in self.running:
             del self.running[task_id]
         elif status == "SCHEDULED" or (status in ("WAITING", "SLEEPING") and runtime <= datetime.datetime.now()):
+            if task_id in self.running:
+                del self.running[task_id]
+            #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s" % (task_id, proc, runtime, status, priority))
             if self.scheduled is not None and self.scheduled != task_id:
                 ## Another task is scheduled for running.
+                #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s cannot run because task_id: %s is scheduled" % (task_id, proc, runtime, status, priority, self.scheduled))
                 return
 
             res = self.bibupload_in_the_queue(task_id)
@@ -800,6 +796,7 @@ class BibSched:
                 for (atask_id, astatus) in res:
                     if astatus in ('STOP', 'SUICIDED', 'ERROR'):
                         raise StandardError('BibSched had to halt because a bibupload with id %s has status %s. Please do your checks and delete/reinitialize the failed bibupload.' % (atask_id, astatus))
+                #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s cannot run because these bibupload are scheduled: %s" % (task_id, proc, runtime, status, priority, res))
                 return
 
             self.scheduled = task_id
@@ -811,11 +808,13 @@ class BibSched:
                     ## There's at least a higher priority task running that
                     ## can not run at the same time of the given task.
                     ## We give up
+                    #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s cannot run because task_id: %s, proc: %s is scheduled and incompatible" % (task_id, proc, runtime, status, priority, other_task_id, other_proc))
                     return
 
             ## No higer priority task have issue with the given task.
             if len(higher) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
                 ## Not enough resources.
+                #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s cannot run because all resource (%s) are used (%s), higher: %s" % (task_id, proc, runtime, status, priority, CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(higher), higher))
                 return
 
             ## We check if it is necessary to stop/put to sleep some lower priority
@@ -825,6 +824,7 @@ class BibSched:
             if tasks_to_stop and priority < 10:
                 ## Only tasks with priority higher than 10 have the power
                 ## to put task to stop.
+                #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s cannot run because there are task to stop: %s and priority < 10" % (task_id, proc, runtime, status, priority, task_to_stop))
                 return
 
             procname = proc.split(':')[0]
@@ -918,8 +918,10 @@ def Log(message):
 
 def redirect_stdout_and_stderr():
     "This function redirects stdout and stderr to bibsched.log and bibsched.err file."
+    old_stdout = sys.stdout
     sys.stdout = open(CFG_LOGDIR + "/bibsched.log", "a")
     sys.stderr = open(CFG_LOGDIR + "/bibsched.err", "a")
+    return old_stdout
 
 def usage(exitcode=1, msg=""):
     """Prints usage info."""
@@ -1022,10 +1024,14 @@ def start(verbose = True):
 
     return
 
-def stop(verbose = True):
+def stop(verbose=True, soft=False):
     pid = server_pid()
     if not pid:
-        error('bibsched seems not to be running.')
+        if soft:
+            print >> sys.stderr, 'bibsched seems not to be running.'
+            return
+        else:
+            error('bibsched seems not to be running.')
 
     try:
         os.kill(pid, signal.SIGKILL)
@@ -1040,13 +1046,15 @@ def stop(verbose = True):
     return
 
 def monitor(verbose = True):
-    redirect_stdout_and_stderr()
-    manager = Manager()
+    old_stdout = redirect_stdout_and_stderr()
+    manager = Manager(old_stdout)
     return
 
-def write_message(msg, stream=sys.stdout, verbose=1):
+def write_message(msg, stream=None, verbose=1):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
     Useful for debugging stuff."""
+    if stream is None:
+        stream = sys.stdout
     if msg:
         if stream == sys.stdout or stream == sys.stderr:
             stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ",
@@ -1109,7 +1117,7 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
     return
 
 def restart(verbose = True):
-    stop(verbose)
+    stop(verbose, soft=True)
     start(verbose)
     return
 
