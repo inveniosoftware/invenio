@@ -28,10 +28,10 @@ import os
 import string
 import sys
 import time
-import datetime
 import re
 import marshal
 import getopt
+import copy
 from socket import gethostname
 import signal
 from tempfile import NamedTemporaryFile
@@ -293,7 +293,7 @@ class Manager:
         if os.path.exists(pager):
             self.curses.endwin()
             os.system('%s %s' % (pager, tmpfile.name))
-            print >> self.old_stdout, "Press ENTER to continue",
+            print >> self.old_stdout, "\rPress ENTER to continue",
             self.old_stdout.flush()
             raw_input()
             self.curses.panel.update_panels()
@@ -408,7 +408,7 @@ class Manager:
         status = self.currentrow[5]
         #if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
             #self.display_in_footer("a process is already running!")
-        if status == "STOPPED" or status == "WAITING":
+        if status == "SCHEDULED" or status == "WAITING":
             if process in self.helper_modules:
                 program = os.path.join(CFG_BINDIR, process)
                 fdout, fderr = get_output_channelnames(task_id)
@@ -416,7 +416,7 @@ class Manager:
                 os.system(COMMAND)
                 Log("manually running task #%d (%s)" % (task_id, process))
         else:
-            self.display_in_footer("process status should be STOPPED or WAITING!")
+            self.display_in_footer("process status should be SCHEDULED or WAITING!")
         self.stdscr.refresh()
 
     def sleep(self):
@@ -684,11 +684,6 @@ class Manager:
 class BibSched:
     def __init__(self):
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
-        self.running = {}
-        self.sleep_done = {}
-        self.sleep_sent = {}
-        self.stop_sent = {}
-        self.suicide_sent = {}
         self.scheduled = None
 
     def set_status(self, task_id, status):
@@ -720,12 +715,18 @@ class BibSched:
         else:
             return to_stop, {min_task_id : (min_proc, min_prio)}
 
-    def split_running_tasks_by_priority(self, task_id, priority):
+    def get_running_tasks(self, task_status):
+        running_tasks = {}
+        for status in ('RUNNING', 'CONTINUING', 'SLEEPING', 'SLEEP SENT', 'SLEEP', 'STOP', 'STOP SENT', 'SUICIDE', 'SUICIDE SENT', 'WAKEUP', 'SCHEDULED'):
+            running_tasks.update(copy.deepcopy(task_status.get(status, {})))
+        return running_tasks
+
+    def split_running_tasks_by_priority(self, task_status, task_id, priority):
         """Return two sets (by dict): the set of task_ids with lower priority and
         those with higher or equal priority."""
         higher = {}
         lower = {}
-        for other_task_id, (task_proc, task_priority) in self.running.iteritems():
+        for other_task_id, (task_proc, dummy, task_priority) in self.get_running_tasks(task_status).iteritems():
             if task_id == other_task_id:
                 continue
             if task_priority < priority:
@@ -734,155 +735,165 @@ class BibSched:
                 higher[other_task_id] = (task_proc, task_priority)
         return lower, higher
 
-    def get_running_processes(self):
-        return run_sql("SELECT id,proc,priority FROM schTASK "\
-                      "WHERE status IN ('RUNNING', 'CONTINUING')")
-
     def bibupload_in_the_queue(self, task_id):
         """Check if bibupload is scheduled/running before runtime."""
-        return run_sql("SELECT id, status FROM schTASK WHERE proc='bibupload' AND id<%s AND status in ('RUNNING', 'WAITING', 'CONTINUING', 'SLEEPING', 'SCHEDULED', 'SUICIDE', 'STOP', 'STOP_SENT', 'SLEEP', 'SLEEP SENT', 'SUICIDE SENT')", (task_id, ))
+        return run_sql("SELECT id, status FROM schTASK WHERE proc='bibupload' AND id<%s AND status in ('RUNNING', 'WAITING', 'CONTINUING', 'SLEEPING', 'SUICIDE', 'STOP', 'STOP SENT', 'SLEEP', 'SLEEP SENT', 'SUICIDE SENT')", (task_id, ))
 
-    def handle_row(self, task_id, proc, runtime, status, priority):
-        """Perform needed action of the row representing a task."""
+    def task_really_running_p(self, proc, task_id):
+        """Ping the task and update its status to error if necessary."""
+        if run_sql("SELECT id FROM schTASK WHERE id=%s AND status in ('CONTINUING', 'RUNNING', 'SLEEP SENT', 'STOP SENT', 'SUICIDE SENT', 'SLEEPING')", (task_id, )):
+            if not get_task_pid(proc, task_id):
+                self.set_status(task_id, "ERROR")
+                return False
+            return True
+        return False
+
+    def handle_row(self, task_status, task_id, proc, runtime, status, priority):
+        """Perform needed action of the row representing a task.
+        Return True when task_status need to be refreshed"""
+        #write_message('%s id: %s, proc: %s, runtime: %s, status: %s, priority: %s' % (task_status, task_id, proc, runtime, status, priority))
         #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s" % (task_id, proc, runtime, status, priority))
-        if status == "SLEEP":
-            if task_id in self.running:
+        if task_id in task_status['RUNNING'] or task_id in task_status['CONTINUING']:
+            if not self.task_really_running_p(proc, task_id):
+                #write_message('update required')
+                return True
+            if status == "SLEEP":
+                #write_message('SLEEP')
                 self.set_status(task_id, "SLEEP SENT")
-                self.send_signal(task_id, signal.SIGUSR1)
-                self.sleep_sent[task_id] = self.running[task_id]
-        elif status == "SLEEPING":
-            if task_id in self.sleep_sent:
-                self.sleep_done[task_id] = self.sleep_sent[task_id]
-                del self.sleep_sent[task_id]
-                del self.running[task_id]
-        if status == "WAKEUP":
-            if task_id in self.sleep_done:
-                self.running[task_id] = self.sleep_done[task_id]
-                del self.sleep_done[task_id]
-                self.send_signal(task_id, signal.SIGCONT)
-                self.set_status(task_id, "CONTINUING")
-        elif status == "STOP":
-            if task_id in self.running:
+                self.send_signal(proc, task_id, signal.SIGUSR1)
+                return True
+            elif status == "STOP":
+                #write_message("STOP")
                 self.set_status(task_id, "STOP SENT")
-                self.send_signal(task_id, signal.SIGTERM)
-                self.stop_sent[task_id] = self.running[task_id]
-        elif status == "STOPPED" and task_id in self.stop_sent:
-            if task_id in self.running:
-                del self.running[task_id]
-            del self.stop_sent[task_id]
-        elif status == "SUICIDE":
-            if task_id in self.running:
-                self.set_status(task_id, "SUICIDE SENT")
-                self.send_signal(task_id, signal.SIGABRT)
-                self.suicide_sent[task_id] = self.running[task_id]
-        elif status == "SUICIDED" and task_id in self.suicide_sent:
-            if task_id in self.running:
-                del self.running[task_id]
-            del self.suicide_sent[task_id]
-        elif 'DONE' in status and task_id in self.running:
-            del self.running[task_id]
-        elif status == "SCHEDULED" or (status in ("WAITING", "SLEEPING") and runtime <= datetime.datetime.now()):
-            if task_id in self.running:
-                del self.running[task_id]
-            #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s" % (task_id, proc, runtime, status, priority))
-            if self.scheduled is not None and self.scheduled != task_id:
+                self.send_signal(proc, task_id, signal.SIGTERM)
+                return True
+            return False
+        elif status == 'WAKEUP':
+            #write_message("WAKEUP")
+            self.send_signal(proc, task_id, signal.SIGCONT)
+            self.set_status(task_id, "CONTINUING")
+            return True
+        elif task_id in task_status['WAITING'] or task_id in task_status['SLEEPING'] or task_id in task_status['SCHEDULED']:
+            #write_message("Trying to run %s" % task_id)
+            if self.scheduled is not None and task_id != self.scheduled:
                 ## Another task is scheduled for running.
-                #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s cannot run because task_id: %s is scheduled" % (task_id, proc, runtime, status, priority, self.scheduled))
-                return
+                #write_message("cannot run because %s is already scheduled" % self.scheduled)
+                return False
 
             res = self.bibupload_in_the_queue(task_id)
             if res:
                 ## All bibupload must finish before.
                 for (atask_id, astatus) in res:
-                    if astatus in ('STOP', 'SUICIDED', 'ERROR'):
+                    if astatus in ('STOPPED', 'SUICIDED', 'ERROR'):
                         raise StandardError('BibSched had to halt because a bibupload with id %s has status %s. Please do your checks and delete/reinitialize the failed bibupload.' % (atask_id, astatus))
-                #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s cannot run because these bibupload are scheduled: %s" % (task_id, proc, runtime, status, priority, res))
-                return
+                #write_message("cannot run because these bibupload are scheduled: %s" % res)
+                return False
 
             self.scheduled = task_id
+            #write_message('Scheduled task %s' % self.scheduled)
             ## Schedule the task for running.
 
-            lower, higher = self.split_running_tasks_by_priority(task_id, priority)
+            lower, higher = self.split_running_tasks_by_priority(task_status, task_id, priority)
+            #write_message('lower: %s' % lower)
+            #write_message('higher: %s' % higher)
             for other_task_id, (other_proc, dummy) in higher.iteritems():
                 if not self.tasks_safe_p(proc, other_proc):
                     ## There's at least a higher priority task running that
                     ## can not run at the same time of the given task.
                     ## We give up
-                    #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s cannot run because task_id: %s, proc: %s is scheduled and incompatible" % (task_id, proc, runtime, status, priority, other_task_id, other_proc))
-                    return
+                    #write_message("cannot run because task_id: %s, proc: %s is the queue and incompatible" % (other_task_id, other_proc))
+                    return False
 
             ## No higer priority task have issue with the given task.
             if len(higher) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
                 ## Not enough resources.
-                #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s cannot run because all resource (%s) are used (%s), higher: %s" % (task_id, proc, runtime, status, priority, CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(higher), higher))
-                return
+                #write_message("cannot run because all resource (%s) are used (%s), higher: %s" % (CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(higher), higher))
+                return False
 
             ## We check if it is necessary to stop/put to sleep some lower priority
             ## task.
             tasks_to_stop, tasks_to_sleep = self.get_tasks_to_sleep_and_stop(proc, lower)
+            #write_message('tasks_to_stop: %s' % tasks_to_stop)
+            #write_message('tasks_to_sleep: %s' % tasks_to_sleep)
 
             if tasks_to_stop and priority < 10:
                 ## Only tasks with priority higher than 10 have the power
                 ## to put task to stop.
-                #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s cannot run because there are task to stop: %s and priority < 10" % (task_id, proc, runtime, status, priority, task_to_stop))
-                return
+                #write_message("cannot run because there are task to stop: %s and priority < 10" % tasks_to_stop)
+                return False
 
             procname = proc.split(':')[0]
             if not tasks_to_stop and not tasks_to_sleep:
                 self.scheduled = None
                 if status == "SLEEPING":
-                    if task_id in self.sleep_done:
-                        self.running[task_id] = self.sleep_done[task_id]
-                        del self.sleep_done[task_id]
-                        self.send_signal(task_id, signal.SIGCONT)
-                        self.set_status(task_id, "CONTINUING")
+                    self.send_signal(proc, task_id, signal.SIGCONT)
+                    self.set_status(task_id, "CONTINUING")
+                    return True
                 elif procname in self.helper_modules:
                     program = os.path.join(CFG_BINDIR, procname)
                     fdout, fderr = get_output_channelnames(task_id)
-                    COMMAND = "%s %s >> %s 2>> %s" % (program, str(task_id), fdout, fderr)
+                    COMMAND = "%s %s >> %s 2>> %s &" % (program, str(task_id), fdout, fderr)
+                    self.set_status(task_id, "SCHEDULED")
                     Log("task #%d (%s) started" % (task_id, proc))
-                    self.set_status(task_id, "WAITING")
                     os.system(COMMAND)
-                    Log("task #%d (%s) ended" % (task_id, proc))
-                    self.running[task_id] = (get_task_pid(proc, task_id), priority)
+                    return True
             else:
                 ## It's not still safe to run the task.
-                self.set_status(task_id, "SCHEDULED")
-                self.scheduled = task_id
-
                 for other_task_id in tasks_to_stop:
-                    if other_task_id not in self.stop_sent:
-                        self.set_status(task_id, "STOP SENT")
-                        self.send_signal(task_id, signal.SIGTERM)
-                        self.stop_sent[task_id] = self.running[task_id]
+                    if other_task_id not in task_status['STOP SENT']:
+                        self.set_status(other_task_id, "STOP SENT")
+                        self.send_signal(proc, task_id, signal.SIGTERM)
                 for other_task_id in tasks_to_sleep:
-                    if other_task_id not in self.sleep_sent:
-                        self.set_status(task_id, "SLEEP SENT")
-                        self.send_signal(task_id, signal.SIGUSR1)
-                        self.sleep_sent[task_id] = self.running[task_id]
+                    if other_task_id not in task_status['SLEEP SENT']:
+                        self.set_status(other_task_id, "SLEEP SENT")
+                        self.send_signal(proc, task_id, signal.SIGUSR1)
+                return True
 
-    def send_signal(self, task_id, signal):
+    def send_signal(self, proc, task_id, signal):
         """Send a signal to a given task."""
         try:
-            os.kill(self.running[task_id][0], signal)
+            os.kill(get_task_pid(proc, task_id), signal)
         except OSError:
             self.set_status(task_id, "ERROR")
         except KeyError:
             register_exception()
 
     def watch_loop(self):
+        def get_rows():
+            """Return all the rows to work on."""
+            return run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE%%' AND status NOT LIKE '%%DELETED%%' AND runtime<=NOW() ORDER BY priority DESC, runtime ASC")
+
+        def get_task_status(rows):
+            """Return a handy data structure to analize the task status."""
+            ret = {
+                'RUNNING' : {},
+                'CONTINUING' : {},
+                'SLEEPING' : {},
+                'WAITING' : {},
+                'STOP SENT' : {},
+                'SLEEP SENT' : {},
+                'ERROR' : {},
+                'SCHEDULED' : {}
+            }
+
+            for (id,proc,runtime,status,priority) in rows:
+                if status not in ret:
+                    ret[status] = {}
+                ret[status][id] = (proc, runtime, priority)
+            return ret
+
         try:
-            running_process = self.get_running_processes()
-            for task_id, proc, prio in running_process:
-                if get_task_pid(proc, task_id):
-                    self.running[task_id] = (get_task_pid(proc, task_id), prio)
-                else:
-                    self.set_status(task_id, "ERROR")
-            rows = []
-            while 1:
-                rows = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE '%%DELETED%%' ORDER BY priority DESC, runtime ASC")
+            run_sql("UPDATE schTASK SET status='OLD ERROR' WHERE status='ERROR'")
+            while True:
+                rows = get_rows()
+                task_status = get_task_status(rows)
+                if task_status['ERROR']:
+                    raise StandardError('BibSched had to halt because a new task is in status ERROR: %s' % task_status['ERROR'])
                 for row in rows:
-                    self.handle_row(*row)
+                    if self.handle_row(task_status, *row):
+                        ## Status has changed, let's updated it!
+                        task_status = get_task_status(get_rows())
+                write_message('PING!')
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
         except:
             register_exception(alert_admin=True)

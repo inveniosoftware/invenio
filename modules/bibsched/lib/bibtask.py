@@ -508,16 +508,21 @@ def _task_run(task_run_fnc):
     Return True in case of success and False in case of failure."""
 
     ## We prepare the pid file inside /prefix/var/run/taskname_id.pid
-    pidfile_name = os.path.join(CFG_PREFIX, 'var', 'run',
-        'bibsched_task_%d.pid' % _task_params['task_id'])
-    pidfile = open(pidfile_name, 'w')
-    pidfile.write(str(os.getpid()))
-    pidfile.close()
+    try:
+        pidfile_name = os.path.join(CFG_PREFIX, 'var', 'run',
+            'bibsched_task_%d.pid' % _task_params['task_id'])
+        pidfile = open(pidfile_name, 'w')
+        pidfile.write(str(os.getpid()))
+        pidfile.close()
+    except OSError:
+        register_exception(alert_admin=True)
+        task_update_status("ERROR")
+        return False
 
     ## check task status:
     task_status = task_read_status()
-    if task_status != "WAITING":
-        write_message("Error: The task #%d is %s.  I expected WAITING." %
+    if task_status not in ("WAITING", "SCHEDULED"):
+        write_message("Error: The task #%d is %s.  I expected WAITING or SCHEDULED." %
             (_task_params['task_id'], task_status), sys.stderr)
         return False
     ## initialize signal handler:
@@ -553,11 +558,12 @@ def _task_run(task_run_fnc):
                 write_message("Task #%d finished and resubmitted." % _task_params['task_id'])
             else:
                 ## We keep the bad result and we resubmit with another id.
-                proc, user, sleeptime, arguments, priority = run_sql('SELECT proc,user,sleeptime,arguments,priority FROM schTASK WHERE id=%s', (_task_params['task_id'], ))
+                res = run_sql('SELECT proc,user,sleeptime,arguments,priority FROM schTASK WHERE id=%s', (_task_params['task_id'], ))
+                proc, user, sleeptime, arguments, priority = res[0]
                 run_sql("""INSERT INTO schTASK (proc,user,
-                        runtime,sleeptime,status,arguments,priority)
-                        VALUES (%s,%s,%s,%s,'WAITING',%s, %s)""",
-                        (proc, user, new_runtime, sleeptime, arguments, priority))
+                            runtime,sleeptime,status,arguments,priority)
+                            VALUES (%s,%s,%s,%s,'WAITING',%s, %s)""",
+                            (proc, user, new_runtime, sleeptime, arguments, priority))
                 write_message("Task #%d finished (%s) and resubmitted." % (_task_params['task_id'], task_status))
 
         else:
