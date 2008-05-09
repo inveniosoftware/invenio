@@ -2198,6 +2198,9 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDATAEXT (
   PRIMARY KEY (id_bibrec, extcitepubinfo)
 ) TYPE=MyISAM;
 
+--create an index for extcitepubinfo: will 10x speed up _deleting_ stuff 
+--(and we try to delete each time we find a citation)
+CREATE INDEX iextcitepubinfo on rnkCITATIONDATAEXT(extcitepubinfo);
 
 -- tables for collections and collection tree:
 
