@@ -552,7 +552,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                                                     "publication_reference_number_tag")
     pubreftag = record_pri_number_tag = config.get(config.get("rank_method", "function"),
                                                     "publication_reference_tag")
-    #pubrefntag is prob 999C5r, pubreftag 999c5s
+    #pubrefntag is prob 999C5r, pubreftag 999C5s
 
 
     citation_list = initial_citationlist
@@ -611,8 +611,9 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                     #bad.. gfhgf/1254312, so  get the corresponding 999C5s (full ref) too
                     #This should really be done in the next loop d_references_s
                     #but the 999C5s fields are not yet normalized
-                    #rectext = print_record(recid, format='hm')
-                    rectext = "" #sorry, print_record is too slow..
+
+                    #rectext = print_record(recid, format='hm', ot=pubreftag[:-1])
+                    rectext = "" # print_record() call disabled to speed things up
                     lines = rectext.split("\n")
                     rpart = p #to be used..
                     for l in lines:
