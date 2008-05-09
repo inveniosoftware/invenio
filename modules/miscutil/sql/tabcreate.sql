@@ -2184,7 +2184,6 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
   UNIQUE KEY object_name (object_name)
 ) TYPE=MyISAM;
 
-
 -- a table for missing citations. This should be scanned by a program
 -- occasionally to check if some publication has been cited more than
 -- 50 times (or such), and alert cataloguers to create record for that
@@ -2195,12 +2194,9 @@ CREATE TABLE IF NOT EXISTS rnkCITATIONDATA (
 CREATE TABLE IF NOT EXISTS rnkCITATIONDATAEXT (
   id_bibrec int(8) unsigned,
   extcitepubinfo varchar(255) NOT NULL,
-  PRIMARY KEY (id_bibrec, extcitepubinfo)
+  PRIMARY KEY (id_bibrec, extcitepubinfo),
+  KEY extcitepubinfo (extcitepubinfo)
 ) TYPE=MyISAM;
-
---create an index for extcitepubinfo: will 10x speed up _deleting_ stuff 
---(and we try to delete each time we find a citation)
-CREATE INDEX iextcitepubinfo on rnkCITATIONDATAEXT(extcitepubinfo);
 
 -- tables for collections and collection tree:
 
