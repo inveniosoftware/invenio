@@ -1475,8 +1475,11 @@ div.detailedrecordbox div.detailedrecordboxcontent{
    border-right: 2px solid #36c;
    border-left: 2px solid #36c;
    padding-bottom:3px;
+   padding-top:1px; /* Needed, otherwise tabs with paperclip get
+                       messed up, but created a small gap at top
+                       of box. Override with !important if needed*/
 }
-div.detailedrecordminipanel{
+Div.Detailedrecordminipanel{
    border: 1px solid #ddd;
    padding-top:3px;
    padding-bottom:3px;
