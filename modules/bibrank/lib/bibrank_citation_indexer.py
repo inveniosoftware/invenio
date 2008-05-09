@@ -35,6 +35,9 @@ from invenio.bibformat_utils import parse_tag
 from invenio.bibtask import write_message, task_get_option, task_update_progress, \
                             task_sleep_now_if_required
 
+NO_AUTHOR_CITES = 1
+#a config param to turn off self citation searching
+
 try:
     Set = set
 except NameError:
@@ -346,27 +349,11 @@ def get_citation_informations(recid_list, config):
                 ok = 1
                 for i in range (0, len(publication_format_string)):
                     current = publication_format_string[i]
-                    if current == "p":
-                        if tagsvalues["p"]:
-                            publ += tagsvalues["p"]
-                        else:
-                            ok = 0
-                            break #it was needed and not found
-                    elif current=="c":
-                        if tagsvalues["c"]:
-                            publ += tagsvalues["c"]
-                        else:
-                            ok = 0
-                            break #it was needed and not found
-                    elif current=="v":
-                        if tagsvalues["v"]:
-                            publ += tagsvalues["v"]
-                        else:
-                            ok = 0
-                            break #it was needed and not found
-                    elif current=="y":
-                        if tagsvalues["y"]:
-                            publ += tagsvalues["y"]
+                    #these are supported
+                    if current == "p" or current=="c" or current=="v" or current=="y":
+                        if tagsvalues[current]:
+                            #add the value in the string
+                            publ += tagsvalues[current]
                         else:
                             ok = 0
                             break #it was needed and not found
@@ -713,7 +700,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         done = done+1
         p = recs
         rec_ids = get_recids_matching_query(p, pubreftag)
-        #print "These records match "+p+" : "+str(rec_ids)
+        #print "These records match "+p+" in "+pubreftag+" : "+str(rec_ids)
         if rec_ids:
             for rec_id in rec_ids:
                 if not rec_id in citation_list[recid]:
@@ -745,8 +732,12 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     selfdic = {}
     #get the initial self citation dict
     initial_self_dict = get_cit_dict("selfcitdict")
+    selfdic = initial_self_dict
     #add new records to selfdic
-    selfdic = get_self_citations(updated_rec_list, citation_list,
+    if NO_AUTHOR_CITES:
+        print "Self cite processing disabled"
+    else:
+        selfdic = get_self_citations(updated_rec_list, citation_list,
                                  initial_self_dict, config)
     #selfdic consists of
     #key k -> list of values [v1,v2,..]
@@ -770,7 +761,11 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
 
     #get author citations for records in updated_rec_list
     initial_author_dict = get_initial_author_dict()
-    authorcitdic = get_author_citations(updated_rec_list, citation_list,
+    authorcitdic = initial_author_dict
+    if NO_AUTHOR_CITES:
+        print "Author cites disabled"
+    else:
+        authorcitdic = get_author_citations(updated_rec_list, citation_list,
                                         initial_author_dict, config)
 
 
