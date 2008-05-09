@@ -265,6 +265,7 @@ def get_citation_informations(recid_list, config):
     publication_year_tag = ""
     publication_journal_tag = ""
     publication_volume_tag = ""
+    publication_format_string = "p v (y) c"
     try:
         tag = config.get(config.get("rank_method", "function"), "publication_pages_tag")
         publication_pages_tag = tagify(parse_tag(tag))
@@ -274,6 +275,7 @@ def get_citation_informations(recid_list, config):
         publication_journal_tag = tagify(parse_tag(tag))
         tag = config.get(config.get("rank_method", "function"), "publication_volume_tag")
         publication_volume_tag = tagify(parse_tag(tag))
+        publication_format_string = config.get(config.get("rank_method", "function"), "publication_format_string")
     except:
         pass
 
@@ -314,29 +316,64 @@ def get_citation_informations(recid_list, config):
             #a "standard" pub field is not always maintained so get a combination of
             #journal vol (year) pages
             if publication_pages_tag and publication_journal_tag and \
-               publication_volume_tag and publication_year_tag:
-                pubinfo = ""
+               publication_volume_tag and publication_year_tag and publication_format_string:
+                tagsvalues = {} #we store the tags and their values here
+                                #like c->444 y->1999 p->"journal of foo",v->20
+                tagsvalues["p"] = ""
+                tagsvalues["y"] = ""
+                tagsvalues["c"] = ""
+                tagsvalues["v"] = ""
+
                 tmp = get_fieldvalues(recid, publication_journal_tag)
                 if tmp:
-                    pubinfo = tmp[0]
-                    tmp = get_fieldvalues(recid, publication_volume_tag)
-                    if tmp:
-                        pubinfo += " "+tmp[0]
-                        tmp = tmp = get_fieldvalues(recid, publication_year_tag)
-                        if tmp:
-                            pubinfo += "  ("+tmp[0]+")"
-                            tmp = tmp = get_fieldvalues(recid, publication_pages_tag)
-                            if tmp:
-                                #if the page numbers have "x-y" take just x
-                                pages = tmp[0]
-                                hpos = pages.find("-")
-                                if hpos > 0:
-                                    pages = pages[:hpos-1]
-                                    pubinfo += " "+pages
-                                    #finally, remove double spaces
-                                    pubinfo = pubinfo.replace("  "," ")
-                                    d_records_s[recid] = pubinfo
-
+                    tagsvalues["p"] = tmp[0]
+                tmp = get_fieldvalues(recid, publication_volume_tag)
+                if tmp:
+                    tagsvalues["v"] = tmp[0]
+                tmp = get_fieldvalues(recid, publication_year_tag)
+                if tmp:
+                    tagsvalues["y"] = tmp[0]
+                tmp = get_fieldvalues(recid, publication_pages_tag)
+                if tmp:
+                    #if the page numbers have "x-y" take just x
+                    pages = tmp[0]
+                    hpos = pages.find("-")
+                    if hpos > 0:
+                        pages = pages[:hpos-1]
+                        tagsvalues["c"] = pages
+                #format the publ infostring according to the format
+                publ = ""
+                ok = 1
+                for i in range (0, len(publication_format_string)):
+                    current = publication_format_string[i]
+                    if current == "p":
+                        if tagsvalues["p"]:
+                            publ += tagsvalues["p"]
+                        else:
+                            ok = 0
+                            break #it was needed and not found
+                    elif current=="c":
+                        if tagsvalues["c"]:
+                            publ += tagsvalues["c"]
+                        else:
+                            ok = 0
+                            break #it was needed and not found
+                    elif current=="v":
+                        if tagsvalues["v"]:
+                            publ += tagsvalues["v"]
+                        else:
+                            ok = 0
+                            break #it was needed and not found
+                    elif current=="y":
+                        if tagsvalues["y"]:
+                            publ += tagsvalues["y"]
+                        else:
+                            ok = 0
+                            break #it was needed and not found
+                    else:
+                        publ += current #just add the character in the format string
+                if ok:
+                    d_records_s[recid] = publ
     mesg = "get cit.inf done fully"
     write_message(mesg)
     task_update_progress(mesg)
@@ -674,6 +711,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         done = done+1
         p = recs
         rec_ids = get_recids_matching_query(p, pubreftag)
+        #print "These records match "+p+" : "+str(rec_ids)
         if rec_ids:
             for rec_id in rec_ids:
                 if not rec_id in citation_list[recid]:
