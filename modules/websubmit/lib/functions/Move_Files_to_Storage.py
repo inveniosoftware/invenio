@@ -88,7 +88,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
             for current_file in os.listdir("%s/files/%s" % (curdir, path)):
                 ## retrieve filename and extension
                 dummy, filename, extension = decompose_file(current_file)
-                if extension:
+                if extension and extension[0] != ".":
                     extension = '.' + extension
                 if len(paths_and_suffixes[path]) != 0:
                     extension = "_%s%s" % (paths_and_suffixes[path], extension)
