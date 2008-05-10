@@ -165,6 +165,16 @@ class BibRecDocs:
             out += str(bibdoc)
         return out
 
+    def empty_p(self):
+        """Return True if the bibrec is empty, i.e. it has no bibdocs
+        connected."""
+        return len(self.bibdocs) == 0
+
+    def deleted_p(self):
+        """Return True if the bibrec has been deleted."""
+        from invenio.search_engine import record_exists
+        return record_exists(self.id) == -1
+
     def get_xml_8564(self):
         """Return a snippet of XML representing the 8564 corresponding to the
         current state"""
@@ -309,6 +319,14 @@ class BibRecDocs:
                 return bibdoc.docname
         raise InvenioWebSubmitFileError, "Recid '%s' is not connected with a " \
             "docid '%s'" % (self.id, docid)
+
+    def has_docname_p(self, docname):
+        """Return True if a bibdoc with a particular docname belong to this
+        record."""
+        for bibdoc in self.bibdocs:
+            if bibdoc.docname == docname:
+                return True
+        return False
 
     def get_bibdoc(self, docname):
         """Returns the bibdoc with a particular docname associated with
@@ -1009,13 +1027,22 @@ class BibDoc:
         return versions
 
     def delete(self):
-        """delete the current bibdoc instance"""
+        """delete the current bibdoc instance."""
         try:
             self.change_name('DELETED-%s-%s' % (datetime.today().strftime('%Y%m%d%H%M%S'), self.docname))
             run_sql("UPDATE bibdoc SET status='DELETED' WHERE id=%s", (self.id,))
         except Exception, e:
             register_exception()
             raise InvenioWebSubmitFileError, "It's impossible to delete bibdoc %s: %s" % (self.id, e)
+
+    def deleted_p(self):
+        """Return True if the bibdoc has been deleted."""
+        return self.status == 'DELETED'
+
+    def empty_p(self):
+        """Return True if the bibdoc is empty, i.e. it has no bibdocfile
+        connected."""
+        return len(self.docfiles) == 0
 
     def undelete(self, previous_status=''):
         """undelete a deleted file (only if it was actually deleted). The
