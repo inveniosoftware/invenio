@@ -65,7 +65,8 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_TMPDIR, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
 from invenio import session
 from invenio.dbquery import run_sql, OperationalError, \
     serialize_via_marshal, deserialize_via_marshal
@@ -205,9 +206,17 @@ def getUid (req):
         s = sm.get_session(req)
     userId = s.getUid()
     if userId == -1: # first time, so create a guest user
-        s.setUid(createGuestUser())
-        userId = s.getUid()
-        guest = 1
+        if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+            s.setUid(createGuestUser())
+            userId = s.getUid()
+            guest = 1
+        else:
+            sm.maintain_session(req, s)
+            if CFG_ACCESS_CONTROL_LEVEL_GUESTS == 0:
+                return 0
+            else:
+                return -1
+
     remember_me = s.getRememberMe()
     sm.maintain_session(req, s, remember_me)
 
@@ -594,18 +603,19 @@ def drop_external_settings(userId):
             del prefs[key]
     set_user_preferences(userId, prefs)
 
-
 def logoutUser(req):
     """It logout the user of the system, creating a guest user.
     """
-    getUid(req)
     sm = session.MPSessionManager(pSession, pSessionMapping())
     try:
         s = sm.get_session(req)
     except SessionError:
         sm.revoke_session_cookie(req)
         s = sm.get_session(req)
-    id1 = createGuestUser()
+    if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+        id1 = createGuestUser()
+    else:
+        id1 = 0
     s.setUid(id1)
     sm.maintain_session(req, s)
     return id1
@@ -828,7 +838,11 @@ def get_preferred_user_language(req):
         for lang in accept_language_header.split(','):
             lang = lang.split(';q=')
             if len(lang) == 2:
-                tmp_langs[float(lang[1])] = lang[0]
+                lang[1] = lang[1].replace('"', '') # Hack for Yeti robot
+                try:
+                    tmp_langs[float(lang[1])] = lang[0]
+                except ValueError:
+                    pass
             else:
                 tmp_langs[1.0] = lang[0]
         ret = []
