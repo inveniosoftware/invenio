@@ -36,32 +36,28 @@ def init_db_dictionary(dname):
         compressed_sc_dic = run_sql(query)
     except OperationalError:
         compressed_sc_dic = []
-    sc_dic = None
+    sc_dic = {}
     if compressed_sc_dic and compressed_sc_dic[0] and compressed_sc_dic[0][0]:
         try:
             sc_dic = marshal.loads(decompress(compressed_sc_dic[0][0]))
         except error:
-            sc_dic = []
+            sc_dic = {}
     return sc_dic
 
 cache_cited_by_dictionary = init_db_dictionary("citationdict")
+cache_cited_by_dictionary_keys = cache_cited_by_dictionary.keys()
+cache_cited_by_dictionary_keys_intbitset = intbitset(cache_cited_by_dictionary.keys())
 cache_reference_list_dictionary = init_db_dictionary("reversedict")
+cache_selfcit_dictionary = init_db_dictionary("selfcitdict")
+cache_selfcitedby_dictionary = init_db_dictionary("selfcitdict")
 
 ### INTERFACE
 
 def get_cited_by(recordid):
     """Return a list of records that cite recordid"""
-    citation_dic = {} #one should always init variables
-    query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"
-    compressed_citation_dic = run_sql_cached(query, affected_tables=['rnkCITATIONDATA'])
-    if compressed_citation_dic and compressed_citation_dic[0]:
-        try:
-            citation_dic = marshal.loads(decompress(compressed_citation_dic[0][0]))
-        except error:
-            citation_dic = {}
-    ret = [] #empty list
-    if citation_dic.has_key(recordid):
-        ret = citation_dic[recordid]
+    ret = []
+    if cache_cited_by_dictionary.has_key(recordid):
+        ret = cache_cited_by_dictionary[recordid]
     return ret
 
 def get_records_with_num_cites(numstr, allrecs = intbitset([])):
@@ -76,8 +72,6 @@ def get_records_with_num_cites(numstr, allrecs = intbitset([])):
         return intbitset([])
     numstr = numstr.replace(" ",'')
     numstr = numstr.replace('"','')
-    #get the cited-by dictionary
-    citedbydict = init_db_dictionary("citationdict")
 
     num = 0
     #first, check if numstr is just a number
@@ -86,9 +80,9 @@ def get_records_with_num_cites(numstr, allrecs = intbitset([])):
         num = int(singlenum[0])
         if num == 0:
             #we return recids that are not in keys
-            return allrecs - intbitset(citedbydict.keys())
-        for k in citedbydict.keys():
-            li = citedbydict[k]
+            return allrecs - cache_cited_by_dictionary_keys_intbitset
+        for k in cache_cited_by_dictionary_keys:
+            li = cache_cited_by_dictionary[k]
             if len(li) == num:
                 matches.add(k)
         return matches
@@ -105,10 +99,10 @@ def get_records_with_num_cites(numstr, allrecs = intbitset([])):
             return intbitset([])
         if (first == 0):
             #start with those that have no cites..
-            matches = allrecs - intbitset(citedbydict.keys())
+            matches = allrecs - cache_cited_by_dictionary_keys_intbitset
         if (first <= sec):
-            for k in citedbydict.keys():
-                li = citedbydict[k]
+            for k in cache_cited_by_dictionary_keys:
+                li = cache_cited_by_dictionary[k]
                 if len(li) >= first:
                     if len(li) <= sec:
                         matches.add(k)
@@ -117,8 +111,8 @@ def get_records_with_num_cites(numstr, allrecs = intbitset([])):
     firstsec = re.findall("(\d+)\+", numstr)
     if firstsec:
         first = firstsec[0]
-        for k in citedbydict.keys():
-            li = citedbydict[k]
+        for k in cache_cited_by_dictionary_keys:
+            li = cache_cited_by_dictionary[k]
             if len(li) > int(first):
                 matches.add(k)
     return matches
@@ -128,15 +122,9 @@ def get_cited_by_list(recordlist):
        records in recordlist.
     """
     result = []
-    query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"
-    compressed_citation_weight_dic = run_sql(query)
-    citation_dic = {} #init variable here in case of compr failure
-    if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
-        citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
-    rdic = {} #return this, based on values in citation_dic
     for recid in recordlist:
-        if citation_dic  and citation_dic.has_key(recid) and citation_dic[recid]:
-            tmp = [recid, citation_dic[recid]]
+        if cache_cited_by_dictionary.has_key(recid):
+            tmp = [recid, cache_cited_by_dictionary[recid]]
         else:
             tmp = [recid, 0]
         result.append(tmp)
@@ -156,8 +144,6 @@ def get_cited_by_weight(recordlist):
             tmp = [recid, 0]
         result.append(tmp)
     return result
-
-
 
 def calculate_cited_by_list(record_id, sort_order="d"):
     """Return a tuple of ([recid,citation_weight],...) for all the
@@ -199,28 +185,24 @@ def get_author_cited_by(authorstring):
        author given as param, such that y1,y2.. cite that author
     """
     citations = []
-    #quote authorstring in case there are authors like 't Hoof
-    authorstring = authorstring.replace("'","\\'")
-    query = """select hitlist from rnkAUTHORDATAR where aterm ='%s'""" % authorstring
-    ablob = run_sql(query)
-    if ablob and ablob[0] and ablob[0][0]:
+    res = run_sql("select hitlist from rnkAUTHORDATAR where aterm=%s",
+                  (authorstring,))
+    if res and res[0] and res[0][0]:
         #has to be prepared for corrupted data!
         try:
-            citations = marshal.loads(decompress(ablob[0][0]))
+            citations = marshal.loads(decompress(res[0][0]))
         except Error:
             citations = []
     return citations
-
 
 def get_self_cited_by(record_id):
     """Return a list of doc ids [y1,y2,..] for the
        rec id x given as param, so that x cites y1,y2,.. and x and each y share an author
     """
     result = []
-    sc = init_db_dictionary("selfcitdict")
-    if sc and sc.has_key(record_id):
-        result.extend(sc[record_id])
-    if (len(result) == 0):
+    if cache_selfcit_dictionary and cache_selfcit_dictionary.has_key(record_id):
+        result.extend(cache_selfcit_dictionary[record_id])
+    if not result:
         return None
     return result
 
@@ -229,10 +211,9 @@ def get_self_cited_in(record_id):
        rec id x given as param, so that x is cited in y1,y2,.. and x and each y share an author
     """
     result = []
-    sc = init_db_dictionary("selfcitedbydict")
-    if sc and sc.has_key(record_id):
-        result.extend(sc[record_id])
-    if (len(result) == 0):
+    if cache_selfcitedby_dictionary and cache_selfcitedby_dictionary.has_key(record_id):
+        result.extend(cache_selfcitedby_dictionary[record_id])
+    if not result:
         return None
     return result
 
