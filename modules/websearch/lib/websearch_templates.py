@@ -3081,4 +3081,6 @@ class Template:
                     req.write(tline)
         tend = "</td></tr>\n<table>"
         out += tend
+        if req:
+            req.write(tend)
         return out
