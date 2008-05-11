@@ -1242,6 +1242,9 @@ class BibDoc:
     def register_download(self, ip_address, version, format, userid=0):
         """Register the information about a download of a particular file."""
         format = normalize_format(format)
+        if format[:1] == '.':
+            format = format[1:]
+        format = format.upper()
         return run_sql("INSERT INTO rnkDOWNLOADS "
             "(id_bibrec,id_bibdoc,file_version,file_format,"
             "id_user,client_host,download_time) VALUES "
