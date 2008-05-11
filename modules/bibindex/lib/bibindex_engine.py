@@ -561,21 +561,22 @@ def split_ranges(parse_string):
     return recIDs
 
 def get_word_tables(tables):
-    """ Given a list of table names it return a dictionary of index_id : index_tags.
-    if tables is empty it returns the whole dictionary."""
-    wordTables = {}
+    """ Given a list of table names it return a list of tuples
+    (index_id, index_tags).
+    If tables is empty it returns the whole list."""
+    wordTables = []
     if tables:
         indexes = tables.split(",")
         for index in indexes:
             index_id = get_index_id_from_index_name(index)
             if index_id:
-                wordTables[index_id] = get_index_tags(index)
+                wordTables.append((index_id, get_index_tags(index)))
             else:
                 write_message("Error: There is no %s words table." % index, sys.stderr)
     else:
         for index in get_all_indexes():
             index_id = get_index_id_from_index_name(index)
-            wordTables[index_id] = get_index_tags(index)
+            wordTables.append((index_id, get_index_tags(index)))
     return wordTables
 
 def get_date_range(var):
@@ -1343,7 +1344,7 @@ def task_run_core():
 
     if task_get_option("cmd") == "check":
         wordTables = get_word_tables(task_get_option("windex"))
-        for index_id, index_tags in wordTables.iteritems():
+        for index_id, index_tags in wordTables:
             wordTable = WordTable(index_id, index_tags, 'idxWORD%02dF', get_words_from_phrase, {'8564_u': get_words_from_fulltext})
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
@@ -1354,7 +1355,7 @@ def task_run_core():
     if False: # FIXME: remove when idxPHRASE will be plugged to search_engine
         if task_get_option("cmd") == "check":
             wordTables = get_word_tables(task_get_option("windex"))
-            for index_id, index_tags in wordTables.iteritems():
+            for index_id, index_tags in wordTables:
                 wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
                 _last_word_table = wordTable
                 wordTable.report_on_table_consistency()
@@ -1376,7 +1377,7 @@ def task_run_core():
 
     # Let's work on single words!
     wordTables = get_word_tables(task_get_option("windex"))
-    for index_id, index_tags in wordTables.iteritems():
+    for index_id, index_tags in wordTables:
         wordTable = WordTable(index_id, index_tags, 'idxWORD%02dF', get_words_from_phrase, {'8564_u': get_words_from_fulltext})
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
@@ -1436,7 +1437,7 @@ def task_run_core():
     if False: # FIXME: remove when idxPHRASE will be plugged to search_engine
         # Let's work on phrases now
         wordTables = get_word_tables(task_get_option("windex"))
-        for index_id, index_tags in wordTables.iteritems():
+        for index_id, index_tags in wordTables:
             wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
             _last_word_table = wordTable
             wordTable.report_on_table_consistency()
