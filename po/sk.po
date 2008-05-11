@@ -16,9 +16,9 @@
 # # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 msgid ""
 msgstr ""
-"Project-Id-Version: CDS-Invenio 0.99.0\n"
+"Project-Id-Version: CDS-Invenio 0.99.0.20080511\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
-"POT-Creation-Date: 2008-03-27 09:54+0100\n"
+"POT-Creation-Date: 2008-05-11 14:21+0200\n"
 "PO-Revision-Date: 2008-02-29 14:29+0100\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: SK <cds.support@cern.ch>\n"
@@ -35,8 +35,8 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:656
 #: modules/websearch/doc/search-guide.webdoc:759
 #: modules/websearch/doc/search-guide.webdoc:794
-#: modules/websearch/lib/search_engine.py:902
-#: modules/websearch/lib/websearch_templates.py:902
+#: modules/websearch/lib/search_engine.py:930
+#: modules/websearch/lib/websearch_templates.py:908
 msgid "AND NOT"
 msgstr "A NIE"
 
@@ -72,24 +72,24 @@ msgstr "Areál Administrátora"
 #: modules/websearch/doc/search-guide.webdoc:550
 #: modules/websearch/doc/search-guide.webdoc:687
 #: modules/websearch/doc/search-guide.webdoc:825
-#: modules/websearch/lib/search_engine.py:3512
-#: modules/websearch/lib/websearch_templates.py:622
-#: modules/websearch/lib/websearch_templates.py:744
-#: modules/websearch/lib/websearch_templates.py:1616
-#: modules/websearch/lib/websearch_templates.py:1707
-#: modules/websearch/lib/websearch_templates.py:1764
-#: modules/websearch/lib/websearch_templates.py:1800
-#: modules/websearch/lib/websearch_templates.py:1823
-#: modules/websearch/lib/websearch_templates.py:1854
+#: modules/websearch/lib/search_engine.py:3622
+#: modules/websearch/lib/websearch_templates.py:628
+#: modules/websearch/lib/websearch_templates.py:750
+#: modules/websearch/lib/websearch_templates.py:1622
+#: modules/websearch/lib/websearch_templates.py:1713
+#: modules/websearch/lib/websearch_templates.py:1770
+#: modules/websearch/lib/websearch_templates.py:1806
+#: modules/websearch/lib/websearch_templates.py:1829
+#: modules/websearch/lib/websearch_templates.py:1860
 msgid "Browse"
 msgstr "Prelistuj"
 
 #: modules/webhelp/web/help-central.webdoc:50
 #: modules/websearch/doc/search-tips.webdoc:21
-#: modules/websearch/lib/websearch_templates.py:623
-#: modules/websearch/lib/websearch_templates.py:745
-#: modules/websearch/lib/websearch_templates.py:1711
-#: modules/websearch/lib/websearch_templates.py:1768
+#: modules/websearch/lib/websearch_templates.py:629
+#: modules/websearch/lib/websearch_templates.py:751
+#: modules/websearch/lib/websearch_templates.py:1717
+#: modules/websearch/lib/websearch_templates.py:1774
 msgid "Search Tips"
 msgstr "Tipy pre vyhľadávanie"
 
@@ -105,7 +105,7 @@ msgstr "Tipy pre vyhľadávanie"
 #: modules/websearch/doc/search-guide.webdoc:741
 #: modules/websearch/doc/search-guide.webdoc:776
 #: modules/websearch/doc/search-guide.webdoc:811
-#: modules/miscutil/lib/inveniocfg.py:388
+#: modules/miscutil/lib/inveniocfg.py:375
 msgid "abstract"
 msgstr "abstrakt"
 
@@ -121,7 +121,7 @@ msgstr "abstrakt"
 #: modules/websearch/doc/search-guide.webdoc:746
 #: modules/websearch/doc/search-guide.webdoc:781
 #: modules/websearch/doc/search-guide.webdoc:816
-#: modules/miscutil/lib/inveniocfg.py:393
+#: modules/miscutil/lib/inveniocfg.py:380
 msgid "fulltext"
 msgstr "plný text"
 
@@ -137,8 +137,8 @@ msgstr "plný text"
 #: modules/websearch/doc/search-guide.webdoc:735
 #: modules/websearch/doc/search-guide.webdoc:771
 #: modules/websearch/doc/search-guide.webdoc:806
-#: modules/websearch/lib/search_engine.py:924
-#: modules/websearch/lib/websearch_templates.py:858
+#: modules/websearch/lib/search_engine.py:952
+#: modules/websearch/lib/websearch_templates.py:864
 msgid "Regular expression:"
 msgstr "Regulárny výraz:"
 
@@ -154,8 +154,8 @@ msgstr "Regulárny výraz:"
 #: modules/websearch/doc/search-guide.webdoc:731
 #: modules/websearch/doc/search-guide.webdoc:767
 #: modules/websearch/doc/search-guide.webdoc:802
-#: modules/websearch/lib/search_engine.py:920
-#: modules/websearch/lib/websearch_templates.py:850
+#: modules/websearch/lib/search_engine.py:948
+#: modules/websearch/lib/websearch_templates.py:856
 msgid "All of the words:"
 msgstr "Všetky tieto slová:"
 
@@ -171,7 +171,7 @@ msgstr "Všetky tieto slová:"
 #: modules/websearch/doc/search-guide.webdoc:749
 #: modules/websearch/doc/search-guide.webdoc:784
 #: modules/websearch/doc/search-guide.webdoc:819
-#: modules/miscutil/lib/inveniocfg.py:390
+#: modules/miscutil/lib/inveniocfg.py:377
 msgid "report number"
 msgstr "číslo správy"
 
@@ -194,7 +194,7 @@ msgstr "číslo správy"
 #: modules/websearch/doc/search-guide.webdoc:752
 #: modules/websearch/doc/search-guide.webdoc:787
 #: modules/websearch/doc/search-guide.webdoc:822
-#: modules/miscutil/lib/inveniocfg.py:396
+#: modules/miscutil/lib/inveniocfg.py:383
 msgid "year"
 msgstr "rok"
 
@@ -210,7 +210,7 @@ msgstr "rok"
 #: modules/websearch/doc/search-guide.webdoc:750
 #: modules/websearch/doc/search-guide.webdoc:785
 #: modules/websearch/doc/search-guide.webdoc:820
-#: modules/miscutil/lib/inveniocfg.py:391
+#: modules/miscutil/lib/inveniocfg.py:378
 msgid "subject"
 msgstr "predmet"
 
@@ -226,8 +226,8 @@ msgstr "predmet"
 #: modules/websearch/doc/search-guide.webdoc:734
 #: modules/websearch/doc/search-guide.webdoc:770
 #: modules/websearch/doc/search-guide.webdoc:805
-#: modules/websearch/lib/search_engine.py:923
-#: modules/websearch/lib/websearch_templates.py:856
+#: modules/websearch/lib/search_engine.py:951
+#: modules/websearch/lib/websearch_templates.py:862
 msgid "Partial phrase:"
 msgstr "Čiastočná veta:"
 
@@ -243,7 +243,7 @@ msgstr "Čiastočná veta:"
 #: modules/websearch/doc/search-guide.webdoc:748
 #: modules/websearch/doc/search-guide.webdoc:783
 #: modules/websearch/doc/search-guide.webdoc:818
-#: modules/miscutil/lib/inveniocfg.py:392
+#: modules/miscutil/lib/inveniocfg.py:379
 msgid "reference"
 msgstr "referencia"
 
@@ -461,7 +461,7 @@ msgstr "referencia"
 #: modules/websearch/doc/search-guide.webdoc:5225
 #: modules/websearch/doc/search-guide.webdoc:5245
 #: modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc:132
-#: modules/miscutil/lib/inveniocfg.py:387
+#: modules/miscutil/lib/inveniocfg.py:374
 msgid "author"
 msgstr "autor"
 
@@ -483,7 +483,7 @@ msgstr "Pozri príručku"
 #: modules/websearch/doc/search-guide.webdoc:745
 #: modules/websearch/doc/search-guide.webdoc:780
 #: modules/websearch/doc/search-guide.webdoc:815
-#: modules/miscutil/lib/inveniocfg.py:397
+#: modules/miscutil/lib/inveniocfg.py:385
 msgid "experiment"
 msgstr "experiment"
 
@@ -499,8 +499,8 @@ msgstr "experiment"
 #: modules/websearch/doc/search-guide.webdoc:732
 #: modules/websearch/doc/search-guide.webdoc:768
 #: modules/websearch/doc/search-guide.webdoc:803
-#: modules/websearch/lib/search_engine.py:921
-#: modules/websearch/lib/websearch_templates.py:852
+#: modules/websearch/lib/search_engine.py:949
+#: modules/websearch/lib/websearch_templates.py:858
 msgid "Any of the words:"
 msgstr "Jedno zo slov:"
 
@@ -516,7 +516,7 @@ msgstr "Jedno zo slov:"
 #: modules/websearch/doc/search-guide.webdoc:744
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
-#: modules/miscutil/lib/inveniocfg.py:395
+#: modules/miscutil/lib/inveniocfg.py:382
 msgid "division"
 msgstr "oddelenie"
 
@@ -723,13 +723,14 @@ msgstr "oddelenie"
 #: modules/websearch/doc/search-guide.webdoc:5226
 #: modules/websearch/doc/search-guide.webdoc:5246
 #: modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc:134
-#: modules/websearch/lib/websearch_templates.py:621
-#: modules/websearch/lib/websearch_templates.py:743
-#: modules/websearch/lib/websearch_templates.py:1613
-#: modules/websearch/lib/websearch_templates.py:1706
-#: modules/websearch/lib/websearch_templates.py:1763
+#: modules/websearch/lib/websearch_templates.py:627
+#: modules/websearch/lib/websearch_templates.py:749
+#: modules/websearch/lib/websearch_templates.py:1619
+#: modules/websearch/lib/websearch_templates.py:1712
+#: modules/websearch/lib/websearch_templates.py:1769
 #: modules/webstyle/lib/webstyle_templates.py:374
 #: modules/webstyle/lib/webstyle_templates.py:442
+#: modules/webstyle/lib/webdoc_tests.py:78
 msgid "Search"
 msgstr "Hľadaj"
 
@@ -947,7 +948,7 @@ msgstr "Hľadaj"
 #: modules/websearch/doc/search-guide.webdoc:5223
 #: modules/websearch/doc/search-guide.webdoc:5243
 #: modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc:130
-#: modules/miscutil/lib/inveniocfg.py:385
+#: modules/miscutil/lib/inveniocfg.py:372
 msgid "any field"
 msgstr "všetky polia"
 
@@ -975,6 +976,7 @@ msgstr "všetky polia"
 #: modules/websearch/doc/search-tips.webdoc:22
 #: modules/websearch/doc/search-guide.webdoc:22
 #: modules/websubmit/doc/submit-guide.webdoc:22
+#: modules/webstyle/lib/webdoc_tests.py:100
 #: modules/webstyle/lib/webdoc_webinterface.py:157
 msgid "Help Central"
 msgstr "Centrála Pomoci"
@@ -996,7 +998,7 @@ msgstr "Hlás zneužitie"
 #: modules/websearch/doc/search-guide.webdoc:743
 #: modules/websearch/doc/search-guide.webdoc:778
 #: modules/websearch/doc/search-guide.webdoc:813
-#: modules/miscutil/lib/inveniocfg.py:394
+#: modules/miscutil/lib/inveniocfg.py:381
 msgid "collection"
 msgstr "kolekcia"
 
@@ -1016,8 +1018,8 @@ msgstr ""
 #: modules/websearch/doc/search-guide.webdoc:733
 #: modules/websearch/doc/search-guide.webdoc:769
 #: modules/websearch/doc/search-guide.webdoc:804
-#: modules/websearch/lib/search_engine.py:922
-#: modules/websearch/lib/websearch_templates.py:854
+#: modules/websearch/lib/search_engine.py:950
+#: modules/websearch/lib/websearch_templates.py:860
 msgid "Exact phrase:"
 msgstr "Presná veta:"
 
@@ -1035,10 +1037,10 @@ msgstr "Pomoc pre pridávanie"
 #: modules/websearch/doc/search-guide.webdoc:655
 #: modules/websearch/doc/search-guide.webdoc:758
 #: modules/websearch/doc/search-guide.webdoc:793
-#: modules/websearch/lib/search_engine.py:789
-#: modules/websearch/lib/search_engine.py:901
-#: modules/websearch/lib/websearch_templates.py:901
-#: modules/websearch/lib/websearch_webcoll.py:508
+#: modules/websearch/lib/search_engine.py:788
+#: modules/websearch/lib/search_engine.py:929
+#: modules/websearch/lib/websearch_templates.py:907
+#: modules/websearch/lib/websearch_webcoll.py:521
 msgid "OR"
 msgstr "ALEBO"
 
@@ -1050,8 +1052,8 @@ msgstr "ALEBO"
 #: modules/websearch/doc/search-guide.webdoc:654
 #: modules/websearch/doc/search-guide.webdoc:757
 #: modules/websearch/doc/search-guide.webdoc:792
-#: modules/websearch/lib/search_engine.py:900
-#: modules/websearch/lib/websearch_templates.py:900
+#: modules/websearch/lib/search_engine.py:928
+#: modules/websearch/lib/websearch_templates.py:906
 msgid "AND"
 msgstr "A"
 
@@ -1067,7 +1069,7 @@ msgstr "A"
 #: modules/websearch/doc/search-guide.webdoc:747
 #: modules/websearch/doc/search-guide.webdoc:782
 #: modules/websearch/doc/search-guide.webdoc:817
-#: modules/miscutil/lib/inveniocfg.py:389
+#: modules/miscutil/lib/inveniocfg.py:376
 msgid "keyword"
 msgstr "kľúčové slovo"
 
@@ -1282,13 +1284,13 @@ msgstr "kľúčové slovo"
 #: modules/websearch/doc/search-guide.webdoc:5224
 #: modules/websearch/doc/search-guide.webdoc:5244
 #: modules/webstyle/doc/hacking/webstyle-webdoc-syntax.webdoc:131
-#: modules/miscutil/lib/inveniocfg.py:386
+#: modules/miscutil/lib/inveniocfg.py:373
 msgid "title"
 msgstr "názov"
 
 #: modules/websearch/doc/search-tips.webdoc:73
 #: modules/websearch/doc/search-tips.webdoc:111
-#: modules/websearch/lib/websearch_templates.py:1014
+#: modules/websearch/lib/websearch_templates.py:1020
 msgid "Narrow by collection:"
 msgstr "Zúžiť podľa kolekciе:"
 
@@ -1391,8 +1393,8 @@ msgstr "Akcia"
 #: modules/bibedit/web/admin/bibeditadmin.py:59
 #: modules/webcomment/lib/webcomment_templates.py:598
 #: modules/webcomment/lib/webcomment_templates.py:1188
-#: modules/websearch/lib/websearch_templates.py:462
-#: modules/websearch/lib/websearch_templates.py:464
+#: modules/websearch/lib/websearch_templates.py:468
+#: modules/websearch/lib/websearch_templates.py:470
 msgid "Record"
 msgstr "Záznam"
 
@@ -1838,14 +1840,10 @@ msgid "External %(link_or_links)s"
 msgstr ""
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:177
+#: modules/bibformat/lib/elements/bfe_fulltext.py:197
 #: modules/websearch/lib/websearchadminlib.py:3205
 msgid "Fulltext"
 msgstr "Plný text"
-
-#: modules/bibformat/lib/elements/bfe_fulltext.py:197
-#, fuzzy
-msgid "Main file(s)"
-msgstr "súbor(y)"
 
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:121
 #, python-format
@@ -2112,8 +2110,8 @@ msgid "Apr"
 msgstr "apr"
 
 #: modules/miscutil/lib/dateutils.py:192 modules/miscutil/lib/dateutils.py:206
-#: modules/websearch/lib/search_engine.py:707
-#: modules/websearch/lib/websearch_templates.py:940
+#: modules/websearch/lib/search_engine.py:720
+#: modules/websearch/lib/websearch_templates.py:946
 msgid "May"
 msgstr "máj"
 
@@ -2146,68 +2144,68 @@ msgid "Dec"
 msgstr "dec"
 
 #: modules/miscutil/lib/dateutils.py:202
-#: modules/websearch/lib/search_engine.py:706
-#: modules/websearch/lib/websearch_templates.py:939
+#: modules/websearch/lib/search_engine.py:719
+#: modules/websearch/lib/websearch_templates.py:945
 msgid "January"
 msgstr "január"
 
 #: modules/miscutil/lib/dateutils.py:203
-#: modules/websearch/lib/search_engine.py:706
-#: modules/websearch/lib/websearch_templates.py:939
+#: modules/websearch/lib/search_engine.py:719
+#: modules/websearch/lib/websearch_templates.py:945
 msgid "February"
 msgstr "február"
 
 #: modules/miscutil/lib/dateutils.py:204
-#: modules/websearch/lib/search_engine.py:706
-#: modules/websearch/lib/websearch_templates.py:939
+#: modules/websearch/lib/search_engine.py:719
+#: modules/websearch/lib/websearch_templates.py:945
 msgid "March"
 msgstr "marec"
 
 #: modules/miscutil/lib/dateutils.py:205
-#: modules/websearch/lib/search_engine.py:706
-#: modules/websearch/lib/websearch_templates.py:939
+#: modules/websearch/lib/search_engine.py:719
+#: modules/websearch/lib/websearch_templates.py:945
 msgid "April"
 msgstr "apríl"
 
 #: modules/miscutil/lib/dateutils.py:207
-#: modules/websearch/lib/search_engine.py:707
-#: modules/websearch/lib/websearch_templates.py:940
+#: modules/websearch/lib/search_engine.py:720
+#: modules/websearch/lib/websearch_templates.py:946
 msgid "June"
 msgstr "jún"
 
 #: modules/miscutil/lib/dateutils.py:208
-#: modules/websearch/lib/search_engine.py:707
-#: modules/websearch/lib/websearch_templates.py:940
+#: modules/websearch/lib/search_engine.py:720
+#: modules/websearch/lib/websearch_templates.py:946
 msgid "July"
 msgstr "júl"
 
 #: modules/miscutil/lib/dateutils.py:209
-#: modules/websearch/lib/search_engine.py:707
-#: modules/websearch/lib/websearch_templates.py:940
+#: modules/websearch/lib/search_engine.py:720
+#: modules/websearch/lib/websearch_templates.py:946
 msgid "August"
 msgstr "august"
 
 #: modules/miscutil/lib/dateutils.py:210
-#: modules/websearch/lib/search_engine.py:708
-#: modules/websearch/lib/websearch_templates.py:941
+#: modules/websearch/lib/search_engine.py:721
+#: modules/websearch/lib/websearch_templates.py:947
 msgid "September"
 msgstr "september"
 
 #: modules/miscutil/lib/dateutils.py:211
-#: modules/websearch/lib/search_engine.py:708
-#: modules/websearch/lib/websearch_templates.py:941
+#: modules/websearch/lib/search_engine.py:721
+#: modules/websearch/lib/websearch_templates.py:947
 msgid "October"
 msgstr "október"
 
 #: modules/miscutil/lib/dateutils.py:212
-#: modules/websearch/lib/search_engine.py:708
-#: modules/websearch/lib/websearch_templates.py:941
+#: modules/websearch/lib/search_engine.py:721
+#: modules/websearch/lib/websearch_templates.py:947
 msgid "November"
 msgstr "november"
 
 #: modules/miscutil/lib/dateutils.py:213
-#: modules/websearch/lib/search_engine.py:708
-#: modules/websearch/lib/websearch_templates.py:941
+#: modules/websearch/lib/search_engine.py:721
+#: modules/websearch/lib/websearch_templates.py:947
 msgid "December"
 msgstr "december"
 
@@ -2252,19 +2250,23 @@ msgstr ""
 msgid "Thank you!"
 msgstr "Vďaka!"
 
-#: modules/miscutil/lib/inveniocfg.py:398
+#: modules/miscutil/lib/inveniocfg.py:384
+msgid "journal"
+msgstr ""
+
+#: modules/miscutil/lib/inveniocfg.py:386
 msgid "record ID"
 msgstr "ID záznamu"
 
-#: modules/miscutil/lib/inveniocfg.py:411
+#: modules/miscutil/lib/inveniocfg.py:399
 msgid "word similarity"
 msgstr "podobnosť slov"
 
-#: modules/miscutil/lib/inveniocfg.py:412
+#: modules/miscutil/lib/inveniocfg.py:400
 msgid "journal impact factor"
 msgstr ""
 
-#: modules/miscutil/lib/inveniocfg.py:413
+#: modules/miscutil/lib/inveniocfg.py:401
 #, fuzzy
 msgid "times cited"
 msgstr "Nastavenia upravené"
@@ -2282,53 +2284,53 @@ msgstr ""
 msgid "Need human intervention?  Contact"
 msgstr ""
 
-#: modules/webaccess/lib/access_control_config.py:171
+#: modules/webaccess/lib/access_control_config.py:175
 #: modules/websession/lib/websession_templates.py:1022
 msgid "Run BibEdit"
 msgstr "Spustite BibEdit"
 
-#: modules/webaccess/lib/access_control_config.py:172
+#: modules/webaccess/lib/access_control_config.py:176
 #: modules/websession/lib/websession_templates.py:1024
 msgid "Configure BibFormat"
 msgstr "Konfigurujte BibFormat"
 
-#: modules/webaccess/lib/access_control_config.py:173
+#: modules/webaccess/lib/access_control_config.py:177
 #: modules/websession/lib/websession_templates.py:1026
 msgid "Configure BibHarvest"
 msgstr "Konfigurujte BibHarvest"
 
-#: modules/webaccess/lib/access_control_config.py:174
+#: modules/webaccess/lib/access_control_config.py:178
 #: modules/websession/lib/websession_templates.py:1028
 #, fuzzy
 msgid "Configure OAI Repository"
 msgstr "Konfigurujte BibFormat"
 
-#: modules/webaccess/lib/access_control_config.py:175
+#: modules/webaccess/lib/access_control_config.py:179
 #: modules/websession/lib/websession_templates.py:1030
 msgid "Configure BibIndex"
 msgstr "Konfigurujte BibIndex"
 
-#: modules/webaccess/lib/access_control_config.py:176
+#: modules/webaccess/lib/access_control_config.py:180
 #: modules/websession/lib/websession_templates.py:1032
 msgid "Configure BibRank"
 msgstr "Konfigurujte BibRank"
 
-#: modules/webaccess/lib/access_control_config.py:177
+#: modules/webaccess/lib/access_control_config.py:181
 #: modules/websession/lib/websession_templates.py:1034
 msgid "Configure WebAccess"
 msgstr "Konfigurujte WebAccess"
 
-#: modules/webaccess/lib/access_control_config.py:178
+#: modules/webaccess/lib/access_control_config.py:182
 #: modules/websession/lib/websession_templates.py:1036
 msgid "Configure WebComment"
 msgstr "Konfigurujte WebComment"
 
-#: modules/webaccess/lib/access_control_config.py:179
+#: modules/webaccess/lib/access_control_config.py:183
 #: modules/websession/lib/websession_templates.py:1038
 msgid "Configure WebSearch"
 msgstr "Konfigurujte WebSearch"
 
-#: modules/webaccess/lib/access_control_config.py:180
+#: modules/webaccess/lib/access_control_config.py:184
 #: modules/websession/lib/websession_templates.py:1040
 msgid "Configure WebSubmit"
 msgstr "Konfigurujte WebSubmit"
@@ -2391,12 +2393,34 @@ msgstr "Konto vytvorené"
 msgid "Your account on '%s' has been deleted:"
 msgstr "Grupa %s bola zrušená."
 
+#: modules/webalert/lib/htmlparser.py:129
+#: modules/websearch/lib/websearch_templates.py:1304
+#: modules/websearch/lib/websearch_templates.py:2616
+#: modules/websearch/lib/websearch_templates.py:2622
+#: modules/websearch/lib/websearch_templates.py:2627
+msgid "Detailed record"
+msgstr "Úplný záznam"
+
+#: modules/webalert/lib/htmlparser.py:130
+#: modules/websearch/lib/websearch_templates.py:1307
+#: modules/websearch/lib/websearch_templates.py:2634
+#: modules/webstyle/lib/webstyle_templates.py:738
+msgid "Similar records"
+msgstr "Podobné záznamy"
+
+#: modules/webalert/lib/htmlparser.py:131
+#: modules/websearch/lib/websearch_templates.py:1313
+#: modules/websearch/lib/websearch_templates.py:2642
+msgid "Cited by"
+msgstr "Citované"
+
 #: modules/webalert/lib/webalert.py:55
 #, python-format
 msgid "You already have an alert named %s."
 msgstr "Už máte avízo pomenované %s."
 
 #: modules/webalert/lib/webalert.py:111
+#: modules/websearch/lib/websearch_templates.py:2952
 msgid "unknown"
 msgstr "neznámy"
 
@@ -2639,17 +2663,24 @@ msgstr "Posledné spustenie"
 msgid "Set new alert"
 msgstr "Nastaviť nové avízo"
 
-#: modules/webalert/lib/webalert_webinterface.py:78
-msgid "Display searches"
-msgstr "Zobraziť výsledky"
+#: modules/webalert/lib/webalert_webinterface.py:79
+#, fuzzy
+msgid "Popular Searches"
+msgstr "Vaše hľadania"
 
-#: modules/webalert/lib/webalert_webinterface.py:83
-#: modules/webalert/lib/webalert_webinterface.py:134
-#: modules/webalert/lib/webalert_webinterface.py:186
-#: modules/webalert/lib/webalert_webinterface.py:223
-#: modules/webalert/lib/webalert_webinterface.py:271
-#: modules/webalert/lib/webalert_webinterface.py:319
-#: modules/webalert/lib/webalert_webinterface.py:360
+#: modules/webalert/lib/webalert_webinterface.py:81
+#: modules/websession/lib/websession_templates.py:437
+#: modules/websession/lib/websession_templates.py:573
+msgid "Your Searches"
+msgstr "Vaše hľadania"
+
+#: modules/webalert/lib/webalert_webinterface.py:88
+#: modules/webalert/lib/webalert_webinterface.py:139
+#: modules/webalert/lib/webalert_webinterface.py:191
+#: modules/webalert/lib/webalert_webinterface.py:228
+#: modules/webalert/lib/webalert_webinterface.py:276
+#: modules/webalert/lib/webalert_webinterface.py:324
+#: modules/webalert/lib/webalert_webinterface.py:365
 #: modules/webbasket/lib/webbasket_webinterface.py:77
 #: modules/webbasket/lib/webbasket_webinterface.py:126
 #: modules/webbasket/lib/webbasket_webinterface.py:174
@@ -2683,18 +2714,18 @@ msgstr "Zobraziť výsledky"
 msgid "Your Account"
 msgstr "Vaše konto"
 
-#: modules/webalert/lib/webalert_webinterface.py:85
+#: modules/webalert/lib/webalert_webinterface.py:90
 #, fuzzy, python-format
 msgid "%s Personalize, Display searches"
 msgstr "Zobraziť výsledky"
 
-#: modules/webalert/lib/webalert_webinterface.py:86
-#: modules/webalert/lib/webalert_webinterface.py:137
-#: modules/webalert/lib/webalert_webinterface.py:189
-#: modules/webalert/lib/webalert_webinterface.py:226
-#: modules/webalert/lib/webalert_webinterface.py:274
-#: modules/webalert/lib/webalert_webinterface.py:322
-#: modules/webalert/lib/webalert_webinterface.py:363
+#: modules/webalert/lib/webalert_webinterface.py:91
+#: modules/webalert/lib/webalert_webinterface.py:142
+#: modules/webalert/lib/webalert_webinterface.py:194
+#: modules/webalert/lib/webalert_webinterface.py:231
+#: modules/webalert/lib/webalert_webinterface.py:279
+#: modules/webalert/lib/webalert_webinterface.py:327
+#: modules/webalert/lib/webalert_webinterface.py:368
 #: modules/websession/lib/websession_webinterface.py:211
 #: modules/websession/lib/websession_webinterface.py:228
 #: modules/websession/lib/websession_webinterface.py:263
@@ -2711,37 +2742,41 @@ msgstr "Zobraziť výsledky"
 msgid "%s, personalize"
 msgstr "Personalizácia"
 
-#: modules/webalert/lib/webalert_webinterface.py:129
+#: modules/webalert/lib/webalert_webinterface.py:134
 msgid "Set a new alert"
 msgstr "Nastaviť nové avízo"
 
-#: modules/webalert/lib/webalert_webinterface.py:136
+#: modules/webalert/lib/webalert_webinterface.py:141
 #, fuzzy, python-format
 msgid "%s Personalize, Set a new alert"
 msgstr "Nastaviť nové avízo"
 
-#: modules/webalert/lib/webalert_webinterface.py:181
+#: modules/webalert/lib/webalert_webinterface.py:186
 msgid "Modify alert settings"
 msgstr "Upraviť parametre avíza"
 
-#: modules/webalert/lib/webalert_webinterface.py:188
+#: modules/webalert/lib/webalert_webinterface.py:193
 #, fuzzy, python-format
 msgid "%s Personalize, Modify alert settings"
 msgstr "Upraviť parametre avíza"
 
-#: modules/webalert/lib/webalert_webinterface.py:218
-#: modules/webalert/lib/webalert_webinterface.py:266
-#: modules/webalert/lib/webalert_webinterface.py:314
-#: modules/webalert/lib/webalert_webinterface.py:354
-msgid "Display alerts"
-msgstr "Zobraziť alerty"
+#: modules/webalert/lib/webalert_webinterface.py:223
+#: modules/websession/lib/websession_templates.py:448
+msgid "Your Alerts"
+msgstr "Vaše avíza"
 
-#: modules/webalert/lib/webalert_webinterface.py:225
-#: modules/webalert/lib/webalert_webinterface.py:273
-#: modules/webalert/lib/webalert_webinterface.py:321
-#: modules/webalert/lib/webalert_webinterface.py:362
+#: modules/webalert/lib/webalert_webinterface.py:230
+#: modules/webalert/lib/webalert_webinterface.py:278
+#: modules/webalert/lib/webalert_webinterface.py:326
+#: modules/webalert/lib/webalert_webinterface.py:367
 #, fuzzy, python-format
 msgid "%s Personalize, Display alerts"
+msgstr "Zobraziť alerty"
+
+#: modules/webalert/lib/webalert_webinterface.py:271
+#: modules/webalert/lib/webalert_webinterface.py:319
+#: modules/webalert/lib/webalert_webinterface.py:359
+msgid "Display alerts"
 msgstr "Zobraziť alerty"
 
 #: modules/webbasket/lib/webbasket.py:346
@@ -2929,7 +2964,7 @@ msgid "This basket is publicly accessible at the following address:"
 msgstr "Tento košík je verejne dostupný na nasledujúcej adrese:"
 
 #: modules/webbasket/lib/webbasket_templates.py:696
-#: modules/websearch/lib/websearch_templates.py:815
+#: modules/websearch/lib/websearch_templates.py:821
 msgid "Sort by:"
 msgstr "Utriediť podľa:"
 
@@ -3685,8 +3720,8 @@ msgstr "WebComment administrácia"
 #: modules/webcomment/web/admin/webcommentadmin.py:125
 #: modules/webcomment/web/admin/webcommentadmin.py:159
 #: modules/webcomment/web/admin/webcommentadmin.py:196
-#: modules/websearch/lib/websearch_webinterface.py:608
-#: modules/websearch/lib/websearch_webinterface.py:686
+#: modules/websearch/lib/websearch_webinterface.py:728
+#: modules/websearch/lib/websearch_webinterface.py:806
 #: modules/websearch/web/admin/websearchadmin.py:1070
 #: modules/websession/lib/websession_webinterface.py:803
 #: modules/webstyle/lib/webstyle_templates.py:522
@@ -3915,64 +3950,70 @@ msgstr "Máte %s nových správ z celkového počtu %s správ"
 msgid "Read a message"
 msgstr "Prečítaj správu"
 
-#: modules/websearch/lib/search_engine.py:586
-#: modules/websearch/lib/search_engine.py:616
-#: modules/websearch/lib/search_engine.py:3534
-#: modules/websearch/lib/search_engine.py:3584
-#: modules/websearch/lib/search_engine.py:3629
+#: modules/websearch/lib/search_engine.py:596
+#: modules/websearch/lib/search_engine.py:626
+#: modules/websearch/lib/search_engine.py:3644
+#: modules/websearch/lib/search_engine.py:3694
+#: modules/websearch/lib/search_engine.py:3739
 msgid "Search Results"
 msgstr "Výsledky hľadania"
 
-#: modules/websearch/lib/search_engine.py:699
-#: modules/websearch/lib/websearch_templates.py:924
+#: modules/websearch/lib/search_engine.py:712
+#: modules/websearch/lib/websearch_templates.py:930
 msgid "any day"
 msgstr "hocaký deň"
 
-#: modules/websearch/lib/search_engine.py:705
-#: modules/websearch/lib/websearch_templates.py:936
+#: modules/websearch/lib/search_engine.py:718
+#: modules/websearch/lib/websearch_templates.py:942
 msgid "any month"
 msgstr "hocaký mesiac"
 
-#: modules/websearch/lib/search_engine.py:713
-#: modules/websearch/lib/websearch_templates.py:950
+#: modules/websearch/lib/search_engine.py:726
+#: modules/websearch/lib/websearch_templates.py:956
 msgid "any year"
 msgstr "hocaký rok"
 
-#: modules/websearch/lib/search_engine.py:754
-#: modules/websearch/lib/search_engine.py:769
+#: modules/websearch/lib/search_engine.py:767
+#: modules/websearch/lib/search_engine.py:782
 msgid "any collection"
 msgstr "všetky kolekcie"
 
-#: modules/websearch/lib/search_engine.py:765
+#: modules/websearch/lib/search_engine.py:778
 msgid "add another collection"
 msgstr "pridať kolekciu"
 
-#: modules/websearch/lib/search_engine.py:774
-#: modules/websearch/lib/websearch_webcoll.py:478
-msgid "latest first"
-msgstr "posledný záznam najskôr"
-
-#: modules/websearch/lib/search_engine.py:789
-#: modules/websearch/lib/websearch_webcoll.py:508
+#: modules/websearch/lib/search_engine.py:788
+#: modules/websearch/lib/websearch_webcoll.py:521
 msgid "rank by"
 msgstr "zoradiť podľa"
 
-#: modules/websearch/lib/search_engine.py:809
+#: modules/websearch/lib/search_engine.py:808
 msgid "HTML brief"
 msgstr "HTML stručné"
 
-#: modules/websearch/lib/search_engine.py:1476
+#: modules/websearch/lib/search_engine.py:907
+#: modules/websearch/lib/websearch_webcoll.py:491
+msgid "latest first"
+msgstr "posledný záznam najskôr"
+
+#: modules/websearch/lib/search_engine.py:1504
 msgid "No values found."
 msgstr "Žiadne hodnoty nenájdené."
 
-#: modules/websearch/lib/search_engine.py:1608
+#: modules/websearch/lib/search_engine.py:1636
 #, python-format
 msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr ""
 "Žiaden presný výsledok pre %(x_query1)s nebol nájdený, skúsme použiť %"
 "(x_query2)s namiesto neho..."
 
-#: modules/websearch/lib/search_engine.py:1862
+#: modules/websearch/lib/search_engine.py:1765
+msgid ""
+"Nested or mismatched parentheses detected. Ignoring all parentheses in the "
+"query..."
+msgstr ""
+
+#: modules/websearch/lib/search_engine.py:1972
 #, python-format
 msgid ""
 "No match found in collection %(x_collection)s. Other public collections gave "
@@ -3981,7 +4022,7 @@ msgstr ""
 "Žiaden záznam nebol nájdený v kolekcii %(x_collection)s. Ostatné verejne "
 "dostupné kolekcie dali %(x_url_open)s%(x_nb_hits)d záznamov%(x_url_close)s."
 
-#: modules/websearch/lib/search_engine.py:1871
+#: modules/websearch/lib/search_engine.py:1981
 msgid ""
 "No public collection matched your query. If you were looking for a non-"
 "public document, please choose the desired restricted collection first."
@@ -3990,15 +4031,15 @@ msgstr ""
 "dokumenty verejne neprístupné, zvoľte prosím najskôr príslušnú neverejnú "
 "kolekciu."
 
-#: modules/websearch/lib/search_engine.py:1984
+#: modules/websearch/lib/search_engine.py:2094
 msgid "No words index available for"
 msgstr "Index slov nie je dostupný pre"
 
-#: modules/websearch/lib/search_engine.py:1988
+#: modules/websearch/lib/search_engine.py:2098
 msgid "No phrase index available for"
 msgstr "Index viet nie je dostupný pre"
 
-#: modules/websearch/lib/search_engine.py:2020
+#: modules/websearch/lib/search_engine.py:2130
 #, python-format
 msgid ""
 "Search term %(x_term)s inside index %(x_index)s did not match any record. "
@@ -4007,7 +4048,7 @@ msgstr ""
 "Hľadaný výraz %(x_term)s v indexe %(x_index)s neodpovedá žiadnemu záznamu. "
 "Najbližšie termíny nezávisle na kolekcii sú:"
 
-#: modules/websearch/lib/search_engine.py:2024
+#: modules/websearch/lib/search_engine.py:2134
 #, python-format
 msgid ""
 "Search term %s did not match any record. Nearest terms in any collection are:"
@@ -4015,7 +4056,7 @@ msgstr ""
 "Hľadaný výraz %s neodpovedá žiadnemu záznamu. Najbližšie termíny nezávisle "
 "na kolekcii sú:"
 
-#: modules/websearch/lib/search_engine.py:2478
+#: modules/websearch/lib/search_engine.py:2588
 #, python-format
 msgid ""
 "Sorry, sorting is allowed on sets of up to %d records only. Using default "
@@ -4024,7 +4065,7 @@ msgstr ""
 "Ľutujem, triedenie je povolené len do %d záznamov.  Použijem štandardné "
 "triedenie."
 
-#: modules/websearch/lib/search_engine.py:2502
+#: modules/websearch/lib/search_engine.py:2612
 #, python-format
 msgid ""
 "Sorry, %s does not seem to be a valid sort option. Choosing title sort "
@@ -4033,31 +4074,31 @@ msgstr ""
 "Ľutujem, %s nie je platné nastavenie pre triedenie.  Použijem triedenie "
 "podľa názvu namiesto neho."
 
-#: modules/websearch/lib/search_engine.py:2787
+#: modules/websearch/lib/search_engine.py:2897
 msgid "Use different search terms."
 msgstr "Použite odlišné hľadacie výrazy."
 
-#: modules/websearch/lib/search_engine.py:2851
-#: modules/websearch/lib/search_engine.py:3016
-#: modules/websearch/lib/search_engine.py:3039
-#: modules/websearch/lib/search_engine.py:3047
-#: modules/websearch/lib/search_engine.py:3055
-#: modules/websearch/lib/search_engine.py:3101
+#: modules/websearch/lib/search_engine.py:2961
+#: modules/websearch/lib/search_engine.py:3126
+#: modules/websearch/lib/search_engine.py:3149
+#: modules/websearch/lib/search_engine.py:3157
+#: modules/websearch/lib/search_engine.py:3165
+#: modules/websearch/lib/search_engine.py:3211
 msgid "The record has been deleted."
 msgstr "Záznam bol vymazaný."
 
-#: modules/websearch/lib/search_engine.py:3508
+#: modules/websearch/lib/search_engine.py:3618
 #, fuzzy
 msgid "Requested record does not seem to exist."
 msgstr "Ľutujem, záznam %s sa nezdá že by existoval."
 
-#: modules/websearch/lib/search_engine.py:3742
+#: modules/websearch/lib/search_engine.py:3852
 msgid "No match within your time limits, discarding this condition..."
 msgstr ""
 "Žiaden výsledok nevyhovuje Vašim časovým kritériám, podmienka nie je vzatá "
 "do úvahy..."
 
-#: modules/websearch/lib/search_engine.py:3766
+#: modules/websearch/lib/search_engine.py:3876
 msgid "No match within your search limits, discarding this condition..."
 msgstr ""
 "Žiaden výsledok nevyhovuje Vašim limitným kritériám, podmienky nie sú vzaté "
@@ -4087,205 +4128,187 @@ msgstr "seansa"
 msgid "Usage statistics"
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:584
+#: modules/websearch/lib/websearch_templates.py:590
 #, python-format
 msgid "Search %s records for:"
 msgstr "Hľadaj v %s záznamoch:"
 
-#: modules/websearch/lib/websearch_templates.py:618
-#: modules/websearch/lib/websearch_templates.py:1752
+#: modules/websearch/lib/websearch_templates.py:624
+#: modules/websearch/lib/websearch_templates.py:1758
 msgid "Advanced Search"
 msgstr "Rozšírené Hľadanie"
 
-#: modules/websearch/lib/websearch_templates.py:679
+#: modules/websearch/lib/websearch_templates.py:685
 #, python-format
 msgid "Search %s records for"
 msgstr "Hľadaj v %s záznamoch"
 
-#: modules/websearch/lib/websearch_templates.py:729
-#: modules/websearch/lib/websearch_templates.py:1668
+#: modules/websearch/lib/websearch_templates.py:735
+#: modules/websearch/lib/websearch_templates.py:1674
 msgid "Simple Search"
 msgstr "Jednoduché Hľadanie"
 
-#: modules/websearch/lib/websearch_templates.py:762
+#: modules/websearch/lib/websearch_templates.py:768
 msgid "Search options:"
 msgstr "Voľby hľadania:"
 
-#: modules/websearch/lib/websearch_templates.py:809
-#: modules/websearch/lib/websearch_templates.py:1846
+#: modules/websearch/lib/websearch_templates.py:815
+#: modules/websearch/lib/websearch_templates.py:1852
 #, fuzzy
 msgid "Added/modified since:"
 msgstr "Pridané od:"
 
-#: modules/websearch/lib/websearch_templates.py:810
-#: modules/websearch/lib/websearch_templates.py:1847
+#: modules/websearch/lib/websearch_templates.py:816
+#: modules/websearch/lib/websearch_templates.py:1853
 msgid "until:"
 msgstr "do:"
 
-#: modules/websearch/lib/websearch_templates.py:816
-#: modules/websearch/lib/websearch_templates.py:1888
+#: modules/websearch/lib/websearch_templates.py:822
+#: modules/websearch/lib/websearch_templates.py:1894
 msgid "Display results:"
 msgstr "Zobraziť výsledky:"
 
-#: modules/websearch/lib/websearch_templates.py:817
-#: modules/websearch/lib/websearch_templates.py:1889
+#: modules/websearch/lib/websearch_templates.py:823
+#: modules/websearch/lib/websearch_templates.py:1895
 msgid "Output format:"
 msgstr "Výstupný formát:"
 
-#: modules/websearch/lib/websearch_templates.py:977
+#: modules/websearch/lib/websearch_templates.py:983
 msgid "Added since:"
 msgstr "Pridané od:"
 
-#: modules/websearch/lib/websearch_templates.py:978
+#: modules/websearch/lib/websearch_templates.py:984
 #, fuzzy
 msgid "Modified since:"
 msgstr "Pridané od:"
 
-#: modules/websearch/lib/websearch_templates.py:1015
+#: modules/websearch/lib/websearch_templates.py:1021
 msgid "Focus on:"
 msgstr "Zamerať sa na:"
 
-#: modules/websearch/lib/websearch_templates.py:1056
+#: modules/websearch/lib/websearch_templates.py:1062
 msgid "restricted"
 msgstr "chránené"
 
-#: modules/websearch/lib/websearch_templates.py:1076
+#: modules/websearch/lib/websearch_templates.py:1082
 #, fuzzy
 msgid "Search also:"
 msgstr "Výsledky hľadania"
 
-#: modules/websearch/lib/websearch_templates.py:1147
+#: modules/websearch/lib/websearch_templates.py:1153
 msgid "The contents of this collection is restricted."
 msgstr "Obsah tejto kolekcie je chránený."
 
-#: modules/websearch/lib/websearch_templates.py:1162
+#: modules/websearch/lib/websearch_templates.py:1168
 msgid "This collection does not contain any document yet."
 msgstr "Táto kolekcia ešte neobsahuje žiadne záznamy."
 
-#: modules/websearch/lib/websearch_templates.py:1196
-#: modules/websearch/lib/websearch_templates.py:2820
-#: modules/websearch/lib/websearch_templates.py:2873
-#: modules/websearch/lib/websearch_templates.py:2900
+#: modules/websearch/lib/websearch_templates.py:1202
+#: modules/websearch/lib/websearch_templates.py:2836
+#: modules/websearch/lib/websearch_templates.py:2889
+#: modules/websearch/lib/websearch_templates.py:2916
 msgid "more"
 msgstr "viac"
 
-#: modules/websearch/lib/websearch_templates.py:1211
+#: modules/websearch/lib/websearch_templates.py:1217
 msgid "Latest additions:"
 msgstr "Posledne pridané:"
 
-#: modules/websearch/lib/websearch_templates.py:1298
-#: modules/websearch/lib/websearch_templates.py:2600
-#: modules/websearch/lib/websearch_templates.py:2606
-#: modules/websearch/lib/websearch_templates.py:2611
-msgid "Detailed record"
-msgstr "Úplný záznam"
-
-#: modules/websearch/lib/websearch_templates.py:1301
-#: modules/websearch/lib/websearch_templates.py:2618
-#: modules/webstyle/lib/webstyle_templates.py:735
-msgid "Similar records"
-msgstr "Podobné záznamy"
-
-#: modules/websearch/lib/websearch_templates.py:1307
-#: modules/websearch/lib/websearch_templates.py:2626
-msgid "Cited by"
-msgstr "Citované"
-
-#: modules/websearch/lib/websearch_templates.py:1373
+#: modules/websearch/lib/websearch_templates.py:1379
 #, python-format
 msgid "Words nearest to %(x_word)s inside %(x_field)s in any collection are:"
 msgstr "Slová blízke %(x_word)s v %(x_field)s vo všetkých kolekciách sú:"
 
-#: modules/websearch/lib/websearch_templates.py:1376
+#: modules/websearch/lib/websearch_templates.py:1382
 #, python-format
 msgid "Words nearest to %(x_word)s in any collection are:"
 msgstr "Slová blízke %(x_word)s vo všetkých kolekciách sú:"
 
-#: modules/websearch/lib/websearch_templates.py:1466
+#: modules/websearch/lib/websearch_templates.py:1472
 msgid "Hits"
 msgstr "Zásahy"
 
-#: modules/websearch/lib/websearch_templates.py:1531
-#: modules/websearch/lib/websearch_templates.py:2104
+#: modules/websearch/lib/websearch_templates.py:1537
+#: modules/websearch/lib/websearch_templates.py:2110
 msgid "next"
 msgstr "ďalší"
 
-#: modules/websearch/lib/websearch_templates.py:1795
+#: modules/websearch/lib/websearch_templates.py:1801
 msgid "collections"
 msgstr "kolekcie"
 
-#: modules/websearch/lib/websearch_templates.py:1817
+#: modules/websearch/lib/websearch_templates.py:1823
 msgid "Limit to:"
 msgstr "Obmedziť na:"
 
-#: modules/websearch/lib/websearch_templates.py:1858
-#: modules/websearch/lib/websearch_webcoll.py:526
+#: modules/websearch/lib/websearch_templates.py:1864
+#: modules/websearch/lib/websearch_webcoll.py:539
 msgid "results"
 msgstr "výsledky"
 
-#: modules/websearch/lib/websearch_templates.py:1887
+#: modules/websearch/lib/websearch_templates.py:1893
 #, fuzzy
 msgid "Sort:"
 msgstr "Utriediť podľa:"
 
-#: modules/websearch/lib/websearch_templates.py:1893
-#: modules/websearch/lib/websearch_webcoll.py:496
+#: modules/websearch/lib/websearch_templates.py:1899
+#: modules/websearch/lib/websearch_webcoll.py:509
 msgid "asc."
 msgstr "vzost."
 
-#: modules/websearch/lib/websearch_templates.py:1896
-#: modules/websearch/lib/websearch_webcoll.py:497
+#: modules/websearch/lib/websearch_templates.py:1902
+#: modules/websearch/lib/websearch_webcoll.py:510
 msgid "desc."
 msgstr "zost."
 
-#: modules/websearch/lib/websearch_templates.py:1902
-#: modules/websearch/lib/websearch_webcoll.py:540
+#: modules/websearch/lib/websearch_templates.py:1908
+#: modules/websearch/lib/websearch_webcoll.py:553
 msgid "single list"
 msgstr "jediný list"
 
-#: modules/websearch/lib/websearch_templates.py:1905
-#: modules/websearch/lib/websearch_webcoll.py:539
+#: modules/websearch/lib/websearch_templates.py:1911
+#: modules/websearch/lib/websearch_webcoll.py:552
 msgid "split by collection"
 msgstr "zoskupené podľa kolekcií"
 
-#: modules/websearch/lib/websearch_templates.py:1940
+#: modules/websearch/lib/websearch_templates.py:1946
 msgid "MARC tag"
 msgstr "značka MARC"
 
-#: modules/websearch/lib/websearch_templates.py:2055
-#: modules/websearch/lib/websearch_templates.py:2060
-#: modules/websearch/lib/websearch_templates.py:2346
+#: modules/websearch/lib/websearch_templates.py:2061
+#: modules/websearch/lib/websearch_templates.py:2066
+#: modules/websearch/lib/websearch_templates.py:2352
 #, python-format
 msgid "%s records found"
 msgstr "%s záznamov nájdených"
 
-#: modules/websearch/lib/websearch_templates.py:2087
+#: modules/websearch/lib/websearch_templates.py:2093
 msgid "begin"
 msgstr "začiatok"
 
-#: modules/websearch/lib/websearch_templates.py:2092
+#: modules/websearch/lib/websearch_templates.py:2098
 #: modules/websubmit/lib/websubmit_templates.py:1193
 msgid "previous"
 msgstr "predošlý"
 
-#: modules/websearch/lib/websearch_templates.py:2111
+#: modules/websearch/lib/websearch_templates.py:2117
 msgid "end"
 msgstr "koniec"
 
-#: modules/websearch/lib/websearch_templates.py:2131
+#: modules/websearch/lib/websearch_templates.py:2137
 msgid "jump to record:"
 msgstr "skoč na záznam:"
 
-#: modules/websearch/lib/websearch_templates.py:2144
+#: modules/websearch/lib/websearch_templates.py:2150
 #, python-format
 msgid "Search took %s seconds."
 msgstr "Hľadanie trvalo %s sekúnd."
 
-#: modules/websearch/lib/websearch_templates.py:2246
+#: modules/websearch/lib/websearch_templates.py:2252
 msgid "ADD TO BASKET"
 msgstr "PRIDAŤ DO KOŠÍKA"
 
-#: modules/websearch/lib/websearch_templates.py:2333
+#: modules/websearch/lib/websearch_templates.py:2339
 #, python-format
 msgid ""
 "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
@@ -4294,40 +4317,40 @@ msgstr ""
 "%(x_fmt_open)sPrehľad výsledkov:%(x_fmt_close)s Nájdených %(x_nb_records)s "
 "záznamov za %(x_nb_seconds)s sekúnd."
 
-#: modules/websearch/lib/websearch_templates.py:2371
+#: modules/websearch/lib/websearch_templates.py:2387
 msgid ""
 "Boolean query returned no hits. Please combine your search terms differently."
 msgstr ""
 "Booleovská otázka nevrátila žiaden výsledok. Skúste skombinovať dané termíny "
 "inakšie."
 
-#: modules/websearch/lib/websearch_templates.py:2403
+#: modules/websearch/lib/websearch_templates.py:2419
 msgid "See also: similar author names"
 msgstr "Viď tiež: podobné mená autorov"
 
-#: modules/websearch/lib/websearch_templates.py:2708
-#: modules/websearch/lib/websearch_webinterface.py:623
+#: modules/websearch/lib/websearch_templates.py:2724
+#: modules/websearch/lib/websearch_webinterface.py:743
 #, python-format
 msgid "Collection %s Not Found"
 msgstr "Kolekcia %s nenájdená"
 
-#: modules/websearch/lib/websearch_templates.py:2720
-#: modules/websearch/lib/websearch_webinterface.py:621
+#: modules/websearch/lib/websearch_templates.py:2736
+#: modules/websearch/lib/websearch_webinterface.py:741
 #, python-format
 msgid "Sorry, collection %s does not seem to exist."
 msgstr "Ľutujem, kolekcia %s sa nezdá že by existovala."
 
-#: modules/websearch/lib/websearch_templates.py:2722
-#: modules/websearch/lib/websearch_webinterface.py:622
+#: modules/websearch/lib/websearch_templates.py:2738
+#: modules/websearch/lib/websearch_webinterface.py:742
 #, python-format
 msgid "You may want to start browsing from %s."
 msgstr "Môžete chcieť začať prehliadať z %s"
 
-#: modules/websearch/lib/websearch_templates.py:2752
+#: modules/websearch/lib/websearch_templates.py:2768
 msgid "Interested in being notified about new results for this query?"
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:2753
+#: modules/websearch/lib/websearch_templates.py:2769
 #, python-format
 msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
@@ -4335,35 +4358,90 @@ msgid ""
 "%(x_url2_close)s."
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:2813
+#: modules/websearch/lib/websearch_templates.py:2829
 msgid "People who downloaded this document also downloaded:"
 msgstr "Užívatelia ktorí si stiahli tento dokument si tiež stiahli:"
 
-#: modules/websearch/lib/websearch_templates.py:2829
+#: modules/websearch/lib/websearch_templates.py:2845
 msgid "People who viewed this page also viewed:"
 msgstr "Užívatelia ktorí si prehliadli túto stránku si tiež prehliadli:"
 
-#: modules/websearch/lib/websearch_templates.py:2862
+#: modules/websearch/lib/websearch_templates.py:2878
 #, python-format
 msgid "Cited by: %s records"
 msgstr "Citované: %s záznamami"
 
-#: modules/websearch/lib/websearch_templates.py:2888
+#: modules/websearch/lib/websearch_templates.py:2904
 #, python-format
 msgid ".. of which self-citations: %s records"
 msgstr ""
 
-#: modules/websearch/lib/websearch_templates.py:2893
+#: modules/websearch/lib/websearch_templates.py:2909
 #, python-format
 msgid "Co-cited with: %s records"
 msgstr "Spolu citované s: %s záznamami"
 
-#: modules/websearch/lib/websearch_webinterface.py:291
+#: modules/websearch/lib/websearch_templates.py:2961
+#, fuzzy
+msgid "Author"
+msgstr "Autor:"
+
+#: modules/websearch/lib/websearch_templates.py:2962
+#, fuzzy
+msgid "Publications"
+msgstr "Citačná história"
+
+#: modules/websearch/lib/websearch_templates.py:2962
+msgid "downloaded"
+msgstr ""
+
+#: modules/websearch/lib/websearch_templates.py:2963
+#, fuzzy
+msgid "times"
+msgstr "Čas"
+
+#: modules/websearch/lib/websearch_templates.py:2979
+msgid "Frequent keywords"
+msgstr ""
+
+#: modules/websearch/lib/websearch_templates.py:2984
+msgid "Author collaborations"
+msgstr ""
+
+#: modules/websearch/lib/websearch_templates.py:2993
+#, fuzzy
+msgid "Publishes in"
+msgstr "pridania"
+
+#: modules/websearch/lib/websearch_templates.py:3045
+#, fuzzy
+msgid "Citation summary results"
+msgstr "Naspäť ku výsledkom hľadania"
+
+#: modules/websearch/lib/websearch_templates.py:3046
+#, fuzzy
+msgid "Total number of papers analyzed:"
+msgstr "Celkový počet ohlásení"
+
+#: modules/websearch/lib/websearch_templates.py:3048
+#, fuzzy
+msgid "Total number of citations:"
+msgstr "Celkový počet ohlásení"
+
+#: modules/websearch/lib/websearch_templates.py:3049
+msgid "Average citations per paper:"
+msgstr ""
+
+#: modules/websearch/lib/websearch_templates.py:3053
+msgid "Breakdown of papers by citations:"
+msgstr ""
+
+#: modules/websearch/lib/websearch_webinterface.py:411
 #, fuzzy
 msgid "You are not authorized to view this area."
 msgstr "Nie ste vlastníkom tohto košíka."
 
-#: modules/websearch/lib/websearch_webinterface.py:625
+#: modules/websearch/lib/websearch_webinterface.py:745
 msgid "Not found"
 msgstr "Nenájdený"
 
@@ -4408,7 +4486,7 @@ msgstr "Žiadne hodnoty nenájdené."
 msgid "%s seconds"
 msgstr "%s záznamov nájdených"
 
-#: modules/websearch/lib/websearch_webcoll.py:561
+#: modules/websearch/lib/websearch_webcoll.py:574
 msgid "brief"
 msgstr "stručný"
 
@@ -4682,11 +4760,6 @@ msgstr ""
 "Nastavte alebo zmeňte Vašu elektronickú adresu alebo heslo. Špecifikujte "
 "Vaše preferencie o tom ako má rozhranie vyzerať."
 
-#: modules/websession/lib/websession_templates.py:437
-#: modules/websession/lib/websession_templates.py:573
-msgid "Your Searches"
-msgstr "Vaše hľadania"
-
 #: modules/websession/lib/websession_templates.py:438
 msgid "View all the searches you performed during the last 30 days."
 msgstr "Zobraziť všetky hľadania ktoré ste vykonali počas uplynulých 30 dní."
@@ -4699,10 +4772,6 @@ msgstr ""
 "S košíkmi môžete definovať špecifické zbierky položiek, uschovať zaujímavé "
 "záznamy ku ktorým budete môcť pristúpiť neskôr alebo ktoré budete môcť "
 "zdiaľať s ostatnými užívateľmi."
-
-#: modules/websession/lib/websession_templates.py:448
-msgid "Your Alerts"
-msgstr "Vaše avíza"
 
 #: modules/websession/lib/websession_templates.py:449
 msgid ""
@@ -5757,7 +5826,7 @@ msgstr "Táto stránka je tiež dostupná v nasledujúcich jazykoch:"
 #: modules/webstyle/lib/webstyle_templates.py:557
 #: modules/webstyle/lib/webstyle_templates.py:559
 #: modules/websubmit/lib/websubmit_engine.py:1534
-#: modules/websubmit/lib/websubmit_webinterface.py:545
+#: modules/websubmit/lib/websubmit_webinterface.py:548
 msgid "Error"
 msgstr "Chyba"
 
@@ -5794,13 +5863,13 @@ msgstr "Pošli chybovú správu"
 msgid "Please contact %s quoting the following information:"
 msgstr "Prosíme kontaktujte %s a uveďte nasledovné informácie:"
 
-#: modules/webstyle/lib/webstyle_templates.py:738
+#: modules/webstyle/lib/webstyle_templates.py:741
 #, python-format
 msgid ""
 "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
 msgstr "Záznam vytvorený %(x_date_creation)s, zmenený %(x_date_modification)s"
 
-#: modules/webstyle/lib/webdoc.py:546
+#: modules/webstyle/lib/webdoc.py:548
 #, python-format
 msgid "%(category)s Pages"
 msgstr ""
@@ -5916,7 +5985,7 @@ msgid "The chosen action is not supported by the document type."
 msgstr "Zvolaná akcia nie je podporovaná týmto typom dokumentu."
 
 #: modules/websubmit/lib/websubmit_engine.py:1547
-#: modules/websubmit/lib/websubmit_webinterface.py:561
+#: modules/websubmit/lib/websubmit_webinterface.py:564
 msgid "Warning"
 msgstr "Upozornenie"
 
@@ -6908,6 +6977,13 @@ msgstr ""
 #: modules/webjournal/lib/webjournal_config.py:629
 msgid "Available journals"
 msgstr ""
+
+#, fuzzy
+#~ msgid "Main file(s)"
+#~ msgstr "súbor(y)"
+
+#~ msgid "Display searches"
+#~ msgstr "Zobraziť výsledky"
 
 #, fuzzy
 #~ msgid "   Username/Email: %s\n"
