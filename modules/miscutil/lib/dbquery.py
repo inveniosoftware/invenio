@@ -38,14 +38,24 @@ from MySQLdb import Warning, Error, InterfaceError, DataError, \
                     DatabaseError, OperationalError, IntegrityError, \
                     InternalError, NotSupportedError, \
                     ProgrammingError
-
+import warnings
 import string
 import time
 import marshal
+import sys
 from zlib import compress, decompress
 from thread import get_ident
 from invenio.config import CFG_ACCESS_CONTROL_LEVEL_SITE, \
     CFG_MISCUTIL_SQL_MAX_CACHED_QUERIES, CFG_MISCUTIL_SQL_USE_SQLALCHEMY
+from invenio.errorlib import register_exception
+
+## Set the following flag to True in order to transform warning printed
+## during run_sql usage into very verbose exception, useful for debugging
+## purpouses.
+CFG_RUN_SQL_WARNINGS_INTO_VERBOSE_EXCEPTIONS=False
+
+if CFG_RUN_SQL_WARNINGS_INTO_VERBOSE_EXCEPTIONS:
+    warnings.filterwarnings('error', category=Warning, module='invenio\.dbquery')
 
 if CFG_MISCUTIL_SQL_USE_SQLALCHEMY:
     try:
@@ -222,6 +232,14 @@ def run_sql(sql, param=None, n=0, with_desc=0):
             cur = db.cursor()
             rc = cur.execute(sql, param)
         except OperationalError: # again an unexpected disconnect, bad malloc error, etc
+            raise
+    except Warning, wmsg:
+        msg = "Warning in executing query:\n%s\nwith parameters:\n%s\n%s" % (sql, param, wmsg)
+        print >> sys.stderr, msg
+        try:
+            raise Warning(msg)
+        except Warning:
+            register_exception()
             raise
     if string.upper(string.split(sql)[0]) in ("SELECT", "SHOW", "DESC", "DESCRIBE"):
         if n:
