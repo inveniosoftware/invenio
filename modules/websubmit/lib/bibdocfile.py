@@ -1252,14 +1252,6 @@ class BibDoc:
             (self.recid, self.id, version, format,
             userid, ip_address,))
 
-def readfile(filename):
-    """Used only for backward compatibility."""
-    try:
-        return open(filename).read()
-    except Exception, e:
-        register_exception()
-        raise InvenioWebSubmitFileError, "It's impossible to read %s: %s" % (filename, e)
-
 class BibDocFile:
     """This class represents a physical file in the CDS Invenio filesystem.
     It should never be instantiated directly"""
@@ -1806,3 +1798,12 @@ class BibDocMoreInfo:
     def serialize(self):
         """Return the serialized version of the more_info."""
         return cPickle.dumps(self.more_info)
+
+def readfile(filename):
+    """Try to read a file. Return '' in case of any error.
+    This function is useful for quick implementation of websubmit functions.
+    """
+    try:
+        return open(filename).read()
+    except:
+        return ''
