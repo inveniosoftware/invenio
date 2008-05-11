@@ -379,7 +379,7 @@ class Template:
         change_page = '<a href="' + CFG_SITE_URL + '/yourbaskets/list_public_baskets?'\
                       'inf_limit=%i&amp;order=' + str(order)
         change_page += '&amp;asc=' + str(asc) + '&amp;ln=' + str(ln) + '">'\
-                       '<img src="%(public_basket)s" style="border: 0px;" alt="%(public_basket)s"/></a> ' % {'public_basket' : _("Public basket")}
+                       '<img src="%s" style="border: 0px;" alt=""/></a> '
         footer = ''
         if inf_limit > (CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS * 2) - 1:
             footer += change_page % (0, CFG_SITE_URL + '/img/sb.gif')
