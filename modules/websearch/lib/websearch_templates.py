@@ -3038,16 +3038,16 @@ class Template:
             columnfill += "<td> </td>"
         thead = """<table>
                  <tr><td><strong class="headline">%(msg_title)s</strong></td><td>%(cf)s</td></tr>
-                 <tr><td><strong>%(msg_recs)s</strong></td><td>%(nb_recs)s</td>%(cf)s</tr>
-                 <tr><td><strong>%(msg_cites)s</strong></td><td>%(nb_cites)s</td>%(cf)s</tr>
-                 <tr><td><strong>%(msg_avgcit)s</strong></td><td>%(nb_avgcit)s</td>%(cf)s</tr>
+                 <tr><td><strong>%(msg_recs)s</strong></td><td align="right">%(nb_recs)s</td>%(cf)s</tr>
+                 <tr><td><strong>%(msg_cites)s</strong></td><td align="right">%(nb_cites)s</td>%(cf)s</tr>
+                 <tr><td><strong>%(msg_avgcit)s</strong></td><td align="right">%(nb_avgcit)s</td>%(cf)s</tr>
                  <tr><td><strong>%(msg_breakdown)s</strong></td><td></td>%(cf)s</tr>
               """ % { 'msg_title': _("Citation summary results"),
                       'msg_recs': _("Total number of papers analyzed:"),
-                      'nb_recs': totalrecs,
+                      'nb_recs': self.tmpl_nice_number(totalrecs, ln),
                       'msg_cites': _("Total number of citations:"),
                       'msg_avgcit': _("Average citations per paper:"),
-                      'nb_cites': totalcites,
+                      'nb_cites': self.tmpl_nice_number(totalcites, ln),
                       'nb_avgcit': avgstr,
                       'cf': columnfill,
                       'msg_breakdown': _("Breakdown of papers by citations:"),}
@@ -3068,14 +3068,15 @@ class Template:
                     intersec_list = list(Set(recs_in_coll)&Set(reclist))
                     if len(intersec_list) > 0:
                         #add stuff like Published:5
-                        collstr += "<td>"+str(k)+": "+str(len(intersec_list))+"</td> "
-                tline = "<tr><td>"+_(rowtitle)+"</td><td>"
+                        collstr += "<td>"+str(k)+": " + self.tmpl_nice_number(len(intersec_list), ln)+"</td> "
+                tline = "<tr><td>"+_(rowtitle)+"</td><td align=\"right\">"
                 #construct a link..
-                link = "../search?p=cited%3A"+str(mincites)+"-%3E"+str(maxcites)
+                link = "../search?p="
                 if criteria:
-                    #the citing min/max was found, append criteria
-                    link += "%20"+criteria
-                tline += "<a href="+link+">"+str(len(reclist))+"</a> "+collstr
+                    link += criteria + "%20"
+                link += "cited%3A" + str(mincites) + "-%3E" + str(maxcites)
+                link += '&amp;rm=citation'
+                tline += "<a href="+link+">"+self.tmpl_nice_number(len(reclist), ln)+"</a> "+collstr
                 out += tline
                 if req:
                     req.write(tline)
