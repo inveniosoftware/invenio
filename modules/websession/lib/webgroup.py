@@ -29,6 +29,7 @@ from invenio.websession_config import CFG_WEBSESSION_INFO_MESSAGES, \
 from invenio.webuser import nickname_valid_p, get_user_info
 from invenio.webmessage import perform_request_send
 import invenio.webgroup_dblayer as db
+from invenio.dbquery import IntegrityError
 try:
     import invenio.template
     websession_templates = invenio.template.load('websession')
@@ -769,11 +770,18 @@ def synchronize_external_groups(userid, groups, login_method):
             db.insert_new_member(userid, groupid[0][0],
                 CFG_WEBSESSION_USERGROUP_STATUS['MEMBER'])
         else: # Adding a new group
-            groupid = db.insert_new_group(userid, group, groups[group], \
-                CFG_WEBSESSION_GROUP_JOIN_POLICY['VISIBLEEXTERNAL'], \
-                login_method)
-            db.add_pending_member(groupid, userid,
-            CFG_WEBSESSION_USERGROUP_STATUS['MEMBER'])
+            try:
+                groupid = db.insert_new_group(userid, group, groups[group], \
+                    CFG_WEBSESSION_GROUP_JOIN_POLICY['VISIBLEEXTERNAL'], \
+                    login_method)
+                db.add_pending_member(groupid, userid,
+                    CFG_WEBSESSION_USERGROUP_STATUS['MEMBER'])
+            except IntegrityError:
+                ## The group already exists? Maybe because of concurrency?
+                groupid = db.get_group_id(group, login_method)
+                if groupid: # Adding the user to an already existent group
+                    db.insert_new_member(userid, groupid[0][0],
+                        CFG_WEBSESSION_USERGROUP_STATUS['MEMBER'])
 
 def synchronize_groups_with_login_method():
     """For each login_method, if possible, synchronize groups in a bulk fashion
