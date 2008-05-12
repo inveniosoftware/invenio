@@ -52,7 +52,7 @@ def get_groups_by_user_status(uid, user_status, login_method='INTERNAL'):
                      g.login_method = %s
                ORDER BY g.name"""
     uid = int(uid)
-    res = run_sql(query, (uid, user_status, login_method))
+    res = run_sql_cached(query, (uid, user_status, login_method), affected_tables=['usergroup', 'user_usergroup'])
     return res
 
 def get_groups_by_login_method(uid, login_method):
@@ -73,7 +73,7 @@ def get_groups_by_login_method(uid, login_method):
 
                ORDER BY g.name"""
     uid = int(uid)
-    res = run_sql(query, (uid, login_method))
+    res = run_sql_cached(query, (uid, login_method), affected_tables=['usergroup', 'user_usergroup'])
     return res
 
 def get_groups_with_description(uid):
@@ -91,7 +91,7 @@ def get_groups_with_description(uid):
                      ug.id_usergroup=g.id
                ORDER BY g.name"""
     uid = int(uid)
-    res = run_sql(query, (uid, ))
+    res = run_sql_cached(query, (uid, ), affected_tables=['usergroup', 'user_usergroup'])
     return res
 
 
@@ -113,7 +113,7 @@ def get_external_groups(uid):
 
                ORDER BY g.name"""
     uid = int(uid)
-    res = run_sql(query, (uid, ))
+    res = run_sql_cached(query, (uid, ), affected_tables=['usergroup', 'user_usergroup'])
     return res
 
 def get_groups(uid):
