@@ -29,7 +29,7 @@ from zlib import decompress
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_VERSION
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, run_sql_cached
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.messages import gettext_set_language
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
@@ -123,7 +123,7 @@ def get_groups(uid):
                WHERE ug.id_user=%s AND
                      ug.id_usergroup=g.id
             """
-    res = run_sql(query, (uid, ))
+    res = run_sql_cached(query, (uid, ), affected_tables=['usergroup', 'user_usergroup'])
     res = list(res)
     return res
 
