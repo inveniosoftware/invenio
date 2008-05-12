@@ -240,6 +240,8 @@ def getUid (req):
 def setApacheUser(req, apache_user):
     """It sets the apache_user into the session, and raise the cookie to the client.
     """
+    if hasattr(req, '_user_info'):
+        del req._user_info
     sm = session.MPSessionManager(pSession, pSessionMapping())
     try:
         s = sm.get_session(req)
@@ -253,6 +255,8 @@ def setApacheUser(req, apache_user):
 def setUid(req, uid, remember_me=False):
     """It sets the userId into the session, and raise the cookie to the client.
     """
+    if hasattr(req, '_user_info'):
+        del req._user_info
     sm = session.MPSessionManager(pSession, pSessionMapping())
     try:
         s = sm.get_session(req)
@@ -890,6 +894,9 @@ def collect_user_info(req):
     provided, also the remote_ip, remote_host, referer, agent fields.
     If the user is authenticated with Apache should provide also
     apache_user and apache_group.
+    NOTE: if req is a mod_python request object, the user_info dictionary
+    is saved into req._user_info (for caching purpouses)
+    setApacheUser & setUid will properly reset it.
     """
     user_info = {
         'remote_ip' : '',
@@ -907,6 +914,7 @@ def collect_user_info(req):
         'last_login' : datetime.datetime(1970, 1, 1)
     }
 
+    has_req = False
     try:
         if req is None:
             uid = -1
@@ -925,6 +933,9 @@ def collect_user_info(req):
             user_info.update(req)
             return user_info
         else:
+            if hasattr(req, '_user_info'):
+                return req._user_info
+            has_req = True
             uid = getUid(req)
             try:
                 user_info['remote_ip'] = gethostbyname(req.connection.remote_ip)
@@ -987,6 +998,8 @@ def collect_user_info(req):
                     user_info[key.lower()] = value
     except Exception, e:
         register_exception()
+    if has_req:
+        req._user_info = user_info
     return user_info
 
 ## --- follow some functions for Apache user/group authentication
