@@ -33,8 +33,6 @@ from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
     """Defines the set of /oai2d OAI provider pages."""
 
-    _exports = ['']
-
     def __call__(self, req, form):
         "OAI repository interface"
 
@@ -67,6 +65,10 @@ class WebInterfaceOAIProviderPages(WebInterfaceDirectory):
         for param in form.keys():
             if param not in argd.keys():
                 argd[param] = ''
+
+        ## But still remove 'ln' parameter that was automatically added.
+        if argd.has_key('ln'):
+            del argd['ln']
 
         ## check request for OAI compliancy
         ## also transform all the list arguments into string
