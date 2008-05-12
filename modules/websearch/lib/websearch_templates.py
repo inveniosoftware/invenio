@@ -3068,7 +3068,14 @@ class Template:
                     intersec_list = list(Set(recs_in_coll)&Set(reclist))
                     if len(intersec_list) > 0:
                         #add stuff like Published:5
-                        collstr += "<td>"+str(k)+": " + self.tmpl_nice_number(len(intersec_list), ln)+"</td> "
+                        #construct a link..
+                        link = "../search?p="
+                        if criteria:
+                            link += criteria + "%20"
+                        link += '980:'+str(k)+"%20"
+                        link += "cited%3A" + str(mincites) + "-%3E" + str(maxcites)
+                        link += '&amp;rm=citation'
+                        collstr += "<td>"+str(k)+": <a href=" + link +">"+ self.tmpl_nice_number(len(intersec_list), ln)+"</a></td> "
                 tline = "<tr><td>"+_(rowtitle)+"</td><td align=\"right\">"
                 #construct a link..
                 link = "../search?p="
