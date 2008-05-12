@@ -957,7 +957,7 @@ def collect_user_info(req):
         user_info['email'] = get_email(uid) or ''
         user_info['group'] = []
         user_info['guest'] = str(isGuestUser(uid))
-        if uid:
+        if user_info['guest'] == '0':
             user_info['group'] = [group[1] for group in get_groups(uid)]
             user_info['last_login'] = get_last_login(uid)
             prefs = get_user_preferences(uid)

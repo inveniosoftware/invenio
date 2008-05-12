@@ -375,8 +375,6 @@ class SessionManager:
         session._set_access_time(self.ACCESS_TIME_RESOLUTION)
         return session
 
-    # get_session ()
-
     def maintain_session (self, request, session, remember_me=False):
         """maintain_session(request : HTTPRequest, session : Session)
 
@@ -393,14 +391,18 @@ class SessionManager:
             # explicitly forget it.
             if self.has_session(session.id):
                 del self[session.id]
-                self.revoke_session_cookie(request)
+                ## Hack to call exactly sessionManager implementation against
+                ## request. Otherwise a derivate method could be called
+                ## that can expect a wrapper outside request
+                ## which is not the case now.
+                SessionManager.revoke_session_cookie(self, request)
             return
 
         if not self.has_session(session.id) or session.is_dirty_remember_me():
             # This is the first time this session has had useful
             # info -- store it and set the session cookie.
             self[session.id] = session
-            self.set_session_cookie(request, session.id, remember_me)
+            SessionManager.set_session_cookie(self, request, session.id, remember_me)
 
         elif session.is_dirty():
             # We have already stored this session, but it's dirty
