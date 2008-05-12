@@ -3072,7 +3072,7 @@ class Template:
                         link = "../search?p="
                         if criteria:
                             link += criteria + "%20"
-                        link += '980:'+str(k)+"%20"
+                        link += 'collection:'+str(k)+"%20"
                         link += "cited%3A" + str(mincites) + "-%3E" + str(maxcites)
                         link += '&amp;rm=citation'
                         collstr += "<td>"+str(k)+": <a href=" + link +">"+ self.tmpl_nice_number(len(intersec_list), ln)+"</a></td> "
