@@ -513,8 +513,8 @@ def get_groupnames_like(uid, pattern):
         map(lambda x: groups.setdefault(x[0], x[1]), res)
         query2 = """SELECT g.id, g.name
                     FROM usergroup g, user_usergroup ug
-                    WHERE g.id=ug.id_usergroup AND ug.id_user=%i AND g.name RLIKE '%s'"""
-        res = run_sql(query2 % (uid, pattern))
+                    WHERE g.id=ug.id_usergroup AND ug.id_user=%s AND g.name RLIKE %s"""
+        res = run_sql(query2, (uid, pattern))
         map(lambda x: groups.setdefault(x[0], x[1]), res)
     return groups
 
