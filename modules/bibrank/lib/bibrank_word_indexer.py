@@ -270,9 +270,9 @@ class WordTable:
         """Flush a single word to the database and delete it from memory"""
         set = self.load_old_recIDs(word)
         #write_message("%s %s" % (word, self.value[word]))
-        if set: # merge the word recIDs found in memory:
+        if set is not None: # merge the word recIDs found in memory:
             options["modified_words"][word] = 1
-            if self.merge_with_old_recIDs(word, recIDs, set) == 0:
+            if not self.merge_with_old_recIDs(word, recIDs, set):
                 # nothing to update:
                 write_message("......... unchanged hitlist for ``%s''" % word, verbose=9)
                 pass
