@@ -37,13 +37,21 @@ try:
 except NameError:
     from sets import Set
 
-try:
-    from invenio.config import CFG_CITESUMMARY_COLLECTIONS
-except:
-    CFG_CITESUMMARY_COLLECTIONS = []
+## CFG_CITESUMMARY_THRESHOLD_NAMES -- how do we break up cite summary
+## results?
+CFG_CITESUMMARY_THRESHOLD_NAMES = [
+                                   (500, 1000000, 'Renowned papers (500+)'),
+                                   (250, 499, 'Famous papers (250-499)'),
+                                   (100, 249, 'Very well-known papers (100-249)'),
+                                   (50, 99, 'Well-known papers (50-99)'),
+                                   (10, 49, 'Known papers (10-49)'),
+                                   (1, 9, 'Less known papers (1-9)'),
+                                   (0, 0, 'Unknown papers (0)')
+                                   ]
 
-
-COLLECTION_TAG = "980__a"
+## CFG_CITESUMMARY_COLLECTIONS -- names of collections that should be
+## shown in the cite summary format, breakdown by collection.
+CFG_CITESUMMARY_COLLECTIONS = ['Published']
 
 def summarize_records(recids, of, ln, defstring="", req=""):
     """Produces a report in the format defined by of in language ln
@@ -56,12 +64,12 @@ def summarize_records(recids, of, ln, defstring="", req=""):
     if of == 'hcs':
         #this is a html cite summary
         citedbylist = get_cited_by_list(recids)
-        #divide the list into sublists according to the collection (980__b) info of the recs
+        #divide the list into sublists according to the collection info of the recs
         collections_citedbys = {}
         #scan the collections in CFG_CITESUMMARY_COLLECTIONS
-        for coll in eval(CFG_CITESUMMARY_COLLECTIONS):
-            #get the records that have this coll in 980__b
-            recsinc = search_engine.search_pattern(f=COLLECTION_TAG,p=coll)
+        for coll in CFG_CITESUMMARY_COLLECTIONS:
+            #get the records that have this coll
+            recsinc = search_engine.search_pattern(p=coll, f='collection')
             #intersect recids and recsinc
             intersec_list = list(Set(recids)&Set(recsinc))
             collections_citedbys[coll] = intersec_list
@@ -70,16 +78,6 @@ def summarize_records(recids, of, ln, defstring="", req=""):
         #this is an xml cite summary
         citedbylist = get_cited_by_list(recids)
         return print_citation_summary_xml(citedbylist)
-
-CFG_CITESUMMARY_THRESHOLD_NAMES = [
-                                   (500, 1000000, 'Renowned papers (500+)'),
-                                   (250, 499, 'Famous papers (250-499)'),
-                                   (100, 249, 'Very well-known papers (100-249)'),
-                                   (50, 99, 'Well-known papers (50-99)'),
-                                   (10, 49, 'Known papers (10-49)'),
-                                   (1, 9, 'Less known papers (1-9)'),
-                                   (0, 0, 'Unknown papers (0)')
-                                   ]
 
 #for citation summary, code xcs/hcs (unless changed)
 def print_citation_summary_xml(citedbylist):
