@@ -58,6 +58,7 @@ from invenio.messages import gettext_set_language
 from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, create_html_link, create_url
 from invenio.htmlutils import nmtoken_from_string
 from invenio.webinterface_handler import wash_urlargd
+from invenio.bibrank_citation_searcher import get_cited_by_count
 
 from invenio.websearch_external_collections import external_collection_get_state
 
@@ -1308,9 +1309,11 @@ class Template:
                                         {'class': "moreinfo"})}
 
         if CFG_BIBRANK_SHOW_CITATION_LINKS:
-            out += '''<span class="moreinfo"> - %s </span>''' % \
-                   create_html_link(self.build_search_url(p='recid:%d' % recid, rm='citation', ln=ln),
-                                    {}, _("Cited by"), {'class': "moreinfo"})
+            num_timescited = get_cited_by_count(recid)
+            if num_timescited:
+                out += '''<span class="moreinfo"> - %s </span>''' % \
+                       create_html_link(self.build_search_url(p='recid:%d' % recid, rm='citation', ln=ln),
+                                        {}, _("Cited by %i records") % num_timescited, {'class': "moreinfo"})
 
         return out
 
@@ -2635,12 +2638,14 @@ class Template:
                                     {'class': "moreinfo"})
 
         if CFG_BIBRANK_SHOW_CITATION_LINKS:
-            out += '<span class="moreinfo"> - %s</span>' % \
-                   create_html_link(self.build_search_url(p="recid:%d" % recID,
-                                                          rm="citation",
-                                                          ln=ln),
-                                    {}, _("Cited by"),
-                                    {'class': "moreinfo"})
+            num_timescited = get_cited_by_count(recID)
+            if num_timescited:
+                out += '<span class="moreinfo"> - %s</span>' % \
+                       create_html_link(self.build_search_url(p="recid:%d" % recID,
+                                                              rm="citation",
+                                                              ln=ln),
+                                        {}, _("Cited by %i records") % num_timescited,
+                                        {'class': "moreinfo"})
 
         return out
 
