@@ -1004,32 +1004,43 @@ def collect_user_info(req):
 
 ## --- follow some functions for Apache user/group authentication
 
-def auth_apache_user_p(user, password, apache_password_file=CFG_APACHE_PASSWORD_FILE):
+def _load_apache_password_file(apache_password_file=CFG_APACHE_PASSWORD_FILE):
+    ret = {}
+    for row in open(os.path.join(CFG_TMPDIR, apache_password_file)):
+        row = row.split(':')
+        if len(row) == 2:
+            ret[row[0].strip()] = row[1].strip()
+    return ret
+_apache_passwords = _load_apache_password_file()
+
+def auth_apache_user_p(user, password):
     """Check whether user-supplied credentials correspond to valid
     Apache password data file."""
-    try:
-        if not apache_password_file.startswith("/"):
-            apache_password_file = CFG_TMPDIR + "/" + apache_password_file
-        dummy, pipe_output = os.popen2(["grep", "^" + user + ":", apache_password_file], 'r')
-        line =  pipe_output.readlines()[0]
-        password_apache = line.strip().split(":")[1]
-    except: # no pw found, so return not-allowed status
+    if user in _apache_passwords:
+        password_apache = _apache_passwords[user]
+        salt = password_apache[:2]
+        return crypt.crypt(password, salt) == password_apache
+    else:
         return False
-    salt = password_apache[:2]
-    return crypt.crypt(password, salt) == password_apache
 
-def auth_apache_user_in_groups(user, apache_group_file=CFG_APACHE_GROUP_FILE):
+def _load_apache_group_file(apache_group_file=CFG_APACHE_GROUP_FILE):
+    ret = {}
+    for row in open(os.path.join(CFG_TMPDIR, apache_group_file)):
+        row = row.split(':')
+        if len(row) == 2:
+            group = row[0].strip()
+            users = row[1].strip().split(' ')
+            for user in users:
+                user = user.strip()
+                if user not in ret:
+                    ret[user] = []
+                ret[user].append(group)
+    return ret
+_apache_groups = _load_apache_group_file()
+
+def auth_apache_user_in_groups(user):
     """Return list of Apache groups to which Apache user belong."""
-    out = []
-    try:
-        if not apache_group_file.startswith("/"):
-            apache_group_file = CFG_TMPDIR + "/" + apache_group_file
-        dummy, pipe_output = os.popen2(["grep", user, apache_group_file], 'r')
-        for line in pipe_output.readlines():
-            out.append(line.strip().split(":")[0])
-    except: # no groups found, so return empty list
-        pass
-    return out
+    return _apache_groups.get(user, [])
 
 def http_get_credentials(req):
     if req.headers_in.has_key("Authorization"):
