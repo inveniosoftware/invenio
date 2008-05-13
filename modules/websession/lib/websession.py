@@ -37,12 +37,15 @@ __revision__ = "$Id$"
 
 import cPickle
 from UserDict import UserDict
+import traceback
 
 from invenio.dbquery import run_sql, blob_to_string, \
      OperationalError, IntegrityError
 from invenio.session import Session
 from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_DEFAULT, \
-    CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER
+    CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
+    CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
+
 
 class SessionNotInDb(Exception):
     """Exception to be raised when a requested session doesn't exist in the DB
@@ -75,6 +78,9 @@ class pSession(Session):
         self.__dirty_remember_me = 0
         self.__apache_user = None
         self.__remember_me = False
+
+    def has_info(self):
+        return CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS or self.__apache_user or self.__uid > 0
 
     def is_dirty( self ):
         return self.__dirty
