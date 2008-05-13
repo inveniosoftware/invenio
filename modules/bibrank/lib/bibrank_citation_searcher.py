@@ -60,6 +60,10 @@ def get_cited_by(recordid):
         ret = cache_cited_by_dictionary[recordid]
     return ret
 
+def get_cited_by_count(recordid):
+    """Return how many records cite given RECORDID."""
+    return len(cache_cited_by_dictionary.get(recordid, []))
+
 def get_records_with_num_cites(numstr, allrecs = intbitset([])):
     """Return an intbitset of record IDs that are cited X times,
        X defined in numstr.
