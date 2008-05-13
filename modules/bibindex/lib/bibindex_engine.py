@@ -792,8 +792,12 @@ class WordTable:
         else: # the word is new, will create new set:
             write_message("......... inserting hitlist for ``%s''" % word, verbose=9)
             set = intbitset(self.value[word].keys())
-            run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
-                (word, set.fastdump()))
+            try:
+                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
+                        (word, set.fastdump()))
+            except Exception, e:
+                ## FIXME: This is for debugging encoding errors
+                register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=True)
 
         if not set: # never store empty words
             run_sql("DELETE from %s WHERE term=%%s" % self.tablename,
