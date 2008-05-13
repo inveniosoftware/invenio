@@ -320,6 +320,9 @@ def isUserSubmitter(user_info):
 
 def isUserReferee(user_info):
     """Return True if the user is a referee for something; False otherwise."""
+    return True
+    ## FIXME: This function is useful for the user experience, but is so
+    ## slooooooooooow on real system that for the time being it's disabled.
     from invenio.access_control_engine import acc_authorize_action
     res = run_sql("select sdocname from sbmDOCTYPE")
     for row in res:
