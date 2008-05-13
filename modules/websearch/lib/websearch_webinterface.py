@@ -301,7 +301,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
 
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : req.unparsed_uri}, {})
             return redirect_to_url(req, target)
         elif auth_code:
@@ -449,7 +449,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                         if coll_recids & recids:
                             if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                                 cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : collname})
-                                target = '/youraccount/login' + \
+                                target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                                 make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : req.unparsed_uri}, {})
                                 return redirect_to_url(req, target)
                             else:
@@ -466,8 +466,8 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
                 if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
-                    target = '/youraccount/login' + \
-                    make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : req.unparsed_uri}, {'ln' : CFG_SITE_LANG})
+                    target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
+                    make_canonical_urlargd({'action' : cookie, 'ln' : argd['ln'], 'referer' : req.unparsed_uri}, {})
                     return redirect_to_url(req, target)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
@@ -935,7 +935,7 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
-            target = '/youraccount/login' + \
+            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                     make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                     CFG_SITE_URL + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
                     search_results_default_urlargd)}, {'ln' : CFG_SITE_LANG})
