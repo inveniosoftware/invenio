@@ -100,7 +100,7 @@ stat['nb_errors'] = 0
 stat['exectime'] = time.localtime()
 
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
-socket.setdefaulttimeout(10)
+socket.setdefaulttimeout(40)
 
 ### bibupload engine functions:
 def bibupload(record, opt_tag=None, opt_mode=None,

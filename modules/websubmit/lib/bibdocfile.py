@@ -35,7 +35,7 @@ from xml.sax.saxutils import quoteattr
 from mimetypes import MimeTypes
 
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
-socket.setdefaulttimeout(10)
+socket.setdefaulttimeout(40)
 
 try:
     set
