@@ -40,6 +40,7 @@ from invenio.bibindex_engine import beautify_range_list, \
 from invenio.bibtask import write_message, task_get_option, task_update_progress, \
     task_update_status, task_sleep_now_if_required
 from invenio.intbitset import intbitset
+from invenio.errorlib import register_exception
 
 options = {} # global variable to hold task options
 
@@ -287,8 +288,14 @@ class WordTable:
             if len(set) > 0:
                 #new word, add to list
                 options["modified_words"][word] = 1
-                run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
-                        (word, serialize_via_marshal(set)))
+                try:
+                    run_sql("INSERT INTO %s (term, hitlist) VALUES (%%s, %%s)" % self.tablename,
+                            (word, serialize_via_marshal(set)))
+                except Exception, e:
+                    ## FIXME: This is for debugging encoding errors
+                    register_exception(prefix="Error in putting the term '%s' into db (hitlist=%s): %s\n" % (word, set, e), alert_admin=True)
+                    run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % self.tablename,
+                            (serialize_via_marshal(set), word))
         if not set: # never store empty words
             run_sql("DELETE from %s WHERE term=%%s" % self.tablename,
                     (word,))
