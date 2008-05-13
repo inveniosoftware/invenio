@@ -280,9 +280,9 @@ def create_handler(root):
                     strstream = StringIO()
                     pstats.Stats(filename, stream=strstream).strip_dirs().sort_stats(sort_type).print_stats()
                     profile_dump.append(strstream.getvalue())
-            profile_dump = ''.join(["<pre>%s</pre>" % single_dump for single_dump in profile_dump])
+            profile_dump = '\n'.join(profile_dump)
             profile_dump += '\nYou can use profile=%s' % existing_sorts
-            req.write("<pre>%s</pre>" % profile_dump)
+            req.write("\n<pre>%s</pre>" % profile_dump)
             return ret
         else:
             return _handler(req)
