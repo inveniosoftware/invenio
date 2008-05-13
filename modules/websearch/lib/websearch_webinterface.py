@@ -220,7 +220,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         simauthbox = search_engine.create_similarly_named_authors_link_box(self.authorname)
         req.write(simauthbox)
 
-    def get_institute_pub_dict(mee, recids):
+    def get_institute_pub_dict(self, mee, recids):
         #return a dictionary consisting of institute -> list of publications
         affus = [] #list of insts from the record
         author_aff_pubs = {} #the disct to be build
@@ -302,9 +302,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
-                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
-                    CFG_SITE_URL + '/record/' + str(self.recid) + make_canonical_urlargd(argd, \
-                    search_results_default_urlargd)}, {'ln' : CFG_SITE_LANG})
+                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : req.unparsed_uri}, {})
             return redirect_to_url(req, target)
         elif auth_code:
             return page_not_authorized(req, "../", \
@@ -452,9 +450,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                             if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                                 cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : collname})
                                 target = '/youraccount/login' + \
-                                make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : \
-                                CFG_SITE_URL + '/search' + make_canonical_urlargd(argd, \
-                                search_results_default_urlargd)}, {'ln' : CFG_SITE_LANG})
+                                make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : req.unparsed_uri}, {})
                                 return redirect_to_url(req, target)
                             else:
                                 return page_not_authorized(req, "../", \
@@ -471,9 +467,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = '/youraccount/login' + \
-                    make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : \
-                    CFG_SITE_URL + '/search' + make_canonical_urlargd(argd, \
-                    search_results_default_urlargd)}, {'ln' : CFG_SITE_LANG})
+                    make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : req.unparsed_uri}, {'ln' : CFG_SITE_LANG})
                     return redirect_to_url(req, target)
                 elif auth_code:
                     return page_not_authorized(req, "../", \
@@ -655,7 +649,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
     def legacy_collection(self, req, form):
         """Collection URL backward compatibility handling."""
         accepted_args = dict(legacy_collection_default_urlargd)
-        accepted_args.update({'referer' : (str, '%s/youraccount/your'),
+        accepted_args.update({'referer' : (str, ''),
              'realm' : (str, '')})
         argd = wash_urlargd(form, accepted_args)
 
