@@ -293,9 +293,7 @@ class WordTable:
                             (word, serialize_via_marshal(set)))
                 except Exception, e:
                     ## FIXME: This is for debugging encoding errors
-                    register_exception(prefix="Error in putting the term '%s' into db (hitlist=%s): %s\n" % (word, set, e), alert_admin=True)
-                    run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % self.tablename,
-                            (serialize_via_marshal(set), word))
+                    register_exception(prefix="Error when putting the term '%s' into db (hitlist=%s): %s\n" % (repr(word), set, e), alert_admin=True)
         if not set: # never store empty words
             run_sql("DELETE from %s WHERE term=%%s" % self.tablename,
                     (word,))
