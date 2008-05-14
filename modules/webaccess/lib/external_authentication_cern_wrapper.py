@@ -30,6 +30,18 @@ import re
 
 from invenio.config import CFG_ETCDIR
 
+_cern_nice_soap_file = open(CFG_ETCDIR + "/webaccess/cern_nice_soap_credentials.txt", "r")
+_cern_nice_soap_auth = _cern_nice_soap_file.read().strip()
+_cern_nice_soap_file.close()
+
+_re_ccd_is_nice = re.compile('<string.*>(?P<CCID>.*)</string>')
+_re_get_groups_for_user = re.compile("<string>(?P<group>.*)</string>")
+_re_user_is_member_of_list = re.compile('<boolean.*>(?P<membership>.*)</boolean>')
+_re_user_is_member_of_group = re.compile("<boolean.*>(?P<membership>.*)</boolean>")
+_re_get_user_info = re.compile("<(?P<field>.*)>(?P<value>.*)</.*>")
+_re_search_groups = re.compile("<string>(?P<group>.*)</string>")
+_re_get_user_info_ex = re.compile("<(?P<field>.*)>(?P<value>.*)</.*>")
+_re_list_users = re.compile("<(?P<field>.*)>(?P<value>.*)</.*>")
 
 class AuthCernWrapper:
     """Wrapper class for CERN NICE/CRA webservice"""
@@ -39,19 +51,15 @@ class AuthCernWrapper:
         CFG_ETCDIR/webaccess/cern_nice_soap_credentials.txt which must contain
         username:password in base64 encoding.
         """
-        self._cern_nice_soap_auth = \
-          open(CFG_ETCDIR + "/webaccess/cern_nice_soap_credentials.txt",
-               "r").read().strip()
         self._headers = {"Content-type": "application/x-www-form-urlencoded",
                    "Accept": "text/plain",
-                   "Authorization": "Basic " + self._cern_nice_soap_auth}
+                   "Authorization": "Basic " + _cern_nice_soap_auth}
         self._conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch")
 
     def __del__(self):
         """Close the CERN Nice webservice connection."""
-        pass
-        #if self._conn:
-        #    self._conn.close()
+        if self._conn:
+            self._conn.close()
 
     def _request(self, name, params):
         """Call the name request with a dictionary parms.
@@ -64,13 +72,12 @@ class AuthCernWrapper:
         response = self._conn.getresponse()
         return response.read()
 
-
     def ccid_is_nice(self, ccid):
         """Verify this CCID belongs to a Nice account. Returns login or -1
         if not found.
         """
         data = self._request("CCIDisNice", {"CCID": ccid})
-        match = re.search('<string.*>(?P<CCID>.*)</string>', data)
+        match = _re_ccd_is_nice.search(data)
         if match:
             if match == -1:
                 return False
@@ -83,7 +90,7 @@ class AuthCernWrapper:
         or 'listname@cern.ch'."""
         data = self._request("GetGroupsForUser", {"UserName": user_name})
         groups = []
-        for match in re.finditer("<string>(?P<group>.*)</string>", data):
+        for match in _re_get_groups_for_user.finditer(data):
             groups.append(match.group("group"))
         return groups
 
@@ -93,13 +100,10 @@ class AuthCernWrapper:
         """
         data = self._request("UserIsMemberOfList",
                 {"UserName": user_name, "ListName": list_name})
-        match = re.search('<boolean.*>(?P<membership>.*)</boolean>', data)
+        match = _re_user_is_member_of_list.search(data)
         if match:
             match = match.group("membership")
-            if match == "true":
-                return True
-            else:
-                return False
+            return match == "true"
         return None
 
     def user_is_member_of_group(self, user_name, group_name):
@@ -107,13 +111,10 @@ class AuthCernWrapper:
         NICE Login or Email."""
         data = self._request("UserIsMemberOfGroup",
                 {"UserName": user_name, "GroupName": group_name})
-        match = re.search("<boolean.*>(?P<membership>.*)</boolean>", data)
+        match = _re_user_is_member_of_group.search(data)
         if match:
             match = match.group("membership")
-            if match == "true":
-                return True
-            else:
-                return False
+            return match == "true"
         return None
 
     def get_user_info(self, user_name, password):
@@ -121,10 +122,9 @@ class AuthCernWrapper:
         address or NICE login."""
         data = self._request("GetUserInfo",
                 {"UserName": user_name, "Password": password})
-        infore = re.compile("<(?P<field>.*)>(?P<value>.*)</.*>")
         infos = {}
         for row in data.split('\r\n'):
-            match = infore.search(row)
+            match = _re_get_user_info.search(row)
             if match:
                 infos[match.group("field")] = match.group("value")
         return infos
@@ -134,7 +134,7 @@ class AuthCernWrapper:
         required. Search is done with: *pattern*."""
         data = self._request("SearchGroups", {"pattern": pattern})
         groups = []
-        for match in re.finditer("<string>(?P<group>.*)</string>", data):
+        for match in _re_search_groups.finditer(data):
             groups.append(match.group("group"))
         return groups
 
@@ -145,10 +145,9 @@ class AuthCernWrapper:
         data = self._request("GetUserInfoEx", {"UserName": user_name,
                                                "Password": password,
                                                "GroupName": group_name})
-        infore = re.compile("<(?P<field>.*)>(?P<value>.*)</.*>")
         infos = {}
         for row in data.split('\r\n'):
-            match = infore.search(row)
+            match = _re_get_user_info_ex.search(row)
             if match:
                 infos[match.group("field")] = match.group("value")
         return infos
@@ -158,14 +157,13 @@ class AuthCernWrapper:
         lastname, or email, and can contain *."""
         data = self._request("ListUsers", {"DisplayName": display_name})
         users = []
-        infore = re.compile("<(?P<field>.*)>(?P<value>.*)</.*>")
         for row in data.split('\r\n'):
             if "<userInfo>" in row:
                 current_user = {}
             elif "</userInfo>" in row:
                 users.append(current_user)
             else:
-                match = infore.search(row)
+                match = _re_list_users.search(row)
                 if match:
                     current_user[match.group("field")] = match.group("value")
         return users

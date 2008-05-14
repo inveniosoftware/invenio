@@ -79,9 +79,7 @@ class ExternalAuthCern(ExternalAuth):
         except (httplib.CannotSendRequest, socket.error, AttributeError,
                 IOError, TypeError), msg: # Let the user note that
                                      # no connection is available
-            self.connection = None
             raise InvenioWebAccessExternalAuthError, msg
-
 
     def _try_twice(self, funct, params):
         """Try twice to execute funct on self.connection passing it params.
