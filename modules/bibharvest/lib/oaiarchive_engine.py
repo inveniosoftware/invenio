@@ -549,13 +549,13 @@ def oaiarchive_task():
                 # Check if file is empty or not:
                 len_file = os.stat(filename)[ST_SIZE]
                 if len_file > 0:
-                    command = "%s/bibupload -a %s" % (CFG_BINDIR, filename)
+                    command = "%s/bibupload -a %s -u oaiarchive" % (CFG_BINDIR, filename)
                     os.system(command)
             if mode == 2 or mode == 4:
                 # Check if file is empty or not:
                 len_file = os.stat(filename2)[ST_SIZE]
                 if len_file > 0:
-                    command = "%s/bibupload -c %s" % (CFG_BINDIR, filename2)
+                    command = "%s/bibupload -c %s -u oaiarchive" % (CFG_BINDIR, filename2)
                     os.system(command)
 
     return True
