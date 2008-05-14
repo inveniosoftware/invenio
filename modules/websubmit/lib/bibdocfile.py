@@ -514,8 +514,12 @@ class BibRecDocs:
                         raise InvenioWebSubmitFileError, "Error in renaming '%s' to '%s': '%s'" % ('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, destination), e)
 
             try:
-                open("%s/.recid" % bibdoc.basedir, "w").write(str(self.id))
-                open("%s/.type" % bibdoc.basedir, "w").write(str(bibdoc.doctype))
+                recid_fd = open("%s/.recid" % bibdoc.basedir, "w")
+                recid_fd.write(str(self.id))
+                recid_fd.close()
+                type_fd = open("%s/.type" % bibdoc.basedir, "w")
+                type_fd.write(str(bibdoc.doctype))
+                type_fd.close()
             except Exception, e:
                 register_exception()
                 raise InvenioWebSubmitFileError, "Error in creating .recid and .type file for '%s' folder: '%s'" % (bibdoc.basedir, e)
@@ -641,9 +645,13 @@ class BibDoc:
                     # and save the father record id if it exists
                     try:
                         if self.recid != "":
-                            open("%s/.recid" % self.basedir, "w").write(str(self.recid))
+                            recid_fd = open("%s/.recid" % self.basedir, "w")
+                            recid_fd.write(str(self.recid))
+                            recid_fd.close()
                         if self.doctype != "":
-                            open("%s/.type" % self.basedir, "w").write(str(self.doctype))
+                            type_fd = open("%s/.type" % self.basedir, "w")
+                            type_fd.write(str(self.doctype))
+                            type_fd.close()
                     except Exception, e:
                         register_exception()
                         raise InvenioWebSubmitFileError, e
@@ -873,8 +881,12 @@ class BibDoc:
         try:
             try:
                 old_umask = os.umask(022)
-                open("%s/.docid" % newicon.get_base_dir(), "w").write(str(self.id))
-                open("%s/.type" % newicon.get_base_dir(), "w").write(str(self.doctype))
+                recid_fd = open("%s/.docid" % newicon.get_base_dir(), "w")
+                recid_fd.write(str(self.id))
+                recid_fd.close()
+                type_fd = open("%s/.type" % newicon.get_base_dir(), "w")
+                type_fd.write(str(self.doctype))
+                type_fd.close()
                 os.umask(old_umask)
             except Exception, e:
                 register_exception()
@@ -1365,7 +1377,10 @@ class BibDocFile:
 
     def get_content(self):
         """Returns the binary content of the file."""
-        return open(self.fullpath, 'rb').read()
+        content_fd = open(self.fullpath, 'rb')
+        content = content_fd.read()
+        content_fd.close()
+        return content
 
     def get_recid(self):
         """Returns the recid connected with the bibdoc of this file."""
@@ -1482,6 +1497,7 @@ class Md5Folder:
             md5file = open(os.path.join(self.folder, ".md5"), "w")
             for key, value in self.md5s.items():
                 md5file.write('%s *%s\n' % (value, key))
+            md5file.close()
             os.umask(old_umask)
         except Exception, e:
             register_exception()
@@ -1491,10 +1507,12 @@ class Md5Folder:
         """Load .md5 into the md5 dictionary"""
         self.md5s = {}
         try:
-            for row in open(os.path.join(self.folder, ".md5"), "r"):
+            md5file = open(os.path.join(self.folder, ".md5"), "r")
+            for row in md5file:
                 md5hash = row[:32]
                 filename = row[34:].strip()
                 self.md5s[filename] = md5hash
+            md5file.close()
         except IOError:
             self.update()
         except Exception, e:
@@ -1558,6 +1576,7 @@ def calculate_md5(filename, force_internal=False):
                     computed_md5.update(buf)
                 else:
                     break
+            to_be_read.close()
             return computed_md5.hexdigest()
         except Exception, e:
             register_exception()
@@ -1657,7 +1676,8 @@ def check_valid_url(url):
                 raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
             for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR]:
                 if path.startswith(allowed_path):
-                    open(path)
+                    dummy_fd = open(path)
+                    dummy_fd.close()
                     return
             raise StandardError, "%s is not in one of the allowed paths." % path
         else:
@@ -1669,7 +1689,8 @@ def download_url(url, format):
     """Download a url (if it corresponds to a remote file) and return a local url
     to it."""
     protocol = urllib2.urlparse.urlsplit(url)[0]
-    tmppath = tempfile.mkstemp(suffix=format, dir=CFG_TMPDIR)[1]
+    tmpfd, tmppath = tempfile.mkstemp(suffix=format, dir=CFG_TMPDIR)
+    os.close(tmpfd)
     try:
         if protocol in ('', 'file'):
             path = urllib2.urlparse.urlsplit(url)[2]
@@ -1804,6 +1825,9 @@ def readfile(filename):
     This function is useful for quick implementation of websubmit functions.
     """
     try:
-        return open(filename).read()
+        fd = open(filename)
+        content = fd.read()
+        fd.close()
+        return content
     except:
         return ''

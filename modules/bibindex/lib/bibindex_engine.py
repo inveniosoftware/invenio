@@ -301,7 +301,8 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                 data_chunk = url.read(8*1024)
             os.close(tmp_fd)
 
-        tmp_dst_name = tempfile.mkstemp('invenio.tmp.txt', dir=CFG_TMPDIR)[1]
+        dummy_fd, tmp_dst_name = tempfile.mkstemp('invenio.tmp.txt', dir=CFG_TMPDIR)
+        os.close(dummy_fd)
 
         bingo = 0
         # try all available conversion programs according to their order:
@@ -762,12 +763,13 @@ class WordTable:
         else:
             return None
 
-    def merge_with_old_recIDs(self,word,set):
+    def merge_with_old_recIDs(self, word, set):
         """Merge the system numbers stored in memory (hash of recIDs with value +1 or -1
         according to whether to add/delete them) with those stored in the database index
         and received in set universe of recIDs for the given word.
 
-        Return 0 in case no change was done to SET, return 1 in case SET was changed.
+        Return False in case no change was done to SET, return True in case SET
+        was changed.
         """
         oldset = intbitset(set)
         set.update_with_signs(self.value[word])
