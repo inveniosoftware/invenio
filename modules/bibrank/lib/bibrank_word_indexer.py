@@ -839,6 +839,7 @@ def word_index(run):
             update_rnkWORD(options["table"], options["modified_words"])
             task_sleep_now_if_required(can_stop_too=True)
         except StandardError, e:
+            register_exception(alert_admin=True)
             write_message("Exception caught: %s" % e, sys.stderr)
             if task_get_option("verbose") >= 9:
                 traceback.print_tb(sys.exc_info()[2])
@@ -864,7 +865,7 @@ def get_tags(config):
             tag[2] = tag[2].strip()
 
             #check if stemmer for language is available
-            if config.get(function,"stemming") and stem("information", "english") != "inform":
+            if config.get(function, "stemming") and stem("information", "en") != "inform":
                 if shown_error == 0:
                     write_message("Warning: Stemming not working. Please check it out!")
                     shown_error = 1
@@ -1107,21 +1108,25 @@ def update_rnkWORD(table, terms):
         docs_terms = get_from_reverse_index(records, i, (i + 5000), table)
         for (j, termlist) in docs_terms:
             doc_terms = deserialize_via_marshal(termlist)
-            for (t, tf) in doc_terms.iteritems():
-                if Gi.has_key(t):
-                    Nj[j] = Nj.get(j, 0) + math.pow(Gi[t] * (1 + math.log(tf[0])), 2)
-                    Git = int(math.floor(Gi[t]*100))
-                    if Git >= 0:
-                        Git += 1
-                    doc_terms[t] = (tf[0], Git)
-                else:
-                    Nj[j] = Nj.get(j, 0) + math.pow(tf[1] * (1 + math.log(tf[0])), 2)
-            Nj[j] = 1.0 / math.sqrt(Nj[j])
-            Nj[j] = int(Nj[j] * 100)
-            if Nj[j] >= 0:
-                Nj[j] += 1
-            run_sql("UPDATE %sR SET termlist=%%s WHERE id_bibrec=%%s" % table[:-1],
-                    (serialize_via_marshal(doc_terms), j))
+            try:
+                for (t, tf) in doc_terms.iteritems():
+                    if Gi.has_key(t):
+                        Nj[j] = Nj.get(j, 0) + math.pow(Gi[t] * (1 + math.log(tf[0])), 2)
+                        Git = int(math.floor(Gi[t]*100))
+                        if Git >= 0:
+                            Git += 1
+                        doc_terms[t] = (tf[0], Git)
+                    else:
+                        Nj[j] = Nj.get(j, 0) + math.pow(tf[1] * (1 + math.log(tf[0])), 2)
+                Nj[j] = 1.0 / math.sqrt(Nj[j])
+                Nj[j] = int(Nj[j] * 100)
+                if Nj[j] >= 0:
+                    Nj[j] += 1
+                run_sql("UPDATE %sR SET termlist=%%s WHERE id_bibrec=%%s" % table[:-1],
+                        (serialize_via_marshal(doc_terms), j))
+            except ZeroDivisionError, e:
+                ## This is to try to isolate division by zero errors.
+                register_exception(prefix="Error when analysing the record %s (%s): %s\n" % (j, repr(docs_terms), e), alert_admin=True)
         write_message("Phase 4: ......processed %s/%s records" % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
         i += 5000
     write_message("Phase 4: Finished calculating normalization value for all affected records and updating %sR" % table[:-1])
