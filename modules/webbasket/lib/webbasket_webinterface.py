@@ -25,15 +25,18 @@ __lastupdated__ = """$Date$"""
 from mod_python import apache
 
 from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_SITE_LANG, \
-                           CFG_ACCESS_CONTROL_LEVEL_SITE
+                           CFG_ACCESS_CONTROL_LEVEL_SITE, \
+                           CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
+                           CFG_SITE_SECURE_URL
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.webbasket import *
 from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES, \
                                      CFG_WEBBASKET_ACTIONS
-from invenio.urlutils import get_referer, redirect_to_url
+from invenio.urlutils import get_referer, redirect_to_url, make_canonical_urlargd
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
+
 
 class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
     """Defines the set of /yourbaskets pages."""
@@ -65,11 +68,23 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/display",
                                        navmenuid = 'yourbaskets')
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/display%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
         (body, errors, warnings) = perform_request_display(uid,
                                                            argd['category'],
                                                            argd['topic'],
                                                            argd['group'],
                                                            argd['ln'])
+
         if isGuestUser(uid):
             body = create_guest_warning_box(argd['ln']) + body
         navtrail = '<a class="navtrail" href="%s/youraccount/display?ln=%s">'\
@@ -110,6 +125,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/display_item",
                                        navmenuid = 'yourbaskets')
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/display_item%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
         (body, errors, warnings) = perform_request_display_item(
                                             uid=uid,
                                             bskid=argd['bskid'],
@@ -160,6 +186,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/write_comment",
                                        navmenuid = 'yourbaskets')
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/write_comment%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
         (body, errors, warnings) = perform_request_write_comment(
                                         uid=uid,
                                         bskid=argd['bskid'],
@@ -209,6 +246,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/save_comment",
                                        navmenuid = 'yourbaskets')
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/save_comment%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
         (errors_saving, infos) = perform_request_save_comment(
                                         uid=uid,
                                         bskid=argd['bskid'],
@@ -273,6 +321,16 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../yourbaskets/delete_comment",
                                        navmenuid = 'yourbaskets')
 
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/delete_comment%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/display%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
         _ = gettext_set_language(argd['ln'])
         url = CFG_SITE_URL + '/yourbaskets/display_item?recid=%i&bskid=%i' % \
                             (argd['recid'], argd['bskid'])
@@ -318,6 +376,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/add",
                                        navmenuid = 'yourbaskets')
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/add%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
         if not argd['referer']:
             argd['referer'] = get_referer(req)
         (body, errors, warnings) = perform_request_add(
@@ -366,6 +435,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/delete",
                                        navmenuid = 'yourbaskets')
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/delete%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
         (body, errors, warnings)=perform_request_delete(
                                         uid=uid,
                                         bskid=argd['bskid'],
@@ -420,6 +500,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/modify",
                                        navmenuid = 'yourbaskets')
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/modify%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
         url = CFG_SITE_URL
         url += '/yourbaskets/display?category=%s&topic=%i&group=%i&ln=%s' %\
                (argd['category'], argd['topic'], argd['group'], argd['ln'])
@@ -489,6 +580,16 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../yourbaskets/edit",
                                        navmenuid = 'yourbaskets')
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/edit%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
 
         _ = gettext_set_language(argd['ln'])
         if argd['cancel']:
@@ -582,6 +683,16 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../yourbaskets/create_basket",
                                        navmenuid = 'yourbaskets')
 
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/create_basket%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
         _ = gettext_set_language(argd['ln'])
         if argd['new_basket_name'] and \
                 (argd['new_topic_name'] or argd['create_in_topic'] != -1):
@@ -631,6 +742,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
             return page_not_authorized(req, "../yourbaskets/display_public",
                                        navmenuid = 'yourbaskets')
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/display_public%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
         if argd['bskid'] == 0:
             # No given basket => display list of public baskets
             (body, errors, warnings) = perform_request_list_public_baskets(
@@ -682,15 +804,27 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                    'of': (str, '')
                                    })
 
+        if argd['inf_limit'] < 0:
+            argd['inf_limit'] = 0
         _ = gettext_set_language(argd['ln'])
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
-            return page_not_authorized(req, "../yourbaskets/unsubscribe",
+            return page_not_authorized(req, "../yourbaskets/list_public_baskets",
                                        navmenuid = 'yourbaskets')
         (body, errors, warnings) = perform_request_list_public_baskets(
                                         argd['inf_limit'],
                                         argd['order'],
                                         argd['asc'], argd['ln'])
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/list_public_baskets%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
 
         return page(title = _("List of public baskets"),
                     body        = body,
@@ -714,6 +848,16 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
             return page_not_authorized(req, "../yourbaskets/unsubscribe",
                                        navmenuid = 'yourbaskets')
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/unsubscribe%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
         perform_request_unsubscribe(uid, argd['bskid'])
         url = CFG_SITE_URL + '/yourbaskets/display?category=%s&ln=%s'
         url %= (CFG_WEBBASKET_CATEGORIES['EXTERNAL'], argd['ln'])
@@ -728,6 +872,17 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
             return page_not_authorized(req, "../yourbaskets/subscribe",
                                        navmenuid = 'yourbaskets')
+
+        if isGuestUser(uid):
+            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                        make_canonical_urlargd({
+                    'referer' : "%s/yourbaskets/subscribe%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
         errors = perform_request_subscribe(uid, argd['bskid'])
         if len(errors):
             return page(errors=errors,

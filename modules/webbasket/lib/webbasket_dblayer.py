@@ -774,9 +774,9 @@ def get_public_baskets_list(inf_limit, max_number, order=1, asc=1):
         query += ' ASC '
     else:
         query += ' DESC '
-    query += "LIMIT %i,%i" % (inf_limit, max_number)
+    query += "LIMIT %s,%s"
 
-    return run_sql(query)
+    return run_sql(query, (inf_limit, max_number))
 
 def is_public(bskid):
     """return 1 if basket is public, 0 else."""
