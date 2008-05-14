@@ -29,7 +29,7 @@ import unittest
 from invenio import search_engine_query_parser
 
 from invenio.testutils import make_test_suite, run_test_suite
-
+from invenio.search_engine import perform_request_search
 class TestSearchQueryParenthesisedParser(unittest.TestCase):
     """Test parenthesis parsing."""
 
@@ -141,7 +141,74 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
 
 
 
-TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser)
+class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
+    """Test parsing of SPIRES data---note these test cases are written against atlantis
+    and use perform_request_search which then loads the parser
+    """
+
+
+    def _compare_searches(self, inv_search, spi_search):
+        """Compare inv_search and spi_search for equivalence
+        tests that a non-trivial result is found, that the hitsets are equal
+        prints a message if both queries are parsed identically (a bonus...)
+        """
+        self.assert_(len(perform_request_search(p=spi_search))>0)
+        self.assertEqual(perform_request_search(p=inv_search), \
+                         perform_request_search(p=spi_search))
+
+
+        #test operator searching
+    def test_operators(self):
+        """find a ellis and t muon
+        """
+        inv_search = "author:ellis and title:muon"
+        spi_search = "find a ellis and t muon"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_parens(self):
+        """find a ellis and not t muon and not t kaon
+        """
+        inv_search = "author:ellis and not (title:muon or title:kaon)"
+        spi_search = "find a ellis and not t muon and not t kaon "
+        self._compare_searches(inv_search, spi_search)
+
+    def test_author_simple(self):
+        """find a ellis, j
+        """
+        inv_search = 'author:"ellis,j." or author:"ellis,j*"'
+        spi_search = "find a ellis, j"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_author_reverse(self):
+        """ find a j ellis
+        """
+        inv_search = 'author"ellis, j" or author:"ellis,j*"'
+        spi_search = "find a j ellis"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_author_full_first(self):
+        """ find a ellis, john
+        """
+        inv_search = "author:'ellis, john' or author:'ellis, j.' or author:'ellis, jo.'"
+        spi_search = "find a ellis, john"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_date(self):
+        """ find date 1996
+        """
+        inv_search = "date:1996"
+        spi_search = "find date 1996"
+        self._compare_searches(inv_search, spi_search)
+
+    def test_month(self):
+        """find date 3/1996
+        """
+        inv_search = "date:'3/1996'"
+        spi_search = "find date 3/1996"
+        self._compare_searches(inv_search, spi_search)
+
+TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser, \
+                             TestSpiresToInvenioSyntaxConverter)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
