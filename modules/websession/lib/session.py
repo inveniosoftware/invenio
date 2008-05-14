@@ -686,7 +686,7 @@ class RequestWrapper:
                                    # so in succesive request it can be recovered
 
     def __str__(self):
-        return 'request: %s, cookies: %s, environ: %s, session: %s' % (self.__requests, self.cookies, self.environ, self.session)
+        return 'request: %s, cookies: %s, environ: %s, session: %s' % (self.__request, self.cookies, self.environ, self.session)
 
     def getWrapper( req ):
         """Returns a RequestWrapper for a given request.
