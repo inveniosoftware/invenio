@@ -74,7 +74,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
 
         last_name = ""
         for descr, urls in main_urls.items():
-            out += '<small class="detailedRecordActions">%s:</small> ' % descr
+            out += '<div><small class="detailedRecordActions">%s:</small> ' % descr
             url_list = []
             urls.sort(lambda (url1, name1, format1), (url2, name2, format2): url1 < url2 and -1 or url1 > url2 and 1 or 0)
 
