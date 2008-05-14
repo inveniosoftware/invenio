@@ -660,7 +660,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     if len(roles) == 1:
                         # There's only one role enabled to see this collection
                         # Let's redirect to log to it!
-                        return redirect_to_url(req, '%s%s' % (CFG_SITE_SECURE_URL, make_canonical_urlargd({'realm' : roles[0][0], 'referer' : args['referer']}, {})))
+                        return redirect_to_url(req, '%s/%s' % (CFG_SITE_SECURE_URL, make_canonical_urlargd({'realm' : roles[0][0], 'referer' : args['referer']}, {})))
             except InvenioWebAccessMailCookieError:
                 pass
 
