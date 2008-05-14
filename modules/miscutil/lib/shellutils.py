@@ -39,10 +39,8 @@ def run_shell_command(cmd):
     """
     cmd_out = ''
     cmd_err = ''
-    dummy_fd, file_cmd_out = tempfile.mkstemp("invenio-shellutils-cmd-out")
-    os.close(dummy_fd)
-    dummy_fd, file_cmd_err = tempfile.mkstemp("invenio-shellutils-cmd-err")
-    os.close(dummy_fd)
+    cmd_out_fd, file_cmd_out = tempfile.mkstemp("invenio-shellutils-cmd-out")
+    cmd_err_fd, file_cmd_err = tempfile.mkstemp("invenio-shellutils-cmd-err")
     cmd_exit_code = os.system("%s > %s 2> %s" % (cmd,
                                                  file_cmd_out,
                                                  file_cmd_err))
@@ -56,6 +54,8 @@ def run_shell_command(cmd):
         cmd_err = cmd_err_fd.read()
         cmd_err_fd.close()
         os.remove(file_cmd_err)
+    os.close(cmd_out_fd)
+    os.close(cmd_err_fd)
     return cmd_exit_code, cmd_out, cmd_err
 
 def escape_shell_arg(shell_arg):

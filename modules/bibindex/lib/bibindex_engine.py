@@ -302,7 +302,6 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
             os.close(tmp_fd)
 
         dummy_fd, tmp_dst_name = tempfile.mkstemp('invenio.tmp.txt', dir=CFG_TMPDIR)
-        os.close(dummy_fd)
 
         bingo = 0
         # try all available conversion programs according to their order:
@@ -373,7 +372,6 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                         write_message("Error while running %s for %s." % (cmd, url_direct), sys.stderr)
                 except:
                     write_message("Error running %s for %s." % (cmd, url_direct), sys.stderr)
-
         # were we successful?
         if bingo:
             tmp_name_txt_file = open(tmp_dst_name)
@@ -389,6 +387,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
         try:
             if not no_src_delete:
                 os.unlink(tmp_name)
+            os.close(dummy_fd)
             os.unlink(tmp_dst_name)
         except StandardError:
             write_message("Error: Could not delete file. It didn't exist", sys.stderr)

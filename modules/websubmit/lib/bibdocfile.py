@@ -1690,7 +1690,6 @@ def download_url(url, format):
     to it."""
     protocol = urllib2.urlparse.urlsplit(url)[0]
     tmpfd, tmppath = tempfile.mkstemp(suffix=format, dir=CFG_TMPDIR)
-    os.close(tmpfd)
     try:
         if protocol in ('', 'file'):
             path = urllib2.urlparse.urlsplit(url)[2]
@@ -1707,6 +1706,7 @@ def download_url(url, format):
     except:
         os.remove(tmppath)
         raise
+    os.close(tmpfd)
 
 class BibDocMoreInfo:
     """Class to wrap the serialized bibdoc more_info. At the moment

@@ -230,10 +230,8 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
 ##         if platform.python_compiler().find('Red Hat') > -1:
 ##             # use os.system
         (result_code, result_path) = tempfile.mkstemp()
-        os.close(result_code)
         command = "( %s/bibformat otype=%s )  > %s" % (CFG_BINDIR, format, result_path)
         (xm_code, xm_path) = tempfile.mkstemp()
-        os.close(xm_code)
         xm_file = open(xm_path, "w")
         xm_file.write(xm_record)
         xm_file.close()
@@ -242,7 +240,9 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
         result_file = open(result_path,"r")
         bibformat_output = result_file.read()
         result_file.close()
+        os.close(result_code)
         os.remove(result_path)
+        os.close(xm_code)
         os.remove(xm_path)
 ##         else:
 ##             # use popen
