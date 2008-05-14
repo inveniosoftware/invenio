@@ -362,7 +362,13 @@ class Template:
                     'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                     'of' : 'hd'}))
         if title_query:
-            if perform_request_search(p=title_query):
+            result = len(perform_request_search(p=title_query))
+            if result == 1:
+                return '%s/search?%s' % (CFG_SITE_URL, urlencode({
+                    'p' : title_query,
+                    'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
+                    'of' : 'hd'}))
+            elif result > 1:
                 return '%s/search?%s' % (CFG_SITE_URL, urlencode({
                     'p' : title_query,
                     'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
@@ -378,7 +384,7 @@ class Template:
             return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
                 'p' : '%s and %s' % (title_query, author_query),
                 'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
-                'of' : 'hd'}, {}))
+                'of' : 'hb'}, {}))
         elif title_query:
             return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
                 'p' : title_query,
