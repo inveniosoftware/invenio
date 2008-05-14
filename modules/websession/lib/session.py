@@ -58,6 +58,7 @@ try:
 except ImportError:
     pass
 
+
 from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER
 
 _qparm_re = re.compile(r'([\0- ]*'
@@ -178,6 +179,8 @@ class SessionManager:
     def __repr__ (self):
         return "<%s at %x>" % (self.__class__.__name__, id(self))
 
+    def __str__(self):
+        return str(self.sessions)
 
     # -- Mapping interface ---------------------------------------------
     # (subclasses shouldn't need to override any of this, unless
@@ -523,7 +526,7 @@ class Session:
         return "<%s at %x: %s>" % (self.__class__.__name__, id(self), self.id)
 
     def __str__ (self):
-        return "session %s" % self.id
+        return "session %s, remote address: %s, creation time: %s" % (self.id, self.__remote_address, self.__creation_time)
 
     def has_info (self):
         """has_info() -> boolean
@@ -682,6 +685,9 @@ class RequestWrapper:
         request.cds_wrapper = self #sticks the current wrapper to the mp request
                                    # so in succesive request it can be recovered
 
+    def __str__(self):
+        return 'request: %s, cookies: %s, environ: %s, session: %s' % (self.__requests, self.cookies, self.environ, self.session)
+
     def getWrapper( req ):
         """Returns a RequestWrapper for a given request.
 
@@ -726,6 +732,9 @@ class ResponseWrapper:
         """
         self.request = request
 
+    def __str__(self):
+        return str(self.request)
+
     def set_cookie(self, cookie_name, cookie_value, **attrs):
         """
         """
@@ -742,6 +751,8 @@ class ResponseWrapper:
                                                  (cookie_name,
                                                   cookie_value,
                                                   options)
+        if 'expires' not in attrs or attrs['expires'] != 0:
+            self.request.cds_wrapper.cookies.update(parse_cookie(self.request.headers_out["Set-Cookie"]))
 
 
 class SessionError(Exception):

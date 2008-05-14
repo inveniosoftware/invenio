@@ -79,6 +79,9 @@ class pSession(Session):
         self.__apache_user = None
         self.__remember_me = False
 
+    def __str__(self):
+        return '%s, uid: %s, dirty: %s, dirty remember me: %s, apache user: %s, remember me: %s' % (Session.__str__(self), self.__uid, self.__dirty, self.__dirty_remember_me, self.__apache_user, self.__remember_me)
+
     def has_info(self):
         return CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS or self.__apache_user or self.__uid > 0
 

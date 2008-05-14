@@ -176,7 +176,8 @@ def getApacheUser(req):
         sm.revoke_session_cookie (req)
         s = sm.get_session(req)
     apache_user = s.getApacheUser()
-    sm.maintain_session(req, s)
+    remember_me = s.getRememberMe()
+    sm.maintain_session(req, s, remember_me)
     return apache_user
 
 def getUid (req):
