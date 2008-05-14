@@ -3227,15 +3227,28 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         tabs['comments']['enabled'] = False
 
     if recID is not None:
+
         # Disable references if no references found
-        bfo = BibFormatObject(recID)
-        if bfe_references.format(bfo, '', '') == '':
-            tabs['references']['enabled'] = False
+        #bfo = BibFormatObject(recID)
+        #if bfe_references.format(bfo, '', '') == '':
+        #    tabs['references']['enabled'] = False
+
+        ## FIXME: the above was commented out because bfe_references
+        ## may be too slow.  And we do not really need this anyway
+        ## because we can disable tabs in WebSearch Admin on a
+        ## collection-by-collection basis.  If we need this, then we
+        ## should probably call bfo.fields('999') here that should be
+        ## much faster than calling bfe_references.
+
         # Disable citations if not citations found
-        #Will be done later since reading the dictionary in get_cited_by is too slow..
         #if len(get_cited_by(recID)) == 0:
-        #    # TODO: Also check for cocitations
         #    tabs['citations']['enabled'] = False
+
+        ## FIXME: the above was commented out because get_cited_by()
+        ## may be too slow.  And we do not really need this anyway
+        ## because we can disable tags in WebSearch Admin on a
+        ## collection-by-collection basis.
+
         # Disable fulltext if no file found
         brd =  BibRecDocs(recID)
         if len(brd.list_bibdocs()) == 0:
