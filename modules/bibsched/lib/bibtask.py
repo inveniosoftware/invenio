@@ -558,13 +558,13 @@ def _task_run(task_run_fnc):
                 write_message("Task #%d finished and resubmitted." % _task_params['task_id'])
             else:
                 ## We keep the bad result and we resubmit with another id.
-                res = run_sql('SELECT proc,user,sleeptime,arguments,priority FROM schTASK WHERE id=%s', (_task_params['task_id'], ))
-                proc, user, sleeptime, arguments, priority = res[0]
-                run_sql("""INSERT INTO schTASK (proc,user,
-                            runtime,sleeptime,status,arguments,priority)
-                            VALUES (%s,%s,%s,%s,'WAITING',%s, %s)""",
-                            (proc, user, new_runtime, sleeptime, arguments, priority))
-                write_message("Task #%d finished (%s) and resubmitted." % (_task_params['task_id'], task_status))
+                #res = run_sql('SELECT proc,user,sleeptime,arguments,priority FROM schTASK WHERE id=%s', (_task_params['task_id'], ))
+                #proc, user, sleeptime, arguments, priority = res[0]
+                #run_sql("""INSERT INTO schTASK (proc,user,
+                            #runtime,sleeptime,status,arguments,priority)
+                            #VALUES (%s,%s,%s,%s,'WAITING',%s, %s)""",
+                            #(proc, user, new_runtime, sleeptime, arguments, priority))
+                write_message("Task #%d finished (%s) but not resubmitted." % (_task_params['task_id'], task_status))
 
         else:
             ## we are done:
