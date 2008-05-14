@@ -221,8 +221,10 @@ class Manager:
                 self.selected_line = 2
             elif chr in (ord("a"), ord("A")):
                 self.change_auto_mode()
-            elif chr in (ord("l"), ord("L")):
+            elif chr == ord("l"):
                 self.openlog()
+            elif chr == ord("L"):
+                self.openlog(err=True)
             elif chr in (ord("w"), ord("W")):
                 self.wakeup()
             elif chr in (ord("r"), ord("R")):
@@ -272,31 +274,22 @@ class Manager:
     def set_progress(self, task_id, progress):
         return run_sql("UPDATE schTASK set progress=%s WHERE id=%s", (progress, task_id))
 
-    def openlog(self):
+    def openlog(self, err=False):
         task_id = self.currentrow[0]
         status = self.currentrow[5]
-        tmpfile = NamedTemporaryFile(dir=CFG_TMPDIR)
-        try:
-            tmpfile.write('bibsched_task_%d.log content\n' % task_id)
-            tmpfile.write('-----------------------------------\n')
-            tmpfile.write(open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % task_id)).read())
-        except IOError:
-            pass
-        try:
-            tmpfile.write('bibsched_task_%d.err content\n' % task_id)
-            tmpfile.write('-----------------------------------\n')
-            tmpfile.write(open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % task_id)).read())
-        except IOError:
-            pass
-        tmpfile.flush()
-        pager = CFG_BIBSCHED_LOG_PAGER or os.environ.get('PAGER', '/bin/more')
-        if os.path.exists(pager):
-            self.curses.endwin()
-            os.system('%s %s' % (pager, tmpfile.name))
-            print >> self.old_stdout, "\rPress ENTER to continue",
-            self.old_stdout.flush()
-            raw_input()
-            self.curses.panel.update_panels()
+        if err:
+            logname = os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % task_id)
+        else:
+            logname = os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % task_id)
+        if os.path.exists(logname):
+            pager = CFG_BIBSCHED_LOG_PAGER or os.environ.get('PAGER', '/bin/more')
+            if os.path.exists(pager):
+                self.curses.endwin()
+                os.system('%s %s' % (pager, logname))
+                print >> self.old_stdout, "\rPress ENTER to continue",
+                self.old_stdout.flush()
+                raw_input()
+                self.curses.panel.update_panels()
 
     def display_task_options(self):
         """Nicely display information about current process."""
