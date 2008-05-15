@@ -456,7 +456,11 @@ class Template:
             if c != []:
                 # Add collections
                 c = [quote(coll) for coll in c]
-                args += '&amp;c=' + '&amp;c='.join(c)
+                if args == '':
+                    args += '?'
+                else:
+                    args += '&amp'
+                args += ';c=' + '&amp;c='.join(c)
 
         return CFG_SITE_URL + '/rss' + args
 
