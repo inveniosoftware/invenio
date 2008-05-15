@@ -6270,12 +6270,14 @@
             <subfield code="m">2001-09-15</subfield>
             <subfield code="o">BATCH</subfield>
         </datafield>
+        <!--the datafield below is used in citation seach testing-->
         <datafield tag="909" ind1="C" ind2="4">
             <subfield code="c">357-362</subfield>
             <subfield code="p">Phys. Lett., B</subfield>
             <subfield code="v">151</subfield>
             <subfield code="y">1985</subfield>
         </datafield>
+        <!--the datafield above is used in citation seach testing-->
         <datafield tag="909" ind1="C" ind2="O">
             <subfield code="o">oai:cds.cern.ch:CERN-TH-4036</subfield>
             <subfield code="p">cern:theory</subfield>
@@ -22144,7 +22146,131 @@
        <subfield code="a">http://doc.cern.ch//archive/electronic/hep-th/9809/9809057.pdf</subfield>
    </datafield>
 </record>
+<!--added he following record to get an example of finding a reference-->
+<!--by 999C5s to 909C4-->
+<!--It's probably a good article, anyway-->
+<record>
+  <controlfield tag="003">SzGeCERN</controlfield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">2174811CERCER</subfield>
+ </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="9">SLAC</subfield>
+    <subfield code="a">4308492</subfield>
+ </datafield>
+  <datafield tag="037" ind1=" " ind2=" ">
+    <subfield code="a">hep-ph/0002060</subfield>
+ </datafield>
+  <datafield tag="041" ind1=" " ind2=" ">
+    <subfield code="a">eng</subfield>
+ </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="a">ACT-2000-1</subfield>
+ </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="a">CTP-TAMU-2000-2</subfield>
+ </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="a">OUTP-2000-03-P</subfield>
+ </datafield>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="a">TPI-MINN-2000-6</subfield>
+ </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="a">Cleaver, G B</subfield>
+ </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">Non-Abelian Flat Directions in a Minimal Superstring Standard Model</subfield>
+ </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">2000</subfield>
+ </datafield>
+  <datafield tag="269" ind1=" " ind2=" ">
+    <subfield code="a">Houston, TX</subfield>
+    <subfield code="b">Houston Univ. Adv. Res. Cent. The Woodlands</subfield>
+    <subfield code="c">4 Feb 2000</subfield>
+ </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">14 p</subfield>
+ </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">Recently, by studying exact flat directions of non-Abelian singlet fields, wedemonstrated the existence of free fermionic heterotic-string models in whichthe SU(3)_C x SU(2)_L x U(1)_Y-charged matter spectrum, just below the stringscale, consists solely of the MSSM spectrum. In this paper we generalize theanalysis to include VEVs of non-Abelian fields. We find several,MSSM-producing, exact non-Abelian flat directions, which are the first suchexamples in the literature. We examine the possibility that hidden sectorcondensates lift the flat directions.</subfield>
+ </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">LANL EDS</subfield>
+ </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS LANLPUBL2001</subfield>
+ </datafield>
+  <datafield tag="595" ind1=" " ind2=" ">
+    <subfield code="a">SIS:2001 PR/LKR added</subfield>
+ </datafield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="2">SzGeCERN</subfield>
+    <subfield code="a">Particle Physics - Phenomenology</subfield>
+ </datafield>
+  <datafield tag="690" ind1="C" ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+ </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Faraggi, A E</subfield>
+ </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Nanopoulos, Dimitri V</subfield>
+ </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="a">Walker, J W</subfield>
+ </datafield>
+  <datafield tag="720" ind1=" " ind2=" ">
+    <subfield code="a">Walker, Joel W.</subfield>
+ </datafield>
+  <datafield tag="909" ind1=" " ind2=" ">
+    <subfield code="c">1191-1202</subfield>
+    <subfield code="p">Mod. Phys. Lett. A</subfield>
+    <subfield code="v">15</subfield>
+    <subfield code="y">2000</subfield>
+ </datafield>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">http://documents.cern.ch/cgi-bin/setlink?base=preprint&amp;categ=hep-ph&amp;id=0002060</subfield>
+    <subfield code="y">Access to fulltext document</subfield>
+ </datafield>
+  <datafield tag="859" ind1=" " ind2=" ">
+    <subfield code="f">gcleaver@rainbow.physics.tamu.edu</subfield>
+ </datafield>
+  <datafield tag="916" ind1=" " ind2=" ">
+    <subfield code="s">n</subfield>
+    <subfield code="w">200006</subfield>
+ </datafield>
+  <datafield tag="960" ind1=" " ind2=" ">
+    <subfield code="a">13</subfield>
+ </datafield>
+  <datafield tag="961" ind1=" " ind2=" ">
+    <subfield code="c">20070425</subfield>
+    <subfield code="h">1017</subfield>
+    <subfield code="l">CER01</subfield>
+    <subfield code="x">20000207</subfield>
+ </datafield>
+  <datafield tag="963" ind1=" " ind2=" ">
+    <subfield code="a">PUBLIC</subfield>
+ </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="a">002174811CER</subfield>
+ </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">ARTICLE</subfield>
+ </datafield>
+ <!--the reference-->
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[12]</subfield>
+    <subfield code="m">J. Ellis, K. Enqvist, D.V. Nanopoulos</subfield>
+    <subfield code="s">Phys. Lett., B 151 (1985) 357</subfield>
+ </datafield> 
+</record>
 
 </collection>
+
+
+
+
 
 
