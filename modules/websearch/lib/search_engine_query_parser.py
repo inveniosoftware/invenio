@@ -510,10 +510,71 @@ class SpiresToInvenioSyntaxConverter:
         # assume that only queries starting with FIND are SPIRES queries
         if query.lower().startswith("find "):
             query = self._replace_spires_keywords_with_invenio_keywords(query)
+            query = self._convert_spires_author_search_to_invenio_author_search(query)
             # remove FIND in the beginning of the query as it is not necessary in Invenio
             query = query[5:]
 
         return query
+
+    def _convert_spires_author_search_to_invenio_author_search(self, query):
+        """Converts SPIRES search patterns for authors to search patterns in invenio
+        that give similar results to the spires search."""
+
+        # regular expression that matches author patterns"
+        re_author_match = re.compile(
+                                     # author:ellis, jacqueline
+                                     r'\bauthor:\s*(?P<surname1>\w+),\s*(?P<name1>\w{2,})\b' + '|' + \
+                                     # author:jacqueline ellis
+                                     r'\bauthor:\s*(?P<name2>\w+)\s+(?!and |or |not )(?P<surname2>\w+)\b' + '|' +\
+                                     # author:ellis, j.
+                                     r'\bauthor:\s*(?P<surname3>\w+),\s*(?P<initial>\w)\.?\b',
+                                     re.IGNORECASE)
+        # result of the replacement
+        result = ""
+        current_position = 0
+
+        for match in re_author_match.finditer(query):
+
+            result = result + query[current_position : match.start()]
+
+            result = result + \
+                self._create_author_search_pattern(match.group('name1'), match.group('surname1')) + \
+                self._create_author_search_pattern(match.group('name2'), match.group('surname2')) + \
+                self._create_author_search_pattern(match.group('initial'), match.group('surname3'))
+
+            # move current position at the end of the processed content
+            current_position = match.end()
+
+        # append the content from the last match till the end
+        result = result + query[current_position : len(query)]
+
+        return result
+
+    def _create_author_search_pattern(self, author_name, author_surname):
+        """Creates search patter for author by given author's name and surname.
+
+        When the pattern is executed in invenio search, it produces results
+        similar to the results of SPIRES search engine."""
+
+        AUTHOR_KEYWORD = 'author:'
+
+        # we expect to have at least surname
+        if author_surname == '' or author_surname == None:
+            return ''
+
+        # ellis ---> "ellis"
+        if author_name == '' or author_name == None:
+            return AUTHOR_KEYWORD + author_surname
+
+        # ellis, j ---> "ellis, j*"
+        if len(author_name) == 1:
+            return AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name + '*"'
+
+        # ellis, jacqueline ---> "ellis, jacqueline" or "ellis, j." or "ellis, ja."
+        if len(author_name) > 1:
+            return AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name + '" or ' +\
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0] + '." or ' +\
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + '."'
 
     def _replace_spires_keywords_with_invenio_keywords(self, query):
         """Replaces SPIRES keywords that have directly
@@ -565,7 +626,8 @@ class SpiresToInvenioSyntaxConverter:
         """Replaces old keyword in the query with a new keyword"""
 
         # perform case insensitive replacement with regular expression
-        regular_expression = re.compile(old_keyword, re.IGNORECASE)
+        regex_string = r'\b((?<=find)|(?<=and)|(?<=or)|(?<=not))\s*' + old_keyword + r'\b'
+        regular_expression = re.compile(regex_string, re.IGNORECASE)
         result = regular_expression.sub(new_keyword, query)
 
         return result
