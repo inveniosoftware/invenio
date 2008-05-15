@@ -81,8 +81,8 @@ def get_citation_weight(rank_method_code, config):
             id = task_get_option("id")
             first = id[0][0]
             last = id[0][1]
-            #make range
-            updated_recid_list = range(first, last)
+            #make range, last+1 so that e.g. -i 1-2 really means [1,2] not [1]
+            updated_recid_list = range(first, last+1)
         else:
             updated_recid_list = create_recordid_list(last_modified_records)
 
