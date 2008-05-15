@@ -76,6 +76,8 @@ class SearchQueryParenthesisedParser:
     def _init_parsing(self, query=""):
         """Initialize variables before parsing """
 
+        self._compile_regular_expressions()
+
         # clean the query replacing some of the content e.g. replace 'AND' with '+'
         query = self._clean_query(query)
         self._query = query
@@ -89,21 +91,23 @@ class SearchQueryParenthesisedParser:
 
         self._inside_parentheses = False
 
-    def _clean_query(self, query):
-        """Clean the query performing replacement of AND, OR, NOT operators with their
-        equivalents +, |, - """
+    def _compile_regular_expressions(self):
+        """Compiles some of the regular expressions that are used in the class
+        for higher performance."""
 
         # regular expression that matches the contents in single and double quotes
         # taking in mind if they are escaped.
-        # if this became bottleneck at some moment, the compilation of the expression
-        # can be moved outside in order to be compiled only once.
-        re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
+        self._re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
+
+    def _clean_query(self, query):
+        """Clean the query performing replacement of AND, OR, NOT operators with their
+        equivalents +, |, - """
 
         # result of the replacement
         result = ""
         current_position = 0
 
-        for match in re_quotes_match.finditer(query):
+        for match in self._re_quotes_match.finditer(query):
             # clean the content after the previous quotes and before current quotes
             cleanable_content = query[current_position : match.start()]
             cleanable_content = self._clean_operators(cleanable_content)
@@ -453,6 +457,12 @@ class SpiresToInvenioSyntaxConverter:
             ' expno ' : ' experiment:',
             ' sd ' : ' experiment:',
             ' se ' : ' experiment:',
+        # journal
+            ' journal ' : ' journal:',
+            ' j ' : ' journal:',
+            ' published_in ' : ' journal:',
+            ' spicite ' : ' journal:',
+            ' vol ' : ' journal:',
         # journal page
             ' journal-page ' : ' 773__c:',
             ' jp ' : ' 773__c:',
@@ -502,6 +512,31 @@ class SpiresToInvenioSyntaxConverter:
             '#':'*'
         }
 
+    def __init__(self):
+        """Initialize the state of the converter"""
+        self._compile_regular_expressions()
+
+    def _compile_regular_expressions(self):
+        """Compiles some of the regular expressions that are used in the class
+        for higher performance."""
+
+        # regular expression that matches the contents in single and double quotes
+        # taking in mind if they are escaped.
+        self._re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
+
+        # regular expression that matches author patterns"
+        # the groups defined in this regular expression are used in the method
+        # _convert_spires_author_search_to_invenio_author_search(...) In case
+        # of changing them, correct also the code in this method
+        self._re_author_match = re.compile(
+                                     # author:ellis, jacqueline
+                                     r'\bauthor:\s*(?P<surname1>\w+),\s*(?P<name1>\w{2,})\b' + '|' + \
+                                     # author:jacqueline ellis
+                                     r'\bauthor:\s*(?P<name2>\w+)\s+(?!and |or |not )(?P<surname2>\w+)\b' + '|' +\
+                                     # author:ellis, j.
+                                     r'\bauthor:\s*(?P<surname3>\w+),\s*(?P<initial>\w)\.?\b',
+                                     re.IGNORECASE)
+
     def convertQuery(self, query):
         """Converts the query from SPIRES syntax to Invenio syntax
 
@@ -520,23 +555,16 @@ class SpiresToInvenioSyntaxConverter:
         """Converts SPIRES search patterns for authors to search patterns in invenio
         that give similar results to the spires search."""
 
-        # regular expression that matches author patterns"
-        re_author_match = re.compile(
-                                     # author:ellis, jacqueline
-                                     r'\bauthor:\s*(?P<surname1>\w+),\s*(?P<name1>\w{2,})\b' + '|' + \
-                                     # author:jacqueline ellis
-                                     r'\bauthor:\s*(?P<name2>\w+)\s+(?!and |or |not )(?P<surname2>\w+)\b' + '|' +\
-                                     # author:ellis, j.
-                                     r'\bauthor:\s*(?P<surname3>\w+),\s*(?P<initial>\w)\.?\b',
-                                     re.IGNORECASE)
         # result of the replacement
         result = ""
         current_position = 0
 
-        for match in re_author_match.finditer(query):
+        for match in self._re_author_match.finditer(query):
 
             result = result + query[current_position : match.start()]
 
+            # the regular expression where these group names are defined is in
+            # the method _compile_regular_expressions()
             result = result + \
                 self._create_author_search_pattern(match.group('name1'), match.group('surname1')) + \
                 self._create_author_search_pattern(match.group('name2'), match.group('surname2')) + \
@@ -582,17 +610,11 @@ class SpiresToInvenioSyntaxConverter:
 
         Replacements are done only in content that is not in quotes."""
 
-        # regular expression that matches the contents in single and double quotes
-        # taking in mind if they are escaped.
-        # if this became bottleneck at some moment, the compilation of the expression
-        # can be moved outside in order to be compiled only once.
-        re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
-
         # result of the replacement
         result = ""
         current_position = 0
 
-        for match in re_quotes_match.finditer(query):
+        for match in self._re_quotes_match.finditer(query):
             # clean the content after the previous quotes and before current quotes
             cleanable_content = query[current_position : match.start()]
             cleanable_content = self._replace_all_spires_keywords_in_string(cleanable_content)
