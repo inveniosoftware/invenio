@@ -1564,7 +1564,7 @@ class Template:
 
           - 'as' *bool* - Should we display an advanced search box?
 
-          - 'cc_intl' *string* - the i18nized current collection name
+          - 'cc_intl' *string* - the i18nized current collection name, used for display
 
           - 'cc' *string* - the internal current collection name
 
@@ -1577,6 +1577,7 @@ class Template:
           - 'p, f, f1, f2, f3, m1, m2, m3, p1, p2, p3, op1, op2, op3, rm' *strings* - the search parameters
 
           - 'coll_selects' *array* - a list of lists, each containing the collections selects to display
+              (if not containing more than one collection, they will not be printed)
 
           - 'd1y, d2y, d1m, d2m, d1d, d2d' *int* - the search between dates
 
@@ -1615,11 +1616,15 @@ class Template:
             }, self.search_results_default_urlargd)
 
 
-        out = '''
-        <h1 class="headline">%(ccname)s</h1>
+        out = ""
+        if len(coll_selects) > 1:
+            # display cc name only if there is more than one collection
+            out += '''
+            <h1 class="headline">%(ccname)s</h1>''' % {'ccname' : cgi.escape(cc_intl),}
+
+        out += '''
         <form name="search" action="%(siteurl)s/search" method="get">
-        ''' % {'ccname' : cgi.escape(cc_intl),
-               'siteurl' : CFG_SITE_URL}
+        ''' % {'siteurl' : CFG_SITE_URL}
 
         # Only add non-default hidden values
         for field, value in argd.items():
@@ -1784,32 +1789,35 @@ class Template:
             }
 
         ## secondly, print Collection(s) box:
-        selects = ''
-        for sel in coll_selects:
-            selects += self.tmpl_select(fieldname='c', values=sel)
 
-        out += """
-            <table class="searchbox">
-             <thead>
-              <tr>
-               <th colspan="3" class="searchboxheader">
-                %(leading)s %(msg_coll)s:
-               </th>
-              </tr>
-             </thead>
-             <tbody>
-              <tr valign="bottom">
-               <td valign="top" class="searchboxbody">
-                 %(colls)s
-               </td>
-              </tr>
-             </tbody>
-            </table>
-             """ % {
-               'leading' : leadingtext,
-               'msg_coll' : _("collections"),
-               'colls' : selects,
-             }
+        if len(coll_selects) > 1:
+            # display collections only if there is more than one
+            selects = ''
+            for sel in coll_selects:
+                selects += self.tmpl_select(fieldname='c', values=sel)
+
+            out += """
+                <table class="searchbox">
+                 <thead>
+                  <tr>
+                   <th colspan="3" class="searchboxheader">
+                    %(leading)s %(msg_coll)s:
+                   </th>
+                  </tr>
+                 </thead>
+                 <tbody>
+                  <tr valign="bottom">
+                   <td valign="top" class="searchboxbody">
+                     %(colls)s
+                   </td>
+                  </tr>
+                 </tbody>
+                </table>
+                 """ % {
+                   'leading' : leadingtext,
+                   'msg_coll' : _("collections"),
+                   'colls' : selects,
+                 }
 
         ## thirdly, print search limits, if applicable:
         if action != _("Browse") and pl:
@@ -1899,7 +1907,7 @@ class Template:
                   </tr>
                  </tbody>
                 </table>""" % {
-                  'sort_by' : _("Sort:"),
+                  'sort_by' : _("Sort by:"),
                   'display_res' : _("Display results:"),
                   'out_format' : _("Output format:"),
                   'select_sf' : self.tmpl_select(fieldname = 'sf', values = sort_fields, selected = sf, css_class = 'address'),
