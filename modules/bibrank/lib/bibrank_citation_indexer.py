@@ -21,7 +21,6 @@
 
 __revision__ = "$Id$"
 
-import re
 import time
 import sys
 import os
@@ -343,8 +342,8 @@ def get_citation_informations(recid_list, config):
                     pages = tmp[0]
                     hpos = pages.find("-")
                     if hpos > 0:
-                        pages = pages[:hpos]
-                    tagsvalues["c"] = pages
+                        pages = pages[:hpos-1]
+                        tagsvalues["c"] = pages
                 #format the publ infostring according to the format
                 publ = ""
                 ok = 1
@@ -560,7 +559,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     done = 0
     numrecs = len(d_references_report_numbers)
     for recid, refnumbers in d_references_report_numbers.iteritems():
-        if (done % 100 == 0):
+        if (done % 1000 == 0):
             mesg =  "d_references_report_numbers done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
@@ -626,7 +625,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     done = 0
     numrecs = len(d_references_s)
     for recid, refss in d_references_s.iteritems():
-        if (done % 100 == 0):
+        if (done % 1000 == 0):
             mesg = "d_references_s done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
@@ -641,20 +640,9 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             if refs:
                 p = refs
                 f = 'publref'
-                #remove the latter page number if it is like 67-74
-                matches = re.compile("(.*)(-\d+$)").findall(p)
-                if matches and matches[0]:
-                    p = matches[0][0]
                 rec_id = get_recids_matching_query(p, f)
-                #print "These match searching "+p+" in publref: "+str(rec_id)
-                if rec_id and rec_id[0]:
-                    #the refered publication is in our collection, remove
-                    #from missing
-                    remove_from_missing(p)
-                else:
-                    #it was not found so add in missing
-                    insert_into_missing(recid, p)
                 if rec_id and not recid in citation_list[rec_id[0]]:
+                    #somebody has this in the references..
                     result[rec_id[0]] += 1
                     citation_list[rec_id[0]].append(recid)
                 if rec_id and not rec_id[0] in reference_list[recid]:
@@ -672,7 +660,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
 
     #search for stuff like CERN-TH-4859/87 in list of refs
     for rec_id, recnumbers in d_reports_numbers.iteritems():
-        if (done % 100 == 0):
+        if (done % 1000 == 0):
             mesg = "d_report_numbers done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
@@ -705,13 +693,13 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     numrecs = len(d_records_s)
     t4 = os.times()[4]
     for recid, recs in d_records_s.iteritems():
-        if (done % 100 == 0):
+        if (done % 1000 == 0):
             mesg = "d_records_s done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
         done = done+1
         p = recs
-        rec_ids = list(search_pattern(p=p, f=pubreftag))
+        rec_ids = get_recids_matching_query(p, pubreftag)
         #print "These records match "+p+" in "+pubreftag+" : "+str(rec_ids)
         if rec_ids:
             for rec_id in rec_ids:
