@@ -3033,7 +3033,7 @@ class Template:
 
         return out
 
-    def tmpl_citesummary_prologue(self, d_total_recs, l_colls, searchpattern, ln=CFG_SITE_LANG):
+    def tmpl_citesummary_prologue(self, d_total_recs, l_colls, searchpattern, searchfield, ln=CFG_SITE_LANG):
         """HTML citesummary format, prologue. A part of HCS format suite."""
         _ = gettext_set_language(ln)
         out = """<p><table id="citesummary">
@@ -3050,6 +3050,8 @@ class Template:
                 link_url += quote(searchpattern)
             if colldef:
                 link_url += ' ' + quote(colldef)
+            if searchfield:
+                link_url += '&amp;f=' + quote(searchfield);
             link_url += '&amp;rm=citation';
             link_text = self.tmpl_nice_number(d_total_recs[coll], ln)
             out += '<td align="right"><a href="%s">%s</a></td>' % (link_url, link_text)
@@ -3073,7 +3075,7 @@ class Template:
                {'msg_breakdown': _("Breakdown of papers by citations:"),}
         return out
 
-    def tmpl_citesummary_breakdown_by_fame(self, d_cites, low, high, fame, l_colls, searchpattern, ln=CFG_SITE_LANG):
+    def tmpl_citesummary_breakdown_by_fame(self, d_cites, low, high, fame, l_colls, searchpattern, searchfield, ln=CFG_SITE_LANG):
         """HTML citesummary format, breakdown by fame. A part of HCS format suite."""
         _ = gettext_set_language(ln)
         out = """<tr><td>%(fame)s</td>""" % \
@@ -3088,6 +3090,8 @@ class Template:
                 link_url += quote('cited:0')
             else:
                 link_url += quote('cited:%i->%i' % (low, high))
+            if searchfield:
+                link_url += '&amp;f=' + quote(searchfield);
             link_url += '&amp;rm=citation';
             link_text = self.tmpl_nice_number(d_cites[coll], ln)
             out += '<td align="right"><a href="%s">%s</a></td>' % (link_url, link_text)

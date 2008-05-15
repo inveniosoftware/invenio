@@ -54,10 +54,10 @@ CFG_CITESUMMARY_FAME_THRESHOLDS = [
                                    (0, 0, 'Unknown papers (0)')
                                    ]
 
-def summarize_records(recids, of, ln, defstring="", req=""):
+def summarize_records(recids, of, ln, searchpattern="", searchfield="", req=None):
     """Write summary report for records RECIDS in the format OF in language LN.
-       DEFSTRING is a part of URL added to point out how RECIDS were selected,
-       for instance f=author&p=Smith, Paul.
+       SEARCHPATTERN and SEARCHFIELD are search query that led to RECIDS,
+       for instance p='Smith, Paul' and f='author'.  They are used for links.
        REQ is the Apache/mod_python request object.
     """
 
@@ -73,7 +73,7 @@ def summarize_records(recids, of, ln, defstring="", req=""):
             else:
                 d_recids[coll] = recids & search_engine.search_pattern(p=colldef)
             d_total_recs[coll] = len(d_recids[coll])
-        req.write(websearch_templates.tmpl_citesummary_prologue(d_total_recs, CFG_CITESUMMARY_COLLECTIONS, defstring, ln))
+        req.write(websearch_templates.tmpl_citesummary_prologue(d_total_recs, CFG_CITESUMMARY_COLLECTIONS, searchpattern, searchfield, ln))
 
         # 2) hcs overview:
         d_recid_citers = {}
@@ -101,7 +101,7 @@ def summarize_records(recids, of, ln, defstring="", req=""):
                         numcites = len(lciters)
                     if numcites >= low and numcites <= high:
                         d_cites[coll] += 1
-            req.write(websearch_templates.tmpl_citesummary_breakdown_by_fame(d_cites, low, high, fame, CFG_CITESUMMARY_COLLECTIONS, defstring, ln))
+            req.write(websearch_templates.tmpl_citesummary_breakdown_by_fame(d_cites, low, high, fame, CFG_CITESUMMARY_COLLECTIONS, searchpattern, searchfield, ln))
 
         # 4) hcs epilogue:
         req.write(websearch_templates.tmpl_citesummary_epilogue(ln))
