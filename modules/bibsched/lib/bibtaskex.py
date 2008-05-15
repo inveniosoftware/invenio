@@ -30,7 +30,8 @@ __revision__ = "$Id$"
 import sys
 import time
 from invenio.bibtask import task_init, write_message, task_set_option, \
-        task_get_option, task_update_progress, task_has_option, task_get_task_param
+        task_get_option, task_update_progress, task_has_option, \
+        task_get_task_param, task_sleep_now_if_required
 
 def fib(n):
     """Returns Fibonacci number for 'n'."""
@@ -70,6 +71,7 @@ def task_run_core():
             write_message("Error: floppy drive dropped on the floor.  Ignoring and continuing.", sys.stderr)
         write_message("fib(%d)=%d" % (i, fib(i)))
         task_update_progress("Done %d out of %d." % (i, n))
+        task_sleep_now_if_required(can_stop_too=True)
         time.sleep(1)
     task_update_progress("Done %d out of %d." % (n, n))
     write_message("Task #%d finished." % task_get_task_param('task_id'))
