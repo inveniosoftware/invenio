@@ -560,7 +560,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     done = 0
     numrecs = len(d_references_report_numbers)
     for recid, refnumbers in d_references_report_numbers.iteritems():
-        if (done % 1000 == 0):
+        if (done % 100 == 0):
             mesg =  "d_references_report_numbers done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
@@ -626,7 +626,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     done = 0
     numrecs = len(d_references_s)
     for recid, refss in d_references_s.iteritems():
-        if (done % 1000 == 0):
+        if (done % 100 == 0):
             mesg = "d_references_s done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
@@ -672,7 +672,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
 
     #search for stuff like CERN-TH-4859/87 in list of refs
     for rec_id, recnumbers in d_reports_numbers.iteritems():
-        if (done % 1000 == 0):
+        if (done % 100 == 0):
             mesg = "d_report_numbers done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
@@ -705,7 +705,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     numrecs = len(d_records_s)
     t4 = os.times()[4]
     for recid, recs in d_records_s.iteritems():
-        if (done % 1000 == 0):
+        if (done % 100 == 0):
             mesg = "d_records_s done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)

@@ -62,7 +62,14 @@ def calculate_citation_history_coordinates(recid):
         if not cit_year: cit_year = get_field_values(rec_id, '260__c')
         #some records simlpy do not have these fields
         if cit_year:
-            if initial_result.has_key(int(cit_year[0][0:4])):
+            #maybe cit_year[0][0:4] has a typo and cannot
+            #be converted to an int
+            numeric=1
+            try:
+                tmpval = int(cit_year[0][0:4])
+            except ValueError:
+                numeric=0
+            if numeric and initial_result.has_key(int(cit_year[0][0:4])):
                 initial_result[int(cit_year[0][0:4])] += 1
     for key, value in initial_result.items():
         result.append((key, value))
