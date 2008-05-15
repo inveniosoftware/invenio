@@ -342,8 +342,8 @@ def get_citation_informations(recid_list, config):
                     pages = tmp[0]
                     hpos = pages.find("-")
                     if hpos > 0:
-                        pages = pages[:hpos-1]
-                        tagsvalues["c"] = pages
+                        pages = pages[:hpos]
+                    tagsvalues["c"] = pages
                 #format the publ infostring according to the format
                 publ = ""
                 ok = 1
@@ -699,7 +699,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             task_update_progress(mesg)
         done = done+1
         p = recs
-        rec_ids = get_recids_matching_query(p, pubreftag)
+        rec_ids = search_pattern(p=p, f=pubreftag)
         #print "These records match "+p+" in "+pubreftag+" : "+str(rec_ids)
         if rec_ids:
             for rec_id in rec_ids:
