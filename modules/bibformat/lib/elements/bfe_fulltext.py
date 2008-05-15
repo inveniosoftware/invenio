@@ -32,6 +32,12 @@ from os.path import basename
 def format(bfo, style, separator='; ', show_icons='no'):
     """
     This is the default format for formatting fulltext links.
+
+    When possible, it returns only the main file(s) (+ link to
+    additional files if needed). If no distinction is made at
+    submission time between main and additional files, returns
+    all the files
+
     @param separator the separator between urls.
     @param style CSS class of the link
     @param show_icons if 'yes', print icons for fulltexts
@@ -123,7 +129,7 @@ def get_files(bfo):
      - old_versions: set to True if we can have access to old versions
      - additionals: set to True if we have other documents than the 'main' document
 
-    Returned dictionary is of the form:
+    'parsed_urls' is a dictionary in the form:
     {'main_urls' : {'Main'      : [('http://CFG_SITE_URL/record/1/files/aFile.pdf', 'aFile', 'PDF'),
                                    ('http://CFG_SITE_URL/record/1/files/aFile.gif', 'aFile', 'GIF')],
                     'Additional': [('http://CFG_SITE_URL/record/1/files/bFile.pdf', 'bFile', 'PDF')]},
@@ -139,14 +145,19 @@ def get_files(bfo):
     - key 'cern_urls' is only available on CERN site
     - keys in main_url dictionaries are defined by the BibDoc.
     - older versions are not part of the parsed urls
+    - returns only main files when possible, that is when doctypes
+      make a distinction between "Main" files and other files. Otherwise
+      returns all the files as main.
     """
     _ = gettext_set_language(bfo.lang)
 
     urls = bfo.fields("8564_")
     bibarchive = BibRecDocs(bfo.recID)
 
-    old_versions = False  # We can provide link to older files
-    additionals = False        # We have additional files
+    old_versions = False # We can provide link to older files. Will be
+                         # set to True if older files are found.
+    additionals = False  # We have additional files. Will be set to
+                         # True if additional files are found.
 
     # Prepare object to return
     parsed_urls = {'main_urls':{},    # Urls hosted by Invenio (bibdocs)
@@ -154,6 +165,14 @@ def get_files(bfo):
                   }
     if CFG_CERN_SITE:
         parsed_urls['cern_urls'] = [] # cern.ch urls
+
+    # Doctypes can of any type, but when there is one file marked as
+    # 'Main', we consider that there is a distinction between "main"
+    # and "additional" files. Otherwise they will all be considered
+    # equally as main files
+    distinct_main_and_additional_files = False
+    if len(bibarchive.list_bibdocs(doctype='Main')) > 0:
+        distinct_main_and_additional_files = True
 
     # Parse URLs
     for complete_url in urls:
@@ -190,7 +209,11 @@ def get_files(bfo):
                     if filename in [f.fullname for f in doc.list_all_files()]:
                         assigned = True
                         #doc.getIcon()
-                        if not doc.doctype == 'Main':
+                        if not doc.doctype == 'Main' and \
+                               distinct_main_and_additional_files == True:
+                            # In that case we record that there are
+                            # additional files, but don't add them to
+                            # returned structure.
                             additionals = True
                         else:
                             if not descr:
