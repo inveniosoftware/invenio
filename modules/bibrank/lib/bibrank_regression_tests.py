@@ -152,7 +152,10 @@ class BibRankExtCitesTest(unittest.TestCase):
         """bibrank - external cites, no internal papers via publication reference"""
         # FIXME: do we have an internal paper having only pubinfo, no
         # repno, that is cited by some demo records via its pubinfo?
-        self.fail("SKIPPED: Not yet implemented.")
+        test_case_repno = "Phys. Lett., B 151 (1985) 357"
+        test_case_repno_cited_by = [96]
+        self.assertEqual(self._detect_extcite_info(test_case_repno),
+                         test_case_repno_cited_by)
 
 TEST_SUITE = make_test_suite(BibRankWebPagesAvailabilityTest,
                              BibRankIntlMethodNames,
