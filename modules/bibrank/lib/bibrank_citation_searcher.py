@@ -141,7 +141,7 @@ def get_cited_by_weight(recordlist):
     result = []
     tuples = get_cited_by_list(recordlist)
     for recid, rlist in tuples:
-        #just return recid - lenght
+        #just return recid - length
         if rlist:
             tmp = [recid, len(rlist)]
         else:
