@@ -22224,7 +22224,7 @@
   <datafield tag="720" ind1=" " ind2=" ">
     <subfield code="a">Walker, Joel W.</subfield>
  </datafield>
-  <datafield tag="909" ind1=" " ind2=" ">
+  <datafield tag="909" ind1="C" ind2="4">
     <subfield code="c">1191-1202</subfield>
     <subfield code="p">Mod. Phys. Lett. A</subfield>
     <subfield code="v">15</subfield>
@@ -22259,12 +22259,59 @@
   <datafield tag="980" ind1=" " ind2=" ">
     <subfield code="a">ARTICLE</subfield>
  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[1]</subfield>
+    <subfield code="m">A.E. Faraggi and D.V. Nanopoulos and L. Yuan</subfield>
+    <subfield code="s">Nucl. Phys. B 335 (1990) 347</subfield>
+ </datafield> 
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[2]</subfield>
+    <subfield code="m">I. Antoniadis and J. Ellis and J. Hagelin and D.V. Nanopoulos</subfield>
+    <subfield code="s">Phys. Lett. B 213 (1989) 65</subfield>
+ </datafield> 
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[3]</subfield>
+    <subfield code="m">I. Antoniadis and C. Bachas and C. Kounnas</subfield>
+    <subfield code="s">Nucl. Phys. B 289 (1987) 87</subfield>
+ </datafield> 
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[4]</subfield>
+    <subfield code="m">A.E. Faraggi and D.V. Nanopoulos</subfield>
+    <subfield code="s">Phys. Rev. D 48 (1993) 3288</subfield>
+ </datafield> 
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[5]</subfield>
+    <subfield code="m">G.B. Cleaver and A.E. Faraggi and D.V. Nanopoulos and L. Yuan</subfield>
+    <subfield code="s">Phys. Lett. B 455 (1999) 135</subfield>
+ </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[6]</subfield>
+    <subfield code="r">hep-ph/9904301</subfield>
+ </datafield> 
+ <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[7]</subfield>
+    <subfield code="r">hep-ph/9910230</subfield>
+ </datafield> 
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[8]</subfield>
+    <subfield code="s">Phys. Lett. B 256 (1991) 150</subfield>
+ </datafield> 
+ <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[10]</subfield>
+    <subfield code="r">hep-ph/9511426</subfield>
+ </datafield> 
  <!--the reference-->
   <datafield tag="999" ind1="C" ind2="5">
     <subfield code="o">[12]</subfield>
     <subfield code="m">J. Ellis, K. Enqvist, D.V. Nanopoulos</subfield>
     <subfield code="s">Phys. Lett., B 151 (1985) 357</subfield>
  </datafield> 
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="o">[13]</subfield>
+    <subfield code="m">P. Horava</subfield>
+    <subfield code="s">Phys. Rev. D 54 (1996) 7561</subfield>
+ </datafield> 
+
 </record>
 
 </collection>
