@@ -771,6 +771,11 @@ def display_collection(req, c, as, verbose, ln):
         filedesc.close()
 
         title = get_coll_i18nname(c, ln)
+        # if there is only one collection defined, do not print its
+        # title on the page as it would be displayed repetitively:
+        if len(search_engine.collection_reclist_cache.keys()) == 1:
+            title = ""
+
         rssurl = CFG_SITE_URL + '/rss'
         if c != CFG_SITE_NAME:
             rssurl += '?cc=' + quote(c)
