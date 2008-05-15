@@ -459,8 +459,8 @@ class Template:
                 if args == '':
                     args += '?'
                 else:
-                    args += '&amp'
-                args += ';c=' + '&amp;c='.join(c)
+                    args += '&amp;'
+                args += 'c=' + '&amp;c='.join(c)
 
         return CFG_SITE_URL + '/rss' + args
 
