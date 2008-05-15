@@ -21,6 +21,7 @@
 
 __revision__ = "$Id$"
 
+import re
 import time
 import sys
 import os
@@ -640,9 +641,20 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             if refs:
                 p = refs
                 f = 'publref'
+                #remove the latter page number if it is like 67-74
+                matches = re.compile("(.*)(-\d+$)").findall(p)
+                if matches and matches[0]:
+                    p = matches[0][0]
                 rec_id = get_recids_matching_query(p, f)
+                #print "These match searching "+p+" in publref: "+str(rec_id)
+                if rec_id and rec_id[0]:
+                    #the refered publication is in our collection, remove
+                    #from missing
+                    remove_from_missing(p)
+                else:
+                    #it was not found so add in missing
+                    insert_into_missing(recid, p)
                 if rec_id and not recid in citation_list[rec_id[0]]:
-                    #somebody has this in the references..
                     result[rec_id[0]] += 1
                     citation_list[rec_id[0]].append(recid)
                 if rec_id and not rec_id[0] in reference_list[recid]:
