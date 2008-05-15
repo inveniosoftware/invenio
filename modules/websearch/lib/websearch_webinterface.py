@@ -885,11 +885,14 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                 try:
                     os.umask(022)
                     f = open(fullfilename, "w")
+                    f.write(rss_prologue + rss_body + rss_epilogue)
+                    f.close()
                 except IOError, v:
-                    raise v
-
-                f.write(rss_prologue + rss_body + rss_epilogue)
-                f.close()
+                    if v[0] == 36:
+                        # URL was too long. Never mind, don't cache
+                        pass
+                    else:
+                        raise repr(v)
 
     index = __call__
 
