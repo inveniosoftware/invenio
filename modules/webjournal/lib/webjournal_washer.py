@@ -95,7 +95,7 @@ def wash_popup_type(language, type, journal_name):
     """
     """
     if type == "":
-        raise IvenioWebJournalNoPopupTypeError(language)
+        raise IvenioWebJournalNoPopupTypeError(language, journal_name)
     else:
         return type
 
