@@ -29,11 +29,6 @@ import string
 import locale
 from urllib import quote, urlencode
 
-try:
-    Set = set
-except NameError:
-    from sets import Set
-
 from invenio.config import \
      CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH, \
      CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD, \
@@ -59,6 +54,7 @@ from invenio.urlutils import make_canonical_urlargd, drop_default_urlargd, creat
 from invenio.htmlutils import nmtoken_from_string
 from invenio.webinterface_handler import wash_urlargd
 from invenio.bibrank_citation_searcher import get_cited_by_count
+from invenio.intbitset import intbitset
 
 from invenio.websearch_external_collections import external_collection_get_state
 
@@ -3004,7 +3000,6 @@ class Template:
             banner = self.tmpl_print_searchresultbox(_("Publishes in"), pubinfo)
             req.write(banner)
 
-
     def tmpl_detailed_record_references(self, recID, ln, content):
         """Returns the discussion page of a record
 
@@ -3025,81 +3020,69 @@ class Template:
 
         return out
 
-    def tmpl_citesummary_html(self, ln, totalrecs, totalcites, avgstr, reciddict, tresholds_names, criteria="", dict_of_lists = {}, req=""):
-        """A template for citation summary output in HTML.
-           Parameters:
-               - ln *string* = language,
-               - totalrecs *string* = total number of records analyzed
-               - totalcites *string* = total number of citations
-               - avgstr *string* = average number of citations per records
-               - reciddict is a dictionary as follows:
-                   'string description of the citation class' -> [id1,id2,..]
-               - tresholds_names is a list of tuples (min,max,'string description of the citation class')
-               - criteria is added to the link
-               - dict_of_lists is a dictionary that holds the category ("collection" in SPIRES, 980__b)
-                 and the record ids in it. Example 'Published'->[1,2,3],'Conference'->[5,6,7]
-               - req the request. If it is not '' it can used for direct printing.
-        """
-        # load the right message language
+    def tmpl_citesummary_prologue(self, d_total_recs, l_colls, searchpattern, ln=CFG_SITE_LANG):
+        """HTML citesummary format, prologue. A part of HCS format suite."""
         _ = gettext_set_language(ln)
+        out = """<p><table id="citesummary">
+                  <tr><td><strong class="headline">%(msg_title)s</strong></td>""" % \
+               {'msg_title': _("Citation summary results"),}
+        for coll, colldef in l_colls:
+            out += '<td align="right">%s</td>' % coll
+        out += '</tr>'
+        out += """<tr><td><strong>%(msg_recs)s</strong></td>""" % \
+               {'msg_recs': _("Total number of papers analyzed:"),}
+        for coll, colldef in l_colls:
+            link_url = CFG_SITE_URL + '/search?p='
+            if searchpattern:
+                link_url += quote(searchpattern)
+            if colldef:
+                link_url += ' ' + quote(colldef)
+            link_url += '&amp;rm=citation';
+            link_text = self.tmpl_nice_number(d_total_recs[coll], ln)
+            out += '<td align="right"><a href="%s">%s</a></td>' % (link_url, link_text)
+        out += '</tr>'
+        return out
 
-        #check the keys of dict_of_lists so that we can make column headers
-        columnfill = ""
-        for col in dict_of_lists.keys():
-            columnfill += "<td> </td>"
-        thead = """<table>
-                 <tr><td><strong class="headline">%(msg_title)s</strong></td><td>%(cf)s</td></tr>
-                 <tr><td><strong>%(msg_recs)s</strong></td><td align="right">%(nb_recs)s</td>%(cf)s</tr>
-                 <tr><td><strong>%(msg_cites)s</strong></td><td align="right">%(nb_cites)s</td>%(cf)s</tr>
-                 <tr><td><strong>%(msg_avgcit)s</strong></td><td align="right">%(nb_avgcit)s</td>%(cf)s</tr>
-                 <tr><td><strong>%(msg_breakdown)s</strong></td><td></td>%(cf)s</tr>
-              """ % { 'msg_title': _("Citation summary results"),
-                      'msg_recs': _("Total number of papers analyzed:"),
-                      'nb_recs': self.tmpl_nice_number(totalrecs, ln),
-                      'msg_cites': _("Total number of citations:"),
-                      'msg_avgcit': _("Average citations per paper:"),
-                      'nb_cites': self.tmpl_nice_number(totalcites, ln),
-                      'nb_avgcit': avgstr,
-                      'cf': columnfill,
-                      'msg_breakdown': _("Breakdown of papers by citations:"),}
-        out = thead
-        if req:
-            req.write(thead)
-        #print the stuff in reciddict, but sort according to tresholds_names
-        for (mincites, maxcites, name) in tresholds_names:
-            if reciddict.has_key(name):
-                rowtitle = name
-                reclist = reciddict[name]
-                #check in which collections the items of reclist lie
-                #and print their numbers in collstr as collname: number
-                collstr = ""
-                for k in dict_of_lists.keys():
-                    recs_in_coll = dict_of_lists[k]
-                    #intersect with reclist to get "of these records in this coll"
-                    intersec_list = list(Set(recs_in_coll)&Set(reclist))
-                    if len(intersec_list) > 0:
-                        #add stuff like Published:5
-                        #construct a link..
-                        link = "../search?p="
-                        if criteria:
-                            link += criteria + "%20"
-                        link += 'collection:'+str(k)+"%20"
-                        link += "cited%3A" + str(mincites) + "-%3E" + str(maxcites)
-                        link += '&amp;rm=citation'
-                        collstr += "<td>"+str(k)+": <a href=" + link +">"+ self.tmpl_nice_number(len(intersec_list), ln)+"</a></td> "
-                tline = "<tr><td>"+_(rowtitle)+"</td><td align=\"right\">"
-                #construct a link..
-                link = "../search?p="
-                if criteria:
-                    link += criteria + "%20"
-                link += "cited%3A" + str(mincites) + "-%3E" + str(maxcites)
-                link += '&amp;rm=citation'
-                tline += "<a href="+link+">"+self.tmpl_nice_number(len(reclist), ln)+"</a> "+collstr
-                out += tline
-                if req:
-                    req.write(tline)
-        tend = "</td></tr>\n<table>"
-        out += tend
-        if req:
-            req.write(tend)
+    def tmpl_citesummary_overview(self, d_total_cites, d_avg_cites, l_colls, ln=CFG_SITE_LANG):
+        """HTML citesummary format, overview. A part of HCS format suite."""
+        _ = gettext_set_language(ln)
+        out = """<tr><td><strong>%(msg_cites)s</strong></td>""" % \
+              {'msg_cites': _("Total number of citations:"),}
+        for coll, colldef in l_colls:
+            out += '<td align="right">%s</td>' % self.tmpl_nice_number(d_total_cites[coll], ln)
+        out += '</tr>'
+        out += """<tr><td><strong>%(msg_avgcit)s</strong></td>""" % \
+               {'msg_avgcit': _("Average citations per paper:"),}
+        for coll, colldef in l_colls:
+            out += '<td align="right">%.1f</td>' % d_avg_cites[coll]
+        out += '</tr>'
+        out += """<tr><td><strong>%(msg_breakdown)s</strong></td></tr>""" % \
+               {'msg_breakdown': _("Breakdown of papers by citations:"),}
+        return out
+
+    def tmpl_citesummary_breakdown_by_fame(self, d_cites, low, high, fame, l_colls, searchpattern, ln=CFG_SITE_LANG):
+        """HTML citesummary format, breakdown by fame. A part of HCS format suite."""
+        _ = gettext_set_language(ln)
+        out = """<tr><td>%(fame)s</td>""" % \
+              {'fame': fame,}
+        for coll, colldef in l_colls:
+            link_url = CFG_SITE_URL + '/search?p='
+            if searchpattern:
+                link_url += quote(searchpattern) + ' '
+            if colldef:
+                link_url += quote(colldef) + ' '
+            if low == 0 and high == 0:
+                link_url += quote('cited:0')
+            else:
+                link_url += quote('cited:%i->%i' % (low, high))
+            link_url += '&amp;rm=citation';
+            link_text = self.tmpl_nice_number(d_cites[coll], ln)
+            out += '<td align="right"><a href="%s">%s</a></td>' % (link_url, link_text)
+        out += '</tr>'
+        return out
+
+    def tmpl_citesummary_epilogue(self, ln=CFG_SITE_LANG):
+        """HTML citesummary format, epilogue. A part of HCS format suite."""
+        _ = gettext_set_language(ln)
+        out = """</table>"""
         return out

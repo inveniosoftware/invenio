@@ -27,19 +27,24 @@ __lastupdated__ = """$Date$"""
 
 __revision__ = "$Id$"
 
+from invenio.config import CFG_INSPIRE_SITE
 from invenio.bibrank_citation_searcher import get_cited_by_list
 import search_engine
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
 
-try:
-    Set = set
-except NameError:
-    from sets import Set
+## CFG_CITESUMMARY_COLLECTIONS -- how do we break down cite summary
+## results according to collections?
+if CFG_INSPIRE_SITE:
+    CFG_CITESUMMARY_COLLECTIONS = [['All papers', ''],
+                                   ['Published only', 'collection:published']]
+else:
+    CFG_CITESUMMARY_COLLECTIONS = [['All papers', ''],
+                                   ['Published only', 'collection:article']]
 
-## CFG_CITESUMMARY_THRESHOLD_NAMES -- how do we break up cite summary
-## results?
-CFG_CITESUMMARY_THRESHOLD_NAMES = [
+## CFG_CITESUMMARY_FAME_THRESHOLDS -- how do we break down cite
+## summary results into famous and less famous paper groups?
+CFG_CITESUMMARY_FAME_THRESHOLDS = [
                                    (500, 1000000, 'Renowned papers (500+)'),
                                    (250, 499, 'Famous papers (250-499)'),
                                    (100, 249, 'Very well-known papers (100-249)'),
@@ -49,33 +54,61 @@ CFG_CITESUMMARY_THRESHOLD_NAMES = [
                                    (0, 0, 'Unknown papers (0)')
                                    ]
 
-## CFG_CITESUMMARY_COLLECTIONS -- names of collections that should be
-## shown in the cite summary format, breakdown by collection.
-CFG_CITESUMMARY_COLLECTIONS = ['Published']
-
 def summarize_records(recids, of, ln, defstring="", req=""):
-    """Produces a report in the format defined by of in language ln
-       defstring is a part of url added to point out how recids were selected
-       for instance f=author&p=Smith, Paul
-       req is the request. It is passed to print_citation_summary_html where
-       it can be used for just-in-time printing
+    """Write summary report for records RECIDS in the format OF in language LN.
+       DEFSTRING is a part of URL added to point out how RECIDS were selected,
+       for instance f=author&p=Smith, Paul.
+       REQ is the Apache/mod_python request object.
     """
 
     if of == 'hcs':
-        #this is a html cite summary
-        citedbylist = get_cited_by_list(recids)
-        #divide the list into sublists according to the collection info of the recs
-        collections_citedbys = {}
-        #scan the collections in CFG_CITESUMMARY_COLLECTIONS
-        for coll in CFG_CITESUMMARY_COLLECTIONS:
-            #get the records that have this coll
-            recsinc = search_engine.search_pattern(p=coll, f='collection')
-            #intersect recids and recsinc
-            intersec_list = list(Set(recids)&Set(recsinc))
-            collections_citedbys[coll] = intersec_list
-        return print_citation_summary_html(citedbylist, ln, defstring, collections_citedbys, req)
-    if of == 'xcs':
-        #this is an xml cite summary
+        # this is HTML cite summary
+
+        # 1) hcs prologue:
+        d_recids = {}
+        d_total_recs = {}
+        for coll, colldef in CFG_CITESUMMARY_COLLECTIONS:
+            if not colldef:
+                d_recids[coll] = recids
+            else:
+                d_recids[coll] = recids & search_engine.search_pattern(p=colldef)
+            d_total_recs[coll] = len(d_recids[coll])
+        req.write(websearch_templates.tmpl_citesummary_prologue(d_total_recs, CFG_CITESUMMARY_COLLECTIONS, defstring, ln))
+
+        # 2) hcs overview:
+        d_recid_citers = {}
+        d_total_cites = {}
+        d_avg_cites = {}
+        for coll, colldef in CFG_CITESUMMARY_COLLECTIONS:
+            d_total_cites[coll] = 0
+            d_avg_cites[coll] = 0
+            d_recid_citers[coll] =  get_cited_by_list(d_recids[coll])
+            for recid, lciters in d_recid_citers[coll]:
+                if lciters:
+                    d_total_cites[coll] += len(lciters)
+            if d_total_cites[coll] != 0:
+                d_avg_cites[coll] = d_total_cites[coll] * 1.0 / d_total_recs[coll]
+        req.write(websearch_templates.tmpl_citesummary_overview(d_total_cites, d_avg_cites, CFG_CITESUMMARY_COLLECTIONS, ln))
+
+        # 3) hcs break down by fame:
+        for low, high, fame in CFG_CITESUMMARY_FAME_THRESHOLDS:
+            d_cites = {}
+            for coll, colldef in CFG_CITESUMMARY_COLLECTIONS:
+                d_cites[coll] = 0
+                for recid, lciters in d_recid_citers[coll]:
+                    numcites = 0
+                    if lciters:
+                        numcites = len(lciters)
+                    if numcites >= low and numcites <= high:
+                        d_cites[coll] += 1
+            req.write(websearch_templates.tmpl_citesummary_breakdown_by_fame(d_cites, low, high, fame, CFG_CITESUMMARY_COLLECTIONS, defstring, ln))
+
+        # 4) hcs epilogue:
+        req.write(websearch_templates.tmpl_citesummary_epilogue(ln))
+        return ''
+
+    elif of == 'xcs':
+        # this is XML cite summary
         citedbylist = get_cited_by_list(recids)
         return print_citation_summary_xml(citedbylist)
 
@@ -91,7 +124,7 @@ def print_citation_summary_xml(citedbylist):
     #output formatting
     outp = "<citationsummary records=\""+str(len(citedbylist))
     outp += "\" citations=\""+str(totalcites)+"\">"
-    for low, high, name in CFG_CITESUMMARY_THRESHOLD_NAMES:
+    for low, high, name in CFG_CITESUMMARY_FAME_THRESHOLDS:
         #get the name, print the value
         if reciddict.has_key(name):
             recs = reciddict[name]
@@ -101,22 +134,6 @@ def print_citation_summary_xml(citedbylist):
     outp = outp + "</citationsummary>"
     #req.write(outp)
     return outp #just to return something
-
-
-def print_citation_summary_html(citedbylist, ln, criteria="", dict_of_lists = {}, req=""):
-    """Prints citation summary in html.
-       The criteria, if any, is added to the link"""
-    alldict = calculate_citations(citedbylist)
-    avgstr = str(alldict['avgcites'])
-    totalrecs = str(alldict['records'])
-    totalcites = str(alldict['totalcites'])
-    #format avg so that it does not span 10 digits
-    avgstr = avgstr[0:4]
-    reciddict = alldict['reciddict']
-    return websearch_templates.tmpl_citesummary_html(ln, totalrecs,
-                                                     totalcites, avgstr,
-                                                     reciddict, CFG_CITESUMMARY_THRESHOLD_NAMES,
-                                                     criteria, dict_of_lists, req)
 
 def calculate_citations(citedbylist):
     """calculates records in classes of citations
@@ -131,8 +148,8 @@ def calculate_citations(citedbylist):
         if cites:
             numcites = len(cites)
         totalcites = totalcites + numcites
-        #take the numbers in CFG_CITESUMMARY_THRESHOLD_NAMES
-        for low, high, name in CFG_CITESUMMARY_THRESHOLD_NAMES:
+        #take the numbers in CFG_CITESUMMARY_FAME_THRESHOLDS
+        for low, high, name in CFG_CITESUMMARY_FAME_THRESHOLDS:
             if (numcites >= low) and (numcites <= high):
                 if reciddict.has_key(name):
                     tmp = reciddict[name]
