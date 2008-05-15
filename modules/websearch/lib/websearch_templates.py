@@ -2614,24 +2614,24 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = ""
+        out = '<div class="moreinfo">'
         if CFG_WEBSEARCH_USE_ALEPH_SYSNOS:
             alephsysnos = get_fieldvalues(recID, "970__a")
             if len(alephsysnos)>0:
                 alephsysno = alephsysnos[0]
-                out += '<br /><span class="moreinfo">%s</span>' % \
+                out += '<span class="moreinfo">%s</span>' % \
                     create_html_link(self.build_search_url(sysno=alephsysno,
                                                            ln=ln),
                                      {}, _("Detailed record"),
                                      {'class': "moreinfo"})
             else:
-                out += '<br /><span class="moreinfo">%s</span>' % \
+                out += '<span class="moreinfo">%s</span>' % \
                     create_html_link(self.build_search_url(recid=recID, ln=ln),
                                      {},
                                      _("Detailed record"),
                                      {'class': "moreinfo"})
         else:
-            out += '<br /><span class="moreinfo">%s</span>' % \
+            out += '<span class="moreinfo">%s</span>' % \
                    create_html_link(self.build_search_url(recid=recID, ln=ln),
                                     {}, _("Detailed record"),
                                     {'class': "moreinfo"})
@@ -2653,6 +2653,7 @@ class Template:
                                         {}, _("Cited by %i records") % num_timescited,
                                         {'class': "moreinfo"})
 
+        out+='</div>'
         return out
 
     def tmpl_xml_rss_prologue(self):
