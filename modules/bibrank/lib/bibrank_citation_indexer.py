@@ -699,7 +699,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             task_update_progress(mesg)
         done = done+1
         p = recs
-        rec_ids = search_pattern(p=p, f=pubreftag)
+        rec_ids = list(search_pattern(p=p, f=pubreftag))
         #print "These records match "+p+" in "+pubreftag+" : "+str(rec_ids)
         if rec_ids:
             for rec_id in rec_ids:
