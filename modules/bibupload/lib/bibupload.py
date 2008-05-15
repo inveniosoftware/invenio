@@ -1020,7 +1020,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                         elif doctype == 'EXPUNGE':
                             bibdoc.expunge()
                         elif doctype == 'FIX':
-                            bibrecdocs.fix(docname, True)
+                            bibrecdocs.fix(docname)
                         elif doctype == 'REVERT':
                             try:
                                 bibdoc.revert(version)
