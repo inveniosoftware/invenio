@@ -564,11 +564,11 @@ def _task_run(task_run_fnc):
                             #runtime,sleeptime,status,arguments,priority)
                             #VALUES (%s,%s,%s,%s,'WAITING',%s, %s)""",
                             #(proc, user, new_runtime, sleeptime, arguments, priority))
-                write_message("Task #%d finished (%s) but not resubmitted." % (_task_params['task_id'], task_status))
+                write_message("Task #%d finished but not resubmitted. [%s]" % (_task_params['task_id'], task_status))
 
         else:
             ## we are done:
-            write_message("Task #%d finished (%s)." % (_task_params['task_id'], task_status))
+            write_message("Task #%d finished. [%s]" % (_task_params['task_id'], task_status))
         ## Removing the pid
         os.remove(pidfile_name)
     return True
