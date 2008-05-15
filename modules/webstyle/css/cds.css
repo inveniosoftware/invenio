@@ -1479,7 +1479,7 @@ div.detailedrecordbox div.detailedrecordboxcontent{
                        messed up, but created a small gap at top
                        of box. Override with !important if needed*/
 }
-Div.Detailedrecordminipanel{
+div.detailedrecordminipanel{
    border: 1px solid #ddd;
    padding-top:3px;
    padding-bottom:3px;
@@ -1633,6 +1633,12 @@ text-decoration: none;
 
 .webjournalBoxList a:hover{
 text-decoration:underline;
+}
+
+/* cite summary output */
+
+#citesummary td {
+   padding-left: 30px;
 }
 
 /* end of cds.css */
