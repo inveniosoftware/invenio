@@ -246,6 +246,23 @@ def visit_for_stamping(visit_for_stamping_arguments, dirname, filenames):
         path_to_subject_file = "%s/%s" % (dirname, file_to_stamp)
         file_stamper_options['input-file'] = path_to_subject_file
 
+        ## Just before attempting to stamp the file, log the dictionary of
+        ## options (file_stamper_options) that will be passed to websubmit-
+        ## file-stamper:
+        try:
+            fh_log = open("%s/websubmit_file_stamper-calls-options.log" \
+                          % visit_for_stamping_arguments['curdir'], "a+")
+            fh_log.write("%s\n" % file_stamper_options)
+            fh_log.flush()
+            fh_log.close()
+        except IOError:
+            ## Unable to log the file stamper options.
+            exception_prefix = "Unable to write websubmit_file_stamper " \
+                               "options to log file " \
+                               "%s/websubmit_file_stamper-calls-options.log" \
+                               % visit_for_stamping_arguments['curdir']
+            register_exception(prefix=exception_prefix)
+
         try:
             ## Try to stamp the file:
             (stamped_file_path_only, stamped_file_name) = \
