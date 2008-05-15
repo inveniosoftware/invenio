@@ -2089,6 +2089,8 @@ def roledetails(id_role=0):
     # show role details
     details  = '<p>role details:</p>'
     role_details = acca.acc_get_role_details(id_role=id_role)
+    if role_details[3] is None:
+        role_details[3] = ''
     role_details[3] = role_details[3].replace('\n', '<br />') # Hack for preformatting firerole rules
     details += tupletotable(header=['id', 'name', 'description', 'firewall like role definition'],
                             tuple=[role_details])
