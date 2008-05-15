@@ -159,17 +159,17 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
 
         #test operator searching
     def test_operators(self):
-        """find a ellis and t muon
+        """find a ellis and t colllisions
         """
-        inv_search = "author:ellis and title:muon"
-        spi_search = "find a ellis and t muon"
+        inv_search = "author:ellis and title:collisions"
+        spi_search = "find a ellis and t collisions"
         self._compare_searches(inv_search, spi_search)
 
     def test_parens(self):
-        """find a ellis and not t muon and not t kaon
+        """find a ellis and not t hadronic and not t collisions
         """
-        inv_search = "author:ellis and not (title:muon or title:kaon)"
-        spi_search = "find a ellis and not t muon and not t kaon "
+        inv_search = "author:ellis and not (title:hadronic or title:collisions)"
+        spi_search = "find a ellis and not t hadronic and not t collisions "
         self._compare_searches(inv_search, spi_search)
 
     def test_author_simple(self):
