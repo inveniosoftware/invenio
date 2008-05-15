@@ -27,6 +27,7 @@ __revision__ = \
 import httplib
 import urllib
 import re
+import socket
 
 from invenio.config import CFG_ETCDIR
 
@@ -51,6 +52,10 @@ class AuthCernWrapper:
         CFG_ETCDIR/webaccess/cern_nice_soap_credentials.txt which must contain
         username:password in base64 encoding.
         """
+        ## WORKAROUND for bug in Python up to 2.4.3
+        ## Having a timeout is buggy with SSL
+        self._socket_timeout = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(None)
         self._headers = {"Content-type": "application/x-www-form-urlencoded",
                    "Accept": "text/plain",
                    "Authorization": "Basic " + _cern_nice_soap_auth}
@@ -58,6 +63,7 @@ class AuthCernWrapper:
 
     def __del__(self):
         """Close the CERN Nice webservice connection."""
+        socket.setdefaulttimeout(self._socket_timeout)
         if self._conn:
             self._conn.close()
 
@@ -69,8 +75,7 @@ class AuthCernWrapper:
         self._conn.request("POST",
                 "/winservices-soap/generic/Authentication.asmx/%s" % name,
                 params, self._headers)
-        response = self._conn.getresponse()
-        return response.read()
+        return self._conn.getresponse().read()
 
     def ccid_is_nice(self, ccid):
         """Verify this CCID belongs to a Nice account. Returns login or -1
