@@ -436,6 +436,11 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
 
     opfts = [] # will hold (o,p,f,t,h) units
 
+    # FIXME: quick hack for the journal index
+    if f == 'journal':
+        opfts.append(['+', p, f, 'w'])
+        return opfts
+
     ## check arguments: if matching type phrase/string/regexp, do we have field defined?
     if (m=='p' or m=='r' or m=='e') and not f:
         m = 'a'
@@ -1832,12 +1837,20 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
         res = run_sql("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
                       (wash_index_term(word0), wash_index_term(word1)))
     else:
-        word = re_word.sub('', word)
+        if f == 'journal':
+            pass # FIXME: quick hack for the journal index
+        else:
+            word = re_word.sub('', word)
         if stemming_language:
             word = stem(word, stemming_language)
         if string.find(word, '%') >= 0: # do we have wildcard in the word?
-            res = run_sql("SELECT term,hitlist FROM %s WHERE term LIKE %%s" % bibwordsX,
-                          (wash_index_term(word),))
+            if f == 'journal':
+                # FIXME: quick hack for the journal index
+                # FIXME: we can run a sanity check here for all indexes
+                res = ()
+            else:
+                res = run_sql("SELECT term,hitlist FROM %s WHERE term LIKE %%s" % bibwordsX,
+                              (wash_index_term(word),))
         else:
             res = run_sql("SELECT term,hitlist FROM %s WHERE term=%%s" % bibwordsX,
                           (wash_index_term(word),))
@@ -1856,6 +1869,11 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
 def search_unit_in_bibxxx(p, f, type):
     """Searches for pattern 'p' inside bibxxx tables for field 'f' and returns hitset of recIDs found.
     The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
+
+    # FIXME: quick hack for the journal index
+    if f == 'journal':
+        return search_unit_in_bibwords(p, f)
+
     p_orig = p # saving for eventual future 'no match' reporting
     query_addons = "" # will hold additional SQL code for the query
     query_params = () # will hold parameters for the query (their number may vary depending on TYPE argument)
@@ -2178,6 +2196,11 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
     ## determine browse field:
     if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
         f, p = string.split(p, ":", 1)
+
+    # FIXME: quick hack for the journal index
+    if f == 'journal':
+        return get_nearest_terms_in_bibwords(p, f, n_below, n_above)
+
     ## We are going to take max(n_below, n_above) as the number of
     ## values to ferch from bibXXx.  This is needed to work around
     ## MySQL UTF-8 sorting troubles in 4.0.x.  Proper solution is to
@@ -2263,6 +2286,11 @@ def get_nbhits_in_bibxxx(p, f):
     ## determine browse field:
     if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
         f, p = string.split(p, ":", 1)
+
+    # FIXME: quick hack for the journal index
+    if f == 'journal':
+        return get_nbhits_in_bibwords(p, f)
+
     ## construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
     if str(f[0]).isdigit() and str(f[1]).isdigit():
