@@ -669,7 +669,7 @@ class WordTable:
 
         ## inconsistency detected!
         write_message("EMERGENCY: %s inconsistencies detected..." % self.tablename)
-        write_message("""EMERGENCY: Errors found. You should check consistency of the %s - %sR tables.\nRunning 'bibindex --repair' is recommended.""" \
+        write_message("""EMERGENCY: Errors found. You should check consistency of the %s - %sR tables.\nRunning 'bibrank --repair' is recommended.""" \
             % (self.tablename, self.tablename[:-1]))
         raise StandardError
 
