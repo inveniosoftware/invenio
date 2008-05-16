@@ -1251,6 +1251,21 @@ class WebSearchSpecialTermsQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=%28U%281%29+OR+SL%282%2CZ%29%29',
                                                expected_text="[57, 79, 80, 88]"))
 
+class WebSearchJournalQueryTest(unittest.TestCase):
+    """Test of the search results for journal pubinfo queries."""
+
+    def test_query_journal_title_only(self):
+        """websearch - journal publication info query, title only"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&f=journal&p=Phys.+Lett.+B',
+                                               expected_text="[77, 78, 85, 87]"))
+
+    def test_query_journal_full_pubinfo(self):
+        """websearch - journal publication info query, full reference"""
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&f=journal&p=Phys.+Lett.+B+531+%282002%29+301',
+                                               expected_text="[78]"))
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -1273,7 +1288,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchMARCQueryTest,
                              WebSearchExtSysnoQueryTest,
                              WebSearchResultsRecordGroupingTest,
-                             WebSearchSpecialTermsQueryTest)
+                             WebSearchSpecialTermsQueryTest,
+                             WebSearchJournalQueryTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
