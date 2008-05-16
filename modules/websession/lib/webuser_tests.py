@@ -31,55 +31,40 @@ from invenio.testutils import make_test_suite, run_test_suite
 class ApacheAuthenticationTests(unittest.TestCase):
     """Test functions related to the Apache authentication."""
 
-    def setUp(self):
-        # pylint: disable-msg=C0103
-        """setting up helper variables for tests"""
-        self.apache_password_file = "demo-site-apache-user-passwords"
-        self.apache_group_file = "demo-site-apache-user-groups"
-
     def test_auth_apache_user_p(self):
         """webuser - apache user password checking"""
         # These should succeed:
         self.assertEqual(True,
-                         webuser.auth_apache_user_p('jekyll', 'j123ekyll',
-                                                    self.apache_password_file))
+                         webuser.auth_apache_user_p('jekyll', 'j123ekyll'))
         self.assertEqual(True,
-                         webuser.auth_apache_user_p('hyde', 'h123yde',
-                                                    self.apache_password_file))
+                         webuser.auth_apache_user_p('hyde', 'h123yde'))
         # Note: the following one should succeed even though the real
         # password is different, because crypt() looks at first 8
         # chars only:
         self.assertEqual(True,
-                         webuser.auth_apache_user_p('jekyll', 'j123ekylx',
-                                                    self.apache_password_file))
+                         webuser.auth_apache_user_p('jekyll', 'j123ekylx'))
         # Now some attempts that should fail:
         self.assertEqual(False,
-                         webuser.auth_apache_user_p('jekyll', '',
-                                                    self.apache_password_file))
+                         webuser.auth_apache_user_p('jekyll', ''))
         self.assertEqual(False,
-                         webuser.auth_apache_user_p('jekyll', 'h123yde',
-                                                    self.apache_password_file))
+                         webuser.auth_apache_user_p('jekyll', 'h123yde'))
         self.assertEqual(False,
-                         webuser.auth_apache_user_p('jekyll', 'aoeuidhtns',
-                                                    self.apache_password_file))
+                         webuser.auth_apache_user_p('jekyll', 'aoeuidhtns'))
         self.assertEqual(False,
-                         webuser.auth_apache_user_p('aoeui', '',
-                                                    self.apache_password_file))
+                         webuser.auth_apache_user_p('aoeui', ''))
         self.assertEqual(False,
-                         webuser.auth_apache_user_p('aoeui', 'h123yde',
-                                                    self.apache_password_file))
+                         webuser.auth_apache_user_p('aoeui', 'h123yde'))
         self.assertEqual(False,
-                         webuser.auth_apache_user_p('aoeui', 'dhtns',
-                                                    self.apache_password_file))
+                         webuser.auth_apache_user_p('aoeui', 'dhtns'))
 
     def test_auth_apache_user_in_groups(self):
         """webuser - apache user group membership checking"""
         self.assertEqual(['theses'],
-          webuser.auth_apache_user_in_groups('jekyll', self.apache_group_file))
+          webuser.auth_apache_user_in_groups('jekyll'))
         self.assertEqual([],
-          webuser.auth_apache_user_in_groups('hyde', self.apache_group_file))
+          webuser.auth_apache_user_in_groups('hyde'))
         self.assertEqual([],
-          webuser.auth_apache_user_in_groups('aoeui', self.apache_group_file))
+          webuser.auth_apache_user_in_groups('aoeui'))
 
 TEST_SUITE = make_test_suite(ApacheAuthenticationTests,)
 
