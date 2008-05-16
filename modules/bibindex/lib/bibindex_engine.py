@@ -41,7 +41,8 @@ from invenio.config import \
      CFG_BIBINDEX_MIN_WORD_LENGTH, \
      CFG_BIBINDEX_REMOVE_HTML_MARKUP, \
      CFG_BIBINDEX_REMOVE_LATEX_MARKUP, \
-     CFG_SITE_URL, CFG_TMPDIR
+     CFG_SITE_URL, CFG_TMPDIR, \
+     CFG_CERN_SITE, CFG_INSPIRE_SITE
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
     CFG_MYSQL_THREAD_TIMEOUT, CONV_PROGRAMS, CONV_PROGRAMS_HELPERS, \
     CFG_CHECK_MYSQL_THREADS
@@ -55,6 +56,17 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
     task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
+
+# FIXME: journal tag and journal pubinfo standard format are defined here:
+if CFG_CERN_SITE:
+    CFG_JOURNAL_TAG = '773__%'
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p 773__v (773__y) 773__c"
+elif CFG_INSPIRE_SITE:
+    CFG_JOURNAL_TAG = '773__%'
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM = "773__p,773__v,773__c"
+else:
+    CFG_JOURNAL_TAG = '909C4%'
+    CFG_JOURNAL_PUBINFO_STANDARD_FORM = "909C4p 909C4v (909C4y) 909C4c"
 
 ## import optional modules:
 try:
@@ -214,6 +226,50 @@ def get_fulltext_urls_from_html_page(htmlpagebody):
             #if match and ext not in ['htm', 'html']:
                 #out.append([ext, match.group(1)])
     return out
+
+def get_words_from_journal_tag(recID, tag):
+    """
+    Special procedure to extract words from journal tags.  Joins
+    title/volume/year/page into a standard form that is also used for
+    citations.
+    """
+
+    # get all journal tags/subfields:
+    bibXXx = "bib" + tag[0] + tag[1] + "x"
+    bibrec_bibXXx = "bibrec_" + bibXXx
+    query = """SELECT bb.field_number,b.tag,b.value FROM %s AS b, %s AS bb
+                WHERE bb.id_bibrec=%d
+                  AND bb.id_bibxxx=b.id AND tag LIKE '%s'""" % (bibXXx, bibrec_bibXXx, recID, tag)
+    res = run_sql(query)
+    # construct journal pubinfo:
+    dpubinfos = {}
+    for row in res:
+        nb_instance, subfield, value = row
+        if subfield.endswith("c"):
+            # delete pageend if value is pagestart-pageend
+            # FIXME: pages may not be in 'c' subfield
+            value = value.split('-', 1)[0]
+        if dpubinfos.has_key(nb_instance):
+            dpubinfos[nb_instance][subfield] = value
+        else:
+            dpubinfos[nb_instance] = {subfield: value}
+    # construct standard format:
+    lwords = []
+    for dpubinfo in dpubinfos.values():
+        # index all journal subfields separately
+        for tag,val in dpubinfo.items():
+            lwords.append(val)
+        # index journal standard format:
+        pubinfo = CFG_JOURNAL_PUBINFO_STANDARD_FORM
+        for tag,val in dpubinfo.items():
+            pubinfo = pubinfo.replace(tag,val)
+        if CFG_JOURNAL_TAG[:-1] in pubinfo:
+            # some subfield was missing, do nothing
+            pass
+        else:
+            lwords.append(pubinfo)
+    # return list of words and pubinfos:
+    return lwords
 
 def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
     """Returns all the words contained in the document specified by
@@ -948,20 +1004,31 @@ class WordTable:
         wlist = {}
         self.recIDs_in_mem.append([recID1,recID2])
         # secondly fetch all needed tags:
-        for tag in self.fields_to_index:
-            get_words_function = self.tag_to_words_fnc_map.get(tag, self.default_get_words_fnc)
-            bibXXx = "bib" + tag[0] + tag[1] + "x"
-            bibrec_bibXXx = "bibrec_" + bibXXx
-            query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
-                    WHERE bb.id_bibrec BETWEEN %d AND %d
-                    AND bb.id_bibxxx=b.id AND tag LIKE '%s'""" % (bibXXx, bibrec_bibXXx, recID1, recID2, tag)
-            res = run_sql(query)
-            for row in res:
-                recID,phrase = row
+        if self.fields_to_index == [CFG_JOURNAL_TAG]:
+            # FIXME: quick hack for the journal index; a special
+            # treatment where we need to associate more than one
+            # subfield into indexed term
+            for recID in range(recID1, recID2 + 1):
+                new_words = get_words_from_journal_tag(recID, self.fields_to_index[0])
                 if not wlist.has_key(recID):
                     wlist[recID] = []
-                new_words = get_words_function(phrase, stemming_language=self.stemming_language) # ,self.separators
                 wlist[recID] = list_union(new_words, wlist[recID])
+        else:
+            # usual tag-by-tag indexing:
+            for tag in self.fields_to_index:
+                get_words_function = self.tag_to_words_fnc_map.get(tag, self.default_get_words_fnc)
+                bibXXx = "bib" + tag[0] + tag[1] + "x"
+                bibrec_bibXXx = "bibrec_" + bibXXx
+                query = """SELECT bb.id_bibrec,b.value FROM %s AS b, %s AS bb
+                        WHERE bb.id_bibrec BETWEEN %d AND %d
+                        AND bb.id_bibxxx=b.id AND tag LIKE '%s'""" % (bibXXx, bibrec_bibXXx, recID1, recID2, tag)
+                res = run_sql(query)
+                for row in res:
+                    recID,phrase = row
+                    if not wlist.has_key(recID):
+                        wlist[recID] = []
+                    new_words = get_words_function(phrase, stemming_language=self.stemming_language) # ,self.separators
+                    wlist[recID] = list_union(new_words, wlist[recID])
 
         # were there some words for these recIDs found?
         if len(wlist) == 0: return 0
