@@ -95,7 +95,10 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
             abstract_en = abstract_en[:int(max_chars)]
 
         if limit != "" and limit.isdigit():
-            s_abstract = abstract_en.split(".")
+            s_abstract = abstract_en.split(". ") # Split around
+                                                 # DOTSPACE so that we
+                                                 # don't split html
+                                                 # links
 
             if int(limit) < len(s_abstract):
                 print_extension = True
@@ -103,7 +106,7 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
 
             #for sentence in s_abstract:
             #    out += sentence + "."
-            out = '.'.join(s_abstract)
+            out = '. '.join(s_abstract)
 
             # Add final dot if needed
             if abstract_en.endswith('.'):
@@ -129,7 +132,10 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
             abstract_fr = abstract_fr[:int(max_chars)]
 
         if limit != "" and limit.isdigit():
-            s_abstract = abstract_fr.split(".")
+            s_abstract = abstract_fr.split(". ") # Split around
+                                                 # DOTSPACE so that we
+                                                 # don't split html
+                                                 # links
 
             if int(limit) < len(s_abstract):
                 print_extension = True
@@ -137,7 +143,7 @@ def format(bfo, prefix_en, prefix_fr, suffix_en, suffix_fr, limit, max_chars,
 
             #for sentence in s_abstract:
             #    out += sentence + "."
-            out = '.'.join(s_abstract)
+            out = '. '.join(s_abstract)
 
             # Add final dot if needed
             if abstract_fr.endswith('.'):
