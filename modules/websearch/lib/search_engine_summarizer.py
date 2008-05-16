@@ -36,8 +36,8 @@ websearch_templates = invenio.template.load('websearch')
 ## CFG_CITESUMMARY_COLLECTIONS -- how do we break down cite summary
 ## results according to collections?
 if CFG_INSPIRE_SITE:
-    CFG_CITESUMMARY_COLLECTIONS = [['All papers', ''],
-                                   ['Published only', 'collection:published']]
+    CFG_CITESUMMARY_COLLECTIONS = [['All papers', 'collection:citeable'],
+                                   ['Published only', 'collection:citeable collection:published']]
 else:
     CFG_CITESUMMARY_COLLECTIONS = [['All papers', ''],
                                    ['Published only', 'collection:article']]
