@@ -451,6 +451,11 @@ class SpiresToInvenioSyntaxConverter:
             ' au ':' author:',
             ' author ':' author:',
             ' name ':' author:',
+        # exact author
+        # this is not a real keyword match. It is pseudo keyword that
+        # will be replaced later with author search
+            ' ea ':' exactauthor:',
+            ' exact-author ':' exactauthor:',
         # experiment
             ' exp ' : ' experiment:',
             ' experiment ' : ' experiment:',
@@ -507,9 +512,7 @@ class SpiresToInvenioSyntaxConverter:
             ' tp ' : ' 653__a:',
             ' hep-topic ' : ' 653__a:',
             ' desy-keyword ' : ' 653__a:',
-            ' dk ' : ' 653__a:',
-        # truncation
-            '#':'*'
+            ' dk ' : ' 653__a:'
         }
 
     def __init__(self):
@@ -524,7 +527,7 @@ class SpiresToInvenioSyntaxConverter:
         # taking in mind if they are escaped.
         self._re_quotes_match = re.compile('[^\\\\](".*?[^\\\\]")|[^\\\\](\'.*?[^\\\\]\')')
 
-        # regular expression that matches author patterns"
+        # regular expression that matches author patterns
         # the groups defined in this regular expression are used in the method
         # _convert_spires_author_search_to_invenio_author_search(...) In case
         # of changing them, correct also the code in this method
@@ -537,6 +540,12 @@ class SpiresToInvenioSyntaxConverter:
                                      r'\bauthor:\s*(?P<surname3>\w+),\s*(?P<initial>\w)\.?\b',
                                      re.IGNORECASE)
 
+        # regular expression that matches exact author patterns
+        # the group defined in this regular expression is used in method
+        # _convert_spires_exact_author_search_to_invenio_author_search(...)
+        # in case of changes correct also the code in this method
+        self._re_exact_author_match = re.compile(r'\bexactauthor:(?P<author_name>.*?\b)(?= and | or | not |$)', re.IGNORECASE)
+
     def convertQuery(self, query):
         """Converts the query from SPIRES syntax to Invenio syntax
 
@@ -544,10 +553,34 @@ class SpiresToInvenioSyntaxConverter:
 
         # assume that only queries starting with FIND are SPIRES queries
         if query.lower().startswith("find "):
+            # call to _replace_spires_keywords_with_invenio_keywords should be at the
+            # beginning because the next methods use the result of the replacement
             query = self._replace_spires_keywords_with_invenio_keywords(query)
+
             query = self._convert_spires_author_search_to_invenio_author_search(query)
+            query = self._convert_spires_exact_author_search_to_invenio_author_search(query)
+            query = self._convert_spires_truncation_to_invenio_truncation(query)
+
             # remove FIND in the beginning of the query as it is not necessary in Invenio
             query = query[5:]
+
+        return query
+
+    def _convert_spires_truncation_to_invenio_truncation(self, query):
+        """Replace SPIRES truncation symbol # with invenio trancation symbol *"""
+        return query.replace('#', '*')
+
+    def _convert_spires_exact_author_search_to_invenio_author_search(self, query):
+        """Converts SPIRES search patterns for exact author into search pattern
+        for invenio"""
+
+        # method used for replacement with regular expression
+        def create_replacement_pattern(match):
+            # the regular expression where this group name is defined is in
+            # the method _compile_regular_expressions()
+            return 'author:"' + match.group('author_name') + '"'
+
+        query = self._re_exact_author_match.sub(create_replacement_pattern, query)
 
         return query
 
