@@ -3047,11 +3047,15 @@ class Template:
         for coll, colldef in l_colls:
             link_url = CFG_SITE_URL + '/search?p='
             if searchpattern:
-                link_url += quote(searchpattern)
+                p = searchpattern
+                if searchfield:
+                    if " " in searchpattern:
+                        p = searchfield + ':"' + searchpattern + '"'
+                    else:
+                        p = searchfield + ':' + searchpattern
+                link_url += quote(p)
             if colldef:
                 link_url += ' ' + quote(colldef)
-            if searchfield:
-                link_url += '&amp;f=' + quote(searchfield);
             link_url += '&amp;rm=citation';
             link_text = self.tmpl_nice_number(d_total_recs[coll], ln)
             out += '<td align="right"><a href="%s">%s</a></td>' % (link_url, link_text)
@@ -3083,15 +3087,19 @@ class Template:
         for coll, colldef in l_colls:
             link_url = CFG_SITE_URL + '/search?p='
             if searchpattern:
-                link_url += quote(searchpattern) + ' '
+                p = searchpattern
+                if searchfield:
+                    if " " in searchpattern:
+                        p = searchfield + ':"' + searchpattern + '"'
+                    else:
+                        p = searchfield + ':' + searchpattern
+                link_url += quote(p) + ' '
             if colldef:
                 link_url += quote(colldef) + ' '
             if low == 0 and high == 0:
                 link_url += quote('cited:0')
             else:
                 link_url += quote('cited:%i->%i' % (low, high))
-            if searchfield:
-                link_url += '&amp;f=' + quote(searchfield);
             link_url += '&amp;rm=citation';
             link_text = self.tmpl_nice_number(d_cites[coll], ln)
             out += '<td align="right"><a href="%s">%s</a></td>' % (link_url, link_text)
