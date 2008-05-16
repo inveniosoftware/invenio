@@ -21,6 +21,7 @@
 
 __revision__ = "$Id$"
 
+import re
 import time
 import sys
 import os
@@ -30,7 +31,8 @@ from zlib import decompress, error
 
 from invenio.dbquery import run_sql, serialize_via_marshal, \
                             deserialize_via_marshal
-from invenio.search_engine import print_record, search_pattern, get_fieldvalues
+from invenio.search_engine import print_record, search_pattern, get_fieldvalues, \
+                           search_unit
 from invenio.bibformat_utils import parse_tag
 from invenio.bibtask import write_message, task_get_option, task_update_progress, \
                             task_sleep_now_if_required
@@ -342,8 +344,8 @@ def get_citation_informations(recid_list, config):
                     pages = tmp[0]
                     hpos = pages.find("-")
                     if hpos > 0:
-                        pages = pages[:hpos-1]
-                        tagsvalues["c"] = pages
+                        pages = pages[:hpos]
+                    tagsvalues["c"] = pages
                 #format the publ infostring according to the format
                 publ = ""
                 ok = 1
@@ -639,10 +641,20 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         for refs in refss:
             if refs:
                 p = refs
-                f = 'publref'
-                rec_id = get_recids_matching_query(p, f)
+                #remove the latter page number if it is like 67-74
+                matches = re.compile("(.*)(-\d+$)").findall(p)
+                if matches and matches[0]:
+                    p = matches[0][0]
+                rec_id = list(search_unit(p, 'journal'))
+                #print "These match searching "+p+" in journal: "+str(rec_id)
+                if rec_id and rec_id[0]:
+                    #the refered publication is in our collection, remove
+                    #from missing
+                    remove_from_missing(p)
+                else:
+                    #it was not found so add in missing
+                    insert_into_missing(recid, p)
                 if rec_id and not recid in citation_list[rec_id[0]]:
-                    #somebody has this in the references..
                     result[rec_id[0]] += 1
                     citation_list[rec_id[0]].append(recid)
                 if rec_id and not rec_id[0] in reference_list[recid]:
@@ -699,7 +711,8 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             task_update_progress(mesg)
         done = done+1
         p = recs
-        rec_ids = get_recids_matching_query(p, pubreftag)
+        #search the publication string like Phys. Lett., B 482 (2000) 417 in 999C5s
+        rec_ids = list(search_unit(f=pubreftag, p=p))
         #print "These records match "+p+" in "+pubreftag+" : "+str(rec_ids)
         if rec_ids:
             for rec_id in rec_ids:
