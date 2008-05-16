@@ -1553,7 +1553,8 @@ class Template:
                         action, fieldslist, f1, f2, f3, m1, m2, m3,
                         p1, p2, p3, op1, op2, rm, p, f, coll_selects,
                         d1y, d2y, d1m, d2m, d1d, d2d, dt, sort_fields,
-                        sf, so, ranks, sc, rg, formats, of, pl, jrec, ec):
+                        sf, so, ranks, sc, rg, formats, of, pl, jrec, ec,
+                        show_colls=True):
 
         """
           Displays the *Nearest search terms* box
@@ -1577,7 +1578,6 @@ class Template:
           - 'p, f, f1, f2, f3, m1, m2, m3, p1, p2, p3, op1, op2, op3, rm' *strings* - the search parameters
 
           - 'coll_selects' *array* - a list of lists, each containing the collections selects to display
-              (if not containing more than one collection, they will not be printed)
 
           - 'd1y, d2y, d1m, d2m, d1d, d2d' *int* - the search between dates
 
@@ -1602,6 +1602,9 @@ class Template:
           - 'of' *string* - the selected output format
 
           - 'pl' *string* - `limit to' search pattern
+
+          - show_colls *bool* - show cc_intl in page title,
+                            and propose coll selection box?
         """
 
         # load the right message language
@@ -1617,8 +1620,8 @@ class Template:
 
 
         out = ""
-        if len(coll_selects) > 1:
-            # display cc name only if there is more than one collection
+        if show_colls:
+            # display cc name if asked for
             out += '''
             <h1 class="headline">%(ccname)s</h1>''' % {'ccname' : cgi.escape(cc_intl),}
 
@@ -1790,7 +1793,7 @@ class Template:
 
         ## secondly, print Collection(s) box:
 
-        if len(coll_selects) > 1:
+        if show_colls:
             # display collections only if there is more than one
             selects = ''
             for sel in coll_selects:
