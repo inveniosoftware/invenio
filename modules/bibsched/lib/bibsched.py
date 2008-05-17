@@ -475,9 +475,9 @@ class Manager:
                 os.system(COMMAND)
                 Log("manually running task #%d (%s)" % (task_id, process))
             else:
-                self.display_in_footer("process %s is not in the list of allowed processes." % process)
+                self.display_in_footer("Process %s is not in the list of allowed processes." % process)
         else:
-            self.display_in_footer("process status should be SCHEDULED or WAITING!")
+            self.display_in_footer("Process status should be SCHEDULED or WAITING!")
 
     def acknowledge():
         task_id = self.currentrow[0]
@@ -490,11 +490,11 @@ class Manager:
         task_id = self.currentrow[0]
         process = self.currentrow[1].split(':')[0]
         status = self.currentrow[5]
-        if status not in ('RUNNING', 'CONTINUING'):
-            self.display_in_footer("this process is not running!")
-        else:
+        if status in ('RUNNING', 'CONTINUING'):
             bibsched_send_signal(process, task_id, signal.SIGUSR1)
             self.display_in_footer("SLEEP signal sent to task #%s" % task_id)
+        else:
+            self.display_in_footer("Can not put to sleep not running process")
 
     def kill(self):
         task_id = self.currentrow[0]
@@ -505,22 +505,28 @@ class Manager:
                 bibsched_send_signal(process, task_id, signal.SIGKILL)
                 bibsched_set_status(task_id, 'KILLED')
                 self.display_in_footer("KILL signal sent to task #%s" % task_id)
+        else:
+            self.display_in_footer("Can not kill not running processes")
 
     def stop(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1]
-        bibsched_send_signal(process, task_id, signal.SIGTERM)
-        self.display_in_footer("TERM signal sent to task #%s" % task_id)
+        status = self.currentrow[5]
+        if status in ('RUNNING', 'CONTINUING'):
+            bibsched_send_signal(process, task_id, signal.SIGTERM)
+            self.display_in_footer("TERM signal sent to task #%s" % task_id)
+        else:
+            self.display_in_footer("Can not stop not running processes")
 
     def delete(self):
         task_id = self.currentrow[0]
         status = self.currentrow[5]
-        if status in ('RUNNING', 'CONTINUING', 'SLEEPING', 'SCHEDULED', 'STOP SENT', 'STOPPING', 'SLEEP SENT'):
+        if status not in ('RUNNING', 'CONTINUING', 'SLEEPING', 'SCHEDULED', 'ABOUT TO STOP', 'ABOUT TO SLEEP'):
             bibsched_set_status(task_id, "%s_DELETED" % status)
             self.display_in_footer("process deleted")
             self.selected_line = max(self.selected_line, 2)
         else:
-            self.display_in_footer("cannot delete running processes")
+            self.display_in_footer("Can not delete running processes")
 
     def init(self):
         task_id = self.currentrow[0]
