@@ -447,15 +447,10 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     if auth_code:
                         coll_recids = get_collection(collname).reclist
                         if coll_recids & recids:
-                            if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
-                                cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : collname})
-                                target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                                make_canonical_urlargd({'action' : cookie,                        'ln' : argd['ln'], 'referer' : req.unparsed_uri}, {})
-                                return redirect_to_url(req, target)
-                            else:
-                                return page_not_authorized(req, "../", \
-                                    text = auth_msg,\
-                                    navmenuid='search')
+                            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : collname})
+                            target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
+                            make_canonical_urlargd({'action' : cookie, 'ln' : argd['ln'], 'referer' : req.unparsed_uri}, {})
+                            return redirect_to_url(req, target)
             else:
                 involved_collections.add(search_engine.guess_primary_collection_of_a_record(argd['recid']))
 
@@ -464,16 +459,11 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         for coll in involved_collections:
             if collection_restricted_p(coll):
                 (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
-                if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+                if auth_code:
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
                     make_canonical_urlargd({'action' : cookie, 'ln' : argd['ln'], 'referer' : req.unparsed_uri}, {})
                     return redirect_to_url(req, target)
-                elif auth_code:
-                    return page_not_authorized(req, "../", \
-                        text = auth_msg,\
-                        navmenuid='search')
-
 
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
@@ -506,9 +496,10 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
             if collection_restricted_p(coll):
                 (auth_code, dummy) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
                 if auth_code:
-                    return page_not_authorized(req, "../",
-                        text="You are not authorized to view this collection.",
-                        navmenuid='search')
+                    cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
+                    target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
+                    make_canonical_urlargd({'action' : cookie, 'ln' : argd['ln'], 'referer' : req.unparsed_uri}, {})
+                    return redirect_to_url(req, target)
 
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
