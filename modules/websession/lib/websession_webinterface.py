@@ -292,6 +292,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                navmenuid='youraccount')
 
         prefs = webuser.get_user_preferences(uid)
+        mess = ''
 
         if args['email']:
             args['email'] = args['email'].lower()
@@ -692,8 +693,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
             # login successful!
             if args['referer']:
-                req.err_headers_out.add("Location", args['referer'])
-                raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+                redirect_to_url(req, args['referer'])
             else:
                 return self.display(req, form)
         else:
