@@ -67,8 +67,8 @@ from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS, \
     CFG_BIBTASK_DEFAULT_TASK_SETTINGS
 
 # Which tasks don't need to ask the user for authorization?
-cfg_valid_processes_no_auth_needed = ("bibupload", )
-cfg_task_is_not_a_deamon = ("bibupload", )
+CFG_VALID_PROCESSES_NO_AUTH_NEEDED = ("bibupload", )
+CFG_TASK_IS_NOT_A_DEAMON = ("bibupload", )
 
 def fix_argv_paths(paths, argv=None):
     """Given the argv vector of cli parameters, and a list of path that
@@ -253,7 +253,7 @@ def _task_build_params(
             elif opt[0] in ["-v", "--verbose"]:
                 _task_params["verbose"] = int(opt[1])
             elif opt[0] in [ "-s", "--sleeptime" ]:
-                if task_name not in cfg_task_is_not_a_deamon:
+                if task_name not in CFG_TASK_IS_NOT_A_DEAMON:
                     get_datetime(opt[1]) # see if it is a valid shift
                     _task_params["sleeptime"] = opt[1]
             elif opt[0] in [ "-t", "--runtime" ]:
@@ -408,7 +408,7 @@ def authenticate(user, authorization_action, authorization_msg=""):
     do system exit upon authorization failure.
     """
     # With SSO it's impossible to check for pwd
-    if CFG_EXTERNAL_AUTH_USING_SSO or os.path.basename(sys.argv[0]) in cfg_valid_processes_no_auth_needed:
+    if CFG_EXTERNAL_AUTH_USING_SSO or os.path.basename(sys.argv[0]) in CFG_VALID_PROCESSES_NO_AUTH_NEEDED:
         return user
     if authorization_msg:
         print authorization_msg
@@ -487,13 +487,14 @@ def _task_get_options(task_id, task_name):
     """Returns options for the task 'id' read from the BibSched task
     queue table."""
     out = {}
-    res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc=%s",
-        (task_id, task_name))
+    res = run_sql("SELECT arguments FROM schTASK WHERE id=%s AND proc LIKE %s",
+        (task_id, task_name+'%'))
     try:
         out = marshal.loads(res[0][0])
     except:
         write_message("Error: %s task %d does not seem to exist." \
             % (task_name, task_id), sys.stderr)
+        task_update_status('ERROR')
         sys.exit(1)
     write_message('Options retrieved: %s' % (out, ), verbose=9)
     return out
@@ -543,10 +544,16 @@ def _task_run(task_run_fnc):
 
     sleeptime = _task_params['sleeptime']
     try:
-        if callable(task_run_fnc) and task_run_fnc():
-            task_update_status("DONE")
-        else:
-            task_update_status("DONE WITH ERRORS")
+        try:
+            if callable(task_run_fnc) and task_run_fnc():
+                task_update_status("DONE")
+            else:
+                task_update_status("DONE WITH ERRORS")
+        except SystemExit:
+            pass
+        except:
+            register_exception(alert_admin=True)
+            task_update_status("ERROR")
     finally:
         task_status = task_read_status()
         if sleeptime:
@@ -605,6 +612,8 @@ def _task_sig_sleep(sig, frame):
             % (sig, frame), verbose=9)
     write_message("sleeping as soon as possible...")
     _task_params['signal_request'] = 'sleep'
+    _db_login(1)
+    task_update_status("ABOUT TO SLEEP")
 
 def _task_sig_ctrlz(sig, frame):
     """Signal handler for the 'ctrlz' signal sent by BibSched."""
@@ -612,6 +621,8 @@ def _task_sig_ctrlz(sig, frame):
             % (sig, frame), verbose=9)
     write_message("sleeping as soon as possible...")
     _task_params['signal_request'] = 'ctrlz'
+    _db_login(1)
+    task_update_status("ABOUT TO STOP")
 
 def _task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
@@ -619,6 +630,7 @@ def _task_sig_wakeup(sig, frame):
     write_message("task_sig_wakeup(), got signal %s frame %s"
             % (sig, frame), verbose=9)
     write_message("continuing...")
+    _task_params['signal_request'] = None
     _db_login(1)
     task_update_status("CONTINUING")
 

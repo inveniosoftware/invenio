@@ -34,7 +34,6 @@ import getopt
 import copy
 from socket import gethostname
 import signal
-from tempfile import NamedTemporaryFile
 
 from invenio.bibtask_config import CFG_BIBTASK_VALID_TASKS
 from invenio.config import \
@@ -43,7 +42,6 @@ from invenio.config import \
      CFG_BIBSCHED_LOG_PAGER, \
      CFG_BINDIR, \
      CFG_LOGDIR, \
-     CFG_TMPDIR, \
      CFG_BIBSCHED_GC_TASKS_OLDER_THAN, \
      CFG_BIBSCHED_GC_TASKS_TO_REMOVE, \
      CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE, \
@@ -51,6 +49,8 @@ from invenio.config import \
 from invenio.dbquery import run_sql, escape_string
 from invenio.textutils import wrap_text_in_a_box
 from invenio.errorlib import register_exception
+
+CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING', 'DELETED %', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED', 'SLEEPING', 'KILLED')
 
 shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
@@ -86,13 +86,15 @@ def get_my_pid(process, args=''):
         answer = answer[:string.find(answer,' ')]
     return int(answer)
 
-def get_task_pid(task_name, task_id):
+def get_task_pid(task_name, task_id, ignore_error=False):
     """Return the pid of task_name/task_id"""
     try:
         pid = int(open(os.path.join(CFG_PREFIX, 'var', 'run', 'bibsched_task_%d.pid' % task_id)).read())
         os.kill(pid, signal.SIGUSR2)
         return pid
     except (OSError, IOError):
+        if ignore_error:
+            return None
         register_exception()
         return get_my_pid(task_name, str(task_id))
 
@@ -103,7 +105,7 @@ def get_output_channelnames(task_id):
 
 def is_task_scheduled(task_name):
     """Check if a certain task_name is due for execution (WAITING or RUNNING)"""
-    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc = %s AND (status = 'WAITING' or status = 'RUNNING')"
+    sql = "SELECT COUNT(proc) FROM schTASK WHERE proc = %s AND (status='WAITING' OR status='RUNNING')"
     return run_sql(sql, (task_name,))[0][0] > 0
 
 def get_task_ids_by_descending_date(task_name, statuses=['SCHEDULED']):
@@ -118,7 +120,7 @@ def get_task_options(task_id):
     try:
         return marshal.loads(res[0][0])
     except IndexError:
-        return {}
+        return list()
 
 def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
     """Garbage collect the task queue."""
@@ -151,6 +153,28 @@ def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
                              runtime<%%s""" % status_query, (task, date))
             write_message('Archived %s %s tasks (created before %s) with %s' % (res, task, date, status_query))
 
+
+def bibsched_set_status(task_id, status):
+    """Update the status of task_id."""
+    return run_sql("UPDATE schTASK SET status=%s WHERE id=%s", (status, task_id))
+
+def bibsched_set_progress(task_id, progress):
+    """Update the progress of task_id."""
+    return run_sql("UPDATE schTASK SET progress=%s WHERE id=%s", (progress, task_id))
+
+def bibsched_set_priority(task_id, priority):
+    """Update the priority of task_id."""
+    return run_sql("UPDATE schTASK SET priority=%s WHERE id=%s", (priority, task_id))
+
+def bibsched_send_signal(proc, task_id, signal):
+    """Send a signal to a given task."""
+    try:
+        os.kill(get_task_pid(proc, task_id), signal)
+    except OSError:
+        pass
+    except KeyError:
+        register_exception()
+
 class Manager:
     def __init__(self, old_stdout):
         import curses
@@ -160,12 +184,12 @@ class Manager:
         self.curses = curses
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.running = 1
-        self.footer_move_mode = "[KeyUp/KeyDown Move] [M Select mode] [Q Quit]"
-        self.footer_auto_mode = "[A Manual mode] [1/2/3 Display] [P Purge Done] [Q Quit]"
-        self.footer_select_mode = "[KeyUp/KeyDown/PgUp/PgDown Select] [L View Log] [1/2/3 Display Type] [M Move mode] [A Auto mode] [Q Quit]"
-        self.footer_waiting_item = "[R Run] [D Delete]"
+        #self.footer_move_mode = "[KeyUp/KeyDown Move] [M Select mode] [Q Quit]"
+        self.footer_auto_mode = "Automatic Mode [A Go to Manual mode] [1/2/3 Display] [P Purge Done] [Q Quit] [lL Log] [O Options]"
+        self.footer_select_mode = "Manual Mode [A Go to Automatic mode] [1/2/3 Display Type] [P Purge Done] [Q Quit] [lL Log] [O Options]"
+        self.footer_waiting_item = "[R Run] [D Delete] [N Priority]"
         self.footer_running_item = "[S Sleep] [T Stop] [K Kill]"
-        self.footer_stopped_item = "[I Initialise] [D Delete]"
+        self.footer_stopped_item = "[I Initialise] [D Delete] [K Acknowledge]"
         self.footer_sleeping_item   = "[W Wake Up]"
         self.item_status = ""
         self.selected_line = 2
@@ -173,7 +197,7 @@ class Manager:
         self.panel = None
         self.display = 2
         self.first_visible_line = 0
-        self.move_mode = 0
+        #self.move_mode = 0
         self.auto_mode = 0
         self.currentrow = None
         wrapper(self.start)
@@ -191,27 +215,28 @@ class Manager:
                                            ord("l"), ord("L"))):
             self.display_in_footer("in automatic mode")
             self.stdscr.refresh()
-        elif self.move_mode and (chr not in (self.curses.KEY_UP,
-                                             self.curses.KEY_DOWN,
-                                             ord("m"), ord("M"), ord("q"),
-                                             ord("Q"))):
-            self.display_in_footer("in move mode")
-            self.stdscr.refresh()
+        #elif self.move_mode and (chr not in (self.curses.KEY_UP,
+                                             #self.curses.KEY_DOWN,
+                                             #ord("m"), ord("M"), ord("q"),
+                                             #ord("Q"))):
+            #self.display_in_footer("in move mode")
+            #self.stdscr.refresh()
         else:
+            status = self.currentrow[5]
             if chr == self.curses.KEY_UP:
-                if self.move_mode:
-                    self.move_up()
-                else:
-                    self.selected_line = max(self.selected_line - 1, 2)
+                #if self.move_mode:
+                    #self.move_up()
+                #else:
+                self.selected_line = max(self.selected_line - 1, 2)
                 self.repaint()
             if chr == self.curses.KEY_PPAGE:
                 self.selected_line = max(self.selected_line - 10, 2)
                 self.repaint()
             elif chr == self.curses.KEY_DOWN:
-                if self.move_mode:
-                    self.move_down()
-                else:
-                    self.selected_line = min(self.selected_line + 1, len(self.rows) + 1 )
+                #if self.move_mode:
+                    #self.move_down()
+                #else:
+                self.selected_line = min(self.selected_line + 1, len(self.rows) + 1 )
                 self.repaint()
             elif chr == self.curses.KEY_NPAGE:
                 self.selected_line = min(self.selected_line + 10, len(self.rows) + 1 )
@@ -227,20 +252,26 @@ class Manager:
                 self.openlog(err=True)
             elif chr in (ord("w"), ord("W")):
                 self.wakeup()
+            elif chr in (ord("n"), ord("N")):
+                self.change_priority()
             elif chr in (ord("r"), ord("R")):
-                self.run()
+                if status not in 'WAITING' or 'SCHEDULED':
+                    self.run()
             elif chr in (ord("s"), ord("S")):
                 self.sleep()
             elif chr in (ord("k"), ord("K")):
-                self.kill()
+                if status == 'ERROR':
+                    self.acknowledge()
+                else:
+                    self.kill()
             elif chr in (ord("t"), ord("T")):
                 self.stop()
             elif chr in (ord("d"), ord("D")):
                 self.delete()
             elif chr in (ord("i"), ord("I")):
                 self.init()
-            elif chr in (ord("m"), ord("M")):
-                self.change_select_mode()
+            #elif chr in (ord("m"), ord("M")):
+                #self.change_select_mode()
             elif chr in (ord("p"), ord("P")):
                 self.purge_done()
             elif chr in (ord("o"), ord("O")):
@@ -268,12 +299,6 @@ class Manager:
                     self.running = 0
                     return
 
-    def set_status(self, task_id, status):
-        return run_sql("UPDATE schTASK set status=%s WHERE id=%s", (status, task_id))
-
-    def set_progress(self, task_id, progress):
-        return run_sql("UPDATE schTASK set progress=%s WHERE id=%s", (progress, task_id))
-
     def openlog(self, err=False):
         task_id = self.currentrow[0]
         status = self.currentrow[5]
@@ -294,6 +319,9 @@ class Manager:
     def display_task_options(self):
         """Nicely display information about current process."""
         msg =  '        id: %i\n\n' % self.currentrow[0]
+        pid = get_task_pid(self.currentrow[1], self.currentrow[0], True)
+        if pid is not None:
+            msg += '       pid: %s\n\n' % pid
         msg += '  priority: %s\n\n' % self.currentrow[8]
         msg += '      proc: %s\n\n' % self.currentrow[1]
         msg += '      user: %s\n\n' % self.currentrow[2]
@@ -313,12 +341,15 @@ class Manager:
         rows = msg.split('\n')
         height = len(rows) + 2
         width = max([len(row) for row in rows]) + 4
-        self.win = self.curses.newwin(
-            height,
-            width,
-            (self.height - height) / 2 + 1,
-            (self.width - width) / 2 + 1
-            )
+        try:
+            self.win = self.curses.newwin(
+                height,
+                width,
+                (self.height - height) / 2 + 1,
+                (self.width - width) / 2 + 1
+                )
+        except self.curses.error:
+            return
         self.panel = self.curses.panel.new_panel( self.win )
         self.panel.top()
         self.win.border()
@@ -338,22 +369,31 @@ class Manager:
             pass
         return out
 
+    def change_priority(self):
+        task_id = self.currentrow[0]
+        priority = self.currentrow[8]
+        new_priority = self._display_ask_number_box("Insert the desired priority for task %s. The smaller the number the less the priority. Note that a negative number will mean to always postpone the task while a number bigger than 10 will mean some tasks with less priority could be stopped in order to let this task run. The current priority is %s. New value:" % (task_id, priority))
+        try:
+            new_priority = int(new_priority)
+        except ValueError:
+            return
+        bibsched_set_priority(task_id, new_priority)
+
     def wakeup(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1]
         status = self.currentrow[5]
-        if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
-            self.display_in_footer("a process is already running!")
-        elif status == "SLEEPING":
-            mypid = get_task_pid(process, task_id)
-            if mypid != 0:
-                os.kill(mypid, signal.SIGCONT)
+        #if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
+            #self.display_in_footer("a process is already running!")
+        if status == "SLEEPING":
+            bibsched_send_signal(process, task_id, signal.SIGCONT)
             self.display_in_footer("process woken up")
         else:
             self.display_in_footer("process is not sleeping")
         self.stdscr.refresh()
 
     def _display_YN_box(self, msg):
+        """Utility to display confirmation boxes."""
         msg += ' (Y/N)'
         msg = wrap_text_in_a_box(msg, style='no_border')
         rows = msg.split('\n')
@@ -376,11 +416,40 @@ class Manager:
         while 1:
             c = self.win.getch()
             if c in (ord('y'), ord('Y')):
+                self.curses.panel.update_panels()
                 return True
             elif c in (ord('n'), ord('N')):
+                self.curses.panel.update_panels()
                 return False
 
+    def _display_ask_number_box(self, msg):
+        """Utility to display confirmation boxes."""
+        msg = wrap_text_in_a_box(msg, style='no_border')
+        rows = msg.split('\n')
+        height = len(rows) + 3
+        width = max([len(row) for row in rows]) + 4
+        self.win = self.curses.newwin(
+            height,
+            width,
+            (self.height - height) / 2 + 1,
+            (self.width - width) / 2 + 1
+            )
+        self.panel = self.curses.panel.new_panel( self.win )
+        self.panel.top()
+        self.win.border()
+        i = 1
+        for row in rows:
+            self.win.addstr(i, 2, row)
+            i += 1
+        self.win.refresh()
+        self.win.move(height - 2, 2)
+        self.curses.echo()
+        ret = self.win.getstr()
+        self.curses.noecho()
+        return ret
+
     def purge_done(self):
+        """Garbage collector."""
         if self._display_YN_box("You are going to purge the list of DONE tasks.\n\n"
             "%s tasks, submitted since %s days, will be archived.\n\n"
             "%s tasks, submitted since %s days, will be deleted.\n\n"
@@ -390,101 +459,89 @@ class Manager:
                 ','.join(CFG_BIBSCHED_GC_TASKS_TO_REMOVE),
                 CFG_BIBSCHED_GC_TASKS_OLDER_THAN)):
             gc_tasks()
-            self.curses.panel.update_panels()
             self.display_in_footer("DONE processes purged")
-        else:
-            self.curses.panel.update_panels()
 
     def run(self):
         task_id = self.currentrow[0]
-        process = self.currentrow[1]
+        process = self.currentrow[1].split(':')[0]
         status = self.currentrow[5]
         #if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
             #self.display_in_footer("a process is already running!")
-        if status == "SCHEDULED" or status == "WAITING":
+        if status in ("SCHEDULED", "WAITING"):
             if process in self.helper_modules:
                 program = os.path.join(CFG_BINDIR, process)
                 fdout, fderr = get_output_channelnames(task_id)
                 COMMAND = "%s %s >> %s 2>> %s &" % (program, str(task_id), fdout, fderr)
                 os.system(COMMAND)
                 Log("manually running task #%d (%s)" % (task_id, process))
+            else:
+                self.display_in_footer("process %s is not in the list of allowed processes." % process)
         else:
             self.display_in_footer("process status should be SCHEDULED or WAITING!")
-        self.stdscr.refresh()
+
+    def acknowledge():
+        task_id = self.currentrow[0]
+        status = self.currentrow[1]
+        if status in ('ERROR', 'DONE WITH ERRORS'):
+            bibsched_set_status(task_id, 'ACK ' + status)
+            self.display_in_footer("Acknowledged error")
 
     def sleep(self):
         task_id = self.currentrow[0]
-        process = self.currentrow[1]
+        process = self.currentrow[1].split(':')[0]
         status = self.currentrow[5]
-        if status != 'RUNNING' and status != 'CONTINUING':
+        if status not in ('RUNNING', 'CONTINUING'):
             self.display_in_footer("this process is not running!")
         else:
-            mypid = get_task_pid(process, task_id)
-            if mypid != 0:
-                os.kill(mypid, signal.SIGUSR1)
-                self.display_in_footer("USR1 signal sent to process #%s" % mypid)
-            else:
-                self.set_status(task_id, 'STOPPED')
-                self.display_in_footer("cannot find process...")
-        self.stdscr.refresh()
+            bibsched_send_signal(process, task_id, signal.SIGUSR1)
+            self.display_in_footer("SLEEP signal sent to task #%s" % task_id)
 
     def kill(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1]
-        mypid = get_task_pid(process, task_id)
-        if mypid != 0:
-            os.kill(mypid, signal.SIGKILL)
-            self.set_status(task_id, 'STOPPED')
-            self.display_in_footer("KILL signal sent to process #%s" % mypid)
-        else:
-            self.set_status(task_id, 'STOPPED')
-            self.display_in_footer("cannot find process...")
-        self.stdscr.refresh()
+        status = self.currentrow[5]
+        if status in ('RUNNING', 'CONTINUING', 'ABOUT TO STOP', 'ABOUT TO SLEEP'):
+            if self._display_YN_box("Are you sure you want to kill the %s process %s?" % (process, task_id)):
+                bibsched_send_signal(process, task_id, signal.SIGKILL)
+                bibsched_set_status(task_id, 'KILLED')
+                self.display_in_footer("KILL signal sent to task #%s" % task_id)
 
     def stop(self):
         task_id = self.currentrow[0]
         process = self.currentrow[1]
-        mypid = get_task_pid(process, task_id)
-        if mypid != 0:
-            os.kill(mypid, signal.SIGTERM)
-            self.display_in_footer("TERM signal sent to process #%s" % mypid)
-        else:
-            self.set_status(task_id, 'STOPPED')
-            self.display_in_footer("cannot find process...")
-        self.stdscr.refresh()
+        bibsched_send_signal(process, task_id, signal.SIGTERM)
+        self.display_in_footer("TERM signal sent to task #%s" % task_id)
 
     def delete(self):
         task_id = self.currentrow[0]
         status = self.currentrow[5]
-        if status not in ('RUNNING', 'CONTINUING', 'SLEEPING'):
-            self.set_status(task_id, "%s_DELETED" % status)
+        if status in ('RUNNING', 'CONTINUING', 'SLEEPING', 'SCHEDULED', 'STOP SENT', 'STOPPING', 'SLEEP SENT'):
+            bibsched_set_status(task_id, "%s_DELETED" % status)
             self.display_in_footer("process deleted")
             self.selected_line = max(self.selected_line, 2)
         else:
             self.display_in_footer("cannot delete running processes")
-        self.stdscr.refresh()
 
     def init(self):
         task_id = self.currentrow[0]
         status = self.currentrow[5]
-        if status != 'RUNNING' and status != 'CONTINUING' and status != 'SLEEPING':
-            self.set_status(task_id, "WAITING")
-            self.set_progress(task_id, "None")
+        if status not in ('RUNNING', 'CONTINUING', 'SLEEPING'):
+            bibsched_set_status(task_id, "WAITING")
+            bibsched_set_progress(task_id, "")
             self.display_in_footer("process initialised")
         else:
             self.display_in_footer("cannot initialise running processes")
-        self.stdscr.refresh()
 
-    def change_select_mode(self):
-        if self.move_mode:
-            self.move_mode = 0
-        else:
-            status = self.currentrow[5]
-            if status in ("RUNNING" , "CONTINUING" , "SLEEPING"):
-                self.display_in_footer("cannot move running processes!")
-            else:
-                self.move_mode = 1
-        self.stdscr.refresh()
+    #def change_select_mode(self):
+        #if self.move_mode:
+            #self.move_mode = 0
+        #else:
+            #status = self.currentrow[5]
+            #if status in ("RUNNING" , "CONTINUING" , "SLEEPING"):
+                #self.display_in_footer("cannot move running processes!")
+            #else:
+                #self.move_mode = 1
+        #self.stdscr.refresh()
 
     def change_auto_mode(self):
         if self.auto_mode:
@@ -502,22 +559,22 @@ class Manager:
             self.move_mode = 0
         self.stdscr.refresh()
 
-    def move_up(self):
-        self.display_in_footer("not implemented yet")
-        self.stdscr.refresh()
+    #def move_up(self):
+        #self.display_in_footer("not implemented yet")
+        #self.stdscr.refresh()
 
-    def move_down(self):
-        self.display_in_footer("not implemented yet")
-        self.stdscr.refresh()
+    #def move_down(self):
+        #self.display_in_footer("not implemented yet")
+        #self.stdscr.refresh()
 
     def put_line(self, row, header=False):
-        col_w = [5 , 15, 10, 21, 7, 11, 25]
+        col_w = [7 , 15, 10, 21, 7, 11, 25]
         maxx = self.width
         if self.y == self.selected_line - self.first_visible_line and self.y > 1:
             if self.auto_mode:
                 attr = self.curses.color_pair(2) + self.curses.A_STANDOUT + self.curses.A_BOLD
-            elif self.move_mode:
-                attr = self.curses.color_pair(7) + self.curses.A_STANDOUT + self.curses.A_BOLD
+            #elif self.move_mode:
+                #attr = self.curses.color_pair(7) + self.curses.A_STANDOUT + self.curses.A_BOLD
             else:
                 attr = self.curses.color_pair(8) + self.curses.A_STANDOUT + self.curses.A_BOLD
             self.item_status = row[5]
@@ -525,8 +582,8 @@ class Manager:
         elif self.y == 0:
             if self.auto_mode:
                 attr = self.curses.color_pair(2) + self.curses.A_STANDOUT + self.curses.A_BOLD
-            elif self.move_mode:
-                attr = self.curses.color_pair(7) + self.curses.A_STANDOUT + self.curses.A_BOLD
+            #elif self.move_mode:
+                #attr = self.curses.color_pair(7) + self.curses.A_STANDOUT + self.curses.A_BOLD
             else:
                 attr = self.curses.color_pair(8) + self.curses.A_STANDOUT + self.curses.A_BOLD
         elif row[5] == "DONE":
@@ -561,7 +618,10 @@ class Manager:
             myline += str(row[5]).ljust(col_w[5])
             myline += str(row[6]).ljust(col_w[6])
         myline = myline.ljust(maxx)
-        self.stdscr.addnstr(self.y, 0, myline, maxx, attr)
+        try:
+            self.stdscr.addnstr(self.y, 0, myline, maxx, attr)
+        except self.curses.error:
+            pass
         self.y = self.y+1
 
     def display_in_footer(self, footer, i = 0, print_time_p=0):
@@ -571,20 +631,29 @@ class Manager:
         footer = footer.ljust(maxx)
         if self.auto_mode:
             colorpair = 2
-        elif self.move_mode:
-            colorpair = 7
+        #elif self.move_mode:
+            #colorpair = 7
         else:
             colorpair = 1
-        self.stdscr.addnstr(self.y - i, 0, footer, maxx - 1, self.curses.A_STANDOUT + self.curses.color_pair(colorpair) + self.curses.A_BOLD )
+        try:
+            self.stdscr.addnstr(self.y - i, 0, footer, maxx - 1, self.curses.A_STANDOUT + self.curses.color_pair(colorpair) + self.curses.A_BOLD )
+        except self.curses.error:
+            pass
 
     def repaint(self):
+        if server_pid():
+            self.auto_mode = 1
+        else:
+            if self.auto_mode == 1:
+                self.curses.beep()
+            self.auto_mode = 0
         self.y = 0
         self.stdscr.clear()
         self.height, self.width = self.stdscr.getmaxyx()
         maxy = self.height - 2
         #maxx = self.width
         self.put_line(("ID", "PROC [PRI]", "USER", "RUNTIME", "SLEEP", "STATUS", "PROGRESS"), True)
-        self.put_line(("---", "---------", "----", "-------------------", "-----", "-----", "--------"), True)
+        self.put_line(("------", "---------", "----", "-------------------", "-----", "-----", "--------"), True)
         if self.selected_line > maxy + self.first_visible_line - 1:
             self.first_visible_line = self.selected_line - maxy + 1
         if self.selected_line < self.first_visible_line + 2:
@@ -594,14 +663,14 @@ class Manager:
         self.y = self.stdscr.getmaxyx()[0] - 1
         if self.auto_mode:
             self.display_in_footer(self.footer_auto_mode, print_time_p=1)
-        elif self.move_mode:
-            self.display_in_footer(self.footer_move_mode, print_time_p=1)
+        #elif self.move_mode:
+            #self.display_in_footer(self.footer_move_mode, print_time_p=1)
         else:
             self.display_in_footer(self.footer_select_mode, print_time_p=1)
             footer2 = ""
-            if self.item_status.find("DONE") > -1 or self.item_status == "ERROR" or self.item_status == "STOPPED":
+            if self.item_status.find("DONE") > -1 or self.item_status in ("ERROR", "STOPPED", "KILLED")
                 footer2 += self.footer_stopped_item
-            elif self.item_status == "RUNNING" or self.item_status == "CONTINUING":
+            elif self.item_status in ("RUNNING", "CONTINUING", "ABOUT TO STOP", "ABOUT TO SLEEP"):
                 footer2 += self.footer_running_item
             elif self.item_status == "SLEEPING":
                 footer2 += self.footer_sleeping_item
@@ -673,22 +742,18 @@ class Manager:
                 char = -1
             self.handle_keys(char)
 
-
 class BibSched:
     def __init__(self):
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.scheduled = None
-
-    def set_status(self, task_id, status):
-        return run_sql("UPDATE schTASK set status=%s WHERE id=%s", (status, task_id))
 
     def tasks_safe_p(self, proc1, proc2):
         """Return True when the two tasks can run concurrently."""
         return proc1 != proc2
 
     def get_tasks_to_sleep_and_stop(self, proc, task_set):
-        """Among the task_set (built after the set of tasks with lower priority
-        than proc), return the dict of task to stop and the dict of task to sleep.
+        """Among the task_set, return the dict of task to stop and the dict
+        of task to sleep.
         """
         min_prio = None
         min_task_id = None
@@ -706,11 +771,14 @@ class BibSched:
             ## All the task are safe and there are enough resources
             return {}, {}
         else:
-            return to_stop, {min_task_id : (min_proc, min_prio)}
+            if to_stop:
+                return to_stop, {}
+            else:
+                {min_task_id : (min_proc, min_prio)}
 
     def get_running_tasks(self, task_status):
         running_tasks = {}
-        for status in ('RUNNING', 'CONTINUING', 'SLEEPING', 'SLEEP SENT', 'SLEEP', 'STOP', 'STOP SENT', 'SUICIDE', 'SUICIDE SENT', 'WAKEUP', 'SCHEDULED'):
+        for status in ('RUNNING', 'CONTINUING', 'SLEEPING', 'ABOUT TO SLEEP', 'ABOUT TO STOP', 'SCHEDULED'):
             running_tasks.update(copy.deepcopy(task_status.get(status, {})))
         return running_tasks
 
@@ -728,15 +796,16 @@ class BibSched:
                 higher[other_task_id] = (task_proc, task_priority)
         return lower, higher
 
-    def bibupload_in_the_queue(self, task_id):
-        """Check if bibupload is scheduled/running before runtime."""
-        return run_sql("SELECT id, status FROM schTASK WHERE proc='bibupload' AND id<%s AND status in ('RUNNING', 'WAITING', 'CONTINUING', 'SLEEPING', 'SUICIDE', 'STOP', 'STOP SENT', 'SLEEP', 'SLEEP SENT', 'SUICIDE SENT')", (task_id, ))
+    def bibupload_in_the_queue(self, task_id, runtime):
+        """Check if bibupload is scheduled/running before runtime.
+        This is useful in order to enforce bibupload order."""
+        return run_sql("SELECT id, status FROM schTASK WHERE proc='bibupload' AND runtime<=%s AND id<%s AND (status='RUNNING' OR status='WAITING' OR status='CONTINUING' OR  status='SLEEPING' OR status='SCHEDULED' OR status='SLEEP' OR status='STOPPING' OR status='STOP' OR status='STOPPED' OR status='ERROR')", (runtime, task_id))
 
     def task_really_running_p(self, proc, task_id):
         """Ping the task and update its status to error if necessary."""
-        if run_sql("SELECT id FROM schTASK WHERE id=%s AND status in ('CONTINUING', 'RUNNING', 'SLEEP SENT', 'STOP SENT', 'SUICIDE SENT', 'SLEEPING')", (task_id, )):
+        if run_sql("SELECT id FROM schTASK WHERE id=%s AND status in ('CONTINUING', 'RUNNING', 'ABOUT TO STOP', 'SLEEPING', 'ABOUT TO SLEEP')", (task_id, )):
             if not get_task_pid(proc, task_id):
-                self.set_status(task_id, "ERROR")
+                bibsched_set_status(task_id, "ERROR")
                 return False
             return True
         return False
@@ -750,39 +819,25 @@ class BibSched:
             if not self.task_really_running_p(proc, task_id):
                 #write_message('update required')
                 return True
-            if status == "SLEEP":
-                #write_message('SLEEP')
-                self.set_status(task_id, "SLEEP SENT")
-                self.send_signal(proc, task_id, signal.SIGUSR1)
-                return True
-            elif status == "STOP":
-                #write_message("STOP")
-                self.set_status(task_id, "STOP SENT")
-                self.send_signal(proc, task_id, signal.SIGTERM)
-                return True
-            return False
-        elif status == 'WAKEUP':
-            #write_message("WAKEUP")
-            self.send_signal(proc, task_id, signal.SIGCONT)
-            self.set_status(task_id, "CONTINUING")
-            return True
-        elif task_id in task_status['WAITING'] or task_id in task_status['SLEEPING'] or task_id in task_status['SCHEDULED']:
+        elif task_id in task_status['WAITING'] or task_id in task_status['SLEEPING']:
             #write_message("Trying to run %s" % task_id)
             if self.scheduled is not None and task_id != self.scheduled:
                 ## Another task is scheduled for running.
                 #write_message("cannot run because %s is already scheduled" % self.scheduled)
                 return False
 
-            res = self.bibupload_in_the_queue(task_id)
+            res = self.bibupload_in_the_queue(task_id, runtime)
             if res:
                 ## All bibupload must finish before.
                 for (atask_id, astatus) in res:
-                    if astatus in ('STOPPED', 'SUICIDED', 'ERROR'):
+                    if astatus in ('ERROR'):
                         raise StandardError('BibSched had to halt because a bibupload with id %s has status %s. Please do your checks and delete/reinitialize the failed bibupload.' % (atask_id, astatus))
                 #write_message("cannot run because these bibupload are scheduled: %s" % res)
+                Log("Task #%d (%s) not yet run because there is a bibupload in the queue" % (task_id, proc))
                 return False
 
             self.scheduled = task_id
+            Log("Task #%d (%s) scheduled for running" % (task_id, proc))
             #write_message('Scheduled task %s' % self.scheduled)
             ## Schedule the task for running.
 
@@ -818,38 +873,29 @@ class BibSched:
             procname = proc.split(':')[0]
             if not tasks_to_stop and not tasks_to_sleep:
                 self.scheduled = None
-                if status == "SLEEPING":
-                    self.send_signal(proc, task_id, signal.SIGCONT)
-                    self.set_status(task_id, "CONTINUING")
+                if status in ("SLEEPING", "ABOUT TO SLEEP"):
+                    bibsched_send_signal(proc, task_id, signal.SIGCONT)
+                    Log("Task #%d (%s) woken up" % (task_id, proc))
                     return True
                 elif procname in self.helper_modules:
                     program = os.path.join(CFG_BINDIR, procname)
                     fdout, fderr = get_output_channelnames(task_id)
                     COMMAND = "%s %s >> %s 2>> %s &" % (program, str(task_id), fdout, fderr)
-                    self.set_status(task_id, "SCHEDULED")
-                    Log("task #%d (%s) started" % (task_id, proc))
+                    bibsched_set_status(task_id, "SCHEDULED")
+                    Log("Task #%d (%s) started" % (task_id, proc))
                     os.system(COMMAND)
                     return True
             else:
                 ## It's not still safe to run the task.
                 for other_task_id in tasks_to_stop:
-                    if other_task_id not in task_status['STOP SENT']:
-                        self.set_status(other_task_id, "STOP SENT")
-                        self.send_signal(proc, task_id, signal.SIGTERM)
+                    if other_task_id not in task_status['ABOUT TO STOP']:
+                        bibsched_set_status(other_task_id, 'ABOUT TO STOP')
+                        bibsched_send_signal(proc, other_task_id, signal.SIGTERM)
                 for other_task_id in tasks_to_sleep:
-                    if other_task_id not in task_status['SLEEP SENT']:
-                        self.set_status(other_task_id, "SLEEP SENT")
-                        self.send_signal(proc, task_id, signal.SIGUSR1)
+                    if other_task_id not in task_status['ABOUT TO SLEEP']:
+                        bibsched_set_status(other_task_id, 'ABOUT TO SLEEP')
+                        bibsched_send_signal(proc, other_task_id, signal.SIGUSR1)
                 return True
-
-    def send_signal(self, proc, task_id, signal):
-        """Send a signal to a given task."""
-        try:
-            os.kill(get_task_pid(proc, task_id), signal)
-        except OSError:
-            self.set_status(task_id, "ERROR")
-        except KeyError:
-            register_exception()
 
     def watch_loop(self):
         def get_rows():
@@ -863,25 +909,24 @@ class BibSched:
                 'CONTINUING' : {},
                 'SLEEPING' : {},
                 'WAITING' : {},
-                'STOP SENT' : {},
-                'SLEEP SENT' : {},
+                'ABOUT TO STOP' : {},
+                'ABOUT TO SLEEP' : {},
                 'ERROR' : {},
                 'SCHEDULED' : {}
             }
 
-            for (id,proc,runtime,status,priority) in rows:
+            for (id, proc, runtime, status, priority) in rows:
                 if status not in ret:
                     ret[status] = {}
                 ret[status][id] = (proc, runtime, priority)
             return ret
 
         try:
-            run_sql("UPDATE schTASK SET status='OLD ERROR' WHERE status='ERROR'")
             while True:
                 rows = get_rows()
                 task_status = get_task_status(rows)
                 if task_status['ERROR']:
-                    raise StandardError('BibSched had to halt because a new task is in status ERROR: %s' % task_status['ERROR'])
+                    raise StandardError('BibSched had to halt because at least a task is in status ERROR: %s' % task_status['ERROR'])
                 for row in rows:
                     if self.handle_row(task_status, *row):
                         ## Status has changed, let's updated it!
