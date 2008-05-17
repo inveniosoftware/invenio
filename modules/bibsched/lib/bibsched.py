@@ -668,7 +668,7 @@ class Manager:
         else:
             self.display_in_footer(self.footer_select_mode, print_time_p=1)
             footer2 = ""
-            if self.item_status.find("DONE") > -1 or self.item_status in ("ERROR", "STOPPED", "KILLED")
+            if self.item_status.find("DONE") > -1 or self.item_status in ("ERROR", "STOPPED", "KILLED"):
                 footer2 += self.footer_stopped_item
             elif self.item_status in ("RUNNING", "CONTINUING", "ABOUT TO STOP", "ABOUT TO SLEEP"):
                 footer2 += self.footer_running_item
