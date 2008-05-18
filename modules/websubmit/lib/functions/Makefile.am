@@ -22,6 +22,7 @@ pylibdir=$(libdir)/python/invenio/websubmit_functions
 pylib_DATA = __init__.py \
              Add_Files.py \
              Allocate_ALEPH_SYS.py \
+             Ask_For_Record_Details_Confirmation.py \
              CaseEDS.py \
              Check_Group.py \
              Convert_RecXML_to_RecALEPH.py \
