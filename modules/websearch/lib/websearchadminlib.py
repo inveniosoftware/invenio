@@ -35,7 +35,8 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_SITE_URL,\
      CFG_WEBCOMMENT_ALLOW_COMMENTS,\
-     CFG_WEBCOMMENT_ALLOW_REVIEWS
+     CFG_WEBCOMMENT_ALLOW_REVIEWS,\
+     CFG_INSPIRE_SITE
 from invenio.bibrankadminlib import \
      write_outcome, \
      modify_translations, \
@@ -3250,9 +3251,10 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
         ## collection-by-collection basis.
 
         # Disable fulltext if no file found
-        brd =  BibRecDocs(recID)
-        if len(brd.list_bibdocs()) == 0:
-            tabs['files']['enabled'] = False
+        if not CFG_INSPIRE_SITE:
+            brd =  BibRecDocs(recID)
+            if len(brd.list_bibdocs()) == 0:
+                tabs['files']['enabled'] = False
 
     tabs[''] = tabs['metadata']
     del tabs['metadata']
