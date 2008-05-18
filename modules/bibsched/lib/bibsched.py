@@ -494,7 +494,7 @@ class Manager:
             bibsched_send_signal(process, task_id, signal.SIGUSR1)
             self.display_in_footer("SLEEP signal sent to task #%s" % task_id)
         else:
-            self.display_in_footer("Can not put to sleep not running process")
+            self.display_in_footer("Cannot put to sleep non-running processes")
 
     def kill(self):
         task_id = self.currentrow[0]
@@ -506,7 +506,7 @@ class Manager:
                 bibsched_set_status(task_id, 'KILLED')
                 self.display_in_footer("KILL signal sent to task #%s" % task_id)
         else:
-            self.display_in_footer("Can not kill not running processes")
+            self.display_in_footer("Cannot kill non-running processes")
 
     def stop(self):
         task_id = self.currentrow[0]
@@ -516,7 +516,7 @@ class Manager:
             bibsched_send_signal(process, task_id, signal.SIGTERM)
             self.display_in_footer("TERM signal sent to task #%s" % task_id)
         else:
-            self.display_in_footer("Can not stop not running processes")
+            self.display_in_footer("Cannot stop non-running processes")
 
     def delete(self):
         task_id = self.currentrow[0]
@@ -526,7 +526,7 @@ class Manager:
             self.display_in_footer("process deleted")
             self.selected_line = max(self.selected_line, 2)
         else:
-            self.display_in_footer("Can not delete running processes")
+            self.display_in_footer("Cannot delete running processes")
 
     def init(self):
         task_id = self.currentrow[0]
@@ -536,7 +536,7 @@ class Manager:
             bibsched_set_progress(task_id, "")
             self.display_in_footer("process initialised")
         else:
-            self.display_in_footer("cannot initialise running processes")
+            self.display_in_footer("Cannot initialise running processes")
 
     #def change_select_mode(self):
         #if self.move_mode:
@@ -853,7 +853,7 @@ class BibSched:
             for other_task_id, (other_proc, dummy) in higher.iteritems():
                 if not self.tasks_safe_p(proc, other_proc):
                     ## There's at least a higher priority task running that
-                    ## can not run at the same time of the given task.
+                    ## cannot run at the same time of the given task.
                     ## We give up
                     #write_message("cannot run because task_id: %s, proc: %s is the queue and incompatible" % (other_task_id, other_proc))
                     return False
