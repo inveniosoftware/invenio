@@ -600,7 +600,7 @@ just let the developer of the element take care of that for you.</p>
 care of that in your format template, as well as of all other values that
 are not returned by the format elements.</p>
 
-    <h3><a name="attrsFormatTemplate">3.9 Edit the Attributes of a Format Template</a></h4>
+    <h3><a name="attrsFormatTemplate">3.9 Edit the Attributes of a Format Template</a></h3>
     <p>To edit the attributes of a format template
     go to the <a href="bibformatadmin.py/format_templates_manage">Manage Format Templates</a> page, click on
     the format template you want to edit, and then in the menu click on "Modify Template Attributes".</p>
