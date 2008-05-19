@@ -28,6 +28,7 @@ import httplib
 import socket
 import re
 
+from invenio.errorlib import register_exception
 from invenio.external_authentication import ExternalAuth, \
         InvenioWebAccessExternalAuthError
 from invenio.external_authentication_cern_wrapper import AuthCernWrapper
@@ -79,6 +80,7 @@ class ExternalAuthCern(ExternalAuth):
         except (httplib.CannotSendRequest, socket.error, AttributeError,
                 IOError, TypeError), msg: # Let the user note that
                                      # no connection is available
+            register_exception(alert_admin=True)
             raise InvenioWebAccessExternalAuthError, msg
 
     def _try_twice(self, funct, params):
@@ -94,6 +96,7 @@ class ExternalAuthCern(ExternalAuth):
                 ret = funct(self.connection, **params)
             except (httplib.CannotSendRequest, socket.error, AttributeError,
                     IOError, TypeError):
+                register_exception(alert_admin=True)
                 self.connection = None
                 raise InvenioWebAccessExternalAuthError
         return ret

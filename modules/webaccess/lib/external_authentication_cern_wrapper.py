@@ -30,6 +30,7 @@ import re
 import socket
 
 from invenio.config import CFG_ETCDIR
+from invenio.errorlib import register_exception
 
 _cern_nice_soap_file = open(CFG_ETCDIR + "/webaccess/cern_nice_soap_credentials.txt", "r")
 _cern_nice_soap_auth = _cern_nice_soap_file.read().strip()
@@ -54,16 +55,17 @@ class AuthCernWrapper:
         """
         ## WORKAROUND for bug in Python up to 2.4.3
         ## Having a timeout is buggy with SSL
-        self._socket_timeout = socket.getdefaulttimeout()
-        socket.setdefaulttimeout(None)
         self._headers = {"Content-type": "application/x-www-form-urlencoded",
                    "Accept": "text/plain",
                    "Authorization": "Basic " + _cern_nice_soap_auth}
-        self._conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch")
+        try:
+            self._conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch")
+        except:
+            register_exception(alert_admin=True)
+            raise
 
     def __del__(self):
         """Close the CERN Nice webservice connection."""
-        socket.setdefaulttimeout(self._socket_timeout)
         if self._conn:
             self._conn.close()
 
@@ -72,10 +74,18 @@ class AuthCernWrapper:
         @return the XML response.
         """
         params = urllib.urlencode(params)
-        self._conn.request("POST",
-                "/winservices-soap/generic/Authentication.asmx/%s" % name,
-                params, self._headers)
-        return self._conn.getresponse().read()
+        socket_timeout = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(None)
+        try:
+            self._conn.request("POST",
+                    "/winservices-soap/generic/Authentication.asmx/%s" % name,
+                    params, self._headers)
+            response = self._conn.getresponse().read()
+        except:
+            register_exception(alert_admin=True)
+            raise
+        socket.setdefaulttimeout(socket_timeout)
+        return response
 
     def ccid_is_nice(self, ccid):
         """Verify this CCID belongs to a Nice account. Returns login or -1

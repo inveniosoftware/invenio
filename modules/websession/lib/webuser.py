@@ -524,9 +524,10 @@ def loginUser(req, p_un, p_pw, login_method):
             if p_email:
                 p_email = p_email.lower()
             else:
-                raise InvenioWebAccessExternalAuthError
+                return([], p_email, p_pw, 15)
         except InvenioWebAccessExternalAuthError:
-            return([], p_email, p_pw, 15)
+            register_exception(alert_admin=True)
+            raise
         if p_email: # Authenthicated externally
             query_result = run_sql("SELECT id from user where email=%s", (p_email,))
             if not query_result: # First time user
@@ -537,6 +538,9 @@ def loginUser(req, p_un, p_pw, login_method):
                         p_nickname = CFG_EXTERNAL_AUTHENTICATION[login_method][0].fetch_user_nickname(p_email, p_pw, req)
                     except (AttributeError, NotImplementedError):
                         pass
+                    except:
+                        register_exception(alert_admin=True)
+                        raise
                 res = registerUser(req, p_email, p_pw_local, p_nickname,
                         register_without_nickname=p_nickname == '',
                         login_method=login_method)
@@ -559,7 +563,8 @@ def loginUser(req, p_un, p_pw, login_method):
                 groups = new_groups
             except (AttributeError, NotImplementedError):
                 pass
-            except InvenioWebAccessExternalAuthError:
+            except:
+                register_exception(alert_admin=True)
                 return([], p_email, p_pw, 16)
             else: # Groups synchronization
                 if groups != 0:
@@ -587,6 +592,7 @@ def loginUser(req, p_un, p_pw, login_method):
             except (AttributeError, NotImplementedError):
                 pass
             except InvenioWebAccessExternalAuthError:
+                register_exception(alert_admin=True)
                 return([], p_email, p_pw, 16)
             # Storing settings
             set_user_preferences(query_result[0][0], user_prefs)
