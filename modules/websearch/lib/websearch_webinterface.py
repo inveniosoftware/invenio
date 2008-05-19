@@ -220,7 +220,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         simauthbox = search_engine.create_similarly_named_authors_link_box(self.authorname)
         req.write(simauthbox)
 
-    def get_institute_pub_dict(self, mee, recids):
+    def get_institute_pub_dict(self, recids):
         #return a dictionary consisting of institute -> list of publications
         affus = [] #list of insts from the record
         author_aff_pubs = {} #the disct to be build
@@ -232,7 +232,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
             mainauthor = " "
             if mainauthors:
                 mainauthor = mainauthors[0]
-            if (mainauthor == mee.authorname):
+            if (mainauthor == self.authorname):
                 affus = get_fieldvalues(recid, AUTHOR_INST_TAG)
             #if this is empty, add a dummy " " value
             if (affus == []):
