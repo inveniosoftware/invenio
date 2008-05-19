@@ -110,6 +110,10 @@ def editaccount(req, userID, mtype='', content='', callback='yes', confirm=0):
 
     return wal.perform_editaccount(req=req, userID=userID, mtype=mtype, content=content, callback=callback, confirm=confirm)
 
+def becomeuser(req, userID='', callback='yes', confirm=0):
+    """edit account. """
+    return wal.perform_becomeuser(req=req, userID=userID, callback=callback, confirm=confirm)
+
 def modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=25, page=1, callback='yes', confirm=0):
     """Modify accounts. """
 

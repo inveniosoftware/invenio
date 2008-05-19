@@ -57,7 +57,8 @@ from invenio.dbquery import run_sql
 from invenio.webpage import page
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webuser import email_valid_p, get_user_preferences, \
-    set_user_preferences
+    set_user_preferences, setUid
+from invenio.urlutils import redirect_to_url
 from invenio.access_control_config import DEF_DEMO_USER_ROLES, \
     DEF_DEMO_ROLES, DEF_DEMO_AUTHS, WEBACCESSACTION, MAXPAGEUSERS, \
     SUPERADMINROLE, CFG_EXTERNAL_AUTHENTICATION, DELEGATEADDUSERROLE, \
@@ -563,6 +564,12 @@ def perform_manageaccounts(req, mtype='', content='', confirm=0):
         fin_output += perform_modifyaccounts(req, callback='')
         fin_output += "<br />"
 
+    if mtype == "perform_becomeuser" and content:
+        fin_output += content
+    elif mtype == "perform_becomeuser" or mtype == "perform_showall":
+        fin_output += perform_becomeuser(req, callback='')
+        fin_output += "<br />"
+
     return index(req=req,
                 title='Manage Accounts',
                 subtitle=subtitle,
@@ -775,20 +782,10 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
     elif mtype == "perform_modifylogindata" or not mtype:
         fin_output += perform_modifylogindata(req, userID, callback='')
 
-    #if mtype == "perform_modifybasket" and content:
-        #fin_output += content
-    #elif mtype == "perform_modifybasket" or not mtype:
-        #fin_output += perform_modifybasket(req, userID, callback='')
-
     if mtype == "perform_modifypreferences" and content:
         fin_output += content
     elif mtype == "perform_modifypreferences" or not mtype:
         fin_output += perform_modifypreferences(req, userID, callback='')
-
-    #if mtype == "perform_modifyalerts" and content:
-        #fin_output += content
-    #elif mtype == "perform_modifyalerts" or not mtype:
-        #fin_output += perform_modifyalerts(req, userID, callback='')
 
     if mtype == "perform_deleteaccount" and content:
         fin_output += content
@@ -802,47 +799,28 @@ def perform_editaccount(req, userID, mtype='', content='', callback='yes', confi
                 adminarea=7,
                 authorized=1)
 
-# Disabled because not secure and maybe not needed.
-#def perform_modifybasket(req, userID, callback='yes', confirm=0):
-    #"""modify email and password of an account"""
+def perform_becomeuser(req, userID='', callback='yes', confirm=0):
+    """modify email and password of an account"""
 
-    #(auth_code, auth_message) = is_adminuser(req)
-    #if auth_code != 0: return mustloginpage(req, auth_message)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
 
-    #subtitle = """<a name="2"></a>2. Modify baskets.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_URL
+    subtitle = """<a name="5"></a>5. Became user.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#5">?</a>]</small>""" % CFG_SITE_URL
 
-    #res = run_sql("SELECT id, email, FROM user WHERE id=%s", (userID, ))
-    #output = ""
-    #if res:
-        #text = """To modify the baskets for this account, you have to login as the user."""
-        #output += createhiddenform(action="%s/youraccount/login?" % CFG_SITE_SECURE_URL,
-                                #text=text,
-                                #p_email=res[0][1],
-                                #p_pw=res[0][2],
-                                #referer="%s/yourbaskets/display" % CFG_SITE_URL,
-                                #button="Login")
-        #output += "Remember that you will be logged out as the current user."
+    res = run_sql("SELECT id FROM user WHERE id=%s", (userID, ))
+    output = ""
+    if res:
+        setUid(req, res[0][0])
+        redirect_to_url(req, CFG_SITE_URL)
+    else:
+        output += '<b><span class="info">The account id given does not exist.</span></b>'
 
-        ##baskets = run_sql("SELECT basket.id, basket.name, basket.public FROM basket, user_basket WHERE id_user=%s and user_basket.id_basket=basket.id" % userID)
-        ##output += "<table><tr>"
-        ##for (id, name, public) in baskets:
-        ##    output += "<tr><td>%s<br />Public: %s</td></tr>" % (name, (public=="y" and "Yes" or "No"))
-        ##    basket_records = run_sql("SELECT id_record, nb_order FROM basket_record WHERE id_basket=%s" % id)
-        ##    for (id_record, nb_order) in basket_records:
-        ##        output += "<tr><td></td><td>"
-        ##        output += print_record(id_record)
-        ##        output += "</td></tr>"
-        ##
-        ##output += "</tr></table>"
-    #else:
-        #output += '<b><span class="info">The account id given does not exist.</span></b>'
+    body = [output]
 
-    #body = [output]
-
-    #if callback:
-        #return perform_editaccount(req, userID, mtype='perform_modifybasket', content=addadminbox(subtitle, body), callback='yes')
-    #else:
-        #return addadminbox(subtitle, body)
+    if callback:
+        return perform_editaccount(req, userID, mtype='perform_becomeuser', content=addadminbox(subtitle, body), callback='yes')
+    else:
+        return addadminbox(subtitle, body)
 
 def perform_modifylogindata(req, userID, nickname='', email='', password='', callback='yes', confirm=0):
     """modify email and password of an account"""
@@ -894,47 +872,6 @@ def perform_modifylogindata(req, userID, nickname='', email='', password='', cal
         return perform_editaccount(req, userID, mtype='perform_modifylogindata', content=addadminbox(subtitle, body), callback='yes')
     else:
         return addadminbox(subtitle, body)
-
-# Disabled because not secure and maybe not needed.
-#def perform_modifyalerts(req, userID, callback='yes', confirm=0):
-    #"""modify email and password of an account"""
-
-    #(auth_code, auth_message) = is_adminuser(req)
-    #if auth_code != 0: return mustloginpage(req, auth_message)
-
-    #subtitle = """<a name="3"></a>3. Modify alerts.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/webaccess-admin-guide#4">?</a>]</small>""" % CFG_SITE_URL
-
-    #res = run_sql("SELECT id, email, password FROM user WHERE id=%s" % userID)
-    #output = ""
-    #if res:
-        #text = """To modify the alerts for this account, you have to login as the user."""
-        #output += createhiddenform(action="%s/youraccount/login?" % CFG_SITE_SECURE_URL,
-                                #text=text,
-                                #p_email=res[0][1],
-                                #p_pw=res[0][2],
-                                #referer="%s/youralerts/display" % CFG_SITE_URL,
-                                #button="Login")
-        #output += "Remember that you will be logged out as the current user."
-
-        #res = """ SELECT q.id, q.urlargs, a.id_basket,
-                #a.alert_name, a.frequency, a.notification,
-                #DATE_FORMAT(a.date_creation,'%%d %%b %%Y'),
-                #DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y')
-                #FROM query q, user_query_basket a
-                #WHERE a.id_user='%s' AND a.id_query=q.id
-                #ORDER BY a.alert_name ASC """ % userID
-        ##res = run_sql(res)
-        ##for (qID, qurlargs,  id_basket, alertname, frequency, notification, date_creation, date_lastrun) in res:
-        ##    output += "%s - %s - %s - %s - %s - %s - %s<br />" % (qID,  id_basket, alertname, frequency, notification, date_creation, date_lastrun)
-    #else:
-        #output += '<b><span class="info">The account id given does not exist.</span></b>'
-
-    #body = [output]
-
-    #if callback:
-        #return perform_editaccount(req, userID, mtype='perform_modifyalerts', content=addadminbox(subtitle, body), callback='yes')
-    #else:
-        #return addadminbox(subtitle, body)
 
 def perform_modifypreferences(req, userID, login_method='', callback='yes', confirm=0):
     """modify email and password of an account"""
@@ -1121,6 +1058,7 @@ def perform_modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=MAXP
                     users[-1].append('<a href="%s?userID=%s&amp;email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s&amp;rand=%s">%s</a>' % (col[0][1], id, email_user_pattern, limit_to, maxpage, page, random.randint(0, 1000), col[0][0]))
                     for (str, function) in col[1:]:
                         users[-1][-1] += ' / <a href="%s?userID=%s&amp;email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s&amp;rand=%s">%s</a>' % (function, id, email_user_pattern, limit_to, maxpage, page, random.randint(0, 1000), str)
+                users[-1].append('<a href=%s?userID=%s&amp;email_user_pattern=%s&amp;limit_to=%s&amp;maxpage=%s&amp;page=%s&amp;rand=%s">%s</a>' % ('becomeuser', id, email_user_pattern, limit_to, maxpage, page, random.randint(0, 1000), 'Become user'))
 
             last = ""
             next = ""
@@ -3328,6 +3266,9 @@ def startpage():
     <dd>configure administration rights with the users as starting point.</dd>
     <dt><a href="webaccessadmin.py/resetarea">Reset Area</a></dt>
     <dd>reset roles, actions and authorizations.</dd>
+    </dl>
+    <dt><a href="webaccessadmin.py/manageaccounts">Manage accounts Area</a></dt>
+    <dd>manage user accounts.</dd>
     </dl>
 </td>
 </tr>
