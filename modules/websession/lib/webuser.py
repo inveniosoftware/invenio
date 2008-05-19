@@ -298,6 +298,19 @@ def get_user_info(uid, ln=CFG_SITE_LANG):
             return tuple(user)
     return (uid, '', _("N/A"))
 
+def get_uid_from_email(email):
+    """Return the uid corresponding to an email.
+    Return -1 when the email does not exists."""
+    try:
+        res = run_sql("SELECT id FROM user WHERE email=%s", (email, ))
+        if res:
+            return res[0][0]
+        else:
+            return -1
+    except OperationalError:
+        register_exception()
+        return -1
+
 def isGuestUser(uid):
     """It Checks if the userId corresponds to a guestUser or not
 
