@@ -117,6 +117,18 @@ jsMath.Easy = {
 
 };
 
+jsMath.styles = {
+  '.typeset .error': 'font-style: italic; color: black',
+  '#jsMath_button': 'display: none'
+};
+
+jsMath.Parse = function (s,font,size,style) {
+  var parse = new jsMath.Parser(s,font,size,style);
+  parse.Parse();
+  if (parse.error) {parse.error = s};
+  return parse;
+};
+
 /****************************************************************/
 /****************************************************************/
 //

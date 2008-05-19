@@ -648,7 +648,6 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
             metaheaderadd = """
   <script type='text/javascript'>
     jsMath = {
-        styles: {'#jsMath_button': 'display: none'},
         Controls: {cookie: {printwarn: 0}}
     };
   </script>
