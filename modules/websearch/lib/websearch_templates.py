@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# -*- codinge: utf-8 -*-
 ## $Id$
 
 ## This file is part of CDS Invenio.
@@ -46,7 +46,8 @@ from invenio.config import \
      CFG_SITE_NAME_INTL, \
      CFG_VERSION, \
      CFG_SITE_URL, \
-     CFG_SITE_SUPPORT_EMAIL
+     CFG_SITE_SUPPORT_EMAIL, \
+     CFG_INSPIRE_SITE
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 #from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
@@ -2976,26 +2977,12 @@ class Template:
                 authoraff += '<br>'
             authoraff += "<a href=\"../search?f=recid&p="+recids+"\">"+a+' ('+str(len(aff_pubdict[a]))+")</a>"
 
-        #construct a string for searching a=thisauthor
-        searchstr = create_html_link(self.build_search_url(p=authorname,
-                                     f='author'),
-                                     {}, str(len(pubs)),)
         #print a "general" banner about the author
-
         req.write("<h1>" + authorname + "</h1>")
 
+        #print affiliations
         line1 = "<strong>" + _("Affiliations:") + "</strong>"
         line2 = authoraff
-        req.write(self.tmpl_print_searchresultbox(line1, line2))
-
-        line1 = "<strong>" + _("Publications:") + "</strong>"
-        line2 = " "+searchstr+" ("+_("downloaded")+" "
-        line2 += str(num_downloads)+" "+_("times")+")"
-        banner = self.tmpl_print_searchresultbox(line1, line2)
-        req.write(banner)
-
-        line1 = "<strong>" + _("Citation summary:") + "</strong>"
-        line2 = 'FIXME'
         req.write(self.tmpl_print_searchresultbox(line1, line2))
 
         #keywords, collaborations
@@ -3029,6 +3016,45 @@ class Template:
                 pubinfo += journal+" ("+str(times)+") "
             banner = self.tmpl_print_searchresultbox(_("Publishes in"), pubinfo)
             req.write(banner)
+
+        #print papers:
+        searchstr = create_html_link(self.build_search_url(p=authorname,
+                                     f='author'),
+                                     {}, "All papers ("+str(len(pubs))+")",)
+        line1 = "<strong>" + _("Papers:") + "</strong>"
+        line2 = searchstr+" ("+_("downloaded")+" "
+        line2 += str(num_downloads)+" "+_("times")+")"
+        from invenio.search_engine import perform_request_search
+        if CFG_INSPIRE_SITE:
+            CFG_COLLS = ['Book',
+                         'Conference',
+                         'Introductory',
+                         'Lectures',
+                         'Preprint',
+                         'Published',
+                         'Report',
+                         'Review',
+                         'Thesis']
+        else:
+            CFG_COLLS = ['Article',
+                         'Book',
+                         'Preprint',]
+        for coll in CFG_COLLS:
+            collsearch = intbitset(pubs) & intbitset(perform_request_search(p="collection:"+coll))
+            if len(collsearch) > 0:
+                num = len(collsearch)
+                line2 += "<br>" + create_html_link(self.build_search_url(p='author:"' + authorname + '" ' + \
+                                                                         'collection:' + coll),
+                                                   {}, coll + " ("+str(num)+")",)
+        banner = self.tmpl_print_searchresultbox(line1, line2)
+        req.write(banner)
+
+        # print citations:
+        if len(citedbylist):
+            line1 = "<strong>" + _("Citations:") + "</strong>"
+            line2 = ""
+            req.write(self.tmpl_print_searchresultbox(line1, line2))
+            # they will be printed after that
 
     def tmpl_detailed_record_references(self, recID, ln, content):
         """Returns the discussion page of a record

@@ -140,16 +140,23 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
         ln = argd['ln']
         req.argd = argd #needed since perform_req_search
-        #wants to check it in case of no results
-        self.authorname = self.authorname.replace("+"," ")
-        citelist = get_author_cited_by(self.authorname)
+
+        # start page
         req.content_type = "text/html"
         req.send_http_header()
         uid = getUid(req)
 
         search_engine.page_start(req, "hb", "", "", ln, uid)
 
+        #wants to check it in case of no results
+        self.authorname = self.authorname.replace("+"," ")
 
+        if not self.authorname:
+            return websearch_templates.tmpl_author_information(req, {}, self.authorname,
+                                                               0, {},
+                                                               {}, {}, {}, {}, ln)
+
+        citelist = get_author_cited_by(self.authorname)
         #search the publications by this author
         pubs = search_engine.perform_request_search(req=req, p=self.authorname, f="author")
         #get most frequent first authors of these pubs
@@ -213,12 +220,13 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
                                                     citedbylist, kwtuples, authors, vtuples, ln)
 
         #cited-by summary
-        out = summarize_records(pubs, 'hcs', ln, "author:" + \
-                                quote(self.authorname))
+        out = summarize_records(intbitset(pubs), 'hcs', ln, self.authorname, 'author', req)
         req.write(out)
 
         simauthbox = search_engine.create_similarly_named_authors_link_box(self.authorname)
         req.write(simauthbox)
+
+        return search_engine.page_end(req, 'hb', ln)
 
     def get_institute_pub_dict(self, recids):
         #return a dictionary consisting of institute -> list of publications
