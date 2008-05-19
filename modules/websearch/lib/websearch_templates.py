@@ -2970,41 +2970,55 @@ class Template:
         authoraff = ""
         for a in aff_pubdict.keys():
             recids = "+or+".join(map(str, aff_pubdict[a]))
-            searchstr = "<a href=\"../search?f=recid&p="+recids+"\">"+str(len(aff_pubdict[a]))+"</a>"
-            if (a == ' '):
-                authoraff = authoraff+" "+_("unknown")+" ("+searchstr+")"
-            else:
-                authoraff = authoraff+" "+a+" ("+searchstr+")"
+            if not a:
+                a = _("unknown")
+            if authoraff:
+                authoraff += '<br>'
+            authoraff += "<a href=\"../search?f=recid&p="+recids+"\">"+a+' ('+str(len(aff_pubdict[a]))+")</a>"
 
         #construct a string for searching a=thisauthor
         searchstr = create_html_link(self.build_search_url(p=authorname,
                                      f='author'),
-                                     {}, str(len(pubs)), {'class':"google"})
+                                     {}, str(len(pubs)),)
         #print a "general" banner about the author
-        line1 = _("Author")+": <i>"+authorname+"</i>"+authoraff
-        line2 = _("Publications")+": "+searchstr+" ("+_("downloaded")+" "
+
+        req.write("<h1>" + authorname + "</h1>")
+
+        line1 = "<strong>" + _("Affiliations:") + "</strong>"
+        line2 = authoraff
+        req.write(self.tmpl_print_searchresultbox(line1, line2))
+
+        line1 = "<strong>" + _("Publications:") + "</strong>"
+        line2 = " "+searchstr+" ("+_("downloaded")+" "
         line2 += str(num_downloads)+" "+_("times")+")"
         banner = self.tmpl_print_searchresultbox(line1, line2)
         req.write(banner)
+
+        line1 = "<strong>" + _("Citation summary:") + "</strong>"
+        line2 = 'FIXME'
+        req.write(self.tmpl_print_searchresultbox(line1, line2))
 
         #keywords, collaborations
         keywstr = ""
         collabstr = ""
         if (kwtuples):
             for (freq, kw) in kwtuples:
+                if keywstr:
+                    keywstr += '<br>'
                 #create a link in author=x, keyword=y
                 searchstr = create_html_link(self.build_search_url(
-                                                p1=authorname,
-                                                f1='author',
-                                                p2=kw, f2='keyword', m1='e', op1='a', m2='e'),
-                                                {}, kw+" ("+str(freq)+")", {'class':"google"})
+                                                p='author:"' + authorname + '" ' +
+                                                  'keyword:"' + kw + '"'),
+                                                {}, kw+" ("+str(freq)+")",)
                 keywstr = keywstr+" "+searchstr
-            banner = self.tmpl_print_searchresultbox(_("Frequent keywords"), keywstr)
+            banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequent keywords:") + "</strong>", keywstr)
             req.write(banner)
         if (authors):
             for c in authors:
+                if collabstr:
+                    collabstr += '<br>'
                 collabstr = collabstr + " <a href=\"/author/"+c+"\">"+c+"</a>"
-            banner = self.tmpl_print_searchresultbox(_("Author collaborations"), collabstr)
+            banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequent co-authors:") + "</strong>", collabstr)
             req.write(banner)
 
         if (vtuples):
