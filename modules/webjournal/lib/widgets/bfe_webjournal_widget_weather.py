@@ -21,7 +21,11 @@
 """
 from invenio import errorlib
 from invenio.config import CFG_CACHEDIR
-import feedparser
+try:
+    import feedparser
+    feedparser_available = 1
+except ImportError:
+    feedparser_available = 0
 import time
 from urllib2 import urlopen
 from invenio.errorlib import register_exception
@@ -37,8 +41,7 @@ Expire_Time_Filename = "weather_RSS_expires"
 
 image_pattern = re.compile('''
                            <img\s*(class=["']imageScale["'])*?\s*src=(?P<image>\S*)\s*/>*
-                           '''
-                           ,re.DOTALL | re.IGNORECASE | re.VERBOSE)
+                           ''', re.DOTALL | re.IGNORECASE | re.VERBOSE)
 
 def format(bfo, title_en="", title_fr=""):
     """
@@ -64,15 +67,17 @@ def format(bfo, title_en="", title_fr=""):
         <a href="http://weather.yahoo.com/" target="_blank">%s</a>
     </h3>
 </div>
-<ul class="rmenulist">
+<p class="rmenulist">
 %s
-</ul>
+</p>
 ''' % (weather_image, title, out)
 
     return out
 
 def escape_values(bfo):
     """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
     """
     return 0
 
@@ -84,6 +89,9 @@ def get_widget_HTML():
     there always resides a cached version in cds CFG_CACHEDIR along with a flat
     file that indicates the time when the feed expires.
     """
+    if not feedparser_available:
+        return ''
+
     try:
         weather_feed = feedparser.parse('%s/%s' % (CFG_CACHEDIR, Cached_Filename))
     except:

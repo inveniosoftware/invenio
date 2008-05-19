@@ -17,170 +17,199 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
 """
 Various utilities for WebJournal, e.g. config parser, etc.
 """
 
-from invenio.bibformat_engine import BibFormatObject
-from invenio.errorlib import register_exception
-from invenio.search_engine import search_pattern
-from invenio.config import CFG_ETCDIR, CFG_SITE_URL, CFG_SITE_ADMIN_EMAIL, CFG_CACHEDIR, CFG_SITE_LANG
-from invenio.messages import gettext_set_language
-from invenio.webpage import page
-from invenio.dbquery import run_sql
-from xml.dom import minidom
-from urllib2 import urlopen
 import time
 import datetime
 import re
 import os
 import cPickle
+import urllib
+from MySQLdb import OperationalError
+from xml.dom import minidom
+
+from invenio.config import \
+     CFG_ETCDIR, \
+     CFG_SITE_URL, \
+     CFG_CACHEDIR, \
+     CFG_SITE_LANG, \
+     CFG_ACCESS_CONTROL_LEVEL_SITE
+from invenio.dbquery import run_sql
+from invenio.bibformat_engine import BibFormatObject
+from invenio.search_engine import search_pattern
+
+########################### REGULAR EXPRESSIONS ###############################
+
+header_pattern = re.compile('<p\s*(align=justify)??>\s*<strong>(?P<header>.*?)</strong>\s*</p>')
+para_pattern = re.compile('<p.*?>(?P<paragraph>.+?)</p>', re.DOTALL)
+image_pattern = re.compile(r'''
+                               (<a\s*href=["']?(?P<hyperlink>\S*)["']?>)?# get the link location for the image
+                               \s*# after each tag we can have arbitrary whitespaces
+                               <center># the image is always centered
+                               \s*
+                               <img\s*(class=["']imageScale["'])*?\s*src=(?P<image>\S*)\s*border=1\s*(/)?># getting the image itself
+                               \s*
+                               </center>
+                               \s*
+                               (</a>)?
+                               (<br />|<br />|<br/>)*# the caption can be separated by any nr of line breaks
+                               (
+                               <b>
+                               \s*
+                               <i>
+                               \s*
+                               <center>(?P<caption>.*?)</center># getting the caption
+                               \s*
+                               </i>
+                               \s*
+                               </b>
+                               )?''',  re.DOTALL | re.VERBOSE | re.IGNORECASE )
+                               #''',re.DOTALL | re.IGNORECASE | re.VERBOSE | re.MULTILINE)
+
 
 
 ############################ MAPPING FUNCTIONS ################################
 
-def get_order_dict_from_recid_list(list, issue_number):
+def get_featured_records(journal_name):
     """
-    this is a centralized function that takes a list of recid's and brings it in
-    order using a centralized algorithm. this always has to be in sync with
-    the reverse function get_recid_from_order(order)
+    Returns the 'featured' records i.e. records chosen to be displayed
+    with an image on the main page, in the widgets section, for the
+    given journal.
+
+    parameter:
+
+       journal_name - (str) the name of the journal for which we want
+                      to get the featured records
+
+    returns:
+       list of tuples (recid, img_url)
+    """
+    try:
+        feature_file = open('%s/webjournal/%s/featured_record' % \
+                            (CFG_ETCDIR, journal_name))
+    except:
+        return []
+    records = feature_file.readlines()
+    return [(record.split('---', 1)[0], record.split('---', 1)[1]) \
+            for record in records if "---" in record]
+
+def add_featured_record(journal_name, recid, img_url):
+    """
+    Adds the given record to the list of featured records of the given
+    journal.
 
     parameters:
-        list:   a list of all recid's that should be brought into order
+
+       journal_name - (str) the name of the journal to which the record
+                      should be added.
+
+       recid        - (int) the record id of the record to be featured.
+
+       img_url      - (str) a url to an image icon displayed along the
+                      featured record.
+    returns:
+         0 if everything went ok
+         1 if record is already in the list
+         2 if other problems
+    """
+    # Check that record is not already there
+    featured_records = get_featured_records(journal_name)
+    for featured_recid, featured_img in featured_records:
+        if featured_recid == str(recid):
+            return 1
+
+    try:
+        fptr = open('%s/webjournal/%s/featured_record'
+                    % (CFG_ETCDIR, journal_name), "a")
+        fptr.write(str(recid) + '---' + img_url + '\n')
+        fptr.close()
+    except:
+        return 2
+    return 0
+
+def remove_featured_record(journal_name, recid):
+    """
+    Removes the given record from the list of featured records of the
+    given journal.
+
+    parameters:
+
+       journal_name - (str) the name of the journal to which the record
+                      should be added.
+
+       recid        - (int) the record id of the record to be featured.
+    """
+    featured_records = get_featured_records(journal_name)
+    try:
+        fptr = open('%s/webjournal/%s/featured_record'
+                    % (CFG_ETCDIR, journal_name), "w")
+        for featured_recid, featured_img in featured_records:
+            if str(featured_recid) != str(recid):
+                fptr.write(str(featured_recid) + '---' + featured_img + \
+                           '\n')
+        fptr.close()
+    except:
+        return 1
+    return 0
+
+def get_order_dict_from_recid_list(recids, issue_number):
+    """
+    Returns the ordered list of input recids, for given
+    'issue_number'.
+
+    Since there might be several articles at the same position, the
+    returned structure is a dictionary with keys being order number
+    indicated in record metadata, and values being list of recids for
+    this order number (recids for one position are ordered from
+    highest to lowest recid).
+            Eg: {'1': [2390, 2386, 2385],
+                 '3': [2388],
+                 '2': [2389],
+                 '4': [2387]}
+
+    parameters:
+        recids:   a list of all recid's that should be brought into order
         issue_number:   the issue_number for which we are deriving the order
                         (this has to be one number)
 
     returns:
             ordered_records: a dictionary with the recids ordered by keys
+
     """
     ordered_records = {}
-    for record in list:
+    records_without_defined_order = []
+    for record in recids:
         temp_rec = BibFormatObject(record)
-        issue_numbers = temp_rec.fields('773__n')
-        order_number = temp_rec.fields('773__c')
-        # todo: the marc fields have to be set'able by some sort of config interface
-        n = 0
-        for temp_issue in issue_numbers:
-            if temp_issue == issue_number:
-                try:
-                    order_number = int(order_number[n])
-                except:
-                    # todo: Warning, record does not support numbering scheme
-                    order_number = -1
-            n+=1
-        if order_number != -1:
-            try:
-                ordered_records[order_number] = record
-            except:
-                pass
-                # todo: Error, there are two records with the same order_number in the issue
-        else:
-            ordered_records[max(ordered_records.keys()) + 1] = record
+        articles_info = temp_rec.fields('773__')
+        for article_info in articles_info:
+            if article_info.get('n', '') == issue_number:
+                if article_info.has_key('c'):
+                    order_number = article_info.get('c', '')
+                    if ordered_records.has_key(order_number):
+                        ordered_records[order_number].append(record)
+                    else:
+                        ordered_records[order_number] = [record]
+                else:
+                    # No order? No problem! Append it at the end.
+                    records_without_defined_order.append(record)
+
+    for record in records_without_defined_order:
+        ordered_records[max(ordered_records.keys()) + 1] = record
+
+    for (order, records) in ordered_records.iteritems():
+        # Reverse so that if there are several articles at same
+        # positon, newest appear first
+        records.reverse()
 
     return ordered_records
 
 def get_records_in_same_issue_in_order(recid):
     """
+    TODO: Remove?
     """
     raise ("Not implemented yet.")
-
-def get_recid_from_order(order, rule, issue_number):
-    """
-    takes the order of a record in the journal as passed in the url arguments
-    and derives the recid using the current issue number and the record
-    rule for this kind of records.
-
-    parameters:
-        order:  the order at which the record appears in the journal as passed
-                in the url
-        rule:   the defining rule of the journal record category
-        issue_number:   the issue number for which we are searching
-
-    returns:
-        recid:  the recid of the ordered record
-    """
-    # get the id list
-    all_records = list(search_pattern(p="%s and 773__n:%s" %
-                                      (rule, issue_number),
-                                      f="&action_search=Search"))
-    ordered_records = {}
-    for record in all_records:
-        temp_rec = BibFormatObject(record)
-        issue_numbers = temp_rec.fields('773__n')
-        order_number = temp_rec.fields('773__c')
-        # todo: fields for issue number and order number have to become generic
-        n = 0
-        for temp_issue in issue_numbers:
-            if temp_issue == issue_number:
-                try:
-                    order_number = int(order_number[n])
-                except:
-                    # todo: Warning, record does not support numbering scheme
-                    order_number = -1
-            n+=1
-
-        if order_number != -1:
-            try:
-                ordered_records[order_number] = record
-            except:
-                pass
-                # todo: Error, there are two records with the same order_number in the issue
-        else:
-            ordered_records[max(ordered_records.keys()) + 1] = record
-    try:
-        recid = ordered_records[int(order)]
-    except:
-        pass
-        # todo: ERROR, numbering scheme inconsistency
-    return recid
-
-# todo: move to a template
-def please_login(req, journal_name, ln="en", title="", message="", backlink=""):
-    """
-    """
-    _ = gettext_set_language(ln)
-    if title == "":
-        title_out = _("Please login to perform this action.")
-    else:
-        title_out = title
-    if message == "":
-        message_out = _("In order to publish webjournal issues you must be logged \
-                        in and be authorized for this kind of task. If you have a \
-                        login, use the link \
-                        below to login.")
-    else:
-        message_out = message
-
-    if backlink == "":
-        backlink_out = "%s/journal/issue_control?name=%s" % (CFG_SITE_URL, journal_name)
-    else:
-        backlink_out = backlink
-
-    title_msg = _("We need you to login")
-    body_out = '''<div style="text-align: center;">
-                <fieldset style="width:400px; margin-left: auto; margin-right: auto;background: url('%s/img/blue_gradient.gif') top left repeat-x;">
-                    <legend style="color:#a70509;background-color:#fff;"><i>%s</i></legend>
-                    <p style="text-align:center;">%s</p>
-                    <br/>
-                    <p><a href="%s/youraccount/login?referer=%s">Login</a></p>
-                    <br/>
-                    <div style="text-align:right;">Mail<a href="mailto:%s"> the Administrator.</a></div>
-                </fieldset>
-            </div>
-            ''' % (CFG_SITE_URL,
-                   title_msg,
-                   message_out,
-                   CFG_SITE_URL,
-                   backlink_out,
-                   CFG_SITE_ADMIN_EMAIL)
-
-    return page(title = title_out,
-                body = body_out,
-                description = "",
-                keywords = "",
-                language = ln,
-                req = req)
 
 def get_rule_string_from_rule_list(rule_list, category):
     """
@@ -191,7 +220,7 @@ def get_rule_string_from_rule_list(rule_list, category):
         category_from_config = rule_string.split(",")[0]
         if category_from_config.lower() == category.lower():
             current_category_in_list = i
-        i+=1
+        i += 1
     try:
         rule_string = rule_list[current_category_in_list]
     except:
@@ -201,11 +230,13 @@ def get_rule_string_from_rule_list(rule_list, category):
 
 def get_category_from_rule_string(rule_string):
     """
+    TODO: Remove?
     """
     pass
 
 def get_rule_string_from_category(category):
     """
+    TODO: Remove?
     """
     pass
 
@@ -219,28 +250,28 @@ def get_monday_of_the_week(week_number, year):
     timetuple = issue_week_strings_to_times(['%s/%s' % (week_number, year), ])[0]
     return time.strftime("%A %d %B %Y", timetuple)
 
-def get_issue_number_display(issue_number, journal_name, language=CFG_SITE_LANG):
+def get_issue_number_display(issue_number, journal_name, ln=CFG_SITE_LANG):
     """
     Returns the display string for a given issue number.
     """
-    journal_id = get_journal_id(journal_name, language)
+    journal_id = get_journal_id(journal_name, ln)
     issue_display = run_sql("SELECT issue_display FROM jrnISSUE \
             WHERE issue_number=%s AND id_jrnJOURNAL=%s", (issue_number,
                                                           journal_id))[0][0]
     return issue_display
 
-def get_current_issue_time(journal_name, language=CFG_SITE_LANG):
+def get_current_issue_time(journal_name, ln=CFG_SITE_LANG):
     """
     Return the current issue of a journal as a time object.
     """
-    current_issue = get_current_issue(language, journal_name)
+    current_issue = get_current_issue(ln, journal_name)
     week_number = current_issue.split("/")[0]
     year = current_issue.split("/")[1]
     current_issue_time = issue_week_strings_to_times(['%s/%s' %
                                                       (week_number, year), ])[0]
     return current_issue_time
 
-def get_all_issue_weeks(issue_time, journal_name, language):
+def get_all_issue_weeks(issue_time, journal_name, ln):
     """
     Function that takes an issue_number, checks the DB for the issue_display
     which can contain the other (update) weeks involved with this issue and
@@ -249,14 +280,14 @@ def get_all_issue_weeks(issue_time, journal_name, language):
     """
     from invenio.webjournal_config import InvenioWebJournalIssueNotFoundDBError
     journal_id = get_journal_id(journal_name)
-    issue_string = issue_times_to_week_strings([issue_time,])[0]
+    issue_string = issue_times_to_week_strings([issue_time])[0]
     try:
         issue_display = run_sql(
         "SELECT issue_display FROM jrnISSUE WHERE issue_number=%s \
         AND id_jrnJOURNAL=%s",
             (issue_string, journal_id))[0][0]
     except:
-        raise InvenioWebJournalIssueNotFoundDBError(language, journal_name,
+        raise InvenioWebJournalIssueNotFoundDBError(ln, journal_name,
                                                     issue_string)
     issue_bounds = issue_display.split("/")[0].split("-")
     year = issue_display.split("/")[1]
@@ -283,17 +314,17 @@ def get_all_issue_weeks(issue_time, journal_name, language):
             # get everything from the new year
             new_year_issues = []
             for i in range(1, int(issue_bounds[1])+1):
-                to_append = issue_week_strings_to_times(['%s/%s' % (i, year),])[0]
+                to_append = issue_week_strings_to_times(['%s/%s' % (i, year)])[0]
                 new_year_issues.append(to_append)
             all_issue_weeks += old_year_issues
             all_issue_weeks += new_year_issues
         else:
             for i in range(int(issue_bounds[0]), int(issue_bounds[1])+1):
-                to_append = issue_week_strings_to_times(['%s/%s' % (i, year),])[0]
+                to_append = issue_week_strings_to_times(['%s/%s' % (i, year)])[0]
                 all_issue_weeks.append(to_append)
     elif len(issue_bounds) == 1:
         to_append = issue_week_strings_to_times(['%s/%s' %
-                                                 (issue_bounds[0], year),])[0]
+                                                 (issue_bounds[0], year)])[0]
         all_issue_weeks.append(to_append)
     else:
         return False
@@ -314,7 +345,7 @@ def count_down_to_monday(current_time):
     return next_monday.timetuple()
 
 def get_next_journal_issues(current_issue_time, journal_name,
-                            language=CFG_SITE_LANG, number=2):
+                            ln=CFG_SITE_LANG, number=2):
     """
     Returns the <number> next issue numbers from the current_issue_time.
     """
@@ -337,7 +368,7 @@ def get_next_journal_issues(current_issue_time, journal_name,
         #next_issues.append(date_formated)
     return next_issues
 
-def issue_times_to_week_strings(issue_times, language=CFG_SITE_LANG):
+def issue_times_to_week_strings(issue_times, ln=CFG_SITE_LANG):
     """
     Function that approaches a correct python time to MySQL time week string
     conversion by looking up and down the time horizon and always rechecking
@@ -348,11 +379,11 @@ def issue_times_to_week_strings(issue_times, language=CFG_SITE_LANG):
         # do the initial pythonic week view
         week = time.strftime("%W/%Y", issue)
         week += " Monday"
-        Limit = 5
+        limit = 5
         counter = 0
         success = False
         # try going up 5
-        while success == False and counter <= Limit:
+        while success == False and counter <= limit:
             counter += 1
             success = get_consistent_issue_week(issue, week)
             if success == False:
@@ -361,7 +392,7 @@ def issue_times_to_week_strings(issue_times, language=CFG_SITE_LANG):
                 break
         # try going down 5
         counter = 0
-        while success == False and counter <= Limit:
+        while success == False and counter <= limit:
             counter += 1
             success = get_consistent_issue_week(issue, week)
             if success == False:
@@ -369,9 +400,9 @@ def issue_times_to_week_strings(issue_times, language=CFG_SITE_LANG):
             else:
                 break
 
-        from webjournal_config import InvenioWebJournalReleaseDBError
+        from invenio.webjournal_config import InvenioWebJournalReleaseDBError
         if success == False:
-            raise InvenioWebJournalReleaseDBError(language)
+            raise InvenioWebJournalReleaseDBError(ln)
 
         #check_for_time = run_sql("SELECT STR_TO_DATE(%s, %s)",
         #                     (week, conversion_rule))[0][0]
@@ -434,7 +465,7 @@ def get_consistent_issue_week(issue_time, issue_week):
     else:
         return False
 
-def issue_week_strings_to_times(issue_weeks, language=CFG_SITE_LANG):
+def issue_week_strings_to_times(issue_weeks, ln=CFG_SITE_LANG):
     """
     Converts a list of issue week strings (WW/YYYY) to python time objects.
     """
@@ -449,16 +480,6 @@ def issue_week_strings_to_times(issue_weeks, language=CFG_SITE_LANG):
         issue_times.append(result.timetuple())
     return issue_times
 
-def release_journal_update(update_issue, journal_name, language=CFG_SITE_LANG):
-    """
-    Releases an update to a journal.
-    """
-    journal_id = get_journal_id(journal_name, language)
-    run_sql("UPDATE jrnISSUE set date_released=NOW() \
-                WHERE issue_number=%s \
-                AND id_jrnJOURNAL=%s", (update_issue,
-                                        journal_id))
-
 def sort_by_week_number(x, y):
     """
     Sorts a list of week numbers.
@@ -472,65 +493,12 @@ def sort_by_week_number(x, y):
         week_y = y.split("/")[0]
         return cmp(week_x, week_y)
 
-def release_journal_issue(publish_issues, journal_name, language=CFG_SITE_LANG):
-    """
-    Releases a new issue.
-    """
-    journal_id = get_journal_id(journal_name, language)
-    if len(publish_issues) > 1:
-        publish_issues.sort(sort_by_week_number)
-        low_bound = publish_issues[0]
-        high_bound = publish_issues[-1]
-        issue_display = '%s-%s/%s' % (low_bound.split("/")[0],
-                                      high_bound.split("/")[0],
-                                      high_bound.split("/")[1])
-        # remember convention: if we are going over a new year, take the higher
-    else:
-        issue_display = publish_issues[0]
-    # produce the DB lines
-    for publish_issue in publish_issues:
-        run_sql("INSERT INTO jrnISSUE (id_jrnJOURNAL, issue_number, issue_display) \
-                VALUES(%s, %s, %s)", (journal_id,
-                                      publish_issue,
-                                      issue_display))
-    # set first issue to published
-    release_journal_update(publish_issues[0], journal_name, language)
-
-def delete_journal_issue(issue, journal_name, language=CFG_SITE_LANG):
-    """
-    Deletes an issue from the DB.
-    """
-    journal_id = get_journal_id(journal_name, language)
-    run_sql("DELETE FROM jrnISSUE WHERE issue_number=%s \
-            AND id_jrnJOURNAL=%s",(issue, journal_id))
-
-def was_alert_sent_for_issue(issue, journal_name, language):
-    """
-    """
-    journal_id = get_journal_id(journal_name, language)
-    date_announced = run_sql("SELECT date_announced FROM jrnISSUE \
-                                WHERE issue_number=%s \
-                                AND id_jrnJOURNAL=%s", (issue, journal_id))[0][0]
-    if date_announced == None:
-        return False
-    else:
-        return date_announced.timetuple()
-
-def update_DB_for_alert(issue, journal_name, language):
-    """
-    """
-    journal_id = get_journal_id(journal_name, language)
-    run_sql("UPDATE jrnISSUE set date_announced=NOW() \
-                WHERE issue_number=%s \
-                AND id_jrnJOURNAL=%s", (issue,
-                                        journal_id))
-
-def get_number_of_articles_for_issue(issue, journal_name, language=CFG_SITE_LANG):
+def get_number_of_articles_for_issue(issue, journal_name, ln=CFG_SITE_LANG):
     """
     Function that returns a dictionary with all categories and number of
     articles in each category.
     """
-    config_strings = get_xml_from_config(["rule",], journal_name)
+    config_strings = get_xml_from_config(["rule"], journal_name)
     rule_list = config_strings["rule"]
     all_articles = {}
     for rule in rule_list:
@@ -541,15 +509,12 @@ def get_number_of_articles_for_issue(issue, journal_name, language=CFG_SITE_LANG
             issue_nr_alternative = "%s/%s" % (week_nr[1], year)
 
             all_records_of_a_type = list(search_pattern(p='65017a:"%s" and 773__n:%s' %
-                                      (category_name, issue),
-                                      f="&action_search=Search"))
+                                      (category_name, issue)))
             all_records_of_a_type += list(search_pattern(p='65017a:"%s" and 773__n:%s' %
-                                      (category_name, issue_nr_alternative),
-                                      f="&action_search=Search"))
+                                      (category_name, issue_nr_alternative)))
         else:
             all_records_of_a_type = list(search_pattern(p='65017a:"%s" and 773__n:%s' %
-                                      (category_name, issue),
-                                      f="&action_search=Search"))
+                                      (category_name, issue)))
         all_articles[category_name] = len(all_records_of_a_type)
     return all_articles
 
@@ -586,11 +551,12 @@ def get_list_of_issues_for_publication(publication):
         issues.append("%s/%s" % (bounds[0], year))
     return issues
 
-def get_release_time(issue, journal_name, language=CFG_SITE_LANG):
+def get_release_time(issue, journal_name, ln=CFG_SITE_LANG):
     """
     Gets the date at which an issue was released from the DB.
+    Returns False if issue has not yet been released.
     """
-    journal_id = get_journal_id(journal_name, language)
+    journal_id = get_journal_id(journal_name, ln)
     try:
         release_date = run_sql("SELECT date_released FROM jrnISSUE \
                            WHERE issue_number=%s AND id_jrnJOURNAL=%s",
@@ -602,11 +568,11 @@ def get_release_time(issue, journal_name, language=CFG_SITE_LANG):
     else:
         return release_date.timetuple()
 
-def get_announcement_time(issue, journal_name, language=CFG_SITE_LANG):
+def get_announcement_time(issue, journal_name, ln=CFG_SITE_LANG):
     """
     Get the date at which an issue was announced through the alert system.
     """
-    journal_id = get_journal_id(journal_name, language)
+    journal_id = get_journal_id(journal_name, ln)
     try:
         announce_date = run_sql("SELECT date_announced FROM jrnISSUE \
                            WHERE issue_number=%s AND id_jrnJOURNAL=%s",
@@ -620,19 +586,67 @@ def get_announcement_time(issue, journal_name, language=CFG_SITE_LANG):
 
 ######################## GET DEFAULTS FUNCTIONS ###############################
 
-def get_journal_id(journal_name, language=CFG_SITE_LANG):
+def get_journal_info_path(journal_name):
     """
-    Get the id for this journal from the DB.
+    Returns the path to the info file of the given journal. The info
+    file should be used to get information about a journal when database
+    is not available.
+
+    Returns None if path cannot be determined
     """
+    # We must make sure we don't try to read outside of webjournal
+    # cache dir
+    info_path = os.path.realpath("%s/webjournal/%s/info.dat"% \
+                                 (CFG_CACHEDIR, journal_name))
+    if info_path.startswith(CFG_CACHEDIR + '/webjournal/'):
+        return info_path
+    else:
+        return None
+
+def get_journal_id(journal_name, ln=CFG_SITE_LANG):
+    """
+    Get the id for this journal from the DB. If DB is down, try to get
+    from cache.
+    """
+    journal_id = None
     from invenio.webjournal_config import InvenioWebJournalJournalIdNotFoundDBError
-    try:
-        journal_id = run_sql("SELECT id FROM jrnJOURNAL WHERE name=%s",
-                          (journal_name,))[0][0]
-    except:
-        raise InvenioWebJournalJournalIdNotFoundDBError(language, journal_name)
+
+    if CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
+        # do not connect to the database as the site is closed for
+        # maintenance:
+        journal_info_path = get_journal_info_path(journal_name)
+        try:
+            journal_info_file = open(journal_info_path, 'r')
+            journal_info = cPickle.load(journal_info_file)
+            journal_id = journal_info.get('journal_id', None)
+        except cPickle.PickleError, e:
+            journal_id = None
+        except IOError:
+            journal_id = None
+    else:
+        try:
+            res = run_sql("SELECT id FROM jrnJOURNAL WHERE name=%s",
+                          (journal_name,))
+            if len(res) > 0:
+                journal_id = res[0][0]
+        except OperationalError, e:
+            # Cannot connect to database. Try to read from cache
+            journal_info_path = get_journal_info_path(journal_name)
+            try:
+                journal_info_file = open(journal_info_path, 'r')
+                journal_info = cPickle.load(journal_info_file)
+                journal_id = journal_info['journal_id']
+            except cPickle.PickleError, e:
+                journal_id = None
+            except IOError:
+                journal_id = None
+
+    if journal_id is None:
+        raise InvenioWebJournalJournalIdNotFoundDBError(ln, journal_name)
+
     return journal_id
 
-def guess_journal_name(language):
+def guess_journal_name(ln):
     """
     tries to take a guess what a user was looking for on the server if not
     providing a name for the journal.
@@ -641,19 +655,95 @@ def guess_journal_name(language):
     """
     from invenio.webjournal_config import InvenioWebJournalNoJournalOnServerError
     from invenio.webjournal_config import InvenioWebJournalNoNameError
-    all_journals = run_sql("SELECT * FROM jrnJOURNAL ORDER BY id")
-    if len(all_journals) == 0:
-        raise InvenioWebJournalNoJournalOnServerError(language)
-    elif len(all_journals) == 1:
-        return all_journals[0][1]
-    else:
-        raise InvenioWebJournalNoNameError(language)
 
-def get_current_issue(language, journal_name):
+    journals_id_and_names = get_journals_ids_and_names()
+    if len(journals_id_and_names) == 0:
+        raise InvenioWebJournalNoJournalOnServerError(ln)
+    elif len(journals_id_and_names) > 0 and \
+             journals_id_and_names[0].has_key('journal_name'):
+        return journals_id_and_names[0]['journal_name']
+    else:
+        raise InvenioWebJournalNoNameError(ln)
+
+##     all_journals = run_sql("SELECT * FROM jrnJOURNAL ORDER BY id")
+##     if len(all_journals) == 0:
+##         # try to get from file, in case DB is down
+##         raise InvenioWebJournalNoJournalOnServerError(ln)
+##     elif len(all_journals) > 0:
+##         return all_journals[0][1]
+##     else:
+##         raise InvenioWebJournalNoNameError(ln)
+
+def get_journals_ids_and_names():
+    """
+    Returns the list of existing journals IDs and names. Try to read
+    from the DB, or from cache if DB is not accessible.
+    """
+    journals = []
+
+    if CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
+        # do not connect to the database as the site is closed for
+        # maintenance:
+        files = os.listdir("%s/webjournal" % CFG_CACHEDIR)
+        info_files = [path + os.sep + 'info.dat' for path in files if \
+                      os.path.isdir(path) and \
+                      os.path.exists(path + os.sep + 'info.dat')]
+        for info_file in info_files:
+            try:
+                journal_info_file = open(info_file, 'r')
+                journal_info = cPickle.load(journal_info_file)
+                journal_id = journal_info.get('journal_id', None)
+                journal_name = journal_info.get('journal_name', None)
+                current_issue = journal_info.get('current_issue', None)
+                if journal_id is not None and \
+                       journal_name is not None:
+                    journals.append({'journal_id': journal_id,
+                                     'journal_name': journal_name,
+                                     'current_issue': current_issue})
+            except cPickle.PickleError, e:
+                # Well, can't do anything...
+                continue
+            except IOError:
+                # Well, can't do anything...
+                continue
+    else:
+        try:
+            res = run_sql("SELECT id, name FROM jrnJOURNAL ORDER BY id")
+            for journal_id, journal_name in res:
+                journals.append({'id': journal_id,
+                                 'name': journal_name})
+        except OperationalError, e:
+            # Cannot connect to database. Try to read from cache
+            files = os.listdir("%s/webjournal" % CFG_CACHEDIR)
+            info_files = [path + os.sep + 'info.dat' for path in files if \
+                          os.path.isdir(path) and \
+                          os.path.exists(path + os.sep + 'info.dat')]
+            for info_file in info_files:
+                try:
+                    journal_info_file = open(info_file, 'r')
+                    journal_info = cPickle.load(journal_info_file)
+                    journal_id = journal_info.get('journal_id', None)
+                    journal_name = journal_info.get('journal_name', None)
+                    current_issue = journal_info.get('current_issue', None)
+                    if journal_id is not None and \
+                           journal_name is not None:
+                        journals.append({'journal_id': journal_id,
+                                         'journal_name': journal_name,
+                                         'current_issue': current_issue})
+                except cPickle.PickleError, e:
+                    # Well, can't do anything...
+                    continue
+                except IOError:
+                    # Well, can't do anything...
+                    continue
+
+    return journals
+
+def get_current_issue(ln, journal_name):
     """
     Returns the current issue of a journal as a string.
     """
-    journal_id = get_journal_id(journal_name, language)
+    journal_id = get_journal_id(journal_name, ln)
     try:
         current_issue = run_sql("SELECT issue_number FROM jrnISSUE \
                 WHERE date_released <= NOW() AND id_jrnJOURNAL=%s \
@@ -668,11 +758,11 @@ def get_current_issue(language, journal_name):
                                       current_issue))
     return current_issue
 
-def get_current_publication(journal_name, current_issue, language=CFG_SITE_LANG):
+def get_current_publication(journal_name, current_issue, ln=CFG_SITE_LANG):
     """
     Returns the current publication string (current issue + updates).
     """
-    journal_id = get_journal_id(journal_name, language)
+    journal_id = get_journal_id(journal_name, ln)
     current_publication =  run_sql("SELECT issue_display FROM jrnISSUE \
                                    WHERE issue_number=%s AND \
                                     id_jrnJOURNAL=%s",
@@ -710,178 +800,108 @@ def get_xml_from_config(xpath_list, journal_name):
             results[xpath].append(result_string)
     return results
 
-def parse_url_string(req):
+def parse_url_string(uri):
     """
-    centralized function to parse any url string given in webjournal.
+    Centralized function to parse any url string given in
+    webjournal. Useful to retrieve current category, journal,
+    etc. from within format elements
 
     returns:
         args: all arguments in dict form
     """
-    args = {}
-    # first get what you can from the argument string
-    try:
-        argument_string =  req.args#"name=CERNBulletin&issue=22/2007"#req.args
-    except:
-        argument_string = ""
-    try:
-        arg_list = argument_string.split("&")
-    except:
-        # no arguments
-        arg_list = []
-    for entry in arg_list:
-        try:
-            key = entry.split("=")[0]
-        except KeyError:
-            # todo: WARNING, could not parse one argument
-            continue
-        try:
-            val = entry.split("=")[1]
-        except:
-            # todo: WARNING, could not parse one argument
-            continue
-        try:
-            args[key] = val
-        except:
-            # todo: WARNING, argument given twice
-            continue
+    args = {'journal_name'  : '',
+            'issue_year'    : '',
+            'issue_number'  : '',
+            'issue'         : '',
+            'category'      : '',
+            'recid'         : '',
+            'verbose'       : 0,
+            'ln'            : CFG_SITE_LANG,
+            'archive_year'  : ''}
 
-    # secondly try to get default arguments
-    try:
-        for entry in req.journal_defaults.keys():
-            try:
-                args[entry] = req.journal_defaults[entry]
-            except:
-                # todo: Error, duplicate entry from args and defaults
-                pass
-    except:
-        # no defaults
-        pass
+    # Take everything after journal and before first question mark
+    splitted_uri = uri.split('journal', 1)
+    second_part = splitted_uri[1]
+    splitted_uri = second_part.split('?')
+    uri_middle_part = splitted_uri[0]
+    uri_arguments = ''
+    if len(splitted_uri) > 1:
+        uri_arguments = splitted_uri[1]
+
+    arg_list = uri_arguments.split("&")
+    args['ln'] = 'en'
+    args['verbose'] = 0
+    for arg_pair in arg_list:
+        arg_and_value = arg_pair.split('=')
+        if len(arg_and_value) == 2:
+            if arg_and_value[0] == 'ln':
+                args['ln'] = arg_and_value[1]
+            elif arg_and_value[0] == 'verbose' and \
+                     arg_and_value[1].isdigit():
+                args['verbose'] = arg_and_value[1]
+            elif arg_and_value[0] == 'archive_year':
+                args['archive_year'] = arg_and_value[1]
+
+    arg_list = uri_middle_part.split("/")
+    if len(arg_list) > 1 and arg_list[1] != 'search':
+        args['journal_name'] = urllib.unquote(arg_list[1])
+    else:
+        args['journal_name'] = guess_journal_name(args['ln'])
+    if len(arg_list) > 2:
+        args['issue_year'] = urllib.unquote(arg_list[2])
+    else:
+        issue = get_current_issue(args['ln'],
+                                  args['journal_name'])
+        args['issue'] = issue
+        args['issue_year'] = issue.split('/')[1]
+        args['issue_number'] = issue.split('/')[0]
+    if len(arg_list) > 3:
+        args['issue_number'] = urllib.unquote(arg_list[3])
+        args['issue'] = args['issue_number'] + "/" + args['issue_year']
+    if len(arg_list) > 4:
+        args['category'] = urllib.unquote(arg_list[4])
+    if len(arg_list) > 5:
+        args['recid'] = urllib.unquote(arg_list[5])
+
+    # TODO : wash arguments
     return args
 
-######################## EMAIL HELPER FUNCTIONS ###############################
-
-def createhtmlmail (html, text, subject, toaddr):
+def make_journal_url(current_uri, custom_parameters={}):
     """
-    Create a mime-message that will render HTML in popular
-    MUAs, text in better ones.
+    Create a url, using the current uri and overriding values
+    with the given custom_parameters
     """
-    import MimeWriter
-    import mimetools
-    import cStringIO
+    default_params = parse_url_string(current_uri)
+    for key, value in custom_parameters.iteritems():
+        # Override default params with custom params
+        default_params[key] = str(value)
 
-    out = cStringIO.StringIO() # output buffer for our message
-    htmlin = cStringIO.StringIO(html)
-    txtin = cStringIO.StringIO(text)
+    uri = CFG_SITE_URL + '/journal/'
+    if default_params['journal_name']:
+        uri += urllib.quote(default_params['journal_name']) + '/'
+        if default_params['issue_year']:
+            uri += urllib.quote(default_params['issue_year']) + '/'
+            if default_params['issue_number']:
+                uri += urllib.quote(default_params['issue_number']) + '/'
+                if default_params['category']:
+                    uri += urllib.quote(default_params['category'])
+                    if default_params['recid']:
+                        uri += '/' + urllib.quote(str(default_params['recid']))
 
-    writer = MimeWriter.MimeWriter(out)
-    #
-    # set up some basic headers... we put subject here
-    # because smtplib.sendmail expects it to be in the
-    # message body
-    #
-    writer.addheader("Subject", subject)
-    writer.addheader("MIME-Version", "1.0")
+    printed_question_mark = False
+    if default_params['ln']:
+        uri += '?ln=' + default_params['ln']
+        printed_question_mark = True
 
-    ## Instead of a comma-separated "To" field, add a new "To" header for
-    ## each of the addresses:
-    to_addresses = [raw_address.strip() for raw_address in toaddr.split(",")]
-    for to_address in to_addresses:
-        writer.addheader("To", to_address)
-    #
-    # start the multipart section of the message
-    # multipart/alternative seems to work better
-    # on some MUAs than multipart/mixed
-    #
-    writer.startmultipartbody("alternative")
-    writer.flushheaders()
-    #
-    # the plain text section
-    #
-    subpart = writer.nextpart()
-    subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
-    #pout = subpart.startbody("text/plain", [("charset", 'us-ascii')])
-    pout = subpart.startbody("text/plain", [("charset", 'utf-8')])
-    mimetools.encode(txtin, pout, 'quoted-printable')
-    txtin.close()
-    #
-    # start the html subpart of the message
-    #
-    subpart = writer.nextpart()
-    subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
-    txtin.close()
-    #
-    # start the html subpart of the message
-    #
-    subpart = writer.nextpart()
-    subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
-    #
-    # returns us a file-ish object we can write to
-    #
-    #pout = subpart.startbody("text/html", [("charset", 'us-ascii')])
-    pout = subpart.startbody("text/html", [("charset", 'utf-8')])
-    mimetools.encode(htmlin, pout, 'quoted-printable')
-    htmlin.close()
-    #
-    # Now that we're done, close our writer and
-    # return the message body
-    #
-    writer.lastpart()
-    msg = out.getvalue()
-    out.close()
-    print msg
-    return msg
-
-def put_css_in_file(html_message, journal_name):
-    """
-    Takes an external css file and puts all the content of it in the head
-    of an HTML file in style tags. (Used for HTML emails)
-    """
-    config_strings = get_xml_from_config(["screen"], journal_name)
-    try:
-        css_path = config_strings["screen"][0]
-    except:
-        register_exception(req=None,
-                           suffix="No css file for journal %s. Is this right?"
-                           % journal_name)
-        return
-    css_file = urlopen('%s/%s' % (CFG_SITE_URL, css_path))
-    css = css_file.read()
-    css = make_full_paths_in_css(css, journal_name)
-    html_parted = html_message.split("</head>")
-    if len(html_parted) > 1:
-        html = '%s<style type="text/css">%s</style></head>%s' % (html_parted[0],
-                                                        css,
-                                                        html_parted[1])
-    else:
-        html_parted = html_message.split("<html>")
-        if len(html_parted) > 1:
-            html = '%s<html><head><style type="text/css">%s</style></head>%s' % (html_parted[0],
-                                                                                 css,
-                                                                                 html_parted[1])
+    if default_params['verbose'] != 0:
+        if printed_question_mark:
+            uri += '&amp;verbose=' + str(default_params['verbose'])
         else:
-            return
-    return html
+            uri += '?verbose=' + str(default_params['verbose'])
 
-def make_full_paths_in_css(css, journal_name):
-    """
-    """
-    url_pattern = re.compile('''url\(["']?\s*(?P<url>\S*)\s*["']?\)''',
-                             re.DOTALL)
-    url_iter = url_pattern.finditer(css)
-    rel_to_full_path = {}
-    for url in url_iter:
-        url_string = url.group("url")
-        url_string = url_string.replace("\"", "")
-        url_string = url_string.replace("\'", "")
-        if url_string[:6] != "http://":
-            rel_to_full_path[url_string] = '"%s/img/%s/%s"' % (CFG_SITE_URL,
-                                                               journal_name,
-                                                               url_string)
-    for url in rel_to_full_path.keys():
-        css = css.replace(url, rel_to_full_path[url])
-    return css
+    return uri
 
-############################ CACHING FUNCTIONS ################################
+############################" CACHING FUNCTIONS ################################
 
 def cache_index_page(html, journal_name, category, issue, ln):
     """
@@ -890,16 +910,21 @@ def cache_index_page(html, journal_name, category, issue, ln):
     """
     issue = issue.replace("/", "_")
     category = category.replace(" ", "")
-    if not (os.path.isdir('%s/webjournal/%s' % (CFG_CACHEDIR, journal_name) )):
-        os.makedirs('%s/webjournal/%s' % (CFG_CACHEDIR, journal_name))
-    cached_file = open('%s/webjournal/%s/%s_index_%s_%s.html' % (CFG_CACHEDIR,
-                                                                 journal_name,
-                                                                 issue, category,
-                                                                 ln), "w")
+
+    cache_path = os.path.realpath('%s/webjournal/%s/%s_index_%s_%s.html' % \
+                                  (CFG_CACHEDIR, journal_name,
+                                   issue, category,
+                                   ln))
+    if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
+        # Mmh, not accessing correct path. Stop caching
+        return False
+
+    cache_path_dir = '%s/webjournal/%s' % (CFG_CACHEDIR, journal_name)
+    if not os.path.isdir(cache_path_dir):
+        os.makedirs(cache_path_dir)
+    cached_file = open(cache_path, "w")
     cached_file.write(html)
     cached_file.close()
-
-
 
 def get_index_page_from_cache(journal_name, category, issue, ln):
     """
@@ -908,9 +933,16 @@ def get_index_page_from_cache(journal_name, category, issue, ln):
     """
     issue = issue.replace("/", "_")
     category = category.replace(" ", "")
+
+    cache_path = os.path.realpath('%s/webjournal/%s/%s_index_%s_%s.html' % \
+                                  (CFG_CACHEDIR, journal_name,
+                                   issue, category, ln))
+    if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
+        # Mmh, not accessing correct path. Stop reading cache
+        return False
+
     try:
-        cached_file = open('%s/webjournal/%s/%s_index_%s_%s.html'
-                        % (CFG_CACHEDIR, journal_name, issue, category, ln)).read()
+        cached_file = open(cache_path).read()
     except:
         return False
     return cached_file
@@ -921,11 +953,16 @@ def cache_article_page(html, journal_name, category, recid, issue, ln):
     """
     issue = issue.replace("/", "_")
     category = category.replace(" ", "")
-    if not (os.path.isdir('%s/webjournal/%s' % (CFG_CACHEDIR, journal_name) )):
-        os.makedirs('%s/webjournal/%s' % (CFG_CACHEDIR, journal_name))
-    cached_file = open('%s/webjournal/%s/%s_article_%s_%s_%s.html'
-                       % (CFG_CACHEDIR, journal_name, issue, category, recid, ln),
-                       "w")
+    cache_path = os.path.realpath('%s/webjournal/%s/%s_article_%s_%s_%s.html' % \
+                                  (CFG_CACHEDIR, journal_name,
+                                   issue, category, recid, ln))
+    if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
+        # Mmh, not accessing correct path. Stop caching
+        return
+    cache_path_dir = '%s/webjournal/%s' % (CFG_CACHEDIR, journal_name)
+    if not os.path.isdir(cache_path_dir):
+        os.makedirs(cache_path_dir)
+    cached_file = open(cache_path, "w")
     cached_file.write(html)
     cached_file.close()
 
@@ -936,9 +973,15 @@ def get_article_page_from_cache(journal_name, category, recid, issue, ln):
     """
     issue = issue.replace("/", "_")
     category = category.replace(" ", "")
+
+    cache_path = os.path.realpath('%s/webjournal/%s/%s_article_%s_%s_%s.html' % \
+                                  (CFG_CACHEDIR, journal_name,
+                                   issue, category, recid, ln))
+    if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
+        # Mmh, not accessing correct path. Stop reading cache
+        return False
     try:
-        cached_file = open('%s/webjournal/%s/%s_article_%s_%s_%s.html'
-                % (CFG_CACHEDIR, journal_name, issue, category, recid, ln)).read()
+        cached_file = open(cache_path).read()
     except:
         return False
 
@@ -950,6 +993,13 @@ def clear_cache_for_article(journal_name, category, recid, issue):
     """
     issue = issue.replace("/", "_")
     category = category.replace(" ", "")
+
+    cache_path = os.path.realpath('%s/webjournal/%s/%s_article_%s_%s_%s.html' % \
+                                  (CFG_CACHEDIR, journal_name))
+    if not cache_path.startswith(CFG_CACHEDIR + '/webjournal'):
+        # Mmh, not accessing correct path. Stop deleting cache
+        return False
+
     # try to delete the article cached file
     try:
         os.remove('%s/webjournal/%s/%s_article_%s_%s_en.html' %
@@ -986,257 +1036,152 @@ def clear_cache_for_issue(journal_name, issue):
     clears the cache of a whole issue.
     """
     issue = issue.replace("/", "_")
-    all_cached_files = os.listdir('%s/webjournal/%s/'
-                                  % (CFG_CACHEDIR, journal_name))
+    cache_path_dir = os.path.realpath('%s/webjournal/%s' % \
+                                      (CFG_CACHEDIR, journal_name))
+    if not cache_path_dir.startswith(CFG_CACHEDIR + '/webjournal'):
+        # Mmh, not accessing correct path. Stop deleting cache
+        return False
+
+    all_cached_files = os.listdir(cache_path_dir)
     for cached_file in all_cached_files:
         if cached_file[:7] == issue:
             try:
-                os.remove('%s/webjournal/%s/%s'
-                          % (CFG_CACHEDIR, journal_name, cached_file))
+                os.remove(cache_path_dir + '/' + cached_file)
             except:
                 return False
     return True
 
-def cache_recid_data_dict_CERNBulletin(recid, issue, rule, order):
-    """
-    The CERN Bulletin has a specific recid data dict that is cached
-    using cPickle.
-    """
-    issue = issue.replace("/", "_")
-    # get whats in there
-    if not os.path.isdir('%s/webjournal/CERNBulletin' % CFG_CACHEDIR):
-        os.makedirs('%s/webjournal/CERNBulletin' % CFG_CACHEDIR)
-    try:
-        temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat'
-                         % (CFG_CACHEDIR, issue))
-    except:
-        temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat'
-                         % (CFG_CACHEDIR, issue), "w")
-    try:
-        recid_map = cPickle.load(temp_file)
-    except:
-        recid_map = ""
-    temp_file.close()
-    # add new recid
-    if recid_map == "":
-        recid_map = {}
-    if not recid_map.has_key(rule):
-        recid_map[rule] = {}
-    recid_map[rule][order] = recid
-    # save back
-    temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat'
-                     % (CFG_CACHEDIR, issue), "w")
-    cPickle.dump(recid_map, temp_file)
-    temp_file.close()
+## def cache_recid_data_dict_CERNBulletin(recid, issue, rule, order):
+##     """
+##     The CERN Bulletin has a specific recid data dict that is cached
+##     using cPickle.
+##     """
+##     issue = issue.replace("/", "_")
+##     # get whats in there
+##     if not os.path.isdir('%s/webjournal/CERNBulletin' % CFG_CACHEDIR):
+##         os.makedirs('%s/webjournal/CERNBulletin' % CFG_CACHEDIR)
+##     try:
+##         temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat'
+##                          % (CFG_CACHEDIR, issue))
+##     except:
+##         temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat'
+##                          % (CFG_CACHEDIR, issue), "w")
+##     try:
+##         recid_map = cPickle.load(temp_file)
+##     except:
+##         recid_map = ""
+##     temp_file.close()
+##     # add new recid
+##     if recid_map == "":
+##         recid_map = {}
+##     if not recid_map.has_key(rule):
+##         recid_map[rule] = {}
+##     recid_map[rule][order] = recid
+##     # save back
+##     temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat'
+##                      % (CFG_CACHEDIR, issue), "w")
+##     cPickle.dump(recid_map, temp_file)
+##     temp_file.close()
 
-def get_cached_recid_data_dict_CERNBulletin(issue, rule):
-    """
-    Function to restore from cache the dict Data Type that the CERN Bulletin
-    uses for mapping between the order of an article and its recid.
-    """
-    issue = issue.replace("/", "_")
-    try:
-        temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat'
-                         % (CFG_CACHEDIR, issue))
-    except:
-        return {}
-    try:
-        recid_map = cPickle.load(temp_file)
-    except:
-        return {}
-    try:
-        recid_dict = recid_map[rule]
-    except:
-        recid_dict = {}
-    return recid_dict
+## def get_cached_recid_data_dict_CERNBulletin(issue, rule):
+##     """
+##     Function to restore from cache the dict Data Type that the CERN Bulletin
+##     uses for mapping between the order of an article and its recid.
+##     """
+##     issue = issue.replace("/", "_")
+##     try:
+##         temp_file = open('%s/webjournal/CERNBulletin/%s_recid_order_map.dat'
+##                          % (CFG_CACHEDIR, issue))
+##     except:
+##         return {}
+##     try:
+##         recid_map = cPickle.load(temp_file)
+##     except:
+##         return {}
+##     try:
+##         recid_dict = recid_map[rule]
+##     except:
+##         recid_dict = {}
+##     return recid_dict
+
 
 ######################### CERN SPECIFIC FUNCTIONS #############################
 
-def get_order_dict_from_recid_list_CERNBulletin(list, issue_number):
+def get_recid_from_legacy_number(issue_number, category, number):
     """
-    special derivative of the get_order_dict_from_recid_list function that
-    extends the behavior insofar as too return a dictionary in which every
-    entry is a dict (there can be several number 1 articles) and every dict entry
-    is a tuple with an additional boolean to indicate if there is a graphical "new"
-    flag. the dict key on the second level is the upload time in epoch seconds.
-    e.g.
-    {1:{10349:(rec, true), 24792:(rec, false)}, 2:{736424:(rec,false)}, 24791:{1:(rec:false}}
-    the ordering inside an order number is given by upload date. so it is an ordering
-        1-level -> number
-        2-level -> date
+    Returns the recid based on the issue number, category and
+    'number'.
+
+    This is used to support URLs using the now deprecated 'number'
+    argument.  The function tries to reproduce the behaviour of the
+    old way of doing, even keeping some of its 'problems' (so that we
+    reach the same article as before with a given number)..
+
+    Returns the recid as int, or -1 if not found
     """
-    ordered_records = {}
-    for record in list:
-        temp_rec = BibFormatObject(record)
-        issue_numbers = temp_rec.fields('773__n')
-        order_number = temp_rec.fields('773__c')
-        try:
-#            upload_date = run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (record, ))[0][0]
-            upload_date = run_sql("SELECT creation_date FROM bibrec WHERE id=%s", (record, ))[0][0]
-        except:
-            pass
-        #return repr(time.mktime(upload_date.timetuple()))
-        # todo: the marc fields have to be set'able by some sort of config interface
-        n = 0
-        for temp_issue in issue_numbers:
-            if temp_issue == issue_number:
-                try:
-                    order_number = int(order_number[n])
-                except:
-                    # todo: Warning, record does not support numbering scheme
-                    order_number = -1
-            n+=1
-        if order_number != -1:
-            try:
-                if ordered_records.has_key(order_number):
-                    ordered_records[order_number][int(time.mktime(upload_date.timetuple()))] = (record, True)
-                else:
-                    ordered_records[order_number] = {int(time.mktime(upload_date.timetuple())):(record, False)}
-            except:
-                pass
-                # todo: Error, there are two records with the same order_number in the issue
-        else:
-            ordered_records[max(ordered_records.keys()) + 1] = record
-
-    return ordered_records
-
-def get_recid_from_order_CERNBulletin(order, rule, issue_number):
-    """
-    same functionality as get_recid_from_order above, but extends it for
-    the CERN Bulletin in a way so multiple entries for the first article are
-    possible.
-
-    parameters:
-        order:  the order at which the record appears in the journal as passed
-                in the url
-        rule:   the defining rule of the journal record category
-        issue_number:   the issue number for which we are searching
-
-    returns:
-        recid:  the recid of the ordered record
-    """
-    # try to get it from cache
-    recid_dict = {}
-    recid_dict = get_cached_recid_data_dict_CERNBulletin(issue_number, rule)
-    if recid_dict.has_key(order):
-        recid = recid_dict[order]
-        return recid
-    alternative_issue_number = "00/0000"
-    # get the id list
+    recids = []
     if issue_number[0] == "0":
         alternative_issue_number = issue_number[1:]
-        all_records = list(search_pattern(p="%s and 773__n:%s" %
-                                      (rule, issue_number),
-                                      f="&action_search=Search"))
-        all_records += list(search_pattern(p="%s and 773__n:%s" %
-                                      (rule, alternative_issue_number),
-                                      f="&action_search=Search"))
+        recids = list(search_pattern(p='65017a:"%s" and 773__n:%s' %
+                                      (category, issue_number)))
+        recids.extend(list(search_pattern(p='65017a:"%s" and 773__n:%s' %
+                                      (category, alternative_issue_number))))
     else:
-        all_records = list(search_pattern(p="%s and 773__n:%s" %
-                                      (rule, issue_number),
-                                      f="&action_search=Search"))
-    #raise repr(all_records)
-    ordered_records = {}
-    new_addition_records = []
-    for record in all_records:
-        temp_rec = BibFormatObject(record)  # todo: refactor with get_fieldValues from search_engine
-        issue_numbers = temp_rec.fields('773__n')
-        order_number = temp_rec.fields('773__c')
-        #raise "%s:%s" % (repr(issue_numbers), repr(order_number))
-        # todo: fields for issue number and order number have to become generic
-        n = 0
-        for temp_issue in issue_numbers:
-            if temp_issue == issue_number or temp_issue == alternative_issue_number:
-                try:
-                    order_number = int(order_number[n])
-                except:
-                    register_exception(stream="warning", suffix="There \
-                        was an article in the journal that does not support \
-                        a numbering scheme")
-                    order_number = -1000
-            n+=1
-        if order_number == -1000:
-            ordered_records[max(ordered_records.keys()) + 1] = record
-        elif order_number <= 1:
-            new_addition_records.append(record)
-        else:
-            try:
-                ordered_records[order_number] = record
-            except:
-                register_exception(stream='warning', suffix="There \
-                        were double entries for an order in this journal.")
+        recids = list(search_pattern(p='65017:"%s" and 773__n:%s' %
+                                      (category, issue_number)))
 
-    # process the CERN Bulletin specific new additions
-    if len(new_addition_records) > 1 and int(order) <= 1:
-        # if we are dealing with a new addition (order number smaller 1)
-        ordered_new_additions = {}
-        for record in new_addition_records:
-            #upload_date = run_sql("SELECT modification_date FROM bibrec WHERE id=%s", (record, ))[0][0]
-            upload_date = run_sql("SELECT creation_date FROM bibrec WHERE id=%s", (record, ))[0][0]
-            ordered_new_additions[int(time.mktime(upload_date.timetuple()))] = record
-        i = 1
-        while len(ordered_new_additions) > 0:
-            temp_key = pop_oldest_article_CERNBulletin(ordered_new_additions)
-            record = ordered_new_additions.pop(int(temp_key))
-            ordered_records[i] = record
-            i -=1
+    # Now must order the records and pick the one at index 'number'.
+    # But we have to take into account that there can be multiple
+    # records at position 1, and that these additional records should
+    # be numbered with negative numbers:
+    # 1, 1, 1, 2, 3 -> 1, -1, -2, 2, 3...
+    negative_index_records = {}
+    positive_index_records = {}
+    # Fill in 'negative_index_records' and 'positive_index_records'
+    # lists with the following loop
+    for recid in recids:
+        bfo = BibFormatObject(recid)
+        order = [subfield['c'] for subfield in bfo.fields('773__') if \
+                 issue_number in subfield['n']]
+
+        if len(order) > 0:
+            # If several orders are defined for the same article and
+            # the same issue, keep the first one
+            order = order[0]
+            if order.isdigit():
+                # Order must be an int. Otherwise skip
+                order = int(order)
+                if order == 1 and positive_index_records.has_key(1):
+                    # This is then a negative number for this record
+                    index = (len(negative_index_records.keys()) > 0 and \
+                             min(negative_index_records.keys()) -1) or 0
+                    negative_index_records[index] = recid
+                else:
+                    # Positive number for this record
+                    if not positive_index_records.has_key(order):
+                        positive_index_records[order] = recid
+                    else:
+                        # We make the assumption that we cannot have
+                        # twice the same position for two
+                        # articles. Previous WebJournal module was not
+                        # clear about that. Just drop this record
+                        # (better than crashing or looping forever..)
+                        pass
+
+    recid_to_return = -1
+    # Ok, we can finally pick the recid corresponding to 'number'
+    if number <= 0:
+        negative_indexes = negative_index_records.keys()
+        negative_indexes.sort()
+        negative_indexes.reverse()
+        if len(negative_indexes) > abs(number):
+            recid_to_return = negative_index_records[negative_indexes[abs(number)]]
     else:
-        # if we have only one record on 1 just push it through
-        ordered_records[1] = new_addition_records[0]
-    try:
-        recid = ordered_records[int(order)]
-    except:
-        register_exception()
+        #positive_indexes = positive_index_records.keys()
+        #positive_indexes.sort()
+        #if len(positive_indexes) >= number:
+        #    recid_to_return = positive_index_records[positive_indexes[number -1]]
+        if positive_index_records.has_key(number):
+            recid_to_return = positive_index_records[number]
 
-    cache_recid_data_dict_CERNBulletin(recid, issue_number, rule, order)
-    return recid
-
-def pop_newest_article_CERNBulletin(news_article_dict):
-    """
-    pop key of the most recent article (highest c-timestamp)
-    """
-    keys = news_article_dict.keys()
-    keys.sort()
-    key = keys[len(keys)-1]
-    return key
-
-def pop_oldest_article_CERNBulletin(news_article_dict):
-    """
-    pop key of the oldest article (lowest c-timestamp)
-    """
-    keys = news_article_dict.keys()
-    keys.sort()
-    key = keys[0]
-    return key
-
-########################### REGULAR EXPRESSIONS ###############################
-
-header_pattern = re.compile('<p\s*(align=justify)??>\s*<strong>(?P<header>.*?)</strong>\s*</p>')
-para_pattern = re.compile('<p.*?>(?P<paragraph>.+?)</p>', re.DOTALL)
-image_pattern = re.compile(r'''
-                               (<a\s*href=["']?(?P<hyperlink>\S*)["']?>)?# get the link location for the image
-                               \s*# after each tag we can have arbitrary whitespaces
-                               <center># the image is always centered
-                               \s*
-                               <img\s*(class=["']imageScale["'])*?\s*src=(?P<image>\S*)\s*border=1\s*(/)?># getting the image itself
-                               \s*
-                               </center>
-                               \s*
-                               (</a>)?
-                               (<br />|<br />|<br/>)*# the caption can be separated by any nr of line breaks
-                               (
-                               <b>
-                               \s*
-                               <i>
-                               \s*
-                               <center>(?P<caption>.*?)</center># getting the caption
-                               \s*
-                               </i>
-                               \s*
-                               </b>
-                               )?''',  re.DOTALL | re.VERBOSE | re.IGNORECASE )
-                               #''',re.DOTALL | re.IGNORECASE | re.VERBOSE | re.MULTILINE)
-
-# (<a\s*href=["']?(?P<hyperlink>\S*)["']?>)?\s*<center>\s*<img\s*(class=["']imageScale["'])*?\s*src=(?P<image>\S*)\s*border=1\s*(/)?>
-# \s*</center>\s*(</a>)?(<br />|<br />|<br/>)*(<b>\s*<i>\s*<center>(?P<caption>.*?)</center>\s*</i>\s*</b>)?
-#url(["']?(?P<url>\S*)["']?)
+    return recid_to_return

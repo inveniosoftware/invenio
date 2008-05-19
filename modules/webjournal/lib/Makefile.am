@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -22,7 +22,7 @@ SUBDIRS = widgets
 pylibdir = $(libdir)/python/invenio
 pylib_DATA = webjournal_webinterface.py webjournal_utils.py \
              webjournal_config.py webjournal.py webjournal_washer.py \
-             webjournal_templates.py
+             webjournal_templates.py webjournaladminlib.py
 
 formatdir = $(pylibdir)/bibformat_elements
 format_DATA = bfe_ObjectLanguage.py

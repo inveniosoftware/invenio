@@ -24,7 +24,7 @@ from xml.dom import minidom
 import time
 
 Cached_Filename = "webjournal_widget_seminars.xml"
-Indico_Seminar_Location = "http://indico.cern.ch/tools/export.py?fid=1l7&date=today&days=1&of=xml"
+Indico_Seminar_Location = "http://indico.cern.ch/tools/export.py?fid=1l7&amp;date=today&amp;days=1&amp;of=xml"
 Update_Frequency = 3600 # in seconds
 
 def format(bfo):
@@ -35,6 +35,8 @@ def format(bfo):
 
 def escape_values(bfo):
     """
+    Called by BibFormat in order to check if output of this element
+    should be escaped.
     """
     return 0
 
@@ -95,7 +97,6 @@ def get_widget_HTML(bfo):
         html += room
 
         html += "</li>"
-
 
     return html.encode('utf-8')
 
