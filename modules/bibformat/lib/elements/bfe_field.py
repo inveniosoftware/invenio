@@ -49,41 +49,34 @@ def format(bfo, tag, limit, instances_separator=" ",
             p_tag[1] = '_'
         if p_tag[2] == '':
             p_tag[2] = '_'
-        values = bfo.fields(p_tag[0]+p_tag[1]+p_tag[2])
+        values = bfo.fields(p_tag[0]+p_tag[1]+p_tag[2]) # Values will
+                                                        # always be a
+                                                        # list of
+                                                        # dicts
     else:
         return ''
 
-    out = ""
-
-    if limit == "" or (not limit.isdigit()) or int(limit) > len(values):
-        limit = len(values)
-    else:
-        limit = int(limit)
-
-    if len(values) > 0 and isinstance(values[0], dict):
-        x = 0
-        instances_out = [] # Retain each instance output
-        for instance in values:
-            filtered_values = [value for (subcode, value) in instance.iteritems()
-                              if p_tag[3] == '' or p_tag[3] == '%' \
-                               or p_tag[3] == subcode]
-            if len(filtered_values) > 0:
-                # We have found some corresponding subcode(s)
+    x = 0
+    instances_out = [] # Retain each instance output
+    for instance in values:
+        filtered_values = [value for (subcode, value) in instance.iteritems()
+                          if p_tag[3] == '' or p_tag[3] == '%' \
+                           or p_tag[3] == subcode]
+        if len(filtered_values) > 0:
+            # We have found some corresponding subcode(s)
+            if limit.isdigit() and x + len(filtered_values) >= int(limit):
+                # We are going to exceed the limit
+                filtered_values = filtered_values[:int(limit)-x] # Takes only needed one
+                if len(filtered_values) > 0: # do not append empty list!
+                    instances_out.append(subfields_separator.join(filtered_values))
+                    x += len(filtered_values) # record that so we know limit has been exceeded
+                break # No need to go further
+            else:
+                instances_out.append(subfields_separator.join(filtered_values))
                 x += len(filtered_values)
-                instance_out = subfields_separator.join(filtered_values)
-                if x >= limit:
-                    instance_out += extension
-                    instances_out.append(instance_out)
-                    break
-                else:
-                    instances_out.append(instance_out)
 
-        out += instances_separator.join(instances_out)
+    ext_out = ''
+    if limit.isdigit() and x >= int(limit):
+        ext_out = extension
 
-    else:
-        out += subfields_separator.join(values[:int(limit)])
-
-        if int(limit) < len(values):
-            out += extension
-
-    return out
+    return instances_separator.join(instances_out) + ext_out
