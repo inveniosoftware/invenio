@@ -58,11 +58,6 @@ class AuthCernWrapper:
         self._headers = {"Content-type": "application/x-www-form-urlencoded",
                    "Accept": "text/plain",
                    "Authorization": "Basic " + _cern_nice_soap_auth}
-        try:
-            self._conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch")
-        except:
-            register_exception(alert_admin=True)
-            raise
 
     def __del__(self):
         """Close the CERN Nice webservice connection."""
@@ -77,10 +72,13 @@ class AuthCernWrapper:
         socket_timeout = socket.getdefaulttimeout()
         socket.setdefaulttimeout(None)
         try:
+            self._conn = httplib.HTTPSConnection("winservices-soap.web.cern.ch")
+            self._conn.connect()
             self._conn.request("POST",
                     "/winservices-soap/generic/Authentication.asmx/%s" % name,
                     params, self._headers)
             response = self._conn.getresponse().read()
+            self._conn.close()
         except:
             register_exception(alert_admin=True)
             raise
