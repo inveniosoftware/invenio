@@ -550,7 +550,7 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
 
     #text += drop_down_menu("oai_set_collection", menu)
 
-    text += "</td></tr><tr><td>"
+    text += '</td><td colspan="3"><small>Eg: <code>Published Articles, Preprints, Theses</code></small></td></tr><tr><td>'
     text += input_text(ln = CFG_SITE_LANG, title = "Phrase:", name = "oai_set_p1", value = oai_set_p1)
     text += "</td><td>"
 
