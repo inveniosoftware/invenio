@@ -207,8 +207,18 @@ class WebInterfaceDirectory(object):
                    req.uri not in no_lang_recognition_uris:
                 ln = get_preferred_user_language(req)
                 form['ln'] = ln
-        result = obj(req, form)
-        return _check_result(req, result)
+        result = _check_result(req, obj(req, form))
+        if hasattr(req, 'cds_wrapper'):
+            ## The session handler saves for caching a request_wrapper in req
+            ## This saves req as an attribute, creating a circular reference.
+            ## Since we have have reached the end of the request handler
+            ## we can safely drop the request_wrapper so to avoid
+            ## memory leaks.
+            del req.cds_wrapper
+        if hasattr(req, '_user_info'):
+            ## For the same reason we can delete the user_info.
+            del req._user_info
+        return result
 
     def __call__(self, req, form):
         """ Maybe resolve the final / of a directory """
