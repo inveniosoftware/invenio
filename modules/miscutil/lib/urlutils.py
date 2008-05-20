@@ -98,6 +98,10 @@ def redirect_to_url(req, url):
     @param req: request as received from apache
     @param url: url to redirect to"""
     req.err_headers_out.add("Location", url)
+    if 'Set-Cookie' in req.headers_out:
+        ## It's important not to loose the cookie of the user, in particular
+        ## when it has just been set for the first time.
+        req.err_headers_out.add('Set-Cookie', req.headers_out['Set-Cookie'])
     raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
 
 def get_client_ip_address(req):

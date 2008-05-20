@@ -656,7 +656,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 apache_msg = make_apache_message(action, arguments, args['referer'])
 
                 # FIXME: Temporary Hack to help CDS current migration
-                if CFG_CERN_SITE and False: ## FIXME! It's broken!
+                if CFG_CERN_SITE:
                     roles = make_list_apache_firerole(action, arguments)
                     if len(roles) == 1:
                         # There's only one role enabled to see this collection

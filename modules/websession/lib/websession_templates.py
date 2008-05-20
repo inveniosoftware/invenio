@@ -36,7 +36,8 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_SITE_URL, \
      CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
-     CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS
+     CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS, \
+     CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO
 from invenio.urlutils import make_canonical_urlargd
@@ -439,7 +440,7 @@ class Template:
           'your_baskets' : _("Your Baskets"),
           'basket_explain' : _("With baskets you can define specific collections of items, store interesting records you want to access later or share with others."),
         }
-        if guest:
+        if guest and CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
             out += self.tmpl_warning_guest_user(ln = ln, type = "baskets")
         out += """</dd>
         <dt><a href="../youralerts/list?ln=%(ln)s">%(your_alerts)s</a></dt>
@@ -448,7 +449,7 @@ class Template:
           'your_alerts' : _("Your Alerts"),
           'explain_alerts' : _("Subscribe to a search which will be run periodically by our service. The result can be sent to you via Email or stored in one of your baskets."),
         }
-        if guest:
+        if guest and CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
             out += self.tmpl_warning_guest_user(type="alerts", ln = ln)
         out += "</dd>"
         if CFG_CERN_SITE:

@@ -752,6 +752,7 @@ class ResponseWrapper:
                                                   cookie_value,
                                                   options)
         if 'expires' not in attrs or attrs['expires'] != 0:
+            self.request.cds_wrapper.setSession(cookie_value)
             self.request.cds_wrapper.cookies.update(parse_cookie(self.request.headers_out["Set-Cookie"]))
 
 
