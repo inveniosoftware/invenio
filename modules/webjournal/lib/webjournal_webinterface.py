@@ -147,8 +147,14 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
            not self.journal_issue_number or \
            not self.category:
             if not self.journal_name:
-                self.journal_name = guess_journal_name(argd['ln'])
-
+                try:
+                    self.journal_name = guess_journal_name(argd['ln'])
+                except InvenioWebJournalNoJournalOnServerError, e:
+                    register_exception(req=req)
+                    return e.user_box()
+                except InvenioWebJournalNoNameError, e:
+                    register_exception(req=req)
+                    return e.user_box()
             if not self.journal_issue_year or not self.journal_issue_number:
                 journal_issue = get_current_issue(argd['ln'], self.journal_name)
                 self.journal_issue_year = journal_issue.split('/')[1]
