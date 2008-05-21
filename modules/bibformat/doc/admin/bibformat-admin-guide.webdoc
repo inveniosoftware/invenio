@@ -578,6 +578,7 @@ for you. For special cases, you can set the parameter
 <code>escape</code> of the element to '0' when calling it, to make
 BibFormat understand that it must not escape the values of the
 element, or to '1' to force the escaping. </p>
+See the <a href="#listofescapingmodes">complete list of escaping modes</a>.
 <p>
 For example
 <code>&lt;bfe_abstract /&gt;</code> will return:<br/>
@@ -821,11 +822,11 @@ translated_welcome =  &#95;("Welcome")
     title = bfo.field('245__a', escape="1")
     abstract = bfo.field('520__a', escape="2")
 </pre>
-
+     <a name="listofescapingmodes" />
      The <code>escape</code> parameter can be one of the following values:
           <ul><li>0 - no escaping</li>
               <li>1 - escape all HTML characters (escaped chars are shown as escaped)</li>
-              <li>2 - remove dangerous HTML tags to avoid XSS, but
+              <li>2 - remove unsafe HTML tags to avoid XSS, but
               keep basic one (such as &lt;br /&gt;)
               This is particularly useful if you want to store HTML text in your
               metadata but still want to escape some tags to prevent
@@ -835,6 +836,8 @@ translated_welcome =  &#95;("Welcome")
               <li>3 - mix of mode 1 and mode 2. If field_value starts with &lt;!--HTML--&gt;,
               then use mode 2. Else use mode 1.</li>
               <li>4 - remove all HTML/XML tags </li>
+              <li>5 - same as 2, but allows more tags, like &lt;img></li>
+              <li>6 - same as 3, but allows more tags, like &lt;img></li>
            </ul>
      These modes are the same for <code>escape_values(bfo)</code> function.
      <p>

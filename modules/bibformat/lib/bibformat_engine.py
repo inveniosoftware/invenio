@@ -65,7 +65,10 @@ from invenio.bibformat_config import \
 from invenio.bibformat_utils import \
      record_get_xml, \
      parse_tag
-from invenio.htmlutils import HTMLWasher
+from invenio.htmlutils import \
+     HTMLWasher, \
+     cfg_html_buffer_allowed_tag_whitelist, \
+     cfg_html_buffer_allowed_attribute_whitelist
 from invenio.webuser import collect_user_info
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
@@ -617,7 +620,7 @@ def eval_format_element(format_element, bfo, parameters={}, verbose=0):
                     output_text += '<b><span style="color: rgb(255, 0, 0);">'+ \
                                    str(error_string[0][1]) +'</span></b> '
         # (3)
-        if escape in ['0', '1', '2', '3', '4']:
+        if escape in ['0', '1', '2', '3', '4', '5', '6']:
             escape_mode = int(escape)
 
         #If escape is equal to 1, then escape all
@@ -1200,9 +1203,9 @@ def get_format_element_attrs_from_function(function, element_name,
         param_escape = {}
         param_escape['name'] = "escape"
         param_escape['default'] = ""
-        param_escape['description'] = """If set to 1, replaces special
-                                         characters '&', '<' and '>' of this
-                                         element by SGML entities"""
+        param_escape['description'] = """0 keeps value as it is. Refers to main
+                                         documentation for escaping modes
+                                         1 to 6"""
         builtin_params.append(param_escape)
 
         attrs['builtin_params'] = builtin_params
@@ -1809,14 +1812,19 @@ class BibFormatObject:
         Returns the value of the field corresponding to tag in the
         current record.
 
-        If the value does not exist, return empty string
+        If the value does not exist, return empty string.  Else
+        returns the same as bfo.fields(..)[0] (see docstring below).
 
         'escape' parameter allows to escape special characters
         of the field. The value of escape can be:
                       0 - no escaping
                       1 - escape all HTML characters
-                      2 - escape all HTML characters by default. If field starts with <!--HTML-->,
-                          escape only unsafe characters, but leave basic HTML tags.
+                      2 - remove unsafe HTML tags (Eg. keep <br />)
+                      3 - Mix of mode 1 and 2. If value of field starts with
+                          <!-- HTML -->, then use mode 2. Else use mode 1.
+                      4 - Remove all HTML tags
+                      5 - Same as 2, with more tags allowed (like <img>)
+                      6 - Same as 3, with more tags allowed (like <img>)
 
         @param tag the marc code of a field
         @param escape 1 if returned value should be escaped. Else 0. (see above for other modes)
@@ -1879,10 +1887,12 @@ class BibFormatObject:
         of the fields. The value of escape can be:
                       0 - no escaping
                       1 - escape all HTML characters
-                      2 - escape all dangerous HTML tags.
+                      2 - remove unsafe HTML tags (Eg. keep <br />)
                       3 - Mix of mode 1 and 2. If value of field starts with
                           <!-- HTML -->, then use mode 2. Else use mode 1.
                       4 - Remove all HTML tags
+                      5 - Same as 2, with more tags allowed (like <img>)
+                      6 - Same as 3, with more tags allowed (like <img>)
 
         @param tag the marc code of a field
         @param escape 1 if returned values should be escaped. Else 0.
@@ -1962,28 +1972,45 @@ def escape_field(value, mode=0):
 
     - mode 0: no escaping
     - mode 1: escaping all HTML/XML characters (escaped chars are shown as escaped)
-    - mode 2: escaping dangerous HTML tags to avoid XSS, but
+    - mode 2: escaping unsafe HTML tags to avoid XSS, but
               keep basic one (such as <br />)
-              Escaped characters are removed.
+              Escaped tags are removed.
     - mode 3: mix of mode 1 and mode 2. If field_value starts with <!--HTML-->,
               then use mode 2. Else use mode 1.
     - mode 4: escaping all HTML/XML tags (escaped tags are removed)
-    -
+    - mode 5: same as 2, but allows more tags, like <img>
+    - mode 6: same as 3, but allows more tags, like <img>
     """
     if mode == 1:
         return cgi.escape(value)
-    elif mode == 2:
+    elif mode in [2, 5]:
+        allowed_attribute_whitelist = cfg_html_buffer_allowed_attribute_whitelist
+        allowed_tag_whitelist = cfg_html_buffer_allowed_tag_whitelist + \
+                                ['class']
+        if mode == 5:
+            allowed_attribute_whitelist += ['src', 'alt',
+                                            'width', 'height']
+            allowed_tag_whitelist += ['img']
         return washer.wash(value,
-                           allowed_attribute_whitelist=['href',
-                                                        'name',
-                                                        'class']
+                           allowed_attribute_whitelist=\
+                           allowed_attribute_whitelist,
+                           allowed_tag_whitelist= \
+                           allowed_tag_whitelist
                            )
-    elif mode == 3:
+    elif mode in [3, 6]:
         if value.lstrip(' \n').startswith(html_field):
+            allowed_attribute_whitelist = cfg_html_buffer_allowed_attribute_whitelist
+            allowed_tag_whitelist = cfg_html_buffer_allowed_tag_whitelist + \
+                                    ['class']
+            if mode == 6:
+                allowed_attribute_whitelist += ['src', 'alt',
+                                                'width', 'height']
+                allowed_tag_whitelist += ['img']
             return washer.wash(value,
-                               allowed_attribute_whitelist=['href',
-                                                            'name',
-                                                            'class']
+                               allowed_attribute_whitelist=\
+                               allowed_attribute_whitelist,
+                               allowed_tag_whitelist=\
+                               allowed_tag_whitelist
                                )
         else:
             return cgi.escape(value)
