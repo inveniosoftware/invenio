@@ -711,7 +711,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     write_message(mesg)
     task_update_progress(mesg)
 
-    #find this record's pubinfo in other records' references
+    #find this record's pubinfo in other records' bibliography
     if task_get_option('verbose') >= 1:
         write_message("Phase 4: d_records_s")
     done = 0
@@ -723,7 +723,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             write_message(mesg)
             task_update_progress(mesg)
         done = done+1
-        p = recs
+        p = recs.replace("\"","")
         #search the publication string like Phys. Lett., B 482 (2000) 417 in 999C5s
         rec_ids = list(search_unit(f=pubreftag, p=p))
         if task_get_option('verbose') >= 9:
