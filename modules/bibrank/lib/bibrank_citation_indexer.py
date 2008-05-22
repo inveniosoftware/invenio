@@ -657,12 +657,22 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 else:
                     #it was not found so add in missing
                     insert_into_missing(recid, p)
-                if rec_id and not recid in citation_list[rec_id[0]]:
-                    result[rec_id[0]] += 1
-                    citation_list[rec_id[0]].append(recid)
-                if rec_id and not rec_id[0] in reference_list[recid]:
-                    reference_list[recid].append(rec_id[0])
-
+                #check citation and reference for this..
+                if rec_id and rec_id[0]:
+                    #the above should always hold
+                    if citation_list.has_key(rec_id[0]):
+                        if not recid in citation_list[rec_id[0]]:
+                            result[rec_id[0]] += 1 #add count for this..
+                            citation_list[rec_id[0]].append(recid) #append actual list
+                    else:
+                        #it was not in the hash so this is the first for rec_id[0]
+                        citation_list[rec_id[0]] = [recid]
+                        result[rec_id[0]] = 1
+                    #update reference_list accordingly
+                    if reference_list.has_key(recid):
+                        reference_list[recid].append(rec_id[0])
+                    else:
+                        reference_list[recid] = [rec_id[0]]
     mesg = "d_references_s done fully"
     write_message(mesg)
     task_update_progress(mesg)
@@ -720,6 +730,11 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
             write_message("These records match "+p+" in "+pubreftag+" : "+str(rec_ids))
         if rec_ids:
             for rec_id in rec_ids:
+                if not citation_list.has_key(recid):
+                    citation_list[recid] = []
+                    result[recid] = 0
+                if not reference_list.has_key(rec_id):
+                    reference_list[rec_id] = []
                 if not rec_id in citation_list[recid]:
                     result[recid] += 1
                     citation_list[recid].append(rec_id)
