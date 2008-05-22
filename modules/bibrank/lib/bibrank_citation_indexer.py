@@ -284,6 +284,7 @@ def get_citation_informations(recid_list, config):
     except:
         pass
 
+    write_message("publication_format_string is "+publication_format_string,verbose=9)
     done = 0 #for status reporting
     numrecs = len(recid_list)
     for recid in recid_list:
@@ -362,6 +363,7 @@ def get_citation_informations(recid_list, config):
                     else:
                         publ += current #just add the character in the format string
                 if ok:
+                    write_message("d_records_s (publication info) for "+str(recid)+" is "+publ, verbose=9)
                     d_records_s[recid] = publ
     mesg = "get cit.inf done fully"
     write_message(mesg)
@@ -646,7 +648,8 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 if matches and matches[0]:
                     p = matches[0][0]
                 rec_id = list(search_unit(p, 'journal'))
-                #print "These match searching "+p+" in journal: "+str(rec_id)
+                if task_get_option('verbose') >= 9:
+                    write_message("These match searching "+p+" in journal: "+str(rec_id))
                 if rec_id and rec_id[0]:
                     #the refered publication is in our collection, remove
                     #from missing
@@ -713,7 +716,8 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         p = recs
         #search the publication string like Phys. Lett., B 482 (2000) 417 in 999C5s
         rec_ids = list(search_unit(f=pubreftag, p=p))
-        #print "These records match "+p+" in "+pubreftag+" : "+str(rec_ids)
+        if task_get_option('verbose') >= 9:
+            write_message("These records match "+p+" in "+pubreftag+" : "+str(rec_ids))
         if rec_ids:
             for rec_id in rec_ids:
                 if not rec_id in citation_list[recid]:
