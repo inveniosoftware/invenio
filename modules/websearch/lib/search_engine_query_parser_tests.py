@@ -30,11 +30,12 @@ from invenio import search_engine_query_parser
 
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.search_engine import perform_request_search
+
 class TestSearchQueryParenthesisedParser(unittest.TestCase):
     """Test parenthesis parsing."""
 
     def test_parse_query(self):
-        """parentheses parser - Test parsing of query with parenthesis"""
+        """parenthesised search query parser - queries with parentheses"""
         parser = search_engine_query_parser.SearchQueryParenthesisedParser()
 
         # test if normal queries are parsed
@@ -77,7 +78,7 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
                          ['+', 'expr1', '+', 'expr2', '+', 'expr3', '|', 'expr4'])
 
     def test_parsing_of_nested_or_mismatched_parentheses(self):
-        """parentheses parser - Test parsing of queries containing nested or mismatched parentheses"""
+        """parenthesised search query parser - queries containing nested or mismatched parentheses"""
 
         parser = search_engine_query_parser.SearchQueryParenthesisedParser()
 
@@ -89,7 +90,7 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
                               parser.parse_query,"(expr")
 
     def test_parsing_of_and_or_and_not_operators(self):
-        """parentheses parser - Test parsing of queries containing AND, OR, NOT operators"""
+        """parenthesised search query parser - queries containing AND, OR, NOT operators"""
 
         parser = search_engine_query_parser.SearchQueryParenthesisedParser()
 
@@ -112,7 +113,7 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
                          parser.parse_query('(expr1 + expr2) or expr3'))
 
     def test_parsing_of_quotes(self):
-        """parentheses parser - Test parsing of queries containing single and double quotes"""
+        """parenthesised search query parser - queries containing single and double quotes"""
 
         parser = search_engine_query_parser.SearchQueryParenthesisedParser()
 
@@ -146,7 +147,6 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
     and use perform_request_search which then loads the parser
     """
 
-
     def _compare_searches(self, inv_search, spi_search):
         """Compare inv_search and spi_search for equivalence
         tests that a non-trivial result is found, that the hitsets are equal
@@ -156,53 +156,45 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         self.assertEqual(perform_request_search(p=inv_search), \
                          perform_request_search(p=spi_search))
 
-
         #test operator searching
     def test_operators(self):
-        """find a ellis and t colllisions
-        """
+        """SPIRES search syntax - find a ellis and t colllisions"""
         inv_search = "author:ellis and title:collisions"
         spi_search = "find a ellis and t collisions"
         self._compare_searches(inv_search, spi_search)
 
     def test_parens(self):
-        """find a ellis and not t hadronic and not t collisions
-        """
+        """SPIRES search syntax - find a ellis and not t hadronic and not t collisions"""
         inv_search = "author:ellis and not (title:hadronic or title:collisions)"
         spi_search = "find a ellis and not t hadronic and not t collisions "
         self._compare_searches(inv_search, spi_search)
 
     def test_author_simple(self):
-        """find a ellis, j
-        """
+        """SPIRES search syntax - find a ellis, j"""
         inv_search = 'author:"ellis,j." or author:"ellis,j*"'
         spi_search = "find a ellis, j"
         self._compare_searches(inv_search, spi_search)
 
     def test_author_reverse(self):
-        """ find a j ellis
-        """
+        """SPIRES search syntax - find a j ellis"""
         inv_search = 'author"ellis, j" or author:"ellis,j*"'
         spi_search = "find a j ellis"
         self._compare_searches(inv_search, spi_search)
 
     def test_author_full_first(self):
-        """ find a ellis, john
-        """
+        """SPIRES search syntax - find a ellis, john"""
         inv_search = "author:'ellis, john' or author:'ellis, j.' or author:'ellis, jo.'"
         spi_search = "find a ellis, john"
         self._compare_searches(inv_search, spi_search)
 
     def test_date(self):
-        """ find date 1996
-        """
+        """SPIRES search syntax - find date 1996"""
         inv_search = "date:1996"
         spi_search = "find date 1996"
         self._compare_searches(inv_search, spi_search)
 
     def test_month(self):
-        """find date 3/1996
-        """
+        """SPIRES search syntax - find date 3/1996"""
         inv_search = "date:'3/1996'"
         spi_search = "find date 3/1996"
         self._compare_searches(inv_search, spi_search)
