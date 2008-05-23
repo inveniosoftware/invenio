@@ -76,7 +76,7 @@ def format(bfo, tag, limit, instances_separator=" ",
                 x += len(filtered_values)
 
     ext_out = ''
-    if limit.isdigit() and x >= int(limit):
+    if limit.isdigit() and x > int(limit):
         ext_out = extension
 
     return instances_separator.join(instances_out) + ext_out
