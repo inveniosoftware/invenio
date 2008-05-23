@@ -442,7 +442,7 @@ def call_bibconvert(config, harvestpath, convertpath):
 def call_bibupload(marcxmlfile, mode="-r -i"):
     """Call bibupload in insert mode on MARCXMLFILE."""
     if os.path.exists(marcxmlfile):
-        command = '%s/bibupload %s %s ' % (CFG_BINDIR, mode, marcxmlfile)
+        command = '%s/bibupload -u oaiharvest %s %s ' % (CFG_BINDIR, mode, marcxmlfile)
         return os.system(command)
     else:
         write_message("marcxmlfile %s does not exist" % marcxmlfile)
