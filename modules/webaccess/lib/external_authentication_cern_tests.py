@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio import external_authentication_cern as cern
+from invenio.config import CFG_CERN_SITE
 from invenio.testutils import make_test_suite, run_test_suite
 
 class ExternalAuthenticationCernTest(unittest.TestCase):
@@ -34,6 +34,7 @@ class ExternalAuthenticationCernTest(unittest.TestCase):
     def setUp(self):
         # pylint: disable-msg=C0103
         """setting up helper variables for tests"""
+        from invenio import external_authentication_cern as cern
         self.username, self.userpwd, self.useremail = \
                 open('demopwd.cfg', 'r').readline().strip().split(':', 2)
         self.cern = cern.ExternalAuthCern()
@@ -57,8 +58,10 @@ class ExternalAuthenticationCernTest(unittest.TestCase):
         self.assertEqual(self.cern.fetch_user_preferences(self.username, self.userpwd)['email'], self.useremail)
         #self.assertRaises(KeyError, self.cern.fetch_user_preferences('patata', 'patata')['email'])
 
-# FIXME: the above tests not plugged into global unit test suite
-TEST_SUITE = make_test_suite() # ExternalAuthenticationCernTest,)
+if CFG_CERN_SITE:
+    TEST_SUITE = make_test_suite(ExternalAuthenticationCernTest,)
+else:
+    TEST_SUITE = make_test_suite()
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
