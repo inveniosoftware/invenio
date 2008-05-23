@@ -27,7 +27,7 @@ import unittest
 import mechanize
 import re
 
-from invenio.config import CFG_SITE_URL
+from invenio.config import CFG_SITE_URL, CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
 from invenio.testutils import make_test_suite, run_test_suite, \
                               test_web_page_content, make_url, make_surl, merge_error_messages
 
@@ -45,8 +45,11 @@ class WebBasketWebPagesAvailabilityTest(unittest.TestCase):
                     'list_public_baskets', 'unsubscribe', 'subscribe']
 
         error_messages = []
+        if CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+            for url in [baseurl + page for page in _exports]:
+                error_messages.extend(test_web_page_content(url))
         for url in [baseurl + page for page in _exports]:
-            error_messages.extend(test_web_page_content(url))
+            error_messages.extend(test_web_page_content(url, username='jekyll', password='j123ekyll'))
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return
@@ -159,6 +162,8 @@ class WebBasketRecordsAdditionTest(unittest.TestCase):
     def test_records_addition_as_guest_user(self):
         """webbasket - addition of records as guest"""
 
+        if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
+            self.fail('SKIPPED: guests users are not differentiated')
         browser = mechanize.Browser()
         self._add_records_to_basket_and_check_content(browser)
 
