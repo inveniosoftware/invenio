@@ -20,7 +20,7 @@
 
 __revision__ = "$Id$"
 
-from invenio.bibdocfile import BibRecDocs, decompose_file
+from invenio.bibdocfile import BibRecDocs, decompose_file, InvenioWebSubmitFileError
 import os
 import re
 from invenio.websubmit_config import InvenioWebSubmitFunctionWarning
@@ -77,13 +77,6 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
     for path in paths_and_suffixes.keys():
         ## Check if there is a directory for the current path
         if os.path.exists("%s/files/%s" % (curdir, path)):
-            mybibdoc = None
-            ## Check if there is no document with the same status (status=path)
-            ## already associated with the current recid
-            existing_with_same_status = bibrecdocs.list_bibdocs(path)
-            ## If yes, use the existing docid
-            if existing_with_same_status:
-                mybibdoc = existing_with_same_status[0]
             ## Go through all the files in curdir/files/path
             for current_file in os.listdir("%s/files/%s" % (curdir, path)):
                 ## retrieve filename and extension
@@ -120,24 +113,24 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                 fullpath = "%s/files/%s/%s%s" % (curdir, path, filename, extension)
                 ## Check if there is any existing similar file
                 if not bibrecdocs.check_file_exists(fullpath):
-                    if not mybibdoc:
-                        ## New docid is created
-                        mybibdoc = bibrecdocs.add_new_file(fullpath, never_fail=True)
-                    else:
-                        ## No new docid created but the file
-                        ## is archive in /bibdoc ID/ directory
-                        mybibdoc = bibrecdocs.add_new_format(fullpath, mybibdoc.get_docname())
-                ## Create related formats
-                if mybibdoc:
+                    bibrecdocs.add_new_file(fullpath, doctype=path, never_fail=True)
                     ## Fulltext
                     if documenttype == "fulltext":
                         additionalformats = createRelatedFormats(fullpath)
                         if len(additionalformats) > 0:
                             for additionalformat in additionalformats:
-                                mybibdoc.add_file_new_format(additionalformat)
+                                try:
+                                    bibrecdocs.add_new_format(additionalformat)
+                                except InvenioWebSubmitFileError:
+                                    pass
                     ## Icon
                     elif documenttype == "picture":
                         iconpath = createIcon(fullpath, iconsize)
+                        docname = decompose_file(fullpath)[1]
+                        try:
+                            mybibdoc = bibrecdocs.get_bibdoc(docname)
+                        except InvenioWebSubmitFileError:
+                            mybibdoc = None
                         if iconpath is not None and mybibdoc is not None:
                             mybibdoc.add_icon(iconpath)
                             ## Save the new icon filename in a text file in curdir so that
