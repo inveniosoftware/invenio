@@ -849,7 +849,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         browser['p_pw'] = 'h123yde'
         browser.submit()
         # Mr. Hyde should not be able to connect:
-        if browser.response().read().find("You are not authorized") <= -1:
+        if browser.response().read().find("This collection is restricted.  If you think you have right to access it, please authenticate yourself.") <= -1:
             # if we got here, things are broken:
             self.fail("Oops, Mr.Hyde should not be able to search Theses collection.")
 
