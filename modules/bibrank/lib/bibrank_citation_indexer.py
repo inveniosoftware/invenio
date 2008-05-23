@@ -725,7 +725,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         done = done+1
         p = recs.replace("\"","")
         #search the publication string like Phys. Lett., B 482 (2000) 417 in 999C5s
-        rec_ids = list(search_unit(f=pubreftag, p=p))
+        rec_ids = list(search_unit(f=pubreftag, p=p, m='a'))
         if task_get_option('verbose') >= 9:
             write_message("These records match "+p+" in "+pubreftag+" : "+str(rec_ids))
         if rec_ids:
