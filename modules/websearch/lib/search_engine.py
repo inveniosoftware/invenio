@@ -3314,7 +3314,7 @@ def log_query(hostname, query_args, uid=-1):
     Return id_query or None in case of problems.
     """
     id_query = None
-    if uid > 0:
+    if uid >= 0:
         # log the query only if uid is reasonable
         res = run_sql("SELECT id FROM query WHERE urlargs=%s", (query_args,), 1)
         try:
