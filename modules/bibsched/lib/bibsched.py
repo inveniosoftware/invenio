@@ -479,7 +479,7 @@ class Manager:
         else:
             self.display_in_footer("Process status should be SCHEDULED or WAITING!")
 
-    def acknowledge():
+    def acknowledge(self):
         task_id = self.currentrow[0]
         status = self.currentrow[1]
         if status in ('ERROR', 'DONE WITH ERRORS'):
