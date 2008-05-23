@@ -1989,7 +1989,8 @@ def escape_field(value, mode=0):
                                 ['class']
         if mode == 5:
             allowed_attribute_whitelist += ['src', 'alt',
-                                            'width', 'height']
+                                            'width', 'height',
+                                            'style']
             allowed_tag_whitelist += ['img']
         return washer.wash(value,
                            allowed_attribute_whitelist=\
@@ -2004,7 +2005,8 @@ def escape_field(value, mode=0):
                                     ['class']
             if mode == 6:
                 allowed_attribute_whitelist += ['src', 'alt',
-                                                'width', 'height']
+                                                'width', 'height',
+                                                'style']
                 allowed_tag_whitelist += ['img']
             return washer.wash(value,
                                allowed_attribute_whitelist=\
