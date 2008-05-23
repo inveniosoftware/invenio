@@ -150,10 +150,11 @@ class BibRankExtCitesTest(unittest.TestCase):
 
     def test_intcite_via_publication_reference(self):
         """bibrank - external cites, no internal papers via publication reference"""
-        # FIXME: do we have an internal paper having only pubinfo, no
-        # repno, that is cited by some demo records via its pubinfo?
+        # The internal paper #18 has only pubinfo, no repno, and is
+        # cited by internal paper #96 via its pubinfo, so should not
+        # be present in the extcite list:
         test_case_repno = "Phys. Lett., B 151 (1985) 357"
-        test_case_repno_cited_by = [96]
+        test_case_repno_cited_by = []
         self.assertEqual(self._detect_extcite_info(test_case_repno),
                          test_case_repno_cited_by)
 
