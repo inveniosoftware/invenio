@@ -832,6 +832,7 @@ class BibSched:
                 #write_message("cannot run because %s is already scheduled" % self.scheduled)
                 return False
 
+            nothing_was_scheduled = self.scheduled is None
             if proc.startswith('bibupload'):
                 self.scheduled = task_id
 
@@ -846,7 +847,8 @@ class BibSched:
                 return False
 
             self.scheduled = task_id
-            Log("Task #%d (%s) scheduled for running" % (task_id, proc))
+            if nothing_was_scheduled:
+                Log("Task #%d (%s) scheduled for running" % (task_id, proc))
             #write_message('Scheduled task %s' % self.scheduled)
             ## Schedule the task for running.
 
@@ -943,7 +945,6 @@ class BibSched:
                             task_status = get_task_status(get_rows())
                         else:
                             break
-                write_message('PING!')
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
         except:
             register_exception(alert_admin=True)
