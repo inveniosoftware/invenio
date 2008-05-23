@@ -755,7 +755,7 @@ class BibSched:
 
     def tasks_safe_p(self, proc1, proc2):
         """Return True when the two tasks can run concurrently."""
-        return proc1 != proc2
+        return proc1 != proc2 and not proc1.startswith('bibupload') and not proc2.startswith('bibupload')
 
     def get_tasks_to_sleep_and_stop(self, proc, task_set):
         """Among the task_set, return the dict of task to stop and the dict
