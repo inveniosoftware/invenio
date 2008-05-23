@@ -396,20 +396,24 @@ class BibRecDocs:
                     raise e
         return bibdoc
 
-    def add_new_version(self, fullpath, docname, description=None, comment=None):
+    def add_new_version(self, fullpath, docname=None, description=None, comment=None):
         """Adds a new fullpath file to an already existent docid making the
         previous files associated with the same bibdocids obsolete.
         It returns the bibdoc object.
         """
+        if docname is None:
+            docname = decompose_file(fullpath)[1]
         bibdoc = self.get_bibdoc(docname=docname)
         bibdoc.add_file_new_version(fullpath, description, comment)
         return bibdoc
 
-    def add_new_format(self, fullpath, docname, description=None, comment=None):
+    def add_new_format(self, fullpath, docname=None, description=None, comment=None):
         """Adds a new format for a fullpath file to an already existent
         docid along side already there files.
         It returns the bibdoc object.
         """
+        if docname is None:
+            docname = decompose_file(fullpath)[1]
         bibdoc = self.get_bibdoc(docname=docname)
         bibdoc.add_file_new_format(fullpath, description, comment)
         return bibdoc
