@@ -832,6 +832,9 @@ class BibSched:
                 #write_message("cannot run because %s is already scheduled" % self.scheduled)
                 return False
 
+            if proc.startswith('bibupload'):
+                self.scheduled = task_id
+
             res = self.bibupload_in_the_queue(task_id, runtime)
             if res:
                 ## All bibupload must finish before.
@@ -936,7 +939,10 @@ class BibSched:
                 for row in rows:
                     if self.handle_row(task_status, *row):
                         ## Status has changed, let's updated it!
-                        task_status = get_task_status(get_rows())
+                        if self.scheduled is None:
+                            task_status = get_task_status(get_rows())
+                        else:
+                            break
                 write_message('PING!')
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
         except:
