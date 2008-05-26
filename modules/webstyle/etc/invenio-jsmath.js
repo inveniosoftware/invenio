@@ -119,7 +119,8 @@ jsMath.Easy = {
 
 jsMath.styles = {
   '.typeset .error': 'font-style: italic; color: black',
-  '#jsMath_button': 'display: none'
+  '#jsMath_button': 'display: none',
+  '#jsMath_message': 'display: none'
 };
 
 jsMath.Parse = function (s,font,size,style) {
