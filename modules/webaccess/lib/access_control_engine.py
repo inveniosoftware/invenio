@@ -258,9 +258,9 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
                 if user_info.has_key('uri'):
-                    return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, arguments, user_info.get('referer', None))))
+                    return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, arguments, user_info['uri'])))
                 else:
-                    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, arguments, user_info.get('referer', None))))
+                    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, arguments)))
 
         # 3.2
         if optional == 'yes':
@@ -290,9 +290,9 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                     if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(id_accROLE[0])):
                         return (0, CFG_WEBACCESS_WARNING_MSGS[0])
                 if user_info.has_key('uri'):
-                    return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, arguments, user_info.get('referer', None))))
+                    return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, arguments, user_info['uri'])))
                 else:
-                    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, arguments, user_info.get('referer', None))))
+                    return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, arguments)))
 
         # none of the zeroargs tests succeded
         if verbose: print ' - not authorization without arguments'
@@ -359,9 +359,9 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 res5.append(row)
         if not res5:
             if user_info.has_key('uri'):
-                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, arguments, user_info.get('referer', None))))
+                return (1, "%s %s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or ""), make_apache_message(name_action, arguments, user_info['uri'])))
             else:
-                return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, arguments, user_info.get('referer', None))))
+                return (1, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[1], make_apache_message(name_action, arguments)))
 
     res5.sort()
 
