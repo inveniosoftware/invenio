@@ -31,7 +31,7 @@ from urlparse import urlparse
 from cgi import parse_qs, escape
 
 try:
-    from mod_python import apache
+    from mod_python import apache, util
 except ImportError:
     pass
 
@@ -102,7 +102,7 @@ def redirect_to_url(req, url):
         ## It's important not to loose the cookie of the user, in particular
         ## when it has just been set for the first time.
         req.err_headers_out.add('Set-Cookie', req.headers_out['Set-Cookie'])
-    raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
+    util.redirect(req, url)
 
 def get_client_ip_address(req):
     """ Returns IP address as string from an apache request. """
