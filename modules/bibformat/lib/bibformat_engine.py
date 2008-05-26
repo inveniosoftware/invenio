@@ -70,6 +70,7 @@ from invenio.htmlutils import \
      cfg_html_buffer_allowed_tag_whitelist, \
      cfg_html_buffer_allowed_attribute_whitelist
 from invenio.webuser import collect_user_info
+from HTMLParser import HTMLParseError
 
 if CFG_PATH_PHP: #Remove when call_old_bibformat is removed
     from xml.dom import minidom
@@ -1992,12 +1993,16 @@ def escape_field(value, mode=0):
                                             'width', 'height',
                                             'style']
             allowed_tag_whitelist += ['img']
-        return washer.wash(value,
-                           allowed_attribute_whitelist=\
-                           allowed_attribute_whitelist,
-                           allowed_tag_whitelist= \
-                           allowed_tag_whitelist
-                           )
+        try:
+            return washer.wash(value,
+                               allowed_attribute_whitelist=\
+                               allowed_attribute_whitelist,
+                               allowed_tag_whitelist= \
+                               allowed_tag_whitelist
+                               )
+        except HTMLParseError:
+            # Parsing failed
+            return cgi.escape(value)
     elif mode in [3, 6]:
         if value.lstrip(' \n').startswith(html_field):
             allowed_attribute_whitelist = cfg_html_buffer_allowed_attribute_whitelist
@@ -2008,19 +2013,27 @@ def escape_field(value, mode=0):
                                                 'width', 'height',
                                                 'style']
                 allowed_tag_whitelist += ['img']
-            return washer.wash(value,
-                               allowed_attribute_whitelist=\
-                               allowed_attribute_whitelist,
-                               allowed_tag_whitelist=\
-                               allowed_tag_whitelist
-                               )
+            try:
+                return washer.wash(value,
+                                   allowed_attribute_whitelist=\
+                                   allowed_attribute_whitelist,
+                                   allowed_tag_whitelist=\
+                                   allowed_tag_whitelist
+                                   )
+            except HTMLParseError:
+                # Parsing failed
+                return cgi.escape(value)
         else:
             return cgi.escape(value)
     elif mode == 4:
-        return washer.wash(value,
-                           allowed_attribute_whitelist=[],
-                           allowed_tag_whitelist=[]
-                           )
+        try:
+            return washer.wash(value,
+                               allowed_attribute_whitelist=[],
+                               allowed_tag_whitelist=[]
+                               )
+        except HTMLParseError:
+            # Parsing failed
+            return cgi.escape(value)
     else:
         return value
 
