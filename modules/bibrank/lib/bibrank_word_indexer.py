@@ -1124,7 +1124,7 @@ def update_rnkWORD(table, terms):
                     Nj[j] += 1
                 run_sql("UPDATE %sR SET termlist=%%s WHERE id_bibrec=%%s" % table[:-1],
                         (serialize_via_marshal(doc_terms), j))
-            except ZeroDivisionError, e:
+            except (ZeroDivisionError, OverflowError), e:
                 ## This is to try to isolate division by zero errors.
                 register_exception(prefix="Error when analysing the record %s (%s): %s\n" % (j, repr(docs_terms), e), alert_admin=True)
         write_message("Phase 4: ......processed %s/%s records" % ((i+5000>len(records) and len(records) or (i+5000)), len(records)))
