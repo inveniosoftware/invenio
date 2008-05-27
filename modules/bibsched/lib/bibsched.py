@@ -911,7 +911,7 @@ class BibSched:
     def watch_loop(self):
         def get_rows():
             """Return all the rows to work on."""
-            return run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE%%' AND status NOT LIKE '%%DELETED%%' AND runtime<=NOW() ORDER BY priority DESC, runtime ASC, id ASC")
+            return run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE%%' AND status NOT LIKE '%%DELETED%%' AND (runtime<=NOW() OR status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='SCHEDULED') ORDER BY priority DESC, runtime ASC, id ASC")
 
         def get_task_status(rows):
             """Return a handy data structure to analize the task status."""
