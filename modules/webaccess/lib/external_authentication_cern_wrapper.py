@@ -58,7 +58,7 @@ class AuthCernWrapper:
         self._headers = {"Content-type": "application/x-www-form-urlencoded",
                    "Accept": "text/plain",
                    "Authorization": "Basic " + _cern_nice_soap_auth}
-        self.conn = None
+        self._conn = None
 
     def __del__(self):
         """Close the CERN Nice webservice connection."""
