@@ -45,14 +45,14 @@ def run_shell_command(cmd):
                                                  file_cmd_out,
                                                  file_cmd_err))
     if os.path.exists(file_cmd_out):
-        cmd_out_fd = open(file_cmd_out)
-        cmd_out = cmd_out_fd.read()
-        cmd_out_fd.close()
+        cmd_out_fo = open(file_cmd_out)
+        cmd_out = cmd_out_fo.read()
+        cmd_out_fo.close()
         os.remove(file_cmd_out)
     if os.path.exists(file_cmd_err):
-        cmd_err_fd = open(file_cmd_err)
-        cmd_err = cmd_err_fd.read()
-        cmd_err_fd.close()
+        cmd_err_fo = open(file_cmd_err)
+        cmd_err = cmd_err_fo.read()
+        cmd_err_fo.close()
         os.remove(file_cmd_err)
     os.close(cmd_out_fd)
     os.close(cmd_err_fd)
