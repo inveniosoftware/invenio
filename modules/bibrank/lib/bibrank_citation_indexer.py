@@ -34,8 +34,8 @@ from invenio.dbquery import run_sql, serialize_via_marshal, \
 from invenio.search_engine import print_record, search_pattern, get_fieldvalues, \
                            search_unit
 from invenio.bibformat_utils import parse_tag
-from invenio.bibtask import write_message, task_get_option, task_update_progress, \
-                            task_sleep_now_if_required
+from invenio.bibtask import write_message, task_get_option, task_update_progress, task_sleep_now_if_required, task_get_task_param
+from invenio.bibrecord import create_records
 
 NO_AUTHOR_CITES = 1
 #a config param to turn off self citation searching
@@ -284,7 +284,7 @@ def get_citation_informations(recid_list, config):
     except:
         pass
 
-    write_message("publication_format_string is "+publication_format_string,verbose=9)
+    write_message("publication_format_string is "+publication_format_string, verbose=9)
     done = 0 #for status reporting
     numrecs = len(recid_list)
     for recid in recid_list:
@@ -555,8 +555,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
        #of type: {77: ['Nucl. Phys. B 72 (1974) 461','blah blah'], 93: ['..'], ..}
     d_records_s = citation_informations[3]
     t1 = os.times()[4]
-    if task_get_option('verbose') >= 1:
-        write_message("Phase 1: d_references_report_numbers")
+    write_message("Phase 1: d_references_report_numbers")
     #d_references_report_numbers: e.g 8 -> ([astro-ph/9889],[hep-ph/768])
     #meaning: rec 8 contains these in bibliography
 
@@ -624,8 +623,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     t2 = os.times()[4]
 
     #try to find references based on 999C5s, like Phys.Rev.Lett. 53 (1986) 2285
-    if task_get_option('verbose') >= 1:
-        write_message("Phase 2: d_references_s")
+    write_message("Phase 2: d_references_s")
     done = 0
     numrecs = len(d_references_s)
     for recid, refss in d_references_s.iteritems():
@@ -648,8 +646,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 if matches and matches[0]:
                     p = matches[0][0]
                 rec_id = list(search_unit(p, 'journal'))
-                if task_get_option('verbose') >= 9:
-                    write_message("These match searching "+p+" in journal: "+str(rec_id))
+                write_message("These match searching "+p+" in journal: "+str(rec_id), verbose=9)
                 if rec_id and rec_id[0]:
                     #the refered publication is in our collection, remove
                     #from missing
@@ -680,8 +677,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     t3 = os.times()[4]
     done = 0
     numrecs = len(d_reports_numbers)
-    if task_get_option('verbose') >= 1:
-        write_message("Phase 3: d_reports_numbers")
+    write_message("Phase 3: d_reports_numbers")
 
     #search for stuff like CERN-TH-4859/87 in list of refs
     for rec_id, recnumbers in d_reports_numbers.iteritems():
@@ -712,8 +708,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     task_update_progress(mesg)
 
     #find this record's pubinfo in other records' bibliography
-    if task_get_option('verbose') >= 1:
-        write_message("Phase 4: d_records_s")
+    write_message("Phase 4: d_records_s")
     done = 0
     numrecs = len(d_records_s)
     t4 = os.times()[4]
@@ -726,8 +721,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         p = recs.replace("\"","")
         #search the publication string like Phys. Lett., B 482 (2000) 417 in 999C5s
         rec_ids = list(search_unit(f=pubreftag, p=p, m='a'))
-        if task_get_option('verbose') >= 9:
-            write_message("These records match "+p+" in "+pubreftag+" : "+str(rec_ids))
+        write_message("These records match "+p+" in "+pubreftag+" : "+str(rec_ids), verbose=9)
         if rec_ids:
             for rec_id in rec_ids:
                 if not citation_list.has_key(recid):
@@ -745,8 +739,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     write_message(mesg)
     task_update_progress(mesg)
 
-    if task_get_option('verbose') >= 1:
-        write_message("Phase 5: reverse lists")
+    write_message("Phase 5: reverse lists")
 
     #remove empty lists in citation and reference
     keys = citation_list.keys()
@@ -759,8 +752,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         if not reference_list[k]:
             del reference_list[k]
 
-    if task_get_option('verbose') >= 1:
-        write_message("Phase 6: self-citations")
+    write_message("Phase 6: self-citations")
     selfdic = {}
     #get the initial self citation dict
     initial_self_dict = get_cit_dict("selfcitdict")
@@ -787,9 +779,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 tmplist = [k]
             selfcitedbydic[v] = tmplist
 
-    if task_get_option('verbose') >= 1:
-        write_message("Getting author citations")
-
+    write_message("Getting author citations")
 
     #get author citations for records in updated_rec_list
     initial_author_dict = get_initial_author_dict()
@@ -801,7 +791,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                                         initial_author_dict, config)
 
 
-    if task_get_option('verbose') >= 3:
+    if task_get_task_param('verbose') >= 3:
         #print only X first to prevent flood
         tmpdict = {}
         tmp = citation_list.keys()[0:10]
