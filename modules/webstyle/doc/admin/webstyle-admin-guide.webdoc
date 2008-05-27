@@ -136,9 +136,11 @@ If you want to force the cache of the pages, use the WebDoc CLI
 CDS Invenio templating system that uses a notion of a template skin.
 How this works?</p>
 
-<p>During the compile time, when you edit <code>config.py</code>, you
-may choose to use your own templates instead of the provided default
-ones by editing
+<p>When you edit <code>invenio-local.conf</code> during installation
+or later during runtime (when during runtime, you have to
+run <code>inveniocfg --update-config-py</code> after editing the conf
+file), you may choose to use your own templates instead of the
+provided default ones by editing
 <code>CFG_WEBSTYLE_TEMPLATE_SKIN</code> variable.  Let us say you
 put <code>ithaca</code> there in order to use your
 own <code>ithaca</code> style.  Now, when you start Apache, then
