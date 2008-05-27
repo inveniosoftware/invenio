@@ -23,10 +23,11 @@ __revision__ = "$Id$"
 from invenio.bibdocfile import BibRecDocs, decompose_file, InvenioWebSubmitFileError
 import os
 import re
+from invenio.websubmit_icon_creator import create_icon, InvenioWebSubmitIconCreatorError
 from invenio.websubmit_config import InvenioWebSubmitFunctionWarning
 from invenio.websubmit_functions.Shared_Functions import get_dictionary_from_string, \
-     createRelatedFormats, \
-     createIcon
+     createRelatedFormats
+from invenio.errorlib import register_exception
 
 def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
     """
@@ -125,7 +126,19 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                                     pass
                     ## Icon
                     elif documenttype == "picture":
-                        iconpath = createIcon(fullpath, iconsize)
+                        try:
+                            iconpath, iconname = create_icon({
+                                'input-file' : fullpath,
+                                'icon-scale' : iconsize,
+                                'icon-name' : None,
+                                'icon-file-format' : None,
+                                'multipage-icon' : False,
+                                'multipage-icon-delay' : 100,
+                                'verbosity' : 0,
+                            })
+                        except InvenioWebSubmitIconCreatorError, e:
+                            register_exception(prefix='Impossible to create icon for %s' % fullpath, alert_admin=True)
+                        iconpath = os.path.join(iconpath, iconname)
                         docname = decompose_file(fullpath)[1]
                         try:
                             mybibdoc = bibrecdocs.get_bibdoc(docname)
