@@ -185,7 +185,7 @@ def save_xml_record(recid):
     file_temp = open("%s.xml" % file_path, 'w')
     file_temp.write(record_xml_output(get_temp_record("%s.tmp" % file_path)[1]))
     file_temp.close()
-    task_low_level_submission('bibupload', 'bibedit', '-r', '%s.xml' % file_path)
+    task_low_level_submission('bibupload', 'bibedit', '-P', '5', '-r', '%s.xml' % file_path)
     os.system("rm %s.tmp" % file_path)
 
 def save_temp_record(record, uid, file_path):
