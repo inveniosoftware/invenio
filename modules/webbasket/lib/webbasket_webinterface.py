@@ -806,16 +806,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                         argd['order'],
                                         argd['asc'], argd['ln'])
 
-        if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
-                    CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/list_public_baskets%s" % (
-                        CFG_SITE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
-
         return page(title = _("List of public baskets"),
                     body        = body,
                     navtrail    = '',

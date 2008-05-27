@@ -50,6 +50,8 @@ class WebBasketWebPagesAvailabilityTest(unittest.TestCase):
                 error_messages.extend(test_web_page_content(url))
         for url in [baseurl + page for page in _exports]:
             error_messages.extend(test_web_page_content(url, username='jekyll', password='j123ekyll'))
+        for url in [baseurl + page for page in ['list_public_baskets', 'display_public']]:
+            error_messages.extend(test_web_page_content(url))
         if error_messages:
             self.fail(merge_error_messages(error_messages))
         return
