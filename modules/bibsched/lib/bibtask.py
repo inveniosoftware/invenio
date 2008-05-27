@@ -185,10 +185,6 @@ def task_init(
     write_message('argv=%s' % (argv, ), verbose=9)
     write_message('_options=%s' % (_options, ), verbose=9)
     write_message('_task_params=%s' % (_task_params, ), verbose=9)
-    #fix for bug: verbose level not going in tasks
-    if _task_params.has_key("verbose"):
-        v = _task_params['verbose']
-        _options['verbose'] = v
 
     if to_be_submitted:
         _task_submit(argv, authorization_action, authorization_msg)
