@@ -58,7 +58,7 @@ fmt            = "hb"                         # default format to be processed
 ### run the bibreformat task bibsched scheduled
 ###
 
-def bibreformat_task(sql, sql_queries, cds_query, process_format):
+def bibreformat_task(sql, sql_queries, cds_query, process_format, recids):
     """
     BibReformat main task
     """
@@ -74,7 +74,7 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format):
         write_message("Querying database for records without cache...")
         without_format = without_fmt(sql)
 
-    recIDs = []
+    recIDs = recids
 
     if cds_query['field']      != "" or  \
        cds_query['collection'] != "" or  \
@@ -475,10 +475,20 @@ def task_run_core():
     else:
         cds_query['matching']      = ""
 
+    recids = []
+    if task_has_option("recids"):
+        for recid in task_get_option('recids').split(','):
+            if ":" in recid:
+                start = int(recid.split(':')[0])
+                end = int(recid.split(':')[1])
+                recids.extend(range(start, end))
+            else:
+                recids.append(int(recid))
+
 ### sql commands to be executed during the script run
 ###
 
-    bibreformat_task(sql, sql_queries, cds_query, process_format)
+    bibreformat_task(sql, sql_queries, cds_query, process_format, recids)
 
     return True
 
@@ -513,6 +523,10 @@ Examples:
   bibreformat -c 'Photos'        Force reformatting all records in 'Photos' collection (in HB).
   bibreformat -c 'Photos' -o HD  Force reformatting all records in 'Photos' collection in HD.
 
+  bibreformat -i 15              Force reformatting record 15 (in HB).
+  bibreformat -i 15:20           Force reformatting records 15 to 20 (in HB).
+  bibreformat -i 15,16,17        Force reformatting records 15, 16 and 17 (in HB).
+
   bibreformat -n                 Show how many records are to be (re)formatted.
   bibreformat -n -c 'Articles'   Show how many records are to be (re)formatted in 'Articles' collection.
 
@@ -524,19 +538,21 @@ Reformatting options:
   -c,  --collection     \t Force reformatting records by collection
   -f,  --field          \t Force reformatting records by field
   -p,  --pattern        \t Force reformatting records by pattern
+  -i,  --id             \t Force reformatting records by record id(s)
 Pattern options:
   -m,  --matching       \t Specify if pattern is exact (e), regular expression (r),
                         \t partial (p), any of the words (o) or all of the words (a)
 """,
             version=__revision__,
-            specific_params=("ac:f:p:lo:nm:",
+            specific_params=("ac:f:p:lo:nm:i:",
                 ["all",
-                "collection=",
-                "matching=",
-                "field=",
-                "pattern=",
-                "format=",
-                "noprocess"]),
+                 "collection=",
+                 "matching=",
+                 "field=",
+                 "pattern=",
+                 "format=",
+                 "noprocess",
+                 "id="]),
             task_submit_check_options_fnc=task_submit_check_options,
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
@@ -545,7 +561,7 @@ def task_submit_check_options():
     """Last checks and updating on the options..."""
     if not (task_has_option('all') or task_has_option('collection') \
             or task_has_option('field') or task_has_option('pattern') \
-            or task_has_option('matching')):
+            or task_has_option('matching') or task_has_option('recids')):
         task_set_option('without', 1)
         task_set_option('last', 1)
     return True
@@ -567,6 +583,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option("matching", value)
     elif key in ("-o","--format"):
         task_set_option("format", value)
+    elif key in ("-i","--id"):
+        task_set_option("recids", value)
     else:
         return False
     return True
