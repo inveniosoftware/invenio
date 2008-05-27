@@ -42,8 +42,13 @@ import zlib
 from invenio import bibformat_dblayer
 from invenio import bibformat_engine
 from invenio import bibformat_utils
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_PATH_PHP
-from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
+from invenio.config import \
+     CFG_SITE_LANG, \
+     CFG_SITE_URL, \
+     CFG_PATH_PHP
+from invenio.bibformat_config import \
+     CFG_BIBFORMAT_USE_OLD_BIBFORMAT, \
+     CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT
 try:
     import invenio.template
     websearch_templates = invenio.template.load('websearch')
@@ -98,7 +103,8 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=[],
     ############################# END ##################################
 
     if not on_the_fly and \
-       (ln==CFG_SITE_LANG or CFG_BIBFORMAT_USE_OLD_BIBFORMAT):
+       (ln==CFG_SITE_LANG or CFG_BIBFORMAT_USE_OLD_BIBFORMAT or \
+        CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT == False):
 	# Try to fetch preformatted record
         # Only possible for records formatted in CFG_SITE_LANG language (other are never stored)
         res = bibformat_dblayer.get_preformatted_record(recID, of)
