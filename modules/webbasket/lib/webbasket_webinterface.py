@@ -743,16 +743,6 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             return page_not_authorized(req, "../yourbaskets/display_public",
                                        navmenuid = 'yourbaskets')
 
-        if isGuestUser(uid):
-            if not CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS:
-                return redirect_to_url(req, "%s/youraccount/login%s" % (
-                    CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s/yourbaskets/display_public%s" % (
-                        CFG_SITE_URL,
-                        make_canonical_urlargd(argd, {})),
-                    "ln" : argd['ln']}, {})))
-
         if argd['bskid'] == 0:
             # No given basket => display list of public baskets
             (body, errors, warnings) = perform_request_list_public_baskets(
