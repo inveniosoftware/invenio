@@ -805,7 +805,7 @@ class BibSched:
     def bibupload_in_the_queue(self, task_id, runtime):
         """Check if bibupload is scheduled/running before runtime.
         This is useful in order to enforce bibupload order."""
-        return run_sql("SELECT id, status FROM schTASK WHERE proc='bibupload' AND runtime<=%s AND id<%s AND (status='RUNNING' OR status='WAITING' OR status='CONTINUING' OR  status='SLEEPING' OR status='SCHEDULED' OR status='SLEEP' OR status='STOPPING' OR status='STOP' OR status='STOPPED' OR status='ERROR')", (runtime, task_id))
+        return run_sql("SELECT id, status FROM schTASK WHERE proc='bibupload' AND runtime<=%s AND id<%s AND (status='RUNNING' OR status='WAITING' OR status='CONTINUING' OR  status='SLEEPING' OR status='SCHEDULED' OR status='ABOUT TO SLEEP' OR status='ABOUT TO STOP' OR status='ERROR')", (runtime, task_id))
 
     def task_really_running_p(self, proc, task_id):
         """Ping the task and update its status to error if necessary."""
@@ -911,7 +911,7 @@ class BibSched:
     def watch_loop(self):
         def get_rows():
             """Return all the rows to work on."""
-            return run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE%%' AND status NOT LIKE '%%DELETED%%' AND runtime<=NOW() ORDER BY priority DESC, runtime ASC")
+            return run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE%%' AND status NOT LIKE '%%DELETED%%' AND runtime<=NOW() ORDER BY priority DESC, runtime ASC, id ASC")
 
         def get_task_status(rows):
             """Return a handy data structure to analize the task status."""
@@ -940,11 +940,8 @@ class BibSched:
                     raise StandardError('BibSched had to halt because at least a task is in status ERROR: %s' % task_status['ERROR'])
                 for row in rows:
                     if self.handle_row(task_status, *row):
-                        ## Status has changed, let's updated it!
-                        if self.scheduled is None:
-                            task_status = get_task_status(get_rows())
-                        else:
-                            break
+                        # Things have changed let's restart
+                        break
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
         except:
             register_exception(alert_admin=True)
