@@ -37,6 +37,7 @@ try:
         'dutch' : 'nl',
         'english' : 'en',
         'finnish' : 'fi',
+        'french' : 'fr',
         'german' : 'de',
         'italian' : 'it',
         'norwegian' : 'no',
