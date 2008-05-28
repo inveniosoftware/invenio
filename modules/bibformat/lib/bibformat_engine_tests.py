@@ -490,6 +490,96 @@ class PatternTest(unittest.TestCase):
         result = bibformat_engine.pattern_format_element_seealso.search(text)
         self.assertEqual(result.group('see').strip(), 'seethis, seethat')
 
+class EscapingAndWashingTest(unittest.TestCase):
+    """ bibformat - test escaping and washing metadata"""
+
+    def test_escaping(self):
+        """ bibformat - tests escaping HTML characters"""
+
+        text = "Is 5 < 6 ? For sure! And what about True && False == True?"
+        result = bibformat_engine.escape_field(text, mode=0)
+        self.assertEqual(result, text)
+
+        result = bibformat_engine.escape_field(text, mode=1)
+        self.assertEqual(result, 'Is 5 &lt; 6 ? For sure! And what about True &amp;&amp; False == True?')
+
+    def test_washing(self):
+        """ bibformat - test washing HTML tags"""
+
+        text = '''Hi dude, <br>, <strong>please login</strong>:<br/>
+        <a onclick="http://www.mycrappywebsite.com" href="login.html">login here</a></a><SCRIPT>alert("XSS");</SCRIPT>'''
+
+        # Keep only basic tags
+        result = bibformat_engine.escape_field(text, mode=2)
+        self.assert_('script' not in result.lower())
+        self.assert_('onclick' not in result.lower())
+        self.assert_('mycrappywebsite' not in result.lower())
+        self.assert_('<br>' in result.lower())
+        self.assert_('<br/>' in result.lower().replace(' ', ''))
+
+        # Keep only basic tags only if value starts with <!--HTML-->
+        # directive. Otherwise escape (which is the case here)
+        result = bibformat_engine.escape_field(text, mode=3)
+        self.assert_('<script' not in result.lower())
+        self.assert_('<' not in result.lower())
+
+        result = bibformat_engine.escape_field(text, mode=5)
+        self.assert_('<script' not in result.lower())
+        self.assert_('<br' in result.lower())
+
+        # Remove all HTML tags
+        result = bibformat_engine.escape_field(text, mode=4)
+        self.assert_('script' not in result.lower())
+        self.assert_('onclick' not in result.lower())
+        self.assert_('mycrappywebsite' not in result.lower())
+        self.assert_('strong' not in result.lower())
+        self.assert_('<br>' not in result.lower())
+        self.assert_('<br/>' not in result.lower().replace(' ', ''))
+        self.assert_('login here' in result.lower())
+
+        # Keep basic tags + some others (like <img>)
+        result = bibformat_engine.escape_field(text, mode=5)
+        self.assert_('script' not in result.lower())
+        self.assert_('onclick' not in result.lower())
+        self.assert_('mycrappywebsite' not in result.lower())
+        self.assert_('<br' in result.lower())
+        self.assert_('login here' in result.lower())
+
+        text2 = text + ' <img src="loginicon" alt="login icon"/>'
+        result = bibformat_engine.escape_field(text2, mode=5)
+        self.assert_('<img' in result.lower())
+        self.assert_('src=' in result.lower())
+        self.assert_('alt="login icon"' in result.lower())
+
+        # Keep some tags only if value starts with <!--HTML-->
+        # directive. Otherwise escape (which is the case here)
+        result = bibformat_engine.escape_field(text, mode=6)
+        self.assert_('<script' not in result.lower())
+        self.assert_('<' not in result.lower())
+
+        result = bibformat_engine.escape_field('<!--HTML-->'+text, mode=6)
+        self.assert_('<script' not in result.lower())
+        self.assert_('<br>' in result.lower())
+        self.assert_('mycrappywebsite' not in result.lower())
+
+        # When the value cannot be parsed by our not so smart parser,
+        # just escape everything
+        text3 = """Ok, let't try with something unparsable < hehe <a onclick="http://www.mycrappywebsite.com" href="login.html">login</a>"""
+        result = bibformat_engine.escape_field(text3, mode=2)
+        self.assert_('mycrappywebsite' not in result.lower() or \
+                     '<a' not in result.lower())
+
+        result = bibformat_engine.escape_field(text3, mode=3)
+        self.assert_('<a' not in result.lower())
+
+        result = bibformat_engine.escape_field(text3, mode=5)
+        self.assert_('mycrappywebsite' not in result.lower() or \
+                     '<a' not in result.lower())
+
+        result = bibformat_engine.escape_field(text3, mode=6)
+        self.assert_('<a' not in result.lower())
+
+
 class MiscTest(unittest.TestCase):
     """ bibformat - tests on various functions"""
 
@@ -709,7 +799,8 @@ TEST_SUITE = make_test_suite(FormatTemplateTest,
                              FormatElementTest,
                              PatternTest,
                              MiscTest,
-                             FormatTest,)
+                             FormatTest,
+                             EscapingAndWashingTest)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)
