@@ -108,9 +108,9 @@ class RecordHTMLParser(HTMLParser):
             self.result += data
 
     def handle_comment(self, data):
-        if 'START_DO_NOT_DISPLAY_IN_TEXTUAL_FORMAT' == data.upper().strip():
+        if 'START_NOT_FOR_TEXT' == data.upper().strip():
             self.silent = True
-        elif 'END_DO_NOT_DISPLAY_IN_TEXTUAL_FORMAT' == data.upper().strip():
+        elif 'END_NOT_FOR_TEXT' == data.upper().strip():
             self.silent = False
 
 
