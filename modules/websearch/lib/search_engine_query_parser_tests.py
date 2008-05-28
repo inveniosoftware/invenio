@@ -140,64 +140,65 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
         self.assertEqual(parser.parse_query('-"expr1" - (expr2)'),
                          ['-', '"expr1"', '-', 'expr2'])
 
-
-
 class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
     """Test parsing of SPIRES data---note these test cases are written against atlantis
     and use perform_request_search which then loads the parser
     """
 
-    def _compare_searches(self, inv_search, spi_search):
+    def _compare_searches(self, invenio_search_query, spires_search_query):
         """Compare inv_search and spi_search for equivalence
         tests that a non-trivial result is found, that the hitsets are equal
         prints a message if both queries are parsed identically (a bonus...)
         """
-        self.assert_(len(perform_request_search(p=spi_search))>0)
-        self.assertEqual(perform_request_search(p=inv_search), \
-                         perform_request_search(p=spi_search))
+
+        invenio_search_result = perform_request_search(p=invenio_search_query)
+        spires_search_result = perform_request_search(p=spires_search_query)
+
+        self.assert_(len(spires_search_result)>0)
+        self.assertEqual(invenio_search_result, spires_search_result)
 
         #test operator searching
     def test_operators(self):
         """SPIRES search syntax - find a ellis and t colllisions"""
-        inv_search = "author:ellis and title:collisions"
-        spi_search = "find a ellis and t collisions"
-        self._compare_searches(inv_search, spi_search)
+        invenio_search = "author:ellis and title:collisions"
+        spires_search = "find a ellis and t collisions"
+        self._compare_searches(invenio_search, spires_search)
 
     def test_parens(self):
         """SPIRES search syntax - find a ellis and not t hadronic and not t collisions"""
-        inv_search = "author:ellis and not (title:hadronic or title:collisions)"
-        spi_search = "find a ellis and not t hadronic and not t collisions "
-        self._compare_searches(inv_search, spi_search)
+        invenio_search = "author:ellis and not (title:hadronic or title:collisions)"
+        spires_search = "find a ellis and not t hadronic and not t collisions "
+        self._compare_searches(invenio_search, spires_search)
 
     def test_author_simple(self):
         """SPIRES search syntax - find a ellis, j"""
-        inv_search = 'author:"ellis,j." or author:"ellis,j*"'
-        spi_search = "find a ellis, j"
-        self._compare_searches(inv_search, spi_search)
+        invenio_search = 'author:"ellis, j*"'
+        spires_search = 'find a ellis, j'
+        self._compare_searches(invenio_search, spires_search)
 
     def test_author_reverse(self):
         """SPIRES search syntax - find a j ellis"""
-        inv_search = 'author"ellis, j" or author:"ellis,j*"'
-        spi_search = "find a j ellis"
-        self._compare_searches(inv_search, spi_search)
+        invenio_search = 'author:"ellis, j*"'
+        spires_search = 'find a j ellis'
+        self._compare_searches(invenio_search, spires_search)
 
     def test_author_full_first(self):
         """SPIRES search syntax - find a ellis, john"""
-        inv_search = "author:'ellis, john' or author:'ellis, j.' or author:'ellis, jo.'"
-        spi_search = "find a ellis, john"
-        self._compare_searches(inv_search, spi_search)
+        invenio_search = 'author:"ellis, john" or author:"ellis, j" or author:"ellis, jo"'
+        spires_search = 'find a ellis, john'
+        self._compare_searches(invenio_search, spires_search)
 
     def test_date(self):
         """SPIRES search syntax - find date 1996"""
-        inv_search = "date:1996"
-        spi_search = "find date 1996"
-        self._compare_searches(inv_search, spi_search)
+        invenio_search = "date:1996"
+        spires_search = "find date 1996"
+        self._compare_searches(invenio_search, spires_search)
 
     def test_month(self):
         """SPIRES search syntax - find date 3/1996"""
-        inv_search = "date:'3/1996'"
-        spi_search = "find date 3/1996"
-        self._compare_searches(inv_search, spi_search)
+        invenio_search = "date:'3/1996'"
+        spires_search = "find date 3/1996"
+        self._compare_searches(invenio_search, spires_search)
 
 TEST_SUITE = make_test_suite(TestSearchQueryParenthesisedParser, \
                              TestSpiresToInvenioSyntaxConverter)

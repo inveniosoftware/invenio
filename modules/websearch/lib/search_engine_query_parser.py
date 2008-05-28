@@ -27,6 +27,7 @@ __lastupdated__ = """$Date$"""
 __revision__ = "$Id$"
 
 import re
+from invenio.config import CFG_INSPIRE_SITE
 
 class SearchQueryParenthesisedParser:
     """Parse search queries containing parenthesis.
@@ -533,11 +534,15 @@ class SpiresToInvenioSyntaxConverter:
         # of changing them, correct also the code in this method
         self._re_author_match = re.compile(
                                      # author:ellis, jacqueline
-                                     r'\bauthor:\s*(?P<surname1>\w+),\s*(?P<name1>\w{2,})\b' + '|' + \
+                                     r'\bauthor:\s*(?P<surname1>\w+),\s*(?P<name1>\w{3,})\b(?= and | or | not |$)' + '|' + \
                                      # author:jacqueline ellis
-                                     r'\bauthor:\s*(?P<name2>\w+)\s+(?!and |or |not )(?P<surname2>\w+)\b' + '|' +\
+                                     r'\bauthor:\s*(?P<name2>\w+)\s+(?!and |or |not )(?P<surname2>\w+)\b(?= and | or | not |$)' + '|' +\
                                      # author:ellis, j.
-                                     r'\bauthor:\s*(?P<surname3>\w+),\s*(?P<initial>\w)\.?\b',
+                                     r'\bauthor:\s*(?P<surname3>\w+),\s*(?P<name3>\w{1,2})\b\.?(?= and | or | not |$)' + '|' +\
+                                     # author: ellis, j. r.
+                                     r'\bauthor:\s*(?P<surname4>\w+),\s*(?P<name4>\w+)\b\.?\s+(?!and |or |not )(?P<middle_name4>\w+)\b\.?' + '|' +\
+                                     # author j. r. ellis
+                                     r'\bauthor:\s*(?P<name5>\w+)\b\.?\s+(?!and |or |not )(?P<middle_name5>\w+)\b\.?\s+(?!and |or |not )(?P<surname5>\w+)\b\.?',
                                      re.IGNORECASE)
 
         # regular expression that matches exact author patterns
@@ -546,6 +551,21 @@ class SpiresToInvenioSyntaxConverter:
         # in case of changes correct also the code in this method
         self._re_exact_author_match = re.compile(r'\bexactauthor:(?P<author_name>.*?\b)(?= and | or | not |$)', re.IGNORECASE)
 
+        # regular expression that matches search term, its conent (words that
+        # are searched)and the operator preceding the term. In case that the
+        # names of the groups defined in the expression are changed, the
+        # chagned should be reflected in the code that use it.
+        self._re_search_term_pattern_match = re.compile(r'\b(?P<combine_operator>find|and|or|not)\s+(?P<search_term>title:|keyword:)(?P<search_content>.*?\b)(?= and | or | not |$)', re.IGNORECASE)
+
+        # regular expression used to split string by white space as separator
+        self._re_split_pattern = re.compile(r'\s*')
+
+        # regular expression matching date after pattern
+        self._re_date_after_match = re.compile(r'\b(d|date)\b\s*(after|>)\s*(?P<year>\d{4})\b', re.IGNORECASE)
+
+        # regular expression matching date after pattern
+        self._re_date_before_match = re.compile(r'\b(d|date)\b\s*(before|<)\s*(?P<year>\d{4})\b', re.IGNORECASE)
+
     def convertQuery(self, query):
         """Converts the query from SPIRES syntax to Invenio syntax
 
@@ -553,6 +573,12 @@ class SpiresToInvenioSyntaxConverter:
 
         # assume that only queries starting with FIND are SPIRES queries
         if query.lower().startswith("find "):
+            # these calls are before keywords replacement becuase when keywords
+            # are replaced, date keyword is replaced by specific field search
+            # and the DATE keyword is not match in DATE BEFORE or DATE AFTER
+            query = self._convert_spires_date_before_to_invenio_span_query(query)
+            query = self._convert_spires_date_after_to_invenio_span_query(query)
+
             # call to _replace_spires_keywords_with_invenio_keywords should be at the
             # beginning because the next methods use the result of the replacement
             query = self._replace_spires_keywords_with_invenio_keywords(query)
@@ -560,9 +586,63 @@ class SpiresToInvenioSyntaxConverter:
             query = self._convert_spires_author_search_to_invenio_author_search(query)
             query = self._convert_spires_exact_author_search_to_invenio_author_search(query)
             query = self._convert_spires_truncation_to_invenio_truncation(query)
+            query = self._expand_search_patterns(query)
 
             # remove FIND in the beginning of the query as it is not necessary in Invenio
             query = query[5:]
+
+        return query
+
+    def _convert_spires_date_after_to_invenio_span_query(self, query):
+        """Converts date after SPIRES search term into invenio span query"""
+
+        # method used for replacement with regular expression
+        def create_replacement_pattern(match):
+            return 'year:' + match.group('year') + '->9999'
+
+        query = self._re_date_after_match.sub(create_replacement_pattern, query)
+
+        return query
+
+    def _convert_spires_date_before_to_invenio_span_query(self, query):
+        """Converts date before SPIRES search term into invenio span query"""
+
+        # method used for replacement with regular expression
+        def create_replacement_pattern(match):
+            return 'year:' + '0->' + match.group('year')
+
+        query = self._re_date_before_match.sub(create_replacement_pattern, query)
+
+        return query
+
+    def _expand_search_patterns(self, query):
+        """Expands search queries.
+
+        If a search term is followed by several words e.g.
+        author: ellis or title:THESE THREE WORDS it is exoanded to
+        author: ellis or title:THESE or title:THREE or title:WORDS.
+
+        For a combining operator is used the operator befor the search term
+
+        Not all the search terms are expanded this way, but only a short
+        list of them"""
+
+        def create_replacement_pattern(match):
+            result = ''
+            search_term = match.group('search_term')
+            combine_operator = match.group('combine_operator')
+            search_content = match.group('search_content').strip()
+
+            for word in self._re_split_pattern.split(search_content):
+                if combine_operator.lower() == 'find':
+                    result = 'find ' + search_term + word
+                    combine_operator = 'and'
+                else:
+                    result =  result + ' ' + combine_operator + ' ' + search_term + word
+
+            return result.strip()
+
+        query = self._re_search_term_pattern_match.sub(create_replacement_pattern, query)
 
         return query
 
@@ -599,9 +679,11 @@ class SpiresToInvenioSyntaxConverter:
             # the regular expression where these group names are defined is in
             # the method _compile_regular_expressions()
             result = result + \
-                self._create_author_search_pattern(match.group('name1'), match.group('surname1')) + \
-                self._create_author_search_pattern(match.group('name2'), match.group('surname2')) + \
-                self._create_author_search_pattern(match.group('initial'), match.group('surname3'))
+                self._create_author_search_pattern(match.group('name1'), None, match.group('surname1')) + \
+                self._create_author_search_pattern(match.group('name2'), None, match.group('surname2')) + \
+                self._create_author_search_pattern(match.group('name3'), None, match.group('surname3')) + \
+                self._create_author_search_pattern(match.group('name4'), match.group('middle_name4'), match.group('surname4')) + \
+                self._create_author_search_pattern(match.group('name5'), match.group('middle_name5'), match.group('surname5'))
 
             # move current position at the end of the processed content
             current_position = match.end()
@@ -611,7 +693,7 @@ class SpiresToInvenioSyntaxConverter:
 
         return result
 
-    def _create_author_search_pattern(self, author_name, author_surname):
+    def _create_author_search_pattern(self, author_name, author_middle_name, author_surname):
         """Creates search patter for author by given author's name and surname.
 
         When the pattern is executed in invenio search, it produces results
@@ -623,6 +705,12 @@ class SpiresToInvenioSyntaxConverter:
         if author_surname == '' or author_surname == None:
             return ''
 
+        # if there is middle name we expect to have also name and surname
+        # ellis, j. r. ---> ellis, j* r*
+        # j r ellis ---> ellis, j* r*
+        if author_middle_name != None and author_middle_name != '':
+            return AUTHOR_KEYWORD +  '"' + author_surname + ', ' + author_name + '*' + ' ' + author_middle_name + '*"'
+
         # ellis ---> "ellis"
         if author_name == '' or author_name == None:
             return AUTHOR_KEYWORD + author_surname
@@ -632,10 +720,15 @@ class SpiresToInvenioSyntaxConverter:
             return AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name + '*"'
 
         # ellis, jacqueline ---> "ellis, jacqueline" or "ellis, j." or "ellis, ja."
+        # in case we don't use SPIRES data, the ending dot is ommited.
+        dot_symbol = ''
+        if CFG_INSPIRE_SITE:
+            dot_symbol = "."
+
         if len(author_name) > 1:
             return AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name + '" or ' +\
-                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0] + '." or ' +\
-                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + '."'
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0] + dot_symbol +'" or ' +\
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + dot_symbol +'"'
 
     def _replace_spires_keywords_with_invenio_keywords(self, query):
         """Replaces SPIRES keywords that have directly
