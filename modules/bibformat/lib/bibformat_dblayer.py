@@ -603,7 +603,7 @@ def set_output_format_name(code, name, lang="generic", type='ln'):
     else:
         # Save inside formatname table for name variations
         run_sql("REPLACE INTO formatname SET id_format=%s, ln=%s, type=%s, value=%s",
-                (id, lang, type.lower(), name))
+                (output_format_id, lang, type.lower(), name))
 
 def change_output_format_code(old_code, new_code):
     """
