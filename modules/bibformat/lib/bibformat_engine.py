@@ -1579,8 +1579,8 @@ def resolve_output_format_filename(code, verbose=0):
                                                        9: errors and warnings, stop if error (debug mode ))
     @return the corresponding filename, with right case, or None if not found
     """
-    #Remove non alphanumeric chars (except .)
-    code = re.sub(r"[^.0-9a-zA-Z]", "", code)
+    #Remove non alphanumeric chars (except . and _)
+    code = re.sub(r"[^.0-9a-zA-Z_]", "", code)
     if not code.endswith("."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION):
         code = re.sub(r"\W", "", code)
         code += "."+CFG_BIBFORMAT_FORMAT_OUTPUT_EXTENSION
@@ -1651,8 +1651,8 @@ def get_fresh_output_format_filename(code):
     """
     #code = re.sub(r"\W", "", code) #Remove non alphanumeric chars
     code = code.upper().replace(" ", "_")
-    # Remove non alphanumeric chars (except .)
-    code = re.sub(r"[^.0-9a-zA-Z]", "", code)
+    # Remove non alphanumeric chars (except . and _)
+    code = re.sub(r"[^.0-9a-zA-Z_]", "", code)
     if len(code) > 6:
         code = code[:6]
 
