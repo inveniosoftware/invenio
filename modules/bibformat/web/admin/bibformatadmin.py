@@ -231,7 +231,7 @@ def output_format_show_attributes(req, bfo, ln=config.CFG_SITE_LANG):
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
-    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/format_templates_manage?ln=%s">%s</a>''' % (config.CFG_SITE_URL, ln , _("Manage Output Formats")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/output_formats_manage?ln=%s">%s</a>''' % (config.CFG_SITE_URL, ln , _("Manage Output Formats")))
 
     try:
         uid = getUid(req)
