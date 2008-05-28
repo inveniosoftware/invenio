@@ -197,7 +197,7 @@ def output_format_show(req, bfo, ln=config.CFG_SITE_LANG,
             return dialog_box(req=req,
                               ln=ln,
                               title="File Permission on %s" % name,
-                              message="You don't have write permission" \
+                              message="You don't have write permission " \
                               "on <i>%s</i>.<br/> You can view the output " \
                               "format, but not edit it." % name,
                               navtrail=navtrail_previous_links,
