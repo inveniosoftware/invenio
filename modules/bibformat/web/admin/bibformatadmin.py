@@ -413,6 +413,13 @@ def output_format_add(req, ln=config.CFG_SITE_LANG):
     if not auth_code:
 
         bfo = bibformatadminlib.add_output_format()
+        if bfo == None:
+            return page(title=_("Cannot create output format"),
+                        body = """BibFormat cannot add an output format.
+                        Check output formats directory permissions.""",
+                        language=ln,
+                        lastupdated=__lastupdated__,
+                        req=req)
         redirect_to_url(req, "output_format_show_attributes?ln=%(ln)s&bfo=%(bfo)s" % {'ln':ln, 'bfo':bfo})
     else:
         return page_not_authorized(req=req, text=auth_msg)

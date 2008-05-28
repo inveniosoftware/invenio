@@ -822,8 +822,12 @@ def add_output_format():
     """
     Adds a new output format (mainly create file with unique name)
 
-    @return the code of the created format
+    @return the code of the created format, or None if it could not be created
     """
+
+    if not os.access(CFG_BIBFORMAT_OUTPUTS_PATH, os.W_OK):
+        return None
+
     (filename, code) = bibformat_engine.get_fresh_output_format_filename("UNTLD")
 
     # Add entry in database
