@@ -1266,6 +1266,26 @@ class WebSearchJournalQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&f=journal&p=Phys.+Lett.+B+531+%282002%29+301',
                                                expected_text="[78]"))
 
+class WebSearchStemmedIndexQueryTest(unittest.TestCase):
+    """Test of the search results for queries using stemmed indexes."""
+
+    def test_query_stemmed_lowercase(self):
+        """websearch - stemmed index query, lowercase"""
+        # note that dasse/Dasse is stemmed into dass/Dass, as expected
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=dasse',
+                                               expected_text="[25, 26]"))
+
+    def test_query_stemmed_uppercase(self):
+        """websearch - stemmed index query, uppercase"""
+        # ... but note also that DASSE is stemmed into DASSE(!); so
+        # the test would fail if the search engine would not lower the
+        # query term.  (Something that is not necessary for
+        # non-stemmed indexes.)
+        self.assertEqual([],
+                         test_web_page_content(CFG_SITE_URL + '/search?of=id&p=DASSE',
+                                               expected_text="[25, 26]"))
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -1289,7 +1309,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchExtSysnoQueryTest,
                              WebSearchResultsRecordGroupingTest,
                              WebSearchSpecialTermsQueryTest,
-                             WebSearchJournalQueryTest)
+                             WebSearchJournalQueryTest,
+                             WebSearchStemmedIndexQueryTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
