@@ -590,8 +590,8 @@ Cher Abonné,
                <td class="admintdright"><a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/administrate?journal_name=%(journal_name)s">edit</a></td>
                <td class="admintdright"><a href="%(CFG_SITE_URL)s/admin/webjournal/webjournaladmin.py/index?journal_name=%(journal_name)s&action=askDelete">delete</a></td>
             </tr>''' % {'color': color,
-                        'journal_name': journal_info['name'],
-                        'journal_id': journal_info['id'],
+                        'journal_name': journal_info['journal_name'],
+                        'journal_id': journal_info['journal_id'],
                         'CFG_SITE_URL': CFG_SITE_URL}
             if color == 'fff':
                 color = 'EBF7FF'

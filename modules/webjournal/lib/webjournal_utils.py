@@ -710,8 +710,8 @@ def get_journals_ids_and_names():
         try:
             res = run_sql("SELECT id, name FROM jrnJOURNAL ORDER BY id")
             for journal_id, journal_name in res:
-                journals.append({'id': journal_id,
-                                 'name': journal_name})
+                journals.append({'journal_id': journal_id,
+                                 'journal_name': journal_name})
         except OperationalError, e:
             # Cannot connect to database. Try to read from cache
             files = os.listdir("%s/webjournal" % CFG_CACHEDIR)
