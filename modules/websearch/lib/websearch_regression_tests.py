@@ -678,22 +678,22 @@ class WebSearchNearestTermsTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aellisz+author%3Aellisz',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergie+author%3Aellisz",
-                                               expected_link_label='energie'))
+                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergi+author%3Aellisz",
+                                               expected_link_label='energi'))
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aenergie+author%3Aenergie',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aenergi+author%3Aenergie',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergie+author%3Aenqvist",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergi+author%3Aenqvist",
                                                expected_link_label='enqvist'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aellisz+author%3Aellisz&f=keyword',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergie+author%3Aellisz&f=keyword",
-                                               expected_link_label='energie'))
+                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergi+author%3Aellisz&f=keyword",
+                                               expected_link_label='energi'))
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aenergie+author%3Aenergie&f=keyword',
+                         test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aenergi+author%3Aenergie&f=keyword',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergie+author%3Aenqvist&f=keyword",
+                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergi+author%3Aenqvist&f=keyword",
                                                expected_link_label='enqvist'))
 
 class WebSearchBooleanQueryTest(unittest.TestCase):
