@@ -1729,7 +1729,7 @@ def search_pattern_parenthesised(req=None, p=None, f=None, m=None, ap=0, of="id"
 
     # if the pattern uses SPIRES search syntax, convert it to Invenio syntax
     spires_syntax_converter = SpiresToInvenioSyntaxConverter()
-    p = spires_syntax_converter.convertQuery(p)
+    p = spires_syntax_converter.convert_query(p)
 
     # sanity check: do not call parenthesised parser for search terms
     # like U(1):
