@@ -2891,7 +2891,7 @@ CREATE TABLE IF NOT EXISTS sbmIMPLEMENT (
 CREATE TABLE IF NOT EXISTS sbmPARAMETERS (
   doctype varchar(10) NOT NULL default '',
   name varchar(20) NOT NULL default '',
-  value varchar(200) NOT NULL default '',
+  value text NOT NULL default '',
   PRIMARY KEY  (doctype,name)
 ) TYPE=MyISAM;
 
