@@ -46,9 +46,12 @@ from invenio.config import \
 from invenio.bibindex_engine_config import CFG_MAX_MYSQL_THREADS, \
     CFG_MYSQL_THREAD_TIMEOUT, CONV_PROGRAMS, CONV_PROGRAMS_HELPERS, \
     CFG_CHECK_MYSQL_THREADS
-from invenio.bibdocfile import bibdocfile_url_to_fullpath, bibdocfile_url_p, decompose_bibdocfile_url
-from invenio.search_engine import perform_request_search, strip_accents, wash_index_term, get_index_stemming_language
-from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, deserialize_via_marshal
+from invenio.bibdocfile import bibdocfile_url_to_fullpath, bibdocfile_url_p, \
+     decompose_bibdocfile_url
+from invenio.search_engine import perform_request_search, strip_accents, \
+     wash_index_term, lower_index_term, get_index_stemming_language
+from invenio.dbquery import run_sql, DatabaseError, serialize_via_marshal, \
+     deserialize_via_marshal
 from invenio.bibindex_engine_stopwords import is_stopword
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibtask import task_init, write_message, get_datetime, \
@@ -487,7 +490,7 @@ def get_words_from_phrase(phrase, stemming_language=None):
         formulas = latex_formula_re.findall(phrase)
         phrase = remove_latex_markup(phrase)
         phrase = latex_formula_re.sub(' ', phrase)
-    phrase = phrase.lower()
+    phrase = lower_index_term(phrase)
     # 1st split phrase into blocks according to whitespace
     for block in strip_accents(phrase).split():
         # 2nd remove leading/trailing punctuation and add block:
