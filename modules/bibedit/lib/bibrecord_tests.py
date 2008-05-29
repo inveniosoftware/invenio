@@ -68,7 +68,7 @@ class BibRecordSuccessTest(unittest.TestCase):
 
     def test_records_created(self):
         """ bibrecord - demo file how many records are created """
-        self.assertEqual(95, len(self.recs))
+        self.assertEqual(96, len(self.recs))
 
     def test_tags_created(self):
         """ bibrecord - demo file which tags are created """
@@ -93,7 +93,7 @@ class BibRecordSuccessTest(unittest.TestCase):
         """bibrecord - demo file how many fields are created"""
         ## check if the number of fields for each record is correct
 
-        fields = [14, 14, 8, 11, 11, 12, 11, 15, 10, 18, 14, 16, 10, 9, 15, 10, 11, 11, 11, 9, 11, 11, 10, 9, 9, 9, 10, 9, 10, 10, 8, 9, 8, 9, 14, 13, 14, 14, 15, 12, 12, 12, 15, 14, 12, 16, 16, 15, 15, 14, 16, 15, 15, 15, 16, 15, 16, 15, 15, 16, 15, 14, 14, 15, 12, 13, 11, 15, 8, 11, 14, 13, 12, 13, 6, 6, 25, 24, 27, 26, 26, 24, 26, 27, 25, 28, 24, 23, 27, 25, 25, 26, 26, 24, 19]
+        fields = [14, 14, 8, 11, 11, 12, 11, 15, 10, 18, 14, 16, 10, 9, 15, 10, 11, 11, 11, 9, 11, 11, 10, 9, 9, 9, 10, 9, 10, 10, 8, 9, 8, 9, 14, 13, 14, 14, 15, 12, 12, 12, 15, 14, 12, 16, 16, 15, 15, 14, 16, 15, 15, 15, 16, 15, 16, 15, 15, 16, 15, 14, 14, 15, 12, 13, 11, 15, 8, 11, 14, 13, 12, 13, 6, 6, 25, 24, 27, 26, 26, 24, 26, 27, 25, 28, 24, 23, 27, 25, 25, 26, 26, 24, 19, 26]
 
         cr = []
         ret = []
