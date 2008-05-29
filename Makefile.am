@@ -245,5 +245,6 @@ update-v0.99.0-tables:
 	echo "ALTER TABLE schTASK ADD KEY priority (priority);" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE hstTASK ADD KEY priority (priority);" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE rnkCITATIONDATAEXT ADD KEY extcitepubinfo (extcitepubinfo);" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE sbmPARAMETERS CHANGE value value text NOT NULL default '';" | ${prefix}/bin/dbexec
 
 CLEANFILES = *~
