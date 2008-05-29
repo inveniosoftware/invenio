@@ -1140,7 +1140,7 @@ def wash_index_term(term, max_char_length=50):
     The function works by an internal conversion of TERM, when needed,
     from its input Python UTF-8 binary string format into Python
     Unicode format, and then truncating it safely to the given number
-    of TF-8 characters, without possible mis-truncation in the middle
+    of UTF-8 characters, without possible mis-truncation in the middle
     of a multi-byte UTF-8 character that could otherwise happen if we
     would have been working with UTF-8 binary representation directly.
 
@@ -1155,6 +1155,15 @@ def wash_index_term(term, max_char_length=50):
     else:
         # truncate the term in a safe position:
         return washed_term[:max_char_length].encode('utf-8')
+
+def lower_index_term(term):
+    """
+    Return safely lowered index term TERM.  This is done by converting
+    to UTF-8 first, because standard Python lower() function is not
+    UTF-8 safe.  To be called by both the search engine and the
+    indexer when appropriate (e.g. before stemming).
+    """
+    return unicode(term, 'utf-8').lower().encode('utf-8')
 
 def wash_pattern(p):
     """Wash pattern passed by URL. Check for sanity of the wildcard by
@@ -1831,6 +1840,8 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
         word0 = re_word.sub('', words[0])
         word1 = re_word.sub('', words[1])
         if stemming_language:
+            word0 = lower_index_term(word0)
+            word1 = lower_index_term(word1)
             word0 = stem(word0, stemming_language)
             word1 = stem(word1, stemming_language)
         res = run_sql("SELECT term,hitlist FROM %s WHERE term BETWEEN %%s AND %%s" % bibwordsX,
@@ -1841,6 +1852,7 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
         else:
             word = re_word.sub('', word)
         if stemming_language:
+            word = lower_index_term(word)
             word = stem(word, stemming_language)
         if string.find(word, '%') >= 0: # do we have wildcard in the word?
             if f == 'journal':
