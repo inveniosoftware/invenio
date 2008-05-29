@@ -432,7 +432,7 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
         """
         argd = wash_urlargd(form, {'name': (str, ""),
                                    'sent': (str, "False"),
-                                   'plainText': (str, u''),
+                                   'plainText': (str, ''),
                                    'htmlMail': (str, ""),
                                    'recipients': (str, ""),
                                    'subject': (str, ""),
