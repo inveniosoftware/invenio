@@ -40,7 +40,7 @@ __revision__ = "$Id$"
 
 import getopt, sys, re, os, time, shutil, tempfile
 from invenio.config import CFG_PATH_DISTILLER, CFG_PATH_GFILE
-
+from invenio.errorlib import register_exception
 from invenio.config import CFG_TMPDIR
 from invenio.config import CFG_ETCDIR
 
@@ -345,6 +345,99 @@ def create_final_latex_template(working_dirname, \
     return "create%s" % latex_template
 
 
+def escape_latex_meta_characters(text):
+    """The following are LaTeX meta characters that must be escaped with a
+       backslash:
+        # $ % & _ { }
+       This function therefore takes a string as input and does a simple
+       replace of these characters with escaped versions.
+       @param text: (string) - the string to be escaped.
+       @return: (string) - the string in which the LaTeX meta characters
+        have been escaped.
+    """
+    text = text.replace('#', '\#')
+    text = text.replace('$', '\$')
+    text = text.replace('%', '\%')
+    text = text.replace('&', '\&')
+    text = text.replace('_', '\_')
+    text = text.replace('{', '\{')
+    text = text.replace('}', '\}')
+    return text
+
+
+def escape_latex_template_vars(template_vars, strict=False):
+    """Take a dictionary of LaTeX template variables/values and escape LaTeX
+       meta characters in some of them, or all of them depending upon whether
+       a call is made in strict mode (if strict is set, ALL values are
+       escaped.)
+       Operating in non-strict mode, the rules for escaping are as follows:
+        * If the string does not contain $ { or }, it must be escaped.
+        * If the string contains $, then there must be an even number of
+          these. If the count is even, do not escape. Else, escape.
+        * If the string contains { or }, it must be balanced with a
+          counterpart. That's to say that the count of "{" must match the
+          count of "}". If it does, do not escape. Else, escape.
+       @param template_vars: (dictionary) - the LaTeX template variables and
+        their values.
+       @param strict: (boolean) - a flag indicating whether or not to
+        operate in strict mode. Strict mode means that all values are
+        escaped regardless of whether or not they are considered to be
+        "good" LaTeX.
+       @return: (dictionary) - the LaTeX template variables with their
+        values escaped.
+    """
+    ## Make a copy of the LaTeX template variables so as not to corrupt
+    ## the original:
+    working_template_vars = template_vars.copy()
+    ##
+    ## For each of the variables, escape LaTeX meta characteras in the
+    ## value according to the strict flag:
+    varnames = working_template_vars.keys()
+    for varname in varnames:
+        escape_value = False
+        varval = working_template_vars[varname]
+        ## We don't want to escape values that are date or include directives
+        ## so unfortunately, this if is needed here:
+        if (varval.find("date(") == 0 or varval.find("include(") == 0) and \
+           varval[-1] == ")":
+            ## This is a date or include directive:
+            continue
+
+        ## Count the number of "$", "{" and "}" in it. If any are present,
+        ## they should be balanced. If so, we will assume that they are
+        ## wanted and that the LaTeX in the string is good.
+        ## If, however, they are not balanced, we will assume that they are
+        ## not valid LaTeX commands and that the string should be escaped.
+        ## If they are not present at all, we assume that the string should
+        ## be escaped.
+        if "$" in varval and varval.count("$") % 2 != 0:
+            ## $ is present, but not in an even number. This string must
+            ## be escaped:
+            escape_value = True
+        elif "{" in varval or "}" in varval:
+            ## "{" and/or "}" is in the value string. Count each of them.
+            ## If they are not matched one to one, consider the string to be
+            ## in need of escaping:
+            if varval.count("{") != varval.count("}"):
+                escape_value = True
+        elif "$" not in varval and "{" not in varval and "}" not in varval:
+            ## Since none of $ { } are in the string, it should be escaped
+            ## to be safe:
+            escape_value = True
+        ##
+        if strict:
+            ## If operating in strict mode, escape everything whatever the
+            ## results of the above tests:
+            escape_value = True
+
+        ## If the value is to be escaped, go ahead and do so:
+        if escape_value:
+            escaped_varval = escape_latex_meta_characters(varval)
+            working_template_vars[varname] = escaped_varval
+    ## Return the "escaped" LaTeX template variables:
+    return working_template_vars
+
+
 def create_pdf_stamp(path_workingdir, latex_template, latex_template_var):
     """Retrieve the LaTeX (and associated) files and use them to create a
        PDF "Stamp" file that can be merged with the main file.
@@ -360,16 +453,19 @@ def create_pdf_stamp(path_workingdir, latex_template, latex_template_var):
     ## Copy the LaTeX (and helper) files should be copied into the working dir:
     template_name = copy_template_files_to_stampdir(path_workingdir, \
                                                     latex_template)
-
+    ##
+    ####
+    ## Make a first attempt at the template PDF creation, escaping the variables
+    ## in non-strict mode:
+    escaped_latex_template_var = escape_latex_template_vars(latex_template_var)
     ## Now that the latex template and its helper files have been retrieved,
     ## the Stamp PDF can be created.
     final_template = create_final_latex_template(path_workingdir, \
                                                  template_name, \
-                                                 latex_template_var)
-
+                                                 escaped_latex_template_var)
+    ##
     ## The name that will be givem to the PDF stamp file:
     pdf_stamp_name = "%s.pdf" % os.path.splitext(final_template)[0]
-
     ## Now, build the Stamp PDF from the LaTeX template:
     cmd_latex = """cd %(workingdir)s; /usr/bin/pdflatex """ \
                 """-interaction=batchmode """ \
@@ -380,10 +476,71 @@ def create_pdf_stamp(path_workingdir, latex_template, latex_template_var):
                   }
     ## Log the latex command
     os.system("""echo %s > %s""" % (escape_shell_arg(cmd_latex), \
-                                    escape_shell_arg("%s/latex_cmd" \
-                                                    % path_workingdir)))
+                                    escape_shell_arg("%s/latex_cmd_first_try" \
+                                                     % path_workingdir)))
     ## Run the latex command
     errcode_latex = os.system("%s" % cmd_latex)
+
+    ## Was the PDF stamp file successfully created without error?
+    if errcode_latex:
+        ## No it wasn't. Perhaps there was a problem with some of the variable
+        ## values that we substituted into the template?
+        ## To be certain, try to create the PDF one more time - this time
+        ## escaping all of the variable values.
+        ##
+        ## Unlink the PDF file if one was created on the previous attempt:
+        if os.access("%s/%s" % (path_workingdir, pdf_stamp_name), os.F_OK):
+            try:
+                os.unlink("%s/%s" % (path_workingdir, pdf_stamp_name))
+            except OSError:
+                ## Unable to unlink the PDF file.
+                err_msg = "Unable to unlink the PDF stamp file [%s]. " \
+                          "Stamping has failed." \
+                          % pdf_stamp_name
+                register_exception(prefix=err_msg)
+                raise InvenioWebSubmitFileStamperError(err_msg)
+        ##
+        ## Unlink the LaTeX template file that was created with the previously
+        ## escaped variables:
+        if os.access("%s/%s" % (path_workingdir, final_template), os.F_OK):
+            try:
+                os.unlink("%s/%s" % (path_workingdir, final_template))
+            except OSError:
+                ## Unable to unlink the LaTeX file.
+                err_msg = "Unable to unlink the LaTeX stamp template file " \
+                          "[%s]. Stamping has failed." \
+                          % final_template
+                register_exception(prefix=err_msg)
+                raise InvenioWebSubmitFileStamperError(err_msg)
+        ##
+        ####
+        ## Make another attempt at the template PDF creation, this time escaping
+        ## the variables in strict mode:
+        escaped_latex_template_var = \
+                     escape_latex_template_vars(latex_template_var, strict=True)
+        ## Now that the latex template and its helper files have been retrieved,
+        ## the Stamp PDF can be created.
+        final_template = create_final_latex_template(path_workingdir, \
+                                                     template_name, \
+                                                     escaped_latex_template_var)
+        ##
+        ## The name that will be givem to the PDF stamp file:
+        pdf_stamp_name = "%s.pdf" % os.path.splitext(final_template)[0]
+        ## Now, build the Stamp PDF from the LaTeX template:
+        cmd_latex = """cd %(workingdir)s; /usr/bin/pdflatex """ \
+                    """-interaction=batchmode """ \
+                    """%(template-path)s > /dev/null 2>&1""" \
+                    % { 'template-path' : escape_shell_arg("%s/%s" \
+                                          % (path_workingdir, final_template)),
+                        'workingdir'    : path_workingdir,
+                      }
+        ## Log the latex command
+        os.system("""echo %s > %s""" \
+                  % (escape_shell_arg(cmd_latex), \
+                     escape_shell_arg("%s/latex_cmd_second_try" \
+                                      % path_workingdir)))
+        ## Run the latex command
+        errcode_latex = os.system("%s" % cmd_latex)
 
     ## Was the PDF stamp file successfully created?
     if errcode_latex or \
@@ -692,6 +849,22 @@ def apply_stamp_to_file(path_workingdir,
                         stamp_file_name,
                         subject_file,
                         output_file):
+    """Given a stamp-file, the details of the type of stamp to apply, and the
+       details of the file to be stamped, coordinate the process of having
+       that stamp applied to the file.
+       @param path_workingdir: (string) - the path to the working directory
+        that contains all of the files needed for the stamping process to be
+        carried out.
+       @param stamp_type: (string) - the type of stamp to be applied to the
+        file.
+       @param stamp_file_name: (string) - the name of the PDF stamp file (i.e.
+        the stamp itself).
+       @param subject_file: (string) - the name of the file to be stamped.
+       @param output_file: (string) - the name of the final "stamped" file that
+        will be written in the working directory after the function has ended.
+       @return: (string) - the name of the stamped file that has been created.
+        It will be found in the stamping working directory.
+    """
     ## Stamping is performed on PDF files. We therefore need to test for the
     ## type of the subject file before attempting to stamp it:
     ##
