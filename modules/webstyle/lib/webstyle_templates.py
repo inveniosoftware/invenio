@@ -637,10 +637,10 @@ URI: http://%(host)s%(page)s
 
         return out
 
-    def detailed_record_container(self, content, recid, tabs, ln=CFG_SITE_LANG,
-                                  show_similar_rec_p=True,
-                                  creationdate=None,
-                                  modificationdate=None, show_short_rec_p=True):
+    def detailed_record_container_top(self, recid, tabs, ln=CFG_SITE_LANG,
+                                      show_similar_rec_p=True,
+                                      creationdate=None,
+                                      modificationdate=None, show_short_rec_p=True):
         """Prints the box displayed in detailed records pages, with tabs at the top.
 
         Returns content as it is if the number of tabs for this record
@@ -648,7 +648,6 @@ URI: http://%(host)s%(page)s
 
            Parameters:
 
-         - content *string* - the content displayed inside the box
          - recid *int* - the id of the displayed record
          - tabs ** - the tabs displayed at the top of the box.
          - ln *string* - the language of the page in which the box is displayed
@@ -657,12 +656,12 @@ URI: http://%(host)s%(page)s
          - modificationdate *string* - the last modification date of the displayed record
          - show_short_rec_p *boolean* - prints a very short version of the record as reminder.
         """
+        # If no tabs, returns nothing
+        if len(tabs) <= 1:
+            return ''
+
         # load the right message language
         _ = gettext_set_language(ln)
-
-        # If no tabs, simply returns the content
-        if len(tabs) <= 1:
-            return content
 
         # Build the tabs at the top of the page
         out_tabs = ''
@@ -696,18 +695,17 @@ URI: http://%(host)s%(page)s
 
 
         # Add the clip icon and the brief record reminder if necessary
+        record_brief = ''
         if show_short_rec_p:
-            record_details = format_record(recID=recid, of='hs', ln=ln)
-            content = '''<div id="detailedrecordshortreminder">
+            record_brief = format_record(recID=recid, of='hs', ln=ln)
+            record_brief = '''<div id="detailedrecordshortreminder">
                              <div id="clip">&nbsp;</div>
                              <div id="HB">
-                                 %(record_details)s
+                                 %(record_brief)s
                              </div>
                          </div>
                          <div style="clear:both;height:1px">&nbsp;</div>
-                         %(content)s
-                      ''' % {'content': content,
-                             'record_details': record_details}
+                         ''' % {'record_brief': record_brief}
 
         # Print the content
         out = """
@@ -719,7 +717,38 @@ URI: http://%(host)s%(page)s
             <div class="inside">
                 <!--<div style="height:0.1em;">&nbsp;</div>
                 <p class="notopgap">&nbsp;</p>-->
-                %(content)s
+                %(record_brief)s
+                """ % {'tabs':out_tabs,
+                       'record_brief':record_brief}
+        return out
+
+    def detailed_record_container_bottom(self, recid, tabs, ln=CFG_SITE_LANG,
+                                         show_similar_rec_p=True,
+                                         creationdate=None,
+                                         modificationdate=None, show_short_rec_p=True):
+        """Prints the box displayed in detailed records pages, with tabs at the top.
+
+        Returns content as it is if the number of tabs for this record
+        is smaller than 2
+
+           Parameters:
+
+         - recid *int* - the id of the displayed record
+         - tabs ** - the tabs displayed at the top of the box.
+         - ln *string* - the language of the page in which the box is displayed
+         - show_similar_rec_p *bool* print 'similar records' link in the box
+         - creationdate *string* - the creation date of the displayed record
+         - modificationdate *string* - the last modification date of the displayed record
+         - show_short_rec_p *boolean* - prints a very short version of the record as reminder.
+        """
+        # If no tabs, returns nothing
+        if len(tabs) <= 1:
+            return ''
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = """
                 <p class="nobottomgap" >&nbsp;</p>
             </div>
             <div class="bottom-left-folded">%(dates)s</div>
@@ -727,24 +756,22 @@ URI: http://%(host)s%(page)s
         </div>
     </div>
     <br/>
-    """ % {
-    'tabs':out_tabs,
-    'content':content,
-    'similar':create_html_link(
-                  websearch_templates.build_search_url(p='recid:%d' % \
-                  recid,
-                  rm='wrd',
-                  ln=ln),
-                  {}, _("Similar records"),
-                  {'class': "moreinfo"}),
-    'dates':creationdate and '<div class="recordlastmodifiedbox" style="float:left;position:relative;margin-left:1px">&nbsp;%(dates)s</div>' % {
-                   'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s") % \
-                   {'x_date_creation': creationdate,
-                    'x_date_modification': modificationdate},
-                    } or ''
-    }
+    """ % {'similar':create_html_link(
+                websearch_templates.build_search_url(p='recid:%d' % \
+                                                     recid,
+                                                     rm='wrd',
+                                                     ln=ln),
+                {}, _("Similar records"),
+                {'class': "moreinfo"}),
+           'dates':creationdate and '<div class="recordlastmodifiedbox" style="float:left;position:relative;margin-left:1px">&nbsp;%(dates)s</div>' % {
+                'dates': _("Record created %(x_date_creation)s, last modified %(x_date_modification)s") % \
+                {'x_date_creation': creationdate,
+                 'x_date_modification': modificationdate},
+                } or ''
+           }
 
         return out
+
 
     def detailed_record_mini_panel(self, recid, ln=CFG_SITE_LANG,
                                    format='hd',

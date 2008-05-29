@@ -2826,6 +2826,9 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                     content = ''
                     # load content
                     if tab == 'usage':
+                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                                                                                   tabs,
+                                                                                   ln))
                         r = calculate_reading_similarity_list(recIDs[irec], "downloads")
                         downloadsimilarity = None
                         downloadhistory = None
@@ -2842,53 +2845,70 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                                                                                       downloadsimilarity=downloadsimilarity,
                                                                                       downloadhistory=downloadhistory,
                                                                                       viewsimilarity=viewsimilarity)
-                        req.write(webstyle_templates.detailed_record_container(content,
-                                                                               recIDs[irec],
-                                                                               tabs,
-                                                                               ln))
+                        req.write(content)
+                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                                                                                      tabs,
+                                                                                      ln))
                     elif tab == 'citations':
-                        citinglist = []
-                        citationhistory = None
                         recid = recIDs[irec]
-                        selfcited = get_self_cited_by(recid)
+                        req.write(webstyle_templates.detailed_record_container_top(recid,
+                                                                                   tabs,
+                                                                                   ln))
+                        req.write(websearch_templates.tmpl_detailed_record_citations_prologue(recid, ln))
+
+                        # Citing
+                        citinglist = []
                         r = calculate_cited_by_list(recid)
                         if r:
                             citinglist = r
+                        req.write(websearch_templates.tmpl_detailed_record_citations_citing_list(recid,
+                                                                                       ln,
+                                                                                       citinglist=citinglist))
+                        # Self-cited
+                        selfcited = get_self_cited_by(recid)
+                        req.write(websearch_templates.tmpl_detailed_record_citations_self_cited(recid,
+                                                                                                ln,
+                                                                                                selfcited=selfcited))
+                        # Co-cited
+                        s = calculate_co_cited_with_list(recid)
+                        cociting = None
+                        if s:
+                            cociting = s
+                        req.write(websearch_templates.tmpl_detailed_record_citations_co_citing(recid,
+                                                                                               ln,
+                                                                                               cociting=cociting))
+                        # Citation history
+                        citationhistory = None
+                        if r:
                             citationhistory = create_citation_history_graph_and_box(recid, ln)
 
-                        r = calculate_co_cited_with_list(recid)
-                        cociting = None
-                        if r:
-                            cociting = r
-
-                        content = websearch_templates.tmpl_detailed_record_citations(recid,
-                                                                                     ln,
-                                                                                     citinglist=citinglist,
-                                                                                     citationhistory=citationhistory,
-                                                                                     cociting=cociting,
-                                             selfcited=selfcited)
-                        req.write(webstyle_templates.detailed_record_container(content,
-                                                                               recid,
-                                                                               tabs,
-                                                                               ln))
+                        req.write(websearch_templates.tmpl_detailed_record_citations_epilogue(recid, ln))
+                        req.write(webstyle_templates.detailed_record_container_bottom(recid,
+                                                                                      tabs,
+                                                                                      ln))
                     elif tab == 'references':
-                        content = format_record(recIDs[irec], 'HDREF', ln=ln, user_info=user_info, verbose=verbose)
-                        req.write(webstyle_templates.detailed_record_container(content,
-                                                                               recIDs[irec],
-                                                                               tabs,
-                                                                               ln))
+                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                                                                                   tabs,
+                                                                                   ln))
+                        req.write(format_record(recIDs[irec], 'HDREF', ln=ln, user_info=user_info, verbose=verbose))
+                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                                                                                      tabs,
+                                                                                      ln))
                     else:
                         # Metadata tab
-                        content = print_record(recIDs[irec], format, ot, ln,
-                                               search_pattern=search_pattern,
-                                               user_info=user_info, verbose=verbose)
-
+                        req.write(webstyle_templates.detailed_record_container_top(recIDs[irec],
+                                                                                   tabs,
+                                                                                   ln,
+                                                                                   show_short_rec_p=False))
                         creationdate = None
                         modificationdate = None
                         if record_exists(recIDs[irec]) == 1:
                             creationdate = get_creation_date(recIDs[irec])
                             modificationdate = get_modification_date(recIDs[irec])
 
+                        content = print_record(recIDs[irec], format, ot, ln,
+                                               search_pattern=search_pattern,
+                                               user_info=user_info, verbose=verbose)
                         content = websearch_templates.tmpl_detailed_record_metadata(
                             recID = recIDs[irec],
                             ln = ln,
@@ -2896,14 +2916,14 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                             creationdate = creationdate,
                             modificationdate = modificationdate,
                             content = content)
+                        req.write(content)
 
-                        req.write(webstyle_templates.detailed_record_container(content,
-                                                                               recIDs[irec],
-                                                                               tabs,
-                                                                               ln=ln,
-                                                                               creationdate=creationdate,
-                                                                               modificationdate=modificationdate,
-                                                                               show_short_rec_p=False))
+                        req.write(webstyle_templates.detailed_record_container_bottom(recIDs[irec],
+                                                                                      tabs,
+                                                                                      ln,
+                                                                                      creationdate=creationdate,
+                                                                                      modificationdate=modificationdate,
+                                                                                      show_short_rec_p=False))
 
                         if len(tabs) > 0:
                             # Add the mini box at bottom of the page

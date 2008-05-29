@@ -43,8 +43,18 @@ CFG_WEBSTYLE_DEPRECATED_FUNCTIONS = {'webstyle': \
                              "webcomment_templates.tmpl_get_comments(..), " + \
                              "webcomment_templates.tmpl_mini_review(..)," + \
                              "websubmit_templates.tmpl_filelist(..) and " + \
-                             "HDFILE + HDACT + HDREF output formats"
-                             }
+                             "HDFILE + HDACT + HDREF output formats",
+                             'detailed_record_container': "Replaced by " + \
+                             "detailed_record_container_top and " + \
+                             "detailed_record_container_bottom"},
+                                     'websearch': \
+                            {'tmpl_detailed_record_citations': "Replaced by " + \
+                             "tmpl_detailed_record_citations_prologue" + \
+                             "tmpl_detailed_record_citations_epilogue" + \
+                             "tmpl_detailed_record_citations_citing_list" + \
+                             "tmpl_detailed_record_citations_citation_history" + \
+                             "tmpl_detailed_record_citations_cociting" + \
+                             "tmpl_detailed_record_citations_self_cited"}
                             }
 
 # List of deprecated parameter

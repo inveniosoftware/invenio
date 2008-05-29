@@ -232,10 +232,12 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                      unordered_tabs[tab_id]['enabled']) \
                     for (tab_id, order) in ordered_tabs_id
                     if unordered_tabs[tab_id]['visible'] == True]
-            t = webstyle_templates.detailed_record_container(t,
-                                                             self.recid,
-                                                             tabs,
-                                                             args['ln'])
+            top = webstyle_templates.detailed_record_container_top(self.recid,
+                                                                   tabs,
+                                                                   args['ln'])
+            bottom = webstyle_templates.detailed_record_container_bottom(self.recid,
+                                                                         tabs,
+                                                                         args['ln'])
             title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, args['ln'])
             return pageheaderonly(title=title,
                         navtrail=create_navtrail_links(cc=cc, as=0, ln=ln) + \
@@ -251,7 +253,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         navmenuid='search',
                         navtrail_append_title_p=0) + \
                         websearch_templates.tmpl_search_pagestart(ln) + \
-                        t + \
+                        top + t + bottom + \
                         websearch_templates.tmpl_search_pageend(ln) + \
                         pagefooteronly(lastupdated=__lastupdated__, language=ln, req=req)
         return getfile, []

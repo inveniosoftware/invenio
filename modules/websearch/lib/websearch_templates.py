@@ -2873,10 +2873,35 @@ class Template:
 
         return out
 
-    def tmpl_detailed_record_citations(self, recID, ln,
-                                       citinglist, citationhistory,
-                                       cociting, selfcited):
-        """Returns the citations page of a record
+    def tmpl_detailed_record_citations_prologue(self, recID, ln):
+        """Returns the prologue of the citations page of a record
+
+        Parameters:
+
+          - 'recID' *int* - The ID of the printed record
+
+          - 'ln' *string* - The language to display
+
+        """
+
+        return '<table>'
+
+    def tmpl_detailed_record_citations_epilogue(self, recID, ln):
+        """Returns the epilogue of the citations page of a record
+
+        Parameters:
+
+          - 'recID' *int* - The ID of the printed record
+
+          - 'ln' *string* - The language to display
+
+        """
+
+        return '</table>'
+
+    def tmpl_detailed_record_citations_citing_list(self, recID, ln,
+                                                   citinglist):
+        """Returns the list of record citing this one
 
         Parameters:
 
@@ -2886,22 +2911,17 @@ class Template:
 
           - citinglist *list* - a list of tuples [(x1,y1),(x2,y2),..] where x is doc id and y is number of citations
 
-          - citationhistory *string* - citationhistory box
-
-          - cociting *string* - cociting box
-
-          - selfcited list - a list of self-citations for recID
-
         """
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = '<table>'
+        out = ''
+
         if CFG_BIBRANK_SHOW_CITATION_STATS and citinglist is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen(
                 _("Cited by: %s records") % len (citinglist), citinglist, ln)
 
-            out += '''
+            out = '''
                     <tr><td>
                       %(similar)s&nbsp;%(more)s
                       <br /><br />
@@ -2913,38 +2933,95 @@ class Template:
                                       {}, _("more")),
                 'similar': similar}
 
-        if CFG_BIBRANK_SHOW_CITATION_GRAPHS and selfcited is not None:
-            sc_scorelist = [] #a score list for print..
-            for s in selfcited:
-                #copy weight from citations
-                weight = 0
-                for c in citinglist:
-                    (crec,score) = c
-                    if crec == s:
-                        weight = score
-                tmp = [s,weight]
-                sc_scorelist.append(tmp)
-            scite = self.tmpl_print_record_list_for_similarity_boxen (
-                _(".. of which self-citations: %s records") % len (selfcited), sc_scorelist, ln)
-            out += '<tr><td>'+scite+'</td></tr>'
+        return out
+
+    def tmpl_detailed_record_citations_citation_history(self, recID, ln,
+                                                        citationhistory):
+        """Returns the citations history graph of this record
+
+        Parameters:
+
+          - 'recID' *int* - The ID of the printed record
+
+          - 'ln' *string* - The language to display
+
+          - citationhistory *string* - citationhistory box
+
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = ''
+
+        if CFG_BIBRANK_SHOW_CITATION_GRAPHS and citationhistory is not None:
+            out = '<tr><td>%s</td></tr>' % citationhistory
+
+        return out
+
+    def tmpl_detailed_record_citations_co_citing(self, recID, ln,
+                                                 cociting):
+        """Returns the list of cocited records
+
+        Parameters:
+
+          - 'recID' *int* - The ID of the printed record
+
+          - 'ln' *string* - The language to display
+
+          - cociting *string* - cociting box
+
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = ''
 
         if CFG_BIBRANK_SHOW_CITATION_STATS and cociting is not None:
             similar = self.tmpl_print_record_list_for_similarity_boxen (
                 _("Co-cited with: %s records") % len (cociting), cociting, ln)
 
-            out += '''
+            out = '''
                     <tr><td>
                       %(similar)s&nbsp;%(more)s
                       <br />
                     </td></tr>''' % { 'more': create_html_link(self.build_search_url(p='cocitedwith:%d' % recID, ln=ln),
                                                                 {}, _("more")),
                                       'similar': similar}
+        return out
 
-        if CFG_BIBRANK_SHOW_CITATION_GRAPHS and citationhistory is not None:
-            out += '<tr><td>%s</td></tr>' % citationhistory
 
-        out += '</table>'
+    def tmpl_detailed_record_citations_self_cited(self, recID, ln,
+                                                  selfcited):
+        """Returns the list of self-citations for this record
 
+        Parameters:
+
+          - 'recID' *int* - The ID of the printed record
+
+          - 'ln' *string* - The language to display
+
+          - selfcited list - a list of self-citations for recID
+
+        """
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = ''
+
+        if CFG_BIBRANK_SHOW_CITATION_GRAPHS and selfcited is not None:
+            sc_scorelist = [] #a score list for print..
+            for s in selfcited:
+                #copy weight from citations
+                weight = 0
+                for c in citinglist:
+                    (crec, score) = c
+                    if crec == s:
+                        weight = score
+                tmp = [s, weight]
+                sc_scorelist.append(tmp)
+            scite = self.tmpl_print_record_list_for_similarity_boxen (
+                _(".. of which self-citations: %s records") % len (selfcited), sc_scorelist, ln)
+            out = '<tr><td>'+scite+'</td></tr>'
         return out
 
     def tmpl_author_information(self, req, pubs, authorname, num_downloads, aff_pubdict,
