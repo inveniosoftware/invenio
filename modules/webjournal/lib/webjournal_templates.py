@@ -537,8 +537,8 @@ Cher Abonné,
                     'released on: %s' % time.strftime("%d.%m.%Y", released_on),
 
                     (announced_on==False)
-                    and '<em>not announced</em><br/><a href="%s/journal/alert?name=%s&issue=%s">&gt;announce now</a>' % (CFG_SITE_URL, journal_name, issue) or
-                    'announced on: %s <br/><a href="%s/journal/alert?name=%s&issue=%s">&gt;re-announce</a>' % (time.strftime("%d.%m.%Y", announced_on), CFG_SITE_URL, journal_name, issue),
+                    and '<em>not announced</em><br/><a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s&issue=%s">&gt;announce now</a>' % (CFG_SITE_URL, journal_name, issue) or
+                    'announced on: %s <br/><a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s&issue=%s">&gt;re-announce</a>' % (time.strftime("%d.%m.%Y", announced_on), CFG_SITE_URL, journal_name, issue),
 
                     CFG_SITE_URL, journal_name, issue
                 )
