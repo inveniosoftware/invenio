@@ -116,7 +116,6 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
     ## Convert the string of latex template variables into a dictionary
     ## of search-term/replacement-term pairs:
     latex_template_vars = get_dictionary_from_string(latex_template_vars_string)
-
     ## For each of the latex variables, check in `CURDIR' for a file with that
     ## name. If found, use it's contents as the template-variable's value.
     ## If not, just use the raw value string already held by the template
@@ -130,27 +129,62 @@ def Stamp_Uploaded_Files(parameters, curdir, form, user_info=None):
                 and varvalue != "":
             ## We don't want to interfere with date() or include() directives,
             ## so we only do this if the variable value didn't contain them:
-            if os.access("%s/%s" % (curdir, os.path.basename(varvalue)), \
-                         os.R_OK|os.F_OK):
-                ## The template variable's value is a file in `CURDIR'.
-                ## Attempt to use the information contained within it:
-                try:
-                    repl_file_val = \
-                      open("%s/%s" \
-                           % (curdir, os.path.basename(varvalue)), \
-                           "r").readlines()
-                except IOError:
-                    ## If we can't read the file, don't do anything about it;
-                    ## Keep the original value for the variable.
-                    register_exception(req=user_info['req'])
+            ##
+            ## Is this variable value the name of a file in the current
+            ## submission's working directory, from which a literal value for
+            ## use in the template should be extracted? If yes, it will
+            ## begin with "FILE:". If no, we leave the value exactly as it is.
+            if varvalue.upper().find("FILE:") == 0:
+                ## The value to be used is to be taken from a file. Clean the
+                ## file name and if it's OK, extract that value from the file.
+                ##
+                seekvalue_fname = varvalue[5:].strip()
+                seekvalue_fname = os.path.basename(seekvalue_fname).strip()
+                if seekvalue_fname != "":
+                    ## Attempt to extract the value from the file:
+                    if os.access("%s/%s" % (curdir, seekvalue_fname), \
+                                 os.R_OK|os.F_OK):
+                        ## The file exists. Extract its value:
+                        try:
+                            repl_file_val = \
+                              open("%s/%s" \
+                                   % (curdir, seekvalue_fname), "r").readlines()
+                        except IOError:
+                            ## The file was unreadable.
+                            err_msg = "Error in Stamp_Uploaded_Files: The " \
+                                      "function attempted to read a LaTex " \
+                                      "template variable value from the " \
+                                      "following file in the current " \
+                                      "submission's working directory: " \
+                                      "[%s]. However, an unexpected error " \
+                                      "was encountered when doing so. " \
+                                      "Please inform the administrator." \
+                                      % seekvalue_fname
+                            register_exception(req=user_info['req'])
+                            raise InvenioWebSubmitFunctionError(err_msg)
+                        else:
+                            final_varval = ""
+                            for line in repl_file_val:
+                                final_varval += line
+                            final_varval = final_varval.rstrip()
+                            ## Replace the variable value with that which has
+                            ## been read from the file:
+                            latex_template_vars[varname] = final_varval
+                    else:
+                        ## The file didn't actually exist in the current
+                        ## submission's working directory. Use an empty
+                        ## value:
+                        latex_template_vars[varname] = ""
                 else:
-                    final_varval = ""
-                    for line in repl_file_val:
-                        final_varval += line
-                    final_varval = final_varval.rstrip()
-                    ## Replace the variable value with that which has been
-                    ## read from the file:
-                    latex_template_vars[varname] = final_varval
+                    ## The filename was not valid.
+                    err_msg = "Error in Stamp_Uploaded_Files: The function " \
+                              "was configured to read a LaTeX template " \
+                              "variable from a file with the following " \
+                              "instruction: [%s --> %s]. The filename, " \
+                              "however, was not considered valid. Please " \
+                              "report this to the administrator." \
+                              % (varname, varvalue)
+                    raise InvenioWebSubmitFunctionError(err_msg)
 
     ## Put the 'fixed' values into the file_stamper_options dictionary:
     file_stamper_options['latex-template'] = latex_template
@@ -397,12 +431,11 @@ def get_dictionary_from_string(dict_string):
     ## Now we should have a list of "key" : "value" terms. For each of them,
     ## check it is OK. If not in the format "Key" : "Value" (quotes are
     ## optional), discard it. As with the comma separator in the previous
-    ## splitting, this one splits on any colon (:) that is not escaped by a
-    ## backslash.
+    ## splitting, this one splits on the first colon (:) ONLY.
     final_dictionary = {}
     for key_value_string in key_vals:
-        ## Split the pair apart, based on ":":
-        key_value_pair = re.split(r'(?<!\\):', key_value_string)
+        ## Split the pair apart, based on the first ":":
+        key_value_pair = key_value_string.split(":", 1)
         ## check that the length of the new list is 2:
         if len(key_value_pair) != 2:
             ## There was a problem with the splitting - pass this pair
