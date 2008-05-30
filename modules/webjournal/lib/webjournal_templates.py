@@ -15,6 +15,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""
+WebJournal templates - Defines the look of various parts of the
+WebJournal modules. Most customizations will however be done through
+BibFormat format templates files.
+"""
 
 import os
 import time
@@ -222,23 +227,25 @@ class Template:
         current_publication = get_current_publication(journal_name, issue)
         plain_text = u'''Dear Subscriber,
 
-    The latest issue of the CERN Bulletin, no. %s, has been released.
+    The latest issue of %(journal_name)s, no. %(current_publication)s, has been released.
     You can access it at the following URL:
-    http://bulletin.cern.ch/
+    %(CFG_SITE_URL)s/journal/%(journal_name)s/
 
     Best Wishes,
-    CERN Bulletin team
+    %(journal_name)s team
 
     ----
 Cher Abonné,
 
-    Le nouveau numéro du CERN Bulletin, no. %s, vient de paraître.
+    Le nouveau numéro de %(journal_name)s, no. %(current_publication)s, vient de paraître.
     Vous pouvez y accéder à cette adresse :
-    http://bulletin.cern.ch/fre
+    %(CFG_SITE_URL)s/journal/%(journal_name)s/?ln=fr
 
     Bonne lecture,
-    L'équipe du Bulletin du CERN
-    ''' % (current_publication, current_publication)
+    L'équipe de %(journal_name)s
+    ''' % {'journal_name': journal_name,
+           'current_publication': current_publication,
+           'CFG_SITE_URL': CFG_SITE_URL}
         return plain_text
     # '
 
@@ -249,8 +256,9 @@ Cher Abonné,
         Customize this function to return different default texts
         based on journal name and language,
         """
-        return "CERN bulletin %s released" % get_current_publication(journal_name,
-                                                                     issue)
+        return "%s %s released" % (journal_name, \
+                                   get_current_publication(journal_name,
+                                                           issue))
 
     def tmpl_admin_alert_recipients(self, journal_name, ln, issue):
         """
@@ -260,12 +268,12 @@ Cher Abonné,
         based on journal name and language.
         Must return a list of comma-separated emails
         """
-        return "bulletin-alert-eng@cern.ch,bulletin-alert-fre@cern.ch,cern-staff@cern.ch,cern-fellows@cern.ch"
+        return ""
 
     def tmpl_admin_alert_interface(self, ln, journal_name, default_subject,
                                    default_msg, default_recipients):
         """
-        Alert eMail interface.
+        Alert email interface.
         """
         _ = gettext_set_language(ln)
         interface = '''
@@ -401,16 +409,16 @@ Cher Abonné,
         _ = gettext_set_language(ln)
         issue_string = "".join([" - %s" % issue for issue in active_issues])
         title = '<h2>Issue(s) %s created successfully!</h2>' % issue_string
-        body = '<p>Now you can:</p> \
-                 <p>Return to your journal here: >> \
-                 <a href="%s/journal/%s"> %s </a>\
-                 </p>\
-                 <p>Make additional publications here: >> \
-                 <a href="%s/admin/webjournal/webjournaladmin.py/issue_control?journal_name=%s">Issue Interface</a> \
-                </p>\
-                <p>Send an alert email here: >> \
-                <a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s"> Send an alert</a> \
-                </p>' % (CFG_SITE_URL, journal_name,
+        body = '''<p>Now you can:</p>
+                 <p>Return to your journal here: >>
+                 <a href="%s/journal/%s"> %s </a>
+                 </p>
+                 <p>Make additional publications here: >>
+                 <a href="%s/admin/webjournal/webjournaladmin.py/issue_control?journal_name=%s">Issue Interface</a>
+                </p>
+                <p>Send an alert email here: >>
+                <a href="%s/admin/webjournal/webjournaladmin.py/alert?journal_name=%s"> Send an alert</a>
+                </p>''' % (CFG_SITE_URL, journal_name,
                          journal_name, CFG_SITE_URL,
                          journal_name, CFG_SITE_URL, journal_name)
         return title + body
@@ -460,16 +468,16 @@ Cher Abonné,
         """
         _ = gettext_set_language(ln)
         title = '<h2>Journal update %s published successfully!</h2>' % update_issue
-        body = '<p>Now you can:</p> \
-                 <p>Return to your journal here: >> \
-                 <a href="%s/journal/%s"> %s </a>\
-                 </p>\
-                 <p>Go back to the publishing interface: >> \
-                 <a href="%s/admin/webjournal/webjournaladmin.py/issue_control?journal_name=%s">Issue Interface</a> \
-                 </p>\
-                 <p>Send an alert email here: >> \
-                 <a href="%s/journal/alert?name=%s"> Send an alert</a> \
-                 </p>' % (CFG_SITE_URL, journal_name, journal_name,
+        body = '''<p>Now you can:</p>
+                 <p>Return to your journal here: >>
+                 <a href="%s/journal/%s"> %s </a>
+                 </p>
+                 <p>Go back to the publishing interface: >>
+                 <a href="%s/admin/webjournal/webjournaladmin.py/issue_control?journal_name=%s">Issue Interface</a>
+                 </p>
+                 <p>Send an alert email here: >>
+                 <a href="%s/journal/alert?name=%s"> Send an alert</a>
+                 </p>''' % (CFG_SITE_URL, journal_name, journal_name,
                           CFG_SITE_URL, journal_name, CFG_SITE_URL, journal_name)
         return title + body
 
