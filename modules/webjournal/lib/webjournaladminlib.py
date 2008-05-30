@@ -761,16 +761,6 @@ def createhtmlmail (html, text, subject, toaddr):
     #
     subpart = writer.nextpart()
     subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
-    txtin.close()
-    #
-    # start the html subpart of the message
-    #
-    subpart = writer.nextpart()
-    subpart.addheader("Content-Transfer-Encoding", "quoted-printable")
-    #
-    # returns us a file-ish object we can write to
-    #
-    #pout = subpart.startbody("text/html", [("charset", 'us-ascii')])
     pout = subpart.startbody("text/html", [("charset", 'utf-8')])
     mimetools.encode(htmlin, pout, 'quoted-printable')
     htmlin.close()
