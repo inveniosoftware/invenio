@@ -634,17 +634,17 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 if rec_id and rec_id[0]:
                     write_citer_cited(recid, rec_id[0])
                     remove_from_missing(p)
-                    if result.has_key(rec_id[0]):
-                        result[rec_id[0]] += 1
+                    if not result.has_key(rec_id[0]):
+                        result[rec_id[0]] = 0
+                    result[rec_id[0]] += 1
                     # Citation list should have rec_id[0] but check anyway
-                    if citation_list.has_key(rec_id[0]):
-                        citation_list[rec_id[0]].append(recid)
-                    else:
-                        citation_list[rec_id[0]] = [recid]
-                    if reference_list.has_key(recid):
-                        reference_list[recid].append(rec_id[0])
-                    else:
-                        reference_list[recid] = [rec_id[0]]
+                    if not citation_list.has_key(rec_id[0]):
+                        citation_list[rec_id[0]] = []
+                    citation_list[rec_id[0]].append(recid)
+
+                    if not reference_list.has_key(recid):
+                        reference_list[recid] = []
+                    reference_list[recid].append(rec_id[0])
                 else:
                     #the reference we wanted was not found among our records.
                     #put the reference in the "missing".. however, it will look
@@ -707,19 +707,18 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 #check citation and reference for this..
                 if rec_id and rec_id[0]:
                     #the above should always hold
-                    if citation_list.has_key(rec_id[0]):
-                        if not recid in citation_list[rec_id[0]]:
-                            result[rec_id[0]] += 1 #add count for this..
-                            citation_list[rec_id[0]].append(recid) #append actual list
-                    else:
-                        #it was not in the hash so this is the first for rec_id[0]
-                        citation_list[rec_id[0]] = [recid]
-                        result[rec_id[0]] = 1
+                    if not citation_list.has_key(rec_id[0]):
+                        citation_list[rec_id[0]] = []
+                    if not recid in citation_list[rec_id[0]]:
+                        citation_list[rec_id[0]].append(recid) #append actual list
+                    if not result.has_key(rec_id[0]):
+                        result[rec_id[0]] = 0
+                    result[rec_id[0]] += 1 #add count for this..
+
                     #update reference_list accordingly
-                    if reference_list.has_key(recid):
-                        reference_list[recid].append(rec_id[0])
-                    else:
-                        reference_list[recid] = [rec_id[0]]
+                    if not reference_list.has_key(recid):
+                        reference_list[recid] = []
+                    reference_list[recid].append(rec_id[0])
     mesg = "d_references_s done fully"
     write_message(mesg)
     task_update_progress(mesg)
