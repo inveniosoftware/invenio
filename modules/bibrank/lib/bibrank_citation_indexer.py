@@ -41,6 +41,13 @@ NO_AUTHOR_CITES = 1
 #a config param to turn off self citation searching
 
 try:
+    from invenio.config import CFG_AUTHOR_CITATIONS
+    if CFG_AUTHOR_CITATIONS:
+        NO_AUTHOR_CITES = 0
+except:
+    pass
+
+try:
     Set = set
 except NameError:
     from sets import Set
@@ -173,7 +180,7 @@ def last_updated_result(rank_method_code, recid_list):
         initialize the value of last updated records by zero,otherwise an initial dictionary
         with zero as value for all recids
     """
-    result = make_initial_result()
+    result = [{},{},{}]
     query = """select relevance_data from rnkMETHOD, rnkMETHODDATA where
                rnkMETHOD.id = rnkMETHODDATA.id_rnkMETHOD
                and rnkMETHOD.Name = '%s'"""% rank_method_code
@@ -183,7 +190,7 @@ def last_updated_result(rank_method_code, recid_list):
         try:
             dic = marshal.loads(decompress(dict[0][0]))
         except error:
-            return result
+            return [{},{},{}]
         query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"
         cit_compressed = run_sql(query)
         cit = []
@@ -195,42 +202,8 @@ def last_updated_result(rank_method_code, recid_list):
                 ref_compressed = run_sql(query)
                 if ref_compressed and ref_compressed[0] and ref_compressed[0][0]:
                     ref = marshal.loads(decompress(ref_compressed[0][0]))
-                    result = get_initial_result(dic, cit, ref, recid_list)
+                    result = (dic, cit, ref)
     return result
-
-def get_initial_result(dic, cit, ref, recid_list):
-    """initialize the citation weights of the last updated record with zero for
-       recalculating it later
-    """
-    for recid in recid_list:
-        dic[recid] = 0
-        cit[recid] = []
-        if ref.has_key(recid) and ref[recid]:
-            for id in ref[recid]:
-                if cit.has_key(id) and recid in cit[id]:
-                    cit[id].remove(recid)
-                    if dic.has_key(id):
-                        dic[id] -= 1
-        if cit.has_key(recid) and cit[recid]:
-            for id in cit[recid]:
-                if ref.has_key(id) and recid in ref[id]:
-                    ref[id].remove(recid)
-        ref[recid] = []
-    return [dic, cit, ref]
-
-def make_initial_result():
-    """return an initial dictinary with recID as key and zero as value
-    """
-    dic = {}
-    cit = {}
-    ref = {}
-    query = "select id from bibrec"
-    res = run_sql(query)
-    for key in res:
-        dic[key[0]] = 0
-        cit[key[0]] = []
-        ref[key[0]] = []
-    return [dic, cit, ref]
 
 def get_citation_informations(recid_list, config):
     """scans the collections searching references (999C5x -fields) and citations for
@@ -417,8 +390,16 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
     """
     i = 0 #just for debugging ..
     #get the tags for main author, coauthors, ext authors from config
+    tags = ['first_author', 'additional_author', 'extauthor']
+    for t in tags:
+        try:
+            x = config.get(config.get("rank_method", "function"), t)
+        except:
+            print "critical error. attribute "+t+" missing in config"
+            raise "cfg error"
+
     r_mainauthortag = config.get(config.get("rank_method", "function"), "first_author")
-    r_coauthortag = config.get(config.get("rank_method", "function"), "additiona_author")
+    r_coauthortag = config.get(config.get("rank_method", "function"), "additional_author")
     r_extauthortag = config.get(config.get("rank_method", "function"), "extauthor")
     #parse the tags
     mainauthortag = tagify(parse_tag(r_mainauthortag))
@@ -482,13 +463,24 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, c
     """
 
     #sorry bout repeated code to get the tags
-    r_mainauthortag = config.get(config.get("rank_method", "function"), "main_author_tag")
-    r_coauthortag = config.get(config.get("rank_method", "function"), "coauthor_tag")
-    r_extauthortag = config.get(config.get("rank_method", "function"), "extauthor_tag")
+    tags = ['first_author', 'additional_author', 'extauthor']
+    tagvals = {}
+    for t in tags:
+        try:
+            x = config.get(config.get("rank_method", "function"), t)
+            tagvals[t] = x
+        except:
+            print "critical error. attribute "+t+" missing in config"
+            raise "cfg error"
+
     #parse the tags
-    mainauthortag = tagify(parse_tag(r_mainauthortag))
-    coauthortag = tagify(parse_tag(r_coauthortag))
-    extauthortag = tagify(parse_tag(r_extauthortag))
+    mainauthortag = tagify(parse_tag(tagvals['first_author']))
+    coauthortag = tagify(parse_tag(tagvals['additional_author']))
+    extauthortag = tagify(parse_tag(tagvals['extauthor']))
+    if task_get_task_param('verbose') >= 9:
+        write_message("mainauthortag "+mainauthortag)
+        write_message("coauthortag "+coauthortag)
+        write_message("extauthortag "+extauthortag)
 
     author_cited_in = initial_author_dict
     if citedbydict:

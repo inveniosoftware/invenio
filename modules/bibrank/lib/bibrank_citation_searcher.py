@@ -130,7 +130,7 @@ def get_cited_by_list(recordlist):
         if cache_cited_by_dictionary.has_key(recid):
             tmp = [recid, cache_cited_by_dictionary[recid]]
         else:
-            tmp = [recid, 0]
+            tmp = [recid, []]
         result.append(tmp)
     return result
 
