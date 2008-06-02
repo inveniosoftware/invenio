@@ -429,7 +429,7 @@ def perform_request_alert(journal_name, issue,
             html_string = put_css_in_file(html_string, journal_name)
         else:
             # Send just as plain text
-            html_string = plain_text.replace("\n", "<br/>")
+            html_string = plain_text.replace("<br/>", '\n')
 
         message = createhtmlmail(html_string, plain_text,
                                  subject, recipients)
