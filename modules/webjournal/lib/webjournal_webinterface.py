@@ -25,7 +25,6 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import urllib
-
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG
@@ -82,27 +81,27 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                          'feature_record', 'regenerate', 'administrate']:
             return WebInterfaceJournalPagesLegacy(), [component]
 
-        # TODO : wash and get default values
-        self.journal_name = None # Reinit
-        self.journal_issue_year = None # Reinit
-        self.journal_issue_number = None # Reinit
-        self.category = None # Reinit
-        self.article_id = None # Reinit
-
-        self.journal_name = component
-        if len(path) > 0:
-            self.journal_issue_year = path[0]
-        if len(path) > 1:
-            self.journal_issue_number = path[1]
-        if len(path) > 2:
-            self.category = urllib.unquote(path[2])
-        if len(path) > 3 and path[3].isdigit():
-            self.article_id = path[3]
-
         return self, []
 
     def __call__(self, req, form):
         """ Maybe resolve the final / of a directory """
+        path = req.uri[1:].split('/')
+        journal_name = None
+        journal_issue_year = None
+        journal_issue_number = None
+        category = None
+        article_id = None
+        if len(path) > 1:
+            journal_name = path[1]
+        if len(path) > 2:
+            journal_issue_year = path[2]
+        if len(path) > 3:
+            journal_issue_number = path[3]
+        if len(path) > 4:
+            category = urllib.unquote(path[4])
+        if len(path) > 5 and path[5].isdigit():
+            article_id = path[5]
+
         ## Support for legacy journal/[empty]?(args*) urls. There are
         ## these parameters only in that case
         argd = wash_urlargd(form, {'name': (str, ""),
@@ -115,8 +114,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
 
         if 'name' in form.keys() or \
             'issue' in form.keys() or \
-            'category' in form.keys() :#or \
-
+            'category' in form.keys():
             ln = wash_journal_language(argd['ln'])
             journal_name = wash_journal_name(ln, argd['name'])
             issue = wash_issue_number(ln, journal_name,
@@ -124,81 +122,81 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             issue_year = issue.split('/')[1]
             issue_number = issue.split('/')[0]
             category = wash_category(ln, argd['category'])
-            return redirect_to_url(req, CFG_SITE_URL + '/journal/%(name)s/%(issue_year)s/%(issue_number)s/%(category)s/?ln=%(ln)s' % \
-                                   {'name': journal_name,
-                                    'issue_year': issue_year,
-                                    'issue_number': issue_number,
-                                    'category': category,
-                                    'ln': ln})
+            redirect_to_url(req, CFG_SITE_URL + '/journal/%(name)s/%(issue_year)s/%(issue_number)s/%(category)s/?ln=%(ln)s' % \
+                            {'name': journal_name,
+                             'issue_year': issue_year,
+                             'issue_number': issue_number,
+                             'category': category,
+                             'ln': ln})
         ## End support for legacy urls
 
         # Check that given journal name exists.
-        if self.journal_name:
+        if journal_name:
             try:
-                get_journal_id(self.journal_name)
+                get_journal_id(journal_name)
             except InvenioWebJournalJournalIdNotFoundDBError, e:
                 register_exception(req=req)
                 return e.user_box()
 
         # If some parameters are missing, deduce them and
         # redirect
-        if not self.journal_name or \
-           not self.journal_issue_year or \
-           not self.journal_issue_number or \
-           not self.category:
-            if not self.journal_name:
+        if not journal_name or \
+           not journal_issue_year or \
+           not journal_issue_number or \
+           not category:
+            if not journal_name:
                 try:
-                    self.journal_name = guess_journal_name(argd['ln'])
+                    journal_name = guess_journal_name(argd['ln'])
                 except InvenioWebJournalNoJournalOnServerError, e:
                     register_exception(req=req)
                     return e.user_box()
                 except InvenioWebJournalNoNameError, e:
                     register_exception(req=req)
                     return e.user_box()
-            if not self.journal_issue_year or not self.journal_issue_number:
-                journal_issue = get_current_issue(argd['ln'], self.journal_name)
-                self.journal_issue_year = journal_issue.split('/')[1]
-                self.journal_issue_number = journal_issue.split('/')[0]
+            if not journal_issue_year or not journal_issue_number:
+                journal_issue = get_current_issue(argd['ln'], journal_name)
+                journal_issue_year = journal_issue.split('/')[1]
+                journal_issue_number = journal_issue.split('/')[0]
 
-            if not self.category:
+            if not category:
                 config_strings = get_xml_from_config(["index", "rule", "issue_number"],
-                                                     self.journal_name)
+                                                     journal_name)
                 rule_list = config_strings["rule"]
-                self.category = rule_list[0].split(",")[0]
+                category = rule_list[0].split(",")[0]
+            redirect_to_url(req, CFG_SITE_URL + '/journal/%(name)s/%(issue_year)s/%(issue_number)s/%(category)s/?ln=%(ln)s' % \
+                            {'name': journal_name,
+                             'issue_year': journal_issue_year,
+                             'issue_number': journal_issue_number,
+                             'category': category,
+                             'ln': argd['ln']})
 
-            return redirect_to_url(req, CFG_SITE_URL + '/journal/%(name)s/%(issue_year)s/%(issue_number)s/%(category)s/?ln=%(ln)s' % \
-                                   {'name': self.journal_name,
-                                    'issue_year': self.journal_issue_year,
-                                    'issue_number': self.journal_issue_number,
-                                    'category': self.category,
-                                    'ln': argd['ln']})
         journal_issue = ""
-        if self.journal_issue_year is not None and \
-           self.journal_issue_number is not None:
-            journal_issue = self.journal_issue_number + '/' + \
-                            self.journal_issue_year
+        if journal_issue_year is not None and \
+           journal_issue_number is not None:
+            journal_issue = journal_issue_number + '/' + \
+                            journal_issue_year
 
         editor = False
         if acc_authorize_action(getUid(req), 'cfgwebjournal',
-                                name="%s" % self.journal_name)[0] == 0:
+                                name="%s" % journal_name)[0] == 0:
             editor = True
 
-        if self.article_id is None:
+        if article_id is None:
             html = perform_request_index(req,
-                                         self.journal_name,
+                                         journal_name,
                                          journal_issue,
                                          argd['ln'],
-                                         self.category,
+                                         category,
                                          editor,
                                          verbose=argd['verbose'])
         else:
             #req.journal_defaults["editor"] = editor
             html = perform_request_article(req,
-                                           self.journal_name,
+                                           journal_name,
                                            journal_issue,
                                            argd['ln'],
-                                           self.category,
-                                           self.article_id,
+                                           category,
+                                           article_id,
                                            editor,
                                            verbose=argd['verbose'])
         return html
