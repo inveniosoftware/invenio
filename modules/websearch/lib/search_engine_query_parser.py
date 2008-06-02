@@ -707,11 +707,24 @@ class SpiresToInvenioSyntaxConverter:
         if author_surname == '' or author_surname == None:
             return ''
 
+        # SPIRES use dots at the end of the abbreviations of the names
+        # CERN don't use dots at the end of the abbreviations of the names
+        # when we are running Invenio with SPIRES date we add the dots, otherwise we don't
+        dot_symbol = ' '
+        if CFG_INSPIRE_SITE:
+            dot_symbol = "."
+
         # if there is middle name we expect to have also name and surname
         # ellis, j. r. ---> ellis, j* r*
         # j r ellis ---> ellis, j* r*
+        # ellis, john r. ---> ellis, j* r* or ellis, j. r. or ellis, jo. r.
         if author_middle_name != None and author_middle_name != '':
-            return AUTHOR_KEYWORD +  '"' + author_surname + ', ' + author_name + '*' + ' ' + author_middle_name + '*"'
+            search_pattern = AUTHOR_KEYWORD +  '"' + author_surname + ', ' + author_name + '*' + ' ' + author_middle_name + '*"'
+            if len(author_name)>1:
+                search_pattern = search_pattern + ' or ' +\
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0] + dot_symbol  + author_middle_name + dot_symbol  + '" or ' +\
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + dot_symbol + author_middle_name + dot_symbol + '"'
+            return search_pattern
 
         # ellis ---> "ellis"
         if author_name == '' or author_name == None:
@@ -721,20 +734,16 @@ class SpiresToInvenioSyntaxConverter:
         if len(author_name) == 1:
             return AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name + '*"'
 
-        # ellis, jacqueline ---> "ellis, jacqueline" or "ellis, j." or "ellis, ja."
+        # ellis, jacqueline ---> "ellis, jacqueline" or "ellis, j.*" or "ellis, j" or "ellis, ja.*" or "ellis, ja" or "ellis, jacqueline *"
         # in case we don't use SPIRES data, the ending dot is ommited.
-        dot_symbol = ''
-        if CFG_INSPIRE_SITE:
-            dot_symbol = "."
 
         if len(author_name) > 1:
             return AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name + '" or ' +\
-                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0] + '.*" or ' +\
-                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + '.*" or ' +\
-                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name + ' *" or '
-
-                #AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0] + '. *" or ' +\
-                #AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + '. *"'
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0] + dot_symbol + '*" or ' +\
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0] + '" or ' +\
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + dot_symbol + '*" or ' +\
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + '" or ' +\
+                AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name + ' *"'
 
 
     def _replace_spires_keywords_with_invenio_keywords(self, query):

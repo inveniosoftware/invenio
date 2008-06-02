@@ -151,10 +151,14 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         prints a message if both queries are parsed identically (a bonus...)
         """
 
+        invenio_search_result = perform_request_search(p=invenio_search_query)
+        spires_search_result = perform_request_search(p=spires_search_query)
+
         # first make sure the test is non trivial
-        self.assert_(len(perform_request_search(p=spi_search))>0)
-        self.assertEqual(perform_request_search(p=inv_search), \
-                         perform_request_search(p=spi_search))
+        self.assert_(len(spires_search_result)>0)
+
+        # make sure we have the same results
+        self.assertEqual(invenio_search_result, spires_search_result)
 
 
         #test operator searching
@@ -183,25 +187,25 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         self._compare_searches(invenio_search, spires_search)
 
     def test_author_initials(self):
-        """ find a j r ellis
-        """
-        inv_search = "author:'ellis, j* r*'"
-        spi_search = "find a j r ellis"
+        """ find a a m polyakov"""
+        inv_search = 'author:"polyakov, a* m*"'
+        spi_search = 'find a a m polyakov'
         self._compare_searches(inv_search, spi_search)
 
     def test_author_full_initial(self):
-        """ find a ellis, john r.
+        """ find a klebanov, igor r.
         """
-        inv_search = "author:'ellis, john r.' or author:'ellis, j. r.' or author:'ellis, jo. r.'"
-        spi_search = "find a ellis, john r."
+        inv_search = 'author:"klebanov, igor* r*" or author:"klebanov, i r" or author:"klebanov, ig r"'
+        spi_search = "find a klebanov, igor r."
         self._compare_searches(inv_search, spi_search)
 
 
     def test_author_full_first(self):
         """SPIRES search syntax - find a ellis, john"""
-        inv_search = "author:'ellis, john' or author:'ellis, j.' or author:'ellis, jo.'"
-        spi_search = "find a ellis, john"
-        self._compare_searches(inv_search, spi_search)
+        invenio_search = 'author:"ellis, john" or author:"ellis, j *" or author:"ellis, j" or author:"ellis, jo *" or author:"ellis, jo" or author:"ellis, john *"'
+        spires_search = 'find a ellis, john'
+        self._compare_searches(invenio_search, spires_search)
+
     def test_combine_multiple(self):
         """ find a j ellis and k symmetry chiral and not title chiral
         """
