@@ -40,6 +40,7 @@ from invenio.config import \
      CFG_BIBRANK_SHOW_CITATION_LINKS, \
      CFG_BIBRANK_SHOW_CITATION_STATS, \
      CFG_BIBRANK_SHOW_CITATION_GRAPHS, \
+     CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
      CFG_WEBSEARCH_RSS_TTL, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
@@ -2668,9 +2669,12 @@ class Template:
         out+='</div>'
         return out
 
-    def tmpl_xml_rss_prologue(self):
+    def tmpl_xml_rss_prologue(self, current_url=None,
+                              previous_url=None, next_url=None):
         """Creates XML RSS 2.0 prologue."""
-        out = """<rss version="2.0">
+        out = """<rss version="2.0"
+        xmlns:media="http://search.yahoo.com/mrss"
+        xmlns:atom="http://www.w3.org/2005/Atom">
       <channel>
         <title>%(sitename)s</title>
         <link>%(siteurl)s</link>
@@ -2680,7 +2684,7 @@ class Template:
         <category></category>
         <generator>CDS Invenio %(version)s</generator>
         <webMaster>%(sitesupportemail)s</webMaster>
-        <ttl>%(timetolive)s</ttl>
+        <ttl>%(timetolive)s</ttl>%(previous_link)s%(next_link)s%(current_link)s
         <image>
             <url>%(siteurl)s/img/cds.png</url>
             <title>%(sitename)s</title>
@@ -2698,7 +2702,13 @@ class Template:
                'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()),
                'version': CFG_VERSION,
                'sitesupportemail': CFG_SITE_SUPPORT_EMAIL,
-               'timetolive': CFG_WEBSEARCH_RSS_TTL
+               'timetolive': CFG_WEBSEARCH_RSS_TTL,
+               'current_link': (current_url and \
+                                 '\n<atom:link rel="self" href="%s" />\n' % current_url) or '',
+               'previous_link': (previous_url and \
+                                 '\n<atom:link rel="previous" href="%s" />' % previous_url) or '',
+               'next_link': (next_url and \
+                             '\n<atom:link rel="next" href="%s" />' % next_url) or '',
                }
         return out
 

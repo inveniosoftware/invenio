@@ -819,7 +819,14 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
         """RSS 2.0 feed service."""
 
         # Keep only interesting parameters for the search
-        argd = wash_urlargd(form, websearch_templates.rss_default_urlargd)
+        default_params = websearch_templates.rss_default_urlargd
+        # We need to keep 'jrec' and 'rg' here in order to have
+        # 'multi-page' RSS. These parameters are not kept be default
+        # as we don't want to consider them when building RSS links
+        # from search and browse pages.
+        default_params.update({'jrec':(int, 1),
+                               'rg': (int, CFG_WEBSEARCH_INSTANT_BROWSE_RSS)})
+        argd = wash_urlargd(form, default_params)
 
         for coll in argd['c'] + [argd['cc']]:
             if collection_restricted_p(coll):
@@ -832,13 +839,16 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                     return redirect_to_url(req, target)
 
         # Create a standard filename with these parameters
-        args = websearch_templates.build_rss_url(argd).split('/')[-1]
+        current_url = websearch_templates.build_rss_url(argd)
+        cache_filename = current_url.split('/')[-1]
+
+        # In the same way as previously, add 'jrec' & 'rg'
 
         req.content_type = "application/rss+xml"
         req.send_http_header()
         try:
             # Try to read from cache
-            path = "%s/rss/%s.xml" % (CFG_CACHEDIR, args)
+            path = "%s/rss/%s.xml" % (CFG_CACHEDIR, cache_filename)
             # Check if cache needs refresh
             filedesc = open(path, "r")
             last_update_time = datetime.datetime.fromtimestamp(os.stat(os.path.abspath(path)).st_mtime)
@@ -849,9 +859,14 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
             return
         except Exception, e:
             # do it live and cache
-            rss_prologue = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
-                           websearch_templates.tmpl_xml_rss_prologue() + '\n'
-            req.write(rss_prologue)
+
+            previous_url = None
+            if argd['jrec'] > 1:
+                prev_jrec = argd['jrec'] - argd['rg']
+                if prev_jrec < 1:
+                    prev_jrec = 1
+                previous_url = websearch_templates.build_rss_url(argd,
+                                                                 jrec=prev_jrec)
 
             recIDs = search_engine.perform_request_search(req, of="id",
                                                           c=argd['c'], cc=argd['cc'],
@@ -861,7 +876,19 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
                                                           p2=argd['p2'], f2=argd['f2'],
                                                           m2=argd['m2'], op2=argd['op2'],
                                                           p3=argd['p3'], f3=argd['f3'],
-                                                          m3=argd['m3'])[:-(CFG_WEBSEARCH_INSTANT_BROWSE_RSS+1):-1]
+                                                          m3=argd['m3'])
+            next_url = None
+            if len(recIDs) >= argd['jrec'] + argd['rg']:
+                next_url = websearch_templates.build_rss_url(argd,
+                                                             jrec=(argd['jrec'] + argd['rg']))
+
+            recIDs = recIDs[-argd['jrec']:(-argd['rg']-argd['jrec']):-1]
+
+            rss_prologue = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
+            websearch_templates.tmpl_xml_rss_prologue(current_url=current_url,
+                                                      previous_url=previous_url,
+                                                      next_url=next_url) + '\n'
+            req.write(rss_prologue)
             rss_body = format_records(recIDs,
                                       of='xr',
                                       record_separator="\n",
@@ -872,7 +899,7 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
             # update cache
             dirname = "%s/rss" % (CFG_CACHEDIR)
             mymkdir(dirname)
-            fullfilename = "%s/rss/%s.xml" % (CFG_CACHEDIR, args)
+            fullfilename = "%s/rss/%s.xml" % (CFG_CACHEDIR, cache_filename)
             try:
                 # Remove the file just in case it already existed
                 # so that a bit of space is created
