@@ -71,7 +71,7 @@ def index(req, ln=CFG_SITE_LANG, journal_name=None, action=""):
         return e.user_box()
     auth = acc_authorize_action(getUid(req), 'cfgwebjournal')
     if auth[0] == 0:
-        return page(title=_('Webjournal Admin'),
+        return page(title=_('WebJournal Admin'),
                     body=wjn.perform_index(ln=ln,
                                            journal_name=journal_name,
                                            action=action),
