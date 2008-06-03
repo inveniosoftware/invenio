@@ -513,7 +513,59 @@ class SpiresToInvenioSyntaxConverter:
             ' tp ' : ' 653__a:',
             ' hep-topic ' : ' 653__a:',
             ' desy-keyword ' : ' 653__a:',
-            ' dk ' : ' 653__a:'
+            ' dk ' : ' 653__a:',
+        # replace all the keywords without match with empty string
+        # this will remove the noise from the unknown keywrds in the search
+        # and will in all fields for the words following the keywords
+
+        # category
+            ' arx ' : ' ',
+            ' category ' : ' ',
+        # coden
+            ' bc ' : ' ',
+            ' browse-only-indx ' : ' ',
+            ' coden ' : ' ',
+            ' journal-coden ' : ' ',
+        # energy
+            ' e ' : ' ',
+            ' energy ' : ' ',
+            ' energyrange-code ' : ' ',
+        # exact author
+            ' ea ' : ' ',
+            ' exact-author ' : ' ',
+        # exact expression number
+            ' ee ' : ' ',
+            ' exact-exp ' : ' ',
+            ' exact-expno ' : ' ',
+        # field code
+            ' f ' : ' ',
+            ' fc ' : ' ',
+            ' field ' : ' ',
+            ' field-code ' : ' ',
+        # hidden note
+            ' hidden-note ' : ' ',
+            ' hn ' : ' ',
+        # ppf
+            ' ppf ' : ' ',
+            ' ppflist ' : ' ',
+        # primarch
+            ' parx ' : ' ',
+            ' primarch ' : ' ',
+        # slac topics
+            ' ppfa ' : ' ',
+            ' slac-topics ' : ' ',
+            ' special-topics ' : ' ',
+            ' stp ' : ' ',
+        # test index
+            ' test ' : ' ',
+            ' testindex ' : ' ',
+        # texkey
+            ' texkey ' : ' ',
+        # type code
+            ' tc ' : ' ',
+            ' ty ' : ' ',
+            ' type ' : ' ',
+            ' type-code ' : ' '
         }
 
     def __init__(self):
