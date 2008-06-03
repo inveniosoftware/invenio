@@ -18,16 +18,11 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import os
 import cgi
 from invenio.config import \
-     CFG_SITE_ADMIN_EMAIL, \
-     CFG_SITE_SUPPORT_EMAIL, \
-     CFG_ETCDIR, \
      CFG_SITE_URL, \
      CFG_SITE_LANG
 from invenio.messages import gettext_set_language
-from invenio.webpage import page
 from invenio.htmlutils import escape_html
 
 import invenio.template
@@ -331,7 +326,7 @@ class InvenioWebJournalNoNameError(Exception):
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_missing_info_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_missing_info_box(self.ln,
                         _("Select a journal on this server"),
                         _("We couldn't guess which journal you are looking for"),
                         _("You did not provide an argument for a journal name. "
@@ -359,7 +354,7 @@ class InvenioWebJournalNoCurrentIssueError(Exception):
         user-friendly message with formatting.
         """
         _ = gettext_set_language(self.ln)
-        return webjournal_error_box(self.ln,
+        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
                     _('No current issue'),
                     _('We could not find any informtion on the current issue'),
                     _('The configuration for the current issue seems to be empty. '
@@ -614,71 +609,3 @@ class InvenioWebJournalNoCategoryError(Exception):
                     _('Category "%(category_name)s" not found') % \
                        {'category_name': cgi.escape(self.category)},
                     _('Sorry, this category does not exist for this journal.'))
-
-
-#!!! depreceated !!!#
-def webjournal_missing_info_box(ln, title, msg_title, msg):
-    """
-    returns a box indicating that the given journal was not found on the
-    server, leaving the opportunity to select an existing journal from a list.
-    """
-    #params = parse_url_string(req)
-    #try:
-    #    ln = params["ln"]
-    #except:
-    #    ln = CFG_SITE_LANG
-    _ = gettext_set_language(ln)
-    title = _(title)
-    box_title = _(msg_title)
-    box_text = _(msg)
-    box_list_title = _("Available journals")
-    find_journals = lambda path: [entry for entry in os.listdir(str(path)) if os.path.isdir(str(path)+str(entry))]
-    try:
-        all_journals = find_journals('%s/webjournal/' % CFG_ETCDIR)
-    except:
-        all_journals = []
-    box = '''<div style="text-align: center;">
-                <fieldset style="width:400px; margin-left: auto; margin-right: auto;background: url('%s/img/blue_gradient.gif') top left repeat-x;">
-                    <legend style="color:#a70509;background-color:#fff;"><i>%s</i></legend>
-                    <p style="text-align:center;">%s</p>
-                    <h2 style="color:#0D2B88;">%s</h2>
-                    <ul class="webjournalBoxList">
-                        %s
-                    </ul>
-                    <br/>
-                    <div style="text-align:right;">Mail<a href="mailto:%s"> the Administrator.</a></div>
-                </fieldset>
-            </div>
-            ''' % (CFG_SITE_URL,
-                   box_title,
-                   box_text,
-                   box_list_title,
-                   "".join(['<li><a href="%s/journal/?name=%s">%s</a></li>' % (CFG_SITE_URL, journal, journal) for journal in all_journals]),
-                   CFG_SITE_ADMIN_EMAIL)
-    return page(title=title, body=box)
-
-
-#!!! depreceated !!!#
-def webjournal_error_box(ln, title, title_msg, msg):
-    """
-    """
-    #params = parse_url_string(req)
-    #try:
-    #    ln = params["ln"]
-    #except:
-    #    ln = CFG_SITE_LANG
-    _ = gettext_set_language(ln)
-    title = _(title)
-    title_msg = _(title_msg)
-    msg = _(msg)
-    box = '''<div style="text-align: center;">
-                <fieldset style="width:400px; margin-left: auto; margin-right: auto;background: url('%s/img/red_gradient.gif') top left repeat-x;">
-                    <legend style="color:#a70509;background-color:#fff;"><i>%s</i></legend>
-                    <p style="text-align:center;">%s</p>
-                    <br/>
-                    <div style="text-align:right;">Mail<a href="mailto:%s"> the Developers.</a></div>
-                </fieldset>
-            </div>
-            ''' % (CFG_SITE_URL, title_msg, msg, CFG_SITE_SUPPORT_EMAIL)
-    return page(title=title, body=box)
-
