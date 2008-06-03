@@ -18,23 +18,30 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-#from invenio.messages import gettext_set_language
-
+# Consider moving this element to CERN specific CVS
 CFG_TWO_TO_THREE_LETTER_MAPPING = {}
 CFG_TWO_TO_THREE_LETTER_MAPPING["en"] = "eng"
 CFG_TWO_TO_THREE_LETTER_MAPPING["fr"] = "fre"
 
-def format(bfo, letters="2"):
+def format(bfo, letters="2", filter='no'):
     """
-    just returns the language string of the object.
+    Returns the user-chosen langage.
+
+    @param letters Can be 2 or 3, to return for example "en" or "eng"
+    @param filter if 'yes', returns only know languages
     """
+    ln = bfo.lang
+    if filter.lower() == 'yes' and \
+           ln not in CFG_TWO_TO_THREE_LETTER_MAPPING.keys():
+        ln = 'en'
+
     if letters == "3":
         try:
-            return CFG_TWO_TO_THREE_LETTER_MAPPING[bfo.lang]
+            return CFG_TWO_TO_THREE_LETTER_MAPPING[ln]
         except:
-            return bfo.lang
+            return ln
     else:
-        return bfo.lang
+        return ln
 
 def escape_values(bfo):
     """
