@@ -59,8 +59,7 @@ DEBUG = False
 # List of URIs for which the 'ln' argument must not be added
 # automatically
 no_lang_recognition_uris = ['/rss',
-                            '/oai2d',
-                            '/journal']
+                            '/oai2d']
 
 def _debug(msg):
     if DEBUG:
