@@ -23,10 +23,13 @@ from invenio.webjournal_config import \
      InvenioWebJournalIssueNumberBadlyFormedError, \
      InvenioWebJournalNoArticleNumberError, \
      InvenioWebJournalArchiveDateWronglyFormedError, \
-     InvenioWebJournalNoPopupRecordError
+     InvenioWebJournalNoPopupRecordError, \
+     InvenioWebJournalNoCategoryError
 from invenio.webjournal_utils import \
      get_current_issue, \
-     guess_journal_name
+     guess_journal_name, \
+     get_xml_from_config, \
+     get_categories_from_rule_list
 from invenio.config import CFG_SITE_LANG
 
 # precompiled patterns for the parameters
@@ -71,11 +74,20 @@ def wash_issue_number(ln, journal_name, issue_number):
             raise InvenioWebJournalIssueNumberBadlyFormedError(ln,
                                                                issue_number)
 
-def wash_category(ln, category):
+def wash_category(ln, category, journal_name):
     """
-    Wahses a category name. No washing criterions so far.
+    Washes a category name.
     """
-    return category
+    config_strings = get_xml_from_config(["rule"],
+                                         journal_name)
+    categories = get_categories_from_rule_list(config_strings["rule"])
+
+    if category in categories:
+        return category
+    else:
+        raise InvenioWebJournalNoCategoryError(ln,
+                                               category,
+                                               categories)
 
 def wash_article_number(ln, number, journal_name):
     """

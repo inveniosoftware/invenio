@@ -39,7 +39,8 @@ from invenio.webjournal_config import \
      InvenioWebJournalArchiveDateWronglyFormedError, \
      InvenioWebJournalJournalIdNotFoundDBError, \
      InvenioWebJournalNoArticleNumberError, \
-     InvenioWebJournalNoPopupRecordError
+     InvenioWebJournalNoPopupRecordError, \
+     InvenioWebJournalNoCategoryError
 from invenio.webjournal_utils import \
      get_xml_from_config, \
      get_current_issue, \
@@ -121,7 +122,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                              argd['issue'])
             issue_year = issue.split('/')[1]
             issue_number = issue.split('/')[0]
-            category = wash_category(ln, argd['category'])
+            category = wash_category(ln, argd['category'], journal_name)
             redirect_to_url(req, CFG_SITE_URL + '/journal/%(name)s/%(issue_year)s/%(issue_number)s/%(category)s/?ln=%(ln)s' % \
                             {'name': journal_name,
                              'issue_year': issue_year,
@@ -175,6 +176,23 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
            journal_issue_number is not None:
             journal_issue = journal_issue_number + '/' + \
                             journal_issue_year
+
+        try:
+            journal_name = wash_journal_name(argd['ln'], journal_name)
+            issue = wash_issue_number(argd['ln'], journal_name, journal_issue)
+            category = wash_category(argd['ln'], category, journal_name)
+        except InvenioWebJournalNoJournalOnServerError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalNoNameError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalIssueNumberBadlyFormedError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalNoCategoryError, e:
+            register_exception(req=req)
+            return e.user_box()
 
         editor = False
         if acc_authorize_action(getUid(req), 'cfgwebjournal',
@@ -302,7 +320,7 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
             journal_name = wash_journal_name(ln, argd['name'])
             issue_number = wash_issue_number(ln, journal_name,
                                              argd['issue'])
-            category = wash_category(ln, argd['category'])
+            category = wash_category(ln, argd['category'], journal_name)
         except InvenioWebJournalNoJournalOnServerError, e:
             register_exception(req=req)
             return e.user_box()
@@ -313,6 +331,9 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalIssueNumberBadlyFormedError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalNoCategoryError, e:
             register_exception(req=req)
             return e.user_box()
         # the journal_defaults will be used by format elements that have no
@@ -347,7 +368,7 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
                                       argd['issue'])
             issue_year = issue.split('/')[1]
             issue_number = issue.split('/')[0]
-            category = wash_category(ln, argd['category'])
+            category = wash_category(ln, argd['category'], journal_name)
             number = wash_article_number(ln, argd['number'], journal_name)
             recid = get_recid_from_legacy_number(issue, category, int(number))
         except InvenioWebJournalNoJournalOnServerError, e:
@@ -363,6 +384,9 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoArticleNumberError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalNoCategoryError, e:
             register_exception(req=req)
             return e.user_box()
 

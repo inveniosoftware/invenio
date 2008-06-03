@@ -228,6 +228,15 @@ def get_rule_string_from_rule_list(rule_list, category):
         # todo: exception
     return rule_string
 
+def get_categories_from_rule_list(rule_list):
+    """
+    Returns the list of categories defined for this configuration
+    """
+    categories = [rule_string.split(',')[0] \
+                  for rule_string in rule_list]
+
+    return categories
+
 def get_category_from_rule_string(rule_string):
     """
     TODO: Remove?

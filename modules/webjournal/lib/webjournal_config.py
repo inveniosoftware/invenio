@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import os
-
+import cgi
 from invenio.config import \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_SUPPORT_EMAIL, \
@@ -583,6 +583,38 @@ class InvenioWebJournalJournalIdNotFoundDBError(Exception):
                       for this journal. You can try to refresh the page or \
                       contact the Administrator. We apologize for the \
                       inconvenience.')
+
+class InvenioWebJournalNoCategoryError(Exception):
+    """
+    Raised when trying to access a category that does not exist.
+    """
+    def __init__(self, ln, category, categories):
+        """
+        Initialisation.
+        """
+        self.ln = ln
+        self.category = category
+        self.categories = categories
+
+    def __str__(self):
+        """
+        String representation.
+        """
+        return 'The specified category "%s" does not exist' % \
+               self.category
+
+    def user_box(self):
+        """
+        user-friendly message with formatting.
+        """
+        _ = gettext_set_language(self.ln)
+        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+                    _('Category "%(category_name)s" not found') % \
+                       {'category_name': cgi.escape(self.category)},
+                    _('Category "%(category_name)s" not found') % \
+                       {'category_name': cgi.escape(self.category)},
+                    _('Sorry, this category does not exist for this journal.'))
+
 
 #!!! depreceated !!!#
 def webjournal_missing_info_box(ln, title, msg_title, msg):
