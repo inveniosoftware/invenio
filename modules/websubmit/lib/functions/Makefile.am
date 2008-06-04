@@ -59,6 +59,7 @@ pylib_DATA = __init__.py \
              Retrieve_Data.py \
              Send_APP_Mail.py \
              Send_Approval_Request.py \
+             Send_Delete_Mail.py \
              Send_Modify_Mail.py \
              Send_Request_For_Direct_Approval.py \
              Send_Request_For_Publication.py \
