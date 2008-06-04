@@ -31,13 +31,26 @@ import sys
 import time
 import copy
 import shelve
-from invenio.bibtask import write_message
 
 # Please point the following variables to the correct paths if using standalone (Invenio-independent) version
 TMPDIR_STANDALONE = "/tmp"
 PDFTOTEXT_STANDALONE = "/usr/bin/pdftotext"
 
 fontSize = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
+
+def write_message(msg, stream=sys.stdout):
+    """Write message and flush output stream (may be sys.stdout or sys.stderr).
+    Useful for debugging stuff."""
+    if stream == sys.stdout or stream == sys.stderr:
+        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ",
+            time.localtime()))
+        try:
+            stream.write("%s\n" % msg)
+        except UnicodeEncodeError:
+            stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
+        stream.flush()
+    else:
+        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
 
 def usage(code, msg=''):
     "Prints usage for this module."
