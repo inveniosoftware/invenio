@@ -901,7 +901,7 @@ class WebSearchRSSFeedServiceTest(unittest.TestCase):
         """websearch - RSS feed service"""
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/rss',
-                                               expected_text='<rss version="2.0">'))
+                                               expected_text='<rss version="2.0"'))
 
 class WebSearchXSSVulnerabilityTest(unittest.TestCase):
     """Test possible XSS vulnerabilities of the search engine."""
