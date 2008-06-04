@@ -723,9 +723,9 @@ class WordTable:
         self.default_get_words_fnc = default_get_words_fnc
 
         if self.stemming_language:
-            write_message('Stemming(%s) is enabled for table %s' % (self.stemming_language, self.tablename))
+            write_message('%s has stemming enabled, language %s' % (self.tablename, self.stemming_language))
         else:
-            write_message('Stemming is disabled for table %s' % self.tablename)
+            write_message('%s has stemming disabled' % self.tablename)
 
     def get_field(self, recID, tag):
         """Returns list of values of the MARC-21 'tag' fields for the
