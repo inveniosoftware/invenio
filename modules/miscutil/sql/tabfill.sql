@@ -360,6 +360,7 @@ INSERT INTO sbmACTION VALUES ('Modify Record','MBI','modify','1998-08-17','2001-
 INSERT INTO sbmACTION VALUES ('Submit New File','SRV','revise','0000-00-00','2001-11-07','','Submit New File');
 INSERT INTO sbmACTION VALUES ('Approve Record','APP','approve','2001-11-08','2002-06-11','','Approve Record');
 
+INSERT INTO sbmALLFUNCDESCR VALUES ('Ask_For_Record_Details_Confirmation','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('CaseEDS','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Create_Modify_Interface',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Create_Recid',NULL);
