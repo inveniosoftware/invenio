@@ -185,7 +185,8 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
         safe_keys = ""
 
     if safe_keys != "":
-        write_message("Author keyword string detected: %s" % safe_keys, verbose=8)
+        if verbose >= 8:
+            write_message("Author keyword string detected: %s" % safe_keys)
 
     # Here we start the big for loop around all concepts in the RDF ontology
     if not reusing_compiled_ontology_p:
