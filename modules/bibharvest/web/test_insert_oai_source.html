@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="selenium.base" href="http://pcdh23.cern.ch/admin/bibharvest/bibharvestadmin.py?ln=en" />
+<link rel="selenium.base" href="http://localhost" />
 <title>test_insert_oai_source</title>
 </head>
 <body>
@@ -13,7 +13,27 @@
 </thead><tbody>
 <tr>
 	<td>open</td>
-	<td>/admin/bibharvest/bibharvestadmin.py?ln=en</td>
+	<td>http://localhost</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=login</td>
+	<td></td>
+</tr>
+<tr>
+	<td>type</td>
+	<td>p_un</td>
+	<td>admin</td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>action</td>
+	<td></td>
+</tr>
+<tr>
+	<td>open</td>
+	<td>http://localhost/admin/bibharvest/bibharvestadmin.py?ln=en</td>
 	<td></td>
 </tr>
 <tr>
@@ -89,6 +109,11 @@
 <tr>
 	<td>verifyTextPresent</td>
 	<td>AtlantisOAI</td>
+	<td></td>
+</tr>
+<tr>
+	<td>clickAndWait</td>
+	<td>link=logout</td>
 	<td></td>
 </tr>
 
