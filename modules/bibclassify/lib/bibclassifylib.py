@@ -785,33 +785,21 @@ def main():
     except StandardError, e:
         write_message(e, sys.stderr)
         sys.exit(1)
+
     if input_file == "" or dict_file == "":
         write_message("Need to enter the name of an input file AND a thesaurus file \n")
         usage(1)
+
     # Weak method to detect dict_file. Need to improve this (e.g. by looking inside the metadata with rdflib?)
     if dict_file.find(".rdf")!=-1:
         outcome = generate_keywords_rdf(input_file, dict_file, output, limit, nkeywords, mode, spires, verbose, dict_file)
     else: # Treat as text
         outcome = generate_keywords(input_file, dict_file, verbose)
-        print outcome
-        if limit > len(outcome): limit = len(outcome)
-        if output == 0:
-            for i in range(limit):
-                print outcome[i]
-        else:
-            print "<html>"
-            print "<head>"
-            print "<title>Keywords</title>"
-            print "<body>"
-            print "<table>"
-            print '<tr><div class="pagebox2" align="top"><small>'
-            for i in range(limit):
-                print "<b>" + str(outcome[i]) + "</b><br />"
-            print '</small></div></tr>'
-            print "</table></body>"
-            print "</html>"
-    return
 
+    # Print the results
+    print outcome
+
+    return
 
 if __name__ == '__main__':
     main()
