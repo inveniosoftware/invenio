@@ -26,6 +26,7 @@ pylib_DATA = __init__.py \
              CaseEDS.py \
              Check_Group.py \
              Convert_RecXML_to_RecALEPH.py \
+             Convert_RecXML_to_RecALEPH_DELETE.py \
              Create_Cplx_Approval.py \
              Create_Modify_Interface.py \
              Create_Recid.py \
