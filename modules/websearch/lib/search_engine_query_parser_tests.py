@@ -187,14 +187,13 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         self._compare_searches(invenio_search, spires_search)
 
     def test_author_initials(self):
-        """ find a a m polyakov"""
+        """SPIRES search syntax - find a a m polyakov"""
         inv_search = 'author:"polyakov, a* m*"'
         spi_search = 'find a a m polyakov'
         self._compare_searches(inv_search, spi_search)
 
     def test_author_full_initial(self):
-        """ find a klebanov, igor r.
-        """
+        """SPIRES search syntax - find a klebanov, igor r."""
         inv_search = 'author:"klebanov, igor* r*" or author:"klebanov, i r" or author:"klebanov, ig r"'
         spi_search = "find a klebanov, igor r."
         self._compare_searches(inv_search, spi_search)
@@ -207,28 +206,24 @@ class TestSpiresToInvenioSyntaxConverter(unittest.TestCase):
         self._compare_searches(invenio_search, spires_search)
 
     def test_combine_multiple(self):
-        """ find a j ellis and k symmetry chiral and not title chiral
-        """
+        """SPIRES search syntax - find a j ellis and k symmetry chiral and not title chiral"""
         inv_search = "author:'ellis, j*' keyword:chiral  keyword:symmetry -title:chiral "
         spi_search = "find a j ellis and k symmetry chiral and not title chiral"
 
     def test_combine_multiple_or(self):
-        """ find a j ellis and t chiral or k cross section
-        """
+        """SPIRES search syntax - find a j ellis and t chiral or k cross section"""
         inv_search = "author:'ellis, j*' and (title:beyond  or (keyword:cross keyword:section))"
         spi_search = "find a j ellis and (title beyond or k cross section)"
 
 
 #    def test_date(self):
-#        """ find date 1996
-#        """
+#        """SPIRES search syntax - find date 1996"""
 #        inv_search = "year:1996"
 #        spi_search = "find date 1996"
 #        self._compare_searches(inv_search, spi_search)
 
 #    def test_month(self):
-#        """find date 3/1996
-#        """
+#        """SPIRES search syntax - find date 3/1996"""
 #        inv_search = "year:'3/1996'"
 #        spi_search = "find date 3/1996"
 #        self._compare_searches(inv_search, spi_search)
