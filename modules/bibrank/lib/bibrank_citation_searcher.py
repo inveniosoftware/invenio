@@ -159,22 +159,10 @@ def calculate_cited_by_list(record_id, sort_order="d"):
     # determine which record cite RECORD_ID:
     if cache_cited_by_dictionary:
         citation_list = cache_cited_by_dictionary.get(record_id, [])
-    # get their weights, this is weighted citation_list (x is cited by y)
-    query = "select relevance_data from rnkMETHODDATA, rnkMETHOD WHERE rnkMETHOD.id=rnkMETHODDATA.id_rnkMETHOD and rnkMETHOD.name='citation'"
-    compressed_citation_weight_dic = run_sql(query)
-    if compressed_citation_weight_dic and compressed_citation_weight_dic[0]:
-        #has to be prepared for corrupted data!
-        try:
-            citation_dic = marshal.loads(decompress(compressed_citation_weight_dic[0][0]))
-            #citation_dic is {1: 0, .. 81: 4, 82: 0, 83: 0, 84: 3} etc, e.g. recnum-weight
-            for id in citation_list:
-                if citation_dic.has_key(id):
-                    tmp = [id, citation_dic[id]]
-                    result.append(tmp)
-        except error:
-            for id in citation_list:
-                tmp = [id, 1]
-                result.append(tmp)
+    #add weights i.e. records that cite each of the entries in citation_list
+    for c in citation_list:
+        ccited = cache_cited_by_dictionary.get(c, [])
+        result.append([c, len(ccited)])
     # sort them:
     if result:
         if sort_order == "d":
