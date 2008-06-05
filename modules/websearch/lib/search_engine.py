@@ -2879,8 +2879,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                         # Self-cited
                         selfcited = get_self_cited_by(recid)
                         req.write(websearch_templates.tmpl_detailed_record_citations_self_cited(recid,
-                                                                                                ln,
-                                                                                                selfcited=selfcited))
+                                  ln, selfcited=selfcited, citinglist=citinglist))
                         # Co-cited
                         s = calculate_co_cited_with_list(recid)
                         cociting = None

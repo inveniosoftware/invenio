@@ -3001,7 +3001,7 @@ class Template:
 
 
     def tmpl_detailed_record_citations_self_cited(self, recID, ln,
-                                                  selfcited):
+                                                  selfcited, citinglist):
         """Returns the list of self-citations for this record
 
         Parameters:
