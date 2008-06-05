@@ -352,14 +352,13 @@ def find_citations(rank_method_code, recID, hitset, verbose):
     ret = []
     if recisint:
         myrecords = get_cited_by(recidint) #this is a simple list
-        for r in myrecords:
-            ret.append([r,0])
+        ret = get_cited_by_weight(myrecords)
     else:
         ret = get_cited_by_weight(hitset)
-        ret.sort(lambda x,y:cmp(x[1],y[1]))      #ascending by the second member of the tuples
+    ret.sort(lambda x,y:cmp(x[1],y[1]))      #ascending by the second member of the tuples
 
     if verbose > 0:
-        voutput = voutput+"\nrecID "+str(recID)+" hitset "+str(hitset)+"\n"+"find_citations retlist "+str(ret)
+        voutput = voutput+"\nrecID "+str(recID)+" is int: "+str(recisint)+" hitset "+str(hitset)+"\n"+"find_citations retlist "+str(ret)
 
     #voutput = voutput + str(ret)
 
