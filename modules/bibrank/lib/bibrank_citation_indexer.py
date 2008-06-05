@@ -37,16 +37,6 @@ from invenio.bibformat_utils import parse_tag
 from invenio.bibtask import write_message, task_get_option, task_update_progress, task_sleep_now_if_required, task_get_task_param
 from invenio.bibrecord import create_records
 
-NO_AUTHOR_CITES = 1
-#a config param to turn off self citation searching
-
-try:
-    from invenio.config import CFG_AUTHOR_CITATIONS
-    if CFG_AUTHOR_CITATIONS:
-        NO_AUTHOR_CITES = 0
-except:
-    pass
-
 try:
     Set = set
 except NameError:
@@ -75,10 +65,7 @@ def get_citation_weight(rank_method_code, config):
     """
     begin_time = time.time()
     last_update_time = get_bibrankmethod_lastupdate(rank_method_code)
-    #addition: YOU DO NEED TO RUN WITH OPTION -R SOMETIMES. This is
-    #because among the new set (X) there can be records such that the old
-    #records Y cite them. But this kind of situation is not detected
-    #unless you go though all the records Y+X.
+
     if task_get_option("quick") == "no":
         last_update_time = "0000-00-00 00:00:00"
     #if task_get_option('verbose') >= 3:
@@ -799,9 +786,11 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     initial_self_dict = get_cit_dict("selfcitdict")
     selfdic = initial_self_dict
     #add new records to selfdic
-    if NO_AUTHOR_CITES:
-        print "Self cite processing disabled"
+    acit = task_get_option("author-citations")
+    if not acit:
+        print "Self cite processing disabled. Use -A option to enable it."
     else:
+        write_message("self cite and author citations enabled")
         selfdic = get_self_citations(updated_rec_list, citation_list,
                                  initial_self_dict, config)
     #selfdic consists of
@@ -825,9 +814,11 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     #get author citations for records in updated_rec_list
     initial_author_dict = get_initial_author_dict()
     authorcitdic = initial_author_dict
-    if NO_AUTHOR_CITES:
-        print "Author cites disabled"
+    acit = task_get_option("author-citations")
+    if not acit:
+        print "Author cites disabled. Use -A option to enable it."
     else:
+        write_message("author citations enabled")
         authorcitdic = get_author_citations(updated_rec_list, citation_list,
                                         initial_author_dict, config)
 

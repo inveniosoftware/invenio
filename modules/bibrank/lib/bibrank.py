@@ -169,6 +169,7 @@ def main():
        bibrank -wjif --rebalance --collection=Articles
        bibrank -wsbr -a -i 234-250,293,300-500 -u admin
        bibrank -u admin -w citation -E 10
+       bibrank -u admin -w citation -A
 """,
             help_specific_usage="""Ranking options:
  -w, --run=r1[,r2]         runs each rank method in the order given
@@ -194,13 +195,16 @@ def main():
                            system.  Useful for cataloguers to input
                            external papers manually.
 
+ -A --author-citations     Calculate author citations.
+
  Repairing options:
  -k,  --check              check consistency for all records in the table(s)
                            check if update of ranking data is necessary
  -r, --repair              try to repair all records in the table(s)
 """,
             version=__revision__,
-            specific_params=("E:ladSi:m:c:kUrRM:f:w:", [
+            specific_params=("AE:ladSi:m:c:kUrRM:f:w:", [
+                "author-citations",
                 "print-extcites=",
                 "lastupdate",
                 "add",
@@ -240,6 +244,8 @@ def task_submit_elaborate_specific_parameter(key, value, opts, dummy):
         except:
             task_set_option("print-extcites", 10) # default fallback value
         task_set_option("cmd", "print-missing")
+    elif key in ("-A", "--author-citations"):
+        task_set_option("author-citations", "1")
     elif key in ("-d", "--del"):
         task_set_option("cmd", "del")
     elif key in ("-k", "--check"):
