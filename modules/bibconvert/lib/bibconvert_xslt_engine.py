@@ -199,13 +199,15 @@ def convert(xmltext, template_filename=None, template_source=None):
         try:
             template_xml = libxml2.parseDoc(template)
         except libxml2.parserError, e:
-            sys.stderr.write('Parsing XSL template failed:\n' % (str(e)))
+            sys.stderr.write('Parsing XSL template failed:\n ' + \
+                             str(e) + '\n')
             return None
         processor = libxslt.parseStylesheetDoc(template_xml)
         try:
             source = libxml2.parseDoc(xmltext)
         except libxml2.parserError, e:
-            sys.stderr.write('Parsing XML source failed:\n' % (str(e)))
+            sys.stderr.write('Parsing XML source failed:\n ' + \
+                             str(e) + '\n')
             return None
 
         # Transform
@@ -236,14 +238,14 @@ def convert(xmltext, template_filename=None, template_source=None):
         try:
             processor.appendStylesheet(transform)
         except XsltException, e:
-            sys.stderr.write('Parsing XSL template failed:\n' % (str(e)))
+            sys.stderr.write('Parsing XSL template failed:\n' + str(e))
             return None
 
         # Transform
         try:
             result = processor.run(source)
         except XsltException, e:
-            sys.stderr.write('Conversion failed:\n' % (str(e)))
+            sys.stderr.write('Conversion failed:\n' + str(e))
             return None
     else:
         sys.stderr.write("No XSLT processor could be found")

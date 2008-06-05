@@ -263,7 +263,9 @@ elif opt_value.endswith('.xsl'):
     # BibConvert for XSLT
     source_xml = sys.stdin.read()
     try:
-        print bibconvert_xslt_engine.convert(source_xml, extract_tpl)
+        res = bibconvert_xslt_engine.convert(source_xml, extract_tpl)
+        if res is not None:
+            print res
     except NameError:
         sys.stderr.write("Error: cannot use BibConvert XSL engine.")
         sys.stderr.write("A compliant XML parser is needed. See Invenio INSTALL guide.")
