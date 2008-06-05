@@ -35,8 +35,7 @@ try:
     from time import gmtime, strftime, localtime
     import os.path
 except ImportError, e:
-    print "Error: %s" % e
-    import sys
+    sys.stderr.write("Error: %s" % e)
     sys.exit(1)
 
 try:
@@ -45,21 +44,24 @@ try:
     from invenio.config import *
     from invenio import bibconvert
 except ImportError, e:
-    print "Error: %s" % e
+    sys.stderr.write("Error: %s" % e)
     sys.exit(1)
-    
+
 try:
     from invenio import bibconvert_bfx_engine
     from invenio import bibconvert_xslt_engine
 except ImportError, e:
-    print "Warning: %s" % e
+    sys.stderr.write("Warning: %s" % e)
 
-def printInfo():
+def usage(exitcode=0, msg=""):
     "print out when not enough parmeters given"
-    
-    print """
-BibConvert data convertor.
 
+    if msg:
+        sys.stderr.write(msg)
+    else:
+        sys.stderr.write("BibConvert data convertor.")
+
+    sys.stderr.write("""
 Usage: [options] < input.dat
 Examples:
        bibconvert -ctemplate.cfg < input.dat
@@ -68,7 +70,7 @@ Examples:
 
  XSL and BFX options:
  -c,  --config             transformation stylesheet file
-  
+
  Plain text-oriented options:
  -c,  --config             configuration template file
  -d,  --directory          source_data fields are located in separated files in 'directory'
@@ -82,11 +84,11 @@ Examples:
  -E,  --record-footer      insert record footer
  -s,  --separator          record separator, default empty line (EOLEOL)
  -t,  --output_separator
- 
+
  -m0,  		           match records using query string, output *unmatched*
  -m1,                      match records using query string, output *matched*
  -m2,                      match records using query string, output *ambiguous*
-     
+
  -Cx,                      alternative to -c when config split to several files, *extraction*
  -Cs,                      alternative to -c when config split to several files, *target*
  -Ct,                      alternative to -c when config split to several files, *source*
@@ -94,10 +96,10 @@ Examples:
  BibConvert can convert:
   - XML data using XSL or bfx templates.
   - Plain text data using cfg templates files.
-  
+
  Plain text-oriented options are not available with .xsl and .bfx configuration files
-       
-    """
+""")
+    sys.exit(exitcode)
 
 ### MAIN ###
 
@@ -117,23 +119,25 @@ begin_header         = ""
 ending_footer        = ""
 oai_identifier_from  = 1
 extract_tpl          = ""
-       
-opts, args = getopt.getopt(sys.argv[1:],"c:d:hVl:o:b:e:B:E:s:m:C:",
-             [
-               "config",
-               "directory",
-               "help",
-               "version",
-               "length",
-               "oai",
-               "header",
-               "footer",
-               "record-header",
-               "record-footer",
-               "separator",
-               "match",
-               "config-alt"
-             ])
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:],"c:d:hVl:o:b:e:B:E:s:m:C:",
+                               ["config",
+                                "directory",
+                                "help",
+                                "version",
+                                "length",
+                                "oai",
+                                "header",
+                                "footer",
+                                "record-header",
+                                "record-footer",
+                                "separator",
+                                "match",
+                                "config-alt"
+                                ])
+except getopt.GetoptError, err:
+    usage(1, "Error: " + str(err))
 
 # get options and arguments
 
@@ -169,11 +173,11 @@ for opt, opt_value in opts:
             pass
         else:
             extract_tpl_parsed  = bibconvert.parse_common_template(extract_tpl,1)
-        
+
             source_tpl  = opt_value
             source_tpl_parsed  = bibconvert.parse_common_template(source_tpl,2)
-            
-            target_tpl  = opt_value 
+
+            target_tpl  = opt_value
             target_tpl_parsed  = bibconvert.parse_common_template(target_tpl,3)
 
     elif opt in ["-d", "--directory"]:
@@ -184,8 +188,7 @@ for opt, opt_value in opts:
         dirmode           = 1
 
     elif opt in ["-h", "--help"]:
-        printInfo()
-        sys.exit(0)
+        usage(0)
 
     elif opt in ["-V", "--version"]:
         print __revision__
@@ -236,13 +239,9 @@ for opt, opt_value in opts:
             source_tpl    = opt_value[1:]
             source_tpl_parsed  = bibconvert.parse_template(source_tpl)
 
-
-
 # Check if required arguments were given
 if(extract_tpl == ""):
-    printInfo()
-    sys.exit(0)
-
+    usage(1, "Error: configuration template missing")
 
 # Redirect to processor for given config file
 if opt_value.endswith('.'+
@@ -251,18 +250,28 @@ if opt_value.endswith('.'+
     source_xml = sys.stdin.read()
     try:
         print bibconvert_bfx_engine.convert(source_xml, extract_tpl)
-    except:
-        print "Error: cannot use BibConvert BFX engine."
-        print "A compliant XSLT library is needed. See Invenio INSTALL guide."
-        
+    except NameError:
+        sys.stderr.write("Error: cannot use BibConvert BFX engine.")
+        sys.stderr.write("A compliant XSLT library is needed. See Invenio INSTALL guide.")
+        sys.exit(1)
+    except Exception, e:
+        sys.stderr.write("An error occurred during the conversion.")
+        sys.stderr.write(str(e))
+        sys.exit(1)
+
 elif opt_value.endswith('.xsl'):
     # BibConvert for XSLT
     source_xml = sys.stdin.read()
     try:
         print bibconvert_xslt_engine.convert(source_xml, extract_tpl)
-    except:
-        print "Error: cannot use BibConvert XSL engine."
-        print "A compliant XML parser is needed. See Invenio INSTALL guide."
+    except NameError:
+        sys.stderr.write("Error: cannot use BibConvert XSL engine.")
+        sys.stderr.write("A compliant XML parser is needed. See Invenio INSTALL guide.")
+        sys.exit(1)
+    except Exception, e:
+        sys.stderr.write("An error occurred during the conversion.")
+        sys.stderr.write(str(e))
+        sys.exit(1)
 else:
     # BibConvert for cfg
 
@@ -291,5 +300,5 @@ else:
     ar_.append(target_tpl_parsed)
     ar_.append(extract_tpl)
     ar_.append(extract_tpl_parsed)
-    
+
     bibconvert.convert(ar_)
