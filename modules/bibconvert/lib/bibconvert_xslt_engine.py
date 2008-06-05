@@ -70,7 +70,7 @@ except ImportError:
 if processor_type == -1:
     try:
         # 4suite
-        from Ft.Xml.Xslt import Processor
+        from Ft.Xml.Xslt import Processor, XsltException
         from Ft.Xml import InputSource
         from xml.dom import Node
         processor_type = 1
@@ -159,7 +159,7 @@ def convert(xmltext, template_filename=None, template_source=None):
     @param xmltext The string representation of the XML to process
     @param template_filename The name of the template to use for the processing
     @param template_source The configuration describing the processing.
-    @return the transformed XML text.
+    @return the transformed XML text, or None if an error occured
     """
     if processor_type == -1:
         # No XSLT processor found
@@ -196,9 +196,17 @@ def convert(xmltext, template_filename=None, template_source=None):
                                           bibconvert_function_libxslt)
 
         # Load template and source
-        template_xml = libxml2.parseDoc(template)
+        try:
+            template_xml = libxml2.parseDoc(template)
+        except libxml2.parserError, e:
+            sys.stderr.write('Parsing XSL template failed:\n' % (str(e)))
+            return None
         processor = libxslt.parseStylesheetDoc(template_xml)
-        source = libxml2.parseDoc(xmltext)
+        try:
+            source = libxml2.parseDoc(xmltext)
+        except libxml2.parserError, e:
+            sys.stderr.write('Parsing XML source failed:\n' % (str(e)))
+            return None
 
         # Transform
         result_object = processor.applyStylesheet(source, None)
@@ -222,13 +230,21 @@ def convert(xmltext, template_filename=None, template_source=None):
 
         # Load template and source
         transform = InputSource.DefaultFactory.fromString(template,
-                                                       uri=CFG_SITE_URL)
+                                                          uri=CFG_SITE_URL)
         source = InputSource.DefaultFactory.fromString(xmltext,
                                                        uri=CFG_SITE_URL)
-        processor.appendStylesheet(transform)
+        try:
+            processor.appendStylesheet(transform)
+        except XsltException, e:
+            sys.stderr.write('Parsing XSL template failed:\n' % (str(e)))
+            return None
 
         # Transform
-        result = processor.run(source)
+        try:
+            result = processor.run(source)
+        except XsltException, e:
+            sys.stderr.write('Conversion failed:\n' % (str(e)))
+            return None
     else:
         sys.stderr.write("No XSLT processor could be found")
 
