@@ -192,11 +192,15 @@ def rank_records(rank_method_code, rank_limit_relevance, hitset_global, pattern=
         function = methods[rank_method_code]["function"]
         #we get 'citation' method correctly here
         func_object = globals().get(function)
+
         if func_object and pattern and pattern[0][0:6] == "recid:" and function == "word_similarity":
             result = find_similar(rank_method_code, pattern[0][6:], hitset, rank_limit_relevance, verbose)
-        elif rank_method_code == "citation" and pattern:
+        elif rank_method_code == "citation":
             #we get rank_method_code correctly here. pattern[0] is the search word - not used by find_cit
-            result = find_citations(rank_method_code, pattern[0][6:], hitset, verbose)
+            p = ""
+            if pattern and pattern[0]:
+                p = pattern[0][6:]
+            result = find_citations(rank_method_code, p, hitset, verbose)
 
         elif func_object:
             result = func_object(rank_method_code, pattern, hitset, rank_limit_relevance, verbose)
