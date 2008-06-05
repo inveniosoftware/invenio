@@ -167,7 +167,7 @@ def last_updated_result(rank_method_code, recid_list):
         initialize the value of last updated records by zero,otherwise an initial dictionary
         with zero as value for all recids
     """
-    result = [{},{},{}]
+    result = [{}, {}, {}]
     query = """select relevance_data from rnkMETHOD, rnkMETHODDATA where
                rnkMETHOD.id = rnkMETHODDATA.id_rnkMETHOD
                and rnkMETHOD.Name = '%s'"""% rank_method_code
@@ -177,7 +177,7 @@ def last_updated_result(rank_method_code, recid_list):
         try:
             dic = marshal.loads(decompress(dict[0][0]))
         except error:
-            return [{},{},{}]
+            return [{}, {}, {}]
         query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"
         cit_compressed = run_sql(query)
         cit = []
@@ -639,7 +639,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                         if (l.find(p) > 0): #the gfhgf/1254312 was found.. get the s-part of it
                             st = l.find('$s')
                             if (st > 0):
-                                end = l.find('$',st)
+                                end = l.find('$', st)
                                 if (end == st):
                                     end = len(l)
                                 rpart = l[st+2:end]
@@ -1004,7 +1004,7 @@ def write_citer_cited(citer, cited):
     sciter = str(citer)
     scited = str(cited)
     try:
-        run_sql("insert into tmpcit(citer, cited) values (%s,%s)", (sciter,scited))
+        run_sql("insert into tmpcit(citer, cited) values (%s,%s)", (sciter, scited))
     except:
         pass
 
