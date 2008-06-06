@@ -117,13 +117,23 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             'issue' in form.keys() or \
             'category' in form.keys():
             ln = wash_journal_language(argd['ln'])
-            journal_name = wash_journal_name(ln, argd['name'])
+            try:
+                journal_name = wash_journal_name(ln, argd['name'])
+            except InvenioWebJournalNoJournalOnServerError, e:
+                register_exception(req=req)
+                return e.user_box()
+            except InvenioWebJournalNoNameError, e:
+                register_exception(req=req)
+                return e.user_box()
             try:
                 issue = wash_issue_number(ln, journal_name,
                                           argd['issue'])
                 issue_year = issue.split('/')[1]
                 issue_number = issue.split('/')[0]
             except InvenioWebJournalIssueNumberBadlyFormedError, e:
+                register_exception(req=req)
+                return e.user_box()
+            except InvenioWebJournalJournalIdNotFoundDBError, e:
                 register_exception(req=req)
                 return e.user_box()
             category = wash_category(ln, argd['category'], journal_name)
@@ -196,6 +206,9 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoCategoryError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalJournalIdNotFoundDBError, e:
             register_exception(req=req)
             return e.user_box()
 
@@ -287,6 +300,9 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
         except InvenioWebJournalArchiveDateWronglyFormedError, e:
             register_exception(req=req)
             return e.user_box()
+        except InvenioWebJournalJournalIdNotFoundDBError, e:
+            register_exception(req=req)
+            return e.user_box()
 
         html = perform_request_search(req=req,
                                       journal_name=journal_name,
@@ -341,6 +357,9 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
         except InvenioWebJournalNoCategoryError, e:
             register_exception(req=req)
             return e.user_box()
+        except InvenioWebJournalJournalIdNotFoundDBError, e:
+            register_exception(req=req)
+            return e.user_box()
         # the journal_defaults will be used by format elements that have no
         # direct access to the params here, no more checking needed
         req.journal_defaults = {"name": journal_name,
@@ -392,6 +411,9 @@ class WebInterfaceJournalPagesLegacy(WebInterfaceDirectory):
             register_exception(req=req)
             return e.user_box()
         except InvenioWebJournalNoCategoryError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalJournalIdNotFoundDBError, e:
             register_exception(req=req)
             return e.user_box()
 
