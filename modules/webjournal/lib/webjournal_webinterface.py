@@ -118,10 +118,14 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             'category' in form.keys():
             ln = wash_journal_language(argd['ln'])
             journal_name = wash_journal_name(ln, argd['name'])
-            issue = wash_issue_number(ln, journal_name,
-                                             argd['issue'])
-            issue_year = issue.split('/')[1]
-            issue_number = issue.split('/')[0]
+            try:
+                issue = wash_issue_number(ln, journal_name,
+                                          argd['issue'])
+                issue_year = issue.split('/')[1]
+                issue_number = issue.split('/')[0]
+            except InvenioWebJournalIssueNumberBadlyFormedError, e:
+                register_exception(req=req)
+                return e.user_box()
             category = wash_category(ln, argd['category'], journal_name)
             redirect_to_url(req, CFG_SITE_URL + '/journal/%(name)s/%(issue_year)s/%(issue_number)s/%(category)s/?ln=%(ln)s' % \
                             {'name': journal_name,
@@ -129,6 +133,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                              'issue_number': issue_number,
                              'category': category,
                              'ln': ln})
+
         ## End support for legacy urls
 
         # Check that given journal name exists.
