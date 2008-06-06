@@ -28,6 +28,7 @@ import re
 import time
 import calendar
 import shutil
+import tempfile
 
 from invenio.config import \
      CFG_BINDIR, \
@@ -238,16 +239,16 @@ def task_run_core():
                                      (str(repos[0][6]), \
                                       i, \
                                       len(harvested_files)))
-                res = call_bibconvert(config=str(repos[0][5]),
-                                      harvestpath=harvested_file,
-                                      convertpath=converted_file)
+                (exitcode, err_msg) = call_bibconvert(config=str(repos[0][5]),
+                                                      harvestpath=harvested_file,
+                                                      convertpath=converted_file)
 
-                if res == 0:
+                if exitcode == 0:
                     write_message("material harvested from source " +
                         str(repos[0][6]) + " was successfully converted")
                 else:
                     write_message("an error occurred while converting from " +
-                        str(repos[0][6]))
+                        str(repos[0][6]) + ': \n' + err_msg)
                     error_happened_p = True
                     continue
 
@@ -355,10 +356,9 @@ def task_run_core():
             continue
 
     if error_happened_p:
-        task_update_status("DONE WITH ERRORS")
+        return False
     else:
-        task_update_status("DONE")
-    return True
+        return True
 
 
 def add_timestamp_and_timelag(timestamp,
@@ -432,12 +432,25 @@ def call_bibharvest(prefix, baseurl, harvestpath,
         return (0, e)
 
 def call_bibconvert(config, harvestpath, convertpath):
-    """ A method that reads from a file and converts according to a BibConvert
-        Configuration file. Converted output is returned """
-    command = """%s/bibconvert -c %s < %s > %s """ % (CFG_BINDIR, config,
-        harvestpath, convertpath)
-    os.popen(command)
-    return 0
+    """ Call BibConvert to convert file given at 'harvestpath' with
+    conversion template 'config', and save the result in file at
+    'convertpath'.
+
+    Returns status exit code of the conversion, as well as error
+    messages, if any
+    """
+    cmd_err_fd, file_cmd_err = tempfile.mkstemp()
+    command = "%s/bibconvert -c %s < %s > %s 2> %s" % \
+              (CFG_BINDIR, config, harvestpath, convertpath, file_cmd_err)
+    exitcode = os.system(command)
+    cmd_err = ""
+    if exitcode != 0:
+        cmd_err_fo = open(file_cmd_err)
+        cmd_err = cmd_err_fo.read()
+        cmd_err_fo.close()
+        os.remove(file_cmd_err)
+    os.close(cmd_err_fd)
+    return (exitcode, cmd_err)
 
 def call_bibupload(marcxmlfile, mode="-r -i"):
     """Call bibupload in insert mode on MARCXMLFILE."""
