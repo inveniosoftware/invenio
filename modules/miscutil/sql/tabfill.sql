@@ -394,6 +394,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Stamp_Uploaded_Files','Stamp some of the fi
 INSERT INTO sbmALLFUNCDESCR VALUES ('Test_Status','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Update_Approval_DB',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Upload_Files','');
+INSERT INTO sbmALLFUNCDESCR VALUES ('User_is_Record_Owner_or_Curator','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Move_Files_to_Storage','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Make_Dummy_MARC_XML_Record','');
 
