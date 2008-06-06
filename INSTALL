@@ -502,7 +502,7 @@ Contents
           This step is recommended to test your local CDS Invenio
           installation.  It should give you our "Atlantis Institute of
           Science" demo installation, exactly as you see it at
-          <http://cdsware.cern.ch:8000/>.
+          <http://invenio-demo.cern.ch/>.
 
       $ /opt/cds-invenio/bin/inveniocfg --load-demo-records
 
