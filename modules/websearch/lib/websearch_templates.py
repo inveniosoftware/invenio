@@ -3177,7 +3177,7 @@ class Template:
             out += '<td align="right">%s</td>' % coll
         out += '</tr>'
         out += """<tr><td><strong>%(msg_recs)s</strong></td>""" % \
-               {'msg_recs': _("Total number of papers analyzed:"),}
+               {'msg_recs': _("Total number of citable papers analyzed:"),}
         for coll, colldef in l_colls:
             link_url = CFG_SITE_URL + '/search?p='
             if searchpattern:
