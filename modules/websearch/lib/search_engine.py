@@ -1165,6 +1165,17 @@ def lower_index_term(term):
     """
     return unicode(term, 'utf-8').lower().encode('utf-8')
 
+def wash_output_format(format):
+    """Wash output format FORMAT.  Currently only prevents input like
+    'of=9' for backwards-compatible format that prints certain fields
+    only.  (for this task, 'of=tm' is preferred)"""
+    if str(format[0:3]).isdigit() and len(format) != 6:
+        # asked to print MARC tags, but not enough digits,
+        # so let's switch back to HTML brief default
+        return 'hb'
+    else:
+        return format
+
 def wash_pattern(p):
     """Wash pattern passed by URL. Check for sanity of the wildcard by
     removing wildcards if they are appended to extremely short words
@@ -3156,7 +3167,7 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
             out += "        <date>%s</date>\n" % get_creation_date(recID)
         out += "    </dc>\n"
 
-    elif str(format[0:3]).isdigit():
+    elif len(format) == 6 and str(format[0:3]).isdigit():
         # user has asked to print some fields only
         if format == "001":
             out += "<!--%s-begin-->%s<!--%s-end-->\n" % (format, recID, format)
@@ -3591,6 +3602,9 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                (e.g. "SPIRES HEP").
     """
     selected_external_collections_infos = None
+
+    # wash output format:
+    of = wash_output_format(of)
 
     # wash all arguments requiring special care
     try:
