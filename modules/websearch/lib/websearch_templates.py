@@ -3058,11 +3058,12 @@ class Template:
         authoraff = ""
         for a in aff_pubdict.keys():
             recids = "+or+".join(map(str, aff_pubdict[a]))
-            if not a:
-                a = _("unknown")
+            print_a = a
+            if (print_a == ' '):
+                print_a = _("unknown")
             if authoraff:
                 authoraff += '<br>'
-            authoraff += "<a href=\"../search?f=recid&p="+recids+"\">"+a+' ('+str(len(aff_pubdict[a]))+")</a>"
+            authoraff += "<a href=\"../search?f=recid&p="+recids+"\">"+print_a+' ('+str(len(aff_pubdict[a]))+")</a>"
 
         #print a "general" banner about the author
         req.write("<h1>" + authorname + "</h1>")
@@ -3089,9 +3090,12 @@ class Template:
             req.write(banner)
         if (authors):
             for c in authors:
+                c = c.strip()
                 if collabstr:
                     collabstr += '<br>'
-                collabstr = collabstr + " <a href=\"/author/"+c+"\">"+c+"</a>"
+                #do not add this person him/herself in the list
+                if not (c == authorname):
+                    collabstr = collabstr + " <a href=\"/author/"+c+"\">"+c+"</a>"
             banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequent co-authors:") + "</strong>", collabstr)
             req.write(banner)
 
