@@ -84,6 +84,8 @@ def wash_category(ln, category, journal_name):
 
     if category in categories:
         return category
+    elif category == "" and len(categories) > 0:
+        return categories[0]
     else:
         raise InvenioWebJournalNoCategoryError(ln,
                                                category,
