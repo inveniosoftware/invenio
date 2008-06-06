@@ -251,11 +251,11 @@ if opt_value.endswith('.'+
     try:
         print bibconvert_bfx_engine.convert(source_xml, extract_tpl)
     except NameError:
-        sys.stderr.write("Error: cannot use BibConvert BFX engine.")
-        sys.stderr.write("A compliant XSLT library is needed. See Invenio INSTALL guide.")
+        sys.stderr.write("Error: cannot use BibConvert BFX engine.\n")
+        sys.stderr.write("A compliant XSLT library is needed. See Invenio INSTALL guide.\n")
         sys.exit(1)
     except Exception, e:
-        sys.stderr.write("An error occurred during the conversion.")
+        sys.stderr.write("An error occurred during the conversion.\n")
         sys.stderr.write(str(e))
         sys.exit(1)
 
@@ -266,12 +266,14 @@ elif opt_value.endswith('.xsl'):
         res = bibconvert_xslt_engine.convert(source_xml, extract_tpl)
         if res is not None:
             print res
+        else:
+            sys.exit(1)
     except NameError:
-        sys.stderr.write("Error: cannot use BibConvert XSL engine.")
-        sys.stderr.write("A compliant XML parser is needed. See Invenio INSTALL guide.")
+        sys.stderr.write("Error: cannot use BibConvert XSL engine.\n")
+        sys.stderr.write("A compliant XML parser is needed. See Invenio INSTALL guide.\n")
         sys.exit(1)
     except Exception, e:
-        sys.stderr.write("An error occurred during the conversion.")
+        sys.stderr.write("An error occurred during the conversion.\n")
         sys.stderr.write(str(e))
         sys.exit(1)
 else:
