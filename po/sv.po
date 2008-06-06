@@ -19,15 +19,15 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0.20080511\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-05-11 14:21+0200\n"
-"PO-Revision-Date: 2008-02-29 14:47+0100\n"
-"Last-Translator: Marcus Johansson <Marcus.Johansson@cern.ch>\n"
+"PO-Revision-Date: 2008-06-06 12:51+0100\n"
+"Last-Translator: Marko Niinimaki <man@cern.ch>\n"
 "Language-Team: SV <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 "X-Generator: KBabel 1.11.4\n"
-"Plural-Forms:  nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: modules/websearch/doc/search-guide.webdoc:352
 #: modules/websearch/doc/search-guide.webdoc:387
@@ -488,7 +488,7 @@ msgstr "Se guide"
 #: modules/websearch/doc/search-guide.webdoc:815
 #: modules/miscutil/lib/inveniocfg.py:385
 msgid "experiment"
-msgstr ""
+msgstr "experiment"
 
 #: modules/websearch/doc/search-guide.webdoc:325
 #: modules/websearch/doc/search-guide.webdoc:361
@@ -1008,7 +1008,7 @@ msgstr "samlingen"
 
 #: modules/websearch/doc/admin/websearch-admin-guide.webdoc:21
 msgid "WebSearch Admin Guide"
-msgstr ""
+msgstr "WebSearch Administratörshandbok"
 
 #: modules/websearch/doc/search-guide.webdoc:326
 #: modules/websearch/doc/search-guide.webdoc:362
@@ -1324,7 +1324,7 @@ msgstr "Lägg till subfält"
 
 #: modules/bibedit/lib/bibedit_templates.py:69
 msgid "Edit institute"
-msgstr ""
+msgstr "editera institutet"
 
 #: modules/bibedit/lib/bibedit_templates.py:78
 #: modules/bibedit/lib/bibedit_templates.py:86
@@ -1448,12 +1448,8 @@ msgid "Please enter the ID of the record you want to edit"
 msgstr "Var god ange ID:et för journalen du vill redigera"
 
 #: modules/bibedit/lib/bibedit_templates.py:479
-msgid ""
-"Your modifications have now been submitted. They will be processed as soon "
-"as the task queue is empty."
-msgstr ""
-"Dina förändringar har skickats in. De kommer att processas så snart som den "
-"interna uppgiftskön är tom. "
+msgid "Your modifications have now been submitted. They will be processed as soon as the task queue is empty."
+msgstr "Dina förändringar har skickats in. De kommer att processas så snart som den interna uppgiftskön är tom. "
 
 #: modules/bibedit/lib/bibedit_templates.py:480
 #: modules/bibedit/lib/bibedit_templates.py:512
@@ -1491,8 +1487,7 @@ msgstr "Nej"
 
 #: modules/bibedit/lib/bibedit_templates.py:511
 msgid "The record will be deleted as soon as the task queue is empty."
-msgstr ""
-"Journalen kommer att tas bort så snart som den interna uppgiftskön är tom."
+msgstr "Journalen kommer att tas bort så snart som den interna uppgiftskön är tom."
 
 #: modules/bibedit/web/admin/bibeditadmin.py:61
 #, python-format
@@ -1794,7 +1789,7 @@ msgstr "fulltext"
 #: modules/bibformat/lib/elements/bfe_fulltext.py:65
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:57
 msgid "additional files"
-msgstr ""
+msgstr "ytterligare filer"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:69
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:61
@@ -1822,12 +1817,12 @@ msgstr "logga in"
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:104
 #, python-format
 msgid "CERN %(link_or_links)s"
-msgstr ""
+msgstr "CERN %(link_or_links)s"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:99
 #, python-format
 msgid "External %(link_or_links)s"
-msgstr ""
+msgstr "Extern %(link_or_links)s"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:177
 #: modules/bibformat/lib/elements/bfe_fulltext.py:197
@@ -1838,7 +1833,7 @@ msgstr "Fulltext"
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:121
 #, python-format
 msgid "external %(link_or_links)s"
-msgstr ""
+msgstr "extern %(link_or_links)s"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:178
 #: modules/bibformat/web/admin/bibformatadmin.py:246
@@ -2011,7 +2006,8 @@ msgstr "Nedladdningshistorik"
 msgid "Download user distribution:"
 msgstr "Nedladdningshistorik"
 
-#: modules/miscutil/lib/dateutils.py:69 modules/miscutil/lib/dateutils.py:96
+#: modules/miscutil/lib/dateutils.py:69
+#: modules/miscutil/lib/dateutils.py:96
 #: modules/webbasket/lib/webbasket.py:170
 #: modules/webbasket/lib/webbasket.py:652
 #: modules/websession/lib/webuser.py:285
@@ -2075,7 +2071,8 @@ msgstr "Fredag"
 msgid "Saturday"
 msgstr "Lördag"
 
-#: modules/miscutil/lib/dateutils.py:187 modules/miscutil/lib/dateutils.py:201
+#: modules/miscutil/lib/dateutils.py:187
+#: modules/miscutil/lib/dateutils.py:201
 msgid "Month"
 msgstr "Månad"
 
@@ -2095,7 +2092,8 @@ msgstr "umars"
 msgid "Apr"
 msgstr "april"
 
-#: modules/miscutil/lib/dateutils.py:192 modules/miscutil/lib/dateutils.py:206
+#: modules/miscutil/lib/dateutils.py:192
+#: modules/miscutil/lib/dateutils.py:206
 #: modules/websearch/lib/search_engine.py:720
 #: modules/websearch/lib/websearch_templates.py:946
 msgid "May"
@@ -2228,8 +2226,7 @@ msgstr "Tack för att Ni hjälper till att förbättra CDS Invenio!"
 
 #: modules/miscutil/lib/errorlib_webinterface.py:103
 msgid "Use the back button of your browser to return to the previous page."
-msgstr ""
-"Använd din webbläsares bakåtpil för att återvända till föregående sida."
+msgstr "Använd din webbläsares bakåtpil för att återvända till föregående sida."
 
 #: modules/miscutil/lib/errorlib_webinterface.py:105
 msgid "Thank you!"
@@ -2237,7 +2234,7 @@ msgstr "Tack!"
 
 #: modules/miscutil/lib/inveniocfg.py:384
 msgid "journal"
-msgstr ""
+msgstr "journal"
 
 #: modules/miscutil/lib/inveniocfg.py:386
 #, fuzzy
@@ -2250,23 +2247,26 @@ msgstr "ord-likhet"
 
 #: modules/miscutil/lib/inveniocfg.py:400
 msgid "journal impact factor"
-msgstr ""
+msgstr "journal impact faktor"
 
 #: modules/miscutil/lib/inveniocfg.py:401
 #, fuzzy
 msgid "times cited"
 msgstr "Inställningar redigerades"
 
-#: modules/miscutil/lib/mailutils.py:144 modules/miscutil/lib/mailutils.py:157
+#: modules/miscutil/lib/mailutils.py:144
+#: modules/miscutil/lib/mailutils.py:157
 #, fuzzy
 msgid "Hello:"
 msgstr "Hej"
 
-#: modules/miscutil/lib/mailutils.py:175 modules/miscutil/lib/mailutils.py:195
+#: modules/miscutil/lib/mailutils.py:175
+#: modules/miscutil/lib/mailutils.py:195
 msgid "Best regards"
 msgstr "Med vänliga hälsningar"
 
-#: modules/miscutil/lib/mailutils.py:177 modules/miscutil/lib/mailutils.py:197
+#: modules/miscutil/lib/mailutils.py:177
+#: modules/miscutil/lib/mailutils.py:197
 msgid "Need human intervention?  Contact"
 msgstr "Behöver du personlig hjälp? Kontakta"
 
@@ -2355,9 +2355,9 @@ msgid "An account has been created for you on '%s':"
 msgstr "Ditt användarkonto har skapats"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3596
-#, fuzzy, python-format
+#, python-format
 msgid "Account rejected on '%s'"
-msgstr "Användarkonto skapades"
+msgstr "Användarkonto har blivit avlagen i '%s'"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3597
 #, fuzzy, python-format
@@ -2412,10 +2412,10 @@ msgstr "Okänd"
 
 #: modules/webalert/lib/webalert.py:174
 msgid "You already have an alert defined for the specified query and basket."
-msgstr ""
-"Du har redan ett alarm definierat för den specifierade sökfrågan och korgen"
+msgstr "Du har redan ett alarm definierat för den specifierade sökfrågan och korgen"
 
-#: modules/webalert/lib/webalert.py:193 modules/webalert/lib/webalert.py:299
+#: modules/webalert/lib/webalert.py:193
+#: modules/webalert/lib/webalert.py:299
 msgid "The alert name cannot be empty."
 msgstr "Alarmnamnet får inte lämnas tomt"
 
@@ -2435,14 +2435,8 @@ msgstr "Alarmet %s har uppdaterats korrekt."
 
 #: modules/webalert/lib/webalert.py:382
 #, fuzzy, python-format
-msgid ""
-"You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s "
-"is available with a possibility to (a) view search results and (b) subscribe "
-"to an automatic email alerting service for these queries."
-msgstr ""
-"Du har ställt %(x_nb)s sökfrågor. En %(x_url_open)sdetaljerad lista%"
-"(x_url_close)s finns tillänglig med möjligheten att (a) visa sökresultat (b) "
-"prenumerera på epost-uppdateringar för utvalda sökfrågor."
+msgid "You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s is available with a possibility to (a) view search results and (b) subscribe to an automatic email alerting service for these queries."
+msgstr "Du har ställt %(x_nb)s sökfrågor. En %(x_url_open)sdetaljerad lista%(x_url_close)s finns tillänglig med möjligheten att (a) visa sökresultat (b) prenumerera på epost-uppdateringar för utvalda sökfrågor."
 
 #: modules/webalert/lib/webalert_templates.py:74
 msgid "Pattern"
@@ -2493,12 +2487,8 @@ msgid "SHOW"
 msgstr "VISA"
 
 #: modules/webalert/lib/webalert_templates.py:172
-msgid ""
-"This alert will notify you each time/only if a new item satisfies the "
-"following query:"
-msgstr ""
-"Detta alarm kommer endast meddela dig om en ny artikel motsvaras av följande "
-"sökfråga:"
+msgid "This alert will notify you each time/only if a new item satisfies the following query:"
+msgstr "Detta alarm kommer endast meddela dig om en ny artikel motsvaras av följande sökfråga:"
 
 #: modules/webalert/lib/webalert_templates.py:173
 msgid "QUERY"
@@ -2560,12 +2550,8 @@ msgstr "RENSA DATA"
 
 #: modules/webalert/lib/webalert_templates.py:300
 #, fuzzy, python-format
-msgid ""
-"Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %"
-"(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
-msgstr ""
-"Sätt ett nytt alarm utifrån %(x_url1_open)sdina sökningar%(x_url1_close)s, %"
-"(x_url2_open)spopulära sökningar%(x_url2_close)s eller dataformuläret."
+msgid "Set a new alert from %(x_url1_open)syour searches%(x_url1_close)s, the %(x_url2_open)spopular searches%(x_url2_close)s, or the input form."
+msgstr "Sätt ett nytt alarm utifrån %(x_url1_open)sdina sökningar%(x_url1_close)s, %(x_url2_open)spopulära sökningar%(x_url2_close)s eller dataformuläret."
 
 #: modules/webalert/lib/webalert_templates.py:320
 msgid "Search checking frequency"
@@ -2616,21 +2602,13 @@ msgstr "Du har definierat %s alarm."
 
 #: modules/webalert/lib/webalert_templates.py:420
 #, python-format
-msgid ""
-"You have not executed any search yet. Please go to the %(x_url_open)ssearch "
-"interface%(x_url_close)s first."
-msgstr ""
-"Du har inte genomfört någon sökning ännu. Var god gå till %(x_url_open)"
-"ssökgränssnittet%(x_url_close)s först."
+msgid "You have not executed any search yet. Please go to the %(x_url_open)ssearch interface%(x_url_close)s first."
+msgstr "Du har inte genomfört någon sökning ännu. Var god gå till %(x_url_open)ssökgränssnittet%(x_url_close)s först."
 
 #: modules/webalert/lib/webalert_templates.py:429
 #, python-format
-msgid ""
-"You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during "
-"the last 30 days or so."
-msgstr ""
-"Du har genomfört %(x_nb1)s sökningar (%(x_nb2)s olika sökfrågor) under de "
-"senaste ungefär 30 dagarna."
+msgid "You have performed %(x_nb1)s searches (%(x_nb2)s different questions) during the last 30 days or so."
+msgstr "Du har genomfört %(x_nb1)s sökningar (%(x_nb2)s olika sökfrågor) under de senaste ungefär 30 dagarna."
 
 #: modules/webalert/lib/webalert_templates.py:434
 #, python-format
@@ -2786,12 +2764,8 @@ msgstr "Andra användares korgar"
 
 #: modules/webbasket/lib/webbasket.py:852
 #, python-format
-msgid ""
-"You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)"
-"s group baskets and %(x_nb_public)s other users public baskets."
-msgstr ""
-"Du har %(x_nb_perso)s personliga korgar. Du prenumerar på %(x_nb_group)s "
-"gruppkorgar och %(x_nb_public)s andra användares korgar."
+msgid "You have %(x_nb_perso)s personal baskets and are subscribed to %(x_nb_group)s group baskets and %(x_nb_public)s other users public baskets."
+msgstr "Du har %(x_nb_perso)s personliga korgar. Du prenumerar på %(x_nb_group)s gruppkorgar och %(x_nb_public)s andra användares korgar."
 
 #: modules/webbasket/lib/webbasket_templates.py:198
 #, python-format
@@ -2809,12 +2783,8 @@ msgstr "Korgen är tom"
 
 #: modules/webbasket/lib/webbasket_templates.py:254
 #, python-format
-msgid ""
-"This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%"
-"(x_url_close)s to it"
-msgstr ""
-"Korgen tillhör %(x_name)s. Du har möjlighet att %(x_url_open)sprenumerera%"
-"(x_url_close)s på den."
+msgid "This basket belongs to %(x_name)s. You can freely %(x_url_open)ssubscribe%(x_url_close)s to it"
+msgstr "Korgen tillhör %(x_name)s. Du har möjlighet att %(x_url_open)sprenumerera%(x_url_close)s på den."
 
 #: modules/webbasket/lib/webbasket_templates.py:281
 #: modules/webbasket/lib/webbasket_templates.py:382
@@ -2866,9 +2836,7 @@ msgstr "Det finns för tillfället inga publika korgar"
 
 #: modules/webbasket/lib/webbasket_templates.py:389
 #, python-format
-msgid ""
-"Displaying baskets %(x_nb_begin)i-%(x_nb_end)i out of %(x_nb_total)i baskets "
-"in total."
+msgid "Displaying baskets %(x_nb_begin)i-%(x_nb_end)i out of %(x_nb_total)i baskets in total."
 msgstr "Visar korgar %(x_nb_begin)i-%(x_nb_end)i utav totalt %(x_nb_total)i."
 
 #: modules/webbasket/lib/webbasket_templates.py:422
@@ -3211,19 +3179,14 @@ msgstr "Dela ut korgen till en ny grupp"
 
 #: modules/webbasket/lib/webbasket_templates.py:1464
 #: modules/websession/lib/websession_templates.py:482
-msgid ""
-"You are logged in as a guest user, so your baskets will disappear at the end "
-"of the current session."
-msgstr ""
-"Du är inloggad som gästanvändare, de korgar du definierar kommer att raderas "
-"vid sessionens slut."
+msgid "You are logged in as a guest user, so your baskets will disappear at the end of the current session."
+msgstr "Du är inloggad som gästanvändare, de korgar du definierar kommer att raderas vid sessionens slut."
 
 #: modules/webbasket/lib/webbasket_templates.py:1465
 #: modules/webbasket/lib/webbasket_templates.py:1480
 #: modules/websession/lib/websession_templates.py:485
 #, python-format
-msgid ""
-"If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
+msgid "If you wish you can %(x_url_open)slogin or register here%(x_url_close)s."
 msgstr "Du kan %(x_url_open)slogga in eller registrera dig här%(x_url_close)s."
 
 #: modules/webbasket/lib/webbasket_templates.py:1479
@@ -3324,9 +3287,7 @@ msgstr "Skriv en recension"
 #: modules/webcomment/lib/webcomment_templates.py:1371
 #, python-format
 msgid "Average review score: %(x_nb_score)s based on %(x_nb_reviews)s reviews"
-msgstr ""
-"Genomsnittlig recensionspoäng: %(x_nb_score)s baserad på %(x_nb_reviews)s "
-"recensioner"
+msgstr "Genomsnittlig recensionspoäng: %(x_nb_score)s baserad på %(x_nb_reviews)s recensioner"
 
 #: modules/webcomment/lib/webcomment_templates.py:251
 #, python-format
@@ -3364,8 +3325,7 @@ msgstr "Recenserad av %(x_nickname)s den %(x_date)s"
 #: modules/webcomment/lib/webcomment_templates.py:362
 #, python-format
 msgid "%(x_nb_people)i out of %(x_nb_total)i people found this review useful"
-msgstr ""
-"%(x_nb_people)i av totalt %(x_nb_total)i fann den här recensionen hjälpfull"
+msgstr "%(x_nb_people)i av totalt %(x_nb_total)i fann den här recensionen hjälpfull"
 
 #: modules/webcomment/lib/webcomment_templates.py:445
 #: modules/webcomment/lib/webcomment_templates.py:455
@@ -3418,19 +3378,13 @@ msgstr "Sida:"
 #: modules/webcomment/lib/webcomment_templates.py:784
 #, python-format
 msgid "Note: Your nickname, %s, will be displayed as author of this comment"
-msgstr ""
-"OBS att ditt smeknamn, %s, kommer att visas som författaren till det här "
-"dokumentet"
+msgstr "OBS att ditt smeknamn, %s, kommer att visas som författaren till det här dokumentet"
 
 #: modules/webcomment/lib/webcomment_templates.py:788
 #: modules/webcomment/lib/webcomment_templates.py:843
 #, python-format
-msgid ""
-"Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %"
-"(x_nickname)s will be displayed as the author of this comment."
-msgstr ""
-"OBS att du inte har %(x_url_open)sdefinierat ditt smeknamn%(x_url_close)s. %"
-"(x_nickname)s kommer att visas som författare till det här dokumentet."
+msgid "Note: you have not %(x_url_open)sdefined your nickname%(x_url_close)s. %(x_nickname)s will be displayed as the author of this comment."
+msgstr "OBS att du inte har %(x_url_open)sdefinierat ditt smeknamn%(x_url_close)s. %(x_nickname)s kommer att visas som författare till det här dokumentet."
 
 #: modules/webcomment/lib/webcomment_templates.py:806
 #: modules/webcomment/lib/webcomment_templates.py:899
@@ -3444,11 +3398,8 @@ msgstr "Lägg till kommentar"
 
 #: modules/webcomment/lib/webcomment_templates.py:838
 #, python-format
-msgid ""
-"Note: Your nickname, %s, will be displayed as the author of this review."
-msgstr ""
-"OBS att ditt smeknamn, %s, kommer att visas som författare av den här "
-"recensionen."
+msgid "Note: Your nickname, %s, will be displayed as the author of this review."
+msgstr "OBS att ditt smeknamn, %s, kommer att visas som författare av den här recensionen."
 
 #: modules/webcomment/lib/webcomment_templates.py:900
 msgid "Rate this article"
@@ -3514,12 +3465,8 @@ msgid "Comments and reviews are disabled"
 msgstr "Möjligheten att kommentera och recensera är avstängd"
 
 #: modules/webcomment/lib/webcomment_templates.py:1051
-msgid ""
-"Please enter the ID of the comment/review so that you can view it before "
-"deciding whether to delete it or not"
-msgstr ""
-"Var god ange ID:et för kommentaren/recensionen för att granska den innan du "
-"avgör om den skall tas bort eller ej"
+msgid "Please enter the ID of the comment/review so that you can view it before deciding whether to delete it or not"
+msgstr "Var god ange ID:et för kommentaren/recensionen för att granska den innan du avgör om den skall tas bort eller ej"
 
 #: modules/webcomment/lib/webcomment_templates.py:1063
 msgid "Comment ID:"
@@ -3544,12 +3491,8 @@ msgid "View all %s reported reviews"
 msgstr "Visa alla % rapporterade recensioner"
 
 #: modules/webcomment/lib/webcomment_templates.py:1130
-msgid ""
-"Here is a list, sorted by total number of reports, of all users who have had "
-"a comment reported at least once."
-msgstr ""
-"Listning, sorterad på mängd rapporter, av alla användare som har ådragit sig "
-"en kommentarsrapport åtminstone en gång."
+msgid "Here is a list, sorted by total number of reports, of all users who have had a comment reported at least once."
+msgstr "Listning, sorterad på mängd rapporter, av alla användare som har ådragit sig en kommentarsrapport åtminstone en gång."
 
 #: modules/webcomment/lib/webcomment_templates.py:1138
 #: modules/webcomment/lib/webcomment_templates.py:1167
@@ -3680,12 +3623,8 @@ msgstr "Journalen %s existerar inte"
 
 #: modules/webcomment/lib/webcomment_webinterface.py:260
 #, python-format
-msgid ""
-"Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s "
-"first."
-msgstr ""
-"Innan du lägger till din kommentar måste du %(x_url_open)slogga in%"
-"(x_url_close)s."
+msgid "Before you add your comment, you need to %(x_url_open)slogin%(x_url_close)s first."
+msgstr "Innan du lägger till din kommentar måste du %(x_url_open)slogga in%(x_url_close)s."
 
 #: modules/webcomment/lib/webcomment_webinterface.py:264
 #: modules/websession/lib/websession_webinterface.py:669
@@ -3754,12 +3693,8 @@ msgstr "Var god ange ett användarnamn eller ett gruppnamn."
 
 #: modules/webmessage/lib/webmessage.py:348
 #, python-format
-msgid ""
-"Your message is too long, please edit it. Maximum size allowed is %i "
-"characters."
-msgstr ""
-"Ditt meddelande är för långt, var god redigera det. Maximal storlek är %i "
-"tecken."
+msgid "Your message is too long, please edit it. Maximum size allowed is %i characters."
+msgstr "Ditt meddelande är för långt, var god redigera det. Maximal storlek är %i tecken."
 
 #: modules/webmessage/lib/webmessage.py:359
 #, python-format
@@ -3778,12 +3713,8 @@ msgid "Write a message"
 msgstr "Skriv ett meddelande"
 
 #: modules/webmessage/lib/webmessage.py:412
-msgid ""
-"Your message could not be sent to the following recipients due to their "
-"quota:"
-msgstr ""
-"Ditt meddelande kunde inte skickas till de följande mottagarna på grund av "
-"storleksbegränsningen på deras inboxar:"
+msgid "Your message could not be sent to the following recipients due to their quota:"
+msgstr "Ditt meddelande kunde inte skickas till de följande mottagarna på grund av storleksbegränsningen på deras inboxar:"
 
 #: modules/webmessage/lib/webmessage.py:416
 msgid "Your message has been sent."
@@ -3994,27 +3925,17 @@ msgid "No exact match found for %(x_query1)s, using %(x_query2)s instead..."
 msgstr "Ingen exakt träff för %(x_query1)s, använder %(x_query2)s istället..."
 
 #: modules/websearch/lib/search_engine.py:1765
-msgid ""
-"Nested or mismatched parentheses detected. Ignoring all parentheses in the "
-"query..."
-msgstr ""
+msgid "Nested or mismatched parentheses detected. Ignoring all parentheses in the query..."
+msgstr "Ogiltiga parentes. Parentes i söket ignorerad."
 
 #: modules/websearch/lib/search_engine.py:1972
 #, python-format
-msgid ""
-"No match found in collection %(x_collection)s. Other public collections gave "
-"%(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
-msgstr ""
-"Ingen träff i samlingen %(x_collection)s. Andra publika samlingar gav%"
-"(x_url_open)s%(x_nb_hits)d träffar%(x_url_close)s."
+msgid "No match found in collection %(x_collection)s. Other public collections gave %(x_url_open)s%(x_nb_hits)d hits%(x_url_close)s."
+msgstr "Ingen träff i samlingen %(x_collection)s. Andra publika samlingar gav%(x_url_open)s%(x_nb_hits)d träffar%(x_url_close)s."
 
 #: modules/websearch/lib/search_engine.py:1981
-msgid ""
-"No public collection matched your query. If you were looking for a non-"
-"public document, please choose the desired restricted collection first."
-msgstr ""
-"Inga publika samlingar motsvarar din sökning. Välj de åtkomstbegränsade "
-"samlingarna först."
+msgid "No public collection matched your query. If you were looking for a non-public document, please choose the desired restricted collection first."
+msgstr "Inga publika samlingar motsvarar din sökning. Välj de åtkomstbegränsade samlingarna först."
 
 #: modules/websearch/lib/search_engine.py:2094
 msgid "No words index available for"
@@ -4026,34 +3947,23 @@ msgstr "Inget frasindex tillgängligt för"
 
 #: modules/websearch/lib/search_engine.py:2130
 #, python-format
-msgid ""
-"Search term %(x_term)s inside index %(x_index)s did not match any record. "
-"Nearest terms in any collection are:"
-msgstr ""
-"Söktermen %(x_term)s i index %(x_index)s matchade inga journaler. Närmsta "
-"söktermer, oavsett samling, är:"
+msgid "Search term %(x_term)s inside index %(x_index)s did not match any record. Nearest terms in any collection are:"
+msgstr "Söktermen %(x_term)s i index %(x_index)s matchade inga journaler. Närmsta söktermer, oavsett samling, är:"
 
 #: modules/websearch/lib/search_engine.py:2134
 #, python-format
-msgid ""
-"Search term %s did not match any record. Nearest terms in any collection are:"
-msgstr ""
-"Söktermen %s matchade inga journaler. Närmsta sökterm, oavsett samling, är:"
+msgid "Search term %s did not match any record. Nearest terms in any collection are:"
+msgstr "Söktermen %s matchade inga journaler. Närmsta sökterm, oavsett samling, är:"
 
 #: modules/websearch/lib/search_engine.py:2588
 #, python-format
-msgid ""
-"Sorry, sorting is allowed on sets of up to %d records only. Using default "
-"sort order."
+msgid "Sorry, sorting is allowed on sets of up to %d records only. Using default sort order."
 msgstr "Sortering är endast tillåten för mängder med upp till %d journaler."
 
 #: modules/websearch/lib/search_engine.py:2612
 #, python-format
-msgid ""
-"Sorry, %s does not seem to be a valid sort option. Choosing title sort "
-"instead."
-msgstr ""
-"%s är inte en tillänglig rangordning. Använder titelsortering istället."
+msgid "Sorry, %s does not seem to be a valid sort option. Choosing title sort instead."
+msgstr "%s är inte en tillänglig rangordning. Använder titelsortering istället."
 
 #: modules/websearch/lib/search_engine.py:2897
 msgid "Use different search terms."
@@ -4075,13 +3985,11 @@ msgstr "Tyvärr verkar inte dokumentet %s existera."
 
 #: modules/websearch/lib/search_engine.py:3852
 msgid "No match within your time limits, discarding this condition..."
-msgstr ""
-"Ingen träff funnen inom den angivna tidsramen, använder ej dessa kriterier"
+msgstr "Ingen träff funnen inom den angivna tidsramen, använder ej dessa kriterier"
 
 #: modules/websearch/lib/search_engine.py:3876
 msgid "No match within your search limits, discarding this condition..."
-msgstr ""
-"Inga träffer funna inom de angivna sökkriterierna, använder ej dessa..."
+msgstr "Inga träffer funna inom de angivna sökkriterierna, använder ej dessa..."
 
 #: modules/websearch/lib/websearchadminlib.py:3200
 #, fuzzy
@@ -4105,7 +4013,7 @@ msgstr "användarsession"
 
 #: modules/websearch/lib/websearchadminlib.py:3204
 msgid "Usage statistics"
-msgstr ""
+msgstr "Användningstatistik"
 
 #: modules/websearch/lib/websearch_templates.py:590
 #, python-format
@@ -4288,19 +4196,12 @@ msgstr "LÄGG I KORGEN"
 
 #: modules/websearch/lib/websearch_templates.py:2339
 #, python-format
-msgid ""
-"%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s "
-"records in %(x_nb_seconds)s seconds."
-msgstr ""
-"%(x_fmt_open)sResultatöverblick:%(x_fmt_close)s Fann %(x_nb_records)s "
-"journalerr på %(x_nb_seconds)s sekunder."
+msgid "%(x_fmt_open)sResults overview:%(x_fmt_close)s Found %(x_nb_records)s records in %(x_nb_seconds)s seconds."
+msgstr "%(x_fmt_open)sResultatöverblick:%(x_fmt_close)s Fann %(x_nb_records)s journalerr på %(x_nb_seconds)s sekunder."
 
 #: modules/websearch/lib/websearch_templates.py:2387
-msgid ""
-"Boolean query returned no hits. Please combine your search terms differently."
-msgstr ""
-"Den booleska sökningen returnerade inga journaler. Kombinera dina söktermer "
-"annorlunda."
+msgid "Boolean query returned no hits. Please combine your search terms differently."
+msgstr "Den booleska sökningen returnerade inga journaler. Kombinera dina söktermer annorlunda."
 
 #: modules/websearch/lib/websearch_templates.py:2419
 msgid "See also: similar author names"
@@ -4332,12 +4233,10 @@ msgstr "Vill du bli notifierad om nya resultat till den här sökfrågan?"
 #, python-format
 msgid ""
 "Set up a personal %(x_url1_open)semail alert%(x_url1_close)s\n"
-"                                  or subscribe to the %(x_url2_open)sRSS feed"
-"%(x_url2_close)s."
+"                                  or subscribe to the %(x_url2_open)sRSS feed%(x_url2_close)s."
 msgstr ""
 "Sätta upp ett %(x_url1_open)sepost-alarm%(x_url1_close)s\n"
-"                                  eller starta en prenumeration på %"
-"(x_url2_open)sRSS-strömmen%(x_url2_close)s."
+"                                  eller starta en prenumeration på %(x_url2_open)sRSS-strömmen%(x_url2_close)s."
 
 #: modules/websearch/lib/websearch_templates.py:2829
 msgid "People who downloaded this document also downloaded:"
@@ -4374,7 +4273,7 @@ msgstr "Referenshistorik"
 
 #: modules/websearch/lib/websearch_templates.py:2962
 msgid "downloaded"
-msgstr ""
+msgstr "hämt"
 
 #: modules/websearch/lib/websearch_templates.py:2963
 #, fuzzy
@@ -4383,11 +4282,11 @@ msgstr "Tid"
 
 #: modules/websearch/lib/websearch_templates.py:2979
 msgid "Frequent keywords"
-msgstr ""
+msgstr "Populära sökord"
 
 #: modules/websearch/lib/websearch_templates.py:2984
 msgid "Author collaborations"
-msgstr ""
+msgstr "Författaresamarbeten"
 
 #: modules/websearch/lib/websearch_templates.py:2993
 #, fuzzy
@@ -4411,11 +4310,11 @@ msgstr "Totalt antal rapporter"
 
 #: modules/websearch/lib/websearch_templates.py:3049
 msgid "Average citations per paper:"
-msgstr ""
+msgstr "Genomsnittliga citeringar per journal"
 
 #: modules/websearch/lib/websearch_templates.py:3053
 msgid "Breakdown of papers by citations:"
-msgstr ""
+msgstr "Fördelning av journaler"
 
 #: modules/websearch/lib/websearch_webinterface.py:411
 #, fuzzy
@@ -4431,8 +4330,7 @@ msgid "in"
 msgstr "i"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:52
-msgid ""
-"Haven't found what you were looking for? Try your search on other servers:"
+msgid "Haven't found what you were looking for? Try your search on other servers:"
 msgstr "Har du inte funnit vad du söker efter? Försök på andra platser:"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:80
@@ -4444,12 +4342,8 @@ msgid "Search timed out."
 msgstr "Sökningen tog för lång tid"
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:121
-msgid ""
-"The external search engine has not responded in time. You can check its "
-"results here:"
-msgstr ""
-"Den externa sökmotorn svarade inte tillräckligt snabbt. Du kan dock själv "
-"kontrollera resultatet här: "
+msgid "The external search engine has not responded in time. You can check its results here:"
+msgstr "Den externa sökmotorn svarade inte tillräckligt snabbt. Du kan dock själv kontrollera resultatet här: "
 
 #: modules/websearch/lib/websearch_external_collections_templates.py:146
 #: modules/websearch/lib/websearch_external_collections_templates.py:154
@@ -4473,31 +4367,21 @@ msgstr "kortfattad"
 
 #: modules/websession/lib/webaccount.py:115
 #, python-format
-msgid ""
-"You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)"
-"s as a regular user."
-msgstr ""
-"Du är inloggad som gäst. Du kan %(x_url_open)slogga in%(x_url_close) som "
-"vanliga användare."
+msgid "You are logged in as guest. You may want to %(x_url_open)slogin%(x_url_close)s as a regular user."
+msgstr "Du är inloggad som gäst. Du kan %(x_url_open)slogga in%(x_url_close) som vanliga användare."
 
 #: modules/websession/lib/webaccount.py:119
 #, python-format
-msgid ""
-"The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%"
-"(x_url_close)s first"
-msgstr ""
-"%(x_fmt_open)sGäst användare%(x_fmt_close)s behöver %(x_url_open)sregistrera%"
-"(x_url_close)s sig först"
+msgid "The %(x_fmt_open)sguest%(x_fmt_close)s users need to %(x_url_open)sregister%(x_url_close)s first"
+msgstr "%(x_fmt_open)sGäst användare%(x_fmt_close)s behöver %(x_url_open)sregistrera%(x_url_close)s sig först"
 
 #: modules/websession/lib/webaccount.py:124
 msgid "No queries found"
 msgstr "Inga sökfrågor hittades"
 
 #: modules/websession/lib/webaccount.py:260
-msgid ""
-"This collection is restricted.  If you think you have right to access it, "
-"please authenticate yourself."
-msgstr ""
+msgid "This collection is restricted.  If you think you have right to access it, please authenticate yourself."
+msgstr "Denna samling är begränsad. Logga in VSG."
 
 #: modules/websession/lib/websession_templates.py:96
 msgid "External account settings"
@@ -4505,24 +4389,16 @@ msgstr "Externa kontoinställningar"
 
 #: modules/websession/lib/websession_templates.py:98
 #, python-format
-msgid ""
-"You can consult the list of your external groups directly in the %"
-"(x_url_open)sgroups page%(x_url_close)s."
-msgstr ""
-"Du kan konsultera listan av externa grupper direkt på %(x_url_open)"
-"sgruppsidan%(x_url_close)s."
+msgid "You can consult the list of your external groups directly in the %(x_url_open)sgroups page%(x_url_close)s."
+msgstr "Du kan konsultera listan av externa grupper direkt på %(x_url_open)sgruppsidan%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:102
 msgid "External user groups"
 msgstr "Externa användargrupper"
 
 #: modules/websession/lib/websession_templates.py:159
-msgid ""
-"If you want to change your email or set for the first time your nickname, "
-"please set new values in the form below."
-msgstr ""
-"Om du vill ändra din epost-adress, eller ange ett smeknamn, var god använd "
-"formuläret nedan."
+msgid "If you want to change your email or set for the first time your nickname, please set new values in the form below."
+msgstr "Om du vill ändra din epost-adress, eller ange ett smeknamn, var god använd formuläret nedan."
 
 #: modules/websession/lib/websession_templates.py:160
 msgid "Edit login credentials"
@@ -4556,18 +4432,12 @@ msgid "Set new values"
 msgstr "Ange nya värden"
 
 #: modules/websession/lib/websession_templates.py:173
-msgid ""
-"Since this is considered as a signature for comments and reviews, once set "
-"it can not be changed."
-msgstr ""
+msgid "Since this is considered as a signature for comments and reviews, once set it can not be changed."
+msgstr "Singaturet kan inte ändras."
 
 #: modules/websession/lib/websession_templates.py:214
-msgid ""
-"If you want to change your password, please enter the old one and set the "
-"new value in the form below."
-msgstr ""
-"Om du vill ändra ditt lösenord, var god ange det gamla och det nya i "
-"formuläret nedan."
+msgid "If you want to change your password, please enter the old one and set the new value in the form below."
+msgstr "Om du vill ändra ditt lösenord, var god ange det gamla och det nya i formuläret nedan."
 
 #: modules/websession/lib/websession_templates.py:216
 msgid "Old password"
@@ -4608,9 +4478,7 @@ msgstr "Du kan %(x_url_open)slogga in eller registrera dig här%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:234
 #, fuzzy, python-format
-msgid ""
-"You can change or reset your CERN account password by means of the %"
-"(x_url_open)sCERN account system%(x_url_close)s."
+msgid "You can change or reset your CERN account password by means of the %(x_url_open)sCERN account system%(x_url_close)s."
 msgstr "Du kan nu logga in till ditt %(x_url_open)skonto%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:248
@@ -4620,7 +4488,7 @@ msgstr "Ange sök-relaterade inställningar"
 
 #: modules/websession/lib/websession_templates.py:259
 msgid "Select desired language of the web interface."
-msgstr ""
+msgstr "Välj språk för användargränssnittet."
 
 #: modules/websession/lib/websession_templates.py:260
 #: modules/websession/lib/websession_templates.py:293
@@ -4648,12 +4516,8 @@ msgid "Edit login method"
 msgstr "Ändra loginmetod"
 
 #: modules/websession/lib/websession_templates.py:325
-msgid ""
-"Please select which login method you would like to use to authenticate "
-"yourself"
-msgstr ""
-"Var god ange vilken loginmetod du vill använda för att bekräfta din "
-"identitet."
+msgid "Please select which login method you would like to use to authenticate yourself"
+msgstr "Var god ange vilken loginmetod du vill använda för att bekräfta din identitet."
 
 #: modules/websession/lib/websession_templates.py:326
 #: modules/websession/lib/websession_templates.py:340
@@ -4662,13 +4526,8 @@ msgstr "Välj metod"
 
 #: modules/websession/lib/websession_templates.py:358
 #, fuzzy, python-format
-msgid ""
-"If you have lost the password for your %(sitename)s %(x_fmt_open)sinternal "
-"account%(x_fmt_close)s, then please enter your email address in the "
-"following form in order to have a password reset link emailed to you."
-msgstr ""
-"Om du förlorat ditt lösenord till ett internt CDS Invenio konto kan du "
-"återfå det genom att ange din epost-adress nedan."
+msgid "If you have lost the password for your %(sitename)s %(x_fmt_open)sinternal account%(x_fmt_close)s, then please enter your email address in the following form in order to have a password reset link emailed to you."
+msgstr "Om du förlorat ditt lösenord till ett internt CDS Invenio konto kan du återfå det genom att ange din epost-adress nedan."
 
 #: modules/websession/lib/websession_templates.py:380
 #: modules/websession/lib/websession_templates.py:967
@@ -4682,41 +4541,23 @@ msgstr "Skicka lösenord"
 
 #: modules/websession/lib/websession_templates.py:385
 #, python-format
-msgid ""
-"If you have been using the %(x_fmt_open)sCERN login system%(x_fmt_close)s, "
-"then you can recover your password through the %(x_url_open)sCERN "
-"authentication system%(x_url_close)s."
-msgstr ""
+msgid "If you have been using the %(x_fmt_open)sCERN login system%(x_fmt_close)s, then you can recover your password through the %(x_url_open)sCERN authentication system%(x_url_close)s."
+msgstr "Om ni har användad %(x_fmt_open)sCERN login system%(x_fmt_close)s, ni kan återställa ditt lösenord med %(x_url_open)sCERN authentication system%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:388
 #, fuzzy
-msgid ""
-"Note that if you have been using an external login system, then we cannot do "
-"anything and you have to ask there."
-msgstr ""
-"OBS att om du har använt ett externt lösenord för att logga in till CDS "
-"Invenio (såsom CERN's NICE-konton) så måste du istället kontakta din lokala "
-"systemadministratör."
+msgid "Note that if you have been using an external login system, then we cannot do anything and you have to ask there."
+msgstr "OBS att om du har använt ett externt lösenord för att logga in till CDS Invenio (såsom CERN's NICE-konton) så måste du istället kontakta din lokala systemadministratör."
 
 #: modules/websession/lib/websession_templates.py:389
 #, python-format
-msgid ""
-"Alternatively, you can ask %s to change your login system from external to "
-"internal."
-msgstr ""
-"Alternativt kan du fråga %s om att få ändra din autentierings-typ från "
-"Extern till Intern."
+msgid "Alternatively, you can ask %s to change your login system from external to internal."
+msgstr "Alternativt kan du fråga %s om att få ändra din autentierings-typ från Extern till Intern."
 
 #: modules/websession/lib/websession_templates.py:416
 #, python-format
-msgid ""
-"%s offers you the possibility to personalize the interface, to set up your "
-"own personal library of documents, or to set up an automatic alert query "
-"that would run periodically and would notify you of search results by email."
-msgstr ""
-"%s medger möjligheten att personifiera gränssnittet, att finjustera ditt "
-"eget digitala bibliotek, samt att ställa in automatiska sökalarm som körs "
-"periodvis och kan meddela dig om nya sökresultat via epost."
+msgid "%s offers you the possibility to personalize the interface, to set up your own personal library of documents, or to set up an automatic alert query that would run periodically and would notify you of search results by email."
+msgstr "%s medger möjligheten att personifiera gränssnittet, att finjustera ditt eget digitala bibliotek, samt att ställa in automatiska sökalarm som körs periodvis och kan meddela dig om nya sökresultat via epost."
 
 #: modules/websession/lib/websession_templates.py:426
 #: modules/websession/lib/websession_webinterface.py:258
@@ -4724,9 +4565,7 @@ msgid "Your Settings"
 msgstr "Dina inställningar"
 
 #: modules/websession/lib/websession_templates.py:427
-msgid ""
-"Set or change your account email address or password. Specify your "
-"preferences about the look and feel of the interface."
+msgid "Set or change your account email address or password. Specify your preferences about the look and feel of the interface."
 msgstr "Ange eller redigera din epost-adress eller lösenord."
 
 #: modules/websession/lib/websession_templates.py:438
@@ -4734,51 +4573,29 @@ msgid "View all the searches you performed during the last 30 days."
 msgstr "Visa alla sökningar du genomfört under de senaste 30 dagarna."
 
 #: modules/websession/lib/websession_templates.py:440
-msgid ""
-"With baskets you can define specific collections of items, store interesting "
-"records you want to access later or share with others."
-msgstr ""
-"Med \"korgar\" kan du specifiera samlingar av journaler och lagra "
-"intressanta journaler som du vill kunna nå snabbt och smidigt senare, eller "
-"dela med andra användare. "
+msgid "With baskets you can define specific collections of items, store interesting records you want to access later or share with others."
+msgstr "Med \"korgar\" kan du specifiera samlingar av journaler och lagra intressanta journaler som du vill kunna nå snabbt och smidigt senare, eller dela med andra användare. "
 
 #: modules/websession/lib/websession_templates.py:449
-msgid ""
-"Subscribe to a search which will be run periodically by our service. The "
-"result can be sent to you via Email or stored in one of your baskets."
-msgstr ""
-"Prenumerera på en sökning som körs periodvis. Resultatet kan skickas till "
-"dig via epost, eller lagras i en av dina korgar."
+msgid "Subscribe to a search which will be run periodically by our service. The result can be sent to you via Email or stored in one of your baskets."
+msgstr "Prenumerera på en sökning som körs periodvis. Resultatet kan skickas till dig via epost, eller lagras i en av dina korgar."
 
 #: modules/websession/lib/websession_templates.py:458
 msgid "Your Loans"
 msgstr "Dina lån"
 
 #: modules/websession/lib/websession_templates.py:459
-msgid ""
-"Check out book you have on loan, submit borrowing requests, etc. Requires "
-"CERN ID."
-msgstr ""
-"Checka ut bok du lånat, skicka in en lånansökan, etc. Kräver ett CERN-id."
+msgid "Check out book you have on loan, submit borrowing requests, etc. Requires CERN ID."
+msgstr "Checka ut bok du lånat, skicka in en lånansökan, etc. Kräver ett CERN-id."
 
 #: modules/websession/lib/websession_templates.py:484
-msgid ""
-"You are logged in as a guest user, so your alerts will disappear at the end "
-"of the current session."
-msgstr ""
-"Du är inloggad som en gästanvändare, dina alarm kommer därför att försvinna "
-"vid sessionens slut."
+msgid "You are logged in as a guest user, so your alerts will disappear at the end of the current session."
+msgstr "Du är inloggad som en gästanvändare, dina alarm kommer därför att försvinna vid sessionens slut."
 
 #: modules/websession/lib/websession_templates.py:507
 #, python-format
-msgid ""
-"You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%"
-"(x_url1_close)s; b) edit your %(x_url2_open)saccount settings%(x_url2_close)"
-"s."
-msgstr ""
-"Du är inloggad som %(x_user)s. Vill du kanske a) %(x_url1_open)slogga ut%"
-"(x_url1_close)s; b) redigera dina  %(x_url2_open)skontoinställningar%"
-"(x_url2_close)s."
+msgid "You are logged in as %(x_user)s. You may want to a) %(x_url1_open)slogout%(x_url1_close)s; b) edit your %(x_url2_open)saccount settings%(x_url2_close)s."
+msgstr "Du är inloggad som %(x_user)s. Vill du kanske a) %(x_url1_open)slogga ut%(x_url1_close)s; b) redigera dina  %(x_url2_open)skontoinställningar%(x_url2_close)s."
 
 #: modules/websession/lib/websession_templates.py:572
 msgid "Your Alert Searches"
@@ -4786,12 +4603,8 @@ msgstr "Dina alarmsökningar"
 
 #: modules/websession/lib/websession_templates.py:574
 #, python-format
-msgid ""
-"You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are "
-"administering or are a member of."
-msgstr ""
-"Du kan konsultera listan av  %(x_url_open)sde grupper%(x_url_close)s som du "
-"administrerar eller är medlem i."
+msgid "You can consult the list of %(x_url_open)syour groups%(x_url_close)s you are administering or are a member of."
+msgstr "Du kan konsultera listan av  %(x_url_open)sde grupper%(x_url_close)s som du administrerar eller är medlem i."
 
 #: modules/websession/lib/websession_templates.py:577
 #: modules/websession/lib/websession_templates.py:2072
@@ -4801,12 +4614,8 @@ msgstr "Dina grupper"
 
 #: modules/websession/lib/websession_templates.py:578
 #, python-format
-msgid ""
-"You can consult the list of %(x_url_open)syour submissions%(x_url_close)s "
-"and inquire about their status."
-msgstr ""
-"Du kan konsultera listan av dina %(x_url_open)ssubmissions%(x_url_close)s "
-"och göra statusförfrågningar."
+msgid "You can consult the list of %(x_url_open)syour submissions%(x_url_close)s and inquire about their status."
+msgstr "Du kan konsultera listan av dina %(x_url_open)ssubmissions%(x_url_close)s och göra statusförfrågningar."
 
 #: modules/websession/lib/websession_templates.py:581
 #: modules/websubmit/web/yoursubmissions.py:172
@@ -4815,12 +4624,8 @@ msgstr "Dina submissions"
 
 #: modules/websession/lib/websession_templates.py:582
 #, python-format
-msgid ""
-"You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with "
-"the documents you approved or refereed."
-msgstr ""
-"Du kan konsultera listan av %(x_url_open)sgodkända dokument%(x_url_close)s "
-"som du godkänt."
+msgid "You can consult the list of %(x_url_open)syour approvals%(x_url_close)s with the documents you approved or refereed."
+msgstr "Du kan konsultera listan av %(x_url_open)sgodkända dokument%(x_url_close)s som du godkänt."
 
 #: modules/websession/lib/websession_templates.py:585
 #: modules/websubmit/web/yourapprovals.py:94
@@ -4843,22 +4648,23 @@ msgid ""
 "for a password reset at %(x_sitename)s\n"
 "for the account \"%(x_email)s\"."
 msgstr ""
+"Någon (kanske ni) från %(x_ip_address)s  har bett för en återställning av lösenord i  %(x_sitename)s\n"
+"för kontot  \"%(x_email)s\"."
 
 #: modules/websession/lib/websession_templates.py:643
 msgid "If you want to reset the password for this account, please go to:"
-msgstr ""
+msgstr "Om ni vill återställa lösenordet för detta konto, gå till:"
 
 #: modules/websession/lib/websession_templates.py:649
 #: modules/websession/lib/websession_templates.py:686
 msgid "in order to confirm the validity of this request."
-msgstr ""
+msgstr "För att kontrollera giltigheten av denna begäran"
 
 #: modules/websession/lib/websession_templates.py:650
 #: modules/websession/lib/websession_templates.py:687
 #, python-format
-msgid ""
-"Please note that this URL will remain valid for about %(days)s days only."
-msgstr ""
+msgid "Please note that this URL will remain valid for about %(days)s days only."
+msgstr "OBS: att denna URL är giltig för bar cirka %(days)s dagar."
 
 #: modules/websession/lib/websession_templates.py:672
 #, python-format
@@ -4866,11 +4672,11 @@ msgid ""
 "Somebody (possibly you) coming from %(x_ip_address)s has asked\n"
 "to register a new account at %(x_sitename)s\n"
 "for the email address \"%(x_email)s\"."
-msgstr ""
+msgstr "Någon (kanske ni) från %(x_ip_address)s  har bett för kontot  \"%(x_sitename)s\" med e-postadress  \"%(x_email)s\"."
 
 #: modules/websession/lib/websession_templates.py:680
 msgid "If you want to complete this account registration, please go to:"
-msgstr ""
+msgstr "Om ni vill fortsätta med konto registreringen, gå till:"
 
 #: modules/websession/lib/websession_templates.py:706
 #, fuzzy, python-format
@@ -4893,6 +4699,8 @@ msgid ""
 "                %(x_fmt_open)sSSO%(x_fmt_close)s system. You can\n"
 "                %(x_url_open)slogout from SSO%(x_url_close)s, too."
 msgstr ""
+"Ni är fortfarande inloggad med centraliserad\n"
+" %(x_fmt_open)sSSO%(x_fmt_close)s system.Ni kan %(x_url_open)slogga ut fran SSO%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:744
 #, python-format
@@ -4905,30 +4713,18 @@ msgstr "Om du redan har ett användarkonto, var god logga in nedanför."
 
 #: modules/websession/lib/websession_templates.py:779
 #, fuzzy, python-format
-msgid ""
-"If you don't own a CERN account yet, you can register a %(x_url_open)snew "
-"CERN lightweight account%(x_url_close)s."
-msgstr ""
-"Om du inte ännu har ett användarkonto, var god %(x_url_open)sregistrera dig%"
-"(x_url_close)s för ett internt konto."
+msgid "If you don't own a CERN account yet, you can register a %(x_url_open)snew CERN lightweight account%(x_url_close)s."
+msgstr "Om du inte ännu har ett användarkonto, var god %(x_url_open)sregistrera dig%(x_url_close)s för ett internt konto."
 
 #: modules/websession/lib/websession_templates.py:782
 #, python-format
-msgid ""
-"If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)"
-"s an internal account."
-msgstr ""
-"Om du inte ännu har ett användarkonto, var god %(x_url_open)sregistrera dig%"
-"(x_url_close)s för ett internt konto."
+msgid "If you don't own an account yet, please %(x_url_open)sregister%(x_url_close)s an internal account."
+msgstr "Om du inte ännu har ett användarkonto, var god %(x_url_open)sregistrera dig%(x_url_close)s för ett internt konto."
 
 #: modules/websession/lib/websession_templates.py:786
 #, python-format
-msgid ""
-"It is not possible to create an account yourself. Contact %s if you want an "
-"account."
-msgstr ""
-"Det är ännu inte möjligt att själv registrera användarkonton. Kontakt "
-"istället %s som hjälper dig."
+msgid "It is not possible to create an account yourself. Contact %s if you want an account."
+msgstr "Det är ännu inte möjligt att själv registrera användarkonton. Kontakt istället %s som hjälper dig."
 
 #: modules/websession/lib/websession_templates.py:809
 msgid "Login method:"
@@ -4945,7 +4741,7 @@ msgstr "Lösenord"
 
 #: modules/websession/lib/websession_templates.py:838
 msgid "Remember login on this computer."
-msgstr ""
+msgstr "Kom ihåg att logga in på denna dator."
 
 #: modules/websession/lib/websession_templates.py:839
 #: modules/websession/lib/websession_templates.py:1081
@@ -4965,10 +4761,8 @@ msgid "You can use your nickname or your email address to login."
 msgstr "Du kan använda ditt smeknamn eller din epost-adress för att logga in."
 
 #: modules/websession/lib/websession_templates.py:876
-msgid ""
-"Your request is valid. Please set the new desired password in the following "
-"form."
-msgstr ""
+msgid "Your request is valid. Please set the new desired password in the following form."
+msgstr "Er begäran är giltig. Ange det nya lösenordet i form."
 
 #: modules/websession/lib/websession_templates.py:899
 #, fuzzy
@@ -4995,12 +4789,8 @@ msgid "Please enter your email address and desired nickname and password:"
 msgstr "Var god ange din epost-adress och ditt önskade smeknamn och lösenord:"
 
 #: modules/websession/lib/websession_templates.py:926
-msgid ""
-"It will not be possible to use the account before it has been verified and "
-"activated."
-msgstr ""
-"Det kommer inte att vara möjligt att använda lösenordet förrän det är "
-"verifierat och aktiverat."
+msgid "It will not be possible to use the account before it has been verified and activated."
+msgstr "Det kommer inte att vara möjligt att använda lösenordet förrän det är verifierat och aktiverat."
 
 #: modules/websession/lib/websession_templates.py:975
 msgid "Retype Password"
@@ -5013,26 +4803,13 @@ msgstr "registrera"
 
 #: modules/websession/lib/websession_templates.py:977
 #, python-format
-msgid ""
-"Please do not use valuable passwords such as your Unix, AFS or NICE "
-"passwords with this service. Your email address will stay strictly "
-"confidential and will not be disclosed to any third party. It will be used "
-"to identify you for personal services of %s. For example, you may set up an "
-"automatic alert search that will look for new preprints and will notify you "
-"daily of new arrivals by email."
-msgstr ""
-"Använd inte värdefulla lösenord! Din epost-adress kommer att lagras högst "
-"konfidentiellt och kommer inte röjas till tredje part. Det kommer bara "
-"användas för att identifiera dig mot CDS Invenio's personliga tjänster som %"
-"s."
+msgid "Please do not use valuable passwords such as your Unix, AFS or NICE passwords with this service. Your email address will stay strictly confidential and will not be disclosed to any third party. It will be used to identify you for personal services of %s. For example, you may set up an automatic alert search that will look for new preprints and will notify you daily of new arrivals by email."
+msgstr "Använd inte värdefulla lösenord! Din epost-adress kommer att lagras högst konfidentiellt och kommer inte röjas till tredje part. Det kommer bara användas för att identifiera dig mot CDS Invenio's personliga tjänster som %s."
 
 #: modules/websession/lib/websession_templates.py:1004
 #, python-format
-msgid ""
-"You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s "
-"first."
-msgstr ""
-"Du är en gästanvändare. Du måste %(x_url_open)slogga in%(x_url_close)s ."
+msgid "You seem to be a guest user. You have to %(x_url_open)slogin%(x_url_close)s first."
+msgstr "Du är en gästanvändare. Du måste %(x_url_open)slogga in%(x_url_close)s ."
 
 #: modules/websession/lib/websession_templates.py:1010
 msgid "You are not authorized to access administrative functions."
@@ -5049,12 +4826,8 @@ msgstr "Här är några intressanta WebAdmin-länkar:"
 
 #: modules/websession/lib/websession_templates.py:1041
 #, python-format
-msgid ""
-"For more admin-level activities, see the complete %(x_url_open)sAdmin Area%"
-"(x_url_close)s."
-msgstr ""
-"För fler administratörs-funktioner, besök %(x_url_open)"
-"sadministratörssektionen%(x_url_close)s."
+msgid "For more admin-level activities, see the complete %(x_url_open)sAdmin Area%(x_url_close)s."
+msgstr "För fler administratörs-funktioner, besök %(x_url_open)sadministratörssektionen%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:1077
 msgid "guest"
@@ -5088,7 +4861,7 @@ msgstr "grupper"
 
 #: modules/websession/lib/websession_templates.py:1101
 msgid "statistics"
-msgstr ""
+msgstr "statistik"
 
 #: modules/websession/lib/websession_templates.py:1107
 msgid "submissions"
@@ -5251,12 +5024,8 @@ msgstr "Bjud in nya medlemmar"
 
 #: modules/websession/lib/websession_templates.py:1822
 #, python-format
-msgid ""
-"If you want to invite new members to join your group, please use the %"
-"(x_url_open)sweb message%(x_url_close)s system."
-msgstr ""
-"Om du vill bjuda in flera användare för att joina din grupp, var god använd %"
-"(x_url_open)sWebMessage%(x_url_close)s."
+msgid "If you want to invite new members to join your group, please use the %(x_url_open)sweb message%(x_url_close)s system."
+msgstr "Om du vill bjuda in flera användare för att joina din grupp, var god använd %(x_url_open)sWebMessage%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:1826
 #, python-format
@@ -5299,11 +5068,8 @@ msgstr "En användare vill joina gruppen %s."
 
 #: modules/websession/lib/websession_templates.py:2106
 #, python-format
-msgid ""
-"Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
-msgstr ""
-"Var god %(x_url_open)sacceptera eller avslå%(x_url_close)s användarens "
-"förfrågan."
+msgid "Please %(x_url_open)saccept or reject%(x_url_close)s this user's request."
+msgstr "Var god %(x_url_open)sacceptera eller avslå%(x_url_close)s användarens förfrågan."
 
 #: modules/websession/lib/websession_templates.py:2123
 #, python-format
@@ -5343,13 +5109,8 @@ msgstr "Grupp %s har raderats av en administratör."
 
 #: modules/websession/lib/websession_templates.py:2163
 #, python-format
-msgid ""
-"You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)"
-"s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i)."
-msgstr ""
-"Du kan konsultera listan av %(x_url_open)s%(x_nb_total)i grupper%"
-"(x_url_close)s som du är medlem i (%(x_nb_member)i) eller administrerar (%"
-"(x_nb_admin)i)."
+msgid "You can consult the list of %(x_url_open)s%(x_nb_total)i groups%(x_url_close)s you are subscribed to (%(x_nb_member)i) or administering (%(x_nb_admin)i)."
+msgstr "Du kan konsultera listan av %(x_url_open)s%(x_nb_total)i grupper%(x_url_close)s som du är medlem i (%(x_nb_member)i) eller administrerar (%(x_nb_admin)i)."
 
 #: modules/websession/lib/webuser.py:151
 msgid "Database problem"
@@ -5405,10 +5166,7 @@ msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:98
 #, python-format
-msgid ""
-"You have successfully obtained an authorization as %(x_role)s! This "
-"authorization will last until %(x_expiration)s and until you close your "
-"browser if you are a guest user."
+msgid "You have successfully obtained an authorization as %(x_role)s! This authorization will last until %(x_expiration)s and until you close your browser if you are a guest user."
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:115
@@ -5437,8 +5195,7 @@ msgid "You have already confirmed the validity of your email address!"
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:135
-msgid ""
-"This request for confirmation of an email address is not valid or is expired."
+msgid "This request for confirmation of an email address is not valid or is expired."
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:140
@@ -5489,18 +5246,12 @@ msgstr "<p>Byta till intern inloggningsmetod"
 
 #: modules/websession/lib/websession_webinterface.py:314
 #, fuzzy
-msgid ""
-"Please note that if this is the first time that you are using this account "
-"with the internal login method then the system has set for you a randomly "
-"generated password. Please clic the following button to obtain a password "
-"reset request link sent to you via email:"
+msgid "Please note that if this is the first time that you are using this account with the internal login method then the system has set for you a randomly generated password. Please clic the following button to obtain a password reset request link sent to you via email:"
 msgstr ""
 "OBS att om det här är första gången som\n"
 "                        som du använder den här inloggningsmetoden\n"
-"                        så har systemet tilldelat dig ett randomiserat "
-"lösenord\n"
-"                        som du kan ha få tillgång till genom att klicka på "
-"följande\n"
+"                        så har systemet tilldelat dig ett randomiserat lösenord\n"
+"                        som du kan ha få tillgång till genom att klicka på följande\n"
 "                        knapp:</p>"
 
 #: modules/websession/lib/websession_webinterface.py:322
@@ -5509,21 +5260,13 @@ msgstr "Skicka lösenord"
 
 #: modules/websession/lib/websession_webinterface.py:332
 #, python-format
-msgid ""
-"Unable to switch to external login method %s, because your email address is "
-"unknown."
-msgstr ""
-"Kunde inte byta till extern inloggningsmetod %s, eftersom din epost-adress "
-"är okänd."
+msgid "Unable to switch to external login method %s, because your email address is unknown."
+msgstr "Kunde inte byta till extern inloggningsmetod %s, eftersom din epost-adress är okänd."
 
 #: modules/websession/lib/websession_webinterface.py:336
 #, python-format
-msgid ""
-"Unable to switch to external login method %s, because your email address is "
-"unknown to the external login system."
-msgstr ""
-"Kunde inte byta till extern inloggningsmetod %s, eftersom din epost-adress "
-"är okänd till det externa systemet."
+msgid "Unable to switch to external login method %s, because your email address is unknown to the external login system."
+msgstr "Kunde inte byta till extern inloggningsmetod %s, eftersom din epost-adress är okänd till det externa systemet."
 
 #: modules/websession/lib/websession_webinterface.py:340
 msgid "Login method successfully selected."
@@ -5531,12 +5274,8 @@ msgstr "Inloggningsmetod vald."
 
 #: modules/websession/lib/websession_webinterface.py:342
 #, python-format
-msgid ""
-"The external login method %s does not support email address based logins.  "
-"Please contact the site administrators."
-msgstr ""
-"Det externa inloggningssystemet %s stödjer inte email-baserade inloggningar. "
-"Kontakta administratör."
+msgid "The external login method %s does not support email address based logins.  Please contact the site administrators."
+msgstr "Det externa inloggningssystemet %s stödjer inte email-baserade inloggningar. Kontakta administratör."
 
 #: modules/websession/lib/websession_webinterface.py:366
 msgid "Settings successfully edited."
@@ -5633,12 +5372,8 @@ msgstr "Kunde inte uppdatera inställningarna."
 
 #: modules/websession/lib/websession_webinterface.py:497
 #, fuzzy
-msgid ""
-"Cannot send password reset request since you are using external "
-"authentication system."
-msgstr ""
-"Kan inte skicka lösenordet via epost eftersom du använder en extern "
-"inloggningsmetod."
+msgid "Cannot send password reset request since you are using external authentication system."
+msgstr "Kan inte skicka lösenordet via epost eftersom du använder en extern inloggningsmetod."
 
 #: modules/websession/lib/websession_webinterface.py:513
 msgid "The entered email address does not exist in the database."
@@ -5649,12 +5384,8 @@ msgid "Password reset request for"
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:531
-msgid ""
-"The entered email address is incorrect, please check that it is written "
-"correctly (e.g. johndoe@example.com)."
-msgstr ""
-"Den angivna epost-adresen är inkorrekt, var god kontrollera att den är "
-"skriven på rätt form (ex: johndoe@example.com)."
+msgid "The entered email address is incorrect, please check that it is written correctly (e.g. johndoe@example.com)."
+msgstr "Den angivna epost-adresen är inkorrekt, var god kontrollera att den är skriven på rätt form (ex: johndoe@example.com)."
 
 #: modules/websession/lib/websession_webinterface.py:532
 msgid "Incorrect email address"
@@ -5692,24 +5423,16 @@ msgid "Account created"
 msgstr "Användarkonto skapades"
 
 #: modules/websession/lib/websession_webinterface.py:758
-msgid ""
-"In order to confirm its validity, an email message containing an account "
-"activation key has been sent to the given email address."
+msgid "In order to confirm its validity, an email message containing an account activation key has been sent to the given email address."
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:759
-msgid ""
-"Please follow instructions presented there in order to complete the account "
-"registration process."
+msgid "Please follow instructions presented there in order to complete the account registration process."
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:761
-msgid ""
-"A second email will be sent when the account has been activated and can be "
-"used."
-msgstr ""
-"Ett andra epost kommer att skickas då kontot blivit aktiverats och är "
-"färdigt för att användas."
+msgid "A second email will be sent when the account has been activated and can be used."
+msgstr "Ett andra epost kommer att skickas då kontot blivit aktiverats och är färdigt för att användas."
 
 #: modules/websession/lib/websession_webinterface.py:764
 #, python-format
@@ -5734,21 +5457,15 @@ msgstr "Smeknamnet %s är upptaget"
 
 #: modules/websession/lib/websession_webinterface.py:794
 msgid "Users cannot register themselves, only admin can register them."
-msgstr ""
-"Användare kan inte registrera sig själva, bara administratörer kan utföra "
-"registreringar."
+msgstr "Användare kan inte registrera sig själva, bara administratörer kan utföra registreringar."
 
 #: modules/websession/lib/websession_webinterface.py:798
-msgid ""
-"The site is having troubles in sending you an email for confirming your "
-"email address."
+msgid "The site is having troubles in sending you an email for confirming your email address."
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:798
 #: modules/websubmit/lib/websubmit_webinterface.py:119
-msgid ""
-"The error has been logged and will be taken in consideration as soon as "
-"possible."
+msgid "The error has been logged and will be taken in consideration as soon as possible."
 msgstr ""
 
 #: modules/websession/lib/websession_webinterface.py:963
@@ -5842,11 +5559,8 @@ msgstr "Vänligen kontakta %s. Bifoga följande information:"
 
 #: modules/webstyle/lib/webstyle_templates.py:741
 #, python-format
-msgid ""
-"Record created %(x_date_creation)s, last modified %(x_date_modification)s"
-msgstr ""
-"Journalen skapades %(x_date_creation)s, och modifierades senast %"
-"(x_date_modification)s"
+msgid "Record created %(x_date_creation)s, last modified %(x_date_modification)s"
+msgstr "Journalen skapades %(x_date_creation)s, och modifierades senast %(x_date_modification)s"
 
 #: modules/webstyle/lib/webdoc.py:548
 #, python-format
@@ -5900,9 +5614,7 @@ msgstr "Tyvärr verkar inte dokumentet %s existera."
 
 #: modules/webstyle/lib/webdoc_webinterface.py:192
 #, fuzzy, python-format
-msgid ""
-"You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)"
-"s."
+msgid "You may want to look at the %(x_url_open)s%(x_category)s pages%(x_url_close)s."
 msgstr "Du kan nu logga in till ditt %(x_url_open)skonto%(x_url_close)s."
 
 #: modules/websubmit/lib/websubmit_engine.py:186
@@ -6000,12 +5712,8 @@ msgid "Select a category and then click on an action button."
 msgstr "Välj en kategori och klicka sedan på en aktion-knapp"
 
 #: modules/websubmit/lib/websubmit_templates.py:363
-msgid ""
-"To continue with a previously interrupted submission, enter an access number "
-"into the box below:"
-msgstr ""
-"För att fortsätta med en avbruten inskickning, ange ett accessnummer i rutan "
-"nedanför:"
+msgid "To continue with a previously interrupted submission, enter an access number into the box below:"
+msgstr "För att fortsätta med en avbruten inskickning, ange ett accessnummer i rutan nedanför:"
 
 #: modules/websubmit/lib/websubmit_templates.py:365
 msgid "GO"
@@ -6040,12 +5748,8 @@ msgid "Back to main menu"
 msgstr "Tillbaka till huvudmenyn"
 
 #: modules/websubmit/lib/websubmit_templates.py:567
-msgid ""
-"This is your submission access number. It can be used to continue with an "
-"interrupted submission in case of problems."
-msgstr ""
-"Detta är ditt inskicknings accessnummer. Det kan användas för att fortsätta "
-"en avbruten inskickning ifall problem uppstår."
+msgid "This is your submission access number. It can be used to continue with an interrupted submission in case of problems."
+msgstr "Detta är ditt inskicknings accessnummer. Det kan användas för att fortsätta en avbruten inskickning ifall problem uppstår."
 
 #: modules/websubmit/lib/websubmit_templates.py:568
 msgid "Mandatory fields appear in red in the SUMMARY window."
@@ -6092,12 +5796,8 @@ msgstr "Bidragsnummer"
 
 #: modules/websubmit/lib/websubmit_templates.py:1026
 #, python-format
-msgid ""
-"Here is the %(x_action)s function list for %(x_doctype)s documents at level %"
-"(x_step)s"
-msgstr ""
-"Här är den exakta %(x_action)s funktionslistan för %(x_doctype)s dokument på "
-"nivå %(x_step)s"
+msgid "Here is the %(x_action)s function list for %(x_doctype)s documents at level %(x_step)s"
+msgstr "Här är den exakta %(x_action)s funktionslistan för %(x_doctype)s dokument på nivå %(x_step)s"
 
 #: modules/websubmit/lib/websubmit_templates.py:1031
 msgid "Function"
@@ -6198,11 +5898,8 @@ msgstr "Lista av dömda typer av dokument"
 #: modules/websubmit/lib/websubmit_templates.py:1581
 #: modules/websubmit/lib/websubmit_templates.py:1626
 #, fuzzy
-msgid ""
-"Select one of the following types of documents to check the documents status"
-msgstr ""
-"Välj en av de följande dokumenttyperna för att se status för relaterade "
-"dokument."
+msgid "Select one of the following types of documents to check the documents status"
+msgstr "Välj en av de följande dokumenttyperna för att se status för relaterade dokument."
 
 #: modules/websubmit/lib/websubmit_templates.py:1594
 msgid "Go to specific approval workflow"
@@ -6356,11 +6053,8 @@ msgstr "Klicka här"
 
 #: modules/websubmit/lib/websubmit_templates.py:2276
 #, python-format
-msgid ""
-"This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
-msgstr ""
-"Det här dokumentet väntar fortfarande på %(x_fmt_open)sgodkännande%"
-"(x_fmt_close)s."
+msgid "This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s."
+msgstr "Det här dokumentet väntar fortfarande på %(x_fmt_open)sgodkännande%(x_fmt_close)s."
 
 #: modules/websubmit/lib/websubmit_templates.py:2279
 #: modules/websubmit/lib/websubmit_templates.py:2300
@@ -6378,12 +6072,8 @@ msgid "Last approval email was sent on:"
 msgstr "Senaste godkännande epost sändes:"
 
 #: modules/websubmit/lib/websubmit_templates.py:2284
-msgid ""
-"You can send an approval request email again by clicking the following "
-"button:"
-msgstr ""
-"Du kan skicka ett godkännande-förfrågan igen genom att klicka på följande "
-"knapp:"
+msgid "You can send an approval request email again by clicking the following button:"
+msgstr "Du kan skicka ett godkännande-förfrågan igen genom att klicka på följande knapp:"
 
 #: modules/websubmit/lib/websubmit_templates.py:2286
 #: modules/websubmit/web/publiline.py:356
@@ -6396,11 +6086,8 @@ msgstr "VARNING! Ett epost kommer att skickas till domaren."
 
 #: modules/websubmit/lib/websubmit_templates.py:2290
 #, fuzzy
-msgid ""
-"As a referee for this document, you may click this button to approve or "
-"reject it"
-msgstr ""
-"I egenskap av domare för den här dokumenttypen, godkänn eller avslå ansökan."
+msgid "As a referee for this document, you may click this button to approve or reject it"
+msgstr "I egenskap av domare för den här dokumenttypen, godkänn eller avslå ansökan."
 
 #: modules/websubmit/lib/websubmit_templates.py:2292
 msgid "Approve/Reject"
@@ -6456,9 +6143,7 @@ msgid "Select a referee"
 msgstr "Välj en poäng"
 
 #: modules/websubmit/lib/websubmit_templates.py:2404
-msgid ""
-"The referee has sent his final recommendations to the publication committee "
-"on the "
+msgid "The referee has sent his final recommendations to the publication committee on the "
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2406
@@ -6477,9 +6162,7 @@ msgstr "Skriv en kommentar"
 
 #: modules/websubmit/lib/websubmit_templates.py:2412
 #: modules/websubmit/lib/websubmit_templates.py:2475
-msgid ""
-"The publication committee has sent his final recommendations to the project "
-"leader on the "
+msgid "The publication committee has sent his final recommendations to the project leader on the "
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2414
@@ -6520,8 +6203,7 @@ msgid "Take a decision"
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2440
-msgid ""
-"An editorial board has been selected by the publication committee on the "
+msgid "An editorial board has been selected by the publication committee on the "
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2442
@@ -6542,14 +6224,11 @@ msgid "A referee has been selected by the editorial board on the "
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2459
-msgid ""
-"The referee has sent his final recommendations to the editorial board on the "
+msgid "The referee has sent his final recommendations to the editorial board on the "
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2467
-msgid ""
-"The editorial board has sent his final recommendations to the publication "
-"committee on the "
+msgid "The editorial board has sent his final recommendations to the publication committee on the "
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_templates.py:2469
@@ -6601,9 +6280,7 @@ msgid "User"
 msgstr "Användare"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:118
-msgid ""
-"The system has encountered an error in retrieving the list of files for this "
-"document."
+msgid "The system has encountered an error in retrieving the list of files for this document."
 msgstr ""
 
 #: modules/websubmit/lib/websubmit_webinterface.py:166
@@ -6746,11 +6423,7 @@ msgid "Please login to perform this action."
 msgstr "Du måste logga in för att göra detta."
 
 #: modules/webjournal/lib/webjournal_utils.py:148
-msgid ""
-"In order to publish webjournal issues you must be "
-"logged                         in and be authorized for this kind of task. "
-"If you have a                         login, use the "
-"link                         below to login."
+msgid "In order to publish webjournal issues you must be logged                         in and be authorized for this kind of task. If you have a                         login, use the link                         below to login."
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_utils.py:160
@@ -6776,9 +6449,7 @@ msgid "Regeneration Error"
 msgstr "Internt fel"
 
 #: modules/webjournal/lib/webjournal_templates.py:124
-msgid ""
-"The issue could not be correctly regenerated. Please contact your "
-"administrator."
+msgid "The issue could not be correctly regenerated. Please contact your administrator."
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_templates.py:143
@@ -6851,9 +6522,7 @@ msgid "We could not provide you any journals"
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:305
-msgid ""
-"It seems that there are no journals defined on this server. Please contact "
-"support if this is not right."
+msgid "It seems that there are no journals defined on this server. Please contact support if this is not right."
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:330
@@ -6865,9 +6534,7 @@ msgid "We couldn't guess which journal you are looking for"
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:332
-msgid ""
-"You did not provide an argument for a journal name. Please select the "
-"journal you want to read in the list below."
+msgid "You did not provide an argument for a journal name. Please select the journal you want to read in the list below."
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:358
@@ -6880,9 +6547,7 @@ msgid "We could not find any informtion on the current issue"
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:360
-msgid ""
-"The configuration for the current issue seems to be empty. Try providing an "
-"issue number or check with support."
+msgid "The configuration for the current issue seems to be empty. Try providing an issue number or check with support."
 msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:387
@@ -6959,7 +6624,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "Main file(s)"
 #~ msgstr "fil(er)"
-
 #~ msgid "Display searches"
 #~ msgstr "Visa sökningar"
 
@@ -6970,16 +6634,12 @@ msgstr ""
 #, fuzzy
 #~ msgid "   Password: %s\n"
 #~ msgstr "Lösenord"
-
 #~ msgid "Migrate BibFormat Settings"
 #~ msgstr "Migrera BibFormat's inställningar"
-
 #~ msgid "Migrate Knowledge Bases"
 #~ msgstr "Migrera kunskapsbaser"
-
 #~ msgid "Migrate Behaviours"
 #~ msgstr "Migrera beteenden"
-
 #~ msgid "Migrate Formats"
 #~ msgstr "Migrera format"
 
@@ -6990,7 +6650,6 @@ msgstr ""
 #, fuzzy
 #~ msgid "You have created a new account on"
 #~ msgstr "eller skapa ett nytt"
-
 #~ msgid ""
 #~ "You can now go back to %(x_url_open)sBibEdit Admin Interface%(x_url_close)"
 #~ "s."
@@ -7025,53 +6684,38 @@ msgstr ""
 #, fuzzy
 #~ msgid "Successfully featured record: %s"
 #~ msgstr "raderade missbruksrapport"
-
 #~ msgid "Convert"
 #~ msgstr "Konvertera"
-
 #~ msgid "Library"
 #~ msgstr "Bibliotek"
-
 #~ msgid "Agenda"
 #~ msgstr "Agenda"
-
 #~ msgid "Webcast"
 #~ msgstr "Webcast"
-
 #~ msgid "Search Help"
 #~ msgstr "Sökhjälp"
-
 #~ msgid "Comment Management"
 #~ msgstr "Kommentarshantering"
-
 #~ msgid "Format:"
 #~ msgstr "Format:"
-
 #~ msgid "Send lost password"
 #~ msgstr "Skicka förlorat lösenord"
-
 #~ msgid "Here are your user credentials for"
 #~ msgstr "Här är dina användaruppgifter för"
-
 #~ msgid "username"
 #~ msgstr "användarnamn"
-
 #~ msgid "password"
 #~ msgstr "lösenord"
-
 #~ msgid "You can login at"
 #~ msgstr "Du kan logga in på"
-
 #~ msgid "You seem to be %(x_role)s."
 #~ msgstr "Du är %(x_role)s."
-
 #~ msgid "Credentials for"
 #~ msgstr "Kreditiv för "
-
 #~ msgid ""
 #~ "An email has been sent to the given address with the account information."
 #~ msgstr ""
 #~ "Ett epost med användarinformationen har skickats till adressen du uppgav."
-
 #~ msgid "Unable to find file."
 #~ msgstr "Kunde inte hitta filen."
+
