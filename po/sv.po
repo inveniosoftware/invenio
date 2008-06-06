@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0.20080511\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-05-11 14:21+0200\n"
-"PO-Revision-Date: 2008-06-06 12:51+0100\n"
+"PO-Revision-Date: 2008-06-06 15:55+0100\n"
 "Last-Translator: Marko Niinimaki <man@cern.ch>\n"
 "Language-Team: SV <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -470,9 +470,8 @@ msgstr "författare"
 
 #: modules/webhelp/web/help-central.webdoc:94
 #: modules/websearch/doc/search-guide.webdoc:21
-#, fuzzy
 msgid "Search Guide"
-msgstr "Se guide"
+msgstr "Sökhandbok"
 
 #: modules/websearch/doc/search-guide.webdoc:338
 #: modules/websearch/doc/search-guide.webdoc:373
@@ -520,9 +519,8 @@ msgstr "Minst ett av orden:"
 #: modules/websearch/doc/search-guide.webdoc:779
 #: modules/websearch/doc/search-guide.webdoc:814
 #: modules/miscutil/lib/inveniocfg.py:382
-#, fuzzy
 msgid "division"
-msgstr "version"
+msgstr "division"
 
 #: modules/websearch/doc/search-tips.webdoc:40
 #: modules/websearch/doc/search-tips.webdoc:71
@@ -986,9 +984,8 @@ msgid "Help Central"
 msgstr "Hjälpcentral"
 
 #: modules/bibformat/etc/format_templates/Default_HTML_actions.bft:6
-#, fuzzy
 msgid "Export as"
-msgstr "Rapportera missbruk"
+msgstr "Exportera"
 
 #: modules/websearch/doc/search-guide.webdoc:336
 #: modules/websearch/doc/search-guide.webdoc:371
@@ -1309,9 +1306,8 @@ msgid "WebSubmit Admin Guide"
 msgstr "WebSubmit administration"
 
 #: modules/bibformat/etc/format_templates/Default_HTML_files.bft:4
-#, fuzzy
 msgid "No fulltext"
-msgstr "fulltext"
+msgstr "Inga fulltext"
 
 #: modules/websearch/doc/search-tips.webdoc:291
 #: modules/websubmit/lib/websubmit_templates.py:1083
@@ -1793,25 +1789,22 @@ msgstr "ytterligare filer"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:69
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:61
-#, fuzzy
 msgid "older versions"
-msgstr "version"
+msgstr "äldre versioner"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:89
 #: modules/bibformat/lib/elements/bfe_fulltext.py:98
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:103
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:120
-#, fuzzy
 msgid "link"
-msgstr "i"
+msgstr "link"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:89
 #: modules/bibformat/lib/elements/bfe_fulltext.py:98
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:103
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:120
-#, fuzzy
 msgid "links"
-msgstr "logga in"
+msgstr "links"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:90
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:104
@@ -2002,9 +1995,8 @@ msgid "Download history:"
 msgstr "Nedladdningshistorik"
 
 #: modules/bibrank/lib/bibrank_downloads_grapher.py:100
-#, fuzzy
 msgid "Download user distribution:"
-msgstr "Nedladdningshistorik"
+msgstr "Nedladdningsdistribution"
 
 #: modules/miscutil/lib/dateutils.py:69
 #: modules/miscutil/lib/dateutils.py:96
@@ -4007,9 +3999,8 @@ msgid "Citations"
 msgstr "Referenshistorik"
 
 #: modules/websearch/lib/websearchadminlib.py:3203
-#, fuzzy
 msgid "Discussion"
-msgstr "användarsession"
+msgstr "Diskussion"
 
 #: modules/websearch/lib/websearchadminlib.py:3204
 msgid "Usage statistics"
@@ -4304,9 +4295,8 @@ msgid "Total number of papers analyzed:"
 msgstr "Totalt antal rapporter"
 
 #: modules/websearch/lib/websearch_templates.py:3048
-#, fuzzy
 msgid "Total number of citations:"
-msgstr "Totalt antal rapporter"
+msgstr "Totalt antal citationer"
 
 #: modules/websearch/lib/websearch_templates.py:3049
 msgid "Average citations per paper:"
@@ -4482,9 +4472,8 @@ msgid "You can change or reset your CERN account password by means of the %(x_ur
 msgstr "Du kan nu logga in till ditt %(x_url_open)skonto%(x_url_close)s."
 
 #: modules/websession/lib/websession_templates.py:248
-#, fuzzy
 msgid "Edit language-related settings"
-msgstr "Ange sök-relaterade inställningar"
+msgstr "Editera språk inställningar"
 
 #: modules/websession/lib/websession_templates.py:259
 msgid "Select desired language of the web interface."
@@ -5123,7 +5112,7 @@ msgstr "Användare"
 #: modules/websession/lib/webuser.py:439
 #, python-format
 msgid "Account registration at %s"
-msgstr ""
+msgstr "Konto aktivering i %s"
 
 #: modules/websession/lib/webuser.py:664
 #, fuzzy
@@ -5132,7 +5121,7 @@ msgstr "Visa användarkonto"
 
 #: modules/websession/lib/webuser.py:666
 msgid "PLEASE ACTIVATE"
-msgstr ""
+msgstr "ACTIVERA VSG"
 
 #: modules/websession/lib/webuser.py:667
 #, fuzzy
@@ -5141,7 +5130,7 @@ msgstr "Ditt användarkonto har skapats"
 
 #: modules/websession/lib/webuser.py:669
 msgid " and is awaiting activation"
-msgstr ""
+msgstr "ock väntar aktivering"
 
 #: modules/websession/lib/webuser.py:671
 #, fuzzy
@@ -5150,24 +5139,24 @@ msgstr "Användarnamn"
 
 #: modules/websession/lib/webuser.py:672
 msgid "You can approve or reject this account request at"
-msgstr ""
+msgstr "Ni kan godkänna eller avslå detta konto begäran i"
 
 #: modules/websession/lib/websession_webinterface.py:85
 msgid "Mail Cookie Service"
-msgstr ""
+msgstr "Mail Cookie Service"
 
 #: modules/websession/lib/websession_webinterface.py:95
 msgid "Role authorization request"
-msgstr ""
+msgstr "Role authorization begära"
 
 #: modules/websession/lib/websession_webinterface.py:95
 msgid "This request for an authorization has already been authorized."
-msgstr ""
+msgstr "Denna begäran har redan varit behandlat."
 
 #: modules/websession/lib/websession_webinterface.py:98
 #, python-format
 msgid "You have successfully obtained an authorization as %(x_role)s! This authorization will last until %(x_expiration)s and until you close your browser if you are a guest user."
-msgstr ""
+msgstr "Ni är godkänd som  %(x_role)s! Detta pågår till %(x_expiration)s (tills ni stänger er webbläsare om ni är gäst användare)."
 
 #: modules/websession/lib/websession_webinterface.py:115
 msgid "You have confirmed the validity of your email address!"
@@ -5240,9 +5229,8 @@ msgid "Show account"
 msgstr "Visa användarkonto"
 
 #: modules/websession/lib/websession_webinterface.py:313
-#, fuzzy
 msgid "Switched to internal login method."
-msgstr "<p>Byta till intern inloggningsmetod"
+msgstr "Byta till intern inloggningsmetod"
 
 #: modules/websession/lib/websession_webinterface.py:314
 #, fuzzy
@@ -5412,7 +5400,7 @@ msgstr "Registrera"
 #: modules/websession/lib/websession_webinterface.py:810
 #, python-format
 msgid "%s  Personalize, Main page"
-msgstr ""
+msgstr "%s  Personalize, startsidan"
 
 #: modules/websession/lib/websession_webinterface.py:755
 msgid "Your account has been successfully created."
@@ -5565,7 +5553,7 @@ msgstr "Journalen skapades %(x_date_creation)s, och modifierades senast %(x_date
 #: modules/webstyle/lib/webdoc.py:548
 #, python-format
 msgid "%(category)s Pages"
-msgstr ""
+msgstr "%(category)s sidor"
 
 #: modules/webstyle/lib/webdoc_webinterface.py:146
 #: modules/webstyle/lib/webdoc_webinterface.py:151
@@ -5598,9 +5586,8 @@ msgid "This is the table of contents of the %(x_category)s pages."
 msgstr ""
 
 #: modules/webstyle/lib/webdoc_webinterface.py:166
-#, fuzzy
 msgid "See also"
-msgstr "Sökresultat"
+msgstr ""
 
 #: modules/webstyle/lib/webdoc_webinterface.py:181
 #, fuzzy, python-format
@@ -6256,9 +6243,8 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_templates.py:2721
 #: modules/websubmit/lib/websubmit_templates.py:2774
 #: modules/websubmit/lib/websubmit_templates.py:2776
-#, fuzzy
 msgid "select user"
-msgstr "Välj korg"
+msgstr "Välj användaren"
 
 #: modules/websubmit/lib/websubmit_templates.py:2730
 msgid "connected"
@@ -6370,7 +6356,7 @@ msgstr ""
 #: modules/websubmit/web/publiline.py:692
 #: modules/websubmit/web/publiline.py:811
 msgid "limit"
-msgstr ""
+msgstr "gräns"
 
 #: modules/websubmit/web/publiline.py:708
 msgid "users in brackets are already attached to the role, try another one..."
@@ -6619,7 +6605,7 @@ msgstr ""
 
 #: modules/webjournal/lib/webjournal_config.py:629
 msgid "Available journals"
-msgstr ""
+msgstr "Tillgängliga journaler"
 
 #, fuzzy
 #~ msgid "Main file(s)"
