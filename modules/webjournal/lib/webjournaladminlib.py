@@ -829,8 +829,8 @@ def make_full_paths_in_css(css, journal_name):
     rel_to_full_path = {}
     for url in url_iter:
         url_string = url.group("url")
-        url_string = url_string.replace("\"", "")
-        url_string = url_string.replace("\'", "")
+        url_string = url_string.replace('"', "")
+        url_string = url_string.replace("'", "")
         if url_string[:6] != "http://":
             rel_to_full_path[url_string] = '"%s/img/webjournal_%s/%s"' % \
             (CFG_SITE_URL,
