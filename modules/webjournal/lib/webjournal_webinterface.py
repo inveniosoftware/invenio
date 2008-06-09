@@ -136,7 +136,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
             except InvenioWebJournalJournalIdNotFoundDBError, e:
                 register_exception(req=req)
                 return e.user_box()
-            category = wash_category(ln, argd['category'], journal_name)
+            category = wash_category(ln, argd['category'], journal_name).replace(' ', '%20')
             redirect_to_url(req, CFG_SITE_URL + '/journal/%(name)s/%(issue_year)s/%(issue_number)s/%(category)s/?ln=%(ln)s' % \
                             {'name': journal_name,
                              'issue_year': issue_year,
@@ -178,7 +178,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                 config_strings = get_xml_from_config(["index", "rule", "issue_number"],
                                                      journal_name)
                 rule_list = config_strings["rule"]
-                category = rule_list[0].split(",")[0]
+                category = rule_list[0].split(",")[0].replace(' ', '%20')
             redirect_to_url(req, CFG_SITE_URL + '/journal/%(name)s/%(issue_year)s/%(issue_number)s/%(category)s/?ln=%(ln)s' % \
                             {'name': journal_name,
                              'issue_year': journal_issue_year,
