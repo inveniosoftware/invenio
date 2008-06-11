@@ -297,14 +297,6 @@ def Register_Approval_Request(parameters, curdir, form, user_info=None):
         num_rows_inserted = register_new_approval_request(doctype, \
                                                           category, \
                                                           rn)
-        if num_rows_inserted < 1:
-            ## The new request couldn't be successfully registered in the DB.
-            ## Cannot continue.
-            msg = "Error in Register_Approval_Request function: Unable to " \
-                  "insert details of the new approval request into the " \
-                  "database. The request for approval cannot be registered. " \
-                  "Please report this problem to the administrator."
-            raise InvenioWebSubmitFunctionError(msg)
     elif approval_status.lower() == "approved":
         ## This document has already been approved. Stop and inform the user
         ## of this.
@@ -396,7 +388,7 @@ def get_simple_approval_status(doctype, category, reportnumber):
            """categ=%s and rn=%s"""
     qres = run_sql(qstr, (doctype, category, reportnumber))
     if len(qres) > 0:
-        approval_status = qres[0]
+        approval_status = qres[0][0]
     return approval_status
 
 
@@ -409,15 +401,13 @@ def register_new_approval_request(doctype, category, reportnumber):
         the new approval request is being registered.
        @param reportnumber: (string) - the report number of the document
         for which the new approval request is being registered.
-       @return: (integer) - the number of rows inserted by the query.
+       @return: None
     """
     qstr = """INSERT INTO sbmAPPROVAL """ \
            """(doctype, categ, rn, status, """ \
            """dFirstReq, dLastReq, dAction, access) VALUES """ \
            """(%s, %s, %s, 'waiting', NOW(), NOW(), '', '')"""
     qres = run_sql(qstr, (doctype, category, reportnumber))
-    ## return the number of rows inserted:
-    return int(qres)
 
 def update_approval_request_status(doctype, \
                                    category, \
