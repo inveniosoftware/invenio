@@ -17,6 +17,10 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""At the time of a "request for approval" submission, register the request in
+   the WebSubmit "Approvals" DB (sbmAPPROVAL).
+"""
+
 __revision__ = "$Id$"
 
 import sre_constants
@@ -32,7 +36,36 @@ from invenio.dbquery import run_sql
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
 
 def Register_Approval_Request(parameters, curdir, form, user_info=None):
-    """
+    """This function is used at the time of a "request for approval" submission
+       in order to register the request in the WebSubmit "Approvals" DB
+       (sbmAPPROVAL).
+       At the time of approval request, the document could be in one of
+       several different approval "states" and depending upon that state,
+       the action taken by this function differs. The states are as
+       follows:
+          * Approval for the document has never been requested.
+             -> In this case, a new row for the document is inserted into the
+                approvals table with the "waiting" state.
+          * Approval of the document has previously been requested and it is
+            still in the "waiting" state.
+             -> In this case, the date of last request for the document is
+                updated in the approvals table.
+          * Approval of the document has previously been requested, but the
+            document was rejected.
+             -> In this case, the function will halt the submission with a
+                message informing the user that approval of the document was
+                already rejected.
+          * Approval of the document has previously been requested and it has
+            been approved.
+             -> In this case, the function will halt the submission with a
+                message informing the user that the document has already
+                been approved and that no further action is necessary.
+          * Approval of the document has previously been requested, but the
+            request withdrawn.
+             -> In this case, the function will update the "approval status"
+                of the document to "waiting" and will return a message
+                informing the user that although the approval request was
+                previously withdrawn, it has been requested again.
        @param categ_file_appreq: (string) - some document types are
         separated into different categories, each of which has its own
         referee(s).
@@ -58,6 +91,12 @@ def Register_Approval_Request(parameters, curdir, form, user_info=None):
         This would allow "PHYS" in the following reference number to be
         recognised as the category:
            ATL-COM-PHYS-2008-001
+       @return: (string) - a message for the user.
+       @Exceptions raised: + InvenioWebSubmitFunctionStop when the submission
+                             should be halted.
+                           + InvenioWebSubmitFunctionError when an unexpected
+                             error has been encountered and execution cannot
+                             continue.
     """
     ## Get the reference number (as global rn - sorry!) and the document type:
     global rn
@@ -311,7 +350,6 @@ Approval has been requested again.
         ## Update the date/time of the last request and inform the user that
         ## although approval had already been requested for this document,
         ## their approval request has been made again.
-        ## FIXME - UPDATE TIME.
         update_approval_request_status(doctype, category, rn)
         info_out += """
 <br />
