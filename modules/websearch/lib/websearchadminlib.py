@@ -2983,7 +2983,8 @@ def add_col(colNAME, dbquery=None):
             res = run_sql("INSERT INTO collection (id,name,dbquery) VALUES (1,%s,%s)",
                           (colNAME,dbquery))
         colID = run_sql("SELECT id FROM collection WHERE name=%s", (colNAME,))
-        res = run_sql("INSERT INTO collectionname(id_collection, type, ln, value) VALUES (%s,%s,%s,%s)" % (colID[0][0], rtype, CFG_SITE_LANG, colNAME))
+        res = run_sql("INSERT INTO collectionname(id_collection, type, ln, value) VALUES (%s,%s,%s,%s)",
+                      (colID[0][0], rtype, CFG_SITE_LANG, colNAME))
         if colID:
             return (1, colID[0][0])
         else:
