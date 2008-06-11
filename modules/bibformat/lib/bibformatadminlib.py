@@ -710,7 +710,9 @@ def add_format_template():
     """
     (filename, name) = bibformat_engine.get_fresh_format_template_filename("Untitled")
 
-    out = '<name>%(name)s</name><description></description>' % {'name':name}
+    out = ""
+    if not filename.endswith(".xsl"):
+        out = '<name>%(name)s</name><description></description>' % {'name': name}
     path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
     format = open(path, 'w')
     format.write(out)
@@ -741,11 +743,12 @@ def update_format_template_code(filename, code=""):
     name = format_template['name']
     description = format_template['description']
 
-    out = '''
-<name>%(name)s</name>
+    out = ""
+    if not filename.endswith(".xsl"):
+        out = """<name>%(name)s</name>
 <description>%(description)s</description>
-%(code)s
-    ''' % {'name':name, 'description':description, 'code':code}
+""" % {'name': name, 'description': description}
+    out += code
     path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
     format = open(path, 'w')
     format.write(out)
@@ -805,9 +808,11 @@ def update_format_template_attributes(filename, name="", description="", duplica
         description = cgi.escape(description)
         name = cgi.escape(name)
         # Write updated format template
-        out = '''<name>%(name)s</name><description>%(description)s</description>%(code)s''' % {'name':name,
-                                                                                               'description':description,
-                                                                                               'code':code}
+        out = ""
+        if not filename.endswith(".xsl"):
+            out = """<name>%(name)s</name><description>%(description)s</description>""" % {'name': name,
+                                                                                           'description': description,}
+        out += code
 
         path = CFG_BIBFORMAT_TEMPLATES_PATH + os.sep + filename
         format = open(path, 'w')
