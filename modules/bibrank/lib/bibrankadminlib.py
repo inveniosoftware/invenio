@@ -1027,12 +1027,17 @@ def modify_translations(ID, langs, sel_type, trans, table):
         return (0, e)
 
 def write_outcome(res):
-    try:
-        if res and res[0] == 1:
-            return """<b><span class="info">Operation successfully completed.</span></b>"""
-        elif res:
-            return """<b><span class="info">Operation failed. Reason:</span></b><br />%s""" % res[1][1]
-    except Exception, e:
-        return """<b><span class="info">Operation failed. Reason unknown</span></b><br />"""
+    """
+    Write the outcome of an update of some settings.
+
+    Parameter 'res' is a tuple (int, str), where 'int' is 0 when there
+    is an error to display, and 1 when everything went fine. 'str' is
+    a message displayed when there is an error.
+    """
+
+    if res and res[0] == 1:
+        return """<b><span class="info">Operation successfully completed.</span></b>"""
+    elif res:
+        return """<b><span class="info">Operation failed. Reason:</span></b><br />%s""" % res[1]
 
 
