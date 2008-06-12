@@ -1057,9 +1057,9 @@ class Template:
 
             if type == 'r':
                 if son.restricted_p() and son.restricted_p() != father.restricted_p():
-                    out += """<input type="checkbox" name="c" value="%(name)s" />&nbsp;</td>""" % {'name' : cgi.escape(son.name) }
+                    out += """<input type="checkbox" name="c" value="%(name)s" /></td>""" % {'name' : cgi.escape(son.name) }
                 else:
-                    out += """<input type="checkbox" name="c" value="%(name)s" checked="checked" />&nbsp;</td>""" % {'name' : cgi.escape(son.name) }
+                    out += """<input type="checkbox" name="c" value="%(name)s" checked="checked" /></td>""" % {'name' : cgi.escape(son.name) }
             else:
                 out += '</td>'
             out += """<td valign="top">%(link)s%(recs)s """ % {
