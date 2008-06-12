@@ -758,6 +758,8 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 if not reference_list.has_key(rec_id):
                     reference_list[rec_id] = []
                 if not rec_id in citation_list[recid]:
+                    if not result.has_key(recid):
+                        result[recid] = 0
                     result[recid] += 1
                     citation_list[recid].append(rec_id)
                 if not recid in reference_list[rec_id]:
