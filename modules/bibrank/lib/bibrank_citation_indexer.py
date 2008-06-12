@@ -450,7 +450,7 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, c
     """
 
     #sorry bout repeated code to get the tags
-    tags = ['first_author', 'additional_author', 'extauthor']
+    tags = ['first_author', 'additional_author', 'alternative_author_name']
     tagvals = {}
     for t in tags:
         try:
@@ -463,7 +463,7 @@ def get_author_citations(updated_redic_list, citedbydict, initial_author_dict, c
     #parse the tags
     mainauthortag = tagify(parse_tag(tagvals['first_author']))
     coauthortag = tagify(parse_tag(tagvals['additional_author']))
-    extauthortag = tagify(parse_tag(tagvals['extauthor']))
+    extauthortag = tagify(parse_tag(tagvals['alternative_author_name']))
     if task_get_task_param('verbose') >= 9:
         write_message("mainauthortag "+mainauthortag)
         write_message("coauthortag "+coauthortag)
