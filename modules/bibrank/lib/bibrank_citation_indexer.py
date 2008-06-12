@@ -261,13 +261,13 @@ def get_citation_informations(recid_list, config):
     publication_volume_tag = ""
     publication_format_string = "p v (y) c"
     try:
-        tag = config.get(function, "pubinfo_journal_pages")
+        tag = config.get(function, "pubinfo_journal_page")
         publication_pages_tag = tagify(parse_tag(tag))
         tag = config.get(function, "pubinfo_journal_year")
         publication_year_tag = tagify(parse_tag(tag))
         tag = config.get(function, "pubinfo_journal_title")
         publication_journal_tag = tagify(parse_tag(tag))
-        tag = config.get(function, "pubinfo_journal_vol")
+        tag = config.get(function, "pubinfo_journal_volume")
         publication_volume_tag = tagify(parse_tag(tag))
         publication_format_string = config.get(function, "pubinfo_journal_format")
     except:
@@ -377,7 +377,7 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
     """
     i = 0 #just for debugging ..
     #get the tags for main author, coauthors, ext authors from config
-    tags = ['first_author', 'additional_author', 'extauthor']
+    tags = ['first_author', 'additional_author', 'alternative_author_name']
     for t in tags:
         try:
             x = config.get(config.get("rank_method", "function"), t)
@@ -387,7 +387,7 @@ def get_self_citations(new_record_list, citationdic, initial_selfcitdict, config
 
     r_mainauthortag = config.get(config.get("rank_method", "function"), "first_author")
     r_coauthortag = config.get(config.get("rank_method", "function"), "additional_author")
-    r_extauthortag = config.get(config.get("rank_method", "function"), "extauthor")
+    r_extauthortag = config.get(config.get("rank_method", "function"), "alternative_author_name")
     #parse the tags
     mainauthortag = tagify(parse_tag(r_mainauthortag))
     coauthortag = tagify(parse_tag(r_coauthortag))
