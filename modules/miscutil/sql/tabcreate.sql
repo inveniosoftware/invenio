@@ -2746,6 +2746,7 @@ CREATE TABLE IF NOT EXISTS sbmAPPROVAL (
   dLastReq datetime NOT NULL default '0000-00-00 00:00:00',
   dAction datetime NOT NULL default '0000-00-00 00:00:00',
   access varchar(20) NOT NULL default '0',
+  note text NOT NULL default '',
   PRIMARY KEY  (rn)
 ) TYPE=MyISAM PACK_KEYS=1;
 
