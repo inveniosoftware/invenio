@@ -397,6 +397,11 @@ class SpiresToInvenioSyntaxConverter:
     that use Invenio search syntax.
     """
 
+    # Constants defining fields
+    _DATE_ADDED_FIELD = ' 961__x:'
+    _DATE_UPDATED_FIELD = ' 961__c:' # FIXME: define and use dateupdate:
+    _DATE_FIELD = ' 269__c:'
+
     # Dictionary containing the matches between SPIRES keywords
     # and their corresponding Invenio keywords or fields
     # SPIRES keyword : Invenio keyword or field
@@ -434,16 +439,16 @@ class SpiresToInvenioSyntaxConverter:
             ' cc ' : ' 044__a:',
             ' country ' : ' 044__a:',
         # date
-            ' date ' : ' 269__c:',
-            ' d ' : ' 269__c:',
+            ' date ' : _DATE_FIELD,
+            ' d ' : _DATE_FIELD,
         # date added
-            ' date-added ' : ' 961__x:',
-            ' dadd ' : ' 961__x:',
-            ' da ' : ' 961__x:',
+            ' date-added ' : _DATE_ADDED_FIELD,
+            ' dadd ' : _DATE_ADDED_FIELD,
+            ' da ' : _DATE_ADDED_FIELD,
         # date updated
-            ' date-updated ' : ' 961__c:',
-            ' dupd ' : ' 961__c:',
-            ' du ' : ' 961__c:',
+            ' date-updated ' : _DATE_UPDATED_FIELD,
+            ' dupd ' : _DATE_UPDATED_FIELD,
+            ' du ' : _DATE_UPDATED_FIELD,
         # first author
             ' fa ' : ' 100__a:',
             ' first-author ' : ' 100__a:',
@@ -570,6 +575,7 @@ class SpiresToInvenioSyntaxConverter:
 
     def __init__(self):
         """Initialize the state of the converter"""
+        self._init_monthes()
         self._compile_regular_expressions()
 
     def _compile_regular_expressions(self):
@@ -618,6 +624,9 @@ class SpiresToInvenioSyntaxConverter:
         # regular expression matching date after pattern
         self._re_date_before_match = re.compile(r'\b(d|date)\b\s*(before|<)\s*(?P<year>\d{4})\b', re.IGNORECASE)
 
+        # regular expression matching dates in general
+        self._re_dates_match = self._compile_dates_regular_expression()
+
     def convert_query(self, query):
         """Converts the query from SPIRES syntax to Invenio syntax
 
@@ -635,20 +644,139 @@ class SpiresToInvenioSyntaxConverter:
             # beginning because the next methods use the result of the replacement
             query = self._replace_spires_keywords_with_invenio_keywords(query)
 
+            query = self._convert_dates(query)
             query = self._convert_spires_author_search_to_invenio_author_search(query)
             query = self._convert_spires_exact_author_search_to_invenio_author_search(query)
             query = self._convert_spires_truncation_to_invenio_truncation(query)
             query = self._expand_search_patterns(query)
 
             # remove FIND in the beginning of the query as it is not necessary in Invenio
-            query = query[5:]
+            query = query[4:]
+            query = query.strip()
 
         return query
 
+    def _init_monthes(self):
+        """Defines a dictionary matching the name
+        of the month with its corresponding number"""
+
+        # this dictionary is used when generating match patterns for monthes
+        self._monthes = {'jan':'01', 'january':'01',
+                         'feb':'02', 'february':'02',
+                         'mar':'03', 'march':'03',
+                         'apr':'04', 'april':'04',
+                         'may':'05', 'may':'05',
+                         'jun':'06', 'june':'06',
+                         'jul':'07', 'july':'07',
+                         'aug':'08', 'august':'08',
+                         'sep':'09', 'september':'09',
+                         'oct':'10', 'october':'10',
+                         'nov':'11', 'november':'11',
+                         'dec':'12', 'december':'12'}
+        # this dicrionary is used to transform name of the month
+        # to a number used in the date format. By this reason it
+        # contains also the numbers itself to simplify the conversion
+        self._month_name_to_month_number = {'1':'01', '01':'01',
+                                            '2':'02', '02':'02',
+                                            '3':'03', '03':'03',
+                                            '4':'04', '04':'04',
+                                            '5':'05', '05':'05',
+                                            '6':'06', '06':'06',
+                                            '7':'07', '07':'07',
+                                            '8':'08', '08':'08',
+                                            '9':'09', '09':'09',
+                                            '10':'10',
+                                            '11':'11',
+                                            '12':'12',}
+        # combine it with monthes in order to cover all the cases
+        self._month_name_to_month_number.update(self._monthes)
+
+    def _get_month_names_match(self):
+        """Retruns part of a patter that matches month in a date"""
+
+        monthes_match = ''
+        for month_name in self._monthes.keys():
+            monthes_match = monthes_match + month_name + '|'
+
+        monthes_match = r'\b(' + monthes_match[0:-1] + r')\b'
+
+        return monthes_match
+
+    def _get_month_number(self, month_name):
+        """Returns the corresponding number for a given month
+        e.g. for February it returns 02"""
+
+        return self._month_name_to_month_number[month_name.lower()]
+
+    def _compile_dates_regular_expression(self):
+        """ Returns compiled regular expression matching dates in general that follow particular keywords"""
+
+        date_preceding_terms_match = r'\b((?<=' + \
+                    self._DATE_ADDED_FIELD +')|(?<=' + \
+                    self._DATE_UPDATED_FIELD + ')|(?<=' + \
+                    self._DATE_FIELD +'))'
+        day_match = r'\b(0?[1-9]|[12][0-9]|3[01])\b'
+        month_match = r'\b(0?[1-9]|1[012])\b'
+        month_names_match = self._get_month_names_match()
+        year_match = r'\b([1-9][0-9]?)?[0-9]{2}\b'
+        date_separator_match = r'(\s+|\s*[,/\-\.]\s*)'
+
+        dates_re = date_preceding_terms_match + r'\s*' + \
+            r'(((((?P<day>' + day_match + r')' + date_separator_match + ')?' + \
+            r'(?P<month>' + month_match + r'|' + month_names_match + r'))' + \
+            r'|' + \
+            r'((?P<month2>' + month_names_match + r')' + date_separator_match + \
+            r'(?P<day2>' + day_match + r')))' + \
+            date_separator_match + r')?' + \
+            r'(?P<year>' + year_match + r')'
+
+        return re.compile(dates_re, re.IGNORECASE)
+
+    def _convert_dates(self, query):
+        """Converts dates in the query in format expected from invenio"""
+
+        def create_replacement_pattern(match):
+            """method used for replacement with regular expression"""
+
+            QUOTES = '"'
+
+            # retrieve the year
+            year = match.group('year')
+            # in case only last two digits are provided, consider it is 19xx
+            if len(year) == 2:
+                year = '19' + year
+
+            # retrieve the month
+            month_name = match.group('month')
+            if None == month_name:
+                month_name =  match.group('month2')
+
+            # if there is no month, look for everything in given year
+            if None == month_name:
+                return QUOTES + year + '*' + QUOTES
+
+            month = self._get_month_number(month_name)
+
+            # retrieve the day
+            day = match.group('day')
+            if None == day:
+                day = match.group('day2')
+
+            # if day is missing, look for everything in geven year and month
+            if None == day:
+                return QUOTES + year + '-' + month + '-*' + QUOTES
+
+            if len(day) == 1:
+                day = '0'+day
+
+            return   QUOTES + year + '-' + month + '-' + day + QUOTES
+
+        query = self._re_dates_match.sub(create_replacement_pattern, query)
+
+        return query
 
     def _convert_spires_date_after_to_invenio_span_query(self, query):
         """Converts date after SPIRES search term into invenio span query"""
-
 
         def create_replacement_pattern(match):
             """method used for replacement with regular expression"""
@@ -657,7 +785,6 @@ class SpiresToInvenioSyntaxConverter:
         query = self._re_date_after_match.sub(create_replacement_pattern, query)
 
         return query
-
 
     def _convert_spires_date_before_to_invenio_span_query(self, query):
         """Converts date before SPIRES search term into invenio span query"""
@@ -669,7 +796,6 @@ class SpiresToInvenioSyntaxConverter:
         query = self._re_date_before_match.sub(create_replacement_pattern, query)
 
         return query
-
 
     def _expand_search_patterns(self, query):
         """Expands search queries.
@@ -796,7 +922,6 @@ class SpiresToInvenioSyntaxConverter:
                 AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + dot_symbol + '*" or ' +\
                 AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name[0:2] + '" or ' +\
                 AUTHOR_KEYWORD + '"' + author_surname + ', ' + author_name + ' *"'
-
 
     def _replace_spires_keywords_with_invenio_keywords(self, query):
         """Replaces SPIRES keywords that have directly
