@@ -91,6 +91,10 @@ def Register_Approval_Request(parameters, curdir, form, user_info=None):
         This would allow "PHYS" in the following reference number to be
         recognised as the category:
            ATL-COM-PHYS-2008-001
+       @param note_file_appreq: (string) - the name of the file from which
+        any "notes" to be added into the approval request's "note" field in
+        the database are to be read. (File must be in the current submission's
+        working directory.)
        @return: (string) - a message for the user.
        @Exceptions raised: + InvenioWebSubmitFunctionStop when the submission
                              should be halted.
@@ -106,7 +110,12 @@ def Register_Approval_Request(parameters, curdir, form, user_info=None):
     ## in the user's browser:
     info_out = ""
 
+    ########
     ## Get the parameters from the list:
+
+    ########
+    ## Get the name of the category file:
+    #######
     try:
         ## If it has been provided, get the name of the file in which the
         ## category is stored:
@@ -120,7 +129,27 @@ def Register_Approval_Request(parameters, curdir, form, user_info=None):
             category_file = os.path.basename(category_file).strip()
             if category_file == "":
                 category_file = None
-    ##
+    ########
+    ## Get the name of the "note" file and read its value:
+    ########
+    note = "" ## variable to hold a note to be added to the approval request's
+              ## details in the DB.
+    try:
+        note_file = parameters["note_file_appreq"]
+    except KeyError:
+        ## No value given for the category file:
+        note_file = None
+    else:
+        if note_file is not None:
+            note_file = str(note_file)
+            note_file = os.path.basename(note_file).strip()
+            if note_file == "":
+                note_file = None
+    if note_file is not None:
+        note = ParamFromFile("%s/%s" % (curdir, note_file))
+    ########
+    ## Get the regexp that is used to find the category in the report number:
+    ########
     try:
         ## If it has been provided, get the regexp used for identifying
         ## a document-type's category from its reference number:
@@ -294,9 +323,7 @@ def Register_Approval_Request(parameters, curdir, form, user_info=None):
     if approval_status is None:
         ## Approval has never been requested for this document. Register the
         ## new request.
-        num_rows_inserted = register_new_approval_request(doctype, \
-                                                          category, \
-                                                          rn)
+        register_new_approval_request(doctype, category, rn, note)
     elif approval_status.lower() == "approved":
         ## This document has already been approved. Stop and inform the user
         ## of this.
@@ -327,7 +354,7 @@ document's report-number [%s] and describing the problem.
         ## An approval request for this document type was already made at some
         ## point. Update it and inform the user that the approval request has
         ## been logged despite having been previously withdrawn:
-        update_approval_request_status(doctype, category, rn)
+        update_approval_request_status(doctype, category, rn, note=note)
         info_out += """
 <br />
 <div>
@@ -342,7 +369,7 @@ Approval has been requested again.
         ## Update the date/time of the last request and inform the user that
         ## although approval had already been requested for this document,
         ## their approval request has been made again.
-        update_approval_request_status(doctype, category, rn)
+        update_approval_request_status(doctype, category, rn, note=note)
         info_out += """
 <br />
 <div>
@@ -392,7 +419,7 @@ def get_simple_approval_status(doctype, category, reportnumber):
     return approval_status
 
 
-def register_new_approval_request(doctype, category, reportnumber):
+def register_new_approval_request(doctype, category, reportnumber, note=""):
     """Register a new approval request by inserting a row into the
        WebSubmit sbmAPPROVAL database table for it.
        @param doctype: (string) - the document type of the document for
@@ -401,17 +428,20 @@ def register_new_approval_request(doctype, category, reportnumber):
         the new approval request is being registered.
        @param reportnumber: (string) - the report number of the document
         for which the new approval request is being registered.
+       @param note: (string) - a "note" containing details about the approval
+        request. (defaults to an empty string.)
        @return: None
     """
     qstr = """INSERT INTO sbmAPPROVAL """ \
            """(doctype, categ, rn, status, """ \
-           """dFirstReq, dLastReq, dAction, access) VALUES """ \
-           """(%s, %s, %s, 'waiting', NOW(), NOW(), '', '')"""
-    qres = run_sql(qstr, (doctype, category, reportnumber))
+           """dFirstReq, dLastReq, dAction, access, note) VALUES """ \
+           """(%s, %s, %s, 'waiting', NOW(), NOW(), '', '', %s)"""
+    run_sql(qstr, (doctype, category, reportnumber, note))
 
 def update_approval_request_status(doctype, \
                                    category, \
                                    reportnumber, \
+                                   note="",
                                    status="waiting"):
     """Update the status of an approval request and either the date of last
        request if it's simply an update, or the date of action if it's an
@@ -422,6 +452,11 @@ def update_approval_request_status(doctype, \
         the approval request is being updated.
        @param reportnumber: (string) - the report number of the document
         for which the approval request is being updated.
+       @param note: (string) - a "note" containing details about the approval
+        request. This note will be prepended to any existing value for the
+        note (with no separator, so include one if you don't want it to
+        directly run into the existing value.) (defaults to an empty
+        string.)
        @status: (string) - the new status of the document - defaults to
         waiting.
     """
@@ -435,5 +470,5 @@ def update_approval_request_status(doctype, \
     else:
         ## Otherwise, update the date of "last request"
         qstr += """dLastReq=NOW()"""
-    qstr += """ WHERE doctype=%s and categ=%s and rn=%s"""
-    run_sql(qstr, (status, doctype, category, reportnumber))
+    qstr += """, note=%s+note WHERE doctype=%s and categ=%s and rn=%s"""
+    run_sql(qstr, (status, note, doctype, category, reportnumber))
