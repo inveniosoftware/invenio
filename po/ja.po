@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.0.20080511\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-05-11 14:21+0200\n"
-"PO-Revision-Date: 2008-06-12 11:00+0100\n"
+"PO-Revision-Date: 2008-06-13 13:00+0100\n"
 "Last-Translator: Marko Niinimaki <man@cern.ch>\n"
 "Language-Team: JA <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -2276,47 +2276,47 @@ msgstr ""
 #: modules/webaccess/lib/access_control_config.py:176
 #: modules/websession/lib/websession_templates.py:1024
 msgid "Configure BibFormat"
-msgstr ""
+msgstr "BibFormat 設定"
 
 #: modules/webaccess/lib/access_control_config.py:177
 #: modules/websession/lib/websession_templates.py:1026
 msgid "Configure BibHarvest"
-msgstr ""
+msgstr "BibHarvest 設定"
 
 #: modules/webaccess/lib/access_control_config.py:178
 #: modules/websession/lib/websession_templates.py:1028
 msgid "Configure OAI Repository"
-msgstr ""
+msgstr "OAI repository 設定"
 
 #: modules/webaccess/lib/access_control_config.py:179
 #: modules/websession/lib/websession_templates.py:1030
 msgid "Configure BibIndex"
-msgstr ""
+msgstr "BibIndex 設定"
 
 #: modules/webaccess/lib/access_control_config.py:180
 #: modules/websession/lib/websession_templates.py:1032
 msgid "Configure BibRank"
-msgstr ""
+msgstr "BibRank 設定"
 
 #: modules/webaccess/lib/access_control_config.py:181
 #: modules/websession/lib/websession_templates.py:1034
 msgid "Configure WebAccess"
-msgstr ""
+msgstr "WebAccess 設定"
 
 #: modules/webaccess/lib/access_control_config.py:182
 #: modules/websession/lib/websession_templates.py:1036
 msgid "Configure WebComment"
-msgstr ""
+msgstr "WebComment 設定"
 
 #: modules/webaccess/lib/access_control_config.py:183
 #: modules/websession/lib/websession_templates.py:1038
 msgid "Configure WebSearch"
-msgstr ""
+msgstr "WebSearch 設定"
 
 #: modules/webaccess/lib/access_control_config.py:184
 #: modules/websession/lib/websession_templates.py:1040
 msgid "Configure WebSubmit"
-msgstr ""
+msgstr "WebSubmit 設定"
 
 #: modules/webaccess/lib/webaccessadmin_lib.py:3569
 #, fuzzy, python-format
