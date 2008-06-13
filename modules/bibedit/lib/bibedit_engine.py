@@ -131,7 +131,6 @@ def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
         record = delete_subfield(recid, uid, record, tag, num_field, num_subfield)
 
     if add == 2:
-
         subcode = dict_value.get("add_subcode", "empty")
         value   = dict_value.get("add_value"  , "empty")
         if subcode == '':
@@ -325,14 +324,9 @@ def add_subfield(recid, uid, tag, record, num_field, subcode, value):
         if field[4] == int(num_field) :
 
             subfields = field[0]
-            same_subfield = False
-            for subfield in subfields:
-                if subfield[0] == subcode:
-                    same_subfield = True
 
-            if not same_subfield:
-                field_add_subfield(record[tag][i], subcode, value)
-                break
+            field_add_subfield(record[tag][i], subcode, value)
+            break
 
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
 
