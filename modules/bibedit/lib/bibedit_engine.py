@@ -128,10 +128,12 @@ def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
     (record, junk) = get_record(ln, recid, uid, temp)
 
     if act_subfield is not None:
-        if act_subfield == "1": #delete
+        if act_subfield == bibedit_templates.DELETE: #delete
             record = delete_subfield(recid, uid, record, tag, num_field, num_subfield)
-        if act_subfield == "2": #move up
-            record = move_up_subfield(recid, uid, record, tag, num_field, num_subfield)
+        if act_subfield == bibedit_templates.MOVE_UP: #move up
+            record = move_subfield(bibedit_templates.MOVE_UP, recid, uid, record, tag, num_field, num_subfield)
+        if act_subfield == bibedit_templates.MOVE_DOWN: #move down
+            record = move_subfield(bibedit_templates.MOVE_DOWN, recid, uid, record, tag, num_field, num_subfield)
 
     if add == 2:
         subcode = dict_value.get("add_subcode", "empty")
@@ -383,7 +385,7 @@ def delete_subfield(recid, uid, record, tag, num_field, num_subfield):
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     return record
 
-def move_up_subfield(recid, uid, record, tag, num_field, num_subfield):
+def move_subfield(direction, recid, uid, record, tag, num_field, num_subfield):
     """moves a subfield up in the field """
     (tag, junk, junk, subcode) = marc_to_split_tag(tag)
     i = -1
@@ -394,11 +396,16 @@ def move_up_subfield(recid, uid, record, tag, num_field, num_subfield):
             mysubfields = field[0]
             for subfield in mysubfields:
                 j += 1
-                if num_subfield == j and j > 0:
+                if direction == bibedit_templates.MOVE_UP and num_subfield == j and j > 0:
                     #swap this and the previous..
                     prevsubfield = field[0][j-1]
                     field[0][j-1] = subfield
                     field[0][j] = prevsubfield
+                if direction == bibedit_templates.MOVE_DOWN and num_subfield == j and j < len(mysubfields):
+                    #swap this and the next..
+                    nextsubfield = field[0][j+1]
+                    field[0][j+1] = subfield
+                    field[0][j] = nextsubfield
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     return record
 

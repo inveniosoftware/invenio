@@ -26,10 +26,15 @@ from invenio.messages import gettext_set_language
 ## Link of edit, move up and delete button:
 btn_delete_url = CFG_SITE_URL + "/img/iconcross.gif"
 btn_moveup_url = CFG_SITE_URL + "/img/arrow_up.gif"
+btn_movedown_url = CFG_SITE_URL + "/img/arrow_down.gif"
 btn_edit_url   = CFG_SITE_URL + "/img/iconpen.gif"
 bibediturl = "%s/admin/bibedit/bibeditadmin.py" % CFG_SITE_URL
 
 class Template:
+
+    DELETE = "1"
+    MOVE_UP = "2"
+    MOVE_DOWN = "3"
 
     def tmpl_table_header(self, ln, type_table, recid, temp="false", format_tag='marc',
                           tag='', num_field=None, add=0):
@@ -352,6 +357,20 @@ class Template:
                                                  'temp'         : 'true',
                                                  'act_subfield' : 2, #move up
                                                  'num_subfield' : num_value})
+                    else:
+                        print_btn += "<td> </td>"
+                    if num_value < len_subfields-1:
+                        print_btn += "<td>%s</td>" \
+                               % self.tmpl_link(ln, '<img border="0" src="%s" alt="%s" />' % (btn_movedown_url, _("Move down")),
+                                                bibediturl, 'edit',
+                                                {'recid'        : str(recid),
+                                                 'tag'          : tag_field[:-1]+ tag_subfield,
+                                                 'num_field'    : num_field,
+                                                 'format_tag'   : format_tag,
+                                                 'temp'         : 'true',
+                                                 'act_subfield' : 3, #move up
+                                                 'num_subfield' : num_value})
+
 
         else:
             print_value = value
