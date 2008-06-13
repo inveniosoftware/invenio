@@ -23,8 +23,9 @@ from invenio.bibedit_dblayer import *
 from invenio.config import CFG_SITE_URL
 from invenio.messages import gettext_set_language
 
-## Link of edit and delete button:
+## Link of edit, move up and delete button:
 btn_delete_url = CFG_SITE_URL + "/img/iconcross.gif"
+btn_moveup_url = CFG_SITE_URL + "/img/arrow_up.gif"
 btn_edit_url   = CFG_SITE_URL + "/img/iconpen.gif"
 bibediturl = "%s/admin/bibedit/bibeditadmin.py" % CFG_SITE_URL
 
@@ -134,6 +135,7 @@ class Template:
                 result = ''
             else:
                 link_cancel = self.tmpl_link(ln, _("Cancel"), bibediturl, 'index', {'cancel' : str(recid)})
+
                 link_delete = self.tmpl_link(ln, _("Delete"), bibediturl, 'index', {'delete' : str(recid),
                                                                                         'confirm_delete' :1,
                                                                                         'temp' : temp})
@@ -337,7 +339,18 @@ class Template:
                                                  'num_field'    : num_field,
                                                  'format_tag'   : format_tag,
                                                  'temp'         : 'true',
-                                                 'del_subfield' : 1,
+                                                 'act_subfield' : 1, #delete
+                                                 'num_subfield' : num_value})
+                    if num_value > 0:
+                        print_btn += "<td>%s</td>" \
+                               % self.tmpl_link(ln, '<img border="0" src="%s" alt="%s" />' % (btn_moveup_url, _("Move up")),
+                                                bibediturl, 'edit',
+                                                {'recid'        : str(recid),
+                                                 'tag'          : tag_field[:-1]+ tag_subfield,
+                                                 'num_field'    : num_field,
+                                                 'format_tag'   : format_tag,
+                                                 'temp'         : 'true',
+                                                 'act_subfield' : 2, #move up
                                                  'num_subfield' : num_value})
 
         else:

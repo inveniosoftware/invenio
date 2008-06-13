@@ -115,7 +115,7 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
 
 
 def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
-                         format_tag, temp, del_subfield, add, dict_value):
+                         format_tag, temp, act_subfield, add, dict_value):
     """Returns the body of edit page. """
 
     errors = []
@@ -127,8 +127,11 @@ def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
 
     (record, junk) = get_record(ln, recid, uid, temp)
 
-    if del_subfield is not None:
-        record = delete_subfield(recid, uid, record, tag, num_field, num_subfield)
+    if act_subfield is not None:
+        if act_subfield == "1": #delete
+            record = delete_subfield(recid, uid, record, tag, num_field, num_subfield)
+        if act_subfield == "2": #move up
+            record = move_up_subfield(recid, uid, record, tag, num_field, num_subfield)
 
     if add == 2:
         subcode = dict_value.get("add_subcode", "empty")
@@ -377,8 +380,25 @@ def delete_subfield(recid, uid, record, tag, num_field, num_subfield):
             break
 
     record[tag][i] = (tmp, record[tag][i][1], record[tag][i][2], record[tag][i][3], record[tag][i][4])
-
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
+    return record
 
+def move_up_subfield(recid, uid, record, tag, num_field, num_subfield):
+    """moves a subfield up in the field """
+    (tag, junk, junk, subcode) = marc_to_split_tag(tag)
+    i = -1
+    for field in record[tag]:
+        i += 1
+        if field[4] == int(num_field):
+            j = -1
+            mysubfields = field[0]
+            for subfield in mysubfields:
+                j += 1
+                if num_subfield == j and j > 0:
+                    #swap this and the previous..
+                    prevsubfield = field[0][j-1]
+                    field[0][j-1] = subfield
+                    field[0][j] = prevsubfield
+    save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     return record
 
