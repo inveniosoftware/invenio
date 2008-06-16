@@ -92,8 +92,8 @@ def format(bfo, style, separator='; ', show_icons='no'):
             out += separator.join(url_list) + additional_str + versions_str + '<br />'
 
     if CFG_CERN_SITE and cern_urls:
-        link_word = len(cern_urls) == 1 and _('link') or _('links')
-        out += '<strong>%s</strong>: ' % _("CERN %(link_or_links)s" % {'link_or_links' : link_word})
+        link_word = len(cern_urls) == 1 and _('%(x_sitename)s link') or _('%(x_sitename)s links')
+        out += '<strong>%s</strong>: ' % (link_word % {'x_sitename': 'CERN'})
         url_list = []
         for url, descr in cern_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+ \
@@ -101,8 +101,8 @@ def format(bfo, style, separator='; ', show_icons='no'):
         out += separator.join(url_list)
 
     if others_urls:
-        link_word = len(others_urls) == 1 and _('link') or _('links')
-        out += '<strong>%s</strong>: ' % _("External %(link_or_links)s" % {'link_or_links' : link_word})
+        external_link = len(others_urls) == 1 and _('external link') or _('external links')
+        out += '<strong>%s</strong>: ' % external_link.capitalize()
         url_list = []
         for url, descr in others_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+ \

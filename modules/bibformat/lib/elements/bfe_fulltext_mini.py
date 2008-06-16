@@ -100,8 +100,8 @@ def format(bfo, style, separator='; ', show_icons='no'):
         else:
             file_icon = ''
 
-        link_word = len(cern_urls) == 1 and _('link') or _('links')
-        out += '<small class="detailedRecordActions">(%s)</small><br />' % _("CERN %(link_or_links)s" % {'link_or_links' : link_word})
+        link_word = len(cern_urls) == 1 and _('%(x_sitename)s link') or _('%(x_sitename)s links')
+        out += '<small class="detailedRecordActions">(%s)</small><br />' % (link_word % {'x_sitename': 'CERN'})
         url_list = []
         for url, descr in cern_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
@@ -117,8 +117,8 @@ def format(bfo, style, separator='; ', show_icons='no'):
             file_icon = '<img style="border:none" src="%s/img/file-icon-text-12x16.gif" alt="%s"/>' % (CFG_SITE_URL, _("Download fulltext"))
         else:
             file_icon = ''
-        link_word = len(others_urls) == 1 and _('link') or _('links')
-        out += '<small class="detailedRecordActions">(%s)</small>%s' % (_("external %(link_or_links)s") % {'link_or_links' : link_word}, separator)
+        external_link = len(others_urls) == 1 and _('external link') or _('external links')
+        out += '<small class="detailedRecordActions">(%s)</small>%s' % (external_link, separator)
         url_list = []
         for url, descr in others_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
