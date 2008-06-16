@@ -470,5 +470,6 @@ def update_approval_request_status(doctype, \
     else:
         ## Otherwise, update the date of "last request"
         qstr += """dLastReq=NOW()"""
-    qstr += """, note=%s+note WHERE doctype=%s and categ=%s and rn=%s"""
+    qstr += """, note=CONCAT(%s, note) """ \
+            """WHERE doctype=%s AND categ=%s AND rn=%s"""
     run_sql(qstr, (status, note, doctype, category, reportnumber))
