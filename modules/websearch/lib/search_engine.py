@@ -1162,6 +1162,9 @@ def lower_index_term(term):
     to UTF-8 first, because standard Python lower() function is not
     UTF-8 safe.  To be called by both the search engine and the
     indexer when appropriate (e.g. before stemming).
+
+    In case of problems with UTF-8 compliance, this function raises
+    UnicodeDecodeError, so the client code may want to catch it.
     """
     return unicode(term, 'utf-8').lower().encode('utf-8')
 
