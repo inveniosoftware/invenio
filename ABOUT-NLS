@@ -23,21 +23,22 @@ B. Integrating translation contributions
 CDS Invenio is currently available in the following languages:
 
    bg = Bulgarian
-   ca = Catalan 
-   cs = Czech 
-   de = German 
-   el = Greek 
-   en = English 
-   es = Spanish 
-   fr = French 
+   ca = Catalan
+   cs = Czech
+   de = German
+   el = Greek
+   en = English
+   es = Spanish
+   fr = French
    hr = Croatian
+   hu = Hungarian
    it = Italian
    ja = Japanese
-   no = Norwegian (Bokmål) 
+   no = Norwegian (Bokmål)
    pl = Polish
-   pt = Portuguese 
-   ru = Russian 
-   sk = Slovak 
+   pt = Portuguese
+   ru = Russian
+   sk = Slovak
    sv = Swedish
    uk = Ukrainian
    zh_CN = Chinese (China)
@@ -91,7 +92,7 @@ the procedure below:
   - If you have access to a test installation of CDS Invenio, you may want
     to see your modified PO file in action:
 
-       $ cd po 
+       $ cd po
        $ emacs ja.po                      # edit Japanese translation
        $ make update-gmo
        $ make install
@@ -141,7 +142,7 @@ In webdoc source files, the convention is _()_:
 
    _(Search Help)_
 
-Here are some tips for writing easily translatable output messages:  
+Here are some tips for writing easily translatable output messages:
 
   - Do not cut big phrases into several pieces, the meaning may be
     harder to grasp and to render properly in another language.  Leave
@@ -149,16 +150,16 @@ Here are some tips for writing easily translatable output messages:
     standalone-translated words as parts of bigger sentences.  The
     translation could differ due to gender, for example.  Rather
     define two sentences instead:
- 
+
        not: _("This %s is not available.") % x,
             where x is either _("basket") or _("alert")
 
-       but: _("This basket is not available.") and 
-            _("This alert is not available.") 
-   
+       but: _("This basket is not available.") and
+            _("This alert is not available.")
+
   - If you print some value in a translatable phrase, you can use an
     unnamed %i or %s string replacement placeholders:
- 
+
        yes: _("There are %i baskets.") % nb_baskets
 
     But, as soon as you are printing more than one value, you should
@@ -176,7 +177,7 @@ Here are some tips for writing easily translatable output messages:
   - Do not mix HTML presentation inside phrases. If you want to
     reserve space for HTML markup, please use generic replacement
     placeholders as prologue and epilogue:
- 
+
        not: _("This is <b>cold</b>.")
        but: _("This is %(x_fmt_open)scold%(x_fmt_close)s.")
 
@@ -184,14 +185,14 @@ Here are some tips for writing easily translatable output messages:
 
        not: _("This is <a href="%s">homepage</a>.")
        not: _("This is %(x_url_open)shomepage%(x_url_close)s.")
- 
+
   - Do not leave unnecessary things in short commonly used
     translatable expressions, such as extraneous spaces or colons
     before or after them.  Rather put them in the business logic:
- 
+
        not: _(" subject")
        but: " " + _("subject")
- 
+
        not: _("Record %i:")
        but: _("Record") + "%i:" % recID
 
@@ -201,7 +202,7 @@ Here are some tips for writing easily translatable output messages:
 
        not: _("Nearest terms in any collection are")
        but: _("Nearest terms in any collection are:")
- 
+
   - Last but not least: the best is to follow the style of existing
     messages as a model, so that the translators are presented with a
     homogeneous and consistently presented output phrase set.
@@ -217,13 +218,13 @@ some dynamic elements that aren't located in PO files.
 
 The development team can edit the respective files ourself, if the
 translator sends over the following translations by email:
- 
+
    - demo server name, from invenio.conf:
- 
+
         Atlantis Institute of Fictive Science
- 
+
    - demo collection names, from democfgdata.sql:
- 
+
         Preprints
         Books
         Theses
@@ -238,21 +239,21 @@ translator sends over the following translations by email:
         Books & Reports
         Multimedia & Arts
         Poetry
- 
+
    - demo right-hand-side portalbox, from democfgdata.sql:
- 
+
         ABOUT THIS SITE
         Welcome to the demo site of the CDS Invenio, a free document server
         software coming from CERN. Please feel free to explore all the
         features of this demo site to the full.
         SEE ALSO
- 
+
 The development team will than edit various files (po/LINGUAS, config
 files, sql files, plenty of Makefile files, etc) as needed.
 
 The last phase of the initial introduction of the new language would
 be to translate some short static HTML pages such as:
- 
+
    - modules/webhelp/web/help-central.webdoc
 
 Thanks for helping us to internationalize CDS Invenio.
@@ -272,7 +273,7 @@ the meantime.  The goal is to integrate the contributions.
 
 Firstly, check whether the contributed file sk-CONTRIB.po was indeed
 prepared for different software release version:
-        
+
    $ msgcmp --use-fuzzy --use-untranslated sk-CONTRIB.po cds-invenio.pot
 
 If yes, then join its translations with the ones in the latest sk.po

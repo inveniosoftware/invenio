@@ -43,6 +43,7 @@
   <hr>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</hr>
   <zh_CN>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</zh_CN>
   <zh_TW>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</zh_TW>
+  <hu>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</hu>
 </lang>
 </p>
 <blockquote>
@@ -123,6 +124,7 @@
       <hr>Get help with submitting to <CFG_SITE_NAME_INTL>.</hr>
       <zh_CN>Get help with submitting to <CFG_SITE_NAME_INTL>.</zh_CN>
       <zh_TW>Get help with submitting to <CFG_SITE_NAME_INTL>.</zh_TW>
+      <hu>Get help with submitting to <CFG_SITE_NAME_INTL>.</hu>
     </lang>
 </dd>
 </dl>

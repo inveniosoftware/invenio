@@ -22,8 +22,8 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.99.0.20080511, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.99.0.20080511)
+AC_INIT(cds-invenio, 0.99.0.20080617, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.99.0.20080617)
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with

@@ -103,6 +103,7 @@ class Template:
         'hr': 'hr_HR',
         'zh_CN': 'zh_CN',
         'zh_TW': 'zh_TW',
+        'hu': 'hu_HU',
         }
     tmpl_default_locale = "en_US" # which locale to use by default, useful in case of failure
 
