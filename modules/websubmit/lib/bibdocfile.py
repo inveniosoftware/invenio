@@ -427,7 +427,7 @@ class BibRecDocs:
             docfiles += bibdoc.list_latest_files()
         return docfiles
 
-    def display(self, docname="", version="", doctype="", ln=CFG_SITE_LANG):
+    def display(self, docname="", version="", doctype="", ln=CFG_SITE_LANG, verbose=0):
         """Returns a formatted panel with information and links about a given
         docid of a particular version (or any), of a particular doctype (or any)
         """
@@ -453,9 +453,15 @@ class BibRecDocs:
                             ln = ln))
                 fulltypes.append(fulltype)
 
+            if verbose >= 9:
+                verbose_files = str(self)
+            else:
+                verbose_files = ''
+
             t = websubmit_templates.tmpl_bibrecdoc_filelist(
                   ln=ln,
                   types = fulltypes,
+                  verbose_files=verbose_files
                 )
         return t
 
@@ -506,6 +512,25 @@ class BibRecDocs:
                     # Strange name
                     register_exception()
                     raise InvenioWebSubmitFileError, "A file called %s exists under %s. This is not a valid name. There should be a ';' followed by an integer representing the file revision. Please, manually fix this file either by renaming or by deleting it." % (filename, bibdoc.basedir)
+        else:
+            # we create the corresponding storage directory
+            old_umask = os.umask(022)
+            os.makedirs(bibdoc.basedir)
+            # and save the father record id if it exists
+            try:
+                if self.id != "":
+                    recid_fd = open("%s/.recid" % bibdoc.basedir, "w")
+                    recid_fd.write(str(self.id))
+                    recid_fd.close()
+                if bibdoc.doctype != "":
+                    type_fd = open("%s/.type" % bibdoc.basedir, "w")
+                    type_fd.write(str(bibdoc.doctype))
+                    type_fd.close()
+            except Exception, e:
+                register_exception()
+                raise InvenioWebSubmitFileError, e
+            os.umask(old_umask)
+
 
         if not versions:
             bibdoc.delete()
