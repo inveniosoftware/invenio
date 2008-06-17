@@ -72,9 +72,10 @@ from invenio.dbquery import run_sql, OperationalError, \
     serialize_via_marshal, deserialize_via_marshal
 from invenio.websession import pSession, pSessionMapping
 from invenio.session import SessionError
-from invenio.access_control_admin import acc_find_user_role_actions, acc_get_role_id
+from invenio.access_control_admin import acc_find_user_role_actions, acc_get_role_id, acc_get_role_id
 from invenio.access_control_mailcookie import mail_cookie_create_mail_activation
 from invenio.access_control_firerole import acc_firerole_check_user, load_role_definition
+from invenio.access_control_config import SUPERADMINROLE
 from invenio.messages import gettext_set_language, wash_languages, wash_language
 from invenio.mailutils import send_email
 from invenio.errorlib import register_exception
@@ -356,6 +357,16 @@ def isUserReferee(user_info):
 def isUserAdmin(user_info):
     """Return True if the user has some admin rights; False otherwise."""
     return acc_find_user_role_actions(user_info)
+
+def isUserSuperAdmin(user_info):
+    """Return True if the user is superadmin; False otherwise."""
+    if run_sql("""SELECT r.id
+        FROM accROLE r LEFT JOIN user_accROLE ur
+        ON r.id = ur.id_accROLE
+        WHERE r.name = '%s' AND
+        ur.id_user = '%s' AND ur.expiration>=NOW()""" % (SUPERADMINROLE, user_info['uid'])):
+        return True
+    return acc_firerole_check_user(user_info, load_role_definition(acc_get_role_id(SUPERADMINROLE)))
 
 def nickname_valid_p(nickname):
     """Check whether wanted NICKNAME supplied by the user is valid.
