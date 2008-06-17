@@ -45,7 +45,8 @@ class Template:
     files_default_urlargd = {
         'version': (str, ""), # version "" means "latest"
         'docname': (str, ""), # the docname (optional)
-        'format' : (str, "") # the format
+        'format' : (str, ""), # the format
+        'verbose' : (int, 0) # the verbosity
         }
 
 
@@ -1121,7 +1122,7 @@ class Template:
 
         return out
 
-    def tmpl_bibrecdoc_filelist(self, ln, types):
+    def tmpl_bibrecdoc_filelist(self, ln, types, verbose_files=''):
         """
         Displays the file list for a record.
 
@@ -1134,6 +1135,9 @@ class Template:
                - 'name' *string* - The name of the format
 
                - 'content' *array of string* - The HTML code produced by tmpl_bibdoc_filelist, for the right files
+
+          - 'verbose_files' - A string representing in a verbose way the
+          file information.
         """
 
         # load the right message language
@@ -1146,6 +1150,8 @@ class Template:
             for content in mytype['content']:
                 out += content
             out += "</ul>"
+            if verbose_files:
+                out += "<pre>%s</pre>" % verbose_files
         return out
 
     def tmpl_bibdoc_filelist(self, ln, versions=[], imageurl='', recid='', docname=''):

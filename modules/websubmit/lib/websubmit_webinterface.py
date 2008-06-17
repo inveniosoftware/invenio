@@ -50,7 +50,7 @@ from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
 from invenio.webpage import page, create_error_box, pageheaderonly, \
     pagefooteronly
-from invenio.webuser import getUid, get_email, page_not_authorized, collect_user_info
+from invenio.webuser import getUid, get_email, page_not_authorized, collect_user_info, isUserSuperAdmin
 from invenio.websubmit_config import *
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import make_canonical_urlargd, redirect_to_url
@@ -88,6 +88,12 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 
             uid = getUid(req)
             user_info = collect_user_info(req)
+
+            verbose = args['verbose']
+            if verbose >= 1 and not isUserSuperAdmin(user_info):
+                # Only SuperUser can see all the details!
+                verbose = 0
+
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE > 1:
                 return page_not_authorized(req, "../getfile.py/index",
                                            navmenuid='submit')
@@ -210,7 +216,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             register_exception(req=req)
                             return errorMsg(str(msg), req, ln)
 
-            filelist = bibarchive.display("", args['version'], ln=ln)
+            filelist = bibarchive.display("", args['version'], ln=ln, verbose=verbose)
 
             t = websubmit_templates.tmpl_filelist(
                 ln=ln,
