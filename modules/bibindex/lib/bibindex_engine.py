@@ -490,7 +490,11 @@ def get_words_from_phrase(phrase, stemming_language=None):
         formulas = latex_formula_re.findall(phrase)
         phrase = remove_latex_markup(phrase)
         phrase = latex_formula_re.sub(' ', phrase)
-    phrase = lower_index_term(phrase)
+    try:
+        phrase = lower_index_term(phrase)
+    except UnicodeDecodeError:
+        # too bad the phrase is not UTF-8 friendly, continue...
+        phrase = phrase.lower()
     # 1st split phrase into blocks according to whitespace
     for block in strip_accents(phrase).split():
         # 2nd remove leading/trailing punctuation and add block:
@@ -934,8 +938,7 @@ class WordTable:
                     self.chk_recID_range(i_low, i_high)
                 except StandardError, e:
                     write_message("Exception caught: %s" % e, sys.stderr)
-                    if task_get_option('verbose') >= 9:
-                        traceback.print_tb(sys.exc_info()[2])
+                    register_exception()
                     task_update_status("ERROR")
                     self.put_into_db()
                     sys.exit(1)
@@ -1199,8 +1202,7 @@ class WordTable:
                     self.fix_recID_range(i_low, i_high)
                 except StandardError, e:
                     write_message("Exception caught: %s" % e, sys.stderr)
-                    if task_get_option['verbose'] >= 9:
-                        traceback.print_tb(sys.exc_info()[2])
+                    register_exception()
                     task_update_status("ERROR")
                     self.put_into_db()
                     sys.exit(1)
@@ -1499,8 +1501,7 @@ def task_run_core():
                 raise StandardError
         except StandardError, e:
             write_message("Exception caught: %s" % e, sys.stderr)
-            if task_get_option("verbose") >= 8:
-                traceback.print_tb(sys.exc_info()[2])
+            register_exception()
             task_update_status("ERROR")
             if _last_word_table:
                 _last_word_table.put_into_db()
@@ -1559,8 +1560,7 @@ def task_run_core():
                     raise StandardError
             except StandardError, e:
                 write_message("Exception caught: %s" % e, sys.stderr)
-                if task_get_option("verbose") >= 9:
-                    traceback.print_tb(sys.exc_info()[2])
+                register_exception()
                 task_update_status("ERROR")
                 if _last_word_table:
                     _last_word_table.put_into_db()
