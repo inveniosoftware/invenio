@@ -482,9 +482,9 @@ class BibRecDocs:
                     try:
                         version = int(version)
                     except ValueError:
-                        # Strange name, let's skip it...
+                        # Strange name
                         register_exception()
-                        continue
+                        raise InvenioWebSubmitFileError, "A file called %s exists under %s. This is not a valid name. After the ';' there must be an integer representing the file revision. Please, manually fix this file either by renaming or by deleting it." % (filename, bibdoc.basedir)
                     if version == 0:
                         zero_version_bug = True
                     format = name[len(file_strip_ext(name)):]
@@ -502,6 +502,10 @@ class BibRecDocs:
                     else:
                         versions[version][format] = new_name
                     counter += 1
+                elif filename[0] != '.':
+                    # Strange name
+                    register_exception()
+                    raise InvenioWebSubmitFileError, "A file called %s exists under %s. This is not a valid name. There should be a ';' followed by an integer representing the file revision. Please, manually fix this file either by renaming or by deleting it." % (filename, bibdoc.basedir)
 
         if not versions:
             bibdoc.delete()
