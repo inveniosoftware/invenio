@@ -33,7 +33,7 @@ def Print_Success_Approval_Request(parameters, curdir, form, user_info=None):
     """
     text = """<br />
 <div>
- The approval request for your document has been successfully been
+ The approval request for your document has successfully been
  registered and the referee has been informed.<br />
  You will be notified by email when a decision has been made.
 </div>
