@@ -700,6 +700,7 @@ def register_new_approval_request(doctype, category, reportnumber, note=""):
            """(%s, %s, %s, 'waiting', NOW(), NOW(), '', '', %s)"""
     run_sql(qstr, (doctype, category, reportnumber, note))
 
+
 def update_approval_request_status(doctype, \
                                    category, \
                                    reportnumber, \
@@ -735,3 +736,22 @@ def update_approval_request_status(doctype, \
     qstr += """, note=CONCAT(%s, note) """ \
             """WHERE doctype=%s AND categ=%s AND rn=%s"""
     run_sql(qstr, (status, note, doctype, category, reportnumber))
+
+
+def get_approval_request_category(reportnumber):
+    """Given the report number of a document for which an approval request
+       has been made, retrieve the category.
+       @param reportnumber: (string) - the report number of the document
+        for which the approval request has been made and the category is to
+        be retrieved.
+       @return: (string or None) - String if there was a row for this approval
+        request; None if not.
+    """
+    qstr = """SELECT categ FROM sbmAPPROVAL """ \
+           """WHERE rn=%s"""
+    qres = run_sql(qstr, (reportnumber,))
+    try:
+        return str(qres[0][0])
+    except IndexError:
+        ## No row for this approval request?
+        return None
