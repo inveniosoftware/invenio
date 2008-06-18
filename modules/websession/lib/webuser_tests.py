@@ -27,6 +27,7 @@ import unittest
 
 from invenio import webuser
 from invenio.testutils import make_test_suite, run_test_suite
+from invenio.dbquery import run_sql
 
 class ApacheAuthenticationTests(unittest.TestCase):
     """Test functions related to the Apache authentication."""
@@ -66,7 +67,21 @@ class ApacheAuthenticationTests(unittest.TestCase):
         self.assertEqual([],
           webuser.auth_apache_user_in_groups('aoeui'))
 
-TEST_SUITE = make_test_suite(ApacheAuthenticationTests,)
+class IsUserSuperAdminTests(unittest.TestCase):
+    """Test functions related to the isUserSuperAdmin function."""
+    def setUp(self):
+        self.id_admin = run_sql('SELECT id FROM user WHERE nickname="admin"')[0][0]
+        self.id_hyde = run_sql('SELECT id FROM user WHERE nickname="hyde"')[0][0]
+
+    def test_isUserSuperAdmin_admin(self):
+        """webuser - isUserSuperAdmin with admin"""
+        self.failUnless(webuser.isUserSuperAdmin(webuser.collect_user_info(self.id_admin)))
+
+    def test_isUserSuperAdmin_hyde(self):
+        """webuser - isUserSuperAdmin with hyde"""
+        self.failIf(webuser.isUserSuperAdmin(webuser.collect_user_info(self.id_hyde)))
+
+TEST_SUITE = make_test_suite(ApacheAuthenticationTests, IsUserSuperAdminTests)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
