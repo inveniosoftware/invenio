@@ -25,7 +25,7 @@ import re
 import marshal
 from zlib import decompress, error
 
-from invenio.dbquery import run_sql, run_sql_cached, OperationalError
+from invenio.dbquery import run_sql, OperationalError
 from invenio.intbitset import intbitset
 
 def init_db_dictionary(dname):
@@ -183,7 +183,7 @@ def get_author_cited_by(authorstring):
         #has to be prepared for corrupted data!
         try:
             citations = marshal.loads(decompress(res[0][0]))
-        except Error:
+        except:
             citations = []
     return citations
 
