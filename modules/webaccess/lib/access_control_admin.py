@@ -1308,9 +1308,9 @@ def acc_find_user_info_names(id_user=0):
         ur.id_accROLE = raa.id_accROLE and
         raa.id_accROLE = r.id and
         raa.id_accACTION = ac.id and
-        raa.id_accARGUMENT = ar.id """, (id_user, )
+        raa.id_accARGUMENT = ar.id """
 
-    res1 =  run_sql(query)
+    res1 =  run_sql(query, (id_user, ))
 
     res2 = []
     for res in res1:

@@ -25,7 +25,7 @@ __revision__ = "$Id$"
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
      CFG_VERSION, CFG_SITE_SECURE_URL
-from invenio.dbquery import run_sql_cached, ProgrammingError
+from invenio.dbquery import run_sql_cached, ProgrammingError, run_sql
 import invenio.access_control_admin as aca
 from invenio.access_control_config import SUPERADMINROLE, CFG_WEBACCESS_WARNING_MSGS, CFG_WEBACCESS_MSGS
 from invenio import webuser
@@ -174,11 +174,11 @@ check_only_uid_p - hidden parameter needed to only check against uids without
     if verbose: print 'task 1 - is user %s' % (SUPERADMINROLE, )
 
     if check_only_uid_p:
-        if run_sql_cached("""SELECT r.id
+        if run_sql("""SELECT r.id
                 FROM accROLE r LEFT JOIN user_accROLE ur
                 ON r.id = ur.id_accROLE
                 WHERE r.name = '%s' AND
-                ur.id_user = '%s' AND ur.expiration>=NOW()""" % (SUPERADMINROLE, id_user), affected_tables=['accROLE', 'user_accROLE']):
+                ur.id_user = '%s' AND ur.expiration>=NOW()""" % (SUPERADMINROLE, id_user)):
             return (0, CFG_WEBACCESS_WARNING_MSGS[0])
     else:
         if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(aca.acc_get_role_id(SUPERADMINROLE))):
@@ -204,8 +204,8 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 else:
                     raise Exception
         if check_only_uid_p:
-            query2 = """SELECT ur.id_accROLE FROM user_accROLE ur WHERE ur.id_user=%s AND ur.expiration>=NOW() ORDER BY ur.id_accROLE """ % id_user
-            res2 = run_sql_cached(query2, affected_tables=['user_accROLE'])
+            query2 = """SELECT ur.id_accROLE FROM user_accROLE ur WHERE ur.id_user=%s AND ur.expiration>=NOW() ORDER BY ur.id_accROLE """
+            res2 = run_sql(query2, (id_user, ))
     except Exception:
         if user_info.has_key('uri'):
             return (6, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[6], (called_from and "%s %s" % (CFG_WEBACCESS_MSGS[0] % quote(user_info['uri']), CFG_WEBACCESS_MSGS[1]) or "")))
