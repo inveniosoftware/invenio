@@ -1006,6 +1006,9 @@ def elaborate_fft_tags(record, rec_id, mode):
                             if newname != docname:
                                 try:
                                     bibdoc.change_name(newname)
+                                    icon = bibdoc.get_icon()
+                                    if icon:
+                                        icon.change_name('icon-%s' % newname)
                                 except StandardError, e:
                                     write_message(e, stream=sys.stderr)
                                     raise
@@ -1054,6 +1057,9 @@ def elaborate_fft_tags(record, rec_id, mode):
                             if newname != docname:
                                 try:
                                     bibdoc.change_name(newname)
+                                    icon = bibdoc.get_icon()
+                                    if icon:
+                                        icon.change_name('icon-%s' % newname)
                                 except StandardError, e:
                                     write_message('Error in renaming %s to %s: %s' % (docname, newname, e), stream=sys.stderr)
                                     raise
