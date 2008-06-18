@@ -162,6 +162,7 @@ def page_not_authorized(req, referer='', uid='', text='', navtrail='', ln=CFG_SI
         body = "%s %s" % (CFG_WEBACCESS_MSGS[4], CFG_WEBACCESS_MSGS[2])
 
     return page(title=title,
+                ln=ln,
                 uid=getUid(req),
                 body=body,
                 navtrail=navtrail,
