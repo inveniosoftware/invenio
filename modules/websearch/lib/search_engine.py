@@ -881,9 +881,11 @@ def get_searchwithin_fields(ln='en', colID=None):
     if colID:
         res = run_sql_cached("""SELECT f.code,f.name FROM field AS f, collection_field_fieldvalue AS cff
                                  WHERE cff.type='sew' AND cff.id_collection=%s AND cff.id_field=f.id
-                              ORDER BY cff.score DESC, f.name ASC""", (colID,))
+                              ORDER BY cff.score DESC, f.name ASC""", (colID,),
+                             affected_tables=['field', 'collection_field_fieldvalue'])
     if not res:
-        res = run_sql_cached("SELECT code,name FROM field ORDER BY name ASC")
+        res = run_sql_cached("SELECT code,name FROM field ORDER BY name ASC",
+                             affected_tables=['field',])
     fields = [{
                 'value' : '',
                 'text' : get_field_i18nname("any field", ln)
@@ -902,17 +904,20 @@ def get_sortby_fields(ln='en', colID=None):
     if colID:
         res = run_sql_cached("""SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
                                  WHERE cff.type='soo' AND cff.id_collection=%s AND cff.id_field=f.id
-                              ORDER BY cff.score DESC, f.name ASC""", (colID,))
+                              ORDER BY cff.score DESC, f.name ASC""", (colID,),
+                             affected_tables=['field', 'collection_field_fieldvalue'])
     if not res:
         # no sort fields defined for this colID, try to take Home collection:
         res = run_sql_cached("""SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
                                  WHERE cff.type='soo' AND cff.id_collection=%s AND cff.id_field=f.id
-                                 ORDER BY cff.score DESC, f.name ASC""", (1,))
+                                 ORDER BY cff.score DESC, f.name ASC""", (1,),
+                             affected_tables=['field', 'collection_field_fieldvalue'])
     if not res:
         # no sort fields defined for the Home collection, take all sort fields defined wherever they are:
         res = run_sql_cached("""SELECT DISTINCT(f.code),f.name FROM field AS f, collection_field_fieldvalue AS cff
                                  WHERE cff.type='soo' AND cff.id_field=f.id
-                                 ORDER BY cff.score DESC, f.name ASC""")
+                                 ORDER BY cff.score DESC, f.name ASC""",
+                             affected_tables=['field', 'collection_field_fieldvalue'])
     fields = [{
                 'value' : '',
                 'text' : _("latest first")
