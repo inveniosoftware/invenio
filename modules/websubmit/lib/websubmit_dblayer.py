@@ -631,3 +631,107 @@ def submission_is_finished(doctype, action, subm_id, email):
         ## submission is finished:
         submission_finished = 1
     return submission_finished
+
+
+######
+## Functions relating to approval stuff:
+######
+
+def get_approval_request_notes(doctype, category, reportnumber):
+    """Get any notes relating to an approval request.
+       An approval request in the database has a "note" field for notes or
+       comments relating to the request. This function will return the value
+       stored in that field.
+       @param doctype: (string) - the document type of the document for
+        which the approval request notes are to be retrieved.
+       @param category: (string) - the category of the document for which
+        the approval request notes are to be retrieved.
+       @param reportnumber: (string) - the report number of the document
+        for which the approval request notes are to be retrieved.
+       @return: (string or None) - String if there was a row for this approval
+        request; None if not.
+    """
+    qstr = """SELECT note FROM sbmAPPROVAL """ \
+           """WHERE doctype=%s AND categ=%s AND rn=%s"""
+    qres = run_sql(qstr, (doctype, category, reportnumber))
+    try:
+        return str(qres[0][0])
+    except IndexError:
+        ## No row for this approval request?
+        return None
+
+
+def get_simple_approval_status(doctype, category, reportnumber):
+    """Get the (simple) approval "status" of a given document.
+       Using this function, Register_Approval_Request can determine whether
+       or not a docunent has already been approved or rejected at request time.
+       @param doctype: (string) - the document type of the document for
+        which the approval status is being requested.
+       @param category: (string) - the category of the document for which
+        the approval status is being requested.
+       @param reportnumber: (string) - the report number of the document
+        for which the approval status is being requested.
+    """
+    approval_status = None
+    qstr = """SELECT status FROM sbmAPPROVAL WHERE doctype=%s and """ \
+           """categ=%s and rn=%s"""
+    qres = run_sql(qstr, (doctype, category, reportnumber))
+    if len(qres) > 0:
+        approval_status = qres[0][0]
+    return approval_status
+
+
+def register_new_approval_request(doctype, category, reportnumber, note=""):
+    """Register a new approval request by inserting a row into the
+       WebSubmit sbmAPPROVAL database table for it.
+       @param doctype: (string) - the document type of the document for
+        which the new approval request is being registered.
+       @param category: (string) - the category of the document for which
+        the new approval request is being registered.
+       @param reportnumber: (string) - the report number of the document
+        for which the new approval request is being registered.
+       @param note: (string) - a "note" containing details about the approval
+        request. (defaults to an empty string.)
+       @return: None
+    """
+    qstr = """INSERT INTO sbmAPPROVAL """ \
+           """(doctype, categ, rn, status, """ \
+           """dFirstReq, dLastReq, dAction, access, note) VALUES """ \
+           """(%s, %s, %s, 'waiting', NOW(), NOW(), '', '', %s)"""
+    run_sql(qstr, (doctype, category, reportnumber, note))
+
+def update_approval_request_status(doctype, \
+                                   category, \
+                                   reportnumber, \
+                                   note="",
+                                   status="waiting"):
+    """Update the status of an approval request and either the date of last
+       request if it's simply an update, or the date of action if it's an
+       approval/rejection.
+       @param doctype: (string) - the document type of the document for
+        which the approval request is being updated.
+       @param category: (string) - the category of the document for which
+        the approval request is being updated.
+       @param reportnumber: (string) - the report number of the document
+        for which the approval request is being updated.
+       @param note: (string) - a "note" containing details about the approval
+        request. This note will be prepended to any existing value for the
+        note (with no separator, so include one if you don't want it to
+        directly run into the existing value.) (defaults to an empty
+        string.)
+       @status: (string) - the new status of the document - defaults to
+        waiting.
+    """
+    status = status.lower()
+    qstr = """UPDATE sbmAPPROVAL """ \
+           """SET status=%s, """
+    if status in ("approved", "rejected"):
+        ## If this is the "final" approval or rejection update, set the
+        ## date of action:
+        qstr += """dAction=NOW()"""
+    else:
+        ## Otherwise, update the date of "last request"
+        qstr += """dLastReq=NOW()"""
+    qstr += """, note=CONCAT(%s, note) """ \
+            """WHERE doctype=%s AND categ=%s AND rn=%s"""
+    run_sql(qstr, (status, note, doctype, category, reportnumber))
