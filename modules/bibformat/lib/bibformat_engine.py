@@ -1991,8 +1991,11 @@ def escape_field(value, mode=0):
         if mode == 5:
             allowed_attribute_whitelist += ['src', 'alt',
                                             'width', 'height',
-                                            'style']
-            allowed_tag_whitelist += ['img']
+                                            'style', 'summary',
+                                            'border', 'cellspacing',
+                                            'cellpadding']
+            allowed_tag_whitelist += ['img', 'table', 'td',
+                                      'tr', 'th', 'span', 'caption']
         try:
             return washer.wash(value,
                                allowed_attribute_whitelist=\
@@ -2011,8 +2014,11 @@ def escape_field(value, mode=0):
             if mode == 6:
                 allowed_attribute_whitelist += ['src', 'alt',
                                                 'width', 'height',
-                                                'style']
-                allowed_tag_whitelist += ['img']
+                                                'style', 'summary',
+                                                'border', 'cellspacing',
+                                                'cellpadding']
+                allowed_tag_whitelist += ['img', 'table', 'td',
+                                          'tr', 'th', 'span', 'caption']
             try:
                 return washer.wash(value,
                                    allowed_attribute_whitelist=\
