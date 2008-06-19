@@ -101,11 +101,12 @@ def format(bfo, style, separator='; ', show_icons='no'):
             file_icon = ''
 
         link_word = len(cern_urls) == 1 and _('%(x_sitename)s link') or _('%(x_sitename)s links')
-        out += '<small class="detailedRecordActions">(%s)</small><br />' % (link_word % {'x_sitename': 'CERN'})
+        out += '<small class="detailedRecordActions">%s:</small><br />' % (link_word % {'x_sitename': 'CERN'})
         url_list = []
         for url, descr in cern_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
         out += separator.join(url_list)
+        out += "<br/>"
 
     if others_urls:
         # Put a big file icon if only one file
@@ -118,7 +119,7 @@ def format(bfo, style, separator='; ', show_icons='no'):
         else:
             file_icon = ''
         external_link = len(others_urls) == 1 and _('external link') or _('external links')
-        out += '<small class="detailedRecordActions">(%s)</small>%s' % (external_link, separator)
+        out += '<small class="detailedRecordActions">%s:</small>%s' % (external_link, separator)
         url_list = []
         for url, descr in others_urls:
             url_list.append('<a '+style+' href="'+escape(url)+'">'+file_icon+escape(str(descr))+'</a>')
