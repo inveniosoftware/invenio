@@ -164,12 +164,12 @@ If you believe this to be an error, please contact &lt;%s&gt;, quoting the
         ## it is either approved or rejected.  If not, the decision couldn't
         ## be registered and an error should be raised.
         status_after_update = get_simple_approval_status(doctype, rn)
-        if status_after_update not in ("approved", "withdrawn"):
+        if status_after_update not in ("approved", "rejected"):
             msg = "Error in Register_Referee_Decision function: It was " \
                   "not possible to update the approvals database when " \
                   "trying to register the referee's descision of [%s] " \
                   "for the document [%s]. Please report this this " \
-                  "problem to <%s>, quoting the document's " \
+                  "problem to [%s], quoting the document's " \
                   "report-number [%s]." \
                   % (decision, rn, CFG_SITE_SUPPORT_EMAIL, rn)
             raise InvenioWebSubmitFunctionError(msg)
@@ -178,7 +178,7 @@ If you believe this to be an error, please contact &lt;%s&gt;, quoting the
         msg = "Error in Register_Referee_Decision function: The " \
               "document [%s] has an unknown approval status " \
               "[%s]. Unable to process the referee's decision. Please " \
-              "report this problem to <%s>, quoting the document's " \
+              "report this problem to [%s], quoting the document's " \
               "report-number [%s] and describing the problem." \
               % (rn, document_status, CFG_SITE_SUPPORT_EMAIL, rn)
         raise InvenioWebSubmitFunctionError(msg)
