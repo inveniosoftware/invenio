@@ -27,6 +27,7 @@ okay, 1 if not okay.  Useful for running during make install.
 __revision__ = "$Id$"
 
 import sys
+import os
 
 def deduce_site_packages_location():
     """Return the most probable location of site-packages directory
@@ -53,22 +54,14 @@ try:
 except ImportError, e:
     print """
     ******************************************************
-    ** IMPORT ERROR: %s
+    ** IMPORT WARNING: %s
     ******************************************************
-    ** Perhaps you need to create a symbolic link       **
+    ** Perhaps you have never created a symbolic link   **
     ** from your system-wide Python module directory    **
-    ** to your CDS Invenio installation directory?      **
+    ** to your CDS Invenio installation directory.      **
     **                                                  **
-    ** If yes, then please create it via:               **
-    **
-    **    $ sudo ln -s %s/lib/python/invenio %s/invenio
-    **
-    ** and continue with the 'make install' afterwards. **
-    **                                                  **
-    ** If not, then please inspect the above error      **
-    ** message and fix the problem before continuing.   **
+    ** It will be created now.                          **
     ******************************************************
-    """ % (e,
-           PREFIX,
-           deduce_site_packages_location())
-    sys.exit(1)
+    """ % e
+    os.system('ln -s %s/lib/python/invenio %s/invenio' %
+        (PREFIX, deduce_site_packages_location()))
