@@ -42,7 +42,7 @@ Contents
 
         You can also install the following packages:
 
-          $ sudo apt-get install python2.3-psyco sbcl cmucl 
+          $ sudo apt-get install python2.3-psyco sbcl cmucl
 
         The last three packages are not available on all Debian
         "Sarge" GNU/Linux architectures (e.g. not on AMD64), but they
@@ -78,10 +78,10 @@ Contents
           <http://python.org/>
         as well as the following Python modules:
           - (mandatory) MySQLdb (version >= 1.2.1_p2; see below)
-             <http://sourceforge.net/projects/mysql-python>                
+             <http://sourceforge.net/projects/mysql-python>
           - (recommended) PyXML, for XML processing:
              <http://pyxml.sourceforge.net/topics/download.html>
-          - (recommended) PyRXP, for very fast XML MARC processing: 
+          - (recommended) PyRXP, for very fast XML MARC processing:
              <http://www.reportlab.org/pyrxp.html>
           - (recommended) libxml2-python, for XML/XLST processing:
              <ftp://xmlsoft.org/libxml2/python/>
@@ -113,7 +113,7 @@ Contents
 
      f) If you want to be able to extract references from PDF fulltext
         files, then you need to install pdftotext version 3 at least.
-          <http://www.foolabs.com/xpdf/home.html> 
+          <http://www.foolabs.com/xpdf/home.html>
 
      g) If you want to be able to search for words in the fulltext
         files (i.e. to have fulltext indexing) or to stamp submitted
@@ -123,14 +123,14 @@ Contents
               <http://www.accesspdf.com/pdftk/>
               <http://www.cs.wisc.edu/~ghost/doc/AFPL/>
           - for PDF files: pdftotext or pstotext
-              <http://www.foolabs.com/xpdf/home.html> 
+              <http://www.foolabs.com/xpdf/home.html>
               <http://www.cs.wisc.edu/~ghost/doc/AFPL/>
           - for PostScript files: pstotext or ps2ascii
               <http://www.cs.wisc.edu/~ghost/doc/AFPL/>
           - for MS Word files: antiword, catdoc, or wvText
               <http://www.winfield.demon.nl/index.html>
               <http://www.ice.ru/~vitus/catdoc/index.html>
-              <http://sourceforge.net/projects/wvware>           
+              <http://sourceforge.net/projects/wvware>
           - for MS PowerPoint files: pptHtml and html2text
               <http://packages.debian.org/stable/utils/ppthtml>
               <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>
@@ -138,10 +138,10 @@ Contents
               <http://chicago.sourceforge.net/xlhtml/>
               <http://userpage.fu-berlin.de/~mbayer/tools/html2text.html>
 
-     h) If you have chosen to install fast XML MARC Python processors 
+     h) If you have chosen to install fast XML MARC Python processors
         in the step d) above, then you have to install the parsers
         themselves:
-          - (optional) RXP: 
+          - (optional) RXP:
              <http://www.cogsci.ed.ac.uk/~richard/rxp.html>
           - (optional) 4suite:
              <http://4suite.org/>
@@ -151,7 +151,7 @@ Contents
         history graphs on the Detailed record pages on the web
         interface.  Note that Gnuplot must be compiled with PNG output
         support, that is, with the GD library.  Note also that Gnuplot
-        is not required, only recommended.  
+        is not required, only recommended.
           <http://www.gnuplot.info/>
 
      j) (recommended) A Common Lisp implementation, such as CLISP,
@@ -163,10 +163,10 @@ Contents
         Common Lisp implementation is not required, only recommended.
           <http://clisp.cons.org/>
           <http://www.cons.org/cmucl/>
-          <http://sbcl.sourceforge.net/>     
+          <http://sbcl.sourceforge.net/>
 
      k) GNU gettext, a set of tools that makes it possible to
-	translate the application in multiple languages. 
+	translate the application in multiple languages.
            <http://www.gnu.org/software/gettext/>
 	This is available by default on many systems.
 
@@ -175,7 +175,7 @@ Contents
    unless everything is in order.  It also warns you if it cannot find
    some optional but recommended software.
 
- 
+
 1. Quick instructions for the impatient CDS Invenio admin
 =========================================================
 
@@ -186,7 +186,7 @@ Contents
       $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.0.tar.gz
       $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.0.tar.gz.md5
       $ wget http://cdsware.cern.ch/download/cds-invenio-0.99.0.tar.gz.sig
-      $ md5sum -v -c cds-invenio-0.99.0.tar.gz.md5 
+      $ md5sum -v -c cds-invenio-0.99.0.tar.gz.md5
       $ gpg --verify cds-invenio-0.99.0.tar.gz.sig cds-invenio-0.99.0.tar.gz
       $ tar xvfz cds-invenio-0.99.0.tar.gz
       $ cd cds-invenio-0.99.0
@@ -227,7 +227,7 @@ Contents
     install its files.  This means that you proceed as follows:
 
       $ cd /usr/local/src/
- 
+
           Change to a directory where we will configure and build the
           CDS Invenio.  (The built files will be installed into
           different "target" directories later.)
@@ -259,13 +259,13 @@ Contents
 
       $ tar xvfz cds-invenio-0.99.0.tar.gz
 
-          Untar the distribution tarball.    
+          Untar the distribution tarball.
 
       $ cd cds-invenio-0.99.0
-   
+
           Go to the source directory.
 
-      $ ./configure 
+      $ ./configure
 
           Configure CDS Invenio software for building on this specific
           platform.  You can use the following optional parameters:
@@ -313,7 +313,7 @@ Contents
                  installation on your system.  If you don't set this
                  option, then the first executable that will be found
                  in your PATH will be chosen for running CDS Invenio.
- 
+
               --with-cmucl=/opt/cmucl/bin/lisp
 
                  Optionally, specify a path to CMUCL executable.  This
@@ -321,7 +321,7 @@ Contents
                  installation on your system.  If you don't set this
                  option, then the first executable that will be found
                  in your PATH will be chosen for running CDS Invenio.
-                 
+
               --with-sbcl=/opt/sbcl/bin/sbcl
 
                  Optionally, specify a path to SBCL executable.  This
@@ -356,25 +356,16 @@ Contents
       $ make install
 
           Install the web pages, scripts, utilities and everything
-          needed for runtime into the respective directories, as
-          specified earlier by the configure command.
+          needed for CDS Invenio runtime into respective installation
+          directories, as specified earlier by the configure command.
 
           Note that if you are installing CDS Invenio for the first
-          time, you will be asked to create a symbolic link for the
-          "invenio" Python module from Python's site-packages
-          directory to instruct Python where to find CDS Invenio's
-          Python files.  The process will hint you at the exact
-          command to use based on the values you have used in the
-          configure line.
-
-          (Note also that on some operating systems you might need to
-          create another symlink manually for lib64:
-             
-              $ sudo ln -s /opt/cds-invenio/lib/python/invenio \
-                           /usr/local/lib64/python2.3/site-packages/invenio
-
-          if you happen to encounter some troubles finding intbitset
-          libraries.)
+          time, you will be asked to create symbolic link(s) from
+          Python's site-packages system-wide directory(ies) to the
+          installation location.  This is in order to instruct Python
+          where to find CDS Invenio's Python files.  You will be
+          hinted as to the exact command to use based on the
+          parameters you have used in the configure command.
 
       $ sudo make install-jsmath-plugin  ## optional
 
@@ -393,7 +384,7 @@ Contents
 
     Once the basic software installation is done, we proceed to
     configuring your Invenio system.
-          
+
       $ emacs /opt/cds-invenio/etc/invenio.conf
       $ emacs /opt/cds-invenio/etc/invenio-local.conf
 
@@ -415,7 +406,7 @@ Contents
              CFG_SITE_SECURE_URL = https://your.site.com
              CFG_SITE_ADMIN_EMAIL = john.doe@your.site.com
              CFG_SITE_SUPPORT_EMAIL = john.doe@your.site.com
-         
+
           The Invenio system will then read both the default
           invenio.conf file and your customized invenio-local.conf
           file and it will override any default options with the ones
@@ -441,7 +432,7 @@ Contents
       $ /opt/cds-invenio/bin/inveniocfg --create-tables
 
           If you are installing CDS Invenio for the first time, you
-          have to create database tables.  
+          have to create database tables.
 
           Note that this step checks for potential problems such as
           the database connection rights and may ask you to perform
@@ -484,11 +475,11 @@ Contents
           server to read files from the installation place and to
           write some log information and to cache interesting entities
           inside the "var" subdirectory of our CDS Invenio
-          installation directory.  
+          installation directory.
 
           Here we assumed that your Apache server processes are run
           under "www-data" group.  Change this appropriately for your
-          system.  
+          system.
 
           Moreover, note that if you are using SELinux extensions
           (e.g. on Fedora Core 6), you may have to check and enable
@@ -561,7 +552,7 @@ Contents
           indexes, etc.
 
 Good luck, and thanks for choosing CDS Invenio.
-  
+
        - CDS Development Group
          <cds.support@cern.ch>
          <http://cdsware.cern.ch/>
