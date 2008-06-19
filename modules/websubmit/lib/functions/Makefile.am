@@ -56,6 +56,7 @@ pylib_DATA = __init__.py \
              Print_Success_MBI.py \
              Print_Success_SRV.py \
              Register_Approval_Request.py \
+             Register_Referee_Decision.py \
              Report_Number_Generation.py \
              Retrieve_Data.py \
              Send_APP_Mail.py \
