@@ -19,27 +19,29 @@
 
 """
 Test importing the CDS Invenio module.  The program expects the prefix
-directory to be passed as an argument.  Warn the user to create a
-symlink in case of troubles during import.  Exit status: 0 if
+directory to be passed as an argument.  Warn the user to create
+symlink(s) in case of troubles during import.  Exit status: 0 if
 okay, 1 if not okay.  Useful for running during make install.
 """
 
 __revision__ = "$Id$"
 
 import sys
-import os
 
-def deduce_site_packages_location():
-    """Return the most probable location of site-packages directory
+def deduce_site_packages_locations():
+    """Return a list of locations of Python site-packages directories
        deduced from the sys variable.  Otherwise return example
        directory.  Suitable to advise people how to create Python
        invenio module symlink."""
-    out = "/usr/lib/python2.3/site-packages" # example directory
+    out = []
     for path in sys.path:
         if path.endswith("site-packages"):
-            out = path # put proper directory instead of the example one
-            break
-    return out
+            out.append(path)
+    if out:
+        return out
+    else:
+        # nothing detected, return example directory
+        return ["/usr/lib/python2.3/site-packages",]
 
 try:
     PREFIX = sys.argv[1]
@@ -54,14 +56,24 @@ try:
 except ImportError, e:
     print """
     ******************************************************
-    ** IMPORT WARNING: %s
+    ** IMPORT ERROR: %s
     ******************************************************
-    ** Perhaps you have never created a symbolic link   **
-    ** from your system-wide Python module directory    **
-    ** to your CDS Invenio installation directory.      **
+    ** Perhaps you need to create symbolic link(s)      **
+    ** from your system-wide Python site-packages       **
+    ** directory(ies) to your CDS Invenio installation  **
+    ** directory?                                       **
     **                                                  **
-    ** It will be created now.                          **
+    ** If yes, then please create symlink(s) via:       **
+    **""" % e
+    for adir in deduce_site_packages_locations():
+        print """\
+    **    $ sudo ln -s %s/lib/python/invenio %s/invenio""" % (PREFIX, adir)
+    print """\
+    **
+    ** and continue with the 'make install' afterwards. **
+    **                                                  **
+    ** If not, then please inspect the above error      **
+    ** message and fix the problem before continuing.   **
     ******************************************************
-    """ % e
-    os.system('ln -s %s/lib/python/invenio %s/invenio' %
-        (PREFIX, deduce_site_packages_location()))
+    """
+    sys.exit(1)
