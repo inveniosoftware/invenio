@@ -207,7 +207,7 @@ semantic:
         $f  ...  format (optional; if not set, deduced from $a)
         $z  ...  comment (optional)
         $r  ...  restriction (optional, see below)
-        $v  ...  version (used only with REVERT, see below)
+        $v  ...  version (used only with REVERT and DELETE-FILE, see below)
         $x  ...  url/path for an icon (optional)
 </pre>
 </p>
@@ -235,6 +235,12 @@ tag instance containing a pointer to e.g. the thesis defence slides.
 The subfields of an FFT tag are non-repetitive.
 </p>
 
+<p>When more than one FFT tag is specified for the same document (e.g. for
+adding more than one format at a time), if $t (docfile type), $m (new desired docfile name), $r (restriction), $v (version), $x (url/path for an icon), are
+specified, they should be identically specified for each single entry of FFT.
+E.g. if you want to specify an icon for a document with two formats (say .pdf
+and .doc), you'll write two FFT tags, both containing the same $x subfield.</p>
+
 <p>The bibupload process, when it encounters FFT tags, will
 automatically populate fulltext storage space
 (<code>/opt/cds-invenio/var/data/files</code>) and metadata record
@@ -242,6 +248,11 @@ associated tables (<code>bibrec_bibdoc</code>, <code>bibdoc</code>) as
 appropriate.  It will also enrich the 856 tags (URL tags) of the MARC
 metadata of the record in question with references to the latest
 versions of each file.
+</p>
+
+<p>Note that for $a and $x subfields filesystem paths must be absolute (e.g. <code>/tmp/icon.gif</code> is valid, while <code>Destkop/icon.gif</code> is
+not) and they must be readable by the user/group of the bibupload process that
+will handle the FFT.
 </p>
 
 <p>The bibupload process supports the usual modes correct, append,
@@ -278,6 +289,10 @@ semantic of the metadata upload:
 
 <p>Note, in append and insert mode, <pre>$m</pre> is ignored.
 
+<p>In order to rename a document just use the the correct mode specifing in the
+$n subfield the original docname that should be renamed and in $m the new name.
+</p>
+
 <p>In order to purge previous file revisions (i.e. in order to keep
 only the latest file version), please use the correct mode with $n
 docname and $t PURGE as the special keyword.
@@ -302,6 +317,11 @@ docname and $t FIX as the special keyword.
 the same content as some previous revision had), please use the correct mode with
 $n docname, $t REVERT as the special keyword and $v the number corresponding
 to the desired version.</p>
+
+<p>In order to delete a particular file added by mistake, please use the correct
+mode with $n docname, $t DELETE-FILE, specifing $v version and
+$f format. Note that this operation is not reversible. Note that if you don't
+spcify a version, the last version will be used.</p>
 
 <p>In order to preserve previous comments and descriptions when correcting, please use the KEEP-OLD-VALUE special keyword with the desired $d and $z subfield.
 </p>
