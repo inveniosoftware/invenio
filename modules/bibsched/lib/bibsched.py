@@ -923,7 +923,7 @@ class BibSched:
                 'ABOUT TO STOP' : {},
                 'ABOUT TO SLEEP' : {},
                 'ERROR' : {},
-                'DONE WITH ERRORS'
+                'DONE WITH ERRORS' : {},
                 'SCHEDULED' : {}
             }
 
