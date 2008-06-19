@@ -923,6 +923,7 @@ class BibSched:
                 'ABOUT TO STOP' : {},
                 'ABOUT TO SLEEP' : {},
                 'ERROR' : {},
+                'DONE WITH ERRORS'
                 'SCHEDULED' : {}
             }
 
@@ -936,7 +937,7 @@ class BibSched:
             while True:
                 rows = get_rows()
                 task_status = get_task_status(rows)
-                if task_status['ERROR']:
+                if task_status['ERROR'] or task_status['DONE WITH ERRORS']:
                     raise StandardError('BibSched had to halt because at least a task is in status ERROR: %s' % task_status['ERROR'])
                 for row in rows:
                     if self.handle_row(task_status, *row):
