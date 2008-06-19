@@ -1002,7 +1002,7 @@ def elaborate_fft_tags(record, rec_id, mode):
             elif mode == 'replace_or_insert': # to be thought as correct_or_insert
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == docname:
-                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT', 'FIX'):
+                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT', 'FIX', 'DELETE-FILE'):
                             if newname != docname:
                                 try:
                                     bibdoc.change_name(newname)
@@ -1024,6 +1024,10 @@ def elaborate_fft_tags(record, rec_id, mode):
                             bibdoc.expunge()
                         elif doctype == 'FIX':
                             bibrecdocs.fix(docname)
+                        elif doctype == 'DELETE-FILE':
+                            if urls:
+                                for (url, format, description, comment) in urls:
+                                    bibdoc.delete_file(format, version)
                         elif doctype == 'REVERT':
                             try:
                                 bibdoc.revert(version)
@@ -1053,7 +1057,7 @@ def elaborate_fft_tags(record, rec_id, mode):
             elif mode == 'correct':
                 for bibdoc in bibrecdocs.list_bibdocs():
                     if bibdoc.get_docname() == docname:
-                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT', 'FIX'):
+                        if doctype not in ('PURGE', 'DELETE', 'EXPUNGE', 'REVERT', 'FIX', 'DELETE-FILE'):
                             if newname != docname:
                                 try:
                                     bibdoc.change_name(newname)
@@ -1075,6 +1079,10 @@ def elaborate_fft_tags(record, rec_id, mode):
                             bibdoc.expunge()
                         elif doctype == 'FIX':
                             bibrecdocs.fix(newname, True)
+                        elif doctype == 'DELETE-FILE':
+                            if urls:
+                                for (url, format, description, comment) in urls:
+                                    bibdoc.delete_file(format, version)
                         elif doctype == 'REVERT':
                             try:
                                 bibdoc.revert(version)
