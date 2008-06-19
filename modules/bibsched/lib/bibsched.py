@@ -938,7 +938,7 @@ class BibSched:
                 rows = get_rows()
                 task_status = get_task_status(rows)
                 if task_status['ERROR'] or task_status['DONE WITH ERRORS']:
-                    raise StandardError('BibSched had to halt because at least a task is in status ERROR: %s' % task_status['ERROR'])
+                    raise StandardError('BibSched had to halt because at least a task is in status ERROR (%s) or DONE WITH ERRORS (%s)' % (task_status['ERROR'], task_status['DONE WITH ERRORS']))
                 for row in rows:
                     if self.handle_row(task_status, *row):
                         # Things have changed let's restart
