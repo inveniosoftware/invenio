@@ -35,7 +35,6 @@ from invenio.websubmit_functions.ParamFile import ParamFromFile
 from invenio.websubmit_config import InvenioWebSubmitFunctionError, \
                                      InvenioWebSubmitFunctionStop
 from invenio.errorlib import register_exception
-from invenio.dbquery import run_sql
 from invenio.config import CFG_SITE_SUPPORT_EMAIL
 
 def Register_Approval_Request(parameters, curdir, form, user_info=None):
@@ -322,7 +321,7 @@ def Register_Approval_Request(parameters, curdir, form, user_info=None):
     ##
     ## Query the "approvals" DB table to determine whether approval of this
     ## document has already been requested:
-    approval_status = get_simple_approval_status(doctype, category, rn)
+    approval_status = get_simple_approval_status(doctype, rn)
     if approval_status is None:
         ## Approval has never been requested for this document. Register the
         ## new request.
@@ -357,7 +356,7 @@ document's report-number [%s] and describing the problem.
         ## An approval request for this document type was already made at some
         ## point. Update it and inform the user that the approval request has
         ## been logged despite having been previously withdrawn:
-        update_approval_request_status(doctype, category, rn, note=note)
+        update_approval_request_status(doctype, rn, note=note)
         info_out += """
 <br />
 <div>
@@ -372,7 +371,7 @@ Approval has been requested again.
         ## Update the date/time of the last request and inform the user that
         ## although approval had already been requested for this document,
         ## their approval request has been made again.
-        update_approval_request_status(doctype, category, rn, note=note)
+        update_approval_request_status(doctype, rn, note=note)
         info_out += """
 <br />
 <div>
