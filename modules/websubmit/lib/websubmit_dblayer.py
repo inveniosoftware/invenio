@@ -661,21 +661,21 @@ def get_approval_request_notes(doctype, category, reportnumber):
         return None
 
 
-def get_simple_approval_status(doctype, category, reportnumber):
+def get_simple_approval_status(doctype, reportnumber):
     """Get the (simple) approval "status" of a given document.
        Using this function, Register_Approval_Request can determine whether
        or not a docunent has already been approved or rejected at request time.
        @param doctype: (string) - the document type of the document for
         which the approval status is being requested.
-       @param category: (string) - the category of the document for which
-        the approval status is being requested.
        @param reportnumber: (string) - the report number of the document
         for which the approval status is being requested.
+       @return: (string or None) - None if there is no approval request row
+        for the document; else the value of the approval status.
     """
     approval_status = None
-    qstr = """SELECT status FROM sbmAPPROVAL WHERE doctype=%s and """ \
-           """categ=%s and rn=%s"""
-    qres = run_sql(qstr, (doctype, category, reportnumber))
+    qstr = """SELECT status FROM sbmAPPROVAL """ \
+           """WHERE doctype=%s AND rn=%s"""
+    qres = run_sql(qstr, (doctype, reportnumber))
     if len(qres) > 0:
         approval_status = qres[0][0]
     return approval_status
@@ -702,7 +702,6 @@ def register_new_approval_request(doctype, category, reportnumber, note=""):
 
 
 def update_approval_request_status(doctype, \
-                                   category, \
                                    reportnumber, \
                                    note="",
                                    status="waiting"):
@@ -711,8 +710,6 @@ def update_approval_request_status(doctype, \
        approval/rejection.
        @param doctype: (string) - the document type of the document for
         which the approval request is being updated.
-       @param category: (string) - the category of the document for which
-        the approval request is being updated.
        @param reportnumber: (string) - the report number of the document
         for which the approval request is being updated.
        @param note: (string) - a "note" containing details about the approval
@@ -734,8 +731,8 @@ def update_approval_request_status(doctype, \
         ## Otherwise, update the date of "last request"
         qstr += """dLastReq=NOW()"""
     qstr += """, note=CONCAT(%s, note) """ \
-            """WHERE doctype=%s AND categ=%s AND rn=%s"""
-    run_sql(qstr, (status, note, doctype, category, reportnumber))
+            """WHERE doctype=%s AND rn=%s"""
+    run_sql(qstr, (status, note, doctype, reportnumber))
 
 
 def get_approval_request_category(reportnumber):
