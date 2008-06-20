@@ -313,7 +313,7 @@ def websubmit_legacy_getfile(req, form):
                 return errorMsg(_("Parameter docid missing"), req, ln)
 
             try:
-                doc = BibDoc(docid=docid)
+                doc = BibDoc(docid=int(docid))
             except InvenioWebSubmitFileError, msg:
                 register_exception(req=req)
                 return errorMsg(str(msg), req, ln)
