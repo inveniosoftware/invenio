@@ -279,94 +279,40 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
 def websubmit_legacy_getfile(req, form):
     """ Handle legacy /getfile.py URLs """
 
-    # FIXME: this should _redirect_ to the proper
-    # /record/.../files/... URL.
-
     args = wash_urlargd(form, {
-        'c': (str, CFG_SITE_NAME),
-        'recid': (str, ''),
-        'docid': (str, ''),
+        'recid': (int, 0),
+        'docid': (int, 0),
         'version': (str, ''),
         'name': (str, ''),
-        'format': (str, '')
+        'format': (str, ''),
+        'ln' : (str, CFG_SITE_LANG)
         })
 
-    def _getfile_py(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,recid="",docid="",version="",name="",format=""):
-        _ = gettext_set_language(ln)
+    _ = gettext_set_language(args['ln'])
 
-        # get user ID:
-        try:
-            uid = getUid(req)
-            if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-                return page_not_authorized(req, "../getfile.py/index",
-                                           navmenuid='submit')
-            uid_email = get_email(uid)
-        except Error, e:
-            return errorMsg(str(e), req, ln)
+    def _getfile_py(req, recid=0, docid=0, version="", name="", format="", ln=CFG_SITE_LANG):
+        if not recid:
+            ## Let's obtain the recid from the docid
+            if docid:
+                try:
+                    bibdoc = BibDoc(docid=docid)
+                    recid = bibdoc.get_recid()
+                except InvenioWebSubmitFileError, e:
+                    return errorMsg(e, req, ln)
+            else:
+                return errorMsg(_('Not enough information to retrieve the document'), req, ln)
+        else:
+            if not name and docid:
+                ## Let's obtain the name from the docid
+                try:
+                    bibdoc = BibDoc(docid)
+                    name = bibdoc.get_docname()
+                except InvenioWebSubmitFileError, e:
+                    return errorMsg(e, req, ln)
 
-        filelist=""
+        format = normalize_format(format)
 
-        # redirect to a canonical URL as far as it is possible (what
-        # if we only have a docid, and no file supplied?)
-        if name!="":
-            if docid=="":
-                return errorMsg(_("Parameter docid missing"), req, ln)
-
-            try:
-                doc = BibDoc(docid=int(docid))
-            except InvenioWebSubmitFileError, msg:
-                register_exception(req=req)
-                return errorMsg(str(msg), req, ln)
-            try:
-                docfile = doc.get_file(format,version)
-            except InvenioWebSubmitFileError, msg:
-                register_exception(req=req)
-                return errorMsg(str(msg), req, ln)
-
-            # redirect to this specific file, possibly dropping
-            # the version if we are referring to the latest one.
-            target = '%s/record/%d/files/%s%s' % (
-                CFG_SITE_URL, doc.recid, quote(docfile.name), docfile.format)
-
-            if version and int(version) == int(doc.get_latest_version()):
-                version = ''
-
-            target += make_canonical_urlargd({
-                'version': version}, websubmit_templates.files_default_urlargd)
-
-            return redirect_to_url(req, target)
-
-        # all files attached to a record
-        elif recid!="":
-            return redirect_to_url(req, '%s/record/%s/files/' % (CFG_SITE_URL, recid))
-
-        # a precise filename
-        elif docid!="":
-            try:
-                bibdoc = BibDoc(docid=int(docid))
-            except InvenioWebSubmitFileError, msg:
-                register_exception(req=req)
-                return errorMsg(str(msg), req, ln)
-            recid = bibdoc.get_recid()
-            filelist = bibdoc.display(version, ln=ln)
-
-        t = websubmit_templates.tmpl_filelist(
-              ln = ln,
-              recid = recid,
-              docname = name,
-              version = version,
-              filelist = filelist,
-            )
-        p_navtrail = _("Access to Fulltext")
-        return page(title="",
-                    body=t,
-                    navtrail = p_navtrail,
-                    description="",
-                    keywords="keywords",
-                    uid=uid,
-                    language=ln,
-                    req=req,
-                    navmenuid='search')
+        redirect_to_url(req, '%s/record/%s/files/%s%s?ln=%s%s' % (CFG_SITE_URL, recid, name, format, ln, version and 'version=%s' % version or ''), apache.HTTP_MOVED_PERMANENTLY)
 
     return _getfile_py(req, **args)
 
