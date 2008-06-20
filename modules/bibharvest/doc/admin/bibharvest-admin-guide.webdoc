@@ -25,9 +25,9 @@
 <h2>Contents</h2>
 <strong>1. <a href="#1">Overview</a></strong><br />
 <strong>2. <a href="#2">OAI Data Harvesting</a></strong><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1 <a href="#2.1">One time harvesting</a><br />
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.2 <a href="#2.2">Periodical harvesting</a><br />
-<strong>3. <a href="#3">OAI Repository</a></strong><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.1 <a href="#2.1">Bibharvest Admin Interface</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 2.2 <a href="#2.2">oaiharvest commmand-line tool</a><br />
+<strong>3. <a href="#3">OAI Repository (<i>Exporting</i>)</a></strong><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.1 <a href="#3.1">Definition of OAI sets</a><br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 3.2 <a href="#3.2">Exposing metadata via OAI Repository Gateway</a><br />
 
@@ -40,29 +40,11 @@ The BibHarvest Admin Interface can be used to set up a database of OAI sources a
 
 <a name="2"></a><h2>2. OAI Data Harvesting</h2>
 
-<a name="2.1"></a><h3>2.1 One-time harvesting</h3>
-
-<p>To harvest records from an OAI compliant repository, run the
-<code>bibharvest</code> command-line tool.  For example:
-
-<blockquote>
-<pre>
-$ bibharvest -vListRecords -f2004-04-01 -u2004-04-02 -pmarcxml -o/tmp/z.xml \\
-             http://cdsweb.cern.ch/oai2d
-</pre>
-</blockquote>
-
-<p>For further help with the command-line harvesting tool, run
-<code>bibharvest --help</code>.
-
-
-<a name="2.2"></a><h3>2.2 Periodical harvesting</h3>
-
 <p>In order to periodically harvest metadata from one or several repositories, it is possible to organize OAI sources through the BibHarvest Admin Interface.
 The interface allows the administrator to add new repositories as well as edit and delete existing ones.
 Once the database has been set up thorugh the BibHarvest Admin Interface, run the oaiharvest command-line tool to run periodical harvesting</p>
 
-<a name="2.2.1"></a><h4>2.2.1. Bibharvest Admin Interface</h4>
+<a name="2.1"></a><h4>2.1 Bibharvest Admin Interface</h4>
 
 <b>Add OAI sources</b><br />
 <p>The first step requires the administrator to enter the baseURL of the OAI repository. This is done for validation purposes - i.e. to check that the baseURL actually points to an OAI-compliant repository.
@@ -117,7 +99,7 @@ OAI repositories can be removed from the database by clicking on the appropriate
 </p>
 
 
-<a name="2.2.2"></a><h4>2.2.2 oaiharvest commmand-line tool</h4>
+<a name="2.2"></a><h4>2.2 oaiharvest commmand-line tool</h4>
 <p>Once administrators have set up their desired OAI repositories in the database through the Admin Interface they can invoke <code>oaiharvest</code> to start up periodical harvesting.<br />
 <br />
 <b>Oaiharvest usage</b>
@@ -148,7 +130,7 @@ OAI repositories can be removed from the database by clicking on the appropriate
 <ul>
 <li> If the <code>--dates</code> argument is not passed, it checks whether an update from the repository is needed (Note: the update status is calculated based on the time of the last harvesting and the frequency chosen by the administrator).
 <ul>
-<li>If an update is needed, it launches <code>bibharvest</code> and harvests all the metadata that the repository has added since the data of the last update. When the update is finished, the last update value is set to the current time and date.
+<li>If an update is needed, it harvests all the metadata that the repository has added since the data of the last update. When the update is finished, the last update value is set to the current time and date.
 <li>If an update is not needed, the source is skipped.
 </ul>
 <li> If the <code>--dates</code> argument is passed, it simply harvests the metadata of the repository from/until the given dates. The last update date is left unchanged.
@@ -162,7 +144,7 @@ OAI repositories can be removed from the database by clicking on the appropriate
 
 <br />
 
-<a name="3"></a><h2>3. OAI Repository</h2>
+<a name="3"></a><h2>3. OAI Repository (<i>Exporting</i>)</h2>
 
 The OAI Repository corresponds to a set of metadata exposed for periodical harvesting by external OAI service providers. The following steps have to be done in order to expose metadata via OAI:
 
