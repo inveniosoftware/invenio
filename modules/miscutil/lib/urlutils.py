@@ -92,17 +92,31 @@ def wash_url_argument(var, new_type):
             out = {0:var}
     return out
 
-def redirect_to_url(req, url):
+def redirect_to_url(req, url, redirection_type=apache.HTTP_TEMPORARY_REDIRECT):
     """
     Redirect current page to url.
     @param req: request as received from apache
-    @param url: url to redirect to"""
-    req.err_headers_out.add("Location", url)
-    if 'Set-Cookie' in req.headers_out:
-        ## It's important not to loose the cookie of the user, in particular
-        ## when it has just been set for the first time.
-        req.err_headers_out.add('Set-Cookie', req.headers_out['Set-Cookie'])
-    util.redirect(req, url)
+    @param url: url to redirect to
+    @param redirection_type: what kind of redirection is required:
+    e.g.: apache.HTTP_MULTIPLE_CHOICES             = 300
+          apache.HTTP_MOVED_PERMANENTLY            = 301
+          apache.HTTP_MOVED_TEMPORARILY            = 302
+          apache.HTTP_SEE_OTHER                    = 303
+          apache.HTTP_NOT_MODIFIED                 = 304
+          apache.HTTP_USE_PROXY                    = 305
+          apache.HTTP_TEMPORARY_REDIRECT           = 307
+    Please see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3
+    """
+    req.err_headers_out["Location"] = url
+    req.err_headers_out["Cache-Control"] = "no-cache"
+
+    if req.sent_bodyct:
+        raise IOError, "Cannot redirect after headers have already been sent."
+
+    req.status = redirection_type
+    req.write('<p>Please go to <a href="%s">here</a></p>\n' % url)
+
+    raise apache.SERVER_RETURN, apache.DONE
 
 def get_client_ip_address(req):
     """ Returns IP address as string from an apache request. """
