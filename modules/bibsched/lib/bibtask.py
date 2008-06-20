@@ -102,18 +102,33 @@ def task_low_level_submission(name, user, *argv):
     Use with care!
     Please use absolute paths in argv!
     """
+
+    def get_priority(argv):
+        """Try to get the priority by analysing the arguments."""
+        priority = 0
+        try:
+            stripped_argv = [arg for arg in argv if not arg.startswith('-') or arg.startswith('-P') or arg.startswith('--priority')]
+            opts, args = getopt.gnu_getopt(stripped_argv, 'P:', ['priority='])
+            for opt in opts:
+                if opt[0] in ('-P', '--priority'):
+                    priority = opt[1]
+        except:
+            pass
+        return priority
+
     task_id = None
     try:
         if not name in CFG_BIBTASK_VALID_TASKS:
             raise StandardError('%s is not a valid task name' % name)
 
+        priority = get_priority(argv)
         argv = tuple([os.path.join(CFG_BINDIR, name)] + list(argv))
 
         ## submit task:
         task_id = run_sql("""INSERT INTO schTASK (proc,user,
-                                            runtime,sleeptime,status,arguments)
-                                            VALUES (%s,%s,NOW(),'','WAITING',%s)""",
-            (name, user, marshal.dumps(argv)))
+            runtime,sleeptime,status,arguments, priority)
+            VALUES (%s,%s,NOW(),'','WAITING',%s,%s)""",
+            (name, user, marshal.dumps(argv), priority))
 
     except Exception:
         register_exception()
