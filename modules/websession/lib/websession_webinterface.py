@@ -693,7 +693,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
 
             # login successful!
             if args['referer']:
-                redirect_to_url(req, args['referer'])
+                redirect_to_url(req, args['referer'], apache.HTTP_MOVED_TEMPORARILY)
             else:
                 return self.display(req, form)
         else:
