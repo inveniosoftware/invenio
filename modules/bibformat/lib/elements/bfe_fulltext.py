@@ -206,7 +206,8 @@ def get_files(bfo):
                 for doc in bibarchive.list_bibdocs():
                     if int(doc.get_latest_version()) > 1:
                         old_versions = True
-                    if filename in [f.fullname for f in doc.list_all_files()]:
+                    if True in [f.fullname.startswith(filename) \
+                                for f in doc.list_all_files()]:
                         assigned = True
                         #doc.getIcon()
                         if not doc.doctype == 'Main' and \
