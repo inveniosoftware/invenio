@@ -125,7 +125,8 @@ _actions = ['get-info',
             #'expunge',
             'check-md5',
             'update-md5',
-            'fix']
+            'fix-all',
+            'fix-marc']
 
 _actions_with_parameter = {
     #'set-doctype' : 'doctype',
@@ -169,6 +170,7 @@ def prepare_option_parser():
         action_with_parameters.add_option('--%s' % action, dest=dest)
     parser.add_option_group(action_with_parameters)
     parser.add_option('-v', '--verbose', type='int', dest='verbose', default=1)
+    parser.add_option('--yes-i-know', action='store_true', dest='yes-i-know')
     return parser
 
 def get_recids_from_query(pattern, collection, recid, recid2, docid, docid2):
@@ -366,13 +368,22 @@ def cli_get_history(docid_set):
         for row in history:
             print_info(bibdoc.get_recid(), docid, row)
 
-def cli_fix(recid_set):
+def cli_fix_all(recid_set):
     """Fix all the records of a recid_set."""
     ffts = {}
     for recid in recid_set:
         ffts[recid] = []
         for docname in BibRecDocs(recid).get_bibdoc_names():
-            ffts[recid].append({'docname' : docname, 'doctype' : 'FIX'})
+            ffts[recid].append({'docname' : docname, 'doctype' : 'FIX-ALL'})
+    return bibupload_ffts(ffts, append=False)
+
+def cli_fix_marc(recid_set):
+    """Fix all the records of a recid_set."""
+    ffts = {}
+    for recid in recid_set:
+        ffts[recid] = []
+        for docname in BibRecDocs(recid).get_bibdoc_names():
+            ffts[recid].append({'docname' : docname, 'doctype' : 'FIX-MARC'})
     return bibupload_ffts(ffts, append=False)
 
 def cli_get_info(recid_set):
@@ -455,8 +466,10 @@ def main():
         cli_check_md5(docid_set)
     elif options.action == 'update-md5':
         cli_update_md5(docid_set)
-    elif options.action == 'fix':
-        cli_fix(recid_set)
+    elif options.action == 'fix-all':
+        cli_fix_all(recid_set)
+    elif options.action == 'fix-marc':
+        cli_fix_marc(recid_set)
     elif options.append_path:
         res = cli_append(options.recid, options.docid, options.docname, options.doctype, options.append_path, options.format, options.icon, options.description, options.comment, options.restriction)
         if not res:
