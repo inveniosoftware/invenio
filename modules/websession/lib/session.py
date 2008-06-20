@@ -747,14 +747,12 @@ class ResponseWrapper:
                 options += "; %s=%s" % (name, value)
             elif name =="secure" and value:
                 options += "; secure"
-        self.request.headers_out["Set-Cookie"] = "%s=%s%s" % \
-                                                 (cookie_name,
-                                                  cookie_value,
-                                                  options)
+        cookie_str = "%s=%s%s" % (cookie_name, cookie_value, options)
+        self.request.headers_out["Set-Cookie"] = cookie_str
+        self.request.err_headers_out["Set-Cookie"] = cookie_str
         if 'expires' not in attrs or attrs['expires'] != 0:
             self.request.cds_wrapper.setSession(cookie_value)
-            self.request.cds_wrapper.cookies.update(parse_cookie(self.request.headers_out["Set-Cookie"]))
-
+            self.request.cds_wrapper.cookies[cookie_name] = cookie_value
 
 class SessionError(Exception):
     """
