@@ -104,7 +104,7 @@ def Send_Request_For_Publication(parameters, curdir, form, user_info=None):
     title_referee = "Request for publication of %s" % rn
     mail_referee = "The document %s has been asked for publication to the %s Server..\nYour have to select an editorial board for it.\n\n" % (rn,CFG_SITE_NAME)
     mail_referee +="Title: %s\n\nAuthor(s): %s\n\n" % (title,author)
-    mail_referee +="To access the document(s), select the file(s) from the location:<%s/getfile.py?recid=%s>\n\n" % (CFG_SITE_URL,sysno)
+    mail_referee +="To access the document(s), select the file(s) from the location:<%s/record/%s/files/>\n\n" % (CFG_SITE_URL,sysno)
     mail_referee +="To select an editorial board, you should go to this URL:\n<%s/publiline.py?doctype=%s&categ=%s&RN=%s>\n" % (CFG_SITE_URL,doctype,category,rn)
     mail_referee +="---------------------------------------------\nBest regards.\nThe submission team.\n"
     #Send mail to referee
