@@ -343,7 +343,7 @@ def websubmit_legacy_getfile(req, form):
         # a precise filename
         elif docid!="":
             try:
-                bibdoc = BibDoc(docid=docid)
+                bibdoc = BibDoc(docid=int(docid))
             except InvenioWebSubmitFileError, msg:
                 register_exception(req=req)
                 return errorMsg(str(msg), req, ln)
