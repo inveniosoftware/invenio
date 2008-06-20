@@ -92,7 +92,7 @@ def wash_url_argument(var, new_type):
             out = {0:var}
     return out
 
-def redirect_to_url(req, url, redirection_type=apache.HTTP_TEMPORARY_REDIRECT):
+def redirect_to_url(req, url, redirection_type=None):
     """
     Redirect current page to url.
     @param req: request as received from apache
@@ -105,8 +105,11 @@ def redirect_to_url(req, url, redirection_type=apache.HTTP_TEMPORARY_REDIRECT):
           apache.HTTP_NOT_MODIFIED                 = 304
           apache.HTTP_USE_PROXY                    = 305
           apache.HTTP_TEMPORARY_REDIRECT           = 307
+    The default is apache.HTTP_TEMPORARY_REDIRECT
     Please see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3
     """
+    if redirection_type is None:
+        redirection_type = apache.HTTP_TEMPORARY_REDIRECT
     req.err_headers_out["Location"] = url
     req.err_headers_out["Cache-Control"] = "no-cache"
 
