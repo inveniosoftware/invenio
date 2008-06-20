@@ -222,7 +222,7 @@ class Manager:
             #self.display_in_footer("in move mode")
             #self.stdscr.refresh()
         else:
-            status = self.currentrow[5]
+            status = self.currentrow and self.currentrow[5] or None
             if chr == self.curses.KEY_UP:
                 #if self.move_mode:
                     #self.move_up()
@@ -255,14 +255,14 @@ class Manager:
             elif chr in (ord("n"), ord("N")):
                 self.change_priority()
             elif chr in (ord("r"), ord("R")):
-                if status not in 'WAITING' or 'SCHEDULED':
+                if status == 'WAITING':
                     self.run()
             elif chr in (ord("s"), ord("S")):
                 self.sleep()
             elif chr in (ord("k"), ord("K")):
                 if status == 'ERROR':
                     self.acknowledge()
-                else:
+                elif status is not None:
                     self.kill()
             elif chr in (ord("t"), ord("T")):
                 self.stop()
@@ -891,7 +891,9 @@ class BibSched:
                 elif procname in self.helper_modules:
                     program = os.path.join(CFG_BINDIR, procname)
                     fdout, fderr = get_output_channelnames(task_id)
-                    COMMAND = "%s %s >> %s 2>> %s &" % (program, str(task_id), fdout, fderr)
+                    ## Trick to log in bibsched.log the task exiting
+                    exit_str = '&& echo "`date "+%%Y-%%m-%%d %%H:%%M:%%S"` --> Task #%d (%s) exited" >> %s/bibsched.log' % (task_id, proc, CFG_LOGDIR)
+                    COMMAND = "%s %s >> %s 2>> %s %s &" % (program, str(task_id), fdout, fderr, exit_str)
                     bibsched_set_status(task_id, "SCHEDULED")
                     Log("Task #%d (%s) started" % (task_id, proc))
                     os.system(COMMAND)
