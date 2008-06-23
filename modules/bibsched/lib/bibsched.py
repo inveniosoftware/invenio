@@ -169,7 +169,8 @@ def bibsched_set_priority(task_id, priority):
 def bibsched_send_signal(proc, task_id, signal):
     """Send a signal to a given task."""
     try:
-        os.kill(get_task_pid(proc, task_id), signal)
+        pid = get_task_pid(proc, task_id, True)
+        os.kill(pid, signal)
     except OSError:
         pass
     except KeyError:
@@ -833,9 +834,6 @@ class BibSched:
                 return False
 
             nothing_was_scheduled = self.scheduled is None
-            if proc.startswith('bibupload'):
-                self.scheduled = task_id
-
             res = self.bibupload_in_the_queue(task_id, runtime)
             if res:
                 ## All bibupload must finish before.
