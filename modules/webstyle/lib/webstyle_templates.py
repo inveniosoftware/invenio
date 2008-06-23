@@ -101,7 +101,8 @@ class Template:
                   titleprologue="", title="", titleepilogue="",
                   body="", lastupdated=None, pagefooteradd="", uid=0,
                   secure_page_p=0, navmenuid="", metaheaderadd="",
-                  rssurl=CFG_SITE_URL+"/rss"):
+                  rssurl=CFG_SITE_URL+"/rss",
+                  show_title_p=True):
 
         """Creates a complete page
 
@@ -157,6 +158,8 @@ class Template:
 
           - 'rssurl' *string* - the url of the RSS feed for this page
 
+          - 'show_title_p' *int* (0 or 1) - do we display the page title in the body of the page?
+
            Output:
 
           - HTML code of the page
@@ -211,7 +214,7 @@ class Template:
   'boxrightbottomadd' : boxrightbottomadd,
 
   'titleprologue' : titleprologue,
-  'title' : title and '<h1 class="headline">' + cgi.escape(title) + '</h1>' or '',
+  'title' : (title and show_title_p) and '<h1 class="headline">' + cgi.escape(title) + '</h1>' or '',
   'titleepilogue' : titleepilogue,
 
   'body' : body,
