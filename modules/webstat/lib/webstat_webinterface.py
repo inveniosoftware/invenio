@@ -63,7 +63,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     navtrail = """<a class="navtrail" href="%s/stats/%%(ln_link)s">Statistics</a>""" % CFG_SITE_URL
 
-    def index(self, req, form):
+    def __call__(self, req, form):
         """Index page."""
         argd = wash_urlargd(form, {'ln': (str, CFG_SITE_LANG)})
         ln = argd['ln']
@@ -277,3 +277,4 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         req.sendfile(filename)
         os.remove(filename)
 
+    index = __call__
