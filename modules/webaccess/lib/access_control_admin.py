@@ -1471,9 +1471,9 @@ def acc_find_possible_roles(name_action, arguments):
     # create dictionary with default values and replace entries from input arguments
     defdict = {}
 
+    ## FIXME: this function should correctly analyse optional arguments.
     for key in defkeys:
-
-        defdict[key] = arguments[key]
+        defdict[key] = arguments.get(key)
 
     # create or-string from arguments
     str_args = ''
