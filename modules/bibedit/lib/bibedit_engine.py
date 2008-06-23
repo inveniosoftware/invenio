@@ -26,10 +26,11 @@ import os
 import sre
 import time
 
-from invenio.bibedit_config import *
+from invenio.bibedit_config import CFG_BIBEDIT_TMPFILENAMEPREFIX
 from invenio.bibedit_dblayer import marc_to_split_tag
 from invenio.bibformat_engine import BibFormatObject
-from invenio.bibrecord import *
+from invenio.bibrecord import record_xml_output, create_record, create_records, \
+field_add_subfield, record_add_field, record_has_field, record_get_field_value
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_BIBEDIT_TIMEOUT, CFG_BIBEDIT_LOCKLEVEL
 from invenio.dbquery import run_sql
