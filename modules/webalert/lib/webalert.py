@@ -223,7 +223,7 @@ def perform_list_alerts (uid, ln=CFG_SITE_LANG):
                        a.alert_name, a.frequency,a.notification,
                        DATE_FORMAT(a.date_creation,'%%Y-%%m-%%d %%H:%%i:%%s'),
                        DATE_FORMAT(a.date_lastrun,'%%Y-%%m-%%d %%H:%%i:%%s')
-                FROM user_query_basket a LEFT JOIN query q ON a.id_query=q.id
+                FROM user_query_basket a JOIN query q ON a.id_query=q.id
                                          LEFT JOIN bskBASKET b ON a.id_basket=b.id
                 WHERE a.id_user='%s'
                 ORDER BY a.alert_name ASC """ % uid
