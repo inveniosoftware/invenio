@@ -27,7 +27,7 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized
 from invenio.bibedit_engine import perform_request_index, perform_request_edit, perform_request_submit
-from invenio.search_engine import record_exists
+from invenio.search_engine import record_exists, guess_primary_collection_of_a_record
 from invenio.access_control_engine import acc_authorize_action
 from invenio.messages import gettext_set_language, wash_language
 from invenio.urlutils import wash_url_argument, redirect_to_url
@@ -48,12 +48,18 @@ def index(req, ln=CFG_SITE_LANG, recid=None, temp="false", format_tag='marc',
     delete         = wash_url_argument(delete,         "int")
     confirm_delete = wash_url_argument(confirm_delete, "int")
 
-    (auth_code, auth_message) = acc_authorize_action(req,'runbibedit')
-    if auth_code == 0:
+    if recid == 0:
         (body, errors, warnings) = perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, format_tag,
                                                          edit_tag, delete_tag, num_field, add, args)
     else:
-        return page_not_authorized(req=req, text=auth_message, navtrail=navtrail)
+        (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit', collection=guess_primary_collection_of_a_record(recid))
+        if auth_code != 0:
+            (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit')
+        if auth_code == 0:
+            (body, errors, warnings) = perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, format_tag,
+                                                         edit_tag, delete_tag, num_field, add, args)
+        else:
+            return page_not_authorized(req=req, text=auth_message, navtrail=navtrail)
 
     if recid != 0:
         title = _("Record") + " #" + str(recid)
@@ -85,8 +91,10 @@ def edit(req, recid=None, tag=None, num_field='0', num_subfield=0, format_tag='m
     add       = wash_url_argument(add,       "int")
     num_subfield = wash_url_argument(num_subfield, "int")
 
-    (auth_code, auth_message) = acc_authorize_action(req,'runbibedit')
-    if (auth_code == 0):
+    (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit', collection=guess_primary_collection_of_a_record(recid))
+    if auth_code != 0:
+        (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit')
+    if auth_code == 0:
         if (recid and tag and (record_exists(recid)>0)):
             (body, errors, warnings) = perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
                                                             format_tag, temp, act_subfield, add, args)
@@ -94,6 +102,7 @@ def edit(req, recid=None, tag=None, num_field='0', num_subfield=0, format_tag='m
             redirect_to_url(req, 'index?ln=' + ln)
     else:
         return page_not_authorized(req=req, text=auth_message, navtrail=navtrail)
+
     title = _("Edit record %(x_recid)s, field %(x_field)s") % {'x_recid': '#' + str(recid),
                                                                'x_field':  '#' + str(tag[:3])}
     if add == 1:
@@ -117,7 +126,9 @@ def submit(req, recid='', ln=CFG_SITE_LANG):
     uid = getUid(req)
 
     recid = wash_url_argument(recid, "int")
-    (auth_code, auth_message) = acc_authorize_action(req,'runbibedit')
+    (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit', collection=guess_primary_collection_of_a_record(recid))
+    if auth_code != 0:
+        (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit')
     if auth_code == 0:
         if (recid and (record_exists(recid)>0)):
             (body, errors, warnings) = perform_request_submit(ln, recid)
