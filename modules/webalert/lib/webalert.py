@@ -234,9 +234,10 @@ def perform_list_alerts(uid, ln=CFG_SITE_LANG):
         try:
             if not qry_id:
                 raise StandardError("""\
-I have detected a bad alert for user id %d,
-because it seems the alert query was deleted from the 'query' table.
-Please check this and delete an alert if needed.
+Warning: I have detected a bad alert for user id %d.
+It seems one of his/her alert queries was deleted from the 'query' table.
+Please check this and delete it if needed.
+Otherwise no problem, I'm continuing with the other alerts now.
 Here are all the alerts defined by this user: %s""" % (uid, repr(res)))
             alerts.append({
                  'queryid' : qry_id,
