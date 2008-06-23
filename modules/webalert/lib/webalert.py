@@ -27,6 +27,7 @@ import time
 from invenio.config import CFG_SITE_LANG
 from invenio.dbquery import run_sql
 from invenio.webuser import isGuestUser
+from invenio.errorlib import register_exception
 from invenio.webaccount import warning_guest_user
 from invenio.webbasket import create_personal_baskets_selection_box
 from invenio.webbasket_dblayer import check_user_owns_baskets
@@ -64,7 +65,6 @@ def get_textual_query_info_from_urlargs(urlargs, ln=CFG_SITE_LANG):
              args = args,
            )
     return out
-
 
 def perform_display(permanent, uid, ln=CFG_SITE_LANG):
     """display the searches performed by the current user
@@ -211,8 +211,7 @@ def perform_add_alert(alert_name, frequency, notification,
     out += perform_list_alerts(uid, ln=ln)
     return out
 
-
-def perform_list_alerts (uid, ln=CFG_SITE_LANG):
+def perform_list_alerts(uid, ln=CFG_SITE_LANG):
     """perform_list_alerts display the list of alerts for the connected user"""
     # set variables
     out = ""
@@ -223,7 +222,7 @@ def perform_list_alerts (uid, ln=CFG_SITE_LANG):
                        a.alert_name, a.frequency,a.notification,
                        DATE_FORMAT(a.date_creation,'%%Y-%%m-%%d %%H:%%i:%%s'),
                        DATE_FORMAT(a.date_lastrun,'%%Y-%%m-%%d %%H:%%i:%%s')
-                FROM user_query_basket a JOIN query q ON a.id_query=q.id
+                FROM user_query_basket a LEFT JOIN query q ON a.id_query=q.id
                                          LEFT JOIN bskBASKET b ON a.id_basket=b.id
                 WHERE a.id_user='%s'
                 ORDER BY a.alert_name ASC """ % uid
@@ -232,19 +231,28 @@ def perform_list_alerts (uid, ln=CFG_SITE_LANG):
     for (qry_id, qry_args,
          bsk_id, bsk_name,
          alrt_name, alrt_frequency, alrt_notification, alrt_creation, alrt_last_run) in res:
-        alerts.append({
-            'queryid' : qry_id,
-            'queryargs' : qry_args,
-            'textargs' : get_textual_query_info_from_urlargs(qry_args, ln=ln),
-            'userid' : uid,
-            'basketid' : bsk_id,
-            'basketname' : bsk_name,
-            'alertname' : alrt_name,
-            'frequency' : alrt_frequency,
-            'notification' : alrt_notification,
-            'created' : convert_datetext_to_dategui(alrt_creation),
-            'lastrun' : convert_datetext_to_dategui(alrt_last_run)
-            })
+        try:
+            if not qry_id:
+                raise StandardError("""\
+I have detected a bad alert for user id %d,
+because it seems the alert query was deleted from the 'query' table.
+Please check this and delete an alert if needed.
+Here are all the alerts defined by this user: %s""" % (uid, repr(res)))
+            alerts.append({
+                 'queryid' : qry_id,
+                 'queryargs' : qry_args,
+                 'textargs' : get_textual_query_info_from_urlargs(qry_args, ln=ln),
+                 'userid' : uid,
+                 'basketid' : bsk_id,
+                 'basketname' : bsk_name,
+                 'alertname' : alrt_name,
+                 'frequency' : alrt_frequency,
+                 'notification' : alrt_notification,
+                 'created' : convert_datetext_to_dategui(alrt_creation),
+                 'lastrun' : convert_datetext_to_dategui(alrt_last_run)
+                 })
+        except StandardError:
+            register_exception(alert_admin=True)
 
     # link to the "add new alert" form
     out = webalert_templates.tmpl_list_alerts(ln=ln, alerts=alerts,
