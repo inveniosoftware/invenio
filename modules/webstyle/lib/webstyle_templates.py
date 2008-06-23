@@ -192,7 +192,7 @@ class Template:
   </div>
   <div class="pagebodystripemiddle">
     %(titleprologue)s
-    <h1 class="headline">%(title)s</h1>
+    %(title)s
     %(titleepilogue)s
     %(body)s
   </div>
@@ -211,7 +211,7 @@ class Template:
   'boxrightbottomadd' : boxrightbottomadd,
 
   'titleprologue' : titleprologue,
-  'title' : cgi.escape(title),
+  'title' : title and '<h1 class="headline">' + cgi.escape(title) + '</h1>' or '',
   'titleepilogue' : titleepilogue,
 
   'body' : body,
