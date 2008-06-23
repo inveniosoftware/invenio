@@ -22,6 +22,7 @@ __revision__ = "$Id$"
 from invenio.bibedit_dblayer import *
 from invenio.config import CFG_SITE_URL
 from invenio.messages import gettext_set_language
+import sre
 
 ## Link of edit, move up and delete button:
 btn_delete_url = CFG_SITE_URL + "/img/iconcross.gif"
@@ -29,6 +30,9 @@ btn_moveup_url = CFG_SITE_URL + "/img/arrow_up.gif"
 btn_movedown_url = CFG_SITE_URL + "/img/arrow_down.gif"
 btn_edit_url   = CFG_SITE_URL + "/img/iconpen.gif"
 bibediturl = "%s/admin/bibedit/bibeditadmin.py" % CFG_SITE_URL
+btn_view_url = "%s/img/file-icon-text-15x20.gif" % CFG_SITE_URL
+btn_comp_url = "%s/img/edit1.gif" % CFG_SITE_URL
+btn_restore_url = "%s/img/left.gif" % CFG_SITE_URL
 
 class Template:
 
@@ -486,7 +490,23 @@ class Template:
                              </b>
                           </span><br/><br/>
                       """ % {'message1' : _("Cannot edit deleted record.")}
+        elif message == 4:
+            result = """ <span class="errorbox">
+                             <b>
+                               %(message1)s %(message2)s
+                             </b>
+                          </span><br/><br/>
+                      """ % {'message1' : _("There are record revisions not yet synchronized with the database."),
+                             'message2' : _("Please try again in a few minutes.")}
 
+        elif message == 5:
+            result = """ <span class="errorbox">
+                             <b>
+                               %(message1)s %(message2)s
+                             </b>
+                          </span><br/><br/>
+                      """ % {'message1' : _("A new revision of this record is not yet synchronized with the database."),
+                             'message2' : _("Please try again in a few minutes.")}
         else:
             result = ''
 

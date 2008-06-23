@@ -19,16 +19,22 @@
 
 __revision__ = "$Id$"
 
-import os
-import time
+import commands
 import cPickle
-from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_BIBEDIT_TIMEOUT
-from invenio.bibedit_dblayer import marc_to_split_tag
+import marshal
+import os
+import sre
+import time
+
 from invenio.bibedit_config import *
-from invenio.search_engine import print_record, record_exists
-from invenio.bibrecord import record_xml_output, create_record, field_add_subfield, record_add_field
-import invenio.template
+from invenio.bibedit_dblayer import marc_to_split_tag
+from invenio.bibformat_engine import BibFormatObject
+from invenio.bibrecord import *
 from invenio.bibtask import task_low_level_submission
+from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_BIBEDIT_TIMEOUT, CFG_BIBEDIT_LOCKLEVEL
+from invenio.dbquery import run_sql
+from invenio.search_engine import print_record, record_exists
+import invenio.template
 
 bibedit_templates = invenio.template.load('bibedit')
 
@@ -58,7 +64,7 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
             if record_exists(recid) > 0:
                 (record, body) = get_record(ln, recid, uid, temp)
 
-                if record != '':
+                if record != '' and not record_locked_b(recid):
                     if add == 3:
                         body = ''
 
@@ -99,8 +105,14 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
 
                     body += bibedit_templates.tmpl_table_footer(ln, "record", add)
 
-                else:
+                elif record == '':
                     body = bibedit_templates.tmpl_record_choice_box(ln, 2)
+
+                elif CFG_BIBEDIT_LOCKLEVEL == 2:
+                    body = bibedit_templates.tmpl_record_choice_box(ln, 4)
+
+                else:
+                    body = bibedit_templates.tmpl_record_choice_box(ln, 5)
 
             else:
                 if record_exists(recid) == -1:
@@ -212,31 +224,32 @@ def get_temp_record(file_path):
 
 def get_record(ln, recid, uid, temp):
     """Returns a record dict, and warning message in case of error. """
+    #FIXME: User doesn't get submit button if reloading BibEdit-page
 
+    warning_temp_file = ''
     file_path = get_file_path(recid)
 
     if temp != "false":
         warning_temp_file = bibedit_templates.tmpl_warning_temp_file(ln)
-    else:
-        warning_temp_file = ''
 
     if os.path.isfile("%s.tmp" % file_path):
 
         (uid_record_temp, record) = get_temp_record("%s.tmp" % file_path)
-
         if uid_record_temp != uid:
 
             time_tmp_file = os.path.getmtime("%s.tmp" % file_path)
             time_out_file = int(time.time()) - CFG_BIBEDIT_TIMEOUT
 
             if time_tmp_file < time_out_file :
-
                 os.system("rm %s.tmp" % file_path)
                 record = create_record(print_record(recid, 'xm'))[0]
                 save_temp_record(record, uid, "%s.tmp" % file_path)
 
             else:
                 record = ''
+
+        else:
+            warning_temp_file = bibedit_templates.tmpl_warning_temp_file(ln)
 
     else:
         record = create_record(print_record(recid, 'xm'))[0]
@@ -409,3 +422,65 @@ def move_subfield(direction, recid, uid, record, tag, num_field, num_subfield):
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     return record
 
+def record_locked_b(recid):
+    """Checks if record should be locked for editing, method based on CFG_BIBEDIT_LOCKLEVEL. """
+
+    # Check only for tmp-file (done in get_record).
+    if CFG_BIBEDIT_LOCKLEVEL == 0:
+        return 0
+
+    cmd = """ %s/bibsched status -t bibupload | grep -v 'USER="bibreformat"' """ % CFG_BINDIR
+    bibsched_status = commands.getoutput(cmd)
+
+    # Check for any scheduled bibupload tasks.
+    if CFG_BIBEDIT_LOCKLEVEL == 2:
+        return bibsched_status.find('PROC="bibupload"') + 1
+
+    # Collect path to all files scheduled for upload.
+    find_tasks = sre.compile('ID="(\d+)"')
+    find_file_option = sre.compile(r'^/')
+    tasks = find_tasks.findall(bibsched_status)
+    filenames = []
+    for task in tasks:
+        res = run_sql("SELECT arguments FROM schTASK WHERE id=%s" % task)
+        if res:
+            record_options = marshal.loads(res[0][0])
+            for option in record_options[1:]:
+                if find_file_option.search(option):
+                    filenames.append(option)
+
+    # Check for match between name of XML-file and record.
+    # Assumes that filename ends with _<recid>.xml.
+    if CFG_BIBEDIT_LOCKLEVEL == 1:
+        recids = []
+        find_filename_suffix = sre.compile('_(\d+)\.xml$')
+        for filename in filenames:
+            filename_suffix = find_filename_suffix.search(filename)
+            if filename_suffix:
+                recids.append(int(filename_suffix.group(1)))
+        return recid in recids
+
+    # Check for match between content of files and record.
+    if CFG_BIBEDIT_LOCKLEVEL == 3:
+        recs_field_001 = []
+        recs_field_035__a = []
+        recs_field_970__a = []
+        for filename in filenames:
+            try:
+                file_ = open(filename)
+                records = create_records(file_.read(), 0, 0)
+                for i in range(0, len(records)):
+                    (record, er, junk) = records[i]
+                    if record != None and er != 0:
+                        if record_has_field(record, '001'):
+                            recs_field_001.append(record_get_field_value(record, '001', '%', '%'))
+                        if record_has_field(record, '035'):
+                            recs_field_035__a.append(record_get_field_value(record, '035', '%', '%', 'a'))
+                        if record_has_field(record, '970'):
+                            recs_field_970__a.append(record_get_field_value(record, '970', '%', '%', 'a'))
+                file_.close()
+            except IOError:
+                continue
+            bfo = BibFormatObject(recid)
+        return (bfo.control_field('001') in recs_field_001 or bfo.field('035__a')
+            in recs_field_035__a or bfo.field('970__a') in recs_field_970__a)
