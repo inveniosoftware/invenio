@@ -1137,18 +1137,21 @@ def update_rnkWORD(table, terms):
         #Adding the Gi value to each term, and adding the normalization value to each term in each document.
         terms_docs = get_from_forward_index(terms, i, (i+5000), table)
         for (t, hitlist) in terms_docs:
-            term_docs = deserialize_via_marshal(hitlist)
-            if term_docs.has_key("Gi"):
-                del term_docs["Gi"]
-            for (j, tf) in term_docs.iteritems():
-                if Nj.has_key(j):
-                    term_docs[j] = (tf[0], Nj[j])
-            Git = int(math.floor(Gi[t]*100))
-            if Git >= 0:
-                Git += 1
-            term_docs["Gi"] = (0, Git)
-            run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % table,
-                    (serialize_via_marshal(term_docs), t))
+            try:
+                term_docs = deserialize_via_marshal(hitlist)
+                if term_docs.has_key("Gi"):
+                    del term_docs["Gi"]
+                for (j, tf) in term_docs.iteritems():
+                    if Nj.has_key(j):
+                        term_docs[j] = (tf[0], Nj[j])
+                Git = int(math.floor(Gi[t]*100))
+                if Git >= 0:
+                    Git += 1
+                term_docs["Gi"] = (0, Git)
+                run_sql("UPDATE %s SET hitlist=%%s WHERE term=%%s" % table,
+                        (serialize_via_marshal(term_docs), t))
+            except (ZeroDivisionError, OverflowError), e:
+                register_exception(prefix="Error when analysing the term %s (%s): %s\n" % (t, repr(terms_docs), e), alert_admin=True)
         write_message("Phase 5: ......processed %s/%s terms" % ((i+5000>len(terms) and len(terms) or (i+5000)), len(terms)))
         i += 5000
     write_message("Phase 5:  Finished updating %s with new normalization values" % table)
