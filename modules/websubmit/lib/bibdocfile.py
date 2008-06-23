@@ -187,7 +187,7 @@ class BibRecDocs:
             if not bibdocfile_url_p(url):
                 out += '\t<datafield tag="856" ind1="4" ind2=" ">\n'
                 for subfield, value in field_get_subfield_instances(field):
-                    out += '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, value)
+                    out += '\t\t<subfield code="%s">%s</subfield>\n' % (subfield, encode_for_xml(value))
                 out += '\t</datafield>\n'
 
         for afile in self.list_latest_files():
@@ -196,11 +196,11 @@ class BibRecDocs:
             description = afile.get_description()
             comment = afile.get_comment()
             if url:
-                out += '\t\t<subfield code="u">%s</subfield>\n' % url
+                out += '\t\t<subfield code="u">%s</subfield>\n' % encode_for_xml(url)
             if description:
-                out += '\t\t<subfield code="y">%s</subfield>\n' % description
+                out += '\t\t<subfield code="y">%s</subfield>\n' % encode_for_xml(description)
             if comment:
-                out += '\t\t<subfield code="z">%s</subfield>\n' % comment
+                out += '\t\t<subfield code="z">%s</subfield>\n' % encode_for_xml(comment)
             out += '\t</datafield>\n'
 
         for bibdoc in self.bibdocs:
@@ -209,7 +209,7 @@ class BibRecDocs:
                 icon = icon.list_all_files()
                 if icon:
                     out += '\t<datafield tag="856" ind1="4" ind2=" ">\n'
-                    out += '\t\t<subfield code="q">%s</subfield>\n' % icon[0].get_url()
+                    out += '\t\t<subfield code="q">%s</subfield>\n' % encode_for_xml(icon[0].get_url())
                     out += '\t\t<subfield code="x">icon</subfield>\n'
                     out += '\t</datafield>\n'
 
@@ -954,7 +954,7 @@ class BibDoc:
         if existing_icon is not None:
             existing_icon = existing_icon.list_all_files()[0]
             imageurl = "%s/record/%s/files/%s" % \
-                (CFG_SITE_URL, self.recid, existing_icon.get_full_name())
+                (CFG_SITE_URL, self.recid, urllib.quote(existing_icon.get_full_name()))
         else:
             imageurl = "%s/img/smallfiles.gif" % CFG_SITE_URL
 
@@ -1320,7 +1320,7 @@ class BibDocFile:
         self.name = name
         self.format = normalize_format(format)
         self.dir = os.path.dirname(fullpath)
-        self.url = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, self.name, self.format)
+        self.url = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, urllib.quote(self.name), urllib.quote(self.format))
         if format == "":
             self.mime = "text/plain"
             self.encoding = ""
@@ -1661,7 +1661,7 @@ def decompose_bibdocfile_url(url):
     else:
         raise InvenioWebSubmitFileError, "Url %s doesn't correspond to a valid record inside the system." % url
     recid_file = recid_file.replace('/files/', '/')
-    recid, docname, format = decompose_file(recid_file)
+    recid, docname, format = decompose_file(urllib.unquote(recid_file))
     return (int(recid), docname, format)
 
 def nice_size(size):
@@ -1680,13 +1680,13 @@ def nice_size(size):
 
 def get_docname_from_url(url):
     """Return a potential docname given a url"""
-    path = urllib2.urlparse.urlsplit(url)[2]
+    path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
     filename = os.path.split(path)[-1]
     return file_strip_ext(filename)
 
 def get_format_from_url(url):
     """Return a potential format given a url"""
-    path = urllib2.urlparse.urlsplit(url)[2]
+    path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
     filename = os.path.split(path)[-1]
     return filename[len(file_strip_ext(filename)):]
 
@@ -1694,7 +1694,7 @@ def clean_url(url):
     """Given a local url e.g. a local path it render it a realpath."""
     protocol = urllib2.urlparse.urlsplit(url)[0]
     if protocol in ('', 'file'):
-        path = urllib2.urlparse.urlsplit(url)[2]
+        path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
         return os.path.realpath(path)
     else:
         return url
@@ -1704,7 +1704,7 @@ def check_valid_url(url):
     try:
         protocol = urllib2.urlparse.urlsplit(url)[0]
         if protocol in ('', 'file'):
-            path = urllib2.urlparse.urlsplit(url)[2]
+            path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
             if os.path.realpath(path) != path:
                 raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
             for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR]:
@@ -1725,7 +1725,7 @@ def download_url(url, format):
     tmpfd, tmppath = tempfile.mkstemp(suffix=format, dir=CFG_TMPDIR)
     try:
         if protocol in ('', 'file'):
-            path = urllib2.urlparse.urlsplit(url)[2]
+            path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
             if os.path.realpath(path) != path:
                 raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
             for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR]:

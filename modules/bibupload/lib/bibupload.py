@@ -59,6 +59,7 @@ import sys
 import time
 from zlib import compress
 import urllib2
+import urllib
 import socket
 
 from invenio.config import CFG_OAI_ID_FIELD, CFG_SITE_URL, \

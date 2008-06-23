@@ -1242,7 +1242,7 @@ class Template:
 
         return """<tr>
                     <td valign="top">
-                      <small><a href="%(siteurl)s/record/%(recid)s/files/%(docname)s%(format)s?version=%(version)s">
+                      <small><a href="%(siteurl)s/record/%(recid)s/files/%(quoted_name)s%(quoted_format)s?version=%(version)s">
                         %(name)s%(format)s
                       </a></small>
                     </td>
@@ -1251,9 +1251,11 @@ class Template:
                     </td></tr>""" % {
                       'siteurl' : CFG_SITE_URL,
                       'recid' : recid,
-                      'docname' : name,
+                      'quoted_name' : urllib.quote(name),
+                      'name' : name,
                       'version' : version,
                       'name' : name,
+                      'quoted_format' : urllib.quote(format),
                       'format' : format,
                       'size' : size
                     }

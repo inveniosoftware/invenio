@@ -32,7 +32,7 @@ except ImportError:
     pass
 
 import sys
-from urllib import quote
+from urllib import quote, unquote
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
@@ -78,7 +78,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
     def _lookup(self, component, path):
         # after /record/<recid>/files/ every part is used as the file
         # name
-        filename = component
+        filename = unquote(component)
 
         def getfile(req, form):
             args = wash_urlargd(form, websubmit_templates.files_default_urlargd)

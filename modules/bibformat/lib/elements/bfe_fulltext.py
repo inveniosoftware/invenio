@@ -28,6 +28,7 @@ from invenio.config import CFG_SITE_URL, CFG_CERN_SITE
 from cgi import escape
 from urlparse import urlparse
 from os.path import basename
+import urllib
 
 def format(bfo, style, separator='; ', show_icons='no'):
     """
@@ -179,7 +180,7 @@ def get_files(bfo):
         if complete_url.has_key('u'):
             url = complete_url['u']
             (dummy, host, path, dummy, dummy, dummy) = urlparse(url)
-            filename = basename(path)
+            filename = urllib.unquote(basename(path))
             name = file_strip_ext(filename)
             format = filename[len(name):]
             if format.startswith('.'):
