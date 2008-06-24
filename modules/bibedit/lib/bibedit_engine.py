@@ -19,7 +19,6 @@
 
 __revision__ = "$Id$"
 
-import commands
 import cPickle
 import marshal
 import os
@@ -34,6 +33,7 @@ from invenio.bibrecord import record_xml_output, create_record, create_records, 
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_BIBEDIT_TIMEOUT, CFG_BIBEDIT_LOCKLEVEL
 from invenio.dbquery import run_sql
+from invenio.shellutils import run_shell_command
 from invenio.search_engine import print_record, record_exists
 import invenio.template
 
@@ -110,9 +110,11 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
                     body = bibedit_templates.tmpl_record_choice_box(ln, 2)
 
                 elif CFG_BIBEDIT_LOCKLEVEL == 2:
+                    os.system("rm %s.tmp" % get_file_path(recid))
                     body = bibedit_templates.tmpl_record_choice_box(ln, 4)
 
                 else:
+                    os.system("rm %s.tmp" % get_file_path(recid))
                     body = bibedit_templates.tmpl_record_choice_box(ln, 5)
 
             else:
@@ -430,8 +432,8 @@ def record_locked_b(recid):
     if CFG_BIBEDIT_LOCKLEVEL == 0:
         return 0
 
-    cmd = """ %s/bibsched status -t bibupload | grep -v 'USER="bibreformat"' """ % CFG_BINDIR
-    bibsched_status = commands.getoutput(cmd)
+    cmd = """%s/bibsched status -t bibupload | grep -v 'USER="bibreformat"'""" % CFG_BINDIR
+    (junk, bibsched_status, junk) = run_shell_command(cmd)
 
     # Check for any scheduled bibupload tasks.
     if CFG_BIBEDIT_LOCKLEVEL == 2:
