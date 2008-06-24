@@ -630,6 +630,8 @@ class Template:
                    'category=%(category)s&amp;group=%(group)i&amp;'\
                    'topic=%(topic)i&amp;ln=%(ln)s">%(view_comments_label)s</a>'
             out += '</span>'
+        else:
+            out += '<a class="moreinfo" href="%(siteurl)s/record/%(recid)s">%(detailed_record_label)s</a>'
         out += """
   </td>
 </tr>"""
