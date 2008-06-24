@@ -707,7 +707,7 @@ INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) 
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,72,'hu','rt',100);
 INSERT INTO collection_portalbox (id_collection,id_portalbox,ln,position,score) VALUES (1,73,'hu','rt',90);
 
-INSERT INTO example VALUES (1,'author search','author:\'Ellis, J\'');
+INSERT INTO example VALUES (1,'author search','author:"Ellis, J"');
 INSERT INTO example VALUES (2,'word search','quantum');
 INSERT INTO example VALUES (3,'wildcard word search','quant*');
 INSERT INTO example VALUES (4,'phrase search','title:\'standard model\'');
@@ -715,13 +715,13 @@ INSERT INTO example VALUES (5,'boolean search','quark -sigma +dense');
 INSERT INTO example VALUES (6,'complex boolean search','author:draper title:electrical');
 INSERT INTO example VALUES (7,'complex boolean search','author:ellis -muon* +abstract:\'dense quark matter\'');
 INSERT INTO example VALUES (8,'boolean search','ellis muon*');
-INSERT INTO example VALUES (13,'reference search','references:\'Theor. Math. Phys. 2 (1998) 231\'');
+INSERT INTO example VALUES (13,'reference search','references:"Theor. Math. Phys. 2 (1998) 231"');
 INSERT INTO example VALUES (14,'phrase search','abstract:\'Higgs boson\'');
 INSERT INTO example VALUES (15,'wildcard word search','cal*');
 INSERT INTO example VALUES (16,'keyword search','keyword:Nobel');
 INSERT INTO example VALUES (17,'author search','author:Cole');
 INSERT INTO example VALUES (18,'phrase search','title:\'nuclear electronics\'');
-INSERT INTO example VALUES (19,'combined search','supergravity and author:\'Ellis, J\' and year:1980->1990');
+INSERT INTO example VALUES (19,'combined search','supergravity and author:"Ellis, J" and year:1980->1990');
 
 INSERT INTO fieldvalue VALUES (1,'Particle Physics','Particle Physics');
 INSERT INTO fieldvalue VALUES (2,'Particle Physics - Experimental Results','Particle Physics - Experimental Results');
