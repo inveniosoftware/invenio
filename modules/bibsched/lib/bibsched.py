@@ -66,7 +66,7 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
             factor = factors[m.groups()[2]]
             value = float(m.groups()[1])
             date = time.localtime(date + sign * factor * value)
-            #date = time.strftime(format_string, date)
+            date = time.strftime(format_string, date)
         else:
             date = time.strptime(var, format_string)
             date = time.strftime(format_string, date)
@@ -186,8 +186,8 @@ class Manager:
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.running = 1
         #self.footer_move_mode = "[KeyUp/KeyDown Move] [M Select mode] [Q Quit]"
-        self.footer_auto_mode = "Automatic Mode [A Go to Manual mode] [1/2/3 Display] [P Purge Done] [Q Quit] [lL Log] [O Options]"
-        self.footer_select_mode = "Manual Mode [A Go to Automatic mode] [1/2/3 Display Type] [P Purge Done] [Q Quit] [lL Log] [O Options]"
+        self.footer_auto_mode = "Automatic Mode [A Manual] [1/2/3 Display] [P Purge] [l/L Log] [O Opts] [Q Quit]"
+        self.footer_select_mode = "Manual Mode [A Automatic] [1/2/3 Display Type] [P Purge] [l/L Log] [O Opts] [Q Quit]"
         self.footer_waiting_item = "[R Run] [D Delete] [N Priority]"
         self.footer_running_item = "[S Sleep] [T Stop] [K Kill]"
         self.footer_stopped_item = "[I Initialise] [D Delete] [K Acknowledge]"
@@ -201,6 +201,7 @@ class Manager:
         #self.move_mode = 0
         self.auto_mode = 0
         self.currentrow = None
+        self.current_attr = 0
         wrapper(self.start)
 
     def handle_keys(self, chr):
@@ -261,7 +262,7 @@ class Manager:
             elif chr in (ord("s"), ord("S")):
                 self.sleep()
             elif chr in (ord("k"), ord("K")):
-                if status == 'ERROR':
+                if status in ('ERROR', 'DONE WITH ERRORS'):
                     self.acknowledge()
                 elif status is not None:
                     self.kill()
@@ -351,12 +352,12 @@ class Manager:
                 )
         except self.curses.error:
             return
-        self.panel = self.curses.panel.new_panel( self.win )
+        self.panel = self.curses.panel.new_panel(self.win)
         self.panel.top()
         self.win.border()
         i = 1
         for row in rows:
-            self.win.addstr(i, 2, row)
+            self.win.addstr(i, 2, row, self.current_attr)
             i += 1
         self.win.refresh()
         self.win.getch()
@@ -411,7 +412,7 @@ class Manager:
         self.win.border()
         i = 1
         for row in rows:
-            self.win.addstr(i, 2, row)
+            self.win.addstr(i, 2, row, self.current_attr)
             i += 1
         self.win.refresh()
         while 1:
@@ -440,7 +441,7 @@ class Manager:
         self.win.border()
         i = 1
         for row in rows:
-            self.win.addstr(i, 2, row)
+            self.win.addstr(i, 2, row, self.current_attr)
             i += 1
         self.win.refresh()
         self.win.move(height - 2, 2)
@@ -482,7 +483,7 @@ class Manager:
 
     def acknowledge(self):
         task_id = self.currentrow[0]
-        status = self.currentrow[1]
+        status = self.currentrow[5]
         if status in ('ERROR', 'DONE WITH ERRORS'):
             bibsched_set_status(task_id, 'ACK ' + status)
             self.display_in_footer("Acknowledged error")
@@ -578,15 +579,15 @@ class Manager:
         col_w = [7 , 15, 10, 21, 7, 11, 25]
         maxx = self.width
         if self.y == self.selected_line - self.first_visible_line and self.y > 1:
-            if self.auto_mode:
-                attr = self.curses.color_pair(2) + self.curses.A_STANDOUT + self.curses.A_BOLD
-            #elif self.move_mode:
-                #attr = self.curses.color_pair(7) + self.curses.A_STANDOUT + self.curses.A_BOLD
-            else:
-                attr = self.curses.color_pair(8) + self.curses.A_STANDOUT + self.curses.A_BOLD
+            #if self.auto_mode:
+                #attr = self.curses.color_pair(2) + self.curses.A_STANDOUT + self.curses.A_BOLD + self.current.A_REVERSE
+            ##elif self.move_mode:
+                ##attr = self.curses.color_pair(7) + self.curses.A_STANDOUT + self.curses.A_BOLD
+            #else:
+                #attr = self.curses.color_pair(8) + self.curses.A_STANDOUT + self.curses.A_BOLD + self.current.A_REVERSE
             self.item_status = row[5]
             self.currentrow = row
-        elif self.y == 0:
+        if self.y == 0:
             if self.auto_mode:
                 attr = self.curses.color_pair(2) + self.curses.A_STANDOUT + self.curses.A_BOLD
             #elif self.move_mode:
@@ -607,6 +608,9 @@ class Manager:
             attr = self.curses.A_BOLD
         else:
             attr = self.curses.A_NORMAL
+        if self.y == self.selected_line - self.first_visible_line and self.y > 1:
+            self.current_attr = attr
+            attr += self.curses.A_REVERSE
         if header: # Dirty hack. put_line should be better refactored.
             # row contains one less element: arguments
             myline = str(row[0]).ljust(col_w[0])
@@ -715,7 +719,7 @@ class Manager:
                 elif self.display == 2:
                     table = "schTASK"
                     where = "and status<>'DONE'"
-                    order = "priority DESC, runtime ASC"
+                    order = "runtime ASC"
                 else:
                     table = "hstTASK"
                     order = "runtime DESC"
