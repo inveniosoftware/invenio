@@ -533,6 +533,8 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         else:
             return out
 
+    index = __call__
+
 # Parameters for the legacy URLs, of the form /?c=ALEPH
 legacy_collection_default_urlargd = {
     'as': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
