@@ -115,6 +115,22 @@ a.moreinfo:hover {
    color: #060;
    background: transparent;
 }
+a.examplequery:link {
+   color: #00c;
+   background: transparent;
+}
+a.examplequery:visited {
+   color: #006;
+   background: transparent;
+}
+a.examplequery:active {
+   color: #00c;
+   background: transparent;
+}
+a.examplequery:hover {
+   color: #00c;
+   background: transparent;
+}
 a.img:hover {
    color: #00c;
    background: transparent;
@@ -836,6 +852,11 @@ a.nearesttermsselected:hover {
 .moreinfo {
    color: #060;
    font-size: small;
+   background: transparent;
+}
+.examplequery {
+   color: #060;
+   font-size: x-small;
    background: transparent;
 }
 .rankscoreinfo {
