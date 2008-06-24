@@ -623,10 +623,13 @@ class Template:
                 out += """
 %(nb_cmts)i %(cmts_label)s; %(last_cmt_label)s: %(last_cmt)s<br />
 """
-            out += '\n<a href="%(siteurl)s/yourbaskets/display_item?'\
+            out += '<span class="moreinfo">'
+            out += '<a class="moreinfo" href="%(siteurl)s/record/%(recid)s">%(detailed_record_label)s</a> - '
+            out += '\n<a class="moreinfo" href="%(siteurl)s/yourbaskets/display_item?'\
                    'bskid=%(bskid)s&amp;recid=%(recid)i&amp;'\
                    'category=%(category)s&amp;group=%(group)i&amp;'\
-                   'topic=%(topic)i&amp;ln=%(ln)s">%(detailed_label)s</a>'
+                   'topic=%(topic)i&amp;ln=%(ln)s">%(view_comments_label)s</a>'
+            out += '</span>'
         out += """
   </td>
 </tr>"""
@@ -639,7 +642,8 @@ class Template:
                      'recid': recid,
                      'cmts_label': _("comments"),
                      'last_cmt_label': _("last"),
-                     'detailed_label': _("Details and comments"),
+                     'view_comments_label': _("View comments"),
+                     'detailed_record_label': _("Detailed record"),
                      'category': selected_category,
                      'topic': selected_topic,
                      'group': selected_group,
