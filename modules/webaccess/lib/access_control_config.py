@@ -111,15 +111,20 @@ DEF_ROLES = ((SUPERADMINROLE, 'superuser with all rights', 'deny any'),
              (WEBACCESSADMINROLE, 'WebAccess administrator', 'deny any'))
 
 # Demo site roles
-DEF_DEMO_ROLES = (('photoadmin', 'Photo collection administrator', 'deny any'),
+DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
                   ('thesesviewer', 'Theses viewer', 'allow group "Theses viewers"\nallow apache_group "theses"'),
-                  ('bookadmin', 'Book collection administrator', 'deny any'),
-                  ('restrictedpicturesviewer', 'Restricted pictures viewer', 'deny any'))
+                  ('thesescurator', 'Theses collection curator', 'deny any'),
+                  ('bookcurator', 'Book collection curator', 'deny any'),
+                  ('restrictedpicturesviewer', 'Restricted pictures viewer', 'deny any'),
+                  ('curator', 'Curator', 'deny any'))
 
 DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
-                       ('dorian.gray@cds.cern.ch', 'bookadmin'),
+                       ('jekyll@cds.cern.ch', 'bookcurator'),
+                       ('dorian.gray@cds.cern.ch', 'curator'),
                        ('romeo.montague@cds.cern.ch', 'restrictedpicturesviewer'),
-                       ('juliet.capulet@cds.cern.ch', 'restrictedpicturesviewer'))
+                       ('romeo.montague@cds.cern.ch', 'thesescurator'),
+                       ('juliet.capulet@cds.cern.ch', 'restrictedpicturesviewer'),
+                       ('juliet.capulet@cds.cern.ch', 'photocurator'))
 
 # users
 # list of e-mail addresses
@@ -145,7 +150,7 @@ DEF_ACTIONS = (
                ('runbibrank', 'run BibRank', '', 'no'),
                ('runoaiharvest', 'run oaiharvest task', '', 'no'),
                ('runoaiarchive', 'run oaiarchive task', '', 'no'),
-               ('runbibedit', 'run BibEdit', '', 'no'),
+               ('runbibedit', 'run BibEdit', 'collection', 'yes'),
                ('runwebstatadmin', 'run WebStadAdmin', '', 'no'),
                ('runinveniogc', 'run InvenioGC', '', 'no'),
                ('referee', 'referee document type doctype/category categ', 'doctype,categ',    'yes'),
@@ -158,16 +163,20 @@ DEF_ACTIONS = (
               )
 
 # Default authorizations
-#              role          action       arglistid  optional arguments
+#              role          action       arglistid  optional  arguments
 DEF_AUTHS = ()
 
 # Demo site authorizations
-#              role          action       arglistid  optional arguments
+#              role          action       arglistid  optional  arguments
 DEF_DEMO_AUTHS = (
-             ('photoadmin', 'runwebcoll', -1, 0, {'collection': 'Pictures'}),
+             ('photocurator', 'runwebcoll', -1, 0, {'collection': 'Pictures'}),
              ('restrictedpicturesviewer', 'viewrestrdoc', -1, 0, {'status': 'restricted_picture'}),
              ('thesesviewer', VIEWRESTRCOLL, -1, 0, {'collection': 'Theses'}),
-             ('bookadmin', 'referee', -1, 0, {'doctype': 'DEMOBOO', 'categ': '*'}),
+             ('bookcurator', 'referee', -1, 0, {'doctype': 'DEMOBOO', 'categ': '*'}),
+             ('curator', 'runbibedit', -1, 1, {}),
+             ('thesescurator', 'runbibedit', -1, 0, {'collection': 'Theses'}),
+             ('photocurator', 'runbibedit', -1, 0, {'collection': 'Pictures'}),
+             ('bookcurator', 'runbibedit', -1, 0, {'collection': 'Books'})
             )
 
 _ = gettext_set_language(CFG_SITE_LANG)
