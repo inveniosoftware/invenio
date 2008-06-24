@@ -52,7 +52,9 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
      CFG_WEBSEARCH_RSS_TTL, \
-     CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS
+     CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS, \
+     CFG_DEFAULT_SEARCH_INTERFACE, \
+     CFG_ENABLED_SEARCH_INTERFACES
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
@@ -533,7 +535,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
 
 # Parameters for the legacy URLs, of the form /?c=ALEPH
 legacy_collection_default_urlargd = {
-    'as': (int, 0),
+    'as': (int, CFG_DEFAULT_SEARCH_INTERFACE),
     'verbose': (int, 0),
     'c': (str, CFG_SITE_NAME)}
 
@@ -583,7 +585,6 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                     # collection argument not present; display
                     # home collection by default
                     argd['c'] = CFG_SITE_NAME
-
                 return display_collection(req, **argd)
 
             return answer, []
@@ -701,7 +702,6 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
 def display_collection(req, c, as, verbose, ln):
     """Display search interface page for collection c by looking
     in the collection cache."""
-
     _ = gettext_set_language(ln)
 
     req.argd = drop_default_urlargd({'as': as, 'verbose': verbose, 'ln': ln},
@@ -771,7 +771,7 @@ def display_collection(req, c, as, verbose, ln):
 
         title = get_coll_i18nname(c, ln)
         # if there is only one collection defined, do not print its
-        # title on the page as it would be displayed repetitively:
+        # title on the page as it would be displayed repetitively.
         if len(search_engine.collection_reclist_cache.keys()) == 1:
             title = ""
 
@@ -793,7 +793,8 @@ def display_collection(req, c, as, verbose, ln):
                     titleepilogue=c_portalbox_te,
                     lastupdated=c_last_updated,
                     navmenuid='search',
-                    rssurl=rssurl)
+                    rssurl=rssurl,
+                    show_title_p=-1 not in CFG_ENABLED_SEARCH_INTERFACES)
     except:
         if verbose >= 9:
             req.write("<br />c=%s" % c)

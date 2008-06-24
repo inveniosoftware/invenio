@@ -30,6 +30,8 @@ import locale
 from urllib import quote, urlencode
 
 from invenio.config import \
+     CFG_WEBSEARCH_SUPERSIMPLESEARCH_PATTERN_BOX_WIDTH, \
+     CFG_WEBSEARCH_SIMPLESEARCH_PATTERN_BOX_WIDTH, \
      CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH, \
      CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD, \
      CFG_WEBSEARCH_USE_ALEPH_SYSNOS, \
@@ -48,7 +50,9 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_SITE_URL, \
      CFG_SITE_SUPPORT_EMAIL, \
-     CFG_INSPIRE_SITE
+     CFG_INSPIRE_SITE, \
+     CFG_DEFAULT_SEARCH_INTERFACE, \
+     CFG_ENABLED_SEARCH_INTERFACES
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 #from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
@@ -119,7 +123,7 @@ class Template:
         'rm': (str, ""),
         'of': (str, "hb"),
         'ot': (list, []),
-        'as': (int, 0),
+        'as': (int, CFG_DEFAULT_SEARCH_INTERFACE),
         'p1': (str, ""), 'f1': (str, ""), 'm1': (str, ""), 'op1':(str, ""),
         'p2': (str, ""), 'f2': (str, ""), 'm2': (str, ""), 'op2':(str, ""),
         'p3': (str, ""), 'f3': (str, ""), 'm3': (str, ""),
@@ -142,7 +146,7 @@ class Template:
 
     # ...and for search interfaces
     search_interface_default_urlargd = {
-        'as': (int, 0),
+        'as': (int, CFG_DEFAULT_SEARCH_INTERFACE),
         'verbose': (int, 0)}
 
     # ...and for RSS feeds
@@ -492,7 +496,7 @@ class Template:
 
         Parameters:
 
-          - 'as' *bool* - Should we display an advanced search box?
+          - 'as' *int* - Should we display an advanced search box?
 
           - 'ln' *string* - The language to display
 
@@ -570,14 +574,166 @@ class Template:
 
         return out
 
+    def tmpl_searchfor_super_simple(self, ln, collection_id, collection_name, record_count,
+                                    example_search_queries): # EXPERIMENTAL
+        """Produces super simple *Search for* box for the current collection.
+
+        Parameters:
+
+          - 'ln' *string* - *str* The language to display
+
+          - 'collection_id' - *str* The collection id
+
+          - 'collection_name' - *str* The collection name in current language
+
+          - 'example_search_queries' - *list* List of search queries given as example for this collection
+        """
+
+        # load the right message language
+        _ = gettext_set_language(ln)
+
+        out = '''
+        <!--create_searchfor_super_simple()-->
+        '''
+
+        argd = drop_default_urlargd({'ln': ln, 'sc': CFG_WEBSEARCH_SPLIT_BY_COLLECTION},
+                                    self.search_results_default_urlargd)
+
+        # Only add non-default hidden values
+        for field, value in argd.items():
+            out += self.tmpl_input_hidden(field, value)
+
+
+        header = _("Search %s records for:") % \
+                 self.tmpl_nbrecs_info(record_count, "", "")
+        asearchurl = self.build_search_interface_url(c=collection_id,
+                                                     as=max(CFG_ENABLED_SEARCH_INTERFACES),
+                                                     ln=ln)
+
+        # Build example of queries for this collection
+        example_search_queries_links = [create_html_link(self.build_search_url(p=example_query,
+                                                                               ln=ln,
+                                                                               as=-1,
+                                                                               c=collection_id),
+                                                         {},
+                                                         cgi.escape(example_query),
+                                                         {'class': 'examplequery'}) \
+                                        for example_query in example_search_queries]
+        example_query_html = ''
+        if len(example_search_queries) > 0:
+            example_query_link = example_search_queries_links[0]
+
+            # offers more examples if possible
+            more = ''
+            if len(example_search_queries_links) > 1:
+                more = '''
+                <script type="text/javascript">
+                function toggle_more_example_queries_visibility(){
+                    var more = document.getElementById('more_example_queries');
+                    var link = document.getElementById('link_example_queries');
+                    var sep = document.getElementById('more_example_sep');
+                    if (more.style.display=='none'){
+                        more.style.display = '';
+                        link.innerHTML = "%(show_less)s"
+                        link.style.color = "rgb(204,0,0)";
+                        sep.style.display = 'none';
+                    } else {
+                        more.style.display = 'none';
+                        link.innerHTML = "%(show_more)s"
+                        link.style.color = "rgb(0,0,204)";
+                        sep.style.display = '';
+                    }
+                    return false;
+                }
+                </script>
+                <span id="more_example_queries" style="display:none;text-align:right"><br/>%(more_example_queries)s<br/></span>
+                <a id="link_example_queries" href="#" onclick="toggle_more_example_queries_visibility()" style="display:none"></a>
+                <script type="text/javascript">
+                    var link = document.getElementById('link_example_queries');
+                    var sep = document.getElementById('more_example_sep');
+                    link.style.display = '';
+                    link.innerHTML = "%(show_more)s";
+                    sep.style.display = '';
+                </script>
+                ''' % {'more_example_queries': '<br/>'.join(example_search_queries_links[1:]),
+                       'show_less':_("less"),
+                       'show_more':_("more")}
+
+            example_query_html += '''<p style="text-align:right;margin:0px;">
+            %(example)s<span id="more_example_sep" style="display:none;">&nbsp;&nbsp;::&nbsp;</span>%(more)s
+            </p>
+            ''' % {'example': _("Example: %(x_sample_search_query)s") % \
+                   {'x_sample_search_query': example_query_link},
+                   'more': more}
+
+        # display options to search in current collection or everywhere
+        search_in = ''
+        if collection_name != CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME):
+            search_in += '''
+           <input type="radio" name="cc" value="%(collection_id)s" id="searchCollection" checked="checked"/>
+           <label for="searchCollection">%(search_in_collection_name)s</label>
+           <input type="radio" name="cc" value="%(root_collection_name)s" id="searchEverywhere" />
+           <label for="searchEverywhere">%(search_everywhere)s</label>
+           ''' % {'search_in_collection_name': _("Search in %(x_collection_name)s") % \
+                  {'x_collection_name': collection_name},
+                  'collection_id': collection_id,
+                  'root_collection_name': CFG_SITE_NAME,
+                  'search_everywhere': _("Search everywhere")}
+
+        # print commentary start:
+        out += '''
+        <table>
+         <tbody>
+          <tr valign="baseline">
+           <td class="searchboxbody" align="right"><input type="text" name="p" size="%(sizepattern)d" value="" /><br/>
+             <small><small>%(example_query_html)s</small></small>
+           </td>
+           <td class="searchboxbody" align="left">
+             <input class="formbutton" type="submit" name="action_search" value="%(msg_search)s" />
+           </td>
+           <td class="searchboxbody" align="left" rowspan="2" valign="top">
+             <small><small>
+             <a href="%(siteurl)s/help/search-tips%(langlink)s">%(msg_search_tips)s</a><br/>
+             %(asearch)s
+             </small></small>
+           </td>
+          </tr></table>
+          <!--<tr valign="baseline">
+           <td class="searchboxbody" colspan="2" align="left">
+             <small>
+               --><small>%(search_in)s</small><!--
+             </small>
+           </td>
+          </tr>
+         </tbody>
+        </table>-->
+        <!--/create_searchfor_super_simple()-->
+        ''' % {'ln' : ln,
+               'sizepattern' : CFG_WEBSEARCH_SUPERSIMPLESEARCH_PATTERN_BOX_WIDTH,
+               'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
+               'siteurl' : CFG_SITE_URL,
+               'asearch' : create_html_link(asearchurl, {}, _('Advanced Search')),
+               'header' : header,
+               'msg_search' : _('Search'),
+               'msg_browse' : _('Browse'),
+               'msg_search_tips' : _('Search Tips'),
+               'search_in': search_in,
+               'example_query_html': example_query_html}
+
+        return out
+
     def tmpl_searchfor_simple(self, ln, collection_id, collection_name, record_count, middle_option):
         """Produces simple *Search for* box for the current collection.
 
         Parameters:
 
-          - 'ln' *string* - The language to display
+          - 'ln' *string* - *str* The language to display
 
-          - 'header' *string* - header of search form
+          - 'collection_id' - *str* The collection id
+
+          - 'collection_name' - *str* The collection name in current language
+
+          - 'record_count' - *str* Number of records in this collection
 
           - 'middle_option' *string* - HTML code for the options (any field, specific fields ...)
         """
@@ -599,7 +755,9 @@ class Template:
 
         header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "", "")
-        asearchurl = self.build_search_interface_url(c=collection_id, as=1, ln=ln)
+        asearchurl = self.build_search_interface_url(c=collection_id,
+                                                     as=max(CFG_ENABLED_SEARCH_INTERFACES),
+                                                     ln=ln)
 
         # print commentary start:
         out += '''
@@ -611,7 +769,7 @@ class Template:
          </thead>
          <tbody>
           <tr valign="baseline">
-           <td class="searchboxbody" align="left"><input type="text" name="p" size="40" value="" /></td>
+           <td class="searchboxbody" align="left"><input type="text" name="p" %(sizepattern)d value="" /></td>
            <td class="searchboxbody" align="left">%(middle_option)s</td>
            <td class="searchboxbody" align="left">
              <input class="formbutton" type="submit" name="action_search" value="%(msg_search)s" />
@@ -629,6 +787,7 @@ class Template:
         </table>
         <!--/create_searchfor_simple()-->
         ''' % {'ln' : ln,
+               'sizepattern' : CFG_WEBSEARCH_SIMPLESEARCH_PATTERN_BOX_WIDTH,
                'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
                'siteurl' : CFG_SITE_URL,
                'asearch' : create_html_link(asearchurl, {}, _('Advanced Search')),
@@ -695,7 +854,7 @@ class Template:
         header = _("Search %s records for") % \
                  self.tmpl_nbrecs_info(record_count, "", "")
         header += ':'
-        ssearchurl = self.build_search_interface_url(c=collection_id, as=0, ln=ln)
+        ssearchurl = self.build_search_interface_url(c=collection_id, as=min(CFG_ENABLED_SEARCH_INTERFACES), ln=ln)
 
         out += '''
         <table class="searchbox">
@@ -1566,7 +1725,7 @@ class Template:
 
           - 'ln' *string* - The language to display
 
-          - 'as' *bool* - Should we display an advanced search box?
+          - 'as' *bool* - Should we display an advanced search box? -1 -> 1, from simpler to more advanced
 
           - 'cc_intl' *string* - the i18nized current collection name, used for display
 
@@ -1616,11 +1775,16 @@ class Template:
 
         # These are hidden fields the user does not manipulate
         # directly
-        argd = drop_default_urlargd({
-            'ln': ln, 'as': as,
-            'cc': cc, 'ot': ot, 'sp': sp, 'ec': ec,
-            }, self.search_results_default_urlargd)
-
+        if as == -1:
+            argd = drop_default_urlargd({
+                'ln': ln, 'as': as,
+                'ot': ot, 'sp': sp, 'ec': ec,
+                }, self.search_results_default_urlargd)
+        else:
+            argd = drop_default_urlargd({
+                'cc': cc, 'ln': ln, 'as': as,
+                'ot': ot, 'sp': sp, 'ec': ec,
+                }, self.search_results_default_urlargd)
 
         out = ""
         if show_colls:
@@ -1736,7 +1900,7 @@ class Template:
               'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
               'search_tips': _("Search Tips")
             }
-        else:
+        elif as == 0:
             # print Simple Search form:
             out += '''
             <table class="searchbox">
@@ -1770,7 +1934,7 @@ class Template:
               'advanced_search': create_html_link(self.build_search_url(p1=p,
                                                                         f1=f,
                                                                         rm=rm,
-                                                                        as=1,
+                                                                        as=max(CFG_ENABLED_SEARCH_INTERFACES),
                                                                         cc=cc,
                                                                         jrec=jrec,
                                                                         ln=ln,
@@ -1778,7 +1942,7 @@ class Template:
                                                   {}, _("Advanced Search")),
 
               'leading' : leadingtext,
-              'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
+              'sizepattern' : CFG_WEBSEARCH_SIMPLESEARCH_PATTERN_BOX_WIDTH,
               'p' : cgi.escape(p, 1),
               'searchwithin' : self.tmpl_searchwithin_select(
                                   ln = ln,
@@ -1793,10 +1957,67 @@ class Template:
               'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
               'search_tips': _("Search Tips")
             }
+        else:
+            # EXPERIMENTAL
+            # print super-simple search form:
+            search_in = ''
+            if cc_intl != CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME):
+                search_in = '''
+            <input type="radio" name="cc" value="%(collection_id)s" id="searchCollection" checked="checked"/>
+            <label for="searchCollection">%(search_in_collection_name)s</label>
+            <input type="radio" name="cc" value="%(root_collection_name)s" id="searchEverywhere" />
+            <label for="searchEverywhere">%(search_everywhere)s</label>
+            ''' % {'search_in_collection_name': _("Search in %(x_collection_name)s") % \
+                  {'x_collection_name': cgi.escape(cc_intl)},
+                  'collection_id': cc,
+                  'root_collection_name': CFG_SITE_NAME,
+                  'search_everywhere': _("Search everywhere")}
+            out += '''
+            <table>
+              <tr valign="top">
+                <td class="searchboxbody"><input type="text" name="p" size="%(sizepattern)d" value="%(p)s" /></td>
+                <td class="searchboxbody">
+                  <input class="formbutton" type="submit" name="action_search" value="%(search)s" />
+                </td>
+                <td class="searchboxbody" align="left" rowspan="2" valign="top">
+                  <small><small>
+                  <a href="%(siteurl)s/help/search-tips%(langlink)s">%(search_tips)s</a><br/>
+                  %(advanced_search)s
+                </td>
+              </tr>
+            </table>
+            <small>%(search_in)s</small>
+            ''' % {
+              'advanced_search': create_html_link(self.build_search_url(p1=p,
+                                                                        f1=f,
+                                                                        rm=rm,
+                                                                        as=max(CFG_ENABLED_SEARCH_INTERFACES),
+                                                                        cc=cc,
+                                                                        jrec=jrec,
+                                                                        ln=ln,
+                                                                        rg=rg),
+                                                  {}, _("Advanced Search")),
 
+              'leading' : leadingtext,
+              'sizepattern' : CFG_WEBSEARCH_SUPERSIMPLESEARCH_PATTERN_BOX_WIDTH,
+              'p' : cgi.escape(p, 1),
+              'searchwithin' : self.tmpl_searchwithin_select(
+                                  ln = ln,
+                                  fieldname = 'f',
+                                  selected = f,
+                                  values = self._add_mark_to_field(value=f, fields=fieldslist, ln=ln)
+                                ),
+              'search' : _("Search"),
+              'browse' : _("Browse"),
+              'siteurl' : CFG_SITE_URL,
+              'ln' : ln,
+              'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
+              'search_tips': _("Search Tips"),
+              'search_in': search_in
+            }
         ## secondly, print Collection(s) box:
 
-        if show_colls:
+        if show_colls and as > -1:
             # display collections only if there is more than one
             selects = ''
             for sel in coll_selects:
@@ -1880,7 +2101,7 @@ class Template:
                       }
 
         ## fifthly, print Display results box, including sort/rank, formats, etc:
-        if action != _("Browse"):
+        if action != _("Browse") and as > -1:
 
             rgs = []
             for i in [10, 25, 50, 100, 250, 500]:

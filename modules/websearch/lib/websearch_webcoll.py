@@ -38,7 +38,9 @@ from invenio.config import \
      CFG_CACHEDIR, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_ENABLED_SEARCH_INTERFACES, \
+     CFG_DEFAULT_SEARCH_INTERFACE
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname, collection_restricted_p
 from invenio.dbquery import run_sql, Error, get_table_update_time
@@ -158,6 +160,14 @@ class Collection:
                 print "Error %d: %s" % (e.args[0], e.args[1])
                 sys.exit(1)
 
+    def get_example_search_queries(self):
+        """Returns list of sample search queries for this collection.
+        """
+        res = run_sql("""SELECT example.body FROM example
+        LEFT JOIN collection_example on example.id=collection_example.id_example
+        WHERE collection_example.id_collection=%s ORDER BY collection_example.score""", (self.id,))
+        return [query[0] for query in res]
+
     def get_name(self, ln=CFG_SITE_LANG, name_type="ln", prolog="", epilog="", prolog_suffix=" ", epilog_suffix=""):
         """Return nicely formatted collection name for language LN.
         The NAME_TYPE may be 'ln' (=long name), 'sn' (=short name), etc."""
@@ -272,22 +282,23 @@ class Collection:
                 _ = gettext_set_language(lang)
 
                 ## first, update navtrail:
-                for as in range(0, 2):
+                for as in CFG_ENABLED_SEARCH_INTERFACES:
                     self.write_cache_file("navtrail-as=%s-ln=%s" % (as, lang),
                                           self.create_navtrail_links(as, lang))
+
                 ## second, update page body:
-                for as in range(0, 2): # do both simple search and advanced search pages:
+                for as in CFG_ENABLED_SEARCH_INTERFACES: # do super-simple, simple and advanced search pages:
                     body = websearch_templates.tmpl_webcoll_body(
-                             ln=lang, collection=self.name,
-                             te_portalbox = self.create_portalbox(lang, 'te'),
-                             searchfor = self.create_searchfor(as, lang),
-                             np_portalbox = self.create_portalbox(lang, 'np'),
-                             narrowsearch = self.create_narrowsearch(as, lang, 'r'),
-                             focuson = self.create_narrowsearch(as, lang, "v") + \
-                                       self.create_external_collections_box(lang),
-                             instantbrowse = self.create_instant_browse(as=as, ln=lang),
-                             ne_portalbox = self.create_portalbox(lang, 'ne')
-                           )
+                        ln=lang, collection=self.name,
+                        te_portalbox = self.create_portalbox(lang, 'te'),
+                        searchfor = self.create_searchfor(as, lang),
+                        np_portalbox = self.create_portalbox(lang, 'np'),
+                        narrowsearch = self.create_narrowsearch(as, lang, 'r'),
+                        focuson = self.create_narrowsearch(as, lang, "v") + \
+                        self.create_external_collections_box(lang),
+                        instantbrowse = self.create_instant_browse(as=as, ln=lang),
+                        ne_portalbox = self.create_portalbox(lang, 'ne')
+                        )
                     self.write_cache_file("body-as=%s-ln=%s" % (as, lang), body)
                 ## third, write portalboxes:
                 self.write_cache_file("portalbox-tp-ln=%s" % lang, self.create_portalbox(lang, "tp"))
@@ -300,7 +311,7 @@ class Collection:
                                                                     ln=lang))
         return
 
-    def create_navtrail_links(self, as=0, ln=CFG_SITE_LANG):
+    def create_navtrail_links(self, as=CFG_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
         """Creates navigation trail links, i.e. links to collection
         ancestors (except Home collection).  If as==1, then links to
         Advanced Search interfaces; otherwise Simple Search.
@@ -333,7 +344,7 @@ class Collection:
                 out += body
         return out
 
-    def create_narrowsearch(self, as=0, ln=CFG_SITE_LANG, type="r"):
+    def create_narrowsearch(self, as=CFG_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG, type="r"):
         """Creates list of collection descendants of type 'type' under title 'title'.
         If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
         Suitable for 'Narrow search' and 'Focus on' boxes."""
@@ -409,7 +420,7 @@ class Collection:
                                                    'date': get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")})
         return
 
-    def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, as=0, ln=CFG_SITE_LANG):
+    def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, as=CFG_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
         "Searches database and produces list of last 'rg' records."
 
         if self.restricted_p():
@@ -611,12 +622,25 @@ class Collection:
         out = "$collSearchExamples = getSearchExample(%d, $se);" % self.id
         return out
 
-    def create_searchfor(self, as=0, ln=CFG_SITE_LANG):
+    def create_searchfor(self, as=CFG_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
         "Produces either Simple or Advanced 'Search for' box for the current collection."
         if as == 1:
             return self.create_searchfor_advanced(ln)
-        else:
+        elif as == 0:
             return self.create_searchfor_simple(ln)
+        else:
+            return self.create_searchfor_super_simple(ln)
+
+    def create_searchfor_super_simple(self, ln=CFG_SITE_LANG):
+        "Produces super simple 'Search for' box for the current collection."
+
+        return websearch_templates.tmpl_searchfor_super_simple(
+          ln=ln,
+          collection_id = self.name,
+          collection_name=self.get_name(ln=ln),
+          record_count=self.nbrecs,
+          example_search_queries=self.get_example_search_queries(),
+        )
 
     def create_searchfor_simple(self, ln=CFG_SITE_LANG):
         "Produces simple 'Search for' box for the current collection."
