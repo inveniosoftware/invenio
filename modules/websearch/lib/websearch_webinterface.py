@@ -53,8 +53,8 @@ from invenio.config import \
      CFG_WEBSEARCH_INSTANT_BROWSE_RSS, \
      CFG_WEBSEARCH_RSS_TTL, \
      CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS, \
-     CFG_DEFAULT_SEARCH_INTERFACE, \
-     CFG_ENABLED_SEARCH_INTERFACES
+     CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
+     CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
@@ -535,7 +535,7 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
 
 # Parameters for the legacy URLs, of the form /?c=ALEPH
 legacy_collection_default_urlargd = {
-    'as': (int, CFG_DEFAULT_SEARCH_INTERFACE),
+    'as': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
     'verbose': (int, 0),
     'c': (str, CFG_SITE_NAME)}
 
@@ -794,7 +794,7 @@ def display_collection(req, c, as, verbose, ln):
                     lastupdated=c_last_updated,
                     navmenuid='search',
                     rssurl=rssurl,
-                    show_title_p=-1 not in CFG_ENABLED_SEARCH_INTERFACES)
+                    show_title_p=-1 not in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES)
     except:
         if verbose >= 9:
             req.write("<br />c=%s" % c)

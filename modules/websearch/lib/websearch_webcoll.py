@@ -39,8 +39,8 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_URL, \
-     CFG_ENABLED_SEARCH_INTERFACES, \
-     CFG_DEFAULT_SEARCH_INTERFACE
+     CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
+     CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.search_engine import HitSet, search_pattern, get_creation_date, get_field_i18nname, collection_restricted_p
 from invenio.dbquery import run_sql, Error, get_table_update_time
@@ -282,12 +282,12 @@ class Collection:
                 _ = gettext_set_language(lang)
 
                 ## first, update navtrail:
-                for as in CFG_ENABLED_SEARCH_INTERFACES:
+                for as in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES:
                     self.write_cache_file("navtrail-as=%s-ln=%s" % (as, lang),
                                           self.create_navtrail_links(as, lang))
 
                 ## second, update page body:
-                for as in CFG_ENABLED_SEARCH_INTERFACES: # do super-simple, simple and advanced search pages:
+                for as in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES: # do super-simple, simple and advanced search pages:
                     body = websearch_templates.tmpl_webcoll_body(
                         ln=lang, collection=self.name,
                         te_portalbox = self.create_portalbox(lang, 'te'),
@@ -311,7 +311,7 @@ class Collection:
                                                                     ln=lang))
         return
 
-    def create_navtrail_links(self, as=CFG_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
+    def create_navtrail_links(self, as=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
         """Creates navigation trail links, i.e. links to collection
         ancestors (except Home collection).  If as==1, then links to
         Advanced Search interfaces; otherwise Simple Search.
@@ -344,7 +344,7 @@ class Collection:
                 out += body
         return out
 
-    def create_narrowsearch(self, as=CFG_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG, type="r"):
+    def create_narrowsearch(self, as=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG, type="r"):
         """Creates list of collection descendants of type 'type' under title 'title'.
         If as==1, then links to Advanced Search interfaces; otherwise Simple Search.
         Suitable for 'Narrow search' and 'Focus on' boxes."""
@@ -420,7 +420,7 @@ class Collection:
                                                    'date': get_creation_date(recid, fmt="%Y-%m-%d<br />%H:%i")})
         return
 
-    def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, as=CFG_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
+    def create_instant_browse(self, rg=CFG_WEBSEARCH_INSTANT_BROWSE, as=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
         "Searches database and produces list of last 'rg' records."
 
         if self.restricted_p():
@@ -622,7 +622,7 @@ class Collection:
         out = "$collSearchExamples = getSearchExample(%d, $se);" % self.id
         return out
 
-    def create_searchfor(self, as=CFG_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
+    def create_searchfor(self, as=CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, ln=CFG_SITE_LANG):
         "Produces either Simple or Advanced 'Search for' box for the current collection."
         if as == 1:
             return self.create_searchfor_advanced(ln)

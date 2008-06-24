@@ -51,8 +51,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_INSPIRE_SITE, \
-     CFG_DEFAULT_SEARCH_INTERFACE, \
-     CFG_ENABLED_SEARCH_INTERFACES
+     CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
+     CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 #from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
@@ -123,7 +123,7 @@ class Template:
         'rm': (str, ""),
         'of': (str, "hb"),
         'ot': (list, []),
-        'as': (int, CFG_DEFAULT_SEARCH_INTERFACE),
+        'as': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
         'p1': (str, ""), 'f1': (str, ""), 'm1': (str, ""), 'op1':(str, ""),
         'p2': (str, ""), 'f2': (str, ""), 'm2': (str, ""), 'op2':(str, ""),
         'p3': (str, ""), 'f3': (str, ""), 'm3': (str, ""),
@@ -146,7 +146,7 @@ class Template:
 
     # ...and for search interfaces
     search_interface_default_urlargd = {
-        'as': (int, CFG_DEFAULT_SEARCH_INTERFACE),
+        'as': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
         'verbose': (int, 0)}
 
     # ...and for RSS feeds
@@ -607,7 +607,7 @@ class Template:
         header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "", "")
         asearchurl = self.build_search_interface_url(c=collection_id,
-                                                     as=max(CFG_ENABLED_SEARCH_INTERFACES),
+                                                     as=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
                                                      ln=ln)
 
         # Build example of queries for this collection
@@ -756,7 +756,7 @@ class Template:
         header = _("Search %s records for:") % \
                  self.tmpl_nbrecs_info(record_count, "", "")
         asearchurl = self.build_search_interface_url(c=collection_id,
-                                                     as=max(CFG_ENABLED_SEARCH_INTERFACES),
+                                                     as=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
                                                      ln=ln)
 
         # print commentary start:
@@ -854,7 +854,7 @@ class Template:
         header = _("Search %s records for") % \
                  self.tmpl_nbrecs_info(record_count, "", "")
         header += ':'
-        ssearchurl = self.build_search_interface_url(c=collection_id, as=min(CFG_ENABLED_SEARCH_INTERFACES), ln=ln)
+        ssearchurl = self.build_search_interface_url(c=collection_id, as=min(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES), ln=ln)
 
         out += '''
         <table class="searchbox">
@@ -1934,7 +1934,7 @@ class Template:
               'advanced_search': create_html_link(self.build_search_url(p1=p,
                                                                         f1=f,
                                                                         rm=rm,
-                                                                        as=max(CFG_ENABLED_SEARCH_INTERFACES),
+                                                                        as=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
                                                                         cc=cc,
                                                                         jrec=jrec,
                                                                         ln=ln,
@@ -1991,7 +1991,7 @@ class Template:
               'advanced_search': create_html_link(self.build_search_url(p1=p,
                                                                         f1=f,
                                                                         rm=rm,
-                                                                        as=max(CFG_ENABLED_SEARCH_INTERFACES),
+                                                                        as=max(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES),
                                                                         cc=cc,
                                                                         jrec=jrec,
                                                                         ln=ln,

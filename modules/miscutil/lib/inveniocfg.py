@@ -124,11 +124,11 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBSCHED_GC_TASKS_TO_REMOVE',
                        'CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE',
                        'CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS',
-                       'CFG_ENABLED_SEARCH_INTERFACES']:
+                       'CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
-                if option_name in ['CFG_ENABLED_SEARCH_INTERFACES']:
+                if option_name in ['CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES']:
                     # 3d1) integer values
                     out += "%i, " % int(elem)
                 else:
