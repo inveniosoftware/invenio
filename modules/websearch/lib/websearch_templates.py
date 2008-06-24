@@ -769,7 +769,7 @@ class Template:
          </thead>
          <tbody>
           <tr valign="baseline">
-           <td class="searchboxbody" align="left"><input type="text" name="p" %(sizepattern)d value="" /></td>
+           <td class="searchboxbody" align="left"><input type="text" name="p" size="%(sizepattern)d" value="" /></td>
            <td class="searchboxbody" align="left">%(middle_option)s</td>
            <td class="searchboxbody" align="left">
              <input class="formbutton" type="submit" name="action_search" value="%(msg_search)s" />
