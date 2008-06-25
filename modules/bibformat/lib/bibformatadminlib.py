@@ -742,7 +742,7 @@ def update_format_template_code(filename, code=""):
     format_template = bibformat_engine.get_format_template_attrs(filename)
     name = format_template['name']
     description = format_template['description']
-
+    code = re.sub("\r\n", "\n", code)
     out = ""
     if not filename.endswith(".xsl"):
         out = """<name>%(name)s</name>
