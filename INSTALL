@@ -45,8 +45,8 @@ Contents
           $ sudo apt-get install python2.3-psyco sbcl cmucl
 
         The last three packages are not available on all Debian
-        "Sarge" GNU/Linux architectures (e.g. not on AMD64), but they
-        are only recommended so you can safely continue without them.
+        "Sarge" GNU/Linux architectures (e.g. not on AMD64); you can
+        safely continue without them.
 
         Note that you can consult CDS Invenio wiki pages at
         <https://twiki.cern.ch/twiki/bin/view/CDS/Invenio> for more
@@ -94,7 +94,7 @@ Contents
              <http://4suite.org/>
           - (optional) feedparser, for web journal creation:
              <http://feedparser.org/>
-          - (optional) Psyco, to speed up the code at places:
+          - (optional) Psyco, if you are running on a 32-bit OS:
              <http://psyco.sourceforge.net/>
           - (optional) RDFLib, to use RDF ontologies and thesauri:
              <http://rdflib.net/>
