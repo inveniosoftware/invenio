@@ -60,6 +60,9 @@ exclude-result-prefixes="marc fn">
                                 <xsl:text>: </xsl:text><xsl:value-of select="subfield[@code='b']"/>
                         </xsl:if>
                 </xsl:for-each>
+                <xsl:for-each select="datafield[@tag='111' and @ind1=' ' and @ind2=' ']">
+                        <xsl:value-of select="subfield[@code='a']"/>
+                </xsl:for-each>
         </title>
         <link>
                 <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
