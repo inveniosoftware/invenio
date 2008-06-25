@@ -1,3 +1,0 @@
-<name>XML Refworks</name>
-<description>XML Refworks output using BFX engine.</description>
-<BFE_BFX_ENGINE template="Refworks"/>
