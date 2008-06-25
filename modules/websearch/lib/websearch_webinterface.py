@@ -54,12 +54,13 @@ from invenio.config import \
      CFG_WEBSEARCH_RSS_TTL, \
      CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
-     CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES
+     CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
+     CFG_WEBDIR
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
-    collect_user_info, http_check_credentials
+    collect_user_info, http_check_credentials, logoutUser
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
@@ -548,7 +549,8 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
     _exports = [('index.py', 'legacy_collection'),
                 ('', 'legacy_collection'),
                 ('search.py', 'legacy_search'),
-                'search', 'openurl', 'testsso']
+                'search', 'openurl', 'testsso',
+                ('wsignout.gif', 'logout_SSO_hook')]
 
     search = WebInterfaceSearchResultsPages()
 
@@ -565,6 +567,19 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             out += "<TR><TD><STRONG>%s</STRONG></TD><TD>%s</TD></TR>" % (var, value)
         out += "</TABLE></BODY></HTML>"
         return out
+
+    def logout_SSO_hook(self, req, form):
+        """Script triggered by the display of the centralized SSO logout
+        dialog. It logouts the user from CDS Invenio and stream back the
+        expected picture."""
+        logoutUser(req)
+        req.content_type = 'image/gif'
+        req.encoding = None
+        req.filename = 'wsignout.gif'
+        req.headers_out["Content-Disposition"] = "inline; filename=wsignout.gif"
+        req.set_content_length(os.path.getsize('%s/img/wsignout.gif' % CFG_WEBDIR))
+        req.send_http_header()
+        req.sendfile('%s/img/wsignout.gif' % CFG_WEBDIR)
 
     def _lookup(self, component, path):
         """ This handler is invoked for the dynamic URLs (for
