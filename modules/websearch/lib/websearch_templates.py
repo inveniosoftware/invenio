@@ -866,21 +866,21 @@ class Template:
          <tbody>
           <tr valign="bottom">
             <td class="searchboxbody" style="white-space: nowrap;">
-                %(matchbox_m1)s<input type="text" name="p1" size="40" value="" />
+                %(matchbox_m1)s<input type="text" name="p1" size="%(sizepattern)d" value="" />
             </td>
             <td class="searchboxbody" style="white-space: nowrap;">%(middle_option_1)s</td>
             <td class="searchboxbody">%(andornot_op1)s</td>
           </tr>
           <tr valign="bottom">
             <td class="searchboxbody" style="white-space: nowrap;">
-                %(matchbox_m2)s<input type="text" name="p2" size="40" value="" />
+                %(matchbox_m2)s<input type="text" name="p2" size="%(sizepattern)d" value="" />
             </td>
             <td class="searchboxbody">%(middle_option_2)s</td>
             <td class="searchboxbody">%(andornot_op2)s</td>
           </tr>
           <tr valign="bottom">
             <td class="searchboxbody" style="white-space: nowrap;">
-                %(matchbox_m3)s<input type="text" name="p3" size="40" value="" />
+                %(matchbox_m3)s<input type="text" name="p3" size="%(sizepattern)d" value="" />
             </td>
             <td class="searchboxbody">%(middle_option_3)s</td>
             <td class="searchboxbody" style="white-space: nowrap;">
@@ -903,6 +903,7 @@ class Template:
                'siteurl' : CFG_SITE_URL,
                'ssearch' : create_html_link(ssearchurl, {}, _("Simple Search")),
                'header' : header,
+               'sizepattern' : CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH,
 
                'matchbox_m1' : self.tmpl_matchtype_box('m1', ln=ln),
                'middle_option_1' : middle_option_1,
