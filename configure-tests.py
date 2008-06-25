@@ -100,14 +100,20 @@ except ImportError, msg:
 
 ## 3) check for recommended modules:
 try:
-    import psyco
+    if (2**31 - 1) == sys.maxint:
+        # check for Psyco since we seem to run in 32-bit environment
+        import psyco
+    else:
+        # no need to advise on Psyco on 64-bit systems
+        pass
 except ImportError, msg:
     print """
     *****************************************************
     ** IMPORT WARNING %s
     *****************************************************
     ** Note that Psyco is not really required but we   **
-    ** recommend it for faster CDS Invenio operation.  **
+    ** recommend it for faster CDS Invenio operation   **
+    ** if you are running in 32-bit operating system.  **
     **                                                 **
     ** You can safely continue installing CDS Invenio  **
     ** now, and add this module anytime later.  (I.e.  **
