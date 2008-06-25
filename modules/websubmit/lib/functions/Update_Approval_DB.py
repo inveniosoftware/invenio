@@ -72,7 +72,7 @@ def Update_Approval_DB(parameters, curdir, form, user_info=None):
             category = "unknown"
         sth = run_sql("SELECT status,dFirstReq,dLastReq,dAction FROM sbmAPPROVAL WHERE  doctype=%s and categ=%s and rn=%s", (doctype,category,rn,))
         if len(sth) == 0:
-            run_sql("INSERT INTO  sbmAPPROVAL values(%s,%s,%s,'waiting',NOW(),NOW(),'',%s)", (doctype,category,rn,access,))
+            run_sql("INSERT INTO sbmAPPROVAL (doctype, categ, rn, status, dFirstReq, dLastReq, dAction, access) VALUES (%s,%s,%s,'waiting',NOW(),NOW(),'',%s)", (doctype,category,rn,access,))
         else:
             run_sql("UPDATE sbmAPPROVAL SET dLastReq=NOW(), status='waiting' WHERE  doctype=%s and categ=%s and rn=%s", (doctype,category,rn,))
     else:
