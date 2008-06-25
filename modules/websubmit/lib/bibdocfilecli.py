@@ -101,14 +101,14 @@ Note that some actions e.g. delete, append, revise etc. works at the docname
 level, while others like --set-comment, --set-description, at single file level
 and other can be applied in an iterative way to many records in a single run.
 
-Note that specifing docid(2) takes precedence over recid(2) which in turns
+Note that specifying docid(2) takes precedence over recid(2) which in turns
 takes precedence over pattern/collection search.
 """
 
-_actions = ['get-info',
+_actions = [('get-info', 'print all the informations about the record/bibdoc/file structure'),
             #'get-stats',
-            'get-disk-usage',
-            'get-docnames',
+            ('get-disk-usage', 'print statistics about usage disk usage'),
+            ('get-docnames', 'print the document docnames'),
             #'get-docids',
             #'get-recids',
             #'get-doctypes',
@@ -119,15 +119,15 @@ _actions = ['get-info',
             #'get-descriptions',
             #'get-restrictions',
             #'get-icons',
-            'get-history',
+            ('get-history', 'print the document history'),
             #'delete',
             #'undelete',
             #'purge',
             #'expunge',
-            'check-md5',
-            'update-md5',
-            'fix-all',
-            'fix-marc']
+            ('check-md5', 'check md5 checksum validity of files'),
+            ('update-md5', 'update md5 checksum of files'),
+            ('fix-all', 'fix inconsistences in filesystem vs database vs MARC'),
+            ('fix-marc', 'synchronize MARC after filesystem/database')]
 
 _actions_with_parameter = {
     #'set-doctype' : 'doctype',
@@ -135,40 +135,60 @@ _actions_with_parameter = {
     #'set-comment' : 'comment',
     #'set-description' : 'description',
     #'set-restriction' : 'restriction',
-    'append' : 'append_path',
-    'revise' : 'revise_path',
+    'append' : ('append_path', 'specify the URL/path of the file that will appended to the bibdoc'),
+    'revise' : ('revise_path', 'specify the URL/path of the file that will revise the bibdoc')
 }
+
+class OptionParserSpecial(OptionParser):
+    def format_help(self, *args, **kwargs):
+        result = OptionParser.format_help(self, *args, **kwargs)
+        if hasattr(self, 'trailing_text'):
+            return "%s\n%s\n" % (result, self.trailing_text)
+        else:
+            return result
 
 def prepare_option_parser():
     """Parse the command line options."""
-    parser = OptionParser(usage="usage: %prog <query> <action> [options]",
+    parser = OptionParserSpecial(usage="usage: %prog <query> <action> [options]",
     #epilog="""With <query> you select the range of record/docnames/single files to work on. Note that some actions e.g. delete, append, revise etc. works at the docname level, while others like --set-comment, --set-description, at single file level and other can be applied in an iterative way to many records in a single run. Note that specifing docid(2) takes precedence over recid(2) which in turns takes precedence over pattern/collection search.""",
         version=__revision__)
+    parser.trailing_text = """
+Examples:
+    $ bibdocfile --append foo.tar.gz --recid=1
+    $ bibdocfile --revise http://foo.com?search=123 --docname='sam'
+            --format=pdf --recid=3 --new-docname='pippo'
+    """
+    parser.trailing_text += wrap_text_in_a_box("""
+The bibdocfile command line tool is in a state of high developement. Please
+do not rely on the command line parameters to remain compatible for the next
+release. You should in particular be aware that if you need to build scripts
+on top of the bibdocfile command line interfaces, you will probably need to
+revise them with the next release of CDS Invenio.""", 'WARNING')
     query_options = OptionGroup(parser, 'Query parameters')
-    query_options.add_option('-a', '--all', action='store_true', dest='all')
-    query_options.add_option('-p', '--pattern', dest='pattern')
-    query_options.add_option('-c', '--collection', dest='collection')
-    query_options.add_option('-r', '--recid', type='int', dest='recid')
-    query_options.add_option('--recid2', type='int', dest='recid2')
-    query_options.add_option('-d', '--docid', type='int', dest='docid')
-    query_options.add_option('--docid2', type='int', dest='docid2')
-    query_options.add_option('--docname', dest='docname')
-    query_options.add_option('--new-docname', dest='newdocname')
-    query_options.add_option('--doctype', dest='doctype')
-    query_options.add_option('--format', dest='format')
-    query_options.add_option('--icon', dest='icon')
-    query_options.add_option('--description', dest='description')
-    query_options.add_option('--comment', dest='comment')
-    query_options.add_option('--restriction', dest='restriction')
+    query_options.add_option('-a', '--all', action='store_true', dest='all', help='Select all the records')
+    query_options.add_option('-p', '--pattern', dest='pattern', help='select by specifying the search pattern')
+    query_options.add_option('-c', '--collection', dest='collection', help='select by collection')
+    query_options.add_option('-r', '--recid', type='int', dest='recid', help='select the recid (or the first recid in a range)')
+    query_options.add_option('--recid2', type='int', dest='recid2', help='select the end of the range')
+    query_options.add_option('-d', '--docid', type='int', dest='docid', help='select by docid (or the first docid in a range)')
+    query_options.add_option('--docid2', type='int', dest='docid2', help='select the end of the range')
+    query_options.add_option('--docname', dest='docname', help='specify the docname to work on')
+    query_options.add_option('--new-docname', dest='newdocname', help='specify the desired new docname for revising')
+    query_options.add_option('--doctype', dest='doctype', help='specify the new doctype')
+    query_options.add_option('--format', dest='format', help='specify the format')
+    query_options.add_option('--icon', dest='icon', help='specify the URL/path for an icon')
+    query_options.add_option('--description', dest='description', help='specify a description')
+    query_options.add_option('--comment', dest='comment', help='specify a comment')
+    query_options.add_option('--restriction', dest='restriction', help='specify a restriction tag')
 
     parser.add_option_group(query_options)
     action_options = OptionGroup(parser, 'Actions')
-    for action in _actions:
-        action_options.add_option('--%s' % action, action='store_const', const=action, dest='action')
+    for (action, help) in _actions:
+        action_options.add_option('--%s' % action, action='store_const', const=action, dest='action', help=help)
     parser.add_option_group(action_options)
     action_with_parameters = OptionGroup(parser, 'Actions with parameter')
-    for action, dest in _actions_with_parameter.iteritems():
-        action_with_parameters.add_option('--%s' % action, dest=dest)
+    for action, (dest, help) in _actions_with_parameter.iteritems():
+        action_with_parameters.add_option('--%s' % action, dest=dest, help=help)
     parser.add_option_group(action_with_parameters)
     parser.add_option('-v', '--verbose', type='int', dest='verbose', default=1)
     parser.add_option('--yes-i-know', action='store_true', dest='yes-i-know')
