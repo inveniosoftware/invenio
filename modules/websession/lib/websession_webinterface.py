@@ -30,6 +30,7 @@ try:
 except ImportError:
     pass
 from datetime import timedelta
+import os
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -41,7 +42,8 @@ from invenio.config import \
      CFG_SITE_SECURE_URL, \
      CFG_SITE_URL, \
      CFG_CERN_SITE, \
-     CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS
+     CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
+     CFG_WEBDIR
 from invenio import webuser
 from invenio.webpage import page
 from invenio import webaccount
@@ -73,6 +75,10 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
     _exports = ['', 'edit', 'change', 'lost', 'display',
                 'send_email', 'youradminactivities', 'access',
                 'delete', 'logout', 'login', 'register', 'resetpassword']
+
+    def __init__(self):
+        if CFG_EXTERNAL_AUTH_USING_SSO:
+            self._exports.append(('wsignout.gif', 'logout_SSO_hook'))
 
     _force_https = True
 
@@ -622,6 +628,19 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     language=args['ln'],
                     lastupdated=__lastupdated__,
                     navmenuid='youraccount')
+
+    def logout_SSO_hook(self, req, form):
+        """Script triggered by the display of the centralized SSO logout
+        dialog. It logouts the user from CDS Invenio and stream back the
+        expected picture."""
+        webuser.logoutUser(req)
+        req.content_type = 'image/gif'
+        req.encoding = None
+        req.filename = 'wsignout.gif'
+        req.headers_out["Content-Disposition"] = "inline; filename=wsignout.gif"
+        req.set_content_length(os.path.getsize('%s/img/wsignout.gif' % CFG_WEBDIR))
+        req.send_http_header()
+        req.sendfile('%s/img/wsignout.gif' % CFG_WEBDIR)
 
     def login(self, req, form):
         args = wash_urlargd(form, {
