@@ -196,6 +196,7 @@ INSERT INTO format VALUES (15,'File mini-panel', 'hdfile', 'Used to show fulltex
 INSERT INTO format VALUES (16,'Actions mini-panel', 'hdact', 'Used to display actions in mini-panel of detailed record pages.', 'text/html', 0);
 INSERT INTO format VALUES (17,'References tab', 'hdref', 'Display record references in References tab.', 'text/html', 0);
 INSERT INTO format VALUES (18,'HTML citesummary','hcs', 'HTML cite summary format, used for search results pages.', 'text/html', 1);
+INSERT INTO format VALUES (19,'RefWorks','xw', 'RefWorks.', 'text/xml', 1);
 
 INSERT INTO tag VALUES (1,'first author','100__%');
 INSERT INTO tag VALUES (2,'additional author','700__%');

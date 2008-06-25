@@ -30,6 +30,7 @@ etc_DATA = Default_HTML_captions.bft Picture_HTML_brief.bft \
 	   NLM.xsl \
 	   RSS.bft \
 	   OAI_DC.xsl DC.xsl EndNote.xsl RSS.xsl \
+           RefWorks.bft RefWorks.xsl \
 	   Default_HTML_references.bft Default_HTML_files.bft \
 	   Default_HTML_actions.bft
 

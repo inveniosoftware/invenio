@@ -2952,6 +2952,16 @@ class Template:
         out = """\n</articles>"""
         return out
 
+    def tmpl_xml_refworks_prologue(self):
+        """Creates XML RefWorks prologue."""
+        out = """"""
+        return out
+
+    def tmpl_xml_refworks_epilogue(self):
+        """Creates XML RefWorks epilogue."""
+        out = """\n"""
+        return out
+
     def tmpl_xml_marc_prologue(self):
         """Creates XML MARC prologue."""
         out = """<collection xmlns="http://www.loc.gov/MARC21/slim">\n"""
