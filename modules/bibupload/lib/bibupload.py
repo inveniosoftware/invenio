@@ -227,15 +227,17 @@ def bibupload(record, opt_tag=None, opt_mode=None,
 
     # Have a look if we have FFT tags
     write_message("Stage 2: Start (Process FFT tags if exist).", verbose=2)
+    record_had_FFT = False
     if opt_stage_to_start_from <= 2 and \
         extract_tag_from_record(record, 'FFT') is not None:
+        record_had_FFT = True
         if not writing_rights_p():
             write_message("   Stage 2 failed: Error no rights to write fulltext files",
                 verbose=1, stream=sys.stderr)
             task_update_status("ERROR")
             sys.exit(1)
         try:
-            elaborate_fft_tags(record, rec_id, opt_mode)
+            record = elaborate_fft_tags(record, rec_id, opt_mode)
         except Exception, e:
             register_exception()
             write_message("   Stage 2 failed: Error while elaborating FFT tags: %s" % e,
@@ -251,7 +253,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
 
     # Have a look if we have FFT tags
     write_message("Stage 2B: Start (Synchronize 8564 tags).", verbose=2)
-    if opt_stage_to_start_from <= 2:
+    if opt_stage_to_start_from <= 2 and (record_had_FFT or extract_tag_from_record(record, '856') is not None):
         try:
             record = synchronize_8564(rec_id, record)
         except Exception, e:
@@ -1151,6 +1153,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                 except:
                     register_exception()
                     raise
+    return record
 
 def insert_fmt_tags(record, rec_id, opt_mode):
     """Process and insert FMT tags"""
