@@ -143,12 +143,12 @@ def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
     (record, junk) = get_record(ln, recid, uid, temp)
 
     if act_subfield is not None:
-        if act_subfield == bibedit_templates.DELETE: #delete
+        if act_subfield == 'delete':
             record = delete_subfield(recid, uid, record, tag, num_field, num_subfield)
-        if act_subfield == bibedit_templates.MOVE_UP: #move up
-            record = move_subfield(bibedit_templates.MOVE_UP, recid, uid, record, tag, num_field, num_subfield)
-        if act_subfield == bibedit_templates.MOVE_DOWN: #move down
-            record = move_subfield(bibedit_templates.MOVE_DOWN, recid, uid, record, tag, num_field, num_subfield)
+        if act_subfield == 'move_up':
+            record = move_subfield('move_up', recid, uid, record, tag, num_field, num_subfield)
+        if act_subfield == 'move_down':
+            record = move_subfield('move_down', recid, uid, record, tag, num_field, num_subfield)
 
     if add == 2:
         subcode = dict_value.get("add_subcode", "empty")
@@ -410,12 +410,12 @@ def move_subfield(direction, recid, uid, record, tag, num_field, num_subfield):
             mysubfields = field[0]
             for subfield in mysubfields:
                 j += 1
-                if direction == bibedit_templates.MOVE_UP and num_subfield == j and j > 0:
+                if direction == 'move_up' and num_subfield == j and j > 0:
                     #swap this and the previous..
                     prevsubfield = field[0][j-1]
                     field[0][j-1] = subfield
                     field[0][j] = prevsubfield
-                if direction == bibedit_templates.MOVE_DOWN and num_subfield == j and j < len(mysubfields):
+                if direction == 'move_down' and num_subfield == j and j < len(mysubfields):
                     #swap this and the next..
                     nextsubfield = field[0][j+1]
                     field[0][j+1] = subfield

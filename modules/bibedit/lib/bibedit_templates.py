@@ -36,9 +36,6 @@ btn_restore_url = "%s/img/left.gif" % CFG_SITE_URL
 
 class Template:
 
-    DELETE = "1"
-    MOVE_UP = "2"
-    MOVE_DOWN = "3"
 
     def tmpl_table_header(self, ln, type_table, recid, temp="false", format_tag='marc',
                           tag='', num_field=None, add=0):
@@ -348,7 +345,7 @@ class Template:
                                                  'num_field'    : num_field,
                                                  'format_tag'   : format_tag,
                                                  'temp'         : 'true',
-                                                 'act_subfield' : 1, #delete
+                                                 'act_subfield' : 'delete', #delete
                                                  'num_subfield' : num_value})
                     if num_value > 0:
                         print_btn += "<td>%s</td>" \
@@ -359,7 +356,7 @@ class Template:
                                                  'num_field'    : num_field,
                                                  'format_tag'   : format_tag,
                                                  'temp'         : 'true',
-                                                 'act_subfield' : 2, #move up
+                                                 'act_subfield' : 'move_up', #move up
                                                  'num_subfield' : num_value})
                     else:
                         print_btn += "<td> </td>"
@@ -372,7 +369,7 @@ class Template:
                                                  'num_field'    : num_field,
                                                  'format_tag'   : format_tag,
                                                  'temp'         : 'true',
-                                                 'act_subfield' : 3, #move up
+                                                 'act_subfield' : 'move_down',
                                                  'num_subfield' : num_value})
 
 
