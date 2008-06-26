@@ -235,7 +235,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             task_update_status("ERROR")
             sys.exit(1)
         try:
-            record = elaborate_fft_tags(record, rec_id, opt_mode)
+            elaborate_fft_tags(record, rec_id, opt_mode)
         except Exception, e:
             register_exception()
             write_message("   Stage 2 failed: Error while elaborating FFT tags: %s" % e,
@@ -243,6 +243,24 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             return (1, int(rec_id))
         if record is None:
             write_message("   Stage 2 failed: Error while elaborating FFT tags",
+                        verbose=1, stream=sys.stderr)
+            return (1, int(rec_id))
+        write_message("   -Stage COMPLETED", verbose=2)
+    else:
+        write_message("   -Stage NOT NEEDED", verbose=2)
+
+    # Have a look if we have FFT tags
+    write_message("Stage 2B: Start (Synchronize 8564 tags).", verbose=2)
+    if opt_stage_to_start_from <= 2:
+        try:
+            record = synchronize_8564(rec_id, record)
+        except Exception, e:
+            register_exception()
+            write_message("   Stage 2B failed: Error while synchronizing 8564 tags: %s" % e,
+                verbose=1, stream=sys.stderr)
+            return (1, int(rec_id))
+        if record is None:
+            write_message("   Stage 2B failed: Error while synchronizing 8564 tags",
                         verbose=1, stream=sys.stderr)
             return (1, int(rec_id))
         write_message("   -Stage COMPLETED", verbose=2)
@@ -695,6 +713,55 @@ def insert_record_bibrec_bibxxx(table_name, id_bibxxx,
             " function 2nd query : %s " % error, verbose=1, stream=sys.stderr)
     return res
 
+def synchronize_8564(rec_id, record):
+    """Sinchronize the 8564 tags for record with actual files. descriptions
+    should be a dictionary docname:description for the new description to be
+    inserted."""
+    write_message("Synchronizing MARC of recid '%s' with:\n%s" % (rec_id, record), verbose=9)
+    tags8564s = record_get_field_instances(record, '856', '4', ' ')
+    filtered_tags8564s = []
+
+    # Let's discover all the previous internal urls, in order to rebuild them!
+    for field in tags8564s:
+        to_be_removed = False
+        for value in field_get_subfield_values(field, 'u') + field_get_subfield_values(field, 'q'):
+            if value.startswith('%s/record/%s/files/' % (CFG_SITE_URL, rec_id)) or \
+                value.startswith('%s/record/%s/files/' % (CFG_SITE_SECURE_URL, rec_id)):
+                to_be_removed = True
+        if not to_be_removed:
+            filtered_tags8564s.append(field)
+
+    # Let's keep in the record only external 8564
+    record_delete_field(record, '856', '4', ' ') # First we delete 8564
+    for field in filtered_tags8564s: # Then we readd external ones
+        record_add_field(record, '856', '4', ' ', '', field[0])
+
+    # Now we refresh with existing internal 8564
+    bibrecdocs = BibRecDocs(rec_id)
+    latest_files = bibrecdocs.list_latest_files()
+    for afile in latest_files:
+        url = afile.get_url()
+        description = afile.get_description()
+        comment = afile.get_comment()
+        new_subfield = [('u', url)]
+        if description:
+            new_subfield.append(('y', description))
+        if comment:
+            new_subfield.append(('z', comment))
+        record_add_field(record, '856', '4', ' ', '', new_subfield)
+
+    # Let'handle all the icons
+    for bibdoc in bibrecdocs.list_bibdocs():
+        icon = bibdoc.get_icon()
+        if icon:
+            icon = icon.list_all_files()
+            if icon:
+                url = icon[0].get_url() ## The 1st format found should be ok
+                new_subfield = [('q', url)]
+                new_subfield.append(('x', 'icon'))
+                record_add_field(record, '856', '4', ' ', '', new_subfield)
+    return record
+
 def elaborate_fft_tags(record, rec_id, mode):
     """
     Process FFT tags that should contain $a with file pathes or URLs
@@ -711,55 +778,6 @@ def elaborate_fft_tags(record, rec_id, mode):
     """
 
     # Let's define some handy sub procedure.
-    def _synchronize_8564(rec_id, record):
-        """Sinchronize the 8564 tags for record with actual files. descriptions
-        should be a dictionary docname:description for the new description to be
-        inserted."""
-        write_message("Synchronizing MARC of recid '%s' with:\n%s" % (rec_id, record), verbose=9)
-        tags8564s = record_get_field_instances(record, '856', '4', ' ')
-        filtered_tags8564s = []
-
-        # Let's discover all the previous internal urls, in order to rebuild them!
-        for field in tags8564s:
-            to_be_removed = False
-            for value in field_get_subfield_values(field, 'u') + field_get_subfield_values(field, 'q'):
-                if value.startswith('%s/record/%s/files/' % (CFG_SITE_URL, rec_id)) or \
-                    value.startswith('%s/record/%s/files/' % (CFG_SITE_SECURE_URL, rec_id)):
-                    to_be_removed = True
-            if not to_be_removed:
-                filtered_tags8564s.append(field)
-
-        # Let's keep in the record only external 8564
-        record_delete_field(record, '856', '4', ' ') # First we delete 8564
-        for field in filtered_tags8564s: # Then we readd external ones
-            record_add_field(record, '856', '4', ' ', '', field[0])
-
-        # Now we refresh with existing internal 8564
-        bibrecdocs = BibRecDocs(rec_id)
-        latest_files = bibrecdocs.list_latest_files()
-        for afile in latest_files:
-            url = afile.get_url()
-            description = afile.get_description()
-            comment = afile.get_comment()
-            new_subfield = [('u', url)]
-            if description:
-                new_subfield.append(('y', description))
-            if comment:
-                new_subfield.append(('z', comment))
-            record_add_field(record, '856', '4', ' ', '', new_subfield)
-
-        # Let'handle all the icons
-        for bibdoc in bibrecdocs.list_bibdocs():
-            icon = bibdoc.get_icon()
-            if icon:
-                icon = icon.list_all_files()
-                if icon:
-                    url = icon[0].get_url() ## The 1st format found should be ok
-                    new_subfield = [('q', url)]
-                    new_subfield.append(('x', 'icon'))
-                    record_add_field(record, '856', '4', ' ', '', new_subfield)
-        return record
-
     def _add_new_format(bibdoc, url, format, docname, doctype, newname, description, comment):
         """Adds a new format for a given bibdoc. Returns True when everything's fine."""
         write_message('Add new format to %s url: %s, format: %s, docname: %s, doctype: %s, newname: %s, description: %s, comment: %s' % (repr(bibdoc), url, format, docname, doctype, newname, description, comment), verbose=9)
@@ -1133,9 +1151,6 @@ def elaborate_fft_tags(record, rec_id, mode):
                 except:
                     register_exception()
                     raise
-        return _synchronize_8564(rec_id, record)
-    else:
-        return record
 
 def insert_fmt_tags(record, rec_id, opt_mode):
     """Process and insert FMT tags"""
