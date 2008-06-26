@@ -45,6 +45,10 @@ delete fields in a record.</p>
 <p>If you want to change several records at once, please use the batch
 command-line techniques describe below.</p>
 
+<p>Please note that 8564 tags pointing to fulltext files managed by CDS Invenio
+can't be manipulated via BibEdit. In order to modify them please use the
+<a href="bibupload-admin-guide#3.5">FFT tags through BibUpload</a> or the bibdocfile command line tool.</p>
+
 <a name="3"></a><h2>3. Edit records via command line</h2>
 
 <p>The idea is to download record in XML MARC format, edit it by using
@@ -183,7 +187,8 @@ be able to access it.
      deleted records.  These entries are to be cleaned from time to
      time by the BibEdit garbage collector.  This GC isn't part of
      CDS Invenio yet; moreover in the future we plan to abolish all the
-     bibXXx tables, so that this won't be necessary anymore.
+     bibXXx tables, so that this won't be necessary anymore.</p>
+
 
 <a name="5"></a><h2>5. Delete all records</h2>
 

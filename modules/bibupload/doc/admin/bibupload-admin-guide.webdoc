@@ -335,3 +335,8 @@ spcify a version, the last version will be used.</p>
 
 <p>The $r subfield can contain a keyword that can be use to restrict the given document. The same keyword must be specified for all the format of a given document. The keyword will be used as the status parameter for the "viewrestrdoc" action, which can be used to give access right/restriction to desired user. e.g. if you set the keyword "thesis", you can the connect the "thesisviewer" to the action "viewrestrdoc" with parameter "status" set to "thesis". Then all the user which are linked with the "thesisviewer" role will be able to download the document. Instead any other user will not be allowed. Note, if you use the keyword "KEEP-OLD-VALUE" the previous restrictions if applicable will be kept.
 </p>
+
+<p>Note regardless of fulltext being touched each time BibUpload is called on a
+record the 8564 tags will be refreshed after the fulltext files being connected to
+the document. Thus if you whish to update an 8564 tag related to a local URL the
+only way to perform this is through FFT tags.<p>
