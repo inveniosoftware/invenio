@@ -1724,22 +1724,24 @@ def download_url(url, format):
     protocol = urllib2.urlparse.urlsplit(url)[0]
     tmpfd, tmppath = tempfile.mkstemp(suffix=format, dir=CFG_TMPDIR)
     try:
-        if protocol in ('', 'file'):
-            path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
-            if os.path.realpath(path) != path:
-                raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
-            for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR]:
-                if path.startswith(allowed_path):
-                    shutil.copy(path, tmppath)
-                    return tmppath
-            raise StandardError, "%s is not in one of the allowed paths." % path
-        else:
-            urllib.urlretrieve(url, tmppath)
-            return tmppath
-    except:
-        os.remove(tmppath)
-        raise
-    os.close(tmpfd)
+        try:
+            if protocol in ('', 'file'):
+                path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
+                if os.path.realpath(path) != path:
+                    raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
+                for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR]:
+                    if path.startswith(allowed_path):
+                        shutil.copy(path, tmppath)
+                        return tmppath
+                raise StandardError, "%s is not in one of the allowed paths." % path
+            else:
+                urllib.urlretrieve(url, tmppath)
+                return tmppath
+        except:
+            os.remove(tmppath)
+            raise
+    finally:
+        os.close(tmpfd)
 
 class BibDocMoreInfo:
     """Class to wrap the serialized bibdoc more_info. At the moment
