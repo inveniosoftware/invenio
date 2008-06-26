@@ -189,12 +189,10 @@ def perform_request_submit(ln, recid):
 
     return (body, errors, warnings)
 
-
 def get_file_path(recid):
     """ return the file path of record. """
 
     return "%s/%s_%s" % (CFG_TMPDIR, CFG_BIBEDIT_TMPFILENAMEPREFIX, str(recid))
-
 
 def save_xml_record(recid):
     """Saves XML record file to database. """
@@ -433,7 +431,7 @@ def record_locked_b(recid):
         return 0
 
     cmd = """%s/bibsched status -t bibupload | grep -v 'USER="bibreformat"'""" % CFG_BINDIR
-    (junk, bibsched_status, junk) = run_shell_command(cmd)
+    bibsched_status = run_shell_command(cmd)[1]
 
     # Check for any scheduled bibupload tasks.
     if CFG_BIBEDIT_LOCKLEVEL == 2:
@@ -484,6 +482,6 @@ def record_locked_b(recid):
                 file_.close()
             except IOError:
                 continue
-            bfo = BibFormatObject(recid)
+        bfo = BibFormatObject(recid)
         return (bfo.control_field('001') in recs_field_001 or bfo.field('035__a')
             in recs_field_035__a or bfo.field('970__a') in recs_field_970__a)
