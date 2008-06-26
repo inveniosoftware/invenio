@@ -86,6 +86,9 @@ contributed to the project:
   - Zbigniew Leonowicz <leonowicz@ieee.org>
     Contributions to the Polish translation.
 
+  - Makiko Matsumoto and Takao Ishigaki
+    Contributions to the Japanese translation.
+
 The web session management and the URL handler were inspired by the
 Quixote Web Framework which is ``Copyright (c) 2004 Corporation for
 National Research Initiatives; All Rights Reserved''.
