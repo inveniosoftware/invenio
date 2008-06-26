@@ -175,6 +175,7 @@ DEF_DEMO_AUTHS = (
              ('bookcurator', 'referee', -1, 0, {'doctype': 'DEMOBOO', 'categ': '*'}),
              ('curator', 'runbibedit', -1, 1, {}),
              ('thesescurator', 'runbibedit', -1, 0, {'collection': 'Theses'}),
+             ('thesescurator', VIEWRESTRCOLL, -1, 0, {'collection': 'Theses'}),
              ('photocurator', 'runbibedit', -1, 0, {'collection': 'Pictures'}),
              ('bookcurator', 'runbibedit', -1, 0, {'collection': 'Books'})
             )
