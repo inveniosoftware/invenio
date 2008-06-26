@@ -387,6 +387,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Print_Success_MBI',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Print_Success_SRV',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Register_Approval_Request',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Report_Number_Generation',NULL);
+INSERT INTO sbmALLFUNCDESCR VALUES ('Second_Report_Number_Generation','Generate a secondary report number for a document.');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Send_Approval_Request',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Send_APP_Mail','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Send_Delete_Mail','');
@@ -485,6 +486,11 @@ INSERT INTO sbmFUNDESC VALUES ('Make_Dummy_MARC_XML_Record','dummyrec_create_tpl
 INSERT INTO sbmFUNDESC VALUES ('Print_Success_APP','decision_file');
 INSERT INTO sbmFUNDESC VALUES ('Send_Delete_Mail','edsrn');
 INSERT INTO sbmFUNDESC VALUES ('Send_Delete_Mail','record_managers');
+INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_rn_file');
+INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_rn_format');
+INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_rn_yeargen');
+INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_rncateg_file');
+INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_counterpath');
 
 INSERT INTO sbmGFILERESULT VALUES ('HTML','HTML document');
 INSERT INTO sbmGFILERESULT VALUES ('WORD','data');
