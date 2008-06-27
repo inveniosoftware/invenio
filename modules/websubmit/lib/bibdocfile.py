@@ -45,7 +45,8 @@ except NameError:
 from invenio.dbquery import run_sql, DatabaseError, blob_to_string
 from invenio.errorlib import register_exception
 from invenio.bibrecord import create_record, record_get_field_instances, \
-    field_get_subfield_values, field_get_subfield_instances
+    field_get_subfield_values, field_get_subfield_instances, \
+    encode_for_xml
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_URL, \
     CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR,\
