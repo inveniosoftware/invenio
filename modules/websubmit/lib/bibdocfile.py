@@ -42,6 +42,7 @@ try:
 except NameError:
     from sets import Set as set
 
+from invenio.shellutils import run_shell_command, escape_shell_arg
 from invenio.dbquery import run_sql, DatabaseError, blob_to_string
 from invenio.errorlib import register_exception
 from invenio.bibrecord import create_record, record_get_field_instances, \
@@ -1736,9 +1737,8 @@ def download_url(url, format, sleep=2):
                         return tmppath
                 raise StandardError, "%s is not in one of the allowed paths." % path
             else:
-                try:
-                    urllib.urlretrieve(url, tmppath)
-                except:
+                #urllib.urlretrieve(url, tmppath)
+                if run_shell_command('wget %s -O %s' % (escape_shell_arg(url), escape_shell_arg(tmppath)))[0]:
                     time.sleep(sleep)
                     try:
                         urllib.urlretrieve(url, tmppath)
