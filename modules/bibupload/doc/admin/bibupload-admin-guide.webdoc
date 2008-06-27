@@ -235,11 +235,13 @@ tag instance containing a pointer to e.g. the thesis defence slides.
 The subfields of an FFT tag are non-repetitive.
 </p>
 
-<p>When more than one FFT tag is specified for the same document (e.g. for
-adding more than one format at a time), if $t (docfile type), $m (new desired docfile name), $r (restriction), $v (version), $x (url/path for an icon), are
-specified, they should be identically specified for each single entry of FFT.
-E.g. if you want to specify an icon for a document with two formats (say .pdf
-and .doc), you'll write two FFT tags, both containing the same $x subfield.</p>
+<p>When more than one FFT tag is specified for the same document
+(e.g. for adding more than one format at a time), if $t (docfile
+type), $m (new desired docfile name), $r (restriction), $v (version),
+$x (url/path for an icon), are specified, they should be identically
+specified for each single entry of FFT.  E.g. if you want to specify
+an icon for a document with two formats (say .pdf and .doc), you'll
+write two FFT tags, both containing the same $x subfield.</p>
 
 <p>The bibupload process, when it encounters FFT tags, will
 automatically populate fulltext storage space
@@ -250,9 +252,10 @@ metadata of the record in question with references to the latest
 versions of each file.
 </p>
 
-<p>Note that for $a and $x subfields filesystem paths must be absolute (e.g. <code>/tmp/icon.gif</code> is valid, while <code>Destkop/icon.gif</code> is
-not) and they must be readable by the user/group of the bibupload process that
-will handle the FFT.
+<p>Note that for $a and $x subfields filesystem paths must be absolute
+(e.g. <code>/tmp/icon.gif</code> is valid,
+while <code>Destkop/icon.gif</code> is not) and they must be readable
+by the user/group of the bibupload process that will handle the FFT.
 </p>
 
 <p>The bibupload process supports the usual modes correct, append,
@@ -303,40 +306,57 @@ effectively hidden, please use the correct mode with $n docname
 and $t DELETE as the special keyword.
 </p>
 
-<p>In order to expunge (i.e. remove completely, also from the filesystem) all existing versions of a file, making it
-effectively disappear, please use the correct mode with $n docname
-and $t EXPUNGE as the special keyword.
+<p>In order to expunge (i.e. remove completely, also from the
+filesystem) all existing versions of a file, making it effectively
+disappear, please use the correct mode with $n docname and $t EXPUNGE
+as the special keyword.
 </p>
 
-<p>In order to synchronize MARC to the bibrec/bibdoc structure (e.g. after an
-update or a tweak in the database), please use the correct mode with $n docname
-and $t FIX-MARC as the special keyword.
+<p>In order to synchronize MARC to the bibrec/bibdoc structure
+(e.g. after an update or a tweak in the database), please use the
+correct mode with $n docname and $t FIX-MARC as the special keyword.
 
-<p>In order to fix a record (i.e. put all its linked documents in a coherent state)
-and synchronize the MARC to the table, please use the correct mode with $n
-docname and $t FIX-ALL as the special keyword.
+<p>In order to fix a record (i.e. put all its linked documents in a
+coherent state) and synchronize the MARC to the table, please use the
+correct mode with $n docname and $t FIX-ALL as the special keyword.
 </p>
 
-<p>In order to revert to a previous file revision (i.e. to create a new revision with
-the same content as some previous revision had), please use the correct mode with
-$n docname, $t REVERT as the special keyword and $v the number corresponding
-to the desired version.</p>
+<p>In order to revert to a previous file revision (i.e. to create a
+new revision with the same content as some previous revision had),
+please use the correct mode with $n docname, $t REVERT as the special
+keyword and $v the number corresponding to the desired version.</p>
 
-<p>In order to delete a particular file added by mistake, please use the correct
-mode with $n docname, $t DELETE-FILE, specifing $v version and
-$f format. Note that this operation is not reversible. Note that if you don't
-spcify a version, the last version will be used.</p>
+<p>In order to delete a particular file added by mistake, please use
+the correct mode with $n docname, $t DELETE-FILE, specifing $v version
+and $f format. Note that this operation is not reversible. Note that
+if you don't spcify a version, the last version will be used.</p>
 
-<p>In order to preserve previous comments and descriptions when correcting, please use the KEEP-OLD-VALUE special keyword with the desired $d and $z subfield.
+<p>In order to preserve previous comments and descriptions when
+correcting, please use the KEEP-OLD-VALUE special keyword with the
+desired $d and $z subfield.
 </p>
 
-<p>In order to add an icon representing a document, you must use a $x subfields. All the FFT for different format of the document must have then the same $x subfield. You can use KEEP-OLD-VALUE in order to keep the previous icon when correcting.
+<p>In order to add an icon representing a document, you must use a $x
+subfields. All the FFT for different format of the document must have
+then the same $x subfield. You can use KEEP-OLD-VALUE in order to keep
+the previous icon when correcting.
 </p>
 
-<p>The $r subfield can contain a keyword that can be use to restrict the given document. The same keyword must be specified for all the format of a given document. The keyword will be used as the status parameter for the "viewrestrdoc" action, which can be used to give access right/restriction to desired user. e.g. if you set the keyword "thesis", you can the connect the "thesisviewer" to the action "viewrestrdoc" with parameter "status" set to "thesis". Then all the user which are linked with the "thesisviewer" role will be able to download the document. Instead any other user will not be allowed. Note, if you use the keyword "KEEP-OLD-VALUE" the previous restrictions if applicable will be kept.
+<p>The $r subfield can contain a keyword that can be use to restrict
+the given document. The same keyword must be specified for all the
+format of a given document. The keyword will be used as the status
+parameter for the "viewrestrdoc" action, which can be used to give
+access right/restriction to desired user. e.g. if you set the keyword
+"thesis", you can the connect the "thesisviewer" to the action
+"viewrestrdoc" with parameter "status" set to "thesis". Then all the
+user which are linked with the "thesisviewer" role will be able to
+download the document. Instead any other user will not be
+allowed. Note, if you use the keyword "KEEP-OLD-VALUE" the previous
+restrictions if applicable will be kept.
 </p>
 
-<p>Note regardless of fulltext being touched each time BibUpload is called on a
-record the 8564 tags will be refreshed after the fulltext files being connected to
-the document. Thus if you whish to update an 8564 tag related to a local URL the
-only way to perform this is through FFT tags.<p>
+<p>Note that each time bibupload is called on a record, the 8564 tags
+pointing to locally stored files are recreated on the basis of the
+full-text files connected to the record.  Thus, if you whish to update
+some 8564 tag pointing to a locally managed file, the only way to
+perform this is through the FFT tag, not by editing 8564 directly.<p>
