@@ -1719,7 +1719,7 @@ def check_valid_url(url):
     except Exception, e:
         raise StandardError, "%s is not a correct url: %s" % (url, e)
 
-def download_url(url, format):
+def download_url(url, format, sleep=2):
     """Download a url (if it corresponds to a remote file) and return a local url
     to it."""
     protocol = urllib2.urlparse.urlsplit(url)[0]
@@ -1736,6 +1736,7 @@ def download_url(url, format):
                         return tmppath
                 raise StandardError, "%s is not in one of the allowed paths." % path
             else:
+                time.sleep(sleep)
                 urllib.urlretrieve(url, tmppath)
                 return tmppath
         except:
