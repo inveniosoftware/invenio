@@ -26,7 +26,8 @@ __lastupdated__ = """$Date$"""
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized
-from invenio.bibedit_engine import perform_request_index, perform_request_edit, perform_request_submit
+from invenio.bibedit_engine import perform_request_index, perform_request_edit, \
+    perform_request_submit, perform_request_history, revid2revdate
 from invenio.search_engine import record_exists, guess_primary_collection_of_a_record
 from invenio.access_control_engine import acc_authorize_action
 from invenio.messages import gettext_set_language, wash_language
@@ -137,6 +138,47 @@ def submit(req, recid='', ln=CFG_SITE_LANG):
     else:
         return page_not_authorized(req=req, text=auth_message, navtrail=navtrail)
     return page(title       = _("Submit and save record %s") % ('#' + str(recid)),
+                body        = body,
+                errors      = errors,
+                warnings    = warnings,
+                uid         = getUid(req),
+                language    = ln,
+                navtrail    = navtrail,
+                lastupdated = __lastupdated__,
+                req         = req)
+
+def history(req, ln=CFG_SITE_LANG, recid=None, revid=None,
+             action=None, temp="false", format_tag='marc', **args):
+    """ Bibedit history interface. """
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    uid = getUid(req)
+    body = ''
+
+    (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit', collection=guess_primary_collection_of_a_record(recid))
+    if auth_code != 0:
+        (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit')
+    if auth_code == 0:
+        if action == 'confirm_load' or action == 'load':
+            (body, errors, warnings) = perform_request_history(ln, recid, revid, action,
+                                                                uid, temp, format_tag, args)
+        else:
+            (body, errors, warnings) = perform_request_history(ln, recid, revid, action,
+                                                                  uid, temp, format_tag, args)
+
+    else:
+        return page_not_authorized(req=req, text=auth_message, navtrail=navtrail)
+
+    if warnings:
+        title = warnings[0]
+    elif action == 'load':
+        title = _("Record #%s" % recid)
+    else:
+        title = _("Record #%(recid)s, revision %(revdate)s"
+          ) % {'recid': recid,
+               'revdate': revid2revdate(revid)}
+
+    return page(title   = title,
                 body        = body,
                 errors      = errors,
                 warnings    = warnings,

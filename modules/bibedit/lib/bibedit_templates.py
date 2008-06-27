@@ -22,7 +22,6 @@ __revision__ = "$Id$"
 from invenio.bibedit_dblayer import *
 from invenio.config import CFG_SITE_URL
 from invenio.messages import gettext_set_language
-import sre
 
 ## Link of edit, move up and delete button:
 btn_delete_url = CFG_SITE_URL + "/img/iconcross.gif"
@@ -30,9 +29,6 @@ btn_moveup_url = CFG_SITE_URL + "/img/arrow_up.gif"
 btn_movedown_url = CFG_SITE_URL + "/img/arrow_down.gif"
 btn_edit_url   = CFG_SITE_URL + "/img/iconpen.gif"
 bibediturl = "%s/admin/bibedit/bibeditadmin.py" % CFG_SITE_URL
-btn_view_url = "%s/img/file-icon-text-15x20.gif" % CFG_SITE_URL
-btn_comp_url = "%s/img/edit1.gif" % CFG_SITE_URL
-btn_restore_url = "%s/img/left.gif" % CFG_SITE_URL
 
 class Template:
 
@@ -530,8 +526,8 @@ class Template:
         out += self.tmpl_record_choice_box(ln=ln, message=0)
         return out
 
-    def tmpl_deleted(self, ln, message='', recid='', temp='', format_tag=''):
-        """ Return a deleted message of Bibedit. """
+    def tmpl_confirm(self, ln, message='', recid='', temp='', format_tag='', revid='', revdate=''):
+        """ Ask for confirmation of or confirm some critical action. """
         _ = gettext_set_language(ln)
         if message == 1:
             return """ %(message)s
@@ -555,7 +551,44 @@ class Template:
                           'input_button_no'  : self.tmpl_input('submit', _("No"),  class_css='formbutton'),
                           'temp'             : temp,
                           'format_tag'       : format_tag}
-
+        if message == 2:
+            question = _('Do you really want to load revision %(revdate)s of record #%(recid)s?'
+                        ) % {'revdate': revdate,
+                             'recid': recid}
+            warning_1 = _('The current version will be replaced with a copy of revision %(revdate)s'
+                        ) % {'revdate': revdate}
+            warning_2 = _('You will also lose any unsubmitted changes for this record!')
+            return """ %(question)s<br />
+                        <b>%(warning_1)s</b><br />
+                        <b>%(warning_2)s</b><br /><br />
+                       <div style="float:left;">
+                         <form action="%(bibediturl)s/history?recid=%(recid)s&revid=%(revid)s&action=load" method="POST">
+                           %(input_ln)s
+                           %(input_button_yes)s
+                         </form>
+                       </div>
+                       <div style="float:left;">
+                         <form action="%(bibediturl)s/index?recid=%(recid)s&temp=%(temp)s&format_tag=%(format_tag)s" method="POST">
+                           %(input_ln)s
+                           %(input_button_no)s
+                         </form>
+                       </div>
+                   """ % {'question'        : question,
+                          'warning_1'       : warning_1,
+                          'warning_2'       : warning_2,
+                          'bibediturl'      : bibediturl,
+                          'revid'           : revid,
+                          'recid'           : recid,
+                          'input_ln'        : self.tmpl_input('hidden', ln, 'ln'),
+                          'input_button_yes': self.tmpl_input('submit', _("Yes"), class_css='formbutton'),
+                          'input_button_no' : self.tmpl_input('submit', _("No"),  class_css='formbutton'),
+                          'temp'            : temp,
+                          'format_tag'      : format_tag}
+        if message == 3:
+            out =   _("The new revision is being synchronized with the database and will be ready shortly.") + '<br /><br />'
+            out += '<h2>' + _("Edit another record") + '</h2>'
+            out += self.tmpl_record_choice_box(ln=ln, message=0)
+            return out
         else:
             out =   _("The record will be deleted as soon as the task queue is empty.") + '<br /><br />'
             out += '<h2>' + _("Edit another record") + '</h2>'

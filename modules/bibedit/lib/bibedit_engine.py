@@ -27,17 +27,25 @@ import time
 
 from invenio.bibedit_config import CFG_BIBEDIT_TMPFILENAMEPREFIX
 from invenio.bibedit_dblayer import marc_to_split_tag
-from invenio.bibformat_engine import BibFormatObject
 from invenio.bibrecord import record_xml_output, create_record, create_records, \
     field_add_subfield, record_add_field, record_has_field, record_get_field_value
 from invenio.bibtask import task_low_level_submission
-from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_BIBEDIT_TIMEOUT, CFG_BIBEDIT_LOCKLEVEL
+from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_BIBEDIT_TIMEOUT, \
+    CFG_BIBEDIT_LOCKLEVEL, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
+    CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG
+from invenio.dateutils import convert_datetext_to_dategui
 from invenio.dbquery import run_sql
 from invenio.shellutils import run_shell_command
-from invenio.search_engine import print_record, record_exists
+from invenio.search_engine import print_record, record_exists, get_fieldvalues
 import invenio.template
 
 bibedit_templates = invenio.template.load('bibedit')
+
+## precompile some often-used regexp for speed reasons:
+re_tasks = sre.compile('ID="(\d+)"')
+re_file_option = sre.compile(r'^/')
+re_filename_suffix = sre.compile('_(\d+)\.xml$')
+re_date = sre.compile('\.(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 
 def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, format_tag, edit_tag,
                           delete_tag, num_field, add, dict_value=None):
@@ -52,20 +60,20 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
 
     if delete != 0:
         if confirm_delete != 0:
-            body = bibedit_templates.tmpl_deleted(ln, 1, delete, temp, format_tag)
+            body = bibedit_templates.tmpl_confirm(ln, 1, delete, temp, format_tag)
         else:
             (record, junk) = get_record(ln, delete, uid, "false")
             add_field(delete, uid, record, "980", "", "", "c", "DELETED")
             save_temp_record(record, uid, "%s.tmp" % get_file_path(delete))
             save_xml_record(delete)
-            body = bibedit_templates.tmpl_deleted(ln)
+            body = bibedit_templates.tmpl_confirm(ln)
 
     else:
         if recid != 0 :
             if record_exists(recid) > 0:
                 (record, body) = get_record(ln, recid, uid, temp)
 
-                if record != '' and not record_locked_b(recid):
+                if record != '' and not record_locked_p(recid):
                     if add == 3:
                         body = ''
 
@@ -187,6 +195,27 @@ def perform_request_submit(ln, recid):
     warnings = []
     body     = bibedit_templates.tmpl_submit(ln)
 
+    return (body, errors, warnings)
+
+def perform_request_history(ln, recid, revid, action, uid, temp, format_tag, args):
+    """ Performs historic operations on a record. """
+
+    errors   = []
+    warnings = []
+    body = ''
+
+    revision = get_revision(recid, revid)
+    if revision != 0:
+        if action == 'confirm_load':
+            body = bibedit_templates.tmpl_confirm(
+                       ln, 2, recid, temp, format_tag, revid, revid2revdate(revid))
+        elif action == 'load':
+            submit_record(recid, revision, uid)
+            body = bibedit_templates.tmpl_confirm(ln, 3, recid)
+        else:
+            body =  '<pre>%s</pre>' % get_text_marc(recid, revision).replace('\n', '<br />')
+    else:
+        warnings.append('No revision named %s for record #%s' % (revid, recid))
     return (body, errors, warnings)
 
 def get_file_path(recid):
@@ -423,65 +452,137 @@ def move_subfield(direction, recid, uid, record, tag, num_field, num_subfield):
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     return record
 
-def record_locked_b(recid):
+def record_locked_p(recid):
     """Checks if record should be locked for editing, method based on CFG_BIBEDIT_LOCKLEVEL. """
 
     # Check only for tmp-file (done in get_record).
     if CFG_BIBEDIT_LOCKLEVEL == 0:
         return 0
 
-    cmd = """%s/bibsched status -t bibupload | grep -v 'USER="bibreformat"'""" % CFG_BINDIR
-    bibsched_status = run_shell_command(cmd)[1]
-
     # Check for any scheduled bibupload tasks.
     if CFG_BIBEDIT_LOCKLEVEL == 2:
+        cmd = """%s/bibsched status -t bibupload | grep -v 'USER="bibreformat"'""" % CFG_BINDIR
+        bibsched_status = run_shell_command(cmd)[1]
         return bibsched_status.find('PROC="bibupload"') + 1
 
-    # Collect path to all files scheduled for upload.
-    find_tasks = sre.compile('ID="(\d+)"')
-    find_file_option = sre.compile(r'^/')
-    tasks = find_tasks.findall(bibsched_status)
-    filenames = []
-    for task in tasks:
-        res = run_sql("SELECT arguments FROM schTASK WHERE id=%s" % task)
-        if res:
-            record_options = marshal.loads(res[0][0])
-            for option in record_options[1:]:
-                if find_file_option.search(option):
-                    filenames.append(option)
+    filenames = get_bibupload_filenames()
 
-    # Check for match between name of XML-file and record.
+    # Check for match between name of XML-files and record.
     # Assumes that filename ends with _<recid>.xml.
     if CFG_BIBEDIT_LOCKLEVEL == 1:
         recids = []
-        find_filename_suffix = sre.compile('_(\d+)\.xml$')
         for filename in filenames:
-            filename_suffix = find_filename_suffix.search(filename)
+            filename_suffix = re_filename_suffix.search(filename)
             if filename_suffix:
                 recids.append(int(filename_suffix.group(1)))
         return recid in recids
 
     # Check for match between content of files and record.
     if CFG_BIBEDIT_LOCKLEVEL == 3:
-        recs_field_001 = []
-        recs_field_035__a = []
-        recs_field_970__a = []
-        for filename in filenames:
-            try:
-                file_ = open(filename)
-                records = create_records(file_.read(), 0, 0)
-                for i in range(0, len(records)):
-                    (record, er, junk) = records[i]
-                    if record != None and er != 0:
-                        if record_has_field(record, '001'):
-                            recs_field_001.append(record_get_field_value(record, '001', '%', '%'))
-                        if record_has_field(record, '035'):
-                            recs_field_035__a.append(record_get_field_value(record, '035', '%', '%', 'a'))
-                        if record_has_field(record, '970'):
-                            recs_field_970__a.append(record_get_field_value(record, '970', '%', '%', 'a'))
-                file_.close()
-            except IOError:
-                continue
-        bfo = BibFormatObject(recid)
-        return (bfo.control_field('001') in recs_field_001 or bfo.field('035__a')
-            in recs_field_035__a or bfo.field('970__a') in recs_field_970__a)
+        while True:
+            lock = record_in_files_p(recid, filenames)
+            # Check if any new files were added while we were searching
+            if not lock:
+                filenames_updated = get_bibupload_filenames()
+                for filename in filenames_updated:
+                    if not filename in filenames:
+                        break
+                else:
+                    return lock
+            else:
+                return lock
+
+def get_bibupload_filenames():
+    """ Returns path to all files scheduled for bibupload, except by user bibreformat. """
+    cmd = """%s/bibsched status -t bibupload | grep -v 'USER="bibreformat"'""" % CFG_BINDIR
+    bibsched_status = run_shell_command(cmd)[1]
+    tasks = re_tasks.findall(bibsched_status)
+    filenames = []
+    for task in tasks:
+        res = run_sql("SELECT arguments FROM schTASK WHERE id=%s" % task)
+        if res:
+            record_options = marshal.loads(res[0][0])
+            for option in record_options[1:]:
+                if re_file_option.search(option):
+                    filenames.append(option)
+    return filenames
+
+def record_in_files_p(recid, filenames):
+    """ Scans trough XML files searching for record. """
+    # Get id tags of record in question
+    rec_oaiid = rec_sysno = -1
+    rec_oaiid_tag = get_fieldvalues(recid, OAIID_TAG)
+    if rec_oaiid_tag:
+        rec_oaiid = rec_oaiid_tag[0]
+    rec_sysno_tag = get_fieldvalues(recid, SYSNO_TAG)
+    if rec_sysno_tag:
+        rec_sysno = rec_sysno_tag[0]
+
+    # For each record in each file, compare ids and abort if match is found
+    for filename in filenames:
+        try:
+            file_ = open(filename)
+            records = create_records(file_.read(), 0, 0)
+            for i in range(0, len(records)):
+                (record, er, junk) = records[i]
+                if record and er != 0:
+                    if record_has_field(record, '001'):
+                        if (record_get_field_value(record, '001', '%', '%')
+                            == str(recid)):
+                            return True
+                    if record_has_field(record, OAIID_TAG[0:3]):
+                        if (record_get_field_value(
+                                record, OAIID_TAG[0:3], OAIID_TAG[3],
+                                OAIID_TAG[4], OAIID_TAG[5]) == rec_oaiid):
+                            return True
+                    if record_has_field(record, SYSNO_TAG[0:3]):
+                        if (record_get_field_value(
+                                record, SYSNO_TAG[0:3], SYSNO_TAG[3],
+                                SYSNO_TAG[4], SYSNO_TAG[5]) == rec_sysno):
+                            return True
+            file_.close()
+        except IOError:
+            continue
+    return False
+
+def get_revision(recid, revid):
+    """ Return previous revision of record. """
+    if revid and len(revid.split('.')) == 2:
+        cmd = "%s/bibedit --list-revisions %s" % (CFG_BINDIR, recid)
+        revids = run_shell_command(cmd)[1]
+        if revid in revids.split('\n'):
+            cmd = "%s/bibedit --get-revision %s" % (CFG_BINDIR, revid)
+            return run_shell_command(cmd)[1]
+    return 0
+
+def revid2revdate(revid):
+    """ Return date of revision in userfriendly format. """
+    date = re_date.search(revid)
+    return convert_datetext_to_dategui('%s-%s-%s %s:%s:%s' % date.groups())
+
+def get_text_marc(recid, xml_record):
+    """ Return record in text MARC format. """
+    tmpfilepath = '%s/bibedit_tmpfile_%s' % (CFG_TMPDIR, recid)
+    tmpfile = open(tmpfilepath, 'w')
+    tmpfile.write(xml_record)
+    tmpfile.close()
+    cmd = ('%s/xmlmarc2textmarc %s') % (CFG_BINDIR, tmpfilepath)
+    textmarc = run_shell_command(cmd)[1]
+    run_shell_command('rm ' + tmpfilepath)
+    return textmarc
+
+def submit_record(recid, xml_record, uid):
+    """
+    Submit a new revision of a record.
+
+    @param recid id of the record in question
+    @param xml_record the new revision in XML MARC format
+    @uid user id of the calling user
+    """
+
+    file_path = get_file_path(recid)
+    if os.path.isfile("%s.tmp" % file_path):
+        os.system("rm %s.tmp" % file_path)
+    record = create_record(xml_record)[0]
+    save_temp_record(record, uid, "%s.tmp" % file_path)
+    save_xml_record(recid)
