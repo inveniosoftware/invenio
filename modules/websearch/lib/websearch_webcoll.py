@@ -866,7 +866,8 @@ def task_submit_check_options():
     if task_has_option('collection'):
         coll = get_collection(task_get_option("collection"))
         if coll.id is None:
-            raise StandardError, 'Collection %s does not exist' % coll.name
+            print 'Collection "%s" does not exist' % coll.name
+            return False
     return True
 
 def task_run_core():
