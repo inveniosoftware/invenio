@@ -331,15 +331,15 @@ def perform_request_addsource(oai_src_name=None, oai_src_baseurl='', oai_src_pre
 
     if confirm in [1, "1"] and not oai_src_name:
         output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please enter a name for the source.")
-    if confirm in [1, "1"] and not oai_src_prefix:
+    elif confirm in [1, "1"] and not oai_src_prefix:
         output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please enter a metadata prefix.")
-    if confirm in [1, "1"] and not oai_src_frequency:
+    elif confirm in [1, "1"] and not oai_src_frequency:
         output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please choose a frequency of harvesting")
-    if confirm in [1, "1"] and not oai_src_lastrun:
+    elif confirm in [1, "1"] and not oai_src_lastrun:
         output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please choose the harvesting starting date")
-    if confirm in [1, "1"] and not oai_src_post:
+    elif confirm in [1, "1"] and not oai_src_post:
         output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please choose a postprocess mode")
-    if confirm in [1, "1"] and oai_src_post.startswith("h-c") and (not oai_src_config or validatefile(oai_src_config)!=0):
+    elif confirm in [1, "1"] and oai_src_post.startswith("h-c") and (not oai_src_config or validatefile(oai_src_config)!=0):
         output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "You selected a postprocess mode which involves conversion.")
         output += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG, "Please enter a valid name of or a full path to a BibConvert config file or change postprocess mode.")
     elif oai_src_name and confirm in [1, "1"]:
