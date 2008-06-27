@@ -1736,8 +1736,14 @@ def download_url(url, format, sleep=2):
                         return tmppath
                 raise StandardError, "%s is not in one of the allowed paths." % path
             else:
-                time.sleep(sleep)
-                urllib.urlretrieve(url, tmppath)
+                try:
+                    urllib.urlretrieve(url, tmppath)
+                except:
+                    time.sleep(sleep)
+                    try:
+                        urllib.urlretrieve(url, tmppath)
+                    except Exception, e:
+                        raise StandardError, "It's impossible to download %s: %s" % (url, e)
                 return tmppath
         except:
             os.remove(tmppath)
