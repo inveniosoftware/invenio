@@ -550,7 +550,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 ('', 'legacy_collection'),
                 ('search.py', 'legacy_search'),
                 'search', 'openurl', 'testsso',
-                ('wsignout.gif', 'logout_SSO_hook')]
+                'logout_SSO_hook']
 
     search = WebInterfaceSearchResultsPages()
 
