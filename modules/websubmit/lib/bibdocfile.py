@@ -1723,6 +1723,7 @@ def check_valid_url(url):
 def download_url(url, format, sleep=2):
     """Download a url (if it corresponds to a remote file) and return a local url
     to it."""
+    format = normalize_format(format)
     protocol = urllib2.urlparse.urlsplit(url)[0]
     tmpfd, tmppath = tempfile.mkstemp(suffix=format, dir=CFG_TMPDIR)
     try:
@@ -1738,12 +1739,9 @@ def download_url(url, format, sleep=2):
                 raise StandardError, "%s is not in one of the allowed paths." % path
             else:
                 #urllib.urlretrieve(url, tmppath)
-                if run_shell_command('wget %s -O %s' % (escape_shell_arg(url), escape_shell_arg(tmppath)))[0]:
-                    time.sleep(sleep)
-                    try:
-                        urllib.urlretrieve(url, tmppath)
-                    except Exception, e:
-                        raise StandardError, "It's impossible to download %s: %s" % (url, e)
+                cmd_exit_code, cmd_out, cmd_err = run_shell_command('wget %s -O %s -t 2 -T 40' % (escape_shell_arg(url), escape_shell_arg(tmppath)))
+                if cmd_exit_code:
+                    raise StandardError, "It's impossible to download %s: %s" % (url, cmd_err)
                 return tmppath
         except:
             os.remove(tmppath)
