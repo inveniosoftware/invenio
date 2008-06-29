@@ -271,8 +271,8 @@ def create_login_page_box(referer='', apache_msg="", ln=CFG_SITE_LANG):
         return msg + apache_msg
 
     if apache_msg:
-        msg += apache_msg + "<p>Otherwise please, provide the correct authorization" \
-        " data in the following form.</p>"
+        msg += apache_msg + "<p>2) Otherwise please authenticate yourself" \
+        " in the following form:</p>"
 
     internal = None
     for system in CFG_EXTERNAL_AUTHENTICATION.keys():

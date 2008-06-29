@@ -64,9 +64,9 @@ def _format_list_of_apache_firerole(roles, referer):
     Please use it with care."""
     out = ""
     if roles:
-        out += "<p>Here's a list of administrative roles you may have " \
-        "received authorization to, via an Apache password. If you are aware " \
-        "of such a password, please follow the corresponding link."
+        out += "<p>1) Here is a list of administrative roles you may have " \
+        "received authorization for via an Apache password. If you are aware " \
+        "of such a password, please follow the corresponding link:"
         out += "<table>"
         for name, description in roles:
             out += "<tr>"
