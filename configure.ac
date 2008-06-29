@@ -22,8 +22,8 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.99.0.20080617, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.99.0.20080617)
+AC_INIT(cds-invenio, 0.99.0.20080629, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.99.0.20080629)
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with
@@ -125,6 +125,17 @@ if test -z "$TAR"; then
    functionality.  We recommend you to install it first and to rerun
    the configure script.  Tar is available from
    <ftp://prep.ai.mit.edu/pub/gnu/tar/>.])
+fi
+
+## Check for wget:
+AC_PATH_PROG(WGET, wget)
+if test -z "$WGET"; then
+   AC_MSG_WARN([
+   wget was not found in your PATH.  It is used for the fulltext file
+   retrieval.
+   You can continue without it but we recomend you to install it first
+   and to rerun the configure script.  wget is available from
+   <http://www.gnu.org/software/wget/>.])
 fi
 
 ## Check for ps2pdf:
