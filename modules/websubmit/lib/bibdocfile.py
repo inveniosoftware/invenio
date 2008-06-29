@@ -54,7 +54,7 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_URL, \
     CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS, \
     CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL, \
     CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS, \
-    CFG_TMPDIR
+    CFG_TMPDIR, CFG_PATH_WGET
 from invenio.bibformat import format_record
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -1739,7 +1739,8 @@ def download_url(url, format, sleep=2):
                 raise StandardError, "%s is not in one of the allowed paths." % path
             else:
                 #urllib.urlretrieve(url, tmppath)
-                cmd_exit_code, cmd_out, cmd_err = run_shell_command('wget %s -O %s -t 2 -T 40' % (escape_shell_arg(url), escape_shell_arg(tmppath)))
+                cmd_exit_code, cmd_out, cmd_err = run_shell_command(CFG_PATH_WGET + ' %s -O %s -t 2 -T 40' % \
+                                                                    (escape_shell_arg(url), escape_shell_arg(tmppath)))
                 if cmd_exit_code:
                     raise StandardError, "It's impossible to download %s: %s" % (url, cmd_err)
                 return tmppath
