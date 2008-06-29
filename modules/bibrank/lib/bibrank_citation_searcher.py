@@ -177,7 +177,7 @@ def get_author_cited_by(authorstring):
        author given as param, such that y1,y2.. cite that author
     """
     citations = []
-    res = run_sql("select hitlist from rnkAUTHORDATAR where aterm=%s",
+    res = run_sql("select hitlist from rnkAUTHORDATA where aterm=%s",
                   (authorstring,))
     if res and res[0] and res[0][0]:
         #has to be prepared for corrupted data!

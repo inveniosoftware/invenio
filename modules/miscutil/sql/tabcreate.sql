@@ -2146,7 +2146,7 @@ CREATE TABLE IF NOT EXISTS rnkWORD01R (
   PRIMARY KEY  (id_bibrec,type)
 ) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS rnkAUTHORDATAR (
+CREATE TABLE IF NOT EXISTS rnkAUTHORDATA (
   aterm varchar(50) default NULL,
   hitlist longblob,
   UNIQUE KEY aterm (aterm)

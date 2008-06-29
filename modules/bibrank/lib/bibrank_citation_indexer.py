@@ -893,17 +893,17 @@ def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,
         a.replace('"', '\'')
         a = unicode(a, 'utf-8')
         try:
-            ablob = run_sql("select hitlist from rnkAUTHORDATAR where aterm = %s", (a,))
+            ablob = run_sql("select hitlist from rnkAUTHORDATA where aterm = %s", (a,))
             if not (ablob):
-                #print "insert into rnkAUTHORDATAR(aterm,hitlist) values (%s,%s)" , (a,lserarr)
-                run_sql("insert into rnkAUTHORDATAR(aterm,hitlist) values (%s,%s)",
+                #print "insert into rnkAUTHORDATA(aterm,hitlist) values (%s,%s)" , (a,lserarr)
+                run_sql("insert into rnkAUTHORDATA(aterm,hitlist) values (%s,%s)",
                          (a,lserarr))
             else:
-                #print "UPDATE rnkAUTHORDATAR SET hitlist  = %s where aterm=%s""" , (lserarr,a)
-                run_sql("UPDATE rnkAUTHORDATAR SET hitlist  = %s where aterm=%s",
+                #print "UPDATE rnkAUTHORDATA SET hitlist  = %s where aterm=%s""" , (lserarr,a)
+                run_sql("UPDATE rnkAUTHORDATA SET hitlist  = %s where aterm=%s",
                         (lserarr,a))
         except:
-            print "Critical error: could not read/write rnkAUTHORDATAR "
+            print "Critical error: could not read/write rnkAUTHORDATA "
             print "aterm="+a+" hitlist="+str(lserarr)+"\n"
             traceback.print_tb(sys.exc_info()[2])
 
@@ -950,12 +950,12 @@ def get_initial_author_dict():
     """read author->citedinlist dict from the db"""
     dict = {}
     try:
-        ah = run_sql("select aterm,hitlist from rnkAUTHORDATAR")
+        ah = run_sql("select aterm,hitlist from rnkAUTHORDATA")
         for (a, h) in ah:
             dict[a] = deserialize_via_marshal(h)
         return dict
     except:
-        print "Critical error: could not read rnkAUTHORDATAR"
+        print "Critical error: could not read rnkAUTHORDATA"
         traceback.print_tb(sys.exc_info()[2])
         dict = {}
         return dict
