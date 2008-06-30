@@ -298,6 +298,11 @@ def build_and_run_unit_test_suite():
     and run it.  Called by 'inveniocfg --run-unit-tests'.
     """
 
+    # We first import webinterface_tests in order to be sure to have
+    # the fake Apache environment loaded among first things.  This is
+    # needed for older OSes and mod_pythons such as on SLC4.
+    from invenio import webinterface_tests
+
     test_modules = []
 
     for candidate in os.listdir(os.path.dirname(invenio.__file__)):
