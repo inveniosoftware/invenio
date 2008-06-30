@@ -143,7 +143,7 @@ AC_PATH_PROG(MD5SUM, md5sum)
 if test -z "$MD5SUM"; then
    AC_MSG_WARN([
    md5sum was not found in your PATH.  It is used for the fulltext file
-   checksumming.
+   checksum verification.
    You can continue without it but we recomend you to install it first
    and to rerun the configure script.  md5sum is available from
    <http://www.gnu.org/software/coreutils/>.])
