@@ -28,8 +28,9 @@ pylib_DATA = webstat.py \
 lispimagedir = $(libdir)/lisp/invenio
 lispimage_DATA = webstat.clisp.mem webstat.cmucl.core webstat.sbcl.core
 
-FILESLISP   = $(wildcard $(srcdir)/*.lisp)
-EXTRA_DIST = $(pylib_DATA) $(FILESLISP:$(srcdir)/%=%)
+FILESLISP   = load.lisp \
+              webstatlib.lisp
+EXTRA_DIST = $(pylib_DATA) $(FILESLISP)
 CLEANFILES = $(lispimage_DATA) *~ *.tmp *.pyc *.fas *.fasl *.lib *.x86f *.mem *.core
 
 webstat.clisp.mem: $(FILESLISP)

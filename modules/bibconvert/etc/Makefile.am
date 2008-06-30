@@ -17,12 +17,9 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-etcdir = $(sysconfdir)/bibconvert/KB
-
-KBS = $(wildcard $(srcdir)/*.kb)
-CONFIGS = oaidc2marcxml.bfx
-
-etc_DATA = $(KBS:$(srcdir)/%=%) $(CONFIGS:$(srcdir)/%=%)
+kbdir = $(sysconfdir)/bibconvert/KB
+kb_DATA = entdec-to-latin1.kb entdec-to-utf8.kb \
+          enthex-to-latin1.kb enthex-to-utf8.kb
 
 bfxdir = $(sysconfdir)/bibconvert/config
 bfx_DATA = oaidc2marcxml.bfx
@@ -30,6 +27,6 @@ bfx_DATA = oaidc2marcxml.bfx
 xsldir = $(sysconfdir)/bibconvert/config
 xsl_DATA = oaidc2marcxml.xsl oaimarc2marcxml.xsl oaiarxiv2marcxml.xsl
 
-EXTRA_DIST = $(etc_DATA) $(bfx_DATA) $(xsl_DATA)
+EXTRA_DIST = $(kb_DATA) $(bfx_DATA) $(xsl_DATA)
 
 CLEANFILES = *~ *.tmp
