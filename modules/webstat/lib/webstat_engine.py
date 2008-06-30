@@ -61,7 +61,7 @@ def get_keyevent_trend_collection_population(args):
     sql_param = (str(ids).replace('[', '(').replace(']', ')'),)
     action_dates = [x[0] for x in run_sql(sql_query, sql_param)]
 
-    initial_quantity = run_sql("SELECT COUNT(id) FROM bibrec WHERE creation_date < '%s'",
+    initial_quantity = run_sql("SELECT COUNT(id) FROM bibrec WHERE creation_date < %s",
                                (_to_datetime(args['t_start'], args['t_format']).isoformat(),))[0][0]
 
     return _get_trend_from_actions(action_dates, initial_quantity,
@@ -235,11 +235,11 @@ def get_customevent_trend(args):
 
     sql_query = ["SELECT creation_time FROM %s WHERE creation_time > '%s'"]
     sql_param =  [tbl_name, lower]
-    sql_query.append("AND creation_time < '%s'")
+    sql_query.append("AND creation_time < %s")
     sql_param.append(upper)
     for col_title, col_content in args['cols']:
         if col_content:
-            sql_query.append("AND %s = '%s'")
+            sql_query.append("AND %s = %s")
             sql_param +=  [col_title, col_content]
     sql_query.append("ORDER BY creation_time DESC")
     sql = ' '.join(sql_query)
@@ -282,13 +282,13 @@ def get_customevent_dump(args):
     for id in args['ids']:
         # Get all the event arguments and creation times
         tbl_name = get_customevent_table(id)
-        sql_query = ["SELECT * FROM %s WHERE creation_time > '%s'"]
+        sql_query = ["SELECT * FROM %s WHERE creation_time > %s"]
         sql_param = [tbl_name, lower]
-        sql_query.append("AND creation_time < '%s'")
+        sql_query.append("AND creation_time < %s")
         sql_param.append(upper)
         for col_title, col_content in args['cols']:
             if col_content:
-                sql_query.append("AND %s = '%s'")
+                sql_query.append("AND %s = %s")
                 sql_param += [col_title, col_content]
         sql_query.append("ORDER BY creation_time DESC")
         sql = ' '.join(sql_query)
@@ -298,7 +298,7 @@ def get_customevent_dump(args):
             event_list.append((row[1],id,row[2:]))
         # Get the event col names
         try:
-            event_cols[id] = cPickle.loads(run_sql("SELECT cols FROM staEVENT WHERE id = '%s'", (id,))[0][0])
+            event_cols[id] = cPickle.loads(run_sql("SELECT cols FROM staEVENT WHERE id = %s", (id,))[0][0])
         except TypeError:
             event_cols[id] = ["Unnamed"]
     event_list.sort()
@@ -319,7 +319,7 @@ def get_customevent_table(id):
     Helper function that for a certain event id retrives the corresponding
     event table name.
     """
-    res = run_sql("SELECT CONCAT('staEVENT', number) FROM staEVENT WHERE id = '%s'", (id,))
+    res = run_sql("SELECT CONCAT('staEVENT', number) FROM staEVENT WHERE id = %s", (id,))
     try:
         return res[0][0]
     except IndexError:
@@ -331,7 +331,7 @@ def get_customevent_args(id):
     Helper function that for a certain event id retrives the corresponding
     event argument (column) names.
     """
-    res = run_sql("SELECT cols FROM staEVENT WHERE id = '%s'", (id,))
+    res = run_sql("SELECT cols FROM staEVENT WHERE id = %s", (id,))
     try:
         return cPickle.loads(res[0][0])
     except IndexError:

@@ -134,7 +134,7 @@ def create_customevent(id=None, name=None, cols=[]):
         return "Please note that both event id and event name needs to be written without any non-standard characters."
 
     # Make sure the chosen id is not already taken
-    if len(run_sql("SELECT NULL FROM staEVENT WHERE id = '%s'", (id,))) != 0:
+    if len(run_sql("SELECT NULL FROM staEVENT WHERE id = %s", (id,))) != 0:
         return "Event id [%s] already exists! Aborted." % id
 
     # Check if the cols are valid titles
@@ -145,7 +145,7 @@ def create_customevent(id=None, name=None, cols=[]):
     # Insert a new row into the events table describing the new event
     sql_name = (name is not None) and ("'%s'" % name) or "NULL"
     sql_cols = (len(cols) != 0) and ('"%s"' % cPickle.dumps(cols)) or "NULL"
-    run_sql("INSERT INTO staEVENT (id, name, cols) VALUES ('%s', %s, %s)",
+    run_sql("INSERT INTO staEVENT (id, name, cols) VALUES (%s, %s, %s)",
             (id, sql_name, sql_cols))
 
     tbl_name = get_customevent_table(id)
@@ -182,12 +182,12 @@ def destroy_customevent(id=None):
         return "Please specify an existing event id."
 
     # Check if the specified id exists
-    if len(run_sql("SELECT NULL FROM staEVENT WHERE id = '%s'", (id,))) == 0:
+    if len(run_sql("SELECT NULL FROM staEVENT WHERE id = %s", (id,))) == 0:
         return "Event id [%s] doesn't exist! Aborted." % id
     else:
         tbl_name = get_customevent_table(id)
         run_sql("DROP TABLE %s" % tbl_name)
-        run_sql("DELETE FROM staEVENT WHERE id = '%s'", (id,))
+        run_sql("DELETE FROM staEVENT WHERE id = %s", (id,))
         return ("Event with id [%s] was successfully destroyed.\n"
                 "Table [%s], with content, was destroyed.") % (id, tbl_name)
 
@@ -206,7 +206,7 @@ def register_customevent(id, *arguments):
     @param *arguments: The rest of the parameters of the function call
     @type *arguments: [params]
     """
-    res = run_sql("SELECT CONCAT('staEVENT', number),cols FROM staEVENT WHERE id = '%s'",  (id,))
+    res = run_sql("SELECT CONCAT('staEVENT', number),cols FROM staEVENT WHERE id = %s",  (id,))
     if not res:
         return # the id don't exist
     tbl_name = res[0][0]
@@ -227,7 +227,7 @@ def register_customevent(id, *arguments):
         sql_query.pop() # del the last ','
         sql_query.append(") VALUES (")
         for argument in arguments[0]:
-            sql_query.append("\"%s\"")
+            sql_query.append("%s")
             sql_query.append(",")
             sql_param.append(argument)
         sql_query.pop() # del the last ','
