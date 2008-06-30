@@ -1,11 +1,18 @@
 %%%%% $Id$ %%%%%
+##ArXiv new format##
+<syymms9999v9>
+<syymms9999>
+ARXIV           ---arXiv
 #####LANL#####
-</yymm999>
+<s/syymm999>
+<syymm999>
+<hello "WORLD" .&%?>
 ACC PHYS	---acc-phys
 ADAP ORG	---adap-org
 ALG GEOM	---alg-geom
 AO SCI		---ao-sci
 ASTRO PH	---astro-ph
+ASTRO PHY	---astro-ph
 ATOM PH		---atom-ph
 AUTO FMS	---auto-fms
 BAYES AN	---bayes-an
@@ -54,9 +61,15 @@ DG GA		---dg-ga
 FUNCT AN	---funct-an
 GR QC		---gr-qc
 HEP EX		---hep-ex
+ARXIVHEP EX	---hep-ex
 HEP LAT		---hep-lat
 HEP PH		---hep-ph
+ARXIVHEP PH	---hep-ph
+HEPPH		---hep-ph
 HEP TH		---hep-th
+ARXIVHEP TH	---hep-th
+HEPTH		---hep-th
+HEPTHE          ---hep-th
 LC OM		---lc-om
 MATH		---math
 MATH AG		---math.AG
@@ -108,6 +121,7 @@ PHYSICS		---physics
 PLASM PH	---plasm-ph
 Q ALG		---q-alg
 QUANT PH	---quant-ph
+QUANT PHYS	---quant-ph
 SOLV INT	---solv-int
 
 
@@ -126,23 +140,77 @@ FERMILAB TM	---FERMILAB-TM
 < yy 999>
 < yyyy 999>
 
-CERN AS		---CERN-AS
+ALEPH                  ---ALEPH
+ALICE                  ---ALICE
+ALICE INT              ---ALICE-INT
+ATL CAL                ---ATL-CAL
+ATL COM                ---ATL-COM
+ATL COM DAQ            ---ATL-COM-DAQ
+ATL COM MUON           ---ATL-COM-MUON
+ATL COM PHYS           ---ATL-COM-PHYS
+ATL COM TILECAL        ---ATL-COM-TILECAL
+ATL CONF               ---ATL-CONF
+ATL DAQ                ---ATL-DAQ
+ATL DAQ CONF           ---ATL-DAQ-CONF
+ATL GEN                ---ATL-GEN
+ATL INDET              ---ATL-INDET
+ATL LARG               ---ATL-LARG
+ATL MUON               ---ATL-MUON
+ATL PHYS               ---ATL-PHYS
+ATL PHYS PUB           ---ATL-PHYS-PUB
+ATL TECH               ---ATL-TECH
+ATL TILECAL            ---ATL-TILECAL
+CERN AB                ---CERN-AB
+CERN ALEPH             ---CERN-ALEPH
+CERN ALEPH PHYSIC      ---CERN-ALEPH-PHYSIC
+CERN ALEPH PUB         ---CERN-ALEPH-PUB
+CERN ALICE INT         ---CERN-ALICE-INT
+CERN ALICE PUB         ---CERN-ALICE-PUB
+CERN ALI               ---CERN-ALI
+CERN AS                ---CERN-AS
+CERN AT                ---CERN-AT
+CERN ATL COM CAL       ---CERN-ATL-COM-CAL
+CERN ATL COM DAQ       ---CERN-ATL-COM-DAQ
+CERN ATL COM GEN       ---CERN-ATL-COM-GEN
+CERN ATL COM INDET     ---CERN-ATL-COM-INDET
+CERN ATL COM LARG      ---CERN-ATL-COM-LARG
+CERN ATL COM MUON      ---CERN-ATL-COM-MUON
+CERN ATL COM PHYS      ---CERN-ATL-COM-PHYS
+CERN ATL COM TECH      ---CERN-ATL-COM
+CERN ATL COM TILECAL   ---CERN-ATL-COM
+CERN ATL DAQ           ---CERN-ATL-DAQ
+CERN ATL SOFT          ---CERN-ATL-SOFT
+CERN ATL SOFT INT      ---CERN-ATL-SOFT-INT
+CERN ATL SOFT PUB      ---CERN-ATL-SOFT-PUB
+CERN CMS               ---CERN-CMS
+CERN CMS CR            ---CERN-CMS-CR
+CERN CMS NOTE          ---CERN-CMS-NOTE
+CERN CN                ---CERN-CN
+CERN DD                ---CERN-DD
+CERN DELPHI            ---CERN-DELPHI
+CERN ECP               ---CERN-ECP
+CERN EF                ---CERN-EF
 CERN EP		---CERN-EP
 CERN EST	---CERN-EST
 CERN ETT	---CERN-ETT
 CERN IT		---CERN-IT
-CERN LHC	---CERN-LHC
+CERN LHCB              ---CERN-LHCB
 CERN LHCC	---CERN-LHCC
+CERN LHC	---CERN-LHC
 CERN LHC PROJECT REPORT	---CERN-LHC-Project-Report
 CERN OPEN	---CERN-OPEN
 CERN PPE	---CERN-PPE
 CERN PS		---CERN-PS
 CERN SL		---CERN-SL
+CERN SPSC	---CERN-SPSC
 CERN ST		---CERN-ST
 CERN TH		---CERN-TH
 CERN THESIS	---CERN-THESIS
 CERN TIS	---CERN-TIS
-CERN SPSC	---CERN-SPSC
+CMS CR                 ---CMS-CR
+CMS NOTE               ---CMS-NOTE
+LHCB                   ---LHCB
+SN ATLAS               ---SN-ATLAS
 
 
 #####KEK#####
