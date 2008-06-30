@@ -810,7 +810,7 @@ class BibSched:
     def bibupload_in_the_queue(self, task_id, runtime):
         """Check if bibupload is scheduled/running before runtime.
         This is useful in order to enforce bibupload order."""
-        return run_sql("SELECT id, status FROM schTASK WHERE proc='bibupload' AND runtime<=%s AND id<%s AND (status='RUNNING' OR status='WAITING' OR status='CONTINUING' OR  status='SLEEPING' OR status='SCHEDULED' OR status='ABOUT TO SLEEP' OR status='ABOUT TO STOP' OR status='ERROR')", (runtime, task_id))
+        return run_sql("SELECT id, status FROM schTASK WHERE proc='bibupload' AND runtime<=%s AND id<%s AND (status='RUNNING' OR status='WAITING' OR status='CONTINUING' OR  status='SLEEPING' OR status='SCHEDULED' OR status='ABOUT TO SLEEP' OR status='ABOUT TO STOP' OR status='ERROR' OR status='DONE WITH ERRORS')", (runtime, task_id))
 
     def task_really_running_p(self, proc, task_id):
         """Ping the task and update its status to error if necessary."""
@@ -842,7 +842,7 @@ class BibSched:
             if res:
                 ## All bibupload must finish before.
                 for (atask_id, astatus) in res:
-                    if astatus in ('ERROR'):
+                    if astatus in ('ERROR', 'DONE WITH ERRORS'):
                         raise StandardError('BibSched had to halt because a bibupload with id %s has status %s. Please do your checks and delete/reinitialize the failed bibupload.' % (atask_id, astatus))
                 #write_message("cannot run because these bibupload are scheduled: %s" % res)
                 Log("Task #%d (%s) not yet run because there is a bibupload in the queue" % (task_id, proc))
@@ -915,7 +915,7 @@ class BibSched:
     def watch_loop(self):
         def get_rows():
             """Return all the rows to work on."""
-            return run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE%%' AND status NOT LIKE '%%DELETED%%' AND (runtime<=NOW() OR status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='SCHEDULED') ORDER BY priority DESC, runtime ASC, id ASC")
+            return run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%%DELETED%%' AND (runtime<=NOW() OR status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='SCHEDULED') ORDER BY priority DESC, runtime ASC, id ASC")
 
         def get_task_status(rows):
             """Return a handy data structure to analize the task status."""
