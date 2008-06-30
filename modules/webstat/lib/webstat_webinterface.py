@@ -199,6 +199,8 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         argd = wash_urlargd(form, {'ids': (list, []),
                                    'timespan': (str, ""),
                                    'format': (str, SUITABLE_GRAPH_FORMAT),
+                                   'cols': (list, []),
+                                   'col_value': (list, []),
                                    'ln': (str, CFG_SITE_LANG)})
         ln = argd['ln']
         user_info = collect_user_info(req)

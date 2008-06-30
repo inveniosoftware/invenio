@@ -56,12 +56,13 @@ def get_keyevent_trend_collection_population(args):
     if len(ids) == 0:
         return []
 
-    sql = ("SELECT creation_date FROM bibrec WHERE id IN %s ORDER BY " + \
-           "creation_date DESC") % str(ids).replace('[', '(').replace(']', ')')
-    action_dates = [x[0] for x in run_sql(sql)]
+    sql_query = "SELECT creation_date FROM bibrec WHERE id IN %s ORDER BY " + \
+           "creation_date DESC"
+    sql_param = (str(ids).replace('[', '(').replace(']', ')'),)
+    action_dates = [x[0] for x in run_sql(sql_query, sql_param)]
 
-    initial_quantity = run_sql("SELECT COUNT(id) FROM bibrec WHERE creation_date < '%s'" %
-                               _to_datetime(args['t_start'], args['t_format']).isoformat())[0][0]
+    initial_quantity = run_sql("SELECT COUNT(id) FROM bibrec WHERE creation_date < '%s'",
+                               (_to_datetime(args['t_start'], args['t_format']).isoformat(),))[0][0]
 
     return _get_trend_from_actions(action_dates, initial_quantity,
                                    args['t_start'], args['t_end'], args['granularity'], args['t_format'])
@@ -222,9 +223,28 @@ def get_customevent_trend(args):
 
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
+
+    @param args['cols']: Columns and it's content that will be include
+                         if don't exist or it's empty it will include all cols
+    @type args['cols']: [ [ str, str ], ]
     """
-    sql = "SELECT creation_time FROM %s ORDER BY creation_time DESC" % get_customevent_table(args['id'])
-    dates = [x[0] for x in run_sql(sql)]
+    # Get a MySQL friendly date
+    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
+    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
+    tbl_name = get_customevent_table(args['id'])
+
+    sql_query = ["SELECT creation_time FROM %s WHERE creation_time > '%s'"]
+    sql_param =  [tbl_name, lower]
+    sql_query.append("AND creation_time < '%s'")
+    sql_param.append(upper)
+    for col_title, col_content in args['cols']:
+        if col_content:
+            sql_query.append("AND %s = '%s'")
+            sql_param +=  [col_title, col_content]
+    sql_query.append("ORDER BY creation_time DESC")
+    sql = ' '.join(sql_query)
+
+    dates = [x[0] for x in run_sql(sql, tuple(sql_param))]
     return _get_trend_from_actions(dates, 0, args['t_start'], args['t_end'], args['granularity'], args['t_format'])
 
 def get_customevent_dump(args):
@@ -246,46 +266,48 @@ def get_customevent_dump(args):
 
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
+
+    @param args['cols']: Columns and it's content that will be include
+                         if don't exist or it's empty it will include all cols
+    @type args['cols']: [ [ str, str ], ]
     """
-    # Mapping of event id and column names
-    event_cols = {}
-
-    run_sql("CREATE TEMPORARY TABLE staTEMP " + \
-            "(event VARCHAR(255), creation_time TIMESTAMP, arguments VARCHAR(255)) "  + \
-            "SELECT '%s' event, creation_time, arguments FROM %s"
-             % (args['ids'][0], get_customevent_table(args['ids'][0])))
-
-    try:
-        event_cols[args['ids'][0]] = cPickle.loads(run_sql("SELECT cols FROM staEVENT WHERE id = '%s'" % args['ids'][0])[0][0])
-    except TypeError:
-        event_cols[args['ids'][0]] = ["Unnamed"]
-
-    for id in args['ids'][1:]:
-        tbl_name = get_customevent_table(id)
-        run_sql("INSERT INTO staTEMP SELECT '%s', creation_time, arguments FROM %s"
-                % (id, tbl_name))
-        try:
-            event_cols[id] = cPickle.loads(run_sql("SELECT cols FROM staEVENT WHERE id = '%s'" % id)[0][0])
-        except TypeError:
-            event_cols[id] = ["Unnamed"]
-
     # Get a MySQL friendly date
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
 
-    sql = "SELECT event,creation_time,arguments FROM staTEMP WHERE creation_time > '%s' " % lower + \
-          "AND creation_time < '%s' ORDER BY creation_time DESC" % upper
+    # Get customevents
+    # events_list = [(creation_time, event, [arg1, arg2, ...]), ...]
+    event_list = []
+    event_cols = {}
+    for id in args['ids']:
+        # Get all the event arguments and creation times
+        tbl_name = get_customevent_table(id)
+        sql_query = ["SELECT * FROM %s WHERE creation_time > '%s'"]
+        sql_param = [tbl_name, lower]
+        sql_query.append("AND creation_time < '%s'")
+        sql_param.append(upper)
+        for col_title, col_content in args['cols']:
+            if col_content:
+                sql_query.append("AND %s = '%s'")
+                sql_param += [col_title, col_content]
+        sql_query.append("ORDER BY creation_time DESC")
+        sql = ' '.join(sql_query)
+        res = run_sql(sql, tuple(sql_param))
+
+        for row in res:
+            event_list.append((row[1],id,row[2:]))
+        # Get the event col names
+        try:
+            event_cols[id] = cPickle.loads(run_sql("SELECT cols FROM staEVENT WHERE id = '%s'", (id,))[0][0])
+        except TypeError:
+            event_cols[id] = ["Unnamed"]
+    event_list.sort()
 
     output = []
-    for row in run_sql(sql):
-        temp = [row[0], row[1].strftime('%Y-%m-%d %H:%M:%S')]
+    for row in event_list:
+        temp = [row[1], row[0].strftime('%Y-%m-%d %H:%M:%S')]
 
-        if row[2] is not None:
-            arguments = cPickle.loads(row[2])
-        else:
-            arguments = [None]
-
-        arguments = ["%s: %s" % (event_cols[row[0]][i], arguments[i]) for i in range(len(arguments))]
+        arguments = ["%s: %s" % (event_cols[row[1]][i], row[2][i]) for i in range(len(row[2]))]
 
         temp.extend(arguments)
         output.append(tuple(temp))
@@ -297,7 +319,7 @@ def get_customevent_table(id):
     Helper function that for a certain event id retrives the corresponding
     event table name.
     """
-    res = run_sql("SELECT CONCAT('staEVENT', number) FROM staEVENT WHERE id = '%s'" % id)
+    res = run_sql("SELECT CONCAT('staEVENT', number) FROM staEVENT WHERE id = '%s'", (id,))
     try:
         return res[0][0]
     except IndexError:
@@ -309,7 +331,7 @@ def get_customevent_args(id):
     Helper function that for a certain event id retrives the corresponding
     event argument (column) names.
     """
-    res = run_sql("SELECT arguments FROM staEVENT WHERE id = '%s'" % id)
+    res = run_sql("SELECT cols FROM staEVENT WHERE id = '%s'", (id,))
     try:
         return cPickle.loads(res[0][0])
     except IndexError:

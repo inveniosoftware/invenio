@@ -134,25 +134,37 @@ def create_customevent(id=None, name=None, cols=[]):
         return "Please note that both event id and event name needs to be written without any non-standard characters."
 
     # Make sure the chosen id is not already taken
-    if len(run_sql("SELECT NULL FROM staEVENT WHERE id = '%s'" % id)) != 0:
+    if len(run_sql("SELECT NULL FROM staEVENT WHERE id = '%s'", (id,))) != 0:
         return "Event id [%s] already exists! Aborted." % id
+
+    # Check if the cols are valid titles
+    for argument in cols:
+        if (argument == "creation_time") or (argument == "id"):
+            return "Invalid column title: %s! Aborted." % argument
 
     # Insert a new row into the events table describing the new event
     sql_name = (name is not None) and ("'%s'" % name) or "NULL"
     sql_cols = (len(cols) != 0) and ('"%s"' % cPickle.dumps(cols)) or "NULL"
-    run_sql("INSERT INTO staEVENT (id, name, cols) VALUES ('%s', %s, %s)"
-            % (id, sql_name, sql_cols))
+    run_sql("INSERT INTO staEVENT (id, name, cols) VALUES ('%s', %s, %s)",
+            (id, sql_name, sql_cols))
 
     tbl_name = get_customevent_table(id)
 
     # Create a table for the new event
-    run_sql("""CREATE TABLE %s (
-                 arguments VARCHAR(255) NULL,
-                 creation_time TIMESTAMP DEFAULT NOW()
-               );""" % tbl_name)
+    sql_param = []
+    sql_query = ["CREATE TABLE %s (" % tbl_name]
+    sql_query.append("id MEDIUMINT unsigned NOT NULL auto_increment,")
+    sql_query.append("creation_time TIMESTAMP DEFAULT NOW(),")
+    for argument in cols:
+        sql_query.append("%s MEDIUMTEXT NULL,")
+        sql_query.append("INDEX %s (%s(50)),")
+        sql_param += [argument, argument, argument]
+    sql_query.append("PRIMARY KEY (id))")
+    sql_str = ' '.join(sql_query)
+    run_sql(sql_str, tuple(sql_param))
 
     # We're done! Print notice containing the name of the event.
-    return ("Event table [%s] successfully created.\n" +
+    return ("Event table [%s] successfully created.\n"
             "Please use event id [%s] when registering an event.") % (tbl_name, id)
 
 def destroy_customevent(id=None):
@@ -170,13 +182,13 @@ def destroy_customevent(id=None):
         return "Please specify an existing event id."
 
     # Check if the specified id exists
-    if len(run_sql("SELECT NULL FROM staEVENT WHERE id = '%s'" % id)) == 0:
+    if len(run_sql("SELECT NULL FROM staEVENT WHERE id = '%s'", (id,))) == 0:
         return "Event id [%s] doesn't exist! Aborted." % id
     else:
         tbl_name = get_customevent_table(id)
         run_sql("DROP TABLE %s" % tbl_name)
-        run_sql("DELETE FROM staEVENT WHERE id = '%s'" % id)
-        return ("Event with id [%s] was successfully destroyed.\n" +
+        run_sql("DELETE FROM staEVENT WHERE id = '%s'", (id,))
+        return ("Event with id [%s] was successfully destroyed.\n"
                 "Table [%s], with content, was destroyed.") % (id, tbl_name)
 
 def register_customevent(id, *arguments):
@@ -194,13 +206,36 @@ def register_customevent(id, *arguments):
     @param *arguments: The rest of the parameters of the function call
     @type *arguments: [params]
     """
-    tbl_name = get_customevent_table(id)
-    if tbl_name != None:
-        if len(arguments) != 0:
-            pickled_args = cPickle.dumps(arguments)
-            run_sql("""INSERT INTO %s (arguments) VALUES ("%s")""" % (tbl_name, pickled_args))
-        else:
-            run_sql("INSERT INTO %s (arguments) VALUES (NULL)" % tbl_name)
+    res = run_sql("SELECT CONCAT('staEVENT', number),cols FROM staEVENT WHERE id = '%s'",  (id,))
+    if not res:
+        return # the id don't exist
+    tbl_name = res[0][0]
+    if res[0][1]:
+        col_titles = cPickle.loads(res[0][1])
+    else:
+        col_titles = []
+    if len(col_titles) != len(arguments[0]):
+        return # there is different number of arguments than cols
+
+    # Make sql query
+    if len(arguments[0]) != 0:
+        sql_param = []
+        sql_query = ["INSERT INTO %s (" % tbl_name]
+        for title in col_titles:
+            sql_query.append("%s" % title)
+            sql_query.append(",")
+        sql_query.pop() # del the last ','
+        sql_query.append(") VALUES (")
+        for argument in arguments[0]:
+            sql_query.append("\"%s\"")
+            sql_query.append(",")
+            sql_param.append(argument)
+        sql_query.pop() # del the last ','
+        sql_query.append(")")
+        sql_str = ''.join(sql_query)
+        run_sql(sql_str, tuple(sql_param))
+    else:
+        run_sql("INSERT INTO %s () VALUES ()" % tbl_name)
 
 def cache_keyevent_trend(ids=[]):
     """
@@ -263,6 +298,7 @@ def cache_customevent_trend(ids=[]):
 
     for id in ids:
         args['id'] = id
+        args['cols'] = []
 
         for i in range(len(timespans)):
             # Get timespans parameters
@@ -364,15 +400,15 @@ def perform_display_keyevent(id=None, args={}, req=None, ln=CFG_SITE_LANG):
     options = dict([(param,
                      (KEYEVENT_REPOSITORY[id]['extraparams'][param][0],
                       KEYEVENT_REPOSITORY[id]['extraparams'][param][1]())) for param in
-                    KEYEVENT_REPOSITORY[id]['extraparams']] +
+                    KEYEVENT_REPOSITORY[id]['extraparams']]
                    [('timespan', ('Time span', _get_timespans())), ('format', ('Output format', _get_formats()))])
     # Order of options
     order = [param for param in KEYEVENT_REPOSITORY[id]['extraparams']] + ['timespan', 'format']
     # Build a dictionary for the selected parameters: { parameter name: argument internal name }
-    choosed = dict([(param, args[param]) for param in KEYEVENT_REPOSITORY[id]['extraparams']] +
+    choosed = dict([(param, args[param]) for param in KEYEVENT_REPOSITORY[id]['extraparams']]
                    [('timespan', args['timespan']), ('format', args['format'])])
     # Send to template to prepare event customization FORM box
-    out = TEMPLATES.tmpl_event_box(options, order, choosed, ln=ln)
+    out = TEMPLATES.tmpl_keyevent_box(options, order, choosed, ln=ln)
 
     # Arguments OK?
 
@@ -390,7 +426,7 @@ def perform_display_keyevent(id=None, args={}, req=None, ln=CFG_SITE_LANG):
 
     # Get unique name for caching purposes (make sure that the params used in the filename are safe!)
     filename = KEYEVENT_REPOSITORY[id]['cachefilename'] \
-               % dict([(param, re.subn("[^\w]", "_", choosed[param])[0]) for param in choosed] +
+               % dict([(param, re.subn("[^\w]", "_", choosed[param])[0]) for param in choosed]
                       [('id', re.subn("[^\w]", "_", id)[0])])
 
     # Get time parameters from repository
@@ -443,18 +479,20 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
     # Get all the option lists: { parameter name: [(argument internal name, argument full name)]}
     options = { 'ids': ('Custom event', _get_customevents()),
                 'timespan': ('Time span', _get_timespans()),
-                'format': ('Output format', _get_formats(True)) }
+                'format': ('Output format', _get_formats(True)),
+                'cols': ('Column', _get_customevent_cols()) }
     # Order of options
-    order = ['ids', 'timespan', 'format']
+    order = ['ids', 'timespan', 'format', 'cols']
     # Build a dictionary for the selected parameters: { parameter name: argument internal name }
-    choosed = { 'ids': ids, 'timespan': args['timespan'], 'format': args['format'] }
+    choosed = { 'ids': ids, 'timespan': args['timespan'], 'format': args['format'], 'cols': "" }
     # Send to template to prepare event customization FORM box
-    out = TEMPLATES.tmpl_event_box(options, order, choosed, ln=ln)
+    out = TEMPLATES.tmpl_customevent_box(options, order, choosed, ln=ln)
 
     # Arguments OK?
 
     # Make sure extraparams are valid, if any
     for param in order:
+        if param == 'cols': continue
         legalvalues = [x[0] for x in options[param][1]]
 
         if type(choosed[param]) is list:
@@ -468,27 +506,29 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
             if not choosed[param] in legalvalues:
                 return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0], ln=ln)
 
+    # Calculate cols
+    cols = []
+    if args.has_key('cols') and args.has_key('col_value'):
+        cols = zip(args['cols'], args['col_value'])
+
     # Fetch time parameters from repository
     _, t_fullname, t_start, t_end, granularity, t_format, xtic_format = \
         options['timespan'][1][[x[0] for x in options['timespan'][1]].index(choosed['timespan'])]
     args = { 't_start': t_start, 't_end': t_end, 'granularity': granularity,
-             't_format': t_format, 'xtic_format': xtic_format }
+            't_format': t_format, 'xtic_format': xtic_format, 'cols': cols }
 
     data_unmerged = []
 
-    # ASCII dump data is different from the standard formats, since we can speed up
-    # dumping by using MySQL's temporary tables for sorting by dates. It would be
-    # a computationally slow doing it here in Python, even though we then could make
-    # use of the same general program flow. Which I guess, would be nice.
+    # ASCII dump data is different from the standard formats
     if choosed['format'] == 'asciidump':
-        filename = "webstat_customevent_" + re.subn("[^\w]", "", ''.join(ids) + "_" + choosed['timespan'] + "_asciidump")[0]
+        filename = "webstat_customevent_" + re.subn("[^\w]", "", ''.join(ids) + "_" + choosed['timespan'] + "_" + '-'.join([ ':'.join(col) for col in args['cols']]) + "_asciidump")[0]
         args['ids'] = ids
         gatherer = lambda: get_customevent_dump(args)
         data = eval(_get_file_using_cache(filename, gatherer).read())
     else:
         for id in ids:
             # Get unique name for the rawdata file (wash arguments!)
-            filename = "webstat_customevent_" + re.subn("[^\w]", "", id + "_" + choosed['timespan'])[0]
+            filename = "webstat_customevent_" + re.subn("[^\w]", "", id + "_" + choosed['timespan'] + "_" + '-'.join([ ':'.join(col) for col in args['cols']]))[0]
 
             # Add the current id to the gatherer's arguments
             args['id'] = id
@@ -664,6 +704,20 @@ def _get_formats(with_dump=False):
         return [(x[0], x[1]) for x in TYPE_REPOSITORY]
     else:
         return [(x[0], x[1]) for x in TYPE_REPOSITORY if x[0] != 'asciidump']
+
+def _get_customevent_cols():
+    """
+    List of all the diferent name of columns in customevents.
+
+    @return: [(internal name, readable name)]
+    @type: [(str, str)]
+    """
+    cols = []
+    for x in run_sql("SELECT cols FROM staEVENT"):
+        if x[0]:
+            cols.extend(cPickle.loads(x[0]))
+
+    return [ (name, name) for name in set(cols) ]
 
 def _is_type_export(typename):
     """
