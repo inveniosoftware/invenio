@@ -33,7 +33,7 @@ class TestWashHTMLtoText(unittest.TestCase):
     """Test HTML to text conversion."""
 
     def test_wash_html_to_text(self):
-        """webalert - HTML to text/email conversion"""
+        """webalert - stripping HTML markup for alert emails"""
         htparser = RecordHTMLParser()
         htparser.feed('''<style type="text/css">
                     <!--
@@ -41,7 +41,7 @@ class TestWashHTMLtoText(unittest.TestCase):
                        div.thumbMosaic span{display:none;}
                        div.thumbMosaic:hover span{display:inline;position:absolute;}
                      -->
-                     </style><!--START_DO_NOT_DISPLAY_IN_TEXTUAL_FORMAT--><strong>Abracadabra!</strong><!--END_DO_NOT_DISPLAY_IN_TEXTUAL_FORMAT--><br/><a class="moreinfo" href="%(CFG_SITE_URL)s">Detailed Record</a>''' % {'CFG_SITE_URL': CFG_SITE_URL})
+                     </style><!--START_NOT_FOR_TEXT--><strong>Abracadabra!</strong><!--END_NOT_FOR_TEXT--><br/><a class="moreinfo" href="%(CFG_SITE_URL)s">Detailed Record</a>''' % {'CFG_SITE_URL': CFG_SITE_URL})
 
         self.assertEqual('\nDetailed record : <%s>' % CFG_SITE_URL, htparser.result)
 
