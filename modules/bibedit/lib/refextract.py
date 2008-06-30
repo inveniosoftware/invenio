@@ -110,6 +110,22 @@ except ImportError:
 
 cli_opts = {}
 
+def massage_arxiv_reportnumber(report_number):
+    """arXiv report numbers need some massaging
+        to change from arXiv-1234-2233(v8) to arXiv.1234.2233(v8)
+              and from arXiv1234-2233(v8) to arXiv.1234.2233(v8)
+    """
+    ## in coming report_number should start with arXiv
+    if report_number.find('arXiv') != 0 :
+        return report_number
+    words = report_number.split('-')
+    if len(words) == 3:  ## case of arXiv-yymm-nnnn  (vn)
+        words.pop(0) # discard leading arXiv
+        report_number = 'arXiv:' + '.'.join(words).lower()
+    elif len(words) == 2: ## case of arXivyymm-nnnn  (vn)
+        report_number = 'arXiv:' + words[0][5:] + '.' + words[1].lower()
+    return report_number
+
 def change_otag_format(out):
     #
     # Mark "o" tag lines so can delete and move o tags
@@ -1184,6 +1200,7 @@ def institute_num_pattern_to_regex(pattern):
            \     -> \\
            9     -> \d
            a     -> [A-Za-z]
+           v     -> [Vv]  # Tony for arXiv vN
            mm    -> (0[1-9]|1[0-2])
            yy    -> \d{2}
            yyyy  -> [12]\d{3}
@@ -1195,6 +1212,7 @@ def institute_num_pattern_to_regex(pattern):
     """
     simple_replacements = [ ('9',    r'\d'),
                             ('a',    r'[A-Za-z]'),
+                            ('v',    r'[Vv]'),
                             ('mm',   r'(0[1-9]|1[0-2])'),
                             ('yyyy', r'[12]\d{3}'),
                             ('yy',   r'\d\d'),
@@ -2271,6 +2289,10 @@ def markup_title_followedby_reportnum_as_marcxml(title, volume, year, page,
         ## the misc subfield is not needed
         xml_misc_subfield = ""
     ## Build the datafield for the report number segment of the reference line:
+    ## but first perhaps change the reportnumber for arxiv
+    if report_number.lower().find('arxiv') == 0:
+        report_number = massage_arxiv_reportnumber(report_number)
+    ## Build the datafield for the report number segment of the reference line:
     xml_line = \
 """   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
       <subfield code="%(sf-code-ref-title)s">%(title)s %(volume)s (%(year)s) %(page)s</subfield>
@@ -2375,6 +2397,9 @@ def markup_reportnum_as_marcxml(report_number, misc_text=""):
         ## the misc subfield is not needed
         xml_misc_subfield = ""
     ## Build the datafield for the report number segment of the reference line:
+    ## but first perhaps change the reportnumber for arxiv
+    if report_number.lower().find('arxiv') == 0:
+        report_number = massage_arxiv_reportnumber(report_number)
     xml_line = \
 """   <datafield tag="%(df-tag-ref)s" ind1="%(df-ind1-ref)s" ind2="%(df-ind2-ref)s">%(misc-subfield)s
       <subfield code="%(sf-code-ref-report-num)s">%(report-number)s</subfield>
