@@ -257,7 +257,7 @@ class Manager:
             elif chr in (ord("n"), ord("N")):
                 self.change_priority()
             elif chr in (ord("r"), ord("R")):
-                if status == 'WAITING':
+                if status in ('WAITING', 'SCHEDULED'):
                     self.run()
             elif chr in (ord("s"), ord("S")):
                 self.sleep()
@@ -936,6 +936,10 @@ class BibSched:
                     ret[status] = {}
                 ret[status][id] = (proc, runtime, priority)
             return ret
+
+        ## Cleaning up scheduled task not run because of bibsched being
+        ## interrupted in the middle.
+        run_sql("UPDATE schTASK SET status='WAITING' WHERE status='SCHEDULED'")
 
         try:
             while True:
