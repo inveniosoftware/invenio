@@ -90,7 +90,8 @@ from invenio.bibtask import task_init, write_message, \
     task_update_progress, task_sleep_now_if_required, fix_argv_paths
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, get_format_from_url, check_valid_url, download_url, \
-    KEEP_OLD_VALUE, decompose_bibdocfile_old_url, decompose_bibdocfile_url
+    KEEP_OLD_VALUE, decompose_bibdocfile_old_url, decompose_bibdocfile_url, \
+    bibdocfile_url_p
 
 #Statistic variables
 stat = {}
@@ -732,30 +733,12 @@ def synchronize_8564(rec_id, record, record_had_FFT):
         description = field_get_subfield_values(field, 'y')[:1]
         comment = field_get_subfield_values(field, 'z')[:1]
         if url:
-            url = url[0]
-        else:
-            return
-        if description:
-            description = description[0]
-        if comment:
-            comment = comment[0]
-        if url.endswith('/files/'):
-            ## Old url /record/123/files/ only
-            ## We import comment and description for all the bibdocs
-            recid = decompose_bibdocfile_old_url(url)
-            bibrecdocs = BibRecDocs(recid)
-            for bibdoc in bibrecdocs.list_bibdocs():
-                if comment:
-                    bibdoc.set_description(description, format)
-                if description:
-                    bibdoc.set_comment(comment, format)
-        else:
-            recid, docname, format = decompose_bibdocfile_url(url)
+            recid, docname, format = decompose_bibdocfile_url(url[0])
             bibdoc = BibRecDocs(recid).get_bibdoc(docname)
             if description:
-                bibdoc.set_description(description, format)
+                bibdoc.set_description(description[0], format)
             if comment:
-                bibdoc.set_comment(comment, format)
+                bibdoc.set_comment(comment[0], format)
 
     write_message("Synchronizing MARC of recid '%s' with:\n%s" % (rec_id, record), verbose=9)
     tags8564s = record_get_field_instances(record, '856', '4', ' ')
@@ -767,7 +750,12 @@ def synchronize_8564(rec_id, record, record_had_FFT):
         for value in field_get_subfield_values(field, 'u') + field_get_subfield_values(field, 'q'):
             if value.startswith('%s/record/%s/files/' % (CFG_SITE_URL, rec_id)) or \
                 value.startswith('%s/record/%s/files/' % (CFG_SITE_SECURE_URL, rec_id)):
-                if not record_had_FFT:
+                if not record_had_FFT and bibdocfile_url_p(value):
+                    ## If the submission didn't have FFTs, i.e. could be
+                    ## not FFTs aware, and it specify 8564s pointing to local
+                    ## owned files, then we should import comment and
+                    ## description from the 8564s tags.
+                    ## Anything else will be discarded.
                     merge_marc_into_bibdocfile(field)
                 to_be_removed = True
         if not to_be_removed:
