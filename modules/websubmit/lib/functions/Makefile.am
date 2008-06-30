@@ -50,6 +50,7 @@ pylib_DATA = __init__.py \
              Move_to_Done.py \
              Move_to_Pending.py \
              Print_Success.py \
+             Print_Success_Approval_Request.py \
              Print_Success_APP.py \
              Print_Success_CPLX.py \
              Print_Success_DEL.py \
