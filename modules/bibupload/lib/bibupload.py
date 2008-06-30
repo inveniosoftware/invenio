@@ -90,7 +90,7 @@ from invenio.bibtask import task_init, write_message, \
     task_update_progress, task_sleep_now_if_required, fix_argv_paths
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, get_format_from_url, check_valid_url, download_url, \
-    KEEP_OLD_VALUE
+    KEEP_OLD_VALUE, decompose_bibdocfile_old_url, decompose_bibdocfile_url
 
 #Statistic variables
 stat = {}
@@ -255,7 +255,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
     write_message("Stage 2B: Start (Synchronize 8564 tags).", verbose=2)
     if opt_stage_to_start_from <= 2 and (record_had_FFT or extract_tag_from_record(record, '856') is not None):
         try:
-            record = synchronize_8564(rec_id, record)
+            record = synchronize_8564(rec_id, record, record_had_FFT)
         except Exception, e:
             register_exception()
             write_message("   Stage 2B failed: Error while synchronizing 8564 tags: %s" % e,
@@ -715,10 +715,48 @@ def insert_record_bibrec_bibxxx(table_name, id_bibxxx,
             " function 2nd query : %s " % error, verbose=1, stream=sys.stderr)
     return res
 
-def synchronize_8564(rec_id, record):
+def synchronize_8564(rec_id, record, record_had_FFT):
     """Sinchronize the 8564 tags for record with actual files. descriptions
     should be a dictionary docname:description for the new description to be
-    inserted."""
+    inserted.
+    If record_had_FFT the algorithm assume that every fulltext operation
+    has been performed through FFT, hence it discard current 8564 local tags,
+    and rebuild them after bibdocfile tables. Otherwise it first import
+    from 8564 tags the $y and $z subfields corresponding to local files and
+    merge them into bibdocfile tables.
+    """
+    def merge_marc_into_bibdocfile(field):
+        """Given the 8564 tag it retrieve the corresponding bibdoc and
+        merge the $y and $z subfields."""
+        url = field_get_subfield_values(field, 'u')[:1]
+        description = field_get_subfield_values(field, 'y')[:1]
+        comment = field_get_subfield_values(field, 'z')[:1]
+        if url:
+            url = url[0]
+        else:
+            return
+        if description:
+            description = description[0]
+        if comment:
+            comment = comment[0]
+        if url.endswith('/files/'):
+            ## Old url /record/123/files/ only
+            ## We import comment and description for all the bibdocs
+            recid = decompose_bibdocfile_old_url(url)
+            bibrecdocs = BibRecDocs(recid)
+            for bibdoc in bibrecdocs.list_bibdocs():
+                if comment:
+                    bibdoc.set_description(description, format)
+                if description:
+                    bibdoc.set_comment(comment, format)
+        else:
+            recid, docname, format = decompose_bibdocfile_url(url)
+            bibdoc = BibRecDocs(recid).get_bibdoc(docname)
+            if description:
+                bibdoc.set_description(description, format)
+            if comment:
+                bibdoc.set_comment(comment, format)
+
     write_message("Synchronizing MARC of recid '%s' with:\n%s" % (rec_id, record), verbose=9)
     tags8564s = record_get_field_instances(record, '856', '4', ' ')
     filtered_tags8564s = []
@@ -729,6 +767,8 @@ def synchronize_8564(rec_id, record):
         for value in field_get_subfield_values(field, 'u') + field_get_subfield_values(field, 'q'):
             if value.startswith('%s/record/%s/files/' % (CFG_SITE_URL, rec_id)) or \
                 value.startswith('%s/record/%s/files/' % (CFG_SITE_SECURE_URL, rec_id)):
+                if not record_had_FFT:
+                    merge_marc_into_bibdocfile(field)
                 to_be_removed = True
         if not to_be_removed:
             filtered_tags8564s.append(field)

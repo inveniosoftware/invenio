@@ -59,6 +59,7 @@ CFG_PATH_PPTHTML = @PPTHTML@
 CFG_PATH_XLHTML = @XLHTML@
 CFG_PATH_HTMLTOTEXT = @HTMLTOTEXT@
 CFG_PATH_WGET = @WGET@
+CFG_PATH_MD5SUM = @MD5SUM@
 
 ## CFG_BIBINDEX_PATH_TO_STOPWORDS_FILE -- path to the stopwords file.  You
 ## probably don't want to change this path, although you may want to

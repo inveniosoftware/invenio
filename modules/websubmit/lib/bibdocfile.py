@@ -54,7 +54,7 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_URL, \
     CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS, \
     CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL, \
     CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS, \
-    CFG_TMPDIR, CFG_PATH_WGET
+    CFG_TMPDIR, CFG_PATH_WGET, CFG_PATH_MD5SUM
 from invenio.bibformat import format_record
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -62,7 +62,7 @@ websearch_templates = invenio.template.load('websearch')
 
 CFG_BIBDOCFILE_MD5_THRESHOLD = 256 * 1024
 CFG_BIBDOCFILE_MD5_BUFFER = 1024 * 1024
-CFG_BIBDOCFILE_MD5SUM_EXISTS = os.system('which md5sum 2>&1 > /dev/null') == 0
+CFG_BIBDOCFILE_STRONG_FORMAT_NORMALIZATION = False
 
 KEEP_OLD_VALUE = 'KEEP-OLD-VALUE'
 
@@ -95,10 +95,12 @@ def file_strip_ext(afile):
 
 def normalize_format(format):
     """Normalize the format."""
-    #format = format.lower()
     if format and format[0] != '.':
         format = '.' + format
-    #format = format.replace('.jpg', '.jpeg')
+    if CFG_BIBDOCFILE_STRONG_FORMAT_NORMALIZATION:
+        if format not in ('.Z', '.H', '.C', '.CC'):
+            format = format.lower()
+        format = format.replace('.jpg', '.jpeg')
     return format
 
 _docname_re = re.compile(r'[^-\w.]*')
@@ -363,9 +365,9 @@ class BibRecDocs:
                 bibdoc = BibDoc(recid=self.id, doctype=doctype, docname=docname)
                 self.build_bibdoc_list()
                 return bibdoc
-        except:
+        except Exception, e:
             register_exception()
-            raise
+            raise InvenioWebSubmitFileError(str(e))
 
     def add_new_file(self, fullpath, doctype="Main", docname='', never_fail=False):
         """Adds a new file with the following policy: if the docname is not set
@@ -475,7 +477,6 @@ class BibRecDocs:
         will be created in order to put does files.
         Returns the list of newly created bibdocs if any.
         """
-
         bibdoc = self.get_bibdoc(docname)
         versions = {}
         res = []
@@ -664,33 +665,39 @@ class BibDoc:
                     # we link the document to the record if a recid was
                     # specified
                     self.more_info = BibDocMoreInfo(self.id)
-                    if self.recid != "":
-                        run_sql("INSERT INTO bibrec_bibdoc (id_bibrec, id_bibdoc, type) VALUES (%s,%s,%s)",
-                            (recid, self.id, self.doctype,))
-                    res = run_sql("select creation_date, modification_date from bibdoc where id=%s", (self.id,))
+                    res = run_sql("SELECT creation_date, modification_date FROM bibdoc WHERE id=%s", (self.id,))
                     self.cd = res[0][0]
                     self.md = res[0][0]
                 else:
                     raise InvenioWebSubmitFileError, "New docid cannot be created"
-                self.basedir = _make_base_dir(self.id)
-                # we create the corresponding storage directory
-                if not os.path.exists(self.basedir):
-                    old_umask = os.umask(022)
-                    os.makedirs(self.basedir)
-                    # and save the father record id if it exists
-                    try:
-                        if self.recid != "":
-                            recid_fd = open("%s/.recid" % self.basedir, "w")
-                            recid_fd.write(str(self.recid))
-                            recid_fd.close()
-                        if self.doctype != "":
-                            type_fd = open("%s/.type" % self.basedir, "w")
-                            type_fd.write(str(self.doctype))
-                            type_fd.close()
-                    except Exception, e:
-                        register_exception()
-                        raise InvenioWebSubmitFileError, e
-                    os.umask(old_umask)
+                try:
+                    self.basedir = _make_base_dir(self.id)
+                    # we create the corresponding storage directory
+                    if not os.path.exists(self.basedir):
+                        old_umask = os.umask(022)
+                        os.makedirs(self.basedir)
+                        # and save the father record id if it exists
+                        try:
+                            if self.recid != "":
+                                recid_fd = open("%s/.recid" % self.basedir, "w")
+                                recid_fd.write(str(self.recid))
+                                recid_fd.close()
+                            if self.doctype != "":
+                                type_fd = open("%s/.type" % self.basedir, "w")
+                                type_fd.write(str(self.doctype))
+                                type_fd.close()
+                        except Exception, e:
+                            register_exception()
+                            raise InvenioWebSubmitFileError, e
+                        os.umask(old_umask)
+                    if self.recid != "":
+                        run_sql("INSERT INTO bibrec_bibdoc (id_bibrec, id_bibdoc, type) VALUES (%s,%s,%s)",
+                            (recid, self.id, self.doctype,))
+                except Exception, e:
+                    run_sql('DELETE FROM bibdoc WHERE id=%s', (self.id, ))
+                    run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (self.id, ))
+                    register_exception()
+                    raise InvenioWebSubmitFileError, e
         # build list of attached files
         self._build_file_list('init')
         # link with related_files
@@ -723,8 +730,8 @@ class BibDoc:
     def touch(self):
         """Update the modification time of the bibdoc."""
         run_sql('UPDATE bibdoc SET modification_date=NOW() WHERE id=%s', (self.id, ))
-        if self.recid:
-            run_sql('UPDATE bibrec SET modification_date=NOW() WHERE id=%s', (self.recid, ))
+        #if self.recid:
+            #run_sql('UPDATE bibrec SET modification_date=NOW() WHERE id=%s', (self.recid, ))
 
     def set_status(self, new_status):
         """Set a new status."""
@@ -815,11 +822,14 @@ class BibDoc:
             self.touch()
             self._build_file_list()
 
-    def import_descriptions_and_comments_from_marc(self):
-        """Import description & comment from the corresponding marc."""
+    def import_descriptions_and_comments_from_marc(self, record=None):
+        """Import description & comment from the corresponding marc.
+        if record is passed it is directly used, otherwise it is
+        calculated after the xm stored in the database."""
         ## Let's get the record
-        xml = format_record(self.id, of='xm')
-        record = create_record(xml)[0]
+        if record is None:
+            xml = format_record(self.id, of='xm')
+            record = create_record(xml)[0]
         fields = record_get_field_instances(record, '856', '4', ' ')
 
         global_comment = None
@@ -911,8 +921,6 @@ class BibDoc:
             basename = decompose_file(filename)[1]
         newicon = BibDoc(doctype='Icon', docname=basename)
         newicon.add_file_new_version(filename)
-        run_sql("INSERT INTO bibdoc_bibdoc (id_bibdoc1, id_bibdoc2, type) VALUES (%s,%s,'Icon')",
-            (self.id, newicon.get_id(),))
         try:
             try:
                 old_umask = os.umask(022)
@@ -923,6 +931,7 @@ class BibDoc:
                 type_fd.write(str(self.doctype))
                 type_fd.close()
                 os.umask(old_umask)
+                run_sql("INSERT INTO bibdoc_bibdoc (id_bibdoc1, id_bibdoc2, type) VALUES (%s,%s,'Icon')", (self.id, newicon.get_id(),))
             except Exception, e:
                 register_exception()
                 raise InvenioWebSubmitFileError, "Encountered an exception while writing .docid and .doctype for folder '%s': '%s'" % (newicon.get_base_dir(), e)
@@ -986,19 +995,25 @@ class BibDoc:
     def change_name(self, newname):
         """Rename the bibdoc name. New name must not be already used by the linked
         bibrecs."""
-        newname = normalize_docname(newname)
-        res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (self.recid, newname))
-        if res:
-            raise InvenioWebSubmitFileError, "A bibdoc called %s already exists for recid %s" % (newname, self.recid)
-        run_sql("update bibdoc set docname=%s where id=%s", (newname, self.id,))
-        for f in os.listdir(self.basedir):
-            if f.startswith(self.docname):
-                shutil.move('%s/%s' % (self.basedir, f), '%s/%s' % (self.basedir, f.replace(self.docname, newname, 1)))
-        self.docname = newname
-        Md5Folder(self.basedir).update()
-        self.touch()
-        self._build_file_list('rename')
-        self._build_related_file_list()
+        try:
+            newname = normalize_docname(newname)
+            res = run_sql("SELECT b.id FROM bibrec_bibdoc bb JOIN bibdoc b on bb.id_bibdoc=b.id WHERE bb.id_bibrec=%s AND b.docname=%s", (self.recid, newname))
+            if res:
+                raise InvenioWebSubmitFileError, "A bibdoc called %s already exists for recid %s" % (newname, self.recid)
+            try:
+                for f in os.listdir(self.basedir):
+                    if f.startswith(self.docname):
+                        shutil.move('%s/%s' % (self.basedir, f), '%s/%s' % (self.basedir, f.replace(self.docname, newname, 1)))
+            except Exception, e:
+                register_exception()
+                raise InvenioWebSubmitFileError("Error in renaming the bibdoc %s to %s for recid %s: %s" % (self.docname, newname, self.recid, e))
+            run_sql("update bibdoc set docname=%s where id=%s", (newname, self.id,))
+            self.docname = newname
+        finally:
+            Md5Folder(self.basedir).update()
+            self.touch()
+            self._build_file_list('rename')
+            self._build_related_file_list()
 
     def set_comment(self, comment, format, version=None):
         """Update the comment of a format/version."""
@@ -1586,7 +1601,7 @@ def calculate_md5_external(filename):
     """Calculate the md5 of a physical file through md5sum Command Line Tool.
     This is suitable for file larger than 256Kb."""
     try:
-        md5_result = os.popen('md5sum -b "%s"' % filename)
+        md5_result = os.popen(CFG_PATH_MD5SUM + ' -b %s' % escape_shell_arg(filename))
         ret = md5_result.read()[:32]
         md5_result.close()
         if len(ret) != 32:
@@ -1601,7 +1616,7 @@ def calculate_md5_external(filename):
 def calculate_md5(filename, force_internal=False):
     """Calculate the md5 of a physical file. This is suitable for files smaller
     than 256Kb."""
-    if not CFG_BIBDOCFILE_MD5SUM_EXISTS or force_internal or os.path.getsize(filename) < CFG_BIBDOCFILE_MD5_THRESHOLD:
+    if not CFG_PATH_MD5SUM or force_internal or os.path.getsize(filename) < CFG_BIBDOCFILE_MD5_THRESHOLD:
         try:
             to_be_read = open(filename, "rb")
             computed_md5 = md5.new()
@@ -1665,6 +1680,15 @@ def decompose_bibdocfile_url(url):
     recid_file = recid_file.replace('/files/', '/')
     recid, docname, format = decompose_file(urllib.unquote(recid_file))
     return (int(recid), docname, format)
+
+re_bibdocfile_old_url = re.compile(r'/record/(\d*)/files/')
+def decompose_bibdocfile_old_url(url):
+    """Given a bibdocfile old url (e.g. CFG_SITE_URL/record/123/files)
+    it returns the recid."""
+    g = re_bibdocfile_old_url.search(url)
+    if g:
+        return int(g.group(1))
+    raise InvenioWebSubmitFileError('%s is not a valid old bibdocfile url' % url)
 
 def nice_size(size):
     """Return a nicely printed size in kilo."""
