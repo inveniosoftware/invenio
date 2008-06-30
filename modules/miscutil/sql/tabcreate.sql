@@ -3089,7 +3089,7 @@ CREATE TABLE IF NOT EXISTS hstDOCUMENT (
   docname varchar(250) NOT NULL,
   docformat varchar(50) NOT NULL,
   docversion tinyint(4) unsigned NOT NULL,
-  docsize mediumint(9) unsigned NOT NULL,
+  docsize bigint(15) unsigned NOT NULL,
   docchecksum char(32) NOT NULL,
   doctimestamp datetime NOT NULL,
   action varchar(50) NOT NULL,
