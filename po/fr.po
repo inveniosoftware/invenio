@@ -19,8 +19,8 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-06-30 18:42+0200\n"
-"PO-Revision-Date: 2008-06-06 11:43+0100\n"
-"Last-Translator: Marko Niinimaki <man@cern.ch>\n"
+"PO-Revision-Date: 2008-07-01 21:17+0200\n"
+"Last-Translator: Jérôme Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1412,12 +1412,10 @@ msgid "Done"
 msgstr "Exécuté"
 
 #: modules/bibedit/lib/bibedit_templates.py:348
-#, fuzzy
 msgid "Move up"
 msgstr "Remonter"
 
 #: modules/bibedit/lib/bibedit_templates.py:361
-#, fuzzy
 msgid "Move down"
 msgstr "Descendre"
 
@@ -1455,20 +1453,18 @@ msgid "Cannot edit deleted record."
 msgstr "Impossible d'éditer une notice supprimée."
 
 #: modules/bibedit/lib/bibedit_templates.py:492
-#, fuzzy
 msgid "There are record revisions not yet synchronized with the database."
-msgstr "L'adresse email fournie n'existe pas dans la base de données."
+msgstr "Certaines notices révisées n'ont pas encore été synchronisées avec la base de donnée."
 
 #: modules/bibedit/lib/bibedit_templates.py:493
 #: modules/bibedit/lib/bibedit_templates.py:502
-#, fuzzy
 msgid "Please try again in a few minutes."
 msgstr "Veuillez réessayer ultérieurement."
 
 #: modules/bibedit/lib/bibedit_templates.py:501
 msgid ""
 "A new revision of this record is not yet synchronized with the database."
-msgstr ""
+msgstr "Une nouvelle révision de cette notice n'a pas encore été synchronisée avec la base de donnée."
 
 #: modules/bibedit/lib/bibedit_templates.py:512
 msgid "Please enter the ID of the record you want to edit"
@@ -1519,25 +1515,25 @@ msgid "No"
 msgstr "Non"
 
 #: modules/bibedit/lib/bibedit_templates.py:555
-#, fuzzy, python-format
+#, python-format
 msgid "Do you really want to load revision %(revdate)s of record #%(recid)s?"
-msgstr "Voulez-vous vraiment supprimer cette notice?"
+msgstr "Voulez-vous vraiment charger la révision %(revdate)s de la notice #%(recid)s?"
 
 #: modules/bibedit/lib/bibedit_templates.py:558
 #, python-format
 msgid ""
 "The current version will be replaced with a copy of revision %(revdate)s"
-msgstr ""
+msgstr "La version courante sera remplacée par une copie de la révision %(revdate)s"
 
 #: modules/bibedit/lib/bibedit_templates.py:560
 msgid "You will also lose any unsubmitted changes for this record!"
-msgstr ""
+msgstr "Vous perdrez également tout changement non soumis pour cette notice!"
 
 #: modules/bibedit/lib/bibedit_templates.py:588
 msgid ""
 "The new revision is being synchronized with the database and will be ready "
 "shortly."
-msgstr ""
+msgstr "La nouvelle révision est en cours de synchronisation et sera bientôt prête."
 
 #: modules/bibedit/lib/bibedit_templates.py:593
 msgid "The record will be deleted as soon as the task queue is empty."
@@ -1569,14 +1565,14 @@ msgid "Submit and save record %s"
 msgstr "Soumettre et enregistrer la notice %s"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:175
-#, fuzzy, python-format
+#, python-format
 msgid "Record #%s"
-msgstr "Notice"
+msgstr "Notice #%s"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:177
-#, fuzzy, python-format
+#, python-format
 msgid "Record #%(recid)s, revision %(revdate)s"
-msgstr "Édition de la notice %(x_recid)s, champ %(x_field)s"
+msgstr "Édition de la notice #%(recid)s, révision %(revdate)s"
 
 #: modules/bibformat/lib/bibformat_templates.py:318
 #: modules/bibformat/lib/bibformat_templates.py:430
@@ -1867,25 +1863,23 @@ msgstr "anciennes versions"
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:103
 #, python-format
 msgid "%(x_sitename)s link"
-msgstr ""
+msgstr "lien %(x_sitename)s"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:96
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:103
 #, python-format
 msgid "%(x_sitename)s links"
-msgstr ""
+msgstr "liens %(x_sitename)s"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:105
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:121
-#, fuzzy
 msgid "external link"
-msgstr "%(link_or_links)s externes"
+msgstr "lien externe"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:105
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:121
-#, fuzzy
 msgid "external links"
-msgstr "%(link_or_links)s externes"
+msgstr "liens externes"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:197
 #: modules/bibformat/lib/elements/bfe_fulltext.py:222
@@ -1926,9 +1920,8 @@ msgid "Delete Output Format"
 msgstr "Supprimer le format de sortie"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:417
-#, fuzzy
 msgid "Cannot create output format"
-msgstr "Gérer les formats de sortie"
+msgstr "Impossible de créer le format de sortie"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:491
 #: modules/bibformat/web/admin/bibformatadmin.py:563
@@ -2704,9 +2697,8 @@ msgid "Set new alert"
 msgstr "Définir une nouvelle alerte"
 
 #: modules/webalert/lib/webalert_webinterface.py:79
-#, fuzzy
 msgid "Popular Searches"
-msgstr "Vos Recherches"
+msgstr "Recherches Populaires"
 
 #: modules/webalert/lib/webalert_webinterface.py:81
 #: modules/websession/lib/websession_templates.py:438
@@ -2993,9 +2985,8 @@ msgid "last"
 msgstr "dernier"
 
 #: modules/webbasket/lib/webbasket_templates.py:647
-#, fuzzy
 msgid "View comments"
-msgstr "voir les commentaires"
+msgstr "Voir les commentaires"
 
 #: modules/webbasket/lib/webbasket_templates.py:672
 msgid "This basket is publicly accessible at the following address:"
@@ -4180,9 +4171,8 @@ msgid "Search %s records for:"
 msgstr "Chercher dans %s notices:"
 
 #: modules/websearch/lib/websearch_templates.py:659
-#, fuzzy
 msgid "less"
-msgstr "Règles"
+msgstr "moins"
 
 #: modules/websearch/lib/websearch_templates.py:660
 #: modules/websearch/lib/websearch_templates.py:1377
@@ -4195,19 +4185,18 @@ msgstr "davantage"
 #: modules/websearch/lib/websearch_templates.py:665
 #, python-format
 msgid "Example: %(x_sample_search_query)s"
-msgstr ""
+msgstr "Exemple: %(x_sample_search_query)s"
 
 #: modules/websearch/lib/websearch_templates.py:677
 #: modules/websearch/lib/websearch_templates.py:1976
 #, python-format
 msgid "Search in %(x_collection_name)s"
-msgstr ""
+msgstr "Rechercher dans %(x_collection_name)s"
 
 #: modules/websearch/lib/websearch_templates.py:681
 #: modules/websearch/lib/websearch_templates.py:1980
-#, fuzzy
 msgid "Search everywhere"
-msgstr "Entrez une requête de recherche ici."
+msgstr "Rechercher partout"
 
 #: modules/websearch/lib/websearch_templates.py:715
 #: modules/websearch/lib/websearch_templates.py:793
@@ -4280,9 +4269,9 @@ msgstr "Derniers ajouts:"
 
 #: modules/websearch/lib/websearch_templates.py:1490
 #: modules/websearch/lib/websearch_templates.py:2894
-#, fuzzy, python-format
+#, python-format
 msgid "Cited by %i records"
-msgstr "Cité par: %s notices"
+msgstr "Cité par: %i notices"
 
 #: modules/websearch/lib/websearch_templates.py:1556
 #, python-format
@@ -4453,58 +4442,48 @@ msgid ".. of which self-citations: %s records"
 msgstr "parmi lesquelles auto-citations: %s notices"
 
 #: modules/websearch/lib/websearch_templates.py:3310
-#, fuzzy
 msgid "Affiliations:"
-msgstr "Citations"
+msgstr "Affiliations:"
 
 #: modules/websearch/lib/websearch_templates.py:3327
-#, fuzzy
 msgid "Frequent keywords:"
-msgstr "Mot-clés frequents"
+msgstr "Mots clés fréquents:"
 
 #: modules/websearch/lib/websearch_templates.py:3337
-#, fuzzy
 msgid "Frequent co-authors:"
-msgstr "Mot-clés frequents"
+msgstr "Co-auteurs fréquents:"
 
 #: modules/websearch/lib/websearch_templates.py:3346
-#, fuzzy
 msgid "Publishes in"
-msgstr "soumissions"
+msgstr "Publie dans"
 
 #: modules/websearch/lib/websearch_templates.py:3353
-#, fuzzy
 msgid "Papers:"
-msgstr "Page:"
+msgstr "Articles:"
 
 #: modules/websearch/lib/websearch_templates.py:3354
 msgid "downloaded"
 msgstr "telechargé"
 
 #: modules/websearch/lib/websearch_templates.py:3355
-#, fuzzy
 msgid "times"
-msgstr "Heure"
+msgstr "fois"
 
 #: modules/websearch/lib/websearch_templates.py:3383
-#, fuzzy
 msgid "Citations:"
-msgstr "Citations"
+msgstr "Citations:"
 
 #: modules/websearch/lib/websearch_templates.py:3413
-#, fuzzy
 msgid "Citation summary results"
-msgstr "Retour aux résultats de recherche"
+msgstr "Résultats du résumé des citations"
 
 #: modules/websearch/lib/websearch_templates.py:3418
-#, fuzzy
 msgid "Total number of citable papers analyzed:"
-msgstr "Nombre total de signalements"
+msgstr "Nombre d'articles analysés:"
 
 #: modules/websearch/lib/websearch_templates.py:3441
-#, fuzzy
 msgid "Total number of citations:"
-msgstr "Nombre total de signalements"
+msgstr "Nombre de citations:"
 
 #: modules/websearch/lib/websearch_templates.py:3446
 msgid "Average citations per paper:"
@@ -6753,9 +6732,8 @@ msgid "Access to Fulltext"
 msgstr "Accès au texte intégral"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:303
-#, fuzzy
 msgid "Not enough information to retrieve the document"
-msgstr "Soyez le premier à évaluer ce document."
+msgstr "Il manque des informations pour retrouver le document"
 
 #: modules/websubmit/web/publiline.py:129
 msgid "Specific Approval and Refereeing Workflow"
@@ -6890,31 +6868,27 @@ msgstr ""
 #: modules/webjournal/lib/webjournaladminlib.py:267
 #: modules/webjournal/lib/webjournaladminlib.py:301
 msgid "Add"
-msgstr ""
+msgstr "Ajouter"
 
 #: modules/webjournal/lib/webjournal_templates.py:398
 #: modules/webjournal/lib/webjournaladminlib.py:326
-#, fuzzy
 msgid "Publish"
-msgstr "soumissions"
+msgstr "Publier"
 
 #: modules/webjournal/lib/webjournal_templates.py:399
 #: modules/webjournal/lib/webjournaladminlib.py:267
 #: modules/webjournal/lib/webjournaladminlib.py:298
-#, fuzzy
 msgid "Refresh"
-msgstr "Références"
+msgstr "Rafraichir"
 
 #: modules/webjournal/lib/webjournal_templates.py:462
 #: modules/webjournal/lib/webjournaladminlib.py:340
-#, fuzzy
 msgid "Update"
-msgstr "Mettre à jour le groupe"
+msgstr "Mettre à jour"
 
 #: modules/webjournal/lib/webjournal_templates.py:625
-#, fuzzy
 msgid "Apply"
-msgstr "avril"
+msgstr "Appliquer"
 
 #: modules/webjournal/lib/webjournal_config.py:62
 #: modules/webjournal/lib/webjournal_config.py:94
@@ -6951,7 +6925,6 @@ msgid "No journal issues"
 msgstr "Aucune édition"
 
 #: modules/webjournal/lib/webjournal_config.py:269
-#, fuzzy
 msgid "Journal article error"
 msgstr "Erreur interne"
 
@@ -7045,7 +7018,6 @@ msgid "Journal publishing DB error"
 msgstr "Erreur de publication du journal dans la base de données"
 
 #: modules/webjournal/lib/webjournal_config.py:544
-#, fuzzy
 msgid "Journal issue error"
 msgstr "Erreur d'édition"
 
@@ -7054,7 +7026,6 @@ msgid "We could not find a current issue in the Database"
 msgstr "Impossible de trouver l'édition actuelle dans la base de données"
 
 #: modules/webjournal/lib/webjournal_config.py:575
-#, fuzzy
 msgid "Journal ID error"
 msgstr "ID du journal incorrect"
 
@@ -7066,22 +7037,20 @@ msgstr "Impossible de trouver l'identifiant du journal dans la base de données"
 #: modules/webjournal/lib/webjournal_config.py:609
 #, python-format
 msgid "Category \"%(category_name)s\" not found"
-msgstr ""
+msgstr "La catégorie \"%(category_name)s\" n'a pas été trouvée"
 
 #: modules/webjournal/lib/webjournal_config.py:611
-#, fuzzy
 msgid "Sorry, this category does not exist for this journal."
-msgstr "Désolé, la notice %s n'existe pas."
+msgstr "Désolé, la catégorie n'existe pas pour ce journal."
 
 #: modules/webjournal/web/admin/webjournaladmin.py:74
-#, fuzzy
 msgid "WebJournal Admin"
-msgstr "Administration de WebComment"
+msgstr "Administration de WebJournal"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:111
 #, python-format
 msgid "Administrate %(journal_name)s"
-msgstr ""
+msgstr "Administrer %(journal_name)s"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:148
 msgid "Feature a record"
@@ -7089,26 +7058,23 @@ msgstr "Mettre en avant une notice"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:206
 msgid "Email Alert System"
-msgstr ""
+msgstr "Système d'Alerte Email"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:259
 msgid "Issue regenerated"
 msgstr "Edition régénérée"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:309
-#, fuzzy
 msgid "Publishing Interface"
-msgstr "Erreur interne"
+msgstr "Interface de publication"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:335
-#, fuzzy
 msgid "Add Journal"
-msgstr "journal"
+msgstr "Ajouter un Journal"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:337
-#, fuzzy
 msgid "Edit Settings"
-msgstr "Modifier les préférences"
+msgstr "Modifier les réglages"
 
 #~ msgid "link"
 #~ msgstr "lien"
