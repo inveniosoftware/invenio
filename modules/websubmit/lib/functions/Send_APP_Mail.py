@@ -39,12 +39,23 @@ from invenio.config import \
      CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_NAME, \
      CFG_SITE_URL, \
-     CFG_SITE_SUPPORT_EMAIL
+     CFG_SITE_SUPPORT_EMAIL,  \
+     CFG_CERN_SITE
 from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
 from invenio.dbquery import run_sql
 from invenio.websubmit_config import CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN
 from invenio.mailutils import send_email
 from invenio.errorlib import register_exception
+from invenio.search_engine import print_record
+
+
+## The field in which to search for the record submitter/owner's email address:
+if CFG_CERN_SITE:
+    ## This is a CERN site - we use 859__f for submitter/record owner's email:
+    CFG_WEBSUBMIT_RECORD_OWNER_EMAIL = "859__f"
+else:
+    ## Non-CERN site. Use 8560_f for submitter/record owner's email:
+    CFG_WEBSUBMIT_RECORD_OWNER_EMAIL = "8560_f"
 
 def Send_APP_Mail (parameters, curdir, form, user_info=None):
     global emailvalue,titlevalue,authorvalue,sysno,rn
@@ -185,19 +196,33 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
         addresses += otheraddresses
     else:
         addresses = re.sub(",$","",addresses)
+    ## Add the record's submitter(s) into the list of recipients:
+    ## Get the email address(es) of the record submitter(s)/owner(s) from
+    ## the record itself:
+    record_owners = print_record(sysno, 'tm', \
+                                 [CFG_WEBSUBMIT_RECORD_OWNER_EMAIL]).strip()
+    if record_owners != "":
+        record_owners_list = record_owners.split("\n")
+        record_owners_list = [email.lower().strip() \
+                              for email in record_owners_list]
+    else:
+        record_owners_list = []
+    record_owners = ",".join([owner for owner in record_owners_list])
+    if record_owners != "":
+        addresses += ",%s" % record_owners
+
     if decision == "approve":
         mailtitle = "%s has been approved" % rn
         mailbody = "The %s %s has been approved." % (docname,rn)
-        mailbody += "\nIt will soon be accessible here:\n<%s/record/%s>" % (CFG_SITE_URL,sysno)
+        mailbody += "\nIt will soon be accessible here:\n\n<%s/record/%s>" % (CFG_SITE_URL,sysno)
     else:
         mailtitle = "%s has been rejected" % rn
         mailbody = "The %s %s has been rejected." % (docname,rn)
     if rn != newrn and decision == "approve" and newrn != "":
-        mailbody += "Its new reference number is: %s" % newrn
+        mailbody += "\n\nIts new reference number is: %s" % newrn
     mailbody += "\n\nTitle: %s\n\nAuthor(s): %s\n\n" % (titlevalue,authorvalue)
     if comment != "":
         mailbody += "Comments from the referee:\n%s\n" % comment
-    mailbody += "---------------------------------------------\nBest regards.\nThe submission team.\n"
     # Send mail to referee
     send_email(FROMADDR,addresses,mailtitle,mailbody, copy_to_admin=CFG_WEBSUBMIT_COPY_MAILS_TO_ADMIN)
     return ""
