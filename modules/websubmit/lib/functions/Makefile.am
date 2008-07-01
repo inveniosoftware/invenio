@@ -69,6 +69,7 @@ pylib_DATA = __init__.py \
              Send_Request_For_Publication.py \
              Send_Request_For_Refereeing_Process.py \
              Send_SRV_Mail.py \
+             Stamp_Replace_Single_File_Approval.py \
              Stamp_Uploaded_Files.py \
              Test_Status.py \
              Update_Approval_DB.py \
