@@ -94,10 +94,6 @@ def Mail_Approval_Request_to_Referee(parameters, curdir, form, user_info=None):
         This would allow "PHYS" in the following reference number to be
         recognised as the category:
            ATL-COM-PHYS-2008-001
-       @param note_file_appreq: (string) - the name of the file from which
-        any "notes" to be added into the approval request's "note" field in
-        the database are to be read. (File must be in the current submission's
-        working directory.)
        @param edsrn: (string) - the name of the field in which the report
         number should be placed when the referee visits the form for making
         a decision.
