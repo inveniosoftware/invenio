@@ -58,6 +58,7 @@ pylib_DATA = __init__.py \
              Print_Success_SRV.py \
              Register_Approval_Request.py \
              Register_Referee_Decision.py \
+             Withdraw_Approval_Request.py \
              Report_Number_Generation.py \
              Retrieve_Data.py \
              Second_Report_Number_Generation.py \
