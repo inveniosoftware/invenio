@@ -24,7 +24,7 @@ import calendar, commands, datetime, time, os, cPickle
 from invenio.config import CFG_TMPDIR, CFG_SITE_URL
 from invenio.urlutils import redirect_to_url
 from invenio.search_engine import perform_request_search
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 
 WEBSTAT_SESSION_LENGTH = 48*60*60 # seconds
 WEBSTAT_GRAPH_TOKENS = '-=#+@$%&XOSKEHBC'
@@ -56,10 +56,9 @@ def get_keyevent_trend_collection_population(args):
     if len(ids) == 0:
         return []
 
-    sql_query = "SELECT creation_date FROM bibrec WHERE id IN %s ORDER BY " + \
-           "creation_date DESC"
-    sql_param = (str(ids).replace('[', '(').replace(']', ')'),)
-    action_dates = [x[0] for x in run_sql(sql_query, sql_param)]
+    sql_query = ("SELECT creation_date FROM bibrec WHERE id IN %s ORDER BY " + \
+           "creation_date DESC") % str(ids).replace('[', '(').replace(']', ')')
+    action_dates = [x[0] for x in run_sql(sql_query)]
 
     initial_quantity = run_sql("SELECT COUNT(id) FROM bibrec WHERE creation_date < %s",
                                (_to_datetime(args['t_start'], args['t_format']).isoformat(),))[0][0]
@@ -232,15 +231,19 @@ def get_customevent_trend(args):
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
     tbl_name = get_customevent_table(args['id'])
+    col_names = get_customevent_args(args['id'])
 
-    sql_query = ["SELECT creation_time FROM %s WHERE creation_time > '%s'"]
-    sql_param =  [tbl_name, lower]
-    sql_query.append("AND creation_time < %s")
-    sql_param.append(upper)
+    sql_query = ["SELECT creation_time FROM %s WHERE creation_time > '%s'" % (tbl_name, lower)]
+    sql_query.append("AND creation_time < '%s'" % upper)
+    sql_param = []
     for col_title, col_content in args['cols']:
+        if not col_title in col_names:
+            continue
+        # TODO: it should go out without do the query
         if col_content:
-            sql_query.append("AND %s = %s")
-            sql_param +=  [col_title, col_content]
+            sql_query.append("AND %s" % escape_string(col_title))
+            sql_query.append(" = %s")
+            sql_param.append(col_content)
     sql_query.append("ORDER BY creation_time DESC")
     sql = ' '.join(sql_query)
 
@@ -282,14 +285,16 @@ def get_customevent_dump(args):
     for id in args['ids']:
         # Get all the event arguments and creation times
         tbl_name = get_customevent_table(id)
-        sql_query = ["SELECT * FROM %s WHERE creation_time > %s"]
-        sql_param = [tbl_name, lower]
-        sql_query.append("AND creation_time < %s")
-        sql_param.append(upper)
+        col_names = get_customevent_args(id)
+        sql_query = ["SELECT * FROM %s WHERE creation_time > '%s'" % (tbl_name, lower)]
+        sql_query.append("AND creation_time < '%s'" % upper)
+        sql_param = []
         for col_title, col_content in args['cols']:
+            if not col_title in col_names: continue
             if col_content:
-                sql_query.append("AND %s = %s")
-                sql_param += [col_title, col_content]
+                sql_query.append("AND %s" % escape_string(col_title))
+                sql_query.append(" = %s")
+                sql_param.append(col_content)
         sql_query.append("ORDER BY creation_time DESC")
         sql = ' '.join(sql_query)
         res = run_sql(sql, tuple(sql_param))
@@ -333,7 +338,10 @@ def get_customevent_args(id):
     """
     res = run_sql("SELECT cols FROM staEVENT WHERE id = %s", (id,))
     try:
-        return cPickle.loads(res[0][0])
+        if res[0][0]:
+            return cPickle.loads(res[0][0])
+        else:
+            return []
     except IndexError:
         # No such event table
         return None

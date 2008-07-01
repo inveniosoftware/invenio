@@ -164,7 +164,7 @@ def create_customevent(id=None, name=None, cols=[]):
     run_sql(sql_str, tuple(sql_param))
 
     # We're done! Print notice containing the name of the event.
-    return ("Event table [%s] successfully created.\n"
+    return ("Event table [%s] successfully created.\n" +
             "Please use event id [%s] when registering an event.") % (tbl_name, id)
 
 def destroy_customevent(id=None):
@@ -188,7 +188,7 @@ def destroy_customevent(id=None):
         tbl_name = get_customevent_table(id)
         run_sql("DROP TABLE %s" % tbl_name)
         run_sql("DELETE FROM staEVENT WHERE id = %s", (id,))
-        return ("Event with id [%s] was successfully destroyed.\n"
+        return ("Event with id [%s] was successfully destroyed.\n" +
                 "Table [%s], with content, was destroyed.") % (id, tbl_name)
 
 def register_customevent(id, *arguments):
@@ -400,12 +400,12 @@ def perform_display_keyevent(id=None, args={}, req=None, ln=CFG_SITE_LANG):
     options = dict([(param,
                      (KEYEVENT_REPOSITORY[id]['extraparams'][param][0],
                       KEYEVENT_REPOSITORY[id]['extraparams'][param][1]())) for param in
-                    KEYEVENT_REPOSITORY[id]['extraparams']]
+                    KEYEVENT_REPOSITORY[id]['extraparams']] +
                    [('timespan', ('Time span', _get_timespans())), ('format', ('Output format', _get_formats()))])
     # Order of options
     order = [param for param in KEYEVENT_REPOSITORY[id]['extraparams']] + ['timespan', 'format']
     # Build a dictionary for the selected parameters: { parameter name: argument internal name }
-    choosed = dict([(param, args[param]) for param in KEYEVENT_REPOSITORY[id]['extraparams']]
+    choosed = dict([(param, args[param]) for param in KEYEVENT_REPOSITORY[id]['extraparams']] +
                    [('timespan', args['timespan']), ('format', args['format'])])
     # Send to template to prepare event customization FORM box
     out = TEMPLATES.tmpl_keyevent_box(options, order, choosed, ln=ln)
@@ -426,7 +426,7 @@ def perform_display_keyevent(id=None, args={}, req=None, ln=CFG_SITE_LANG):
 
     # Get unique name for caching purposes (make sure that the params used in the filename are safe!)
     filename = KEYEVENT_REPOSITORY[id]['cachefilename'] \
-               % dict([(param, re.subn("[^\w]", "_", choosed[param])[0]) for param in choosed]
+               % dict([(param, re.subn("[^\w]", "_", choosed[param])[0]) for param in choosed] +
                       [('id', re.subn("[^\w]", "_", id)[0])])
 
     # Get time parameters from repository
