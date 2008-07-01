@@ -386,6 +386,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Print_Success_DEL','Prepare a message for t
 INSERT INTO sbmALLFUNCDESCR VALUES ('Print_Success_MBI',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Print_Success_SRV',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Register_Approval_Request',NULL);
+INSERT INTO sbmALLFUNCDESCR VALUES ('Register_Referee_Decision',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Withdraw_Approval_Request',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Report_Number_Generation',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Second_Report_Number_Generation','Generate a secondary report number for a document.');
@@ -426,6 +427,7 @@ INSERT INTO sbmFUNDESC VALUES ('Send_Modify_Mail','sourceDoc');
 INSERT INTO sbmFUNDESC VALUES ('Register_Approval_Request','categ_file_appreq');
 INSERT INTO sbmFUNDESC VALUES ('Register_Approval_Request','categ_rnseek_appreq');
 INSERT INTO sbmFUNDESC VALUES ('Register_Approval_Request','note_file_appreq');
+INSERT INTO sbmFUNDESC VALUES ('Register_Referee_Decision','decision_file');
 INSERT INTO sbmFUNDESC VALUES ('Withdraw_Approval_Request','categ_file_withd');
 INSERT INTO sbmFUNDESC VALUES ('Withdraw_Approval_Request','categ_rnseek_withd');
 INSERT INTO sbmFUNDESC VALUES ('Report_Number_Generation','edsrn');
