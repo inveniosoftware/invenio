@@ -393,7 +393,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Send_APP_Mail','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Send_Delete_Mail','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Send_Modify_Mail',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Send_SRV_Mail',NULL);
-INSERT INTO sbmALLFUNCDESCR VALUES ('Stamp_and_Replace_Single_File_Approval','Stamp a single file when a document is approved.');
+INSERT INTO sbmALLFUNCDESCR VALUES ('Stamp_Replace_Single_File_Approval','Stamp a single file when a document is approved.');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Stamp_Uploaded_Files','Stamp some of the files that were uploaded during a submission.');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Test_Status','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Update_Approval_DB',NULL);
@@ -492,11 +492,11 @@ INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_rn_format'
 INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_rn_yeargen');
 INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_rncateg_file');
 INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_counterpath');
-INSERT INTO sbmFUNDESC VALUES ('Stamp_and_Replace_Single_File_Approval','file_to_be_stamped');
-INSERT INTO sbmFUNDESC VALUES ('Stamp_and_Replace_Single_File_Approval','latex_template');
-INSERT INTO sbmFUNDESC VALUES ('Stamp_and_Replace_Single_File_Approval','latex_template_vars');
-INSERT INTO sbmFUNDESC VALUES ('Stamp_and_Replace_Single_File_Approval','new_file_name');
-INSERT INTO sbmFUNDESC VALUES ('Stamp_and_Replace_Single_File_Approval','stamp');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','file_to_be_stamped');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','latex_template');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','latex_template_vars');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','new_file_name');
+INSERT INTO sbmFUNDESC VALUES ('Stamp_Replace_Single_File_Approval','stamp');
 
 INSERT INTO sbmGFILERESULT VALUES ('HTML','HTML document');
 INSERT INTO sbmGFILERESULT VALUES ('WORD','data');
