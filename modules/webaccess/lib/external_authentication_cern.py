@@ -185,5 +185,13 @@ class ExternalAuthCern(ExternalAuth):
                 ret['HIDDEN_' + key] = value
             else:
                 ret[key] = value
+
+        ## Hack to be forward-compatible with CERN SSO implementation
+        if ret.has_key('company'):
+            ret['homeinstitute'] = ret['company']
+            del ret['company']
+        if ret.has_key('name'):
+            ret['fullname'] = ret['name']
+            del ret['name']
         return ret
 
