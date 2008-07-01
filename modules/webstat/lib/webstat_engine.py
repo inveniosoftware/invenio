@@ -238,8 +238,8 @@ def get_customevent_trend(args):
     sql_param = []
     for col_title, col_content in args['cols']:
         if not col_title in col_names:
+            # TODO: it should go out without do the query
             continue
-        # TODO: it should go out without do the query
         if col_content:
             sql_query.append("AND %s" % escape_string(col_title))
             sql_query.append(" = %s")

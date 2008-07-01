@@ -29,7 +29,7 @@ from invenio.config import \
      CFG_TMPDIR, \
      CFG_SITE_LANG
 from invenio.search_engine import get_alphabetically_ordered_collection_list
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, escape_string
 from invenio.bibsched import is_task_scheduled, get_task_ids_by_descending_date, get_task_options
 
 # Imports handling key events
@@ -143,25 +143,24 @@ def create_customevent(id=None, name=None, cols=[]):
             return "Invalid column title: %s! Aborted." % argument
 
     # Insert a new row into the events table describing the new event
-    sql_name = (name is not None) and ("'%s'" % name) or "NULL"
-    sql_cols = (len(cols) != 0) and ('"%s"' % cPickle.dumps(cols)) or "NULL"
-    run_sql("INSERT INTO staEVENT (id, name, cols) VALUES (%s, %s, %s)",
-            (id, sql_name, sql_cols))
+    sql_name = (name is not None) and ("'%s'" % escape_string(name)) or "NULL"
+    sql_cols = (len(cols) != 0) and ('"%s"' % escape_string(cPickle.dumps(cols))) or "NULL"
+    run_sql("INSERT INTO staEVENT (id, name, cols) VALUES ('%s', %s, %s)" %
+            (escape_string(id), sql_name, sql_cols))
 
     tbl_name = get_customevent_table(id)
 
     # Create a table for the new event
-    sql_param = []
     sql_query = ["CREATE TABLE %s (" % tbl_name]
     sql_query.append("id MEDIUMINT unsigned NOT NULL auto_increment,")
     sql_query.append("creation_time TIMESTAMP DEFAULT NOW(),")
     for argument in cols:
-        sql_query.append("%s MEDIUMTEXT NULL,")
-        sql_query.append("INDEX %s (%s(50)),")
-        sql_param += [argument, argument, argument]
+        arg = escape_string(argument)
+        sql_query.append("%s MEDIUMTEXT NULL," % arg)
+        sql_query.append("INDEX %s (%s(50))," % (arg, arg))
     sql_query.append("PRIMARY KEY (id))")
     sql_str = ' '.join(sql_query)
-    run_sql(sql_str, tuple(sql_param))
+    run_sql(sql_str)
 
     # We're done! Print notice containing the name of the event.
     return ("Event table [%s] successfully created.\n" +
