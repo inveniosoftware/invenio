@@ -178,24 +178,38 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
             category = "unknown"
     else:
         category = "unknown"
-    # Build referee's email address
-    refereeaddress = ""
-    # Try to retrieve the referee's email from the referee's database
-    for user in acc_get_role_users(acc_get_role_id("referee_%s_%s" % (doctype,category))):
-        refereeaddress += user[1] + ","
-    # And if there is a general referee
-    for user in acc_get_role_users(acc_get_role_id("referee_%s_*" % doctype)):
-        refereeaddress += user[1] + ","
-    refereeaddress = re.sub(",$","",refereeaddress)
-    # Creation of the mail for the referee
-    otheraddresses = otheraddresses.replace("<CATEG>",category)
-    addresses = ""
-    if refereeaddress != "":
-        addresses = refereeaddress + ","
-    if otheraddresses != "":
-        addresses += otheraddresses
+    ## Get the referee email address:
+    if CFG_CERN_SITE:
+        ## The referees system in CERN now works with listbox membership.
+        ## List names should take the format
+        ## "service-cds-referee-doctype-category@cern.ch"
+        ## Make sure that your list exists!
+        ## FIXME - to be replaced by a mailing alias in webaccess in the
+        ## future.
+        referee_listname = "service-cds-referee-%s" % doctype.lower()
+        if category != "":
+            referee_listname += "-%s" % category.lower()
+        referee_listname += "@cern.ch"
+        addresses = referee_listname
     else:
-        addresses = re.sub(",$","",addresses)
+        # Build referee's email address
+        refereeaddress = ""
+        # Try to retrieve the referee's email from the referee's database
+        for user in acc_get_role_users(acc_get_role_id("referee_%s_%s" % (doctype,category))):
+            refereeaddress += user[1] + ","
+        # And if there is a general referee
+        for user in acc_get_role_users(acc_get_role_id("referee_%s_*" % doctype)):
+            refereeaddress += user[1] + ","
+        refereeaddress = re.sub(",$","",refereeaddress)
+        # Creation of the mail for the referee
+        otheraddresses = otheraddresses.replace("<CATEG>",category)
+        addresses = ""
+        if refereeaddress != "":
+            addresses = refereeaddress + ","
+        if otheraddresses != "":
+            addresses += otheraddresses
+        else:
+            addresses = re.sub(",$","",addresses)
     ## Add the record's submitter(s) into the list of recipients:
     ## Get the email address(es) of the record submitter(s)/owner(s) from
     ## the record itself:
