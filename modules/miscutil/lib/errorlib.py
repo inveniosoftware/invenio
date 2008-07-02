@@ -278,7 +278,7 @@ def register_errors(errors_or_warnings_list, stream, req=None):
         error = 'ERR_MISCUTIL_BAD_FILE_ARGUMENT_PASSED'
         errors_or_warnings_list.append((error, eval(CFG_MISCUTIL_ERROR_MESSAGES[error])% stream))
     # update log_errors
-    stream_location = os.path.join(CFG_LOGDIR, '/invenio.' + stream)
+    stream_location = os.path.join(CFG_LOGDIR, 'invenio.' + stream)
     errors = ''
     for etuple in errors_or_warnings_list:
         try:
