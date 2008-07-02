@@ -357,7 +357,7 @@ There is nothing to do.
         raise InvenioWebSubmitFunctionStop(msg)
     elif approval_status.lower() == "waiting":
         ## Mark the approval request as withdrawn:
-        note = "Withdrawn by [%s]: %s\n\n" \
+        note = "Withdrawn by [%s]: %s\n#####\n" \
                % (cgi.escape(user_info['email']), \
                   cgi.escape(time.strftime("%d/%m/%Y %H:%M:%S", \
                                            time.localtime())))
