@@ -383,6 +383,7 @@ INSERT INTO sbmALLFUNCDESCR VALUES ('Move_From_Pending','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Move_to_Done',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Move_to_Pending',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Print_Success','');
+INSERT INTO sbmALLFUNCDESCR VALUES ('Print_Success_Approval_Request',NULL);
 INSERT INTO sbmALLFUNCDESCR VALUES ('Print_Success_APP','');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Print_Success_DEL','Prepare a message for the user informing them that their record was successfully deleted.');
 INSERT INTO sbmALLFUNCDESCR VALUES ('Print_Success_MBI',NULL);
