@@ -33,6 +33,6 @@ __revision__ = "$Id$"
 def Finish_Submission(parameters, curdir, form, user_info=None):
     global last_step,action_score
     last_step = 1
-    action_score = "-1"
+    action_score = -1
     return ""
 
