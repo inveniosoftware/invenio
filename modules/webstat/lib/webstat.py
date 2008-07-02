@@ -143,10 +143,19 @@ def create_customevent(id=None, name=None, cols=[]):
             return "Invalid column title: %s! Aborted." % argument
 
     # Insert a new row into the events table describing the new event
-    sql_name = (name is not None) and ("'%s'" % escape_string(name)) or "NULL"
-    sql_cols = (len(cols) != 0) and ('"%s"' % escape_string(cPickle.dumps(cols))) or "NULL"
-    run_sql("INSERT INTO staEVENT (id, name, cols) VALUES ('%s', %s, %s)" %
-            (escape_string(id), sql_name, sql_cols))
+    sql_param = [id]
+    if name is not None:
+        sql_name = "%s"
+        sql_param.append(name)
+    else:
+        sql_name = "NULL"
+    if len(cols) != 0:
+        sql_cols = "%s"
+        sql_param.append(cPickle.dumps(cols))
+    else:
+        sql_cols = "NULL"
+    run_sql("INSERT INTO staEVENT (id, name, cols) VALUES (%s, " + sql_name + ", " + sql_cols + ")",
+            tuple(sql_param))
 
     tbl_name = get_customevent_table(id)
 
