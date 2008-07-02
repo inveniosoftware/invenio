@@ -146,6 +146,7 @@ If you believe this to be an error, please contact &lt;%s&gt;, quoting the
 """ % (cgi.escape(rn), \
        cgi.escape(CFG_SITE_SUPPORT_EMAIL), \
        cgi.escape(rn))
+        raise InvenioWebSubmitFunctionStop(msg)
     elif document_status == "waiting":
         ## The document is awaiting approval. Register the referee's decision:
         if decision == "approve":
