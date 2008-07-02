@@ -131,7 +131,7 @@ document's report-number [%s] and describing the problem.
         ## Somebody had withdrawn the approval request for this document
         ## before the referee made this decision. Halt the approval process
         ## with a message for the referee:
-        msg += """
+        msg = """
 <br />
 <div>
 <span style="color: red;">Note:</span> The request for the approval of the
