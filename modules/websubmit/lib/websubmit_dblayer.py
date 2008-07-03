@@ -637,23 +637,21 @@ def submission_is_finished(doctype, action, subm_id, email):
 ## Functions relating to approval stuff:
 ######
 
-def get_approval_request_notes(doctype, category, reportnumber):
+def get_approval_request_notes(doctype, reportnumber):
     """Get any notes relating to an approval request.
        An approval request in the database has a "note" field for notes or
        comments relating to the request. This function will return the value
        stored in that field.
        @param doctype: (string) - the document type of the document for
         which the approval request notes are to be retrieved.
-       @param category: (string) - the category of the document for which
-        the approval request notes are to be retrieved.
        @param reportnumber: (string) - the report number of the document
         for which the approval request notes are to be retrieved.
        @return: (string or None) - String if there was a row for this approval
         request; None if not.
     """
     qstr = """SELECT note FROM sbmAPPROVAL """ \
-           """WHERE doctype=%s AND categ=%s AND rn=%s"""
-    qres = run_sql(qstr, (doctype, category, reportnumber))
+           """WHERE doctype=%s AND rn=%s"""
+    qres = run_sql(qstr, (doctype, reportnumber))
     try:
         return str(qres[0][0])
     except IndexError:
