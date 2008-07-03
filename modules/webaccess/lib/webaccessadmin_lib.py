@@ -1737,7 +1737,7 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
     </td><td>
     <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea>
     </td></tr><tr><td align='right' valign='top'>
-    <span class="adminlabel">firewall like role definition [<a href="/admin/webaccess/firerole.html">?</a>]</span>
+    <span class="adminlabel">firewall like role definition [<a href="/help/admin/webaccess-admin-guide#6">?</a>]</span>
     </td><td>
     <textarea class="admin_wvar" rows="6" cols="30" name="firerole_def_src">%s</textarea>
     </td></tr><tr><td></td><td>
@@ -1848,7 +1848,7 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
     </td><td>
     <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea> <br />
     </td></tr><tr><td align='right' valign='top'>
-    <span class="adminlabel">firewall like role definition</span> [<a href="/admin/webaccess/firerole.html">?</a>]
+    <span class="adminlabel">firewall like role definition</span> [<a href="/help/admin/webaccess-admin-guide#6">?</a>]
     </td><td>
     <textarea class="admin_wvar" rows="6" cols="30" name="firerole_def_src">%s</textarea><br />
     </td></tr><tr><td></td><td>
