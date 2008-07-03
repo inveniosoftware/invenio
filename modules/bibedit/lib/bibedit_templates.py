@@ -95,7 +95,7 @@ class Template:
             else:
                 link_form = "index"
 
-            result = """ <form action="%(bibediturl)s/%(link_form)s" method="POST">
+            formcontents = """ <form action="%(bibediturl)s/%(link_form)s" method="POST">
                            %(input_recid)s
                            %(input_temp)s
                            %(input_ln)s
@@ -110,6 +110,7 @@ class Template:
                             'link_form'                 : link_form,
                             'print_action_add_subfield' : print_action_add_subfield,
                             'print_action_edit_100' : print_action_edit_100}
+            result = formcontents
         else:
             link_submit         = ''
             link_add_field      = self.tmpl_link(ln, _("Add Field"), bibediturl, 'index',
@@ -236,7 +237,7 @@ class Template:
         else:
             #click on "add field" link on the top of index page.
             result = """ <td class="bibEditCellTag">
-                           <form action="%(bibediturl)s/index" method="POST">
+                           <form action="%(bibediturl)s/index" method="GET">
                              %(input_recid)s
                              %(input_temp)s
                              %(input_ln)s
@@ -265,15 +266,22 @@ class Template:
                    </tr> """ % result
 
 
-    def tmpl_table_footer(self, ln, type_table, add=0):
+    def tmpl_table_footer(self, ln, type_table, add=0, another=0):
         """ Return a footer of table. """
 
         _ = gettext_set_language(ln)
 
-        button  = _("Done")
+        dbutton  = _("Done")
+        abutton = _("Add another subfield")
 
         if type_table != "record" or add == 3:
-            form = self.tmpl_input('submit', button, class_css='formbutton') + "</form>"
+            #add a done button and 'add another subfield' button in the form
+            form = self.tmpl_input('submit', dbutton, class_css='formbutton') + "<br/>"
+            if another:
+                form += self.tmpl_input('submit', abutton, 'addanother', class_css='formbutton') + "<br>"
+                form += _("Tags and values should be filled before pressing Done or Add another subfield")
+            form += "</form>"
+
         else:
             form = ''
 

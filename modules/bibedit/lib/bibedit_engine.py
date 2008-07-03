@@ -90,9 +90,16 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
                         ind2    = dict_value.get("add_ind2"   , '')
                         subcode = dict_value.get("add_subcode", '')
                         value   = dict_value.get("add_value"  , '')
+                        another = dict_value.get("addanother" , '')
 
                         if tag != '' and subcode != '' and value != '':
-                            record = add_field(recid, uid, record, tag, ind1, ind2, subcode, value)
+                            #add these in the record, take the instance number
+                            tag = tag[:3]
+                            new_field_number = record_add_field(record, tag, ind1, ind2, [(subcode,value)])
+                            record  = add_subfield(recid, uid, tag, record, new_field_number, subcode, value)
+                            if another and another != '':
+                                #if the user pressed 'another' instead of 'done', take to editing
+                                return perform_request_edit(ln, recid, uid, tag, new_field_number, 0, 'marc', True, None, 0, dict_value)
 
                     body += bibedit_templates.tmpl_table_header(ln, "record", recid, temp, format_tag, add=add)
 
@@ -112,7 +119,7 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
                     if add == 3:
                         body += bibedit_templates.tmpl_table_value(ln, recid, '', [], format_tag, "record", add, 1)
 
-                    body += bibedit_templates.tmpl_table_footer(ln, "record", add)
+                    body += bibedit_templates.tmpl_table_footer(ln, "record", add, 1)
 
                 elif record == '':
                     body = bibedit_templates.tmpl_record_choice_box(ln, 2)
@@ -140,7 +147,6 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
 def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
                          format_tag, temp, act_subfield, add, dict_value):
     """Returns the body of edit page. """
-
     errors = []
     warnings = []
     body = ''
@@ -173,8 +179,7 @@ def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
                                                 tag=tag, num_field=num_field, add=add)
 
     tag = tag[:3]
-    fields = record.get(str(tag), "empty")
-
+    fields = record.get(str(tag), 'empty')
     if fields != "empty":
         for field in fields:
             if field[4] == int(num_field) :
