@@ -58,12 +58,11 @@ else:
     CFG_WEBSUBMIT_RECORD_OWNER_EMAIL = "8560_f"
 
 def Send_APP_Mail (parameters, curdir, form, user_info=None):
-    global emailvalue,titlevalue,authorvalue,sysno,rn
+    global titlevalue,authorvalue,sysno,rn
     FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
     doctype = form['doctype']
-    emailvalue = emailvalue.replace("\n","")
-    titlevalue = titlevalue.replace("\n","")
-    authorvalue = authorvalue.replace("\n","")
+    titlevalue = titlevalue.replace("\n"," ")
+    authorvalue = authorvalue.replace("\n","; ")
     # variables declaration
     categformat = parameters['categformatAPP']
     otheraddresses = parameters['addressesAPP']
