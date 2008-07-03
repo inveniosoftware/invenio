@@ -499,6 +499,7 @@ INSERT INTO sbmFUNDESC VALUES ('Stamp_Uploaded_Files','stamp');
 INSERT INTO sbmFUNDESC VALUES ('Make_Dummy_MARC_XML_Record','dummyrec_source_tpl');
 INSERT INTO sbmFUNDESC VALUES ('Make_Dummy_MARC_XML_Record','dummyrec_create_tpl');
 INSERT INTO sbmFUNDESC VALUES ('Print_Success_APP','decision_file');
+INSERT INTO sbmFUNDESC VALUES ('Print_Success_APP','newrnin');
 INSERT INTO sbmFUNDESC VALUES ('Send_Delete_Mail','edsrn');
 INSERT INTO sbmFUNDESC VALUES ('Send_Delete_Mail','record_managers');
 INSERT INTO sbmFUNDESC VALUES ('Second_Report_Number_Generation','2nd_rn_file');
