@@ -25,43 +25,66 @@ import re
 import marshal
 from zlib import decompress, error
 
-from invenio.dbquery import run_sql, OperationalError
+from invenio.dbquery import run_sql, get_table_update_time, OperationalError
 from invenio.intbitset import intbitset
+from invenio.data_cacher import DataCacher
 
-def init_db_dictionary(dname):
-    """return a dictionary from rnkCITATIONDATA
+class CitationDictsDataCacher(DataCacher):
     """
-    query = "select object_value from rnkCITATIONDATA where object_name='"+dname+"'"
-    try:
-        compressed_sc_dic = run_sql(query)
-    except OperationalError:
-        compressed_sc_dic = []
-    sc_dic = {}
-    if compressed_sc_dic and compressed_sc_dic[0] and compressed_sc_dic[0][0]:
-        try:
-            sc_dic = marshal.loads(decompress(compressed_sc_dic[0][0]))
-        except error:
-            sc_dic = {}
-    return sc_dic
+    Cache holding all citation dictionaries (citationdict,
+    reversedict, selfcitdict, selfcitedbydict).
+    """
+    def __init__(self):
+        def cache_filler():
+            alldicts = {}
+            try:
+                res = run_sql("""SELECT object_name,object_value FROM rnkCITATIONDATA""")
+            except OperationalError:
+                # database problems, return empty cache
+                return {}
+            for row in res:
+                object_name = row[0]
+                object_value = row[1]
+                try:
+                    object_value_dict = marshal.loads(decompress(object_value))
+                except:
+                    object_value_dict = {}
+                alldicts[object_name] = object_value_dict
+                if object_name == 'citationdict':
+                    # for cited:M->N queries, it is interesting to cache also
+                    # some preprocessed citationdict:
+                    alldicts['citationdict_keys'] = object_value_dict.keys()
+                    alldicts['citationdict_keys_intbitset'] = intbitset(object_value_dict.keys())
+            return alldicts
 
-cache_cited_by_dictionary = init_db_dictionary("citationdict")
-cache_cited_by_dictionary_keys = cache_cited_by_dictionary.keys()
-cache_cited_by_dictionary_keys_intbitset = intbitset(cache_cited_by_dictionary.keys())
-cache_reference_list_dictionary = init_db_dictionary("reversedict")
-cache_selfcit_dictionary = init_db_dictionary("selfcitdict")
-cache_selfcitedby_dictionary = init_db_dictionary("selfcitdict")
+        def timestamp_getter():
+            return get_table_update_time('rnkCITATIONDATA')
 
-### INTERFACE
+        DataCacher.__init__(self, cache_filler, timestamp_getter)
+
+try:
+    cache_citation_dicts.is_ok_p
+except Exception:
+    cache_citation_dicts = CitationDictsDataCacher()
+
+def get_citation_dict(dictname):
+    """Return cached value of a citation dictionary. DICTNAME can be
+       citationdict, reversedict, selfcitdict, selfcitedbydict.
+    """
+    cache = cache_citation_dicts.get_cache()
+    return cache.get(dictname, {})
 
 def get_cited_by(recordid):
     """Return a list of records that cite recordid"""
     ret = []
+    cache_cited_by_dictionary = get_citation_dict("citationdict")
     if cache_cited_by_dictionary.has_key(recordid):
         ret = cache_cited_by_dictionary[recordid]
     return ret
 
 def get_cited_by_count(recordid):
     """Return how many records cite given RECORDID."""
+    cache_cited_by_dictionary = get_citation_dict("citationdict")
     return len(cache_cited_by_dictionary.get(recordid, []))
 
 def get_records_with_num_cites(numstr, allrecs = intbitset([])):
@@ -70,6 +93,9 @@ def get_records_with_num_cites(numstr, allrecs = intbitset([])):
        Warning: numstr is string and may not be numeric! It can
        be 10,0->100 etc
     """
+    cache_cited_by_dictionary = get_citation_dict("citationdict")
+    cache_cited_by_dictionary_keys = get_citation_dict("citationdict_keys")
+    cache_cited_by_dictionary_keys_intbitset = get_citation_dict("citationdict_keys_intbitset")
     matches = intbitset([])
     #once again, check that the parameter is a string
     if not (type(numstr) == type("thisisastring")):
@@ -125,6 +151,7 @@ def get_cited_by_list(recordlist):
     """Return a tuple of ([recid,list_of_citing_records],...) for all the
        records in recordlist.
     """
+    cache_cited_by_dictionary = get_citation_dict("citationdict")
     result = []
     for recid in recordlist:
         if cache_cited_by_dictionary.has_key(recid):
@@ -154,6 +181,7 @@ def calculate_cited_by_list(record_id, sort_order="d"):
        record in citing RECORD_ID.  The resulting recids is sorted by
        ascending/descending citation weights depending or SORT_ORDER.
     """
+    cache_cited_by_dictionary = get_citation_dict("citationdict")
     citation_list = []
     result = []
     # determine which record cite RECORD_ID:
@@ -191,6 +219,7 @@ def get_self_cited_by(record_id):
     """Return a list of doc ids [y1,y2,..] for the
        rec id x given as param, so that x cites y1,y2,.. and x and each y share an author
     """
+    cache_selfcit_dictionary = get_citation_dict("selfcitdict")
     result = []
     if cache_selfcit_dictionary and cache_selfcit_dictionary.has_key(record_id):
         result.extend(cache_selfcit_dictionary[record_id])
@@ -202,6 +231,7 @@ def get_self_cited_in(record_id):
     """Return a list of doc ids [y1,y2,..] for the
        rec id x given as param, so that x is cited in y1,y2,.. and x and each y share an author
     """
+    cache_selfcitedby_dictionary = get_citation_dict("selfcitedbydict")
     result = []
     if cache_selfcitedby_dictionary and cache_selfcitedby_dictionary.has_key(record_id):
         result.extend(cache_selfcitedby_dictionary[record_id])
@@ -214,6 +244,8 @@ def calculate_co_cited_with_list(record_id, sort_order="d"):
        that are co-cited with RECORD_ID.  The resulting recids is sorted by
        ascending/descending citation weights depending or SORT_ORDER.
     """
+    cache_cited_by_dictionary = get_citation_dict("citationdict")
+    cache_reference_list_dictionary = get_citation_dict("reversedict")
     result = []
     result_intermediate = {}
     citation_list = []
