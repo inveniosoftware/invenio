@@ -89,6 +89,9 @@ contributed to the project:
   - Makiko Matsumoto <maki.matsumoto@gmail.com> and Takao Ishigaki
     Contributions to the Japanese translation.
 
+  - Eva Papp <Eva.Papp@cern.ch>
+    Contributions to the Hungarian translation.
+
 The web session management and the URL handler were inspired by the
 Quixote Web Framework which is ``Copyright (c) 2004 Corporation for
 National Research Initiatives; All Rights Reserved''.

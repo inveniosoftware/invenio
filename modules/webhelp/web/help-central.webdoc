@@ -43,7 +43,7 @@
   <hr>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</hr>
   <zh_CN>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</zh_CN>
   <zh_TW>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</zh_TW>
-  <hu>Welcome to _(Help Central)_ of the <CFG_SITE_NAME_INTL>.</hu>
+  <hu>Üdvözöljük a <CFG_SITE_NAME_INTL> _(Help Central)_ szolgáltatásában.</hu>
 </lang>
 </p>
 <blockquote>
@@ -90,17 +90,21 @@
         Denna sida ger dig användbara tips och tekniker för att hjälpa dig att
         till fullo använda denna webbplats som <CFG_SITE_NAME_INTL> erbjuder dig.
       </sv>
+      <hu>
+        Ez az oldal hasznos tippeket, technikákat nyújt segítségül a <CFG_SITE_NAME_INTL>
+        weboldalának minél hatékonyabb felhasználásához.
+      </hu>
     </lang>
 </dd>
 <dt><a href="search-guide<lang:link/>">_(Search Guide)_</a>
 </dt>
 <dd><lang>
-      <en>Full guide on how to search</en>
-      <fr>Le guide complet sur comment rechercher sur</fr>
-      <ca>Guia completa de com cercar a l'</ca>
-      <pt>Guia completo de como realizar buscas no</pt>
+      <en>Full guide on how to search <CFG_SITE_NAME_INTL>.</en>
+      <fr>Le guide complet sur comment rechercher sur <CFG_SITE_NAME_INTL>.</fr>
+      <ca>Guia completa de com cercar a l'<CFG_SITE_NAME_INTL>.</ca>
+      <pt>Guia completo de como realizar buscas no <CFG_SITE_NAME_INTL>.</pt>
+      <hu>Teljes útmutató a <CFG_SITE_NAME_INTL> weboldalán való kereséshez.</hu>
     </lang>
-    <CFG_SITE_NAME_INTL>.
 </dd>
 <dt><a href="submit-guide<lang:link/>">_(Submit Guide)_</a></dt>
 <dd><lang>
@@ -124,7 +128,7 @@
       <hr>Get help with submitting to <CFG_SITE_NAME_INTL>.</hr>
       <zh_CN>Get help with submitting to <CFG_SITE_NAME_INTL>.</zh_CN>
       <zh_TW>Get help with submitting to <CFG_SITE_NAME_INTL>.</zh_TW>
-      <hu>Get help with submitting to <CFG_SITE_NAME_INTL>.</hu>
+      <hu>Segítség a saját anyagainak feltöltéséhez a <CFG_SITE_NAME_INTL> weboldalára.</hu>
     </lang>
 </dd>
 </dl>

@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-06-30 18:42+0200\n"
-"PO-Revision-Date: 2008-06-17 18:38+0200\n"
+"PO-Revision-Date: 2008-07-03 22:58+0200\n"
 "Last-Translator: Tibor Simko <tibor.simko@cern.ch>\n"
 "Language-Team: HU <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -95,7 +95,7 @@ msgstr ""
 #: modules/websearch/lib/websearch_templates.py:1964
 #: modules/websearch/lib/websearch_templates.py:2021
 msgid "Search Tips"
-msgstr ""
+msgstr "Keresési tippek"
 
 #: modules/websearch/doc/search-guide.webdoc:334
 #: modules/websearch/doc/search-guide.webdoc:369
@@ -472,7 +472,7 @@ msgstr ""
 #: modules/webhelp/web/help-central.webdoc:95
 #: modules/websearch/doc/search-guide.webdoc:21
 msgid "Search Guide"
-msgstr ""
+msgstr "Keresési Útmutató"
 
 #: modules/websearch/doc/search-guide.webdoc:338
 #: modules/websearch/doc/search-guide.webdoc:373
@@ -737,7 +737,7 @@ msgstr ""
 #: modules/webstyle/lib/webstyle_templates.py:447
 #: modules/webstyle/lib/webdoc_tests.py:78
 msgid "Search"
-msgstr ""
+msgstr "Keresés"
 
 #: modules/websearch/doc/search-tips.webdoc:36
 #: modules/websearch/doc/search-tips.webdoc:67
@@ -985,7 +985,7 @@ msgstr ""
 #: modules/webstyle/lib/webdoc_tests.py:100
 #: modules/webstyle/lib/webdoc_webinterface.py:157
 msgid "Help Central"
-msgstr ""
+msgstr "Központi súgó"
 
 #: modules/bibformat/etc/format_templates/Default_HTML_actions.bft:6
 msgid "Export as"
@@ -1031,7 +1031,7 @@ msgstr ""
 #: modules/webhelp/web/help-central.webdoc:105
 #: modules/websubmit/doc/submit-guide.webdoc:21
 msgid "Submit Guide"
-msgstr ""
+msgstr "Feltöltési Útmutató"
 
 #: modules/websearch/doc/search-guide.webdoc:351
 #: modules/websearch/doc/search-guide.webdoc:386
@@ -1345,7 +1345,7 @@ msgstr ""
 #: modules/websubmit/lib/websubmit_engine.py:1017
 #: modules/websubmit/lib/websubmit_engine.py:1243
 msgid "Submit"
-msgstr ""
+msgstr "Elküld"
 
 #: modules/bibedit/lib/bibedit_templates.py:139
 #: modules/bibformat/web/admin/bibformatadmin.py:392
@@ -2684,7 +2684,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:438
 #: modules/websession/lib/websession_templates.py:574
 msgid "Your Searches"
-msgstr ""
+msgstr "Keresések"
 
 #: modules/webalert/lib/webalert_webinterface.py:88
 #: modules/webalert/lib/webalert_webinterface.py:139
@@ -2724,7 +2724,7 @@ msgstr ""
 #: modules/websubmit/web/yourapprovals.py:97
 #: modules/websubmit/web/yoursubmissions.py:175
 msgid "Your Account"
-msgstr ""
+msgstr "Személyes beállítások"
 
 #: modules/webalert/lib/webalert_webinterface.py:90
 #, python-format
@@ -2775,7 +2775,7 @@ msgstr ""
 #: modules/webalert/lib/webalert_webinterface.py:223
 #: modules/websession/lib/websession_templates.py:449
 msgid "Your Alerts"
-msgstr ""
+msgstr "Emlékeztetők"
 
 #: modules/webalert/lib/webalert_webinterface.py:230
 #: modules/webalert/lib/webalert_webinterface.py:278
@@ -3267,7 +3267,7 @@ msgstr ""
 #: modules/websession/lib/websession_templates.py:440
 #: modules/websession/lib/websession_templates.py:572
 msgid "Your Baskets"
-msgstr ""
+msgstr "Kosarak"
 
 #: modules/webbasket/lib/webbasket_webinterface.py:406
 msgid "Add records to baskets"
@@ -5665,17 +5665,17 @@ msgstr ""
 #: modules/webstyle/lib/webstyle_templates.py:89
 #: modules/webstyle/lib/webstyle_templates.py:270
 msgid "Home"
-msgstr ""
+msgstr "Főoldal"
 
 #: modules/webstyle/lib/webstyle_templates.py:381
 #: modules/webstyle/lib/webstyle_templates.py:449
 msgid "Personalize"
-msgstr ""
+msgstr "Beállítások"
 
 #: modules/webstyle/lib/webstyle_templates.py:382
 #: modules/webstyle/lib/webstyle_templates.py:450
 msgid "Help"
-msgstr ""
+msgstr "Súgó"
 
 #: modules/webstyle/lib/webstyle_templates.py:414
 msgid "Last updated"
