@@ -329,8 +329,7 @@ check_only_uid_p - hidden parameter needed to only check against uids without
                 raa.id_accARGUMENT = arg.id """ % (id_action, str_roles, str_args)
     else:
         query4 = """SELECT DISTINCT raa.id_accROLE, raa.id_accACTION, raa.argumentlistid,
-                raa.id_accARGUMENT, arg.keyword, arg.value, ar.firerole_def_ser
-                FROM accROLE_accACTION_accARGUMENT raa INNER JOIN accROLE ar ON
+                raa.id_accARGUMENT, arg.keyword, arg.value FROM accROLE_accACTION_accARGUMENT raa INNER JOIN accROLE ar ON
                 raa.id_accROLE = ar.id, accARGUMENT arg
                 WHERE raa.id_accACTION = %s AND
                 (%s) AND
