@@ -24,7 +24,9 @@
 
 __revision__ = "$Id$"
 
-import os, cgi
+import os
+import cgi
+import os.path
 from invenio.errorlib import register_exception
 
 def Print_Success_APP(parameters, curdir, form, user_info=None):
@@ -34,6 +36,8 @@ def Print_Success_APP(parameters, curdir, form, user_info=None):
         Contains:
           + decision_file: (string) - the name of the file in which the
                            referee's decision is stored.
+          + newrnin: (string) - the name of the file in which the
+                                new report number is stored.
        @param curdir: (string) - the current submission's working directory.
        @param form: (dictionary) - submitted form values.
        @param user_info: (dictionary) - information about the user.
@@ -45,6 +49,28 @@ def Print_Success_APP(parameters, curdir, form, user_info=None):
         decision_filename = parameters['decision_file']
     except KeyError:
         decision_filename = ""
+
+    ## If a new report number has been generated, retrieve it:
+    try:
+        newrnpath = parameters['newrnin']
+    except KeyError:
+        register_exception()
+        newrnpath = ""
+    else:
+        if newrnpath in (None, "None"):
+            newrnpath = ""
+    newrnpath = os.path.basename(newrnpath)
+    newrn = ""
+    if newrnpath != ""  and os.path.exists("%s/%s" % (curdir, newrnpath)):
+        try:
+            fp = open("%s/%s" % (curdir, newrnpath) , "r")
+            newrn = fp.read()
+            fp.close()
+        except IOError:
+            register_exception()
+            newrn = ""
+    else:
+        newrn = ""
 
     ## Now try to read the decision from the decision_filename:
     if decision_filename in (None, "", "NULL"):
@@ -87,16 +113,18 @@ def Print_Success_APP(parameters, curdir, form, user_info=None):
 
     ## Create the message:
     if decision != "":
+        additional_info_approve = "The item will now be integrated into " \
+                                  "the relevant collection with the " \
+                                  "reference number <b>%s</b>." \
+                                  % ((newrn == "" and cgi.escape(rn)) or \
+                                     cgi.escape(newrn))
         msg = "<br /><div>Your decision was: <b>%(decision)s</b>.<br />\n" \
               "It has been taken into account.<br />\n" \
               "%(additional-info)s</div><br />\n" \
               % { 'decision'        : cgi.escape(decision),
                   'additional-info' : ((decision == "approve" and \
-                                       "The item will now be integrated into " \
-                                        "the relevant collection with the " \
-                                        "reference number <b>%s</b>." \
-                                        % cgi.escape(rn)) \
-                                       or "")
+                                        additional_info_approve) \
+                                       or ""),
                 }
     else:
         ## Since the decision could not be read from the decision file, we will
