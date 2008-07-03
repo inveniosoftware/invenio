@@ -89,6 +89,7 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Search guidance</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Searching for words versus phrases</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolean queries</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#parens">Parentheses</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Special characters and punctuation</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">International characters</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Word truncation/stemming</a>
@@ -110,6 +111,7 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Aide à la recherche</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Recherche de mots versus recherche de phrases</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Requêtes booléennes</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#parens">Parenthèses</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Caractères spéciaux et ponctuation</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">Caractères internationaux</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Troncature des mots/indexation par radicaux</a>
@@ -131,6 +133,7 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Grundlagen</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Suche nach Wörtern und Wortgruppen</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Boolsche Suche</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#parens">Parentheses</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Spezielle Zeichen und Notation</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">Internationale Zeichen</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Trunkierung</a>
@@ -152,6 +155,7 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Búsqueda guiada</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Búsqueda por palabras versus búsqueda por frases</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Consultas booleanas</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#parens">Parentheses</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Caracteres especiales y puntuación</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">Caracteres internacionales</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Truncamientos y búsquedas por raíz</a>
@@ -173,6 +177,7 @@ eficaç.</p>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#guidance">Cerca guiada</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#words-vs-phrases">Cerca per paraules versus cerca per frases</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#boolean">Consultes booleanes</a>
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#parens">Parentheses</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#punctuation">Caracters especials i puntuació</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#unicode">Caracters internacionals</a>
 <br/>&nbsp;&nbsp;&nbsp;&nbsp;<a href="#wildcard">Truncaments i cercques per arrel</a>
@@ -1954,6 +1959,40 @@ anterior, només cal afegir <code>-decay</code>:</p>
 Amb el que s’obtindria una llista més filtrada.  Es poden afegir o
 traure tants elements com sigui convenient, fins aconseguir més
 precisió a la cerca.  </ca>
+</lang>
+
+<h3><a name="parens">
+<lang>
+<en>Parentheses</en>
+</lang>
+</a></h3>
+
+<lang>
+<en>
+You can also use parentheses in your queries to group boolean expressions together:
+</en>
+</lang>
+
+    <form action="<CFG_SITE_URL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
+    <blockquote>
+    <input size="40" type="text" name="p" value="(gravity OR supergravity) AND (ellis OR perelstein)" />
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+    </blockquote>
+    </form>
+
+<lang>
+<en>
+<p>This query returns records containing either <em>gravity</em> or <em>supergravity</em>,
+and either <em>ellis</em> or <em>perelstein</em> anywhere in the record.</p>
+
+<p>Note that you can use any number of parentheses in the query, but
+nesting of parentheses, such as <code>foo AND (bar OR (fuux NOT quux))</code>, is not supported.</p>
+</en>
 </lang>
 
 <h3><a name="punctuation">

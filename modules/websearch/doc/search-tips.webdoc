@@ -357,6 +357,37 @@ della ricerca.</it>
 </lang>
 </a></small></div>
 
+<h5><lang>
+<en>How to use parentheses:</en>
+</lang></h5>
+
+<table width="100%" border="1" cellpadding="10" cellspacing="0">
+<tr>
+<td width="50%" style="white-space: nowrap">
+    <form action="<CFG_SITE_URL>/search" method="get">
+    <input type="hidden" name="ln" value="<lang:current />" />
+    <input size="20" type="text" name="p" value="(gravity OR supergravity) AND (ellis OR perelstein)" />
+    <select name="f"><option value="">_(any field)_</option>
+                     <option>_(title)_</option>
+                     <option>_(author)_</option>
+    </select>
+    <input class="formbutton" type="submit" name="action" value="_(Search)_" />
+    </form>
+</td>
+<td width="50%">
+<lang>
+  <en>Returns records containing either <em>gravity</em> or <em>supergravity</em>,
+      and <em>ellis</em> or <em>perelstein</em>.  Nested parens are not supported.</en>
+</lang>
+</td>
+</tr>
+</table>
+<div align="right"><small><a href="search-guide<lang:link/>#parens">
+<lang>
+  <en>more on parentheses...</en>
+</lang>
+</a></small></div>
+
 
 <h5><lang>
 <en>How to find documents from a certain period:</en>
