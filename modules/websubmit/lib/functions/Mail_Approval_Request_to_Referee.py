@@ -326,7 +326,7 @@ def Mail_Approval_Request_to_Referee(parameters, curdir, form, user_info=None):
     ##
     #######
     ## Get notes about the approval request:
-    approval_notes = get_approval_request_notes(doctype, category, rn)
+    approval_notes = get_approval_request_notes(doctype, rn)
 
     ## Get the referee email address:
     if CFG_CERN_SITE:
