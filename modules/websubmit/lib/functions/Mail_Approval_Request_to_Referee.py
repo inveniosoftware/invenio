@@ -56,7 +56,7 @@ You can see the details of the record at the following address:
 
 Please register your decision by following the instructions at the
 following address:
- <%(site-url)s/submit/sub?%(report-number-fieldname)s=%(report-number)s@APP%(doctype)s&ln=%(lang)s&combo%(doctype)s=%(category)s>
+ <%(site-url)s/submit/sub?%(report-number-fieldname)s=%(report-number)s@APP%(doctype)s&combo%(doctype)s=%(category)s>
 
 Below, you may find some additional information about the approval request:
 
@@ -371,7 +371,6 @@ def Mail_Approval_Request_to_Referee(parameters, curdir, form, user_info=None):
                   'site-url'                : CFG_SITE_URL,
                   'record-id'               : sysno,
                   'doctype'                 : doctype,
-                  'lang'                    : user_info['language'],
                   'notes'                   : approval_notes,
                   'category'                : category,
                 }
