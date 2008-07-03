@@ -175,13 +175,38 @@ class Template(DefaultTemplate):
         Ithaca style page footer.  See the default function for
         the meaning of parameters.
         """
+        out = ""
+        out += """&lt;hr>This site has no footer.
+                  &lt;/body>
+                  &lt;/html>"""
+        return out
 
-        return "&lt;hr>This site has no footer."
 </pre>
 </blockquote>
 
 <p>After the file was created, restart Apache and lo, your new ithaca
 style footer will be seen in action.</p>
+
+<p>(A side comment: note that <code>tmpl_page_footer()</code> is an
+ideal place to put any local code you may want to execute at the end
+of web request processing when the main page content was just served
+to the user.  As an example, if you are using Google Analytics, you
+may want to put just after the above <code>out = ""</code> statement
+your GA script code:</p>
+</blockquote>
+<pre>
+        [...]
+        out += """&lt;script src="http://www.google-analytics.com/urchin.js"
+                          type="text/javascript">
+                  &lt;/script>
+                  &lt;script type="text/javascript">
+                          _uacct = "UA-1234567-8";
+                          urchinTracker();
+                  &lt;/script>"""
+        [...]
+</pre>
+</blockquote>
+End of the side comment.)
 
 <p>Some further remarks on this templating system:</p>
 
@@ -249,7 +274,7 @@ style footer will be seen in action.</p>
     templates have been installed, in order to ensure that
     modifications you have done to your templates are valid. To do so
     move to your CDS Invenio installation directory, and run: <br/>
-    <code>$python /opt/cds-invenio/lib/python/invenio/template.py
+    <code>$ python /opt/cds-invenio/lib/python/invenio/template.py
     --check-custom-templates</code>
 </li>
 
