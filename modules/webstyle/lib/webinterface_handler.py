@@ -31,6 +31,7 @@ __revision__ = "$Id$"
 import urlparse
 import cgi
 import sys
+import re
 
 # The following mod_python imports are done separately in a particular
 # order (util first) because I was getting sometimes publisher import
@@ -237,7 +238,7 @@ class WebInterfaceDirectory(object):
         raise TraversalError()
 
 
-
+re_slashes = re.compile('/+')
 def create_handler(root):
     """ Return a handler function that will dispatch apache requests
     through the URL layout passed in parameter."""
@@ -308,6 +309,8 @@ def create_handler(root):
             if uri == '/':
                 path = ['']
             else:
+                ## Let's collapse multiple slashes into a single /
+                uri = re_slashes.sub('/', uri)
                 path = uri[1:].split('/')
 
             return root._traverse(req, path)
