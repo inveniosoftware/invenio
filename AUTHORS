@@ -136,7 +136,7 @@ project.  In an approximate decreasing chronological order:
      management, for the WebSession module.
 
  - Richard Owen <ro@tes.la>
-     Elecronic mail submission system, the ElmSubmit module. 
+     Electronic mail submission system, the ElmSubmit module. 
 
  - Alexandra Silva <xana@correio.ci.uminho.pt>
      Rewriting and enhancing BibRecord XML MARC and record handling
