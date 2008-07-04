@@ -1137,6 +1137,80 @@ def warnings(l):
         alist.append(warning(w))
     return alist
 
+def choose(cond, a, b):
+    """ Simple implementation of c-like ? operator ( Just for the further code clarity)
+        a,b are function arguments which calculate the result ( just in order to have the
+        lazy evaluation)
+    """
+    if cond:
+        return a()
+    else:
+        return b()
+
+def compare_lists(list1, list2, comparer):
+    """
+    Compares twolists using given comparing function
+    @param list1 first list to compare
+    @param list2 second list to compare
+    @param comparer -  a function taking two arguments ( element of list 1, element of list 2) and
+    @retrun  True or False depending if the values are the same
+    """
+    len1 = len(list1)
+    len2 = len(list2)
+    if len1 != len2:
+        return False
+    result = True
+    for ind in range(0,len1):
+        if not comparer(list1[ind],list2[ind]):
+            result = False
+    return result
+
+def record_field_diff(rec1, rec2, field):
+    """
+       Compares given field in two records.
+       returns a list containing at most one element
+       If the fields are identical ( that means have the same order, the same
+        subfields), empty list is returned.
+       If the field is removed in second record, [(field, 'r')] is returned
+       If the field is added in second record, [(field, 'a')] is returned
+       If the field is changed [(field, 'c')] is returned
+    """
+    subfields1 = choose(rec1[0].has_key(field), lambda: rec1[0][field], lambda: [])
+    subfields2 = choose(rec2[0].has_key(field), lambda: rec2[0][field], lambda: [])
+    if subfields1 == [] and subfields2 == []:
+        return []
+    if subfields1 == []:
+        return [(field, 'a')]
+    if subfields2 == []:
+        return [(field, 'r')]
+    #we can not use simple == operator due to the numeric field which can be different in both records
+    #hopefully, we can compare element by element because order of subfields must be preserved
+    #   comparer function compares the exact values and indicators 1 and 2
+    are_identical = compare_lists(subfields1, subfields2, lambda el1,el2: \
+                                  (el1[0] == el2[0]) and (el1[1] == el2[1]) and (el1[2] == el2[2]))
+    return choose(are_identical, lambda: [], lambda: [(field, 'c')])
+
+def record_diff(rec1, rec2):
+    """  Compares two given records
+         Considers the change of order of fields as a change
+         @param rec1 - First record
+         @param rec2 - Second record
+
+         @return list of differences. Each difference is of a form:
+          (field_id, 'r') - if field field_id exists in rec1 but not in rec2
+          (field_id, 'a') - if field field_id exists in rec2 but not in rec1
+          (field_id, 'c') - if field field_id exists in both records, but
+          it's value has changed
+    """
+    result = []
+    for field in rec1[0].keys():
+        result.extend(record_field_diff(rec1, rec2, field))
+    for field in rec2[0].keys():
+        if not rec1[0].has_key(field):
+            result.append((field, 'a'))
+    return result
+
+
 if psycho_available == 1:
     #psyco.full()
     psyco.bind(wash)

@@ -806,6 +806,82 @@ class BibRecordPrintingTest(unittest.TestCase):
         self.assertEqual(bibrecord.create_records(bibrecord.print_recs(list_of_recs_elems, tags=["001", "037"]), 1, 1), list_of_recs_short)
         self.assertEqual(bibrecord.create_records(bibrecord.print_recs(list_of_recs_elems, tags=["037"]), 1, 1), list_of_recs_short)
 
+class BibRecordComparingTest(unittest.TestCase):
+    """ bibrecord - testing for comparing record """
+
+    def setUp(self):
+        self.record1 = bibrecord.create_record("""
+            <record>
+                <controlfield tag="003">SzGeCERN</controlfield>
+            </record>
+         """)
+        self.record2 = bibrecord.create_record("""
+            <record>
+                <controlfield tag="003">SzGeCERN</controlfield>
+                <datafield tag="035" ind1=" " ind2=" ">
+                    <subfield code="9">arXiv</subfield>
+                    <subfield code="a">oai:arXiv.org:0704.0299</subfield>
+                </datafield>
+            </record>
+         """)
+        self.record3 = bibrecord.create_record("""
+            <record>
+                <controlfield tag="003">SzGeCERN</controlfield>
+                <datafield tag="035" ind1=" " ind2=" ">
+                    <subfield code="9">arX</subfield>
+                    <subfield code="a">oai:arXiv.org:0704.0299</subfield>
+                </datafield>
+            </record>
+         """)
+        self.record4 = bibrecord.create_record("""
+            <record>
+                <controlfield tag="003">SzGeCERN</controlfield>
+                <datafield tag="035" ind1=" " ind2=" ">
+                    <subfield code="9">arX</subfield>
+                </datafield>
+            </record>
+         """)
+        self.record5 = bibrecord.create_record("""
+            <record>
+                <controlfield tag="003">SzGeCERN</controlfield>
+                <datafield tag="035" ind1=" " ind2=" ">
+                    <subfield code="9">arX</subfield>
+                </datafield>
+                <datafield tag="773" ind1=" " ind2=" ">
+                    <subfield code="p">Journal of Applied Philosobhy</subfield>
+                </datafield>
+            </record>
+         """)
+    def test_comparing_records(self):
+        def compare_lists2(list1, list2):
+            """Comparing two lists of changes... the order does not play any role"""
+            dict2 = {}
+            for el in list2:
+                dict2[el[0]] = el[1]
+            for el in list1:
+                if not dict2.has_key(el[0]):
+                    return False
+                else:
+                    if dict2[el[0]] != el[1]:
+                        return False
+                    else:
+                        del dict2[el[0]]
+            return True
+
+        self.assertEqual(bibrecord.record_diff(self.record1, self.record1), [])
+        self.assertEqual(bibrecord.record_diff(self.record1, self.record2), [])
+        self.assertEqual(bibrecord.record_diff(self.record1, self.record3), [])
+        self.assertEqual(bibrecord.record_diff(self.record1, self.record4), [])
+        self.assertEqual(bibrecord.record_diff(self.record1, self.record5), [])
+        self.assertEqual(bibrecord.record_diff(self.record1, self.record2), [("035", "a")])
+        self.assertEqual(bibrecord.record_diff(self.record2, self.record1), [("035", "r")])
+        self.assertEqual(bibrecord.record_diff(self.record2, self.record3), [("035", "c")])
+        self.assertEqual(bibrecord.record_diff(self.record3, self.record4), [("035", "c")])
+        self.assertEqual(bibrecord.record_diff(self.record4, self.record5), [("773", "a")])
+        self.assertEqual(bibrecord.record_diff(self.record5, self.record4), [("773", "r")])
+        self.assertTrue(compare_lists2(bibrecord.record_diff(self.record1, self.record5), [("035", "a"), ("773", "a")]))
+        self.assertTrue(compare_lists2(bibrecord.record_diff(self.record5, self.record1), [("035", "r"), ("773", "r")]))
+
 TEST_SUITE = make_test_suite(BibRecordSanityTest,
                              BibRecordSuccessTest,
                              BibRecordBadInputTreatmentTest,
@@ -815,7 +891,8 @@ TEST_SUITE = make_test_suite(BibRecordSanityTest,
                              BibRecordDeleteFieldTest,
                              BibRecordAccentedUnicodeLettersTest,
                              BibRecordSpecialTagParsingTest,
-                             BibRecordPrintingTest,)
+                             BibRecordPrintingTest,
+                             BibRecordComparingTest,)
 
 if __name__ == '__main__':
     run_test_suite(TEST_SUITE)
