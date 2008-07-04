@@ -2152,7 +2152,7 @@ def Get_Report_Number (parameters,curdir,form):
             &nbsp;<span class="guideheader">T</span>he BibConvert configuration files used by webSubmit are in the
             <ETCDIR>/bibconvert/config directory.<br/><br/>
             &nbsp;<span class="guideheader">F</span>or more info about bibconvert, please see the dedicated
-            <a href="bibconvert-admin">guide</a>.
+            <a href="bibconvert-admin-guide">guide</a>.
         </blockquote>
 
 
