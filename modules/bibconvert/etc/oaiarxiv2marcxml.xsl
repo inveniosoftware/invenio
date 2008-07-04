@@ -452,10 +452,12 @@
 
            <!-- MARC FIELDS [1,7]00$$a,u  = metadata/arXiv/[author,affiliation]
                 N.B.: $$v not used, all affiliations are repeated in $$u   -->
+
            <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author">
 
-             <!-- Filling 100$$a,u   substring(chaine,position,longueur)  -->
+
              <xsl:if test="not(contains(./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author/arXiv:forenames, 'Collab') or contains(./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author/arXiv:keyname, 'Collab'))">
+
              <datafield tag="100" ind1=" " ind2=" ">
                 <subfield code="a">
                   <xsl:variable name="fnames">
@@ -464,7 +466,10 @@
                   <xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author/arXiv:keyname"/>, <xsl:call-template name="replace-string"><xsl:with-param name="text" select="$fnames"/><xsl:with-param name="from" select="'.'"/><xsl:with-param name="to" select="''"/></xsl:call-template>
                 </subfield>
                 <xsl:for-each select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author[1]/arXiv:affiliation">
-                  <subfield code="u"><xsl:value-of select="."/></subfield>
+	         <xsl:variable name="knlow"><xsl:value-of select="normalize-space(translate(., $ucletters, $lcletters))"/></xsl:variable>
+		  <xsl:if test="not (contains($knlow,'collab') or contains($knlow,'team') or contains($knlow,'group'))">
+		    <subfield code="u"><xsl:value-of select="."/></subfield>
+		  </xsl:if>
                 </xsl:for-each>
              </datafield>
              </xsl:if>
@@ -481,7 +486,10 @@
                   <xsl:value-of select="./arXiv:keyname"/>, <xsl:call-template name="replace-string"><xsl:with-param name="text" select="$fnames"/><xsl:with-param name="from" select="'.'"/><xsl:with-param name="to" select="''"/></xsl:call-template>
                 </subfield>
                 <xsl:for-each select="./arXiv:affiliation">
-                  <subfield code="u"><xsl:value-of select="."/></subfield>
+	         <xsl:variable name="knlow"><xsl:value-of select="normalize-space(translate(., $ucletters, $lcletters))"/></xsl:variable>
+		  <xsl:if test="not (contains($knlow,'collab') or contains($knlow,'team') or contains($knlow,'group'))">
+		     <subfield code="u"><xsl:value-of select="."/></subfield>
+		  </xsl:if>
                 </xsl:for-each>
                </datafield>
              </xsl:if>
@@ -490,33 +498,33 @@
 
              <!-- Filling 710$$g - collaboration detection in affiliation field  -->
 	     <xsl:for-each select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:authors/arXiv:author">
-             <xsl:variable name="knlowc"><xsl:value-of select="normalize-space(translate(./arXiv:affiliation, $ucletters, $lcletters))"/></xsl:variable>
-             <xsl:variable name="knlowfn"><xsl:value-of select="normalize-space(translate(./arXiv:forenames, $ucletters, $lcletters))"/></xsl:variable>
-             <xsl:variable name="knlowkn"><xsl:value-of select="normalize-space(translate(./arXiv:keyname, $ucletters, $lcletters))"/></xsl:variable>
-             <xsl:variable name="knlow"><xsl:value-of select="concat($knlowc,$knlowfn,$knlowkn)"/></xsl:variable>
-             <xsl:if test="contains($knlow,'collab') or contains($knlow,'team') or contains($knlow,'group') ">
-               <datafield tag="595" ind1=" " ind2=" ">
-                 <subfield code="a">giva a faire</subfield>
-               </datafield>
-               <datafield tag="710" ind1=" " ind2=" ">
-                 <subfield code="g">
-                   <xsl:choose>
-                     <xsl:when test="contains($knlowc, 'collab')">
-                       <xsl:value-of select="./arXiv:affiliation"/> 
-                     </xsl:when>
-                     <xsl:when test="contains($knlowfn, 'collab')">
-                       <xsl:value-of select="concat(./arXiv:keyname , ' ', ./arXiv:forenames)"/> 
-                     </xsl:when>
-                     <xsl:when test="contains($knlowkn, 'collab')">
-                       <xsl:value-of select="concat(./arXiv:forenames, ' ', ./arXiv:keyname)"/> 
-                     </xsl:when>
-                     <xsl:otherwise>
-                       <xsl:value-of select="concat(./arXiv:forenames, ' ', ./arXiv:keyname, ' ', ./arXiv:affiliation)"/> 
-                     </xsl:otherwise>
-                   </xsl:choose>
-                   </subfield>
-               </datafield>
-             </xsl:if>
+	         <xsl:variable name="knlowc"><xsl:value-of select="normalize-space(translate(./arXiv:affiliation, $ucletters, $lcletters))"/></xsl:variable>
+		 <xsl:variable name="knlowfn"><xsl:value-of select="normalize-space(translate(./arXiv:forenames, $ucletters, $lcletters))"/></xsl:variable>
+		 <xsl:variable name="knlowkn"><xsl:value-of select="normalize-space(translate(./arXiv:keyname, $ucletters, $lcletters))"/></xsl:variable>
+		 <xsl:variable name="knlow"><xsl:value-of select="concat($knlowc,$knlowfn,$knlowkn)"/></xsl:variable>
+		 <xsl:if test="contains($knlow,'collab') or contains($knlow,'team') or contains($knlow,'group') ">
+		     <datafield tag="595" ind1=" " ind2=" ">
+		         <subfield code="a">giva a faire</subfield>
+                     </datafield>
+		     <datafield tag="710" ind1=" " ind2=" ">
+		         <subfield code="g">
+			     <xsl:choose>
+                                 <xsl:when test="contains($knlowc, 'collab')">
+    			             <xsl:value-of select="./arXiv:affiliation"/> 
+  			         </xsl:when>
+                                 <xsl:when test="contains($knlowfn, 'collab')">
+                                     <xsl:value-of select="concat(./arXiv:keyname , ' ', ./arXiv:forenames)"/> 
+			         </xsl:when>
+			         <xsl:when test="contains($knlowkn, 'collab')">
+			             <xsl:value-of select="concat(./arXiv:forenames, ' ', ./arXiv:keyname)"/> 
+                                 </xsl:when>
+                                 <xsl:otherwise>
+                                     <xsl:value-of select="concat(./arXiv:forenames, ' ', ./arXiv:keyname, ' ', ./arXiv:affiliation)"/> 
+                                 </xsl:otherwise>
+                             </xsl:choose>
+                         </subfield>
+                     </datafield>
+                 </xsl:if>
 	     </xsl:for-each>
 
              </xsl:if>
@@ -576,11 +584,11 @@
                    <subfield code="a"><xsl:call-template name="last-word"><xsl:with-param name="text" select="$beforepages"/></xsl:call-template> p</subfield>
                  </datafield>
                </xsl:when>
-               <xsl:otherwise>
-                 <datafield tag="300" ind1=" " ind2=" ">
-                   <subfield code="a">mult. p</subfield>
-                 </datafield>
-               </xsl:otherwise>
+               <!--xsl:otherwise-->
+                 <!--datafield tag="300" ind1=" " ind2=" "-->
+                   <!--subfield code="a">mult. p</subfield-->
+                 <!--/datafield-->
+               <!--/xsl:otherwise-->
                </xsl:choose>
              </xsl:when>
              <xsl:otherwise>
@@ -610,11 +618,11 @@
 
 
            <!-- MARC FIELD 595$$a -->
-           <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments">
-              <datafield tag="595" ind1=" " ind2=" ">
-                <subfield code="a">LANL EDS</subfield>
-              </datafield>
-           </xsl:if>
+           <!--xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:comments"-->
+	   <datafield tag="595" ind1=" " ind2=" ">
+               <subfield code="a">LANL EDS</subfield>
+           </datafield>
+           <!-- /xsl:if-->
 
 
            <!-- MARC FIELD 65017$$ab -->
@@ -633,9 +641,14 @@
            </xsl:if>
 
            <!-- MARC FIELD 773$$p  - publication detection in comments field -->
-           <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref">
+           <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref or ./OAI-PMH:metadata/arXiv:arXiv/arXiv:doi">
                <datafield tag="773" ind1=" " ind2=" ">
-                    <subfield code="p"><xsl:value-of select="normalize-space(./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref)"/></subfield>
+                  <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref">                                     
+                      <subfield code="o"><xsl:value-of select="normalize-space(./OAI-PMH:metadata/arXiv:arXiv/arXiv:journal-ref)"/></subfield>
+                  </xsl:if>   
+                  <xsl:if test="./OAI-PMH:metadata/arXiv:arXiv/arXiv:doi">
+                    <subfield code="a"><xsl:value-of select="./OAI-PMH:metadata/arXiv:arXiv/arXiv:doi"/></subfield>
+                  </xsl:if>
                </datafield>
            </xsl:if>
 
