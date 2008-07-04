@@ -236,3 +236,8 @@ class Template:
         msg_error = "returns the following HTTP error: "
         output = """<br /><span class="info">baseURL <strong>%s</strong> %s</span><br /><blockquote>%s</blockquote>""" % (base, msg_error, error)
         return output
+
+    def tmpl_embed_document(self, url):
+        output = "<iframe src=\"" + url + "\" width=\"80%\" height=\"400\"></iframe>"
+        return output
+

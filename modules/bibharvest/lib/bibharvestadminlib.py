@@ -1,6 +1,6 @@
 ## $Id$
-## Administrator interface for BibIndex
 
+## Administrator interface for BibIndex
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -28,6 +28,7 @@ import ConfigParser
 import time
 import random
 import urllib
+import tempfile
 
 from httplib import InvalidURL
 from invenio.config import \
@@ -91,7 +92,8 @@ def perform_request_index(ln=CFG_SITE_LANG):
         elif oai_src_frequency==720: freq = "monthly"
         editACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/editsource", title = "edit", args = namelinked_args)
         delACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/delsource", title = "delete", args = namelinked_args)
-        action = editACTION + " / " + delACTION
+        testACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/testsource", title = "test", args = namelinked_args)
+        action = editACTION + " / " + delACTION + " / " + testACTION
         sources.append([namelinked,oai_src_baseurl,oai_src_prefix,freq,oai_src_config,oai_src_post, action])
 
     updates = []
@@ -406,6 +408,93 @@ def perform_request_delsource(oai_src_id=None, ln=CFG_SITE_LANG, callback='yes',
 
     return addadminbox(subtitle, body)
 
+
+def perform_request_testsource(oai_src_id=None, ln=CFG_SITE_LANG, callback='yes', confirm=0, record_id=None):
+    if oai_src_id is None:
+        return "No OAI source ID selected."
+    result = ""
+    guideurl = "help/admin/bibharvest-admin-guide"
+    result += bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = "Record ID ( Recognized by the data source )", guideurl=guideurl)
+    record_str = ""
+    if record_id != None:
+        record_str = str(record_id)
+    form_text = bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG, title = "Record identifier", name = "record_id", value = record_str)
+    result += createhiddenform(action="testsource",
+                               text=form_text,
+                               button="Test",
+                               oai_src_id=oai_src_id,
+                               ln=ln,
+                               confirm=1)
+    if record_id != None:
+        result += bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = "OAI XML downloaded from the source" , guideurl = guideurl)
+        result += bibharvest_templates.tmpl_embed_document( \
+            "/admin/bibharvest/bibharvestadmin.py/preview_original_xml?oai_src_id=" \
+            + urllib.quote(str(oai_src_id)) + "&record_id=" \
+            + urllib.quote(str(record_id)))
+        result += bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = "MARC XML after all the transformations", guideurl = guideurl)
+        result += bibharvest_templates.tmpl_embed_document( \
+            "/admin/bibharvest/bibharvestadmin.py/preview_harvested_xml?oai_src_id=" \
+            + urllib.quote(str(oai_src_id)) + "&record_id=" \
+            + urllib.quote(str(record_id)))
+    return result
+
+############################################################
+###  The functions allowing to preview the harvested XML ###
+############################################################
+
+def perform_request_preview_original_xml(oai_src_id = None, record_id = None):
+    oai_src = get_oai_src(oai_src_id)
+    oai_src_baseurl = oai_src[0][2]
+    oai_src_prefix = oai_src[0][3]
+    oai_src_config = oai_src[0][5]
+    oai_src_post = oai_src[0][6]
+    oai_src_sets = oai_src[0][7].split()
+    oai_src_bibfilter = oai_src[0][8]
+    result = ""
+    command = "/opt/cds-invenio/bin/bibharvest -vGetRecord -i" \
+              + record_id + " -p" + oai_src_prefix + " " + oai_src_baseurl
+    program_output = os.popen(command)
+    lines = program_output.readlines()
+    program_output.close()
+    for line in lines:
+        result += line
+    return result
+
+def perform_request_preview_harvested_xml(oai_src_id = None, record_id = None):
+    oai_src = get_oai_src(oai_src_id)
+    oai_src_baseurl = oai_src[0][2]
+    oai_src_prefix = oai_src[0][3]
+    oai_src_config = oai_src[0][5]
+    oai_src_post = oai_src[0][6]
+    oai_src_sets = oai_src[0][7].split()
+    oai_src_bibfilter = oai_src[0][8]
+    result = ""
+    command = "/opt/cds-invenio/bin/bibharvest -vGetRecord -i" + record_id \
+              + " -p" + oai_src_prefix + " " + oai_src_baseurl \
+              + " | /opt/cds-invenio/bin/bibconvert -c " + oai_src_config
+    program_output = os.popen(command)
+    lines = program_output.readlines()
+    program_output.close()
+    #if the data should be formatted before uploading
+    if oai_src_post.find("f") != -1:
+        (file_descriptor, file_name) = tempfile.mkstemp()
+        f = os.fdopen(file_descriptor, 'w')
+        for line in lines:
+            f.write(line)
+        f.close()
+        command = oai_src_bibfilter + " " + file_name
+        program_output = os.popen(command)
+        lines = program_output.readlines()
+        rc = program_output.close()
+        program_output = os.popen("xmllint --format " + file_name + ".insert.xml")
+        lines = program_output.readlines()
+        rc = program_output.close()
+        os.remove(file_name)
+        if os.path.exists(file_name + ".insert.xml"):
+            os.remove(file_name + ".insert.xml")
+    for line in lines:
+        result += line
+    return result
 
 ##################################################################
 ### Here the functions to retrieve, modify, delete and add sources
