@@ -123,39 +123,39 @@ text file with following structure:
 &nbsp; ### the configuration starts here
 &nbsp; ### Configuration of bibconvert templates
 &nbsp; ### source data : <source_data_name>
-&nbsp; 
+&nbsp;
 &nbsp; === data extraction configuration template ===
 &nbsp; ### here comes the data extraction configuration template
 &nbsp; #   entry example:
-&nbsp; 
+&nbsp;
 &nbsp; AU---%A---MAX---;---
-&nbsp; 
+&nbsp;
 &nbsp; #   extracts maximum available data by field from metadata record
 &nbsp; #   the values are found between specified tags
 &nbsp; #   in this case between the '%A' tag and other tags defined
 &nbsp; #   repetitive values are recognized by a semicolon separator
 &nbsp; #   resp. by multiple presence of '%A' tag
-&nbsp; 
+&nbsp;
 &nbsp; ===   data source configuration template   ===
 &nbsp; ### here comes the data source configuration template
 &nbsp; #   entry example:
-&nbsp; 
+&nbsp;
 &nbsp; AU---<:FIRSTNAME:>-<:SURNAME:>
-&nbsp; 
+&nbsp;
 &nbsp; #   describes the contents of extracted source data fields
 &nbsp; #   in this case, the field AU is described as having two distinct subfields
-&nbsp; 
+&nbsp;
 &nbsp; ===   data target configuration template   ===
 &nbsp; ### here comes the data target configuration template
 &nbsp; #   entry example:
-&nbsp; 
+&nbsp;
 &nbsp; AU::CONF(AU,,0)---&lt;datafield id="700" ind1="" ind2="">&lt;subfield code="a">&lt;:AU*::SURNAME::CAP():>, &lt;AU*::FIRSTNAME::ABR():>&lt;/subfield>&lt;/datafield>
-&nbsp; 
+&nbsp;
 &nbsp; #   This section concerns rather the desired output, while previous two were focused on the data source structures.
 &nbsp; #   Each line equals to one output line, composed of given literals and values from extracted source data fields.
 &nbsp; #   In this example, the XML Marc21 output line is defined,
 &nbsp; #   containing re-formatted values of source fields SURNAME and FIRSTNAME
-&nbsp; 
+&nbsp;
 &nbsp; ### the configuration ends here
 </pre>
 </blockquote>
@@ -164,7 +164,7 @@ text file with following structure:
 <p>Having prepared a configuration, the BibConvert will convert the
 source data file according to it in a batch mode. The BibConvert is
 fully compatible with the Uploader1.x configuration language. For more
-information, have a look at the <a href="#C">BibConvert Configuration
+information, have a look at the <a href="#C.3">BibConvert Configuration
 Guide</a> section below.
 
 
@@ -228,7 +228,7 @@ fields:
 <pre>
 &nbsp; === data extraction configuration template ===
 &nbsp; ### here comes the data extraction configuration template
-&nbsp; 
+&nbsp;
 &nbsp; AU---AU_---MAX---;---
 &nbsp; TI---TI_---EOL------
 </pre>
