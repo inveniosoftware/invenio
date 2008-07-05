@@ -330,7 +330,7 @@ class Template:
 <br />
 <div style="float:right">%(links)s</div>
 </div>""" % \
-                {'title'         : '<div style="background-color:#EEE;padding:2px;"><img src="%s/img/user-icon-1-24x24.png" alt="" />&nbsp;%s</div>' % (CFG_SITE_URL, title),
+                {'title'         : '<div style="background-color:#EEE;padding:2px;"><img src="%s/img/user-icon-1-24x24.gif" alt="" />&nbsp;%s</div>' % (CFG_SITE_URL, title),
                  'body'          : final_body,
                  'links'         : links}
         return out
