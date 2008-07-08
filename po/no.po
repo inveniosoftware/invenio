@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-06-30 18:42+0200\n"
-"PO-Revision-Date: 2008-06-04 18:18+0200\n"
+"PO-Revision-Date: 2008-07-03 15:49+0200\n"
 "Last-Translator: Lars Christian Raae <lars.christian.raae@cern.ch>\n"
 "Language-Team: NO <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1412,14 +1412,12 @@ msgid "Done"
 msgstr "Ferdig"
 
 #: modules/bibedit/lib/bibedit_templates.py:348
-#, fuzzy
 msgid "Move up"
-msgstr "Flytt element opp"
+msgstr "Flytt opp"
 
 #: modules/bibedit/lib/bibedit_templates.py:361
-#, fuzzy
 msgid "Move down"
-msgstr "Flytt element ned"
+msgstr "Flytt ned"
 
 #: modules/bibedit/lib/bibedit_templates.py:398
 #: modules/bibedit/lib/bibedit_templates.py:515
@@ -1455,20 +1453,18 @@ msgid "Cannot edit deleted record."
 msgstr "Kan ikke endre slettet element."
 
 #: modules/bibedit/lib/bibedit_templates.py:492
-#, fuzzy
 msgid "There are record revisions not yet synchronized with the database."
-msgstr "Den oppgitte e-postadressen finnes ikke i databasen."
+msgstr "Det finnes revisjoner som ikke er synkronisert med databasen enda."
 
 #: modules/bibedit/lib/bibedit_templates.py:493
 #: modules/bibedit/lib/bibedit_templates.py:502
-#, fuzzy
 msgid "Please try again in a few minutes."
-msgstr "Prøv igjen senere."
+msgstr "Forsøk igjen om et par minutter."
 
 #: modules/bibedit/lib/bibedit_templates.py:501
 msgid ""
 "A new revision of this record is not yet synchronized with the database."
-msgstr ""
+msgstr "En ny revisjon av dette elementet er ikke synkronisert med databasen enda."
 
 #: modules/bibedit/lib/bibedit_templates.py:512
 msgid "Please enter the ID of the record you want to edit"
@@ -1519,25 +1515,25 @@ msgid "No"
 msgstr "Nei"
 
 #: modules/bibedit/lib/bibedit_templates.py:555
-#, fuzzy, python-format
+#, python-format
 msgid "Do you really want to load revision %(revdate)s of record #%(recid)s?"
-msgstr "Er du sikker på at du vil slette dette elementet?"
+msgstr "Er du sikker på at du vil gjenopprette revisjon %(revdate)s av element #%(recid)s?"
 
 #: modules/bibedit/lib/bibedit_templates.py:558
 #, python-format
 msgid ""
 "The current version will be replaced with a copy of revision %(revdate)s"
-msgstr ""
+msgstr "Den nåværende versjonen vil bli erstattet med en kopi av revisjon %(revdate)s"
 
 #: modules/bibedit/lib/bibedit_templates.py:560
 msgid "You will also lose any unsubmitted changes for this record!"
-msgstr ""
+msgstr "Du vil miste alle ulagrede endringer av dette elementet!"
 
 #: modules/bibedit/lib/bibedit_templates.py:588
 msgid ""
 "The new revision is being synchronized with the database and will be ready "
 "shortly."
-msgstr ""
+msgstr "Den nye revisjonen synkroniseres nå med databasen og vil være klar om litt."
 
 #: modules/bibedit/lib/bibedit_templates.py:593
 msgid "The record will be deleted as soon as the task queue is empty."
@@ -1568,14 +1564,14 @@ msgid "Submit and save record %s"
 msgstr "Send inn og lagre element %s"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:175
-#, fuzzy, python-format
+#, python-format
 msgid "Record #%s"
-msgstr "Samling %s ikke funnet"
+msgstr "Element #%s"
 
 #: modules/bibedit/web/admin/bibeditadmin.py:177
-#, fuzzy, python-format
+#, python-format
 msgid "Record #%(recid)s, revision %(revdate)s"
-msgstr "Endre element %(x_recid)s, felt %(x_field)s"
+msgstr "Element #%(recid)s, revisjon %(revdate)s"
 
 #: modules/bibformat/lib/bibformat_templates.py:318
 #: modules/bibformat/lib/bibformat_templates.py:430
@@ -1866,25 +1862,23 @@ msgstr "eldre versjoner"
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:103
 #, python-format
 msgid "%(x_sitename)s link"
-msgstr ""
+msgstr "%(x_sitename)s lenke"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:96
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:103
 #, python-format
 msgid "%(x_sitename)s links"
-msgstr ""
+msgstr "%(x_sitename)s lenker"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:105
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:121
-#, fuzzy
 msgid "external link"
-msgstr "ekstern(e) %(link_or_links)s"
+msgstr "ekstern lenke"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:105
 #: modules/bibformat/lib/elements/bfe_fulltext_mini.py:121
-#, fuzzy
 msgid "external links"
-msgstr "ekstern(e) %(link_or_links)s"
+msgstr "eksterne lenker"
 
 #: modules/bibformat/lib/elements/bfe_fulltext.py:197
 #: modules/bibformat/lib/elements/bfe_fulltext.py:222
@@ -1925,9 +1919,8 @@ msgid "Delete Output Format"
 msgstr "Slett visningsformat"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:417
-#, fuzzy
 msgid "Cannot create output format"
-msgstr "Administrer visningsformater"
+msgstr "Kan ikke lage visningsformat"
 
 #: modules/bibformat/web/admin/bibformatadmin.py:491
 #: modules/bibformat/web/admin/bibformatadmin.py:563
@@ -2985,9 +2978,8 @@ msgid "last"
 msgstr "siste"
 
 #: modules/webbasket/lib/webbasket_templates.py:647
-#, fuzzy
 msgid "View comments"
-msgstr "se kommentarer"
+msgstr "Se kommentarer"
 
 #: modules/webbasket/lib/webbasket_templates.py:672
 msgid "This basket is publicly accessible at the following address:"
@@ -4163,9 +4155,8 @@ msgid "Search %s records for:"
 msgstr "Søk blant %s elementer etter:"
 
 #: modules/websearch/lib/websearch_templates.py:659
-#, fuzzy
 msgid "less"
-msgstr "Regler"
+msgstr "mindre"
 
 #: modules/websearch/lib/websearch_templates.py:660
 #: modules/websearch/lib/websearch_templates.py:1377
@@ -4178,19 +4169,18 @@ msgstr "mer"
 #: modules/websearch/lib/websearch_templates.py:665
 #, python-format
 msgid "Example: %(x_sample_search_query)s"
-msgstr ""
+msgstr "Eksempel: %(x_sample_search_query)s"
 
 #: modules/websearch/lib/websearch_templates.py:677
 #: modules/websearch/lib/websearch_templates.py:1976
 #, python-format
 msgid "Search in %(x_collection_name)s"
-msgstr ""
+msgstr "Søk i %(x_collection_name)s"
 
 #: modules/websearch/lib/websearch_templates.py:681
 #: modules/websearch/lib/websearch_templates.py:1980
-#, fuzzy
 msgid "Search everywhere"
-msgstr "Skriv søkespørring her."
+msgstr "Søk i alt"
 
 #: modules/websearch/lib/websearch_templates.py:715
 #: modules/websearch/lib/websearch_templates.py:793
@@ -4263,9 +4253,9 @@ msgstr "Nyeste elementer:"
 
 #: modules/websearch/lib/websearch_templates.py:1490
 #: modules/websearch/lib/websearch_templates.py:2894
-#, fuzzy, python-format
+#, python-format
 msgid "Cited by %i records"
-msgstr "Sitert av: %s elementer"
+msgstr "Sitert i %i elementer"
 
 #: modules/websearch/lib/websearch_templates.py:1556
 #, python-format
@@ -4433,28 +4423,24 @@ msgid ".. of which self-citations: %s records"
 msgstr ".. hvor av selvsitering utgjorde: %s elementer"
 
 #: modules/websearch/lib/websearch_templates.py:3310
-#, fuzzy
 msgid "Affiliations:"
-msgstr "Publikasjoner"
+msgstr "Tilhørigheter:"
 
 #: modules/websearch/lib/websearch_templates.py:3327
-#, fuzzy
 msgid "Frequent keywords:"
-msgstr "Vanlige nøkkelord"
+msgstr "Vanlige nøkkelord:"
 
 #: modules/websearch/lib/websearch_templates.py:3337
-#, fuzzy
 msgid "Frequent co-authors:"
-msgstr "Vanlige nøkkelord"
+msgstr "Vanlige medforfattere:"
 
 #: modules/websearch/lib/websearch_templates.py:3346
 msgid "Publishes in"
 msgstr "Publiserer i"
 
 #: modules/websearch/lib/websearch_templates.py:3353
-#, fuzzy
 msgid "Papers:"
-msgstr "Side:"
+msgstr "Tekster:"
 
 #: modules/websearch/lib/websearch_templates.py:3354
 msgid "downloaded"
@@ -4465,18 +4451,16 @@ msgid "times"
 msgstr "ganger"
 
 #: modules/websearch/lib/websearch_templates.py:3383
-#, fuzzy
 msgid "Citations:"
-msgstr "Siteringer"
+msgstr "Siteringer:"
 
 #: modules/websearch/lib/websearch_templates.py:3413
 msgid "Citation summary results"
 msgstr "Resultatsammendrag siteringer"
 
 #: modules/websearch/lib/websearch_templates.py:3418
-#, fuzzy
 msgid "Total number of citable papers analyzed:"
-msgstr "Totalt antall analyserte tekster:"
+msgstr "Totalt antall analyserte siterbare tekster:"
 
 #: modules/websearch/lib/websearch_templates.py:3441
 msgid "Total number of citations:"
@@ -6679,9 +6663,8 @@ msgid "Access to Fulltext"
 msgstr "Tilgang til fulltekst"
 
 #: modules/websubmit/lib/websubmit_webinterface.py:303
-#, fuzzy
 msgid "Not enough information to retrieve the document"
-msgstr "Bli den første til å vurdere dette dokumentet."
+msgstr "Ikke nok informasjon til å hente dette dokumentet"
 
 #: modules/websubmit/web/publiline.py:129
 msgid "Specific Approval and Refereeing Workflow"
@@ -6814,31 +6797,27 @@ msgstr ""
 #: modules/webjournal/lib/webjournaladminlib.py:267
 #: modules/webjournal/lib/webjournaladminlib.py:301
 msgid "Add"
-msgstr ""
+msgstr "Legg til"
 
 #: modules/webjournal/lib/webjournal_templates.py:398
 #: modules/webjournal/lib/webjournaladminlib.py:326
-#, fuzzy
 msgid "Publish"
-msgstr "Publiserer i"
+msgstr "Publiser"
 
 #: modules/webjournal/lib/webjournal_templates.py:399
 #: modules/webjournal/lib/webjournaladminlib.py:267
 #: modules/webjournal/lib/webjournaladminlib.py:298
-#, fuzzy
 msgid "Refresh"
-msgstr "Referanser"
+msgstr "Oppdater"
 
 #: modules/webjournal/lib/webjournal_templates.py:462
 #: modules/webjournal/lib/webjournaladminlib.py:340
-#, fuzzy
 msgid "Update"
-msgstr "Oppdater gruppe"
+msgstr "Oppdater"
 
 #: modules/webjournal/lib/webjournal_templates.py:625
-#, fuzzy
 msgid "Apply"
-msgstr "april"
+msgstr "Bruk"
 
 #: modules/webjournal/lib/webjournal_config.py:62
 #: modules/webjournal/lib/webjournal_config.py:94
@@ -6986,22 +6965,20 @@ msgstr "Klarte ikke å finne denne journalens ID i databasen"
 #: modules/webjournal/lib/webjournal_config.py:609
 #, python-format
 msgid "Category \"%(category_name)s\" not found"
-msgstr ""
+msgstr "Fant ikke kategori \"%(category_name)s\""
 
 #: modules/webjournal/lib/webjournal_config.py:611
-#, fuzzy
 msgid "Sorry, this category does not exist for this journal."
-msgstr "Beklager, elementet %s finnes ikke."
+msgstr "Beklager, denne kategorien eksisterer ikke for denne journalen."
 
 #: modules/webjournal/web/admin/webjournaladmin.py:74
-#, fuzzy
 msgid "WebJournal Admin"
-msgstr "WebComment Administrator"
+msgstr "WebJournal Administrator"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:111
 #, python-format
 msgid "Administrate %(journal_name)s"
-msgstr ""
+msgstr "Administrer %(journal_name)s"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:148
 msgid "Feature a record"
@@ -7009,24 +6986,21 @@ msgstr "Presentere et element"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:206
 msgid "Email Alert System"
-msgstr ""
+msgstr "E-postvarslingssystem"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:259
 msgid "Issue regenerated"
 msgstr "Utgave rekonstruert"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:309
-#, fuzzy
 msgid "Publishing Interface"
-msgstr "Intern Feil"
+msgstr "Publiseringsgrensesnitt"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:335
-#, fuzzy
 msgid "Add Journal"
-msgstr "journal"
+msgstr "Legg til journal"
 
 #: modules/webjournal/web/admin/webjournaladmin.py:337
-#, fuzzy
 msgid "Edit Settings"
 msgstr "Endre innstillinger"
 
