@@ -42,9 +42,9 @@ import zlib
 from invenio import bibformat_dblayer
 from invenio import bibformat_engine
 from invenio import bibformat_utils
+from invenio.errorlib import register_exception
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_SITE_URL, \
      CFG_PATH_PHP
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_USE_OLD_BIBFORMAT, \
@@ -60,7 +60,7 @@ import sys
 # Functions to format a single record
 ##
 
-def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=[],
+def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
                   xml_record=None, user_info=None, on_the_fly=False):
     """
     Formats a record given output format.
@@ -92,6 +92,9 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=[],
     @param on_the_fly if False, try to return an already preformatted version of the record in the database
     @return formatted record
     """
+    if search_pattern is None:
+        search_pattern = []
+
     out = ""
     if verbose == 9:
         out += """\n<span class="quicknote">
@@ -103,10 +106,17 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=[],
     ############################# END ##################################
 
     if not on_the_fly and \
-       (ln==CFG_SITE_LANG or CFG_BIBFORMAT_USE_OLD_BIBFORMAT or \
-        CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT == False):
+       (ln == CFG_SITE_LANG or \
+        of.lower() == 'xm' or \
+        CFG_BIBFORMAT_USE_OLD_BIBFORMAT or \
+        (CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT == False and of.lower() == 'hb')):
 	# Try to fetch preformatted record
-        # Only possible for records formatted in CFG_SITE_LANG language (other are never stored)
+        # Only possible for records formatted in CFG_SITE_LANG
+        # language (other are never stored), or of='xm' which does not
+        # depend on language.
+        # Also, when formatting in HB, and when
+        # CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT is set to False,
+        # ignore other languages and fetch the preformatted output.
         res = bibformat_dblayer.get_preformatted_record(recID, of)
         if res is not None:
             # record 'recID' is formatted in 'of', so return it
@@ -119,14 +129,14 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=[],
             return out
         else:
             if verbose == 9:
-                out+= """\n<br/><span class="quicknote">
+                out += """\n<br/><span class="quicknote">
                 No preformatted output found for record %s.
                 </span>"""% recID
 
 
     # Live formatting of records in all other cases
     if verbose == 9:
-        out+= """\n<br/><span class="quicknote">
+        out += """\n<br/><span class="quicknote">
         Formatting record %i on-the-fly.
         </span>""" % recID
 
@@ -140,14 +150,17 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=[],
                                               user_info=user_info)
         return out
     except Exception, e:
+        register_exception(prefix="An error occured while formatting record %i in %s" % \
+                           (recID, of),
+                           alert_admin=True)
         #Failsafe execution mode
         if verbose == 9:
-            out+= """\n<br/><span class="quicknote">
+            out += """\n<br/><span class="quicknote">
             An error occured while formatting record %i. (%s)
             </span>""" % (recID, str(e))
         if of.lower() == 'hd':
             if verbose == 9:
-                out+= """\n<br/><span class="quicknote">
+                out += """\n<br/><span class="quicknote">
                 Formatting record %i with websearch_templates.tmpl_print_record_detailed.
                 </span><br/>""" % recID
                 return out + websearch_templates.tmpl_print_record_detailed(
@@ -155,7 +168,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=[],
                     recID = recID,
                     )
         if verbose == 9:
-            out+= """\n<br/><span class="quicknote">
+            out += """\n<br/><span class="quicknote">
             Formatting record %i with websearch_templates.tmpl_print_record_brief.
             </span><br/>""" % recID
         return out + websearch_templates.tmpl_print_record_brief(ln = ln,
