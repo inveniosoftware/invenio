@@ -852,7 +852,10 @@ class BibRecordComparingTest(unittest.TestCase):
                 </datafield>
             </record>
          """)
+
     def test_comparing_records(self):
+        """bibrecord - comparing two records"""
+
         def compare_lists2(list1, list2):
             """Comparing two lists of changes... the order does not play any role"""
             dict2 = {}
