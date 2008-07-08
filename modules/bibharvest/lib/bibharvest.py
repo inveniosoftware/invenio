@@ -196,6 +196,8 @@ def help():
     print "  -r<resuptionToken> Resume previous harvest"
     print "  -f<from>           from date (datestamp)"
     print "  -u<until>          until date (datestamp)\n"
+    print "  Example:"
+    print "    bibharvest -vListRecords -f2004-04-01 -u2004-04-02 -pmarcxml -o/tmp/z.xml http://cdsweb.cern.ch/oai2d\n"
 
 
 def OAI_Request(server, script, params, method="POST"):
