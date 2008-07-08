@@ -2690,7 +2690,7 @@ CREATE TABLE IF NOT EXISTS cmtACTIONHISTORY (
   id_cmtRECORDCOMMENT int(15) unsigned NULL,
   id_bibrec int(15) unsigned NULL,
   id_user int(15) unsigned NULL default NULL,
-  client_host int(10) unsigned NOT NULL,
+  client_host int(10) unsigned default NULL,
   action_time datetime NOT NULL default '0000-00-00 00:00:00',
   action_code char(1) NOT NULL,
   KEY id_cmtRECORDCOMMENT (id_cmtRECORDCOMMENT),
