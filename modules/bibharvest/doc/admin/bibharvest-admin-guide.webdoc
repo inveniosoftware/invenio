@@ -42,7 +42,8 @@ The BibHarvest Admin Interface can be used to set up a database of OAI sources a
 
 <p>In order to periodically harvest metadata from one or several repositories, it is possible to organize OAI sources through the BibHarvest Admin Interface.
 The interface allows the administrator to add new repositories as well as edit and delete existing ones.
-Once the database has been set up thorugh the BibHarvest Admin Interface, run the oaiharvest command-line tool to run periodical harvesting</p>
+Once defined, run the <code>oaiharvest</code> command-line tool to start periodical harvesting of these repositories based on your settings.</p>
+<p>(Note that you can <b>alternatively</b> use the <code>bibharvest</code> command-line tool to perform a manual harvesting independently of the BibHarvest admin interface, and save the result into a file. You would then need to run <code>bibconvert</code> and <code>bibupload</code> to integrate the harvested records into your repository, but this is not recommended. Run <code>bibharvest -h</code> for additional information.)</p>
 
 <a name="2.1"></a><h4>2.1 Bibharvest Admin Interface</h4>
 
