@@ -271,7 +271,7 @@ def call_old_bibformat(recID, format="HD", on_the_fly=False, verbose=0):
         return out
 
 def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
-                  search_pattern=[], xml_record=None, user_info=None):
+                  search_pattern=None, xml_record=None, user_info=None):
     """
     Formats a record given output format. Main entry function of
     bibformat engine.
@@ -300,6 +300,9 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0,
     @param user_info the information of the user who will view the formatted page
     @return formatted record
     """
+    if search_pattern is None:
+        search_pattern = []
+
     out = ""
     errors_ = []
     # Temporary workflow (during migration of formats):
@@ -442,7 +445,9 @@ def format_with_format_template(format_template_filename, bfo,
     else:
         #.xsl
         # Fetch MARCXML. On-the-fly xm if we are now formatting in xm
-        xml_record = record_get_xml(bfo.recID, 'xm', on_the_fly=(bfo.format != 'xm'))
+        xml_record = '<?xml version="1.0" encoding="UTF-8"?>\n' + \
+                     record_get_xml(bfo.recID, 'xm', on_the_fly=False)
+
         # Transform MARCXML using stylesheet
         evaluated_format = format(xml_record, template_source=format_content)
 
@@ -1724,7 +1729,7 @@ class BibFormatObject:
 
     req = None # DEPRECATED: use bfo.user_info instead
 
-    def __init__(self, recID, ln=CFG_SITE_LANG, search_pattern=[],
+    def __init__(self, recID, ln=CFG_SITE_LANG, search_pattern=None,
                  xml_record=None, user_info=None, format=''):
         """
         Creates a new bibformat object, with given record.
@@ -1763,6 +1768,8 @@ class BibFormatObject:
             recID = record_get_field_value(self.record, "001")
 
         self.lang = wash_language(ln)
+        if search_pattern is None:
+            search_pattern = []
         self.search_pattern = search_pattern
         self.recID = recID
         self.format = format
