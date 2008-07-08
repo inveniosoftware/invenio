@@ -33,7 +33,7 @@ Options to inspect record history:
    --get-revision [recid.revdate]      print MARCXML of given record revision
    --diff-revisions [recidA.revdateB]  print MARCXML difference between record A
                     [recidC.revdateD]   dated B and record C dated D
-   --revert-revision [recid.revdate]  submit given record revision to become
+   --revert-to-revision [recid.revdate]  submit given record revision to become
                                        current revision
 """
 
@@ -150,7 +150,7 @@ def cli_diff_revisions(revid1, revid2):
                                        revid1,
                                        revid2,))
 
-def cli_revert_revision(revid):
+def cli_revert_to_revision(revid):
     """
     Submits specified revision for bibupload, to replace current version.
     """
@@ -233,13 +233,13 @@ def main():
                 print_usage()
                 sys.exit(1)
             cli_diff_revisions(revid1, revid2)
-        elif cmd == '--revert-revision':
+        elif cmd == '--revert-to-revision':
             try:
                 revid = opts[0]
             except IndexError:
                 print_usage()
                 sys.exit(1)
-            cli_revert_revision(revid)
+            cli_revert_to_revision(revid)
         else:
             print """ERROR: Please specify a command.  Please see '--help'."""
             sys.exit(1)
