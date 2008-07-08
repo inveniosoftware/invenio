@@ -560,7 +560,7 @@ class Template:
                           'temp'             : temp,
                           'format_tag'       : format_tag}
         if message == 2:
-            question = _('Do you really want to load revision %(revdate)s of record #%(recid)s?'
+            question = _('Do you really want to revert to revision %(revdate)s of record #%(recid)s?'
                         ) % {'revdate': revdate,
                              'recid': recid}
             warning_1 = _('The current version will be replaced with a copy of revision %(revdate)s'

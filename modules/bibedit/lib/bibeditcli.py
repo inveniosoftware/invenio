@@ -33,18 +33,26 @@ Options to inspect record history:
    --get-revision [recid.revdate]      print MARCXML of given record revision
    --diff-revisions [recidA.revdateB]  print MARCXML difference between record A
                     [recidC.revdateD]   dated B and record C dated D
+   --revert-revision [recid.revdate]  submit given record revision to become
+                                       current revision
 """
 
 __revision__ = "$Id$"
 
+import os
 import re
 import sys
+import time
 import zlib
 import difflib
 
 _RE_RECORD_REVISION_FORMAT = re.compile(r'^(\d+)\.(\d{14})$')
 
+from invenio.config import CFG_BIBEDIT_TIMEOUT
 from invenio.dbquery import run_sql
+from invenio.bibedit_engine import get_file_path, record_locked_p, \
+    save_temp_record, save_xml_record
+from invenio.bibrecord import create_record
 
 def print_usage():
     """Print help."""
@@ -142,6 +150,50 @@ def cli_diff_revisions(revid1, revid2):
                                        revid1,
                                        revid2,))
 
+def cli_revert_revision(revid):
+    """
+    Submits specified revision for bibupload, to replace current version.
+    """
+    # Is the revision valid?
+    if not revision_valid_p(revid):
+        print "ERROR: revision %s is invalid; " \
+              "must be NNN.YYYYMMDDhhmmss." % revid
+        sys.exit(1)
+
+    xmlrecord = get_marcxml_of_record_revision(revid)
+
+    # Does the revision exist?
+    if xmlrecord == '':
+        print "ERROR: Revision %s does not exist. " % revid
+        sys.exit(1)
+
+    match = _RE_RECORD_REVISION_FORMAT.match(revid)
+    recid = match.group(1)
+    file_path = get_file_path(recid)
+
+    # Does a tmp file already exist?
+    if os.path.isfile("%s.tmp" % file_path):
+        time_tmp_file = os.path.getmtime("%s.tmp" % file_path)
+        time_out_file = int(time.time()) - CFG_BIBEDIT_TIMEOUT
+
+        # Is it expired?
+        if time_tmp_file > time_out_file :
+            print "ERROR: Record %s is currently being edited by another " \
+              "user. Please try again later." % recid
+            sys.exit(1)
+
+        os.system("rm %s.tmp" % file_path)
+
+    # Is the record locked for editing?
+    if record_locked_p(recid):
+        print "ERROR: Record %s is currently locked for editing. Please try " \
+          "again in a few minutes." % recid
+        sys.exit(1)
+
+    record = create_record(xmlrecord)[0]
+    save_temp_record(record, 0, "%s.tmp" % file_path)
+    save_xml_record(recid)
+
 def main():
     """Main entry point."""
     if '--help' in sys.argv or \
@@ -181,6 +233,13 @@ def main():
                 print_usage()
                 sys.exit(1)
             cli_diff_revisions(revid1, revid2)
+        elif cmd == '--revert-revision':
+            try:
+                revid = opts[0]
+            except IndexError:
+                print_usage()
+                sys.exit(1)
+            cli_revert_revision(revid)
         else:
             print """ERROR: Please specify a command.  Please see '--help'."""
             sys.exit(1)

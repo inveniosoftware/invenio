@@ -233,6 +233,7 @@ def save_xml_record(recid):
 
     file_path = get_file_path(recid)
 
+    os.system("rm -f %s.xml" % file_path)
     file_temp = open("%s.xml" % file_path, 'w')
     file_temp.write(record_xml_output(get_temp_record("%s.tmp" % file_path)[1]))
     file_temp.close()
@@ -260,6 +261,8 @@ def get_temp_record(file_path):
 def get_record(ln, recid, uid, temp):
     """Returns a record dict, and warning message in case of error. """
     #FIXME: User doesn't get submit button if reloading BibEdit-page
+    #FIXME: User will get warning of changes being temporary when reloading
+    #   BibEdit-page, even though no changes have been made.
 
     warning_temp_file = ''
     file_path = get_file_path(recid)
@@ -576,18 +579,21 @@ def get_text_marc(recid, xml_record):
     run_shell_command('rm ' + tmpfilepath)
     return textmarc
 
-def submit_record(recid, xml_record, uid):
+def submit_record(recid, xml_record, uid=0):
     """
     Submit a new revision of a record.
-
     @param recid id of the record in question
     @param xml_record the new revision in XML MARC format
-    @uid user id of the calling user
+    @uid user id of the calling user (0 if called from command line)
     """
-
     file_path = get_file_path(recid)
     if os.path.isfile("%s.tmp" % file_path):
         os.system("rm %s.tmp" % file_path)
     record = create_record(xml_record)[0]
     save_temp_record(record, uid, "%s.tmp" % file_path)
     save_xml_record(recid)
+
+def get_revisions(recid):
+    """ Return list of revisions. """
+    cmd = '%s/bibedit --list-revisions %s' % (CFG_BINDIR, recid)
+    return run_shell_command(cmd)[1].split('\n')[:-1]
