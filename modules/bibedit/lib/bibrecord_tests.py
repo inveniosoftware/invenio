@@ -872,10 +872,8 @@ class BibRecordComparingTest(unittest.TestCase):
             return True
 
         self.assertEqual(bibrecord.record_diff(self.record1, self.record1), [])
-        self.assertEqual(bibrecord.record_diff(self.record1, self.record2), [])
-        self.assertEqual(bibrecord.record_diff(self.record1, self.record3), [])
-        self.assertEqual(bibrecord.record_diff(self.record1, self.record4), [])
-        self.assertEqual(bibrecord.record_diff(self.record1, self.record5), [])
+        self.assertEqual(bibrecord.record_diff(self.record1, self.record3), [("035", "a")])
+        self.assertEqual(bibrecord.record_diff(self.record1, self.record4), [("035", "a")])
         self.assertEqual(bibrecord.record_diff(self.record1, self.record2), [("035", "a")])
         self.assertEqual(bibrecord.record_diff(self.record2, self.record1), [("035", "r")])
         self.assertEqual(bibrecord.record_diff(self.record2, self.record3), [("035", "c")])
