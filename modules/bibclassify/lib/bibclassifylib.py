@@ -135,6 +135,15 @@ def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, sp
     compiled_ontology_db = None
     compiled_ontology_db_file = dictfile + '.db'
     namespace = rdflib.Namespace("http://www.w3.org/2004/02/skos/core#")
+    if True:
+        # FIXME: there is a bad bug in ontology compilation below - it
+        # stores objects for the given input file, not for
+        # input-file-independent ontology regexps.  So let us remove
+        # the precompiled ontology file here in order not to reuse it
+        # for another file.  This workaround should be removed only
+        # after the issue is fixed.
+        if os.path.exists(compiled_ontology_db_file):
+            os.remove(compiled_ontology_db_file)
     if not(os.access(dictfile,os.F_OK) and os.access(compiled_ontology_db_file,os.F_OK) and os.path.getmtime(compiled_ontology_db_file) > os.path.getmtime(dictfile)):
         # changed graph type, recommended by devel team
         store = rdflib.ConjunctiveGraph()
