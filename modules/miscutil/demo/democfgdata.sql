@@ -23,6 +23,7 @@ INSERT INTO user VALUES (4,'dorian.gray@cds.cern.ch',AES_ENCRYPT(email,'d123oria
 INSERT INTO user VALUES (5,'romeo.montague@cds.cern.ch',AES_ENCRYPT(email,'r123omeo'),'1','NULL','romeo','');
 INSERT INTO user VALUES (6,'juliet.capulet@cds.cern.ch',AES_ENCRYPT(email,'j123uliet'),'1','NULL','juliet','');
 INSERT INTO user VALUES (7,'benvolio.montague@cds.cern.ch',AES_ENCRYPT(email,'b123envolio'),'1','NULL','benvolio','');
+INSERT INTO user VALUES (8,'balthasar.montague@cds.cern.ch',AES_ENCRYPT(email,'b123althasar'),'1','NULL','balthasar','');
 INSERT INTO usergroup VALUES (1,'Theses viewers','Theses viewers internal group','VO','INTERNAL');
 INSERT INTO user_usergroup VALUES (2,1,'M',NOW());
 
