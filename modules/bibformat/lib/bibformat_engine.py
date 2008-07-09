@@ -1994,15 +1994,15 @@ def escape_field(value, mode=0):
     elif mode in [2, 5]:
         allowed_attribute_whitelist = cfg_html_buffer_allowed_attribute_whitelist
         allowed_tag_whitelist = cfg_html_buffer_allowed_tag_whitelist + \
-                                ['class']
+                                ('class',)
         if mode == 5:
-            allowed_attribute_whitelist += ['src', 'alt',
+            allowed_attribute_whitelist += ('src', 'alt',
                                             'width', 'height',
                                             'style', 'summary',
                                             'border', 'cellspacing',
-                                            'cellpadding']
-            allowed_tag_whitelist += ['img', 'table', 'td',
-                                      'tr', 'th', 'span', 'caption']
+                                            'cellpadding')
+            allowed_tag_whitelist += ('img', 'table', 'td',
+                                      'tr', 'th', 'span', 'caption')
         try:
             return washer.wash(value,
                                allowed_attribute_whitelist=\
@@ -2017,15 +2017,15 @@ def escape_field(value, mode=0):
         if value.lstrip(' \n').startswith(html_field):
             allowed_attribute_whitelist = cfg_html_buffer_allowed_attribute_whitelist
             allowed_tag_whitelist = cfg_html_buffer_allowed_tag_whitelist + \
-                                    ['class']
+                                    ('class',)
             if mode == 6:
-                allowed_attribute_whitelist += ['src', 'alt',
+                allowed_attribute_whitelist += ('src', 'alt',
                                                 'width', 'height',
                                                 'style', 'summary',
                                                 'border', 'cellspacing',
-                                                'cellpadding']
-                allowed_tag_whitelist += ['img', 'table', 'td',
-                                          'tr', 'th', 'span', 'caption']
+                                                'cellpadding')
+                allowed_tag_whitelist += ('img', 'table', 'td',
+                                          'tr', 'th', 'span', 'caption')
             try:
                 return washer.wash(value,
                                    allowed_attribute_whitelist=\
