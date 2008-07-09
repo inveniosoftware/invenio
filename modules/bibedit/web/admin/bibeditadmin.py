@@ -25,7 +25,7 @@ __lastupdated__ = """$Date$"""
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.webpage import page
-from invenio.webuser import getUid, page_not_authorized
+from invenio.webuser import getUid, page_not_authorized, collect_user_info
 from invenio.bibedit_engine import perform_request_index, perform_request_edit, \
     perform_request_submit, perform_request_history, revid2revdate
 from invenio.search_engine import record_exists, guess_primary_collection_of_a_record
@@ -50,8 +50,16 @@ def index(req, ln=CFG_SITE_LANG, recid=None, temp="false", format_tag='marc',
     confirm_delete = wash_url_argument(confirm_delete, "int")
 
     if recid == 0:
-        (body, errors, warnings) = perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, format_tag,
-                                                         edit_tag, delete_tag, num_field, add, args)
+        # do not display the introductory recID selection box to guest
+        # users (as it used to be with v0.99.0):
+        user_info = collect_user_info(req)
+        if user_info['email'] == 'guest':
+            (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit')
+            return page_not_authorized(req=req, text=auth_message, navtrail=navtrail)
+        else:
+            # the user is logged in, so display the box:
+            (body, errors, warnings) = perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, format_tag,
+                                                             edit_tag, delete_tag, num_field, add, args)
     else:
         (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit', collection=guess_primary_collection_of_a_record(recid))
         if auth_code != 0:
