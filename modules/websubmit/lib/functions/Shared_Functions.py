@@ -137,3 +137,17 @@ def get_dictionary_from_string(dict_string):
         final_dictionary[key_term] = value_term
     return final_dictionary
 
+def ParamFromFile(afile):
+    """ Pipe a multi-line file into a single parameter"""
+    parameter = ''
+    afile = afile.strip()
+    if afile == '': return parameter
+    try:
+        fp = open(afile, "r")
+        lines = fp.readlines()
+        for line in lines:
+            parameter = parameter + line
+        fp.close()
+    except IOError:
+        pass
+    return parameter

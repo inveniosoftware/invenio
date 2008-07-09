@@ -36,7 +36,7 @@ from invenio.config import CFG_CERN_SITE, \
                            CFG_SITE_URL, \
                            CFG_SITE_SUPPORT_EMAIL
 from invenio.access_control_admin import acc_get_role_users, acc_get_role_id
-from invenio.websubmit_functions.ParamFile import ParamFromFile
+from invenio.websubmit_functions.Shared_Functions import ParamFromFile
 from invenio.errorlib import register_exception
 from invenio.search_engine import print_record
 from invenio.mailutils import send_email

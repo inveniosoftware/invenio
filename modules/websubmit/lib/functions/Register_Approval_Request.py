@@ -31,7 +31,7 @@ import os.path
 from invenio.websubmit_dblayer import register_new_approval_request, \
                                       get_simple_approval_status, \
                                       update_approval_request_status
-from invenio.websubmit_functions.ParamFile import ParamFromFile
+from invenio.websubmit_functions.Shared_Functions import ParamFromFile
 from invenio.websubmit_config import InvenioWebSubmitFunctionError, \
                                      InvenioWebSubmitFunctionStop
 from invenio.errorlib import register_exception
