@@ -119,8 +119,8 @@ DEF_DEMO_ROLES = (('photocurator', 'Photo collection curator', 'deny any'),
                   ('curator', 'Curator', 'deny any'))
 
 DEF_DEMO_USER_ROLES = (('jekyll@cds.cern.ch', 'thesesviewer'),
-                       ('jekyll@cds.cern.ch', 'bookcurator'),
-                       ('dorian.gray@cds.cern.ch', 'curator'),
+                       ('dorian.gray@cds.cern.ch', 'bookcurator'),
+                       ('balthasar.montague@cds.cern.ch', 'curator'),
                        ('romeo.montague@cds.cern.ch', 'restrictedpicturesviewer'),
                        ('romeo.montague@cds.cern.ch', 'thesescurator'),
                        ('juliet.capulet@cds.cern.ch', 'restrictedpicturesviewer'),
