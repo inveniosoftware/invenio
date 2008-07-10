@@ -18,8 +18,17 @@ The CERN development group currently consists of:
      WebSearch, BibIndex, BibSched, WebStat, WebStyle, WebSession,
      WebHelp, and more.
   
- - Nicholas Robinson <nicholas.robinson@cern.ch>
-     WebSubmit.  Reference extraction for the BibEdit module.
+ - Jerome Caffaro <jerome.caffaro@cern.ch>
+     BibFormat, redesign and rewrite in Python.  BibConvert
+     XML-oriented mode.  OAI harvester improvements.  Improvements to
+     BibEdit.  WebDoc tool.  WebJournal refactoring and rewrite.
+
+ - Samuele Kaplun <samuele.kaplun@cern.ch>
+     Authentication and user preferences rewrite and improvements.
+     Firewall-like access control RBAC system.  Fulltext file
+     management rewrite and upload feature.  Intbitset Python C
+     extension for the indexer.  Improvents to the task scheduler and
+     session hander, etc.
 
  - Martin Vesely <martin.vesely@cern.ch>
      BibHarvest, OAI daemon and admin interface. BibConvert
@@ -28,32 +37,30 @@ The CERN development group currently consists of:
  - Chris Montarbaud <christiane.montarbaud@cern.ch>
      Multimedia and photo management.
 
- - Jerome Caffaro <jerome.caffaro@cern.ch>
-     BibFormat, redesign and rewrite in Python.  BibConvert
-     XML-oriented mode.  OAI harvester improvements.  Improvements to
-     BibEdit.  WebDoc tool.
-
- - Samuele Kaplun <samuele.kaplun@cern.ch>
-     Authentication and user preferences rewrite and improvements.
-     Firewall-like access control RBAC system.  Fulltext file
-     management rewrite and upload feature.  Intbitset Python C
-     extension for the indexer.  Other contributions and
-     improvements.
-
  - Tony Osborne <tony.osborne@cern.ch>
      Improvements to the reference extractor.
 
  - Marko Niinimaki <manzikki@gmail.com>
-     Contributions to the BibRank citation module.
+     Contributions to the BibRank citation module and WebSearch 
+     summary output formats.
 
  - Radoslav Ivanov <radoslav.ivanov@cern.ch>
-     Contributions to the WebBasket module test suite.
+     Contributions to the WebBasket module test suite.  Support for
+     parentheses and SPIRES search syntax in WebSearch.
 
  - Joaquim Silvestre <joaquim.rodrigues.silvestre@cern.ch>
-     Contributions to Portuguese translation.
+     Forthcoming BibCirculation module to handle physical item copies.
 
  - Lars Christian Raae <lars.christian.raae@cern.ch>
-     Contributions to Norwegian translation.
+     Record locking, per-collection curating authentication, reverting
+     older record versions, for the BibEdit.
+
+ - Ruben Pollan <ruben.pollan@cern.ch>
+     Contributions to the WebStat module.
+
+ - Piotr Praczyk <piotr.praczyk@gmail.com>
+     OAI harvesting from arXiv.  Test harvesting interface, for
+     BibHarvest.  Record comparison library functions, for BibRecord.
 
 The EPFL development group currently consists of:
 
@@ -61,9 +68,17 @@ The EPFL development group currently consists of:
      Rewrite of WebBasket.  WebMessage.  Improvements to WebComment.
      Other contributions and improvements.
 
+The SLAC development group currently consists of:
+
+ - Travis C. Brooks <travis@slac.stanford.edu>
+     Support for SPIRES search syntax.
+
 Many former group members (CERN and EPFL staff and fellows, technical
 students, diploma students, summer students) contributed to the
 project.  In an approximate decreasing chronological order:
+
+ - Nicholas Robinson <nicholas.robinson@cern.ch>
+     WebSubmit.  Reference extraction for the BibEdit module.
 
  - Gabriel Hase <gabriel.hase@konnektiv.ch>
      WebJournal module.
