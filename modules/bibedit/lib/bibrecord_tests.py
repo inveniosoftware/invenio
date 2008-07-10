@@ -880,8 +880,8 @@ class BibRecordComparingTest(unittest.TestCase):
         self.assertEqual(bibrecord.record_diff(self.record3, self.record4), [("035", "c")])
         self.assertEqual(bibrecord.record_diff(self.record4, self.record5), [("773", "a")])
         self.assertEqual(bibrecord.record_diff(self.record5, self.record4), [("773", "r")])
-        self.assertTrue(compare_lists2(bibrecord.record_diff(self.record1, self.record5), [("035", "a"), ("773", "a")]))
-        self.assertTrue(compare_lists2(bibrecord.record_diff(self.record5, self.record1), [("035", "r"), ("773", "r")]))
+        self.failUnless(compare_lists2(bibrecord.record_diff(self.record1, self.record5), [("035", "a"), ("773", "a")]))
+        self.failUnless(compare_lists2(bibrecord.record_diff(self.record5, self.record1), [("035", "r"), ("773", "r")]))
 
 TEST_SUITE = make_test_suite(BibRecordSanityTest,
                              BibRecordSuccessTest,
