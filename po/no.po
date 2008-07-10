@@ -1426,7 +1426,9 @@ msgstr "Legg til underfelt"
 #: modules/bibedit/lib/bibedit_templates.py:282
 msgid ""
 "Tags and values should be filled before pressing Done or Add another subfield"
-msgstr "Felt og verdier må være fylt ut før du klikker Ferdig eller Legg til underfelt"
+msgstr ""
+"Felt og verdier må være fylt ut før du klikker Ferdig eller Legg til "
+"underfelt"
 
 #: modules/bibedit/lib/bibedit_templates.py:356
 msgid "Move up"

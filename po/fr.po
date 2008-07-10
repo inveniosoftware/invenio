@@ -1426,7 +1426,9 @@ msgstr "Ajouter un autre sous-champ"
 #: modules/bibedit/lib/bibedit_templates.py:282
 msgid ""
 "Tags and values should be filled before pressing Done or Add another subfield"
-msgstr "Les 'tags' et valeurs doivent être indiqués avant de valider ou d'ajouter un autre sous-champ"
+msgstr ""
+"Les 'tags' et valeurs doivent être indiqués avant de valider ou d'ajouter un "
+"autre sous-champ"
 
 #: modules/bibedit/lib/bibedit_templates.py:356
 msgid "Move up"
