@@ -9,39 +9,114 @@ CDS Invenio v0.99.1 was released on July 10, 2008.
 What's new:
 -----------
 
-FIXME
+ *) search engine syntax now supports parentheses (WebSearch)
 
- *) 
+ *) search engine syntax now supports SPIRES query language
+    (WebSearch)
 
- *) 
+ *) strict respect for per-collection sort options on the search
+    results pages (WebSearch)
 
- *) 
+ *) improved parsing of search query with respect to non-existing
+    field terms (WebSearch)
 
- *) 
+ *) fixed "any collection" switch on the search results page
+    (WebSearch)
 
- *) 
+ *) added possibility for progressive display of detailed record page
+    tabs (WebSearch)
 
- *) 
+ *) added multimedia RSS output tags (WebSearch)
 
- *) 
+ *) new search engine summarizer module with the cite summary output
+    format (WebSearch, BibRank)
 
- *) 
+ *) "cited by" links are now generated only when needed (WebSearch)
 
- *) 
+ *) new experimental comprehensive author page (WebSearch)
 
- *) 
+ *) stemming for many indexes is now enabled by default (BibIndex)
 
- *) 
+ *) new intelligent journal index (BibIndex)
 
- *) 
+ *) new logging of missing citations (BibRank)
 
- *) 
+ *) citation indexer and searcher improvements and caching (BibRank)
 
- *) 
+ *) new low-level task submission facility (BibSched)
 
- *) 
+ *) new options in bibsched task monitor: view task options, log and
+    error files; prune task to a history table; extended status
+    reporting; failed tasks now need acknowledgement in order to
+    restart the queue (BibSched)
 
- *) 
+ *) safer handling of task sleeping and waking up (BibSched)
+
+ *) new experimental support for task priorities and concurrent task
+    execution (BibSched)
+
+ *) improved user-configured browser language matching (MiscUtil)
+
+ *) new default behaviour not differentiating between guest users;
+    this removes a need to keep sessions/uids for guests and robots
+    (WebSession)
+
+ *) optimized sessions and collecting external user information (WebSession)
+
+ *) improved logging conflicts for external vs internal users
+    (WebAccess)
+
+ *) improved Single Sign-On session preservation (WebAccess)
+
+ *) new 'become user' debugging facility for admins (WebAccess)
+
+ *) new bibdocfile CLI tool to manipulate full-text files archive
+    (WebSubmit)
+
+ *) optimized redirection of old URLs (WebSubmit)
+
+ *) new icon creation tool in the submission input chain (WebSubmit)
+
+ *) improved full-text file migration tool (WebSubmit)
+
+ *) improved stamping of full-text files (WebSubmit)
+
+ *) new approval-related end-submission functions (WebSubmit)
+
+ *) comments and descriptions of full-text files are now kept also in
+    bibdoc tables, not only in MARC; they are synchronized during
+    bibupload (WebSubmit, BibUpload)
+
+ *) fixed navigation in public baskets (WebBasket)
+
+ *) added detailed record page link to basket records (WebBasket)
+
+ *) new removal of HTML markup in alert notification emails (WebAlert)
+
+ *) improved OAI harvester logging and handling (BibHarvest)
+
+ *) improved error checking (BibConvert)
+
+ *) improvements to the record editing tool: subfield order change,
+    repetitive subfields; improved record locking features;
+    configurable per-collection curators (BibEdit)
+
+ *) fully refactored WebJournal module (WebJournal)
+
+ *) new RefWorks output format, thanks to Theodoros Theodoropoulos
+    (BibFormat)
+
+ *) fixed keyword detection tool's output; deactivated taxonomy
+    compilation (BibClassify)
+
+ *) new /stats URL for administrators (WebStat)
+
+ *) better filtering of unused translations (WebStyle)
+
+ *) updated French, Italian, Norwegian and Swedish translations;
+    updated Japanese translation (thanks to Makiko Matsumoto and Takao
+    Ishigaki); updated Greek translation (thanks to Theodoros
+    Theodoropoulos); new Hungarian translation (thanks to Eva Papp)
 
  *) ... plus many other minor bug fixes and improvements
 
@@ -77,8 +152,8 @@ and then study the differences in the 'etc' folder and copy or merge
 your past customizations (namely, files like HB.bfo).  After that
 restart your Apache server and your bibsched queue and you are done.
 
-If you are upgrading from previous CDS Invenio releases (e.g. 0.92.1),
-then please see a dedicated Invenio Upgrade wiki page at
+If you are upgrading from previous CDS Invenio releases (e.g. from
+v0.92.1), then please see a dedicated Invenio Upgrade wiki page at
 <https://twiki.cern.ch/twiki/bin/view/CDS/InvenioUpgrade>.
 
 Further notes and issues:
