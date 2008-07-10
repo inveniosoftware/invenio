@@ -1,7 +1,73 @@
 CDS Invenio v0.99.1 (released 2008-07-10)
 =========================================
 
-	FIXME
+2008-07-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* NEWS, RELEASE-NOTES: Clarified multi-page RSS output news.
+
+2008-07-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* RELEASE-NOTES: Updated upgrade notes by cleaning the session and
+	user tables of guests.
+
+2008-07-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/bibedit/lib/bibrecord_tests.py: Replaced assertTrue by
+	failUnless in order to please older Pythons.
+
+2008-07-10  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* po/fr.po: Updated translation.
+
+2008-07-10  Lars Christian Raae <lars.christian.raae@cern.ch>
+
+	* po/no.po: Updated norwegian translation.
+
+2008-07-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/bg.po, po/ca.po, po/cds-invenio.pot, po/cs.po, po/de.po,
+	po/el.po, po/en.po, po/es.po, po/fr.po, po/hr.po, po/hu.po,
+	po/it.po, po/ja.po, po/no.po, po/pl.po, po/pt.po, po/ru.po,
+	po/sk.po, po/sv.po, po/uk.po, po/zh_CN.po, po/zh_TW.po: New PO
+	files for the release of v0.99.1.
+
+2008-07-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* NEWS, RELEASE-NOTES: Updated 0.99.1 release notes and news.
+
+2008-07-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* AUTHORS: Updated author list and author contributions.
+
+2008-07-10  Jerome Caffaro <jerome.caffaro@cern.ch>
+
+	* modules/webalert/lib/webalert_regression_tests.py: Adapted test
+	to new format that display publication information.
+
+2008-07-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* modules/websearch/lib/websearch_templates.py: Using
+	<references>...</references> envelope for RefWorks output; fixing
+	XML problem with displaying more than one record.  The precise tag
+	to use to be checked against RefWorks specs.
+
+2008-07-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* po/hu.po: Updated last translator.
+
+2008-07-10  Tibor Simko <tibor.simko@cern.ch>
+
+	* config/invenio.conf, modules/miscutil/lib/inveniocfg.py:
+	Temporarily taking out experimental conf variables
+	(CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES,
+	CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE) since they will be
+	refactored soon.  Keeping them for now as they are, but generating
+	them inside inveniocfg.
+
+2008-07-09  Tibor Simko <tibor.simko@cern.ch>
+
+	* ChangeLog, INSTALL, NEWS, RELEASE-NOTES, configure.ac: Preparing
+	the forthcoming release.  Completed ChangeLog, bumped version, etc.
 
 2008-07-09  Tibor Simko <tibor.simko@cern.ch>
 
