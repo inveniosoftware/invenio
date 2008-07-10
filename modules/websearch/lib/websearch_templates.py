@@ -2959,12 +2959,12 @@ class Template:
 
     def tmpl_xml_refworks_prologue(self):
         """Creates XML RefWorks prologue."""
-        out = """"""
+        out = """<references>\n"""
         return out
 
     def tmpl_xml_refworks_epilogue(self):
         """Creates XML RefWorks epilogue."""
-        out = """\n"""
+        out = """\n</references>"""
         return out
 
     def tmpl_xml_marc_prologue(self):
