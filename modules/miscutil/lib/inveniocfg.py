@@ -187,6 +187,11 @@ def cli_cmd_update_config_py(conf):
                 line_out = convert_conf_option(option, conf.get(section, option))
                 if line_out:
                     fdesc.write(line_out + "\n")
+    ## FIXME: special treatment for experimental variables
+    ## CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES and CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
+    ## (not offering them in invenio.conf since they will be refactored)
+    fdesc.write("CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE = 0\n")
+    fdesc.write("CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES = [0, 1,]\n")
     ## generate postamble:
     fdesc.write("")
     fdesc.write("# END OF GENERATED FILE")
