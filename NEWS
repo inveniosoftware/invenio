@@ -28,7 +28,7 @@ CDS Invenio v0.99.1 -- released 2008-07-10
  *) added possibility for progressive display of detailed record page
     tabs (WebSearch)
 
- *) added multimedia RSS output tags (WebSearch)
+ *) added support for multi-page RSS output (WebSearch)
 
  *) new search engine summarizer module with the cite summary output
     format (WebSearch, BibRank)
