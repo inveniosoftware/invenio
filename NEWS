@@ -213,7 +213,7 @@ CDS Invenio v0.99.0 -- released 2008-03-27
  *) improved speed of the record output reformatter in case of large
     sets (BibFormat)
 
- *) support for displaying LaTeX forumas via JavaScript (BibFormat)
+ *) support for displaying LaTeX formulas via JavaScript (BibFormat)
 
  *) new and improved output formatter elements (BibFormat)
 
