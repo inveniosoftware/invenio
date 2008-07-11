@@ -35,6 +35,7 @@ from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_BIBEDIT_TIMEOUT, \
     CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.dbquery import run_sql
+from invenio.htmlutils import escape_html
 from invenio.shellutils import run_shell_command
 from invenio.search_engine import print_record, record_exists, get_fieldvalues
 import invenio.template
@@ -50,7 +51,6 @@ re_date = sre.compile('\.(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, format_tag, edit_tag,
                           delete_tag, num_field, add, dict_value=None):
     """Returns the body of main page. """
-
     errors   = []
     warnings = []
     body     = ''
@@ -95,7 +95,7 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
                         if tag != '' and subcode != '' and value != '':
                             #add these in the record, take the instance number
                             tag = tag[:3]
-                            new_field_number = record_add_field(record, tag, ind1, ind2, [(subcode,value)])
+                            new_field_number = record_add_field(record, tag, ind1, ind2, [(subcode, value)])
                             record  = add_subfield(recid, uid, tag, record, new_field_number, subcode, value)
                             if another and another != '':
                                 #if the user pressed 'another' instead of 'done', take to editing
@@ -202,25 +202,80 @@ def perform_request_submit(ln, recid):
 
     return (body, errors, warnings)
 
-def perform_request_history(ln, recid, revid, action, uid, temp, format_tag, args):
+def perform_request_history(ln, recid, revid, revid_cmp, action, uid, format_tag):
     """ Performs historic operations on a record. """
 
     errors   = []
     warnings = []
     body = ''
+    if not recid or record_exists(recid) < 1:
+        body = bibedit_templates.tmpl_record_choice_box(ln, 1)
+        return (body, errors, warnings)
 
-    revision = get_revision(recid, revid)
-    if revision != 0:
-        if action == 'confirm_load':
+    if revid:
+        if action == 'compare' and revid_cmp:
+            revids = get_revisions(recid)
+            revdates = [revid2revdate(revision) for revision in revids]
+            revdate = revid2revdate(revid)
+            revdate_cmp = revid2revdate(revid_cmp)
+            comparison = escape_html(get_comparison(revid, revid_cmp)).replace('\n', '<br />')
+            body = bibedit_templates.tmpl_history_container('header')
+            body += bibedit_templates.tmpl_history_comparebox(ln, revdate, revdate_cmp, comparison)
+            body += bibedit_templates.tmpl_history_forms(ln, recid, revids, revdates, 'compare', revid, revid_cmp)
+            body += bibedit_templates.tmpl_history_container('footer')
+            return (body, errors, warnings)
+        elif action == 'revert':
             body = bibedit_templates.tmpl_confirm(
-                       ln, 2, recid, temp, format_tag, revid, revid2revdate(revid))
-        elif action == 'load':
-            submit_record(recid, revision, uid)
-            body = bibedit_templates.tmpl_confirm(ln, 3, recid)
-        else:
-            body =  '<pre>%s</pre>' % get_text_marc(recid, revision).replace('\n', '<br />')
+                ln, 2, recid, format_tag=format_tag, revid=revid, revdate=revid2revdate(revid))
+            return (body, errors, warnings)
+        elif action == 'confirm_revert':
+            # Does a tmp file already exist?
+            file_path = get_file_path(recid)
+            if os.path.isfile("%s.tmp" % file_path):
+                (uid_record_temp, junk) = get_temp_record("%s.tmp" % file_path)
+                if uid_record_temp != uid:
+                    time_tmp_file = os.path.getmtime("%s.tmp" % file_path)
+                    time_out_file = int(time.time()) - CFG_BIBEDIT_TIMEOUT
+
+                    if time_tmp_file < time_out_file :
+                        os.system("rm %s.tmp" % file_path)
+                    else:
+                        body = bibedit_templates.tmpl_record_choice_box(ln, 2)
+                        return (body, errors, warnings)
+                else:
+                    os.system("rm %s.tmp" % file_path)
+
+            # Is the record locked for editing?
+            if record_locked_p(recid):
+                if CFG_BIBEDIT_LOCKLEVEL == 2:
+                    body = bibedit_templates.tmpl_record_choice_box(ln, 4)
+                else:
+                    body = bibedit_templates.tmpl_record_choice_box(ln, 5)
+                return (body, errors, warnings)
+
+            else:
+                revision = get_revision(recid, revid)
+                submit_record(recid, revision, uid)
+                body = bibedit_templates.tmpl_confirm(ln, 3, recid)
+
+            return (body, errors, warnings)
+
+    revids = get_revisions(recid)
+    revdates = [revid2revdate(revision) for revision in revids]
+    current_revision = revids[0]
+    if not revid:
+        revid = current_revision
+        current = True
     else:
-        warnings.append('No revision named %s for record #%s' % (revid, recid))
+        current = revid == current_revision
+    revdate = revid2revdate(revid)
+    revision = create_record(get_revision(recid, revid))[0]
+    body = bibedit_templates.tmpl_history_container('header')
+    body += bibedit_templates.tmpl_history_viewbox(ln, 'header', current, recid, revid, revdate)
+    body += bibedit_templates.tmpl_history_revision(ln, recid, revision)
+    body += bibedit_templates.tmpl_history_viewbox(ln, 'footer', current, recid, revid, revdate)
+    body += bibedit_templates.tmpl_history_forms(ln, recid, revids, revdates, 'view', revid)
+    body += bibedit_templates.tmpl_history_container('footer')
     return (body, errors, warnings)
 
 def get_file_path(recid):
@@ -553,20 +608,10 @@ def record_in_files_p(recid, filenames):
             continue
     return False
 
-def get_revision(recid, revid):
-    """ Return previous revision of record. """
-    if revid and len(revid.split('.')) == 2:
-        cmd = "%s/bibedit --list-revisions %s" % (CFG_BINDIR, recid)
-        revids = run_shell_command(cmd)[1]
-        if revid in revids.split('\n'):
-            cmd = "%s/bibedit --get-revision %s" % (CFG_BINDIR, revid)
-            return run_shell_command(cmd)[1]
-    return 0
-
-def revid2revdate(revid):
-    """ Return date of revision in userfriendly format. """
-    date = re_date.search(revid)
-    return convert_datetext_to_dategui('%s-%s-%s %s:%s:%s' % date.groups())
+def get_comparison(recid_1, recid_2):
+    """ Return comparison between two revisions. """
+    cmd = '%s/bibedit --diff-revisions %s %s' % (CFG_BINDIR, recid_1, recid_2)
+    return run_shell_command(cmd)[1]
 
 def get_text_marc(recid, xml_record):
     """ Return record in text MARC format. """
@@ -578,6 +623,26 @@ def get_text_marc(recid, xml_record):
     textmarc = run_shell_command(cmd)[1]
     run_shell_command('rm ' + tmpfilepath)
     return textmarc
+
+def get_revision(recid, revid):
+    """ Return previous revision of record. """
+    if revid and len(revid.split('.')) == 2:
+        cmd = "%s/bibedit --list-revisions %s" % (CFG_BINDIR, recid)
+        revids = run_shell_command(cmd)[1]
+        if revid in revids.split('\n'):
+            cmd = "%s/bibedit --get-revision %s" % (CFG_BINDIR, revid)
+            return run_shell_command(cmd)[1]
+    return 0
+
+def get_revisions(recid):
+    """ Return list of revisions. """
+    cmd = '%s/bibedit --list-revisions %s' % (CFG_BINDIR, recid)
+    return run_shell_command(cmd)[1].split('\n')[:-1]
+
+def revid2revdate(revid):
+    """ Return date of revision in userfriendly format. """
+    date = re_date.search(revid)
+    return convert_datetext_to_dategui('%s-%s-%s %s:%s:%s' % date.groups())
 
 def submit_record(recid, xml_record, uid=0):
     """
@@ -592,8 +657,3 @@ def submit_record(recid, xml_record, uid=0):
     record = create_record(xml_record)[0]
     save_temp_record(record, uid, "%s.tmp" % file_path)
     save_xml_record(recid)
-
-def get_revisions(recid):
-    """ Return list of revisions. """
-    cmd = '%s/bibedit --list-revisions %s' % (CFG_BINDIR, recid)
-    return run_shell_command(cmd)[1].split('\n')[:-1]

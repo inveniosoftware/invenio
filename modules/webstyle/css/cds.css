@@ -1391,6 +1391,21 @@ input.hyperlinkformSubmitButton {
    padding: 2px 5px 2px 5px;
    font-weight: bold;
 }
+.bibEditHistView{
+   float: left;
+   margin: 0px 10px 5px 0px;
+   width: 70%;
+}
+.bibEditHistCompare{
+   float: left;
+   margin: 0px 10px 5px 0px;
+   font-size: small;
+   width: 70%;
+}
+.bibEditHistForms{
+   margin: 5px 0px 5px 10px;
+}
+
 /* end of BibEdit module*/
 /* WebAlert module */
 .alrtTable{
