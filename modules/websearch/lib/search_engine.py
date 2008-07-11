@@ -371,9 +371,10 @@ def get_alphabetically_ordered_collection_list(level=0, ln=CFG_SITE_LANG):
     for c_id, c_name in res:
         # make a nice printable name (e.g. truncate c_printable for
         # long collection names in given language):
-        c_printable = get_coll_i18nname(c_name, ln)
-        if len(c_printable)>30:
-            c_printable = c_printable[:30] + "..."
+        c_printable_fullname = get_coll_i18nname(c_name, ln)
+        c_printable = wash_index_term(c_printable_fullname, 30, False)
+        if c_printable != c_printable_fullname:
+            c_printable = c_printable + "..."
         if level:
             c_printable = " " + level * '-' + " " + c_printable
         out.append([c_name, c_printable])
@@ -390,9 +391,10 @@ def get_nicely_ordered_collection_list(collid=1, level=0, ln=CFG_SITE_LANG):
     for c, cid in res:
         # make a nice printable name (e.g. truncate c_printable for
         # long collection names in given language):
-        c_printable = get_coll_i18nname(c, ln)
-        if len(c_printable)>30:
-            c_printable = c_printable[:30] + "..."
+        c_printable_fullname = get_coll_i18nname(c, ln)
+        c_printable = wash_index_term(c_printable_fullname, 30, False)
+        if c_printable != c_printable_fullname:
+            c_printable = c_printable + "..."
         if level:
             c_printable = " " + level * '-' + " " + c_printable
         colls_nicely_ordered.append([c, c_printable])
@@ -1137,12 +1139,12 @@ def strip_accents(x):
     # return UTF-8 representation of the Unicode string:
     return y.encode("utf-8")
 
-def wash_index_term(term, max_char_length=50):
+def wash_index_term(term, max_char_length=50, lower_term=True):
     """
     Return washed form of the index term TERM that would be suitable
-    for storing into idxWORD* tables.  I.e., lower the TERM, and
-    truncate it safely to MAX_CHAR_LENGTH UTF-8 characters (meaning,
-    in principle, 4*MAX_CHAR_LENGTH bytes).
+    for storing into idxWORD* tables.  I.e., lower the TERM if
+    LOWER_TERM is True, and truncate it safely to MAX_CHAR_LENGTH
+    UTF-8 characters (meaning, in principle, 4*MAX_CHAR_LENGTH bytes).
 
     The function works by an internal conversion of TERM, when needed,
     from its input Python UTF-8 binary string format into Python
@@ -1154,7 +1156,10 @@ def wash_index_term(term, max_char_length=50):
     Note that MAX_CHAR_LENGTH corresponds to the length of the term
     column in idxINDEX* tables.
     """
-    washed_term = unicode(term, 'utf-8').lower()
+    if lower_term:
+        washed_term = unicode(term, 'utf-8').lower()
+    else:
+        washed_term = unicode(term, 'utf-8')
     if len(washed_term) <= max_char_length:
         # no need to truncate the term, because it will fit
         # nicely even if it uses four-byte UTF-8 characters
