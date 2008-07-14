@@ -536,6 +536,31 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
 
     index = __call__
 
+class WebInterfaceLegacySearchPages(WebInterfaceDirectory):
+    """ Handling of the /search.py URL and its sub-pages. """
+
+    _exports = ['', ('authenticate', 'index')]
+
+    def __call__(self, req, form):
+        """ Perform a search. """
+
+        argd = wash_search_urlargd(form)
+
+        # We either jump into the generic search form, or the specific
+        # /record/... display if a recid is requested
+        if argd['recid'] != -1:
+            target = '/record/%d' % argd['recid']
+            del argd['recid']
+
+        else:
+            target = '/search'
+
+        target += make_canonical_urlargd(argd, search_results_default_urlargd)
+        return redirect_to_url(req, target, apache.HTTP_MOVED_PERMANENTLY)
+
+    index = __call__
+
+
 # Parameters for the legacy URLs, of the form /?c=ALEPH
 legacy_collection_default_urlargd = {
     'as': (int, CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE),
@@ -553,6 +578,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
                 'logout_SSO_hook']
 
     search = WebInterfaceSearchResultsPages()
+    legacy_search = WebInterfaceLegacySearchPages()
 
     def testsso(self, req, form):
         """ For testing single sign-on """
@@ -696,25 +722,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             target = '/collection/' + quote(c)
 
         target += make_canonical_urlargd(argd, legacy_collection_default_urlargd)
-        return redirect_to_url(req, target)
-
-
-    def legacy_search(self, req, form):
-        """Search URL backward compatibility handling."""
-        argd = wash_search_urlargd(form)
-
-        # We either jump into the generic search form, or the specific
-        # /record/... display if a recid is requested
-        if argd['recid'] != -1:
-            target = '/record/%d' % argd['recid']
-            del argd['recid']
-
-        else:
-            target = '/search'
-
-        target += make_canonical_urlargd(argd, search_results_default_urlargd)
-        return redirect_to_url(req, target)
-
+        return redirect_to_url(req, target, apache.HTTP_MOVED_PERMANENTLY)
 
 def display_collection(req, c, as, verbose, ln):
     """Display search interface page for collection c by looking
