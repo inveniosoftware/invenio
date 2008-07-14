@@ -544,7 +544,7 @@ def _task_run(task_run_fnc):
     ## initialize signal handler:
     _task_params['signal_request'] = None
     signal.signal(signal.SIGUSR1, _task_sig_sleep)
-    signal.signal(signal.SIGUSR2, _task_sig_ping)
+    signal.signal(signal.SIGUSR2, signal.SIG_IGN)
     signal.signal(signal.SIGTSTP, _task_sig_ctrlz)
     signal.signal(signal.SIGTERM, _task_sig_stop)
     signal.signal(signal.SIGQUIT, _task_sig_stop)
@@ -666,11 +666,6 @@ def _task_sig_stop(sig, frame):
     _db_login(1) # To avoid concurrency with an interrupted run_sql call
     task_update_status("STOPPING")
     _task_params['signal_request'] = 'stop'
-
-def _task_sig_ping(sig, frame):
-    """Signal handler for the 'ping' signal sent by BibSched."""
-    write_message("task_sig_ping(), got signal %s frame %s"
-            % (sig, frame), verbose=9)
 
 def _task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
