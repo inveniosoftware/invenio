@@ -847,6 +847,9 @@ class BibSched:
 
             nothing_was_scheduled = self.scheduled is None
             res = self.bibupload_in_the_queue(task_id, runtime)
+            if _refresh_tasks:
+                ## Some tasks have finished. Better refresh things...
+                return True
             if res:
                 ## All bibupload must finish before.
                 for (atask_id, astatus) in res:
