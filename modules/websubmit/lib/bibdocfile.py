@@ -723,6 +723,14 @@ class BibDoc:
             out += str(self.get_icon())
         return out
 
+    def format_already_exists_p(self, format):
+        """Return True if the given format already exists among the latest files."""
+        format = normalize_format(format)
+        for afile in self.list_latest_files():
+            if format == afile.get_format():
+                return True
+        return False
+
     def get_status(self):
         """Retrieve the status."""
         return self.status
@@ -1762,11 +1770,11 @@ def download_url(url, format, sleep=2):
                         return tmppath
                 raise StandardError, "%s is not in one of the allowed paths." % path
             else:
-                #urllib.urlretrieve(url, tmppath)
-                cmd_exit_code, cmd_out, cmd_err = run_shell_command(CFG_PATH_WGET + ' %s -O %s -t 2 -T 40' % \
-                                                                    (escape_shell_arg(url), escape_shell_arg(tmppath)))
-                if cmd_exit_code:
-                    raise StandardError, "It's impossible to download %s: %s" % (url, cmd_err)
+                urllib.urlretrieve(url, tmppath)
+                #cmd_exit_code, cmd_out, cmd_err = run_shell_command(CFG_PATH_WGET + ' %s -O %s -t 2 -T 40' % \
+                                                                    #(escape_shell_arg(url), escape_shell_arg(tmppath)))
+                #if cmd_exit_code:
+                    #raise StandardError, "It's impossible to download %s: %s" % (url, cmd_err)
                 return tmppath
         except:
             os.remove(tmppath)
