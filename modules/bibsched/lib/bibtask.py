@@ -593,6 +593,12 @@ def _task_run(task_run_fnc):
             write_message("Task #%d finished. [%s]" % (_task_params['task_id'], task_status))
         ## Removing the pid
         os.remove(pidfile_name)
+        try:
+            # Let's signal bibsched that we have finished.
+            from invenio.bibsched import pidfile
+            os.kill(int(open(pidfile).read()), signal.SIGUSR2)
+        except:
+            pass
     return True
 
 def _usage(exitcode=1, msg="", help_specific_usage="", description=""):

@@ -753,10 +753,18 @@ class Manager:
                 char = -1
             self.handle_keys(char)
 
+_refresh_tasks = True
+def _bibsched_sig_info(sig, frame):
+    """Signal handler for the 'USR2' signal sent by a finished task."""
+    global _refresh_tasks
+    _refresh_tasks = True
+    write_message('A task has terminated. Refreshing the task list.')
+
 class BibSched:
     def __init__(self):
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.scheduled = None
+        signal.signal(signal.SIGUSR2, _bibsched_sig_info)
 
     def tasks_safe_p(self, proc1, proc2):
         """Return True when the two tasks can run concurrently."""
@@ -913,6 +921,7 @@ class BibSched:
                 return True
 
     def watch_loop(self):
+        global _refresh_tasks
         def get_rows():
             """Return all the rows to work on."""
             return run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%%DELETED%%' AND (runtime<=NOW() OR status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='SCHEDULED') ORDER BY priority DESC, runtime ASC, id ASC")
@@ -944,11 +953,12 @@ class BibSched:
         try:
             while True:
                 rows = get_rows()
+                _refresh_tasks = False
                 task_status = get_task_status(rows)
                 if task_status['ERROR'] or task_status['DONE WITH ERRORS']:
                     raise StandardError('BibSched had to halt because at least a task is in status ERROR (%s) or DONE WITH ERRORS (%s)' % (task_status['ERROR'], task_status['DONE WITH ERRORS']))
                 for row in rows:
-                    if self.handle_row(task_status, *row):
+                    if _refresh_tasks or self.handle_row(task_status, *row):
                         # Things have changed let's restart
                         break
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
