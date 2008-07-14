@@ -126,8 +126,8 @@ def task_low_level_submission(name, user, *argv):
 
         ## submit task:
         task_id = run_sql("""INSERT INTO schTASK (proc,user,
-            runtime,sleeptime,status,arguments, priority)
-            VALUES (%s,%s,NOW(),'','WAITING',%s,%s)""",
+            runtime,sleeptime,status,progress,arguments,priority)
+            VALUES (%s,%s,NOW(),'','WAITING','',%s,%s)""",
             (name, user, marshal.dumps(argv), priority))
 
     except Exception:
@@ -488,8 +488,8 @@ def _task_submit(argv, authorization_action, authorization_msg):
         task_name = _task_params['task_name']
     write_message("storing task options %s\n" % argv, verbose=9)
     _task_params['task_id'] = run_sql("""INSERT INTO schTASK (proc,user,
-                                           runtime,sleeptime,status,arguments,priority)
-                                         VALUES (%s,%s,%s,%s,'WAITING',%s, %s)""",
+                                           runtime,sleeptime,status,progress,arguments,priority)
+                                         VALUES (%s,%s,%s,%s,'WAITING','',%s, %s)""",
         (task_name, _task_params['user'], _task_params["runtime"],
          _task_params["sleeptime"], marshal.dumps(argv), _task_params['priority']))
 
