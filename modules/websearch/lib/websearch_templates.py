@@ -1611,7 +1611,7 @@ class Template:
         out += "</table>"
         return intro + "<blockquote>" + out + "</blockquote>"
 
-    def tmpl_browse_pattern(self, f, fn, ln, browsed_phrases_in_colls, colls):
+    def tmpl_browse_pattern(self, f, fn, ln, browsed_phrases_in_colls, colls, rg):
         """
           Displays the *Nearest search terms* box
 
@@ -1626,6 +1626,8 @@ class Template:
           - 'browsed_phrases_in_colls' *array* - the phrases to display
 
           - 'colls' *array* - the list of collection parameters of the search (c's)
+
+          - 'rg' *int* - the number of records
         """
 
         # load the right message language
@@ -1657,7 +1659,8 @@ class Template:
             query = {'c': colls,
                      'ln': ln,
                      'p': phrase,
-                     'f': f}
+                     'f': f,
+                     'rg' : rg}
 
             out += """<tr>
                        <td class="searchresultsboxbody" style="text-align: right;">
@@ -1679,7 +1682,8 @@ class Template:
                 query = {'c': colls,
                          'ln': ln,
                          'p': phrase,
-                         'f': f}
+                         'f': f,
+                         'rg' : rg}
 
                 out += """<tr>
                            <td class="searchresultsboxbody" style="text-align: right;">
@@ -1701,7 +1705,8 @@ class Template:
             query = {'c': colls,
                      'ln': ln,
                      'p': phrase,
-                     'f': f}
+                     'f': f,
+                     'rg' : rg}
 
             out += """<tr><td colspan="2" class="normal">
                             &nbsp;

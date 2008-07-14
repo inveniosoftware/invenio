@@ -1578,6 +1578,7 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
             ln=ln,
             browsed_phrases_in_colls=browsed_phrases_in_colls,
             colls=colls,
+            rg=rg,
           )
     req.write(out)
     return
