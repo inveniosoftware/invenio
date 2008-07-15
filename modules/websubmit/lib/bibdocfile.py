@@ -795,17 +795,25 @@ class BibDoc:
             self._build_file_list()
 
     def expunge(self):
-        """Phisically remove all the traces of a given bibdoc"""
-        for afile in self.docfiles:
-            try:
-                self.more_info.unset_comment(afile.get_format(), afile.get_version())
-                self.more_info.unset_description(afile.get_format(), afile.get_version())
-                os.remove(afile.get_full_path())
-            except Exception, e:
-                register_exception()
-        Md5Folder(self.basedir).update()
-        self.touch()
-        self._build_file_list()
+        """Phisically remove all the traces of a given bibdoc
+        note that you should not use any more this object or unpredictable
+        things will happen."""
+        del self.md5s
+        del self.more_info
+        os.system('rm -rf %s' % escape_shell_arg(self.basedir))
+        run_sql('DELETE FROM bibrec_bibdoc WHERE id_bibdoc=%s', (self.id, ))
+        run_sql('DELETE FROM bibdoc_bibdoc WHERE id_bibdoc1=%s OR id_bibdoc2=%s', (self.id, self.id))
+        run_sql('DELETE FROM bibdoc WHERE id=%s', (self.id, ))
+        run_sql('INSERT DELAYED INTO hstDOCUMENT(action, id_bibdoc, docname, doctimestamp) VALUES("EXPUNGE", %s, %s, NOW())', (self.id, self.docname))
+
+        del self.docfiles
+        del self.id
+        del self.cd
+        del self.md
+        del self.basedir
+        del self.recid
+        del self.doctype
+        del self.docname
 
     def revert(self, version):
         """Revert to a given version by copying its differnt formats to a new
