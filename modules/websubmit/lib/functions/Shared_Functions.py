@@ -26,42 +26,53 @@ from invenio.config import \
      CFG_PATH_DISTILLER, \
      CFG_PATH_GUNZIP, \
      CFG_PATH_GZIP
+from invenio.bibdocfile import decompose_file
 import re
 import os
 
-def createRelatedFormats(fullpath):
+def createRelatedFormats(fullpath, overwrite=True):
     """Given a fullpath, this function extracts the file's extension and
     finds in which additional format the file can be converted and converts it.
     @param fullpath: (string) complete path to file
+    @param overwrite: (bool) overwrite already existing formats
     Return a list of the paths to the converted files
     """
     createdpaths = []
-    basedir = os.path.dirname(fullpath)
-    filename = os.path.basename(fullpath)
-    filename, extension = os.path.splitext(filename)
+    basedir, filename, extension = decompose_file(fullpath)
     extension = extension.lower()
     if extension == ".pdf":
-        # Create PostScript
-        os.system("%s -toPostScript %s" % (CFG_PATH_ACROREAD, fullpath))
-        if os.path.exists("%s/%s.ps" % (basedir, filename)):
-            os.system("%s %s/%s.ps" % (CFG_PATH_GZIP, basedir, filename))
-            createdpaths.append("%s/%s.ps.gz" % (basedir, filename))
+        if overwrite == True or \
+               not os.path.exists("%s/%s.ps" % (basedir, filename)):
+            # Create PostScript
+            os.system("%s -toPostScript %s" % (CFG_PATH_ACROREAD, fullpath))
+        if overwrite == True or \
+               not os.path.exists("%s/%s.ps.gz" % (basedir, filename)):
+            if os.path.exists("%s/%s.ps" % (basedir, filename)):
+                os.system("%s %s/%s.ps" % (CFG_PATH_GZIP, basedir, filename))
+                createdpaths.append("%s/%s.ps.gz" % (basedir, filename))
     if extension == ".ps":
-        # Create PDF
-        os.system("%s %s %s/%s.pdf" % (CFG_PATH_DISTILLER, fullpath, \
-                                       basedir, filename))
-        if os.path.exists("%s/%s.pdf" % (basedir, filename)):
-            createdpaths.append("%s/%s.pdf" % (basedir, filename))
+        if overwrite == True or \
+               not os.path.exists("%s/%s.pdf" % (basedir, filename)):
+            # Create PDF
+            os.system("%s %s %s/%s.pdf" % (CFG_PATH_DISTILLER, fullpath, \
+                                           basedir, filename))
+            if os.path.exists("%s/%s.pdf" % (basedir, filename)):
+                createdpaths.append("%s/%s.pdf" % (basedir, filename))
     if extension == ".ps.gz":
-        #gunzip file
-        os.system("%s %s" % (CFG_PATH_GUNZIP, fullpath))
-        # Create PDF
-        os.system("%s %s/%s.ps %s/%s.pdf" % (CFG_PATH_DISTILLER, basedir, \
-                                             filename, basedir, filename))
-        if os.path.exists("%s/%s.pdf" % (basedir, filename)):
-            createdpaths.append("%s/%s.pdf" % (basedir, filename))
+        if overwrite == True or \
+               not os.path.exists("%s/%s.ps" % (basedir, filename)):
+            #gunzip file
+            os.system("%s %s" % (CFG_PATH_GUNZIP, fullpath))
+        if overwrite == True or \
+               not os.path.exists("%s/%s.pdf" % (basedir, filename)):
+            # Create PDF
+            os.system("%s %s/%s.ps %s/%s.pdf" % (CFG_PATH_DISTILLER, basedir, \
+                                                 filename, basedir, filename))
+            if os.path.exists("%s/%s.pdf" % (basedir, filename)):
+                createdpaths.append("%s/%s.pdf" % (basedir, filename))
         #gzip file
-        os.system("%s %s/%s.ps" % (CFG_PATH_GZIP, basedir, filename))
+        if not os.path.exists("%s/%s.ps.gz" % (basedir, filename)):
+            os.system("%s %s/%s.ps" % (CFG_PATH_GZIP, basedir, filename))
     return createdpaths
 
 def createIcon(fullpath, iconsize):
