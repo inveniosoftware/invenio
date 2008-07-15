@@ -216,7 +216,7 @@ def cli_cmd_update_dbquery_py(conf):
     ## replace db parameters:
     out = ''
     for line in open(dbquerypyfile, 'r').readlines():
-        match = re.search(r'^CFG_DATABASE_(HOST|NAME|USER|PASS)(\s*=\s*)\'.*\'$', line)
+        match = re.search(r'^CFG_DATABASE_(HOST|PORT|NAME|USER|PASS)(\s*=\s*)\'.*\'$', line)
         if match:
             dbparam = 'CFG_DATABASE_' + match.group(1)
             out += "%s%s'%s'\n" % (dbparam, match.group(2),
@@ -245,7 +245,7 @@ def cli_cmd_update_dbexec(conf):
     ## replace db parameters via sed:
     out = ''
     for line in open(dbexecfile, 'r').readlines():
-        match = re.search(r'^CFG_DATABASE_(HOST|NAME|USER|PASS)(\s*=\s*)\'.*\'$', line)
+        match = re.search(r'^CFG_DATABASE_(HOST|PORT|NAME|USER|PASS)(\s*=\s*)\'.*\'$', line)
         if match:
             dbparam = 'CFG_DATABASE_' + match.group(1)
             out += "%s%s'%s'\n" % (dbparam, match.group(2),
@@ -435,8 +435,8 @@ def test_db_connection():
     try:
         run_sql("SHOW TABLES")
     except Error, err:
-        from invenio.dbquery import CFG_DATABASE_HOST, CFG_DATABASE_NAME, \
-             CFG_DATABASE_USER, CFG_DATABASE_PASS
+        from invenio.dbquery import CFG_DATABASE_HOST, CFG_DATABASE_PORT, \
+             CFG_DATABASE_NAME, CFG_DATABASE_USER, CFG_DATABASE_PASS
         print wrap_text_in_a_box("""\
 DATABASE CONNECTIVITY ERROR %(errno)d: %(errmsg)s.\n
 
@@ -445,7 +445,7 @@ If yes, then please login as MySQL admin user and run the
 following commands now:
 
 
-$ mysql -h %(dbhost)s -u root -p mysql
+$ mysql -h %(dbhost)s -P %(dbport)s -u root -p mysql
 
 mysql> CREATE DATABASE %(dbname)s DEFAULT CHARACTER SET utf8;
 
@@ -467,6 +467,7 @@ the above error message and fix the problem before continuing.""" % \
                                   'errmsg': err.args[1],
                                   'dbname': CFG_DATABASE_NAME,
                                   'dbhost': CFG_DATABASE_HOST,
+                                  'dbport': CFG_DATABASE_PORT,
                                   'dbuser': CFG_DATABASE_USER,
                                   'dbpass': CFG_DATABASE_PASS,
                                   'webhost': CFG_DATABASE_HOST == 'localhost' and 'localhost' or os.popen('hostname -f', 'r').read().strip(),

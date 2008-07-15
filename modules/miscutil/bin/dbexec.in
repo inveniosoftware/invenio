@@ -14,7 +14,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,6 +27,7 @@ MYSQL='@MYSQL@'
 ## by admins and then replaced in situ in this file by calling
 ## "inveniocfg --update-dbexec".
 CFG_DATABASE_HOST='localhost'
+CFG_DATABASE_PORT='3306'
 CFG_DATABASE_NAME='cdsinvenio'
 CFG_DATABASE_USER='cdsinvenio'
 CFG_DATABASE_PASS='my123p$ss'
@@ -38,13 +39,13 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo " -h, --help            Print this help."
     echo " -V, --version         Print version information."
     exit 0
-fi 
+fi
 
 # is version called?
 if [ "$1" = "-V" ] || [ "$1" = "--version" ]; then
     echo $VERSION
     exit 0
-fi 
- 
+fi
+
 ## okay, call MySQL client:
-$MYSQL -B --default-character-set="utf8" --host="$CFG_DATABASE_HOST" --user="$CFG_DATABASE_USER" --password="$CFG_DATABASE_PASS" $CFG_DATABASE_NAME
+$MYSQL -B --default-character-set="utf8" --host="$CFG_DATABASE_HOST" --port="$CFG_DATABASE_PORT" --user="$CFG_DATABASE_USER" --password="$CFG_DATABASE_PASS" $CFG_DATABASE_NAME

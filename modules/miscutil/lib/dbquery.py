@@ -76,6 +76,7 @@ else:
 ## prevent them from being exported accidentally elsewhere, as no-one
 ## should know DB credentials but this file.
 CFG_DATABASE_HOST = 'localhost'
+CFG_DATABASE_PORT = '3306'
 CFG_DATABASE_NAME = 'cdsinvenio'
 CFG_DATABASE_USER = 'cdsinvenio'
 CFG_DATABASE_PASS = 'my123p$ss'
@@ -97,13 +98,15 @@ def _db_login(relogin = 0):
     ## upgrade to more recent versions anyway.
 
     if CFG_MISCUTIL_SQL_USE_SQLALCHEMY:
-        return connect(host=CFG_DATABASE_HOST, db=CFG_DATABASE_NAME,
-                       user=CFG_DATABASE_USER, passwd=CFG_DATABASE_PASS,
+        return connect(host=CFG_DATABASE_HOST, port=int(CFG_DATABASE_PORT),
+                       db=CFG_DATABASE_NAME, user=CFG_DATABASE_USER,
+                       passwd=CFG_DATABASE_PASS,
                        use_unicode=False, charset='utf8')
     else:
         thread_ident = get_ident()
     if relogin:
         _DB_CONN[thread_ident] = connect(host=CFG_DATABASE_HOST,
+                                         port=int(CFG_DATABASE_PORT),
                                          db=CFG_DATABASE_NAME,
                                          user=CFG_DATABASE_USER,
                                          passwd=CFG_DATABASE_PASS,
@@ -114,6 +117,7 @@ def _db_login(relogin = 0):
             return _DB_CONN[thread_ident]
         else:
             _DB_CONN[thread_ident] = connect(host=CFG_DATABASE_HOST,
+                                             port=int(CFG_DATABASE_PORT),
                                              db=CFG_DATABASE_NAME,
                                              user=CFG_DATABASE_USER,
                                              passwd=CFG_DATABASE_PASS,
