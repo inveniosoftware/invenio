@@ -24,6 +24,7 @@ import sys, webstat
 
 from invenio.bibtask import task_init, task_get_option, task_set_option, \
                             task_has_option, task_update_progress, write_message
+from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
 
 def main():
     """Main dealing with all the BibTask magic."""
@@ -39,13 +40,16 @@ def main():
                                   "                                  -c KEYEVENTS\n"
                                   "                                  -c CUSTOMEVENTS\n"
                                   "                                  -c 'event id1',id2,'testevent'\n"
+                                  "  -d,--dump-config              dump default config file\n"
+                                  "  -e,--load-config              create the custom events described in config_file\n"
                                   "\nWhen creating events (-n) the following parameters are also applicable:\n"
                                   "  -l, --event-label=NAME  set a descriptive label to the custom event\n"
                                   "  -a, --args=[NAME]       set column headers for additional custom event arguments\n"
                                   "                          (e.g. -a country,person,car)\n",
               version=__revision__,
-              specific_params=("n:r:Sl:a:c:", ["new-event=", "remove-event=", "show-events",
-                                               "event-label", "args", "cache-events="]),
+              specific_params=("n:r:Sl:a:c:de", ["new-event=", "remove-event=", "show-events",
+                                                  "event-label", "args", "cache-events=", "dump-config",
+                                                  "load-config" ]),
               task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
               task_submit_check_options_fnc=task_submit_check_options,
               task_run_fnc=task_run_core)
@@ -73,6 +77,12 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
 
     elif key in ("-c", "--cache-events"):
         task_set_option("cache_events", value.split(','))
+
+    elif key in ("-d", "--dump-config"):
+        task_set_option("dump_config", True)
+
+    elif key in ("-e", "--load-config"):
+        task_set_option("load_config", True)
 
     else:
         return False
@@ -134,6 +144,63 @@ def task_submit_check_options():
 
         return True
 
+    elif task_has_option("dump_config"):
+        print """\
+[general]
+visitors_box = True
+search_box = True
+record_box = True
+bibsched_box = True
+basket_box = True
+apache_box = True
+uptime_box = True
+
+[webstat_custom_event_1]
+name = baskets
+param1 = action
+param2 = basket
+param3 = user
+
+[apache_log_analyzer]
+profile = nil
+nb-histogram-items-to-print = 20
+exclude-ip-list = ("137.138.249.162")
+home-collection = "Atlantis Institute of Fictive Science"
+search-interface-url = "/?"
+detailed-record-url = "/record/"
+search-engine-url = "/search?"
+search-engine-url-old-style = "/search.py?"
+basket-url = "/yourbaskets/"
+add-to-basket-url = "/yourbaskets/add"
+display-basket-url = "/yourbaskets/display"
+display-public-basket-url = "/yourbaskets/display_public"
+alert-url = "/youralerts/"
+display-your-alerts-url = "/youralerts/list"
+display-your-searches-url = "/youralerts/display"
+"""
+        sys.exit(0)
+
+    elif task_has_option("load_config"):
+        from ConfigParser import ConfigParser
+        conf = ConfigParser()
+        conf.read(CFG_WEBSTAT_CONFIG_PATH)
+        for section in conf.sections():
+            if section[:21] == "webstat_custom_event_":
+                cols = []
+                name = ""
+                for option, value in conf.items(section):
+                    if option == "name":
+                        name = value
+                    if option[:5] == "param":
+                        # add the column name in it's position
+                        index = int(option[-1]) - 1
+                        while len(cols) <= index:
+                            cols.append("")
+                        cols[index] = value
+                if name:
+                    webstat.create_customevent(name, name, cols)
+        sys.exit(0)
+
     else:
         # False means that the --help should be displayed
         return False
@@ -148,7 +215,7 @@ def task_run_core():
 
     # Cache key events
     keyevents = task_get_option("keyevents")
-    if len(keyevents) > 0:
+    if keyevents and len(keyevents) > 0:
         for i in range(len(keyevents)):
             write_message("Caching key event 1: %s" % keyevents[i])
             webstat.cache_keyevent_trend(keyevents)

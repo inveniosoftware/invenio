@@ -28,6 +28,7 @@ from invenio.config import \
      CFG_WEBDIR, \
      CFG_TMPDIR, \
      CFG_SITE_LANG
+from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
 from invenio.search_engine import get_alphabetically_ordered_collection_list
 from invenio.dbquery import run_sql, escape_string
 from invenio.bibsched import is_task_scheduled, get_task_ids_by_descending_date, get_task_options
@@ -326,6 +327,32 @@ def cache_customevent_trend(ids=[]):
 
     return True
 
+def basket_display():
+    """
+    Display basket statistics.
+    """
+    tbl_name = get_customevent_table("baskets")
+
+    try:
+        res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time" % tbl_name)
+        days = (res[-1][0] - res[0][0]).days + 1
+        public = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'display_public'" % tbl_name)[0][0]
+        users = run_sql("SELECT COUNT(DISTINCT user) FROM %s" % tbl_name)[0][0]
+        adds = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'add'" % tbl_name)[0][0]
+        displays = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'display' OR action = 'display_public'" % tbl_name)[0][0]
+        hits = adds + displays
+        average = hits / days
+
+        res = [("Basket page hits", hits)]
+        res.append(("   Average per day", average))
+        res.append(("   Unique users", users))
+        res.append(("   Additions", adds))
+        res.append(("   Public", public))
+    except IndexError:
+        res = []
+
+    return res
+
 # WEB
 
 def perform_request_index(ln=CFG_SITE_LANG):
@@ -333,6 +360,9 @@ def perform_request_index(ln=CFG_SITE_LANG):
     Displays some informative text, the health box, and a the list of
     key/custom events.
     """
+    from ConfigParser import ConfigParser
+    conf = ConfigParser()
+    conf.read(CFG_WEBSTAT_CONFIG_PATH)
     out = TEMPLATES.tmpl_welcome(ln=ln)
 
     # Prepare the health base data
@@ -343,42 +373,53 @@ def perform_request_index(ln=CFG_SITE_LANG):
     tomorrow = (now+datetime.timedelta(days=1)).strftime("%Y-%m-%d")
 
     # Append session information to the health box
-    sess = get_keyevent_snapshot_sessions()
-    health_indicators.append(("Total active visitors", sum(sess)))
-    health_indicators.append(("    Logged in", sess[1]))
-    health_indicators.append(None)
+    if conf.get("general", "visitors_box") == "True":
+        sess = get_keyevent_snapshot_sessions()
+        health_indicators.append(("Total active visitors", sum(sess)))
+        health_indicators.append(("    Logged in", sess[1]))
+        health_indicators.append(None)
 
     # Append searches information to the health box
-    args = { 't_start': today, 't_end': tomorrow, 'granularity': "day", 't_format': "%Y-%m-%d" }
-    searches = get_keyevent_trend_search_type_distribution(args)
-    health_indicators.append(("Searches since midnight", sum(searches[0][1])))
-    health_indicators.append(("    Simple", searches[0][1][0]))
-    health_indicators.append(("    Advanced", searches[0][1][1]))
-    health_indicators.append(None)
+    if conf.get("general", "search_box") == "True":
+        args = { 't_start': today, 't_end': tomorrow, 'granularity': "day", 't_format': "%Y-%m-%d" }
+        searches = get_keyevent_trend_search_type_distribution(args)
+        health_indicators.append(("Searches since midnight", sum(searches[0][1])))
+        health_indicators.append(("    Simple", searches[0][1][0]))
+        health_indicators.append(("    Advanced", searches[0][1][1]))
+        health_indicators.append(None)
 
     # Append new records information to the health box
-    args = { 'collection': CFG_SITE_NAME, 't_start': today, 't_end': tomorrow, 'granularity': "day", 't_format': "%Y-%m-%d" }
-    try: tot_records = get_keyevent_trend_collection_population(args)[0][1]
-    except IndexError: tot_records = 0
-    args = { 'collection': CFG_SITE_NAME, 't_start': yesterday, 't_end': today, 'granularity': "day", 't_format': "%Y-%m-%d" }
-    try: new_records = tot_records - get_keyevent_trend_collection_population(args)[0][1]
-    except IndexError: new_records = 0
-    health_indicators.append(("Total records", tot_records))
-    health_indicators.append(("    New records since midnight", new_records))
-    health_indicators.append(None)
+    if conf.get("general", "record_box") == "True":
+        args = { 'collection': CFG_SITE_NAME, 't_start': today, 't_end': tomorrow, 'granularity': "day", 't_format': "%Y-%m-%d" }
+        try: tot_records = get_keyevent_trend_collection_population(args)[0][1]
+        except IndexError: tot_records = 0
+        args = { 'collection': CFG_SITE_NAME, 't_start': yesterday, 't_end': today, 'granularity': "day", 't_format': "%Y-%m-%d" }
+        try: new_records = tot_records - get_keyevent_trend_collection_population(args)[0][1]
+        except IndexError: new_records = 0
+        health_indicators.append(("Total records", tot_records))
+        health_indicators.append(("    New records since midnight", new_records))
+        health_indicators.append(None)
 
     # Append status of BibSched queue to the health box
-    bibsched = get_keyevent_snapshot_bibsched_status()
-    health_indicators.append(("BibSched queue", sum([x[1] for x in bibsched])))
-    for item in bibsched:
-        health_indicators.append(("    " + item[0], str(item[1])))
-    health_indicators.append(None)
+    if conf.get("general", "bibsched_box") == "True":
+        bibsched = get_keyevent_snapshot_bibsched_status()
+        health_indicators.append(("BibSched queue", sum([x[1] for x in bibsched])))
+        for item in bibsched:
+            health_indicators.append(("    " + item[0], str(item[1])))
+        health_indicators.append(None)
+
+    # Append basket stats to the health box
+    if conf.get("general", "basket_box") == "True":
+        health_indicators += basket_display()
+        health_indicators.append(None)
 
     # Append number of Apache processes to the health box
-    health_indicators.append(("Apache processes", get_keyevent_snapshot_apache_processes()))
+    if conf.get("general", "apache_box") == "True":
+        health_indicators.append(("Apache processes", get_keyevent_snapshot_apache_processes()))
 
     # Append uptime and load average to the health box
-    health_indicators.append(("Uptime cmd", get_keyevent_snapshot_uptime_cmd()))
+    if conf.get("general", "uptime_box") == "True":
+        health_indicators.append(("Uptime cmd", get_keyevent_snapshot_uptime_cmd()))
 
     # Display the health box
     out += TEMPLATES.tmpl_system_health(health_indicators, ln=ln)

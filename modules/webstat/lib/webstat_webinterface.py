@@ -212,8 +212,9 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                 navmenuid='custom event',
                 ln=ln)
 
+        body = perform_display_customevent(argd['ids'], argd, req=req, ln=ln)
         return page(title="Custom event",
-                    body=perform_display_customevent(argd['ids'], argd, req=req, ln=ln),
+                    body=body,
                     navtrail="""<a class="navtrail" href="%s/stats/%s">Statistics</a>""" % \
                     (CFG_SITE_URL, (ln != CFG_SITE_LANG and '?ln='+ln) or ''),
                     description="CDS Personalize, Statistics, Custom event",

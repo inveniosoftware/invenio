@@ -242,8 +242,8 @@ def get_customevent_trend(args):
             continue
         if col_content:
             sql_query.append("AND %s" % escape_string(col_title))
-            sql_query.append(" = %s")
-            sql_param.append(col_content)
+            sql_query.append(" LIKE %s")
+            sql_param.append("%" + col_content + "%")
     sql_query.append("ORDER BY creation_time DESC")
     sql = ' '.join(sql_query)
 
@@ -293,8 +293,8 @@ def get_customevent_dump(args):
             if not col_title in col_names: continue
             if col_content:
                 sql_query.append("AND %s" % escape_string(col_title))
-                sql_query.append(" = %s")
-                sql_param.append(col_content)
+                sql_query.append(" LIKE %s")
+                sql_param.append("%" + col_content + "%")
         sql_query.append("ORDER BY creation_time DESC")
         sql = ' '.join(sql_query)
         res = run_sql(sql, tuple(sql_param))
