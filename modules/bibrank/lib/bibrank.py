@@ -81,7 +81,12 @@ from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, write_message, task_get_option, \
     task_set_option, get_datetime, task_update_status, \
     task_sleep_now_if_required
-from invenio.bibrank_tag_based_indexer import single_tag_rank_method, citation
+from invenio.bibrank_tag_based_indexer import \
+    single_tag_rank_method, \
+    citation, \
+    download_weight_filtering_user, \
+    download_weight_total, \
+    file_similarity_by_times_downloaded
 from invenio.bibrank_word_indexer import word_similarity
 
 
