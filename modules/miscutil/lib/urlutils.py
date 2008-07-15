@@ -109,9 +109,10 @@ def redirect_to_url(req, url, redirection_type=None):
     Please see: http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3
     """
     if redirection_type is None:
-        redirection_type = apache.HTTP_TEMPORARY_REDIRECT
+        redirection_type = apache.HTTP_MOVED_TEMPORARILY
     req.err_headers_out["Location"] = url
-    req.err_headers_out["Cache-Control"] = "no-cache"
+    if redirection_type != apache.HTTP_MOVED_PERMANENTLY:
+        req.err_headers_out["Cache-Control"] = "no-cache"
 
     if req.sent_bodyct:
         raise IOError, "Cannot redirect after headers have already been sent."

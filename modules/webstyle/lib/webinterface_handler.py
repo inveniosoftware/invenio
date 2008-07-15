@@ -186,7 +186,7 @@ class WebInterfaceDirectory(object):
                 final_parts[-3:] = original_parts[-3:]
 
                 target = urlparse.urlunparse(final_parts)
-                redirect_to_url(req, target)
+                redirect_to_url(req, target, apache.HTTP_MOVED_PERMANENTLY)
 
         # Continue the traversal. If there is a path, continue
         # resolving, otherwise call the method as it is our final
