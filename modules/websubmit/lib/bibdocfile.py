@@ -761,6 +761,8 @@ class BibDoc:
             else:
                 myversion = latestVersion + 1
             if os.path.exists(filename):
+                if not os.path.getsize(filename) > 0:
+                    raise InvenioWebSubmitFileError, "%s seems to be empty" % filename
                 dummy, dummy, format = decompose_file(filename)
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, myversion)
                 try:
@@ -900,6 +902,8 @@ class BibDoc:
             if version == 0:
                 version = 1
             if os.path.exists(filename):
+                if not os.path.getsize(filename) > 0:
+                    raise InvenioWebSubmitFileError, "%s seems to be empty" % filename
                 dummy, dummy, format = decompose_file(filename)
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, version)
                 if os.path.exists(destination):
@@ -1775,7 +1779,10 @@ def download_url(url, format, sleep=2):
                 for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR]:
                     if path.startswith(allowed_path):
                         shutil.copy(path, tmppath)
-                        return tmppath
+                        if os.path.getsize(tmppath) > 0:
+                            return tmppath
+                        else:
+                            raise StandardError, "%s seems to be empty" % url
                 raise StandardError, "%s is not in one of the allowed paths." % path
             else:
                 urllib.urlretrieve(url, tmppath)
@@ -1783,7 +1790,10 @@ def download_url(url, format, sleep=2):
                                                                     #(escape_shell_arg(url), escape_shell_arg(tmppath)))
                 #if cmd_exit_code:
                     #raise StandardError, "It's impossible to download %s: %s" % (url, cmd_err)
-                return tmppath
+                if os.path.getsize(tmppath) > 0:
+                    return tmppath
+                else:
+                    raise StandardError, "%s seems to be empty" % url
         except:
             os.remove(tmppath)
             raise
