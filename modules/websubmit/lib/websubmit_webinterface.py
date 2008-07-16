@@ -119,7 +119,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             try:
                 bibarchive = BibRecDocs(self.recid)
             except InvenioWebSubmitFileError, e:
-                register_exception(req=req)
+                register_exception(req=req, alert_admin=True)
                 msg = "<p>%s</p><p>%s</p>" % (
                     _("The system has encountered an error in retrieving the list of files for this document."),
                     _("The error has been logged and will be taken in consideration as soon as possible."))
@@ -161,7 +161,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         try:
                             docfile = doc.get_file(format, version)
                         except InvenioWebSubmitFileError, msg:
-                            register_exception(req=req)
+                            register_exception(req=req, alert_admin=True)
                             return errorMsg(str(msg), req, ln)
 
                         if docfile.get_status() == '':
@@ -183,7 +183,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         try:
                             return docfile.stream(req)
                         except InvenioWebSubmitFileError, msg:
-                            register_exception(req=req)
+                            register_exception(req=req, alert_admin=True)
                             return errorMsg(str(msg), req, ln)
 
                     elif doc.get_icon() is not None and doc.get_icon().docname in filename:
@@ -191,7 +191,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         try:
                             iconfile = icon.get_file('gif', args['version'])
                         except InvenioWebSubmitFileError, msg:
-                            register_exception(req=req)
+                            register_exception(req=req, alert_admin=True)
                             return errorMsg(str(msg), req, ln)
 
                         if iconfile.get_status() == '':
@@ -213,7 +213,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         try:
                             return iconfile.stream(req)
                         except InvenioWebSubmitFileError, msg:
-                            register_exception(req=req)
+                            register_exception(req=req, alert_admin=True)
                             return errorMsg(str(msg), req, ln)
 
             filelist = bibarchive.display("", args['version'], ln=ln, verbose=verbose)
