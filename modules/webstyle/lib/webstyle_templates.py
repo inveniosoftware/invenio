@@ -695,7 +695,7 @@ URI: http://%(host)s%(page)s
             out_tabs = '''        <div class="detailedrecordtabs">
             <div>
                 <ul class="detailedrecordtabs">%s</ul>
-            <div style="clear:both;height:00px">&nbsp;</div></div>
+            <div id="tabsSpacer" style="clear:both;height:0px">&nbsp;</div></div>
         </div>''' % out_tabs
 
 

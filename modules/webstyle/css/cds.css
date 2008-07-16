@@ -1544,6 +1544,15 @@ ul.detailedrecordtabs{
    margin:0;
    float: left;
 }
+* html .detailedrecordtabs li{
+   /*IE 6 hack*/
+   width:1%;
+   white-space: nowrap;
+}
+*html #tabsSpacer {
+   /*IE 6 hack*/
+   display: none;
+}
 .detailedrecordtabs li a{
    border-top: 2px solid #79D;
    border-right: 2px solid #79D;
