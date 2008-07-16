@@ -202,6 +202,7 @@ Contents
       $ emacs /opt/cds-invenio/etc/invenio-local.conf
       $ /opt/cds-invenio/bin/inveniocfg --update-all
       $ /opt/cds-invenio/bin/inveniocfg --create-tables
+      $ /opt/cds-invenio/bin/inveniocfg --load-webstat-conf
       $ /opt/cds-invenio/bin/inveniocfg --create-apache-conf
       $ sudo /path/to/apache/bin/apachectl graceful
       $ sudo chgrp -R www-data /opt/cds-invenio
@@ -449,6 +450,12 @@ Contents
           At this point you should now have successfully completed the
           "make install" process.  We continue by setting up the
           Apache web server.
+
+      $ /opt/cds-invenio/bin/inveniocfg --load-webstat-conf
+          
+          Load the configuration file of webstat module. It will create 
+          the tables in the database for register customevents, such as
+          basket hits.
 
       $ /opt/cds-invenio/bin/inveniocfg --create-apache-conf
 

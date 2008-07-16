@@ -31,6 +31,7 @@ General options:
 Options to finish your installation:
    --create-apache-conf     create Apache configuration files
    --create-tables          create DB tables for Invenio
+   --load-webstat-conf      load the WebStat configuration
    --drop-tables            drop DB tables of Invenio
 
 Options to set up and test a demo site:
@@ -519,6 +520,15 @@ def cli_cmd_create_tables(conf):
             sys.exit(1)
     print ">>> Tables created and filled successfully."
 
+def cli_cmd_load_webstat_conf(conf):
+    print ">>> Going to load WebStat config..."
+    from invenio.config import CFG_PREFIX
+    cmd = "%s/bin/webstatadmin --load-config" % CFG_PREFIX
+    if os.system(cmd):
+        print "ERROR: failed execution of", cmd
+        sys.exit(1)
+    print ">>> WebStat config load successfully."
+
 def cli_cmd_drop_tables(conf):
     """Drop Invenio DB tables.  Useful for the uninstallation process."""
     print ">>> Going to drop tables..."
@@ -937,6 +947,9 @@ def main():
                 done = True
             elif opt == '--create-tables':
                 cli_cmd_create_tables(conf)
+                done = True
+            elif opt == '--load-webstat-conf':
+                cli_cmd_load_webstat_conf(conf)
                 done = True
             elif opt == '--drop-tables':
                 cli_cmd_drop_tables(conf)
