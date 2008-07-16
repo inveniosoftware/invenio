@@ -322,13 +322,10 @@ def perform_emailMessage(eMsg, ln):
                                          )
 
 # perform_back(): template for return to a previous page, used for login,register and setting
-def perform_back(mess,act,linkname='', ln='en'):
-    if not linkname:
-        linkname = act
-
+def perform_back(mess, url, linkname, ln='en'):
     return websession_templates.tmpl_back_form(
              ln = ln,
              message = mess,
-             act = act,
+             url = url,
              link = linkname,
            )

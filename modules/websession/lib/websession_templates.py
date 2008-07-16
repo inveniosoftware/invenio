@@ -45,7 +45,7 @@ from invenio.htmlutils import escape_html, nmtoken_from_string
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
 class Template:
-    def tmpl_back_form(self, ln, message, act, link):
+    def tmpl_back_form(self, ln, message, url, link):
         """
         A standard one-message-go-back-link page.
 
@@ -55,7 +55,7 @@ class Template:
 
           - 'message' *string* - The message to display
 
-          - 'act' *string* - The action to accomplish when going back
+          - 'url' *string* - The url to go back to
 
           - 'link' *string* - The link text
         """
@@ -63,12 +63,12 @@ class Template:
                  <table>
                     <tr>
                       <td align="left">%(message)s
-                       <a href="./%(act)s?ln=%(ln)s">%(link)s</a></td>
+                       <a href="%(url)s">%(link)s</a></td>
                     </tr>
                  </table>
              """% {
                'message' : message,
-               'act'     : act,
+               'url'     : url,
                'link'    : link,
                'ln'      : ln
              }

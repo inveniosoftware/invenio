@@ -102,7 +102,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                     "you close your browser if you are a guest user.") %
                     {'x_role' : '<strong>%s</strong>' % role_name,
                      'x_expiration' : '<em>%s</em>' % expiration.strftime("%Y-%m-%d %H:%M:%S")},
-                    'login', _('login'), args['ln']),
+                    '/youraccount/display?ln=%s' % args['ln'], _('login'), args['ln']),
                 req=req,
                 uid=webuser.getUid(req),
                 language=args['ln'],
@@ -189,7 +189,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             body=webaccount.perform_back(
                 _("The password was successfully set! "
                 "You can now proceed with the login."),
-                'login', _('login'), args['ln']),
+                '/youraccout/login?ln=%s' % args['ln'], _('login'), args['ln']),
             req=req,
             language=args['ln'],
             lastupdated=__lastupdated__,
@@ -302,7 +302,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         if args['login_method'] and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 4 \
                 and args['login_method'] in CFG_EXTERNAL_AUTHENTICATION.keys():
             title = _("Settings edited")
-            act = "display"
+            act = "/youraccount/display?ln=%s" % args['ln']
             linkname = _("Show account")
 
             if prefs['login_method'] != args['login_method']:
@@ -367,32 +367,32 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                                                        navmenuid='youraccount')
                 if change:
                     mess = _("Settings successfully edited.")
-                act = "display"
+                act = "/youraccount/display?ln=%s" % args['ln']
                 linkname = _("Show account")
                 title = _("Settings edited")
             elif args['nickname'] is not None and not webuser.nickname_valid_p(args['nickname']):
                 mess = _("Desired nickname %s is invalid.") % args['nickname']
                 mess += " " + _("Please try again.")
-                act = "edit"
+                act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif not webuser.email_valid_p(args['email']):
                 mess = _("Supplied email address %s is invalid.") % args['email']
                 mess += " " + _("Please try again.")
-                act = "edit"
+                act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif uid2 == -1 or uid2 != uid and not uid2 == 0:
                 mess = _("Supplied email address %s already exists in the database.") % args['email']
                 mess += " " + websession_templates.tmpl_lost_your_password_teaser(args['ln'])
                 mess += " " + _("Or please try again.")
-                act = "edit"
+                act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
             elif uid_with_the_same_nickname == -1 or uid_with_the_same_nickname != uid and not uid_with_the_same_nickname == 0:
                 mess = _("Desired nickname %s is already in use.") % args['nickname']
                 mess += " " + _("Please try again.")
-                act = "edit"
+                act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing settings failed")
         elif args['old_password'] != None and CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS < 3:
@@ -403,19 +403,19 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
                 if args['password'] == args['password2']:
                     webuser.updatePasswordUser(uid, args['password'])
                     mess = _("Password successfully edited.")
-                    act = "display"
+                    act = "/youraccount/display?ln=%s" % args['ln']
                     linkname = _("Show account")
                     title = _("Password edited")
                 else:
                     mess = _("Both passwords must match.")
                     mess += " " + _("Please try again.")
-                    act = "edit"
+                    act = "/youraccount/edit?ln=%s" % args['ln']
                     linkname = _("Edit settings")
                     title = _("Editing password failed")
             else:
                 mess = _("Wrong old password inserted.")
                 mess += " " + _("Please try again.")
-                act = "edit"
+                act = "/youraccount/edit?ln=%s" % args['ln']
                 linkname = _("Edit settings")
                 title = _("Editing password failed")
         elif args['group_records']:
@@ -425,7 +425,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             prefs['websearch_helpbox'] = args['helpbox']
             webuser.set_user_preferences(uid, prefs)
             title = _("Settings edited")
-            act = "display"
+            act = "/youraccount/display?ln=%s" % args['ln']
             linkname = _("Show account")
             mess = _("User settings saved correctly.")
         elif args['lang']:
@@ -436,12 +436,12 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             _ = gettext_set_language(lang)
             webuser.set_user_preferences(uid, prefs)
             title = _("Settings edited")
-            act = "display"
+            act = "/youraccount/display?ln=%s" % args['ln']
             linkname = _("Show account")
             mess = _("User settings saved correctly.")
         else:
             mess = _("Unable to update settings.")
-            act = "edit"
+            act = "/youraccount/edit?ln=%s" % args['ln']
             linkname = _("Edit settings")
             title = _("Editing settings failed")
 
@@ -703,7 +703,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             if msgcode == 14:
                 if webuser.username_exists_p(args['p_un']):
                     mess = CFG_WEBACCESS_WARNING_MSGS[15] % args['login_method']
-            act = "login"
+            act = '/youraccount/login%s' % make_canonical_urlargd({'ln' : args['ln'], 'referer' : args['referer']}, {})
             return page(title=_("Login"),
                         body=webaccount.perform_back(mess, act, _("login"), args['ln']),
                         navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
@@ -769,45 +769,45 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         elif ruid == -2:
             mess = _("Both passwords must match.")
             mess += " " + _("Please try again.")
-            act = "register"
+            act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 1:
             mess = _("Supplied email address %s is invalid.") % args['p_email']
             mess += " " + _("Please try again.")
-            act = "register"
+            act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 2:
             mess = _("Desired nickname %s is invalid.") % args['p_nickname']
             mess += " " + _("Please try again.")
-            act = "register"
+            act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 3:
             mess = _("Supplied email address %s already exists in the database.") % args['p_email']
             mess += " " + websession_templates.tmpl_lost_your_password_teaser(args['ln'])
             mess += " " + _("Or please try again.")
-            act = "register"
+            act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 4:
             mess = _("Desired nickname %s already exists in the database.") % args['p_nickname']
             mess += " " + _("Please try again.")
-            act = "register"
+            act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 5:
             mess = _("Users cannot register themselves, only admin can register them.")
-            act = "register"
+            act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         elif ruid == 6:
             mess = _("The site is having troubles in sending you an email for confirming your email address.") + _("The error has been logged and will be taken in consideration as soon as possible.")
-            act = "register"
+            act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
         else:
             # this should never happen
             mess = _("Internal Error")
-            act = "register"
+            act = "/youraccount/register?ln=%s" % args['ln']
             title = _("Registration failure")
 
         return page(title=title,
-                    body=webaccount.perform_back(mess,act, (act == 'register' and _("register") or ""), args['ln']),
+                    body=webaccount.perform_back(mess,act, _("register"), args['ln']),
                     navtrail="""<a class="navtrail" href="%s/youraccount/display?ln=%s">""" % (CFG_SITE_SECURE_URL, args['ln']) + _("Your Account") + """</a>""",
                     description=_("%s  Personalize, Main page") % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
                     keywords="%s , personalize" % CFG_SITE_NAME_INTL.get(args['ln'], CFG_SITE_NAME),
