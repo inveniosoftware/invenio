@@ -1528,7 +1528,10 @@ div.detailedrecordminipanel{
 .top-left-folded {
    height: 10px;
 }
-
+* html .top-left-folded, * html .top-right-folded{
+   /*IE6 hack*/
+   display:none
+}
 /* tabs as used in detailed record pages */
 ul.detailedrecordtabs{
    margin-top:0px;
