@@ -369,7 +369,7 @@ class BibRecDocs:
             register_exception()
             raise InvenioWebSubmitFileError(str(e))
 
-    def add_new_file(self, fullpath, doctype="Main", docname='', never_fail=False):
+    def add_new_file(self, fullpath, doctype="Main", docname='', never_fail=False, description=None, comment=None):
         """Adds a new file with the following policy: if the docname is not set
         it is retrieved from the name of the file. If bibdoc with the given
         docname doesn't exist, it is created and the file is added to it.
@@ -387,15 +387,15 @@ class BibRecDocs:
         except InvenioWebSubmitFileError:
             # bibdoc doesn't already exists!
             bibdoc = self.add_bibdoc(doctype, docname, False)
-            bibdoc.add_file_new_version(fullpath)
+            bibdoc.add_file_new_version(fullpath, description=description, comment=comment)
         else:
             try:
-                bibdoc.add_file_new_format(fullpath)
+                bibdoc.add_file_new_format(fullpath, description=description, comment=comment)
             except InvenioWebSubmitFileError, e:
                 # Format already exist!
                 if never_fail:
                     bibdoc = self.add_bibdoc(doctype, docname, True)
-                    bibdoc.add_file_new_version(fullpath)
+                    bibdoc.add_file_new_version(fullpath, description=description, comment=comment)
                 else:
                     raise e
         return bibdoc
