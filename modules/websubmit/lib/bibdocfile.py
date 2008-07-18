@@ -131,21 +131,18 @@ def decompose_file(afile):
         extension = '.' + extension
     return (dirname, base, extension)
 
-def propose_unique_name(afile, use_version=False):
-    """Propose a unique name, taking in account the version"""
-    if use_version:
-        version = ';'+re.sub('.*;', '', afile)
-        afile = afile[:-len(version)]
+def propose_next_docname(docname):
+    """Propose a next docname docname"""
+    if '_' in docname:
+        split_docname = docname.split('_')
+        try:
+            split_docname[-1] = str(int(split_docname[-1]) + 1)
+            docname = '_'.join(split_docname)
+        except ValueError:
+            docname += '_1'
     else:
-        version = ''
-    (basedir, basename, extension) = decompose_file(afile)
-    goodname = "%s%s%s" % (basename, extension, version)
-    i = 1
-    listdir = os.listdir(basedir)
-    while goodname in listdir:
-        i += 1
-        goodname = "%s_%s%s%s" % (basename, i, extension, version)
-    return "%s/%s" % (basedir, goodname)
+        docname += '_1'
+    return docname
 
 class BibRecDocs:
     """this class represents all the files attached to one record"""
@@ -1111,7 +1108,8 @@ class BibDoc:
     def delete(self):
         """delete the current bibdoc instance."""
         try:
-            self.change_name('DELETED-%s-%s' % (datetime.today().strftime('%Y%m%d%H%M%S'), self.docname))
+            today = datetime.today()
+            self.change_name('DELETED-%s%s-%s' % (today.strftime('%Y%m%d%H%M%S'), today.microsecond, self.docname))
             run_sql("UPDATE bibdoc SET status='DELETED' WHERE id=%s", (self.id,))
         except Exception, e:
             register_exception()
