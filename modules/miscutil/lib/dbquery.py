@@ -167,7 +167,7 @@ def run_sql_cached(sql, param=None, n=0, with_desc=0, affected_tables=['bibrec']
 
     global _db_cache
 
-    if CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
+    if CFG_ACCESS_CONTROL_LEVEL_SITE == 3:
         # do not connect to the database as the site is closed for maintenance:
         return []
 
@@ -216,7 +216,7 @@ def run_sql(sql, param=None, n=0, with_desc=0):
        file and catch them.
     """
 
-    if CFG_ACCESS_CONTROL_LEVEL_SITE == 2:
+    if CFG_ACCESS_CONTROL_LEVEL_SITE == 3:
         # do not connect to the database as the site is closed for maintenance:
         return []
 
