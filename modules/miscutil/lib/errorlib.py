@@ -29,7 +29,7 @@ import sys
 import time
 from cStringIO import StringIO
 
-from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL
+from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, CFG_VERSION
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
@@ -177,7 +177,7 @@ def register_exception(force_stack=False, stream='error', req=None, prefix='', s
                 print >> log_stream, prefix
                 print >> email_stream, prefix
 
-            print >> email_stream, "The following problem occurred on <%s>" % CFG_SITE_URL
+            print >> email_stream, "The following problem occurred on <%s> (CDS Invenio %s)" % (CFG_SITE_URL, CFG_VERSION)
             print >> email_stream, "\n>>> Registered exception\n"
 
             print >> log_stream, www_data
