@@ -810,6 +810,7 @@ II. Example - connecting role and user</a>
       0 = normal operation of the site
       1 = read-only site, all write operations temporarily closed
       2 = site fully closed
+      3 = database connections disabled
       CFG_ACCESS_CONTROL_LEVEL_SITE = 0
     Access policy for guests:
       0 = Allow guests to search,
