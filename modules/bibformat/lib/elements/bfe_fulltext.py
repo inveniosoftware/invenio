@@ -154,6 +154,7 @@ def get_files(bfo):
 
     urls = bfo.fields("8564_")
     bibarchive = BibRecDocs(bfo.recID)
+    use_bibdocs_p = len(bibarchive.list_bibdocs()) > 0
 
     old_versions = False # We can provide link to older files. Will be
                          # set to True if older files are found.
@@ -199,7 +200,9 @@ def get_files(bfo):
                         #FIXME remove eventual ?parameters
                         descr = filename or host # Let's take the name from the url
                 if CFG_CERN_SITE and 'cern.ch' in host:
-                    parsed_urls['cern_urls'].append((url, descr)) # Obsolete cern.ch url (we're migrating)
+                    if not use_bibdocs_p or not ('/setlink?' in url or 'cms' in host):
+                        parsed_urls['cern_urls'].append((url, descr)) # Obsolete cern.ch url (we're migrating)
+                    ## if use_bibdocs_p is True file is already using bibdoc
                 else:
                     parsed_urls['others_urls'].append((url, descr)) # external url
             else: # It's a bibdoc!
