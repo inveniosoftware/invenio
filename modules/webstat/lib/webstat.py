@@ -529,61 +529,61 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
     options = { 'ids': ('Custom event', _get_customevents()),
                 'timespan': ('Time span', _get_timespans()),
                 'format': ('Output format', _get_formats(True)),
-                'cols': ('Column', _get_customevent_cols()) }
-    # Order of options
-    order = ['ids', 'timespan', 'format', 'cols']
+                'cols': ('Argument', _get_customevent_cols()) }
     # Build a dictionary for the selected parameters: { parameter name: argument internal name }
-    choosed = { 'ids': ids, 'timespan': args['timespan'], 'format': args['format'], 'cols': "" }
+    choosed = { 'ids': "", 'timespan': args['timespan'], 'format': args['format'], 'cols': "" }
     # Send to template to prepare event customization FORM box
-    out = TEMPLATES.tmpl_customevent_box(options, order, choosed, ln=ln)
+    out = TEMPLATES.tmpl_customevent_box(options, choosed, ln=ln)
 
     # Arguments OK?
 
     # Make sure extraparams are valid, if any
-    for param in order:
-        if param == 'cols': continue
+    for param in ['ids', 'timespan', 'format']:
         legalvalues = [x[0] for x in options[param][1]]
 
-        if type(choosed[param]) is list:
+        if type(args[param]) is list:
             # If the argument is a list, like the content of 'ids' every value has to be checked
-            if len(choosed[param]) == 0:
+            if len(args[param]) == 0:
                 return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0], ln=ln)
-            for arg in choosed[param]:
+            for arg in args[param]:
                 if not arg in legalvalues:
                     return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0], ln=ln)
         else:
-            if not choosed[param] in legalvalues:
+            if not args[param] in legalvalues:
                 return out + TEMPLATES.tmpl_error('Please specify a valid value for parameter "%s".' % options[param][0], ln=ln)
-
-    # Calculate cols
-    cols = []
-    if args.has_key('cols') and args.has_key('col_value'):
-        cols = zip(args['cols'], args['col_value'])
 
     # Fetch time parameters from repository
     _, t_fullname, t_start, t_end, granularity, t_format, xtic_format = \
         options['timespan'][1][[x[0] for x in options['timespan'][1]].index(choosed['timespan'])]
-    args = { 't_start': t_start, 't_end': t_end, 'granularity': granularity,
-            't_format': t_format, 'xtic_format': xtic_format, 'cols': cols }
+    args_req = { 't_start': t_start, 't_end': t_end, 'granularity': granularity,
+                't_format': t_format, 'xtic_format': xtic_format }
 
     data_unmerged = []
 
     # ASCII dump data is different from the standard formats
     if choosed['format'] == 'asciidump':
-        filename = "webstat_customevent_" + re.subn("[^\w]", "", ''.join(ids) + "_" + choosed['timespan'] + "_" + '-'.join([ ':'.join(col) for col in args['cols']]) + "_asciidump")[0]
-        args['ids'] = ids
-        gatherer = lambda: get_customevent_dump(args)
+        for i in [ str(j) for j in range(len(ids))]:
+            args_req['cols'+i] = zip(args['bool'+i], args['cols'+i], args['col_value'+i])
+        filename = "webstat_customevent_" + re.subn("[^\w]", "", ''.join(ids) + "_" + choosed['timespan'] + "_" + '-'.join([ ':'.join(col) for col in [ args['cols'+str(i)] for i in range(len(ids))]]) + "_asciidump")[0]
+        args_req['ids'] = ids
+        gatherer = lambda: get_customevent_dump(args_req)
         data = eval(_get_file_using_cache(filename, gatherer).read())
     else:
-        for id in ids:
+        for id, i in [ (ids[i], str(i)) for i in range(len(ids))]:
+            # Calculate cols
+            args_req['cols'] = []
+            if args.has_key('cols'+i):
+                args['bool'+i].insert(0,"")
+                args_req['cols'] = zip(args['bool'+i], args['cols'+i], args['col_value'+i])
+
             # Get unique name for the rawdata file (wash arguments!)
-            filename = "webstat_customevent_" + re.subn("[^\w]", "", id + "_" + choosed['timespan'] + "_" + '-'.join([ ':'.join(col) for col in args['cols']]))[0]
+            filename = "webstat_customevent_" + re.subn("[^\w]", "", id + "_" + choosed['timespan'] + "_" + '-'.join([ ':'.join(col) for col in args_req['cols']]))[0]
 
             # Add the current id to the gatherer's arguments
-            args['id'] = id
+            args_req['id'] = id
 
             # Prepare raw data gatherer, if cache needs refreshing.
-            gatherer = lambda: get_customevent_trend(args)
+            gatherer = lambda: get_customevent_trend(args_req)
 
             # Determine if this particular file is due for scheduling cacheing, in that case we must not
             # allow refreshing of the rawdata.
@@ -596,8 +596,8 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
         data = [(x[0][0], tuple([y[1] for y in x])) for x in zip(*data_unmerged)]
 
     # If type indicates an export, run the export function and we're done
-    if _is_type_export(choosed['format']):
-        _get_export_closure(choosed['format'])(data, req)
+    if _is_type_export(args['format']):
+        _get_export_closure(args['format'])(data, req)
         return out
 
     # Get full names, for those that have them

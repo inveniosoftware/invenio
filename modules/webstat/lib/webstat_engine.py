@@ -236,12 +236,18 @@ def get_customevent_trend(args):
     sql_query = ["SELECT creation_time FROM %s WHERE creation_time > '%s'" % (tbl_name, lower)]
     sql_query.append("AND creation_time < '%s'" % upper)
     sql_param = []
-    for col_title, col_content in args['cols']:
+    for col_bool, col_title, col_content in args['cols']:
         if not col_title in col_names:
-            # TODO: it should go out without do the query
             continue
         if col_content:
-            sql_query.append("AND %s" % escape_string(col_title))
+            if col_bool == "and" or col_bool == "":
+                sql_query.append("AND %s" % escape_string(col_title))
+            elif col_bool == "or":
+                sql_query.append("OR %s" % escape_string(col_title))
+            elif col_bool == "and_not":
+                sql_query.append("AND NOT %s" % escape_string(col_title))
+            else:
+                continue
             sql_query.append(" LIKE %s")
             sql_param.append("%" + col_content + "%")
     sql_query.append("ORDER BY creation_time DESC")
@@ -282,17 +288,24 @@ def get_customevent_dump(args):
     # events_list = [(creation_time, event, [arg1, arg2, ...]), ...]
     event_list = []
     event_cols = {}
-    for id in args['ids']:
+    for id, i in [ (args['ids'][i], str(i)) for i in range(len(args['ids']))]:
         # Get all the event arguments and creation times
         tbl_name = get_customevent_table(id)
         col_names = get_customevent_args(id)
         sql_query = ["SELECT * FROM %s WHERE creation_time > '%s'" % (tbl_name, lower)]
         sql_query.append("AND creation_time < '%s'" % upper)
         sql_param = []
-        for col_title, col_content in args['cols']:
+        for col_bool, col_title, col_content in args['cols'+i]:
             if not col_title in col_names: continue
             if col_content:
-                sql_query.append("AND %s" % escape_string(col_title))
+                if col_bool == "and" or col_bool == "":
+                    sql_query.append("AND %s" % escape_string(col_title))
+                elif col_bool == "or":
+                    sql_query.append("OR %s" % escape_string(col_title))
+                elif col_bool == "and_not":
+                    sql_query.append("AND NOT %s" % escape_string(col_title))
+                else:
+                    continue
                 sql_query.append(" LIKE %s")
                 sql_param.append("%" + col_content + "%")
         sql_query.append("ORDER BY creation_time DESC")

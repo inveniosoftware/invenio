@@ -196,12 +196,17 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def customevent(self, req, form):
         """Custom event statistics page"""
-        argd = wash_urlargd(form, {'ids': (list, []),
-                                   'timespan': (str, ""),
-                                   'format': (str, SUITABLE_GRAPH_FORMAT),
-                                   'cols': (list, []),
-                                   'col_value': (list, []),
-                                   'ln': (str, CFG_SITE_LANG)})
+        num_bloks = len(form['ids'])
+        arg_format = {'ids': (list, []),
+                     'timespan': (str, ""),
+                     'format': (str, SUITABLE_GRAPH_FORMAT),
+                     'ln': (str, CFG_SITE_LANG)}
+        for i in [ str(j) for j in range(num_bloks)]:
+            arg_format['cols'+i]=(list, [])
+            arg_format['col_value'+i]=(list, [])
+            arg_format['bool'+i]=(list, [])
+        argd = wash_urlargd(form, arg_format)
+
         ln = argd['ln']
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = acc_authorize_action(user_info, 'runwebstatadmin')

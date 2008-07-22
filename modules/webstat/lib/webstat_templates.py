@@ -166,58 +166,113 @@ register_customevent('test') </pre>
         <input type="hidden" name="ln"value="%s" />""" % ln
 
         # Create the headers using the options permutation
-        headers = [options[param][0] for param in order]
+        headers = [[options[param][0] for param in order]]
+        headers[0].append("")
 
         # Create all SELECT boxes
-        sels = [self._tmpl_select_box(options[param][1],                # SELECT box data
+        sels = [[self._tmpl_select_box(options[param][1],                # SELECT box data
                                       " - select " + options[param][0], # first item info
                                       param,                            # name
                                       choosed[param],                   # selected value (perhaps several)
                                       type(choosed[param]) is list,     # multiple box?
                                       ln=ln)
-                for param in order]
+                for param in order]]
 
-        # Create all buttons
-        buttons = []
-        buttons.append("""<input class="formbutton" type="submit" name="action_gen" value="Generate">""")
+        # Create button
+        sels[0].append("""<input class="formbutton" type="submit" name="action_gen" value="Generate">""")
 
-        return self._tmpl_box(formheader, headers, sels, buttons, ln=ln)
+        # Create form footer
+        formfooter = """</form>"""
 
-    def tmpl_customevent_box(self, options, order, choosed, ln=CFG_SITE_LANG):
+        return self._tmpl_box(formheader, formfooter, ["keyevent_table"], headers, sels, [""], ln=ln)
+
+    def tmpl_customevent_box(self, options, choosed, ln=CFG_SITE_LANG):
         """
         Generates a FORM box with dropdowns for customevents.
 
         @param options: { parameter name: [(argument internal, argument full)]}
         @type options: { str: [(str, str)]}
 
-        @param order: A permutation of the keys in options, for design purpose.
-        @type order: [str]
-
-        @param options: The selected parameters, and its values.
-        @type options: { str: str }
+        @param choosed: The selected parameters, and its values.
+        @type choosed: { str: str }
         """
-        # Create the FORM's header
-        formheader = """<form method="get">
-        <input type="hidden" name="ln"value="%s" />""" % ln
+        # Crate the ids of the tables
+        table_id = ["time_format", "cols0"]
 
         # Create the headers using the options permutation
-        headers = [options[param][0] for param in order]
-        headers.append("Value")
+        headers = [(options['timespan'][0], options['format'][0]),
+                   (options['ids'][0], "", options['cols'][0], "value")]
 
         # Create all SELECT boxes
-        sels = [self._tmpl_select_box(options[param][1],                # SELECT box data
-                                      " - select " + options[param][0], # first item info
-                                      param,                            # name
-                                      choosed[param],                   # selected value (perhaps several)
-                                      type(choosed[param]) is list,     # multiple box?
-                                      ln=ln)
-                for param in order]
+        sels = []
+        for order in [['timespan', 'format'], ['ids', 'cols']]:
+            sels.append([self._tmpl_select_box(options[param][1],           # SELECT box data
+                                          " - select " + options[param][0], # first item info
+                                          param,                            # name
+                                          choosed[param],                   # selected value (perhaps several)
+                                          type(choosed[param]) is list,     # multiple box?
+                                          ln=ln)
+                    for param in order])
+        sels[1][1] = sels[1][1].replace("cols", "cols0")
+        sels[1].insert(1, "")
+        sels[1].append("<input name=\"col_value0\">")
 
-        # Create all buttons
-        buttons = []
-        buttons.append("""<input class="formbutton" type="submit" name="action_gen" value="Generate">""")
+        # javascript for add col selectors
+        sels_col = []
+        sels_col.append(sels[1][0])
+        sels_col.append(sels[1][1])
+        sels_col.append(self._tmpl_select_box(options['cols'][1], " - select " + options['cols'][0],
+                                            'cols\' + col + \'', "", False, ln=ln))
+        sels_col.append("<input name=\"col_value' + col + '\">")
+        col_table = self._tmpl_box("", "", ["cols' + col + '"], headers[1:], [sels_col],
+                    ["""<a href="javascript:;" onclick="addcol(\\'cols' + col + '\\', ' + col + ');">Add more arguments</a>"""], ln=ln)
+        col_table = col_table.replace('\n','')
+        formheader = """<script type="text/javascript">
+                var col = 1;
+                function addcol(id, num){
+                    var table = document.getElementById(id);
+                    var body = table.getElementsByTagName('tbody')[0];
+                    var row = document.createElement('tr');
+                    var cel0 = document.createElement('td');
+                    row.appendChild(cel0);
+                    var cel1 = document.createElement('td');
+                    cel1.innerHTML = '<select name="bool' + num + '"> <option value="and">AND</option> <option value="or">OR</option> <option value="and_not">AND NOT</option> </select>';
+                    row.appendChild(cel1);
+                    var cel2 = document.createElement('td');
+                    cel2.innerHTML = '%s'
+                    row.appendChild(cel2);
+                    var cel3 = document.createElement('td');
+                    cel3.innerHTML = '%s';
+                    row.appendChild(cel3);
+                    body.appendChild(row);
+                } """ % (sels_col[2].replace("' + col + '", "' + num + '"),
+                        sels_col[3].replace("' + col + '", "' + num + '"))
+        formheader += """
+                function addblock() {
+                    var ni = document.getElementById('block');
+                    var newdiv = document.createElement('div'+col);
+                    newdiv.innerHTML = '%s';
+                    ni.appendChild(newdiv);
+                    col = col + 1;
+                }
+        </script>""" % col_table
 
-        return self._tmpl_box_customevent(formheader, headers, sels, buttons, ln=ln)
+        # Create the FORM's header
+        formheader += """<form method="get">
+        <input type="hidden" name="ln"value="%s" />""" % ln
+
+        # Create all footers
+        footers = []
+        footers.append("")
+        footers.append("""<a href="javascript:;" onclick="addcol('cols0', 0);">Add more arguments</a>
+                <div  id="block"> </div>""")
+
+        # Create formfooter
+        formfooter = """<p><a href="javascript:;" onclick="addblock();">Add more events</a>
+                    <input class="formbutton" type="submit" name="action_gen" value="Generate"></p>
+                    </form>"""
+
+        return self._tmpl_box(formheader, formfooter, table_id, headers, sels, footers, ln=ln)
 
     def tmpl_display_event_trend_ascii(self, title, filename, ln=CFG_SITE_LANG):
         """Displays an image graph representing a trend"""
@@ -239,52 +294,7 @@ register_customevent('test') </pre>
                    <tbody><tr><td class="narrowsearchboxbody" valign="top">%s</td></tr></tbody>
                   </table> """ % (title, html)
 
-    def _tmpl_box(self, formheader, headers, selectboxes, buttons, ln=CFG_SITE_LANG):
-        """
-        Aggregates together the parameters in order to generate the
-        corresponding box.
-
-        @param formheader: Start tag for the FORM element.
-        @type formheader: str
-
-        @param headers: Headers for the SELECT boxes
-        @type headers: list<str>
-
-        @param selectboxes: The actual HTML drop-down boxes, with appropriate content.
-        @type selectboxes: list<str>
-
-        @param buttons: Buttons to attach to the FORM.
-        @type buttons: list<str>
-
-        @return: HTML describing a particular FORM box.
-        @type: str
-        """
-        out = formheader + """<table class="searchbox"><thead><tr>"""
-
-        # Zip together the lists to achieve symmetry (some items might be discarded!)
-        combined = zip(headers, selectboxes)
-
-        # Append the headers
-        for header in [x[0] for x in combined]:
-            if header == combined[-1][0]:
-                colspan = ("""colspan="%i" """ % (len(buttons)+1)).strip()
-            else:
-                colspan = ""
-            out += """<th %s class="searchboxheader">%s</th>""" % (colspan, header)
-
-        out += """</tr></thead><tbody><tr valign="bottom">"""
-
-        # Append the SELECT boxes
-        for selectbox in [x[1] for x in combined]:
-            out += """<td class="searchboxbody" valign="top">%s</td>""" % selectbox
-
-        # Append all the buttons in a row
-        out += """<td class="searchboxbody" valign="top" align="left">""" + "".join(buttons)
-        out += "</td></tr></tbody></table></form>"
-
-        return out
-
-    def _tmpl_box_customevent(self, formheader, headers, selectboxes, buttons, ln=CFG_SITE_LANG):
+    def _tmpl_box(self, formheader, formfooter, table_id, headers, selectboxes, footers, ln=CFG_SITE_LANG):
         """
         Aggregates together the parameters in order to generate the
         corresponding box for customevent.
@@ -292,74 +302,52 @@ register_customevent('test') </pre>
         @param formheader: Start tag for the FORM element.
         @type formheader: str
 
+        @param formfooter: End tag for the FORM element.
+        @type formfooter: str
+
+        @param table_id: id for each table
+        @type table_id: list<str>
+
         @param headers: Headers for the SELECT boxes
-        @type headers: list<str>
+        @type headers: list<list<str>>
 
         @param selectboxes: The actual HTML drop-down boxes, with appropriate content.
-        @type selectboxes: list<str>
+        @type selectboxes: list<list<str>>
 
-        @param buttons: Buttons to attach to the FORM.
-        @type buttons: list<str>
+        @param footers: footer for each table
+        @type footers: list<str>
 
         @return: HTML describing a particular FORM box.
         @type: str
         """
-        # javascript for add col selectors
-        out = """<script type="text/javascript">
-                function addcol(){
-                    var tblBody = document.getElementById("cols").tBodies[0];
-                    var newNode = tblBody.rows[0].cloneNode(true);
-                    tblBody.appendChild(newNode);
-                }
-                </script>"""
-        out += formheader + """<table class="searchbox">
-                <thead>
-                    <tr>"""
-
-        #Append the headers
-        for header in headers[:-2]:
-            out += """<th class="searchboxheader">%s</th>""" % header
-
-        out += """</tr>
-            </thead>
-            <tbody>
-            <tr valign="bottom">"""
-
-        # Append the SELECT boxes
-        out += """<td rowspan="2" class="searchboxbody" valign="top">%s</td>""" % selectboxes[0]
-        for selectbox in selectboxes[1:-1]:
-            out += """<td class="searchboxbody" valign="top">%s</td>""" % selectbox
-        out += """
-            </tr>"""
-
-        # Append expansive talbe
-        out += """<tr>
-                <td colspan="2">
-                <table id="cols" class="searchbox">
+        out = formheader
+        for table in range(len(table_id)):
+            out += """<table id="%s" class="searchbox">
                     <thead>
-                        <tr>"""
-        for header in headers[-2:]:
-            out += """<th class="searchboxheader">%s</th>""" % header
-        out += """</tr>
-                    </thead>
-                    <tbody>
-                        <tr valign="bottom">"""
-        out += """<td class="searchboxbody" valign="top">%s</td>""" % selectboxes[-1]
-        out += """<td class="searchboxbody" valign="top"><input name="col_value"></td>
-                        </tr>
-                    </tbody>
-                </table>"""
-        out += """<a href="javascript:;" onclick="addcol();">Add more cols</a>"""
-        out += """</td>
-            </tr>"""
-        # Append all the buttons
-        out += """<tr>
-                <td class="searchboxbody" valign="top" align="left">""" + "".join(buttons)
-        out += """</td>
-                </tr>
-            </tbody>
-        </table>
-        </form>"""
+                        <tr>""" % table_id[table]
+
+            #Append the headers
+            for header in headers[table]:
+                out += """<th class="searchboxheader">%s</th>""" % header
+
+            out += """</tr>
+                </thead>
+                <tbody>
+                <tr valign="bottom">"""
+
+            # Append the SELECT boxes
+            for selectbox in selectboxes[table]:
+                out += """<td class="searchboxbody" valign="top">%s</td>""" % selectbox
+            out += """
+                </tr>"""
+            out += """
+                </tbody>
+            </table>"""
+
+            # Append footer
+            out += footers[table]
+
+        out += formfooter
 
         return out
 
