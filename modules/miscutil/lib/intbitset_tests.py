@@ -385,6 +385,39 @@ class IntBitSetTest(unittest.TestCase):
             self.assertEqual(intbitset1, intbitset2)
             self.assertEqual(intbitset1, intbitset3)
 
+    def test_set_consistence(self):
+        """intbitset - set consistence"""
+        tests = (
+            (
+                (20, 30, 1000, 40),
+                'x\x9cc`\x10p``d\x18\x18\x80d/\x00*\xb6\x00S',
+                'x\x9cc`\x10p`\x18(\xf0\x1f\x01\x00k\xe6\x0bF'
+            ),
+            (
+                (20, 30, 1000, 41),
+                'x\x9cc`\x10p``b\x18\x18\xc0\x88`\x02\x00+9\x00T',
+                'x\x9cc`\x10p`\x18(\xf0\x1f\x01\x00k\xe6\x0bF'
+            ),
+            (
+                (20, 30, 1001, 41),
+                'x\x9cc`\x10p``b\x18\x18\x80d/\x00+D\x00U',
+                'x\x9cc`\x10p`\x18(\xf0\xef?\x1c\x00\x00k\xdb\x0bE'
+            )
+        )
+        for original, dumped, dumped_trails in tests:
+            intbitset1 = intbitset(original)
+            intbitset2 = intbitset(original, trailing_bits=True)
+            intbitset3 = intbitset(dumped)
+            intbitset4 = intbitset(dumped_trails)
+            self._helper_sanity_test(intbitset1)
+            self._helper_sanity_test(intbitset2)
+            self._helper_sanity_test(intbitset3)
+            self._helper_sanity_test(intbitset4)
+            self.assertEqual(intbitset1.fastdump(), dumped)
+            self.assertEqual(intbitset1, intbitset3)
+            self.assertEqual(intbitset2.fastdump(), dumped_trails)
+            self.assertEqual(intbitset2, intbitset4)
+
 TEST_SUITE = make_test_suite(IntBitSetTest,)
 
 if __name__ == "__main__":
