@@ -51,10 +51,12 @@ datetext_default = '0000-00-00 00:00:00'
 datestruct_default = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 datetext_format = "%Y-%m-%d %H:%M:%S"
 
-def convert_datetext_to_dategui(datetext, ln=CFG_SITE_LANG):
+def convert_datetext_to_dategui(datetext, ln=CFG_SITE_LANG, secs=False):
     """
     Convert:
     '2005-11-16 15:11:57' => '16 nov 2005, 15:11'
+    Or optionally with seconds:
+    '2005-11-16 15:11:57' => '16 nov 2005, 15:11:57'
     Month is internationalized
     """
     try:
@@ -62,7 +64,10 @@ def convert_datetext_to_dategui(datetext, ln=CFG_SITE_LANG):
         if datestruct == datestruct_default:
             raise ValueError
         month = get_i18n_month_name(datestruct[1], ln=ln)
-        output_format = "%d " + month + " %Y, %H:%M"
+        if secs:
+            output_format = "%d " + month + " %Y, %H:%M:%S"
+        else:
+            output_format = "%d " + month + " %Y, %H:%M"
         return strftime(output_format, datestruct)
     except:
         _ = gettext_set_language(ln)
