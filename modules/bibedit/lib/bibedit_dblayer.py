@@ -16,15 +16,14 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""bibedit DB layer"""
 
 __revision__ = "$Id$"
 
 from invenio.dbquery import run_sql
 
 def get_name_tag(tag):
-
-    """ This function return a textual name of tag """
-
+    """This function returns a textual name of tag."""
     result = run_sql("SELECT name FROM tag WHERE value='%s'" % tag)
 
     if len(result) != 0:
@@ -33,11 +32,8 @@ def get_name_tag(tag):
     else:
         return tag
 
-
 def get_tag_name(name):
-
-    """ This function return a tag from the name of this tag """
-
+    """This function return a tag from the name of this tag."""
     result = run_sql("SELECT value FROM tag WHERE name LIKE '%s'" % name)
 
     if len(result) != 0:
@@ -46,11 +42,8 @@ def get_tag_name(name):
     else:
         return name
 
-
 def split_tag_to_marc(tag, ind1='', ind2='', subcode=''):
-
-    """ This function make a marc tag with tag, ind1, ind2 and subcode. """
-
+    """This function make a marc tag with tag, ind1, ind2 and subcode."""
     tag = get_tag_name(tag)
 
     if len(tag) > 3:
@@ -67,11 +60,8 @@ def split_tag_to_marc(tag, ind1='', ind2='', subcode=''):
 
     return "%s%s%s%s" % (tag, ind1, ind2, subcode)
 
-
 def marc_to_split_tag(tag):
-
-    """ The inverse of split_tag_to_marc function. """
-
+    """The inverse of split_tag_to_marc function."""
     tag = get_tag_name(tag)
     ind1 = ' '
     ind2 = ' '
@@ -96,3 +86,28 @@ def marc_to_split_tag(tag):
     tag = tag[:3]
 
     return (tag, ind1, ind2, subcode)
+
+def get_bibupload_task_opts(task_ids):
+    """Returns a list with all options for a given list of task IDs."""
+    res = []
+    for task_id in task_ids:
+        res.append(run_sql("SELECT arguments FROM schTASK WHERE id=%s" %
+                           task_id))
+    return res
+
+def get_marcxml_of_record_revision(recid, job_date):
+    """
+    Return MARCXML string of revision corresponding to given recid
+    and job date.
+    """
+    return run_sql("""SELECT marcxml FROM hstRECORD
+                       WHERE id_bibrec=%s AND job_date=%s""",
+                   (recid, job_date))
+
+def get_record_revisions(recid):
+    """Return dates for all known revisions of the given record."""
+    return run_sql("""SELECT id_bibrec,
+                             DATE_FORMAT(job_date, '%%Y%%m%%d%%H%%i%%s')
+                        FROM hstRECORD WHERE id_bibrec=%s
+                    ORDER BY job_date DESC""",
+                   (str(recid),))

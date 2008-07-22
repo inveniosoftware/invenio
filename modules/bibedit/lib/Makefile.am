@@ -30,7 +30,8 @@ pylib_DATA = bibrecord_config.py \
              bibedit_dblayer.py \
              bibedit_templates.py \
              bibedit_regression_tests.py \
-             bibeditcli.py
+             bibeditcli.py \
+             bibedit_utils.py
 
 EXTRA_DIST = $(pylib_DATA)
 

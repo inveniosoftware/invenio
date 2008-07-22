@@ -17,36 +17,36 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# pylint: disable-msg=C0103
+
+"""bibedit engine."""
+
 __revision__ = "$Id$"
 
 import cPickle
-import marshal
+import difflib
 import os
 import sre
 import time
+import zlib
 
-from invenio.bibedit_config import CFG_BIBEDIT_TMPFILENAMEPREFIX
-from invenio.bibedit_dblayer import marc_to_split_tag
-from invenio.bibrecord import record_xml_output, create_record, create_records, \
-    field_add_subfield, record_add_field, record_has_field, record_get_field_value
+from invenio.bibedit_dblayer import get_marcxml_of_record_revision, \
+    get_record_revisions, marc_to_split_tag
+from invenio.bibedit_utils import get_file_path, get_tmp_file_owner, \
+    get_tmp_record, record_in_use_p, record_locked_p
+from invenio.bibrecord import record_xml_output, create_record, \
+    field_add_subfield, record_add_field
 from invenio.bibtask import task_low_level_submission
-from invenio.config import CFG_BINDIR, CFG_TMPDIR, CFG_BIBEDIT_TIMEOUT, \
-    CFG_BIBEDIT_LOCKLEVEL, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG as OAIID_TAG, \
-    CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG as SYSNO_TAG
+from invenio.config import CFG_BIBEDIT_TIMEOUT
 from invenio.dateutils import convert_datetext_to_dategui
-from invenio.dbquery import run_sql
-from invenio.htmlutils import escape_html
-from invenio.shellutils import run_shell_command
-from invenio.search_engine import print_record, record_exists, get_fieldvalues
+from invenio.search_engine import print_record, record_exists
 import invenio.template
 
-bibedit_templates = invenio.template.load('bibedit')
+# Precompile regexp:
+re_revid_split = sre.compile('^(\d+)\.(\d{14})$')
+re_revdate_split = sre.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 
-## precompile some often-used regexp for speed reasons:
-re_tasks = sre.compile('ID="(\d+)"')
-re_file_option = sre.compile(r'^/')
-re_filename_suffix = sre.compile('_(\d+)\.xml$')
-re_date = sre.compile('\.(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
+bibedit_templates = invenio.template.load('bibedit')
 
 def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, format_tag, edit_tag,
                           delete_tag, num_field, add, dict_value=None):
@@ -60,99 +60,76 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
 
     if delete != 0:
         if confirm_delete != 0:
-            body = bibedit_templates.tmpl_confirm(ln, 1, delete, temp, format_tag)
+            body = bibedit_templates.confirm(ln, 'delete', delete, temp, format_tag)
         else:
             (record, junk) = get_record(ln, delete, uid, "false")
             add_field(delete, uid, record, "980", "", "", "c", "DELETED")
             save_temp_record(record, uid, "%s.tmp" % get_file_path(delete))
-            save_xml_record(delete)
-            body = bibedit_templates.tmpl_confirm(ln)
+            return perform_request_submit(ln, delete, deleting=True)
 
     else:
         if recid != 0 :
             if record_exists(recid) > 0:
                 (record, body) = get_record(ln, recid, uid, temp)
-
-                if record != '' and not record_locked_p(recid):
+                if record and not record_locked_p(recid):
                     if add == 3:
                         body = ''
-
                     if edit_tag is not None and dict_value is not None:
                         record = edit_record(recid, uid, record, edit_tag, dict_value, num_field)
-
                     if delete_tag is not None and num_field is not None:
                         record = delete_field(recid, uid, record, delete_tag, num_field)
 
                     if add == 4:
-
                         tag     = dict_value.get("add_tag"    , '')
                         ind1    = dict_value.get("add_ind1"   , '')
                         ind2    = dict_value.get("add_ind2"   , '')
                         subcode = dict_value.get("add_subcode", '')
                         value   = dict_value.get("add_value"  , '')
                         another = dict_value.get("addanother" , '')
-
                         if tag != '' and subcode != '' and value != '':
                             #add these in the record, take the instance number
                             tag = tag[:3]
                             new_field_number = record_add_field(record, tag, ind1, ind2, [(subcode, value)])
                             record  = add_subfield(recid, uid, tag, record, new_field_number, subcode, value)
-                            if another and another != '':
+                            if another:
                                 #if the user pressed 'another' instead of 'done', take to editing
                                 return perform_request_edit(ln, recid, uid, tag, new_field_number, 0, 'marc', True, None, 0, dict_value)
 
-                    body += bibedit_templates.tmpl_table_header(ln, "record", recid, temp, format_tag, add=add)
-
+                    revisions = len(get_record_revision_ids(recid)) - 1
+                    body += bibedit_templates.editor_table_header(ln, "record", recid, temp, format_tag, add=add, revisions=revisions)
                     keys = record.keys()
                     keys.sort()
-
                     for tag in keys:
-
                         fields = record.get(str(tag), "empty")
-
                         if fields != "empty":
                             for field in fields:
                                 if field[0]: # Only display if has subfield(s)
-                                    body += bibedit_templates.tmpl_table_value(ln, recid, tag,
+                                    body += bibedit_templates.editor_table_value(ln, recid, tag,
                                                                                field, format_tag, "record", add)
-
                     if add == 3:
-                        body += bibedit_templates.tmpl_table_value(ln, recid, '', [], format_tag, "record", add, 1)
-
-                    body += bibedit_templates.tmpl_table_footer(ln, "record", add, 1)
-
-                elif record == '':
-                    body = bibedit_templates.tmpl_record_choice_box(ln, 2)
-
-                elif CFG_BIBEDIT_LOCKLEVEL == 2:
-                    os.system("rm %s.tmp" % get_file_path(recid))
-                    body = bibedit_templates.tmpl_record_choice_box(ln, 4)
-
+                        body += bibedit_templates.editor_table_value(ln, recid, '', [], format_tag, "record", add, 1)
+                    body += bibedit_templates.editor_table_footer(ln, "record", add, 1)
+                elif not record:
+                    body = bibedit_templates.record_choice_box(ln, 3)
                 else:
+                    body = bibedit_templates.record_choice_box(ln, 4)
                     os.system("rm %s.tmp" % get_file_path(recid))
-                    body = bibedit_templates.tmpl_record_choice_box(ln, 5)
-
             else:
                 if record_exists(recid) == -1:
-                    body = bibedit_templates.tmpl_record_choice_box(ln, 3)
+                    body = bibedit_templates.record_choice_box(ln, 2)
                 else:
-                    body = bibedit_templates.tmpl_record_choice_box(ln, 1)
-
+                    body = bibedit_templates.record_choice_box(ln, 1)
         else:
-            body = bibedit_templates.tmpl_record_choice_box(ln, 0)
+            body = bibedit_templates.record_choice_box(ln, 0)
 
     return (body, errors, warnings)
 
-
 def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
                          format_tag, temp, act_subfield, add, dict_value):
-    """Returns the body of edit page. """
+    """Returns the body of edit page."""
     errors = []
     warnings = []
     body = ''
-    if record_exists(recid) in (-1, 0):
-        body = bibedit_templates.tmpl_record_choice_box(ln, 0)
-        return (body, errors, warnings)
 
     (record, junk) = get_record(ln, recid, uid, temp)
 
@@ -175,7 +152,7 @@ def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
         if value != "empty" and subcode != "empty":
             record = add_subfield(recid, uid, tag, record, num_field, subcode, value)
 
-    body += bibedit_templates.tmpl_table_header(ln, "edit", recid, temp=temp,
+    body += bibedit_templates.editor_table_header(ln, "edit", recid, temp=temp,
                                                 tag=tag, num_field=num_field, add=add)
 
     tag = tag[:3]
@@ -183,151 +160,31 @@ def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
     if fields != "empty":
         for field in fields:
             if field[4] == int(num_field) :
-                body += bibedit_templates.tmpl_table_value(ln, recid, tag, field, format_tag, "edit", add)
+                body += bibedit_templates.editor_table_value(ln, recid, tag, field, format_tag, "edit", add)
                 break
 
-    body += bibedit_templates.tmpl_table_footer(ln, "edit", add)
+    body += bibedit_templates.editor_table_footer(ln, "edit", add)
 
     return (body, errors, warnings)
-
-
-def perform_request_submit(ln, recid):
-    """Submits record to the database. """
-
-    save_xml_record(recid)
-
-    errors   = []
-    warnings = []
-    body     = bibedit_templates.tmpl_submit(ln)
-
-    return (body, errors, warnings)
-
-def perform_request_history(ln, recid, revid, revid_cmp, action, uid, format_tag):
-    """ Performs historic operations on a record. """
-
-    errors   = []
-    warnings = []
-    body = ''
-    if not recid or record_exists(recid) < 1:
-        body = bibedit_templates.tmpl_record_choice_box(ln, 1)
-        return (body, errors, warnings)
-
-    if revid:
-        if action == 'compare' and revid_cmp:
-            revids = get_revisions(recid)
-            revdates = [revid2revdate(revision) for revision in revids]
-            revdate = revid2revdate(revid)
-            revdate_cmp = revid2revdate(revid_cmp)
-            comparison = escape_html(get_comparison(revid, revid_cmp)).replace('\n', '<br />')
-            body = bibedit_templates.tmpl_history_container('header')
-            body += bibedit_templates.tmpl_history_comparebox(ln, revdate, revdate_cmp, comparison)
-            body += bibedit_templates.tmpl_history_forms(ln, recid, revids, revdates, 'compare', revid, revid_cmp)
-            body += bibedit_templates.tmpl_history_container('footer')
-            return (body, errors, warnings)
-        elif action == 'revert':
-            body = bibedit_templates.tmpl_confirm(
-                ln, 2, recid, format_tag=format_tag, revid=revid, revdate=revid2revdate(revid))
-            return (body, errors, warnings)
-        elif action == 'confirm_revert':
-            # Does a tmp file already exist?
-            file_path = get_file_path(recid)
-            if os.path.isfile("%s.tmp" % file_path):
-                (uid_record_temp, junk) = get_temp_record("%s.tmp" % file_path)
-                if uid_record_temp != uid:
-                    time_tmp_file = os.path.getmtime("%s.tmp" % file_path)
-                    time_out_file = int(time.time()) - CFG_BIBEDIT_TIMEOUT
-
-                    if time_tmp_file < time_out_file :
-                        os.system("rm %s.tmp" % file_path)
-                    else:
-                        body = bibedit_templates.tmpl_record_choice_box(ln, 2)
-                        return (body, errors, warnings)
-                else:
-                    os.system("rm %s.tmp" % file_path)
-
-            # Is the record locked for editing?
-            if record_locked_p(recid):
-                if CFG_BIBEDIT_LOCKLEVEL == 2:
-                    body = bibedit_templates.tmpl_record_choice_box(ln, 4)
-                else:
-                    body = bibedit_templates.tmpl_record_choice_box(ln, 5)
-                return (body, errors, warnings)
-
-            else:
-                revision = get_revision(recid, revid)
-                submit_record(recid, revision, uid)
-                body = bibedit_templates.tmpl_confirm(ln, 3, recid)
-
-            return (body, errors, warnings)
-
-    revids = get_revisions(recid)
-    revdates = [revid2revdate(revision) for revision in revids]
-    current_revision = revids[0]
-    if not revid:
-        revid = current_revision
-        current = True
-    else:
-        current = revid == current_revision
-    revdate = revid2revdate(revid)
-    revision = create_record(get_revision(recid, revid))[0]
-    body = bibedit_templates.tmpl_history_container('header')
-    body += bibedit_templates.tmpl_history_viewbox(ln, 'header', current, recid, revid, revdate)
-    body += bibedit_templates.tmpl_history_revision(ln, recid, revision)
-    body += bibedit_templates.tmpl_history_viewbox(ln, 'footer', current, recid, revid, revdate)
-    body += bibedit_templates.tmpl_history_forms(ln, recid, revids, revdates, 'view', revid)
-    body += bibedit_templates.tmpl_history_container('footer')
-    return (body, errors, warnings)
-
-def get_file_path(recid):
-    """ return the file path of record. """
-
-    return "%s/%s_%s" % (CFG_TMPDIR, CFG_BIBEDIT_TMPFILENAMEPREFIX, str(recid))
-
-def save_xml_record(recid):
-    """Saves XML record file to database. """
-
-    file_path = get_file_path(recid)
-
-    os.system("rm -f %s.xml" % file_path)
-    file_temp = open("%s.xml" % file_path, 'w')
-    file_temp.write(record_xml_output(get_temp_record("%s.tmp" % file_path)[1]))
-    file_temp.close()
-    task_low_level_submission('bibupload', 'bibedit', '-P', '5', '-r', '%s.xml' % file_path)
-    os.system("rm %s.tmp" % file_path)
 
 def save_temp_record(record, uid, file_path):
-    """ Save record dict in temp file. """
-
+    """Save record dict in temp file."""
     file_temp = open(file_path, "w")
     cPickle.dump([uid, record], file_temp)
     file_temp.close()
 
-
-def get_temp_record(file_path):
-    """Loads record dict from a temp file. """
-
-    file_temp = open(file_path)
-    [uid, record] = cPickle.load(file_temp)
-    file_temp.close()
-
-    return (uid, record)
-
-
 def get_record(ln, recid, uid, temp):
-    """Returns a record dict, and warning message in case of error. """
-    #FIXME: User doesn't get submit button if reloading BibEdit-page
-    #FIXME: User will get warning of changes being temporary when reloading
-    #   BibEdit-page, even though no changes have been made.
+    """Returns a record dict, and warning message in case of error."""
 
     warning_temp_file = ''
     file_path = get_file_path(recid)
 
     if temp != "false":
-        warning_temp_file = bibedit_templates.tmpl_warning_temp_file(ln)
+        warning_temp_file = bibedit_templates.editor_warning_temp_file(ln)
 
     if os.path.isfile("%s.tmp" % file_path):
 
-        (uid_record_temp, record) = get_temp_record("%s.tmp" % file_path)
+        (uid_record_temp, record) = get_tmp_record(recid)
         if uid_record_temp != uid:
 
             time_tmp_file = os.path.getmtime("%s.tmp" % file_path)
@@ -339,10 +196,10 @@ def get_record(ln, recid, uid, temp):
                 save_temp_record(record, uid, "%s.tmp" % file_path)
 
             else:
-                record = ''
+                record = {}
 
         else:
-            warning_temp_file = bibedit_templates.tmpl_warning_temp_file(ln)
+            warning_temp_file = bibedit_templates.editor_warning_temp_file(ln)
 
     else:
         record = create_record(print_record(recid, 'xm'))[0]
@@ -354,7 +211,7 @@ def get_record(ln, recid, uid, temp):
 ######### EDIT #########
 
 def edit_record(recid, uid, record, edit_tag, dict_value, num_field):
-    """Edits value of a record. """
+    """Edits value of a record."""
 
     for num_subfield in range( len(dict_value.keys())/3 ): # Iterate over subfield indices of field
 
@@ -383,9 +240,9 @@ def edit_record(recid, uid, record, edit_tag, dict_value, num_field):
 
 
 def edit_subfield(record, tag, new_subcode, new_value, num_field, num_subfield):
-    """Edits the value of a subfield. """
+    """Edits the value of a subfield."""
 
-    new_value   = bibedit_templates.tmpl_clean_value(str(new_value),     "html")
+    new_value   = bibedit_templates.clean_value(str(new_value),     "html")
 
     (tag, ind1, ind2, junk) = marc_to_split_tag(tag)
 
@@ -411,7 +268,7 @@ def edit_subfield(record, tag, new_subcode, new_value, num_field, num_subfield):
 ######### ADD ########
 
 def add_field(recid, uid, record, tag, ind1, ind2, subcode, value_subfield):
-    """Adds a new field to the record. """
+    """Adds a new field to the record."""
 
     tag = tag[:3]
 
@@ -424,7 +281,7 @@ def add_field(recid, uid, record, tag, ind1, ind2, subcode, value_subfield):
 
 
 def add_subfield(recid, uid, tag, record, num_field, subcode, value):
-    """Adds a new subfield to a field. """
+    """Adds a new subfield to a field."""
 
     tag = tag[:3]
     fields = record.get(str(tag))
@@ -447,7 +304,7 @@ def add_subfield(recid, uid, tag, record, num_field, subcode, value):
 ######### DELETE ########
 
 def delete_field(recid, uid, record, tag, num_field):
-    """Deletes field in record. """
+    """Deletes field in record."""
 
     (tag, junk, junk, junk) = marc_to_split_tag(tag)
     tmp = []
@@ -468,7 +325,7 @@ def delete_field(recid, uid, record, tag, num_field):
 
 
 def delete_subfield(recid, uid, record, tag, num_field, num_subfield):
-    """Deletes subfield of a field. """
+    """Deletes subfield of a field."""
 
     (tag, junk, junk, subcode) = marc_to_split_tag(tag)
     tmp = []
@@ -492,7 +349,7 @@ def delete_subfield(recid, uid, record, tag, num_field, num_subfield):
     return record
 
 def move_subfield(direction, recid, uid, record, tag, num_field, num_subfield):
-    """moves a subfield up in the field """
+    """Moves a subfield up in the field."""
     (tag, junk, junk, subcode) = marc_to_split_tag(tag)
     i = -1
     for field in record[tag]:
@@ -515,145 +372,149 @@ def move_subfield(direction, recid, uid, record, tag, num_field, num_subfield):
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
     return record
 
-def record_locked_p(recid):
-    """Checks if record should be locked for editing, method based on CFG_BIBEDIT_LOCKLEVEL. """
+def perform_request_submit(ln, recid, xml_record='', deleting=False):
+    """Submits record to the database. """
+    if xml_record:
+        save_xml_record(recid, xml_record)
+    else:
+        save_xml_record(recid)
+    errors   = []
+    warnings = []
+    if deleting:
+        body = bibedit_templates.record_choice_box(ln, 6)
+    else:
+        body = bibedit_templates.record_choice_box(ln, 5)
+    return (body, errors, warnings)
 
-    # Check only for tmp-file (done in get_record).
-    if CFG_BIBEDIT_LOCKLEVEL == 0:
-        return 0
-
-    # Check for any scheduled bibupload tasks.
-    if CFG_BIBEDIT_LOCKLEVEL == 2:
-        cmd = """%s/bibsched status -t bibupload | grep -v 'USER="bibreformat"'""" % CFG_BINDIR
-        bibsched_status = run_shell_command(cmd)[1]
-        return bibsched_status.find('PROC="bibupload"') + 1
-
-    filenames = get_bibupload_filenames()
-
-    # Check for match between name of XML-files and record.
-    # Assumes that filename ends with _<recid>.xml.
-    if CFG_BIBEDIT_LOCKLEVEL == 1:
-        recids = []
-        for filename in filenames:
-            filename_suffix = re_filename_suffix.search(filename)
-            if filename_suffix:
-                recids.append(int(filename_suffix.group(1)))
-        return recid in recids
-
-    # Check for match between content of files and record.
-    if CFG_BIBEDIT_LOCKLEVEL == 3:
-        while True:
-            lock = record_in_files_p(recid, filenames)
-            # Check if any new files were added while we were searching
-            if not lock:
-                filenames_updated = get_bibupload_filenames()
-                for filename in filenames_updated:
-                    if not filename in filenames:
-                        break
-                else:
-                    return lock
-            else:
-                return lock
-
-def get_bibupload_filenames():
-    """ Returns path to all files scheduled for bibupload, except by user bibreformat. """
-    cmd = """%s/bibsched status -t bibupload | grep -v 'USER="bibreformat"'""" % CFG_BINDIR
-    bibsched_status = run_shell_command(cmd)[1]
-    tasks = re_tasks.findall(bibsched_status)
-    filenames = []
-    for task in tasks:
-        res = run_sql("SELECT arguments FROM schTASK WHERE id=%s" % task)
-        if res:
-            record_options = marshal.loads(res[0][0])
-            for option in record_options[1:]:
-                if re_file_option.search(option):
-                    filenames.append(option)
-    return filenames
-
-def record_in_files_p(recid, filenames):
-    """ Scans trough XML files searching for record. """
-    # Get id tags of record in question
-    rec_oaiid = rec_sysno = -1
-    rec_oaiid_tag = get_fieldvalues(recid, OAIID_TAG)
-    if rec_oaiid_tag:
-        rec_oaiid = rec_oaiid_tag[0]
-    rec_sysno_tag = get_fieldvalues(recid, SYSNO_TAG)
-    if rec_sysno_tag:
-        rec_sysno = rec_sysno_tag[0]
-
-    # For each record in each file, compare ids and abort if match is found
-    for filename in filenames:
-        try:
-            file_ = open(filename)
-            records = create_records(file_.read(), 0, 0)
-            for i in range(0, len(records)):
-                (record, er, junk) = records[i]
-                if record and er != 0:
-                    if record_has_field(record, '001'):
-                        if (record_get_field_value(record, '001', '%', '%')
-                            == str(recid)):
-                            return True
-                    if record_has_field(record, OAIID_TAG[0:3]):
-                        if (record_get_field_value(
-                                record, OAIID_TAG[0:3], OAIID_TAG[3],
-                                OAIID_TAG[4], OAIID_TAG[5]) == rec_oaiid):
-                            return True
-                    if record_has_field(record, SYSNO_TAG[0:3]):
-                        if (record_get_field_value(
-                                record, SYSNO_TAG[0:3], SYSNO_TAG[3],
-                                SYSNO_TAG[4], SYSNO_TAG[5]) == rec_sysno):
-                            return True
-            file_.close()
-        except IOError:
-            continue
-    return False
-
-def get_comparison(recid_1, recid_2):
-    """ Return comparison between two revisions. """
-    cmd = '%s/bibedit --diff-revisions %s %s' % (CFG_BINDIR, recid_1, recid_2)
-    return run_shell_command(cmd)[1]
-
-def get_text_marc(recid, xml_record):
-    """ Return record in text MARC format. """
-    tmpfilepath = '%s/bibedit_tmpfile_%s' % (CFG_TMPDIR, recid)
-    tmpfile = open(tmpfilepath, 'w')
-    tmpfile.write(xml_record)
-    tmpfile.close()
-    cmd = ('%s/xmlmarc2textmarc %s') % (CFG_BINDIR, tmpfilepath)
-    textmarc = run_shell_command(cmd)[1]
-    run_shell_command('rm ' + tmpfilepath)
-    return textmarc
-
-def get_revision(recid, revid):
-    """ Return previous revision of record. """
-    if revid and len(revid.split('.')) == 2:
-        cmd = "%s/bibedit --list-revisions %s" % (CFG_BINDIR, recid)
-        revids = run_shell_command(cmd)[1]
-        if revid in revids.split('\n'):
-            cmd = "%s/bibedit --get-revision %s" % (CFG_BINDIR, revid)
-            return run_shell_command(cmd)[1]
-    return 0
-
-def get_revisions(recid):
-    """ Return list of revisions. """
-    cmd = '%s/bibedit --list-revisions %s' % (CFG_BINDIR, recid)
-    return run_shell_command(cmd)[1].split('\n')[:-1]
-
-def revid2revdate(revid):
-    """ Return date of revision in userfriendly format. """
-    date = re_date.search(revid)
-    return convert_datetext_to_dategui('%s-%s-%s %s:%s:%s' % date.groups())
-
-def submit_record(recid, xml_record, uid=0):
-    """
-    Submit a new revision of a record.
-    @param recid id of the record in question
-    @param xml_record the new revision in XML MARC format
-    @uid user id of the calling user (0 if called from command line)
-    """
+def save_xml_record(recid, xml_record=''):
+    """Saves XML record file to database."""
     file_path = get_file_path(recid)
-    if os.path.isfile("%s.tmp" % file_path):
+    os.system("rm -f %s.xml" % file_path)
+    file_temp = open("%s.xml" % file_path, 'w')
+    if xml_record:
+        file_temp.write(xml_record)
+    else:
+        file_temp.write(record_xml_output(get_tmp_record(recid)[1]))
         os.system("rm %s.tmp" % file_path)
-    record = create_record(xml_record)[0]
-    save_temp_record(record, uid, "%s.tmp" % file_path)
-    save_xml_record(recid)
+    file_temp.close()
+    task_low_level_submission('bibupload', 'bibedit', '-P', '5', '-r',
+                              '%s.xml' % file_path)
+
+def perform_request_history(ln, recid, revid, revid_cmp, action, uid,
+                            format_tag):
+    """Performs historic operations on a record."""
+    errors   = []
+    warnings = []
+    body = ''
+
+    if action == 'revert' and revid:
+        body = bibedit_templates.confirm(
+            ln, 'revert', recid, format_tag=format_tag, revid=revid,
+            revdate=split_revid(revid, 'dategui')[1])
+        return (body, errors, warnings)
+
+    if action == 'confirm_revert' and revid:
+        # Is the record locked for editing?
+        if record_locked_p(recid):
+            body = bibedit_templates.record_choice_box(ln, 4)
+            return (body, errors, warnings)
+        # Is the record being edited?
+        if record_in_use_p(recid):
+            if get_tmp_file_owner(recid) != uid:
+                body = bibedit_templates.record_choice_box(ln, 3)
+                return (body, errors, warnings)
+            else:
+                os.system("rm -f %s" % ('%s.tmp' % get_file_path(recid)))
+        # Submit the revision.
+        return perform_request_submit(ln, recid,
+                                      get_marcxml_of_revision_id(revid))
+
+    revids = get_record_revision_ids(recid)
+    if not revid:
+        revid = revids[0]
+    body = bibedit_templates.history_container('header')
+    revdates = [split_revid(some_revid, 'dategui')[1] for some_revid
+                in revids]
+    revdate = split_revid(revid, 'dategui')[1]
+
+    if action == 'compare' and revid_cmp:
+        revdate_cmp = split_revid(revid_cmp, 'dategui')[1]
+        xml1 = get_marcxml_of_revision_id(revid)
+        xml2 = get_marcxml_of_revision_id(revid_cmp)
+        comparison = bibedit_templates.clean_value(
+            get_xml_comparison(revid, revid_cmp, xml1, xml2),
+            'text').replace('\n', '<br />\n           ')
+        body += bibedit_templates.history_comparebox(ln, revdate,
+            revdate_cmp, comparison)
+        forms = bibedit_templates.history_forms(ln, recid, revids,
+            revdates, 'compare', revid, revid_cmp)
+
+    else:
+        current = revid == revids[0]
+        revision = create_record(get_marcxml_of_revision_id(
+            revid))[0]
+        body += bibedit_templates.history_viewbox(ln, 'header',
+            current, recid, revid, revdate)
+        body += bibedit_templates.history_revision(ln, recid,
+                                                        revision)
+        body += bibedit_templates.history_viewbox(ln, 'footer',
+            current, recid, revid, revdate)
+        forms = bibedit_templates.history_forms(ln, recid, revids,
+            revdates, 'view', revid)
+
+    body += forms
+    body += bibedit_templates.history_container('footer')
+    return (body, errors, warnings)
+
+def get_marcxml_of_revision_id(revid):
+    """
+    Return MARCXML string with corresponding to revision REVID
+    (=RECID.REVDATE) of a record.  Return empty string if revision
+    does not exist.  REVID is assumed to be washed already.
+    """
+    res = ""
+    (recid, job_date) = split_revid(revid, 'datetext')
+    tmp_res = get_marcxml_of_record_revision(recid, job_date)
+    if tmp_res:
+        for row in tmp_res:
+            res += zlib.decompress(row[0]) + "\n"
+    return res
+
+def get_record_revision_ids(recid):
+    """
+    Return list of all known record revision ids (=RECID.REVDATE) for
+    record RECID in chronologically decreasing order (latest first).
+    """
+    res = []
+    tmp_res =  get_record_revisions(recid)
+    for row in tmp_res:
+        res.append("%s.%s" % (row[0], row[1]))
+    return res
+
+def get_xml_comparison(header1, header2, xml1, xml2):
+    """
+    Return diffs of two MARCXML records.
+    """
+    return "".join(difflib.unified_diff(xml1.splitlines(1),
+        xml2.splitlines(1), header1, header2))
+
+def split_revid(revid, dateformat=''):
+    """
+    Split revid and return tuple with (recid, revdate).
+    Optional dateformat can be datetext or dategui.
+    """
+    (recid, revdate) = re_revid_split.search(revid).groups()
+    if dateformat:
+        datetext = '%s-%s-%s %s:%s:%s' % re_revdate_split.search(
+            revdate).groups()
+        if dateformat == 'datetext':
+            revdate = datetext
+        elif dateformat == 'dategui':
+            revdate = convert_datetext_to_dategui(datetext, secs=True)
+    return (recid, revdate)
+
+def revision_format_valid_p(revid):
+    """Predicate to test validity of revision ID format (=RECID.REVDATE)."""
+    if re_revid_split.match(revid):
+        return True
+    return False

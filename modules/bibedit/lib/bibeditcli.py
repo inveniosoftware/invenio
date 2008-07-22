@@ -19,8 +19,9 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+# pylint: disable-msg=C0103
 """
-BibEdit CLI tool.
+bibedit CLI tool.
 
 Usage: bibedit [options]
 
@@ -29,30 +30,22 @@ General options:
    -V, --version                       print version number
 
 Options to inspect record history:
-   --list-revisions [recid]            list all revisions of a record
-   --get-revision [recid.revdate]      print MARCXML of given record revision
-   --diff-revisions [recidA.revdateB]  print MARCXML difference between record A
-                    [recidC.revdateD]   dated B and record C dated D
-   --revert-to-revision [recid.revdate]  submit given record revision to become
-                                       current revision
+   --list-revisions [recid]              list all revisions of a record
+   --get-revision [recid.revdate]        print MARCXML of given record revision
+   --diff-revisions [recidA.revdateB]    print MARCXML difference between
+                    [recidC.revdateD]    record A dated B and record C dated D
+   --revert-to-revision [recid.revdate]  submit given record revision to
+                                         become current revision
 """
 
 __revision__ = "$Id$"
 
-import os
-import re
 import sys
-import time
-import zlib
-import difflib
 
-_RE_RECORD_REVISION_FORMAT = re.compile(r'^(\d+)\.(\d{14})$')
-
-from invenio.config import CFG_BIBEDIT_TIMEOUT
-from invenio.dbquery import run_sql
-from invenio.bibedit_engine import get_file_path, record_locked_p, \
-    save_temp_record, save_xml_record
-from invenio.bibrecord import create_record
+from invenio.bibedit_engine import get_marcxml_of_revision_id, \
+    get_record_revision_ids, get_xml_comparison, \
+    revision_format_valid_p, save_xml_record, split_revid
+from invenio.bibedit_utils import record_in_use_p, record_locked_p
 
 def print_usage():
     """Print help."""
@@ -62,50 +55,6 @@ def print_version():
     """Print version information."""
     print __revision__
 
-def list_record_revisions(recid):
-    """
-    Return list of all known record revisions (=RECID.REVDATE) for
-    record RECID in chronologically decreasing order (latest first).
-    """
-    out = []
-    res =  run_sql("""SELECT id_bibrec,
-                             DATE_FORMAT(job_date, '%%Y%%m%%d%%H%%i%%s')
-                        FROM hstRECORD WHERE id_bibrec=%s
-                    ORDER BY job_date DESC""",
-                   (recid,))
-    for row in res:
-        out.append("%s.%s" % (row[0], row[1]))
-    return out
-
-def revision_valid_p(revid):
-    """
-    Predicate to test validity of revision ID format (=RECID.REVDATE).
-    """
-    if _RE_RECORD_REVISION_FORMAT.match(revid):
-        return True
-    return False
-
-def get_marcxml_of_record_revision(revid):
-    """
-    Return MARCXML string with corresponding to revision REVID
-    (=RECID.REVDATE) of a record.  Return empty string if revision
-    does not exist.  REVID is assumed to be washed already.
-    """
-    out = ""
-    match = _RE_RECORD_REVISION_FORMAT.match(revid)
-    recid = match.group(1)
-    revdate = match.group(2)
-    job_date = "%s-%s-%s %s:%s:%s" % (revdate[0:4], revdate[4:6],
-                                      revdate[6:8], revdate[8:10],
-                                      revdate[10:12], revdate[12:14],)
-    res =  run_sql("""SELECT marcxml FROM hstRECORD
-                       WHERE id_bibrec=%s AND job_date=%s""",
-                   (recid, job_date))
-    if res:
-        for row in res:
-            out += zlib.decompress(row[0]) + "\n"
-    return out
-
 def cli_list_revisions(recid):
     """
     Print list of all known record revisions (=RECID.REVDATE) for
@@ -114,24 +63,28 @@ def cli_list_revisions(recid):
     try:
         recid = int(recid)
     except ValueError:
-        print "ERROR: record ID must be integer, not %s." % recid
+        print 'ERROR: record ID must be integer, not %s.' % recid
         sys.exit(1)
-    print "\n".join(list_record_revisions(recid))
+    out = '\n'.join(get_record_revision_ids(recid))
+    if out:
+        print out
+    else:
+        print 'ERROR: Record %s not found.' % recid
 
 def cli_get_revision(revid):
     """
     Return MARCXML for revision REVID (=RECID.REVDATE) of a record.
     Exit if things go wrong.
     """
-    if not revision_valid_p(revid):
-        print "ERROR: revision %s is invalid; " \
-              "must be NNN.YYYYMMDDhhmmss." % revid
+    if not revision_format_valid_p(revid):
+        print 'ERROR: revision %s is invalid; ' \
+              'must be NNN.YYYYMMDDhhmmss.' % revid
         sys.exit(1)
-    out =  get_marcxml_of_record_revision(revid)
+    out =  get_marcxml_of_revision_id(revid)
     if out:
         print out
     else:
-        print "ERROR: Revision %s not found." % revid
+        print 'ERROR: Revision %s not found.' % revid
 
 def cli_diff_revisions(revid1, revid2):
     """
@@ -139,60 +92,49 @@ def cli_diff_revisions(revid1, revid2):
     Exit if things go wrong.
     """
     for revid in [revid1, revid2]:
-        if not revision_valid_p(revid):
-            print "ERROR: revision %s is invalid; " \
-                  "must be NNN.YYYYMMDDhhmmss." % revid
+        if not revision_format_valid_p(revid):
+            print 'ERROR: revision %s is invalid; ' \
+                  'must be NNN.YYYYMMDDhhmmss.' % revid
             sys.exit(1)
-    xml1 = get_marcxml_of_record_revision(revid1)
-    xml2 = get_marcxml_of_record_revision(revid2)
-    print "".join(difflib.unified_diff(xml1.splitlines(1),
-                                       xml2.splitlines(1),
-                                       revid1,
-                                       revid2,))
+    xml1 = get_marcxml_of_revision_id(revid1)
+    if not xml1:
+        print 'ERROR: Revision %s not found. ' % revid1
+        sys.exit(1)
+    xml2 = get_marcxml_of_revision_id(revid2)
+    if not xml2:
+        print 'ERROR: Revision %s not found. ' % revid2
+        sys.exit(1)
+    print get_xml_comparison(revid1, revid2, xml1, xml2)
 
 def cli_revert_to_revision(revid):
     """
     Submits specified revision for bibupload, to replace current version.
     """
-    # Is the revision valid?
-    if not revision_valid_p(revid):
-        print "ERROR: revision %s is invalid; " \
-              "must be NNN.YYYYMMDDhhmmss." % revid
+    if not revision_format_valid_p(revid):
+        print 'ERROR: revision %s is invalid; ' \
+              'must be NNN.YYYYMMDDhhmmss.' % revid
         sys.exit(1)
 
-    xmlrecord = get_marcxml_of_record_revision(revid)
-
-    # Does the revision exist?
-    if xmlrecord == '':
-        print "ERROR: Revision %s does not exist. " % revid
+    xml_record = get_marcxml_of_revision_id(revid)
+    if xml_record == '':
+        print 'ERROR: Revision %s does not exist. ' % revid
         sys.exit(1)
 
-    match = _RE_RECORD_REVISION_FORMAT.match(revid)
-    recid = match.group(1)
-    file_path = get_file_path(recid)
+    recid = split_revid(revid)[0]
 
-    # Does a tmp file already exist?
-    if os.path.isfile("%s.tmp" % file_path):
-        time_tmp_file = os.path.getmtime("%s.tmp" % file_path)
-        time_out_file = int(time.time()) - CFG_BIBEDIT_TIMEOUT
+    if record_in_use_p(recid):
+        print 'This record is currently being edited by another user. ' \
+            'Please try again later.'
+        sys.exit(1)
 
-        # Is it expired?
-        if time_tmp_file > time_out_file :
-            print "ERROR: Record %s is currently being edited by another " \
-              "user. Please try again later." % recid
-            sys.exit(1)
-
-        os.system("rm %s.tmp" % file_path)
-
-    # Is the record locked for editing?
     if record_locked_p(recid):
-        print "ERROR: Record %s is currently locked for editing. Please try " \
-          "again in a few minutes." % recid
+        print 'The record is locked because of unfinished upload tasks.' \
+            'Please try again in a few minutes.'
         sys.exit(1)
 
-    record = create_record(xmlrecord)[0]
-    save_temp_record(record, 0, "%s.tmp" % file_path)
-    save_xml_record(recid)
+    save_xml_record(recid, xml_record)
+    print 'Your modifications have now been submitted. They will be ' \
+        'processed as soon as the task queue is empty.'
 
 def main():
     """Main entry point."""
@@ -241,7 +183,7 @@ def main():
                 sys.exit(1)
             cli_revert_to_revision(revid)
         else:
-            print """ERROR: Please specify a command.  Please see '--help'."""
+            print "ERROR: Please specify a command.  Please see '--help'."
             sys.exit(1)
 
 if __name__ == '__main__':
