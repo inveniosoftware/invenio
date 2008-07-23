@@ -563,6 +563,7 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
     # ASCII dump data is different from the standard formats
     if choosed['format'] == 'asciidump':
         for i in [ str(j) for j in range(len(ids))]:
+            args['bool'+i].insert(0, "")
             args_req['cols'+i] = zip(args['bool'+i], args['cols'+i], args['col_value'+i])
         filename = "webstat_customevent_" + re.subn("[^\w]", "", ''.join(ids) + "_" + choosed['timespan'] + "_" + '-'.join([ ':'.join(col) for col in [ args['cols'+str(i)] for i in range(len(ids))]]) + "_asciidump")[0]
         args_req['ids'] = ids

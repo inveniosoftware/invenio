@@ -119,26 +119,22 @@ class Template:
 
                   <h3>How to create a new custom event</h3>
 
-                  <p>The listing below reflects the most basic usage. See
-                     <strong>%(bindir)s/webstatadmin --help</strong> for more options.</p>
-
                   <ol>
-                    <li>Execute the following command, where ID is the unique name you want to use
-                        when referring to the event:
-                        <pre>%(bindir)s/webstatadmin -n ID</pre>
+                    <li>Edit <strong>/opt/cds-invenio/etc/webstat/webstat.cfg</strong> adding
+                    the definition of the customevent:
+                    <pre>
+                    [webstat_custom_event_1]
+                    name = baskets
+                    param1 = action
+                    param2 = basket
+                    param3 = user</pre>
                     </li>
-                    <li>If the command completed succesfully, output similar to the following
-                        is generated:
-                        <pre>$ %(bindir)s/webstatadmin -n test
-Event table [staEVENT01] succesfully created.
-Please use event id [test] when registering an event.</pre>
+                    <li>The title must be <em>webstat_custom_event_(num)</em> where <em>(num)</em>
+                    is a number. The number can not be repeated in two different customevents.
                     </li>
-                    <li>You can now use the code snippet:
-                        <pre>from invenio.webstat import register_customevent
-register_customevent('test') </pre>
-                        from anywhere in your CDS Invenio sources in order to start logging
-                        the custom event 'test' using the use case logic of your choice!
-                    </li>
+                    <li>The option <em>name</em> is the name of the customevent.</li>
+                    <li>Each param in the customevent must be given as <em>param(num)</em> where
+                    <em>(num)</em> is an unique number.</li>
                   </ol>""" % { "bindir": CFG_BINDIR, }
 
 
