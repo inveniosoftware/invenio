@@ -228,7 +228,7 @@ def record_has_field(rec, tag):
 
 def record_add_field(rec, tag, ind1="", ind2="",
                      controlfield_value="",
-                     datafield_subfield_code_value_tuples=[],
+                     datafield_subfield_code_value_tuples=None,
                      desired_field_number=-1):
     """
     Add a new field TAG to record REC with the following values:
@@ -252,6 +252,8 @@ def record_add_field(rec, tag, ind1="", ind2="",
 
     Return the field number of newly created field.
     """
+    if datafield_subfield_code_value_tuples is None:
+        datafield_subfield_code_value_tuples = []
     (ind1, ind2) = wash_indicators(ind1, ind2)
 
     # detect field number to be used for insertion:
@@ -523,13 +525,15 @@ def record_get_field_values(rec, tag, ind1="", ind2="", code=""):
     # If tmp was not set, nothing was found
     return tmp
 
-def print_rec(rec, format=1, tags=[]):
+def print_rec(rec, format=1, tags=None):
     """prints a record
        format = 1 -- XML
        format = 2 -- HTML (not implemented)
        @tags: list of tags to be printed
       """
 
+    if tags is None:
+        tags = []
     if format == 1:
         text = record_xml_output(rec, tags)
     else:
@@ -537,13 +541,15 @@ def print_rec(rec, format=1, tags=[]):
 
     return text
 
-def print_recs(listofrec, format=1, tags=[]):
+def print_recs(listofrec, format=1, tags=None):
     """prints a list of records
        format = 1 -- XML
        format = 2 -- HTML (not implemented)
        @tags: list of tags to be printed
        if 'listofrec' is not a list it returns empty string
     """
+    if tags is None:
+        tags = []
     text = ""
 
     if type(listofrec).__name__ !='list':
@@ -553,11 +559,13 @@ def print_recs(listofrec, format=1, tags=[]):
             text = "%s\n%s" % (text, print_rec(rec, format, tags))
     return text
 
-def record_xml_output(rec, tags=[]):
+def record_xml_output(rec, tags=None):
     """generates the XML for record 'rec' and returns it as a string
     @rec: record
     @tags: list of tags to be printed
     """
+    if tags is None:
+        tags = []
     xmltext = "<record>\n"
     if tags and "001" not in tags:
         tags.append("001")
