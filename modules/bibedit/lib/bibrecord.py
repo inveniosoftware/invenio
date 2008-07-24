@@ -302,6 +302,105 @@ def record_delete_field(rec, tag, ind1="", ind2="", field_number=None):
                     newlist.append(field)
         rec[tag] = newlist
 
+def record_delete_subfield(rec, tag, subfield, ind1="", ind2=""):
+    newlist = []
+    if rec.has_key(tag):
+        for field in rec[tag]:
+            if (field[1] == ind1 and field[2] == ind2):
+                newsublist = []
+                for sf in field[0]:
+                    if (sf[0] != subfield):
+                        newsublist.append(sf)
+                if newsublist != []:
+                    newlist.append((newsublist, field[1], field[2], field[3], field[4]))
+            else:
+                newlist.append(field)
+        rec[tag] = newlist
+
+def record_add_or_modify_subfield(record, field, subfield, ind1, ind2, value):
+    """
+       Modifies ( if exists) or creates ( if does not exist) subfield of a given field of record.
+       @param record record to be modified
+       @param field field tag
+       @subfield subfield tag
+       @ind1
+       @ind2
+       @value : value to be added
+    """
+    if (record.has_key(field)):
+        subfields = record_get_field_instances(rec = record, \
+                                                     tag = field, \
+                                                     ind1 = ind1, \
+                                                     ind2 = ind2)[0][0]
+        sfieldind = -1
+        for ind in range(0,len(subfields)):
+            if subfields[ind][0] == subfield:
+                sfieldind = ind
+                break
+
+        if sfieldind == -1:
+            subfields.append((subfield, value))
+        else:
+            subfields[sfieldind] = (subfield, value)
+    else:
+        record_add_field(rec = record, tag = field, \
+                             ind1 = ind1, ind2 = ind2, \
+                             datafield_subfield_code_value_tuples= \
+                             [(subfield, value)])
+
+def record_add_subfield(record, field, ind1, ind2, subfield, value):
+    """
+       Adds a subfield to given fiels
+
+    """
+    if (record.has_key(field)):
+        record[field][0][0].append((subfield, value))
+    else:
+        record_add_field(rec = record, tag = field, \
+                             ind1 = ind1, ind2 = ind2, \
+                             datafield_subfield_code_value_tuples= \
+                             [(subfield, value)])
+
+def record_does_field_exist(record, field, ind1, ind2):
+    """
+    Returns True if specified record exists and False otherwise
+    """
+    if record_get_field_instances(rec = record, \
+                                      tag = field, \
+                                      ind1 = ind1, \
+                                      ind2 = ind2) == []:
+        return False
+    else:
+        return True
+
+def record_filter_fields(record, ffunction):
+    """
+        Produces a filtered sequence of fields from record
+        @param record - record o be processed
+        @param ffunction - predicate telling if a given field should
+           be included in the sequence. Takes two arguments: field tag, field body
+    """
+    for fields in record:
+        for field in record[fields]:
+            if (ffunction(fields, field)):
+                yield field
+
+
+def record_replace_in_subfields(record, field, subfield, ind1, ind2, original, value):
+    """
+        Replaces specified string with another in a given subfields
+        (Only if whole field is equal to selected pattern)
+    """
+    for r_field in record_filter_fields(record,lambda code, f: code == field and f[1]==ind1 and f[2] == ind2):
+        subfields = []
+        for subf in r_field[0]:
+            if subf[0] == subfield and subf[1] == original:
+                subfields.append((subf[0], value))
+            else:
+                subfields.append((subf[0], subf[1]))
+        r_field[0][:] = subfields
+
+
 def tag_matches_pattern(tag, pattern):
     """
     Returns true if MARC 'tag' matches a 'pattern'.
@@ -1217,6 +1316,7 @@ def record_diff(rec1, rec2):
         if not rec1[0].has_key(field):
             result.append((field, 'a'))
     return result
+
 
 
 if psycho_available == 1:
