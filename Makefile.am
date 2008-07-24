@@ -255,5 +255,5 @@ update-v0.99.0-tables:
 update-v0.99.1-tables:
 	${prefix}/bin/dbexec < $(top_srcdir)/modules/miscutil/sql/tabcreate.sql
 	echo "ALTER TABLE sbmPARAMETERS CHANGE name name varchar(40) NOT NULL default '';" | ${prefix}/bin/dbexec
-
+	echo "ALTER TABLE bibdoc CHANGE docname docname varchar(250) COLLATE latin1_general_cs NOT NULL default 'file';" | ${prefix}/bin/dbexec
 CLEANFILES = *~
