@@ -38,10 +38,12 @@ from invenio.webuser import getUid, page_not_authorized, collect_user_info
 navtrail = (' <a class="navtrail" href=\"%s/help/admin\">Admin Area</a> '
             ) % CFG_SITE_URL
 
-def index(req, ln=CFG_SITE_LANG, recid=None, temp="false", format_tag='marc',
+def index(req, ln=CFG_SITE_LANG, recid=None, format_tag='marc',
           edit_tag=None, delete_tag=None, num_field=None, add=0, cancel=0,
-          delete=0, confirm_delete=0, **args):
+          delete=0, confirm_delete=0, view_history=None, **args):
     """BibEdit Admin interface."""
+    if view_history:
+        redirect_to_url(req, 'history?ln=%s&recid=%s' % (ln, recid))
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     uid = getUid(req)
@@ -62,7 +64,7 @@ def index(req, ln=CFG_SITE_LANG, recid=None, temp="false", format_tag='marc',
         else:
             # the user is logged in, so display the box:
             (body, errors, warnings) = perform_request_index(ln, recid,
-                cancel, delete, confirm_delete, uid, temp, format_tag,
+                cancel, delete, confirm_delete, uid, format_tag,
                 edit_tag, delete_tag, num_field, add, args)
     else:
         (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit',
@@ -72,7 +74,7 @@ def index(req, ln=CFG_SITE_LANG, recid=None, temp="false", format_tag='marc',
                                                              'runbibedit')
         if auth_code == 0:
             (body, errors, warnings) = perform_request_index(ln, recid,
-                cancel, delete, confirm_delete, uid, temp, format_tag,
+                cancel, delete, confirm_delete, uid, format_tag,
                 edit_tag, delete_tag, num_field, add, args)
         else:
             return page_not_authorized(req=req, text=auth_message,
@@ -96,7 +98,7 @@ def index(req, ln=CFG_SITE_LANG, recid=None, temp="false", format_tag='marc',
                 req         = req)
 
 def edit(req, recid=None, tag=None, num_field='0', num_subfield=0,
-         format_tag='marc', act_subfield=None, temp="false", add=0,
+         format_tag='marc', act_subfield=None, add=0,
          ln=CFG_SITE_LANG, **args):
     """Edit Field page."""
     ln = wash_language(ln)
@@ -114,7 +116,7 @@ def edit(req, recid=None, tag=None, num_field='0', num_subfield=0,
             (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit')
         if auth_code == 0:
             (body, errors, warnings) = perform_request_edit(ln, recid, uid,
-                tag, num_field, num_subfield, format_tag, temp, act_subfield,
+                tag, num_field, num_subfield, format_tag, act_subfield,
                 add, args)
         else:
             return page_not_authorized(req=req, text=auth_message,
@@ -177,6 +179,9 @@ def history(req, ln=CFG_SITE_LANG, recid=None, revid=None, revid_cmp=None,
     uid = getUid(req)
 
     recid = wash_url_argument(recid, "int")
+    debug = open('/opt/cds-invenio/var/tmp/debug2', 'w')
+    debug.write(str(recid))
+    debug.close()
     if (recid and (record_exists(recid)>0)):
         (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit',
             collection=guess_primary_collection_of_a_record(recid))
@@ -190,7 +195,7 @@ def history(req, ln=CFG_SITE_LANG, recid=None, revid=None, revid_cmp=None,
             return page_not_authorized(req=req, text=auth_message,
                                        navtrail=navtrail)
     else:
-        redirect_to_url(req, 'index')
+        redirect_to_url(req, 'index?ln=' + ln)
 
     title = _("Record") + " #" + str(recid)
     return page(title   = title,

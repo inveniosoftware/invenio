@@ -48,7 +48,7 @@ re_revdate_split = sre.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 
 bibedit_templates = invenio.template.load('bibedit')
 
-def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, format_tag, edit_tag,
+def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, format_tag, edit_tag,
                           delete_tag, num_field, add, dict_value=None):
     """Returns the body of main page. """
     errors   = []
@@ -56,13 +56,13 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
     body     = ''
 
     if cancel != 0:
-        os.system("rm %s.tmp" % get_file_path(cancel))
+        os.system("rm -f %s.tmp" % get_file_path(cancel))
 
     if delete != 0:
         if confirm_delete != 0:
-            body = bibedit_templates.confirm(ln, 'delete', delete, temp, format_tag)
+            body = bibedit_templates.confirm(ln, 'delete', delete, format_tag)
         else:
-            (record, junk) = get_record(ln, delete, uid, "false")
+            (record, junk) = get_record(delete, uid)
             add_field(delete, uid, record, "980", "", "", "c", "DELETED")
             save_temp_record(record, uid, "%s.tmp" % get_file_path(delete))
             return perform_request_submit(ln, delete, deleting=True)
@@ -70,10 +70,9 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
     else:
         if recid != 0 :
             if record_exists(recid) > 0:
-                (record, body) = get_record(ln, recid, uid, temp)
+                body = ''
+                (record, original_record) = get_record(recid, uid)
                 if record and not record_locked_p(recid):
-                    if add == 3:
-                        body = ''
                     if edit_tag is not None and dict_value is not None:
                         record = edit_record(recid, uid, record, edit_tag, dict_value, num_field)
                     if delete_tag is not None and num_field is not None:
@@ -94,9 +93,15 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
                             if another:
                                 #if the user pressed 'another' instead of 'done', take to editing
                                 return perform_request_edit(ln, recid, uid, tag, new_field_number, 0, 'marc', True, None, 0, dict_value)
-
+                    # Compare original record with version in tmp file, to
+                    # determine if it has been edited.
+                    if record != original_record:
+                        tmp = True
+                        body = bibedit_templates.editor_warning_temp_file(ln)
+                    else:
+                        tmp = False
                     revisions = len(get_record_revision_ids(recid)) - 1
-                    body += bibedit_templates.editor_table_header(ln, "record", recid, temp, format_tag, add=add, revisions=revisions)
+                    body += bibedit_templates.editor_table_header(ln, "record", recid, tmp, format_tag, add=add, revisions=revisions)
                     keys = record.keys()
                     keys.sort()
                     for tag in keys:
@@ -125,13 +130,13 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
     return (body, errors, warnings)
 
 def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
-                         format_tag, temp, act_subfield, add, dict_value):
+                         format_tag, act_subfield, add, dict_value):
     """Returns the body of edit page."""
     errors = []
     warnings = []
     body = ''
 
-    (record, junk) = get_record(ln, recid, uid, temp)
+    (record, junk) = get_record(recid, uid)
 
     if act_subfield is not None:
         if act_subfield == 'delete':
@@ -152,7 +157,8 @@ def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
         if value != "empty" and subcode != "empty":
             record = add_subfield(recid, uid, tag, record, num_field, subcode, value)
 
-    body += bibedit_templates.editor_table_header(ln, "edit", recid, temp=temp,
+
+    body += bibedit_templates.editor_table_header(ln, "edit", recid, False,
                                                 tag=tag, num_field=num_field, add=add)
 
     tag = tag[:3]
@@ -168,51 +174,42 @@ def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
     return (body, errors, warnings)
 
 def save_temp_record(record, uid, file_path):
-    """Save record dict in temp file."""
+    """Save record dict in tmp file."""
     file_temp = open(file_path, "w")
     cPickle.dump([uid, record], file_temp)
     file_temp.close()
 
-def get_record(ln, recid, uid, temp):
-    """Returns a record dict, and warning message in case of error."""
-
-    warning_temp_file = ''
+def get_record(recid, uid):
+    """
+    Returns original and tmp record dict. If returned tmp record dict is
+    empty, that indicates another user editing the record.
+    """
+    original_record = create_record(print_record(recid, 'xm'))[0]
+    tmp_record = ''
     file_path = get_file_path(recid)
 
-    if temp != "false":
-        warning_temp_file = bibedit_templates.editor_warning_temp_file(ln)
-
     if os.path.isfile("%s.tmp" % file_path):
-
-        (uid_record_temp, record) = get_tmp_record(recid)
-        if uid_record_temp != uid:
-
+        (tmp_record_uid, tmp_record) = get_tmp_record(recid)
+        if tmp_record_uid != uid:
             time_tmp_file = os.path.getmtime("%s.tmp" % file_path)
             time_out_file = int(time.time()) - CFG_BIBEDIT_TIMEOUT
-
             if time_tmp_file < time_out_file :
                 os.system("rm %s.tmp" % file_path)
-                record = create_record(print_record(recid, 'xm'))[0]
-                save_temp_record(record, uid, "%s.tmp" % file_path)
-
+                tmp_record = original_record
+                save_temp_record(tmp_record, uid, "%s.tmp" % file_path)
             else:
-                record = {}
-
-        else:
-            warning_temp_file = bibedit_templates.editor_warning_temp_file(ln)
-
+                tmp_record = {}
     else:
-        record = create_record(print_record(recid, 'xm'))[0]
-        save_temp_record(record, uid, "%s.tmp" % file_path)
+        tmp_record = original_record
+        save_temp_record(tmp_record, uid, "%s.tmp" % file_path)
 
-    return (record, warning_temp_file)
+    return tmp_record, original_record
 
 
 ######### EDIT #########
 
 def edit_record(recid, uid, record, edit_tag, dict_value, num_field):
     """Edits value of a record."""
-
     for num_subfield in range( len(dict_value.keys())/3 ): # Iterate over subfield indices of field
 
         new_subcode = dict_value.get("subcode%s"     % num_subfield, None)
@@ -447,7 +444,7 @@ def perform_request_history(ln, recid, revid, revid_cmp, action, uid,
         body += bibedit_templates.history_comparebox(ln, revdate,
             revdate_cmp, comparison)
         forms = bibedit_templates.history_forms(ln, recid, revids,
-            revdates, 'compare', revid, revid_cmp)
+            revdates, 'compare', revid, format_tag, revid_cmp)
 
     else:
         current = revid == revids[0]
@@ -455,12 +452,12 @@ def perform_request_history(ln, recid, revid, revid_cmp, action, uid,
             revid))[0]
         body += bibedit_templates.history_viewbox(ln, 'header',
             current, recid, revid, revdate)
-        body += bibedit_templates.history_revision(ln, recid,
+        body += bibedit_templates.history_revision(ln, recid, format_tag,
                                                         revision)
         body += bibedit_templates.history_viewbox(ln, 'footer',
             current, recid, revid, revdate)
         forms = bibedit_templates.history_forms(ln, recid, revids,
-            revdates, 'view', revid)
+            revdates, 'view', revid, format_tag)
 
     body += forms
     body += bibedit_templates.history_container('footer')

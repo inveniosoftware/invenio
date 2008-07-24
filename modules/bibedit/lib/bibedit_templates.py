@@ -49,7 +49,7 @@ class Template:
 
         return value
 
-    def confirm(self, ln, message='', recid='', temp='', format_tag='', revid='', revdate=''):
+    def confirm(self, ln, message='', recid='', format_tag='', revid='', revdate=''):
         """ Ask for confirmation of or confirm some critical action. """
         _ = gettext_set_language(ln)
         if message == 'delete':
@@ -61,7 +61,7 @@ class Template:
                          </form>
                        </div>
                        <div style="float:left;">
-                         <form action="%(bibediturl)s/index?recid=%(recid)s&temp=%(temp)s&format_tag=%(format_tag)s" method="POST">
+                         <form action="%(bibediturl)s/index?recid=%(recid)s&format_tag=%(format_tag)s" method="POST">
                            %(input_ln)s
                            %(input_button_no)s
                          </form>
@@ -72,7 +72,6 @@ class Template:
                           'input_ln'         : self.input('hidden', ln, 'ln'),
                           'input_button_yes' : self.input('submit', _("Yes"), class_css='formbutton'),
                           'input_button_no'  : self.input('submit', _("No"),  class_css='formbutton'),
-                          'temp'             : temp,
                           'format_tag'       : format_tag}
         if message == 'revert':
             question = _('Do you really want to revert to revision %(revdate)s of record #%(recid)s?'
@@ -105,7 +104,6 @@ class Template:
                           'input_ln'        : self.input('hidden', ln, 'ln'),
                           'input_button_yes': self.input('submit', _("Yes"), class_css='formbutton'),
                           'input_button_no' : self.input('submit', _("No"),  class_css='formbutton'),
-                          'temp'            : temp,
                           'format_tag'      : format_tag}
 
     def input(self, type_input, value='', name='', maxlength='', size='', class_css='', style=''):
@@ -187,8 +185,7 @@ class Template:
                 result += '''%s<br /><br />
                 <h2>%s</h2>''' % (message, header)
 
-        view_history_action = "document.selectForm.action='%s/history';" % bibediturl
-        input_button_history = '<input type="submit" name="view_history" value="View history" class="formbutton" onClick="%s">' % view_history_action
+        input_button_history = '<input type="submit" name="view_history" value="View history" class="formbutton">'
         result += """ <form name="selectForm" action="%(bibediturl)s/index"  method="POST">
                         %(input_ln)s
                         <span style="background-color: #ddd; padding: 5px;">
@@ -258,7 +255,6 @@ class Template:
                                                  'tag'          : tag_field[:-1]+ tag_subfield,
                                                  'num_field'    : num_field,
                                                  'format_tag'   : format_tag,
-                                                 'temp'         : 'true',
                                                  'act_subfield' : 'delete', #delete
                                                  'num_subfield' : num_value})
                     if num_value > 0:
@@ -269,7 +265,6 @@ class Template:
                                                  'tag'          : tag_field[:-1]+ tag_subfield,
                                                  'num_field'    : num_field,
                                                  'format_tag'   : format_tag,
-                                                 'temp'         : 'true',
                                                  'act_subfield' : 'move_up', #move up
                                                  'num_subfield' : num_value})
                     else:
@@ -282,7 +277,6 @@ class Template:
                                                  'tag'          : tag_field[:-1]+ tag_subfield,
                                                  'num_field'    : num_field,
                                                  'format_tag'   : format_tag,
-                                                 'temp'         : 'true',
                                                  'act_subfield' : 'move_down',
                                                  'num_subfield' : num_value})
 
@@ -309,7 +303,7 @@ class Template:
                                     'print_old_value'    : print_old_value,
                                     'print_btn'          : print_btn}
 
-    def editor_table_header(self, ln, type_table, recid, temp="false", format_tag='marc',
+    def editor_table_header(self, ln, type_table, recid, tmp, format_tag='marc',
                           tag='', num_field=None, add=0, revisions=0):
         """ Return the Header of table. """
 
@@ -335,7 +329,6 @@ class Template:
                                                      'tag'        : tag[:3],
                                                      'num_field'  : str(num_field),
                                                      'format_tag' : format_tag,
-                                                     'temp'       : 'true',
                                                      'add'        : 1})
 
                 link_edit_100 = ""
@@ -350,7 +343,6 @@ class Template:
                          'tag'        : tag[:3],
                          'num_field'  : str(num_field),
                          'format_tag' : format_tag,
-                         'temp'       : 'true',
                          'add'        : 1})
                     print_action_edit_100 = """ %(field)s:
                                                 %(link_edit_100)s
@@ -373,7 +365,6 @@ class Template:
 
             formcontents = """ <form action="%(bibediturl)s/%(link_form)s" method="POST">
                            %(input_recid)s
-                           %(input_temp)s
                            %(input_ln)s
                          <div class="bibEditCellRight" style="font-weight: normal;">
                            %(print_action_add_subfield)s
@@ -381,7 +372,6 @@ class Template:
                          </div>
                      """ % {'bibediturl'            : bibediturl,
                             'input_recid'               : self.input('hidden', recid,  'recid'),
-                            'input_temp'                : self.input('hidden', 'true', 'temp'),
                             'input_ln'                  : self.input('hidden', ln,     'ln'),
                             'link_form'                 : link_form,
                             'print_action_add_subfield' : print_action_add_subfield,
@@ -393,20 +383,17 @@ class Template:
                                                  {'recid'      : str(recid),
                                                   'tag'        : tag[:3],
                                                   'format_tag' : format_tag,
-                                                  'temp'       : 'true',
                                                   'add'        : 3}, 'add') + " | "
 
             link_diplay_verbose = self.link(ln, _("Verbose"), bibediturl, 'index',
                                                  {'recid'      : str(recid),
-                                                  'format_tag' : 's',
-                                                  'temp'       : temp})
+                                                  'format_tag' : 's'})
 
             link_diplay_marc    = self.link(ln, "MARC", bibediturl, 'index',
                                                  {'recid'      : str(recid),
-                                                  'format_tag' : 'marc',
-                                                  'temp'       : temp})
+                                                  'format_tag' : 'marc'})
 
-            if temp != "false" and add != 3:
+            if tmp and add != 3:
                 link_submit = self.link(ln, _("Submit"), bibediturl, 'submit', {'recid' : str(recid)}) + " | "
 
             if add == 3:
@@ -416,8 +403,7 @@ class Template:
                 link_cancel = self.link(ln, _("Cancel"), bibediturl, 'index', {'cancel' : str(recid)})
 
                 link_delete = self.link(ln, _("Delete"), bibediturl, 'index', {'delete' : str(recid),
-                                                                                        'confirm_delete' :1,
-                                                                                        'temp' : temp})
+                                                                                        'confirm_delete' :1})
 
                 result = """ <div class="bibEditCellRight" style="font-weight: normal">
                                  &nbsp;%(action)s: %(link_submit)s%(link_cancel)s
@@ -438,7 +424,8 @@ class Template:
 
         history_link = ''
         if revisions:
-            history_dest = 'history?ln=%s&recid=%s' % (ln, recid)
+            history_dest = 'history?ln=%s&recid=%s&format_tag=%s' % (
+                ln, recid, format_tag)
             if revisions == 1:
                 history_link_text = _('(%s previous revision)') % revisions
             else:
@@ -525,7 +512,6 @@ class Template:
             result = """ <td class="bibEditCellTag">
                            <form action="%(bibediturl)s/index" method="GET">
                              %(input_recid)s
-                             %(input_temp)s
                              %(input_ln)s
                              %(input_add)s
                              <b>
@@ -538,7 +524,6 @@ class Template:
                                </b>
                          </td> """ % {'bibediturl' : bibediturl,
                                       'input_recid'    : self.input('hidden', recid, 'recid'),
-                                      'input_temp'     : self.input('hidden', 'true', 'temp'),
                                       'input_add'      : self.input('hidden', 4, 'add'),
                                       'input_ln'       : self.input('hidden', ln, 'ln'),
                                       'recid'          : str(recid),
@@ -586,16 +571,14 @@ class Template:
                                   {'recid'        : str(recid),
                                    'tag'          : tag,
                                    'num_field'    : num_field,
-                                   'format_tag'   : format_tag,
-                                   'temp'         : 'true'})
+                                   'format_tag'   : format_tag})
 
         btn_delete = self.link(ln, '<img style="border: 0px" src="%s" alt="%s" />' % (btn_delete_url, _("Delete")),
                                     bibediturl, 'index',
                                     {'recid'      : str(recid),
                                      'delete_tag' : tag,
                                      'num_field'  : num_field,
-                                     'format_tag' : format_tag,
-                                     'temp'       : 'true'})
+                                     'format_tag' : format_tag})
 
         return """ <td rowspan="%(len_subfields)s" style="text-align:center;vertical-align:top;">
                      %(btn_edit)s
@@ -608,7 +591,7 @@ class Template:
                       'btn_delete'    : btn_delete}
 
     def editor_warning_temp_file(self, ln):
-        """ Return a warning message for user who use a temp file. """
+        """ Return a warning message for user who use a tmp file. """
 
         _ = gettext_set_language(ln)
 
@@ -665,7 +648,7 @@ class Template:
        </div>'''
         return out
 
-    def history_revision(self, ln, recid, revision):
+    def history_revision(self, ln, recid, format_tag, revision):
         """ Display the content of a record in the bibedit history. """
         out = ''
         keys = revision.keys()
@@ -678,15 +661,14 @@ class Template:
             if fields != "empty":
                 for field in fields:
                     if field[0]: # Only display if has subfield(s)
-                        out += self.history_table_value(ln, recid, tag, field)
+                        out += self.history_table_value(ln, recid,
+                            format_tag, tag, field)
         return out
 
-    def history_table_value(self, ln, recid, tag, field):
+    def history_table_value(self, ln, recid, format_tag, tag, field):
         """ Return a field to print in table, like editor_table_value, but
             without the edit and delete buttons."""
         #FIXME: We should refactor to get a more generic printing of these fields.
-
-        format_tag = 'marc'
         type_table = 'record'
 
         subfields = field[0]
@@ -745,12 +727,14 @@ class Template:
          </p>
        </div>''' % (title, comparison)
 
-    def history_forms(self, ln, recid, revids, revdates, page_type, revid, revid_cmp=None):
+    def history_forms(self, ln, recid, revids, revdates, page_type, revid,
+        format_tag, revid_cmp=None):
         """ Display the bibedit history option forms. """
         _ = gettext_set_language(ln)
         # Hidden input fields
         input_ln = self.input('hidden', value=ln, name='ln')
         input_recid = self.input('hidden', value=recid, name='recid')
+        input_format_tag = self.input('hidden', value=format_tag, name='format_tag')
         input_compare = self.input('hidden', value='compare', name='action')
         input_revert = self.input('hidden', value='revert', name='action')
 
@@ -783,15 +767,16 @@ class Template:
         default_actionurl = bibediturl + '/history'
 
         edit_form = self.history_form(bibediturl + '/index', input_edit_submit,
-            hidden_fields=(input_ln, input_recid))
+            hidden_fields=(input_ln, input_recid, input_format_tag))
         view_form = self.history_form(default_actionurl, input_view_submit,
-            ('revid',), (optlist_view,), (input_ln, input_recid))
+            ('revid',), (optlist_view,), (input_ln, input_recid,
+                                          input_format_tag))
         compare_form = self.history_form(default_actionurl, input_compare_submit,
             ('revid', 'revid_cmp'), (optlist_cmp1, optlist_cmp2), (input_ln,
-            input_recid, input_compare))
+            input_recid, input_format_tag, input_compare))
         revert_form = self.history_form(default_actionurl, input_revert_submit,
             ('revid',), (optlist_revert,), (input_ln, input_recid,
-            input_revert))
+                                            input_format_tag, input_revert))
         back_form = self.history_form(bibediturl + '/index', input_back_submit,
             hidden_fields=(input_ln,))
         return '''
