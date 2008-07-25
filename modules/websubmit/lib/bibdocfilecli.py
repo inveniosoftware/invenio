@@ -56,7 +56,7 @@ def _xml_fft_creator(fft):
     out += _xml_mksubfield('newdocname', 'm', fft)
     out += _xml_mksubfield('doctype', 't', fft)
     out += _xml_mksubfield('description', 'd', fft)
-    out += _xml_mksubfield('comment', 'c', fft)
+    out += _xml_mksubfield('comment', 'z', fft)
     out += _xml_mksubfield('restriction', 'r', fft)
     out += _xml_mksubfield('icon', 'x', fft)
     out += '\t</datafield>\n'
@@ -120,7 +120,7 @@ _actions = [('get-info', 'print all the informations about the record/bibdoc/fil
             #'get-restrictions',
             #'get-icons',
             ('get-history', 'print the document history'),
-            #'delete',
+            ('delete', 'delete the specified docname'),
             #'undelete',
             #'purge',
             #'expunge',
@@ -407,6 +407,15 @@ def cli_fix_marc(recid_set):
             ffts[recid].append({'docname' : docname, 'doctype' : 'FIX-MARC'})
     return bibupload_ffts(ffts, append=False)
 
+def cli_delete(recid, docname):
+    """Delete the given docname of the given recid."""
+    if docname in BibRecDocs(recid).get_bibdoc_names():
+        ffts = {}
+        ffts[recid] = [{'docname' : docname, 'doctype' : 'DELETE'}]
+        return bibupload_ffts(ffts, append=False)
+    else:
+        print >> sys.stderr('%s is not a valid docname for recid %s' % (docname, recid))
+
 def cli_get_info(recid_set):
     """Print all the info of a recid_set."""
     for recid in recid_set:
@@ -491,6 +500,8 @@ def main():
         cli_fix_all(recid_set)
     elif options.action == 'fix-marc':
         cli_fix_marc(recid_set)
+    elif options.action == 'delete':
+        cli_delete(options.recid, options.docname)
     elif options.append_path:
         res = cli_append(options.recid, options.docid, options.docname, options.doctype, options.append_path, options.format, options.icon, options.description, options.comment, options.restriction)
         if not res:
