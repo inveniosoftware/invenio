@@ -27,6 +27,7 @@ from invenio.config import \
      CFG_SITE_NAME, \
      CFG_WEBDIR, \
      CFG_TMPDIR, \
+     CFG_SITE_URL, \
      CFG_SITE_LANG
 from invenio.webstat_config import CFG_WEBSTAT_CONFIG_PATH
 from invenio.search_engine import get_alphabetically_ordered_collection_list
@@ -352,6 +353,27 @@ def basket_display():
         res = []
 
     return res
+
+def get_url_customevent(url_dest, id, *arguments):
+    """
+    Get an url for registers a custom event. Every time is load the
+    url will register a customevent as register_customevent().
+
+    @param id: Human-readable id of the event to be registered
+    @type id: str
+
+    @param *arguments: The rest of the parameters of the function call
+    @type *arguments: [params]
+
+    @param id: url to redirect after register the event
+    @type id: str
+
+    @return: url for register event
+    @type: str
+    """
+    #FIXME: is url secure?
+    return "%s/stats/customevent_register?id=%s&arg=%s&url=%s" % \
+            (CFG_SITE_URL, id, ','.join(arguments[0]), url_dest)
 
 # WEB
 
@@ -755,15 +777,20 @@ def _get_formats(with_dump=False):
     else:
         return [(x[0], x[1]) for x in TYPE_REPOSITORY if x[0] != 'asciidump']
 
-def _get_customevent_cols():
+def _get_customevent_cols(id=""):
     """
     List of all the diferent name of columns in customevents.
 
     @return: [(internal name, readable name)]
     @type: [(str, str)]
     """
+    sql_str = "SELECT cols FROM staEVENT"
+    sql_param = []
+    if id:
+        sql_str += "WHERE id = %s"
+        sql_param.append(id)
     cols = []
-    for x in run_sql("SELECT cols FROM staEVENT"):
+    for x in run_sql(sql_str, sql_param):
         if x[0]:
             cols.extend(cPickle.loads(x[0]))
 

@@ -38,6 +38,7 @@ from invenio.webstat import perform_request_index
 from invenio.webstat import perform_display_keyevent
 from invenio.webstat import perform_display_customevent
 from invenio.webstat import perform_display_customevent_help
+from invenio.webstat import register_customevent
 
 def detect_suitable_graph_format():
     """
@@ -58,7 +59,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     _exports = [ '',
                  'collection_population', 'search_frequency', 'search_type_distribution',
-                 'download_frequency', 'customevent', 'customevent_help',
+                 'download_frequency', 'customevent', 'customevent_help', 'customevent_register',
                  'export' ]
 
     navtrail = """<a class="navtrail" href="%s/stats/%%(ln_link)s">Statistics</a>""" % CFG_SITE_URL
@@ -252,6 +253,24 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                     lastupdated=__lastupdated__,
                     navmenuid='custom event help',
                     language=ln)
+
+    def customevent_register(self, req, form):
+        """Register a customevent and reload to it defined url"""
+        argd = wash_urlargd(form, {'id': (str, ""),
+                                   'arg': (str, ""),
+                                   'url': (str, ""),
+                                   'ln': (str, CFG_SITE_LANG)})
+        register_customevent(argd['id'], argd['arg'].split(','))
+        return """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+                <html xmlns="http://www.w3.org/1999/xhtml">
+                <head>
+                    <title>Loading</title>
+                    <meta http-equiv="refresh" content="0;url=%s" />
+                </head>
+                <body></body>
+                </html>""" % argd['url']
+
 
     # EXPORT SECTION
 
