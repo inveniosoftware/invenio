@@ -54,6 +54,7 @@ from invenio.bibrankadminlib import \
 from invenio.dbquery import run_sql
 from invenio.webpage import page, pageheaderonly, pagefooteronly, adderrorbox
 from invenio.webuser import getUid, get_email
+from invenio.bibharvest_dblayer import get_history_entries, HistoryEntry
 
 import invenio.template
 bibharvest_templates = invenio.template.load('bibharvest')
@@ -93,7 +94,8 @@ def perform_request_index(ln=CFG_SITE_LANG):
         editACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/editsource", title = "edit", args = namelinked_args)
         delACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/delsource", title = "delete", args = namelinked_args)
         testACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/testsource", title = "test", args = namelinked_args)
-        action = editACTION + " / " + delACTION + " / " + testACTION
+        historyACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/viewhistory", title = "history", args = namelinked_args)
+        action = editACTION + " / " + delACTION + " / " + testACTION + " / " + historyACTION
         sources.append([namelinked,oai_src_baseurl,oai_src_prefix,freq,oai_src_config,oai_src_post, action])
 
     updates = []
@@ -436,6 +438,31 @@ def perform_request_testsource(oai_src_id=None, ln=CFG_SITE_LANG, callback='yes'
             "/admin/bibharvest/bibharvestadmin.py/preview_harvested_xml?oai_src_id=" \
             + urllib.quote(str(oai_src_id)) + "&record_id=" \
             + urllib.quote(str(record_id)))
+    return result
+
+
+### Probably should be moved to some other data-connection file
+
+
+def format_history_entries(orig_data):
+    headers = ["Date", "arXiv ID", "operation"]
+    result = []
+    for item in orig_data:
+        if item.operation == "i":
+            oper = "inserted"
+        elif item.operation == "u":
+            oper = "updated"
+        else:
+            oper = "unknown"
+
+        result.append([item.date, item.arXivId, oper])
+    return (headers, result)
+
+def perform_request_viewhistory(oai_src_id=None, ln=CFG_SITE_LANG, callback='yes', confirm=0):
+    """ Creates html to view the harvesting history """
+    result = ""
+    headers, data = format_history_entries(get_history_entries(oai_src_id))
+    result += bibharvest_templates.tmpl_output_table(headers, data)
     return result
 
 ############################################################

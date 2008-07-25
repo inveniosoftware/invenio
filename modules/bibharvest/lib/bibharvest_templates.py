@@ -241,3 +241,20 @@ class Template:
         output = "<iframe src=\"" + url + "\" width=\"80%\" height=\"400\"></iframe>"
         return output
 
+    def tmpl_output_table(self, title_row = [], data = []):
+        """
+           Prints a table of given titles and data
+           @param title_row is a list of titles of columns
+           @param data is a list o rows. Each row is a list of string values
+        """
+        result = "<table><tr>"
+        for header in title_row:
+            result += "<td><b>"+ header + "</b></td>"
+        result += "</tr>"
+        for row in data:
+            result += "<tr>"
+            for item in row:
+                result += "<td>" + item + "</td>"
+            result += "</tr>"
+        result += "</table>"
+        return result
