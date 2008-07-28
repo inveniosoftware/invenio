@@ -2355,8 +2355,6 @@ def perform_addauthorization(req, id_role="0", id_action="0", optional=0, revers
     <dl>
     <dt><a href="addrole">Create new role</a></dt>
     <dd>go here to add a new role.</dd>
-    <dt><a href="addaction">Create new action</a></dt>
-    <dd>go here to add a new action.</dd>
     </dl>
     """
 
@@ -2688,8 +2686,6 @@ def perform_modifyauthorizations(req, id_role="0", id_action="0", reverse=0, con
     <dl>
     <dt><a href="addrole">Create new role</a></dt>
     <dd>go here to add a new role.</dd>
-    <dt><a href="addaction">Create new action</a></dt>
-    <dd>go here to add a new action.</dd>
     </dl>
     """
     if id_role or id_action:
