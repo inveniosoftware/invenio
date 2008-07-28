@@ -61,10 +61,11 @@ def perform_index(ln=CFG_SITE_LANG, mtype='', content=''):
     <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/index?ln=%s&amp;mtype=perform_showindexoverview#1">Overview of indexes</a></small></td>
     <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/index?ln=%s&amp;mtype=perform_editindexes#2">Edit index</a></small></td>
     <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/index?ln=%s&amp;mtype=perform_addindex#3">Add new index</a></small></td>
-    <td>4.&nbsp;<small><a href="%s/help/admin/bibindex-admin-guide">Guide</a></small></td>
+    <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/field?ln=%s">Manage logical fields</a></small></td>
+    <td>5.&nbsp;<small><a href="%s/help/admin/bibindex-admin-guide">Guide</a></small></td>
     </tr>
     </table>
-    """ % (CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL)
+    """ % (CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL)
 
     if mtype == "perform_showindexoverview" and content:
         fin_output += content
@@ -95,10 +96,16 @@ def perform_field(ln=CFG_SITE_LANG, mtype='', content=''):
     <td>1.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/field?ln=%s&amp;mtype=perform_showfieldoverview#1">Overview of logical fields</a></small></td>
     <td>2.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/field?ln=%s&amp;mtype=perform_editfields#2">Edit logical field</a></small></td>
     <td>3.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/field?ln=%s&amp;mtype=perform_addfield#3">Add new logical field</a></small></td>
-    <td>4.&nbsp;<small><a href="%s/help/admin/bibindex-admin-guide">Guide</a></small></td>
+    <td>4.&nbsp;<small><a href="%s/admin/bibindex/bibindexadmin.py/index?ln=%s">Manage Indexes</a></small></td>
+    <td>5.&nbsp;<small><a href="%s/help/admin/bibindex-admin-guide">Guide</a></small></td>
     </tr>
     </table>
-    """ % (CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL)
+    """ % (CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL, ln, CFG_SITE_URL)
+
+    if mtype == "perform_showfieldoverview" and content:
+        fin_output += content
+    elif mtype == "perform_showfieldoverview" or not mtype:
+        fin_output += perform_showfieldoverview(ln, callback='')
 
     if mtype == "perform_editfields" and content:
         fin_output += content
@@ -109,11 +116,6 @@ def perform_field(ln=CFG_SITE_LANG, mtype='', content=''):
         fin_output += content
     elif mtype == "perform_addfield" or not mtype:
         fin_output += perform_addfield(ln, callback='')
-
-    if mtype == "perform_showfieldoverview" and content:
-        fin_output += content
-    elif mtype == "perform_showfieldoverview" or not mtype:
-        fin_output += perform_showfieldoverview(ln, callback='')
 
     return addadminbox("<b>Menu</b>",  [fin_output])
 
@@ -327,7 +329,7 @@ def perform_editindexes(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1
 def perform_editfields(ln=CFG_SITE_LANG, callback='yes', content='', confirm=-1):
     """show a list of all logical fields that can be edited."""
 
-    subtitle = """<a name="5"></a>5. Edit logical field&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (CFG_SITE_URL)
+    subtitle = """<a name="2"></a>2. Edit logical field&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % (CFG_SITE_URL)
 
     fin_output = ''
 
@@ -629,7 +631,7 @@ def perform_addfield(ln=CFG_SITE_LANG, fldNAME='', code='', callback="yes", conf
     code - the field code"""
 
     output = ""
-    subtitle = """<a name="6"></a>6. Add new logical field"""
+    subtitle = """<a name="3"></a>3. Add new logical field"""
     code = str.replace(code,' ', '')
     text = """
     <span class="adminlabel">Field name</span>
@@ -732,7 +734,7 @@ def perform_deleteindex(idxID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
         return addadminbox(subtitle, body)
 
 def perform_showfieldoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
-    subtitle = """<a name="4"></a>4. Logical fields overview"""
+    subtitle = """<a name="1"></a>1. Logical fields overview"""
     output = """<table cellpadding="3" border="1">"""
     output += """<tr><td><strong>%s</strong></td><td><strong>%s</strong></td><td><strong>%s</strong></td></tr>""" % ("Field", "MARC Tags", "Translations")
     query = "SELECT id,name FROM field"
