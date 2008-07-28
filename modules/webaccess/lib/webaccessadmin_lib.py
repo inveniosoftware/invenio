@@ -3110,7 +3110,7 @@ def startpage():
     <dt><a href="webaccessadmin.py/manageaccounts">Manage accounts Area</a></dt>
     <dd>manage user accounts.</dd>
     <dt><a href="webaccessadmin.py/delegate_startarea">Delegate Rights - With Restrictions</a></dt>
-    <dd>delegate your rights for some roles..</dd>
+    <dd>delegate your rights for some roles.</dd>
     </dl>
 </td>
 </tr>
