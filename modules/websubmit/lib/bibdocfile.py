@@ -25,6 +25,7 @@ import shutil
 import md5
 import filecmp
 import time
+import random
 import socket
 import urllib2
 import urllib
@@ -1471,7 +1472,7 @@ class BibDocFile:
             auth_code = 0
         if auth_code == 0:
             if os.path.exists(self.fullpath):
-                if calculate_md5(self.fullpath) != self.checksum:
+                if random.random() < 0.25 and calculate_md5(self.fullpath) != self.checksum:
                     raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
                 req.content_type = self.mime
                 req.encoding = self.encoding
