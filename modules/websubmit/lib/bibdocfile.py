@@ -1476,8 +1476,10 @@ class BibDocFile:
                 req.content_type = self.mime
                 req.encoding = self.encoding
                 req.filename = self.fullname
-                req.headers_out["Content-Disposition"] = \
-                    "inline; filename=%s" % quoteattr(self.fullname)
+                req.headers_out["Last-Modified"] = self.md.strftime('%a, %d %b %Y %X GMT')
+                req.headers_out["Accept-Ranges"] = "none"
+                #req.headers_out["Content-Disposition"] = \
+                    #"inline; filename=%s" % quoteattr(self.fullname)
                 req.set_content_length(self.size)
                 req.send_http_header()
                 try:
