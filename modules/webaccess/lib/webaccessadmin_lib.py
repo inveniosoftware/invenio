@@ -3107,9 +3107,10 @@ def startpage():
     <dd>configure administration rights with the users as starting point.</dd>
     <dt><a href="webaccessadmin.py/resetarea">Reset Area</a></dt>
     <dd>reset roles, actions and authorizations.</dd>
-    </dl>
     <dt><a href="webaccessadmin.py/manageaccounts">Manage accounts Area</a></dt>
     <dd>manage user accounts.</dd>
+    <dt><a href="webaccessadmin.py/delegate_startarea">Delegate Rights - With Restrictions</a></dt>
+    <dd>delegate your rights for some roles..</dd>
     </dl>
 </td>
 </tr>
