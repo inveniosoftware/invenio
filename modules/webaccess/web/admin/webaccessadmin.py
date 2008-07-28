@@ -153,31 +153,6 @@ def delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
                                                confirm=confirm)
 
 
-def addaction(req, name_action='', arguments='', optional='no', description='put description here.', confirm=0):
-    """form to add a new action with these values:
-
-    name_action - name of the new action
-
-      arguments - allowedkeywords, separated by whitespace
-
-    description - optional description of the action"""
-
-    return wal.perform_addaction(req=req,
-                                 name_action=name_action,
-                                 arguments=arguments,
-                                 optional=optional,
-                                 description=description,
-                                 confirm=confirm)
-
-
-def deleteaction(req, id_action="0", confirm=0):
-    """show all roles connected, and ask for confirmation."""
-
-    return wal.perform_deleteaction(req=req,
-                                    id_action=id_action,
-                                    confirm=confirm)
-
-
 def addrole(req, name_role='', description='put description here.', firerole_def_src=CFG_ACC_EMPTY_ROLE_DEFINITION_SRC, confirm=0):
     """form to add a new role with these values:
 

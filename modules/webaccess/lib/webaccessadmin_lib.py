@@ -205,8 +205,6 @@ def perform_rolearea(req):
     <dl>
     <dt><a href="addrole">Create new role</a></dt>
     <dd>go here to add a new role.</dd>
-    <dt><a href="addaction">Create new action</a></dt>
-    <dd>go here to add a new action.</dd>
     </dl>
     """
 
@@ -223,7 +221,7 @@ def perform_actionarea(req):
     (auth_code, auth_message) = is_adminuser(req)
     if auth_code != 0: return mustloginpage(req, auth_message)
 
-    header = ['id', 'name', 'authorizations/roles', 'action', '']
+    header = ['id', 'name', 'authorizations/roles', '']
     actions = acca.acc_get_all_actions()
 
     actions2 = []
@@ -233,7 +231,6 @@ def perform_actionarea(req):
         for col in [(('add', 'addauthorization'),
                     ('modify', 'modifyauthorizations'),
                     ('remove', 'deleteroleaction')),
-                    (('delete', 'deleteaction'), ),
                     (('show details', 'showactiondetails'), )]:
             actions2[-1].append('<a href="%s?id_action=%s&amp;reverse=1">%s'
                 '</a>' % (col[0][1], id, col[0][0]))
@@ -248,8 +245,7 @@ def perform_actionarea(req):
         connection between a role and an action (possibly) containing
         arguments.</dd>
     <dt>Actions:</dt>
-    <dd>see all the information attached to an action and decide if you
-        want to<br />delete it.</dd>
+    <dd>see all the information attached to an action.</dd>
     </dl>
     """
 
@@ -259,8 +255,6 @@ def perform_actionarea(req):
     <dl>
     <dt><a href="addrole">Create new role</a>
     <dd>go here to add a new role.
-    <dt><a href="addaction">Create new action</a>
-    <dd>go here to add a new action.
     </dl>
     """
 
@@ -1485,159 +1479,6 @@ def perform_delegate_deleteuserrole(req, id_role=0, id_user=0, confirm=0):
                 body=[output, extra],
                 adminarea=1,
                 authorized=1)
-
-
-def perform_addaction(req, name_action='', arguments='', optional='no', description='put description here.', confirm=0):
-    """form to add a new action with these values:
-
-    name_action - name of the new action
-
-    arguments - allowedkeywords, separated by whitespace
-
-    description - optional description of the action"""
-
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0: return mustloginpage(req, auth_message)
-
-    name_action = cleanstring(name_action)
-    arguments = cleanstring(arguments, comma=1)
-
-    title = 'Add Action'
-    subtitle = 'step 1 - give values to the requested fields'
-
-    output  = """
-    <form action="addaction" method="POST">
-    <span class="adminlabel">action name </span>
-    <input class="admin_wvar" type="text" name="name_action" value="%s" /> <br />
-    <span class="adminlabel">arguments </span>
-    <input class="admin_wvar" type="text" name="arguments" value="%s" />
-    <small>keywords for arguments, separate with comma, no whitespace.</small> <br />
-    <span class="adminlabel">optional arguments</span>
-    <select name="optional" class="admin_w200">
-    <option value="no" selected="selected">no, not allowed</option>
-    <option value="yes" %s>yes, allowed</option>
-    </select><br />
-    <span class="adminlabel">description </span>
-    <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea>
-    <input class="adminbutton" type="submit" value="add action" />
-    </form>
-    """ % (name_action, arguments, optional == 'yes' and 'selected="selected"' or '', description)
-
-    if name_action:
-        # description must be changed before it is submitted
-        if description == 'put description here.': internaldesc = ''
-        else: internaldesc = description
-
-        if arguments:
-            subtitle = 'step 2 - confirm to add action with %s arguments' % (optional == 'yes' and 'optional' or '', )
-            arguments = arguments.replace(' ', '')
-            text  = 'add action with: <br />\n'
-            text += 'name: <strong>%s</strong><br />\n' % (name_action, )
-            if internaldesc:
-                text += 'description: <strong>%s</strong><br />\n' % (description, )
-            text += '%sarguments: <strong>%s</strong><br />' % (optional == 'yes' and 'optional ' or '', arguments)
-            text += 'optional: <strong>%s</strong>?' % (optional, )
-
-        else:
-            optional = 'no'
-            subtitle = 'step 2 - confirm to add action without arguments'
-            text = 'add action <strong>%s</strong> without arguments' % (name_action, )
-            if internaldesc: text += '<br />\nand description: <strong>%s</strong>?\n' % (description, )
-            else: text += '?\n'
-
-        output += createhiddenform(action="addaction",
-                                text=text,
-                                name_action=name_action,
-                                arguments=arguments,
-                                optional=optional,
-                                description=description,
-                                confirm=1)
-
-        if confirm not in ["0", 0]:
-            arguments = arguments.split(',')
-            result = acca.acc_add_action(name_action,
-                                        internaldesc,
-                                        optional,
-                                        *arguments)
-
-            if result:
-                subtitle = 'step 3 - action added'
-                output += '<p>action added:</p>'
-                output += tupletotable(header=['id', 'action name', 'description', 'allowedkeywords', 'optional'],
-                                    tuple=[result])
-            else:
-                subtitle = 'step 3 - action could not be added'
-                output += '<p>sorry, could not add action, <br />action with the same name probably exists.</p>'
-
-            extra = """
-            <dl>
-            <dt><a href="addauthorization?id_action=%s&amp;reverse=1">Add authorization</a></dt>
-            <dd>start adding new authorizations to action %s.</dd>
-            </dl> """ % (acca.acc_get_action_id(name_action=name_action), name_action)
-
-    try: body = [output, extra]
-    except NameError: body = [output]
-
-    return index(req=req,
-                title=title,
-                body=body,
-                subtitle=subtitle,
-                adminarea=4)
-
-
-def perform_deleteaction(req, id_action="0", confirm=0):
-    """show all roles connected, and ask for confirmation.
-
-    id_action - id of action to delete """
-
-    (auth_code, auth_message) = is_adminuser(req)
-    if auth_code != 0: return mustloginpage(req, auth_message)
-
-    title='Delete action'
-    subtitle='step 1 - select action to delete'
-    name_action = acca.acc_get_action_name(id_action=id_action)
-
-    output = createactionselect(id_action=id_action,
-                                action="deleteaction",
-                                step=1,
-                                actions=acca.acc_get_all_actions(),
-                                button="delete action")
-
-    if id_action != "0" and name_action:
-        subtitle = 'step 2 - confirm the delete'
-
-        output += actiondetails(id_action=id_action)
-
-        if acca.acc_get_action_roles(id_action=id_action):
-            output += createhiddenform(action="deleteroleaction",
-                                    text="""rather delete only connection between action %s
-                                    and a selected role?""" % (name_action, ),
-                                    id_action=id_action,
-                                    reverse=1,
-                                    button='go there')
-
-        output += createhiddenform(action="deleteaction",
-                                text=' delete action <strong>%s</strong> and all connections?' % (name_action, ),
-                                confirm=1,
-                                id_action=id_action)
-
-        if confirm:
-            subtitle = 'step 3 - confirm delete of action'
-            res = acca.acc_delete_action(id_action=id_action)
-            if res:
-                output += '<p>confirm: action <strong>%s</strong> deleted.<br />\n' % (name_action, )
-                output += '%s entries deleted all in all.</p>\n' % (res, )
-            else:
-                output += '<p>sorry, action could not be deleted.</p>\n'
-    elif id_action != "0":
-        output += '<p>the action has been deleted...</p>'
-
-    return index(req=req,
-                title=title,
-                subtitle=subtitle,
-                body=[output],
-                adminarea=4)
-
 
 def perform_showactiondetails(req, id_action):
     """show the details of an action. """
