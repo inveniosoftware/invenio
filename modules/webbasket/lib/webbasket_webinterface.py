@@ -476,7 +476,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
         navtrail %= (CFG_SITE_URL, argd['ln'], _("Your Account"))
 
         # register event in webstat
-        basket_str = "%s (%d)" % (get_basket_name(argd['bskid']), argd['bskid'])
+        basket_str = ["%s (%s)" % (get_basket_name(bskid), bskid) for bskid in argd['bskids']]
         user_info = collect_user_info(req)
         if user_info['email']:
             user_str = "%s (%d)" % (user_info['email'], user_info['uid'])

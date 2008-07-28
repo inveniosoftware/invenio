@@ -54,7 +54,8 @@ CFG_WEBBASKET_WARNING_MESSAGES = {
     'ERR_WEBBASKET_CMTID_INVALID': '_("%i is an invalid comment ID")',
     'WRN_WEBBASKET_NO_RECORD': '_("No records to add")',
     'WRN_WEBBASKET_NO_GIVEN_TOPIC':
-            '_("Please select an existing topic or create a new one")'
+            '_("Please select an existing topic or create a new one")',
+    'WRN_WEBBASKET_NO_BASKET_SELECTED':  '_("No basket has been selected")'
 }
 
 # pylint: disable-msg=C0301

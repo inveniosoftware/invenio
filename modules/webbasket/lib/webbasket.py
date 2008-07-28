@@ -423,24 +423,39 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
         if len(errors):
             return (body, errors, warnings)
 
-        nb_modified_baskets = db.add_to_basket(uid, validated_recids, bskids)
-        body = webbasket_templates.tmpl_added_to_basket(nb_modified_baskets, ln)
-        body += webbasket_templates.tmpl_back_link(referer, ln)
+        bskids = [bskid for bskid in bskids if bskid != -1]
 
-    else:
-        # Display basket_selection
-        personal_baskets = db.get_all_personal_baskets_names(uid)
-        group_baskets = db.get_all_group_baskets_names(uid)
-        external_baskets = db.get_all_external_baskets_names(uid)
-        topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
-        body += webbasket_templates.tmpl_add(recids=validated_recids,
-                                            personal_baskets=personal_baskets,
-                                            group_baskets=group_baskets,
-                                            external_baskets=external_baskets,
-                                            topics=topics,
-                                            referer=referer,
-                                            ln=ln)
-        body += webbasket_templates.tmpl_back_link(referer, ln)
+        if bskids:
+            nb_modified_baskets = db.add_to_basket(uid, validated_recids, bskids)
+            body = webbasket_templates.tmpl_added_to_basket(nb_modified_baskets, ln)
+            body_tmp, warnings_temp, errors_tmp = perform_request_display(uid,
+                            category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
+                            selected_topic=create_in_topic != -1 and create_in_topic or 0,
+                            selected_group_id=0,
+                            ln=CFG_SITE_LANG)
+            body += body_tmp
+            warnings += warnings_temp
+            errors += errors_tmp
+            body += webbasket_templates.tmpl_back_link(referer, ln)
+            return (body, warnings, errors)
+
+        else:
+            warnings.append('WRN_WEBBASKET_NO_BASKET_SELECTED')
+            body += webbasket_templates.tmpl_warnings(warnings, ln)
+
+    # Display basket_selection
+    personal_baskets = db.get_all_personal_baskets_names(uid)
+    group_baskets = db.get_all_group_baskets_names(uid)
+    external_baskets = db.get_all_external_baskets_names(uid)
+    topics = map(lambda x: x[0], db.get_personal_topics_infos(uid))
+    body += webbasket_templates.tmpl_add(recids=validated_recids,
+                                        personal_baskets=personal_baskets,
+                                        group_baskets=group_baskets,
+                                        external_baskets=external_baskets,
+                                        topics=topics,
+                                        referer=referer,
+                                        ln=ln)
+    body += webbasket_templates.tmpl_back_link(referer, ln)
     return (body, errors, warnings)
 
 def perform_request_delete(uid, bskid, confirmed=0,
