@@ -1003,20 +1003,20 @@ class Template:
         create_html = """
 <tr>
   <td style="padding: 10 5 0 5;">%s</td>
-  <td style="padding: 10 5 0 0;">
-    <input type="text" name="new_basket_name" value="%s"/>
-  </td>
-</tr>
-<tr>
-  <td style="padding: 10 5 0 5;">%s</td>
   <td style="padding: 10 5 0 0;">%s</td>
 </tr>
 <tr>
   <td style="padding: 10 5 0 5;">%s</td>
   <td style="padding: 10 5 0 0;"><input type="text" name="new_topic_name" value="%s"/></td>
-</tr>""" % (_("Basket's name"), new_basket_name,
-            topics_html != '' and _("Choose topic") or '', topics_html,
-            topics_html != '' and _("or create a new one") or _("Create new topic"), new_topic_name)
+</tr>
+<tr>
+  <td style="padding: 10 5 0 5;">%s</td>
+  <td style="padding: 10 5 0 0;">
+    <input type="text" name="new_basket_name" value="%s"/>
+  </td>
+</tr>""" % (topics_html != '' and _("Choose topic") or '', topics_html,
+            topics_html != '' and _("or create a new one") or _("Create new topic"), new_topic_name,
+            _("Basket's name"), new_basket_name,)
         return self.__tmpl_basket_box(img=CFG_SITE_URL + '/img/webbasket_create.png',
                                       title=_("Create a new basket"),
                                       body=create_html)

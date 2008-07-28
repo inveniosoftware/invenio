@@ -823,7 +823,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                             ln=argd['ln'])
 
             # register event in webstat
-            basket_str = "%s ()" % (get_basket_name(argd['new_basket_name']), )
+            basket_str = "%s ()" % argd['new_basket_name']
             user_info = collect_user_info(req)
             if user_info['email']:
                 user_str = "%s (%d)" % (user_info['email'], user_info['uid'])

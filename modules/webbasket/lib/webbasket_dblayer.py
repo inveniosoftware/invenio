@@ -232,8 +232,8 @@ def get_all_personal_baskets_names(uid):
 
 def get_basket_name(bskid):
     """return the name of a given basket"""
-    query = 'SELECT name FROM bskBASKET where id=%i'
-    res = run_sql(query % int(bskid))
+    query = 'SELECT name FROM bskBASKET where id=%s'
+    res = run_sql(query, (bskid, ))
     if res:
         return res[0][0]
     else:

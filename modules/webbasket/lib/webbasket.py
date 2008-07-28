@@ -96,6 +96,8 @@ def perform_request_display(uid,
         selectionbox = webbasket_templates.tmpl_topic_selection(topics_list,
                                                                 selected_topic,
                                                                 ln)
+        if selected_topic >= len(topics_list):
+            selected_topic = len(topics_list) - 1
         if len(topics_list) > 0:
             baskets = db.get_personal_baskets_infos(uid, topics_list[selected_topic][0])
         else:
