@@ -55,12 +55,14 @@ tables according to options.
 __revision__ = "$Id$"
 
 import os
+import re
 import sys
 import time
 from zlib import compress
 import urllib2
 import urllib
 import socket
+import marshal
 
 from invenio.config import CFG_OAI_ID_FIELD, CFG_SITE_URL, \
      CFG_SITE_SECURE_URL, \
@@ -84,6 +86,7 @@ from invenio.bibrecord import create_records, \
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
 from invenio.bibformat import format_record
+from invenio.intbitset import intbitset
 from invenio.config import CFG_WEBSUBMIT_FILEDIR
 from invenio.bibtask import task_init, write_message, \
     task_set_option, task_get_option, task_get_task_param, task_update_status, \
@@ -103,6 +106,37 @@ stat['exectime'] = time.localtime()
 
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
 socket.setdefaulttimeout(40)
+
+_re_find_001 = re.compile('<controlfield\\s+tag=("001"|\'001\')\\s*>\\s*(\\d*)\\s*</controlfield>', re.S)
+def bibupload_pending_recids():
+    """This function embed a bit of A.I. and is more a hack than an elegant
+    algorithm. It should be updated in case bibupload/bibsched are modified
+    in incompatible ways.
+    This function return the intbitset of all the records that are being
+    (or are scheduled to be) touched by other bibuploads.
+    """
+    options = run_sql("""SELECT arguments FROM schTASK WHERE status<>'DONE' AND
+        proc='bibupload' AND (status='RUNNING' OR status='CONTINUING' OR
+        status='WAITING' OR status='SCHEDULED' OR status='ABOUT TO STOP' OR
+        status='ABOUT TO SLEEP')""")
+    ret = intbitset()
+    xmls = []
+    if options:
+        for arguments in options:
+            arguments = marshal.loads(arguments[0])
+            for argument in arguments[1:]:
+                if argument.startswith('/'):
+                    # XMLs files are recognizable because they're absolute
+                    # files...
+                    xmls.append(argument)
+    for xmlfile in xmls:
+        # Let's grep for the 001
+        try:
+            xml = open(xmlfile).read()
+            ret += [int(group[1]) for group in _re_find_001.findall(xml)]
+        except:
+            continue
+    return ret
 
 ### bibupload engine functions:
 def bibupload(record, opt_tag=None, opt_mode=None,
