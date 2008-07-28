@@ -684,7 +684,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
         else:
             # Fake parameters for p_un & p_pw because SSO takes them from the environment
             (iden, args['p_un'], args['p_pw'], msgcode) = webuser.loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
-            args['remember_me'] = True
+            args['remember_me'] = False
         if len(iden)>0:
             uid = webuser.update_Uid(req, args['p_un'], args['remember_me'])
             uid2 = webuser.getUid(req)
