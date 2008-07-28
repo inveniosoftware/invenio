@@ -1474,42 +1474,41 @@ class BibDocFile:
             if os.path.exists(self.fullpath):
                 if random.random() < 0.25 and calculate_md5(self.fullpath) != self.checksum:
                     raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
-                req.content_type = self.mime
-                req.encoding = self.encoding
-                req.filename = self.fullname
-                req.headers_out["Last-Modified"] = self.md.strftime('%a, %d %b %Y %X GMT')
-                req.headers_out["Accept-Ranges"] = "none"
-                #req.headers_out["Content-Disposition"] = \
-                    #"inline; filename=%s" % quoteattr(self.fullname)
-                req.set_content_length(self.size)
-                req.send_http_header()
-                try:
-                    req.sendfile(self.fullpath)
-                    return ""
-                except IOError, e:
-                    register_exception(req=req)
-                    raise InvenioWebSubmitFileError, "Encountered exception while reading '%s': '%s'" % (self.fullpath, e)
+                return stream_file(req, self.fullpath, self.fullname, self.mime, self.encoding)
             else:
                 raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
         else:
             raise InvenioWebSubmitFileError, "You are not authorized to download %s: %s" % (self.fullname, auth_message)
 
+def stream_file(req, fullpath, fullname=None, mime=None, encoding=None):
+    """This is a generic function to stream a file to the user."""
+    if os.path.exists(fullpath):
+        if fullname is None:
+            fullname = os.path.basename(fullpath)
+        if mime is None:
+            format = decompose_file(fullpath)[2]
+            (mime, encoding) = _mimes.guess_type(fullname)
+            if mime is None:
+                mime = "text/plain"
+        req.content_type = mime
+        req.encoding = encoding
+        req.filename = fullname
+        req.headers_out["Last-Modified"] = datetime.fromtimestamp(os.path.getmtime(fullpath)).strftime('%a, %d %b %Y %X GMT')
+        req.headers_out["Accept-Ranges"] = "none"
+        req.set_content_length(os.path.getsize(fullpath))
+        req.send_http_header()
+        try:
+            req.sendfile(fullpath)
+            return ""
+        except IOError, e:
+            register_exception(req=req)
+            raise InvenioWebSubmitFileError, "Encountered exception while reading '%s': '%s'" % (fullpath, e)
+    else:
+        raise InvenioWebSubmitFileError, "%s does not exists!" % fullpath
+
 def stream_restricted_icon(req):
     """Return the content of the "Restricted Icon" file."""
-    req.content_type = 'image/gif'
-    req.encoding = None
-    req.filename = 'restricted'
-    req.headers_out["Content-Disposition"] = \
-        "inline; filename=%s" % quoteattr('restricted')
-    req.set_content_length(os.path.getsize('%s/img/restricted.gif' % CFG_WEBDIR))
-    req.send_http_header()
-    try:
-        req.sendfile('%s/img/restricted.gif' % CFG_WEBDIR)
-        return ""
-    except Exception, e:
-        register_exception(req=req)
-        raise InvenioWebSubmitFileError, "Encountered exception while streaming restricted icon: '%s'" % (e, )
-
+    return stream_file('%s/img/restricted.gif' % CFG_WEBDIR, 'restricted', 'image/gif')
 
 def list_types_from_array(bibdocs):
     """Retrieves the list of types from the given bibdoc list."""
