@@ -167,10 +167,10 @@ class WebInterfaceDirectory(object):
 
         # We have found the next segment. If we know that from this
         # point our subpages are over HTTPS, do the switch.
-        if has_https_support and self._force_https:
-            is_over_https = req.subprocess_env.has_key('HTTPS') \
-                            and req.subprocess_env['HTTPS'] == 'on'
+        is_over_https = req.subprocess_env.has_key('HTTPS') \
+                        and req.subprocess_env['HTTPS'] == 'on'
 
+        if has_https_support and self._force_https:
             if not is_over_https:
                 # We need to isolate the part of the URI that is after
                 # CFG_SITE_URL, and append that to our CFG_SITE_SECURE_URL.
@@ -189,10 +189,10 @@ class WebInterfaceDirectory(object):
 
                 target = urlparse.urlunparse(final_parts)
                 redirect_to_url(req, target, apache.HTTP_MOVED_PERMANENTLY)
-            elif CFG_EXTERNAL_AUTH_USING_SSO and isGuestUser(getUid(req)):
-                (iden, p_un, p_pw, msgcode) = loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
-                if len(iden)>0:
-                    uid = update_Uid(req, p_un)
+        if CFG_EXTERNAL_AUTH_USING_SSO and is_over_https and isGuestUser(getUid(req)):
+            (iden, p_un, p_pw, msgcode) = loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
+            if len(iden)>0:
+                uid = update_Uid(req, p_un)
 
         # Continue the traversal. If there is a path, continue
         # resolving, otherwise call the method as it is our final
