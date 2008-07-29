@@ -47,10 +47,12 @@ except ImportError:
     pass
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_TMPDIR
+from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO
 from invenio.messages import wash_language
 from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
-from invenio.webuser import get_preferred_user_language
+from invenio.webuser import get_preferred_user_language, isGuestUser, \
+    getUid, loginUser, update_Uid
 
 has_https_support = CFG_SITE_URL != CFG_SITE_SECURE_URL
 
@@ -187,6 +189,10 @@ class WebInterfaceDirectory(object):
 
                 target = urlparse.urlunparse(final_parts)
                 redirect_to_url(req, target, apache.HTTP_MOVED_PERMANENTLY)
+            elif CFG_EXTERNAL_AUTH_USING_SSO and isGuestUser(getUid(req)):
+                (iden, p_un, p_pw, msgcode) = loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
+                if len(iden)>0:
+                    uid = update_Uid(req, p_un)
 
         # Continue the traversal. If there is a path, continue
         # resolving, otherwise call the method as it is our final
@@ -417,4 +423,3 @@ def wash_urlargd(form, content):
     result['ln'] = wash_language(result['ln'])
 
     return result
-
