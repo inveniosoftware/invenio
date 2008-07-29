@@ -654,6 +654,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
         """
         self.recid76_xm_before_all_the_tests = print_record(76, 'xm')
         self.recid76_hm_before_all_the_tests = print_record(76, 'hm')
+        self.recid76_fmts = run_sql("""SELECT last_updated, value, format FROM bibfmt WHERE id_bibrec=76""")
         self.recid76_xm_with_fmt = """
         <record>
          <controlfield tag="001">76</controlfield>
@@ -694,7 +695,7 @@ class BibUploadFMTModeTest(unittest.TestCase):
         </record>
         """
 
-    def restore_recid76(self):
+    def tearDown(self):
         """Helper function that restores recID 76 MARCXML, using the
            value saved before all the tests started to execute.
            (see self.recid76_xm_before_all_the_tests).
@@ -702,6 +703,8 @@ class BibUploadFMTModeTest(unittest.TestCase):
         """
         recs = bibupload.xml_marc_to_records(self.recid76_xm_before_all_the_tests)
         err, recid = bibupload.bibupload(recs[0], opt_mode='replace')
+        for (last_updated, value, format) in self.recid76_fmts:
+            run_sql("""UPDATE bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=76 AND format=%s""", (last_updated, value, format))
         inserted_xm = print_record(recid, 'xm')
         inserted_hm = print_record(recid, 'hm')
         self.assertEqual(compare_xmbuffers(inserted_xm, self.recid76_xm_before_all_the_tests), '')
@@ -745,8 +748,6 @@ class BibUploadFMTModeTest(unittest.TestCase):
         self.assertEqual(hm_after, hm_before)
         self.failUnless(hb_after.startswith("Test. Yet another test, to be run after the first one."))
         self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
-        # restore original record 76:
-        self.restore_recid76()
 
     def test_updating_existing_record_formats_in_correct_mode(self):
         """bibupload - FMT tag, updating existing record via correct mode"""
@@ -772,8 +773,6 @@ class BibUploadFMTModeTest(unittest.TestCase):
         self.assertEqual(hm_after, hm_before)
         self.failUnless(hb_after.startswith("Test. Yet another test, to be run after the first one."))
         self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
-        # restore original record 76:
-        self.restore_recid76()
 
     def test_updating_existing_record_formats_in_replace_mode(self):
         """bibupload - FMT tag, updating existing record via replace mode"""
@@ -830,8 +829,6 @@ class BibUploadFMTModeTest(unittest.TestCase):
                                            """), '')
         self.failUnless(hb_after.startswith("Test. Here is some format value."))
         self.failUnless(hd_after.startswith("Test. Let's see what will be stored in the detailed format field."))
-        # restore original record 76:
-        self.restore_recid76()
 
 class BibUploadRecordsWithSYSNOTest(unittest.TestCase):
     """Testing uploading of records that have external SYSNO present."""
