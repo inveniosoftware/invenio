@@ -68,7 +68,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'submit',
         'rss',
         'stats',
-	'journal',
+        'journal',
         'help'
         ]
 
