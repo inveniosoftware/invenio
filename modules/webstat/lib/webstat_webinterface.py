@@ -21,6 +21,8 @@ __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
 import os
+from urllib import unquote
+from mod_python import apache
 
 from invenio.config import \
      CFG_TMPDIR, \
@@ -261,7 +263,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                                    'url': (str, ""),
                                    'ln': (str, CFG_SITE_LANG)})
         register_customevent(argd['id'], argd['arg'].split(','))
-        return redirect_to_url(req, argd['url'], apache.HTTP_MOVED_PERMANENTLY)
+        return redirect_to_url(req, unquote(argd['url']), apache.HTTP_MOVED_PERMANENTLY)
 
 
     # EXPORT SECTION

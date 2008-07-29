@@ -21,6 +21,7 @@ __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
 import os, time, re, datetime, cPickle, calendar
+from urllib import quote
 
 from invenio import template
 from invenio.config import \
@@ -176,6 +177,83 @@ def create_customevent(id=None, name=None, cols=[]):
     # We're done! Print notice containing the name of the event.
     return ("Event table [%s] successfully created.\n" +
             "Please use event id [%s] when registering an event.") % (tbl_name, id)
+
+def modify_customevent(id=None, name=None, cols=[]):
+    """
+    Modify a custom event. It can modify the columns definition
+    or/and the descriptive name
+
+    @param id: Human-readable id of the event.
+    @type id: str
+
+    @param name: Optionally, a descriptive name.
+    @type name: str
+
+    @param cols: Optionally, the name of the additional columns.
+    @type cols: [str]
+
+    @return: A status message
+    @type: str
+    """
+    if id is None:
+        return "Please specify a human-readable ID for the event."
+
+    # Only accept name with standard characters
+    if not re.search("[^\w]", str(name)) is None:
+        return "Please note that event name needs to be written without any non-standard characters."
+
+    # Check if the cols are valid titles
+    for argument in cols:
+        if (argument == "creation_time") or (argument == "id"):
+            return "Invalid column title: %s! Aborted." % argument
+
+    res = run_sql("SELECT CONCAT('staEVENT', number), cols FROM staEVENT WHERE id = %s", (id,))
+    cols_orig = cPickle.loads(res[0][1])
+
+    # add new cols
+    cols_add = []
+    for col in cols:
+        if not col in cols_orig:
+            cols_add.append(col)
+
+    # del old cols
+    cols_del = []
+    for col in cols_orig:
+        if not col in cols:
+            cols_del.append(col)
+
+    #modify event table
+    if cols_del or cols_add:
+        sql_query = ["ALTER TABLE %s " % res[0][0]]
+        for col in cols_del:
+            sql_query.append("DROP COLUMN %s" % col)
+            sql_query.append(", ")
+        for col in cols_add:
+            sql_query.append("ADD COLUMN %s MEDIUMTEXT NULL, " % col)
+            sql_query.append("ADD INDEX %s (%s(50))" % (col, col))
+            sql_query.append(", ")
+        sql_query[-1] = ";"
+        run_sql("".join(sql_query))
+
+    #modify event definition
+    sql_query = ["UPDATE staEVENT SET"]
+    sql_param = []
+    if cols_del or cols_add:
+        sql_query.append("cols = %s")
+        sql_query.append(",")
+        sql_param.append(cPickle.dumps(cols))
+    if name:
+        sql_query.append("name = %s")
+        sql_query.append(",")
+        sql_param.append(name)
+    if sql_param:
+        sql_query[-1] = "WHERE id = %s"
+        sql_param.append(id)
+        sql_str = ' '.join(sql_query)
+        run_sql(sql_str, sql_param)
+
+    # We're done! Print notice containing the name of the event.
+    return ("Event table [%s] successfully modified." % (id,))
 
 def destroy_customevent(id=None):
     """
@@ -371,9 +449,8 @@ def get_url_customevent(url_dest, id, *arguments):
     @return: url for register event
     @type: str
     """
-    #FIXME: is url secure?
     return "%s/stats/customevent_register?id=%s&arg=%s&url=%s" % \
-            (CFG_SITE_URL, id, ','.join(arguments[0]), url_dest)
+            (CFG_SITE_URL, id, ','.join(arguments[0]), quote(url_dest))
 
 # WEB
 

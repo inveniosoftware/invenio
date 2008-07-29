@@ -20,7 +20,7 @@
 __revision__ = "$Id$"
 __lastupdated__ = "$Date$"
 
-import sys, cPickle, webstat
+import sys, webstat
 
 from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, task_get_option, task_set_option, \
@@ -199,35 +199,13 @@ display-your-searches-url = "/youralerts/display"
                             cols.append("")
                         cols[index] = value
                 if name:
-                    res = run_sql("SELECT CONCAT('staEVENT', number),cols FROM staEVENT WHERE id = %s", (name,))
+                    res = run_sql("SELECT NULL FROM staEVENT WHERE id = %s", (name,))
                     if len(res) == 0:
                         # name don't exist, create customevent
                         webstat.create_customevent(name, name, cols)
                     else:
                         # name already exist, update customevent
-                        cols_orig = cPickle.loads(res[0][1])
-                        # add new cols
-                        cols_add = []
-                        for col in cols:
-                            if not col in cols_orig:
-                                cols_add.append(col)
-                        # del old cols
-                        cols_del = []
-                        for col in cols_orig:
-                            if not col in cols:
-                                cols_del.append(col)
-                        # do sql call
-                        if cols_del or cols_add:
-                            sql_query = ["ALTER TABLE %s " % res[0][0]]
-                            for col in cols_del:
-                                sql_query.append("DROP COLUMN %s" % col)
-                                sql_query.append(", ")
-                            for col in cols_add:
-                                sql_query.append("ADD COLUMN %s MEDIUMTEXT NULL, " % col)
-                                sql_query.append("ADD INDEX %s (%s(50))" % (col, col))
-                                sql_query.append(", ")
-                            sql_query[-1] = ";"
-                            run_sql("".join(sql_query))
+                        webstat.modify_customevent(name, cols=cols)
 
         sys.exit(0)
 
