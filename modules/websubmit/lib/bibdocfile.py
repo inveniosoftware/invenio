@@ -1764,9 +1764,17 @@ def check_valid_url(url):
     except Exception, e:
         raise StandardError, "%s is not a correct url: %s" % (url, e)
 
-def download_url(url, format, sleep=2):
+def download_url(url, format, sleep=2, user=None, password=None):
     """Download a url (if it corresponds to a remote file) and return a local url
     to it."""
+    class my_fancy_url_opener(urllib.FancyURLopener):
+        def __init__(self, user, password):
+            self.user = user
+            self.password = password
+
+        def prompt_user_passwd(self, host, realm):
+            return (user, password)
+
     format = normalize_format(format)
     protocol = urllib2.urlparse.urlsplit(url)[0]
     tmpfd, tmppath = tempfile.mkstemp(suffix=format, dir=CFG_TMPDIR)
@@ -1785,7 +1793,11 @@ def download_url(url, format, sleep=2):
                             raise StandardError, "%s seems to be empty" % url
                 raise StandardError, "%s is not in one of the allowed paths." % path
             else:
-                urllib.urlretrieve(url, tmppath)
+                if user is not None:
+                    urlopener = my_fancy_url_opener(user, password)
+                    urlopener.retrieve(url, tmppath)
+                else:
+                    urllib.urlretrieve(url, tmppath)
                 #cmd_exit_code, cmd_out, cmd_err = run_shell_command(CFG_PATH_WGET + ' %s -O %s -t 2 -T 40' % \
                                                                     #(escape_shell_arg(url), escape_shell_arg(tmppath)))
                 #if cmd_exit_code:
