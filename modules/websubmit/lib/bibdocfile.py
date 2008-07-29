@@ -1487,7 +1487,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None):
             fullname = os.path.basename(fullpath)
         if mime is None:
             format = decompose_file(fullpath)[2]
-            (mime, encoding) = _mimes.guess_type(fullname)
+            (mime, encoding) = _mimes.guess_type(fullpath)
             if mime is None:
                 mime = "text/plain"
         req.content_type = mime
@@ -1508,7 +1508,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None):
 
 def stream_restricted_icon(req):
     """Return the content of the "Restricted Icon" file."""
-    return stream_file('%s/img/restricted.gif' % CFG_WEBDIR, 'restricted', 'image/gif')
+    return stream_file(req, '%s/img/restricted.gif' % CFG_WEBDIR, 'restricted', 'image/gif')
 
 def list_types_from_array(bibdocs):
     """Retrieves the list of types from the given bibdoc list."""
