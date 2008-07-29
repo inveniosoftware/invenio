@@ -261,15 +261,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                                    'url': (str, ""),
                                    'ln': (str, CFG_SITE_LANG)})
         register_customevent(argd['id'], argd['arg'].split(','))
-        return """<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-                "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-                <html xmlns="http://www.w3.org/1999/xhtml">
-                <head>
-                    <title>Loading</title>
-                    <meta http-equiv="refresh" content="0;url=%s" />
-                </head>
-                <body></body>
-                </html>""" % argd['url']
+        return redirect_to_url(req, argd['url'], apache.HTTP_MOVED_PERMANENTLY)
 
 
     # EXPORT SECTION
