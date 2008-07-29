@@ -64,12 +64,18 @@ class MessagesLanguageTest(unittest.TestCase):
 
     def test_wash_languages(self):
         """messages - washing multiple languages"""
-        self.assertEqual(messages.wash_languages(['00',
+        if 'de' not in CFG_SITE_LANGS:
+            self.assertEqual(messages.wash_languages(['00',
+                                                  '11',
+                                                  '22',
+                                                  'de']),
+                         CFG_SITE_LANG)
+        else:
+            self.assertEqual(messages.wash_languages(['00',
                                                   '11',
                                                   '22',
                                                   'de']),
                          'de')
-
         self.assertEqual(messages.wash_languages(['00',
                                                   '11',
                                                   '22']),
