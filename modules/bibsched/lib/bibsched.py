@@ -45,10 +45,11 @@ from invenio.config import \
      CFG_BIBSCHED_GC_TASKS_OLDER_THAN, \
      CFG_BIBSCHED_GC_TASKS_TO_REMOVE, \
      CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE, \
-     CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS
+     CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, \
+     CFG_SITE_URL
 from invenio.dbquery import run_sql, escape_string
 from invenio.textutils import wrap_text_in_a_box
-from invenio.errorlib import register_exception
+from invenio.errorlib import register_exception, register_emergency
 
 CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING', 'DELETED %', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED', 'SLEEPING', 'KILLED')
 
@@ -966,6 +967,7 @@ class BibSched:
                         break
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
         except:
+            register_emergency('Emergency from %s: BibSched had to halt!' % CFG_SITE_URL)
             register_exception(alert_admin=True)
             raise
 

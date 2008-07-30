@@ -29,7 +29,7 @@ import sys
 import time
 from cStringIO import StringIO
 
-from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, CFG_VERSION
+from invenio.config import CFG_SITE_LANG, CFG_LOGDIR, CFG_WEBALERT_ALERT_ENGINE_EMAIL, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME, CFG_SITE_URL, CFG_VERSION, CFG_CERN_SITE, CFG_SITE_EMERGENCY_PHONE_NUMBERS
 from invenio.miscutil_config import CFG_MISCUTIL_ERROR_MESSAGES
 from invenio.urlutils import wash_url_argument
 from invenio.messages import wash_language, gettext_set_language
@@ -94,6 +94,26 @@ def get_tracestack():
                     'text'      : trace_tuple[3] is not None and str(trace_tuple[3]) or ""
                 }
     return tracestack_pretty
+
+def send_sms(phone_number, msg):
+    """Send msg as an SMS to each phone number.
+    Note: this function is just an example and works only at CERN
+    it should be reimplemented in your own instituition.
+    """
+    if not CFG_CERN_SITE:
+        raise NotImplemented, "Implement this function with your own method"
+    if phone_number[0] == '+':
+        phone_number = '00' + phone_number[1:]
+    if phone_number[0] != '0':
+        phone_number = '00' + phone_number
+    from invenio.mailutils import send_email
+    return send_email(CFG_SITE_SUPPORT_EMAIL, phone_number + '@sms.switch.ch', '', msg, header='', footer='')
+
+def register_emergency(msg, send_sms_function=send_sms):
+    """Launch an emergency. This means to send sms messages to each
+    phone number in CFG_SITE_EMERGENCY_PHONE_NUMBERS."""
+    for phone_number in CFG_SITE_EMERGENCY_PHONE_NUMBERS:
+        send_sms_function(phone_number, msg)
 
 def register_exception(force_stack=False, stream='error', req=None, prefix='', suffix='', alert_admin=False):
     """

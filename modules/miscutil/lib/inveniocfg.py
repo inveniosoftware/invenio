@@ -94,7 +94,8 @@ def convert_conf_option(option_name, option_value):
     if option_name in ['CFG_BIBUPLOAD_REFERENCE_TAG',
                        'CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG',
                        'CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG',
-                       'CFG_BIBUPLOAD_STRONG_TAGS']:
+                       'CFG_BIBUPLOAD_STRONG_TAGS',
+                       'CFG_SITE_EMERGENCY_PHONE_NUMBERS']:
         # some options are supposed be string even when they look like
         # numeric
         option_value = '"' + option_value + '"'
@@ -125,7 +126,8 @@ def convert_conf_option(option_name, option_value):
                        'CFG_BIBSCHED_GC_TASKS_TO_REMOVE',
                        'CFG_BIBSCHED_GC_TASKS_TO_ARCHIVE',
                        'CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS',
-                       'CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES']:
+                       'CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES',
+                       'CFG_SITE_EMERGENCY_PHONE_NUMBERS']:
         out = "["
         for elem in option_value[1:-1].split(","):
             if elem:
