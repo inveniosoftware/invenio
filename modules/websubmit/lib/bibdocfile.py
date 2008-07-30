@@ -1764,16 +1764,18 @@ def check_valid_url(url):
     except Exception, e:
         raise StandardError, "%s is not a correct url: %s" % (url, e)
 
-def download_url(url, format, sleep=2, user=None, password=None):
+def download_url(url, format, user=None, password=None, sleep=2):
     """Download a url (if it corresponds to a remote file) and return a local url
     to it."""
     class my_fancy_url_opener(urllib.FancyURLopener):
         def __init__(self, user, password):
-            self.user = user
-            self.password = password
+            urllib.FancyURLopener.__init__(self)
+            self.fancy_user = user
+            self.fancy_password = password
 
         def prompt_user_passwd(self, host, realm):
-            return (user, password)
+            return (self.fancy_user, self.fancy_password)
+
 
     format = normalize_format(format)
     protocol = urllib2.urlparse.urlsplit(url)[0]
