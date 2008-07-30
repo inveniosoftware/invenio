@@ -121,10 +121,11 @@ def normalize_version(version):
             return ''
     return str(version)
 
-_path_re = re.compile(r'.*[\\/:]')
 def decompose_file(afile):
-    """Decompose a file into dirname, basename and extension"""
-    basename = _path_re.sub('', afile)
+    """Decompose a file into dirname, basename and extension.
+    Note that if provided with a URL, the scheme in front will be part
+    of the dirname."""
+    basename = os.path.basename(afile)
     dirname = afile[:-len(basename)-1]
     base = file_strip_ext(basename)
     extension = basename[len(base) + 1:]
