@@ -965,7 +965,8 @@ def elaborate_fft_tags(record, rec_id, mode):
                 if url:
                     name = get_docname_from_url(url)
                 else:
-                    raise StandardError, "fft '%s' doesn't specifies neither a url nor a name" % str(fft)
+                    write_message("Warning: fft '%s' doesn't specifies neither a url nor a name" % str(fft), stream=sys.stderr)
+                    continue
 
             # Let's discover the desired new docname in case we want to change it
             newname = field_get_subfield_values(fft, 'm')
