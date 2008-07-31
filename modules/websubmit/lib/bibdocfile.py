@@ -1765,6 +1765,19 @@ def check_valid_url(url):
     except Exception, e:
         raise StandardError, "%s is not a correct url: %s" % (url, e)
 
+def safe_mkstemp(suffix):
+    """Create a temporary filename that don't have any '.' inside a part
+    from the suffix."""
+    tmpfd, tmppath = tempfile.mkstemp(suffix=suffix, dir=CFG_TMPDIR)
+    if '.' not in suffix:
+        # Just in case format is empty
+        return tmpfd, tmppath
+    while '.' in os.path.basename(tmppath)[:-len(suffix)]:
+        os.close(tmpfd)
+        os.remove(tmppath)
+        tmpfd, tmppath = tempfile.mkstemp(suffix=suffix, dir=CFG_TMPDIR)
+    return (tmpfd, tmppath)
+
 def download_url(url, format, user=None, password=None, sleep=2):
     """Download a url (if it corresponds to a remote file) and return a local url
     to it."""
@@ -1777,10 +1790,9 @@ def download_url(url, format, user=None, password=None, sleep=2):
         def prompt_user_passwd(self, host, realm):
             return (self.fancy_user, self.fancy_password)
 
-
     format = normalize_format(format)
     protocol = urllib2.urlparse.urlsplit(url)[0]
-    tmpfd, tmppath = tempfile.mkstemp(suffix=format, dir=CFG_TMPDIR)
+    tmpfd, tmppath = safe_mkstemp(format)
     try:
         try:
             if protocol in ('', 'file'):
