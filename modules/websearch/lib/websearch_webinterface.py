@@ -58,7 +58,8 @@ from invenio.config import \
      CFG_WEBSEARCH_RSS_MAX_CACHED_REQUESTS, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
-     CFG_WEBDIR
+     CFG_WEBDIR, \
+     CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
@@ -819,11 +820,24 @@ def display_collection(req, c, as, verbose, ln):
         if c != CFG_SITE_NAME:
             rssurl += '?cc=' + quote(c)
 
+        if 'hb' in CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS:
+            metaheaderadd = """
+  <script type='text/javascript'>
+    jsMath = {
+        Controls: {cookie: {printwarn: 0}}
+    };
+  </script>
+  <script src='/jsMath/easy/invenio-jsmath.js' type='text/javascript'></script>
+"""
+        else:
+            metaheaderadd = ''
+
         return page(title=title,
                     body=c_body,
                     navtrail=c_navtrail,
                     description="%s - %s" % (CFG_SITE_NAME, c),
                     keywords="%s, %s" % (CFG_SITE_NAME, c),
+                    metaheaderadd=metaheaderadd,
                     uid=uid,
                     language=ln,
                     req=req,

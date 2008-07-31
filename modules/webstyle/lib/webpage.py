@@ -59,7 +59,8 @@ def create_navtrailbox_body(title,
                                                     prolog = prolog,
                                                     epilog = epilog)
 
-def page(title, body, navtrail="", description="", keywords="", uid=None,
+def page(title, body, navtrail="", description="", keywords="",
+         metaheaderadd="", uid=None,
          cdspageheaderadd="", cdspageboxlefttopadd="",
          cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
          cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
@@ -72,6 +73,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=None,
                body of the page in html format
                description goes to the metadata in the header of the HTML page
                keywords goes to the metadata in the header of the html page
+               metaheaderadd goes to further metadata in the header of the html page
                cdspageheaderadd is a message to be displayed just under the page header
                cdspageboxlefttopadd is a message to be displayed in the page body on left top
                cdspageboxleftbottomadd is a message to be displayed in the page body on left bottom
@@ -158,6 +160,7 @@ def page(title, body, navtrail="", description="", keywords="", uid=None,
         return webstyle_templates.tmpl_page(req, ln=language,
                           description = description,
                           keywords = keywords,
+                          metaheaderadd = metaheaderadd,
                           userinfobox = create_userinfobox_body(req, uid, language),
                           navtrailbox = create_navtrailbox_body(navtrail_append_title_p \
                                                                 and title or '',
