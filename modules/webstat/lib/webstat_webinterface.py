@@ -262,7 +262,11 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
                                    'arg': (str, ""),
                                    'url': (str, ""),
                                    'ln': (str, CFG_SITE_LANG)})
-        register_customevent(argd['id'], argd['arg'].split(','))
+        params = argd['arg'].split(',')
+        if "WEBSTAT_IP" in params:
+            index = params.index("WEBSTAT_IP")
+            params[index] = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+        register_customevent(argd['id'], params)
         return redirect_to_url(req, unquote(argd['url']), apache.HTTP_MOVED_PERMANENTLY)
 
 

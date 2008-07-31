@@ -441,6 +441,8 @@ def get_url_customevent(url_dest, id, *arguments):
     @type id: str
 
     @param *arguments: The rest of the parameters of the function call
+                       the param "WEBSTAT_IP" will tell webstat that here
+                       should be the IP who request the url
     @type *arguments: [params]
 
     @param id: url to redirect after register the event
