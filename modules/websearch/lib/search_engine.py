@@ -2826,7 +2826,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                 for irec in range(irec_max, irec_min, -1):
                     row_number = jrec+irec_max-irec
                     recid = recIDs[irec]
-                    if relevances and relevances[irec]:
+                    if relevances and relevances.has_key(irec) and relevances[irec]:
                         relevance = relevances[irec]
                     else:
                         relevance = ''
