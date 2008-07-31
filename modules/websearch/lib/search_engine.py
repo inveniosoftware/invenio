@@ -2919,7 +2919,11 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                         citationhistory = None
                         if r:
                             citationhistory = create_citation_history_graph_and_box(recid, ln)
+                        #debug
+                        if verbose > 3:
+                            print_warning(req, "Citation graph debug: "+str(len(citationhistory)))
 
+                        req.write(websearch_templates.tmpl_detailed_record_citations_citation_history(recid, ln, citationhistory))
                         req.write(websearch_templates.tmpl_detailed_record_citations_epilogue(recid, ln))
                         req.write(webstyle_templates.detailed_record_container_bottom(recid,
                                                                                       tabs,
