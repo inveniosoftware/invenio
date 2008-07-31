@@ -25,7 +25,10 @@ import cgi
 import os
 import datetime
 from urllib import quote
-from mod_python import apache
+try:
+    from mod_python import apache
+except ImportError:
+    pass
 
 #maximum number of collaborating authors etc shown in GUI
 MAX_COLLAB_LIST = 10
@@ -455,13 +458,17 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                 restricted_colls = restricted_collection_cache.get_cache()
                 for collname in restricted_colls:
                     (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=collname)
-                    if auth_code:
+                    if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                         coll_recids = get_collection(collname).reclist
                         if coll_recids & recids:
                             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : collname})
                             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                            make_canonical_urlargd({'action' : cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
+                                    make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
                             return redirect_to_url(req, target)
+                    elif auth_code:
+                        return page_not_authorized(req, "../", \
+                            text = auth_msg,\
+                            navmenuid='search')
             else:
                 involved_collections.add(search_engine.guess_primary_collection_of_a_record(argd['recid']))
 
@@ -470,11 +477,15 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         for coll in involved_collections:
             if collection_restricted_p(coll):
                 (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
-                if auth_code:
+                if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                    make_canonical_urlargd({'action' : cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
+                            make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
                     return redirect_to_url(req, target)
+                elif auth_code:
+                    return page_not_authorized(req, "../", \
+                        text = auth_msg,\
+                        navmenuid='search')
 
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
@@ -505,12 +516,16 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         for coll in argd['c'] + [argd['cc']]:
             if collection_restricted_p(coll):
-                (auth_code, dummy) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
-                if auth_code:
+                (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
+                if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                    make_canonical_urlargd({'action' : cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
+                            make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
                     return redirect_to_url(req, target)
+                elif auth_code:
+                    return page_not_authorized(req, "../", \
+                        text = auth_msg,\
+                        navmenuid='search')
 
         # Keep all the arguments, they might be reused in the
         # search_engine itself to derivate other queries
@@ -858,11 +873,15 @@ class WebInterfaceRSSFeedServicePages(WebInterfaceDirectory):
             if collection_restricted_p(coll):
                 user_info = collect_user_info(req)
                 (auth_code, auth_msg) = acc_authorize_action(user_info, VIEWRESTRCOLL, collection=coll)
-                if auth_code:
+                if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
                     cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : coll})
                     target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
-                    make_canonical_urlargd({'action' : cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
+                            make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : CFG_SITE_URL + req.unparsed_uri}, {})
                     return redirect_to_url(req, target)
+                elif auth_code:
+                    return page_not_authorized(req, "../", \
+                        text = auth_msg,\
+                        navmenuid='search')
 
         # Create a standard filename with these parameters
         current_url = websearch_templates.build_rss_url(argd)
