@@ -241,11 +241,11 @@ def get_customevent_trend(args):
             continue
         if col_content:
             if col_bool == "and" or col_bool == "":
-                sql_query.append("AND %s" % escape_string(col_title))
+                sql_query.append("AND `%s`" % escape_string(col_title))
             elif col_bool == "or":
-                sql_query.append("OR %s" % escape_string(col_title))
+                sql_query.append("OR `%s`" % escape_string(col_title))
             elif col_bool == "and_not":
-                sql_query.append("AND NOT %s" % escape_string(col_title))
+                sql_query.append("AND NOT `%s`" % escape_string(col_title))
             else:
                 continue
             sql_query.append(" LIKE %s")
@@ -299,11 +299,11 @@ def get_customevent_dump(args):
             if not col_title in col_names: continue
             if col_content:
                 if col_bool == "and" or col_bool == "":
-                    sql_query.append("AND %s" % escape_string(col_title))
+                    sql_query.append("AND `%s`" % escape_string(col_title))
                 elif col_bool == "or":
-                    sql_query.append("OR %s" % escape_string(col_title))
+                    sql_query.append("OR `%s`" % escape_string(col_title))
                 elif col_bool == "and_not":
-                    sql_query.append("AND NOT %s" % escape_string(col_title))
+                    sql_query.append("AND NOT `%s`" % escape_string(col_title))
                 else:
                     continue
                 sql_query.append(" LIKE %s")

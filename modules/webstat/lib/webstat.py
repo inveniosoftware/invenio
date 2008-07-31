@@ -168,8 +168,8 @@ def create_customevent(id=None, name=None, cols=[]):
     sql_query.append("creation_time TIMESTAMP DEFAULT NOW(),")
     for argument in cols:
         arg = escape_string(argument)
-        sql_query.append("%s MEDIUMTEXT NULL," % arg)
-        sql_query.append("INDEX %s (%s(50))," % (arg, arg))
+        sql_query.append("`%s` MEDIUMTEXT NULL," % arg)
+        sql_query.append("INDEX `%s` (`%s`(50))," % (arg, arg))
     sql_query.append("PRIMARY KEY (id))")
     sql_str = ' '.join(sql_query)
     run_sql(sql_str)
@@ -226,11 +226,11 @@ def modify_customevent(id=None, name=None, cols=[]):
     if cols_del or cols_add:
         sql_query = ["ALTER TABLE %s " % res[0][0]]
         for col in cols_del:
-            sql_query.append("DROP COLUMN %s" % col)
+            sql_query.append("DROP COLUMN `%s`" % col)
             sql_query.append(", ")
         for col in cols_add:
-            sql_query.append("ADD COLUMN %s MEDIUMTEXT NULL, " % col)
-            sql_query.append("ADD INDEX %s (%s(50))" % (col, col))
+            sql_query.append("ADD COLUMN `%s` MEDIUMTEXT NULL, " % col)
+            sql_query.append("ADD INDEX `%s` (`%s`(50))" % (col, col))
             sql_query.append(", ")
         sql_query[-1] = ";"
         run_sql("".join(sql_query))
@@ -310,7 +310,7 @@ def register_customevent(id, *arguments):
         sql_param = []
         sql_query = ["INSERT INTO %s (" % tbl_name]
         for title in col_titles:
-            sql_query.append("%s" % title)
+            sql_query.append("`%s`" % title)
             sql_query.append(",")
         sql_query.pop() # del the last ','
         sql_query.append(") VALUES (")
