@@ -64,6 +64,7 @@ from invenio.intbitset import intbitset
 
 from invenio.websearch_external_collections import external_collection_get_state
 
+
 def get_fieldvalues(recID, tag):
     """Return list of field values for field TAG inside record RECID.
        FIXME: should be imported commonly for search_engine too."""
@@ -2898,6 +2899,8 @@ class Template:
                                                               ln=ln),
                                         {}, _("Cited by %i records") % num_timescited,
                                         {'class': "moreinfo"})
+            else:
+                out+="<!--not showing citations links-->"
 
         out+='</div>'
         return out
@@ -3174,7 +3177,7 @@ class Template:
             similar = self.tmpl_print_record_list_for_similarity_boxen(
                 _("Cited by: %s records") % len (citinglist), citinglist, ln)
 
-            out = '''
+            out += '''
                     <tr><td>
                       %(similar)s&nbsp;%(more)s
                       <br /><br />
@@ -3185,7 +3188,6 @@ class Template:
                                       rm='citation', ln=ln),
                                       {}, _("more")),
                 'similar': similar}
-
         return out
 
     def tmpl_detailed_record_citations_citation_history(self, recID, ln,
@@ -3207,8 +3209,11 @@ class Template:
         out = ''
 
         if CFG_BIBRANK_SHOW_CITATION_GRAPHS and citationhistory is not None:
-            out = '<tr><td>%s</td></tr>' % citationhistory
-
+            out = '<!--citation history--><tr><td>%s</td></tr>' % citationhistory
+        else:
+            out = "<!--not showing citation history. CFG_BIBRANK_SHOW_CITATION_GRAPHS:"
+            out+= str(CFG_BIBRANK_SHOW_CITATION_GRAPHS)+" citationhistory "
+            out+= str(len(citationhistory))+"-->"
         return out
 
     def tmpl_detailed_record_citations_co_citing(self, recID, ln,
@@ -3239,7 +3244,7 @@ class Template:
                       <br />
                     </td></tr>''' % { 'more': create_html_link(self.build_search_url(p='cocitedwith:%d' % recID, ln=ln),
                                                                 {}, _("more")),
-                                      'similar': similar}
+                                      'similar': similar }
         return out
 
 
