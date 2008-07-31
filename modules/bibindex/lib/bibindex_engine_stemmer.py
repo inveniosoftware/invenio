@@ -434,7 +434,8 @@ except ImportError:
 
     def stem(word, lang):
         """Return WORD stemmed according to language LANG (e.g. 'en')."""
-        if lang == 'en':
+        if lang == 'en' and _stemmers and _stemmers.has_key(get_ident()):
+            #make sure _stemmers[get_ident()] is avail..
             return _stemmers[get_ident()].stem(word, 0, len(word)-1)
         else:
             return word
