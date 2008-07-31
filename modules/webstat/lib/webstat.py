@@ -58,6 +58,11 @@ from invenio.webstat_engine import create_graph_dump
 from invenio.webstat_engine import export_to_python
 from invenio.webstat_engine import export_to_csv
 
+try:
+    set
+except NameError:
+    from sets import Set as set
+
 TEMPLATES = template.load('webstat')
 
 # Constants
