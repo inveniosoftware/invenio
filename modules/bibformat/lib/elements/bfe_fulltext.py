@@ -72,8 +72,8 @@ def format(bfo, style, separator='; ', show_icons='no'):
         additional_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
 
     versions_str = ''
-    if old_versions:
-        versions_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
+    #if old_versions:
+        #versions_str = ' <small>(<a '+style+' href="'+CFG_SITE_URL+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
 
     if main_urls:
         last_name = ""
@@ -200,7 +200,7 @@ def get_files(bfo):
                         #FIXME remove eventual ?parameters
                         descr = filename or host # Let's take the name from the url
                 if CFG_CERN_SITE and 'cern.ch' in host:
-                    if not use_bibdocs_p or not ('/setlink?' in url or 'cms' in host):
+                    if not use_bibdocs_p or not ('/setlink?' in url or 'cms' in host or 'document.cern.ch' in url or 'doc.cern.ch' in url or 'preprints.cern.ch' in url):
                         parsed_urls['cern_urls'].append((url, descr)) # Obsolete cern.ch url (we're migrating)
                     ## if use_bibdocs_p is True file is already using bibdoc
                 else:
