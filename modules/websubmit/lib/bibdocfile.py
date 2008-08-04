@@ -1520,7 +1520,8 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
 
         req.send_http_header()
         try:
-            return req.sendfile(fullpath)
+            req.sendfile(fullpath)
+            return ''
         except IOError, e:
             register_exception(req=req)
             raise InvenioWebSubmitFileError, "Encountered exception while reading '%s': '%s'" % (fullpath, e)
