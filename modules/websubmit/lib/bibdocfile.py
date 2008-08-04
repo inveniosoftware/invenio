@@ -1538,11 +1538,13 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                         parsed_ranges.append((rfrom, rto - rfrom))
                 the_range = parsed_ranges[0]
                 if 0 <= the_range[0] < size and the_range[1] <= size - the_range[0]:
-                    req.status = apache.HTTP_PARTIAL_CONTENT
                     req.set_content_length(the_range[1])
                     req.headers_out['Content-Range'] = 'bytes %d-%d/%d' % (the_range[0], the_range[0] + the_range[1] - 1, size)
+                    req.status = apache.HTTP_PARTIAL_CONTENT
                     req.send_http_header()
-                    req.sendfile(fullpath, the_range[0], the_range[1])
+                    if not req.header_only:
+                        req.sendfile(fullpath, the_range[0], the_range[1])
+                        return ''
             except Exception:
                 pass
         req.set_content_length(size)
