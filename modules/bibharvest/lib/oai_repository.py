@@ -796,8 +796,11 @@ def oaicacheclean():
         filename = directory + "/" + file_
         # cache entry expires when not modified during a specified period of time
         if ((time.time() - os.path.getmtime(filename)) > CFG_OAI_EXPIRE):
-            os.remove(filename)
-
+            try:
+                os.remove(filename)
+            except OSError, e:
+                # Most probably the cache was already deleted
+                pass
     return 1
 
 
