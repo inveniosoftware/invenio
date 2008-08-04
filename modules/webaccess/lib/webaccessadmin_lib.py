@@ -1576,11 +1576,11 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
     </td></tr><tr><td align='right' valign='top'>
     <span class="adminlabel">description </span>
     </td><td>
-    <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea>
+    <textarea class="admin_wvar" rows="6" cols="80" name="description">%s</textarea>
     </td></tr><tr><td align='right' valign='top'>
     <span class="adminlabel">firewall like role definition [<a href="/help/admin/webaccess-admin-guide#6">?</a>]</span>
     </td><td>
-    <textarea class="admin_wvar" rows="6" cols="30" name="firerole_def_src">%s</textarea>
+    <textarea class="admin_wvar" rows="6" cols="80" name="firerole_def_src">%s</textarea>
     </td></tr><tr><td></td><td>
     <input class="adminbutton" type="submit" value="add role" />
     </td></tr></tbody></table>
@@ -1687,11 +1687,11 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
     </td></tr><tr><td align='right' valign='top'>
     <span class="adminlabel">description </span>
     </td><td>
-    <textarea class="admin_wvar" rows="6" cols="30" name="description">%s</textarea> <br />
+    <textarea class="admin_wvar" rows="6" cols="80" name="description">%s</textarea> <br />
     </td></tr><tr><td align='right' valign='top'>
     <span class="adminlabel">firewall like role definition</span> [<a href="/help/admin/webaccess-admin-guide#6">?</a>]
     </td><td>
-    <textarea class="admin_wvar" rows="6" cols="30" name="firerole_def_src">%s</textarea><br />
+    <textarea class="admin_wvar" rows="6" cols="80" name="firerole_def_src">%s</textarea><br />
     </td></tr><tr><td></td><td>
     <input class="adminbutton" type="submit" value="modify role" />
     <input type="hidden" name="modified" value="1" />
