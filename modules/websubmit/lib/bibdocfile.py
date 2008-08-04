@@ -1363,7 +1363,7 @@ class BibDocFile:
         self.format = normalize_format(format)
         self.dir = os.path.dirname(fullpath)
         self.url = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, urllib.quote(self.name), urllib.quote(self.format))
-        self.etag = '%i%s%i' % (self.docid, self.format, self.version)
+        self.etag = '"%i%s%i"' % (self.docid, self.format, self.version)
         if format == "":
             self.mime = "text/plain"
             self.encoding = ""
@@ -1482,13 +1482,13 @@ class BibDocFile:
             if os.path.exists(self.fullpath):
                 if random.random() < 0.25 and calculate_md5(self.fullpath) != self.checksum:
                     raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
-                return stream_file(req, self.fullpath, self.fullname, self.mime, self.encoding, self.etag)
+                return stream_file(req, self.fullpath, self.fullname, self.mime, self.encoding, self.etag, self.checksum)
             else:
                 raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
         else:
             raise InvenioWebSubmitFileError, "You are not authorized to download %s: %s" % (self.fullname, auth_message)
 
-def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None):
+def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5=None):
     """This is a generic function to stream a file to the user."""
     if_none_match = req.headers_in.get('If-None-Match')
     if if_none_match is not None:
@@ -1513,15 +1513,44 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         req.encoding = encoding
         req.filename = fullname
         req.headers_out["Last-Modified"] = time.strftime('%a, %d %b %Y %X GMT', time.gmtime(mtime))
-        req.headers_out["Accept-Ranges"] = "none"
+        req.headers_out["Accept-Ranges"] = "bytes"
         if etag is not None:
             req.headers_out["ETag"] = etag
-        req.set_content_length(os.path.getsize(fullpath))
-
+        if md5 is not None:
+            req.headers_out["Content-MD5"] = md5
+        size = os.path.getsize(fullpath)
+        ranges = req.headers_in.get('Range')
+        if ranges is not None:
+            try:
+                ranges = ranges[len('bytes='):].split(',')
+                parsed_ranges = []
+                for arange in ranges:
+                    if arange.startswith('-'):
+                        arange = int(arange[1:])
+                        parsed_ranges.append((size - arange, arange))
+                    elif arange.endswith('-'):
+                        arange = int(arange[:-1])
+                        parsed_ranges.append((arange, size - arange))
+                    elif '-' in arange:
+                        (rfrom, rto) = arange.split('-')
+                        rfrom = int(rfrom)
+                        rto = int(rto)
+                        parsed_ranges.append((rfrom, rto - rfrom))
+                the_range = parsed_ranges[0]
+                if 0 <= the_range[0] < size and the_range[1] <= size - the_range[0]:
+                    req.status = apache.HTTP_PARTIAL_CONTENT
+                    req.set_content_length(the_range[1])
+                    req.headers_out['Content-Range'] = 'bytes %d-%d/%d' % (the_range[0], the_range[0] + the_range[1] - 1, size)
+                    req.send_http_header()
+                    req.sendfile(fullpath, the_range[0], the_range[1])
+            except Exception:
+                pass
+        req.set_content_length(size)
         req.send_http_header()
         try:
-            req.sendfile(fullpath)
-            return ''
+            if not req.header_only:
+                req.sendfile(fullpath)
+                return ''
         except IOError, e:
             register_exception(req=req)
             raise InvenioWebSubmitFileError, "Encountered exception while reading '%s': '%s'" % (fullpath, e)
