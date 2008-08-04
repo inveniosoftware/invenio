@@ -1358,6 +1358,7 @@ class BibDocFile:
         self.format = normalize_format(format)
         self.dir = os.path.dirname(fullpath)
         self.url = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, urllib.quote(self.name), urllib.quote(self.format))
+        self.etag = '%i%s%i' % (self.docid, self.format, self.version)
         if format == "":
             self.mime = "text/plain"
             self.encoding = ""
@@ -1384,6 +1385,7 @@ class BibDocFile:
         out += '%s:%s:%s:%s:url=%s\n' % (self.recid, self.docid, self.version, self.format, self.url)
         out += '%s:%s:%s:%s:description=%s\n' % (self.recid, self.docid, self.version, self.format, self.description)
         out += '%s:%s:%s:%s:comment=%s\n' % (self.recid, self.docid, self.version, self.format, self.comment)
+        out += '%s:%s:%s:%s:etag=%s\n' % (self.recid, self.docid, self.version, self.format, self.etag)
         return out
 
     def display(self, ln = CFG_SITE_LANG):
@@ -1475,13 +1477,13 @@ class BibDocFile:
             if os.path.exists(self.fullpath):
                 if random.random() < 0.25 and calculate_md5(self.fullpath) != self.checksum:
                     raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
-                return stream_file(req, self.fullpath, self.fullname, self.mime, self.encoding)
+                return stream_file(req, self.fullpath, self.fullname, self.mime, self.encoding, self.etag)
             else:
                 raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
         else:
             raise InvenioWebSubmitFileError, "You are not authorized to download %s: %s" % (self.fullname, auth_message)
 
-def stream_file(req, fullpath, fullname=None, mime=None, encoding=None):
+def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None):
     """This is a generic function to stream a file to the user."""
     if os.path.exists(fullpath):
         if fullname is None:
@@ -1496,6 +1498,8 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None):
         req.filename = fullname
         req.headers_out["Last-Modified"] = datetime.fromtimestamp(os.path.getmtime(fullpath)).strftime('%a, %d %b %Y %X GMT')
         req.headers_out["Accept-Ranges"] = "none"
+        if etag is not None:
+            req.headers_out["ETag"] = etag
         req.set_content_length(os.path.getsize(fullpath))
         req.send_http_header()
         try:
