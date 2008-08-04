@@ -35,6 +35,11 @@ from datetime import datetime
 from xml.sax.saxutils import quoteattr
 from mimetypes import MimeTypes
 
+try:
+    from mod_python import apache
+except ImportError:
+    pass
+
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
 socket.setdefaulttimeout(40)
 
@@ -1485,7 +1490,18 @@ class BibDocFile:
 
 def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None):
     """This is a generic function to stream a file to the user."""
+    if_none_match = req.headers_in.get('If-None-Match')
+    if if_none_match is not None:
+        if_none_match = [elem.strip() for elem in if_none_match.split(',')]
+        if etag is not None and etag in if_none_match:
+            raise apache.SERVER_RETURN, apache.HTTP_NOT_MODIFIED
     if os.path.exists(fullpath):
+        mtime = os.path.getmtime(fullpath)
+        if_modified_since = req.headers_in.get('If-Modified-Since')
+        if if_modified_since is not None:
+            if_modified_since = time.mktime(time.strptime(if_modified_since, '%a, %d %b %Y %X %Z'))
+            if if_modified_since >= mtime:
+                raise apache.SERVER_RETURN, apache.HTTP_NOT_MODIFIED
         if fullname is None:
             fullname = os.path.basename(fullpath)
         if mime is None:
@@ -1496,15 +1512,15 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         req.content_type = mime
         req.encoding = encoding
         req.filename = fullname
-        req.headers_out["Last-Modified"] = datetime.fromtimestamp(os.path.getmtime(fullpath)).strftime('%a, %d %b %Y %X GMT')
+        req.headers_out["Last-Modified"] = time.strftime('%a, %d %b %Y %X GMT', time.gmtime(mtime))
         req.headers_out["Accept-Ranges"] = "none"
         if etag is not None:
             req.headers_out["ETag"] = etag
         req.set_content_length(os.path.getsize(fullpath))
+
         req.send_http_header()
         try:
-            req.sendfile(fullpath)
-            return ""
+            return req.sendfile(fullpath)
         except IOError, e:
             register_exception(req=req)
             raise InvenioWebSubmitFileError, "Encountered exception while reading '%s': '%s'" % (fullpath, e)
