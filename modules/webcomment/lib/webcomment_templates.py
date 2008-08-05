@@ -311,7 +311,7 @@ class Template:
         """
         # load the right message language
         _ = gettext_set_language(ln)
-        date_creation = convert_datetext_to_dategui(date_creation)
+        date_creation = convert_datetext_to_dategui(date_creation, ln=ln)
         out = ''
         final_body = email_quoted_txt2html(body)
         title = _('%(x_name)s wrote on %(x_date)s:') % {'x_name': nickname,
@@ -358,7 +358,8 @@ class Template:
             star_score_img = 'stars-0-0.png'
 
         out = ""
-        date_creation = convert_datetext_to_dategui(date_creation)
+
+        date_creation = convert_datetext_to_dategui(date_creation, ln=ln)
         reviewed_label = _("Reviewed by %(x_nickname)s on %(x_date)s") % {'x_nickname': nickname, 'x_date':date_creation}
         useful_label = _("%(x_nb_people)i out of %(x_nb_total)i people found this review useful") % {'x_nb_people': nb_votes_yes,
                                                                                                      'x_nb_total': nb_votes_total}

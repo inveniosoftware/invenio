@@ -134,7 +134,7 @@ def query_get_comments(uid, cmtID, reviews, ln):
              'nb_abuse_reports': 5, 'nb_votes_yes': 6, 'nb_votes_total': 7,
              'star_score': 8, 'title': 9, 'email': -2, 'nickname': -1}
     query = """SELECT c.id, c.id_bibrec, c.id_user,
-                      c.date_creation, c.body,
+                      DATE_FORMAT(c.date_creation, '%%Y-%%m-%%d %%H:%%i:%%S'), c.body,
                       c.nb_abuse_reports,
                       %s
                       u.email, u.nickname
