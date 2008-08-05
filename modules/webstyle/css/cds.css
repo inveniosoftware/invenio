@@ -1063,6 +1063,7 @@ input,select {
    width: 100%;
    padding: 0px 10px 10px 10px;
    border-left: 2px solid #36c;
+   margin-left: 10px;
 }
 .warninggreen {
    color: #060;
