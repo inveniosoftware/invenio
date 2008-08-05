@@ -141,7 +141,7 @@ install-fckeditor-plugin:
 	@echo "***********************************************************"
 	@echo "** The FCKeditor plugin was successfully installed.      **"
 	@echo "** Please do not forget to properly set the option       **"
-	@echo "** CFG_WEBCOMMENT_USE_FCKEDITOR in invenio.conf.         **"
+	@echo "** CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR in invenio.conf.  **"
 	@echo "***********************************************************"
 
 uninstall-fckeditor-plugin:
