@@ -24,7 +24,7 @@
 __revision__ = "$Id$"
 
 # CDS Invenio imports
-from invenio.webuser import get_user_info
+from invenio.webuser import get_user_info, isGuestUser
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.config import CFG_SITE_URL, \
@@ -33,8 +33,9 @@ from invenio.config import CFG_SITE_URL, \
                            CFG_SITE_NAME, \
                            CFG_SITE_NAME_INTL,\
                            CFG_WEBCOMMENT_ALLOW_REVIEWS, \
-                           CFG_WEBCOMMENT_ALLOW_COMMENTS
-
+                           CFG_WEBCOMMENT_ALLOW_COMMENTS, \
+                           CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR
+from invenio.htmlutils import get_html_text_editor
 from invenio.messages import gettext_set_language
 
 class Template:
@@ -369,7 +370,7 @@ class Template:
             _body = '''
       <blockquote>
 %s
-      </blockquote>''' % email_quoted_txt2html(body)
+      </blockquote>''' % email_quoted_txt2html(body, linebreak_html='')
 
         out += '''
 <div style="background:#F9F9F9;border:1px solid #DDD">
@@ -760,13 +761,16 @@ class Template:
         else:
             return ""
 
-    def tmpl_add_comment_form(self, recID, uid, nickname, ln, msg, warnings):
+    def tmpl_add_comment_form(self, recID, uid, nickname, ln, msg, warnings, textual_msg=None):
         """
         Add form for comments
         @param recID: record id
         @param uid: user id
         @param ln: language
-        @param msg: comment body contents for when refreshing due to warning
+        @param msg: comment body contents for when refreshing due to
+                    warning, or when replying to a comment
+        @param textual_msg: same as 'msg', but contains the textual
+                            version in case user cannot display FCKeditor
         @param warnings: list of warning tuples (warning_msg, color)
         @return html add comment form
         """
@@ -776,6 +780,9 @@ class Template:
                         'function'  : 'add',
                         'arguments' : 'ln=%s&amp;action=%s' % (ln, 'SUBMIT'),
                         'recID'     : recID}
+
+        if textual_msg is None:
+            textual_msg = msg
 
         # FIXME a cleaner handling of nicknames is needed.
         if not nickname:
@@ -794,30 +801,46 @@ class Template:
         #record_details = print_record(recID=recID, format='hb', ln=ln)
 
         warnings = self.tmpl_warnings(warnings, ln)
+
+        file_upload_url = None
+        if not isGuestUser(uid):
+            # Can only upload files when user is logged in
+            file_upload_url = '%s/record/%i/comments/attachments/put' % \
+                              (CFG_SITE_URL, recID)
+
+        editor = get_html_text_editor(name='msg',
+                                      content=msg,
+                                      textual_content=textual_msg,
+                                      width='90%',
+                                      height='400px',
+                                      enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
+                                      file_upload_url=file_upload_url,
+                                      toolbar_set = "WebComment")
+
         form = """<div><h2>%(add_comment)s</h2>
 
-<textarea name="msg" cols="80" rows="20" style="width:90%%">%(msg)s</textarea>
+%(editor)s
 <br />
                 <span class="reportabuse">%(note)s</span>
                 </div>
-                """ % {'msg': msg,
-                               'note': note,
-                               #'record': record_details,
-                               'record_label': _("Article") + ":",
-                               'comment_label': _("Comment") + ":",
-                               'add_comment': _('Add comment')}
+                """ % {'note': note,
+                       'record_label': _("Article") + ":",
+                       'comment_label': _("Comment") + ":",
+                       'add_comment': _('Add comment'),
+                       'editor': editor}
         form_link = "%(siteurl)s/record/%(recID)s/comments/%(function)s?%(arguments)s" % link_dic
         form = self.createhiddenform(action=form_link, method="post", text=form, button='Add comment')
         return warnings + form
 
     def tmpl_add_comment_form_with_ranking(self, recID, uid, nickname, ln, msg, score, note,
-                                           warnings, show_title_p=False):
+                                           warnings, textual_msg=None, show_title_p=False):
         """
         Add form for reviews
         @param recID: record id
         @param uid: user id
         @param ln: language
         @param msg: comment body contents for when refreshing due to warning
+        @param textual_msg: the textual version of 'msg' when user cannot display FCKeditor
         @param score: review score
         @param note: review title
         @param warnings: list of warning tuples (warning_msg, color)
@@ -831,6 +854,9 @@ class Template:
                         'arguments' : 'ln=%s&amp;action=%s' % (ln, 'SUBMIT'),
                         'recID'     : recID}
         warnings = self.tmpl_warnings(warnings, ln)
+
+        if textual_msg is None:
+            textual_msg = msg
 
         #from search_engine import print_record
         #record_details = print_record(recID=recID, format='hb', ln=ln)
@@ -863,6 +889,21 @@ class Template:
             selected4 = ' selected="selected"'
         elif score == 5:
             selected5 = ' selected="selected"'
+
+        file_upload_url = None
+        if not isGuestUser(uid):
+            # Can only upload files when user is logged in
+            file_upload_url = '%s/record/%i/comments/attachments/put' % \
+                              (CFG_SITE_URL, recID)
+
+        editor = get_html_text_editor(name='msg',
+                                      content=msg,
+                                      textual_content=msg,
+                                      width='90%',
+                                      height='400px',
+                                      enabled=CFG_WEBCOMMENT_USE_RICH_TEXT_EDITOR,
+                                      file_upload_url=file_upload_url,
+                                      toolbar_set = "WebComment")
         form = """%(add_review)s
                 <table style="width: 100%%">
                     <tr>
@@ -890,29 +931,30 @@ class Template:
                     </tr>
                     <tr>
                       <td>
-<textarea name="msg" cols="80" rows="20" style="width:90%%">%(msg)s</textarea>
+                      %(editor)s
                       </td>
                     </tr>
                     <tr>
                       <td class="reportabuse">%(note_label)s</td></tr>
                 </table>
                 """ % {'article_label': _('Article'),
-                               'rate_label': _("Rate this article"),
-                               'select_label': _("Select a score"),
-                               'title_label': _("Give a title to your review"),
-                               'write_label': _("Write your review"),
-                               'note_label': note_label,
-                               'note'      : note!='' and note or "",
-                               'msg'       : msg!='' and msg or "",
-                               #'record'    : record_details
-                               'add_review': show_title_p and ('<h2>'+_('Add review')+'</h2>') or '',
-                               'selected0': selected0,
-                               'selected1': selected1,
-                               'selected2': selected2,
-                               'selected3': selected3,
-                               'selected4': selected4,
-                               'selected5': selected5
-                               }
+                       'rate_label': _("Rate this article"),
+                       'select_label': _("Select a score"),
+                       'title_label': _("Give a title to your review"),
+                       'write_label': _("Write your review"),
+                       'note_label': note_label,
+                       'note'      : note!='' and note or "",
+                       'msg'       : msg!='' and msg or "",
+                       #'record'    : record_details
+                       'add_review': show_title_p and ('<h2>'+_('Add review')+'</h2>') or '',
+                       'selected0': selected0,
+                       'selected1': selected1,
+                       'selected2': selected2,
+                       'selected3': selected3,
+                       'selected4': selected4,
+                       'selected5': selected5,
+                       'editor': editor,
+                       }
         form_link = "%(siteurl)s/record/%(recID)s/reviews/%(function)s?%(arguments)s" % link_dic
         form = self.createhiddenform(action=form_link, method="post", text=form, button=_('Add Review'))
         return warnings + form

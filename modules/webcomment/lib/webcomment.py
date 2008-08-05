@@ -41,7 +41,9 @@ from invenio.config import CFG_SITE_LANG, \
                            CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN,\
                            CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_COMMENTS_IN_SECONDS,\
                            CFG_WEBCOMMENT_TIMELIMIT_PROCESSING_REVIEWS_IN_SECONDS
-from invenio.webmessage_mailutils import email_quote_txt
+from invenio.webmessage_mailutils import \
+     email_quote_txt, \
+     email_quoted_txt2html
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui, \
                               datetext_default, \
@@ -49,7 +51,6 @@ from invenio.dateutils import convert_datetext_to_dategui, \
 from invenio.mailutils import send_email
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument
-from invenio.webuser import isGuestUser
 from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE
 
 try:
@@ -557,7 +558,9 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
         return res
     return ()
 
-def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="", note="", score=0, priority=0, client_ip_address=''):
+def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
+                                note="", score=0, priority=0,
+                                client_ip_address='', editor_type='textarea'):
     """
     Private function
     Insert a comment/review or remarkinto the database
@@ -567,6 +570,7 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="", note="", sco
     @param note: comment title
     @param score: review star score
     @param priority: remark priority #!FIXME
+    @param editor_type: the kind of editor used to submit the comment: 'textarea', 'fckeditor'
     @return integer >0 representing id if successful, integer 0 if not
     """
     current_date = calculate_start_date('0d')
@@ -576,6 +580,15 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="", note="", sco
     #change general unicode back to utf-8
     msg = msg.encode('utf-8')
     note = note.encode('utf-8')
+
+    if editor_type == 'fckeditor':
+        # Here we remove the line feeds introduced by FCKeditor (they
+        # have no meaning for the user) and replace the HTML line
+        # breaks by linefeeds, so that we are close to an input that
+        # would be done without the FCKeditor. That's much better if a
+        # reply to a comment is made with a browser that does not
+        # support FCKeditor.
+        msg = msg.replace('\n', '').replace('\r', '').replace('<br />', '\n')
     query = """INSERT INTO cmtRECORDCOMMENT (id_bibrec,
                                            id_user,
                                            body,
@@ -772,7 +785,8 @@ def perform_request_add_comment_or_remark(recID=0,
                                           priority=None,
                                           reviews=0,
                                           comID=-1,
-                                          client_ip_address=None):
+                                          client_ip_address=None,
+                                          editor_type='textarea'):
     """
     Add a comment/review or remark
     @param recID: record id
@@ -787,6 +801,7 @@ def perform_request_add_comment_or_remark(recID=0,
     @param priority: priority of remark (int)
     @param reviews: boolean, if enabled will add a review, if disabled will add a comment
     @param comID: if replying, this is the comment id of the commetn are replying to
+    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
     @return html add form if action is display or reply
             html successful added form if action is submit
     """
@@ -821,16 +836,27 @@ def perform_request_add_comment_or_remark(recID=0,
             errors.append(('ERR_WEBCOMMENT_REPLY_REVIEW',))
             return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings), errors, warnings)
         elif not reviews and CFG_WEBCOMMENT_ALLOW_COMMENTS:
+            textual_msg = msg
             if comID > 0:
                 comment = query_get_comment(comID)
                 if comment:
                     user_info = get_user_info(comment[2])
                     if user_info:
                         date_creation = convert_datetext_to_dategui(str(comment[4]))
+                        # Build two msg: one mostly textual, the other one with HTML markup, for the FCKeditor.
                         msg = _("%(x_name)s wrote on %(x_date)s:")% {'x_name': user_info[2], 'x_date': date_creation}
-                        msg += "\n\n" + comment[3]
+                        textual_msg = msg
+                        # 1 For FCKeditor input
+                        msg += '<br /><br />'
+                        msg += comment[3]
                         msg = email_quote_txt(text=msg)
-            return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings), errors, warnings)
+                        msg = email_quoted_txt2html(text=msg)
+                        msg = '<br/>' + msg + '<br/>'
+                        # 2 For textarea input
+                        textual_msg += "\n\n"
+                        textual_msg += comment[3]
+                        textual_msg = email_quote_txt(text=textual_msg)
+            return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings, textual_msg), errors, warnings)
         else:
             errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
 
@@ -848,16 +874,18 @@ def perform_request_add_comment_or_remark(recID=0,
             if reviews:
                 if check_user_can_review(recID, client_ip_address, uid):
                     success = query_add_comment_or_remark(reviews, recID=recID, uid=uid, msg=msg,
-                                                      note=note, score=score, priority=0,
-                                                      client_ip_address=client_ip_address)
+                                                          note=note, score=score, priority=0,
+                                                          client_ip_address=client_ip_address,
+                                                          editor_type=editor_type)
                 else:
                     warnings.append('WRN_WEBCOMMENT_CANNOT_REVIEW_TWICE')
                     success = 1
             else:
                 if check_user_can_comment(recID, client_ip_address, uid):
                     success = query_add_comment_or_remark(reviews, recID=recID, uid=uid, msg=msg,
-                                                      note=note, score=score, priority=0,
-                                                      client_ip_address=client_ip_address)
+                                                          note=note, score=score, priority=0,
+                                                          client_ip_address=client_ip_address,
+                                                          editor_type=editor_type)
                 else:
                     warnings.append('WRN_WEBCOMMENT_TIMELIMIT')
                     success = 1

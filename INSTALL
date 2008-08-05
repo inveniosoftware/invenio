@@ -193,7 +193,8 @@ Contents
       $ ./configure
       $ make
       $ make install
-      $ make install-jsmath-plugin  ## optional
+      $ make install-jsmath-plugin     ## optional
+      $ make install-fckeditor-plugin  ## optional
 
 1b. Configuration
 -----------------
@@ -368,17 +369,36 @@ Contents
           hinted as to the exact command to use based on the
           parameters you have used in the configure command.
 
-      $ sudo make install-jsmath-plugin  ## optional
+      $ make install-jsmath-plugin  ## optional
 
           This will automatically download and install in the proper
           place jsMath, a Javascript library to render LaTeX formulas
           in the client browser.
+
+          Check that the plugin files have proper permissions,
+          i.e. that Apache can read them. For eg:
+          $ sudo chgrp -R www-data /opt/cds-invenio/var/www/
+          $ sudo chmod -R g+r /opt/cds-invenio/var/www/
 
           Note that in order to enable the rendering you will have to
           set the variable CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS in
           invenio.conf to a suitable list of output format codes. For
           example:
           CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS = hd,hb
+
+      $ make install-fckeditor-plugin  ## optional
+
+          This will automatically download and install in the proper
+          place FCKeditor, a WYSIWYG Javascript-based editor (Eg. for
+          the WebComment module).
+
+          Check that the plugin files have proper permissions,
+          i.e. that Apache can read them. For eg:
+          $ sudo chgrp -R www-data /opt/cds-invenio/var/www/
+          $ sudo chmod -R g+r /opt/cds-invenio/var/www/
+
+          Note that in order to enable the editor you have to set the
+          CFG_WEBCOMMENT_USE_FCKEDITOR to True.
 
 2b. Configuration
 -----------------
@@ -452,8 +472,8 @@ Contents
           Apache web server.
 
       $ /opt/cds-invenio/bin/inveniocfg --load-webstat-conf
-          
-          Load the configuration file of webstat module. It will create 
+
+          Load the configuration file of webstat module. It will create
           the tables in the database for register customevents, such as
           basket hits.
 

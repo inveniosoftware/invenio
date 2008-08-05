@@ -31,11 +31,13 @@ from invenio.webcomment import check_recID_is_in_range, \
                                perform_request_add_comment_or_remark,\
                                perform_request_vote,\
                                perform_request_report
-from invenio.config import CFG_SITE_LANG, \
-                           CFG_SITE_URL, \
-                           CFG_SITE_SECURE_URL, \
-                           CFG_WEBCOMMENT_ALLOW_COMMENTS,\
-                           CFG_WEBCOMMENT_ALLOW_REVIEWS
+from invenio.config import \
+     CFG_PREFIX, \
+     CFG_SITE_LANG, \
+     CFG_SITE_URL, \
+     CFG_SITE_SECURE_URL, \
+     CFG_WEBCOMMENT_ALLOW_COMMENTS,\
+     CFG_WEBCOMMENT_ALLOW_REVIEWS
 from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_user_info
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
@@ -53,14 +55,20 @@ import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
 
+from invenio.fckeditor_invenio_connector import FCKeditorConnectorInvenio
+import os
+from mod_python import apache
+from invenio.bibdocfile import stream_file
+
 class WebInterfaceCommentsPages(WebInterfaceDirectory):
     """Defines the set of /comments pages."""
 
-    _exports = ['', 'display', 'add', 'vote', 'report', 'index']
+    _exports = ['', 'display', 'add', 'vote', 'report', 'index', 'attachments']
 
     def __init__(self, recid=-1, reviews=0):
         self.recid = recid
         self.discussion = reviews # 0:comments, 1:reviews
+        self.attachments = WebInterfaceCommentsFiles(recid, reviews)
 
     def index(self, req, form):
         """
@@ -155,7 +163,9 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
 
             title, description, keywords = websearch_templates.tmpl_record_page_header_content(req, self.recid, argd['ln'])
             navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid), ln=argd['ln'])
-            navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+            if navtrail:
+                navtrail += ' &gt; '
+            navtrail += '<a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
             navtrail += title
             navtrail += '</a>'
             navtrail += ' &gt; <a class="navtrail">%s</a>' % (self.discussion==1 and _("Reviews") or _("Comments"))
@@ -198,6 +208,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param score: star score of the review
         @param note: title of the review
         @param comid: comment id, needed for replying
+        @param editor_type: the type of editor used for submitting the
+                            comment: 'textarea', 'fckeditor'.
         @return the full html page.
         """
 
@@ -206,6 +218,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                    'note': (str, ''),
                                    'score': (int, 0),
                                    'comid': (int, -1),
+                                   'editor_type':(str, ""),
                                    })
 
         _ = gettext_set_language(argd['ln'])
@@ -233,7 +246,9 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                                                self.recid,
                                                                                                argd['ln'])
             navtrail = create_navtrail_links(cc=guess_primary_collection_of_a_record(self.recid))
-            navtrail += ' &gt; <a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
+            if navtrail:
+                navtrail += ' &gt; '
+            navtrail += '<a class="navtrail" href="%s/record/%s?ln=%s">'% (CFG_SITE_URL, self.recid, argd['ln'])
             navtrail += title
             navtrail += '</a>'
             navtrail += '&gt; <a class="navtrail" href="%s/record/%s/%s/?ln=%s">%s</a>' % (CFG_SITE_URL,
@@ -282,7 +297,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                                  score=argd['score'],
                                                                                  reviews=self.discussion,
                                                                                  comID=argd['comid'],
-                                                                                 client_ip_address=client_ip_address)
+                                                                                 client_ip_address=client_ip_address,
+                                                                                 editor_type=argd['editor_type'])
                 if self.discussion:
                     title = _("Add Review")
                 else:
@@ -427,3 +443,137 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
             referer = "%s/record/%s/%s/display?ln=%s&amp;voted=1"
             referer %= (CFG_SITE_URL, self.recid, self.discussion==1 and 'reviews' or 'comments', argd['ln'])
             redirect_to_url(req, referer)
+
+
+class WebInterfaceCommentsFiles(WebInterfaceDirectory):
+    """Handle upload and access to files for comments.
+
+       The upload is currently only available through the FCKeditor.
+    """
+
+    _exports = ['put'] # 'get' is handled by _lookup(..)
+
+    def __init__(self, recid=-1, reviews=0):
+        self.recid = recid
+        self.discussion = reviews # 0:comments, 1:reviews
+
+    def _lookup(self, component, path):
+        """ This handler is invoked for the dynamic URLs (for getting
+        and putting attachments) Eg:
+        /record/5953/comments/attachments/get/652/file/myfile.pdf
+        /record/5953/comments/attachments/get/550/image/myfigure.png
+        """
+        if component == 'get' and len(path) > 2:
+
+            uid = path[0] # uid of the submitter
+
+            file_type = path[1] # file, image, flash or media (as
+                                # defined by FCKeditor)
+
+            if file_type in ['file', 'image', 'flash', 'media']:
+                file_name = '/'.join(path[2:]) # the filename
+
+                def answer_get(req, form):
+                    """Accessing files attached to comments."""
+                    form['file'] = file_name
+                    form['type'] = file_type
+                    form['uid'] = uid
+                    return self._get(req, form)
+
+                return answer_get, []
+
+        # All other cases: file not found
+        return None, []
+
+    def _get(self, req, form):
+        """
+        Returns a file attached to a comment.
+
+        A file is attached to a comment, by a user (who is the author
+        of the comment), and is of a certain type (file, image,
+        etc). Therefore these 3 values are part of the URL. Eg:
+        CFG_SITE_URL/record/5953/comments/attachments/get/652/file/myfile.pdf
+        """
+        argd = wash_urlargd(form, {'file': (str, None),
+                                   'type': (str, None),
+                                   'uid': (int, 0)})
+
+        # Can user view this record, i.e. can user access its
+        # attachments?
+        uid = getUid(req)
+
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+            cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
+            target = '/youraccount/login' + \
+                make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
+                CFG_SITE_URL + user_info['uri']}, {})
+            return redirect_to_url(req, target)
+        elif auth_code:
+            return page_not_authorized(req, "../", \
+                text = auth_msg)
+
+        if not argd['file'] is None:
+            # Prepare path to file on disk. Normalize the path so that
+            # ../ and other dangerous components are removed.
+            path = os.path.abspath('/opt/cds-invenio/var/data/comments/' + \
+                                   str(self.recid) + '/'  + str(argd['uid']) + \
+                                   '/' + argd['type'] + '/' + argd['file'])
+
+            # Check that we are really accessing attachements
+            # directory, for the declared record.
+            if path.startswith('/opt/cds-invenio/var/data/comments/' + \
+                               str(self.recid)) and \
+                   os.path.exists(path):
+                return stream_file(req, path)
+
+        # Send error 404 in all other cases
+        return(apache.HTTP_NOT_FOUND)
+
+    def put(self, req, form):
+        """
+        Process requests received from FCKeditor to upload files, etc.
+        """
+        uid = getUid(req)
+
+        # URL that handles file upload
+        user_files_path = '%(CFG_SITE_URL)s/record/%(recid)i/comments/attachments/get/%(uid)s' % \
+                          {'uid': uid,
+                           'recid': self.recid,
+                           'CFG_SITE_URL': CFG_SITE_URL}
+        # Path to directory where uploaded files are saved
+        user_files_absolute_path = '%(CFG_PREFIX)s/var/data/comments/%(recid)s/%(uid)s' % \
+                                   {'uid': uid,
+                                    'recid': self.recid,
+                                    'CFG_PREFIX': CFG_PREFIX}
+        # Create a Connector instance to handle the request
+        conn = FCKeditorConnectorInvenio(form, recid=self.recid, uid=uid,
+                                         allowed_commands=['QuickUpload'],
+                                         allowed_types = ['File', 'Image', 'Flash', 'Media'],
+                                         user_files_path = user_files_path,
+                                         user_files_absolute_path = user_files_absolute_path)
+
+        # Check that user can upload attachments for comments.
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+        if user_info['email'] == 'guest' and not user_info['apache_user']:
+            # User is guest: must login prior to upload
+            data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
+        elif auth_code:
+            # User cannot view
+            data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to submit files.')
+        else:
+            # Process the upload and get the response
+            data = conn.doResponse()
+
+        # Transform the headers into something ok for mod_python
+        for header in conn.headers:
+            if not header is None:
+                if header[0] == 'Content-Type':
+                    req.content_type = header[1]
+                else:
+                    req.headers_out[header[0]] = header[1]
+        # Send our response
+        req.send_http_header()
+        req.write(data)

@@ -44,10 +44,9 @@ from invenio.errorlib_webinterface import WebInterfaceErrorPages
 from invenio.oai_repository_webinterface import WebInterfaceOAIProviderPages
 from invenio.webstat_webinterface import WebInterfaceStatsPages
 
-try:
-    from invenio.webjournal_webinterface import WebInterfaceJournalPages
-except:
-    WebInterfaceJournalPages = WebInterfaceErrorPages
+
+from invenio.webjournal_webinterface import WebInterfaceJournalPages
+
 from invenio.webdoc_webinterface import WebInterfaceDocumentationPages
 
 class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):

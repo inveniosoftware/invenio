@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -27,7 +27,8 @@ pylib_DATA = webdoc.py \
              webstyle_templates.py \
              webinterface_handler.py \
              webinterface_tests.py \
-             webinterface_layout.py
+             webinterface_layout.py \
+	     fckeditor_invenio_connector.py
 
 EXTRA_DIST = $(pylib_DATA)
 

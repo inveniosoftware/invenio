@@ -23,9 +23,15 @@
 __revision__ = "$Id$"
 
 from HTMLParser import HTMLParser
+from invenio.config import CFG_SITE_URL
 import re
 import cgi
 
+try:
+    from invenio.fckeditor import fckeditor
+    fckeditor_available = True
+except ImportError, e:
+    fckeditor_available = False
 # List of allowed tags (tags that won't create any XSS risk)
 cfg_html_buffer_allowed_tag_whitelist = ('a',
                                          'p', 'br', 'blockquote',
@@ -204,3 +210,142 @@ class HTMLWasher(HTMLParser):
         if self.re_js.match(value) or self.re_vb.match(value):
             return ''
         return value
+
+def get_html_text_editor(name, id=None, content='', textual_content=None, width='300px', height='200px',
+                         enabled=True, file_upload_url=None, toolbar_set="Basic"):
+    """
+    Returns a wysiwyg editor (FCKeditor) to embed in html pages.
+
+    Fall back to a simple textarea when the library is not installed,
+    or when the user's browser is not compatible with the editor, or
+    when 'enable' == False, or when javascript is not enabled.
+
+    NOTE that the output also contains a hidden field named
+    'editor_type' that contains the kind of editor used: 'textarea' or
+    'fckeditor'
+
+    Based on 'editor_type' you might want to take different actions,
+    like replace \n\r with <br/> when editor_type == 'textarea', but
+    not when editor_type == 'fckeditor'.
+
+    Parameters:
+
+           name - *str* the name attribute of the returned editor
+
+             id - *str* the id attribute of the returned editor (when
+                  applicable)
+
+        content - *str* the default content of the editor.
+
+textual_content - *str* a content formatted for the case where the
+                  wysiwyg editor is not available for user. When not
+                  specified, use value of 'content'
+
+          width - *str* width of the editor in an html compatible unit:
+                  Eg: '400px', '50%'
+
+         height - *str* height of the editor in an html compatible unit:
+                  Eg: '400px', '50%'
+
+         enable - *bool* if the wysiwyg editor is return (True) or if a
+                  simple texteara is returned (False)
+
+file_upload_url - *str* the URL used to upload new files via the
+                  editor upload panel. You have to implement the
+                  handler for your own use. The URL handler will get
+                  form variables 'File' as POST for the uploaded file,
+                  and 'Type' as GET for the type of file ('file',
+                  'image', 'flash', 'media')
+                  When value is not given, the file upload is disabled.
+
+    toolbar_set - *str* the name of the toolbar layout to
+                  use. FCKeditor comes by default with 'Basic' and
+                  'Default'. To define other sets, customize the
+                  config file in
+                  /opt/cds-invenio/var/www/fckeditor/invenio-fckconfig.js
+
+    Returns:
+
+        the HTML markup of the editor
+
+    """
+
+##     NOTE that the FCKeditor is instantiated using the Python interface
+##     provided with the editor, which must have access to the
+##     os.environ['HTTP_USER_AGENT'] variable to check if user's browser
+##     is compatible with the editor. This value is set in the
+##     webinterface_handler file.
+
+    if textual_content is None:
+        textual_content = content
+
+    editor = ''
+    textarea = '<textarea %(id)s name="%(name)s" style="width:%(width)s;height:%(height)s">%(content)s</textarea>' \
+                     % {'content': textual_content,
+                        'width': width,
+                        'height': height,
+                        'name': name,
+                        'id': id and ('id="%s"' % id) or ''}
+
+    if enabled and fckeditor_available:
+        oFCKeditor = fckeditor.FCKeditor(name)
+        oFCKeditor.BasePath = '/fckeditor/'
+        oFCKeditor.Config["CustomConfigurationsPath"] = "/fckeditor/invenio-fckeditor-config.js"
+
+        # Though not recommended, it is much better that users gets a
+        # <br/> when pressing carriage return than a <p> element. Then
+        # when a user replies to a webcomment without the FCKeditor,
+        # line breaks are nicely displayed.
+        oFCKeditor.Config["EnterMode"] = 'br'
+
+        if file_upload_url is not None:
+            oFCKeditor.Config["LinkUploadURL"] = file_upload_url
+            oFCKeditor.Config["ImageUploadURL"] = file_upload_url + '%3Ftype%3DImage'
+            oFCKeditor.Config["FlashUploadURL"] = file_upload_url + '%3Ftype%3DFlash'
+            oFCKeditor.Config["MediaUploadURL"] = file_upload_url + '%3Ftype%3DMedia'
+
+            oFCKeditor.Config["LinkUpload"] = 'true'
+            oFCKeditor.Config["ImageUpload"] = 'true'
+            oFCKeditor.Config["FlashUpload"] = 'true'
+        else:
+            oFCKeditor.Config["LinkUpload"] = 'false'
+            oFCKeditor.Config["ImageUpload"] = 'false'
+            oFCKeditor.Config["FlashUpload"] = 'false'
+
+        # In any case, disable browsing on the server
+        oFCKeditor.Config["LinkBrowser"] = 'false'
+        oFCKeditor.Config["ImageBrowser"] = 'false'
+        oFCKeditor.Config["FlashBrowser"] = 'false'
+
+        # Set the toolbar
+        oFCKeditor.ToolbarSet = toolbar_set
+        #toolbar_set_js_repr = repr(toolbar_set) + ';'
+        #oFCKeditor.Config["ToolbarSets"] = {}
+        #oFCKeditor.Config['ToolbarSets["Default"]'] = toolbar_set_js_repr
+
+        # Set the CSS used by Invenio, so that it is also applied
+        # inside the editor
+        oFCKeditor.Config["EditorAreaCSS"] = CFG_SITE_URL + '/img/cds.css'
+
+        oFCKeditor.Value = content
+        oFCKeditor.Height = height
+        oFCKeditor.Width = width
+        if oFCKeditor.IsCompatible():
+            # Browser seems compatible
+            editor += '<script language="JavaScript" type="text/javascript">'
+            editor += "document.write('" + oFCKeditor.Create().replace('\n', '').replace('\r', '') + "');"
+            editor += "document.write('<input type=\"hidden\" name=\"editor_type\" value=\"fckeditor\" />');"
+            editor += '</script>'
+            # In case javascript is disabled
+            editor += '<noscript>' + textarea + \
+                      '<input type="hidden" name="editor_type" value="textarea" /></noscript>'
+        else:
+            # Browser is not compatible
+            editor = textarea
+            editor += '<input type="hidden" name="editor_type" value="textarea" />'
+    else:
+        # FCKedior is not installed
+        editor = textarea
+        editor += '<input type="hidden" name="editor_type" value="textarea" />'
+
+    return editor

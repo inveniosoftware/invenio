@@ -30,6 +30,10 @@ JSMFV = 1.3
 JSMATH = jsMath-$(JSMV).zip
 JSMATHFONTS = jsMath-fonts-$(JSMFV).zip
 
+# current FCKeditor version
+FCKV = 2.6.2
+FCKEDITOR = FCKeditor_$(FCKV).zip
+
 all:
 	@echo "****************************************************"
 	@echo "** CDS Invenio has been successfully built.       **"
@@ -110,6 +114,41 @@ uninstall-jsmath-plugin:
 	@rm -rvf ${prefix}/var/www/jsMath
 	@echo "***********************************************************"
 	@echo "** The jsMath plugin was successfully removed.           **"
+	@echo "***********************************************************"
+
+install-fckeditor-plugin:
+	@echo "***********************************************************"
+	@echo "** Installing FCKeditor plugin, please wait...           **"
+	@echo "***********************************************************"
+	rm -rf ${prefix}/lib/python/invenio/fckeditor/
+	rm -rf /tmp/invenio-fckeditor-plugin
+	mkdir /tmp/invenio-fckeditor-plugin
+	(cd /tmp/invenio-fckeditor-plugin && \
+	wget 'http://downloads.sourceforge.net/fckeditor/$(FCKEDITOR)' && \
+	unzip -u -d ${prefix}/var/www $(FCKEDITOR)) && \
+	mkdir -p ${prefix}/lib/python/invenio/fckeditor/editor/filemanager/connectors/py && \
+	mv -f ${prefix}/var/www/fckeditor/fckeditor.py ${prefix}/lib/python/invenio/fckeditor/ && \
+	mv -f ${prefix}/var/www/fckeditor/editor/filemanager/connectors/py/*.py ${prefix}/lib/python/invenio/fckeditor/editor/filemanager/connectors/py/ && \
+	rm -f ${prefix}/var/www/fckeditor/editor/filemanager/connectors/py/upload.py && \
+	rm -f ${prefix}/var/www/fckeditor/editor/filemanager/connectors/py/zope.py && \
+	find ${prefix}/lib/python/invenio/fckeditor -type d -exec touch {}/__init__.py \; && \
+	find ${prefix}/var/www/fckeditor/ -depth -name '_*' -exec rm -rf {} \; && \
+	rm -r ${prefix}/var/www/fckeditor/editor/filemanager/connectors && \
+	find ${prefix}/var/www/fckeditor/fckeditor* -maxdepth 0 -exec rm -r {} \; && \
+	rm -fr /tmp/invenio-fckeditor-plugin
+	@echo "* Installing Invenio-specific FCKeditor config..."
+	(cd $(top_srcdir)/modules/webstyle/etc && make install)
+	@echo "***********************************************************"
+	@echo "** The FCKeditor plugin was successfully installed.      **"
+	@echo "** Please do not forget to properly set the option       **"
+	@echo "** CFG_WEBCOMMENT_USE_FCKEDITOR in invenio.conf.         **"
+	@echo "***********************************************************"
+
+uninstall-fckeditor-plugin:
+	@rm -rvf ${prefix}/var/www/fckeditor
+	@rm -rvf ${prefix}/lib/python/invenio/fckeditor
+	@echo "***********************************************************"
+	@echo "** The FCKeditor plugin was successfully removed.        **"
 	@echo "***********************************************************"
 
 update-v0.3.0-tables update-v0.3.1-tables:

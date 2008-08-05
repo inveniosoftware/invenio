@@ -17,9 +17,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-webdir=$(localstatedir)/www/jsMath/easy
-web_DATA=invenio-jsmath.js
+jsmathwebdir=$(localstatedir)/www/jsMath/easy
+jsmathweb_DATA=invenio-jsmath.js
 
-EXTRA_DIST = $(web_DATA)
+fckeditorwebdir=$(localstatedir)/www/fckeditor
+fckeditorweb_DATA=invenio-fckeditor-config.js
+
+EXTRA_DIST = $(jsmathweb_DATA)$(fckeditorweb_DATA)
 
 CLEANFILES = *~ *.tmp

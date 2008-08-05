@@ -32,6 +32,7 @@ import urlparse
 import cgi
 import sys
 import re
+import os
 
 # The following mod_python imports are done separately in a particular
 # order (util first) because I was getting sometimes publisher import
@@ -309,6 +310,9 @@ def create_handler(root):
         req.allow_methods(["GET", "POST"])
         if req.method not in ["GET", "POST"]:
             raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
+
+        # Set user agent for fckeditor.py, which needs it here
+        os.environ["HTTP_USER_AGENT"] = req.headers_in.get('User-Agent', '')
 
         try:
             uri = req.uri
