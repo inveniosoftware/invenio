@@ -31,7 +31,7 @@ JSMATH = jsMath-$(JSMV).zip
 JSMATHFONTS = jsMath-fonts-$(JSMFV).zip
 
 # current FCKeditor version
-FCKV = 2.6.2
+FCKV = 2.6.3
 FCKEDITOR = FCKeditor_$(FCKV).zip
 
 all:
