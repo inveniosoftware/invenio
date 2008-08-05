@@ -114,6 +114,8 @@ def redirect_to_url(req, url, redirection_type=None):
     if redirection_type != apache.HTTP_MOVED_PERMANENTLY:
         req.err_headers_out["Cache-Control"] = "no-cache"
 
+    req.err_headers_out["Set-Cookie"] = req.headers_out.get("Set-Cookie")
+
     if req.sent_bodyct:
         raise IOError, "Cannot redirect after headers have already been sent."
 

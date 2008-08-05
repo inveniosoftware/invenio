@@ -246,6 +246,7 @@ class WebInterfaceDirectory(object):
 
 
 re_slashes = re.compile('/+')
+re_bibdoc_uri = re.compile('/record/\d+/files/.+')
 def create_handler(root):
     """ Return a handler function that will dispatch apache requests
     through the URL layout passed in parameter."""
@@ -307,13 +308,22 @@ def create_handler(root):
     def _handler(req):
         """ This handler is invoked by mod_python with the apache request."""
 
-        req.allow_methods(["GET", "POST"])
-        if req.method not in ["GET", "POST"]:
+        if re_bibdoc_uri.match(req.uri):
+            allowed_methods = ("GET", "POST", "HEAD")
+        else:
+            allowed_methods = ("GET", "POST")
+        req.allow_methods(allowed_methods)
+        if req.method not in allowed_methods:
             raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
 
         # Set user agent for fckeditor.py, which needs it here
         os.environ["HTTP_USER_AGENT"] = req.headers_in.get('User-Agent', '')
 
+        if guest_p:
+            cache_control = "public"
+        else:
+            cache_control = "private"
+        req.headers_out['Cache-Control'] = cache_control
         try:
             uri = req.uri
             if uri == '/':

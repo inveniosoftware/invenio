@@ -405,7 +405,6 @@ class SessionManager:
             # This is the first time this session has had useful
             # info -- store it and set the session cookie.
             self[session.id] = session
-            SessionManager.set_session_cookie(self, request, session.id, remember_me)
 
         elif session.is_dirty():
             # We have already stored this session, but it's dirty
@@ -414,6 +413,7 @@ class SessionManager:
             # applications using a persistence mechanism that requires
             # repeatedly storing the same object in the same mapping.
             self[session.id] = session
+        SessionManager.set_session_cookie(self, request, session.id, remember_me)
 
 
     def set_session_cookie (self, request, session_id, remember_me=False):
@@ -749,7 +749,6 @@ class ResponseWrapper:
                 options += "; secure"
         cookie_str = "%s=%s%s" % (cookie_name, cookie_value, options)
         self.request.headers_out["Set-Cookie"] = cookie_str
-        self.request.err_headers_out["Set-Cookie"] = cookie_str
         if 'expires' not in attrs or attrs['expires'] != 0:
             self.request.cds_wrapper.setSession(cookie_value)
             self.request.cds_wrapper.cookies[cookie_name] = cookie_value
