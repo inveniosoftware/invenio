@@ -504,8 +504,8 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
     @param ranking: boolean, enabled if reviews, disabled for comments
     @param full_reviews_p: boolean, filter out empty reviews (with score only) if False
     @return tuple of comment where comment is
-            tuple (nickname, date_creation, body, id) if ranking disabled or
-            tuple (nickname, date_creation, body, nb_votes_yes, nb_votes_total, star_score, title, id)
+            tuple (nickname, uid, date_creation, body, id) if ranking disabled or
+            tuple (nickname, uid, date_creation, body, nb_votes_yes, nb_votes_total, star_score, title, id)
     Note: for the moment, if no nickname, will return email address up to '@'
     """
     display_since = calculate_start_date(display_since)
