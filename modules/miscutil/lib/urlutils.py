@@ -112,7 +112,8 @@ def redirect_to_url(req, url, redirection_type=None):
         redirection_type = apache.HTTP_MOVED_TEMPORARILY
     req.err_headers_out["Location"] = url
     if redirection_type != apache.HTTP_MOVED_PERMANENTLY:
-        req.err_headers_out["Cache-Control"] = "no-cache, private, no-store, must-revalidate, post-check=0, pre-check=0"
+        del req.headers_out["Cache-Control"]
+        req.err_headers_out["Cache-Control"] = "no-cache, private, no-store, must-revalidate, post-check=0, pre-check=0, max-age=0"
         req.err_headers_out["Pragma"] = "no-cache"
 
     if req.headers_out.has_key("Set-Cookie"):
