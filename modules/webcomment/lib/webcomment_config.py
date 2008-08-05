@@ -55,6 +55,7 @@ CFG_WEBCOMMENT_WARNING_MESSAGES = \
     'WRN_WEBCOMMENT_ADMIN_COMID_NAN': '_("comment ID must be a number")',
     'WRN_WEBCOMMENT_ADMIN_INVALID_COMID': '_("Invalid comment ID")',
     'WRN_WEBCOMMENT_ADMIN_COMID_INEXISTANT': '_("Comment ID %s does not exist")',
+    'WRN_WEBCOMMENT_ADMIN_RECID_INEXISTANT': '_("Record ID %s does not exist")',
     'ERR_WEBCOMMENT_RECID_MISSING': '_("No record ID was given")',
     'ERR_WEBCOMMENT_RECID_INEXISTANT': '_("Record ID %s does not exist in the database")',
     'ERR_WEBCOMMENT_RECID_INVALID': '_("Record ID %s is an invalid ID")',

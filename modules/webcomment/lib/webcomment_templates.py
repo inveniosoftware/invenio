@@ -1068,7 +1068,7 @@ class Template:
                 <li><a href="%(siteurl)s/admin/webcomment/webcommentadmin.py/users?ln=%(ln)s">%(view_users)s</a></li>
                 <li><a href="%(siteurl)s/help/admin/webcomment-admin-guide">%(guide)s</a></li>
                 """ % {'siteurl'    : CFG_SITE_URL,
-                       'delete_label': _("Delete a specific comment/review (by ID)"),
+                       'delete_label': _("Delete comment(s) or supress abuse report(s)"),
                        'view_users': _("View all users who have been reported"),
                        'ln'        : ln,
                        'guide'     : _("Guide")}
@@ -1080,6 +1080,8 @@ class Template:
 
     def tmpl_admin_delete_form(self, ln, warnings):
         """
+        Display admin interface to fetch list of records to delete
+
         @param warnings: list of warning_tuples where warning_tuple is (warning_message, text_color)
                          see tmpl_warnings, color is optional
         """
@@ -1103,7 +1105,21 @@ class Template:
                 <tr>
             </table>
             <br />
-        ''' %_("Comment ID:")
+            %s <br/>
+            <br />
+            <table>
+                <tr>
+                    <td>%s</td>
+                    <td><input type=text name="recid" size="10" maxlength="10" value="" /></td>
+                </tr>
+                <tr>
+                    <td><br /></td>
+                <tr>
+            </table>
+            <br />
+        ''' % (_("Comment ID:"),
+               _("Or enter a record ID to list all the associated comments/reviews:"),
+               _("Record ID:"))
         form_link = "%s/admin/webcomment/webcommentadmin.py/delete?ln=%s" % (CFG_SITE_URL, ln)
         form = self.createhiddenform(action=form_link, method="get", text=form, button=_('View Comment'))
         return warnings + out + form
@@ -1235,7 +1251,7 @@ class Template:
                 'ln': ln}
         return out
 
-    def tmpl_admin_comments(self, ln, uid, comID, comment_data, reviews):
+    def tmpl_admin_comments(self, ln, uid, comID, recID, comment_data, reviews):
         """
         @param comment_data: same type of tuple as that
         which is returned by webcomment.py/query_retrieve_comments_or_remarks i.e.
@@ -1338,19 +1354,35 @@ class Template:
             else:
                 header += _("Here are the reported comments of user %s") %  uid
             header += '<br /><br />'
-        if comID > 0:
-            header = '<br />' +_("Here is comment/review %s")% comID + '<br /><br />'
-        if uid > 0 and comID > 0:
-            header = '<br />' + _("Here is comment/review %(x_cmtID)s written by user %(x_user)s") % {'x_cmtID': comID, 'x_user': uid}
+        if comID > 0 and recID <= 0 and uid <=0:
+            if reviews:
+                header = '<br />' +_("Here is review %s")% comID + '<br /><br />'
+            else:
+                header = '<br />' +_("Here is comment %s")% comID + '<br /><br />'
+        if uid > 0 and comID > 0 and recID <= 0:
+            if reviews:
+                header = '<br />' + _("Here is review %(x_cmtID)s written by user %(x_user)s") % {'x_cmtID': comID, 'x_user': uid}
+            else:
+                header = '<br />' + _("Here is comment %(x_cmtID)s written by user %(x_user)s") % {'x_cmtID': comID, 'x_user': uid}
             header += '<br/ ><br />'
-        if uid == 0 and comID == 0:
+
+        if comID <= 0 and recID <= 0 and uid <=0:
             header = '<br />'
             if reviews:
                 header += _("Here are all reported reviews sorted by the most reported")
             else:
                 header += _("Here are all reported comments sorted by the most reported")
             header += "<br /><br />"
+        elif recID > 0:
+            header = '<br />'
+            if reviews:
+                header += _("Here are all reviews for record %i, sorted by the most reported" % recID)
+                header += '<br /><a href="%s/admin/webcomment/webcommentadmin.py/delete?comid=&recid=%s&amp;reviews=0">%s</a>' % (CFG_SITE_URL, recID, _("Show comments"))
+            else:
+                header += _("Here are all comments for record %i, sorted by the most reported" % recID)
+                header += '<br /><a href="%s/admin/webcomment/webcommentadmin.py/delete?comid=&recid=%s&amp;reviews=1">%s</a>' % (CFG_SITE_URL, recID, _("Show reviews"))
 
+                header += "<br /><br />"
         return header + form
 
     def tmpl_admin_del_com(self, del_res, ln=CFG_SITE_LANG):

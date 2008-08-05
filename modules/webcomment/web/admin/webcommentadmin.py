@@ -67,7 +67,7 @@ def index(req, ln=CFG_SITE_LANG):
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-def delete(req, ln=CFG_SITE_LANG, comid=""):
+def delete(req, ln=CFG_SITE_LANG, comid="", recid="", uid="", reviews=""):
     """
     Delete a comment by giving its comment id
     @param ln: language
@@ -91,8 +91,12 @@ def delete(req, ln=CFG_SITE_LANG, comid=""):
 
     (auth_code, auth_msg) = check_user(req,'cfgwebcomment')
     if (auth_code != 'false'):
-        (body, errors, warnings) = perform_request_delete(ln=ln, comID=comid)
-        return page(title=_("Delete Comment"),
+        (body, errors, warnings) = perform_request_delete(ln=ln,
+                                                          comID=comid,
+                                                          recID=recid,
+                                                          uid=uid,
+                                                          reviews=reviews)
+        return page(title=(reviews=='1' and _("Delete Reviews") or _("Delete Comments")) +' / ' + _("Suppress abuse reports"),
                 body=body,
                 uid=uid,
                 language=ln,
@@ -131,8 +135,8 @@ def comments(req, ln=CFG_SITE_LANG, uid="", comid="", reviews=0):
 
     (auth_code, auth_msg) = check_user(auid, 'cfgwebcomment')
     if (auth_code != 'false'):
-        return page(title=_("View all reported comments"),
-                    body=perform_request_comments(ln=ln, uid=uid, comID=comid, reviews=reviews),
+        return page(title=(reviews=='0' and _("View all reported comments") or _("View all reported reviews")),
+                    body=perform_request_comments(ln=ln, uid=uid, comID=comid, reviews=reviews, abuse=True),
                     uid=auid,
                     language=ln,
                     navtrail = navtrail_previous_links,

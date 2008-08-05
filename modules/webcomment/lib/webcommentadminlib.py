@@ -21,7 +21,9 @@
 __revision__ = "$Id$"
 
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
-from invenio.webcomment import query_get_comment
+from invenio.search_engine import record_exists
+from invenio.webcomment import query_get_comment, \
+     query_retrieve_comments_or_remarks
 from invenio.urlutils import wash_url_argument
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language, wash_language
@@ -44,31 +46,49 @@ def perform_request_index(ln=CFG_SITE_LANG):
     """
     return webcomment_templates.tmpl_admin_index(ln=ln)
 
-def perform_request_delete(comID=-1, ln=CFG_SITE_LANG):
+def perform_request_delete(comID=-1, recID=-1, uid=-1, reviews="", ln=CFG_SITE_LANG):
     """
     """
     warnings = []
 
     ln = wash_language(ln)
     comID = wash_url_argument(comID, 'int')
+    recID = wash_url_argument(recID, 'int')
+    uid = wash_url_argument(uid, 'int')
+    # parameter reviews is deduced from comID when needed
 
-    if comID is not None:
-        if comID <= 0:
+    if comID is not None and recID is not None and uid is not None:
+        if comID <= 0 and recID <= 0 and uid <= 0:
             if comID != -1:
                 warnings.append(("WRN_WEBCOMMENT_ADMIN_INVALID_COMID",))
-            return (webcomment_templates.tmpl_admin_delete_form(ln, warnings),None, warnings)
-
-        comment = query_get_comment(comID)
-        if comment:
-            c_star_score = 5
-            if comment[c_star_score] > 0:
-                reviews = 1
-            else:
-                reviews = 0
-            return (perform_request_comments(ln=ln, comID=comID, reviews=reviews), None, warnings)
-        else:
-            warnings.append(('WRN_WEBCOMMENT_ADMIN_COMID_INEXISTANT', comID))
             return (webcomment_templates.tmpl_admin_delete_form(ln, warnings), None, warnings)
+
+        if comID > 0 and not recID > 0:
+            comment = query_get_comment(comID)
+
+            if comment:
+                # Figure out if this is a review or a comment
+                c_star_score = 5
+                if comment[c_star_score] > 0:
+                    reviews = 1
+                else:
+                    reviews = 0
+                return (perform_request_comments(ln=ln, comID=comID, recID=recID, reviews=reviews), None, warnings)
+            else:
+                warnings.append(('WRN_WEBCOMMENT_ADMIN_COMID_INEXISTANT', comID))
+                return (webcomment_templates.tmpl_admin_delete_form(ln, warnings), None, warnings)
+
+        elif recID > 0:
+            if record_exists(recID):
+                comID = ''
+                reviews = wash_url_argument(reviews, 'int')
+                return (perform_request_comments(ln=ln, comID=comID, recID=recID, reviews=reviews), None, warnings)
+            else:
+                warnings.append(('WRN_WEBCOMMENT_ADMIN_RECID_INEXISTANT', comID))
+                return (webcomment_templates.tmpl_admin_delete_form(ln, warnings), None, warnings)
+        else:
+            return (webcomment_templates.tmpl_admin_delete_form(ln, warnings), None, warnings)
+
     else:
         return (webcomment_templates.tmpl_admin_delete_form(ln, warnings), None, warnings)
 
@@ -109,21 +129,34 @@ def query_get_users_reported():
     users = tuple(users)
     return users
 
-def perform_request_comments(ln=CFG_SITE_LANG, uid="", comID="", reviews=0):
+def perform_request_comments(ln=CFG_SITE_LANG, uid="", comID="", recID="", reviews=0, abuse=False):
     """
+    Display the list of comments/reviews along with information about the comment.
+
+    Display the comment given by its ID, or the list of comments for
+    the given record ID.
+    If abuse == True, only list records reported as abuse.
+    If comID and recID are not provided, list all comments, or all
+    abused comments (check parameter 'abuse')
     """
     ln = wash_language(ln)
     uid = wash_url_argument(uid, 'int')
     comID = wash_url_argument(comID, 'int')
+    recID = wash_url_argument(recID, 'int')
     reviews = wash_url_argument(reviews, 'int')
 
-    comments = query_get_comments(uid, comID, reviews, ln)
+    if recID or uid:
+        comments = query_get_comments(uid, comID, recID, reviews, ln, abuse=abuse)
+    else:
+        comments = query_get_comments('', comID, '', reviews, ln, abuse=abuse)
+
     return webcomment_templates.tmpl_admin_comments(ln=ln, uid=uid,
                                                     comID=comID,
+                                                    recID=recID,
                                                     comment_data=comments,
                                                     reviews=reviews)
 
-def query_get_comments(uid, cmtID, reviews, ln):
+def query_get_comments(uid, cmtID, recID, reviews, ln, abuse=False):
     """
     private function
     tuple of comment where comment is
@@ -147,10 +180,13 @@ def query_get_comments(uid, cmtID, reviews, ln):
     where_clause = "WHERE " + (reviews and 'c.star_score>0' or 'c.star_score=0')
     if uid:
         where_clause += ' AND c.id_user=%i' % uid
+    if recID:
+        where_clause += ' AND c.id_bibrec=%i' % recID
     if cmtID:
         where_clause += ' AND c.id=%i' % cmtID
-    else:
+    if abuse:
         where_clause += ' AND c.nb_abuse_reports>0'
+
     res = run_sql(query % (select_fields, where_clause))
     output = []
     for qtuple in res:
