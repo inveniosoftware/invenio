@@ -57,8 +57,8 @@ def format(bfo, style, separator='; ', show_icons='no'):
         additional_str = separator + '<small>(<a '+style+' href="'+CFG_SITE_URL+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("additional files")
 
     versions_str = ''
-    if old_versions:
-        versions_str = separator + '<small>(<a '+style+' href="'+CFG_SITE_URL+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
+    #if old_versions:
+        #versions_str = separator + '<small>(<a '+style+' href="'+CFG_SITE_URL+'/record/'+str(bfo.recID)+'/files/">%s</a>)</small>' % _("older versions")
 
     if main_urls:
         # Put a big file icon if only one file
