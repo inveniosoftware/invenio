@@ -114,7 +114,7 @@ def redirect_to_url(req, url, redirection_type=None):
     if redirection_type != apache.HTTP_MOVED_PERMANENTLY:
         req.err_headers_out["Cache-Control"] = "no-cache"
 
-    if req.get("Set-Cookie") is not None:
+    if req.headers_out.has_key("Set-Cookie"):
         req.err_headers_out["Set-Cookie"] = req.headers_out["Set-Cookie"]
 
     if req.sent_bodyct:
