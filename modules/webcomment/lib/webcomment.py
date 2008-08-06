@@ -161,6 +161,8 @@ def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display
         warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED',))
     elif reported == 0:
         warnings.append(('WRN_WEBCOMMENT_ALREADY_REPORTED',))
+    elif reported == -1:
+        warnings.append(('WRN_WEBCOMMENT_INVALID_REPORT',))
     if CFG_WEBCOMMENT_ALLOW_REVIEWS and reviews:
         avg_score = calculate_avg_score(res)
         if voted > 0:
@@ -276,7 +278,7 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
     Report a comment/review for inappropriate content.
     Will send an email to the administrator if number of reports is a multiple of CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN
     @param cmt_id: comment id
-    @return integer 1 if successful, integer 0 if not
+    @return integer 1 if successful, integer 0 if not. -1 if comment does not exist
     """
     cmt_id = wash_url_argument(cmt_id, 'int')
     if cmt_id <= 0:
@@ -284,6 +286,8 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
     (query_res, nb_abuse_reports) = query_record_report_this(cmt_id)
     if query_res == 0:
         return 0
+    elif query_res == -1:
+        return -1
     if not(check_user_can_report(cmt_id, client_ip_address, uid)):
         return 0
     action_date = convert_datestruct_to_datetext(time.localtime())
@@ -447,14 +451,13 @@ def query_record_report_this(comID):
     @param comID: comment id
     @return tuple (success, new_total_nb_reports_for_this_comment) where
     success is integer 1 if success, integer 0 if not
-            if none found, return ()
     """
     #retrieve nb_abuse_reports
     query1 = "SELECT nb_abuse_reports FROM cmtRECORDCOMMENT WHERE id=%s"
     params1 = (comID,)
     res1 = run_sql(query1, params1)
     if len(res1)==0:
-        return ()
+        return (-1, 0)
 
     #increment and update
     nb_abuse_reports = int(res1[0][0]) + 1

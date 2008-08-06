@@ -97,7 +97,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         @param nb: number of results per page
         @param p: results page
         @param voted: boolean, active if user voted for a review, see vote function
-        @param reported: boolean, active if user reported a certain comment/review, see report function
+        @param reported: int, active if user reported a certain comment/review, see report function
         @param reviews: boolean, enabled for reviews, disabled for comments
         @return the full html page.
         """

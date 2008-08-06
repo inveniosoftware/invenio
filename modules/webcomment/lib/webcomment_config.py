@@ -48,6 +48,7 @@ CFG_WEBCOMMENT_WARNING_MESSAGES = \
     'WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED': '_("Your feedback could not be recorded, please try again")',
     'WRN_WEBCOMMENT_ALREADY_VOTED': '_("Sorry, you have already voted. This vote hasn\'t been recorded.")',
     'WRN_WEBCOMMENT_ALREADY_REPORTED': '_("You have already reported an abuse for this comment.")',
+    'WRN_WEBCOMMENT_INVALID_REPORT': '_("The comment you have reported no longer exists.")',
     'WRN_WEBCOMMENT_ADD_NO_TITLE': '_("You must enter a title")',
     'WRN_WEBCOMMENT_ADD_NO_SCORE': '_("You must choose a score")',
     'WRN_WEBCOMMENT_ADD_NO_BODY': '_("You must enter a text")',
