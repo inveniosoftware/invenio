@@ -31,6 +31,7 @@ import urllib2
 import urllib
 import tempfile
 import cPickle
+import base64
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 from mimetypes import MimeTypes
@@ -1490,6 +1491,17 @@ class BibDocFile:
 
 def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5=None):
     """This is a generic function to stream a file to the user."""
+    def normal_streaming(size):
+        req.set_content_length(size)
+        req.send_http_header()
+        try:
+            if not req.header_only:
+                req.sendfile(fullpath)
+                return ''
+        except IOError, e:
+            register_exception(req=req)
+            raise InvenioWebSubmitFileError, "Encountered exception while reading '%s': '%s'" % (fullpath, e)
+
     if_none_match = req.headers_in.get('If-None-Match')
     if if_none_match is not None:
         if_none_match = [elem.strip() for elem in if_none_match.split(',')]
@@ -1517,10 +1529,24 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         if etag is not None:
             req.headers_out["ETag"] = etag
         if md5 is not None:
-            req.headers_out["Content-MD5"] = md5
+            req.headers_out["Content-MD5"] = base64.encodestring(base64.b16decode(md5.upper()))[:-1]
         size = os.path.getsize(fullpath)
         ranges = req.headers_in.get('Range')
         if ranges is not None:
+            if_match = req.headers_in.get('If-Match')
+            if if_match is not None:
+                if_match = [elem.strip() for elem in if_match.split(',')]
+                if etag is None:
+                    normal_streaming(size)
+                    return
+                elif etag not in if_match:
+                    raise apache.SERVER_RETURN, apache.HTTP_PRECONDITION_FAILED
+            if_range = req.headers_in.get('If-Range')
+            if if_range is not None:
+                if_range = [elem.strip() for elem in if_range.split(',')]
+                if etag is None or etag not in if_range:
+                    normal_streaming(size)
+                    return
             try:
                 ranges = ranges[len('bytes='):].split(',')
                 parsed_ranges = []
@@ -1547,15 +1573,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                         return ''
             except Exception:
                 pass
-        req.set_content_length(size)
-        req.send_http_header()
-        try:
-            if not req.header_only:
-                req.sendfile(fullpath)
-                return ''
-        except IOError, e:
-            register_exception(req=req)
-            raise InvenioWebSubmitFileError, "Encountered exception while reading '%s': '%s'" % (fullpath, e)
+        normal_streaming(size)
     else:
         raise InvenioWebSubmitFileError, "%s does not exists!" % fullpath
 
