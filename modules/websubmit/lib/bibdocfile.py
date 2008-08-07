@@ -32,6 +32,7 @@ import urllib
 import tempfile
 import cPickle
 import base64
+import binascii
 from datetime import datetime
 from mimetypes import MimeTypes
 
@@ -1528,7 +1529,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         if etag is not None:
             req.headers_out["ETag"] = etag
         if md5 is not None:
-            req.headers_out["Content-MD5"] = base64.encodestring(base64.b16decode(md5.upper()))[:-1]
+            req.headers_out["Content-MD5"] = base64.encodestring(binascii.unhexlify(md5.upper()))[:-1]
         size = os.path.getsize(fullpath)
         ranges = req.headers_in.get('Range')
         if ranges is not None:
