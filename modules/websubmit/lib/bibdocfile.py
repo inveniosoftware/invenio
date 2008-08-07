@@ -33,7 +33,6 @@ import tempfile
 import cPickle
 import base64
 from datetime import datetime
-from xml.sax.saxutils import quoteattr
 from mimetypes import MimeTypes
 
 try:
@@ -49,19 +48,19 @@ try:
 except NameError:
     from sets import Set as set
 
-from invenio.shellutils import run_shell_command, escape_shell_arg
+from invenio.shellutils import escape_shell_arg
 from invenio.dbquery import run_sql, DatabaseError, blob_to_string
 from invenio.errorlib import register_exception
 from invenio.bibrecord import create_record, record_get_field_instances, \
     field_get_subfield_values, field_get_subfield_instances, \
     encode_for_xml
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_URL, \
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_WEBDIR, CFG_WEBSUBMIT_FILEDIR,\
     CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS, \
     CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL, \
     CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS, \
-    CFG_TMPDIR, CFG_PATH_WGET, CFG_PATH_MD5SUM
+    CFG_TMPDIR, CFG_PATH_MD5SUM
 from invenio.bibformat import format_record
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -1366,14 +1365,14 @@ class BibDocFile:
         self.url = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, urllib.quote(self.name), urllib.quote(self.format))
         self.etag = '"%i%s%i"' % (self.docid, self.format, self.version)
         if format == "":
-            self.mime = "text/plain"
+            self.mime = "application/octet-stream"
             self.encoding = ""
             self.fullname = name
         else:
             self.fullname = "%s%s" % (name, self.format)
             (self.mime, self.encoding) = _mimes.guess_type(self.fullname)
             if self.mime is None:
-                self.mime = "text/plain"
+                self.mime = "application/octet-stream"
 
     def __repr__(self):
         return ('BibDocFile(%s, %s, %i, %s, %s, %i, %i, %s, %s, %s, %s)' % (repr(self.fullpath), repr(self.doctype), self.version, repr(self.name), repr(self.format), self.recid, self.docid, repr(self.status), repr(self.checksum), repr(self.description), repr(self.comment)))
@@ -1520,7 +1519,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             format = decompose_file(fullpath)[2]
             (mime, encoding) = _mimes.guess_type(fullpath)
             if mime is None:
-                mime = "text/plain"
+                mime = "application/octet-stream"
         req.content_type = mime
         req.encoding = encoding
         req.filename = fullname
@@ -1547,31 +1546,46 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 if etag is None or etag not in if_range:
                     normal_streaming(size)
                     return
+            unless_modified_since = req.headers_in.get('Unless-Modified-Since')
+            if unless_modified_since is not None:
+                unless_modified_since = time.mktime(time.strptime(unless_modified_since, '%a, %d %b %Y %X %Z'))
+                if unless_modified_since < mtime:
+                    normal_streaming(size)
+                    return
             try:
                 ranges = ranges[len('bytes='):].split(',')
                 parsed_ranges = []
                 for arange in ranges:
+                    arange = arange.strip()
                     if arange.startswith('-'):
                         arange = int(arange[1:])
-                        parsed_ranges.append((size - arange, arange))
+                        if size - arange < size:
+                            parsed_ranges.append((size - arange, arange))
                     elif arange.endswith('-'):
                         arange = int(arange[:-1])
-                        parsed_ranges.append((arange, size - arange))
+                        if arange < size:
+                            parsed_ranges.append((arange, size - arange))
                     elif '-' in arange:
                         (rfrom, rto) = arange.split('-')
                         rfrom = int(rfrom)
                         rto = int(rto)
-                        parsed_ranges.append((rfrom, rto - rfrom))
+                        if rfrom < size:
+                            parsed_ranges.append((rfrom, rto - rfrom))
+                if not parsed_ranges:
+                    raise apache.SERVER_RETURN, apache.HTTP_RANGE_NOT_SATISFIABLE
                 the_range = parsed_ranges[0]
-                if 0 <= the_range[0] < size and the_range[1] <= size - the_range[0]:
-                    req.set_content_length(the_range[1])
-                    req.headers_out['Content-Range'] = 'bytes %d-%d/%d' % (the_range[0], the_range[0] + the_range[1] - 1, size)
-                    req.status = apache.HTTP_PARTIAL_CONTENT
-                    req.send_http_header()
-                    if not req.header_only:
-                        req.sendfile(fullpath, the_range[0], the_range[1])
-                        return ''
-            except Exception:
+                the_range = (the_range[0], min(the_range[1], size - the_range[0]))
+                req.set_content_length(the_range[1])
+                req.headers_out['Content-Range'] = 'bytes %d-%d/%d' % (the_range[0], the_range[0] + the_range[1] - 1, size)
+                req.status = apache.HTTP_PARTIAL_CONTENT
+                req.send_http_header()
+                if not req.header_only:
+                    req.sendfile(fullpath, the_range[0], the_range[1])
+                    return
+            except apache.SERVER_RETURN:
+                raise
+            except Exception, e:
+                print >> open('/tmp/stream.log', 'a'), e
                 pass
         normal_streaming(size)
     else:
