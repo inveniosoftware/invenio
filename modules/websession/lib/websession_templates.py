@@ -1119,17 +1119,11 @@ class Template:
                          'ln' : ln,
                          'administration' : _("administration"),
                        }
-            if CFG_EXTERNAL_AUTH_LOGOUT_SSO:
-                out += """<a class="userinfo" href="%(sso_link)s">%(logout)s</a>""" % {
-                        'sso_link' : CFG_EXTERNAL_AUTH_LOGOUT_SSO,
-                        'logout' : _("logout"),
-                    }
-            else:
-                out += """<a class="userinfo" href="%(sitesecureurl)s/youraccount/logout?ln=%(ln)s">%(logout)s</a>""" % {
-                        'sitesecureurl' : CFG_SITE_SECURE_URL,
-                        'ln' : ln,
-                        'logout' : _("logout"),
-                    }
+            out += """<a class="userinfo" href="%(sitesecureurl)s/youraccount/logout?ln=%(ln)s">%(logout)s</a>""" % {
+                    'sitesecureurl' : CFG_SITE_SECURE_URL,
+                    'ln' : ln,
+                    'logout' : _("logout"),
+                }
         return out
 
     def tmpl_warning(self, warnings, ln=CFG_SITE_LANG):
