@@ -290,6 +290,7 @@ file_upload_url - *str* the URL used to upload new files via the
     if enabled and fckeditor_available:
         oFCKeditor = fckeditor.FCKeditor(name)
         oFCKeditor.BasePath = '/fckeditor/'
+        # TODO: check if path would not better be a parameter of the function
         oFCKeditor.Config["CustomConfigurationsPath"] = "/fckeditor/invenio-fckeditor-config.js"
 
         # Though not recommended, it is much better that users gets a
