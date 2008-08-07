@@ -217,7 +217,8 @@ def viewhistory(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0):
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def preview_original_xml(req, oai_src_id = None, record_id = None):
+def reharvest(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, **records):
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
     except Error, e:
@@ -230,17 +231,46 @@ def preview_original_xml(req, oai_src_id = None, record_id = None):
                     req=req)
     auth = bhc.check_user(req,'cfgbibharvest')
     if not auth[0]:
-        if (record_id == None) or (oai_src_id == None):
-            req.content_type = "text/plain";
-            req.write("No record number provided")
-            return
-        req.content_type = "text/xml"
-        return bhc.perform_request_preview_original_xml
+        return page(title="OAI source - reharvesting records",
+                    body=bhc.perform_request_reharvest_records(oai_src_id=oai_src_id,
+                                                    ln=ln,
+                                                    confirm=confirm, record_ids = records),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+def harvest(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, record_id=None):
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
+    auth = bhc.check_user(req,'cfgbibharvest')
+    if not auth[0]:
+        return page(title="OAI source - harvesting new records",
+                    body=bhc.perform_request_harvest_record(oai_src_id=oai_src_id,
+                                                    ln=ln,
+                                                    confirm=confirm, record_id = record_id),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def preview_harvested_xml(req, oai_src_id = None, record_id = None):
+def preview_original_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = None):
     try:
         uid = getUid(req)
     except Error, e:
@@ -258,7 +288,34 @@ def preview_harvested_xml(req, oai_src_id = None, record_id = None):
             req.write("No record number provided")
             return
         req.content_type = "text/xml"
-        return bhc.perform_request_preview_harvested_xml
+        return bhc.perform_request_preview_original_xml(oai_src_id, record_id)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
+def preview_harvested_xml(req, oai_src_id = None, ln=CFG_SITE_LANG, record_id = None):
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
+    auth = bhc.check_user(req,'cfgbibharvest')
+    if not auth[0]:
+        if (record_id == None) or (oai_src_id == None):
+            req.content_type = "text/plain";
+            req.write("No record number provided")
+            return
+        content = bhc.perform_request_preview_harvested_xml(oai_src_id, record_id)
+        if content[0]:
+            req.content_type = "text/xml"
+        else:
+            req.content_type = "text/plain"
+        return content[1]
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 

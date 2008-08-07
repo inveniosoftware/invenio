@@ -17,29 +17,25 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-logfile = "/opt/cds-invenio/var/cache/oaiarxiv_oaiid.dat"
+
+from invenio.dbquery import run_sql
+
+#logfile = "/opt/cds-invenio/var/cache/oaiarxiv_oaiid.dat"
 
 class HistoryEntry:
     date = ""
-    arXivId = ""
+    id = ""
     operation = "i"
-    def __init__(self, date, arXivId, operation):
+    def __init__(self, date, id):
         self.date = date
-        self.arXivId = arXivId
-        self.operation = operation
-
+        self.id = id
 
 def get_history_entries(oai_src_id):
-    """
-    Getting the harvesting history from any database
-    """
+    query = "SELECT harvesting_date, oai_record_id  from oaiHARVESTINGLOG where oai_src_id=%s"
+    res = run_sql(query,(str(oai_src_id)))
     result = []
-    f = open(logfile, "r")
-    lines = f.readlines()
-    f.close()
-    for line in lines:
-#        result.append(HistoryEntry("a","a","u"))
-        parts = line.split()
-        if (len(parts) >= 3) and ( parts[2] == oai_src_id):
-            result.append(HistoryEntry(parts[1][0:4] + "-" + parts[1][4:6] + "-" + parts[1][6:8] + " " + parts[1][8:10] + ":" + parts[1][10:12] + ":" + parts[1][12:], parts[0], "i"))
+    for entry in res:
+        date = str(entry[0].year) + "-" + str(entry[0].month) + "-" + str(entry[0].day) + \
+            " " + str(entry[0].hour) + ":" + str(entry[0].minute) + ":" + str(entry[0].second)
+        result.append(HistoryEntry(date,str(entry[1])))
     return result

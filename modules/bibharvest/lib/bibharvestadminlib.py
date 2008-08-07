@@ -36,7 +36,8 @@ from invenio.config import \
      CFG_TMPDIR, \
      CFG_VERSION, \
      CFG_SITE_URL,\
-     CFG_ETCDIR
+     CFG_ETCDIR, \
+     CFG_BINDIR
 from invenio.bibrankadminlib import \
      write_outcome,modify_translations,\
      get_def_name,\
@@ -95,7 +96,8 @@ def perform_request_index(ln=CFG_SITE_LANG):
         delACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/delsource", title = "delete", args = namelinked_args)
         testACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/testsource", title = "test", args = namelinked_args)
         historyACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/viewhistory", title = "history", args = namelinked_args)
-        action = editACTION + " / " + delACTION + " / " + testACTION + " / " + historyACTION
+        harvestACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/harvest", title = "harvest", args = namelinked_args)
+        action = editACTION + " / " + delACTION + " / " + testACTION + " / " + historyACTION + " / " + harvestACTION
         sources.append([namelinked,oai_src_baseurl,oai_src_prefix,freq,oai_src_config,oai_src_post, action])
 
     updates = []
@@ -445,29 +447,115 @@ def perform_request_testsource(oai_src_id=None, ln=CFG_SITE_LANG, callback='yes'
 
 
 def format_history_entries(orig_data):
-    headers = ["Date", "arXiv ID", "operation"]
+    headers = ["Date", "record ID", "Reharvest"]
     result = []
     for item in orig_data:
-        if item.operation == "i":
-            oper = "inserted"
-        elif item.operation == "u":
-            oper = "updated"
-        else:
-            oper = "unknown"
-
-        result.append([item.date, item.arXivId, oper])
+        chkbox = bibharvest_templates.tmpl_output_checkbox(item.id, "1")
+        result.append([item.date, item.id, chkbox])
     return (headers, result)
 
 def perform_request_viewhistory(oai_src_id=None, ln=CFG_SITE_LANG, callback='yes', confirm=0):
     """ Creates html to view the harvesting history """
     result = ""
     headers, data = format_history_entries(get_history_entries(oai_src_id))
-    result += bibharvest_templates.tmpl_output_table(headers, data)
+    inner_text = bibharvest_templates.tmpl_output_table(headers, data)
+    inner_text += bibharvest_templates.tmpl_print_brs(ln, 1)
+    result +=  createhiddenform(action="/admin/bibharvest/bibharvestadmin.py/reharvest", text = inner_text, button = "Reharvest selected records", oai_src_id=oai_src_id, ln=ln)
     return result
+
 
 ############################################################
 ###  The functions allowing to preview the harvested XML ###
 ############################################################
+
+
+
+def harvest_record(record_id , oai_src_baseurl, oai_src_prefix):
+    """
+       Harvests given record and returns it's string as a result
+    """
+    command = CFG_BINDIR + "/bibharvest -vGetRecord -i" + record_id \
+              + " -p" + oai_src_prefix + " " + oai_src_baseurl
+    program_output = os.popen(command)
+    result = program_output.read(-1)
+    program_output.close()
+    return result
+
+def convert_record(oai_src_config, record_to_convert):
+    command = CFG_BINDIR + "/bibconvert -c " + oai_src_config
+    (s_in,s_out,s_err) = os.popen3(command)
+    s_in.write(record_to_convert)
+    s_in.close()
+    s_err.readlines()
+    result = s_out.read(-1)
+    s_err.close()
+    s_out.close()
+    return result
+
+def format_record(oai_src_bibfilter,  record_to_convert):
+    """
+    Formats the record using given formatting program.
+    Returns name of the file containing result,
+    program output, program error output
+    """
+    (file_descriptor, file_name) = tempfile.mkstemp()
+    f = os.fdopen(file_descriptor, "w")
+    f.write(record_to_convert)
+    f.close()
+    command = oai_src_bibfilter + " " + file_name
+    (program_input, program_output, program_err) = os.popen3(command)
+    program_input.close()
+    out = program_output.read(-1)
+    err = program_err.read(-1)
+    program_output.close()
+    program_err.close()
+
+    if os.path.exists(file_name + ".insert.xml"):
+        return (file_name + ".insert.xml", out, err)
+    else:
+        return (None, out, err)
+
+def harvest_postprocress_record(oai_src_id, record_id):
+    oai_src = get_oai_src(oai_src_id)
+    oai_src_baseurl = oai_src[0][2]
+    oai_src_prefix = oai_src[0][3]
+    oai_src_config = oai_src[0][5]
+    oai_src_post = oai_src[0][6]
+    oai_src_sets = oai_src[0][7].split()
+    oai_src_bibfilter = oai_src[0][8]
+    result = harvest_record(record_id, oai_src_baseurl, oai_src_prefix)
+    if result == None:
+        return (False, "Error during harvesting")
+    if oai_src_post.find("c") != -1:
+        result = convert_record(oai_src_config, result)
+        if result == None:
+            return (False, "Error during converting")
+    if oai_src_post.find("f") != -1:
+        fres = format_record(oai_src_bibfilter, result)
+        fname = fres[0]
+        if fname != None:
+            f = open(fname, "r")
+            result = f.read(-1)
+            f.close()
+            os.remove(fname)
+        else:
+            return (False, "Error during formatting: " + fres[1] + "\n\n" + fres[2])
+    return (True, result)
+
+def upload_record(record = None, uploader_paremeters = "", oai_source_id = None):
+    if record == None:
+        return
+    (file_descriptor, file_name) = tempfile.mkstemp()
+    f = os.fdopen(file_descriptor, "w")
+    f.write(record)
+    f.close()
+    command = CFG_BINDIR + "/bibupload " + uploader_paremeters + " "
+    if oai_source_id != None:
+        command += " -o" + str(oai_source_id)
+    command += " " + file_name
+    out = os.popen(command)
+    output_data = out.read(-1)
+    out.close()
 
 def perform_request_preview_original_xml(oai_src_id = None, record_id = None):
     oai_src = get_oai_src(oai_src_id)
@@ -477,51 +565,47 @@ def perform_request_preview_original_xml(oai_src_id = None, record_id = None):
     oai_src_post = oai_src[0][6]
     oai_src_sets = oai_src[0][7].split()
     oai_src_bibfilter = oai_src[0][8]
-    result = ""
-    command = "/opt/cds-invenio/bin/bibharvest -vGetRecord -i" \
-              + record_id + " -p" + oai_src_prefix + " " + oai_src_baseurl
-    program_output = os.popen(command)
-    lines = program_output.readlines()
-    program_output.close()
-    for line in lines:
-        result += line
-    return result
+    record = harvest_record(record_id, oai_src_baseurl, oai_src_prefix)
+    return record
 
 def perform_request_preview_harvested_xml(oai_src_id = None, record_id = None):
-    oai_src = get_oai_src(oai_src_id)
-    oai_src_baseurl = oai_src[0][2]
-    oai_src_prefix = oai_src[0][3]
-    oai_src_config = oai_src[0][5]
-    oai_src_post = oai_src[0][6]
-    oai_src_sets = oai_src[0][7].split()
-    oai_src_bibfilter = oai_src[0][8]
+    return harvest_postprocress_record(oai_src_id, record_id)
+
+############################################################
+### Reharvesting of already existing records             ###
+############################################################
+
+def perform_request_reharvest_records(oai_src_id = None, ln = CFG_SITE_LANG, confirm=0, record_ids = None):
+    for record_id in record_ids:
+        # 1) Run full harvesing process as in the preview scenarios
+        transformed = harvest_postprocress_record(oai_src_id, record_id)[1]
+        upload_record(transformed, "-r", oai_src_id)
+    return  "reharvested"
+
+
+def perform_request_harvest_record(oai_src_id = None, ln = CFG_SITE_LANG, confirm=0, record_id = None):
+    """ Request for harvesting a new record """
+    if oai_src_id is None:
+        return "No OAI source ID selected."
     result = ""
-    command = "/opt/cds-invenio/bin/bibharvest -vGetRecord -i" + record_id \
-              + " -p" + oai_src_prefix + " " + oai_src_baseurl \
-              + " | /opt/cds-invenio/bin/bibconvert -c " + oai_src_config
-    program_output = os.popen(command)
-    lines = program_output.readlines()
-    program_output.close()
-    #if the data should be formatted before uploading
-    if oai_src_post.find("f") != -1:
-        (file_descriptor, file_name) = tempfile.mkstemp()
-        f = os.fdopen(file_descriptor, 'w')
-        for line in lines:
-            f.write(line)
-        f.close()
-        command = oai_src_bibfilter + " " + file_name
-        program_output = os.popen(command)
-        lines = program_output.readlines()
-        rc = program_output.close()
-        program_output = os.popen("xmllint --format " + file_name + ".insert.xml")
-        lines = program_output.readlines()
-        rc = program_output.close()
-        os.remove(file_name)
-        if os.path.exists(file_name + ".insert.xml"):
-            os.remove(file_name + ".insert.xml")
-    for line in lines:
-        result += line
+    guideurl = "help/admin/bibharvest-admin-guide"
+    result += bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = "Record ID ( Recognized by the data source )", guideurl=guideurl)
+    record_str = ""
+    if record_id != None:
+        record_str = str(record_id)
+    form_text = bibharvest_templates.tmpl_admin_w200_text(ln = CFG_SITE_LANG, title = "Record identifier", name = "record_id", value = record_str)
+    result += createhiddenform(action="harvest",
+                               text=form_text,
+                               button="Harvest",
+                               oai_src_id=oai_src_id,
+                               ln=ln,
+                               confirm=1)
+    if record_id != None:
+        # there was a harvest-request
+        transformed = harvest_postprocress_record(oai_src_id, record_id)[1]
+        upload_record(transformed, "-i", oai_src_id)
     return result
+
 
 ##################################################################
 ### Here the functions to retrieve, modify, delete and add sources

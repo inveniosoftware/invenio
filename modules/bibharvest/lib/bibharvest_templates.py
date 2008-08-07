@@ -258,3 +258,5 @@ class Template:
             result += "</tr>"
         result += "</table>"
         return result
+    def tmpl_output_checkbox(self, name, value):
+        return "<input type=\"checkbox\" name=\"" + name + "\" value=\"" + value + "\" />"

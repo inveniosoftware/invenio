@@ -214,7 +214,7 @@ def task_run_core():
                                      (str(repos[0][6]),\
                                       i, \
                                       len(harvested_files)))
-                res += call_bibupload(harvested_file)
+                res += call_bibupload(harvested_file, oai_src_id = repos[0][0])
                 if res == 0:
                     write_message("material harvested from source " +
                         str(repos[0][6]) + " was successfully uploaded")
@@ -270,7 +270,7 @@ def task_run_core():
                                          (str(repos[0][6]),\
                                           i, \
                                           len(converted_files)))
-                    res += call_bibupload(converted_file)
+                    res += call_bibupload(converted_file, oai_src_id = repos[0][0])
                     uploaded = True
             if len(converted_files) > 0:
                 if res == 0:
@@ -325,7 +325,7 @@ def task_run_core():
                                          (str(repos[0][6]),\
                                           i, \
                                           len(converted_files)))
-                    res += call_bibupload(converted_file + ".insert.xml", "-i")
+                    res += call_bibupload(converted_file + ".insert.xml", "-i", oai_src_id = repos[0][0])
                     uploaded = True
                 task_sleep_now_if_required()
                 if get_nb_records_in_file(converted_file + ".correct.xml") > 0:
@@ -333,7 +333,7 @@ def task_run_core():
                                          (str(repos[0][6]),\
                                           i, \
                                           len(converted_files)))
-                    res += call_bibupload(converted_file + ".correct.xml", "-c")
+                    res += call_bibupload(converted_file + ".correct.xml", "-c", oai_src_id = repos[0][0])
                     uploaded = True
             if len(converted_files) > 0:
                 if res == 0:
@@ -452,10 +452,13 @@ def call_bibconvert(config, harvestpath, convertpath):
     os.close(cmd_err_fd)
     return (exitcode, cmd_err)
 
-def call_bibupload(marcxmlfile, mode="-r -i"):
+def call_bibupload(marcxmlfile, mode="-r -i",  oai_src_id = -1):
     """Call bibupload in insert mode on MARCXMLFILE."""
+    additional_options = ""
+    if oai_src_id != -1:
+        additional_options += " -o" + str(oai_src_id)
     if os.path.exists(marcxmlfile):
-        command = '%s/bibupload -u oaiharvest %s %s ' % (CFG_BINDIR, mode, marcxmlfile)
+        command = '%s/bibupload -u oaiharvest %s %s %s ' % (CFG_BINDIR, additional_options, mode, marcxmlfile)
         return os.system(command)
     else:
         write_message("marcxmlfile %s does not exist" % marcxmlfile)
