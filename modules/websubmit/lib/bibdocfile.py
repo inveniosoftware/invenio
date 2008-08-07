@@ -1582,11 +1582,10 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 req.send_http_header()
                 if not req.header_only:
                     req.sendfile(fullpath, the_range[0], the_range[1])
-                    return
+                return ''
             except apache.SERVER_RETURN:
                 raise
             except Exception, e:
-                print >> open('/tmp/stream.log', 'a'), e
                 pass
         normal_streaming(size)
     else:
