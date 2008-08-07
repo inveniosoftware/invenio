@@ -47,6 +47,8 @@ def userarea(req, email_user_pattern=''):
     return wal.perform_userarea(req=req,
                                 email_user_pattern=email_user_pattern)
 
+def listgroups(req):
+    return wal.perform_listgroups(req=req)
 
 def resetarea(req):
     """create the role area menu page."""

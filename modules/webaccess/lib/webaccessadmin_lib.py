@@ -121,6 +121,10 @@ def index(req, title='', body='', subtitle='', adminarea=2, authorized=0):
             navtrail_previous_links += '&gt; ' \
             '<a class="navtrail" href=%s/admin/webaccess/webaccessadmin.py' \
             '/manageaccounts>Manage Accounts</a> ' % (CFG_SITE_URL, )
+        elif adminarea == 8:
+            navtrail_previous_links += '&gt; ' \
+            '<a class="navtrail" href=%s/admin/webaccess/webaccessadmin.py' \
+            '/listgroups>List Groups</a> ' % (CFG_SITE_URL, )
 
     id_user = getUid(req)
     (auth_code, auth_message) = is_adminuser(req)
@@ -153,6 +157,29 @@ def is_adminuser(req):
     """check if user is a registered administrator. """
 
     return acce.acc_authorize_action(req, WEBACCESSACTION)
+
+def perform_listgroups(req):
+    """List all the existing groups."""
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0: return mustloginpage(req, auth_message)
+
+    header = ['name']
+    groups = run_sql('select name from usergroup')
+
+    output = tupletotable(header, groups)
+
+    extra = """
+    <dl>
+    <dt><a href="addrole">Create new role</a></dt>
+    <dd>go here to add a new role.</dd>
+    </dl>
+    """
+
+    return index(req=req,
+                title='Group list',
+                subtitle='All the groups registered in the system',
+                body=[output, extra],
+                adminarea=2)
 
 def perform_rolearea(req):
     """create the role area menu page."""
@@ -1581,7 +1608,9 @@ def perform_addrole(req, id_role=0, name_role='', description='put description h
     <span class="adminlabel">firewall like role definition [<a href="/help/admin/webaccess-admin-guide#6">?</a>]</span>
     </td><td>
     <textarea class="admin_wvar" rows="6" cols="80" name="firerole_def_src">%s</textarea>
-    </td></tr><tr><td></td><td>
+    </td></tr>
+    <tr><td></td><td>See the <a href="listgroups" target="_blank">list of groups</a> for a hint about which group names you can use.</td></tr>
+    <tr><td></td><td>
     <input class="adminbutton" type="submit" value="add role" />
     </td></tr></tbody></table>
     </form>
@@ -1692,7 +1721,9 @@ def perform_modifyrole(req, id_role='0', name_role='', description='put descript
     <span class="adminlabel">firewall like role definition</span> [<a href="/help/admin/webaccess-admin-guide#6">?</a>]
     </td><td>
     <textarea class="admin_wvar" rows="6" cols="80" name="firerole_def_src">%s</textarea><br />
-    </td></tr><tr><td></td><td>
+    </td></tr>
+    <tr><td></td><td>See the <a href="listgroups" target="_blank">list of groups</a> for a hint about which group names you can use.</td></tr>
+    <tr><td></td><td>
     <input class="adminbutton" type="submit" value="modify role" />
     <input type="hidden" name="modified" value="1" />
     </td></tr></tbody></table>
