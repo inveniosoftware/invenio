@@ -319,6 +319,7 @@ def create_handler(root):
         # Set user agent for fckeditor.py, which needs it here
         os.environ["HTTP_USER_AGENT"] = req.headers_in.get('User-Agent', '')
 
+        guest_p = isGuestUser(getUid(req))
         if guest_p:
             cache_control = "public"
         else:
