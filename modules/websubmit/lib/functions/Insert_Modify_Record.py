@@ -40,5 +40,5 @@ def Insert_Modify_Record(parameters, curdir, form, user_info=None):
     initialfile = "%s/%s" % (curdir,recfile)
     finalfile = "%s/%s_%s" % (CFG_TMPDIR,rn,time.strftime("%Y-%m-%d_%H:%M:%S"))
     shutil.copy(initialfile,finalfile)
-    task_low_level_submission('bibupload', 'websubmit.Insert_Modify_Record', '-c', finalfile)
+    task_low_level_submission('bibupload', 'websubmit.Insert_Modify_Record', '-c', finalfile, '-P', '3')
     return ""
