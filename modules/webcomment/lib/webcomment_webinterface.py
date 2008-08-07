@@ -45,8 +45,8 @@ from invenio.search_engine import create_navtrail_links, \
      get_colID, check_user_can_view_record
 from invenio.urlutils import get_client_ip_address, \
                              redirect_to_url, \
-                             wash_url_argument, make_canonical_urlargd
-from invenio.messages import wash_language, gettext_set_language
+                             make_canonical_urlargd
+from invenio.messages import gettext_set_language
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.websearchadminlib import get_detailed_page_tabs
 from invenio.access_control_config import VIEWRESTRCOLL
@@ -54,8 +54,11 @@ from invenio.access_control_mailcookie import mail_cookie_create_authorize_actio
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
 websearch_templates = invenio.template.load('websearch')
-
-from invenio.fckeditor_invenio_connector import FCKeditorConnectorInvenio
+try:
+    from invenio.fckeditor_invenio_connector import FCKeditorConnectorInvenio
+    fckeditor_available = True
+except ImportError, e:
+    fckeditor_available = False
 import os
 from mod_python import apache
 from invenio.bibdocfile import stream_file
@@ -144,7 +147,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                     self.recid,
                                                     ln=argd['ln'])
             ordered_tabs_id = [(tab_id, values['order']) for (tab_id, values) in unordered_tabs.iteritems()]
-            ordered_tabs_id.sort(lambda x,y: cmp(x[1],y[1]))
+            ordered_tabs_id.sort(lambda x, y: cmp(x[1], y[1]))
             link_ln = ''
             if argd['ln'] != CFG_SITE_LANG:
                 link_ln = '?ln=%s' % argd['ln']
@@ -535,6 +538,9 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
         """
         Process requests received from FCKeditor to upload files, etc.
         """
+        if not fckeditor_available:
+            return
+
         uid = getUid(req)
 
         # URL that handles file upload
