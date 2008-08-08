@@ -350,8 +350,12 @@ def perform_request_send(uid,
                             (CFG_WEBMESSAGE_MAX_SIZE_OF_MESSAGE,))
         problem = True
 
-    users_dict = db.get_uids_from_nicks(users_to)
-    users_to = users_dict.items() # users_to=[(nick, uid),(nick2, uid2)]
+    if use_email_address == 0:
+        users_dict = db.get_uids_from_nicks(users_to)
+        users_to = users_dict.items() # users_to=[(nick, uid),(nick2, uid2)]
+    elif use_email_address == 1:
+        users_dict = db.get_uids_from_emails(users_to)
+        users_to = users_dict.items() # users_to=[(email, uid),(email2, uid2)]
     groups_dict = db.get_gids_from_groupnames(groups_to)
     groups_to = groups_dict.items()
     gids_to = []
