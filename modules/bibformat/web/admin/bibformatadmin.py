@@ -1197,6 +1197,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
     @param description the new description of the kb
     @param chosen_option set to dialog box value
     """
+
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
 
@@ -1248,6 +1249,39 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
         return page_not_authorized(req=req,
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
+
+def kb_export(req, ln=config.CFG_SITE_LANG):
+    """
+    Exports the knowledge bases into text files.
+    """
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    webdir = config.CFG_WEBDIR
+    names = ""
+    errors = ""
+    kbs = bibformat_dblayer.get_kbs()
+    for kb in kbs:
+        name = kb['name']
+        #make this a filename
+        fname = webdir+"/"+name+".kb"
+        try:
+            f = open(fname,"w")
+            mappings = bibformat_dblayer.get_kb_mappings(name)
+            for m in mappings:
+                mkey = m['key']
+                mvalue = m['value']
+                f.write(mkey+"--"+mvalue+"\n")
+            f.close()
+            names = names+"<br/>"+name
+        except:
+            errors = errors+"<br/>"+name
+    message = "Exports OK "+names
+    if errors:
+        message = message+"<br/>Not exported :"+errors
+    return dialog_box(req=req, ln=ln,
+               title="Knowledge Bases",
+	       message=message)
+
 
 def kb_add(req, ln=config.CFG_SITE_LANG, sortby="to"):
     """
