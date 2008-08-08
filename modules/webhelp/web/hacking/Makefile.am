@@ -31,7 +31,8 @@ webdoclib_DATA = \
 	common-concepts.webdoc \
 	directory-organization.webdoc \
 	release-numbering.webdoc \
-	test-suite.webdoc
+	test-suite.webdoc \
+	fckeditor.webdoc
 
 EXTRA_DIST = $(webdoclib_DATA) $(doc_DATA) $(img_DATA)
 
