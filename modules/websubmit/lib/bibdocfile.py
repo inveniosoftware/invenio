@@ -1571,11 +1571,12 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                         rfrom = int(rfrom)
                         rto = int(rto)
                         if rfrom < size:
-                            parsed_ranges.append((rfrom, rto - rfrom))
+                            parsed_ranges.append((rfrom, rto - rfrom + 1))
                 if not parsed_ranges:
                     raise apache.SERVER_RETURN, apache.HTTP_RANGE_NOT_SATISFIABLE
                 the_range = parsed_ranges[0]
                 the_range = (the_range[0], min(the_range[1], size - the_range[0]))
+                assert(the_range[1] > 0)
                 req.set_content_length(the_range[1])
                 req.headers_out['Content-Range'] = 'bytes %d-%d/%d' % (the_range[0], the_range[0] + the_range[1] - 1, size)
                 req.status = apache.HTTP_PARTIAL_CONTENT
@@ -1585,8 +1586,9 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 return ''
             except apache.SERVER_RETURN:
                 raise
-            except Exception, e:
-                pass
+            except Exception:
+                if 'Content-Range' in req.headers_out:
+                    del req.headers_out['Content-Range']
         normal_streaming(size)
     else:
         raise InvenioWebSubmitFileError, "%s does not exists!" % fullpath
