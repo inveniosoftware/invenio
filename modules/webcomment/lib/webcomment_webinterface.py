@@ -543,7 +543,7 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
 
         uid = getUid(req)
 
-        # URL that handles file upload
+        # URL where the file can be fetched after upload
         user_files_path = '%(CFG_SITE_URL)s/record/%(recid)i/comments/attachments/get/%(uid)s' % \
                           {'uid': uid,
                            'recid': self.recid,
