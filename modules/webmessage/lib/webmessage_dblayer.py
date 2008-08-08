@@ -316,6 +316,35 @@ def get_nicks_from_uids(uids):
             users[int(user_id)] = nickname
     return users
 
+def get_uids_from_emails(emails):
+    """
+    Get the association uid/nickname of given nicknames
+    @param nicks: list or sequence of strings, each string being a nickname
+    @return a dictionary {nickname: uid}
+    """
+    # FIXME: test case
+    if not((type(emails) is list) or (type(emails) is tuple)):
+        emails = [emails]
+    users = {}
+    query = "SELECT email, id FROM user WHERE BINARY email IN ("
+    query_params = ()
+    if len(emails)> 0:
+        for mail in emails:
+            users[mail] = None
+        users_keys = users.keys()
+        for mail in users_keys[0:-1]:
+            query += "%s,"
+            query_params += (mail,)
+        query += "%s)"
+        query_params += (users_keys[-1],)
+        res = run_sql(query, query_params)
+        def enter_dict(couple):
+            """ takes a a tuple and enters it into dict users """
+            users[couple[0]] = int(couple[1])
+        map(enter_dict, res)
+    return users
+
+
 def get_gids_from_groupnames(groupnames):
     """
     Get the gids of given groupnames
