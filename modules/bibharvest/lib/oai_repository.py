@@ -280,7 +280,7 @@ def check_date(date):
     """Check if given date has a correct format, complying to "Complete date" or
     "Complete date plus hours, minutes and seconds" formats defined in ISO8601."""
 
-    if(re.match("\d\d\d\d-\d\d-\d\d(T\d\d:\d\d:\d\dZ)?", date) is not None):
+    if(re.match("\d\d\d\d-\d\d-\d\d(T\d\d:\d\d:\d\dZ)?\Z", date) is not None):
         return date
     else:
         return ""
