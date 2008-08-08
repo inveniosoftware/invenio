@@ -288,7 +288,8 @@ def perform_request_send(uid,
                          msg_send_year=0,
                          msg_send_month=0,
                          msg_send_day=0,
-                         ln=CFG_SITE_LANG):
+                         ln=CFG_SITE_LANG,
+                         use_email_address = 0):
     """
     send a message. if unable return warnings to write page
     @param uid: id of user from (int)
