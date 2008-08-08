@@ -309,12 +309,16 @@ def create_handler(root):
         """ This handler is invoked by mod_python with the apache request."""
 
         if re_bibdoc_uri.match(req.uri):
-            allowed_methods = ("GET", "POST", "HEAD")
+            allowed_methods = ("GET", "POST", "HEAD", "OPTIONS")
         else:
             allowed_methods = ("GET", "POST")
         req.allow_methods(allowed_methods)
         if req.method not in allowed_methods:
             raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
+
+        if req.method == 'OPTIONS':
+            req.headers_out['Allow'] = ', '.join(allowed_methods)
+            raise apache.SERVER_RETURN, apache.OK
 
         # Set user agent for fckeditor.py, which needs it here
         os.environ["HTTP_USER_AGENT"] = req.headers_in.get('User-Agent', '')
@@ -356,10 +360,7 @@ def create_handler(root):
         # Serve an error by default.
         return apache.HTTP_NOT_FOUND
 
-
     return _profiler
-
-
 
 def wash_urlargd(form, content):
     """
