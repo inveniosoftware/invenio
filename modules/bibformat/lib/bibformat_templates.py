@@ -1842,6 +1842,11 @@ class Template:
         <td align="left" valign="top">&nbsp;</td>
         '''
         out += '''
+        <td align="left">
+        <form action="kb_export?ln=%(ln)s">
+        <input class="adminbutton" type="submit" value="Export to text files"/>
+        </form>
+        </td>
         <td align="right">
         <form action="kb_add?ln=%(ln)s">
         <input class="adminbutton" type="submit" value="Add New Knowledge Base"/>
