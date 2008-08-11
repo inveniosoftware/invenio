@@ -509,7 +509,7 @@ def create_graph_dump(dump, path, settings):
 
         cols = ["Event", "Date and time"] + ["Argument %d" % i for i in range(max_len-2)]
 
-        column_widths = [max([len(str(x[i])) for x in events + cols])+3 for i in range(len(events[0]))]
+        column_widths = [max([len(str(x[i])) for x in events + [cols]])+3 for i in range(len(events[0]))]
 
         for i in range(len(cols)):
             out += cols[i] + ' '*(column_widths[i] - len(cols[i]))
