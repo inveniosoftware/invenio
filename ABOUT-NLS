@@ -22,6 +22,7 @@ B. Integrating translation contributions
 
 CDS Invenio is currently available in the following languages:
 
+   af = Afrikaans
    bg = Bulgarian
    ca = Catalan
    cs = Czech
@@ -30,6 +31,7 @@ CDS Invenio is currently available in the following languages:
    en = English
    es = Spanish
    fr = French
+   gl = Galician
    hr = Croatian
    hu = Hungarian
    it = Italian

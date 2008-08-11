@@ -94,7 +94,8 @@ def language_list_long(enabled_langs_only=True):
     site by the local administrator.  Useful for recognizing all I18N
     translations in webdoc sources or bibformat templates.
     """
-    all_language_names = {'bg': 'Български',
+    all_language_names = {'af': 'Afrikaans',
+                          'bg': 'Български',
                           'ca': 'Català',
                           'cs': 'Česky',
                           'de': 'Deutsch',
@@ -103,6 +104,7 @@ def language_list_long(enabled_langs_only=True):
                           'es': 'Español',
                           'fr': 'Français',
                           'hr': 'Hrvatski',
+                          'gl': 'Galego',
                           'it': 'Italiano',
                           'hu': 'Magyar',
                           'ja': '日本語',
