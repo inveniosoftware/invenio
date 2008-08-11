@@ -149,7 +149,8 @@ def bibupload(record, opt_tag=None, opt_mode=None,
 
     Return (error_code, recID) of the processed record.
     """
-    write_message("record_id : "+ str(oai_rec_id)+ "  oai_src: "+ str(oai_src_id), verbose=1)
+    if oai_src_id != -1:
+        write_message("record_id : "+ str(oai_rec_id)+ "  oai_src: "+ str(oai_src_id), verbose=2)
     assert(opt_mode in ('insert', 'replace', 'replace_or_insert', 'reference',
         'correct', 'append', 'format'))
     error = None
@@ -1790,14 +1791,14 @@ def task_run_core():
     return not stat['nb_errors'] >= 1
 
 def log_record_harvesting(oai_rec_id, oai_src_id):
-    query = """INSERT INTO  oaiHARVESTINGLOG (oai_src_id, harvesting_date, oai_record_id)
-        VALUES (%s, NOW(), %s)"""
-    try:
-        row_id  = run_sql(query, (oai_src_id, oai_rec_id))
-        return row_id
-    except Error, error:
-        write_message("   Error during the log_record_harvesting function : %s "
-            % error, verbose=1, stream=sys.stderr)
-
+    if oai_src_id != -1:
+        query = """INSERT INTO  oaiHARVESTINGLOG (oai_src_id, harvesting_date, oai_record_id)
+            VALUES (%s, NOW(), %s)"""
+        try:
+            row_id  = run_sql(query, (oai_src_id, oai_rec_id))
+            return row_id
+        except Error, error:
+            write_message("   Error during the log_record_harvesting function : %s "
+                          % error, verbose=1, stream=sys.stderr)
 if __name__ == "__main__":
     main()
