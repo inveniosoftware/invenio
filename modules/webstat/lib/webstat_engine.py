@@ -56,12 +56,16 @@ def get_keyevent_trend_collection_population(args):
     if len(ids) == 0:
         return []
 
-    sql_query = ("SELECT creation_date FROM bibrec WHERE id IN %s ORDER BY " + \
-           "creation_date DESC") % str(ids).replace('[', '(').replace(']', ')')
+    # collect action dates
+    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
+    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
+    sql_query = ("SELECT creation_date FROM bibrec WHERE id IN %s AND creation_date > '%s'" + \
+           "AND creation_date < '%s' ORDER BY creation_date DESC") % \
+           (str(ids).replace('[', '(').replace(']', ')'), lower, upper)
     action_dates = [x[0] for x in run_sql(sql_query)]
 
     initial_quantity = run_sql("SELECT COUNT(id) FROM bibrec WHERE creation_date < %s",
-                               (_to_datetime(args['t_start'], args['t_format']).isoformat(),))[0][0]
+                               (lower,))[0][0]
 
     return _get_trend_from_actions(action_dates, initial_quantity,
                                    args['t_start'], args['t_end'], args['granularity'], args['t_format'])
@@ -84,7 +88,12 @@ def get_keyevent_trend_search_frequency(args):
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
-    sql = "SELECT date FROM query INNER JOIN user_query ON id=id_query ORDER BY date DESC"
+    # collect action dates
+    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
+    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
+    sql = "SELECT date FROM query INNER JOIN user_query ON id=id_query " + \
+          "WHERE date > '%s' AND date < '%s' ORDER BY date DESC" % \
+          (lower, upper)
     action_dates = [x[0] for x in run_sql(sql)]
 
     return _get_trend_from_actions(action_dates, 0, args['t_start'], args['t_end'], args['granularity'], args['t_format'])
@@ -107,14 +116,17 @@ def get_keyevent_trend_search_type_distribution(args):
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
+    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
+    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
+
     # SQL to determine all simple searches:
-    sql = "SELECT date FROM query INNER JOIN user_query ON id=id_query \
-           WHERE urlargs LIKE '%p=%' ORDER BY date DESC"
+    sql = "SELECT date FROM query INNER JOIN user_query ON id=id_query WHERE urlargs LIKE '%p=%' " + \
+          "AND date > '%s' AND date < '%s' ORDER BY date DESC" % (lower, upper)
     simple = [x[0] for x in run_sql(sql)]
 
     # SQL to determine all advanced searches:
-    sql = "SELECT date FROM query INNER JOIN user_query ON id=id_query \
-           WHERE urlargs LIKE '%as=1%' ORDER BY date DESC"
+    sql = "SELECT date FROM query INNER JOIN user_query ON id=id_query WHERE urlargs LIKE '%as=1%' " + \
+          "AND date > '%s' AND date < '%s' ORDER BY date DESC" % (lower, upper)
     advanced = [x[0] for x in run_sql(sql)]
 
     # Compute the trend for both types
@@ -141,7 +153,10 @@ def get_keyevent_trend_download_frequency(args):
     @param args['t_format']: Date and time formatting string
     @type args['t_format']: str
     """
-    sql = "SELECT download_time FROM rnkDOWNLOADS ORDER BY download_time DESC"
+    lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
+    upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
+    sql = "SELECT download_time FROM rnkDOWNLOADS WHERE download_time > '%s' \
+            AND download_time < '%s'  ORDER BY download_time DESC" % (lower, upper)
     actions = [x[0] for x in run_sql(sql)]
 
     return _get_trend_from_actions(actions, 0, args['t_start'], args['t_end'], args['granularity'], args['t_format'])
