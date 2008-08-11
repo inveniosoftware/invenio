@@ -19,23 +19,21 @@
 
 
 from invenio.dbquery import run_sql
-
+import datetime
 #logfile = "/opt/cds-invenio/var/cache/oaiarxiv_oaiid.dat"
 
 class HistoryEntry:
-    date = ""
+    date = None
     id = ""
     operation = "i"
     def __init__(self, date, id):
         self.date = date
         self.id = id
 
-def get_history_entries(oai_src_id):
-    query = "SELECT harvesting_date, oai_record_id  from oaiHARVESTINGLOG where oai_src_id=%s"
+def get_history_entries(oai_src_id, monthdate):
+    query = "SELECT harvesting_date, oai_record_id  from oaiHARVESTINGLOG WHERE oai_src_id=%s AND MONTH(harvesting_date) =" + str(monthdate.month) + " AND YEAR(harvesting_date) = " + str(monthdate.year) + " ORDER BY harvesting_date"
     res = run_sql(query,(str(oai_src_id)))
     result = []
     for entry in res:
-        date = str(entry[0].year) + "-" + str(entry[0].month) + "-" + str(entry[0].day) + \
-            " " + str(entry[0].hour) + ":" + str(entry[0].minute) + ":" + str(entry[0].second)
-        result.append(HistoryEntry(date,str(entry[1])))
+        result.append(HistoryEntry(entry[0],str(entry[1])))
     return result

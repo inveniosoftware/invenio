@@ -1691,3 +1691,26 @@ text-decoration:underline;
 }
 
 /* end of cds.css */
+
+
+/*Table columns*/
+.oddtablecolumn
+{
+    background-color: #f0f0ff;
+}
+.pairtablecolumn
+{
+    background-color: #fafaff;
+}
+.scrollableframe
+{
+    overflow-y: auto;
+    min-height: 10px;
+    max-height: 300px;
+    height: auto;
+    width: 600px;
+}
+.brtable
+{
+    width: 100%;
+}

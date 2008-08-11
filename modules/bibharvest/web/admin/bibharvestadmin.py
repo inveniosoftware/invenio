@@ -190,7 +190,7 @@ def testsource(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, record_id = No
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def viewhistory(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0):
+def viewhistory(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, year = None, month = None):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
@@ -207,7 +207,9 @@ def viewhistory(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0):
         return page(title="View OAI source harvesting history",
                     body=bhc.perform_request_viewhistory(oai_src_id=oai_src_id,
                                                     ln=ln,
-                                                    confirm=confirm),
+                                                    confirm=confirm,
+                                                    year = year,
+                                                    month = month),
                     uid=uid,
                     language=ln,
                     req=req,

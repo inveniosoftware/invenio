@@ -1,4 +1,4 @@
-## $Id$
+1## $Id$
 
 ## Administrator interface for BibIndex
 ## This file is part of CDS Invenio.
@@ -29,6 +29,7 @@ import time
 import random
 import urllib
 import tempfile
+import datetime
 
 from httplib import InvalidURL
 from invenio.config import \
@@ -71,6 +72,22 @@ def getnavtrail(previous = ''):
     """Get the navtrail"""
     return bibharvest_templates.tmpl_getnavtrail(previous = previous, ln = CFG_SITE_LANG)
 
+def generate_sources_actions_menu(ln, oai_src_id):
+    namelinked_args = []
+    namelinked_args.append(["oai_src_id", str(oai_src_id)])
+    namelinked_args.append(["ln", ln])
+    editACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/editsource", title = "edit", args = namelinked_args)
+    delACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/delsource", title = "delete", args = namelinked_args)
+    testACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/testsource", title = "test", args = namelinked_args)
+    historyACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/viewhistory", title = "history", args = namelinked_args)
+    harvestACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/harvest", title = "harvest", args = namelinked_args)
+    return editACTION + " / " + delACTION + " / " + testACTION + " / " + historyACTION + " / " + harvestACTION
+
+def generate_oai_source_operations(ln, oai_src_id):
+    result = bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = "OAI source operations", guideurl=guideurl)
+    result += generate_sources_actions_menu(ln, oai_src_id)
+    return result
+
 def perform_request_index(ln=CFG_SITE_LANG):
     """start area for administering harvesting from OAI repositories"""
 
@@ -86,18 +103,14 @@ def perform_request_index(ln=CFG_SITE_LANG):
         namelinked_args = []
         namelinked_args.append(["oai_src_id", str(oai_src_id)])
         namelinked_args.append(["ln", ln])
+
         namelinked = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/editsource", title = oai_src_name, args = namelinked_args)
         freq = "Not Set"
         if oai_src_frequency==0: freq = "never"
         elif oai_src_frequency==24: freq = "daily"
         elif oai_src_frequency==168: freq = "weekly"
         elif oai_src_frequency==720: freq = "monthly"
-        editACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/editsource", title = "edit", args = namelinked_args)
-        delACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/delsource", title = "delete", args = namelinked_args)
-        testACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/testsource", title = "test", args = namelinked_args)
-        historyACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/viewhistory", title = "history", args = namelinked_args)
-        harvestACTION = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/harvest", title = "harvest", args = namelinked_args)
-        action = editACTION + " / " + delACTION + " / " + testACTION + " / " + historyACTION + " / " + harvestACTION
+        action = generate_sources_actions_menu(ln, oai_src_id)
         sources.append([namelinked,oai_src_baseurl,oai_src_prefix,freq,oai_src_config,oai_src_post, action])
 
     updates = []
@@ -440,27 +453,67 @@ def perform_request_testsource(oai_src_id=None, ln=CFG_SITE_LANG, callback='yes'
             "/admin/bibharvest/bibharvestadmin.py/preview_harvested_xml?oai_src_id=" \
             + urllib.quote(str(oai_src_id)) + "&record_id=" \
             + urllib.quote(str(record_id)))
+    result += generate_oai_source_operations(ln, oai_src_id)
     return result
 
 
 ### Probably should be moved to some other data-connection file
 
 
-def format_history_entries(orig_data):
-    headers = ["Date", "record ID", "Reharvest"]
-    result = []
-    for item in orig_data:
-        chkbox = bibharvest_templates.tmpl_output_checkbox(item.id, "1")
-        result.append([item.date, item.id, chkbox])
-    return (headers, result)
+def format_date(entry):
+    if entry == None:
+        return "(None)"
+    return str(entry.year) + "-" + str(entry.month) + "-" + str(entry.day)
 
-def perform_request_viewhistory(oai_src_id=None, ln=CFG_SITE_LANG, callback='yes', confirm=0):
+def format_time(entry):
+    if entry == None:
+        return "(None)"
+    return str(entry.hour) + ":" + str(entry.minute) + ":" + str(entry.second)
+
+def build_history_table(orig_data):
+    headers = ["Date", "record ID", "Reharvest"]
+    result = bibharvest_templates.tmpl_table_begin(headers)
+    last_date = None
+    identifiers = {}
+    for item in orig_data:
+        if last_date == None or last_date.year != item.date.year or last_date.month != item.date.month or last_date.day != item.date.day:
+            result += bibharvest_templates.tmpl_table_row_begin()
+            result += bibharvest_templates.tmpl_table_output_cell("<b>" + format_date(item.date) + "</b>", colspan=2)
+            btn = bibharvest_templates.tmpl_output_select_day_button(item.date.day)
+            result += bibharvest_templates.tmpl_table_output_cell(btn)
+            result += bibharvest_templates.tmpl_table_row_end()
+        result += bibharvest_templates.tmpl_table_row_begin()
+        result += bibharvest_templates.tmpl_table_output_cell(format_date(item.date) + " " + format_time(item.date), cssclass = "oddtablecolumn")
+        result += bibharvest_templates.tmpl_table_output_cell(item.id, cssclass = "pairtablecolumn")
+        identifier = format_date(item.date) + format_time(item.date) + "_" + item.id
+        chkbox = bibharvest_templates.tmpl_output_checkbox(item.id, identifier, "1")
+        result += bibharvest_templates.tmpl_table_output_cell(chkbox, cssclass = "oddtablecolumn")
+        result += bibharvest_templates.tmpl_table_row_end()
+        last_date = item.date
+        if not identifiers.has_key(item.date.day):
+            identifiers[item.date.day] = []
+        identifiers[item.date.day].append(identifier)
+    result += bibharvest_templates.tmpl_table_end()
+    result += bibharvest_templates.tmpl_output_identifiers(identifiers)
+    return result
+
+def perform_request_viewhistory(oai_src_id = None, ln = CFG_SITE_LANG, callback = 'yes', confirm = 0, month = None, year = None):
     """ Creates html to view the harvesting history """
+    date = datetime.datetime.now()
+    if year != None and month != None:
+        year = int(year)
+        month = int(month)
+        date = datetime.datetime(year, month, 1)
+
     result = ""
-    headers, data = format_history_entries(get_history_entries(oai_src_id))
-    inner_text = bibharvest_templates.tmpl_output_table(headers, data)
+    result += bibharvest_templates.tmpl_output_history_javascript_functions()
+    result += bibharvest_templates.tmpl_output_month_selection_bar(oai_src_id, ln, current_month = month, current_year = year)
+    inner_text = build_history_table(get_history_entries(oai_src_id, date))
     inner_text += bibharvest_templates.tmpl_print_brs(ln, 1)
+    inner_text = bibharvest_templates.tmpl_output_scrollable_frame(inner_text)
+    inner_text += bibharvest_templates.tmpl_output_selection_bar()
     result +=  createhiddenform(action="/admin/bibharvest/bibharvestadmin.py/reharvest", text = inner_text, button = "Reharvest selected records", oai_src_id=oai_src_id, ln=ln)
+    result += generate_oai_source_operations(ln, oai_src_id)
     return result
 
 
@@ -580,8 +633,9 @@ def perform_request_reharvest_records(oai_src_id = None, ln = CFG_SITE_LANG, con
         # 1) Run full harvesing process as in the preview scenarios
         transformed = harvest_postprocress_record(oai_src_id, record_id)[1]
         upload_record(transformed, "-r", oai_src_id)
-    return  "reharvested"
-
+    result = bibharvest_templates.tmpl_print_info(ln, "Submitted for inserion into the database")
+    result += generate_oai_source_operations(ln, oai_src_id)
+    return result
 
 def perform_request_harvest_record(oai_src_id = None, ln = CFG_SITE_LANG, confirm=0, record_id = None):
     """ Request for harvesting a new record """
@@ -604,6 +658,8 @@ def perform_request_harvest_record(oai_src_id = None, ln = CFG_SITE_LANG, confir
         # there was a harvest-request
         transformed = harvest_postprocress_record(oai_src_id, record_id)[1]
         upload_record(transformed, "-i", oai_src_id)
+        result += bibharvest_templates.tmpl_print_info(ln, "Submitted for inserion into the database")
+    result += generate_oai_source_operations(ln, oai_src_id)
     return result
 
 

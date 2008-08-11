@@ -26,7 +26,7 @@ import gettext
 import traceback
 import urllib
 import sys
-
+import datetime
 from invenio.config import \
      CFG_VERSION, \
      CFG_SITE_URL
@@ -258,5 +258,134 @@ class Template:
             result += "</tr>"
         result += "</table>"
         return result
-    def tmpl_output_checkbox(self, name, value):
-        return "<input type=\"checkbox\" name=\"" + name + "\" value=\"" + value + "\" />"
+    def tmpl_table_begin(self, title_row = None):
+        result = "<table class=\"brtable\">"
+        if title_row != None:
+            result += "<tr>"
+            for header in title_row:
+                result += "<td><b>"+ header + "</b></td>"
+            result += "</tr>"
+        return result
+    def tmpl_table_row_begin(self):
+        return "<tr>"
+    def tmpl_table_output_cell(self, content, colspan=1, rowspan=1, cssclass=None):
+        result = "<td"
+        if colspan != 1:
+            result += " colspan=\"" + str(colspan) + "\""
+        if rowspan != 1:
+            result += " rowspan=\"" + str(rowspan) + "\""
+        if cssclass != None:
+            result += " class = \"" + cssclass + "\""
+        result += ">" + content + "</td>"
+        return result
+    def tmpl_table_row_end(self):
+        return "</tr>\n"
+    def tmpl_table_end(self):
+        return "</table>\n"
+
+    def tmpl_output_checkbox(self, name, id, value):
+        return "<input type=\"checkbox\" id=\"" + id + "\"name=\"" + name + "\" value=\"" + value + "\" />"
+    def tmpl_output_scrollable_frame(self, content):
+        output = """<div class="scrollableframe" heigh="40">"""
+        output += content
+        output += "</div>"
+        return output
+
+    def tmpl_output_month_selection_bar(self, oai_src_id, ln, current_year = None, current_month=None):
+        #constructs the month selection bar
+        if current_month == None or current_year == None:
+            current_month = datetime.datetime.today().month
+            current_year = datetime.datetime.today().year
+        prev_year = current_year
+        prev_month = current_month
+        prev_month -= 1
+        if prev_month == 0:
+            prev_year -= 1
+            prev_month = 12
+        next_year = current_year
+        next_month = current_month
+        next_month += 1
+        if next_month == 13:
+            next_year += 1
+            next_month = 1
+        prevurl = self.tmpl_link_with_args(ln, "/admin/bibharvest/bibharvestadmin.py/viewhistory", "&lt;&lt; previous month", [["ln", ln], ["oai_src_id", str(oai_src_id)], ["year", str(prev_year)], ["month", str(prev_month)]])
+        nexturl = self.tmpl_link_with_args(ln, "/admin/bibharvest/bibharvestadmin.py/viewhistory", "next month &gt;&gt;", [["ln", ln], ["oai_src_id", str(oai_src_id)], ["year", str(next_year)], ["month", str(next_month)]])
+        result = prevurl + """&nbsp;&nbsp;&nbsp;&nbsp;"""
+        result += "<b>Current month: " + str(current_year) + "-" + str(current_month) + "</b>"
+        result += """&nbsp;&nbsp;&nbsp;&nbsp;""" + nexturl
+        return result
+    def tmpl_output_selection_bar(self):
+        result = ""
+        result += "<button class=\"adminbutton\" onClick=\"return selectAll()\">Select all</button>\n"
+        result += "<button class=\"adminbutton\" onClick=\"return removeSelection()\">Remove selection</button>\n"
+        result += "<button class=\"adminbutton\" onClick=\"return invertSelection()\">Invert selection</button>\n"
+        return result
+    def tmpl_output_history_javascript_functions(self):
+        # Writes necessary javascript functions
+        result = '<script type="text/javascript">'
+        result += """
+   function selectDay(day)
+   {
+      for (key in identifiers[day])
+         document.getElementById(identifiers[day][key]).checked = true;
+      return false
+   }
+
+   function selectAll()
+   {
+      for (day in identifiers)
+      {
+         for (key in identifiers[day])
+            document.getElementById(identifiers[day][key]).checked = true;
+      }
+      return false
+   }
+
+   function removeSelection()
+   {
+      for (day in identifiers)
+      {
+         for (key in identifiers[day])
+            document.getElementById(identifiers[day][key]).checked = false;
+      }
+      return false
+   }
+
+   function invertSelection()
+   {
+      for (day in identifiers)
+      {
+         for (key in identifiers[day])
+            document.getElementById(identifiers[day][key]).checked = !(document.getElementById(identifiers[day][key]).checked);
+      }
+      return false
+   }
+
+   """
+        result += "</script>"
+        return result
+    def tmpl_output_identifiers(self, identifiers):
+        # Creates the Javascript array of identifiers.
+        # @param identifiers is a dictionary containning day as a key and list of identifiers as a value
+        result = '<script type="text/javascript">\n'
+        result += "   var identifiers = {\n"
+        first = True
+        for day in identifiers:
+            result += "      "
+            if not first:
+                result += ","
+            else:
+                first = False
+            result += str(day) + " : ["
+            for id_n in range(0, len(identifiers[day])):
+                result += "         "
+                if id_n != 0:
+                    result += ","
+                result += "'" + identifiers[day][id_n] + "'\n"
+            result +="        ]\n"
+        result += "    }\n"
+        result += '</script>'
+        return result
+    def tmpl_output_select_day_button(self, day):
+        result = """<button class="adminbutton" onClick="return selectDay(""" + str(day)+ """)">Select day</button>"""
+        return result
