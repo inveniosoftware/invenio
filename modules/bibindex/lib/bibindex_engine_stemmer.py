@@ -66,6 +66,13 @@ try:
         else:
             return word
 
+    def stemWords(words, lang):
+        """Return WORDS stemmed according to language LANG (e.g. 'en')."""
+        if lang and is_stemmer_available_for_language(lang):
+            return _stemmers[get_ident()][lang].stemWords(words)
+        else:
+            return words
+
     def get_stemming_language_map():
         """Return a diction of code language, language name for all the available
         languages."""
@@ -80,10 +87,10 @@ try:
         stemmers_initialized = {}
         for src_lang in Stemmer.algorithms():
             try:
-                dst_lang = _lang_map.get(src_lang, None)
+                dst_lang = _lang_map.get(src_lang)
                 if dst_lang:
                     stemmers_initialized[dst_lang] = Stemmer.Stemmer(src_lang, 40000)
-            except TypeError:
+            except (TypeError, KeyError):
                 pass
         return stemmers_initialized
 
@@ -442,6 +449,14 @@ except ImportError:
             return _stemmers[get_ident()].stem(word, 0, len(word)-1)
         else:
             return word
+
+    def stemWords(words, lang):
+        """Return WORDS stemmed according to language LANG (e.g. 'en')."""
+        if lang == 'en' and _stemmers and _stemmers.has_key(get_ident()):
+            #make sure _stemmers[get_ident()] is avail..
+            return [_stemmers[get_ident()].stem(word, 0, len(word)-1) for word in words]
+        else:
+            return words
 
     def get_stemming_language_map():
         """Return a diction of code language, language name for all the available
