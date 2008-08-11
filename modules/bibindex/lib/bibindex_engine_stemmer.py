@@ -39,12 +39,15 @@ try:
         'finnish' : 'fi',
         'french' : 'fr',
         'german' : 'de',
+        'hungarian' : 'hu',
         'italian' : 'it',
         'norwegian' : 'no',
         'portuguese' : 'pt',
+        'romanian' : 'ro',
         'russian' : 'ru',
         'spanish' : 'es',
-        'swedish' : 'sv'
+        'swedish' : 'sv',
+        'turkish' : 'tr'
     }
 
     def is_stemmer_available_for_language(lang):
