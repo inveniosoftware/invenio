@@ -28,6 +28,7 @@ import unittest
 
 from invenio import search_engine
 from invenio.testutils import make_test_suite, run_test_suite
+from invenio.config import CFG_SITE_URL
 
 class TestWashQueryParameters(unittest.TestCase):
     """Test for washing of search query parameters."""
@@ -245,10 +246,34 @@ class TestQueryParser(unittest.TestCase):
                     [['+', 'muon', 'title', 'w'],
                      ['+', 'ellis', 'author', 'w']])
 
+class TestCollectionUtils(unittest.TestCase):
+    """Collection utilities tests."""
+
+    def test_collection_restricted_p(self):
+        """search engine - collection_restricted_p"""
+        self.failUnless(search_engine.collection_restricted_p('Theses'), True)
+        self.failIf(search_engine.collection_restricted_p('Books & Reports'))
+
+    def test_coll_restricted_group(self):
+        """search engine - coll_restricted_group"""
+        self.assertEqual(search_engine.coll_restricted_group('Theses'), 'theses')
+        self.assertEqual(search_engine.coll_restricted_group('Books & Reports'), None)
+
+    def test_guess_primary_collection_of_a_record(self):
+        """search engine - guess_primary_collection_of_a_record"""
+        self.assertEqual(search_engine.guess_primary_collection_of_a_record(96), 'Articles')
+
+    def test_guess_collection_of_a_record(self):
+        """search engine - guess_collection_of_a_record"""
+        self.assertEqual(search_engine.guess_collection_of_a_record(96), 'Articles')
+        self.assertEqual(search_engine.guess_collection_of_a_record(96, '%s/collection/Theoretical Physics (TH)?ln=en' % CFG_SITE_URL), 'Articles')
+        self.assertEqual(search_engine.guess_collection_of_a_record(12, '%s/collection/Theoretical Physics (TH)?ln=en' % CFG_SITE_URL), 'Theoretical Physics (TH)')
+        self.assertEqual(search_engine.guess_collection_of_a_record(12, '%s/collection/Theoretical%%20Physics%%20%%28TH%%29?ln=en' % CFG_SITE_URL), 'Theoretical Physics (TH)')
 
 TEST_SUITE = make_test_suite(TestWashQueryParameters,
                              TestStripAccents,
-                             TestQueryParser,)
+                             TestQueryParser,
+                             TestCollectionUtils)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

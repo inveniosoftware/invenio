@@ -34,6 +34,7 @@ import os
 import re
 import time
 import urllib
+import urlparse
 import zlib
 
 ## import CDS Invenio stuff:
@@ -1397,18 +1398,21 @@ def get_collection_reclist(coll):
         # yes it was, cache clear-up needed:
         collection_reclist_cache = create_collection_reclist_cache()
     # secondly, read reclist from either the cache or the database:
-    if not collection_reclist_cache[coll]:
-        # not yet it the cache, so calculate it and fill the cache:
-        query = "SELECT nbrecs,reclist FROM collection WHERE name='%s'" % coll
-        res = run_sql(query, None, 1)
-        if res:
-            try:
-                set = HitSet(res[0][1])
-            except:
-                set = HitSet()
-        collection_reclist_cache[coll] = set
-    # finally, return reclist:
-    return collection_reclist_cache[coll]
+    try:
+        if not collection_reclist_cache[coll]:
+            # not yet it the cache, so calculate it and fill the cache:
+            query = "SELECT nbrecs,reclist FROM collection WHERE name='%s'" % coll
+            res = run_sql(query, None, 1)
+            if res:
+                try:
+                    set = HitSet(res[0][1])
+                except:
+                    set = HitSet()
+            collection_reclist_cache[coll] = set
+        # finally, return reclist:
+        return collection_reclist_cache[coll]
+    except KeyError:
+        return HitSet()
 
 def coll_restricted_p(coll):
     "Predicate to test if the collection coll is restricted or not."
@@ -2369,8 +2373,10 @@ def get_mysql_recid_from_aleph_sysno(sysno):
     return out
 
 def guess_primary_collection_of_a_record(recID):
-    """Return primary collection name a record recid belongs to, by testing 980 identifier.
-       May lead to bad guesses when a collection is defined dynamically bia dbquery.
+    """Return primary collection name a record recid belongs to, by
+       testing 980 identifier.
+       May lead to bad guesses when a collection is defined dynamically
+       via dbquery.
        In that case, return 'CFG_SITE_NAME'."""
     out = CFG_SITE_NAME
     dbcollids = get_fieldvalues(recID, "980__a")
@@ -2380,6 +2386,34 @@ def guess_primary_collection_of_a_record(recID):
         if res:
             out = res[0][0]
     return out
+
+_re_collection_url = re.compile('/collection/(.+)')
+def guess_collection_of_a_record(recID, referer=None):
+    """Return collection name a record recid belongs to, by first testing
+       the referer URL if provided and otherwise returning the
+       primary collection."""
+    if referer:
+        dummy, hostname, path, dummy, query, dummy = urlparse.urlparse(referer)
+        g = _re_collection_url.match(path)
+        if g:
+            name = urllib.unquote_plus(g.group(1))
+            if recID in get_collection_reclist(name):
+                return name
+        elif path.startswith('/search'):
+            query = cgi.parse_qs(query)
+            for name in query.get('cc', []) + query.get('c', []):
+                if recID in get_collection_reclist(name):
+                    return name
+    return guess_primary_collection_of_a_record(recID)
+
+def get_all_collections_of_a_record(recID):
+    """Return all the collection names a record belongs to.
+    Note this function is O(n_collections)."""
+    ret = []
+    for name in collection_reclist_cache.keys():
+        if recID in get_collection_reclist(name):
+            ret.append(name)
+    return ret
 
 def get_tag_name(tag_value, prolog="", epilog=""):
     """Return tag name from the known tag value, by looking up the 'tag' table.
@@ -3684,7 +3718,10 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             recid = 0 # use recid 0 to indicate that this sysno does not exist
     # deduce collection we are in (if applicable):
     if recid > 0:
-        cc = guess_primary_collection_of_a_record(recid)
+        referer = None
+        if req:
+            referer = req.headers_in.get('Referer')
+        cc = guess_collection_of_a_record(recid, referer)
     # deduce user id (if applicable):
     try:
         uid = getUid(req)

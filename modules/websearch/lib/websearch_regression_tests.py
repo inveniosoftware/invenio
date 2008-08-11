@@ -224,7 +224,7 @@ class WebSearchTestRecord(unittest.TestCase):
                 # hd format should have a link to the following
                 # formats
                 for oformat in ('hx', 'hm', 'xm', 'xd'):
-                    target = make_url('/record/1/export/%s' % oformat)
+                    target = make_url('/record/1/export/%s?ln=en' % oformat)
                     try:
                         browser.find_link(url=target)
                     except LinkNotFoundError:
@@ -850,7 +850,7 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
         browser['p_pw'] = 'h123yde'
         browser.submit()
         # Mr. Hyde should not be able to connect:
-        if browser.response().read().find("This collection is restricted.  If you think you have right to access it, please authenticate yourself.") <= -1:
+        if browser.response().read().find("Authorization failure") <= -1:
             # if we got here, things are broken:
             self.fail("Oops, Mr.Hyde should not be able to search Theses collection.")
 
