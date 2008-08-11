@@ -311,7 +311,7 @@ def create_handler(root):
         if re_bibdoc_uri.match(req.uri):
             allowed_methods = ("GET", "POST", "HEAD", "OPTIONS")
         else:
-            allowed_methods = ("GET", "POST")
+            allowed_methods = ("GET", "POST", "OPTIONS")
         req.allow_methods(allowed_methods)
         if req.method not in allowed_methods:
             raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
