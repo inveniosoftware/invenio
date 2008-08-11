@@ -38,4 +38,7 @@ suffix="<br />" />
 
 <BFE_PUBLI_INFO prefix="<br /><br /><strong>Published in: </strong>"/>
 <br />
+
 </div>
+
+<BFE_APPEARS_IN_COLLECTIONS prefix="<p style='margin-left: 10px;'><em>The record appears in these collections:</em><br />" suffix="</p>">
