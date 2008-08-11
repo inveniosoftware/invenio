@@ -38,6 +38,7 @@ from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.htmlutils import escape_html
+import invenio.template
 
 class Template:
 
@@ -323,7 +324,7 @@ class Template:
                     <table><tr><td>
                """
         #display list of actions
-        for i in range(0,len(actionShortDesc)):
+        for i in range(0, len(actionShortDesc)):
             out += """<input type="submit" class="adminbutton" value="%(status)s" onclick="if (tester()) { document.forms[0].indir.value='%(indir)s';document.forms[0].act.value='%(act)s';document.forms[0].submit();}; return false;" /><br />""" % {
                      'status' : statustext[i],
                      'indir' : indir[i],
@@ -467,7 +468,7 @@ class Template:
             if i == int(curpage):
                 out += """<td class="submitCurrentPage"><small>&nbsp;page: %s&nbsp;</small></td>""" % curpage
             else:
-                out += """<td class="submitPage"><small>&nbsp;<a href='' onclick="if (tester2() == 1){document.forms[0].curpage.value=%s;document.forms[0].submit();return false;} else { return false; }">%s</a>&nbsp;</small></td>""" % (i,i)
+                out += """<td class="submitPage"><small>&nbsp;<a href='' onclick="if (tester2() == 1){document.forms[0].curpage.value=%s;document.forms[0].submit();return false;} else { return false; }">%s</a>&nbsp;</small></td>""" % (i, i)
         out += """        <td class="submitEmptyPage">&nbsp;&nbsp;
                         </td></tr></table>
                     </td>
@@ -505,7 +506,7 @@ class Template:
                 out += """<script language="JavaScript1.1"  type="text/javascript">
                           %s
                           </script>
-                       """ % field['javascript'];
+                       """ % field['javascript']
 
             # now displays the html form field(s)
             out += "%s\n%s\n" % (field['fullDesc'], field['text'])
@@ -608,7 +609,7 @@ class Template:
         # If the field is a textarea
         if field['type'] == 'T':
             ## Field is a textarea:
-            text="<textarea name=\"%s\" rows=\"%s\" cols=\"%s\">%s</textarea>" \
+            text = "<textarea name=\"%s\" rows=\"%s\" cols=\"%s\">%s</textarea>" \
                   % (field['name'], field['rows'], field['cols'], cgi.escape(str(field['val']), 1))
         # If the field is a file upload
         elif field['type'] == 'F':
@@ -624,16 +625,16 @@ class Template:
                       % ((field['maxlength'] in (0, None) and " ") or (""" maxlength="%s\"""" % field['maxlength'])) )
         # If the field is a hidden input
         elif field['type'] == 'H':
-            text="<input type=\"hidden\" name=\"%s\" value=\"%s\" />" % (field['name'], field['val'])
+            text = "<input type=\"hidden\" name=\"%s\" value=\"%s\" />" % (field['name'], field['val'])
         # If the field is user-defined
         elif field['type'] == 'D':
-            text=field['htmlcode']
+            text = field['htmlcode']
         # If the field is a select box
         elif field['type'] == 'S':
-            text=field['htmlcode']
+            text = field['htmlcode']
         # If the field type is not recognized
         else:
-            text="%s: unknown field type" % field['typename']
+            text = "%s: unknown field type" % field['typename']
 
         return text
 
@@ -1555,6 +1556,7 @@ class Template:
             out += "</ul><br /></li></ul>"
 
         out += "</td></tr></table>"
+        out += '''<p>To see the status of documents for which approval has been requested, click <a href=\"%(url)s/publiline.py?flow=cplx\">here</a></p>''' % {'url' : CFG_SITE_URL}
         return out
 
     def tmpl_publiline_selectdoctype(self, ln, docs):
@@ -1639,12 +1641,7 @@ class Template:
             params.update(doc)
             out += '<li><a href="publiline.py?flow=cplx&doctype=%(doctype)s&amp;ln=%(ln)s">%(docname)s</a></li><br />' % params
 
-        out += """</blockquote>
-                </td>
-            </tr>
-        </table>
-
-        <a href="publiline.py?ln=%s">%s</a>""" % (ln, _("Go to general approval workflow"))
+        out += """</blockquote> </td> </tr> </table> </li><br/>"""
         return out
 
     def tmpl_publiline_selectcateg(self, ln, doctype, title, categories):
@@ -1791,31 +1788,32 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        out = """
-               <table class="searchbox" width="100%%" summary="">
-                  <tr>
-                    <th class="portalboxheader">%(title)s: %(list_type)s</th>
-                  </tr>
-               </table><br />
-               <table class="searchbox" width="100%%" summary="">
-                  <tr>""" % {
-                  'title' : title,
-                  'list_type' : _("List of specific approvals"),
-              }
+        out = ""
+        #out = """
+        #       <table class="searchbox" width="100%%" summary="">
+        #          <tr>
+        #            <th class="portalboxheader">%(title)s: %(list_type)s</th>
+        #          </tr>
+        #       </table><br />
+        #       <table class="searchbox" width="100%%" summary="">
+        #          <tr>""" % {
+        #          'title' : title,
+        #          'list_type' : _("List of specific approvals"),
+        #      }
 
         columns = []
         columns.append ({'apptype' : 'RRP',
                          'list_categ' : _("List of refereing categories"),
                          'id_form' : 0,
                        })
-        columns.append ({'apptype' : 'RPB',
-                         'list_categ' : _("List of publication categories"),
-                         'id_form' : 1,
-                       })
-        columns.append ({'apptype' : 'RDA',
-                         'list_categ' : _("List of direct approval categories"),
-                         'id_form' : 2,
-                       })
+        #columns.append ({'apptype' : 'RPB',
+        #                 'list_categ' : _("List of publication categories"),
+        #                 'id_form' : 1,
+        #               })
+        #columns.append ({'apptype' : 'RDA',
+        #                 'list_categ' : _("List of direct approval categories"),
+        #                 'id_form' : 2,
+        #               })
 
         for column in columns:
             out += """
@@ -1853,40 +1851,45 @@ class Template:
                 else:
                     classtext = ""
 
-                out += """<a href="" onclick="document.forms[%(id_form)s].categ.value='%(id)s';document.forms[%(id_form)s].submit();return false;"><small %(classtext)s>%(desc)s</small></a><small> (%(num)s document(s)""" % {
+                out += """<table><tr><td width="200px">*&nbsp<a href="" onclick="document.forms[%(id_form)s].categ.value='%(id)s';document.forms[%(id_form)s].submit();return false;"><small %(classtext)s>%(desc)s</small></td><td width="150px"></a><small> Total document(s) : %(num)s """ % {
                          'id' : categ['id'],
                          'id_form' : column['id_form'],
                          'classtext' : classtext,
                          'num' : num,
                          'desc' : categ['desc'],
                        }
-                if categ['waiting'] != 0:
-                    out += """| %(waiting)s <img alt="%(pending)s" src="%(images)s/waiting_or.gif" border="0" />""" % {
+                out += """<td width="100px">"""
+                #if categ['waiting'] != 0:
+                out += """ %(waiting)s &nbsp&nbsp<img alt="%(pending)s" src="%(images)s/waiting_or.gif" border="0" /></td>""" % {
                               'waiting' : categ['waiting'],
                               'pending' : _("Pending"),
                               'images' : CFG_SITE_URL + '/img',
                             }
-                if categ['approved'] != 0:
-                    out += """| %(approved)s<img alt="%(approved_text)s" src="%(images)s/smchk_gr.gif" border="0" />""" % {
+                out += """<td width="100px">"""
+                #if categ['approved'] != 0:
+                out += """ %(approved)s &nbsp&nbsp<img alt="%(approved_text)s" src="%(images)s/smchk_gr.gif" border="0" /></td>""" % {
                               'approved' : categ['approved'],
                               'approved_text' : _("Approved"),
                               'images' : CFG_SITE_URL + '/img',
                             }
-                if categ['rejected'] != 0:
-                    out += """| %(rejected)s<img alt="%(rejected_text)s" src="%(images)s/cross_red.gif" border="0" />""" % {
+                out += """<td width="100px">"""
+                #if categ['rejected'] != 0:
+                out += """ %(rejected)s&nbsp&nbsp<img alt="%(rejected_text)s" src="%(images)s/cross_red.gif" border="0" /></td>""" % {
                               'rejected' : categ['rejected'],
                               'rejected_text' : _("Rejected"),
                               'images' : CFG_SITE_URL + '/img',
                             }
-                if categ['cancelled'] != 0:
-                    out += """| %(cancelled)s<img alt="%(cancelled_text)s" src="%(images)s/smchk_rd.gif" border="0" />""" % {
+                out += """<td width="100px">"""
+                #if categ['cancelled'] != 0:
+                out += """ %(cancelled)s&nbsp&nbsp<img alt="%(cancelled_text)s" src="%(images)s/smchk_rd.gif" border="0" /></td>""" % {
                               'cancelled' : categ['cancelled'],
                               'cancelled_text' : _("Cancelled"),
                               'images' : CFG_SITE_URL + '/img',
                             }
-                out += ")</small><br />"
+                out += "</small></td></tr>"
 
             out += """
+				</table>
                                 </td>
                             </tr>
                             </table>
@@ -2370,21 +2373,26 @@ class Template:
                  'apptype' : apptype,
                  'ln': ln,
                }
+
+        out += "<table><tr height='30px'><td width='120px'>"
+
         if title != "unknown":
-            out += """<strong class="headline">%(title_text)s</strong>%(title)s<br /><br />""" % {
+            out += """<strong class="headline">%(title_text)s</strong></td><td>%(title)s</td></tr>""" % {
                      'title_text' : _("Title:"),
                      'title' : title,
                    }
 
+        out += "<tr height='30px'><td width='120px'>"
         if authors != "":
-            out += """<strong class="headline">%(author_text)s</strong>%(authors)s<br /><br />""" % {
+            out += """<strong class="headline">%(author_text)s</strong></td><td>%(authors)s</td></tr>""" % {
                      'author_text' : _("Author:"),
                      'authors' : authors,
                    }
+        out += "<tr height='30px'><td width='120px'>"
         if sysno != "":
             out += """<strong class="headline">%(more)s</strong>
-                        <a href="%(siteurl)s/record/%(sysno)s?ln=%(ln)s">%(click)s</a>
-                        <br /><br />
+                        </td><td><a href="%(siteurl)s/record/%(sysno)s?ln=%(ln)s">%(click)s</a>
+                        </td></tr>
                    """ % {
                      'more' : _("More information:"),
                      'click' : _("Click here"),
@@ -2393,51 +2401,64 @@ class Template:
                      'ln' : ln,
                    }
 
+        out += "</table>"
         out += "<br /><br />"
 
         if apptype == "RRP":
-            out += _("It has first been asked for refereing process on the ") + ' <strong class="headline">' + str(dates['dFirstReq']) + '</strong><br />'
+            out += "<table><tr><td width='400px'>"
+            out += _("It has first been asked for refereing process on the ") + "</td><td>" + ' <strong class="headline">' + str(dates['dFirstReq']) + '</strong><br /></td></tr>'
 
-            out += _("Last request e-mail was sent to the publication committee chair on the ") + ' <strong class="headline">' + str(dates['dLastReq']) + '</strong><br />'
+            out += "<tr><td width='400px'>"
+            out += _("Last request e-mail was sent to the publication committee chair on the ") + "</td><td>" + ' <strong class="headline">' + str(dates['dLastReq']) + '</strong><br /></td></tr>'
 
             if dates['dRefereeSel'] != None:
-                out += _("A referee has been selected by the publication committee on the ") + ' <strong class="headline">' + str(dates['dRefereeSel']) + '</strong><br />'
+                out += "<tr><td width='400px'>"
+                out += _("A referee has been selected by the publication committee on the ") + "</td><td>" +  ' <strong class="headline">' + str(dates['dRefereeSel']) + '</strong><br /></td></tr>'
             else:
-                out += _("No referee has been selected yet.")
+                out += "<tr><td width='400px'>"
+                out += _("No referee has been selected yet.") + "</td><td>"
                 if (status != "cancelled") and (isPubCom == 0):
                     out += displaycplxdoc_displayauthaction (action="RefereeSel", linkText=_("Select a referee"))
-                out += '<br />'
+                out += '<br /></td></tr>'
 
             if dates['dRefereeRecom'] != None:
-                out += _("The referee has sent his final recommendations to the publication committee on the ") + ' <strong class="headline">' + str(dates['dRefereeRecom']) + '</strong><br />'
+                out += "<tr><td width='400px'>"
+                out += _("The referee has sent his final recommendations to the publication committee on the ") + "</td><td>" +  ' <strong class="headline">' + str(dates['dRefereeRecom']) + '</strong><br /></td></tr>'
             else:
-                out += _("No recommendation from the referee yet.")
+                out += "<tr><td width='400px'>"
+                out += _("No recommendation from the referee yet.") + "</td><td>"
                 if (status != "cancelled") and (dates['dRefereeSel'] != None) and (isReferee == 0):
                     out += displaycplxdoc_displayauthaction (action="RefereeRecom", linkText=_("Send a recommendation"))
-                out += '<br />'
+                out += '<br /></td></tr>'
 
             if dates['dPubComRecom'] != None:
-                out += _("The publication committee has sent his final recommendations to the project leader on the ") + ' <strong class="headline">' + str(dates['dPubComRecom']) + '</strong><br />'
+                out += "<tr><td width='400px'>"
+                out += _("The publication committee has sent his final recommendations to the project leader on the ") + "</td><td>" +  ' <strong class="headline">' + str(dates['dPubComRecom']) + '</strong><br /></td></tr>'
             else:
-                out += _("No recommendation from the publication committee yet.")
+                out += "<tr><td width='400px'>"
+                out += _("No recommendation from the publication committee yet.") + "</td><td>"
                 if (status != "cancelled") and (dates['dRefereeRecom'] != None) and (isPubCom == 0):
                     out += displaycplxdoc_displayauthaction (action="PubComRecom", linkText=_("Send a recommendation"))
-                out += '<br />'
+                out += '<br /></td></tr>'
 
             if status == "cancelled":
-                out += _("It has been cancelled by the author on the ") + ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br />'
+                out += "<tr><td width='400px'>"
+                out += _("It has been cancelled by the author on the ") + "</td><td>" +  ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br /></td></tr>'
             elif dates['dProjectLeaderAction'] != None:
                 if status == "approved":
-                    out += _("It has been approved by the project leader on the ") + ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br />'
+                    out += "<tr><td width='400px'>"
+                    out += _("It has been approved by the project leader on the ") + "</td><td>" +  ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br /></td></tr>'
                 elif status == "rejected":
-                    out += _("It has been rejected by the project leader on the ") + ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br />'
+                    out += "<tr><td width='400px'>"
+                    out += _("It has been rejected by the project leader on the ") + "</td><td>" +  ' <strong class="headline">' + str(dates['dProjectLeaderAction']) + '</strong><br /></td></tr>'
             else:
-                out += _("No final decision taken yet.")
+                out += "<tr><td width='400px'>"
+                out += _("No final decision taken yet.") + "</td><td>"
                 if (dates['dPubComRecom'] != None) and (isProjectLeader == 0):
                     out += displaycplxdoc_displayauthaction (action="ProjectLeaderDecision", linkText=_("Take a decision"))
                 if isAuthor == 0:
                     out += displaycplxdoc_displayauthaction (action="AuthorCancel", linkText=_("Cancel"))
-                out += '<br />'
+                out += '<br /></table>'
 
         elif apptype == "RPB":
             out += _("It has first been asked for refereing process on the ") + ' <strong class="headline">' + str(dates['dFirstReq']) + '</strong><br />'
