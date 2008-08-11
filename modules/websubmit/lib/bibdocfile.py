@@ -1502,6 +1502,49 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             register_exception(req=req)
             raise InvenioWebSubmitFileError, "Encountered exception while reading '%s': '%s'" % (fullpath, e)
 
+    def single_range(size, the_range):
+        the_range = (the_range[0], min(the_range[1], size - the_range[0]))
+        assert(the_range[1] > 0)
+        req.set_content_length(the_range[1])
+        req.headers_out['Content-Range'] = 'bytes %d-%d/%d' % (the_range[0], the_range[0] + the_range[1] - 1, size)
+        req.status = apache.HTTP_PARTIAL_CONTENT
+        req.send_http_header()
+        if not req.header_only:
+            req.sendfile(fullpath, the_range[0], the_range[1])
+        return ''
+
+    def multiple_ranges(size, ranges, mime):
+        req.status = apache.HTTP_PARTIAL_CONTENT
+        req.content_type = 'multipart/byteranges'
+        boundary = '%s%04d' % (time.strftime('THIS_STRING_SEPARATES_%Y%m%d%H%M%S'), random.randint(0, 9999))
+        req.headers_out['boundary'] = boundary
+        for arange in ranges:
+            arange = (arange[0], min(arange[1], size - arange[0]))
+            assert(arange[1] > 0)
+            req.write('--%s\r\n' % boundary)
+            req.write('Content-Type: %s\r\n' % mime)
+            req.write('Content-Range: bytes %d-%d/%d\r\n' % (arange[0], arange[0] + arange[1] - 1, size))
+            req.write('\r\n')
+            req.sendfile(fullpath, arange[0], arange[1])
+            req.write('\r\n')
+        req.write('--%s--\r\n' % boundary)
+        return ""
+
+    def parse_date(date):
+        if date is None:
+            return None
+        try:
+            date = date.split(';')[0].strip() # Because of IE
+            return time.mktime(time.strptime(date, '%a, %d %b %Y %X %Z'))
+        except:
+            try:
+                return time.mktime(time.strptime(date, '%A, %d-%b-%y %H:%M:%S %Z'))
+            except:
+                try:
+                    return time.mktime(date)
+                except:
+                    return None
+
     if_none_match = req.headers_in.get('If-None-Match')
     if if_none_match is not None:
         if_none_match = [elem.strip() for elem in if_none_match.split(',')]
@@ -1509,11 +1552,9 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             raise apache.SERVER_RETURN, apache.HTTP_NOT_MODIFIED
     if os.path.exists(fullpath):
         mtime = os.path.getmtime(fullpath)
-        if_modified_since = req.headers_in.get('If-Modified-Since')
-        if if_modified_since is not None:
-            if_modified_since = time.mktime(time.strptime(if_modified_since, '%a, %d %b %Y %X %Z'))
-            if if_modified_since >= mtime:
-                raise apache.SERVER_RETURN, apache.HTTP_NOT_MODIFIED
+        if_modified_since = parse_date(req.headers_in.get('If-Modified-Since'))
+        if if_modified_since is not None and if_modified_since >= mtime:
+            raise apache.SERVER_RETURN, apache.HTTP_NOT_MODIFIED
         if fullname is None:
             fullname = os.path.basename(fullpath)
         if mime is None:
@@ -1530,6 +1571,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             req.headers_out["ETag"] = etag
         if md5 is not None:
             req.headers_out["Content-MD5"] = base64.encodestring(binascii.unhexlify(md5.upper()))[:-1]
+        req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
         size = os.path.getsize(fullpath)
         ranges = req.headers_in.get('Range')
         if ranges is not None:
@@ -1537,22 +1579,17 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             if if_match is not None:
                 if_match = [elem.strip() for elem in if_match.split(',')]
                 if etag is None:
-                    normal_streaming(size)
-                    return
+                    return normal_streaming(size)
                 elif etag not in if_match:
                     raise apache.SERVER_RETURN, apache.HTTP_PRECONDITION_FAILED
             if_range = req.headers_in.get('If-Range')
             if if_range is not None:
                 if_range = [elem.strip() for elem in if_range.split(',')]
                 if etag is None or etag not in if_range:
-                    normal_streaming(size)
-                    return
-            unless_modified_since = req.headers_in.get('Unless-Modified-Since')
-            if unless_modified_since is not None:
-                unless_modified_since = time.mktime(time.strptime(unless_modified_since, '%a, %d %b %Y %X %Z'))
-                if unless_modified_since < mtime:
-                    normal_streaming(size)
-                    return
+                    return normal_streaming(size)
+            unless_modified_since = parse_date(req.headers_in.get('Unless-Modified-Since'))
+            if unless_modified_since is not None and unless_modified_since < mtime:
+                return normal_streaming(size)
             try:
                 ranges = ranges[len('bytes='):].split(',')
                 parsed_ranges = []
@@ -1574,16 +1611,10 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                             parsed_ranges.append((rfrom, rto - rfrom + 1))
                 if not parsed_ranges:
                     raise apache.SERVER_RETURN, apache.HTTP_RANGE_NOT_SATISFIABLE
-                the_range = parsed_ranges[0]
-                the_range = (the_range[0], min(the_range[1], size - the_range[0]))
-                assert(the_range[1] > 0)
-                req.set_content_length(the_range[1])
-                req.headers_out['Content-Range'] = 'bytes %d-%d/%d' % (the_range[0], the_range[0] + the_range[1] - 1, size)
-                req.status = apache.HTTP_PARTIAL_CONTENT
-                req.send_http_header()
-                if not req.header_only:
-                    req.sendfile(fullpath, the_range[0], the_range[1])
-                return ''
+                if len(parsed_ranges) == 1:
+                    return single_range(size, parsed_ranges[0])
+                else:
+                    return multiple_ranges(size, parsed_ranges, mime)
             except apache.SERVER_RETURN:
                 raise
             except Exception:
