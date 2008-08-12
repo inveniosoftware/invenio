@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id:
+## $Id$
 ##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
@@ -23,7 +23,7 @@
 bibcirculation config file, here you can manage
 """
 
-__revision__ = "$Id:"
+__revision__ = "$Id$"
 
 # templates used to notify borrowers
 CFG_BIBCIRCULATION_TEMPLATES = {
