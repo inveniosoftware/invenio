@@ -179,9 +179,6 @@ def history(req, ln=CFG_SITE_LANG, recid=None, revid=None, revid_cmp=None,
     uid = getUid(req)
 
     recid = wash_url_argument(recid, "int")
-    debug = open('/opt/cds-invenio/var/tmp/debug2', 'w')
-    debug.write(str(recid))
-    debug.close()
     if (recid and (record_exists(recid)>0)):
         (auth_code, auth_message) = acc_authorize_action(req, 'runbibedit',
             collection=guess_primary_collection_of_a_record(recid))
