@@ -32,7 +32,6 @@ import sys
 import time
 import urllib2
 import tempfile
-import traceback
 
 from invenio.config import \
      CFG_BIBINDEX_CHARS_ALPHANUMERIC_SEPARATORS, \
@@ -59,6 +58,7 @@ from invenio.bibtask import task_init, write_message, get_datetime, \
     task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 from invenio.errorlib import register_exception
+from invenio.shellutils import escape_shell_arg
 
 # FIXME: journal tag and journal pubinfo standard format are defined here:
 if CFG_CERN_SITE:
@@ -70,14 +70,6 @@ elif CFG_INSPIRE_SITE:
 else:
     CFG_JOURNAL_TAG = '909C4%'
     CFG_JOURNAL_PUBINFO_STANDARD_FORM = "909C4p 909C4v (909C4y) 909C4c"
-
-## import optional modules:
-try:
-    import psyco
-    psyco.bind(get_words_from_phrase)
-    psyco.bind(WordTable.merge_with_old_recIDs)
-except:
-    pass
 
 ## precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')
@@ -370,60 +362,60 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
                 cmd = ""  # will keep command to run
                 bingo = 0 # had we success?
                 if os.path.basename(conv_program) == "pdftotext":
-                    cmd = "%s -enc UTF-8 %s %s" % (conv_program, tmp_name, tmp_dst_name)
+                    cmd = "%s -enc UTF-8 %s %s" % (conv_program, escape_shell_arg(tmp_name), escape_shell_arg(tmp_dst_name))
                 elif os.path.basename(conv_program) == "pstotext":
                     if ext == "ps.gz":
                         # is there gzip available?
                         if os.path.exists(CONV_PROGRAMS_HELPERS["gz"]):
                             cmd = "%s -cd %s | %s > %s" \
-                                  % (CONV_PROGRAMS_HELPERS["gz"], tmp_name, conv_program, tmp_dst_name)
+                                  % (CONV_PROGRAMS_HELPERS["gz"], escape_shell_arg(tmp_name), conv_program, escape_shell_arg(tmp_dst_name))
                     else:
                         cmd = "%s %s > %s" \
-                              % (conv_program, tmp_name, tmp_dst_name)
+                              % (conv_program, escape_shell_arg(tmp_name), escape_shell_arg(tmp_dst_name))
                 elif os.path.basename(conv_program) == "ps2ascii":
                     if ext == "ps.gz":
                          # is there gzip available?
                         if os.path.exists(CONV_PROGRAMS_HELPERS["gz"]):
                             cmd = "%s -cd %s | %s > %s"\
-                                  % (CONV_PROGRAMS_HELPERS["gz"], tmp_name,
-                                     conv_program, tmp_dst_name)
+                                  % (CONV_PROGRAMS_HELPERS["gz"], escape_shell_arg(tmp_name),
+                                     conv_program, escape_shell_arg(tmp_dst_name))
                     else:
                         cmd = "%s %s %s" \
-                              % (conv_program, tmp_name, tmp_dst_name)
+                              % (conv_program, escape_shell_arg(tmp_name), escape_shell_arg(tmp_dst_name))
                 elif os.path.basename(conv_program) == "antiword":
-                    cmd = "%s %s > %s" % (conv_program, tmp_name, tmp_dst_name)
+                    cmd = "%s %s > %s" % (conv_program, escape_shell_arg(tmp_name), escape_shell_arg(tmp_dst_name))
                 elif os.path.basename(conv_program) == "catdoc":
-                    cmd = "%s %s > %s" % (conv_program, tmp_name, tmp_dst_name)
+                    cmd = "%s %s > %s" % (conv_program, escape_shell_arg(tmp_name), escape_shell_arg(tmp_dst_name))
                 elif os.path.basename(conv_program) == "wvText":
-                    cmd = "%s %s %s" % (conv_program, tmp_name, tmp_dst_name)
+                    cmd = "%s %s %s" % (conv_program, escape_shell_arg(tmp_name), escape_shell_arg(tmp_dst_name))
                 elif os.path.basename(conv_program) == "ppthtml":
                     # is there html2text available?
                     if os.path.exists(CONV_PROGRAMS_HELPERS["html"]):
                         cmd = "%s %s | %s > %s"\
-                              % (conv_program, tmp_name,
-                                 CONV_PROGRAMS_HELPERS["html"], tmp_dst_name)
+                              % (conv_program, escape_shell_arg(tmp_name),
+                                 CONV_PROGRAMS_HELPERS["html"], escape_shell_arg(tmp_dst_name))
                     else:
                         cmd = "%s %s > %s" \
-                              % (conv_program, tmp_name, tmp_dst_name)
+                              % (conv_program, escape_shell_arg(tmp_name), escape_shell_arg(tmp_dst_name))
                 elif os.path.basename(conv_program) == "xlhtml":
                     # is there html2text available?
                     if os.path.exists(CONV_PROGRAMS_HELPERS["html"]):
                         cmd = "%s %s | %s > %s" % \
-                              (conv_program, tmp_name,
-                               CONV_PROGRAMS_HELPERS["html"], tmp_dst_name)
+                              (conv_program, escape_shell_arg(tmp_name),
+                               CONV_PROGRAMS_HELPERS["html"], escape_shell_arg(tmp_dst_name))
                     else:
                         cmd = "%s %s > %s" % \
-                              (conv_program, tmp_name, tmp_dst_name)
+                              (conv_program, escape_shell_arg(tmp_name), escape_shell_arg(tmp_dst_name))
                 elif os.path.basename(conv_program) == "html2text":
                     cmd = "%s %s > %s" % \
-                          (conv_program, tmp_name, tmp_dst_name)
+                          (conv_program, escape_shell_arg(tmp_name), escape_shell_arg(tmp_dst_name))
                 else:
                     write_message("Error: Do not know how to handle %s conversion program." % conv_program, sys.stderr)
                 # try to run it:
                 try:
                     write_message("..... launching %s" % cmd, verbose=9)
                     # Note we replace ; in order to make happy internal file names
-                    errcode = os.system(cmd.replace(';', '\\;'))
+                    errcode = os.system(cmd)
                     if errcode == 0 and os.path.exists(tmp_dst_name):
                         bingo = 1
                         break # bingo!
@@ -1571,6 +1563,16 @@ def task_run_core():
 
     _last_word_table = None
     return True
+
+
+## import optional modules:
+try:
+    import psyco
+    psyco.bind(get_words_from_phrase)
+    psyco.bind(WordTable.merge_with_old_recIDs)
+except:
+    pass
+
 
 ### okay, here we go:
 if __name__ == '__main__':
