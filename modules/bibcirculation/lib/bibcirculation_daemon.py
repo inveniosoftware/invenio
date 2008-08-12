@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
+## $Id$
+##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
 ##
@@ -21,7 +23,7 @@
 BibCirculation daemon.
 """
 
-__revision__ = "$Id: bibcirculation_daemon.py"
+__revision__ = "$Id$"
 
 import sys
 from invenio.dbquery import run_sql
