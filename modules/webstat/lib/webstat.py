@@ -437,6 +437,32 @@ def basket_display():
 
     return res
 
+def alert_display():
+    """
+    Display alert statistics.
+    """
+    tbl_name = get_customevent_table("alerts")
+
+    try:
+        res = run_sql("SELECT creation_time FROM %s ORDER BY creation_time" % tbl_name)
+        days = (res[-1][0] - res[0][0]).days + 1
+        res = run_sql("SELECT COUNT(DISTINCT user),COUNT(*) FROM %s" % tbl_name)
+        users = res[0][0]
+        hits = res[0][1]
+        displays = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'list'" % tbl_name)[0][0]
+        search = run_sql("SELECT COUNT(*) FROM %s WHERE action = 'display'" % tbl_name)[0][0]
+        average = hits / days
+
+        res = [("Alerts page hits", hits)]
+        res.append(("   Average per day", average))
+        res.append(("   Unique users", users))
+        res.append(("   Displays", displays))
+        res.append(("   Searches history display", search))
+    except IndexError:
+        res = []
+
+    return res
+
 def get_url_customevent(url_dest, id, *arguments):
     """
     Get an url for registers a custom event. Every time is load the
@@ -517,6 +543,11 @@ def perform_request_index(ln=CFG_SITE_LANG):
     # Append basket stats to the health box
     if conf.get("general", "basket_box") == "True":
         health_indicators += basket_display()
+        health_indicators.append(None)
+
+    # Append alerts stats to the health box
+    if conf.get("general", "alert_box") == "True":
+        health_indicators += alert_display()
         health_indicators.append(None)
 
     # Append number of Apache processes to the health box
