@@ -36,6 +36,9 @@ from invenio import webalert
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
+from invenio.webstat import register_customevent
+from invenio.errorlib import register_exception
+from invenio.webuser import collect_user_info
 
 from invenio.messages import gettext_set_language
 import invenio.template
@@ -79,6 +82,17 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
             _title = _("Popular Searches")
         else:
             _title = _("Your Searches")
+
+        # register event in webstat
+        user_info = collect_user_info(req)
+        if user_info['email']:
+            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
+        else:
+            user_str = ""
+        try:
+            register_customevent("alerts", ["display", "", user_str])
+        except:
+            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         return page(title=_title,
                     body=webalert.perform_display(argd['p'], uid, ln=argd['ln']),
@@ -131,6 +145,19 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                      error_msg = argd['error_msg'],
                      rest = html,
                    )
+
+        # register event in webstat
+        alert_str = "%s (%d)" % (argd['name'], argd['idq'])
+        user_info = collect_user_info(req)
+        if user_info['email']:
+            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
+        else:
+            user_str = ""
+        try:
+            register_customevent("alerts", ["input", alert_str, user_str])
+        except:
+            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
+
         return page(title=_("Set a new alert"),
                     body=html,
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -183,6 +210,19 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                      error_msg = argd['error_msg'],
                      rest = html,
                    )
+
+        # register event in webstat
+        alert_str = "%s (%d)" % (argd['name'], argd['idq'])
+        user_info = collect_user_info(req)
+        if user_info['email']:
+            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
+        else:
+            user_str = ""
+        try:
+            register_customevent("alerts", ["modify", alert_str, user_str])
+        except:
+            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
+
         return page(title=_("Modify alert settings"),
                     body=html,
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -219,6 +259,17 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
+
+        # register event in webstat
+        user_info = collect_user_info(req)
+        if user_info['email']:
+            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
+        else:
+            user_str = ""
+        try:
+            register_customevent("alerts", ["list", "", user_str])
+        except:
+            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         return page(title=_("Your Alerts"),
                     body=webalert.perform_list_alerts(uid, ln = argd['ln']),
@@ -268,6 +319,19 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
         except webalert.AlertError, e:
             html = e
             #return self.input(req, form)
+
+        # register event in webstat
+        alert_str = "%s (%d)" % (argd['name'], argd['idq'])
+        user_info = collect_user_info(req)
+        if user_info['email']:
+            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
+        else:
+            user_str = ""
+        try:
+            register_customevent("alerts", ["add", alert_str, user_str])
+        except:
+            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
+
         return page(title=_("Display alerts"),
                     body=html,
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -316,6 +380,19 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
                                                  argd['idb'], argd['idq'], argd['old_idb'], uid, ln=argd['ln'])
         except webalert.AlertError, e:
             return self.modify(req, form)
+
+        # register event in webstat
+        alert_str = "%s (%d)" % (argd['name'], argd['idq'])
+        user_info = collect_user_info(req)
+        if user_info['email']:
+            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
+        else:
+            user_str = ""
+        try:
+            register_customevent("alerts", ["update", alert_str, user_str])
+        except:
+            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
+
         return page(title=_("Display alerts"),
                     body=html,
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a>""" % {
@@ -355,6 +432,18 @@ class WebInterfaceYourAlertsPages(WebInterfaceDirectory):
 
         # load the right message language
         _ = gettext_set_language(argd['ln'])
+
+        # register event in webstat
+        alert_str = "%s (%d)" % (argd['name'], argd['idq'])
+        user_info = collect_user_info(req)
+        if user_info['email']:
+            user_str = "%s (%d)" % (user_info['email'], user_info['uid'])
+        else:
+            user_str = ""
+        try:
+            register_customevent("alerts", ["remove", alert_str, user_str])
+        except:
+            register_exception(suffix="Do the webstat tables exists? Try with 'webstatadmin --load-config'")
 
         return page(title=_("Display alerts"),
                     body=webalert.perform_remove_alert(argd['name'], argd['idq'],
