@@ -33,6 +33,8 @@ import cgi
 import sys
 import re
 import os
+import gc
+import time
 
 # The following mod_python imports are done separately in a particular
 # order (util first) because I was getting sometimes publisher import
@@ -53,7 +55,7 @@ from invenio.messages import wash_language
 from invenio.urlutils import redirect_to_url
 from invenio.errorlib import register_exception
 from invenio.webuser import get_preferred_user_language, isGuestUser, \
-    getUid, loginUser, update_Uid
+    getUid, loginUser, update_Uid, isUserSuperAdmin, collect_user_info
 
 has_https_support = CFG_SITE_URL != CFG_SITE_SECURE_URL
 
@@ -215,16 +217,6 @@ class WebInterfaceDirectory(object):
                 ln = get_preferred_user_language(req)
                 form['ln'] = ln
         result = _check_result(req, obj(req, form))
-        if hasattr(req, 'cds_wrapper'):
-            ## The session handler saves for caching a request_wrapper in req
-            ## This saves req as an attribute, creating a circular reference.
-            ## Since we have have reached the end of the request handler
-            ## we can safely drop the request_wrapper so to avoid
-            ## memory leaks.
-            del req.cds_wrapper
-        if hasattr(req, '_user_info'):
-            ## For the same reason we can delete the user_info.
-            del req._user_info
         return result
 
     def __call__(self, req, form):
@@ -260,7 +252,12 @@ def create_handler(root):
         profile requirement like ?profile=time&profile=cumulative.
         The list of available algorithm is displayed at the end of the profile.
         """
-        if req.args and cgi.parse_qs(req.args).has_key('profile'):
+        args = {}
+        if req.args:
+            args = cgi.parse_qs(req.args)
+        if 'profile' in args:
+            if not isUserSuperAdmin(collect_user_info(req)):
+                return _handler(req)
             from cStringIO import StringIO
             try:
                 import pstats
@@ -274,7 +271,7 @@ def create_handler(root):
             existing_sorts = pstats.Stats.sort_arg_dict_default.keys()
             required_sorts = []
             profile_dump = []
-            for sort in cgi.parse_qs(req.args)['profile']:
+            for sort in args['profile']:
                 if sort not in existing_sorts:
                     sort = 'cumulative'
                 if sort not in required_sorts:
@@ -302,63 +299,90 @@ def create_handler(root):
             profile_dump += '\nYou can use profile=%s' % existing_sorts
             req.write("\n<pre>%s</pre>" % profile_dump)
             return ret
+        elif 'garbage' in args:
+            if not isUserSuperAdmin(collect_user_info(req)):
+                return _handler(req)
+            gc.set_debug(gc.DEBUG_LEAK)
+            ret = _handler(req)
+            req.write("\n<pre>%s</pre>" % gc.garbage)
+            gc.collect()
+            req.write("\n<pre>%s</pre>" % gc.garbage)
+            gc.set_debug(0)
+            return ret
         else:
             return _handler(req)
 
     def _handler(req):
         """ This handler is invoked by mod_python with the apache request."""
-
-        if re_bibdoc_uri.match(req.uri):
-            allowed_methods = ("GET", "POST", "HEAD", "OPTIONS")
-        else:
-            allowed_methods = ("GET", "POST", "OPTIONS")
-        req.allow_methods(allowed_methods)
-        if req.method not in allowed_methods:
-            raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
-
-        if req.method == 'OPTIONS':
-            req.headers_out['Allow'] = ', '.join(allowed_methods)
-            raise apache.SERVER_RETURN, apache.OK
-
-        # Set user agent for fckeditor.py, which needs it here
-        os.environ["HTTP_USER_AGENT"] = req.headers_in.get('User-Agent', '')
-
-        guest_p = isGuestUser(getUid(req))
-        if guest_p:
-            cache_control = "public"
-        else:
-            cache_control = "private"
-        req.headers_out['Cache-Control'] = cache_control
         try:
-            uri = req.uri
-            if uri == '/':
-                path = ['']
+            if re_bibdoc_uri.match(req.uri):
+                allowed_methods = ("GET", "POST", "HEAD", "OPTIONS")
             else:
-                ## Let's collapse multiple slashes into a single /
-                uri = re_slashes.sub('/', uri)
-                path = uri[1:].split('/')
+                allowed_methods = ("GET", "POST", "OPTIONS")
+            req.allow_methods(allowed_methods)
+            if req.method not in allowed_methods:
+                raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
 
-            return root._traverse(req, path)
+            if req.method == 'OPTIONS':
+                req.headers_out['Allow'] = ', '.join(allowed_methods)
+                raise apache.SERVER_RETURN, apache.OK
 
-        except TraversalError:
-            return apache.HTTP_NOT_FOUND
-        except apache.SERVER_RETURN:
-            ## This is one of mod_python way of communicating
-            raise
-        except IOError, exc:
-            if 'Write failed, client closed connection' in "%s" % exc:
-                ## Workaround for considering as false positive exceptions
-                ## rised by mod_python when the user close the connection
-                ## or in some other rare and not well identified cases.
+            # Set user agent for fckeditor.py, which needs it here
+            os.environ["HTTP_USER_AGENT"] = req.headers_in.get('User-Agent', '')
+
+            guest_p = isGuestUser(getUid(req))
+            if guest_p:
+                cache_control = "public"
+            else:
+                cache_control = "private"
+            req.headers_out['Cache-Control'] = cache_control
+            try:
+                uri = req.uri
+                if uri == '/':
+                    path = ['']
+                else:
+                    ## Let's collapse multiple slashes into a single /
+                    uri = re_slashes.sub('/', uri)
+                    path = uri[1:].split('/')
+
+                return root._traverse(req, path)
+
+            except TraversalError:
+                return apache.HTTP_NOT_FOUND
+            except apache.SERVER_RETURN:
+                ## This is one of mod_python way of communicating
                 raise
-            else:
+            except IOError, exc:
+                if 'Write failed, client closed connection' in "%s" % exc:
+                    ## Workaround for considering as false positive exceptions
+                    ## rised by mod_python when the user close the connection
+                    ## or in some other rare and not well identified cases.
+                    raise
+                else:
+                    register_exception(req=req, alert_admin=True)
+            except Exception:
                 register_exception(req=req, alert_admin=True)
-        except Exception:
-            register_exception(req=req, alert_admin=True)
-            raise
+                raise
 
-        # Serve an error by default.
-        return apache.HTTP_NOT_FOUND
+            # Serve an error by default.
+            return apache.HTTP_NOT_FOUND
+        finally:
+            t1 = time.time()
+            if hasattr(req, 'cds_wrapper'):
+                ## The session handler saves for caching a request_wrapper
+                ## in req.
+                ## This saves req as an attribute, creating a circular
+                ## reference.
+                ## Since we have have reached the end of the request handler
+                ## we can safely drop the request_wrapper so to avoid
+                ## memory leaks.
+                del req.cds_wrapper
+            if hasattr(req, '_user_info'):
+                ## For the same reason we can delete the user_info.
+                del req._user_info
+            ## as suggested in
+            ## <http://www.python.org/doc/2.3.5/lib/module-gc.html>
+            del gc.garbage[:]
 
     return _profiler
 
