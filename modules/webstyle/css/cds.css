@@ -1714,3 +1714,193 @@ text-decoration:underline;
 {
     width: 100%;
 }
+
+
+
+/*BibCirculation CSS*/
+
+#bibcircmenu h2 {
+	display:none
+}
+#bibcircmenu ul {
+	list-style:none;
+	margin:0;
+	padding:0 0 0 4px;
+}
+#bibcircmenu {
+	clear:both;
+	width:100%;
+	border-bottom:2px solid #36c;
+	border-top:2px solid #36c;	
+	height:auto;
+	padding:0;
+	position:relative;
+	padding-bottom:9px;
+}
+#bibcircmenu ul {
+	padding-top:9px;
+	position:relative;
+}
+* html #bibcircmenu ul {
+	/* Needed for ie < 7 ONLY
+	That's why the star hack is used
+	*/
+	width:99%;
+}
+#bibcircmenu li.on a, #bibcircmenu li.on a:hover, #bibcircmenu li.on a:visited{
+	text-decoration:none;
+	color:#555;
+}
+#bibcircmenu li {
+	display:block;
+	float:left;
+	text-decoration:none;
+	padding: 5px 5px 5px 7px;
+	height:100%;
+	padding-right:5px;
+	margin-right:10px;
+	background: transparent url(list_sep_blue.gif) no-repeat left center;
+	
+}
+#bibcircmenu li.hassubmenu{
+	position:relative;
+}
+#bibcircmenu li.hassubmenu a{
+	padding-right:12px;
+	background: transparent url(drop_down_menu_arrow_down.gif) no-repeat right center;
+}
+#bibcircmenu li.on.hassubmenu a{
+	background: transparent url(drop_down_menu_arrow_down_w.gif) no-repeat right center;
+}
+#bibcircmenu li.on {
+	background: #eee url(list_sep_grey.gif) no-repeat left center;
+	height:100%;
+}
+#bibcircmenu li a img {
+	vertical-align:middle;
+}
+#bibcircmenu li img{
+	border:none;
+}
+#bibcircmenu li.right {
+	float:right;
+	margin-right:2px;
+	padding-right:0;
+	padding-left:0;
+	margin-left:0;
+	background-image:none;
+}
+#bibcircmenu li a{
+	white-space:nowrap;
+	text-decoration:none;
+	margin:0;
+	padding:3px 6px;
+}
+#bibcircmenu li ul.subsubmenu {
+	display:none;
+	position: absolute;
+	background-image:none;
+	top: 1em;
+	left: 0;
+}
+#bibcircmenu li ul.subsubmenu li {
+	display:list-item !important;
+	float: none !important;
+	position: relative;
+	border-bottom: 1px solid #36c;
+	border-left: 1px solid #36c;
+	border-right: 1px solid #36c;
+	background:#fff none;
+}
+#bibcircmenu li ul.subsubmenu li a, #bibcircmenu li ul.subsubmenu li a:hover, #bibcircmenu li ul.subsubmenu li a:visited{
+	background:transparent none;
+	display:block;
+	color:#36c;
+}
+#bibcircmenu li ul.subsubmenu li a:hover{
+	text-decoration:underline
+}
+#bibcircmenu li:hover ul {
+	display:block;
+	position: absolute;
+}
+
+
+    div.bibcircbottom {
+        clear:both;
+	width:100%;
+	border-bottom:2px solid #36c;
+	height:auto;
+	padding:0;
+	position:relative;
+	padding-bottom:9px;
+        
+        }
+        
+        .bibcirctable {
+        color: #79d;
+        font-size: 82%;
+        width:95%;
+        margin:auto;
+        max-width: 1280px;
+        }
+        
+        .bibcirctable_contents {
+        color: #79d;
+        font-size: small;
+        width:90%;
+        margin:auto;
+        max-width: 300px;
+        }
+
+        .bibcirctableheader {
+        color: #79d;
+        font-size: small;
+        font-weight: bold;
+        font-variant: small-caps;
+        }
+        
+        .bibcircwarning {
+        color: #f11010;
+        }
+  	
+	 .bibcircpending {
+        color: #f16f10;
+        }
+  
+
+        
+        .bibcircok {
+        color: #060;
+        }
+        
+        .bibcirccontent {
+        color: black;
+        }
+        
+
+        .formbutton {
+        color: #fff;
+        background: #36c;
+        font-weight: bold;
+        }
+
+ 	div.title {
+        width: 600px;
+        padding-left: 5px;
+        color: #36c;
+        font-size: 20px;
+        font-weight: bold;
+        font-variant: small-caps;
+        padding-bottom:2px;
+        }
+        
+        
+        div.subtitle {
+        width: 600px;
+        padding-left: 5px;
+        color: #36c;
+        font-size: 16px;
+        font-variant: small-caps;
+        padding-bottom:2px;
+        }
