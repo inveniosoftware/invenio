@@ -741,7 +741,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             target = '/collection/' + quote(c)
 
         target += make_canonical_urlargd(argd, legacy_collection_default_urlargd)
-        return redirect_to_url(req, target, apache.HTTP_MOVED_PERMANENTLY)
+        return redirect_to_url(req, target)
 
 def display_collection(req, c, as, verbose, ln):
     """Display search interface page for collection c by looking
