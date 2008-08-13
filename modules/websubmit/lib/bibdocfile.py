@@ -1364,6 +1364,7 @@ class BibDocFile:
         self.format = normalize_format(format)
         self.dir = os.path.dirname(fullpath)
         self.url = '%s/record/%s/files/%s%s' % (CFG_SITE_URL, self.recid, urllib.quote(self.name), urllib.quote(self.format))
+        self.fullurl = '%s?version=%s' % (self.url, self.version)
         self.etag = '"%i%s%i"' % (self.docid, self.format, self.version)
         if format == "":
             self.mime = "application/octet-stream"
@@ -1389,6 +1390,7 @@ class BibDocFile:
         out += '%s:%s:%s:%s:modification time=%s\n' % (self.recid, self.docid, self.version, self.format, self.md)
         out += '%s:%s:%s:%s:encoding=%s\n' % (self.recid, self.docid, self.version, self.format, self.encoding)
         out += '%s:%s:%s:%s:url=%s\n' % (self.recid, self.docid, self.version, self.format, self.url)
+        out += '%s:%s:%s:%s:fullurl=%s\n' % (self.recid, self.docid, self.version, self.format, self.fullurl)
         out += '%s:%s:%s:%s:description=%s\n' % (self.recid, self.docid, self.version, self.format, self.description)
         out += '%s:%s:%s:%s:comment=%s\n' % (self.recid, self.docid, self.version, self.format, self.comment)
         out += '%s:%s:%s:%s:etag=%s\n' % (self.recid, self.docid, self.version, self.format, self.etag)
@@ -1483,13 +1485,17 @@ class BibDocFile:
             if os.path.exists(self.fullpath):
                 if random.random() < 0.25 and calculate_md5(self.fullpath) != self.checksum:
                     raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
-                return stream_file(req, self.fullpath, self.fullname, self.mime, self.encoding, self.etag, self.checksum)
+                return stream_file(req, self.fullpath, self.fullname, self.mime, self.encoding, self.etag, self.checksum, self.fullurl)
             else:
                 raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
         else:
             raise InvenioWebSubmitFileError, "You are not authorized to download %s: %s" % (self.fullname, auth_message)
 
-def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5=None):
+def stream_stream(req, file_object, size=None, mtime=None, fullname=None, mime=None, encoding=None, etag=None, md5=None):
+    """This is a generic function to stream an opened stream to the user."""
+
+
+def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=None, md5=None, location=None):
     """This is a generic function to stream a file to the user."""
     def normal_streaming(size):
         req.set_content_length(size)
@@ -1518,6 +1524,8 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         req.content_type = 'multipart/byteranges'
         boundary = '%s%04d' % (time.strftime('THIS_STRING_SEPARATES_%Y%m%d%H%M%S'), random.randint(0, 9999))
         req.headers_out['boundary'] = boundary
+        req.chunked = False
+        req.send_http_header()
         for arange in ranges:
             arange = (arange[0], min(arange[1], size - arange[0]))
             assert(arange[1] > 0)
@@ -1567,11 +1575,14 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         req.filename = fullname
         req.headers_out["Last-Modified"] = time.strftime('%a, %d %b %Y %X GMT', time.gmtime(mtime))
         req.headers_out["Accept-Ranges"] = "bytes"
+        if location is None:
+            location = req.uri
+        req.headers_out["Content-Location"] = location
         if etag is not None:
             req.headers_out["ETag"] = etag
         if md5 is not None:
             req.headers_out["Content-MD5"] = base64.encodestring(binascii.unhexlify(md5.upper()))[:-1]
-        req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
+        req.headers_out["Content-Disposition"] = 'attachment; filename="%s"' % fullname.replace('"', '\\"')
         size = os.path.getsize(fullpath)
         ranges = req.headers_in.get('Range')
         if ranges is not None:
