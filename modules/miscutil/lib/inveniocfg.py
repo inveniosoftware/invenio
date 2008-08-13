@@ -674,7 +674,7 @@ Listen 80
         LogLevel warn
         CustomLog %(logdir)s/apache.log combined
         DirectoryIndex index.en.html index.html
-        <LocationMatch "^(/+$|/index|/collection|/record|/author|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss|/help|/journal|/openurl|/stats)">
+        <LocationMatch "^(/+$|/index|/collection|/record|/author|/search|/browse|/youraccount|/youralerts|/yourbaskets|/yourmessages|/yourloans|/yourgroups|/submit|/getfile|/comments|/error|/oai2d|/rss|/help|/journal|/openurl|/stats)">
            SetHandler python-program
            PythonHandler invenio.webinterface_layout
            PythonDebug On
