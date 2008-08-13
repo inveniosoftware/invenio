@@ -191,7 +191,7 @@ class WebInterfaceDirectory(object):
                 final_parts[-3:] = original_parts[-3:]
 
                 target = urlparse.urlunparse(final_parts)
-                redirect_to_url(req, target, apache.HTTP_MOVED_PERMANENTLY)
+                redirect_to_url(req, target)
         if CFG_EXTERNAL_AUTH_USING_SSO and is_over_https and isGuestUser(getUid(req)):
             (iden, p_un, p_pw, msgcode) = loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
             if len(iden)>0:
