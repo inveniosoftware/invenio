@@ -59,13 +59,15 @@ def get_keyevent_trend_collection_population(args):
     # collect action dates
     lower = _to_datetime(args['t_start'], args['t_format']).isoformat()
     upper = _to_datetime(args['t_end'], args['t_format']).isoformat()
+    ids_str = str(ids).replace('[', '(').replace(']', ')')
     sql_query = ("SELECT creation_date FROM bibrec WHERE id IN %s AND creation_date > '%s'" + \
            "AND creation_date < '%s' ORDER BY creation_date DESC") % \
-           (str(ids).replace('[', '(').replace(']', ')'), lower, upper)
+           (ids_str, lower, upper)
     action_dates = [x[0] for x in run_sql(sql_query)]
 
-    initial_quantity = run_sql("SELECT COUNT(id) FROM bibrec WHERE creation_date < %s",
-                               (lower,))[0][0]
+    sql_query = "SELECT COUNT(id) FROM bibrec WHERE id IN %s AND creation_date < '%s'" % \
+                (ids_str,lower)
+    initial_quantity = run_sql(sql_query)[0][0]
 
     return _get_trend_from_actions(action_dates, initial_quantity,
                                    args['t_start'], args['t_end'], args['granularity'], args['t_format'])
@@ -484,6 +486,7 @@ def create_graph_trend(trend, path, settings):
                      %H:%M:%S').strftime(settings["xtic_format"]), i)
                      for i in range(len(trend))]) + ')'
             g(xtics)
+        g('set format y "%.0f"')
 
         # If we have multiple data sets, we need to do some magic to make Gnuplot eat it,
         # This is basically a matrix transposition, and the addition of index numbers.

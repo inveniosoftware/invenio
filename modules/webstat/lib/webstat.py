@@ -870,7 +870,7 @@ def _get_timespans(dt=None):
         y1 = dt.year
 
     y2 = time.localtime()[0]
-    spans.extend([(str(x-1), str(x), str(x), str(x+1), "month", "%Y", "%b") for x in  range(y2, y1-1, -1)])
+    spans.extend([(str(x), str(x), str(x), str(x+1), "month", "%Y", "%b") for x in  range(y2, y1-1, -1)])
 
     return spans
 
