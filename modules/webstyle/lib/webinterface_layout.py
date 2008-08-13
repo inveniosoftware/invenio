@@ -43,6 +43,7 @@ from invenio.webmessage_webinterface import WebInterfaceYourMessagesPages
 from invenio.errorlib_webinterface import WebInterfaceErrorPages
 from invenio.oai_repository_webinterface import WebInterfaceOAIProviderPages
 from invenio.webstat_webinterface import WebInterfaceStatsPages
+from invenio.bibcirculation_webinterface import WebInterfaceYourLoansPages
 
 
 from invenio.webjournal_webinterface import WebInterfaceJournalPages
@@ -59,6 +60,7 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'youralerts',
         'yourbaskets',
         'yourmessages',
+        'yourloans',
         'yourgroups',
         'comments',
         'error',
@@ -86,6 +88,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     yourbaskets = WebInterfaceYourBasketsPages()
 
     yourmessages = WebInterfaceYourMessagesPages()
+
+    yourloans = WebInterfaceYourLoansPages()
 
     yourgroups = WebInterfaceYourGroupsPages()
 

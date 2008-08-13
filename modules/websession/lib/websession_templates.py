@@ -540,7 +540,7 @@ class Template:
                           </table>""" % (url, title, body)
         return out
 
-    def tmpl_account_page(self, ln, accBody, baskets, alerts, searches, messages, groups, administrative):
+    def tmpl_account_page(self, ln, accBody, baskets, alerts, searches, messages, loans, groups, administrative):
         """
         Displays the your account page
 
@@ -569,6 +569,9 @@ class Template:
         out = ""
         out += self.tmpl_account_template(_("Your Account"), accBody, ln, '/youraccount/edit?ln=%s' % ln)
         out += self.tmpl_account_template(_("Your Messages"), messages, ln, '/yourmessages/display?ln=%s' % ln)
+
+        out += self.tmpl_account_template(_("Your Loans"), loans, ln, '/yourloans/display?ln=%s' % ln)
+
         out += self.tmpl_account_template(_("Your Baskets"), baskets, ln, '/yourbaskets/display?ln=%s' % ln)
         out += self.tmpl_account_template(_("Your Alert Searches"), alerts, ln, '/youralerts/list?ln=%s' % ln)
         out += self.tmpl_account_template(_("Your Searches"), searches, ln, '/youralerts/display?ln=%s' % ln)
@@ -1086,6 +1089,9 @@ class Template:
             out += """%(username)s ::
                <a class="userinfo" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(account)s</a> ::
                    <a class="userinfo" href="%(siteurl)s/yourmessages/display?ln=%(ln)s">%(messages)s</a> ::
+
+                   <a class="userinfo" href="%(siteurl)s/yourloans/display?ln=%(ln)s">%(loans)s</a> ::
+
                    <a class="userinfo" href="%(siteurl)s/yourbaskets/display?ln=%(ln)s">%(baskets)s</a> ::
                    <a class="userinfo" href="%(siteurl)s/youralerts/list?ln=%(ln)s">%(alerts)s</a> ::
                    <a class="userinfo" href="%(siteurl)s/yourgroups/display?ln=%(ln)s">%(groups)s</a> ::
@@ -1096,7 +1102,8 @@ class Template:
                      'ln' : ln,
                      'account' : _("account"),
                      'alerts' : _("alerts"),
-             'messages': _("messages"),
+                     'messages': _("messages"),
+                     'loans': _("loans"),
                      'baskets' : _("baskets"),
                      'groups' : _("groups"),
                      'stats' : _("statistics"),
