@@ -34,7 +34,7 @@
 
 ;; fancy parens and such:
 (set-scroll-bar-mode 'right)
-(setq blink-cursor nil)
+(blink-cursor-mode nil)
 (setq transient-mark-mode t)
 (show-paren-mode t)
 
@@ -58,6 +58,19 @@
 ;; Pythonic things:
 (autoload 'python-mode "python-mode" "Python editing mode." t)
 (setq interpreter-mode-alist (cons '("python" . python-mode) interpreter-mode-alist))
+(defun pylint ()
+    "Run pylint against the file behind the current buffer after
+    checking if unsaved buffers should be saved."
+    (interactive)
+    (let* ((file (buffer-file-name (current-buffer)))
+	   (command (concat "pylint -f parseable " file)))
+      (save-some-buffers (not compilation-ask-about-save) nil) ; save  files.
+      (compile-internal command "No more errors or warnings" "pylint")))
+(global-set-key "\C-cp" 'pylint)
+(global-set-key "\C-cw" 'py-pychecker-run)
+
+; workaround for Emacs22 and pylint/pychecker:
+(setq compilation-scroll-output t)
 
 ;; choosing version control software:
 (setq vc-default-back-end 'CVS)
