@@ -68,6 +68,7 @@ from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
+from invenio.bibcirculation_webinterface import WebInterfaceHoldingsPages
 from invenio.webpage import page, create_error_box
 from invenio.messages import gettext_set_language
 from invenio.search_engine import get_colID, get_coll_i18nname, \
@@ -269,7 +270,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /record/<recid> URL fragment """
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
-                'references', 'export', 'citations']
+                'references', 'export', 'citations', 'holdings']
 
     #_exports.extend(output_formats)
 
@@ -284,6 +285,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.comments = WebInterfaceCommentsPages(self.recid)
         self.usage = self
         self.references = self
+        self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
 
@@ -338,7 +340,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
-                'references', 'export', 'citations']
+                'references', 'export', 'citations', 'holdings']
 
     #_exports.extend(output_formats)
 
@@ -352,6 +354,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.comments = WebInterfaceCommentsPages(self.recid)
         self.usage = self
         self.references = self
+        self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
 
@@ -671,7 +674,7 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             tab = ''
             try:
                 if path[1] in ['', 'files', 'reviews', 'comments',
-                               'usage', 'references', 'citations']:
+                               'usage', 'references', 'citations', 'holdings']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''

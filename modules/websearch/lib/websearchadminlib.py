@@ -58,7 +58,7 @@ from invenio.websearch_external_collections import \
 from invenio.websearch_external_collections_utils import \
      get_collection_descendants
 from invenio.websearch_external_collections_config import CFG_EXTERNAL_COLLECTION_STATES_NAME
-from invenio.bibformat_elements import bfe_references
+from invenio.bibformat_elements import bfe_references, bfe_holdings
 from invenio.bibformat_engine import BibFormatObject
 from invenio.bibdocfile import BibRecDocs
 from invenio.messages import gettext_set_language
@@ -3204,7 +3204,8 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             'citations' : {'label': _('Citations'),        'visible': False, 'enabled': True, 'order': 3},
             'comments'  : {'label': _('Discussion'),       'visible': False, 'enabled': True, 'order': 4},
             'usage'     : {'label': _('Usage statistics'), 'visible': False, 'enabled': True, 'order': 5},
-            'files'     : {'label': _('Fulltext'),         'visible': False, 'enabled': True, 'order': 6}
+            'files'     : {'label': _('Fulltext'),         'visible': False, 'enabled': True, 'order': 6},
+            'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 7}
             }
 
     res = run_sql("SELECT tabs FROM collectiondetailedrecordpagetabs " + \
