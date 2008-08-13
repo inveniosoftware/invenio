@@ -355,7 +355,7 @@ class Template:
           'cssurl' : secure_page_p and CFG_SITE_SECURE_URL or CFG_SITE_URL,
           'rssurl': rssurl,
           'ln' : ln,
-          'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
+          'langlink': '?ln=' + ln,
 
           'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
           'headertitle' : cgi.escape(headertitle),
@@ -439,7 +439,7 @@ class Template:
           'siteurl' : CFG_SITE_URL,
           'sitesecureurl' : CFG_SITE_SECURE_URL,
           'ln' : ln,
-          'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
+          'langlink': '?ln=' + ln,
 
           'sitename' : CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME),
           'sitesupportemail' : CFG_SITE_SUPPORT_EMAIL,
