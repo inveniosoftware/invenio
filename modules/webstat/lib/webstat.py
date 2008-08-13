@@ -669,6 +669,8 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
                 'cols': ('Argument', _get_customevent_cols()) }
     # Build a dictionary for the selected parameters: { parameter name: argument internal name }
     choosed = { 'ids': "", 'timespan': args['timespan'], 'format': args['format'], 'cols': "" }
+    if args['ids']:
+        choosed['ids'] = args['ids'][0]
     # Send to template to prepare event customization FORM box
     out = TEMPLATES.tmpl_customevent_box(options, choosed, ln=ln)
 

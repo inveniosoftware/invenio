@@ -201,7 +201,7 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
         """Custom event statistics page"""
         num_bloks = len(form['ids'])
         arg_format = {'ids': (list, []),
-                     'timespan': (str, ""),
+                     'timespan': (str, "today"),
                      'format': (str, SUITABLE_GRAPH_FORMAT),
                      'ln': (str, CFG_SITE_LANG)}
         for i in [ str(j) for j in range(num_bloks)]:
