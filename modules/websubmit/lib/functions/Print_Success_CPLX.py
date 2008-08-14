@@ -27,15 +27,41 @@
 
 import os
 
+from invenio.dbquery import run_sql
+
 from invenio.websubmit_config import InvenioWebSubmitFunctionError
 
 def Print_Success_CPLX(parameters, curdir, form, user_info=None):
     global rn
     act = form['act']
+    doctype = form['doctype']
+    category = rn.split('-')
+    category = category[0]
+
+    #Path of file containing group
+    group_id = ""
+    if os.path.exists("%s/%s" % (curdir,'Group')):
+        fp = open("%s/%s" % (curdir,'Group'),"r")
+        group = fp.read()
+        group = group.replace("/","_")
+        group = re.sub("[\n\r]+","",group)
+        group_id = run_sql ("""SELECT id FROM usergroup WHERE name = %s""", (group,))[0][0]
+    else:
+        return ""
+
     t="<br /><br /><B>Your request has been taken into account!</B><br /><br />"
-    if (act == "RRP") or (act == "RPB"):
-        t+="An email has been sent to the Publication Committee Chair. You will be warned by email as soon as the Project Leader takes his/her decision regarding your document.<br /><br />"
-    elif act == "RDA":
+
+    sth = run_sql("SELECT rn FROM sbmCPLXAPPROVAL WHERE  doctype=%s and categ=%s and rn=%s and type=%s and id_group=%s", (doctype,category,rn,act,group_id))
+    if not len(sth) == 0:
+        run_sql("UPDATE sbmCPLXAPPROVAL SET dLastReq=NOW(), status='waiting', dProjectLeaderAction='' WHERE  doctype=%s and categ=%s and rn=%s and type=%s and id_group=%s", (doctype,category,rn,act,group_id))
+
+        if (act == "RRP") or (act == "RPB"):
+            t+="NOTE: Approval has already been requested for this document. You will be warned by email as soon as the Project Leader takes his/her decision regarding your document.<br /><br />"
+    else:
+        if (act == "RRP") or (act == "RPB"):
+            t+="A notification has been sent to the Publication Committee Chair. You will be notified by email as soon as the Project Leader makes his/her decision regarding your document."
+
+
+    if act == "RDA":
         t+="An email has been sent to the Project Leader. You will be warned by email as soon as the Project Leader takes his/her decision regarding your document.<br /><br />"
     return t
-
