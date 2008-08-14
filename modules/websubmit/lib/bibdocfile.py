@@ -1524,7 +1524,6 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         req.content_type = 'multipart/byteranges'
         boundary = '%s%04d' % (time.strftime('THIS_STRING_SEPARATES_%Y%m%d%H%M%S'), random.randint(0, 9999))
         req.headers_out['boundary'] = boundary
-        req.chunked = False
         req.send_http_header()
         for arange in ranges:
             arange = (arange[0], min(arange[1], size - arange[0]))
