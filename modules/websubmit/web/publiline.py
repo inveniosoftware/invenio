@@ -126,7 +126,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
             t = displayCplxDocument(req, doctype, categ, RN, apptype, ln)
         else:
             t = doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, ln)
-        return page(title=_("Specific Approval and Refereeing Workflow"),
+        return page(title=_("Document Approval Workflow"),
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display">%(account)s</a>""" % {
                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
                                  'account' : _("Your Account"),
@@ -138,7 +138,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
                     language=ln,
                     req=req,
                     navmenuid='yourapprovals')
-    else:
+    '''else:
         if doctype == "":
             t = selectDoctype(ln)
         elif categ == "":
@@ -158,7 +158,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
                     uid=uid,
                     language=ln,
                     req=req,
-                    navmenuid='yourapprovals')
+                    navmenuid='yourapprovals')'''
 
 def selectDoctype(ln = CFG_SITE_LANG):
     res = run_sql("select DISTINCT doctype from sbmAPPROVAL")
@@ -585,7 +585,8 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
     Return HTML body for the paget.
     In case of errors, deletes hard drive. ;-)
     """
-    # load the right message language
+
+   # load the right message language
     _ = gettext_set_language(ln)
 
     TEXT_RRP_RefereeSel_BASKET_DESCR = "Requests for refereeing process"
@@ -756,7 +757,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
             to_check = __is_PubCom (req, doctype)
             TEXT_RefereeSel_BASKET_DESCR = TEXT_RRP_RefereeSel_BASKET_DESCR
             TEXT_RefereeSel_MSG_REFEREE_SUBJECT = TEXT_RRP_RefereeSel_MSG_REFEREE_SUBJECT
-            TEXT_RefereeSel_MSG_REFEREE_BODY = TEXT_RRP_RefereeSel_MSG_REFEREE_BODY
+            TEXT_RefereeSel_MSG_REFEREE_BODY = TEXT_RRP_RefereeSel_MSG_REFEREE_BODY + " " + "\"" + item_details['title'] + "\""
             TEXT_RefereeSel_MSG_GROUP_SUBJECT = TEXT_RRP_RefereeSel_MSG_GROUP_SUBJECT
             TEXT_RefereeSel_MSG_GROUP_BODY = TEXT_RRP_RefereeSel_MSG_GROUP_BODY
         elif apptype == "RPB":
@@ -783,11 +784,12 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
 
                 __db_set_basket (key, id_bsk)
 
-                referee_name = run_sql("""SELECT nickname FROM user WHERE id = %s """, (id_user_val, ))[0][0]
-                perform_request_send (uid, referee_name, "", TEXT_RefereeSel_MSG_REFEREE_SUBJECT, TEXT_RefereeSel_MSG_REFEREE_BODY)
+                email_address = run_sql("""SELECT email FROM user WHERE id = %s """, (id_user_val, ))[0][0]
+                perform_request_send (uid, email_address, "", TEXT_RefereeSel_MSG_REFEREE_SUBJECT, TEXT_RefereeSel_MSG_REFEREE_BODY, 0, 0, 0, ln, 1)
 
                 group_name = run_sql("""SELECT name FROM usergroup WHERE id = %s""", (id_group, ))[0][0]
                 perform_request_send (int(id_user_val), "", group_name, TEXT_RefereeSel_MSG_GROUP_SUBJECT, TEXT_RefereeSel_MSG_GROUP_BODY)
+                sendMailToGroup(doctype,categ,RN,id_group,authors)
             return displayCplxDocument(req, doctype,categ,RN,apptype, ln)
 
         subtitle1 = _('Referee selection')
@@ -889,12 +891,20 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         if apptype == "RRP":
             # Build publication committee chair's email address
             user_addr = ""
+            project_leader_email = []
+
+            for user in acc_get_role_users(acc_get_role_id("projectleader_%s_%s" % ("ATL",categ))):
+                user_addr += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
+                project_leader_email.append(run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0])
+
             # Try to retrieve the publication committee chair's email from the role database
             for user in acc_get_role_users(acc_get_role_id("pubcomchair_%s_%s" % (doctype,categ))):
-                user_addr += run_sql("""SELECT nickname FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
+                user_addr += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
             # And if there are general publication committee chair's
             for user in acc_get_role_users(acc_get_role_id("pubcomchair_%s_*" % doctype)):
-                user_addr += run_sql("""SELECT nickname FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
+                user_addr += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
+
+            #Get committee chair's email address from the database
             user_addr = re.sub(",$","",user_addr)
             group_addr = ""
             TEXT_RefereeRecom_MSG_SUBJECT = TEXT_RRP_RefereeRecom_MSG_PUBCOM_SUBJECT
@@ -909,7 +919,8 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
 
         if validate == "go":
             if dRefereeRecom == None:
-                perform_request_send (uid, user_addr, group_addr, msg_subject, msg_body)
+                perform_request_send (uid, user_addr, group_addr, msg_subject, msg_body, 0, 0, 0, ln, 1)
+                sendMailToProjectLeader(doctype, categ, RN, project_leader_email[0], authors, "referee", msg_body)
                 __db_set_RefereeRecom_time (key)
             return displayCplxDocument(req, doctype,categ,RN,apptype, ln)
 
@@ -981,12 +992,14 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
 
         # Build project leader's email address
         user_addr = ""
+        project_leader_email = []
         # Try to retrieve the project leader's email from the role database
-        for user in acc_get_role_users(acc_get_role_id("projectleader_%s_%s" % (doctype,categ))):
-            user_addr += run_sql("""SELECT nickname FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
+        for user in acc_get_role_users(acc_get_role_id("projectleader_%s_%s" % ("ATL",categ))):
+            user_addr += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
+            project_leader_email.append(run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0])
         # And if there are general project leader's
         for user in acc_get_role_users(acc_get_role_id("projectleader_%s_*" % doctype)):
-            user_addr += run_sql("""SELECT nickname FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
+            user_addr += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
         user_addr = re.sub(",$","",user_addr)
 
         if apptype == "RRP":
@@ -999,7 +1012,8 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
 
         if validate == "go":
             if dPubComRecom == None:
-                perform_request_send (uid, user_addr, "", msg_subject, msg_body)
+                perform_request_send (uid, user_addr, "", msg_subject, msg_body, 0, 0, 0, ln, 1)
+                sendMailToProjectLeader(doctype, categ, RN, project_leader_email[0], authors, "publication committee chair", msg_body)
                 __db_set_PubComRecom_time (key)
             return displayCplxDocument(req, doctype,categ,RN,apptype, ln)
 
@@ -1016,7 +1030,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
               sysno = sysno,
               msg_to = user_addr,
               msg_to_group = "",
-              msg_subject = TEXT_PubComRecom_MSG_SUBJECT,
+              msg_subject = TEXT_PubComRecom_MSG_SUBJECT + " " + "\"" + item_details['title'] + "\"",
             )
 
         return t
@@ -1049,6 +1063,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
                 out = "%(infos)s<br /><br />" % {'infos' : infos[0]}
 
                 __db_set_status (key, 'approved')
+                sendMailToSubmitter(doctype, categ, RN, "approved")
             return out + t
 
         elif validate == "reject":
@@ -1057,6 +1072,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
                 out = "%(infos)s<br /><br />" % {'infos' : infos[0]}
 
                 __db_set_status (key, 'rejected')
+                sendMailToSubmitter(doctype, categ, RN, "rejected")
             return out + t
 
         validation = """
@@ -1371,6 +1387,7 @@ def get_brief_doc_details_from_repository(reportnumber):
         + Authors
         + recid (why?)
         + report-number (why?)
+        + email (for emailing submitter when process is complete)
        This function searches in the CDS Invenio repository, based on
        "reportnumber" for a record and then pulls the interesting fields
        from it.
@@ -1399,6 +1416,7 @@ def get_brief_doc_details_from_repository(reportnumber):
                                 'recid'         : '',
                                 'report-number' : '',
                                 'authors'       : [],
+                                'email'         : '',
                               }
         recid = found_record_ids[0]
         ## Authors:
@@ -1423,6 +1441,10 @@ def get_brief_doc_details_from_repository(reportnumber):
         reptnum = get_fieldvalues(recid, "037__a")
         if len(reptnum) > 0:
             pending_doc_details['report-number'] = reptnum[0]
+        ##Email:
+        email = get_fieldvalues(recid, "859__f")
+        if len(email) > 0:
+            pending_doc_details['email'] = email[0]
     elif len(found_record_ids) > 1:
         ## Oops. This is unexpected - there shouldn't be me multiple matches
         ## for this item. The old "getInAlice" function would have simply
@@ -1578,4 +1600,167 @@ def warningMsg(title,req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
                 language=ln,
                 req=req,
                 navmenuid='yourapprovals')
+
+def sendMailToReferee(doctype,categ,RN,email,authors):
+    item_details = get_brief_doc_details_from_repository(RN)
+    ## get_brief_doc_details_from_repository has returned either None
+    ## or a dictionary with the following structure:
+    ##   { 'title'            : '-', ## String - the item's title
+    ##     'recid'            : '',  ## String - recid
+    ##     'report-number'    : '',  ## String - the item's report number
+    ##     'authors'          : [],  ## List   - the item's authors
+    ##   }
+
+
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
+
+    message = """
+    Scientific Note approval for document %s has been submitted to the CERN Document Server.
+    Your reccommendation is requested on it.
+
+    Requested subcategory: %s
+
+    Title: %s
+
+    Author(s): %s
+
+    To access the document(s), select the file(s) from the location:
+    <%s/record/%s>
+
+    To make a reccommendation, you should go to this URL:
+    <%s>
+
+    You can also check the status of the document:
+    <%s>
+
+    ---------------------------------------------
+    Best regards.
+    The submission team.""" % (str(RN),
+                               str(categ),
+                               str(item_details['title']),
+                               authors,
+                               CFG_SITE_URL,
+                               str(item_details['recid']),
+                               str(CFG_SITE_URL + "/publiline.py?flow=cplx&doctype="+doctype+"&ln=en&apptype=RRP&categ="+categ+"&RN="+RN+"&action=RefereeRecom"),
+                               str(CFG_SITE_URL + "/publiline.py?flow=cplx&doctype="+doctype+"&ln=en&apptype=RRP&categ="+categ+"&RN="+RN))
+
+    # send the mail
+    send_email(FROMADDR, email,"Request for document %s recommendation" % (RN),message)
+    return ""
+
+def sendMailToGroup(doctype,categ,RN,group_id,authors):
+    item_details = get_brief_doc_details_from_repository(RN)
+    ## get_brief_doc_details_from_repository has returned either None
+    ## or a dictionary with the following structure:
+    ##   { 'title'            : '-', ## String - the item's title
+    ##     'recid'            : '',  ## String - recid
+    ##     'report-number'    : '',  ## String - the item's report number
+    ##     'authors'          : [],  ## List   - the item's authors
+    ##   }
+
+
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
+
+    message = """
+    Scientific Note approval for document %s has been submitted to the CERN Document Server.
+    Your comments are requested on this document.
+
+    Requested subcategory: %s
+
+    Title: %s
+
+    Author(s): %s
+
+    To access the document(s), select the file(s) from the location:
+    <%s/record/%s>
+
+    To leave a comment or check the status of the approval process, you should go to this URL:
+    <%s>
+
+    """ % (str(RN),
+           str(categ),
+           str(item_details['title']),
+           authors,
+           CFG_SITE_URL,
+           str(item_details['recid']),
+           str(CFG_SITE_URL + "/publiline.py?flow=cplx&doctype="+doctype+"&ln=en&apptype=RRP&categ="+categ+"&RN="+RN))
+
+    # send mails to all members of the ATLAS group
+    group_member_ids = run_sql("SELECT id_user FROM user_usergroup WHERE id_usergroup = '%s'" % (group_id))
+    for member_id in group_member_ids:
+        member_email = run_sql("SELECT email FROM user WHERE id = '%s'" % (member_id))
+        send_email(FROMADDR, member_email[0][0],"Request for comment on document %s" % (RN),message)
+    return ""
+
+def sendMailToProjectLeader(doctype, categ, RN, email, authors, actor, recommendation):
+    item_details = get_brief_doc_details_from_repository(RN)
+    ## get_brief_doc_details_from_repository has returned either None
+    ## or a dictionary with the following structure:
+    ##   { 'title'            : '-', ## String - the item's title
+    ##     'recid'            : '',  ## String - recid
+    ##     'report-number'    : '',  ## String - the item's report number
+    ##     'authors'          : [],  ## List   - the item's authors
+    ##   }
+
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
+
+    message = """
+    Scientific Note approval for document %s has been submitted to the CERN Document Server.
+    Your approval is requested for this document. Once you have received recommendations from both the referee and the publication committee chair, you will be able to make your decision.
+
+    Requested subcategory: %s
+
+    Title: %s
+
+    Author(s): %s
+
+    To access the document(s), select the file(s) from the location:
+    <%s/record/%s>
+
+    The %s has made a recommendation for the document. He/she said the following:
+
+    %s
+
+    You can approve this document by visiting this page:
+    <%s>
+    """ % (str(RN),
+           str(categ),
+           str(item_details['title']),
+           authors,
+           CFG_SITE_URL,
+           str(item_details['recid']),
+           actor,
+           recommendation,
+           str(CFG_SITE_URL + "/publiline.py?flow=cplx&doctype="+doctype+"&ln=en&apptype=RRP&categ="+categ+"&RN="+RN+"&action=ProjectLeaderDecision"))
+
+    # send mails to all members of the ATLAS group
+    send_email(FROMADDR, email,"Request for approval/rejection of document %s" % (RN),message)
+    return ""
+
+def sendMailToSubmitter(doctype, categ, RN, outcome):
+    item_details = get_brief_doc_details_from_repository(RN)
+    ## get_brief_doc_details_from_repository has returned either None
+    ## or a dictionary with the following structure:
+    ##   { 'title'            : '-', ## String - the item's title
+    ##     'recid'            : '',  ## String - recid
+    ##     'report-number'    : '',  ## String - the item's report number
+    ##     'authors'          : [],  ## List   - the item's authors
+    ##   }
+
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
+
+    message = """
+    The approval process for your document : %s, has been completed. The details of this document are as follows:
+
+    Requested subcategory: %s
+    Title: %s
+
+    The project leader has made the following recommendation for the document:
+
+    %s
+    """ % (RN, categ, item_details['title'], outcome)
+
+    # send mails to all members of the ATLAS group
+    send_email(FROMADDR, item_details['email'],"Final outcome for approval of document : %s" % (RN),message)
+    return ""
 
