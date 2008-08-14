@@ -480,13 +480,19 @@ def loan_return(req, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 
-def loan_on_desk(req, column, string, borrower_id, confirm_button, barcode, borrower_name, ln=CFG_SITE_LANG):
+def loan_on_desk(req, column, string, borrower, confirm_button, barcode, borrower_name, ln=CFG_SITE_LANG):
     """
-
+    @param ln: language of the page
     """
+    if confirm_button == "Confirm":
+        title="Loan on desk confirm"
+        barcode = barcode.split()
+        body = bibcirculation_templates.tmpl_loan_on_desk_confirm(barcode=barcode,
+                                                                  borrower=borrower_name,
+                                                                  ln=ln)
 
-
-    if string:
+    elif string:
+        title="Loan on desk"
         if column == 'name':
             result = db.search_borrower_by_name(string)
         elif column == 'phone':
@@ -495,36 +501,14 @@ def loan_on_desk(req, column, string, borrower_id, confirm_button, barcode, borr
             result = db.search_borrower_by_email(string)
         else:
             result = db.search_borrower_by_id(string)
+
+        body = bibcirculation_templates.tmpl_loan_on_desk(result=result,
+                                                          borrower=borrower,
+                                                          barcode=barcode,
+                                                          ln=ln)
     else:
+        title="Loan on desk"
         result = ""
-
-
-    if borrower_id:
-        borrower = db.get_borrower_name(borrower_id)
-
-    else:
-        borrower = ""
-
-    if not barcode:
-        barcode = ""
-
-
-    if confirm_button == "Confirm":
-        borrowerID = db.get_borrowerID(borrower_name)
-
-        result = []
-        barcode = barcode.split(",")
-        for (brcd) in barcode:
-            #raise repr(barcode)
-            output = db.get_id_bibrec(brcd)
-            #output = db.loan_on_desk_confirm(brcd, borrowerID)
-            result.append(output)
-
-        raise repr(result)
-
-        body = bibcirculation_templates.tmpl_loan_on_desk_confirm(result=result, barcode=barcode, borrower_id=borrowerID, ln=ln)
-
-    else:
         body = bibcirculation_templates.tmpl_loan_on_desk(result=result,
                                                           borrower=borrower,
                                                           barcode=barcode,
@@ -542,7 +526,7 @@ def loan_on_desk(req, column, string, borrower_id, confirm_button, barcode, borr
 
 
 
-    return page(title="Loan on desk",
+    return page(title=title,
                 uid=id_user,
                 req=req,
                 body=body,
@@ -554,8 +538,6 @@ def loan_on_desk_confirm(req, barcode=None, borrower_id=None, ln=CFG_SITE_LANG):
     """
 
     """
-
-
 
     result = db.loan_on_desk_confirm(barcode, borrower_id)
 
@@ -580,15 +562,17 @@ def loan_on_desk_confirm(req, barcode=None, borrower_id=None, ln=CFG_SITE_LANG):
 
 def register_new_loan(req, barcode, borrower_id, ln=CFG_SITE_LANG):
     """
+    @param ln: language of the page
     """
 
-    raise repr(barcode)
-
     loaned_on = datetime.date.today()
-    id_bibrec = db.get_id_bibrec(barcode)
-    due_date = get_datetext(loaned_on.year, loaned_on.month + 1, loaned_on.day)
-    db.new_loan(borrower_id, id_bibrec, barcode, loaned_on, due_date, 'on loan', 'normal','')
-    db.update_item_status('on loan', barcode)
+
+    for(bar) in barcode:
+        id_bibrec = db.get_id_bibrec(bar)
+        due_date = get_datetext(loaned_on.year, loaned_on.month + 1, loaned_on.day)
+
+        db.new_loan(borrower_id, id_bibrec, bar, loaned_on, due_date, 'on loan', 'normal','')
+        db.update_item_status('on loan', bar)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -601,7 +585,7 @@ def register_new_loan(req, barcode, borrower_id, ln=CFG_SITE_LANG):
 
     body = bibcirculation_templates.tmpl_register_new_loan_done(ln=ln)
 
-    return page(title="Title",
+    return page(title="Loan on desk",
                 uid=id_user,
                 req=req,
                 body=body,
@@ -620,10 +604,6 @@ def loan_return_confirm(req, barcode, ln=CFG_SITE_LANG):
 
     result.append(borrower_id)
     result.append(id_bibrec)
-
-#    raise repr(result)
-
-    # result = db.loan_return_confirm(borrower_id, recid)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
