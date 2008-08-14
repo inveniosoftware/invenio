@@ -41,6 +41,7 @@
 ;; light yellow on dark green is cool:
 (when (locate-library "color-theme")
     (require 'color-theme)
+    (color-theme-initialize)
     (color-theme-gnome2))
 
 ;; setting color-syntax highlighting:
