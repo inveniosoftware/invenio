@@ -1259,26 +1259,37 @@ def kb_export(req, ln=config.CFG_SITE_LANG):
     webdir = config.CFG_WEBDIR
     names = ""
     errors = ""
-    kbs = bibformat_dblayer.get_kbs()
-    for kb in kbs:
-        name = kb['name']
-        #make this a filename
-        fname = webdir+"/"+name+".kb"
-        try:
-            f = open(fname,"w")
-            mappings = bibformat_dblayer.get_kb_mappings(name)
-            for m in mappings:
-                mkey = m['key']
-                mvalue = m['value']
-                f.write(mkey+"--"+mvalue+"\n")
-            f.close()
-            names = names+"<br/>"+name
-        except:
-            errors = errors+"<br/>"+name
-    message = "Exports OK "+names
-    if errors:
-        message = message+"<br/>Not exported :"+errors
-    return dialog_box(req=req, ln=ln,
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
+    if auth_code:
+	#return "not authorized"
+        navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.CFG_SITE_URL, ln, _("Manage Knowledge Bases")))
+
+        return page_not_authorized(req=req,
+                                   text=auth_msg,
+                                   navtrail=navtrail_previous_links)
+    else:
+        kbs = bibformat_dblayer.get_kbs()
+        for kb in kbs:
+            name = kb['name']
+            #make this a filename
+            fname = webdir+"/"+name+".kb"
+            #and name for URL to access it..
+            urlname=config.CFG_SITE_URL+"/"+name+".kb"
+            try:
+                f = open(fname,"w")
+                mappings = bibformat_dblayer.get_kb_mappings(name)
+                for m in mappings:
+                    mkey = m['key']
+                    mvalue = m['value']
+                    f.write(mkey+"--"+mvalue+"\n")
+                f.close()
+                names = names+"<br/>"+urlname
+            except:
+                errors = errors+"<br/>"+name
+        message = "Exports OK <br/>"+names
+        if errors:
+            message = message+"<br/>Not exported :"+errors
+        return dialog_box(req=req, ln=ln,
                title="Knowledge Bases",
 	       message=message)
 
