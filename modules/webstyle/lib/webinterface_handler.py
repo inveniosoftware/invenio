@@ -336,6 +336,8 @@ def create_handler(root):
             else:
                 cache_control = "private"
             req.headers_out['Cache-Control'] = cache_control
+            ## See <http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44>
+            req.headers_out['Vary'] = 'Cookie,ETag,Cache-Control'
             try:
                 uri = req.uri
                 if uri == '/':
