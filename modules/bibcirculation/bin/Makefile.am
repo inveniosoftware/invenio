@@ -17,8 +17,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = bibcirculation
+## bin_SCRIPTS = bibcirculation
 
-EXTRA_DIST = bibcirculation.in
+## EXTRA_DIST = bibcirculation.in
 
 CLEANFILES = *~ *.tmp
