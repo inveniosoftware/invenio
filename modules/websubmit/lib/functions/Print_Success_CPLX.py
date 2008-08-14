@@ -36,7 +36,7 @@ def Print_Success_CPLX(parameters, curdir, form, user_info=None):
     act = form['act']
     doctype = form['doctype']
     category = rn.split('-')
-    category = category[0]
+    categ = category[2]
 
     #Path of file containing group
     group_id = ""
@@ -51,16 +51,15 @@ def Print_Success_CPLX(parameters, curdir, form, user_info=None):
 
     t="<br /><br /><B>Your request has been taken into account!</B><br /><br />"
 
-    sth = run_sql("SELECT rn FROM sbmCPLXAPPROVAL WHERE  doctype=%s and categ=%s and rn=%s and type=%s and id_group=%s", (doctype,category,rn,act,group_id))
+    sth = run_sql("SELECT rn FROM sbmCPLXAPPROVAL WHERE  doctype=%s and categ=%s and rn=%s and type=%s and id_group=%s", (doctype,categ,rn,act,group_id))
     if not len(sth) == 0:
-        run_sql("UPDATE sbmCPLXAPPROVAL SET dLastReq=NOW(), status='waiting', dProjectLeaderAction='' WHERE  doctype=%s and categ=%s and rn=%s and type=%s and id_group=%s", (doctype,category,rn,act,group_id))
+        run_sql("UPDATE sbmCPLXAPPROVAL SET dLastReq=NOW(), status='waiting', dProjectLeaderAction='' WHERE  doctype=%s and categ=%s and rn=%s and type=%s and id_group=%s", (doctype,categ,rn,act,group_id))
 
-        if (act == "RRP") or (act == "RPB"):
+        if (act == "RSN") or (act == "RPB"):
             t+="NOTE: Approval has already been requested for this document. You will be warned by email as soon as the Project Leader takes his/her decision regarding your document.<br /><br />"
     else:
-        if (act == "RRP") or (act == "RPB"):
+        if (act == "RSN") or (act == "RPB"):
             t+="A notification has been sent to the Publication Committee Chair. You will be notified by email as soon as the Project Leader makes his/her decision regarding your document."
-
 
     if act == "RDA":
         t+="An email has been sent to the Project Leader. You will be warned by email as soon as the Project Leader takes his/her decision regarding your document.<br /><br />"
