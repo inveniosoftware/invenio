@@ -117,7 +117,12 @@ def redirect_to_url(req, url, redirection_type=None):
         req.err_headers_out["Pragma"] = "no-cache"
 
     if req.headers_out.has_key("Set-Cookie"):
-        req.err_headers_out["Set-Cookie"] = req.headers_out["Set-Cookie"]
+        cookies = req.headers_out['Set-Cookie']
+        if type(cookies) is list:
+            for cookie in cookies:
+                req.err_headers_out.add("Set-Cookie", cookie)
+        else:
+            req.err_headers_out.add("Set-Cookie", cookies)
 
     if req.sent_bodyct:
         raise IOError, "Cannot redirect after headers have already been sent."
