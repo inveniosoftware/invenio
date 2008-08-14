@@ -24,6 +24,7 @@
 
 __revision__ = "$Id$"
 
+__lastupdated__ = """$Date$"""
 
 # others invenio imports
 from invenio.config import CFG_SITE_LANG, \
