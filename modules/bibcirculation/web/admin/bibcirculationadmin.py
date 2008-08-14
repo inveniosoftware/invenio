@@ -104,15 +104,15 @@ def loan_return(req, ln=CFG_SITE_LANG):
     return bal.loan_return(req, ln)
 
 def loan_on_desk(req, column=None, string=None,
-                 borrower_id=None, confirm_button=None,
-                 barcode=None, borrower_name=None, ln=CFG_SITE_LANG):
+                 borrower="", confirm_button=None,
+                 barcode="", borrower_name=None, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/loan_on_desk
 
     """
 
     return bal.loan_on_desk(req, column, string,
-                            borrower_id, confirm_button,
+                            borrower, confirm_button,
                             barcode, borrower_name, ln)
 
 
@@ -129,6 +129,8 @@ def register_new_loan(req, barcode=None, borrower_id=None, ln=CFG_SITE_LANG):
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/register_new_loan
 
     """
+    barcode = wash_url_argument(barcode, 'list')
+
     return bal.register_new_loan(req, barcode, borrower_id, ln)
 
 
