@@ -129,8 +129,20 @@ def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
                     user = user,
                   )
 
+    #Display warnings if user is superuser
+    roles = acc_find_user_role_actions(uid)
+    warnings = "0"
+    for role in roles:
+        if "superadmin" in role:
+            warnings = "1"
+            break
+
+    warning_list = superuser_account_warnings()
+
     return websession_templates.tmpl_account_page(
              ln = ln,
+             warnings = warnings,
+             warning_list = warning_list,
              accBody = accBody,
              baskets = bask,
              alerts = aler,
@@ -139,6 +151,62 @@ def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
              groups = grps,
              administrative = perform_youradminactivities(user_info, ln)
            )
+
+def superuser_account_warnings():
+    """Check to see whether admin accounts have default / blank password etc. Returns a list"""
+    warning_array = [0,0,0,0,0,0]
+
+    #Try and connect to the mysql database with the default invenio password
+    try:
+        conn = MySQLdb.connect (host = CFG_DATABASE_HOST,
+                                user = "root",
+                                passwd = "my123p$ss",
+                                db = "mysql")
+        conn.close()
+        warning_array[0] = 1
+    except:
+        warning_array[0] = 0
+
+    #Try and connect to the invenio database with the default invenio password
+    try:
+        conn = MySQLdb.connect (host = CFG_DATABASE_HOST,
+                                    user = "cdsinvenio",
+                                                passwd = "my123p$ss",
+                                                db = CFG_DATABASE_NAME)
+        conn.close ()
+        warning_array[1] = 1
+    except:
+        warning_array[1] = 0
+
+    #Check if the admin password is empty
+    res = run_sql("SELECT password, email from user where nickname = 'admin'")
+    res1 = run_sql("SELECT email from user where nickname = 'admin' and password = AES_ENCRYPT('%s','')" % (res[0][1]))
+
+    for user in res1:
+        warning_array[2] = 1
+
+    #Check if the admin email has been changed from the default
+    if (CFG_SITE_ADMIN_EMAIL == "cds.support@cern.ch" or CFG_SITE_SUPPORT_EMAIL == "cds.support@cern.ch") and CFG_CERN_SITE == 0:
+        warning_array[3] = 0
+
+    #Check for a new release of CDS Invenio
+    try:
+        webFile = urllib.urlopen("http://cdsware.cern.ch/invenio/RELEASE")
+        web_version = (webFile.readline()).split(".")
+        webFile.close()
+        local_version = CFG_VERSION.split(".")
+
+        if web_version[0] > local_version[0]:
+            warning_array[4] = 1
+        elif web_version[0] == local_version[0] and web_version[1] > local_version[1]:
+            warning_array[4] = 1
+        elif web_version[0] == local_version[0] and web_version[1] == local_version[1] and web_version[2] > local_version[2]:
+            warning_array[4] = 1
+    except:
+        warning_array[5] = 1 #Cant download release notes
+
+    return warning_array
+
 
 def template_account(title, body, ln):
     """It is a template for print each of the options from the user's account."""
