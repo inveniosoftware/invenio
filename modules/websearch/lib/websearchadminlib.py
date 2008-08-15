@@ -66,6 +66,7 @@ from invenio.bibrank_citation_searcher import get_cited_by
 from invenio.access_control_admin import acc_get_action_id
 from invenio.access_control_config import VIEWRESTRCOLL
 
+
 def getnavtrail(previous = ''):
     """Get the navtrail"""
 
@@ -3257,6 +3258,11 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             brd =  BibRecDocs(recID)
             if len(brd.list_bibdocs()) == 0:
                 tabs['files']['enabled'] = False
+
+        #Disable holdings tab if collection != Books
+        collection = run_sql("""select name from collection where id=%s""", (colID, ))
+        if collection[0][0] != 'Books':
+            tabs['holdings']['enabled'] = False
 
     tabs[''] = tabs['metadata']
     del tabs['metadata']
