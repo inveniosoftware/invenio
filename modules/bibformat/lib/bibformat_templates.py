@@ -1902,7 +1902,7 @@ class Template:
         <td width="300" valign="top">
 
         <form name="addNewMapping"
-        action="kb_add_mapping?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s" method="post">''' % {'ln':ln,
+        action="kb_add_mapping?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s&amp;forcetype=no" method="post">''' % {'ln':ln,
                                                                                                       'kb_id':kb_id,
                                                                                                       'sortby':sortby}
         out += '''
@@ -2303,4 +2303,63 @@ class Template:
             out += '''<input type="submit" class="adminbutton" name="chosen_option" value="%(value)s" />&nbsp;''' % {'value':option}
 
         out += '''</form></fieldset></div>'''
+        return out
+
+    def tmpl_select_rule_action(self, ln, kbid, left, right, leftorright, current, tuples):
+        """
+        Returns a form of actions for the user to descide what to do
+        if there are overlapping rules.
+        """
+        _ = gettext_set_language(ln)    # load the right message language
+
+        gen=""
+        if (leftorright=='left'):
+            gen = _("The left side of the rule ")+" ("+left+") "
+        else:
+            gen = _("The right side of the rule ")+" ("+left+"=>"+right+") "
+        gen+=_("already appears in these knowledge bases:")+"<br/>"
+        inkbs = []
+        dontdoit = False
+        for t in tuples:
+            (kib, kb, l, r) = t
+            if kb==current and leftorright=='left':
+                dontdoit=True
+                #two rules with same left side in the same kb? no.
+            if inkbs.count(kb)==0:
+                inkbs.append(kb)
+        gen+=" ".join(inkbs)
+        message = _("Please select action")
+        optreplace = _("Replace the selected rules with this rule")
+        optadd = _("Add this rule in the current knowledge base")+" ("+current+")"
+        optcancel = _("Cancel: do not add this rule")
+        formreplace = '''<form action="kb_add_mapping?ln=%(ln)s&amp;kb=%(kb_id)s&amp;forcetype=all"
+                    method="post">
+                    <input type="hidden" name="mapFrom" value="%(left)s"/>
+                    <input type="hidden" name="mapTo" value="%(right)s"/>
+                 ''' % {  'ln':ln, 'kb_id':kbid, 'left':left, 'right':right }
+
+        #make a selectable list of kb's where to push the value..
+        for t in tuples:
+            (kib, kb, l, r) = t
+            value=kb+"++++"+l+"++++"+r
+            formreplace+="<input type=\"checkbox\" name=\"replacements\" value=\""+value+"\">"+kb+": "+l+"=>"+r+"</input><br/>"
+
+        formreplace+=''' <input class="adminbutton"
+                     type="submit" value="%(opt)s"/></form>''' % { 'opt':optreplace }
+
+        formadd = '''<form action="kb_add_mapping?ln=%(ln)s&amp;kb=%(kb_id)s&amp;forcetype=curr" method="post">
+                    <input type="hidden" name="mapFrom" value="%(left)s"/>
+                    <input type="hidden" name="mapTo" value="%(right)s"/>
+	            <input class="adminbutton"
+                     type="submit" value="%(opt)s"/></form>''' % { 'opt':optadd, 'ln':ln,
+                                                                    'kb_id':kbid,
+                                                                    'left':left, 'right':right }
+        formcancel = '''<form action="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s">
+                    <input type="hidden" name="kb" value="%(kb_id)s">
+	            <input  class="adminbutton"
+                     type="submit" value="%(opt)s"/></form>''' % { 'ln': ln, 'kb_id':kbid, 'opt':optcancel }
+
+        if dontdoit:
+            formadd = _("It is not possible to have two rules with the same left side in the same knowledge base.")+"<p>"
+        out = gen+"<P>"+message+"<P>"+formadd+formcancel+"<P><P><P>"+formreplace
         return out
