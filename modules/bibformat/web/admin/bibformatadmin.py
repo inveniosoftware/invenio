@@ -1086,16 +1086,19 @@ def kb_show_dependencies(req, kb, ln=config.CFG_SITE_LANG, sortby="to"):
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG):
+def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG, forcetype=None, replacements=None):
     """
     Adds a new mapping to a kb.
 
     @param ln language
     @param kb the kb id to show
     @param sortby the sorting criteria ('from' or 'to')
+    @param forcetype indicates if this function should ask about replacing left/right sides (None or 'no')
+                     replace in current kb ('curr') or in all ('all')
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
+
     navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.CFG_SITE_URL, ln, _("Manage Knowledge Bases")))
 
     try:
@@ -1118,12 +1121,45 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG
                         lastupdated=__lastupdated__,
                         req=req)
 
-
-
         key = wash_url_argument(mapFrom, 'str')
         value = wash_url_argument(mapTo, 'str')
 
-        bibformatadminlib.add_kb_mapping(kb_name, key, value)
+	#check if key or value already exists in some KB
+        left_sides = bibformat_dblayer.kb_key_rules(key)
+        right_sides = bibformat_dblayer.kb_value_rules(value)
+
+        if forcetype and not forcetype=="no":
+            print "forcing data input"
+        else:
+            if len(right_sides) > 0:
+                return page(title=_("Right side exists"),
+                        body = bibformatadminlib.perform_request_verify_rule(ln, kb_id, key, value, "right", kb_name, right_sides),
+                        language=ln,
+                        navtrail = navtrail_previous_links,
+                        lastupdated=__lastupdated__,
+                        req=req)
+
+            if len(left_sides) > 0:
+                return page(title=_("Left side exists"),
+                        body = bibformatadminlib.perform_request_verify_rule(ln, kb_id, key, value, "left", kb_name, left_sides),
+                        language=ln,
+                        navtrail = navtrail_previous_links,
+                        lastupdated=__lastupdated__,
+                        req=req)
+
+        if forcetype=="curr":
+            bibformatadminlib.add_kb_mapping(kb_name, key, value)
+        if forcetype=="all":
+            #a bit tricky.. remove the rules given in param replacement and add the current
+            #rule in the same kb's
+            for r in replacements:
+                if r.index("++++") > 0:
+                    (rkbname, rleft, rright) = r.split('++++')
+                    bibformatadminlib.remove_kb_mapping(rkbname, rleft)
+                    #add only if this is not yet there..
+                    if not bibformat_dblayer.kb_mapping_exists(rkbname, key):
+                        bibformatadminlib.add_kb_mapping(rkbname, key, value)
+
         redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s" % {'ln':ln,
                                                                                 'kb':kb_id,
                                                                                 'sortby':sortby})
