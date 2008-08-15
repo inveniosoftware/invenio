@@ -245,7 +245,7 @@ def reharvest(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, **records):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
-def harvest(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, record_id=None):
+def harvest(req, oai_src_id = None, ln=CFG_SITE_LANG, confirm=0, record_id=None):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
     try:
         uid = getUid(req)
@@ -260,7 +260,7 @@ def harvest(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, record_id=None):
     auth = bhc.check_user(req,'cfgbibharvest')
     if not auth[0]:
         return page(title="OAI source - harvesting new records",
-                    body=bhc.perform_request_harvest_record(oai_src_id=oai_src_id,
+                    body=bhc.perform_request_harvest_record(oai_src_id = oai_src_id,
                                                     ln=ln,
                                                     confirm=confirm, record_id = record_id),
                     uid=uid,

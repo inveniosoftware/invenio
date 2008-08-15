@@ -1,4 +1,4 @@
-1## $Id$
+## $Id$
 
 ## Administrator interface for BibIndex
 ## This file is part of CDS Invenio.
@@ -512,7 +512,7 @@ def perform_request_viewhistory(oai_src_id = None, ln = CFG_SITE_LANG, callback 
     inner_text += bibharvest_templates.tmpl_print_brs(ln, 1)
     inner_text = bibharvest_templates.tmpl_output_scrollable_frame(inner_text)
     inner_text += bibharvest_templates.tmpl_output_selection_bar()
-    result +=  createhiddenform(action="/admin/bibharvest/bibharvestadmin.py/reharvest", text = inner_text, button = "Reharvest selected records", oai_src_id=oai_src_id, ln=ln)
+    result +=  createhiddenform(action="/admin/bibharvest/bibharvestadmin.py/reharvest", text = inner_text, button = "Reharvest selected records", oai_src_id = oai_src_id, ln = ln)
     result += generate_oai_source_operations(ln, oai_src_id)
     return result
 
@@ -520,8 +520,6 @@ def perform_request_viewhistory(oai_src_id = None, ln = CFG_SITE_LANG, callback 
 ############################################################
 ###  The functions allowing to preview the harvested XML ###
 ############################################################
-
-
 
 def harvest_record(record_id , oai_src_baseurl, oai_src_prefix):
     """
@@ -625,7 +623,7 @@ def perform_request_preview_original_xml(oai_src_id = None, record_id = None):
     return record
 
 def perform_request_preview_harvested_xml(oai_src_id = None, record_id = None):
-    return harvest_postprocress_record(oai_src_id, record_id)
+    return harvest_postprocress_record(oai_src_id, record_id, treat_new = True)
 
 ############################################################
 ### Reharvesting of already existing records             ###
