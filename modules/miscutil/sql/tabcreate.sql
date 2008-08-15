@@ -2272,7 +2272,7 @@ CREATE TABLE IF NOT EXISTS oaiHARVESTLOG (
   date_harvested datetime NOT NULL default '0000-00-00', -- when we harvested
   date_inserted datetime NOT NULL default '0000-00-00', -- when it was inserted
   inserted_to_db char(1) NOT NULL default 'P', -- where it was inserted (P=prod, H=holding-pen, etc)
-  PRIMARY KEY (id_oaiHARVEST, oai_id, date_inserted, inserted_into_db)
+  PRIMARY KEY (id_oaiHARVEST, oai_id, date_inserted, inserted_to_db)
 ) TYPE=MyISAM;
 -- tables for portal elements:
 
