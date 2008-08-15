@@ -216,6 +216,22 @@ def kb_mapping_exists(kb_name, key):
             return True
     return False
 
+def kb_key_rules(key):
+    """Returns a list of 4-tuples that have a key->value mapping in some KB
+       The format of the tuples is [kb_id, kb_name,key,value] """
+    res = run_sql("""SELECT f.id, f.name, m.m_key, m.m_value from fmtKNOWLEDGEBASEMAPPINGS as m JOIN
+                     fmtKNOWLEDGEBASES as f on m.id_fmtKNOWLEDGEBASES=f.id WHERE
+                     m.m_key = %s""", (key, ))
+    return res
+
+def kb_value_rules(value):
+    """Returns a list of 4-tuples that have a key->value mapping in some KB
+       The format of the tuples is [kb_id, kb_name,key,value] """
+    res = run_sql("""SELECT f.id, f.name, m.m_key, m.m_value from fmtKNOWLEDGEBASEMAPPINGS as m JOIN
+                     fmtKNOWLEDGEBASES as f on m.id_fmtKNOWLEDGEBASES=f.id WHERE
+                     m.m_value = %s""", (value, ))
+    return res
+
 def get_kb_mapping_value(kb_name, key):
     """
     Returns a value of the given key from the given kb.
