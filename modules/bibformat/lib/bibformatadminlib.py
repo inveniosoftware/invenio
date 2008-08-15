@@ -1625,6 +1625,20 @@ def perform_request_dreamweaver_floater():
 
     elements = filter(filter_elem, elements)
 
-
-
     return bibformat_templates.tmpl_dreamweaver_floater(CFG_SITE_LANG, elements)
+
+
+def perform_request_verify_rule(ln, kbid, left, right, leftorright, currentname, tuples):
+    """
+    Returns a page element by which the user chooses an action:
+    What to do if a rule already exists in some kb.
+    Parameters:
+    @ln language
+    @kbid current kb id
+    @left left side of rule
+    @right right side of rule
+    @leftorright "left" or "right" checking
+    @currentname the name of the current kb
+    @tuples a list containing "kb - rule" tuples
+    """
+    return bibformat_templates.tmpl_select_rule_action(ln, kbid, left, right, leftorright, currentname, tuples)
