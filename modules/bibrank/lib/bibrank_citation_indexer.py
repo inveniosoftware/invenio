@@ -674,7 +674,11 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 matches = re.compile("(.*)(-\d+$)").findall(p)
                 if matches and matches[0]:
                     p = matches[0][0]
-                rec_id = list(search_unit(p, 'journal'))
+                rec_id=None
+                try:
+                    rec_id = list(search_unit(p, 'journal'))
+                except:
+                    rec_id=None
                 write_message("These match searching "+p+" in journal: "+str(rec_id), verbose=9)
                 if rec_id and rec_id[0]:
                     #the refered publication is in our collection, remove
@@ -718,12 +722,19 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         for recnumber in recnumbers:
             if recnumber:
                 p = recnumber
-                recid_list = get_recids_matching_query(p, pubrefntag)
+                recid_list = []
+                try:
+                    recid_list = get_recids_matching_query(p, pubrefntag)
+                except:
+                    recid_list = []
+
                 if recid_list:
                     for recid in recid_list:
                         if not citation_list.has_key(rec_id):
                             citation_list[rec_id] = []
                         if not recid in citation_list[rec_id]:
+                            if not result.has_key(rec_id):
+                                result[rec_id] = 0
                             result[rec_id] += 1
                             citation_list[rec_id].append(recid)
                         if not reference_list.has_key(recid):
