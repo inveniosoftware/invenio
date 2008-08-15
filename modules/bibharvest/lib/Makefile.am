@@ -25,6 +25,7 @@ pylib_DATA = oai_repository.py \
              oai_repository_webinterface.py \
              oai_repository_regression_tests.py \
              bibharvest.py \
+	     bibharvest_dblayer.py \
              bibharvest_templates.py \
              bibharvestadminlib.py \
              bibharvestadmin_regression_tests.py \

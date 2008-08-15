@@ -2266,11 +2266,13 @@ CREATE TABLE IF NOT EXISTS oaiHARVEST (
   PRIMARY KEY  (id)
 ) TYPE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS oaiHARVESTINGLOG (
-  oai_src_id mediumint(6) unsigned NOT NULL REFERENCES oaiARCHIVE, 
-  harvesting_date datetime,
-  oai_record_id varchar(40) default "", -- record identifier in the source
-  PRIMARY KEY(oai_src_id, oai_record_id, harvesting_date)
+CREATE TABLE IF NOT EXISTS oaiHARVESTLOG (
+  id_oaiHARVEST mediumint(9) unsigned NOT NULL REFERENCES oaiHARVEST, -- source we harvest from
+  oai_id varchar(40) NOT NULL default "", -- OAI record identifier we harvested
+  date_harvested datetime NOT NULL default '0000-00-00', -- when we harvested
+  date_inserted datetime NOT NULL default '0000-00-00', -- when it was inserted
+  inserted_to_db char(1) NOT NULL default 'P', -- where it was inserted (P=prod, H=holding-pen, etc)
+  PRIMARY KEY (id_oaiHARVEST, oai_id, date_inserted, inserted_into_db)
 ) TYPE=MyISAM;
 -- tables for portal elements:
 

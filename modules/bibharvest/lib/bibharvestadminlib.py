@@ -545,7 +545,7 @@ def convert_record(oai_src_config, record_to_convert):
     s_out.close()
     return result
 
-def format_record(oai_src_bibfilter,  record_to_convert):
+def format_record(oai_src_bibfilter,  record_to_convert, treat_new = False):
     """
     Formats the record using given formatting program.
     Returns name of the file containing result,
@@ -555,7 +555,10 @@ def format_record(oai_src_bibfilter,  record_to_convert):
     f = os.fdopen(file_descriptor, "w")
     f.write(record_to_convert)
     f.close()
-    command = oai_src_bibfilter + " " + file_name
+    command = oai_src_bibfilter
+    if treat_new:
+        command += " -n"
+    command += " " + file_name
     (program_input, program_output, program_err) = os.popen3(command)
     program_input.close()
     out = program_output.read(-1)
@@ -568,7 +571,7 @@ def format_record(oai_src_bibfilter,  record_to_convert):
     else:
         return (None, out, err)
 
-def harvest_postprocress_record(oai_src_id, record_id):
+def harvest_postprocress_record(oai_src_id, record_id, treat_new = False):
     oai_src = get_oai_src(oai_src_id)
     oai_src_baseurl = oai_src[0][2]
     oai_src_prefix = oai_src[0][3]
@@ -584,7 +587,7 @@ def harvest_postprocress_record(oai_src_id, record_id):
         if result == None:
             return (False, "Error during converting")
     if oai_src_post.find("f") != -1:
-        fres = format_record(oai_src_bibfilter, result)
+        fres = format_record(oai_src_bibfilter, result, treat_new = treat_new)
         fname = fres[0]
         if fname != None:
             f = open(fname, "r")
@@ -631,7 +634,7 @@ def perform_request_preview_harvested_xml(oai_src_id = None, record_id = None):
 def perform_request_reharvest_records(oai_src_id = None, ln = CFG_SITE_LANG, confirm=0, record_ids = None):
     for record_id in record_ids:
         # 1) Run full harvesing process as in the preview scenarios
-        transformed = harvest_postprocress_record(oai_src_id, record_id)[1]
+        transformed = harvest_postprocress_record(oai_src_id, record_id, treat_new = True)[1]
         upload_record(transformed, "-r", oai_src_id)
     result = bibharvest_templates.tmpl_print_info(ln, "Submitted for inserion into the database")
     result += generate_oai_source_operations(ln, oai_src_id)

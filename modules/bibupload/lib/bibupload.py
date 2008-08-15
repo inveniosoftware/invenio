@@ -1792,7 +1792,7 @@ def task_run_core():
 
 def log_record_harvesting(oai_rec_id, oai_src_id):
     if oai_src_id != -1:
-        query = """INSERT INTO  oaiHARVESTINGLOG (oai_src_id, harvesting_date, oai_record_id)
+        query = """INSERT INTO  oaiHARVESTLOG (id_oaiHARVEST, date_inserted, oai_id)
             VALUES (%s, NOW(), %s)"""
         try:
             row_id  = run_sql(query, (oai_src_id, oai_rec_id))
