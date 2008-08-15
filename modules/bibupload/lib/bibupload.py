@@ -192,6 +192,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             error = None
             write_message("   -Check if reference tags exist: DONE", verbose=2)
 
+    record_deleted_p = False
     if opt_mode == 'insert' or \
     (opt_mode == 'replace_or_insert' and rec_id is None):
         insert_mode_p = True
@@ -244,133 +245,142 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         # record (they will be populated later (if needed) during
         # stage 4 below):
         delete_bibrec_bibxxx(rec_old, rec_id)
+        record_deleted_p = True
         write_message("   -Clean bibrec_bibxxx: DONE", verbose=2)
     write_message("   -Stage COMPLETED", verbose=2)
 
-    # Have a look if we have FMT tags
-    write_message("Stage 1: Start (Insert of FMT tags if exist).", verbose=2)
-    if opt_stage_to_start_from <= 1 and \
-        extract_tag_from_record(record, 'FMT') is not None:
-        record = insert_fmt_tags(record, rec_id, opt_mode)
-        if record is None:
-            write_message("   Stage 1 failed: Error while inserting FMT tags",
-                        verbose=1, stream=sys.stderr)
-            return (1, int(rec_id))
-        elif record == 0:
-            # Mode format finished
-            stat['nb_records_updated'] += 1
-            return (0, int(rec_id))
-        write_message("   -Stage COMPLETED", verbose=2)
-    else:
-        write_message("   -Stage NOT NEEDED", verbose=2)
-
-    # Have a look if we have FFT tags
-    write_message("Stage 2: Start (Process FFT tags if exist).", verbose=2)
-    record_had_FFT = False
-    if opt_stage_to_start_from <= 2 and \
-        extract_tag_from_record(record, 'FFT') is not None:
-        record_had_FFT = True
-        if not writing_rights_p():
-            write_message("   Stage 2 failed: Error no rights to write fulltext files",
-                verbose=1, stream=sys.stderr)
-            task_update_status("ERROR")
-            sys.exit(1)
-        try:
-            record = elaborate_fft_tags(record, rec_id, opt_mode)
-        except Exception, e:
-            register_exception()
-            write_message("   Stage 2 failed: Error while elaborating FFT tags: %s" % e,
-                verbose=1, stream=sys.stderr)
-            return (1, int(rec_id))
-        if record is None:
-            write_message("   Stage 2 failed: Error while elaborating FFT tags",
-                        verbose=1, stream=sys.stderr)
-            return (1, int(rec_id))
-        write_message("   -Stage COMPLETED", verbose=2)
-    else:
-        write_message("   -Stage NOT NEEDED", verbose=2)
-
-    # Have a look if we have FFT tags
-    write_message("Stage 2B: Start (Synchronize 8564 tags).", verbose=2)
-    if opt_stage_to_start_from <= 2 and (record_had_FFT or extract_tag_from_record(record, '856') is not None):
-        try:
-            record = synchronize_8564(rec_id, record, record_had_FFT)
-        except Exception, e:
-            register_exception()
-            write_message("   Stage 2B failed: Error while synchronizing 8564 tags: %s" % e,
-                verbose=1, stream=sys.stderr)
-            return (1, int(rec_id))
-        if record is None:
-            write_message("   Stage 2B failed: Error while synchronizing 8564 tags",
-                        verbose=1, stream=sys.stderr)
-            return (1, int(rec_id))
-        write_message("   -Stage COMPLETED", verbose=2)
-    else:
-        write_message("   -Stage NOT NEEDED", verbose=2)
-
-    # Update of the BibFmt
-    write_message("Stage 3: Start (Update bibfmt).", verbose=2)
-    if opt_stage_to_start_from <= 3:
-        # format the single record as xml
-        rec_xml_new = record_xml_output(record)
-        # Update bibfmt with the format xm of this record
-        if opt_mode != 'format':
-            error = update_bibfmt_format(rec_id, rec_xml_new, 'xm')
-        if error == 1:
-            write_message("   Failed: error during update_bibfmt_format",
-                        verbose=1, stream=sys.stderr)
-            return (1, int(rec_id))
-        # archive MARCXML format of this record for version history purposes:
-        if opt_mode != 'format':
-            error = archive_marcxml_for_history(rec_id)
-            if error == 1:
-                write_message("   Failed to archive MARCXML for history",
-                              verbose=1, stream=sys.stderr)
+    try:
+        # Have a look if we have FMT tags
+        write_message("Stage 1: Start (Insert of FMT tags if exist).", verbose=2)
+        if opt_stage_to_start_from <= 1 and \
+            extract_tag_from_record(record, 'FMT') is not None:
+            record = insert_fmt_tags(record, rec_id, opt_mode)
+            if record is None:
+                write_message("   Stage 1 failed: Error while inserting FMT tags",
+                            verbose=1, stream=sys.stderr)
                 return (1, int(rec_id))
-            else:
-                write_message("   -Archived MARCXML for history : DONE", verbose=2)
-        write_message("   -Stage COMPLETED", verbose=2)
-
-    # Update the database MetaData
-    write_message("Stage 4: Start (Update the database with the metadata).",
-                verbose=2)
-    if opt_stage_to_start_from <= 4:
-        if opt_mode == 'insert' or \
-        opt_mode == 'replace' or \
-        opt_mode == 'replace_or_insert' or \
-        opt_mode == 'append' or \
-        opt_mode == 'correct' or \
-        opt_mode == 'reference':
-            update_database_with_metadata(record, rec_id, oai_rec_id, oai_src_id)
+            elif record == 0:
+                # Mode format finished
+                stat['nb_records_updated'] += 1
+                return (0, int(rec_id))
+            write_message("   -Stage COMPLETED", verbose=2)
         else:
-            write_message("   -Stage NOT NEEDED in mode %s" % opt_mode,
-                        verbose=2)
-        write_message("   -Stage COMPLETED", verbose=2)
-    else:
-        write_message("   -Stage NOT NEEDED", verbose=2)
+            write_message("   -Stage NOT NEEDED", verbose=2)
 
-    # Finally we update the bibrec table with the current date
-    write_message("Stage 5: Start (Update bibrec table with current date).",
-                verbose=2)
-    if opt_stage_to_start_from <= 5 and \
-    opt_notimechange == 0 and \
-    not insert_mode_p:
-        now = convert_datestruct_to_datetext(time.localtime())
-        write_message("   -Retrieved current localtime: DONE", verbose=2)
-        update_bibrec_modif_date(now, rec_id)
-        write_message("   -Stage COMPLETED", verbose=2)
-    else:
-        write_message("   -Stage NOT NEEDED", verbose=2)
+        # Have a look if we have FFT tags
+        write_message("Stage 2: Start (Process FFT tags if exist).", verbose=2)
+        record_had_FFT = False
+        if opt_stage_to_start_from <= 2 and \
+            extract_tag_from_record(record, 'FFT') is not None:
+            record_had_FFT = True
+            if not writing_rights_p():
+                write_message("   Stage 2 failed: Error no rights to write fulltext files",
+                    verbose=1, stream=sys.stderr)
+                task_update_status("ERROR")
+                sys.exit(1)
+            try:
+                record = elaborate_fft_tags(record, rec_id, opt_mode)
+            except Exception, e:
+                register_exception()
+                write_message("   Stage 2 failed: Error while elaborating FFT tags: %s" % e,
+                    verbose=1, stream=sys.stderr)
+                return (1, int(rec_id))
+            if record is None:
+                write_message("   Stage 2 failed: Error while elaborating FFT tags",
+                            verbose=1, stream=sys.stderr)
+                return (1, int(rec_id))
+            write_message("   -Stage COMPLETED", verbose=2)
+        else:
+            write_message("   -Stage NOT NEEDED", verbose=2)
 
-    # Increase statistics
-    if insert_mode_p:
-        stat['nb_records_inserted'] += 1
-    else:
-        stat['nb_records_updated'] += 1
+        # Have a look if we have FFT tags
+        write_message("Stage 2B: Start (Synchronize 8564 tags).", verbose=2)
+        if opt_stage_to_start_from <= 2 and (record_had_FFT or extract_tag_from_record(record, '856') is not None):
+            try:
+                record = synchronize_8564(rec_id, record, record_had_FFT)
+            except Exception, e:
+                register_exception()
+                write_message("   Stage 2B failed: Error while synchronizing 8564 tags: %s" % e,
+                    verbose=1, stream=sys.stderr)
+                return (1, int(rec_id))
+            if record is None:
+                write_message("   Stage 2B failed: Error while synchronizing 8564 tags",
+                            verbose=1, stream=sys.stderr)
+                return (1, int(rec_id))
+            write_message("   -Stage COMPLETED", verbose=2)
+        else:
+            write_message("   -Stage NOT NEEDED", verbose=2)
 
-    # Upload of this record finish
-    write_message("Record "+str(rec_id)+" DONE", verbose=1)
-    return (0, int(rec_id))
+        # Update of the BibFmt
+        write_message("Stage 3: Start (Update bibfmt).", verbose=2)
+        if opt_stage_to_start_from <= 3:
+            # format the single record as xml
+            rec_xml_new = record_xml_output(record)
+            # Update bibfmt with the format xm of this record
+            if opt_mode != 'format':
+                error = update_bibfmt_format(rec_id, rec_xml_new, 'xm')
+            if error == 1:
+                write_message("   Failed: error during update_bibfmt_format",
+                            verbose=1, stream=sys.stderr)
+                return (1, int(rec_id))
+            # archive MARCXML format of this record for version history purposes:
+            if opt_mode != 'format':
+                error = archive_marcxml_for_history(rec_id)
+                if error == 1:
+                    write_message("   Failed to archive MARCXML for history",
+                                verbose=1, stream=sys.stderr)
+                    return (1, int(rec_id))
+                else:
+                    write_message("   -Archived MARCXML for history : DONE", verbose=2)
+            write_message("   -Stage COMPLETED", verbose=2)
+
+        # Update the database MetaData
+        write_message("Stage 4: Start (Update the database with the metadata).",
+                    verbose=2)
+        if opt_stage_to_start_from <= 4:
+            if opt_mode == 'insert' or \
+            opt_mode == 'replace' or \
+            opt_mode == 'replace_or_insert' or \
+            opt_mode == 'append' or \
+            opt_mode == 'correct' or \
+            opt_mode == 'reference':
+                update_database_with_metadata(record, rec_id, oai_rec_id, oai_src_id)
+                record_deleted_p = False
+            else:
+                write_message("   -Stage NOT NEEDED in mode %s" % opt_mode,
+                            verbose=2)
+            write_message("   -Stage COMPLETED", verbose=2)
+        else:
+            write_message("   -Stage NOT NEEDED", verbose=2)
+
+        # Finally we update the bibrec table with the current date
+        write_message("Stage 5: Start (Update bibrec table with current date).",
+                    verbose=2)
+        if opt_stage_to_start_from <= 5 and \
+        opt_notimechange == 0 and \
+        not insert_mode_p:
+            now = convert_datestruct_to_datetext(time.localtime())
+            write_message("   -Retrieved current localtime: DONE", verbose=2)
+            update_bibrec_modif_date(now, rec_id)
+            write_message("   -Stage COMPLETED", verbose=2)
+        else:
+            write_message("   -Stage NOT NEEDED", verbose=2)
+
+        # Increase statistics
+        if insert_mode_p:
+            stat['nb_records_inserted'] += 1
+        else:
+            stat['nb_records_updated'] += 1
+
+        # Upload of this record finish
+        write_message("Record "+str(rec_id)+" DONE", verbose=1)
+        return (0, int(rec_id))
+    finally:
+        if record_deleted_p:
+            ## BibUpload has failed living the record deleted. We should
+            ## back the original record then.
+            update_database_with_metadata(rec_old, rec_id, oai_rec_id, oai_src_id)
+            write_message("   Restored original record", verbose=1, stream=sys.stderr)
 
 def print_out_bibupload_statistics():
     """Print the statistics of the process"""
@@ -1724,6 +1734,7 @@ def writing_rights_p():
         register_exception()
         return False
     return True
+
 def extract_oai_id(record):
     # Scanning the 035 field searching for oai ids.
     values = record_get_field_values(record, '035', ' ', ' ', 'a')
