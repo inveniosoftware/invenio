@@ -25,7 +25,6 @@
 AC_INIT(cds-invenio, 0.99.1.20080811, cds.support@cern.ch)
 AM_INIT_AUTOMAKE(cds-invenio, 0.99.1.20080811)
 
-
 ## By default we shall install into /opt/cds-invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with
 ## the localstatedir hack below.)
@@ -47,7 +46,7 @@ else
    AC_PATH_PROG(MYSQL, mysql)
    if test -z "$MYSQL"; then
       AC_MSG_ERROR([
-      MySQL command-line client was not found in your PATH.  
+      MySQL command-line client was not found in your PATH.
       Please install it first.
       Available from <http://mysql.com/>.])
    fi
@@ -128,6 +127,28 @@ if test -z "$TAR"; then
    <ftp://prep.ai.mit.edu/pub/gnu/tar/>.])
 fi
 
+## Check for wget:
+AC_PATH_PROG(WGET, wget)
+if test -z "$WGET"; then
+   AC_MSG_WARN([
+   wget was not found in your PATH.  It is used for the fulltext file
+   retrieval.
+   You can continue without it but we recomend you to install it first
+   and to rerun the configure script.  wget is available from
+   <http://www.gnu.org/software/wget/>.])
+fi
+
+## Check for md5sum:
+AC_PATH_PROG(MD5SUM, md5sum)
+if test -z "$MD5SUM"; then
+   AC_MSG_WARN([
+   md5sum was not found in your PATH.  It is used for the fulltext file
+   checksum verification.
+   You can continue without it but we recomend you to install it first
+   and to rerun the configure script.  md5sum is available from
+   <http://www.gnu.org/software/coreutils/>.])
+fi
+
 ## Check for ps2pdf:
 AC_PATH_PROG(PS2PDF, ps2pdf)
 if test -z "$PS2PDF"; then
@@ -157,7 +178,7 @@ AC_PATH_PROG(PDFTK, pdftk)
 if test -z "$PDFTK"; then
    AC_MSG_WARN([
    pdftk was not found in your PATH.  It is used for the fulltext file stamping.
-   You can continue without it but you may miss this feature of CDS Invenio.  
+   You can continue without it but you may miss this feature of CDS Invenio.
    We recomend you to install it first and to rerun the configure
    script.  pdftk is available from <http://www.accesspdf.com/pdftk/>.
    ])
@@ -638,13 +659,13 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/websubmit/web/Makefile \
 	  modules/websubmit/web/admin/Makefile \
 	  modules/bibcirculation/Makefile \
-          modules/bibcirculation/doc/Makefile \
-          modules/bibcirculation/doc/admin/Makefile \
-          modules/bibcirculation/doc/hacking/Makefile \
-          modules/bibcirculation/lib/Makefile \
-          modules/bibcirculation/web/Makefile \
-          modules/bibcirculation/web/admin/Makefile \
-          modules/bibcirculation/bin/Makefile \
+	  modules/bibcirculation/doc/Makefile \
+	  modules/bibcirculation/doc/admin/Makefile \
+	  modules/bibcirculation/doc/hacking/Makefile
+	  modules/bibcirculation/lib/Makefile \
+	  modules/bibcirculation/web/Makefile \
+	  modules/bibcirculation/web/admin/Makefile \
+	  modules/bibcirculation/bin/Makefile \
 	  ])
 
 ## Finally, write output files:
