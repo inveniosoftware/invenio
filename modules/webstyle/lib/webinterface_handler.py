@@ -258,6 +258,16 @@ def create_handler(root):
         if 'profile' in args:
             if not isUserSuperAdmin(collect_user_info(req)):
                 return _handler(req)
+
+            if 'memory' in args['profile']:
+                gc.set_debug(gc.DEBUG_LEAK)
+                ret = _handler(req)
+                req.write("\n<pre>%s</pre>" % gc.garbage)
+                gc.collect()
+                req.write("\n<pre>%s</pre>" % gc.garbage)
+                gc.set_debug(0)
+                return ret
+
             from cStringIO import StringIO
             try:
                 import pstats
@@ -296,18 +306,8 @@ def create_handler(root):
                     pstats.Stats(filename, stream=strstream).strip_dirs().sort_stats(sort_type).print_stats()
                     profile_dump.append(strstream.getvalue())
             profile_dump = '\n'.join(profile_dump)
-            profile_dump += '\nYou can use profile=%s' % existing_sorts
+            profile_dump += '\nYou can use profile=%s or profile=memory' % existing_sorts
             req.write("\n<pre>%s</pre>" % profile_dump)
-            return ret
-        elif 'garbage' in args:
-            if not isUserSuperAdmin(collect_user_info(req)):
-                return _handler(req)
-            gc.set_debug(gc.DEBUG_LEAK)
-            ret = _handler(req)
-            req.write("\n<pre>%s</pre>" % gc.garbage)
-            gc.collect()
-            req.write("\n<pre>%s</pre>" % gc.garbage)
-            gc.set_debug(0)
             return ret
         else:
             return _handler(req)
@@ -331,24 +331,25 @@ def create_handler(root):
             os.environ["HTTP_USER_AGENT"] = req.headers_in.get('User-Agent', '')
 
             guest_p = isGuestUser(getUid(req))
-            if guest_p:
-                cache_control = "public"
+
+            uri = req.uri
+            if uri == '/':
+                path = ['']
             else:
-                cache_control = "private"
-            req.headers_out['Cache-Control'] = cache_control
-            ## See <http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.44>
-            req.headers_out['Vary'] = 'Cookie,ETag,Cache-Control'
+                ## Let's collapse multiple slashes into a single /
+                uri = re_slashes.sub('/', uri)
+                path = uri[1:].split('/')
+
+            if uri.startswith('/yours') or not guest_p:
+                req.headers_out['Cache-Control'] = 'private, no-cache, no-store, max-age=0, must-revalidate'
+                req.headers_out['Pragma'] = 'no-cache'
+                req.headers_out['Vary'] = '*'
+            else:
+                req.headers_out['Cache-Control'] = 'public, max-age=3600'
+                req.headers_out['Vary'] = 'Cookie, ETag, Cache-Control'
+
             try:
-                uri = req.uri
-                if uri == '/':
-                    path = ['']
-                else:
-                    ## Let's collapse multiple slashes into a single /
-                    uri = re_slashes.sub('/', uri)
-                    path = uri[1:].split('/')
-
                 return root._traverse(req, path)
-
             except TraversalError:
                 return apache.HTTP_NOT_FOUND
             except apache.SERVER_RETURN:
@@ -369,7 +370,6 @@ def create_handler(root):
             # Serve an error by default.
             return apache.HTTP_NOT_FOUND
         finally:
-            t1 = time.time()
             if hasattr(req, 'cds_wrapper'):
                 ## The session handler saves for caching a request_wrapper
                 ## in req.
