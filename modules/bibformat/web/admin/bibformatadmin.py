@@ -1128,6 +1128,10 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG
         left_sides = bibformat_dblayer.kb_key_rules(key)
         right_sides = bibformat_dblayer.kb_value_rules(value)
 
+        if (len(right_sides) == 0) and (len(left_sides) == 0):
+            #no problems, just add in current
+            forcetype="curr"
+
         if forcetype and not forcetype=="no":
             print "forcing data input"
         else:
