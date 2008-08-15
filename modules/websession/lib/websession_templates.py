@@ -540,7 +540,7 @@ class Template:
                           </table>""" % (url, title, body)
         return out
 
-    def tmpl_account_page(self, ln, accBody, baskets, alerts, searches, messages, loans, groups, administrative):
+    def tmpl_account_page(self, ln, warnings, warning_list, accBody, baskets, alerts, searches, messages, groups, administrative):
         """
         Displays the your account page
 
@@ -567,6 +567,10 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = ""
+
+        if warnings == "1":
+            out += self.tmpl_general_warnings(warning_list)
+
         out += self.tmpl_account_template(_("Your Account"), accBody, ln, '/youraccount/edit?ln=%s' % ln)
         out += self.tmpl_account_template(_("Your Messages"), messages, ln, '/yourmessages/display?ln=%s' % ln)
 
@@ -2175,3 +2179,48 @@ class Template:
                 'x_nb_admin': nb_admin_groups,
                 'x_nb_member': nb_member_groups}
         return out
+
+    def tmpl_general_warnings(self, warning_list, ln=CFG_SITE_LANG):
+        """
+        display information to the admin user about possible
+        ssecurity problems in the system.
+        """
+        message = ""
+        _ = gettext_set_language(ln)
+
+        #Try and connect to the mysql database with the default invenio password
+        if warning_list[0] == 1:
+            message += "<p><font color=red>"
+            message += _("Warning : The password set for MySQL is the same as the default CDS-Invenio password. For security purposes, you might want to change the password.")
+            message += "</font></p>"
+
+        #Try and connect to the invenio database with the default invenio password
+        if warning_list[1] == 1:
+            message += "<p><font color=red>"
+            message += _("Warning : The password set for the CDS Invenio database is the same as the default CDS-Invenio password. For security purposes, you might want to change the password.")
+            message += "</font></p>"
+
+        #Check if the admin password is empty
+        if warning_list[2] == 1:
+            message += "<p><font color=red>"
+            message += _("Warning : The password set for the CDS-Invenio admin user is currently empty. For security purposes, it is strongly recommended that you add a password.")
+            message += "</font></p>"
+
+        #Check if the admin email has been changed from the default
+        if warning_list[3] == 1:
+            message += "<p><font color=red>"
+            message += _("Warning : The email address set for support email is currently set to cds.support@cern.ch . It is recommended that you change this to change this to your own address.")
+            message += "</font></p>"
+
+        if warning_list[4] == 1:
+            message += "<p><font color=red>"
+            message += _("A newer version of CDS-Invenio is available for download. Please visit ")
+            message += "<a href=\"http://cdsware.cern.ch/invenio/download.html\">cdsware</a>"
+            message += "</font></p>"
+
+        if warning_list[5] == 1:
+            message += "<p><font color=red>"
+            message += _("Cannot download release notes from http://cdsware.cern.ch/, please check your internet connection")
+            message += "</font></p>"
+
+        return message
