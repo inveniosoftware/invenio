@@ -43,6 +43,7 @@ from invenio.config import \
     CFG_SITE_LANG, \
     CFG_SITE_NAME, \
     CFG_SITE_SUPPORT_EMAIL, \
+    CFG_SITE_ADMIN_EMAIL, \
     CFG_SITE_SECURE_URL, \
     CFG_SITE_URL
 import invenio.access_control_engine as acce
@@ -401,7 +402,7 @@ def perform_resetdefaultsettings(req, superusers=[], confirm=0):
     enter as many e-mail addresses you want and press <strong>reset</strong>.<br />
     <strong>confirm reset settings</strong> when you have added enough e-mails.<br />
     <strong>%s</strong> is added as default.
-    </p>""" % (SUPERADMINROLE, CFG_SITE_SUPPORT_EMAIL)
+    </p>""" % (SUPERADMINROLE, CFG_SITE_ADMIN_EMAIL)
 
     # add more superusers
     output += """
@@ -480,7 +481,7 @@ def perform_adddefaultsettings(req, superusers=[], confirm=0):
     enter as many e-mail addresses you want and press <strong>add</strong>.<br />
     <strong>confirm add settings</strong> when you have added enough e-mails.<br />
     <strong>%s</strong> is added as default.
-    </p>""" % (SUPERADMINROLE, CFG_SITE_SUPPORT_EMAIL)
+    </p>""" % (SUPERADMINROLE, CFG_SITE_ADMIN_EMAIL)
 
     # add more superusers
     output += """
@@ -3488,16 +3489,16 @@ def main():
                     authorization_msg="WebAccess Administration",
                     authorization_action="cfgwebaccess")
             if options['reset'] and options['demo']:
-                acca.acc_reset_default_settings([CFG_SITE_SUPPORT_EMAIL], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
+                acca.acc_reset_default_settings([CFG_SITE_ADMIN_EMAIL], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
                 print "Reset default demo site settings."
             elif options['reset']:
-                acca.acc_reset_default_settings([CFG_SITE_SUPPORT_EMAIL])
+                acca.acc_reset_default_settings([CFG_SITE_ADMIN_EMAIL])
                 print "Reset default settings."
             elif options['add'] and options['demo']:
-                acca.acc_add_default_settings([CFG_SITE_SUPPORT_EMAIL], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
+                acca.acc_add_default_settings([CFG_SITE_ADMIN_EMAIL], DEF_DEMO_USER_ROLES, DEF_DEMO_ROLES, DEF_DEMO_AUTHS)
                 print "Added default demo site settings."
             elif options['add']:
-                acca.acc_add_default_settings([CFG_SITE_SUPPORT_EMAIL])
+                acca.acc_add_default_settings([CFG_SITE_ADMIN_EMAIL])
                 print "Added default settings."
             if options['compile']:
                 repair_role_definitions()
