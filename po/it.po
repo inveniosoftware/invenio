@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-07-10 12:19+0200\n"
-"PO-Revision-Date: 2008-07-01 19:12+0200\n"
+"PO-Revision-Date: 2008-08-18 09:41+0200\n"
 "Last-Translator: Samuele Kaplun <Samuele.Kaplun@cern.ch>\n"
 "Language-Team: IT <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1422,14 +1422,15 @@ msgid "Done"
 msgstr "Fatto"
 
 #: modules/bibedit/lib/bibedit_templates.py:275
-#, fuzzy
 msgid "Add another subfield"
-msgstr "Aggiungi sotto-campo"
+msgstr "Aggiungi un altro sotto-campo"
 
 #: modules/bibedit/lib/bibedit_templates.py:282
 msgid ""
 "Tags and values should be filled before pressing Done or Add another subfield"
 msgstr ""
+"I tag e i valori dovrebbero essere riempiti prima di premere Fatto o "
+"Aggiungi un altro sotto-campo"
 
 #: modules/bibedit/lib/bibedit_templates.py:356
 msgid "Move up"
@@ -1538,12 +1539,12 @@ msgid "No"
 msgstr "No"
 
 #: modules/bibedit/lib/bibedit_templates.py:563
-#, fuzzy, python-format
+#, python-format
 msgid ""
 "Do you really want to revert to revision %(revdate)s of record #%(recid)s?"
 msgstr ""
-"Sei veramente sicuro di voler caricare la revisione %(revdate)s del record #%"
-"(recid)s?"
+"Sei veramente sicuro di voler ritornare alla versione %(revdate)s del record "
+"#%(recid)s?"
 
 #: modules/bibedit/lib/bibedit_templates.py:566
 #, python-format
