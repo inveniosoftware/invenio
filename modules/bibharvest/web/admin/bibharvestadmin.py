@@ -24,6 +24,7 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 import invenio.bibharvestadminlib as bhc
+import datetime
 from invenio.webpage import page, create_error_box
 from invenio.config import CFG_SITE_NAME, CFG_SITE_URL, CFG_SITE_LANG
 from invenio.dbquery import Error
@@ -190,8 +191,13 @@ def testsource(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, record_id = No
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
 
-def viewhistory(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, year = None, month = None):
+def viewhistory(req, oai_src_id=0, ln=CFG_SITE_LANG, confirm=0, year = None, month = None):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
+    d_date = datetime.datetime.now()
+    if year == None:
+        year = d_date.year
+    if month == None:
+        month = d_date.month
     try:
         uid = getUid(req)
     except Error, e:
@@ -208,8 +214,45 @@ def viewhistory(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, year = None, 
                     body=bhc.perform_request_viewhistory(oai_src_id=oai_src_id,
                                                     ln=ln,
                                                     confirm=confirm,
-                                                    year = year,
-                                                    month = month),
+                                                    year = int(year),
+                                                    month = int(month)),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+def viewhistoryday(req, oai_src_id=0, ln=CFG_SITE_LANG, confirm=0, year = None, month = None, day = None, start = 0):
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
+    d_date = datetime.datetime.now()
+    if year == None:
+        year = d_date.year
+    if month == None:
+        month = d_date.month
+    if day == None:
+        day = d_date.day
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
+    auth = bhc.check_user(req,'cfgbibharvest')
+    if not auth[0]:
+        return page(title="View OAI source harvesting history",
+                    body=bhc.perform_request_viewhistoryday(oai_src_id=oai_src_id,
+                                                    ln=ln,
+                                                    confirm=confirm,
+                                                    year = int(year),
+                                                    month = int(month),
+                                                    day = int(day),
+                                                    start = int(start)),
                     uid=uid,
                     language=ln,
                     req=req,

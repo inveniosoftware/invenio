@@ -1690,8 +1690,6 @@ text-decoration:underline;
    padding-left: 30px;
 }
 
-/* end of cds.css */
-
 
 /*Table columns*/
 .oddtablecolumn
@@ -1708,6 +1706,10 @@ text-decoration:underline;
     min-height: 10px;
     max-height: 300px;
     height: auto;
+    width: 600px;
+}
+.normalframe
+{
     width: 600px;
 }
 .brtable
@@ -1904,3 +1906,6 @@ text-decoration:underline;
         font-variant: small-caps;
         padding-bottom:2px;
         }
+
+
+/* end of cds.css */

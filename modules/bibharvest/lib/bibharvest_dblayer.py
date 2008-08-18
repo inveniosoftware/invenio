@@ -30,9 +30,40 @@ class HistoryEntry:
         self.id = id
 
 def get_history_entries(oai_src_id, monthdate):
-    query = "SELECT date_inserted, oai_id  from oaiHARVESTLOG WHERE id_oaiHARVEST = %s AND MONTH(date_inserted)=" + str(monthdate.month) + " AND YEAR(date_inserted) = " + str(monthdate.year) + " ORDER BY date_inserted"
-    res = run_sql(query,(str(oai_src_id)))
+    query = "SELECT date_inserted, oai_id  from oaiHARVESTLOG WHERE id_oaiHARVEST = %s AND MONTH(date_inserted) = %s AND YEAR(date_inserted) = %s ORDER BY date_inserted"
+    res = run_sql(query,(str(oai_src_id), str(monthdate.month), str(monthdate.year)))
     result = []
     for entry in res:
         result.append(HistoryEntry(entry[0],str(entry[1])))
     return result
+
+def get_history_entries_for_day(oai_src_id, date, limit = -1, start = 0):
+    query = "SELECT date_inserted, oai_id  from oaiHARVESTLOG WHERE id_oaiHARVEST = %s AND MONTH(date_inserted) = %s AND YEAR(date_inserted) = %s  AND DAY(date_inserted) = %s ORDER BY date_inserted"
+    if limit > 0:
+        query += " LIMIT " + str(start) + "," + str(limit)
+    res = run_sql(query,(str(oai_src_id), str(date.month), str(date.year), str(date.day)))
+    result = []
+    for entry in res:
+        result.append(HistoryEntry(entry[0], str(entry[1])))
+    return result
+
+def get_month_inserts_number(oai_src_id, date):
+    # Function which returns number of inserts which took place in given month (splited into days)
+    # @param oai_src_id - harvesting source identifier
+    # @result Dictionary of harvesting statistics - keys describe days. values - numbers of inserted recordds
+    query = "SELECT DAY(date_inserted), COUNT(*) FROM oaiHARVESTLOG WHERE id_oaiHARVEST = %s AND MONTH(date_inserted) = %s AND YEAR(date_inserted)= %s GROUP BY DAY(date_inserted)"
+    query_result = run_sql(query, (str(oai_src_id), str(date.month), str(date.year)))
+    result = {}
+    for entry in query_result:
+        result[int(entry[0])] = int(entry[1])
+    return result
+
+def get_day_inserts_number(oai_src_id, date):
+    # Function which returns number of inserts which took place in given day
+    # @param oai_src_id - harvesting source identifier
+    # @result Number of inserts during the given day
+    query = "SELECT COUNT(*) FROM oaiHARVESTLOG WHERE id_oaiHARVEST = %s AND MONTH(date_inserted) = %s AND YEAR(date_inserted)= %s AND DAY(date_inserted) = %s"
+    query_result = run_sql(query, (str(oai_src_id), str(date.month), str(date.year), str(date.day)))
+    for entry in query_result:
+        return int(entry[0])
+    return 0

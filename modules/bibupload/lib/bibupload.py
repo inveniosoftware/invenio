@@ -1754,8 +1754,12 @@ def writing_rights_p():
     return True
 
 def extract_oai_id(record):
-    # Scanning the 035 field searching for oai ids.
-    values = record_get_field_values(record, '035', ' ', ' ', 'a')
+    # Searching for oai ids.
+    tag = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0] + CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[1] + CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[2]
+    ind1 = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3]
+    ind2 = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4]
+    subfield = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5]
+    values = record_get_field_values(record, tag, ind1, ind2, subfield)
     oai_id_regexp = "oai[a-zA-Z0-9/.:]+"
     for id in values:
         if re.match(oai_id_regexp, str(id).strip()) != None:
@@ -1820,7 +1824,7 @@ def task_run_core():
     return not stat['nb_errors'] >= 1
 
 def log_record_harvesting(oai_rec_id, oai_src_id):
-    if oai_src_id != -1:
+    if oai_src_id != -1 and oai_src_id != None and oai_rec_id != "" and oai_rec_id != None:
         query = """INSERT INTO  oaiHARVESTLOG (id_oaiHARVEST, date_inserted, oai_id)
             VALUES (%s, NOW(), %s)"""
         try:

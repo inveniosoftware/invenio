@@ -258,6 +258,7 @@ class Template:
             result += "</tr>"
         result += "</table>"
         return result
+
     def tmpl_table_begin(self, title_row = None):
         result = "<table class=\"brtable\">"
         if title_row != None:
@@ -266,8 +267,10 @@ class Template:
                 result += "<td><b>"+ header + "</b></td>"
             result += "</tr>"
         return result
+
     def tmpl_table_row_begin(self):
         return "<tr>"
+
     def tmpl_table_output_cell(self, content, colspan=1, rowspan=1, cssclass=None):
         result = "<td"
         if colspan != 1:
@@ -278,15 +281,39 @@ class Template:
             result += " class = \"" + cssclass + "\""
         result += ">" + content + "</td>"
         return result
+
     def tmpl_table_row_end(self):
         return "</tr>\n"
+
     def tmpl_table_end(self):
         return "</table>\n"
 
+    def tmpl_day_details_link(self, ln, date, oai_src_id):
+        return self.tmpl_link_with_args(ln, "/admin/bibharvest/bibharvestadmin.py/viewhistoryday", "View all entries...", [["ln", ln], ["oai_src_id", str(oai_src_id)], ["year", str(date.year)], ["month", str(date.month)], ["day",  str(date.day)], ["start", str(0)]])
+
+    def tmpl_table_output_day_cell(self, date, number_of_records, oai_src_id, ln, show_details = False):
+        inner_text = "<b>" + str(date.year) + "-" + str(date.month) + "-" + str(date.day)
+        inner_text += " ( "+ str(number_of_records) + " entries ) &nbsp;&nbsp;&nbsp;"
+        if show_details:
+            inner_text +=  self.tmpl_day_details_link(ln, date, oai_src_id)
+        inner_text += "</b>"
+        return self.tmpl_table_output_cell(inner_text, colspan=2)
+
+    def tmpl_table_output_day_details_cell(self, ln, date, oai_src_id):
+        inner_text = self.tmpl_day_details_link(ln, date, oai_src_id)
+        return self.tmpl_table_output_cell(inner_text, colspan=3)
+
     def tmpl_output_checkbox(self, name, id, value):
         return "<input type=\"checkbox\" id=\"" + id + "\"name=\"" + name + "\" value=\"" + value + "\" />"
+
     def tmpl_output_scrollable_frame(self, content):
         output = """<div class="scrollableframe" heigh="40">"""
+        output += content
+        output += "</div>"
+        return output
+
+    def tmpl_output_normal_frame(self, content):
+        output = """<div class="normalframe" heigh="40">"""
         output += content
         output += "</div>"
         return output
@@ -314,12 +341,14 @@ class Template:
         result += "<b>Current month: " + str(current_year) + "-" + str(current_month) + "</b>"
         result += """&nbsp;&nbsp;&nbsp;&nbsp;""" + nexturl
         return result
+
     def tmpl_output_selection_bar(self):
         result = ""
         result += "<button class=\"adminbutton\" onClick=\"return selectAll()\">Select all</button>\n"
         result += "<button class=\"adminbutton\" onClick=\"return removeSelection()\">Remove selection</button>\n"
         result += "<button class=\"adminbutton\" onClick=\"return invertSelection()\">Invert selection</button>\n"
         return result
+
     def tmpl_output_history_javascript_functions(self):
         # Writes necessary javascript functions
         result = '<script type="text/javascript">'
@@ -360,10 +389,10 @@ class Template:
       }
       return false
    }
-
    """
         result += "</script>"
         return result
+
     def tmpl_output_identifiers(self, identifiers):
         # Creates the Javascript array of identifiers.
         # @param identifiers is a dictionary containning day as a key and list of identifiers as a value
@@ -386,6 +415,7 @@ class Template:
         result += "    }\n"
         result += '</script>'
         return result
+
     def tmpl_output_select_day_button(self, day):
-        result = """<button class="adminbutton" onClick="return selectDay(""" + str(day)+ """)">Select day</button>"""
+        result = """<button class="adminbutton" onClick="return selectDay(""" + str(day)+ """)">Select</button>"""
         return result
