@@ -191,9 +191,29 @@ def superuser_account_warnings():
 
     #Check for a new release of CDS Invenio
     try:
-        webFile = urllib.urlopen("http://cdsware.cern.ch/invenio/RELEASE")
-        web_version = (webFile.readline()).split(".")
+        find = re.compile('CDS Invenio v[0-9]+.[0-9]+.[0-9]+ is released')
+
+        webFile = urllib.urlopen("http://cdsware.cern.ch/download/RELEASE-NOTES")
+
+        temp = ""
+        version = ""
+        version1 = ""
+        while 1:
+            temp = webFile.readline()
+            match1 = find.match(temp)
+            try:
+                version = match1.group()
+                break
+            except:
+                pass
+            if not temp:
+                break
+
         webFile.close()
+        submatch = re.compile('[0-9]+.[0-9]+.[0-9]+')
+        version1 = submatch.search(version)
+        web_version = version1.group().split(".")
+
         local_version = CFG_VERSION.split(".")
 
         if web_version[0] > local_version[0]:
@@ -204,6 +224,7 @@ def superuser_account_warnings():
             warning_array[4] = 1
     except:
         warning_array[5] = 1 #Cant download release notes
+
 
     return warning_array
 
