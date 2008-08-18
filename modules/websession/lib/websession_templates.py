@@ -2189,36 +2189,38 @@ class Template:
         _ = gettext_set_language(ln)
 
         #Try and connect to the mysql database with the default invenio password
-        if warning_list[0] == 1:
+        if "warning_mysql_password_equal_to_invenio_password" in warning_list:
             message += "<p><font color=red>"
             message += _("Warning : The password set for MySQL is the same as the default CDS-Invenio password. For security purposes, you might want to change the password.")
             message += "</font></p>"
 
-        #Try and connect to the invenio database with the default invenio password
-        if warning_list[1] == 1:
+		#Try and connect to the invenio database with the default invenio password
+        if "warning_invenio_password_equal_to_default" in warning_list:
             message += "<p><font color=red>"
             message += _("Warning : The password set for the CDS Invenio database is the same as the default CDS-Invenio password. For security purposes, you might want to change the password.")
             message += "</font></p>"
 
         #Check if the admin password is empty
-        if warning_list[2] == 1:
+        if "warning_empty_admin_password" in warning_list:
             message += "<p><font color=red>"
             message += _("Warning : The password set for the CDS-Invenio admin user is currently empty. For security purposes, it is strongly recommended that you add a password.")
             message += "</font></p>"
 
         #Check if the admin email has been changed from the default
-        if warning_list[3] == 1:
+        if "warning_site_support_email_equal_to_default" in warning_list:
             message += "<p><font color=red>"
             message += _("Warning : The email address set for support email is currently set to cds.support@cern.ch . It is recommended that you change this to change this to your own address.")
             message += "</font></p>"
 
-        if warning_list[4] == 1:
+        #Check for a new release
+        if "note_new_release_available" in warning_list:
             message += "<p><font color=red>"
             message += _("A newer version of CDS-Invenio is available for download. Please visit ")
             message += "<a href=\"http://cdsware.cern.ch/invenio/download.html\">cdsware</a>"
             message += "</font></p>"
 
-        if warning_list[5] == 1:
+        #Error downloading release notes
+        if "error_cannot_download_release_notes" in warning_list:
             message += "<p><font color=red>"
             message += _("Cannot download release notes from http://cdsware.cern.ch/, please check your internet connection")
             message += "</font></p>"
