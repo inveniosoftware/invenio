@@ -36,7 +36,8 @@ from md5 import md5
 from invenio.config import CFG_OAI_ID_FIELD, CFG_PREFIX, CFG_SITE_URL, CFG_TMPDIR, \
      CFG_WEBSUBMIT_FILEDIR, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
-     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG
 from invenio import bibupload
 from invenio.search_engine import print_record
 from invenio.dbquery import run_sql
@@ -1112,6 +1113,7 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
          <controlfield tag="003">SzGeCERN</controlfield>
          <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
           <subfield code="%(extoaiidsubfieldcode)s">extoaiid1</subfield>
+          <subfield code="%(extoaisrcsubfieldcode)s">extoaisrc1</subfield>
          </datafield>
          <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
           <subfield code="0">extoaiid2</subfield>
@@ -1130,11 +1132,12 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
                'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and \
                             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or " ",
                'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               'extoaisrcsubfieldcode' : CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5:6],
                }
         self.hm_testrec1 = """
         001__ 123456789
         003__ SzGeCERN
-        %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$%(extoaiidsubfieldcode)sextoaiid1
+        %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$%(extoaisrcsubfieldcode)sextoaisrc1$$%(extoaiidsubfieldcode)sextoaiid1
         %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$0extoaiid2
         100__ $$aBar, Baz$$uFoo
         245__ $$aOn the quux and huux 1
@@ -1142,12 +1145,14 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
                'extoaiidind1': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4],
                'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5],
                'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               'extoaisrcsubfieldcode' : CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5:6],
                }
         self.xm_testrec1_to_update = """
         <record>
          <controlfield tag="003">SzGeCERN</controlfield>
          <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
           <subfield code="%(extoaiidsubfieldcode)s">extoaiid1</subfield>
+          <subfield code="%(extoaisrcsubfieldcode)s">extoaisrc1</subfield>
          </datafield>
          <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
           <subfield code="0">extoaiid2</subfield>
@@ -1166,6 +1171,7 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
                'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and \
                             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or " ",
                'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               'extoaisrcsubfieldcode' : CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5:6],
                }
         self.xm_testrec1_updated = """
         <record>
@@ -1173,6 +1179,7 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
          <controlfield tag="003">SzGeCERN</controlfield>
          <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
           <subfield code="%(extoaiidsubfieldcode)s">extoaiid1</subfield>
+          <subfield code="%(extoaisrcsubfieldcode)s">extoaisrc1</subfield>
          </datafield>
          <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
           <subfield code="0">extoaiid2</subfield>
@@ -1191,11 +1198,12 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
                'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and \
                             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or " ",
                'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               'extoaisrcsubfieldcode' : CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5:6],
                }
         self.hm_testrec1_updated = """
         001__ 123456789
         003__ SzGeCERN
-        %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$%(extoaiidsubfieldcode)sextoaiid1
+        %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$%(extoaisrcsubfieldcode)sextoaisrc1$$%(extoaiidsubfieldcode)sextoaiid1
         %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$0extoaiid2
         100__ $$aBar, Baz$$uFoo
         245__ $$aOn the quux and huux 1 Updated
@@ -1203,6 +1211,7 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
                'extoaiidind1': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4],
                'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5],
                'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               'extoaisrcsubfieldcode' : CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5:6],
                }
         self.xm_testrec2 = """
         <record>
@@ -1210,6 +1219,7 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
          <controlfield tag="003">SzGeCERN</controlfield>
          <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
           <subfield code="%(extoaiidsubfieldcode)s">extoaiid2</subfield>
+          <subfield code="%(extoaisrcsubfieldcode)s">extoaisrc1</subfield>
          </datafield>
          <datafield tag="%(extoaiidtag)s" ind1="%(extoaiidind1)s" ind2="%(extoaiidind2)s">
           <subfield code="0">extoaiid1</subfield>
@@ -1228,11 +1238,12 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
                'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and \
                             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or " ",
                'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               'extoaisrcsubfieldcode' : CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5:6],
                }
         self.hm_testrec2 = """
         001__ 987654321
         003__ SzGeCERN
-        %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$%(extoaiidsubfieldcode)sextoaiid2
+        %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$%(extoaisrcsubfieldcode)sextoaisrc1$$%(extoaiidsubfieldcode)sextoaiid2
         %(extoaiidtag)s%(extoaiidind1)s%(extoaiidind2)s $$0extoaiid1
         100__ $$aBar, Baz$$uFoo
         245__ $$aOn the quux and huux 2
@@ -1240,6 +1251,7 @@ class BibUploadRecordsWithEXTOAIIDTest(unittest.TestCase):
                'extoaiidind1': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4],
                'extoaiidind2': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5],
                'extoaiidsubfieldcode': CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6],
+               'extoaisrcsubfieldcode' : CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5:6],
                }
 
     def test_insert_the_same_extoaiid_record(self):

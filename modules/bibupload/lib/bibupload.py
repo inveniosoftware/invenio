@@ -70,6 +70,7 @@ from invenio.config import CFG_OAI_ID_FIELD, CFG_SITE_URL, \
      CFG_BIBUPLOAD_REFERENCE_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, \
      CFG_BIBUPLOAD_STRONG_TAGS
 
 from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
@@ -83,7 +84,8 @@ from invenio.bibrecord import create_records, \
                               record_xml_output, \
                               record_get_field_instances, \
                               record_get_field_values, \
-                              field_get_subfield_values
+                              field_get_subfield_values, \
+                              field_get_subfield_instances
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
 from invenio.bibformat import format_record
@@ -483,31 +485,43 @@ def find_record_from_sysno(sysno):
     else:
         return None
 
-def find_record_from_extoaiid(extoaiid):
+def find_records_from_extoaiid(extoaiid, extoaisrc):
     """
-    Try to find record in the database from the external EXTOAIID number.
-    Return record ID if found, None otherwise.
+    Try to find records in the database from the external EXTOAIID number.
+    Return list of record ID if found, None otherwise.
     """
     bibxxx = 'bib'+CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:2]+'x'
+    bibxxx2 = 'bib'+CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[0:2]+'x'
     bibrec_bibxxx = 'bibrec_' + bibxxx
+    bibrec_bibxxx2 = 'bibrec_' + bibxxx2
+    ret = intbitset()
     try:
-        res = run_sql("""SELECT bb.id_bibrec FROM %(bibrec_bibxxx)s AS bb,
+        id_bibrecs = intbitset(run_sql("""SELECT bb.id_bibrec FROM %(bibrec_bibxxx)s AS bb,
             %(bibxxx)s AS b WHERE b.tag=%%s AND b.value=%%s
             AND bb.id_bibxxx=b.id""" % \
                       {'bibxxx': bibxxx,
                        'bibrec_bibxxx': bibrec_bibxxx},
-                      (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, extoaiid,))
+                      (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, extoaiid,)))
+        write_message('Partially found %s for extoaiid="%s"' % (id_bibrecs, extoaiid), verbose=9)
+        for id_bibrec in id_bibrecs:
+            res = run_sql("""SELECT bb.id_bibrec FROM %(bibrec_bibxxx)s AS bb,
+                %(bibxxx)s AS b WHERE bb.id_bibrec=%%s AND b.tag=%%s AND
+                b.value=%%s AND bb.id_bibxxx=b.id""" % \
+                    {'bibxxx' : bibxxx2,
+                    'bibrec_bibxxx' : bibrec_bibxxx2},
+                    (id_bibrec, CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, extoaisrc,))
+            if res:
+                write_message('Found %s for extsrcid="%s"' % (res, extoaiid), verbose=9)
+                ret.add(res[0][0])
+        return intbitset(ret)
     except Error, error:
-        write_message("   Error during find_record_from_extoaiid(): %s "
+        write_message("   Error during find_records_from_extoaiid(): %s "
             % error, verbose=1, stream=sys.stderr)
-    if res:
-        return res[0][0]
-    else:
-        return None
+        return intbitset()
 
 def find_record_from_oaiid(oaiid):
     """
-    Try to find record in the database from the OAI ID number.
+    Try to find record in the database from the OAI ID number and OAI SRC.
     Return record ID if found, None otherwise.
     """
     bibxxx = 'bib'+CFG_OAI_ID_FIELD[0:2]+'x'
@@ -598,28 +612,32 @@ def retrieve_rec_id(record, opt_mode):
 
     if rec_id is None:
         # 2nd step we look for the external OAIID
-        extoaiids = record_get_field_values(record,
+        extoai_fields = record_get_field_instances(record,
             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3],
             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] != "_" and \
             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3:4] or "",
             CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] != "_" and \
-            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or "",
-            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6])
-        if extoaiids:
-            extoaiid = extoaiids[0] # there should be only one external OAI ID
-            write_message("   -Checking if EXTOAIID " + extoaiid + \
-                          " exists in the database", verbose=9)
-            # try to find the corresponding rec id from the database
-            rec_id = find_record_from_extoaiid(extoaiid)
-            if rec_id is not None:
-                # rec_id found
-                pass
-            else:
-                # The record doesn't exist yet. We will try to check
-                # OAI id later.
-                write_message("   -Tag EXTOAIID value not found in database.",
-                              verbose=9)
-                rec_id = None
+            CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4:5] or "")
+        if extoai_fields:
+            for field in extoai_fields:
+                extoaiid = field_get_subfield_values(field, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6])
+                extoaisrc = field_get_subfield_values(field, CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5:6])
+                if extoaiid and extoaisrc:
+                    extoaiid = extoaiid[0]
+                    extoaisrc = extoaisrc[0]
+                    write_message("   -Checking if EXTOAIID %s (%s) exists in the database" % (extoaiid, extoaisrc), verbose=9)
+                    # try to find the corresponding rec id from the database
+                    rec_ids = find_records_from_extoaiid(extoaiid, extoaisrc)
+                    if rec_ids:
+                        # rec_id found
+                        rec_id = rec_ids.pop()
+                        break
+                    else:
+                        # The record doesn't exist yet. We will try to check
+                        # OAI id later.
+                        write_message("   -Tag EXTOAIID value not found in database.",
+                                    verbose=9)
+                        rec_id = None
         else:
             write_message("   -Tag EXTOAIID not found in the xml marc file.", verbose=9)
 
