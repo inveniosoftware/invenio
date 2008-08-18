@@ -23,6 +23,8 @@ import sys
 import string
 import cgi
 import re
+import MySQLdb
+import urllib
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_ACCOUNTS, \
@@ -30,8 +32,11 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_SUPPORT_EMAIL, \
+     CFG_SITE_ADMIN_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_VERSION, \
+     CFG_DATABASE_HOST, \
+     CFG_DATABASE_NAME, \
      CFG_SITE_URL
 from invenio.access_control_config import CFG_EXTERNAL_AUTHENTICATION, SUPERADMINROLE
 from invenio.webpage import page
