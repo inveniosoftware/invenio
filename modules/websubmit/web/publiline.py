@@ -138,7 +138,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
                     language=ln,
                     req=req,
                     navmenuid='yourapprovals')
-    '''else:
+    else:
         if doctype == "":
             t = selectDoctype(ln)
         elif categ == "":
@@ -158,7 +158,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
                     uid=uid,
                     language=ln,
                     req=req,
-                    navmenuid='yourapprovals')'''
+                    navmenuid='yourapprovals')
 
 def selectDoctype(ln = CFG_SITE_LANG):
     res = run_sql("select DISTINCT doctype from sbmAPPROVAL")
