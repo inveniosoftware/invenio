@@ -43,7 +43,7 @@ jsMath.Easy = {
   //  1 means use the autoload plug-in to decide if jsMath should be loaded
   //  0 means always load jsMath
   //
-  autoload: 0,
+  autoload: 1,
 
   //
   //  Setting any of these will cause the tex2math plugin to be used
