@@ -19,7 +19,7 @@ msgstr ""
 "Project-Id-Version: CDS-Invenio 0.99.1\n"
 "Report-Msgid-Bugs-To: cds.support@cern.ch\n"
 "POT-Creation-Date: 2008-07-10 12:19+0200\n"
-"PO-Revision-Date: 2008-08-18 07:33+0200\n"
+"PO-Revision-Date: 2008-08-18 07:39+0200\n"
 "Last-Translator: Jérôme Caffaro <jerome.caffaro@cern.ch>\n"
 "Language-Team: FR <cds.support@cern.ch>\n"
 "MIME-Version: 1.0\n"
@@ -1353,7 +1353,7 @@ msgstr "Textuel"
 #: modules/websubmit/lib/websubmit_engine.py:1017
 #: modules/websubmit/lib/websubmit_engine.py:1243
 msgid "Submit"
-msgstr "Soumission"
+msgstr "Soumettre"
 
 #: modules/bibedit/lib/bibedit_templates.py:140
 #: modules/bibformat/web/admin/bibformatadmin.py:392
