@@ -29,7 +29,8 @@ import sys
 import datetime
 from invenio.config import \
      CFG_VERSION, \
-     CFG_SITE_URL
+     CFG_SITE_URL, \
+     CFG_SITE_LANG
 from invenio.messages import gettext_set_language, language_list_long
 from invenio.htmlutils import nmtoken_from_string
 
@@ -288,19 +289,19 @@ class Template:
     def tmpl_table_end(self):
         return "</table>\n"
 
-    def tmpl_day_details_link(self, ln, date, oai_src_id):
-        return self.tmpl_link_with_args(ln, "/admin/bibharvest/bibharvestadmin.py/viewhistoryday", "View all entries...", [["ln", ln], ["oai_src_id", str(oai_src_id)], ["year", str(date.year)], ["month", str(date.month)], ["day",  str(date.day)], ["start", str(0)]])
+    def tmpl_history_day_details_link(self, ln, date, oai_src_id):
+        return self.tmpl_link_with_args(ln, "/admin/bibharvest/bibharvestadmin.py/viewhistoryday", "View next entries...", [["ln", ln], ["oai_src_id", str(oai_src_id)], ["year", str(date.year)], ["month", str(date.month)], ["day",  str(date.day)], ["start", str(10)]])
 
-    def tmpl_table_output_day_cell(self, date, number_of_records, oai_src_id, ln, show_details = False):
-        inner_text = "<b>" + str(date.year) + "-" + str(date.month) + "-" + str(date.day)
+    def tmpl_history_table_output_day_cell(self, date, number_of_records, oai_src_id, ln, show_details = False):
+        inner_text = "<b>" + self.format_date(date)
         inner_text += " ( "+ str(number_of_records) + " entries ) &nbsp;&nbsp;&nbsp;"
         if show_details:
-            inner_text +=  self.tmpl_day_details_link(ln, date, oai_src_id)
+            inner_text +=  self.tmpl_history_day_details_link(ln, date, oai_src_id)
         inner_text += "</b>"
         return self.tmpl_table_output_cell(inner_text, colspan=2)
 
-    def tmpl_table_output_day_details_cell(self, ln, date, oai_src_id):
-        inner_text = self.tmpl_day_details_link(ln, date, oai_src_id)
+    def tmpl_history_table_output_day_details_cell(self, ln, date, oai_src_id):
+        inner_text = self.tmpl_history_day_details_link(ln, date, oai_src_id)
         return self.tmpl_table_output_cell(inner_text, colspan=3)
 
     def tmpl_output_checkbox(self, name, id, value):
@@ -335,10 +336,11 @@ class Template:
         if next_month == 13:
             next_year += 1
             next_month = 1
+        current_date = datetime.datetime(current_year, current_month, 1)
         prevurl = self.tmpl_link_with_args(ln, "/admin/bibharvest/bibharvestadmin.py/viewhistory", "&lt;&lt; previous month", [["ln", ln], ["oai_src_id", str(oai_src_id)], ["year", str(prev_year)], ["month", str(prev_month)]])
         nexturl = self.tmpl_link_with_args(ln, "/admin/bibharvest/bibharvestadmin.py/viewhistory", "next month &gt;&gt;", [["ln", ln], ["oai_src_id", str(oai_src_id)], ["year", str(next_year)], ["month", str(next_month)]])
         result = prevurl + """&nbsp;&nbsp;&nbsp;&nbsp;"""
-        result += "<b>Current month: " + str(current_year) + "-" + str(current_month) + "</b>"
+        result += "<b>Current month: " + self.format_ym(current_date) + "</b>"
         result += """&nbsp;&nbsp;&nbsp;&nbsp;""" + nexturl
         return result
 
@@ -394,8 +396,10 @@ class Template:
         return result
 
     def tmpl_output_identifiers(self, identifiers):
-        # Creates the Javascript array of identifiers.
-        # @param identifiers is a dictionary containning day as a key and list of identifiers as a value
+        """
+        Creates the Javascript array of identifiers.
+        @param identifiers is a dictionary containning day as a key and list of identifiers as a value
+        """
         result = '<script type="text/javascript">\n'
         result += "   var identifiers = {\n"
         first = True
@@ -419,3 +423,57 @@ class Template:
     def tmpl_output_select_day_button(self, day):
         result = """<button class="adminbutton" onClick="return selectDay(""" + str(day)+ """)">Select</button>"""
         return result
+
+    def tmpl_output_menu(self, ln, oai_src_id, guideurl):
+        """
+           Function which displays menu
+        """
+        namelinked_args = []
+        namelinked_args.append(["ln", ln])
+        main_link =  self.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py", title = "main page",  args = namelinked_args)
+        namelinked_args.append(["oai_src_id", str(oai_src_id)])
+        edit_link = self.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/editsource", title = "edit", args = namelinked_args)
+        delete_link = self.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/delsource", title = "delete", args = namelinked_args)
+        test_link = self.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/testsource", title = "test", args = namelinked_args)
+        history_link = self.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/viewhistory", title = "history", args = namelinked_args)
+        harvest_link = self.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/harvest", title = "harvest", args = namelinked_args)
+        separator = "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+        menu_header = self.tmpl_draw_titlebar(ln, title = "Menu" , guideurl = guideurl)
+        # Putting everything together
+        result = menu_header + main_link
+        if oai_src_id != None:
+            result += separator + edit_link + separator + delete_link + separator + test_link + separator + history_link + separator + harvest_link + separator
+        result += self.tmpl_print_brs(ln, 2)
+        return result
+
+    # Datetime formatting functions
+    def format_al_twodigits(self, number):
+        """
+        Converts integers to string guaranteeing that there will be at least 2 digits
+        @param number - Nuber to be formatted
+        @result - string representation with at least 2 digits
+        """
+        if number < 10:
+            return "0" + str(number)
+        else:
+            return str(number)
+
+    def format_ym(self, date):
+        """
+        formats year and month of a given date in the human-readabla format
+        @param date - date containing data to be formatted
+        @returns string representation
+        """
+        if date == None:
+            return "(None)"
+        return self.format_al_twodigits(date.year) + "-" + self.format_al_twodigits(date.month)
+
+    def format_date(self, date):
+        if date == None:
+            return "(None)"
+        return self.format_ym(date) + "-" + self.format_al_twodigits(date.day)
+
+    def format_time(self, datetime):
+        if datetime == None:
+            return "(None)"
+        return self.format_al_twodigits(datetime.hour) + ":" + self.format_al_twodigits(datetime.minute) + ":" + self.format_al_twodigits(datetime.second)

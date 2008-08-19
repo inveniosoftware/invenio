@@ -86,7 +86,7 @@ This allows fully automatised harvesting and conversion (and possibly upload) of
              <td class="admintdleft">daily</td>
              <td class="admintdleft">NULL</td>
              <td class="admintdleft">h-u</td>
-             <td class="admintdleft">edit / delete</td>
+             <td class="admintdleft">edit / delete / test / history / harvest</td>
              <td rowspan="4" style="vertical-align: bottom">
              </td>
             </tr>
@@ -99,6 +99,20 @@ There is no more validation at this stage, hence, please take extra care when ed
 OAI repositories can be removed from the database by clicking on the appropriate action button in the overview page.
 </p>
 
+<b>Testing OAI sources</b><br/>
+<p>This interface provides the possibility to test OAI harvesting settings. In order to see the harvesting and postprocessing results, administrator has to provide record identifier (insige the harvested OAI source) and click "test" button.
+After doing this, two new frames will appear.
+The upper contatins original OAI XML harvested from the source. The second contains the result of all the postprocessing activities or an error message.</p>
+
+<b>Viewing the harvesting history</b><br/>
+<p>This page allows the administrator to see which records have been recently harvested. All the data is shown in database insertion order. If there was more than 10 inserted records during a day, only first 10 will be displayed. In order to do manipulations connected with the rest, the administrator has to proceed to day details page which is available by "View next entries..." link.</p>
+<p>
+The same page provides the possibility of reharvesting the records present in the past. 
+All have to be done in order to achieve this is selecting appropriate records by checking the checkboxes on the right side of the entry and clicking "reharvest selected records" button.
+</p>
+
+<b>Harvesting particular records</b><br/>
+<p>This page provides the possibility of harvesting records manually. The administrator has to provide internal OAI source identifier. After this, record will be harvested, converted and filtered according to the source settings and scheduled to be uploaded into the database. </p>
 
 <a name="2.2"></a><h4>2.2 oaiharvest commmand-line tool</h4>
 <p>Once administrators have set up their desired OAI repositories in the database through the Admin Interface they can invoke <code>oaiharvest</code> to start up periodical harvesting.<br />
