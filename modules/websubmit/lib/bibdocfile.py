@@ -1485,7 +1485,8 @@ class BibDocFile:
             if os.path.exists(self.fullpath):
                 if random.random() < 0.25 and calculate_md5(self.fullpath) != self.checksum:
                     raise InvenioWebSubmitFileError, "File %s, version %i, for record %s is corrupted!" % (self.fullname, self.version, self.recid)
-                return stream_file(req, self.fullpath, self.fullname, self.mime, self.encoding, self.etag, self.checksum, self.fullurl)
+                stream_file(req, self.fullpath, self.fullname, self.mime, self.encoding, self.etag, self.checksum, self.fullurl)
+                raise apache.SERVER_RETURN, apache.DONE
             else:
                 raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
         else:
@@ -1697,7 +1698,8 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
 
 def stream_restricted_icon(req):
     """Return the content of the "Restricted Icon" file."""
-    return stream_file(req, '%s/img/restricted.gif' % CFG_WEBDIR)
+    stream_file(req, '%s/img/restricted.gif' % CFG_WEBDIR)
+    raise apache.SERVER_RETURN, apache.DONE
 
 def list_types_from_array(bibdocs):
     """Retrieves the list of types from the given bibdoc list."""

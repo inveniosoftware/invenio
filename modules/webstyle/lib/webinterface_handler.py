@@ -149,7 +149,7 @@ class WebInterfaceDirectory(object):
         """
         return None, path
 
-    def _traverse(self, req, path):
+    def _traverse(self, req, path, do_head=False, guest_p=True):
         """ Locate the handler of an URI by traversing the elements of
         the path."""
 
@@ -192,16 +192,21 @@ class WebInterfaceDirectory(object):
 
                 target = urlparse.urlunparse(final_parts)
                 redirect_to_url(req, target)
-        if CFG_EXTERNAL_AUTH_USING_SSO and is_over_https and isGuestUser(getUid(req)):
+        if CFG_EXTERNAL_AUTH_USING_SSO and is_over_https and guest_p:
             (iden, p_un, p_pw, msgcode) = loginUser(req, '', '', CFG_EXTERNAL_AUTH_USING_SSO)
             if len(iden)>0:
                 uid = update_Uid(req, p_un)
+                guest_p = False
 
         # Continue the traversal. If there is a path, continue
         # resolving, otherwise call the method as it is our final
         # renderer. We even pass it the parsed form arguments.
         if path:
-            return obj._traverse(req, path)
+            return obj._traverse(req, path, do_head, guest_p)
+
+        if do_head:
+            req.content_type = "text/html; charset=UTF-8"
+            raise apache.SERVER_RETURN, apache.DONE
 
         form = util.FieldStorage(req, keep_blank_values=True)
         try:
@@ -315,15 +320,13 @@ def create_handler(root):
     def _handler(req):
         """ This handler is invoked by mod_python with the apache request."""
         try:
-            if re_bibdoc_uri.match(req.uri):
-                allowed_methods = ("GET", "POST", "HEAD", "OPTIONS")
-            else:
-                allowed_methods = ("GET", "POST", "OPTIONS")
-            req.allow_methods(allowed_methods)
+            allowed_methods = ("GET", "POST", "HEAD", "OPTIONS")
+            req.allow_methods(allowed_methods, 1)
             if req.method not in allowed_methods:
                 raise apache.SERVER_RETURN, apache.HTTP_METHOD_NOT_ALLOWED
 
             if req.method == 'OPTIONS':
+                ## OPTIONS is used to now which method are allowed
                 req.headers_out['Allow'] = ', '.join(allowed_methods)
                 raise apache.SERVER_RETURN, apache.OK
 
@@ -341,6 +344,7 @@ def create_handler(root):
                 path = uri[1:].split('/')
 
             if uri.startswith('/yours') or not guest_p:
+                ## Private/personalized request should not be cached
                 req.headers_out['Cache-Control'] = 'private, no-cache, no-store, max-age=0, must-revalidate'
                 req.headers_out['Pragma'] = 'no-cache'
                 req.headers_out['Vary'] = '*'
@@ -349,26 +353,29 @@ def create_handler(root):
                 req.headers_out['Vary'] = 'Cookie, ETag, Cache-Control'
 
             try:
-                return root._traverse(req, path)
+                if req.header_only and not re_bibdoc_uri.match(req.uri):
+                    return root._traverse(req, path, True, guest_p)
+                else:
+                    ## bibdocfile have a special treatment for HEAD
+                    return root._traverse(req, path, False, guest_p)
             except TraversalError:
-                return apache.HTTP_NOT_FOUND
+                raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
             except apache.SERVER_RETURN:
                 ## This is one of mod_python way of communicating
                 raise
             except IOError, exc:
-                if 'Write failed, client closed connection' in "%s" % exc:
+                if 'Write failed, client closed connection' not in "%s" % exc:
                     ## Workaround for considering as false positive exceptions
                     ## rised by mod_python when the user close the connection
                     ## or in some other rare and not well identified cases.
-                    raise
-                else:
                     register_exception(req=req, alert_admin=True)
+                raise
             except Exception:
                 register_exception(req=req, alert_admin=True)
                 raise
 
             # Serve an error by default.
-            return apache.HTTP_NOT_FOUND
+            raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
         finally:
             if hasattr(req, 'cds_wrapper'):
                 ## The session handler saves for caching a request_wrapper
