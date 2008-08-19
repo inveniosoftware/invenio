@@ -89,12 +89,12 @@ def get_pending_loan_request(req, show=None, ln=CFG_SITE_LANG):
     return bal.get_pending_loan_request(req, show, ln)
 
 
-def item_search_result(req, p=None, f=None, ln=CFG_SITE_LANG):
+def item_search_result(req, p=None, f=None, start=None, end=None, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/item_search_result
     """
 
-    return bal.item_search_result(req, p, f, ln)
+    return bal.item_search_result(req, p, f, start, end, ln)
 
 def loan_return(req, ln=CFG_SITE_LANG):
     """
@@ -199,6 +199,15 @@ def all_requests_for_item(req, recid=None, orderby=None, ln=CFG_SITE_LANG):
 
     """
     return bal.get_all_requests_for_item(req, recid, orderby, ln)
+
+
+def all_loans_for_item(req, recid=None, ln=CFG_SITE_LANG):
+    """
+    http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/borrowers_search
+
+    """
+    return bal.all_loans_for_item(req, recid, ln)
+
 
 def get_borrower_details(req, ln=CFG_SITE_LANG, borrower_id=None):
     """
