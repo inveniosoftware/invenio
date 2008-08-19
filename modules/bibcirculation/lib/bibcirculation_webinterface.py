@@ -56,13 +56,14 @@ bibcirculation_templates = invenio.template.load('bibcirculation')
 from invenio.bibcirculation import perform_new_loan_request, \
                                    perform_new_loan_request_send, \
                                    perform_get_holdings_information, \
-                                   perform_borrower_loans
+                                   perform_borrower_loans, \
+                                   perform_loanshistoricaloverview
 
 class WebInterfaceYourLoansPages(WebInterfaceDirectory):
     """Defines the set of /yourloans pages."""
 
 
-    _exports = ['', 'display']
+    _exports = ['', 'display', 'loanshistoricaloverview']
 
     def index(self, req, form):
         """ The function called by default
@@ -105,6 +106,41 @@ class WebInterfaceYourLoansPages(WebInterfaceDirectory):
                                       ln=argd['ln'])
 
         return page(title       = _("Your Loans"),
+                    body        = body,
+                    uid         = uid,
+                    lastupdated = __lastupdated__,
+                    req         = req,
+                    language    = argd['ln'],
+                    navmenuid   = "yourloans")
+
+    def loanshistoricaloverview(self, req, form):
+        """
+
+        """
+
+        argd = wash_urlargd(form, {})
+
+        # Check if user is logged
+        uid = getUid(req)
+        if CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
+            return page_not_authorized(req, "%s/yourloans/loanshistoricaloverview" % \
+                                             (CFG_SITE_URL,),
+                                       navmenuid="yourloans")
+        elif uid == -1 or isGuestUser(uid):
+            return redirect_to_url(req, "%s/youraccount/login%s" % (
+                CFG_SITE_SECURE_URL,
+                make_canonical_urlargd({
+                    'referer' : "%s/yourloans/loanshistoricaloverview%s" % (
+                        CFG_SITE_URL,
+                        make_canonical_urlargd(argd, {})),
+                    "ln" : argd['ln']}, {})))
+
+        _ = gettext_set_language(argd['ln'])
+
+        body = perform_loanshistoricaloverview(uid=uid,
+                                               ln=argd['ln'])
+
+        return page(title       = _("Loans - historical overview"),
                     body        = body,
                     uid         = uid,
                     lastupdated = __lastupdated__,
