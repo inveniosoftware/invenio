@@ -424,7 +424,7 @@ class BibRecDocs:
         if docname is None:
             docname = decompose_file(fullpath)[1]
         bibdoc = self.get_bibdoc(docname=docname)
-        bibdoc.add_file_new_format(fullpath, description, comment)
+        bibdoc.add_file_new_format(fullpath, description=description, comment=comment)
         return bibdoc
 
     def list_latest_files(self, doctype=''):
