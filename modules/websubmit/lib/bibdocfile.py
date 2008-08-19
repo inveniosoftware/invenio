@@ -1659,7 +1659,9 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         req.encoding = encoding
         req.filename = fullname
         req.headers_out["Last-Modified"] = time.strftime('%a, %d %b %Y %X GMT', time.gmtime(mtime))
-        req.headers_out["Accept-Ranges"] = "bytes"
+        req.headers_out["Accept-Ranges"] = "none"
+        ## we can put this to bytes the day that mod_python support disabling
+        ## chunked encoding
         req.headers_out["Content-Location"] = location
         if etag is not None:
             req.headers_out["ETag"] = etag
@@ -1680,7 +1682,9 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 raise apache.SERVER_RETURN, apache.HTTP_NOT_MODIFIED
         if headers['unless-modified-since'] and headers['unless-modified-since'] < mtime:
             return normal_streaming(size)
-        if headers['range']:
+        if False and headers['range']:
+            ## We can remove the above False the day mod_python support
+            ## disabling chunked encoding.
             if headers['if-range']:
                 if etag is None or etag not in headers['if-range']:
                     return normal_streaming(size)
