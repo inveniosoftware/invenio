@@ -36,6 +36,18 @@ import datetime
 from invenio.search_engine import get_fieldvalues
 
 
+def perform_loanshistoricaloverview(uid, ln=CFG_SITE_LANG):
+    """
+    @param ln: language of the page
+    """
+
+    result = db.get_historical_overview(uid)
+
+    body = bibcirculation_templates.tmpl_loanshistoricaloverview(result=result, ln=ln)
+
+    return body
+
+
 def perform_borrower_loans(uid, barcode, borrower, ln=CFG_SITE_LANG):
     """
     @param ln: language of the page
@@ -91,15 +103,10 @@ def perform_get_holdings_information(recid, ln=CFG_SITE_LANG):
 
     nb_requests = db.get_number_requests(recid)
 
-
+    nb_copies = db.get_number_copies(recid)
 
     hold_details = db.get_holdings_details(recid)
     loan_details = db.get_loan_details(recid)
-
-    #aux = len(loan_details)
-    #raise repr(aux)
-
-    #raise repr(loan_details)
 
     if len(loan_details) != 0:
         for(barcod, stat) in loan_details:
@@ -108,19 +115,19 @@ def perform_get_holdings_information(recid, ln=CFG_SITE_LANG):
         due_date = " - "
         nb_requests = ""
     else:
-        infos.append("Sorry. Actually, all copies of this item are on loan.")
         barcode = ""
         status = "On loan"
+        title = ''.join(get_fieldvalues(recid, "245__a"))
         due_date = db.get_due_date_loan(recid)
+        infos.append('Sorry. Actually, all copies of "' + title + '" are on loan. One copy should be available on ' + due_date + '.')
         nb_requests = db.get_number_requests(recid)
-
-    #raise repr(due_date)
 
     body = bibcirculation_templates.tmpl_holdings_information(recid=recid,
                                                               status=status,
                                                               barcode=barcode,
                                                               hold_details=hold_details,
                                                               nb_requests=nb_requests,
+                                                              nb_copies=nb_copies,
                                                               due_date=due_date,
                                                               infos=infos,
                                                               ln=ln)
