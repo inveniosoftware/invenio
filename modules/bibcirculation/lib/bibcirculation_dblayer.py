@@ -428,10 +428,12 @@ def get_all_requests():
                             DATE_FORMAT(lr.request_date_to,'%Y-%m-%d')
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER
+                     WHERE  bor.id = lr.id_crcBORROWER and lr.status!='done'
                             """)
 
     return res
+
+
 
 def get_all_requests_for_item(recid):
     """
@@ -445,7 +447,7 @@ def get_all_requests_for_item(recid):
                             DATE_FORMAT(lr.request_date_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER and lr.id_bibrec=%s
+                     WHERE  bor.id = lr.id_crcBORROWER and lr.id_bibrec=%s and lr.status!='done'
                      """, (recid, ))
 
     return res
@@ -463,7 +465,7 @@ def get_all_requests_for_item_order_by_status(recid):
                             DATE_FORMAT(lr.request_date_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER and lr.id_bibrec=%s ORDER BY status
+                     WHERE  bor.id = lr.id_crcBORROWER and lr.id_bibrec=%s and lr.status!='done' ORDER BY status
                      """, (recid, ))
 
     return res
@@ -480,7 +482,7 @@ def get_all_requests_for_item_order_by_name(recid):
                             DATE_FORMAT(lr.request_date_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER and lr.id_bibrec=%s ORDER BY name
+                     WHERE  bor.id = lr.id_crcBORROWER and lr.id_bibrec=%s and lr.status!='done' ORDER BY name
                      """, (recid, ))
 
     return res
@@ -497,7 +499,7 @@ def get_all_requests_order_by_status():
                             DATE_FORMAT(lr.request_date_to,'%Y-%m-%d')
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER ORDER BY status
+                     WHERE  bor.id = lr.id_crcBORROWER and lr.status!='done' ORDER BY status
                             """)
 
     return res
@@ -513,7 +515,7 @@ def get_all_requests_order_by_name():
                             DATE_FORMAT(lr.request_date_to,'%Y-%m-%d')
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER ORDER BY name
+                     WHERE  bor.id = lr.id_crcBORROWER and lr.status!='done' ORDER BY name
                             """)
 
     return res
@@ -531,7 +533,7 @@ def get_all_requests_order_by_item():
                             DATE_FORMAT(lr.request_date_to,'%Y-%m-%d')
                      FROM   crcLOANREQUEST lr,
                             crcBORROWER bor
-                     WHERE  bor.id = lr.id_crcBORROWER ORDER BY id_bibrec
+                     WHERE  bor.id = lr.id_crcBORROWER and lr.status!='done' ORDER BY id_bibrec
                             """)
 
     return res
@@ -645,7 +647,7 @@ def  get_borrower_loan_details(uid):
                          l.status,
                          l.type
                   from crcLOAN l, crcITEM it
-                  where l.barcode=it.barcode and id_crcBORROWER=%s
+                  where l.barcode=it.barcode and id_crcBORROWER=%s and l.status!='returned'
     """, (uid, ))
 
     return res
@@ -662,7 +664,7 @@ def get_borrower_request_details(uid):
                             DATE_FORMAT(lr.request_date_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.request_date_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr
-                     WHERE  lr.id_crcBORROWER =%s
+                     WHERE  lr.id_crcBORROWER =%s and lr.status!='done'
                             """, (uid, ))
 
     return res
@@ -678,7 +680,7 @@ def get_borrower_request_details_order_by_item(uid):
                             DATE_FORMAT(lr.request_date_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.request_date_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr
-                     WHERE  lr.id_crcBORROWER =%s ORDER BY id_bibrec
+                     WHERE  lr.id_crcBORROWER =%s and lr.status!='done' ORDER BY id_bibrec
                             """, (uid, ))
 
     return res
@@ -695,7 +697,7 @@ def get_borrower_request_details_order_by_status(uid):
                             DATE_FORMAT(lr.request_date_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.request_date_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr
-                     WHERE  lr.id_crcBORROWER =%s ORDER BY status
+                     WHERE  lr.id_crcBORROWER =%s and lr.status!='done' ORDER BY status
                             """, (uid, ))
 
     return res
@@ -712,7 +714,7 @@ def get_borrower_request_details_order_by_from(uid):
                             DATE_FORMAT(lr.request_date_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.request_date_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr
-                     WHERE  lr.id_crcBORROWER =%s ORDER BY request_date_from
+                     WHERE  lr.id_crcBORROWER =%s and lr.status!='done' ORDER BY request_date_from
                             """, (uid, ))
 
     return res
@@ -729,7 +731,7 @@ def get_borrower_request_details_order_by_to(uid):
                             DATE_FORMAT(lr.request_date_from,'%%Y-%%m-%%d'),
                             DATE_FORMAT(lr.request_date_to,'%%Y-%%m-%%d')
                      FROM   crcLOANREQUEST lr
-                     WHERE  lr.id_crcBORROWER =%s ORDER BY request_date_to
+                     WHERE  lr.id_crcBORROWER =%s and lr.status!='done' ORDER BY request_date_to
                             """, (uid, ))
 
     return res
@@ -751,9 +753,37 @@ def new_loan(borrower_id, id_bibrec, barcode,
 
     return res
 
+def get_all_loans_for_item(recid):
+    """
+    @param recid: recID - CDS Invenio record identifier
+    """
+
+    res = run_sql(
+    """
+    select bor.id,
+           bor.name,
+           it.id_bibrec,
+           l.barcode,
+           DATE_FORMAT(l.loaned_on,'%%Y-%%m-%%d'),
+           DATE_FORMAT(l.returned_on,'%%Y-%%m-%%d'),
+           DATE_FORMAT(l.due_date,'%%Y-%%m-%%d'),
+           l.number_of_renewals,
+           l.overdue_letter_number,
+           l.overdue_letter_date,
+           l.status
+    from crcLOAN l, crcBORROWER bor, crcITEM it
+    where l.id_crcBORROWER = bor.id
+          and l.barcode=it.barcode
+          and l.id_bibrec=%s
+          and l.status!='returned'
+    """, (recid, ))
+
+    return res
+
 def get_all_loans():
     """
     """
+
     res = run_sql(
     """
     select bor.id,
@@ -768,7 +798,9 @@ def get_all_loans():
            l.overdue_letter_date,
            l.status
     from crcLOAN l, crcBORROWER bor, crcITEM it
-    where l.id_crcBORROWER = bor.id and l.barcode=it.barcode;
+    where l.id_crcBORROWER = bor.id
+          and l.barcode=it.barcode
+          and l.status!='returned'
     """)
 
     return res
@@ -791,7 +823,7 @@ def get_all_expired_loans():
            l.status
     from crcLOAN l, crcBORROWER bor, crcITEM it
     where l.id_crcBORROWER = bor.id and
-          l.barcode=it.barcode and l.status='expired';
+          l.barcode=it.barcode and l.status='expired' ;
     """)
 
     return res
@@ -903,3 +935,26 @@ def get_borrowerID(name):
                       where name=%s """, (name, ))
 
     return res [0][0]
+
+def update_barcode_on_crcloanrequest(barcode, check_id):
+    """
+    """
+
+    run_sql("""update crcLOANREQUEST
+               set barcode = %s
+               where id = %s
+            """, (barcode, check_id))
+
+def get_historical_overview(uid):
+    """
+    """
+
+    res = run_sql("""select id_bibrec,
+                            DATE_FORMAT(loaned_on,'%%Y-%%m-%%d'),
+                            returned_on,
+                            number_of_renewals
+                     from crcLOAN
+                     where id_crcBORROWER = %s and status = "returned";
+                  """, (uid, ))
+
+    return res
