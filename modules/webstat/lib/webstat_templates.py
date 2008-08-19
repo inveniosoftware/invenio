@@ -269,6 +269,15 @@ class Template:
                     cel3.innerHTML = '%s';
                     row.appendChild(cel3);
                     body.appendChild(row);
+
+                    // Change arguments
+                    arguments = document['customevent']['cols' + num]
+                    if (col_select[1] == 0) {
+                        value = document['customevent']['ids'].value;
+                    } else {
+                        value = document['customevent']['ids'][num].value;
+                    }
+                    _change_select_options(arguments[arguments.length -1], get_argument_list(value), '')
                 } """ % (sels_col[2].replace("' + col + '", "' + num + '"),
                         sels_col[3].replace("' + col + '", "' + num + '"))
         formheader += """
@@ -302,15 +311,20 @@ class Template:
                     }
                 }
 
-                function changed_customevent(select,num){
+                function changed_customevent(select, num){
                     if (col_select[1] == 0) {
                         value = select.value;
                     } else {
                         value = select[num].value;
                     }
+                    list = get_argument_list(value);
                     select_list = (col_select[num] > 1);
+                    change_select_options(document['customevent']['cols' + num], select_list, list, '');
+                }
+
+                function get_argument_list(value) {
                     if (value == "") {
-                        change_select_options(document['customevent']['cols' + num], select_list, ['Choose CustomEvent',''], '');"""
+                        return ['Choose CustomEvent',''];"""
         for id,cols in options['cols'].items():
             if id not in ['__header', '__none']:
                 str_cols = "[' - select %s', ''," % options['cols']['__header']
@@ -319,8 +333,7 @@ class Template:
                 str_cols = str_cols[:-1] + ']'
                 formheader += """
                     } else if (value == "%s") {
-                        change_select_options(document['customevent']['cols' + num], select_list, %s, '');""" \
-                        % (id, str_cols)
+                        return %s;""" % (id, str_cols)
         formheader += """
                     }
                 }
