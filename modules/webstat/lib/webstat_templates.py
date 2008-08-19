@@ -186,8 +186,13 @@ class Template:
         """
         Generates a FORM box with dropdowns for customevents.
 
-        @param options: { parameter name: [(argument internal, argument full)]}
-        @type options: { str: [(str, str)]}
+        @param options: { parameter name: (header,  [(argument internal, argument full)]) or
+                                          {param father: [(argument internal, argument full)]}}
+                        The dictionary is for options that are dependient of other.
+                        It's use for 'cols'
+                        With "param father"="__header" the headers
+                        With "param father"="__none" indicate the arguments by default
+        @type options: { str: (str, [(str, str)]|{str: [(str, str)]})}
 
         @param choosed: The selected parameters, and its values.
         @type choosed: { str: str }
@@ -197,27 +202,48 @@ class Template:
 
         # Create the headers using the options permutation
         headers = [(options['timespan'][0], options['format'][0]),
-                   (options['ids'][0], "", options['cols'][0], "value")]
+                   (options['ids'][0], "", options['cols']['__header'], "value")]
 
         # Create all SELECT boxes
-        sels = []
-        for order in [['timespan', 'format'], ['ids', 'cols']]:
-            sels.append([self._tmpl_select_box(options[param][1],           # SELECT box data
+        sels = [[],[]]
+        for param in ['timespan', 'format']:
+            sels[0].append(self._tmpl_select_box(options[param][1],        # SELECT box data
                                           " - select " + options[param][0], # first item info
                                           param,                            # name
                                           choosed[param],                   # selected value (perhaps several)
                                           type(choosed[param]) is list,     # multiple box?
-                                          ln=ln)
-                    for param in order])
-        sels[1][1] = sels[1][1].replace("cols", "cols0")
-        sels[1].insert(1, "")
+                                          ln=ln))
+        sels[1].append(self._tmpl_select_box(options['ids'][1],
+                                        " - select " + options['ids'][0],
+                                        'ids',
+                                        choosed['ids'],
+                                        type(choosed['ids']) is list,
+                                        attribute='onChange="javascript: changed_customevent(customevent[\'ids\'],0);"',
+                                        ln=ln))
+        sels[1].append("")
+        if choosed['ids']:
+            sels[1].append(self._tmpl_select_box(options['cols'][choosed['ids']],
+                                            " - select " + options['cols']['__header'],
+                                            'cols',
+                                            choosed['cols'],
+                                            type(choosed['cols']) is list,
+                                            ln=ln))
+        else:
+            sels[1].append(self._tmpl_select_box(options['cols']['__none'],
+                                            "Choose CustomEvent",
+                                            'cols',
+                                            choosed['cols'],
+                                            type(choosed['cols']) is list,
+                                            ln=ln))
+        sels[1][2] = sels[1][2].replace("cols", "cols0")
         sels[1].append("<input name=\"col_value0\">")
 
         # javascript for add col selectors
         sels_col = []
-        sels_col.append(sels[1][0])
+        sels_col.append(self._tmpl_select_box(options['ids'][1], " - select " + options['ids'][0],'ids', "", False,
+                                            attribute='onChange="javascript: changed_customevent(customevent[\\\'ids\\\'],\' + col + \');"',ln=ln))
         sels_col.append(sels[1][1])
-        sels_col.append(self._tmpl_select_box(options['cols'][1], " - select " + options['cols'][0],
+        sels_col.append(self._tmpl_select_box(options['cols']['__none'], "Choose CustomEvent",
                                             'cols\' + col + \'', "", False, ln=ln))
         sels_col.append("<input name=\"col_value' + col + '\">")
         col_table = self._tmpl_box("", "", ["cols' + col + '"], headers[1:], [sels_col],
@@ -225,7 +251,9 @@ class Template:
         col_table = col_table.replace('\n','')
         formheader = """<script type="text/javascript">
                 var col = 1;
+                var col_select = new Array(1,0)
                 function addcol(id, num){
+                    col_select[num]++;
                     var table = document.getElementById(id);
                     var body = table.getElementsByTagName('tbody')[0];
                     var row = document.createElement('tr');
@@ -245,16 +273,61 @@ class Template:
                         sels_col[3].replace("' + col + '", "' + num + '"))
         formheader += """
                 function addblock() {
+                    col_select[col] = 1;
                     var ni = document.getElementById('block');
                     var newdiv = document.createElement('div'+col);
                     newdiv.innerHTML = '%s';
                     ni.appendChild(newdiv);
                     col = col + 1;
+                }""" % col_table
+        formheader += """
+                function change_select_options(selectList, isList, optionArray, chooseDefault) {
+                    if (isList) {
+                        for (var select = 0; select < selectList.length; select++) {
+                            _change_select_options(selectList[select], optionArray, chooseDefault);
+                        }
+                    } else {
+                        _change_select_options(selectList, optionArray, chooseDefault);
+                    }
                 }
-        </script>""" % col_table
+
+                function _change_select_options(select, optionArray, chooseDefault) {
+                    select.options.length = 0;
+                    for (var option = 0; option*2 < optionArray.length - 1; option++) {
+                        if (chooseDefault == optionArray[option*2+1]) {
+                            select.options[option] = new Option(optionArray[option*2], optionArray[option*2+1], true, true);
+                        } else {
+                            select.options[option] = new Option(optionArray[option*2], optionArray[option*2+1]);
+                        }
+                    }
+                }
+
+                function changed_customevent(select,num){
+                    if (col_select[1] == 0) {
+                        value = select.value;
+                    } else {
+                        value = select[num].value;
+                    }
+                    select_list = (col_select[num] > 1);
+                    if (value == "") {
+                        change_select_options(document['customevent']['cols' + num], select_list, ['Choose CustomEvent',''], '');"""
+        for id,cols in options['cols'].items():
+            if id not in ['__header', '__none']:
+                str_cols = "[' - select %s', ''," % options['cols']['__header']
+                for internal,full in cols:
+                    str_cols += "'%s','%s'," % (full,internal)
+                str_cols = str_cols[:-1] + ']'
+                formheader += """
+                    } else if (value == "%s") {
+                        change_select_options(document['customevent']['cols' + num], select_list, %s, '');""" \
+                        % (id, str_cols)
+        formheader += """
+                    }
+                }
+            </script>"""
 
         # Create the FORM's header
-        formheader += """<form method="get">
+        formheader += """<form method="get" name="customevent">
         <input type="hidden" name="ln"value="%s" />""" % ln
 
         # Create all footers
@@ -347,7 +420,7 @@ class Template:
 
         return out
 
-    def _tmpl_select_box(self, iterable, explaination, name, preselected, multiple=False, ln=CFG_SITE_LANG):
+    def _tmpl_select_box(self, iterable, explaination, name, preselected, multiple=False, attribute="", ln=CFG_SITE_LANG):
         """
         Generates a HTML SELECT drop-down menu.
 
@@ -364,10 +437,16 @@ class Template:
                             preselected. Blank or empty list for none.
         @type preselected: str | []
 
+        @param attribute: Optionally add attributes to the select tag
+        @type attribute: str
+
         @param multiple: Optionally sets the SELECT box to accept multiple entries.
         @type multiple: bool
         """
-        sel = """<select name="%s">""" % name
+        if attribute:
+            sel = """<select name="%s" %s>""" % (name, attribute)
+        else:
+            sel = """<select name="%s">""" % name
 
         if multiple is True:
             sel = sel.replace("<select ", """<select multiple="multiple" size="5" """)

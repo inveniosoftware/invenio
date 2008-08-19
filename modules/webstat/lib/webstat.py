@@ -663,12 +663,15 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
     @type req:
     """
     # Get all the option lists: { parameter name: [(argument internal name, argument full name)]}
+    cols_dict = _get_customevent_cols()
+    cols_dict['__header'] = 'Argument'
+    cols_dict['__none'] = []
     options = { 'ids': ('Custom event', _get_customevents()),
                 'timespan': ('Time span', _get_timespans()),
                 'format': ('Output format', _get_formats(True)),
-                'cols': ('Argument', _get_customevent_cols()) }
+                'cols': cols_dict }
     # Build a dictionary for the selected parameters: { parameter name: argument internal name }
-    choosed = { 'ids': "", 'timespan': args['timespan'], 'format': args['format'], 'cols': "" }
+    choosed = { 'ids': "", 'timespan': args['timespan'], 'format': args['format'], 'cols': '' }
     if args['ids']:
         choosed['ids'] = args['ids'][0]
     # Send to template to prepare event customization FORM box
@@ -898,20 +901,22 @@ def _get_customevent_cols(id=""):
     """
     List of all the diferent name of columns in customevents.
 
-    @return: [(internal name, readable name)]
-    @type: [(str, str)]
+    @return: {id: [(internal name, readable name)]}
+    @type: {str: [(str, str)]}
     """
-    sql_str = "SELECT cols FROM staEVENT"
+    sql_str = "SELECT id,cols FROM staEVENT"
     sql_param = []
     if id:
         sql_str += "WHERE id = %s"
         sql_param.append(id)
-    cols = []
+    cols = {}
     for x in run_sql(sql_str, sql_param):
         if x[0]:
-            cols.extend(cPickle.loads(x[0]))
-
-    return [ (name, name) for name in set(cols) ]
+            if x[1]:
+                cols[x[0]] = [ (name, name) for name in cPickle.loads(x[1]) ]
+            else:
+                cols[x[0]] = []
+    return cols
 
 def _is_type_export(typename):
     """
