@@ -37,27 +37,14 @@ def Create_Cplx_Approval(parameters, curdir, form, user_info=None):
     doctype = form['doctype']
     act = form['act']
     categformat = parameters['categformatDAM']
-    # retrieve category
-    '''if re.search("<FILE:",categformat):
-        filename = categformat.replace("<FILE:","")
-        filename = filename.replace(">","")
-        if os.path.exists("%s/%s" % (curdir,filename)):
-            fp = open("%s/%s" % (curdir,filename))
-            category = fp.read()
-            fp.close()
-        else:
-            category=""
-        category = category.replace("\n","")
-    else:
-        categformat = categformat.replace("<CATEG>","([^-]*)")
-        category = re.match(categformat,rn).group(1)
-    if category == "":
-        category = "unknown"'''
 
-    #Obtain the document category from the global report number (rn)
-    #Strip away the year and the document number and keep only the category
-    category = rn.split('-')
-    category = category[2]
+    #Obtain the document category from combo<DOCTYPE> file
+    category = ""
+    if os.path.exists("%s/%s" % (curdir,'combo'+doctype)):
+        fp = open("%s/%s" % (curdir,'combo'+doctype),"r")
+        category = fp.read()
+    else:
+        return ""
 
     #Path of file containing group
     group_id = ""
