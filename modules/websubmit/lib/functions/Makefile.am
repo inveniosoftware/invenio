@@ -32,6 +32,7 @@ pylib_DATA = __init__.py \
              Create_Recid.py \
              Finish_Submission.py \
              Format_Record.py \
+             Generate_Group_File.py \
              Get_Info.py \
              Get_Recid.py \
              Get_Report_Number.py \
@@ -40,6 +41,7 @@ pylib_DATA = __init__.py \
              Insert_Record.py \
              Is_Original_Submitter.py \
              Is_Referee.py \
+             Mail_Approval_Request_to_Committee_Chair.py \
              Mail_Approval_Request_to_Referee.py \
              Mail_Approval_Withdrawn_to_Referee.py \
              Mail_Submitter.py \
