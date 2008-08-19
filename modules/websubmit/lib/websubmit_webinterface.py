@@ -216,9 +216,14 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             register_exception(req=req, alert_admin=True)
                             return errorMsg(str(msg), req, ln)
 
+            if docname and format:
+                req.status = apache.HTTP_NOT_FOUND
+                warn = print_warning(_("Requested file does not seem to exist."))
+            else:
+                warn = ''
             filelist = bibarchive.display("", args['version'], ln=ln, verbose=verbose)
 
-            t = websubmit_templates.tmpl_filelist(
+            t = warn + websubmit_templates.tmpl_filelist(
                 ln=ln,
                 recid=self.recid,
                 docname=args['docname'],
@@ -523,3 +528,15 @@ def warningMsg(title, req, c=None, ln=CFG_SITE_LANG):
                 language=ln,
                 req=req,
                 navmenuid='submit')
+
+def print_warning(msg, type='', prologue='<br />', epilogue='<br />'):
+    """Prints warning message and flushes output."""
+    if msg:
+        return websubmit_templates.tmpl_print_warning(
+                   msg = msg,
+                   type = type,
+                   prologue = prologue,
+                   epilogue = epilogue,
+                 )
+    else:
+        return ''

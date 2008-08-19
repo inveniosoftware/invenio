@@ -1488,6 +1488,7 @@ class BibDocFile:
                 stream_file(req, self.fullpath, self.fullname, self.mime, self.encoding, self.etag, self.checksum, self.fullurl)
                 raise apache.SERVER_RETURN, apache.DONE
             else:
+                req.status = apache.HTTP_NOT_FOUND
                 raise InvenioWebSubmitFileError, "%s does not exists!" % self.fullpath
         else:
             raise InvenioWebSubmitFileError, "You are not authorized to download %s: %s" % (self.fullname, auth_message)
@@ -1659,15 +1660,22 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         req.encoding = encoding
         req.filename = fullname
         req.headers_out["Last-Modified"] = time.strftime('%a, %d %b %Y %X GMT', time.gmtime(mtime))
-        req.headers_out["Accept-Ranges"] = "none"
-        ## we can put this to bytes the day that mod_python support disabling
-        ## chunked encoding
+
+        try:
+            tmp = req.chunked
+            req.chunked = tmp
+            req.headers_out["Accept-Ranges"] = "bytes"
+        except TypeError:
+            ## Old mod_python where the above attributes were
+            ## read-only
+            req.headers_out["Accept-Ranges"] = "none"
+
         req.headers_out["Content-Location"] = location
         if etag is not None:
             req.headers_out["ETag"] = etag
         if md5 is not None:
             req.headers_out["Content-MD5"] = base64.encodestring(binascii.unhexlify(md5.upper()))[:-1]
-        req.headers_out["Content-Disposition"] = 'attachment; filename="%s"' % fullname.replace('"', '\\"')
+        req.headers_out["Content-Disposition"] = 'inline; filename="%s"' % fullname.replace('"', '\\"')
         size = os.path.getsize(fullpath)
         if not size:
             try:
@@ -1682,14 +1690,19 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 raise apache.SERVER_RETURN, apache.HTTP_NOT_MODIFIED
         if headers['unless-modified-since'] and headers['unless-modified-since'] < mtime:
             return normal_streaming(size)
-        if False and headers['range']:
-            ## We can remove the above False the day mod_python support
-            ## disabling chunked encoding.
+        if headers['range']:
             if headers['if-range']:
                 if etag is None or etag not in headers['if-range']:
                     return normal_streaming(size)
             ranges = fix_ranges(headers['range'], size)
             if len(ranges) > 1:
+                try:
+                    req.chunked = False
+                    req.connection.keepalive = apache.AP_CONN_CLOSE
+                except TypeError:
+                    ## Old mod_python where the above attributes were
+                    ## read-only
+                    return normal_streaming(size)
                 return multiple_ranges(size, ranges, mime)
             elif ranges:
                 return single_range(size, ranges[0])

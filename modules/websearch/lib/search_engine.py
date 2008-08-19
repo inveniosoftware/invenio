@@ -3742,7 +3742,8 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
         title, description, keywords = \
                websearch_templates.tmpl_record_page_header_content(req, recid, ln)
 
-        page_start(req, of, cc, as, ln, uid, title, description, keywords, recid, tab)
+        if not req.header_only:
+            page_start(req, of, cc, as, ln, uid, title, description, keywords, recid, tab)
         # Default format is hb but we are in detailed -> change 'of'
         if of == "hb":
             of = "hd"
@@ -3764,7 +3765,10 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                 print_records_prologue(req, of)
                 print_records_epilogue(req, of)
             elif of.startswith("h"):
-                print_warning(req, _("Requested record does not seem to exist."))
+                if req.header_only:
+                    raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+                else:
+                    print_warning(req, _("Requested record does not seem to exist."))
 
     elif action == "browse":
         ## 2 - browse needed
@@ -3790,14 +3794,18 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
 
     elif rm and p.startswith("recid:"):
         ## 3-ter - similarity search needed
-        page_start(req, of, cc, as, ln, uid, _("Search Results"))
+        if not req.header_only:
+            page_start(req, of, cc, as, ln, uid, _("Search Results"))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
         if record_exists(p[6:]) != 1:
             # record does not exist
             if of.startswith("h"):
-                print_warning(req, "Requested record does not seem to exist.")
+                if req.header_only:
+                    raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
+                else:
+                    print_warning(req, "Requested record does not seem to exist.")
             if of == "id":
                 return []
             elif of.startswith("x"):

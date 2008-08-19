@@ -50,6 +50,26 @@ class Template:
         'verbose' : (int, 0) # the verbosity
         }
 
+    def tmpl_print_warning(self, msg, type, prologue, epilogue):
+        """Prints warning message and flushes output.
+
+        Parameters:
+
+          - 'msg' *string* - The message string
+
+          - 'type' *string* - the warning type
+
+          - 'prologue' *string* - HTML code to display before the warning
+
+          - 'epilogue' *string* - HTML code to display after the warning
+        """
+
+        out = '\n%s<span class="quicknote">' % (prologue)
+        if type:
+            out += '%s: ' % type
+        out += '%s</span>%s' % (msg, epilogue)
+        return out
+
 
     def tmpl_submit_home_page(self, ln, catalogues):
         """

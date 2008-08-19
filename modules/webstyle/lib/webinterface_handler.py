@@ -65,7 +65,8 @@ DEBUG = False
 # List of URIs for which the 'ln' argument must not be added
 # automatically
 no_lang_recognition_uris = ['/rss',
-                            '/oai2d']
+                            '/oai2d',
+                            '/journal']
 
 def _debug(msg):
     if DEBUG:
@@ -93,10 +94,11 @@ def _check_result(req, result):
             else:
                 req.content_type = 'text/plain'
 
-        if req.method != "HEAD":
-            req.write(result)
+        if req.header_only:
+            if req.status in (apache.HTTP_NOT_FOUND, ):
+                raise apache.SERVER_RETURN, req.status
         else:
-            req.write("")
+            req.write(result)
 
         return apache.OK
 
@@ -243,7 +245,7 @@ class WebInterfaceDirectory(object):
 
 
 re_slashes = re.compile('/+')
-re_bibdoc_uri = re.compile('/record/\d+/files/.+')
+re_special_uri = re.compile('^/record/\d+|^/collection/.+')
 def create_handler(root):
     """ Return a handler function that will dispatch apache requests
     through the URL layout passed in parameter."""
@@ -353,7 +355,7 @@ def create_handler(root):
                 req.headers_out['Vary'] = 'Cookie, ETag, Cache-Control'
 
             try:
-                if req.header_only and not re_bibdoc_uri.match(req.uri):
+                if req.header_only and not re_special_uri.match(req.uri):
                     return root._traverse(req, path, True, guest_p)
                 else:
                     ## bibdocfile have a special treatment for HEAD
