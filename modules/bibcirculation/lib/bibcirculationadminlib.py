@@ -82,6 +82,9 @@ def index(req, ln=CFG_SITE_LANG):
                 navtrail=navtrail_previous_links,
                 lastupdated=__lastupdated__)
 
+
+
+
 def manage_holdings(req, ln=CFG_SITE_LANG):
     """
     Main admin page of Bibcirculation.
@@ -134,12 +137,12 @@ def borrower_search(req, ln=CFG_SITE_LANG):
                 lastupdated=__lastupdated__)
 
 
-def item_search_result(req, p, f, ln=CFG_SITE_LANG):
+def item_search_result(req, p, f, start, end, ln=CFG_SITE_LANG):
     """
     """
 
     result = perform_request_search(cc="Books", sc="1", p=p, f=f)
-    #raise repr(result)
+    #raise repr(start)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -150,7 +153,11 @@ def item_search_result(req, p, f, ln=CFG_SITE_LANG):
     if auth_code != 0:
         return mustloginpage(req, auth_message)
 
-    body = bibcirculation_templates.tmpl_item_search_result(result=result, ln=ln)
+
+    body = bibcirculation_templates.tmpl_item_search_result(result=result,
+                                                            start=start,
+                                                            end=end,
+                                                            ln=ln)
 
     return page(title="Search result",
                 uid=id_user,
@@ -424,12 +431,12 @@ def update_next_loan_request_status(req, check_id=None,
 
     recid = db.get_recid_from_crcLOANREQUEST(check_id)
     borrower_id = db.get_borrower_id_from_crcLOANREQUEST(check_id)
-    due_date = db.get_request_date_to_from_crcLOANREQUEST(check_id)
     loaned_on = datetime.date.today()
-    #nb_request = db.get_number_requests(recid)
+    due_date = get_datetext(loaned_on.year, loaned_on.month + 1, loaned_on.day)
 
     if check_id != None and approve_button == "Approve":
         db.update_loan_request_status(check_id,'done')
+        db.update_barcode_on_crcloanrequest(barcode, check_id)
         db.new_loan(borrower_id, recid, barcode, loaned_on, due_date, 'on loan', 'normal','')
         db.update_item_status('on loan', barcode)
 
@@ -712,6 +719,32 @@ def get_borrower_loans_details(req, orderby=None, ln=CFG_SITE_LANG, notify_butto
                 lastupdated=__lastupdated__)
 
 
+def all_loans_for_item(req, recid, ln=CFG_SITE_LANG):
+    """
+    """
+    #raise repr(recid)
+
+    result = db.get_all_loans_for_item(recid)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    body = bibcirculation_templates.tmpl_all_loans_for_item(result=result,
+                                                            ln=ln)
+
+    return page(title="All loans",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
 def get_item_details(req, ln=CFG_SITE_LANG, recid=None):
     """
     Display the details of an item.
@@ -816,8 +849,6 @@ def get_pending_loan_request(req, show, ln=CFG_SITE_LANG):
     Get all loans requests who are pending.
     """
 
-    #raise repr(show)
-
     if show =='on_loan':
         status = db.get_pending_loan_request_on_loan('pending')
         title = "List of pending requests for holdings 'ON LOAN'"
@@ -825,11 +856,8 @@ def get_pending_loan_request(req, show, ln=CFG_SITE_LANG):
         status = db.get_pending_loan_request_available('pending')
         title = "List of pending requests for holdings 'AVAILABLE'"
     else:
-        #status = []
         status = db.get_pending_loan_request("pending")
         title = "List of all pending requests"
-
-    #raise repr(status)
 
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
@@ -869,10 +897,9 @@ def update_loan_request_status(req, check_id_list=None, approve_button=None,
                 db.update_loan_request_status(check_id,'waiting')
 
             else:
-                due_date = db.get_due_date(barcode)
+                loaned_on = datetime.date.today()
+                due_date = get_datetext(loaned_on.year, loaned_on.month + 1, loaned_on.day)
                 nb_request = db.get_number_requests2(barcode, check_id)
-
-#                raise repr(nb_request)
 
                 if len(nb_request) != 0:
                     db.update_loan_request_status(check_id,'waiting')
@@ -880,7 +907,6 @@ def update_loan_request_status(req, check_id_list=None, approve_button=None,
                 else:
                     db.update_loan_request_status(check_id,'done')
                     db.update_item_status('on loan', barcode)
-                    loaned_on = datetime.date.today()
                     db.new_loan(borrower_id, recid, barcode, loaned_on, due_date, 'on loan', 'normal','')
 
 
@@ -978,7 +1004,7 @@ def all_loans(req, show, ln=CFG_SITE_LANG):
 
 def get_all_requests_for_item(req, recid=None, orderby=None, ln=CFG_SITE_LANG):
     """
-    Display all loans for a specific item.
+    Display all requests for a specific item.
     """
 
     if orderby == "status":
