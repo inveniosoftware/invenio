@@ -1523,13 +1523,14 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         req.send_http_header()
         if not req.header_only:
             for arange in ranges:
-                req.write('--%s\r\n' % boundary, flush=0)
-                req.write('Content-Type: %s\r\n' % mime, flush=0)
-                req.write('Content-Range: bytes %d-%d/%d\r\n' % (arange[0], arange[0] + arange[1] - 1, size), flush=0)
-                req.write('\r\n', flush=0)
+                req.write('--%s\r\n' % boundary, 0)
+                req.write('Content-Type: %s\r\n' % mime, 0)
+                req.write('Content-Range: bytes %d-%d/%d\r\n' % (arange[0], arange[0] + arange[1] - 1, size), 0)
+                req.write('\r\n', 0)
                 req.sendfile(fullpath, arange[0], arange[1])
-                req.write('\r\n', flush=0)
+                req.write('\r\n', 0)
             req.write('--%s--\r\n' % boundary)
+            req.flush()
         return ""
 
     def parse_date(date):
@@ -1608,7 +1609,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                 elif arange[1] is None:
                     arange[1] = size - arange[0]
                 else:
-                    arange[1] = arange[1] - arange[0] - 1
+                    arange[1] = arange[1] - arange[0] + 1
                 arange[0] = max(0, arange[0])
                 arange[1] = min(size - arange[0], arange[1])
                 ret.append(arange)
