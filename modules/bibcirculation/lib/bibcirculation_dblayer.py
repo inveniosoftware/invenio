@@ -341,6 +341,43 @@ def get_number_copies(recid):
 
     return res[0][0]
 
+
+def item_loans_historical_overview(recid):
+    """
+    """
+
+    res = run_sql("""select bor.name,
+                            bor.id,
+                            l.barcode,
+                            DATE_FORMAT(l.loaned_on,'%%Y-%%m-%%d'),
+                            l.returned_on,
+                            l.number_of_renewals,
+                            l.overdue_letter_number
+                     from crcLOAN l, crcBORROWER bor
+                     where l.id_crcBORROWER=bor.id and l.id_bibrec = %s
+                                                   and status = 'returned' """
+                  , (recid, ))
+
+    return res
+
+
+def item_requests_historical_overview(recid):
+    """
+    """
+
+    res = run_sql("""
+                  select bor.name,
+                         bor.id,
+                         DATE_FORMAT(lr.request_date_from,'%%Y-%%m-%%d'),
+                         DATE_FORMAT(lr.request_date_to,'%%Y-%%m-%%d')
+                  from crcLOANREQUEST lr, crcBORROWER bor
+                  where lr.id_crcBORROWER=bor.id and lr.id_bibrec = %s
+                                                 and status = 'done'
+                  """, (recid, ))
+
+    return res
+
+
 def get_library_details(libid):
     """
     @param libid: primary key of crcLIBRARY
@@ -865,7 +902,7 @@ def get_borrower_loans(uid):
                              DATE_FORMAT(loaned_on,'%%Y-%%m-%%d'),
                              DATE_FORMAT(due_date,'%%Y-%%m-%%d')
                       from crcLOAN
-                      where id_crcBORROWER=%s and status = 'on loan'
+                      where id_crcBORROWER=%s and status != 'returned'
                   """, (uid, ))
 
     return res
