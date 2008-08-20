@@ -540,7 +540,7 @@ class Template:
                           </table>""" % (url, title, body)
         return out
 
-    def tmpl_account_page(self, ln, warnings, warning_list, accBody, baskets, alerts, searches, messages, groups, administrative):
+    def tmpl_account_page(self, ln, warnings, warning_list, accBody, baskets, alerts, searches, messages, loans, groups, administrative):
         """
         Displays the your account page
 
