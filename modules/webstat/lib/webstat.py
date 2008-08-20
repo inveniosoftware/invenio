@@ -864,8 +864,12 @@ def _get_timespans(dt=None):
               to_str(dt-d_diff(dt.day)+d_diff(1)),
               "day", format, "%d"),
              ("last three months", "Last three months",
-              to_str(dt-d_diff(d_in_m(1))-d_diff(d_in_m(2))-d_diff(d_in_m(3))-d_diff(dt.day)+d_diff(1)),
-              to_str(dt-d_diff(dt.day)+d_diff(1)),
+              to_str(dt-d_diff(d_in_m(1))-d_diff(d_in_m(2))-d_diff(dt.day)+d_diff(1)),
+              dt_str,
+              "month", format, "%b"),
+             ("last year", "Last year",
+              to_str(dt.replace(year=dt.year-1,month=dt.month+1)),
+              to_str(dt.replace(month=dt.month+1)),
               "month", format, "%b")]
 
     # Get first year as indicated by the content's in bibrec
@@ -875,6 +879,23 @@ def _get_timespans(dt=None):
         y1 = dt.year
 
     y2 = time.localtime()[0]
+    diff_year = y2 - y1
+    if diff_year >= 2:
+        spans.append(("last 2 years", "Last 2 years",
+                      to_str(dt.replace(year=dt.year-2,month=dt.month+1)),
+                      to_str(dt.replace(month=dt.month+1)),
+                      "month", format, "%b"))
+    if diff_year >= 5:
+        spans.append(("last 5 years", "Last 5 years",
+                      to_str(dt.replace(year=dt.year-5,month=1)),
+                      to_str(dt.replace(month=dt.month+1)),
+                      "year", format, "%Y"))
+    if diff_year >= 10:
+        spans.append(("last 10 years", "Last 10 years",
+                      to_str(dt.replace(year=dt.year-10,month=1)),
+                      to_str(dt.replace(month=dt.month+1)),
+                      "year", format, "%Y"))
+    spans.append(("full history", "Full history", str(y1), str(y2+1), "year", "%Y", "%Y"))
     spans.extend([(str(x), str(x), str(x), str(x+1), "month", "%Y", "%b") for x in  range(y2, y1-1, -1)])
 
     return spans
