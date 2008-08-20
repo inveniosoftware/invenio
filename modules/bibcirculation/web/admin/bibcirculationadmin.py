@@ -185,6 +185,16 @@ def all_requests(req, orderby=None, ln=CFG_SITE_LANG):
     return bal.all_requests(req, orderby, ln)
 
 
+def item_req_historical_overview(req, recid=None, ln=CFG_SITE_LANG):
+    """
+    """
+    return bal.item_req_historical_overview(req, recid, ln)
+
+def item_loans_historical_overview(req, recid=None, ln=CFG_SITE_LANG):
+    """
+    """
+    return bal.item_loans_historical_overview(req, recid, ln)
+
 def all_loans(req, show=None, ln=CFG_SITE_LANG):
     """
     http://cdsweb.cern.ch/admin/bibcirculation/bibcirculationadmin.py/all_loans
