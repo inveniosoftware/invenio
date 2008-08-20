@@ -97,7 +97,7 @@ from invenio.bibtask import task_init, write_message, \
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, get_format_from_url, check_valid_url, download_url, \
     KEEP_OLD_VALUE, decompose_bibdocfile_old_url, decompose_bibdocfile_url, \
-    bibdocfile_url_p
+    bibdocfile_url_p, InvenioWebSubmitFileError
 
 #Statistic variables
 stat = {}
