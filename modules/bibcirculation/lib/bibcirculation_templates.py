@@ -1509,15 +1509,43 @@ class Template:
         """
         return out
 
-    def tmpl_item_details(self, recid, details, nb_copies, ln=CFG_SITE_LANG):
+    def tmpl_item_details(self, recid, details, requests, loans, req_hist_overview,
+                          loans_hist_overview, nb_copies, ln=CFG_SITE_LANG):
         """
         @param ln: language of the page
         """
+
         _ = gettext_set_language(ln)
 
         out = """
         """
         out += _MENU_
+
+        nb_req = len(requests)
+        nb_loans = len(loans)
+
+        nb_req_hist = len(req_hist_overview)
+        nb_loans_hist = len(loans_hist_overview)
+
+        req_hist_link = create_html_link(CFG_SITE_URL +
+                                        '/admin/bibcirculation/bibcirculationadmin.py/item_req_historical_overview',
+                                        {'recid': recid, 'ln': ln},
+                                        (_("More details")))
+
+        loans_hist_link = create_html_link(CFG_SITE_URL +
+                                        '/admin/bibcirculation/bibcirculationadmin.py/item_loans_historical_overview',
+                                        {'recid': recid, 'ln': ln},
+                                        (_("More details")))
+
+        req_link = create_html_link(CFG_SITE_URL +
+                                        '/admin/bibcirculation/bibcirculationadmin.py/all_requests_for_item',
+                                        {'recid': recid, 'ln': ln},
+                                        (_("More details")))
+
+        loans_link = create_html_link(CFG_SITE_URL +
+                                        '/admin/bibcirculation/bibcirculationadmin.py/all_loans_for_item',
+                                        {'recid': recid, 'ln': ln},
+                                        (_("More details")))
 
         item_name = ' '.join(get_fieldvalues(recid, "245__a") + \
                              get_fieldvalues(recid, "245__b"))
@@ -1531,8 +1559,8 @@ class Template:
 
         out += """
            <div class="bibcircbottom">
-                <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_requests_for_item" method="get" >
-                <input type=hidden name=recid value=%s>
+
+
                 <br \>
                      <table class="bibcirctable">
                           <tr>
@@ -1563,9 +1591,7 @@ class Template:
                      <td class="bibcirctableheader">%s</td>
                 </tr>
            </table>
-           """  % (CFG_SITE_URL,
-                   recid,
-                   _("Item details"),
+           """  % (_("Item details"),
                   _("Name"),
                   item_name,
                   _("Author(s)"),
@@ -1584,7 +1610,7 @@ class Template:
             library_link = create_html_link(CFG_SITE_URL +
                                             '/admin/bibcirculation/bibcirculationadmin.py/get_library_details',
                                             {'libid': libid, 'ln': ln},
-                                            (lib_name))
+                                            (_("More details")))
 
             out += """
             <table class="bibcirctable">
@@ -1595,6 +1621,7 @@ class Template:
 
                  <tr>
                       <td width="100">%s</td>
+                      <td width="90" class="bibcirccontent">%s</td>
                       <td class="bibcirccontent">%s</td>
                  </tr>
 
@@ -1605,29 +1632,72 @@ class Template:
 
 
             </table>
+
             <br />
-           <table class="bibcirctable">
-                  <tr>
-                     <td><input type="submit" name="details_button" value="More details about requests" class="formbutton"></td>
-                  </tr>
-            </table>
-            </form>
-            </br>
-            <form name="borrower_form" action="%s/admin/bibcirculation/bibcirculationadmin.py/all_loans_for_item" method="get" >
-            <input type=hidden name=recid value=%s>
             <table class="bibcirctable">
-                  <tr>
-                     <td><input type="submit" name="details_button" value="More details about loans" class="formbutton"></td>
-                  </tr>
+                 <tr>
+                     <td class="bibcirctableheader">%s</td>
+                </tr>
             </table>
+            <table class="bibcirctable">
+                 <tr>
+                      <td width="100">%s</td>
+                      <td width="50" class="bibcirccontent">%s</td>
+                      <td class="bibcirccontent">%s</td>
+                 </tr>
+
+                 <tr>
+                      <td width="100">%s</td>
+                      <td width="50" class="bibcirccontent">%s</td>
+                      <td class="bibcirccontent">%s</td>
+                 </tr>
+
+            </table>
+            <br />
+            <table class="bibcirctable">
+                 <tr>
+                     <td class="bibcirctableheader">%s</td>
+                </tr>
+            </table>
+            <table class="bibcirctable">
+                 <tr>
+                      <td width="100">%s</td>
+                      <td width="50" class="bibcirccontent">%s</td>
+                      <td class="bibcirccontent">%s</td>
+                 </tr>
+
+                 <tr>
+                      <td width="100">%s</td>
+                      <td width="50" class="bibcirccontent">%s</td>
+                      <td class="bibcirccontent">%s</td>
+                 </tr>
+
+            </table>
+            <br />
+
             """ % (_("Loan period"),
                    loan_period,
                    _("Location"),
-                    library_link,
+                   lib_name,
+                   library_link,
                    _("No of copies"),
                    nb_copies,
-                   CFG_SITE_URL,
-                   recid)
+                   _("Requests and loans overview"),
+                   _("Requests"),
+                   nb_req,
+                   req_link,
+                   _("Loans"),
+                   nb_loans,
+                   loans_link,
+                   _("Historical overview"),
+                   _("Requests"),
+                   nb_req_hist,
+                   req_hist_link,
+                   _("Loans"),
+                   nb_loans_hist,
+                   loans_hist_link)
+
+
 
 
         out += """
@@ -1640,7 +1710,114 @@ class Template:
            <br \>
            <br \>
            <br \>
-           </form>
+
+           </div>
+           """
+
+        return out
+
+    def tmpl_item_req_historical_overview(self, req_hist_overview, ln=CFG_SITE_LANG):
+        """
+        """
+
+        _ = gettext_set_language(ln)
+
+        out = """
+        """
+        out += _MENU_
+
+        out += """<div class="bibcircbottom">
+                    <br /> <br \>
+                    <table class="bibcirctable">
+                     <tr>
+                     <td class="bibcirctableheader">%s</td>
+                     <td class="bibcirctableheader">%s</td>
+                     <td class="bibcirctableheader">%s</td>
+                     </tr>
+                     """ % (_("Borrower"), _("From"), _("To"))
+
+        for (name, uid, req_from, req_to) in req_hist_overview:
+
+            borrower_link = create_html_link(CFG_SITE_URL +
+                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             {'borrower_id': uid, 'ln': ln},
+                                             (name))
+
+            out += """ <tr>
+                       <td class="bibcirccontent">%s</td>
+                       <td class="bibcirccontent">%s</td>
+                       <td class="bibcirccontent">%s</td>
+                       </tr>
+                 """ % (borrower_link, req_from, req_to)
+
+        out += """
+           </table>
+           <br \>
+           <table class="bibcirctable">
+                <tr>
+                     <td><input type=button value="Back" onClick="history.go(-1)" class="formbutton"></td>
+                </tr>
+           </table>
+           <br \>
+           <br \>
+           <br \>
+           </div>
+           """
+
+        return out
+
+
+    def tmpl_item_loans_historical_overview(self, loans_hist_overview, ln=CFG_SITE_LANG):
+        """
+        """
+
+        _ = gettext_set_language(ln)
+
+        out = """
+        """
+        out += _MENU_
+
+        out += """<div class="bibcircbottom">
+                    <br /> <br \>
+                    <table class="bibcirctable">
+                     <tr>
+                     <td class="bibcirctableheader">%s</td>
+                     <td class="bibcirctableheader">%s</td>
+                     <td class="bibcirctableheader">%s</td>
+                     <td class="bibcirctableheader">%s</td>
+                     <td class="bibcirctableheader">%s</td>
+                     <td class="bibcirctableheader">%s</td>
+                     </tr>
+                     """ % (_("Borrower"), _("Barcode"), _("Loaned on"), _("Returned on"), _("No of renewalls"), _("No of overdue lettersb"))
+
+        for (name, uid, barcode, loaned_on, returned_on, nb_renew, nb_overdueletters) in loans_hist_overview:
+
+            borrower_link = create_html_link(CFG_SITE_URL +
+                                             '/admin/bibcirculation/bibcirculationadmin.py/get_borrower_details',
+                                             {'borrower_id': uid, 'ln': ln},
+                                             (name))
+
+            out += """ <tr>
+                       <td class="bibcirccontent">%s</td>
+                       <td class="bibcirccontent">%s</td>
+                       <td class="bibcirccontent">%s</td>
+                       <td class="bibcirccontent">%s</td>
+                       <td class="bibcirccontent">%s</td>
+                       <td class="bibcirccontent">%s</td>
+                       </tr>
+                 """ % (borrower_link, barcode, loaned_on, returned_on, nb_renew, nb_overdueletters)
+
+        out += """
+           </table>
+           <br \>
+           <table class="bibcirctable">
+                <tr>
+                     <td><input type=button value="Back" onClick="history.go(-1)" class="formbutton"></td>
+                </tr>
+           </table>
+           <br \>
+           <br \>
+           <br \>
            </div>
            """
 
