@@ -2373,7 +2373,7 @@ class BibUploadFFTModeTest(unittest.TestCase):
         100__ $$aTest, John$$uTest University
         8564_ $$u%(siteurl)s/record/123456789/files/cds.gif
         """ % { 'siteurl': CFG_SITE_URL}
-        testrec_expected_url = "%(siteurl)s/record/123456789/files/patata.gif" \
+        testrec_expected_url = "%(siteurl)s/record/123456789/files/cds.gif" \
             % {'siteurl': CFG_SITE_URL}
         # insert test record:
         task_set_task_param('verbose', 0)
