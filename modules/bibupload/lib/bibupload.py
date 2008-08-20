@@ -485,7 +485,7 @@ def find_record_from_sysno(sysno):
     else:
         return None
 
-def find_records_from_extoaiid(extoaiid, extoaisrc):
+def find_records_from_extoaiid(extoaiid, extoaisrc=None):
     """
     Try to find records in the database from the external EXTOAIID number.
     Return list of record ID if found, None otherwise.
@@ -494,7 +494,6 @@ def find_records_from_extoaiid(extoaiid, extoaisrc):
     bibxxx2 = 'bib'+CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[0:2]+'x'
     bibrec_bibxxx = 'bibrec_' + bibxxx
     bibrec_bibxxx2 = 'bibrec_' + bibxxx2
-    ret = intbitset()
     try:
         id_bibrecs = intbitset(run_sql("""SELECT bb.id_bibrec FROM %(bibrec_bibxxx)s AS bb,
             %(bibxxx)s AS b WHERE b.tag=%%s AND b.value=%%s
@@ -503,17 +502,21 @@ def find_records_from_extoaiid(extoaiid, extoaisrc):
                        'bibrec_bibxxx': bibrec_bibxxx},
                       (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, extoaiid,)))
         write_message('Partially found %s for extoaiid="%s"' % (id_bibrecs, extoaiid), verbose=9)
-        for id_bibrec in id_bibrecs:
-            res = run_sql("""SELECT bb.id_bibrec FROM %(bibrec_bibxxx)s AS bb,
-                %(bibxxx)s AS b WHERE bb.id_bibrec=%%s AND b.tag=%%s AND
-                b.value=%%s AND bb.id_bibxxx=b.id""" % \
-                    {'bibxxx' : bibxxx2,
-                    'bibrec_bibxxx' : bibrec_bibxxx2},
-                    (id_bibrec, CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, extoaisrc,))
-            if res:
-                write_message('Found %s for extsrcid="%s"' % (res, extoaiid), verbose=9)
-                ret.add(res[0][0])
-        return intbitset(ret)
+        if extoaisrc and id_bibrecs:
+            ret = intbitset()
+            for id_bibrec in id_bibrecs:
+                res = run_sql("""SELECT bb.id_bibrec FROM %(bibrec_bibxxx)s AS bb,
+                    %(bibxxx)s AS b WHERE bb.id_bibrec=%%s AND b.tag=%%s AND
+                    b.value=%%s AND bb.id_bibxxx=b.id""" % \
+                        {'bibxxx' : bibxxx2,
+                        'bibrec_bibxxx' : bibrec_bibxxx2},
+                        (id_bibrec, CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, extoaisrc,))
+                if res:
+                    write_message('Found %s for extsrcid="%s"' % (res, extoaiid), verbose=9)
+                    ret.add(res[0][0])
+            return ret
+        else:
+            return id_bibrecs
     except Error, error:
         write_message("   Error during find_records_from_extoaiid(): %s "
             % error, verbose=1, stream=sys.stderr)
@@ -622,9 +625,12 @@ def retrieve_rec_id(record, opt_mode):
             for field in extoai_fields:
                 extoaiid = field_get_subfield_values(field, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5:6])
                 extoaisrc = field_get_subfield_values(field, CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5:6])
-                if extoaiid and extoaisrc:
+                if extoaiid:
                     extoaiid = extoaiid[0]
-                    extoaisrc = extoaisrc[0]
+                    if extoaisrc:
+                        extoaisrc = extoaisrc[0]
+                    else:
+                        extoaisrc = None
                     write_message("   -Checking if EXTOAIID %s (%s) exists in the database" % (extoaiid, extoaisrc), verbose=9)
                     # try to find the corresponding rec id from the database
                     rec_ids = find_records_from_extoaiid(extoaiid, extoaisrc)
@@ -800,11 +806,16 @@ def synchronize_8564(rec_id, record, record_had_FFT):
         comment = field_get_subfield_values(field, 'z')[:1]
         if url:
             recid, docname, format = decompose_bibdocfile_url(url[0])
-            bibdoc = BibRecDocs(recid).get_bibdoc(docname)
-            if description:
-                bibdoc.set_description(description[0], format)
-            if comment:
-                bibdoc.set_comment(comment[0], format)
+            try:
+                bibdoc = BibRecDocs(recid).get_bibdoc(docname)
+                if description:
+                    bibdoc.set_description(description[0], format)
+                if comment:
+                    bibdoc.set_comment(comment[0], format)
+            except InvenioWebSubmitFileError:
+                ## Apparently the referenced docname doesn't exist anymore.
+                ## Too bad. Let's skip it.
+                write_message("WARNING: docname %s doesn't exist for record %s. Has it been renamed outside FFT?" % (docname, recid), stream=sys.stderr)
 
     write_message("Synchronizing MARC of recid '%s' with:\n%s" % (rec_id, record), verbose=9)
     tags8564s = record_get_field_instances(record, '856', '4', ' ')
