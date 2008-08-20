@@ -753,6 +753,13 @@ def get_item_details(req, ln=CFG_SITE_LANG, recid=None):
     result = db.get_item_addicional_details(recid)
     nb_copies = db.get_number_copies(recid)
 
+    requests = db.get_all_requests_for_item(recid)
+    loans = db.get_all_loans_for_item(recid)
+
+    req_hist_overview = db.item_requests_historical_overview(recid)
+    loans_hist_overview = db.item_loans_historical_overview(recid)
+
+
     navtrail_previous_links = '<a class="navtrail" ' \
                               'href="%s/help/admin">Admin Area' \
                               '</a>' % (CFG_SITE_URL,)
@@ -764,10 +771,66 @@ def get_item_details(req, ln=CFG_SITE_LANG, recid=None):
 
     body = bibcirculation_templates.tmpl_item_details(recid=recid,
                                                       details=result,
+                                                      requests=requests,
+                                                      loans=loans,
+                                                      req_hist_overview = req_hist_overview,
+                                                      loans_hist_overview = loans_hist_overview,
                                                       nb_copies=nb_copies,
                                                       ln=ln)
 
     return page(title="Item details",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def item_req_historical_overview(req, recid, ln=CFG_SITE_LANG):
+    """
+    """
+
+    req_hist_overview = db.item_requests_historical_overview(recid)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    body = bibcirculation_templates.tmpl_item_req_historical_overview(
+        req_hist_overview = req_hist_overview,
+        ln=ln)
+
+    return page(title="Requests historical overview",
+                uid=id_user,
+                req=req,
+                body=body,
+                navtrail=navtrail_previous_links,
+                lastupdated=__lastupdated__)
+
+def item_loans_historical_overview(req, recid, ln=CFG_SITE_LANG):
+    """
+    """
+
+    loans_hist_overview = db.item_loans_historical_overview(recid)
+
+    navtrail_previous_links = '<a class="navtrail" ' \
+                              'href="%s/help/admin">Admin Area' \
+                              '</a>' % (CFG_SITE_URL,)
+
+    id_user = getUid(req)
+    (auth_code, auth_message) = is_adminuser(req)
+    if auth_code != 0:
+        return mustloginpage(req, auth_message)
+
+    body = bibcirculation_templates.tmpl_item_loans_historical_overview(
+        loans_hist_overview = loans_hist_overview,
+        ln=ln)
+
+    return page(title="Loans historical overview",
                 uid=id_user,
                 req=req,
                 body=body,
