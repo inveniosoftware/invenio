@@ -298,11 +298,11 @@ class Template:
         if show_details:
             inner_text +=  self.tmpl_history_day_details_link(ln, date, oai_src_id)
         inner_text += "</b>"
-        return self.tmpl_table_output_cell(inner_text, colspan=2)
+        return self.tmpl_table_output_cell(inner_text, colspan=6)
 
     def tmpl_history_table_output_day_details_cell(self, ln, date, oai_src_id):
         inner_text = self.tmpl_history_day_details_link(ln, date, oai_src_id)
-        return self.tmpl_table_output_cell(inner_text, colspan=3)
+        return self.tmpl_table_output_cell(inner_text, colspan=7)
 
     def tmpl_output_checkbox(self, name, id, value):
         return "<input type=\"checkbox\" id=\"" + id + "\"name=\"" + name + "\" value=\"" + value + "\" />"

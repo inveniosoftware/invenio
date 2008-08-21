@@ -458,14 +458,17 @@ def create_bibharvest_log(task_id, oai_src_id, marcxmlfile):
     """
     Funcion which creates the harvesting logs
     """
-    #log the fact ! ( parse marcxmlfile and find the record ids ! -> the code from bibupload)
-    # 1) Parse the marcxml file in order to obtain the records collection
+    file = open(marcxmlfile, "r")
+    xml_content = file.read(-1)
+    file.close()
+    create_bibharvest_log_str(task_id, oai_src_id, xml_content)
+
+def create_bibharvest_log_str(task_id, oai_src_id, xml_content):
+    """
+    Funcion which creates the harvesting logs
+    """
     try:
-        file = open(marcxmlfile, "r")
-        xml_content = file.read(-1)
-        file.close()
         records = create_records(xml_content)
-    # 2) For each record from this collection, create the log entry
         for record in records:
             oai_id = record_extract_oai_id(record[0])
             query = "INSERT INTO oaiHARVESTLOG (id_oaiHARVEST, oai_id, date_harvested, bibupload_task_id) VALUES (%s, %s, NOW(), %s)"
@@ -478,9 +481,7 @@ def call_bibupload(marcxmlfile, mode = ["-r", "-i"],  oai_src_id = -1):
         try:
             args = mode
             args.append(marcxmlfile)
-            print "Submitting bibupload Parameters : ", str(tuple(args))
             task_id = task_low_level_submission_tuple("bibupload", "oaiharvest", tuple(args))
-            print "Submitted ! task id : ", str(task_id)
             create_bibharvest_log(task_id, oai_src_id, marcxmlfile)
         except Exception, msg:
             write_message("An exception during submitting bibharvest task occured : %s " % (str(msg)))
