@@ -56,7 +56,7 @@ from invenio.bibrankadminlib import \
 from invenio.dbquery import run_sql
 from invenio.webpage import page, pageheaderonly, pagefooteronly, adderrorbox
 from invenio.webuser import getUid, get_email
-from invenio.bibharvest_dblayer import get_history_entries, HistoryEntry, get_month_logs_size, get_history_entries_for_day, get_day_logs_size
+from invenio.bibharvest_dblayer import get_history_entries, HistoryEntry, get_month_logs_size, get_history_entries_for_day, get_day_logs_size, get_entry_history, get_entry_logs_size
 
 import invenio.template
 from invenio import oaiharvestlib
@@ -461,7 +461,7 @@ def perform_request_testsource(oai_src_id=None, ln=CFG_SITE_LANG, callback='yes'
 
 ### Probably should be moved to some other data-connection file
 
-def build_history_table(oai_src_id, date, ln):
+def build_month_history_table(oai_src_id, date, ln):
     """ Function formats the historical data
      @param oai_src_id - identifier of the harvesting source
      @param date - date designing the month of interest
@@ -492,7 +492,11 @@ def build_history_table(oai_src_id, date, ln):
                 bibharvest_templates.format_date(item.date_inserted) + " " + \
                 bibharvest_templates.format_time(item.date_inserted), cssclass = "pairtablecolumn")
 
-            result += bibharvest_templates.tmpl_table_output_cell(item.oai_id, cssclass = "oddtablecolumn")
+            record_history_link = bibharvest_templates.tmpl_link_with_args(ln, \
+                "/admin/bibharvest/bibharvestadmin.py/viewentryhistory", \
+                str(item.oai_id), [["ln", ln], ["oai_id", str(item.oai_id)], \
+                ["start", "0"]])
+            result += bibharvest_templates.tmpl_table_output_cell(record_history_link, cssclass = "oddtablecolumn")
 
             result += bibharvest_templates.tmpl_table_output_cell(str(item.record_id), cssclass = "pairtablecolumn")
 
@@ -515,14 +519,16 @@ def build_history_table(oai_src_id, date, ln):
     result += bibharvest_templates.tmpl_output_identifiers(identifiers)
     return result
 
-def build_day_history_table(data):
-    headers = ["Harvesting Date", "Insert date", "Record ID ( OAI )", "Rec. ID <br/>(Invenio)", "DB", "task <br/> number", "Reharvest"]
+def build_history_table(data, ln = CFG_SITE_LANG, show_selection = True, show_oai_source = False):
+    headers = ["Harvesting Date", "Insert date", "Record ID ( OAI )", "Rec. ID <br/>(Invenio)", "DB", "task <br/> number"]
+    if show_selection:
+        headers.append("Reharvest")
+    if show_oai_source:
+        headers.append("Harvested from <br/> source no")
+
     result = bibharvest_templates.tmpl_table_begin(headers)
     identifiers = {}
     for item in data:
-        identifier = bibharvest_templates.format_date(item.date_harvested) + \
-            bibharvest_templates.format_time(item.date_harvested) + "_" + item.oai_id
-
         result += bibharvest_templates.tmpl_table_row_begin()
         result += bibharvest_templates.tmpl_table_output_cell(\
             bibharvest_templates.format_date(item.date_harvested) + " " + \
@@ -532,24 +538,33 @@ def build_day_history_table(data):
             bibharvest_templates.format_date(item.date_inserted) + " " + \
             bibharvest_templates.format_time(item.date_inserted), cssclass = "pairtablecolumn")
 
-        result += bibharvest_templates.tmpl_table_output_cell(item.oai_id, cssclass = "oddtablecolumn")
+        record_history_link = bibharvest_templates.tmpl_link_with_args(ln, \
+          "/admin/bibharvest/bibharvestadmin.py/viewentryhistory", \
+          str(item.oai_id), [["ln", ln], ["oai_id", str(item.oai_id)], \
+          ["start", "0"]])
+        result += bibharvest_templates.tmpl_table_output_cell(record_history_link, cssclass = "oddtablecolumn")
 
         result += bibharvest_templates.tmpl_table_output_cell(str(item.record_id), cssclass = "pairtablecolumn")
 
         result += bibharvest_templates.tmpl_table_output_cell(item.inserted_to_db, cssclass = "oddtablecolumn")
 
         result += bibharvest_templates.tmpl_table_output_cell(str(item.bibupload_task_id), cssclass = "pairtablecolumn")
-
-        chkbox = bibharvest_templates.tmpl_output_checkbox(item.oai_id, identifier, "1")
-        result += bibharvest_templates.tmpl_table_output_cell(chkbox, cssclass = "oddtablecolumn")
+        if show_selection:
+            identifier = bibharvest_templates.format_date(item.date_harvested) + \
+                bibharvest_templates.format_time(item.date_harvested) + "_" + item.oai_id
+            chkbox = bibharvest_templates.tmpl_output_checkbox(item.oai_id, identifier, "1")
+            result += bibharvest_templates.tmpl_table_output_cell(chkbox, cssclass = "oddtablecolumn")
+        if show_oai_source:
+            result += bibharvest_templates.tmpl_table_output_cell(str(item.oai_src_id), cssclass = "oddtablecolumn")
 
         result += bibharvest_templates.tmpl_table_row_end()
-
-        if not identifiers.has_key(item.date_harvested.day):
-            identifiers[item.date_harvested.day] = []
-        identifiers[item.date_harvested.day].append(identifier)
+        if show_selection:
+            if not identifiers.has_key(item.date_harvested.day):
+                identifiers[item.date_harvested.day] = []
+            identifiers[item.date_harvested.day].append(identifier)
     result += bibharvest_templates.tmpl_table_end()
-    result += bibharvest_templates.tmpl_output_identifiers(identifiers)
+    if show_selection:
+        result += bibharvest_templates.tmpl_output_identifiers(identifiers)
     return result
 
 def perform_request_viewhistory(oai_src_id = None, ln = CFG_SITE_LANG, callback = 'yes', confirm = 0, month = None, year = None):
@@ -563,12 +578,13 @@ def perform_request_viewhistory(oai_src_id = None, ln = CFG_SITE_LANG, callback 
     result += bibharvest_templates.tmpl_output_menu(ln, oai_src_id, guideurl)
     result += bibharvest_templates.tmpl_output_history_javascript_functions()
     result += bibharvest_templates.tmpl_output_month_selection_bar(oai_src_id, ln, current_month = month, current_year = year)
-    inner_text = build_history_table(oai_src_id, date, ln)
+    inner_text = build_month_history_table(oai_src_id, date, ln)
     inner_text += bibharvest_templates.tmpl_print_brs(ln, 1)
     inner_text = bibharvest_templates.tmpl_output_scrollable_frame(inner_text)
     inner_text += bibharvest_templates.tmpl_output_selection_bar()
     result +=  createhiddenform(action="/admin/bibharvest/bibharvestadmin.py/reharvest", text = inner_text, button = "Reharvest selected records", oai_src_id = oai_src_id, ln = ln)
     return result
+
 
 def perform_request_viewhistoryday(oai_src_id = None, ln = CFG_SITE_LANG, callback = 'yes', confirm = 0, month = None, year = None, day = None, start = 0):
     page_length = 50
@@ -607,10 +623,50 @@ def perform_request_viewhistoryday(oai_src_id = None, ln = CFG_SITE_LANG, callba
     result += bibharvest_templates.tmpl_draw_titlebar(ln, "Viewing history of " + str(year) + "-" + str(month) + "-" + str(day) , guideurl)
     result += prev_page_link + current_range + next_page_link + bibharvest_templates.tmpl_print_brs(ln, 1)
     result += bibharvest_templates.tmpl_output_history_javascript_functions()
-    inner_text = bibharvest_templates.tmpl_output_scrollable_frame(build_day_history_table(current_day_records))
+    inner_text = bibharvest_templates.tmpl_output_scrollable_frame(build_history_table(current_day_records, ln=ln))
     inner_text += bibharvest_templates.tmpl_output_selection_bar()
     result +=  createhiddenform(action="/admin/bibharvest/bibharvestadmin.py/reharvest", text = inner_text, button = "Reharvest selected records", oai_src_id = oai_src_id, ln = ln)
     result += return_to_month_link + bibharvest_templates.tmpl_print_brs(ln, 1)
+    return result
+
+
+def perform_request_viewentryhistory(oai_id, ln, confirm, start):
+    page_length = 50
+    result = ""
+    result += bibharvest_templates.tmpl_output_menu(ln, None, guideurl)
+    considered_date = datetime.datetime.now()
+
+    number_of_records = get_entry_logs_size(oai_id)
+
+    next_page_link = ""
+    if number_of_records > start + page_length:
+        next_page_link = bibharvest_templates.tmpl_link_with_args(ln, \
+          "/admin/bibharvest/bibharvestadmin.py/viewhistoryday", \
+          "Next page &gt;&gt;", \
+          [["ln", ln], ["oai_id", str(oai_id)], \
+          ["start", str(start + page_length)]])
+    prev_page_link = ""
+    if start > 0:
+        new_start = start - page_length
+        if new_start < 0:
+            new_start = 0
+        prev_page_link = bibharvest_templates.tmpl_link_with_args(ln, \
+          "/admin/bibharvest/bibharvestadmin.py/viewhistoryday", \
+          "&lt;&lt; Previous page", \
+          [["ln", ln], ["oai_id", str(oai_id)], \
+          ["start", str(new_start)]])
+    last_shown = start + page_length
+    if last_shown > number_of_records:
+        last_shown = number_of_records
+    current_entry_records = get_entry_history(oai_id, limit = page_length, start = start)
+    current_range = "&nbsp;&nbsp;&nbsp;&nbsp;Viewing entries : " + str(start + 1) + "-" + str(last_shown) + "&nbsp;&nbsp;&nbsp;&nbsp;"
+    # Building the interface
+    result += bibharvest_templates.tmpl_draw_titlebar(ln, "Viewing history of " + str(oai_id) , guideurl)
+    result += prev_page_link + current_range + next_page_link + bibharvest_templates.tmpl_print_brs(ln, 1)
+    result += bibharvest_templates.tmpl_output_history_javascript_functions()
+    inner_text = bibharvest_templates.tmpl_output_scrollable_frame(build_history_table(current_entry_records, ln, show_selection = False, show_oai_source = True))
+    result += inner_text
+    result += bibharvest_templates.tmpl_print_brs(ln, 1)
     return result
 
 ############################################################
