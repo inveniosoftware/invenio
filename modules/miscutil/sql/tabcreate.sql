@@ -2277,13 +2277,6 @@ CREATE TABLE IF NOT EXISTS oaiHARVESTLOG (
   PRIMARY KEY (bibupload_task_id, oai_id, date_harvested)
 ) TYPE=MyISAM;
 
--- The sequence used for generating the operation numbers ( necessary when synchronizing log updates)
-CREATE TABLE IF NOT EXISTS oaiHARVESTSEQUENCE (
-  id int default 0
-) TYPE=MyISAM;
-
-INSERT INTO oaiHARVESTSEQUENCE VALUES(0);
-
 -- tables for portal elements:
 
 CREATE TABLE IF NOT EXISTS collection_portalbox (
