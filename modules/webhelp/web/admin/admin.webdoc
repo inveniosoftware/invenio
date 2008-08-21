@@ -186,6 +186,21 @@ data are uploaded in CDS Invenio, you may want to modify them via
 </td>
 </tr>
 
+<tr>
+<td>
+  <strong>Publiline Admin</strong>
+</td>
+<td>
+  Enables you to approve documents by using a complex approval workflow.
+</td>
+<td>
+  None
+</td>
+<td>
+  <a href="publiline-admin-guide">Publiline Admin Guide</a>
+</td>
+</tr>
+
 </table>
 
 <h3>Data provision related modules</h3>
