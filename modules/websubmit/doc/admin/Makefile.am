@@ -27,11 +27,13 @@ img_DATA = websubmit-admin-guide-elements.png \
 	websubmit-admin-guide-menu_doc.png \
 	websubmit-admin-guide-form.png \
 	websubmit-admin-guide-main_menu.png \
-	websubmit-admin-guide-menu_page.png
+	websubmit-admin-guide-menu_page.png \
+    publiline-guide-flow.png
 
 webdoclibdir = $(libdir)/webdoc/invenio/admin
 
-webdoclib_DATA = websubmit-admin-guide.webdoc
+webdoclib_DATA = websubmit-admin-guide.webdoc \
+    publiline-admin-guide.webdoc
 
 EXTRA_DIST = $(img_DATA) $(webdoclib_DATA)
 
