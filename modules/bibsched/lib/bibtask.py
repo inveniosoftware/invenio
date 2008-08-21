@@ -102,7 +102,13 @@ def task_low_level_submission(name, user, *argv):
     Use with care!
     Please use absolute paths in argv!
     """
+    task_low_level_submission_tuple(argv)
 
+def task_low_level_submission_tuple(name, user, argv):
+    """
+       Function does the same as task_low_level_submission_tuple.
+       The only difference is that the arguments are passed as tuple
+    """
     def get_priority(argv):
         """Try to get the priority by analysing the arguments."""
         priority = 0

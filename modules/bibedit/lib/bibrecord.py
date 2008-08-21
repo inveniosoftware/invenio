@@ -44,7 +44,7 @@ from invenio.bibrecord_config import CFG_MARC21_DTD, \
                                      CFG_BIBRECORD_DEFAULT_VERBOSE_LEVEL, \
                                      CFG_BIBRECORD_DEFAULT_CORRECT, \
                                      CFG_BIBRECORD_PARSERS_AVAILABLE
-
+from invenio.config import CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 # find out about the best usable parser:
 err = []
 parser = -1
@@ -1316,6 +1316,20 @@ def record_diff(rec1, rec2):
         if not rec1[0].has_key(field):
             result.append((field, 'a'))
     return result
+
+def record_extract_oai_id(record):
+    # Searching for oai ids.
+    tag = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3]
+    ind1 = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3]
+    ind2 = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4]
+    subfield = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5]
+    values = record_get_field_values(record, tag, ind1, ind2, subfield)
+    oai_id_regexp = "oai[a-zA-Z0-9/.:]+"
+    for id in values:
+        if re.match(oai_id_regexp, str(id).strip()) != None:
+            return str(id).strip()
+    return ""
+
 
 
 

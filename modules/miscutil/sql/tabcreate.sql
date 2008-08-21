@@ -2268,12 +2268,22 @@ CREATE TABLE IF NOT EXISTS oaiHARVEST (
 
 CREATE TABLE IF NOT EXISTS oaiHARVESTLOG (
   id_oaiHARVEST mediumint(9) unsigned NOT NULL REFERENCES oaiHARVEST, -- source we harvest from
+  id_bibrec mediumint(8) unsigned NOT NULL default '0', -- internal record id ( filled by bibupload )
+  bibupload_task_id int NOT NULL default 0, -- bib upload task number
   oai_id varchar(40) NOT NULL default "", -- OAI record identifier we harvested
   date_harvested datetime NOT NULL default '0000-00-00', -- when we harvested
   date_inserted datetime NOT NULL default '0000-00-00', -- when it was inserted
   inserted_to_db char(1) NOT NULL default 'P', -- where it was inserted (P=prod, H=holding-pen, etc)
-  PRIMARY KEY (id_oaiHARVEST, oai_id, date_inserted, inserted_to_db)
+  PRIMARY KEY (bibupload_task_id, oai_id, date_harvested)
 ) TYPE=MyISAM;
+
+-- The sequence used for generating the operation numbers ( necessary when synchronizing log updates)
+CREATE TABLE IF NOT EXISTS oaiHARVESTSEQUENCE (
+  id int default 0
+) TYPE=MyISAM;
+
+INSERT INTO oaiHARVESTSEQUENCE VALUES(0);
+
 -- tables for portal elements:
 
 CREATE TABLE IF NOT EXISTS collection_portalbox (

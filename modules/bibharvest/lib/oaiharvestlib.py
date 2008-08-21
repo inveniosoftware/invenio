@@ -41,7 +41,9 @@ from invenio.bibtask import \
      task_update_status, \
      task_init, \
      task_sleep_now_if_required, \
-     task_update_progress
+     task_update_progress, \
+     task_low_level_submission_tuple
+from invenio.bibrecord import record_extract_oai_id, create_records
 
 ## precompile some often-used regexp for speed reasons:
 re_subfields = re.compile('\$\$\w')
@@ -325,7 +327,7 @@ def task_run_core():
                                          (str(repos[0][6]),\
                                           i, \
                                           len(converted_files)))
-                    res += call_bibupload(converted_file + ".insert.xml", "-i", oai_src_id = repos[0][0])
+                    res += call_bibupload(converted_file + ".insert.xml", ["-i"], oai_src_id = repos[0][0])
                     uploaded = True
                 task_sleep_now_if_required()
                 if get_nb_records_in_file(converted_file + ".correct.xml") > 0:
@@ -333,7 +335,7 @@ def task_run_core():
                                          (str(repos[0][6]),\
                                           i, \
                                           len(converted_files)))
-                    res += call_bibupload(converted_file + ".correct.xml", "-c", oai_src_id = repos[0][0])
+                    res += call_bibupload(converted_file + ".correct.xml", ["-c"], oai_src_id = repos[0][0])
                     uploaded = True
             if len(converted_files) > 0:
                 if res == 0:
@@ -452,14 +454,38 @@ def call_bibconvert(config, harvestpath, convertpath):
     os.close(cmd_err_fd)
     return (exitcode, cmd_err)
 
-def call_bibupload(marcxmlfile, mode="-r -i",  oai_src_id = -1):
+def create_bibharvest_log(task_id, oai_src_id, marcxmlfile):
+    """
+    Funcion which creates the harvesting logs
+    """
+    #log the fact ! ( parse marcxmlfile and find the record ids ! -> the code from bibupload)
+    # 1) Parse the marcxml file in order to obtain the records collection
+    try:
+        file = open(marcxmlfile, "r")
+        xml_content = file.read(-1)
+        file.close()
+        records = create_records(xml_content)
+    # 2) For each record from this collection, create the log entry
+        for record in records:
+            oai_id = record_extract_oai_id(record[0])
+            query = "INSERT INTO oaiHARVESTLOG (id_oaiHARVEST, oai_id, date_harvested, bibupload_task_id) VALUES (%s, %s, NOW(), %s)"
+            run_sql(query, (str(oai_src_id),str(oai_id), str(task_id)))
+    except Exception, msg:
+        print "Logging exception : %s   " % (str(msg), )
+def call_bibupload(marcxmlfile, mode = ["-r", "-i"],  oai_src_id = -1):
     """Call bibupload in insert mode on MARCXMLFILE."""
-    additional_options = ""
-    if oai_src_id != -1:
-        additional_options += " -o" + str(oai_src_id)
     if os.path.exists(marcxmlfile):
-        command = '%s/bibupload -u oaiharvest %s %s %s ' % (CFG_BINDIR, additional_options, mode, marcxmlfile)
-        return os.system(command)
+        try:
+            args = mode
+            args.append(marcxmlfile)
+            print "Submitting bibupload Parameters : ", str(tuple(args))
+            task_id = task_low_level_submission_tuple("bibupload", "oaiharvest", tuple(args))
+            print "Submitted ! task id : ", str(task_id)
+            create_bibharvest_log(task_id, oai_src_id, marcxmlfile)
+        except Exception, msg:
+            write_message("An exception during submitting bibharvest task occured : %s " % (str(msg)))
+            return 1
+        return 0
     else:
         write_message("marcxmlfile %s does not exist" % marcxmlfile)
         return 1

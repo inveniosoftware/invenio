@@ -42,7 +42,6 @@ tables according to options.
          2: FFT tags; 3: BibFmt; 4: Metadata update; 5: time update)
      -n,  --notimechange     do not change record last modification date
         when updating
-     -o, --oaisourceid=ID    id of the OAI source from which the data was harvested
 
     Scheduling options:
      -u, --user=USER         user name to store task, password needed
@@ -85,7 +84,8 @@ from invenio.bibrecord import create_records, \
                               record_get_field_instances, \
                               record_get_field_values, \
                               field_get_subfield_values, \
-                              field_get_subfield_instances
+                              field_get_subfield_instances, \
+                              record_extract_oai_id
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
 from invenio.bibformat import format_record
@@ -143,16 +143,13 @@ def bibupload_pending_recids():
 
 ### bibupload engine functions:
 def bibupload(record, opt_tag=None, opt_mode=None,
-        opt_stage_to_start_from=1, opt_notimechange=0, oai_rec_id = "",
-        oai_src_id=-1):
+        opt_stage_to_start_from=1, opt_notimechange=0, oai_rec_id = ""):
     """Main function: process a record and fit it in the tables
     bibfmt, bibrec, bibrec_bibxxx, bibxxx with proper record
     metadata.
 
     Return (error_code, recID) of the processed record.
     """
-    if oai_src_id != -1:
-        write_message("record_id : "+ str(oai_rec_id)+ "  oai_src: "+ str(oai_src_id), verbose=2)
     assert(opt_mode in ('insert', 'replace', 'replace_or_insert', 'reference',
         'correct', 'append', 'format'))
     error = None
@@ -346,7 +343,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             opt_mode == 'append' or \
             opt_mode == 'correct' or \
             opt_mode == 'reference':
-                update_database_with_metadata(record, rec_id, oai_rec_id, oai_src_id)
+                update_database_with_metadata(record, rec_id, oai_rec_id)
                 record_deleted_p = False
             else:
                 write_message("   -Stage NOT NEEDED in mode %s" % opt_mode,
@@ -381,7 +378,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         if record_deleted_p:
             ## BibUpload has failed living the record deleted. We should
             ## back the original record then.
-            update_database_with_metadata(rec_old, rec_id, oai_rec_id, oai_src_id)
+            update_database_with_metadata(rec_old, rec_id, oai_rec_id)
             write_message("   Restored original record", verbose=1, stream=sys.stderr)
 
 def print_out_bibupload_statistics():
@@ -1377,7 +1374,7 @@ def archive_marcxml_for_history(recID):
         return 1
     return 0
 
-def update_database_with_metadata(record, rec_id, oai_rec_id = "oai", oai_src_id = -1):
+def update_database_with_metadata(record, rec_id, oai_rec_id = "oai"):
     """Update the database tables with the record and the record id given in parameter"""
     for tag in record.keys():
         # check if tag is not a special one:
@@ -1446,7 +1443,8 @@ def update_database_with_metadata(record, rec_id, oai_rec_id = "oai", oai_src_id
                 tag_list.pop()
             tag_list.pop()
     write_message("   -Update the database with metadata : DONE", verbose=2)
-    log_record_harvesting(oai_rec_id, oai_src_id)
+
+    log_record_uploading(oai_rec_id, task_get_task_param('task_id', 0), rec_id, 'P')
 
 def append_new_tag_to_old_record(record, rec_old, opt_tag, opt_mode):
     """Append new tags to a old record"""
@@ -1639,10 +1637,9 @@ Examples:
   -S, --stage=STAGE\tstage to start from in the algorithm (0: always done; 1: FMT tags;
 \t\t\t2: FFT tags; 3: BibFmt; 4: Metadata update; 5: time update)
   -n, --notimechange\tdo not change record last modification date when updating
-  -o, --oaisourceid=ID    id of the OAI source from which the data was harvested
 """,
             version=__revision__,
-            specific_params=("ircazS:fno:",
+            specific_params=("ircazS:fn",
                  [
                    "insert",
                    "replace",
@@ -1652,7 +1649,6 @@ Examples:
                    "stage=",
                    "format",
                    "notimechange",
-                   "oaisourceid=",
                  ]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
@@ -1728,8 +1724,6 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
             print >> sys.stderr, """The value specified for --stage must be comprised between 0 and 5"""
             return False
         task_set_option('stage_to_start_from', value)
-    elif key in ("-o", "--oaisourceid"):
-        task_set_option('oaisrcid', str(value))
     else:
         return False
     return True
@@ -1764,19 +1758,6 @@ def writing_rights_p():
         return False
     return True
 
-def extract_oai_id(record):
-    # Searching for oai ids.
-    tag = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3]
-    ind1 = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3]
-    ind2 = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4]
-    subfield = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[5]
-    values = record_get_field_values(record, tag, ind1, ind2, subfield)
-    oai_id_regexp = "oai[a-zA-Z0-9/.:]+"
-    for id in values:
-        if re.match(oai_id_regexp, str(id).strip()) != None:
-            return str(id).strip()
-    return ""
-
 def task_run_core():
     """ Reimplement to add the body of the task."""
     error = 0
@@ -1793,7 +1774,7 @@ def task_run_core():
         if recs is not None:
             # We proceed each record by record
             for record in recs:
-                record_id = extract_oai_id(record)
+                record_id = record_extract_oai_id(record)
                 task_sleep_now_if_required(can_stop_too=True)
                 error = bibupload(
                     record,
@@ -1801,8 +1782,7 @@ def task_run_core():
                     opt_mode=task_get_option('mode'),
                     opt_stage_to_start_from=task_get_option('stage_to_start_from'),
                     opt_notimechange=task_get_option('notimechange'),
-                    oai_rec_id = record_id,
-                    oai_src_id = task_get_option('oaisrcid'))
+                    oai_rec_id = record_id)
                 if error[0] == 1:
                     if record:
                         write_message(record_xml_output(record),
@@ -1834,15 +1814,13 @@ def task_run_core():
     # Check if they were errors
     return not stat['nb_errors'] >= 1
 
-def log_record_harvesting(oai_rec_id, oai_src_id):
-    if oai_src_id != -1 and oai_src_id != None and oai_rec_id != "" and oai_rec_id != None:
-        query = """INSERT INTO  oaiHARVESTLOG (id_oaiHARVEST, date_inserted, oai_id)
-            VALUES (%s, NOW(), %s)"""
+def log_record_uploading(oai_rec_id, task_id, bibrec_id, insertion_db):
+    if oai_rec_id != "" and oai_rec_id != None:
+        query = """UPDATE oaiHARVESTLOG SET date_inserted=NOW(), inserted_to_db=%s, id_bibrec=%s WHERE oai_id = %s AND bibupload_task_id = %s ORDER BY date_harvested LIMIT 1"""
         try:
-            row_id  = run_sql(query, (oai_src_id, oai_rec_id))
-            return row_id
+            run_sql(query, (str(insertion_db), str(bibrec_id), str(oai_rec_id), str(task_id), ))
         except Error, error:
-            write_message("   Error during the log_record_harvesting function : %s "
+            write_message("   Error during the log_record_uploading function : %s "
                           % error, verbose=1, stream=sys.stderr)
 if __name__ == "__main__":
     main()
