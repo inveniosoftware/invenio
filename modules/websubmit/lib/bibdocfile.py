@@ -1517,9 +1517,18 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
 
     def multiple_ranges(size, ranges, mime):
         req.status = apache.HTTP_PARTIAL_CONTENT
-        req.content_type = 'multipart/byteranges'
         boundary = '%s%04d' % (time.strftime('THIS_STRING_SEPARATES_%Y%m%d%H%M%S'), random.randint(0, 9999))
-        req.headers_out['boundary'] = boundary
+        req.content_type = 'multipart/byteranges; boundary=%s' % boundary
+        content_length = 0
+        for arange in ranges:
+            content_length += len('--%s\r\n' % boundary)
+            content_length += len('Content-Type: %s\r\n' % mime)
+            content_length += len('Content-Range: bytes %d-%d/%d\r\n' % (arange[0], arange[0] + arange[1] - 1, size))
+            content_length += len('\r\n')
+            content_length += arange[1]
+            content_length += len('\r\n')
+        content_length += len('--%s--\r\n' % boundary)
+        req.set_content_length(content_length)
         req.send_http_header()
         if not req.header_only:
             for arange in ranges:
@@ -1612,7 +1621,8 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                     arange[1] = arange[1] - arange[0] + 1
                 arange[0] = max(0, arange[0])
                 arange[1] = min(size - arange[0], arange[1])
-                ret.append(arange)
+                if arange[1] > 0:
+                    ret.append(arange)
         return ret
 
     def get_normalized_headers(headers):
@@ -1661,16 +1671,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         req.encoding = encoding
         req.filename = fullname
         req.headers_out["Last-Modified"] = time.strftime('%a, %d %b %Y %X GMT', time.gmtime(mtime))
-
-        try:
-            tmp = req.chunked
-            req.chunked = tmp
-            req.headers_out["Accept-Ranges"] = "bytes"
-        except TypeError:
-            ## Old mod_python where the above attributes were
-            ## read-only
-            req.headers_out["Accept-Ranges"] = "none"
-
+        req.headers_out["Accept-Ranges"] = "bytes"
         req.headers_out["Content-Location"] = location
         if etag is not None:
             req.headers_out["ETag"] = etag
@@ -1697,13 +1698,6 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
                     return normal_streaming(size)
             ranges = fix_ranges(headers['range'], size)
             if len(ranges) > 1:
-                try:
-                    req.chunked = False
-                    req.connection.keepalive = apache.AP_CONN_CLOSE
-                except TypeError:
-                    ## Old mod_python where the above attributes were
-                    ## read-only
-                    return normal_streaming(size)
                 return multiple_ranges(size, ranges, mime)
             elif ranges:
                 return single_range(size, ranges[0])
