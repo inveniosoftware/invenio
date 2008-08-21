@@ -3166,7 +3166,7 @@ CREATE TABLE IF NOT EXISTS crcLOAN(
 	id_bibrec int(15) unsigned NOT NULL,			
 	barcode VARCHAR(30) NOT NULL,
 	loaned_on datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-	returned_on date NOT NULL DEFAULT '0000-00-00 00:00:00',
+	returned_on date NOT NULL DEFAULT '0000-00-00',
 	due_date datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
 	number_of_renewals int(3) unsigned NOT NULL DEFAULT '0',
 	overdue_letter_number int(3) unsigned NOT NULL DEFAULT '0',
