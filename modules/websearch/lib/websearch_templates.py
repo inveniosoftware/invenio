@@ -3215,7 +3215,10 @@ class Template:
         else:
             out = "<!--not showing citation history. CFG_BIBRANK_SHOW_CITATION_GRAPHS:"
             out+= str(CFG_BIBRANK_SHOW_CITATION_GRAPHS)+" citationhistory "
-            out+= str(len(citationhistory))+"-->"
+            if citationhistory:
+                out+= str(len(citationhistory))+"-->"
+            else:
+                out+= "no citationhistory -->"
         return out
 
     def tmpl_detailed_record_citations_co_citing(self, recID, ln,
