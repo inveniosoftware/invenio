@@ -159,7 +159,10 @@ DEF_ACTIONS = (
                (WEBACCESSACTION, 'configure WebAccess', '', 'no'),
                (DELEGATEADDUSERROLE, 'delegate subroles inside WebAccess', 'role',          'no'),
                (VIEWRESTRCOLL, 'view restricted collection', 'collection', 'no'),
-               ('cfgwebjournal', 'configure WebJournal', 'name', 'no'),
+               ('cfgwebjournal', 'configure WebJournal', 'name', 'yes'),
+               ('viewcomment', 'view comments', 'collection', 'no'),
+               ('sendcomment', 'send comments', 'collection', 'no'),
+               ('attachcommentfile', 'attach files to comments', 'collection', 'no'),
               )
 
 # Default authorizations
