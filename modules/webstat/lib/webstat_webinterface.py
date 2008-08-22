@@ -199,18 +199,16 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def customevent(self, req, form):
         """Custom event statistics page"""
-        if form.has_key('ids'):
-            num_bloks = len(form['ids'])
-        else:
-            num_bloks = 0
         arg_format = {'ids': (list, []),
                      'timespan': (str, "today"),
                      'format': (str, SUITABLE_GRAPH_FORMAT),
                      'ln': (str, CFG_SITE_LANG)}
-        for i in [ str(j) for j in range(num_bloks)]:
-            arg_format['cols'+i]=(list, [])
-            arg_format['col_value'+i]=(list, [])
-            arg_format['bool'+i]=(list, [])
+        for key in form.keys():
+            if key[:4] == 'cols':
+                i = key[4:]
+                arg_format['cols'+i]=(list, [])
+                arg_format['col_value'+i]=(list, [])
+                arg_format['bool'+i]=(list, [])
         argd = wash_urlargd(form, arg_format)
 
         ln = argd['ln']

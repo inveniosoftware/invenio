@@ -229,13 +229,12 @@ class Template:
                                             attribute='onChange="javascript: changed_customevent(customevent[\'ids\'],%d);"' % i,
                                             ln=ln)]
             is_first_loop = True
+            row = 0
             if choosed['cols'][i] == []:
                 choosed['cols'][i] = [("","","")]
             for bool,col,value in choosed['cols'][i]:
                 select_row.append("")
-                if is_first_loop:
-                    is_first_loop = False
-                else:
+                if not is_first_loop:
                     select_row.append("""<select name="bool%d"> <option value="and">AND</option> <option value="or">OR</option> <option value="and_not">AND NOT</option> </select>""" % i)
                 if id:
                     select_row.append(self._tmpl_select_box(options['cols'][id],
@@ -249,9 +248,17 @@ class Template:
                                                     'cols' + str(i),
                                                     "",
                                                     ln=ln))
-                select_row.append("<input name=\"col_value%d\" value=\"%s\">" % (i,value))
+                if is_first_loop:
+                    select_row.append("<input name=\"col_value%d\" value=\"%s\">" % (i,value))
+                else:
+                    select_row.append("""<input name="col_value%d" value="%s">
+                            <a href="javascript:;" onclick="delrow(%d,%d);">Remove row</a>""" \
+                            % (i,value,i,row))
                 select_table.append(select_row)
                 select_row = []
+                if is_first_loop:
+                    is_first_loop = False
+                row += 1
             sels.append(select_table)
 
         # javascript for add col selectors
@@ -261,13 +268,20 @@ class Template:
         sels_col.append("")
         sels_col.append(self._tmpl_select_box(options['cols']['__none'], "Choose CustomEvent",
                                             'cols\' + col + \'', "", False, ln=ln))
-        sels_col.append("<input name=\"col_value' + col + '\">")
+        sels_col.append("""<input name="col_value' + col + '">""")
         col_table = self._tmpl_box("", "", ["cols' + col + '"], headers[1:], [sels_col],
-                    ["""<a href="javascript:;" onclick="addcol(\\'cols' + col + '\\', ' + col + ');">Add more arguments</a>"""], ln=ln)
+                    ["""<a id="add' + col + '" href="javascript:;" onclick="addcol(\\'cols' + col + '\\', ' + col + ');">Add more arguments</a>
+                    <a id="del' + col + '" href="javascript:;" onclick="delblock(' + col + ');">Remove block</a>
+                        """], ln=ln)
         col_table = col_table.replace('\n','')
         formheader = """<script type="text/javascript">
                 var col = %d;
-                var col_select = new Array(%s,0)
+                var col_select = new Array(%s,0);
+                var block_pos_max = %d;
+                var block_pos = new Array(%s,0);
+                var rows_pos_max = [%s];
+                var rows_pos = [%s];
+
                 function addcol(id, num){
                     col_select[num]++;
                     var table = document.getElementById(id);
@@ -279,7 +293,7 @@ class Template:
                     cel1.innerHTML = '<select name="bool' + num + '"> <option value="and">AND</option> <option value="or">OR</option> <option value="and_not">AND NOT</option> </select>';
                     row.appendChild(cel1);
                     var cel2 = document.createElement('td');
-                    cel2.innerHTML = '%s'
+                    cel2.innerHTML = '%s';
                     row.appendChild(cel2);
                     var cel3 = document.createElement('td');
                     cel3.innerHTML = '%s';
@@ -291,13 +305,20 @@ class Template:
                     if (col_select[1] == 0) {
                         value = document['customevent']['ids'].value;
                     } else {
-                        value = document['customevent']['ids'][num].value;
+                        value = document['customevent']['ids'][block_pos[num]].value;
                     }
-                    _change_select_options(arguments[arguments.length -1], get_argument_list(value), '')
+                    _change_select_options(arguments[arguments.length -1], get_argument_list(value), '');
+                    rows_pos[num][col_select[num]-1] = rows_pos_max[num];
+                    rows_pos_max[num]++;
                 } """ % (num_ids,
                         ','.join([ str(len(choosed['cols'][i])) for i in range(num_ids)]),
+                        num_ids,
+                        ','.join([ str(i) for i in range(num_ids)]),
+                        ','.join([ str(len(block)) for block in choosed['cols']]),
+                        ','.join([ str(range(len(block))) for block in choosed['cols']]),
                         sels_col[2].replace("' + col + '", "' + num + '"),
-                        sels_col[3].replace("' + col + '", "' + num + '"))
+                        sels_col[3].replace("' + col + '", "' + num + '") + \
+                                """ <a href="javascript:;" onclick="delrow(' + num + ',' + (col_select[num]-1) + ');">Remove row</a>""")
         formheader += """
                 function addblock() {
                     col_select[col] = 1;
@@ -305,8 +326,35 @@ class Template:
                     var newdiv = document.createElement('div'+col);
                     newdiv.innerHTML = '%s';
                     ni.appendChild(newdiv);
-                    col = col + 1;
+                    block_pos[col] = block_pos_max;
+                    block_pos_max++;
+                    rows_pos[col] = [0];
+                    rows_pos_max[col] = 1;
+                    col++;
                 }""" % col_table
+        formheader += """
+                function delblock(id) {
+                    var block = document.getElementById("cols" + id);
+                    var add = document.getElementById("add" + id);
+                    var del = document.getElementById("del" + id);
+                    block.parentNode.removeChild(block);
+                    add.parentNode.removeChild(add);
+                    del.parentNode.removeChild(del);
+                    for (var i = id+1; i < col_select.length; i++) {
+                        block_pos[i]--;
+                    }
+                    block_pos_max--;
+                }
+
+                function delrow(table_id,row_num) {
+                    var table = document.getElementById('cols' + table_id);
+                    table.tBodies[0].deleteRow(rows_pos[table_id][row_num]);
+                    col_select[table_id]--;
+                    for (var i = row_num+1; i < rows_pos[table_id].length; i++) {
+                        rows_pos[table_id][i]--;
+                    }
+                    rows_pos_max[table_id]--;
+                } """
         formheader += """
                 function change_select_options(selectList, isList, optionArray, chooseDefault) {
                     if (isList) {
@@ -330,10 +378,10 @@ class Template:
                 }
 
                 function changed_customevent(select, num){
-                    if (col_select[1] == 0) {
-                        value = select.value;
+                    if (select.length) {
+                        value = select[block_pos[num]].value;
                     } else {
-                        value = select[num].value;
+                        value = select.value;
                     }
                     list = get_argument_list(value);
                     select_list = (col_select[num] > 1);
@@ -364,8 +412,12 @@ class Template:
         # Create all footers
         footers = []
         footers.append("")
-        for i in range(len(choosed['ids'])):
-            footers.append("""<a href="javascript:;" onclick="addcol('cols%d', %d);">Add more arguments</a>""" % (i,i))
+        footers.append("""<a href="javascript:;" onclick="addcol('cols0', 0);">Add more arguments</a>""")
+        for i in range(1,num_ids):
+            footers.append("""
+                    <a id="add%(i)d" href="javascript:;" onclick="addcol('cols%(i)d', %(i)d);">Add more arguments</a>
+                    <a id="del%(i)d" href="javascript:;" onclick="delblock(%(i)d);">Remove block</a>
+                    """ % {'i': i})
         footers[-1] += """<div  id="block"> </div>"""
 
         # Create formfooter

@@ -672,10 +672,15 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
                 'cols': cols_dict }
 
     # Build a dictionary for the selected parameters: { parameter name: argument internal name }
-    choosed = { 'ids': args['ids'], 'timespan': args['timespan'], 'format': args['format'], 'cols': [] }
+    choosed = { 'ids': args['ids'], 'timespan': args['timespan'], 'format': args['format']}
     # Calculate cols
+    index = []
+    for key in args.keys():
+        if key[:4] == 'cols':
+            index.append(key[4:])
+    index.sort()
     choosed['cols'] = [ zip([""]+args['bool'+i], args['cols'+i], args['col_value'+i])
-                        for i in [ str(j) for j in range(len(args['ids']))]]
+                        for i in index ]
     # Send to template to prepare event customization FORM box
     out = TEMPLATES.tmpl_customevent_box(options, choosed, ln=ln)
 
