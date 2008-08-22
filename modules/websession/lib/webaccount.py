@@ -153,6 +153,7 @@ def perform_display_account(req,username,bask,aler,sear,msgs,grps,ln):
              alerts = aler,
              searches = sear,
              messages = msgs,
+             loans = None,
              groups = grps,
              administrative = perform_youradminactivities(user_info, ln)
            )
