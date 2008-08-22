@@ -230,6 +230,8 @@ class Template:
                                             ln=ln)]
             is_first_loop = True
             row = 0
+            if len(choosed['cols']) <= i:
+                choosed['cols'].append([("","","")])
             if choosed['cols'][i] == []:
                 choosed['cols'][i] = [("","","")]
             for bool,col,value in choosed['cols'][i]:

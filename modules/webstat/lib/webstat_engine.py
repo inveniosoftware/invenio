@@ -503,7 +503,7 @@ def create_graph_trend(trend, path, settings):
                 plot_items.append(Gnuplot.PlotItems.Data(data, title=settings["multiple"][col]))
             g.plot(*plot_items)
         else:
-            g.plot(str([x[1] for x in trend]) + "with boxes")
+            g.plot([x[1] for x in trend])
 
 def create_graph_dump(dump, path, settings):
     """
