@@ -468,6 +468,8 @@ def create_graph_trend(trend, path, settings):
 
         g = Gnuplot.Gnuplot()
 
+        #FIXME
+        #g('set style fill pattern')
         g('set style data linespoints')
         g('set terminal png small')
         g('set output "%s"' % path)
@@ -501,7 +503,7 @@ def create_graph_trend(trend, path, settings):
                 plot_items.append(Gnuplot.PlotItems.Data(data, title=settings["multiple"][col]))
             g.plot(*plot_items)
         else:
-            g.plot([x[1] for x in trend])
+            g.plot(str([x[1] for x in trend]) + "with boxes")
 
 def create_graph_dump(dump, path, settings):
     """

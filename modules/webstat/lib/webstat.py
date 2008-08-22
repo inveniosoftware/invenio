@@ -670,10 +670,12 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
                 'timespan': ('Time span', _get_timespans()),
                 'format': ('Output format', _get_formats(True)),
                 'cols': cols_dict }
+
     # Build a dictionary for the selected parameters: { parameter name: argument internal name }
-    choosed = { 'ids': "", 'timespan': args['timespan'], 'format': args['format'], 'cols': '' }
-    if args['ids']:
-        choosed['ids'] = args['ids'][0]
+    choosed = { 'ids': args['ids'], 'timespan': args['timespan'], 'format': args['format'], 'cols': [] }
+    # Calculate cols
+    choosed['cols'] = [ zip([""]+args['bool'+i], args['cols'+i], args['col_value'+i])
+                        for i in [ str(j) for j in range(len(args['ids']))]]
     # Send to template to prepare event customization FORM box
     out = TEMPLATES.tmpl_customevent_box(options, choosed, ln=ln)
 
@@ -714,10 +716,7 @@ def perform_display_customevent(ids=[], args={}, req=None, ln=CFG_SITE_LANG):
     else:
         for id, i in [ (ids[i], str(i)) for i in range(len(ids))]:
             # Calculate cols
-            args_req['cols'] = []
-            if args.has_key('cols'+i):
-                args['bool'+i].insert(0,"")
-                args_req['cols'] = zip(args['bool'+i], args['cols'+i], args['col_value'+i])
+            args_req['cols'] = choosed['cols'][int(i)]
 
             # Get unique name for the rawdata file (wash arguments!)
             filename = "webstat_customevent_" + re.subn("[^\w]", "", id + "_" + choosed['timespan'] + "_" + '-'.join([ ':'.join(col) for col in args_req['cols']]))[0]

@@ -199,7 +199,10 @@ class WebInterfaceStatsPages(WebInterfaceDirectory):
 
     def customevent(self, req, form):
         """Custom event statistics page"""
-        num_bloks = len(form['ids'])
+        if form.has_key('ids'):
+            num_bloks = len(form['ids'])
+        else:
+            num_bloks = 0
         arg_format = {'ids': (list, []),
                      'timespan': (str, "today"),
                      'format': (str, SUITABLE_GRAPH_FORMAT),

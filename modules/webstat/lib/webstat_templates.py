@@ -192,20 +192,27 @@ class Template:
                         It's use for 'cols'
                         With "param father"="__header" the headers
                         With "param father"="__none" indicate the arguments by default
-        @type options: { str: (str, [(str, str)]|{str: [(str, str)]})}
+        @type options: { str: (str, [(str, str)])|{str: [(str, str)]}}
 
         @param choosed: The selected parameters, and its values.
         @type choosed: { str: str }
         """
+        if choosed['ids'] == []:
+            choosed['ids'] = [""]
+            choosed['cols'] = [[("","","")]]
+        num_ids = len(choosed['ids'])
+
         # Crate the ids of the tables
-        table_id = ["time_format", "cols0"]
+        table_id = ["time_format"]
+        table_id.extend([ 'cols' + str(i) for i in range(num_ids)])
 
         # Create the headers using the options permutation
-        headers = [(options['timespan'][0], options['format'][0]),
-                   (options['ids'][0], "", options['cols']['__header'], "value")]
+        headers = [(options['timespan'][0], options['format'][0])]
+        headers.extend([(options['ids'][0], "", options['cols']['__header'], "value")
+                        for id in choosed['ids']])
 
         # Create all SELECT boxes
-        sels = [[],[]]
+        sels = [[]]
         for param in ['timespan', 'format']:
             sels[0].append(self._tmpl_select_box(options[param][1],        # SELECT box data
                                           " - select " + options[param][0], # first item info
@@ -213,36 +220,45 @@ class Template:
                                           choosed[param],                   # selected value (perhaps several)
                                           type(choosed[param]) is list,     # multiple box?
                                           ln=ln))
-        sels[1].append(self._tmpl_select_box(options['ids'][1],
-                                        " - select " + options['ids'][0],
-                                        'ids',
-                                        choosed['ids'],
-                                        type(choosed['ids']) is list,
-                                        attribute='onChange="javascript: changed_customevent(customevent[\'ids\'],0);"',
-                                        ln=ln))
-        sels[1].append("")
-        if choosed['ids']:
-            sels[1].append(self._tmpl_select_box(options['cols'][choosed['ids']],
-                                            " - select " + options['cols']['__header'],
-                                            'cols',
-                                            choosed['cols'],
-                                            type(choosed['cols']) is list,
-                                            ln=ln))
-        else:
-            sels[1].append(self._tmpl_select_box(options['cols']['__none'],
-                                            "Choose CustomEvent",
-                                            'cols',
-                                            choosed['cols'],
-                                            type(choosed['cols']) is list,
-                                            ln=ln))
-        sels[1][2] = sels[1][2].replace("cols", "cols0")
-        sels[1].append("<input name=\"col_value0\">")
+        for id,i in zip(choosed['ids'],range(num_ids)):
+            select_table = []
+            select_row = [self._tmpl_select_box(options['ids'][1],
+                                            " - select " + options['ids'][0],
+                                            'ids',
+                                            id,
+                                            attribute='onChange="javascript: changed_customevent(customevent[\'ids\'],%d);"' % i,
+                                            ln=ln)]
+            is_first_loop = True
+            if choosed['cols'][i] == []:
+                choosed['cols'][i] = [("","","")]
+            for bool,col,value in choosed['cols'][i]:
+                select_row.append("")
+                if is_first_loop:
+                    is_first_loop = False
+                else:
+                    select_row.append("""<select name="bool%d"> <option value="and">AND</option> <option value="or">OR</option> <option value="and_not">AND NOT</option> </select>""" % i)
+                if id:
+                    select_row.append(self._tmpl_select_box(options['cols'][id],
+                                                    " - select " + options['cols']['__header'],
+                                                    'cols' + str(i),
+                                                    col,
+                                                    ln=ln))
+                else:
+                    select_row.append(self._tmpl_select_box(options['cols']['__none'],
+                                                    "Choose CustomEvent",
+                                                    'cols' + str(i),
+                                                    "",
+                                                    ln=ln))
+                select_row.append("<input name=\"col_value%d\" value=\"%s\">" % (i,value))
+                select_table.append(select_row)
+                select_row = []
+            sels.append(select_table)
 
         # javascript for add col selectors
         sels_col = []
         sels_col.append(self._tmpl_select_box(options['ids'][1], " - select " + options['ids'][0],'ids', "", False,
                                             attribute='onChange="javascript: changed_customevent(customevent[\\\'ids\\\'],\' + col + \');"',ln=ln))
-        sels_col.append(sels[1][1])
+        sels_col.append("")
         sels_col.append(self._tmpl_select_box(options['cols']['__none'], "Choose CustomEvent",
                                             'cols\' + col + \'', "", False, ln=ln))
         sels_col.append("<input name=\"col_value' + col + '\">")
@@ -250,8 +266,8 @@ class Template:
                     ["""<a href="javascript:;" onclick="addcol(\\'cols' + col + '\\', ' + col + ');">Add more arguments</a>"""], ln=ln)
         col_table = col_table.replace('\n','')
         formheader = """<script type="text/javascript">
-                var col = 1;
-                var col_select = new Array(1,0)
+                var col = %d;
+                var col_select = new Array(%s,0)
                 function addcol(id, num){
                     col_select[num]++;
                     var table = document.getElementById(id);
@@ -278,7 +294,9 @@ class Template:
                         value = document['customevent']['ids'][num].value;
                     }
                     _change_select_options(arguments[arguments.length -1], get_argument_list(value), '')
-                } """ % (sels_col[2].replace("' + col + '", "' + num + '"),
+                } """ % (num_ids,
+                        ','.join([ str(len(choosed['cols'][i])) for i in range(num_ids)]),
+                        sels_col[2].replace("' + col + '", "' + num + '"),
                         sels_col[3].replace("' + col + '", "' + num + '"))
         formheader += """
                 function addblock() {
@@ -346,8 +364,9 @@ class Template:
         # Create all footers
         footers = []
         footers.append("")
-        footers.append("""<a href="javascript:;" onclick="addcol('cols0', 0);">Add more arguments</a>
-                <div  id="block"> </div>""")
+        for i in range(len(choosed['ids'])):
+            footers.append("""<a href="javascript:;" onclick="addcol('cols%d', %d);">Add more arguments</a>""" % (i,i))
+        footers[-1] += """<div  id="block"> </div>"""
 
         # Create formfooter
         formfooter = """<p><a href="javascript:;" onclick="addblock();">Add more events</a>
@@ -394,7 +413,7 @@ class Template:
         @type headers: list<list<str>>
 
         @param selectboxes: The actual HTML drop-down boxes, with appropriate content.
-        @type selectboxes: list<list<str>>
+        @type selectboxes: list<list<str>>|list<list<list<str>>>
 
         @param footers: footer for each table
         @type footers: list<str>
@@ -414,12 +433,22 @@ class Template:
 
             out += """</tr>
                 </thead>
-                <tbody>
-                <tr valign="bottom">"""
+                <tbody>"""
 
             # Append the SELECT boxes
+            is_first_loop = True
+            out += """<tr valign="bottom">"""
             for selectbox in selectboxes[table]:
-                out += """<td class="searchboxbody" valign="top">%s</td>""" % selectbox
+                if type(selectbox) is list:
+                    if is_first_loop:
+                        is_first_loop = False
+                    else:
+                        out += """</tr>
+                                <tr valign="bottom">"""
+                    for select in selectbox:
+                        out += """<td class="searchboxbody" valign="top">%s</td>""" % select
+                else:
+                    out += """<td class="searchboxbody" valign="top">%s</td>""" % selectbox
             out += """
                 </tr>"""
             out += """
