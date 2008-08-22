@@ -22,8 +22,8 @@
 ## script.
 
 ## Initialize autoconf and automake:
-AC_INIT(cds-invenio, 0.99.1.20080811, cds.support@cern.ch)
-AM_INIT_AUTOMAKE(cds-invenio, 0.99.1.20080811)
+AC_INIT(cds-invenio, 0.99.1.20080820, cds.support@cern.ch)
+AM_INIT_AUTOMAKE(cds-invenio, 0.99.1.20080820)
 
 ## By default we shall install into /opt/cds-invenio.  (Do not use
 ## AC_PREFIX_DEFAULT for this, because it would not work well with
@@ -440,58 +440,14 @@ AC_CONFIG_FILES([config.nice  \
 	  config/Makefile \
 	  config/invenio-autotools.conf \
 	  modules/Makefile \
-	  modules/bibconvert/Makefile \
-	  modules/bibconvert/bin/Makefile \
-	  modules/bibconvert/bin/bibconvert \
-	  modules/bibconvert/doc/Makefile \
-	  modules/bibconvert/doc/admin/Makefile \
-	  modules/bibconvert/doc/hacking/Makefile \
-	  modules/bibconvert/etc/Makefile \
-	  modules/bibconvert/lib/Makefile \
-	  modules/bibmatch/Makefile \
-	  modules/bibmatch/bin/Makefile \
-	  modules/bibmatch/bin/bibmatch \
-	  modules/bibmatch/doc/Makefile \
-	  modules/bibmatch/doc/admin/Makefile \
-	  modules/bibmatch/etc/Makefile \
-	  modules/bibmatch/lib/Makefile \
-	  modules/bibedit/Makefile \
-	  modules/bibedit/bin/Makefile \
-	  modules/bibedit/bin/refextract \
-	  modules/bibedit/bin/xmlmarclint \
-	  modules/bibedit/bin/xmlmarc2textmarc \
-	  modules/bibedit/bin/bibedit \
-	  modules/bibedit/doc/Makefile \
-	  modules/bibedit/doc/admin/Makefile \
-	  modules/bibedit/doc/hacking/Makefile \
-	  modules/bibedit/etc/Makefile \
-	  modules/bibedit/lib/Makefile \
-	  modules/bibedit/web/Makefile \
-	  modules/bibedit/web/admin/Makefile \
-	  modules/bibformat/Makefile \
-	  modules/bibformat/bin/Makefile \
-	  modules/bibformat/bin/bibreformat \
-	  modules/bibformat/doc/Makefile \
-	  modules/bibformat/doc/admin/Makefile \
-	  modules/bibformat/doc/hacking/Makefile \
-	  modules/bibformat/etc/Makefile \
-	  modules/bibformat/etc/output_formats/Makefile \
-	  modules/bibformat/etc/format_templates/Makefile \
-	  modules/bibformat/lib/Makefile \
-	  modules/bibformat/lib/elements/Makefile \
-	  modules/bibformat/web/Makefile \
-	  modules/bibformat/web/admin/Makefile \
-	  modules/bibharvest/Makefile \
-	  modules/bibharvest/bin/Makefile \
-	  modules/bibharvest/bin/bibharvest \
-	  modules/bibharvest/bin/oaiharvest \
-	  modules/bibharvest/bin/oaiarchive \
-	  modules/bibharvest/doc/Makefile \
-	  modules/bibharvest/doc/admin/Makefile \
-	  modules/bibharvest/doc/hacking/Makefile \
-	  modules/bibharvest/lib/Makefile \
-	  modules/bibharvest/web/Makefile \
-	  modules/bibharvest/web/admin/Makefile \
+	  modules/bibcirculation/Makefile \
+	  modules/bibcirculation/bin/Makefile \
+	  modules/bibcirculation/doc/Makefile \
+	  modules/bibcirculation/doc/admin/Makefile \
+	  modules/bibcirculation/doc/hacking/Makefile
+	  modules/bibcirculation/lib/Makefile \
+	  modules/bibcirculation/web/Makefile \
+	  modules/bibcirculation/web/admin/Makefile \
 	  modules/bibclassify/Makefile \
 	  modules/bibclassify/bin/Makefile \
 	  modules/bibclassify/bin/bibclassify \
@@ -501,6 +457,61 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibclassify/doc/hacking/Makefile \
 	  modules/bibclassify/etc/Makefile
 	  modules/bibclassify/lib/Makefile
+	  modules/bibconvert/Makefile \
+	  modules/bibconvert/bin/Makefile \
+	  modules/bibconvert/bin/bibconvert \
+	  modules/bibconvert/doc/Makefile \
+	  modules/bibconvert/doc/admin/Makefile \
+	  modules/bibconvert/doc/hacking/Makefile \
+	  modules/bibconvert/etc/Makefile \
+	  modules/bibconvert/lib/Makefile \
+	  modules/bibedit/Makefile \
+	  modules/bibedit/bin/Makefile \
+	  modules/bibedit/bin/bibedit \
+	  modules/bibedit/bin/refextract \
+	  modules/bibedit/bin/xmlmarc2textmarc \
+	  modules/bibedit/bin/xmlmarclint \
+	  modules/bibedit/doc/Makefile \
+	  modules/bibedit/doc/admin/Makefile \
+	  modules/bibedit/doc/hacking/Makefile \
+	  modules/bibedit/etc/Makefile \
+	  modules/bibedit/lib/Makefile \
+	  modules/bibedit/web/Makefile \
+	  modules/bibedit/web/admin/Makefile \
+	  modules/bibexport/Makefile \
+	  modules/bibexport/bin/Makefile \
+	  modules/bibexport/bin/bibexport \
+	  modules/bibexport/doc/Makefile \
+	  modules/bibexport/doc/admin/Makefile \
+	  modules/bibexport/doc/hacking/Makefile
+	  modules/bibexport/etc/Makefile \
+	  modules/bibexport/lib/Makefile \
+	  modules/bibexport/web/Makefile \
+	  modules/bibexport/web/admin/Makefile \
+	  modules/bibformat/Makefile \
+	  modules/bibformat/bin/Makefile \
+	  modules/bibformat/bin/bibreformat \
+	  modules/bibformat/doc/Makefile \
+	  modules/bibformat/doc/admin/Makefile \
+	  modules/bibformat/doc/hacking/Makefile \
+	  modules/bibformat/etc/Makefile \
+	  modules/bibformat/etc/format_templates/Makefile \
+	  modules/bibformat/etc/output_formats/Makefile \
+	  modules/bibformat/lib/Makefile \
+	  modules/bibformat/lib/elements/Makefile \
+	  modules/bibformat/web/Makefile \
+	  modules/bibformat/web/admin/Makefile \
+	  modules/bibharvest/Makefile \
+	  modules/bibharvest/bin/Makefile \
+	  modules/bibharvest/bin/bibharvest \
+	  modules/bibharvest/bin/oaiarchive \
+	  modules/bibharvest/bin/oaiharvest \
+	  modules/bibharvest/doc/Makefile \
+	  modules/bibharvest/doc/admin/Makefile \
+	  modules/bibharvest/doc/hacking/Makefile \
+	  modules/bibharvest/lib/Makefile \
+	  modules/bibharvest/web/Makefile \
+	  modules/bibharvest/web/admin/Makefile \
 	  modules/bibindex/Makefile \
 	  modules/bibindex/bin/Makefile \
 	  modules/bibindex/bin/bibindex \
@@ -511,6 +522,13 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibindex/lib/Makefile \
 	  modules/bibindex/web/Makefile \
 	  modules/bibindex/web/admin/Makefile \
+	  modules/bibmatch/Makefile \
+	  modules/bibmatch/bin/Makefile \
+	  modules/bibmatch/bin/bibmatch \
+	  modules/bibmatch/doc/Makefile \
+	  modules/bibmatch/doc/admin/Makefile \
+	  modules/bibmatch/etc/Makefile \
+	  modules/bibmatch/lib/Makefile \
 	  modules/bibrank/Makefile \
 	  modules/bibrank/bin/Makefile \
 	  modules/bibrank/bin/bibrank \
@@ -553,12 +571,12 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/miscutil/bin/Makefile \
 	  modules/miscutil/bin/dbexec \
 	  modules/miscutil/bin/inveniocfg \
-	  modules/miscutil/lib/Makefile \
 	  modules/miscutil/demo/Makefile \
-	  modules/miscutil/sql/Makefile \
-	  modules/miscutil/web/Makefile \
 	  modules/miscutil/doc/Makefile \
 	  modules/miscutil/doc/hacking/Makefile \
+	  modules/miscutil/lib/Makefile \
+	  modules/miscutil/sql/Makefile \
+	  modules/miscutil/web/Makefile \
 	  modules/webaccess/Makefile \
 	  modules/webaccess/bin/Makefile \
 	  modules/webaccess/bin/authaction \
@@ -577,11 +595,40 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/webalert/doc/hacking/Makefile \
 	  modules/webalert/lib/Makefile \
 	  modules/webalert/web/Makefile \
+	  modules/webbasket/Makefile \
+	  modules/webbasket/doc/Makefile \
+	  modules/webbasket/doc/admin/Makefile \
+	  modules/webbasket/doc/hacking/Makefile \
+	  modules/webbasket/lib/Makefile \
+	  modules/webbasket/web/Makefile \
+	  modules/webcomment/Makefile \
+	  modules/webcomment/doc/Makefile \
+	  modules/webcomment/doc/admin/Makefile \
+	  modules/webcomment/doc/hacking/Makefile \
+	  modules/webcomment/lib/Makefile \
+	  modules/webcomment/web/Makefile \
+	  modules/webcomment/web/admin/Makefile \
 	  modules/webhelp/Makefile \
 	  modules/webhelp/web/Makefile \
-	  modules/webhelp/web/hacking/Makefile \
 	  modules/webhelp/web/admin/Makefile \
 	  modules/webhelp/web/admin/howto/Makefile \
+	  modules/webhelp/web/hacking/Makefile \
+	  modules/webjournal/Makefile \
+	  modules/webjournal/doc/Makefile \
+	  modules/webjournal/doc/admin/Makefile \
+	  modules/webjournal/doc/hacking/Makefile \
+	  modules/webjournal/lib/Makefile \
+	  modules/webjournal/lib/widgets/Makefile \
+	  modules/webjournal/web/Makefile \
+	  modules/webjournal/web/admin/Makefile \
+	  modules/webmessage/Makefile \
+	  modules/webmessage/bin/Makefile \
+	  modules/webmessage/bin/webmessageadmin \
+	  modules/webmessage/doc/Makefile \
+	  modules/webmessage/doc/admin/Makefile \
+	  modules/webmessage/doc/hacking/Makefile \
+	  modules/webmessage/lib/Makefile \
+	  modules/webmessage/web/Makefile \
 	  modules/websearch/Makefile \
 	  modules/websearch/bin/Makefile \
 	  modules/websearch/bin/webcoll \
@@ -613,59 +660,22 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/webstyle/bin/webdoc \
 	  modules/webstyle/css/Makefile \
 	  modules/webstyle/doc/Makefile \
-	  modules/webstyle/etc/Makefile \
 	  modules/webstyle/doc/admin/Makefile \
 	  modules/webstyle/doc/hacking/Makefile \
+	  modules/webstyle/etc/Makefile \
 	  modules/webstyle/img/Makefile \
 	  modules/webstyle/lib/Makefile \
-	  modules/webcomment/Makefile \
-	  modules/webcomment/doc/Makefile \
-	  modules/webcomment/doc/admin/Makefile \
-	  modules/webcomment/doc/hacking/Makefile \
-	  modules/webcomment/lib/Makefile \
-	  modules/webcomment/web/Makefile \
-	  modules/webcomment/web/admin/Makefile \
-	  modules/webbasket/Makefile \
-	  modules/webbasket/doc/Makefile \
-	  modules/webbasket/doc/admin/Makefile \
-	  modules/webbasket/doc/hacking/Makefile \
-	  modules/webbasket/lib/Makefile \
-	  modules/webbasket/web/Makefile \
-	  modules/webjournal/Makefile \
-	  modules/webjournal/doc/Makefile \
-	  modules/webjournal/doc/admin/Makefile \
-	  modules/webjournal/doc/hacking/Makefile \
-	  modules/webjournal/lib/Makefile \
-	  modules/webjournal/lib/widgets/Makefile \
-	  modules/webjournal/web/Makefile \
-	  modules/webjournal/web/admin/Makefile \
-	  modules/webmessage/Makefile \
-	  modules/webmessage/bin/Makefile \
-	  modules/webmessage/bin/webmessageadmin \
-	  modules/webmessage/doc/Makefile \
-	  modules/webmessage/doc/admin/Makefile \
-	  modules/webmessage/doc/hacking/Makefile \
-	  modules/webmessage/lib/Makefile \
-	  modules/webmessage/web/Makefile \
 	  modules/websubmit/Makefile \
 	  modules/websubmit/bin/Makefile \
 	  modules/websubmit/bin/bibdocfile \
-	  modules/websubmit/etc/Makefile \
 	  modules/websubmit/doc/Makefile \
 	  modules/websubmit/doc/admin/Makefile \
 	  modules/websubmit/doc/hacking/Makefile \
+	  modules/websubmit/etc/Makefile \
 	  modules/websubmit/lib/Makefile \
 	  modules/websubmit/lib/functions/Makefile \
 	  modules/websubmit/web/Makefile \
 	  modules/websubmit/web/admin/Makefile \
-	  modules/bibcirculation/Makefile \
-	  modules/bibcirculation/doc/Makefile \
-	  modules/bibcirculation/doc/admin/Makefile \
-	  modules/bibcirculation/doc/hacking/Makefile
-	  modules/bibcirculation/lib/Makefile \
-	  modules/bibcirculation/web/Makefile \
-	  modules/bibcirculation/web/admin/Makefile \
-	  modules/bibcirculation/bin/Makefile \
 	  ])
 
 ## Finally, write output files:

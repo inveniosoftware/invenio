@@ -17,6 +17,12 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = bibcirculation bibclassify bibconvert bibedit bibexport bibharvest bibmatch bibsched bibindex bibrank bibupload bibformat elmsubmit miscutil webstyle websession webhelp webbasket webalert websearch websubmit webaccess webmessage webstat webcomment webjournal
+pylibdir = $(libdir)/python/invenio
 
-CLEANFILES = *~
+pylib_DATA = bibexport.py \
+             bibexport_method_sitemap.py \
+             bibexport_method_googlescholar.py
+
+EXTRA_DIST = $(pylib_DATA)
+
+CLEANFILES = *~ *.tmp *.pyc

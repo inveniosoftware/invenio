@@ -1,0 +1,6 @@
+Makefile
+Makefile.in
+bibexport
+z_*
+*.O
+*~

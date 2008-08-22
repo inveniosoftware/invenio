@@ -163,6 +163,8 @@ DEF_ACTIONS = (
                ('viewcomment', 'view comments', 'collection', 'no'),
                ('sendcomment', 'send comments', 'collection', 'no'),
                ('attachcommentfile', 'attach files to comments', 'collection', 'no'),
+               ('cfgbibexport', 'configure BibExport', '', 'no'),
+               ('runbibexport', 'run BibExport', '', 'no'),
               )
 
 # Default authorizations

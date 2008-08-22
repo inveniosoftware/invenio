@@ -2009,4 +2009,8 @@ INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES
 -- switch on stemming for some indexes:
 UPDATE idxINDEX SET stemming_language='en' WHERE name IN ('global','abstract','keyword','title','fulltext');
 
+-- exporting demo:
+INSERT INTO expJOB (jobname) VALUES ('sitemap');
+INSERT INTO expJOB (jobname) VALUES ('googlescholar');
+
 -- end of file

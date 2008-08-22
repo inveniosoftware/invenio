@@ -27,7 +27,7 @@ __revision__ = "$Id$"
 CFG_BIBTASK_VALID_TASKS = ("bibindex", "bibupload", "bibreformat",
                            "webcoll", "bibtaskex", "bibrank",
                            "oaiharvest", "oaiarchive", "inveniogc",
-                           "webstatadmin", "bibclassifyd")
+                           "webstatadmin", "bibclassifyd", "bibexport")
 
 # Task that should not be reinstatiated
 CFG_BIBTASK_NON_REPETITIVE_TASK = ('bibupload')
@@ -92,5 +92,8 @@ CFG_BIBTASK_DEFAULT_TASK_SETTINGS = {
     },
     'bibtaskex' : {
         'number' : 30,
-    }
+    },
+    'bibexport' : {
+        'wjob' : None,
+    },
 }

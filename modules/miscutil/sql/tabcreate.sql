@@ -3217,5 +3217,15 @@ CREATE TABLE IF NOT EXISTS crcLIBRARY(
 	PRIMARY KEY (id)
 	)TYPE=MyISAM;
 
+-- BibExport tables:
+
+CREATE TABLE IF NOT EXISTS expJOB (
+  id mediumint(9) unsigned NOT NULL auto_increment,
+  jobname varchar(50) NOT NULL default '',
+  jobfreq mediumint(12) NOT NULL default '0',
+  lastrun datetime NOT NULL default '0000-00-00 00:00:00',
+  PRIMARY KEY  (id),
+  UNIQUE KEY jobname (jobname)
+) TYPE=MyISAM;
 
 -- end of file
