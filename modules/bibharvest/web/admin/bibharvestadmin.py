@@ -275,11 +275,37 @@ def viewentryhistory(req, oai_id=0, ln=CFG_SITE_LANG, confirm=0, start = 0):
                     req=req)
     auth = bhc.check_user(req,'cfgbibharvest')
     if not auth[0]:
-        return page(title="View OAI source harvesting history",
-                    body=bhc.perform_request_viewentryhistory(oai_id=str(oai_id),
+        return page(title="View OAI source harvesting history (single record)",
+                    body=bhc.perform_request_viewentryhistory(oai_id = str(oai_id),
                                                     ln=ln,
                                                     confirm=confirm,
                                                     start = int(start)),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+def viewtasklogs(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0):
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
+    auth = bhc.check_user(req,'cfgbibharvest')
+    if not auth[0]:
+        return page(title="View bibsched task logs",
+                    body=bhc.perform_request_viewtasklogs(ln=ln,
+                                                    confirm=confirm,
+                                                    task_id = int(task_id)),
                     uid=uid,
                     language=ln,
                     req=req,

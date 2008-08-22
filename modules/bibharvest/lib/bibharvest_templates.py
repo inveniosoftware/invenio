@@ -307,6 +307,9 @@ class Template:
     def tmpl_output_checkbox(self, name, id, value):
         return "<input type=\"checkbox\" id=\"" + id + "\"name=\"" + name + "\" value=\"" + value + "\" />"
 
+    def tmpl_output_preformatted(self, content):
+        return "<pre style=\"background-color: #eeeeee;\">" + content + "</pre>"
+
     def tmpl_output_scrollable_frame(self, content):
         output = """<div class="scrollableframe" heigh="40">"""
         output += content
