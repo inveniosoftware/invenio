@@ -1133,7 +1133,7 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG
             forcetype="curr"
 
         if forcetype and not forcetype=="no":
-            print "forcing data input"
+            pass
         else:
             if len(right_sides) > 0:
                 return page(title=_("Right side exists"),
@@ -1157,8 +1157,13 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG
             #a bit tricky.. remove the rules given in param replacement and add the current
             #rule in the same kb's
             if replacements:
+                #"replacements" can be either a string or an arry. Let's make it always an array
+                if type(replacements) == type("this is a string"):
+                    mystr = replacements
+                    replacements = []
+                    replacements.append(mystr)
                 for r in replacements:
-                    if r.index("++++") > 0:
+                    if r.find("++++") > 0:
                         (rkbname, rleft, rright) = r.split('++++')
                         bibformatadminlib.remove_kb_mapping(rkbname, rleft)
                         #add only if this is not yet there..
