@@ -52,7 +52,12 @@ from invenio.mailutils import send_email
 from invenio.messages import wash_language, gettext_set_language
 from invenio.urlutils import wash_url_argument
 from invenio.webcomment_config import CFG_WEBCOMMENT_ACTION_CODE
-
+from invenio.access_control_engine import acc_authorize_action
+from invenio.access_control_admin import acc_is_role
+from invenio.access_control_config import CFG_WEBACCESS_WARNING_MSGS
+from invenio.search_engine import \
+     guess_primary_collection_of_a_record, \
+     check_user_can_view_record
 try:
     import invenio.template
     webcomment_templates = invenio.template.load('webcomment')
@@ -60,7 +65,7 @@ except:
     pass
 
 
-def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display_order='od', display_since='all', nb_per_page=100, page=1, voted=-1, reported=-1, reviews=0, uid=-1):
+def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display_order='od', display_since='all', nb_per_page=100, page=1, voted=-1, reported=-1, reviews=0, uid=-1, can_send_comments=False, can_attach_files=False):
     """
     Returns all the comments (reviews) of a specific internal record or external basket record.
     @param recID:  record id where (internal record IDs > 0) or (external basket record IDs < -100)
@@ -82,9 +87,10 @@ def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display
     @param reported: boolean, active if user reported a certain comment/review, perform_request_report function
     @param reviews: boolean, enabled if reviews, disabled for comments
     @param uid: the id of the user who is reading comments
+    @param can_send_comments: if user can send comment or not
+    @oaram can_attach_files: if user can attach file to comment or not
     @return html body.
     """
-
     errors = []
     warnings = []
     nb_reviews = 0
@@ -180,7 +186,9 @@ def perform_request_display_comments_or_remarks(recID, ln=CFG_SITE_LANG, display
                                                   border=0,
                                                   reviews=reviews,
                                                   total_nb_reviews=nb_reviews,
-                                                  uid=uid)
+                                                  uid=uid,
+                                                  can_send_comments=can_send_comments,
+                                                  can_attach_files=can_attach_files)
     return (body, errors, warnings)
 
 def perform_request_vote(cmt_id, client_ip_address, value, uid=-1):
@@ -736,7 +744,7 @@ def get_first_comments_or_remarks(recID=-1,
         elif reported == 0:
             warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
         if CFG_WEBCOMMENT_ALLOW_COMMENTS: # normal comments
-            comments = webcomment_templates.tmpl_get_first_comments_without_ranking(recID, ln, first_res_comments, nb_res_comments, warnings)
+            comments = webcomment_templates.tmpl_get_first_comments_without_ranking(recID, ln, first_res_comments, nb_res_comments, warnings, can_attach_files=can_attach_files)
         if CFG_WEBCOMMENT_ALLOW_REVIEWS: # ranked comments
             #calculate average score
             avg_score = calculate_avg_score(res_reviews)
@@ -744,7 +752,7 @@ def get_first_comments_or_remarks(recID=-1,
                 warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED_GREEN_TEXT',))
             elif voted == 0:
                 warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
-            reviews = webcomment_templates.tmpl_get_first_comments_with_ranking(recID, ln, first_res_reviews, nb_res_reviews, avg_score, warnings)
+            reviews = webcomment_templates.tmpl_get_first_comments_with_ranking(recID, ln, first_res_reviews, nb_res_reviews, avg_score, warnings, can_attach_files=can_attach_files)
         return (comments, reviews)
     # remark
     else:
@@ -789,7 +797,8 @@ def perform_request_add_comment_or_remark(recID=0,
                                           reviews=0,
                                           comID=-1,
                                           client_ip_address=None,
-                                          editor_type='textarea'):
+                                          editor_type='textarea',
+                                          can_attach_files=False):
     """
     Add a comment/review or remark
     @param recID: record id
@@ -828,16 +837,16 @@ def perform_request_add_comment_or_remark(recID=0,
     # show the form
     if action == 'DISPLAY':
         if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
-            return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings), errors, warnings)
+            return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings, can_attach_files=can_attach_files), errors, warnings)
         elif not reviews and CFG_WEBCOMMENT_ALLOW_COMMENTS:
-            return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings), errors, warnings)
+            return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings, can_attach_files=can_attach_files), errors, warnings)
         else:
             errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
 
     elif action == 'REPLY':
         if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
             errors.append(('ERR_WEBCOMMENT_REPLY_REVIEW',))
-            return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings), errors, warnings)
+            return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings, can_attach_files=can_attach_files), errors, warnings)
         elif not reviews and CFG_WEBCOMMENT_ALLOW_COMMENTS:
             textual_msg = msg
             if comID > 0:
@@ -859,7 +868,7 @@ def perform_request_add_comment_or_remark(recID=0,
                         textual_msg += "\n\n"
                         textual_msg += comment[3]
                         textual_msg = email_quote_txt(text=textual_msg)
-            return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings, textual_msg), errors, warnings)
+            return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings, textual_msg, can_attach_files=can_attach_files), errors, warnings)
         else:
             errors.append(('ERR_WEBCOMMENT_COMMENTS_NOT_ALLOWED',))
 
@@ -900,16 +909,16 @@ def perform_request_add_comment_or_remark(recID=0,
                 errors.append(('ERR_WEBCOMMENT_DB_INSERT_ERROR'))
         # if are warnings or if inserting comment failed, show user where warnings are
         if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
-            return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings), errors, warnings)
+            return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, msg, score, note, warnings, can_attach_files=can_attach_files), errors, warnings)
         else:
-            return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings), errors, warnings)
+            return (webcomment_templates.tmpl_add_comment_form(recID, uid, nickname, ln, msg, warnings, can_attach_files=can_attach_files), errors, warnings)
     # unknown action send to display
     else:
         warnings.append(('WRN_WEBCOMMENT_ADD_UNKNOWN_ACTION',))
         if reviews and CFG_WEBCOMMENT_ALLOW_REVIEWS:
-            return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, ln, msg, score, note, warnings), errors, warnings)
+            return (webcomment_templates.tmpl_add_comment_form_with_ranking(recID, uid, ln, msg, score, note, warnings, can_attach_files=can_attach_files), errors, warnings)
         else:
-            return (webcomment_templates.tmpl_add_comment_form(recID, uid, ln, msg, warnings), errors, warnings)
+            return (webcomment_templates.tmpl_add_comment_form(recID, uid, ln, msg, warnings, can_attach_files=can_attach_files), errors, warnings)
 
     return ('', errors, warnings)
 
@@ -1060,7 +1069,6 @@ def check_int_arg_is_in_range(value, name, errors, gte_value, lte_value=None):
             return 0
     return 1
 
-
 def get_mini_reviews(recid, ln=CFG_SITE_LANG):
     """
     Returns the web controls to add reviews to a record from the
@@ -1079,3 +1087,87 @@ def get_mini_reviews(recid, ln=CFG_SITE_LANG):
     return webcomment_templates.tmpl_mini_review(recid, ln, action=action,
                                                  avg_score=calculate_avg_score(reviews),
                                                  nb_comments_total=len(reviews))
+
+def check_user_can_view_comments(user_info, recid):
+    """Check if the user is authorized to view comments for given
+    recid.
+    Returns the same type as acc_authorize_action
+    """
+    # Check user can view the record itself first
+    (auth_code, auth_msg) = check_user_can_view_record(user_info, recid)
+    if auth_code:
+        return (auth_code, auth_msg)
+
+    # Check if user can view the comments
+    ## But first can we find an authorization for this case action,
+    ## for this collection?
+    record_primary_collection = guess_primary_collection_of_a_record(recid)
+    if not acc_is_role('viewcomment', collection=record_primary_collection):
+        # No such action. Try without parameter
+        if not acc_is_role('viewcomment', collection="*"):
+            # No default (without parameter) role defined. By default,
+            # grant access
+            return (0, '')
+        else:
+            # A default role is defined. Check it
+            return acc_authorize_action(user_info,
+                                        'viewcomment',
+                                        collection="*")
+    else:
+        ## An authorization was found. check it
+        return acc_authorize_action(user_info,
+                                    'viewcomment',
+                                    collection=record_primary_collection)
+
+def check_user_can_send_comments(user_info, recid):
+    """Check if the user is authorized to comment the given
+    recid. This function does not check that user can view the record
+    or view the comments
+
+    Returns the same type as acc_authorize_action
+    """
+    ## First can we find an authorization for this case, action + collection
+    record_primary_collection = guess_primary_collection_of_a_record(recid)
+    if not acc_is_role('sendcomment', collection=record_primary_collection):
+        # No such action. Try without parameter
+        if not acc_is_role('sendcomment', collection="*"):
+            # No default (without parameter) role defined. By default,
+            # grant access
+            return (0, '')
+        else:
+            # A default role is defined. Check it
+            return acc_authorize_action(user_info,
+                                        'sendcomment',
+                                        collection="*")
+    else:
+        ## An authorization was found. Check it
+        return acc_authorize_action(user_info,
+                                    'sendcomment',
+                                    collection=record_primary_collection)
+
+def check_user_can_attach_file_to_comments(user_info, recid):
+    """Check if the user is authorized to attach a file to comments
+    for given recid. This function does not check that user can view
+    the comments or send comments.
+
+    Returns the same type as acc_authorize_action
+    """
+    ## First can we find an authorization for this case action, for
+    ## this collection?
+    record_primary_collection = guess_primary_collection_of_a_record(recid)
+    if not acc_is_role('attachcommentfile', collection=record_primary_collection):
+        # No such action. Try without parameter
+        if not acc_is_role('attachcommentfile', collection="*"):
+            # No default (without parameter) role defined. By default,
+            # do not grant access
+            return (1, CFG_WEBACCESS_WARNING_MSGS[1])
+        else:
+            # A default role is defined. Check it
+            return acc_authorize_action(user_info,
+                                        'attachcommentfile',
+                                        collection="*")
+    else:
+        ## An authorization was found. check it
+        return acc_authorize_action(user_info,
+                                    'attachcommentfile',
+                                    collection=record_primary_collection)

@@ -27,10 +27,13 @@ __revision__ = """$Id$"""
 
 import urllib
 from invenio.webcomment import check_recID_is_in_range, \
-                               perform_request_display_comments_or_remarks,\
-                               perform_request_add_comment_or_remark,\
-                               perform_request_vote,\
-                               perform_request_report
+                               perform_request_display_comments_or_remarks, \
+                               perform_request_add_comment_or_remark, \
+                               perform_request_vote, \
+                               perform_request_report, \
+                               check_user_can_attach_file_to_comments, \
+                               check_user_can_view_comments, \
+                               check_user_can_send_comments
 from invenio.config import \
      CFG_PREFIX, \
      CFG_SITE_LANG, \
@@ -42,7 +45,7 @@ from invenio.webuser import getUid, page_not_authorized, isGuestUser, collect_us
 from invenio.webpage import page, pageheaderonly, pagefooteronly
 from invenio.search_engine import create_navtrail_links, \
      guess_primary_collection_of_a_record, \
-     get_colID, check_user_can_view_record
+     get_colID
 from invenio.urlutils import get_client_ip_address, \
                              redirect_to_url, \
                              make_canonical_urlargd
@@ -117,7 +120,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+        (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
@@ -127,6 +130,16 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         elif auth_code:
             return page_not_authorized(req, "../", \
                 text = auth_msg)
+
+        can_send_comments = False
+        (auth_code, auth_msg) = check_user_can_send_comments(user_info, self.recid)
+        if not auth_code:
+            can_send_comments = True
+
+        can_attach_files = False
+        (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, self.recid)
+        if not auth_code:
+            can_attach_files = True
 
         check_warnings = []
 
@@ -141,7 +154,9 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                 voted=argd['voted'],
                 reported=argd['reported'],
                 reviews=self.discussion,
-                uid=uid)
+                uid=uid,
+                can_send_comments=can_send_comments,
+                can_attach_files=can_attach_files)
 
             unordered_tabs = get_detailed_page_tabs(get_colID(guess_primary_collection_of_a_record(self.recid)),
                                                     self.recid,
@@ -230,16 +245,22 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
-        if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
+        (auth_code_1, auth_msg_1) = check_user_can_view_comments(user_info, self.recid)
+        (auth_code_2, auth_msg_2) = check_user_can_send_comments(user_info, self.recid)
+        if (auth_code_1 or auth_code_2) and user_info['email'] == 'guest' and not user_info['apache_user']:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
                 make_canonical_urlargd({'action': cookie, 'ln' : argd['ln'], 'referer' : \
                 CFG_SITE_URL + user_info['uri']}, {})
             return redirect_to_url(req, target)
-        elif auth_code:
+        elif (auth_code_1 or auth_code_2):
             return page_not_authorized(req, "../", \
                 text = auth_msg)
+
+        can_attach_files = False
+        (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, self.recid)
+        if not auth_code:
+            can_attach_files = True
 
         client_ip_address = get_client_ip_address(req)
         check_warnings = []
@@ -301,7 +322,8 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
                                                                                  reviews=self.discussion,
                                                                                  comID=argd['comid'],
                                                                                  client_ip_address=client_ip_address,
-                                                                                 editor_type=argd['editor_type'])
+                                                                                 editor_type=argd['editor_type'],
+                                                                                 can_attach_files=can_attach_files)
                 if self.discussion:
                     title = _("Add Review")
                 else:
@@ -366,7 +388,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+        (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
@@ -425,7 +447,7 @@ class WebInterfaceCommentsPages(WebInterfaceDirectory):
         uid = getUid(req)
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+        (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
@@ -506,7 +528,7 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
         uid = getUid(req)
 
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+        (auth_code, auth_msg) = check_user_can_view_comments(user_info, self.recid)
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : guess_primary_collection_of_a_record(self.recid)})
             target = '/youraccount/login' + \
@@ -562,12 +584,12 @@ class WebInterfaceCommentsFiles(WebInterfaceDirectory):
 
         # Check that user can upload attachments for comments.
         user_info = collect_user_info(req)
-        (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+        (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, self.recid)
         if user_info['email'] == 'guest' and not user_info['apache_user']:
             # User is guest: must login prior to upload
             data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
         elif auth_code:
-            # User cannot view
+            # User cannot submit
             data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to submit files.')
         else:
             # Process the upload and get the response

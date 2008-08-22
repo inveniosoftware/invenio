@@ -402,7 +402,9 @@ class Template:
                           warnings,
                           border=0, reviews=0,
                           total_nb_reviews=0,
-                          nickname='', uid=-1, note='',score=5):
+                          nickname='', uid=-1, note='',score=5,
+                          can_send_comments=False,
+                          can_attach_files=False):
         """
         Get table of all comments
         @param recID: record id
@@ -428,6 +430,8 @@ class Template:
         @param warnings: list of warning tuples (warning_msg, color)
         @param border: boolean, active if want to show border around each comment/review
         @param reviews: boolean, enabled for reviews, disabled for comments
+        @param can_send_comments: boolean, if user can send comments or not
+        @param can_attach_files: boolean, if user can attach file to comment or not
         """
         # load the right message language
         _ = gettext_set_language(ln)
@@ -445,7 +449,7 @@ class Template:
             discussion = 'reviews'
             comments_link = '<a href="%s/record/%s/comments/">%s</a> (%i)' % (CFG_SITE_URL, recID, _('Comments'), total_nb_comments)
             reviews_link = '<b>%s (%i)</b>' % (_('Reviews'), total_nb_reviews)
-            add_comment_or_review = self.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, '', score, note, warnings, show_title_p=True)
+            add_comment_or_review = self.tmpl_add_comment_form_with_ranking(recID, uid, nickname, ln, '', score, note, warnings, show_title_p=True, can_attach_files=can_attach_files)
         else:
             c_nickname = 0
             c_user_id = 1
@@ -455,7 +459,7 @@ class Template:
             discussion = 'comments'
             comments_link = '<b>%s (%i)</b>' % (_('Comments'), total_nb_comments)
             reviews_link = '<a href="%s/record/%s/reviews/">%s</a> (%i)' % (CFG_SITE_URL, recID, _('Reviews'), total_nb_reviews)
-            add_comment_or_review = self.tmpl_add_comment_form(recID, uid, nickname, ln, note, warnings)
+            add_comment_or_review = self.tmpl_add_comment_form(recID, uid, nickname, ln, note, warnings, can_attach_files=can_attach_files)
 
         # voting links
         useful_dict =   {   'siteurl'        : CFG_SITE_URL,
@@ -582,9 +586,9 @@ class Template:
         total_label %= total_nb_comments
 
         review_or_comment_first = ''
-        if reviews == 0 and total_nb_comments == 0:
+        if reviews == 0 and total_nb_comments == 0 and can_send_comments:
             review_or_comment_first = _("Start a discussion about any aspect of this document.")
-        elif reviews == 1 and total_nb_reviews == 0:
+        elif reviews == 1 and total_nb_reviews == 0 and can_send_comments:
             review_or_comment_first = _("Be the first to review this document.")
 
         # do NOT remove the HTML comments below. Used for parsing
@@ -669,9 +673,14 @@ class Template:
 
         if nb_pages > 1:
             #body = warnings + body + form + pages
-            body = warnings + body + pages + add_comment_or_review
+            body = warnings + body + pages
         else:
-            body = warnings + body + add_comment_or_review
+            body = warnings + body
+
+        if can_send_comments:
+            body += add_comment_or_review
+        else:
+            body += '<br/><em>' + _("You are not authorized to comment or review.") + '</em>'
 
         return '<div style="margin-left:10px;margin-right:10px;">' + body + '</div>'
 
@@ -762,7 +771,7 @@ class Template:
         else:
             return ""
 
-    def tmpl_add_comment_form(self, recID, uid, nickname, ln, msg, warnings, textual_msg=None):
+    def tmpl_add_comment_form(self, recID, uid, nickname, ln, msg, warnings, textual_msg=None, can_attach_files=False):
         """
         Add form for comments
         @param recID: record id
@@ -773,6 +782,7 @@ class Template:
         @param textual_msg: same as 'msg', but contains the textual
                             version in case user cannot display FCKeditor
         @param warnings: list of warning tuples (warning_msg, color)
+        @param can_attach_files: if user can upload attach file to record or not
         @return html add comment form
         """
         _ = gettext_set_language(ln)
@@ -781,7 +791,6 @@ class Template:
                         'function'  : 'add',
                         'arguments' : 'ln=%s&amp;action=%s' % (ln, 'SUBMIT'),
                         'recID'     : recID}
-
         if textual_msg is None:
             textual_msg = msg
 
@@ -804,7 +813,7 @@ class Template:
         warnings = self.tmpl_warnings(warnings, ln)
 
         file_upload_url = None
-        if not isGuestUser(uid):
+        if can_attach_files:
             # Can only upload files when user is logged in
             file_upload_url = '%s/record/%i/comments/attachments/put' % \
                               (CFG_SITE_URL, recID)
@@ -834,7 +843,8 @@ class Template:
         return warnings + form
 
     def tmpl_add_comment_form_with_ranking(self, recID, uid, nickname, ln, msg, score, note,
-                                           warnings, textual_msg=None, show_title_p=False):
+                                           warnings, textual_msg=None, show_title_p=False,
+                                           can_attach_files=False):
         """
         Add form for reviews
         @param recID: record id
@@ -846,6 +856,7 @@ class Template:
         @param note: review title
         @param warnings: list of warning tuples (warning_msg, color)
         @param show_title_p: if True, prefix the form with "Add Review" as title
+        @param can_attach_files: if user can upload attach file to record or not
         @return html add review form
         """
         _ = gettext_set_language(ln)
@@ -892,8 +903,7 @@ class Template:
             selected5 = ' selected="selected"'
 
         file_upload_url = None
-        if not isGuestUser(uid):
-            # Can only upload files when user is logged in
+        if can_attach_files:
             file_upload_url = '%s/record/%i/comments/attachments/put' % \
                               (CFG_SITE_URL, recID)
 
