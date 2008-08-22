@@ -1321,7 +1321,7 @@ def kb_export(req, ln=config.CFG_SITE_LANG):
                 for m in mappings:
                     mkey = m['key']
                     mvalue = m['value']
-                    f.write(mkey+"--"+mvalue+"\n")
+                    f.write(mkey+"---"+mvalue+"\n")
                 f.close()
                 names = names+"<br/>"+urlname
             except:
