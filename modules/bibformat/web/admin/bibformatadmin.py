@@ -1156,13 +1156,14 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG
         if forcetype=="all":
             #a bit tricky.. remove the rules given in param replacement and add the current
             #rule in the same kb's
-            for r in replacements:
-                if r.index("++++") > 0:
-                    (rkbname, rleft, rright) = r.split('++++')
-                    bibformatadminlib.remove_kb_mapping(rkbname, rleft)
-                    #add only if this is not yet there..
-                    if not bibformat_dblayer.kb_mapping_exists(rkbname, key):
-                        bibformatadminlib.add_kb_mapping(rkbname, key, value)
+            if replacements:
+                for r in replacements:
+                    if r.index("++++") > 0:
+                        (rkbname, rleft, rright) = r.split('++++')
+                        bibformatadminlib.remove_kb_mapping(rkbname, rleft)
+                        #add only if this is not yet there..
+                        if not bibformat_dblayer.kb_mapping_exists(rkbname, key):
+                            bibformatadminlib.add_kb_mapping(rkbname, key, value)
 
         redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s" % {'ln':ln,
                                                                                 'kb':kb_id,
