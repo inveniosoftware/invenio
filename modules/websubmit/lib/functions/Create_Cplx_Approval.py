@@ -36,7 +36,7 @@ def Create_Cplx_Approval(parameters, curdir, form, user_info=None):
     global rn
     doctype = form['doctype']
     act = form['act']
-    categformat = parameters['categformatDAM']
+    #categformat = parameters['categformatDAM']
 
     #Obtain the document category from combo<DOCTYPE> file
     category = ""
