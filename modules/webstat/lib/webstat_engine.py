@@ -468,8 +468,6 @@ def create_graph_trend(trend, path, settings):
 
         g = Gnuplot.Gnuplot()
 
-        #FIXME
-        #g('set style fill pattern')
         g('set style data linespoints')
         g('set terminal png small')
         g('set output "%s"' % path)
@@ -496,14 +494,24 @@ def create_graph_trend(trend, path, settings):
             cols = len(trend[0][1])
             rows = len(trend)
             plot_items = []
+            y_max = 0
             for col in range(cols):
                 data = []
                 for row in range(rows):
                     data.append([row, trend[row][1][col]])
                 plot_items.append(Gnuplot.PlotItems.Data(data, title=settings["multiple"][col]))
+                tmp_max = max(data[col])
+                if tmp_max > y_max:
+                    y_max = tmp_max
+            if y_max < 5:
+                g('set ytic 1')
             g.plot(*plot_items)
         else:
-            g.plot([x[1] for x in trend])
+            data = [x[1] for x in trend]
+            y_max = max(data)
+            if y_max < 5:
+                g('set ytic 1')
+            g.plot(data)
 
 def create_graph_dump(dump, path, settings):
     """
