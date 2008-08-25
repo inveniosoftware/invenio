@@ -25,7 +25,8 @@ pylib_DATA = bibcirculation.py \
              bibcirculation_webinterface.py \
              bibcirculation_dblayer.py \
 	     bibcirculation_config.py \
-	     bibcirculation_daemon.py			
+	     bibcirculation_daemon.py \
+	     bibicirculation_utlis.py	
 
 EXTRA_DIST = $(pylib_DATA)
 
