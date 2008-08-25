@@ -816,7 +816,7 @@ def create_search_box(cc, colls, p, f, rg, sf, so, sp, rm, of, ot, as,
                        })
 
     # show collections in the search box? (not if there is only one
-    # collection defined, and not if we are in super simple search)
+    # collection defined, and not if we are in light search)
     show_colls = True
     if len(collection_reclist_cache.keys()) == 1 or \
            as == -1:

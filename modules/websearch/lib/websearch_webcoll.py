@@ -287,7 +287,7 @@ class Collection:
                                           self.create_navtrail_links(as, lang))
 
                 ## second, update page body:
-                for as in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES: # do super-simple, simple and advanced search pages:
+                for as in CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES: # do light, simple and advanced search pages:
                     body = websearch_templates.tmpl_webcoll_body(
                         ln=lang, collection=self.name,
                         te_portalbox = self.create_portalbox(lang, 'te'),
@@ -629,12 +629,12 @@ class Collection:
         elif as == 0:
             return self.create_searchfor_simple(ln)
         else:
-            return self.create_searchfor_super_simple(ln)
+            return self.create_searchfor_light(ln)
 
-    def create_searchfor_super_simple(self, ln=CFG_SITE_LANG):
-        "Produces super simple 'Search for' box for the current collection."
+    def create_searchfor_light(self, ln=CFG_SITE_LANG):
+        "Produces light 'Search for' box for the current collection."
 
-        return websearch_templates.tmpl_searchfor_super_simple(
+        return websearch_templates.tmpl_searchfor_light(
           ln=ln,
           collection_id = self.name,
           collection_name=self.get_name(ln=ln),

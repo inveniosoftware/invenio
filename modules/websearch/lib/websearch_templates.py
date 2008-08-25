@@ -30,7 +30,7 @@ import locale
 from urllib import quote, urlencode
 
 from invenio.config import \
-     CFG_WEBSEARCH_SUPERSIMPLESEARCH_PATTERN_BOX_WIDTH, \
+     CFG_WEBSEARCH_LIGHTSEARCH_PATTERN_BOX_WIDTH, \
      CFG_WEBSEARCH_SIMPLESEARCH_PATTERN_BOX_WIDTH, \
      CFG_WEBSEARCH_ADVANCEDSEARCH_PATTERN_BOX_WIDTH, \
      CFG_WEBSEARCH_AUTHOR_ET_AL_THRESHOLD, \
@@ -577,9 +577,9 @@ class Template:
 
         return out
 
-    def tmpl_searchfor_super_simple(self, ln, collection_id, collection_name, record_count,
-                                    example_search_queries): # EXPERIMENTAL
-        """Produces super simple *Search for* box for the current collection.
+    def tmpl_searchfor_light(self, ln, collection_id, collection_name, record_count,
+                             example_search_queries): # EXPERIMENTAL
+        """Produces light *Search for* box for the current collection.
 
         Parameters:
 
@@ -596,7 +596,7 @@ class Template:
         _ = gettext_set_language(ln)
 
         out = '''
-        <!--create_searchfor_super_simple()-->
+        <!--create_searchfor_light()-->
         '''
 
         argd = drop_default_urlargd({'ln': ln, 'sc': CFG_WEBSEARCH_SPLIT_BY_COLLECTION},
@@ -710,9 +710,9 @@ class Template:
           </tr>
          </tbody>
         </table>-->
-        <!--/create_searchfor_super_simple()-->
+        <!--/create_searchfor_light()-->
         ''' % {'ln' : ln,
-               'sizepattern' : CFG_WEBSEARCH_SUPERSIMPLESEARCH_PATTERN_BOX_WIDTH,
+               'sizepattern' : CFG_WEBSEARCH_LIGHTSEARCH_PATTERN_BOX_WIDTH,
                'langlink': ln != CFG_SITE_LANG and '?ln=' + ln or '',
                'siteurl' : CFG_SITE_URL,
                'asearch' : create_html_link(asearchurl, {}, _('Advanced Search')),
@@ -1973,7 +1973,7 @@ class Template:
             }
         else:
             # EXPERIMENTAL
-            # print super-simple search form:
+            # print light search form:
             search_in = ''
             if cc_intl != CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME):
                 search_in = '''
@@ -2013,7 +2013,7 @@ class Template:
                                                   {}, _("Advanced Search")),
 
               'leading' : leadingtext,
-              'sizepattern' : CFG_WEBSEARCH_SUPERSIMPLESEARCH_PATTERN_BOX_WIDTH,
+              'sizepattern' : CFG_WEBSEARCH_LIGHTSEARCH_PATTERN_BOX_WIDTH,
               'p' : cgi.escape(p, 1),
               'searchwithin' : self.tmpl_searchwithin_select(
                                   ln = ln,
