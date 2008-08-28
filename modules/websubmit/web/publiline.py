@@ -129,7 +129,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
         elif action == "":
             t = displayCplxDocument(req, doctype, categ, RN, apptype, reply, commentId, ln)
         else:
-            t = doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, ln)
+            t = doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, reply, commentId, ln)
         return page(title=_("Document Approval Workflow"),
                     navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display">%(account)s</a>""" % {
                                  'sitesecureurl' : CFG_SITE_SECURE_URL,
@@ -597,7 +597,7 @@ def __db_set_PubComRecom_time (key):
 def __db_set_status ((RN,apptype), status):
     run_sql("UPDATE sbmCPLXAPPROVAL SET status=%s, dProjectLeaderAction=NOW() WHERE  rn=%s and type=%s", (status,RN,apptype,))
 
-def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, ln=CFG_SITE_LANG):
+def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, reply, commentId, ln=CFG_SITE_LANG):
     """
     Perform complex action. Note: all argume,ts are supposed to be washed already.
     Return HTML body for the paget.
@@ -1107,7 +1107,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         else:
             TEXT_ProjectLeaderDecision_MSG_SUBJECT = ""
 
-        t = websubmit_templates.tmpl_publiline_displaywritecomment(doctype, categ, RN, apptype, action, _("Take a decision"), TEXT_ProjectLeaderDecision_MSG_SUBJECT, validation, ln)
+        t = websubmit_templates.tmpl_publiline_displaywritecomment(doctype, categ, RN, apptype, action, _("Take a decision"), TEXT_ProjectLeaderDecision_MSG_SUBJECT, validation, "", ln)
 
         return t
 
