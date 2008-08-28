@@ -28,8 +28,13 @@ from invenio.webbasket_config import \
                        CFG_WEBBASKET_CATEGORIES, \
                        CFG_WEBBASKET_SHARE_LEVELS
 from invenio.webmessage_mailutils import email_quoted_txt2html, email_quote_txt
-from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_SITE_LANG, \
-     CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS
+from invenio.htmlutils import get_html_text_editor
+from invenio.config import \
+     CFG_SITE_URL, \
+     CFG_SITE_SECURE_URL, \
+     CFG_SITE_LANG, \
+     CFG_WEBBASKET_MAX_NUMBER_OF_DISPLAYED_BASKETS, \
+     CFG_WEBBASKET_USE_RICH_TEXT_EDITOR
 from invenio.webuser import get_user_info
 from invenio.dateutils import convert_datetext_to_dategui
 
@@ -842,9 +847,13 @@ class Template:
         _ = gettext_set_language(ln)
         out = """
 <div class="bskcomment">
-  <b>%(title)s</b>, %(label_author)s <a href="%(url)s/yourmessages/write?msg_to=%(user)s">%(user_display)s</a> %(label_date)s <i>%(date)s</i><br/><br/>
+  <div class="bskcommentheader"><img src="%(url)s/img/user-icon-1-24x24.gif" alt="" />&nbsp;<b>%(title)s</b>, %(label_author)s <a href="%(url)s/yourmessages/write?msg_to=%(user)s">%(user_display)s</a> %(label_date)s <i>%(date)s</i></div>
+  <blockquote>
   %(body)s
-  <br />"""
+  </blockquote>
+  <div style="float:right">
+"""
+
         if user_can_add_comment:
             out += '\n<a href="%(url)s/yourbaskets/write_comment?bskid=%(bskid)i'\
                    '&amp;recid=%(recid)i&amp;cmtid=%(cmtid)i&amp;'\
@@ -856,7 +865,7 @@ class Template:
                    '&amp;category=%(category)s&amp;topic=%(topic)i&amp;'\
                    'group=%(group_id)i&amp;ln=%(ln)s">%(delete_label)s</a>'
         out += """
-</div>"""
+</div></div>"""
         out %= {'title': cmt_title,
                 'url': CFG_SITE_URL,
                 'label_author': _("by"),
@@ -876,7 +885,7 @@ class Template:
                 'delete_label': _("Delete comment")}
         return out
 
-    def tmpl_quote_comment(self, title, uid, nickname, date, body, ln=CFG_SITE_LANG):
+    def tmpl_quote_comment_textual(self, title, uid, nickname, date, body, ln=CFG_SITE_LANG):
         """Return a comment in a quoted form (i.e. with '>' signs before each line)
         @param title: title of comment to quote
         @param uid: user id of user who posted comment to quote
@@ -887,12 +896,47 @@ class Template:
         _ = gettext_set_language(ln)
         if not(nickname):
             nickname = get_user_info(uid)[2]
-        out = title + ', ' + _("by") + ' ' + nickname + ' ' + _("on") + ' ' + date + '\n' + body
-        return email_quote_txt(out)
+
+        if title:
+            msg = title + ', ' + _("by") + ' ' + nickname + ' ' + _("on") + ' ' + date
+        else:
+            msg = _("%(x_name)s wrote on %(x_date)s:")% {'x_name': nickname, 'x_date': date}
+
+        msg += '\n\n'
+        msg += body
+        return email_quote_txt(msg)
+
+    def tmpl_quote_comment_html(self, title, uid, nickname, date, body, ln=CFG_SITE_LANG):
+        """Return a comment in a quoted form (i.e. indented using HTML
+        table) for HTML output (i.e. in FCKeditor).
+
+        @param title: title of comment to quote
+        @param uid: user id of user who posted comment to quote
+        @param nickname: nickname of user who posted comment to quote
+        @param date: date of post of comment to quote
+        @param body: body of comment to quote
+        @param ln: language"""
+        _ = gettext_set_language(ln)
+        if not(nickname):
+            nickname = get_user_info(uid)[2]
+
+        if title:
+            msg = title + ', ' + _("by") + ' ' + nickname + ' ' + _("on") + ' ' + date
+        else:
+            msg = _("%(x_name)s wrote on %(x_date)s:")% {'x_name': nickname, 'x_date': date}
+
+        msg += '<br/><br/>'
+        msg += body
+        msg = email_quote_txt(text=msg)
+        msg = email_quoted_txt2html(text=msg)
+
+        return '<br/>' + msg + '<br/>'
 
     def tmpl_write_comment(self, bskid, recid,
                            record,
-                           cmt_body='',
+                           cmt_title='',
+                           cmt_body_textual='',
+                           cmt_body_html='',
                            selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                            selected_topic=0, selected_group_id=0,
                            ln=CFG_SITE_LANG,
@@ -901,6 +945,9 @@ class Template:
         @param bskid: basket id (int)
         @param recid: record id (int)
         @param record: text of the record (str)
+        @param cmt_title: initial value for title (str)
+        @param cmt_body_textual initial value for comment box (when displayed as textual box) (str)
+        @param cmt_body_html initial value for comment box (when displayed with FCKeditor) (str)
         @param selected_category: CFG_WEBBASKET_CATEGORIES
         @param selected_topic: # of topic
         @param selected_group_id: in case of category: group, id of selected group
@@ -913,6 +960,22 @@ class Template:
             warnings_box = self.tmpl_warnings(warnings, ln)
         else:
             warnings_box = ''
+
+        file_upload_url = None
+##         if can_attach_files:
+##             # Can only upload files when user is logged in
+##             file_upload_url = '%s/record/%i/comments/attachments/put' % \
+##                               (CFG_SITE_URL, recID)
+
+        editor = get_html_text_editor(name='text',
+                                      content=cmt_body_html,
+                                      textual_content=cmt_body_textual,
+                                      width='700px',
+                                      height='400px',
+                                      enabled=CFG_WEBBASKET_USE_RICH_TEXT_EDITOR,
+                                      file_upload_url=file_upload_url,
+                                      toolbar_set = "WebComment")
+
         out = """
 <div style="width:100%%">%(warnings)s
   %(record)s
@@ -920,9 +983,9 @@ class Template:
   <h2>%(write_label)s</h2>
   <form name="write_comment" method="post" action="%(action)s">
     <p class="bsklabel">%(title_label)s:</p>
-    <input type="text" name="title" size="80" />
+    <input type="text" name="title" size="80" value="%(comment_title)s"/>
     <p class="bsklabel">%(comment_label)s:</p>
-<textarea name="text" rows="20" cols="80">%(cmt_body)s</textarea><br />
+    %(editor)s<br />
     <input type="submit" class="formbutton" value="%(button_label)s" />
   </form>
 </div>""" % {'warnings': warnings_box,
@@ -931,8 +994,9 @@ class Template:
              'title_label': _("Title"),
              'comment_label': _("Comment"),
              'action': action,
-             'cmt_body': cmt_body,
-             'button_label': _("Add Comment")
+             'button_label': _("Add Comment"),
+             'editor': editor,
+             'comment_title': cmt_title
             }
 
         return out

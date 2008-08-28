@@ -285,7 +285,9 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
     body = ''
     warnings = []
     errors = []
-    cmt_body = ''
+    textual_msg = '' # initial value in replies
+    html_msg = '' # initial value  in replies (if FCKeditor)
+    title = '' # initial title in replies
     if not __check_user_can_comment(uid, bskid):
         errors.append(('ERR_WEBBASKET_CANNOT_COMMENT'))
         return (body, errors, warnings)
@@ -293,19 +295,32 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
         # this is a reply to another comment
         comment = db.get_comment(cmtid)
         if comment:
-            cmt_body = webbasket_templates.tmpl_quote_comment(comment[2], # title
-                                                              uid,
-                                                              comment[0], # nickname
-                                                              comment[4], # date
-                                                              comment[3],
-                                                              ln)
+            # Title
+            if comment[2]:
+                title = 'Re: ' + comment[2]
+
+            # Build two msg: one mostly textual, the other one with HTML markup, for the FCKeditor.
+            textual_msg = webbasket_templates.tmpl_quote_comment_textual(comment[2], # title
+                                                                         uid,
+                                                                         comment[0], # nickname
+                                                                         comment[4], # date
+                                                                         comment[3],
+                                                                         ln)
+            html_msg = webbasket_templates.tmpl_quote_comment_html(comment[2], # title
+                                                                   uid,
+                                                                   comment[0], # nickname
+                                                                   comment[4], # date
+                                                                   comment[3],
+                                                                   ln)
         else:
             warning = (CFG_WEBBASKET_WARNING_MESSAGES['ERR_WEBBASKET_cmtid_INVALID'], cmtid)
             warnings.append(warning)
     record = db.get_basket_record(bskid, recid, 'hb')
     body = webbasket_templates.tmpl_write_comment(bskid=bskid,
                                                   recid=recid,
-                                                  cmt_body=cmt_body,
+                                                  cmt_title=title,
+                                                  cmt_body_textual=textual_msg,
+                                                  cmt_body_html=html_msg,
                                                   record = record,
                                                   selected_category=category,
                                                   selected_topic=topic,
@@ -326,7 +341,9 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
     body = webbasket_templates.tmpl_display(topicsbox, '', [ body ], category, ln)
     return (body, errors, warnings)
 
-def perform_request_save_comment(uid, bskid, recid, title='', text='', ln=CFG_SITE_LANG):
+def perform_request_save_comment(uid, bskid, recid, title='', text='',
+                                 ln=CFG_SITE_LANG,
+                                 editor_type='textarea'):
     """ Save a given comment if able to.
     @param uid: user id (int)
     @param bskid: basket id (int)
@@ -334,6 +351,7 @@ def perform_request_save_comment(uid, bskid, recid, title='', text='', ln=CFG_SI
     @param title: title of comment (string)
     @param text: comment's body (string)
     @param ln: language (string)
+    @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
     @return (errors, infos) where errors: list of errors while saving
                                   infos: list of informations to display"""
     _ = gettext_set_language(ln)
@@ -342,6 +360,16 @@ def perform_request_save_comment(uid, bskid, recid, title='', text='', ln=CFG_SI
     if not __check_user_can_comment(uid, bskid):
         errors.append(('ERR_WEBBASKET_CANNOT_COMMENT'))
         return (errors, infos)
+
+    if editor_type == 'fckeditor':
+        # Here we remove the line feeds introduced by FCKeditor (they
+        # have no meaning for the user) and replace the HTML line
+        # breaks by linefeeds, so that we are close to an input that
+        # would be done without the FCKeditor. That's much better if a
+        # reply to a comment is made with a browser that does not
+        # support FCKeditor.
+        text = text.replace('\n', '').replace('\r', '').replace('<br />', '\n')
+
     if not(db.save_comment(uid, bskid, recid, title, text)):
         errors.append(('ERR_WEBBASKET_DB_ERROR'))
     else:

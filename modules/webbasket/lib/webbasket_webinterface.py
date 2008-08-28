@@ -280,7 +280,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                      (str, CFG_WEBBASKET_CATEGORIES['PRIVATE']),
                                    'topic': (int, 0),
                                    'group': (int, 0),
-                                   'of'   : (str, '')
+                                   'of'   : (str, ''),
+                                   'editor_type':(str, ""),
                                    })
 
         _ = gettext_set_language(argd['ln'])
@@ -305,7 +306,8 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                         recid=argd['recid'],
                                         title=argd['title'],
                                         text=argd['text'],
-                                        ln=argd['ln'])
+                                        ln=argd['ln'],
+                                        editor_type=argd['editor_type'])
         (body, errors_displaying, warnings) = perform_request_display_item(
                                                     uid=uid,
                                                     bskid=argd['bskid'],

@@ -191,6 +191,60 @@ th.searchboxheader a:hover {
    color: #000;
 }
 
+a.searchoptionlink:link {
+padding:3px;
+border: 1px solid transparent;
+color: #6E5907;
+text-decoration:none;
+}
+a.searchoptionlink:visited {
+padding:3px;
+border: 1px solid transparent;
+color: #6E5907;
+text-decoration:none;
+}
+a.searchoptionlink:hover {
+padding:3px;
+border: 1px dotted #CBA50E;
+color: #6E5907;
+text-decoration:underline;
+}
+a.searchoptionlink:active, a.searchoptionlink:visited:active {
+padding:3px;
+border: 1px solid #CBA50E;
+background-color: #D4D4A0;
+color: #6E5907;
+text-decoration:none;
+}
+
+a.searchoptionlinkselected:link {
+border: 1px solid #CBA50E;
+padding:3px;
+background-color: #D4D4A0;
+text-decoration:none;
+color: #6E5907;
+}
+a.searchoptionlinkselected:visited {
+border: 1px solid #CBA50E;
+padding:3px;
+background-color: #D4D4A0;
+text-decoration:none;
+color: #6E5907;
+}
+a.searchoptionlinkselected:hover {
+border: 1px solid #CBA50E;
+padding:3px;
+background-color: #D4D4A0;
+text-decoration:none;
+color: #6E5907;
+}
+a.searchoptionlinkselected:active,  a.searchoptionlinkselected:visited:active{
+border: 1px dotted #CBA50E;
+padding:3px;
+background-color: transparent;
+text-decoration:none;
+color: #6E5907;
+}
 
 .headerbox {
    color: #000;
@@ -1312,15 +1366,16 @@ input,select {
    font-size: small;
 }
 .bskcomment {
-   padding: 15px 10px 15px 10px;
-   margin-bottom: 5px;
-   border-bottom: 1px solid #fc0;
+   margin-bottom:20px;
+   margin-left:30px;
+   background:#F9F9F9;
+   border:1px solid #DDD;
+   font-size:small;
+   width: 90%;
 }
-.bsklabel{
-   font-size: small;
-   font-weight: bold;
-   white-space: nowrap;
-   padding-right: 15px;
+.bskcommentheader {
+   background-color:#EEE;
+   padding:2px;
 }
 .bsk_create_link{
    padding-top: 5px;
