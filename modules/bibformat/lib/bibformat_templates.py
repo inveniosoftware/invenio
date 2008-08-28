@@ -32,6 +32,9 @@ from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL
 from invenio.messages import language_list_long
 from invenio.config import CFG_PATH_PHP
 
+MAX_MAPPINGS = 100 #show max this number of mappings on one page
+
+
 class Template:
     """Templating class, refer to bibformat.py for examples of call"""
 
@@ -1857,7 +1860,7 @@ class Template:
 
         return out
 
-    def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby):
+    def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby, startat=0):
         """
         Returns the content of a knowledge base.
 
@@ -1866,6 +1869,7 @@ class Template:
         @param kb_name the name of the kb
         @param content a list of dictionaries with mappings
         @param sortby the sorting criteria ('from' or 'to')
+        @startat start showing the mappings from number x. Usefull for large kb's.
         @return main management console as html
         """
 
@@ -1951,6 +1955,11 @@ class Template:
                'kb_id':kb_id,
                'siteurl':CFG_SITE_URL}
 
+        try:
+            startati = int(startat)
+        except ValueError:
+            startati = 0
+
         #table content: key, value and actions
         if len(mappings) == 0:
             out += '''
@@ -1962,52 +1971,69 @@ class Template:
             tabindex_key = 6
             tabindex_value = 7
             tabindex_save_button = 8
+            mnum = 0 #current iteration in mappings
             for mapping in mappings:
-                style = "vertical-align: middle;"
-                if line % 2:
-                    style += 'background-color: rgb(235, 247, 255);'
-                line += 1
-                tabindex_key += 3
-                tabindex_value += 3
-                tabindex_save_button += 3
+                #roll to startat
+                mnum += 1
+                if mnum > startati and mnum <= startati+MAX_MAPPINGS:
+                    style = "vertical-align: middle;"
+                    if line % 2:
+                        style += 'background-color: rgb(235, 247, 255);'
+                    line += 1
+                    tabindex_key += 3
+                    tabindex_value += 3
+                    tabindex_save_button += 3
 
-                row_content = '''
-                <tr>
-                <td colspan="5">
-                <form action="kb_edit_mapping?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s" name="%(key)s" method="post">
-                <table>
-                <tr>
-                <td class="admintdright" style="%(style)s" width="5">
-                &nbsp;
-                <input type="hidden" name="key" value="%(key)s"/>
-                </td>
-                <td class="admintdleft" style="%(style)s">
-                    <input type="text" name="mapFrom" size="30" maxlength="255" value="%(key)s" tabindex="%(tabindex_key)s"/>
-                </td>
-                <td class="admintdleft" style="%(style)s white-space: nowrap;" width="5">=&gt;</td>
-                <td class="admintdleft"style="%(style)s">
-                     <input type="text" name="mapTo" size="30" value="%(value)s" tabindex="%(tabindex_value)s">
-                </td>
-                <td class="admintd" style="%(style)s white-space: nowrap;">
-                     <input class="adminbutton" type="submit" name="update" value="Save" tabindex="%(tabindex_save_button)s"/>
-                     <input class="adminbutton" type="submit" name="delete"value="Delete"/></td>
-                </tr></table></form></td></tr>
-                ''' % {'key': mapping['key'],
-                       'value':mapping['value'],
-                       'ln':ln,
-                       'style':style,
-                       'tabindex_key': tabindex_key,
-                       'tabindex_value': tabindex_value,
-                       'tabindex_save_button': tabindex_save_button,
-                       'kb_id':kb_id,
-                       'sortby':sortby}
+                    row_content = '''
+                    <tr>
+                    <td colspan="5">
+                    <form action="kb_edit_mapping?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s" name="%(key)s" method="post">
+                    <table>
+                    <tr>
+                    <td class="admintdright" style="%(style)s" width="5">
+                    &nbsp;
+                    <input type="hidden" name="key" value="%(key)s"/>
+                    </td>
+                    <td class="admintdleft" style="%(style)s">
+                        <input type="text" name="mapFrom" size="30" maxlength="255" value="%(key)s" tabindex="%(tabindex_key)s"/>
+                    </td>
+                    <td class="admintdleft" style="%(style)s white-space: nowrap;" width="5">=&gt;</td>
+                    <td class="admintdleft"style="%(style)s">
+                        <input type="text" name="mapTo" size="30" value="%(value)s" tabindex="%(tabindex_value)s">
+                    </td>
+                    <td class="admintd" style="%(style)s white-space: nowrap;">
+                        <input class="adminbutton" type="submit" name="update" value="Save" tabindex="%(tabindex_save_button)s"/>
+                        <input class="adminbutton" type="submit" name="delete"value="Delete"/></td>
+                    </tr></table></form></td></tr>
+                    ''' % {'key': mapping['key'],
+                        'value':mapping['value'],
+                        'ln':ln,
+                        'style':style,
+                        'tabindex_key': tabindex_key,
+                        'tabindex_value': tabindex_value,
+                        'tabindex_save_button': tabindex_save_button,
+                        'kb_id':kb_id,
+                        'sortby':sortby}
 
-                out += row_content
+                    out += row_content
 
-        #End of tables
-        out += '''</tbody></table>
-        </td>
-        '''
+        #End of table
+        out += '</tbody></table>'
+
+        #add prev/next buttons if needed
+        if startati > 0:
+            newstart=startati-MAX_MAPPINGS
+            if newstart < 0:
+                newstart = 0
+            out += '<a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s">%(Previous)s</a>' % { 'ln':ln, 'kb_id':kb_id, 'sortby':sortby, 'Previous': _("Previous") }
+
+        if len(mappings) > startati+MAX_MAPPINGS:
+            #all of them were not shown yet
+            out += '&nbsp;'
+            newstart = startati+MAX_MAPPINGS
+            out += '<a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s&amp;startat=%(newstart)s">%(Next)s</a>' % { 'ln':ln, 'kb_id':kb_id, 'sortby':sortby, 'newstart':str(newstart), 'Next': _("Next") }
+
+        out += '</td>'
         out+= '''
         <td width="20%">&nbsp;</td>
         </tr>

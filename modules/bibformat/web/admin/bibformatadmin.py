@@ -944,7 +944,7 @@ def kb_manage(req, ln=config.CFG_SITE_LANG):
                                    navtrail=navtrail_previous_links)
 
 
-def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG):
+def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG, startat=0):
     """
     Shows the content of the given knowledge base id. Check for authentication and kb existence.
     Before displaying the content of the knowledge base, check if a form was submitted asking for
@@ -953,6 +953,7 @@ def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG):
     @param ln language
     @param kb the kb id to show
     @param sortby the sorting criteria ('from' or 'to')
+    @startat the number from which start showing mapping rules in kb
     """
 
     ln = wash_language(ln)
@@ -982,8 +983,7 @@ def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG):
 
         return page(title=_("Knowledge Base %s" % kb_name),
                 body=bibformatadminlib.perform_request_knowledge_base_show(ln=ln,
-                                                                           kb_id=kb_id,
-                                                                           sortby=sortby),
+                kb_id=kb_id, sortby=sortby, startat=startat),
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
@@ -1135,17 +1135,17 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG
         if forcetype and not forcetype=="no":
             pass
         else:
-            if len(right_sides) > 0:
-                return page(title=_("Right side exists"),
-                        body = bibformatadminlib.perform_request_verify_rule(ln, kb_id, key, value, "right", kb_name, right_sides),
+            if len(left_sides) > 0:
+                return page(title=_("Left side exists"),
+                        body = bibformatadminlib.perform_request_verify_rule(ln, kb_id, key, value, "left", kb_name, left_sides),
                         language=ln,
                         navtrail = navtrail_previous_links,
                         lastupdated=__lastupdated__,
                         req=req)
 
-            if len(left_sides) > 0:
-                return page(title=_("Left side exists"),
-                        body = bibformatadminlib.perform_request_verify_rule(ln, kb_id, key, value, "left", kb_name, left_sides),
+            if len(right_sides) > 0:
+                return page(title=_("Right side exists"),
+                        body = bibformatadminlib.perform_request_verify_rule(ln, kb_id, key, value, "right", kb_name, right_sides),
                         language=ln,
                         navtrail = navtrail_previous_links,
                         lastupdated=__lastupdated__,

@@ -658,19 +658,20 @@ def perform_request_knowledge_bases_management(ln=CFG_SITE_LANG):
 
     return bibformat_templates.tmpl_admin_kbs_management(ln, kbs)
 
-def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to"):
+def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to", startat=0):
     """
     Show the content of a knowledge base
 
     @param ln language
     @param kb a knowledge base id
     @param sortby the sorting criteria ('from' or 'to')
+    @startat start showing mapping rules at what number
     @return the content of the given knowledge base
     """
     name = bibformat_dblayer.get_kb_name(kb_id)
     mappings = bibformat_dblayer.get_kb_mappings(name, sortby)
 
-    return bibformat_templates.tmpl_admin_kb_show(ln, kb_id, name, mappings, sortby)
+    return bibformat_templates.tmpl_admin_kb_show(ln, kb_id, name, mappings, sortby, startat)
 
 
 def perform_request_knowledge_base_show_attributes(kb_id, ln=CFG_SITE_LANG, sortby="to"):
