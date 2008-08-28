@@ -814,6 +814,7 @@ def perform_request_add_comment_or_remark(recID=0,
     @param reviews: boolean, if enabled will add a review, if disabled will add a comment
     @param comID: if replying, this is the comment id of the commetn are replying to
     @param editor_type: the kind of editor/input used for the comment: 'textarea', 'fckeditor'
+    @param can_attach_files: if user can attach files to comments or not
     @return html add form if action is display or reply
             html successful added form if action is submit
     """
