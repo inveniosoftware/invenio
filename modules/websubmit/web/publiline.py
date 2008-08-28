@@ -84,7 +84,7 @@ CFG_WEBSUBMIT_DUMMY_MARC_XML_REC = "dummy_marcxml_rec"
 CFG_WEBSUBMIT_MARC_XML_REC = "recmysql"
 
 
-def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send="",flow="",apptype="", action="", email_user_pattern="", id_user="", id_user_remove="", validate="", id_user_val="", msg_subject="", msg_body=""):
+def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send="",flow="",apptype="", action="", email_user_pattern="", id_user="", id_user_remove="", validate="", id_user_val="", msg_subject="", msg_body="", reply="", commentId=""):
     global uid
 
     ln = wash_language(ln)
@@ -101,6 +101,9 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
     id_user_val = wash_url_argument(id_user_val, 'int')
     msg_subject = wash_url_argument(msg_subject, 'str')
     msg_body = wash_url_argument(msg_body, 'str')
+    reply = wash_url_argument(reply, 'str')
+    commentId = wash_url_argument(commentId, 'str')
+
 
     # load the right message language
     _ = gettext_set_language(ln)
@@ -115,6 +118,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
         uid_email = get_email(uid)
     except Error, e:
         return errorMsg(str(e),req, ln = ln)
+
     if flow == "cplx":
         if doctype == "":
             t = selectCplxDoctype(ln)
@@ -123,7 +127,7 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,doctype="",categ="",RN="",send=""
         elif RN == "":
             t = selectCplxDocument(doctype, categ, apptype, ln)
         elif action == "":
-            t = displayCplxDocument(req, doctype, categ, RN, apptype, ln)
+            t = displayCplxDocument(req, doctype, categ, RN, apptype, reply, commentId, ln)
         else:
             t = doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, id_user, id_user_remove, validate, id_user_val, msg_subject, msg_body, ln)
         return page(title=_("Document Approval Workflow"),
@@ -392,8 +396,7 @@ def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
         )
     return t
 
-def displayCplxDocument(req, doctype,categ,RN,apptype, ln = CFG_SITE_LANG):
-
+def displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln = CFG_SITE_LANG):
     # load the right message language
     _ = gettext_set_language(ln)
 
@@ -428,7 +431,9 @@ def displayCplxDocument(req, doctype,categ,RN,apptype, ln = CFG_SITE_LANG):
 ##         (authors,title,sysno,newrn) = getInAlice(doctype,categ,RN)
 ##     except TypeError:
 ##         return _("Unable to display document.")
+
     item_details = get_brief_doc_details_from_repository(RN)
+
     ## get_brief_doc_details_from_repository has returned either None
     ## or a dictionary with the following structure:
     ##   { 'title'            : '-', ## String - the item's title
@@ -491,14 +496,27 @@ def displayCplxDocument(req, doctype,categ,RN,apptype, ln = CFG_SITE_LANG):
         else:
             user_can_add_comment = __check_basket_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT'])
 
-        t += websubmit_templates.tmpl_publiline_displaycplxdocitem(
+            comment_subject = ""
+            comment_body = ""
+            if reply == "true":
+                #Get the message subject and body from the comment
+                for comment in comments:
+                    if str(commentId) == str(comment[0]):
+                        comment_subject = comment[2]
+                        comment_body = comment[3]
+                comment_subject = comment_subject.lstrip("Re: ")
+                comment_subject = "Re: " + comment_subject
+                comment_body = "> " + comment_body.replace("\n", "\n> ")
+
+
+            t += websubmit_templates.tmpl_publiline_displaycplxdocitem(
                                                   doctype, categ, RN, apptype, "AddComment",
                                                   comments,
                                                   (__check_basket_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
                                                    user_can_add_comment,
                                                    __check_basket_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['DELCMT'])),
                                                   selected_category=CFG_WEBBASKET_CATEGORIES['GROUP'], selected_topic=0, selected_group_id=id_group,
-                                                  ln=ln)
+                                                  comment_subject=comment_subject, comment_body=comment_body, ln=ln)
 
     return t
 
@@ -585,18 +603,17 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
     Return HTML body for the paget.
     In case of errors, deletes hard drive. ;-)
     """
-
-   # load the right message language
+    # load the right message language
     _ = gettext_set_language(ln)
 
-    TEXT_RRP_RefereeSel_BASKET_DESCR = "Requests for refereeing process"
-    TEXT_RRP_RefereeSel_MSG_REFEREE_SUBJECT = "Referee selection"
-    TEXT_RRP_RefereeSel_MSG_REFEREE_BODY = "You have been named as a referee for this document :"
-    TEXT_RRP_RefereeSel_MSG_GROUP_SUBJECT = "Please, review this publication"
-    TEXT_RRP_RefereeSel_MSG_GROUP_BODY = "Please, review the following publication"
-    TEXT_RRP_RefereeRecom_MSG_PUBCOM_SUBJECT = "Final recommendation from the referee"
-    TEXT_RRP_PubComRecom_MSG_PRJLEADER_SUBJECT = "Final recommendation from the publication board"
-    TEXT_RRP_ProjectLeaderDecision_MSG_SUBJECT = "Final decision from the project leader"
+    TEXT_RSN_RefereeSel_BASKET_DESCR = "Requests for refereeing process"
+    TEXT_RSN_RefereeSel_MSG_REFEREE_SUBJECT = "Referee selection"
+    TEXT_RSN_RefereeSel_MSG_REFEREE_BODY = "You have been named as a referee for this document :"
+    TEXT_RSN_RefereeSel_MSG_GROUP_SUBJECT = "Please, review this publication"
+    TEXT_RSN_RefereeSel_MSG_GROUP_BODY = "Please, review the following publication"
+    TEXT_RSN_RefereeRecom_MSG_PUBCOM_SUBJECT = "Final recommendation from the referee"
+    TEXT_RSN_PubComRecom_MSG_PRJLEADER_SUBJECT = "Final recommendation from the publication board"
+    TEXT_RSN_ProjectLeaderDecision_MSG_SUBJECT = "Final decision from the project leader"
 
     TEXT_RPB_EdBoardSel_MSG_EDBOARD_SUBJECT = "You have been selected in a editorial board"
     TEXT_RPB_EdBoardSel_MSG_EDBOARD_BODY = "You have been selected as a member of the editorial board of this document :"
@@ -662,7 +679,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
             if dEdBoardSel == None:
                 __db_set_EdBoardSel_time (key)
                 perform_request_send (uid, "", RN, TEXT_RPB_EdBoardSel_MSG_EDBOARD_SUBJECT, TEXT_RPB_EdBoardSel_MSG_EDBOARD_BODY)
-            return displayCplxDocument(req, doctype,categ,RN,apptype, ln)
+            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         id_EdBoardGroup = __db_check_EdBoardGroup (key, id_EdBoardGroup, uid, TEXT_RPB_EdBoardSel_EDBOARD_GROUP_DESCR)
 
@@ -755,18 +772,18 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
     elif (action == "RefereeSel") and ((apptype == "RRP") or (apptype == "RPB")):
         if apptype == "RRP":
             to_check = __is_PubCom (req, doctype)
-            TEXT_RefereeSel_BASKET_DESCR = TEXT_RRP_RefereeSel_BASKET_DESCR
-            TEXT_RefereeSel_MSG_REFEREE_SUBJECT = TEXT_RRP_RefereeSel_MSG_REFEREE_SUBJECT
-            TEXT_RefereeSel_MSG_REFEREE_BODY = TEXT_RRP_RefereeSel_MSG_REFEREE_BODY + " " + "\"" + item_details['title'] + "\""
-            TEXT_RefereeSel_MSG_GROUP_SUBJECT = TEXT_RRP_RefereeSel_MSG_GROUP_SUBJECT
-            TEXT_RefereeSel_MSG_GROUP_BODY = TEXT_RRP_RefereeSel_MSG_GROUP_BODY
+            TEXT_RefereeSel_BASKET_DESCR = TEXT_RSN_RefereeSel_BASKET_DESCR
+            TEXT_RefereeSel_MSG_REFEREE_SUBJECT = TEXT_RSN_RefereeSel_MSG_REFEREE_SUBJECT
+            TEXT_RefereeSel_MSG_REFEREE_BODY = TEXT_RSN_RefereeSel_MSG_REFEREE_BODY + " " + "\"" + item_details['title'] + "\""
+            TEXT_RefereeSel_MSG_GROUP_SUBJECT = TEXT_RSN_RefereeSel_MSG_GROUP_SUBJECT
+            TEXT_RefereeSel_MSG_GROUP_BODY = TEXT_RSN_RefereeSel_MSG_GROUP_BODY
         elif apptype == "RPB":
             to_check = __is_EdBoard (uid, id_EdBoardGroup)
-            TEXT_RefereeSel_BASKET_DESCR = TEXT_RRP_RefereeSel_BASKET_DESCR
-            TEXT_RefereeSel_MSG_REFEREE_SUBJECT = TEXT_RRP_RefereeSel_MSG_REFEREE_SUBJECT
-            TEXT_RefereeSel_MSG_REFEREE_BODY = TEXT_RRP_RefereeSel_MSG_REFEREE_BODY
-            TEXT_RefereeSel_MSG_GROUP_SUBJECT = TEXT_RRP_RefereeSel_MSG_GROUP_SUBJECT
-            TEXT_RefereeSel_MSG_GROUP_BODY = TEXT_RRP_RefereeSel_MSG_GROUP_BODY
+            TEXT_RefereeSel_BASKET_DESCR = TEXT_RSN_RefereeSel_BASKET_DESCR
+            TEXT_RefereeSel_MSG_REFEREE_SUBJECT = TEXT_RSN_RefereeSel_MSG_REFEREE_SUBJECT
+            TEXT_RefereeSel_MSG_REFEREE_BODY = TEXT_RSN_RefereeSel_MSG_REFEREE_BODY
+            TEXT_RefereeSel_MSG_GROUP_SUBJECT = TEXT_RSN_RefereeSel_MSG_GROUP_SUBJECT
+            TEXT_RefereeSel_MSG_GROUP_BODY = TEXT_RSN_RefereeSel_MSG_GROUP_BODY
         else:
             to_check = None
 
@@ -790,7 +807,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
                 group_name = run_sql("""SELECT name FROM usergroup WHERE id = %s""", (id_group, ))[0][0]
                 perform_request_send (int(id_user_val), "", group_name, TEXT_RefereeSel_MSG_GROUP_SUBJECT, TEXT_RefereeSel_MSG_GROUP_BODY)
                 sendMailToGroup(doctype,categ,RN,id_group,authors)
-            return displayCplxDocument(req, doctype,categ,RN,apptype, ln)
+            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         subtitle1 = _('Referee selection')
 
@@ -891,23 +908,15 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         if apptype == "RRP":
             # Build publication committee chair's email address
             user_addr = ""
-            project_leader_email = []
-
-            for user in acc_get_role_users(acc_get_role_id("projectleader_%s_%s" % ("ATL",categ))):
-                user_addr += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
-                project_leader_email.append(run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0])
-
             # Try to retrieve the publication committee chair's email from the role database
             for user in acc_get_role_users(acc_get_role_id("pubcomchair_%s_%s" % (doctype,categ))):
                 user_addr += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
             # And if there are general publication committee chair's
             for user in acc_get_role_users(acc_get_role_id("pubcomchair_%s_*" % doctype)):
                 user_addr += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
-
-            #Get committee chair's email address from the database
             user_addr = re.sub(",$","",user_addr)
             group_addr = ""
-            TEXT_RefereeRecom_MSG_SUBJECT = TEXT_RRP_RefereeRecom_MSG_PUBCOM_SUBJECT
+            TEXT_RefereeRecom_MSG_SUBJECT = TEXT_RSN_RefereeRecom_MSG_PUBCOM_SUBJECT
         elif apptype == "RPB":
             user_addr = ""
             group_addr = RN
@@ -920,9 +929,15 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         if validate == "go":
             if dRefereeRecom == None:
                 perform_request_send (uid, user_addr, group_addr, msg_subject, msg_body, 0, 0, 0, ln, 1)
-                sendMailToProjectLeader(doctype, categ, RN, project_leader_email[0], authors, "referee", msg_body)
+
+                #Get the Project Leader's email address
+                email = ""
+                for user in acc_get_role_users(acc_get_role_id("projectleader_%s_%s" % (doctype,categ))):
+                    email += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
+                sendMailToProjectLeader(doctype, categ, RN, email, authors, "referee", msg_body)
+                sendMailtoCommitteeChair(doctype, categ, RN, user_addr, authors)
                 __db_set_RefereeRecom_time (key)
-            return displayCplxDocument(req, doctype,categ,RN,apptype, ln)
+            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         t = websubmit_templates.tmpl_publiline_displaycplxrecom (
               ln = ln,
@@ -963,7 +978,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
             if dEdBoardRecom == None:
                 perform_request_send (uid, user_addr, "", msg_subject, msg_body)
                 __db_set_EdBoardRecom_time (key)
-            return displayCplxDocument(req, doctype,categ,RN,apptype, ln)
+            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         t = websubmit_templates.tmpl_publiline_displaycplxrecom (
               ln = ln,
@@ -992,18 +1007,16 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
 
         # Build project leader's email address
         user_addr = ""
-        project_leader_email = []
         # Try to retrieve the project leader's email from the role database
-        for user in acc_get_role_users(acc_get_role_id("projectleader_%s_%s" % ("ATL",categ))):
+        for user in acc_get_role_users(acc_get_role_id("projectleader_%s_%s" % (doctype,categ))):
             user_addr += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
-            project_leader_email.append(run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0])
         # And if there are general project leader's
         for user in acc_get_role_users(acc_get_role_id("projectleader_%s_*" % doctype)):
             user_addr += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
         user_addr = re.sub(",$","",user_addr)
 
         if apptype == "RRP":
-            TEXT_PubComRecom_MSG_SUBJECT = TEXT_RRP_PubComRecom_MSG_PRJLEADER_SUBJECT
+            TEXT_PubComRecom_MSG_SUBJECT = TEXT_RSN_PubComRecom_MSG_PRJLEADER_SUBJECT
         elif apptype == "RPB":
             group_addr = RN
             TEXT_PubComRecom_MSG_SUBJECT = TEXT_RPB_PubComRecom_MSG_PRJLEADER_SUBJECT
@@ -1013,9 +1026,9 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         if validate == "go":
             if dPubComRecom == None:
                 perform_request_send (uid, user_addr, "", msg_subject, msg_body, 0, 0, 0, ln, 1)
-                sendMailToProjectLeader(doctype, categ, RN, project_leader_email[0], authors, "publication committee chair", msg_body)
+                sendMailToProjectLeader(doctype, categ, RN, user_addr, authors, "publication committee chair", msg_body)
                 __db_set_PubComRecom_time (key)
-            return displayCplxDocument(req, doctype,categ,RN,apptype, ln)
+            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         t = websubmit_templates.tmpl_publiline_displaycplxrecom (
               ln = ln,
@@ -1062,8 +1075,8 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
                 (errors, infos) = perform_request_save_comment (uid, id_bskBASKET, sysno, msg_subject, msg_body, ln)
                 out = "%(infos)s<br /><br />" % {'infos' : infos[0]}
 
-                __db_set_status (key, 'approved')
                 sendMailToSubmitter(doctype, categ, RN, "approved")
+                __db_set_status (key, 'approved')
             return out + t
 
         elif validate == "reject":
@@ -1071,8 +1084,8 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
                 (errors, infos) = perform_request_save_comment (uid, id_bskBASKET, sysno, msg_subject, msg_body, ln)
                 out = "%(infos)s<br /><br />" % {'infos' : infos[0]}
 
-                __db_set_status (key, 'rejected')
                 sendMailToSubmitter(doctype, categ, RN, "rejected")
+                __db_set_status (key, 'rejected')
             return out + t
 
         validation = """
@@ -1088,7 +1101,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
                                                                              }
 
         if apptype == "RRP":
-            TEXT_ProjectLeaderDecision_MSG_SUBJECT = TEXT_RRP_ProjectLeaderDecision_MSG_SUBJECT
+            TEXT_ProjectLeaderDecision_MSG_SUBJECT = TEXT_RSN_ProjectLeaderDecision_MSG_SUBJECT
         elif apptype == "RPB":
             TEXT_ProjectLeaderDecision_MSG_SUBJECT = TEXT_RPB_ProjectLeaderDecision_MSG_SUBJECT
         else:
@@ -1108,12 +1121,12 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         if validate == "approve":
             if dProjectLeaderAction == None:
                 __db_set_status (key, 'approved')
-            return displayCplxDocument(req, doctype,categ,RN,apptype, ln)
+            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         elif validate == "reject":
             if dProjectLeaderAction == None:
                 __db_set_status (key, 'rejected')
-            return displayCplxDocument(req, doctype,categ,RN,apptype, ln)
+            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         t = """<p>
                  <form action="publiline.py">
@@ -1157,7 +1170,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
 
         if validate == "go":
             __db_set_status (key, 'cancelled')
-            return displayCplxDocument(req, doctype,categ,RN,apptype, ln)
+            return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
 
         t = """<p>
                  <form action="publiline.py">
@@ -1387,7 +1400,7 @@ def get_brief_doc_details_from_repository(reportnumber):
         + Authors
         + recid (why?)
         + report-number (why?)
-        + email (for emailing submitter when process is complete)
+        + email
        This function searches in the CDS Invenio repository, based on
        "reportnumber" for a record and then pulls the interesting fields
        from it.
@@ -1441,7 +1454,7 @@ def get_brief_doc_details_from_repository(reportnumber):
         reptnum = get_fieldvalues(recid, "037__a")
         if len(reptnum) > 0:
             pending_doc_details['report-number'] = reptnum[0]
-        ##Email:
+        ## Email:
         email = get_fieldvalues(recid, "859__f")
         if len(email) > 0:
             pending_doc_details['email'] = email[0]
@@ -1689,7 +1702,8 @@ def sendMailToGroup(doctype,categ,RN,group_id,authors):
     group_member_ids = run_sql("SELECT id_user FROM user_usergroup WHERE id_usergroup = '%s'" % (group_id))
     for member_id in group_member_ids:
         member_email = run_sql("SELECT email FROM user WHERE id = '%s'" % (member_id))
-        send_email(FROMADDR, member_email[0][0],"Request for comment on document %s" % (RN),message)
+        if not member_email[0][0] == "cds.support@cern.ch":
+            send_email(FROMADDR, member_email[0][0],"Request for comment on document %s" % (RN),message)
     return ""
 
 def sendMailToProjectLeader(doctype, categ, RN, email, authors, actor, recommendation):
@@ -1763,4 +1777,41 @@ def sendMailToSubmitter(doctype, categ, RN, outcome):
     # send mails to all members of the ATLAS group
     send_email(FROMADDR, item_details['email'],"Final outcome for approval of document : %s" % (RN),message)
     return ""
+
+def sendMailtoCommitteeChair(doctype, categ, RN, email, authors):
+    item_details = get_brief_doc_details_from_repository(RN)
+    ## get_brief_doc_details_from_repository has returned either None
+    ## or a dictionary with the following structure:
+    ##   { 'title'            : '-', ## String - the item's title
+    ##     'recid'            : '',  ## String - recid
+    ##     'report-number'    : '',  ## String - the item's report number
+    ##     'authors'          : [],  ## List   - the item's authors
+    ##   }
+
+    FROMADDR = '%s Submission Engine <%s>' % (CFG_SITE_NAME,CFG_SITE_SUPPORT_EMAIL)
+
+    message = """
+    The referree assigned to the document detailed below has made a reccommendation. You are now requested to make a reccommendation of your own.
+
+    Requested subcategory: %s
+
+    Title: %s
+
+    Author(s): %s
+
+    To access the document(s), select the file(s) from the location:
+    <%s/record/%s>
+
+    You can make a reccommendation by visiting this page:
+    <%s>
+    """ % (str(categ),
+           str(item_details['title']),
+           authors,
+           CFG_SITE_URL,
+           str(item_details['recid']),
+           str(CFG_SITE_URL + "/publiline.py?flow=cplx&doctype="+doctype+"&ln=en&apptype=RRP&categ="+categ+"&RN="+RN))
+
+    # send mails to all members of the ATLAS group
+    send_email(FROMADDR, email,"Request for reccommendation of document %s" % (RN),message)
+
 
