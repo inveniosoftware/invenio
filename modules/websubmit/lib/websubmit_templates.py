@@ -50,26 +50,6 @@ class Template:
         'verbose' : (int, 0) # the verbosity
         }
 
-    def tmpl_print_warning(self, msg, type, prologue, epilogue):
-        """Prints warning message and flushes output.
-
-        Parameters:
-
-          - 'msg' *string* - The message string
-
-          - 'type' *string* - the warning type
-
-          - 'prologue' *string* - HTML code to display before the warning
-
-          - 'epilogue' *string* - HTML code to display after the warning
-        """
-
-        out = '\n%s<span class="quicknote">' % (prologue)
-        if type:
-            out += '%s: ' % type
-        out += '%s</span>%s' % (msg, epilogue)
-        return out
-
 
     def tmpl_submit_home_page(self, ln, catalogues):
         """
@@ -2575,7 +2555,7 @@ class Template:
                                           comments,
                                           (user_can_view_comments, user_can_add_comment, user_can_delete_comment),
                                           selected_category,
-                                          selected_topic, selected_group_id, ln):
+                                          selected_topic, selected_group_id, comment_subject, comment_body, ln):
         _ = gettext_set_language(ln)
 
         if comments and user_can_view_comments:
@@ -2590,12 +2570,12 @@ class Template:
                 comments_text += """
 <table class="bskbasket">
   <thead class="bskbasketheader">
-    <tr><td class="bsktitle"><a name="%s"></a>%s - %s (%s)</td><td><a href="#top">Top</a></td></tr>
+    <tr><td class="bsktitle"><a name="%s"></a>%s - %s (%s)</td><td><a href=%s/publiline.py?flow=cplx&doctype=%s&apptype=%s&categ=%s&RN=%s&reply=true&commentId=%s&ln=%s#add_comment>Reply</a></td><td><a href="#top">Top</a></td></tr>
   </thead>
   <tbody>
     <tr><td colspan="2">%s</td></tr>
   </tbody>
-</table>""" % (cmtid, cmt_nickname, cmt_title, convert_datetext_to_dategui (cmt_date), email_quoted_txt2html(cmt_body))
+</table>""" % (cmtid, cmt_nickname, cmt_title, convert_datetext_to_dategui (cmt_date), CFG_SITE_URL, doctype, apptype, categ, rn, cmt_uid, ln, email_quoted_txt2html(cmt_body))
 
             comments_overview += '</ul>'
         else:
@@ -2611,7 +2591,7 @@ class Template:
             validation = """
     <input type="hidden" name="validate" value="go" />
     <input type="submit" class="formbutton" value="%(button_label)s" />""" % {'button_label': _("Add Comment")}
-            body += self.tmpl_publiline_displaywritecomment (doctype, categ, rn, apptype, action, _("Add Comment"), "", validation, ln)
+            body += self.tmpl_publiline_displaywritecomment (doctype, categ, rn, apptype, action, _("Add Comment"), comment_subject, validation, comment_body, ln)
 
         body %= {
                 'comments_label': _("Comments"),
@@ -2646,7 +2626,7 @@ class Template:
 
         return out
 
-    def tmpl_publiline_displaywritecomment(self, doctype, categ, rn, apptype, action, write_label, title, validation, ln):
+    def tmpl_publiline_displaywritecomment(self, doctype, categ, rn, apptype, action, write_label, title, validation, reply_message, ln):
         _ = gettext_set_language(ln)
         return """
 <div style="width:100%%%%">
@@ -2661,9 +2641,10 @@ class Template:
     <input type="hidden" name="action" value="%(action)s" />
     <input type="hidden" name="ln" value="%(ln)s" />
     <p class="bsklabel">%(title_label)s:</p>
+    <a name="add_comment"></a>
     <input type="text" name="msg_subject" size="80" value="%(title)s"/>
     <p class="bsklabel">%(comment_label)s:</p>
-    <textarea name="msg_body" rows="20" cols="80"></textarea><br />
+    <textarea name="msg_body" rows="20" cols="80">%(reply_message)s</textarea><br />
     %(validation)s
   </form>
 </div>""" % {'write_label': write_label,
@@ -2676,6 +2657,7 @@ class Template:
              'apptype' : apptype,
              'action' : action,
              'validation' : validation,
+             'reply_message' : reply_message,
              'ln' : ln,
             }
 
