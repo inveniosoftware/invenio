@@ -51,6 +51,21 @@ this:
     /export/google-scholar/lastmonth-partN.nlm.xml.gz - last batch of 1000 records
 """
 
+from invenio.config import CFG_WEBDIR
+from invenio.bibtask import write_message
+from invenio.google_scholar_exporter import GoogleScholarExporter, GoogleScholarExportException
+import os
+
 def run_export_method(jobname):
     """Main function, reading params and running the task."""
-    raise NotImplementedError
+    # FIXME: read jobname's cfg file to detect collection and fulltext status arguments
+    write_message("bibexport_sitemap: job %s started." % jobname)
+
+    try:
+        output_directory = CFG_WEBDIR + os.sep + "export" + os.sep + "google-scholar"
+        exporter = GoogleScholarExporter(output_directory)
+        exporter.export()
+    except GoogleScholarExportException, ex:
+        write_message("%s Exception: %s" %(ex.get_error_message(), ex.get_inner_exception()))
+
+    write_message("bibexport_sitemap: job %s finished." % jobname)

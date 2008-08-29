@@ -21,7 +21,8 @@ pylibdir = $(libdir)/python/invenio
 
 pylib_DATA = bibexport.py \
              bibexport_method_sitemap.py \
-             bibexport_method_googlescholar.py
+             bibexport_method_googlescholar.py \
+             google_scholar_exporter.py
 
 EXTRA_DIST = $(pylib_DATA)
 
