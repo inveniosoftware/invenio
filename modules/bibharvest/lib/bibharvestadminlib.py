@@ -39,7 +39,8 @@ from invenio.config import \
      CFG_SITE_URL,\
      CFG_ETCDIR, \
      CFG_BINDIR, \
-     CFG_LOGDIR
+     CFG_LOGDIR, \
+     CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG
 from invenio.bibrankadminlib import \
      write_outcome,modify_translations,\
      get_def_name,\
@@ -57,11 +58,16 @@ from invenio.bibrankadminlib import \
 from invenio.dbquery import run_sql
 from invenio.webpage import page, pageheaderonly, pagefooteronly, adderrorbox
 from invenio.webuser import getUid, get_email
-from invenio.bibharvest_dblayer import get_history_entries, HistoryEntry, get_month_logs_size, get_history_entries_for_day, get_day_logs_size, get_entry_history, get_entry_logs_size
-
+from invenio.bibharvest_dblayer import get_history_entries, \
+    HistoryEntry, get_month_logs_size, get_history_entries_for_day, \
+    get_day_logs_size, get_entry_history, get_entry_logs_size, \
+    get_holdingpen_entries, delete_holdingpen_entry, get_holdingpen_entry
+from invenio.search_engine import search_pattern
 import invenio.template
 from invenio import oaiharvestlib
-
+from invenio.xmlmarc2textmarclib import recxml2recmarc, create_marc_record
+from invenio import bibformat
+from invenio.bibrecord import create_record
 bibharvest_templates = invenio.template.load('bibharvest')
 
 tmppath = CFG_TMPDIR + '/bibharvestadmin.' + str(os.getpid())
@@ -128,12 +134,16 @@ def perform_request_index(ln=CFG_SITE_LANG):
     if schtime:
         schtime = re.sub(r'\.[0-9]+$', '', str(schtime))
 
+
+    holdingpen_link = bibharvest_templates.tmpl_link_with_args(ln = CFG_SITE_LANG, funcurl = "admin/bibharvest/bibharvestadmin.py/viewholdingpen", title = "View Holding Pen", args = [["ln", str(ln)],])
     output = titlebar
     output += bibharvest_templates.tmpl_output_numbersources(CFG_SITE_LANG, get_tot_oai_src())
     output += tupletotable(header=header, tuple=sources)
     output += bibharvest_templates.tmpl_print_brs(CFG_SITE_LANG, 2)
     output += titlebar2
     output += bibharvest_templates.tmpl_output_schedule(CFG_SITE_LANG, schtime, str(schstatus))
+    output += holdingpen_link
+    output += bibharvest_templates.tmpl_print_brs(ln, 2)
     output += tupletotable(header=header2, tuple=updates)
 
     return output
@@ -930,6 +940,80 @@ def perform_request_harvest_record(oai_src_id = None, ln = CFG_SITE_LANG, confir
     return result
 
 
+############################
+### Holding pen support  ###
+############################
+def build_holdingpen_table(data, ln):
+    result = ""
+    headers = ["OAI Record ID", "Insertion Date", "", ""]
+    result += bibharvest_templates.tmpl_table_begin(headers)
+    for record in data:
+        oai_id = record[0]
+        date_inserted = record[1]
+        result += bibharvest_templates.tmpl_table_row_begin()
+        result += bibharvest_templates.tmpl_table_output_cell(str(oai_id), cssclass = "oddtablecolumn")
+        result += bibharvest_templates.tmpl_table_output_cell(str(date_inserted), cssclass = "pairtablecolumn")
+        details_link = bibharvest_templates.tmpl_link_with_args(ln, \
+                            "/admin/bibharvest/bibharvestadmin.py/viewhprecord", \
+                            "Compare with original", [["ln", ln], \
+                            ["oai_id", str(oai_id)], ["date_inserted", str(date_inserted)]])
+        result += bibharvest_templates.tmpl_table_output_cell(details_link, cssclass = "oddtablecolumn")
+        delete_hp_link = bibharvest_templates.tmpl_link_with_args(ln, \
+                            "/admin/bibharvest/bibharvestadmin.py/delhprecord", \
+                            "Delete from holding pen", [["ln", ln], \
+                            ["oai_id", str(oai_id)], ["date_inserted", str(date_inserted)]])
+        result += bibharvest_templates.tmpl_table_output_cell(delete_hp_link, cssclass = "pairtablecolumn")
+        result += bibharvest_templates.tmpl_table_row_end()
+    result += bibharvest_templates.tmpl_table_end()
+    return result
+
+def perform_request_viewholdingpen(ln = CFG_SITE_LANG, confirm=0, start = 0, limit = -1):
+    data = get_holdingpen_entries(start, limit)
+    result = ""
+    result += build_holdingpen_table(data, ln)
+    return result
+
+def perform_request_viewhprecord(oai_id, date_inserted, ln = CFG_SITE_LANG, confirm=0):
+    result = ""
+    record_id = int(search_pattern( p = oai_id, f = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
+                                        m = 'e' ).tolist()[0])
+    db_rec = create_record(bibformat.format_record(record_id ,"xm"))
+    db_MARC = create_marc_record(db_rec[0], record_id, {"text-marc": 1, "aleph-marc": 0})
+    db_content = bibharvest_templates.tmpl_output_preformatted(db_MARC.encode("utf-8"))
+    db_label = "Database version of record" + bibharvest_templates.tmpl_print_brs(ln, 1)
+    hp_rec = create_record(get_holdingpen_entry(oai_id, date_inserted))
+    hp_MARC = create_marc_record(hp_rec[0], record_id, {"text-marc": 1, "aleph-marc": 0})
+    hp_content = bibharvest_templates.tmpl_output_preformatted(hp_MARC.encode("utf-8"))
+    hp_label = bibharvest_templates.tmpl_print_brs(ln, 2) + "Holdingpen version of record"\
+        + bibharvest_templates.tmpl_print_brs(ln, 1)
+    submit_link = bibharvest_templates.tmpl_link_with_args(ln,
+                      "admin/bibharvest/bibharvestadmin.py/accepthprecord",
+                      "Accept Holding Pen version",
+                      [["ln", str(ln)], ["oai_id", str(oai_id)], ["date_inserted",
+                      str(date_inserted)]])
+    delete_link = delete_hp_link = bibharvest_templates.tmpl_link_with_args(ln,
+                     "admin/bibharvest/bibharvestadmin.py/delhprecord",
+                     "Delete from holding pen", [["ln", ln],
+                     ["oai_id", str(oai_id)], ["date_inserted", str(date_inserted)]])
+    result = ""
+    result += db_label
+    result += db_content
+    result += hp_label
+    result += hp_content
+    result += delete_link + " "
+    result += submit_link
+    return result
+
+def perform_request_delhprecord(oai_id, date_inserted, ln = CFG_SITE_LANG, confirm = 0):
+    delete_holdingpen_entry(oai_id, date_inserted)
+    return "Record deleted from the holding pen"
+
+def perform_request_accepthprecord(oai_id, date_inserted, ln = CFG_SITE_LANG, confirm = 0):
+    record_xml = get_holdingpen_entry(oai_id, date_inserted)
+    delete_holdingpen_entry(oai_id, date_inserted)
+    upload_record(record_xml)
+
+    return perform_request_viewholdingpen(ln = ln, confirm = confirm, start = 0, limit = -1)
 ##################################################################
 ### Here the functions to retrieve, modify, delete and add sources
 ##################################################################

@@ -317,6 +317,9 @@ def task_run_core():
                 write_message("File %s contains %i records." % \
                     (converted_file + ".correct.xml",
                     get_nb_records_in_file(converted_file + ".correct.xml")))
+                write_message("File %s contains %i records." % \
+                    (converted_file + ".holdingpen.xml",
+                    get_nb_records_in_file(converted_file + ".holdingpen.xml")))
             # only then call upload:
             i = 0
             for converted_file in converted_files:
@@ -336,6 +339,13 @@ def task_run_core():
                                           i, \
                                           len(converted_files)))
                     res += call_bibupload(converted_file + ".correct.xml", ["-c"], oai_src_id = repos[0][0])
+                    uploaded = True
+                if get_nb_records_in_file(converted_file + ".holdingpen.xml") > 0:
+                    task_update_progress("Uploading records harvested from %s to holding pen (%i/%i)" % \
+                                         (str(repos[0][6]),\
+                                          i, \
+                                          len(converted_files)))
+                    res += call_bibupload(converted_file + ".holdingpen.xml", ["-o"], oai_src_id = repos[0][0])
                     uploaded = True
             if len(converted_files) > 0:
                 if res == 0:

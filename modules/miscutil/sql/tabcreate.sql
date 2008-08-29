@@ -2277,6 +2277,12 @@ CREATE TABLE IF NOT EXISTS oaiHARVESTLOG (
   PRIMARY KEY (bibupload_task_id, oai_id, date_harvested)
 ) TYPE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS oaiHOLDINGPEN (
+       oai_id varchar(40) NOT NULL default "", -- identifier of the downloaded record
+       date_inserted datetime NOT NULL default '0000-00-00', -- when was the record inserted int oholding pen
+       record_XML TEXT NOT NULL default ""
+) TYPE=MyISAM;
+
 -- tables for portal elements:
 
 CREATE TABLE IF NOT EXISTS collection_portalbox (

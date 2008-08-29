@@ -314,6 +314,112 @@ def viewtasklogs(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0):
     else:
         return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
 
+def viewholdingpen(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0):
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
+    auth = bhc.check_user(req,'cfgbibharvest')
+    if not auth[0]:
+        return page(title="Holding Pen",
+                    body=bhc.perform_request_viewholdingpen(ln=ln,
+                                                    confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+def viewhprecord(req, ln=CFG_SITE_LANG, confirm=0, oai_id = "", date_inserted="0000-00-00 00:00:00"):
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
+    auth = bhc.check_user(req,'cfgbibharvest')
+    if not auth[0]:
+        return page(title="Holding Pen Record",
+                    body=bhc.perform_request_viewhprecord(oai_id = oai_id,
+                                                          date_inserted = date_inserted,
+                                                          ln=ln,
+                                                          confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+def accepthprecord(req, ln=CFG_SITE_LANG, confirm=0, oai_id = "", date_inserted="0000-00-00 00:00:00"):
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
+    auth = bhc.check_user(req,'cfgbibharvest')
+    if not auth[0]:
+        return page(title="Holding Pen Record",
+                    body=bhc.perform_request_accepthprecord(oai_id = oai_id,
+                                                          date_inserted = date_inserted,
+                                                          ln=ln,
+                                                          confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
+
+def delhprecord(req, ln=CFG_SITE_LANG, confirm=0, task_id = 0, oai_id = "", date_inserted="0000-00-00 00:00:00"):
+    navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)
+    try:
+        uid = getUid(req)
+    except Error, e:
+        return page(title="BibHarvest Admin Interface - Error",
+                    body=e,
+                    uid=uid,
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
+    auth = bhc.check_user(req,'cfgbibharvest')
+    if not auth[0]:
+        return page(title="Holding Pen Record",
+                    body=bhc.perform_request_delhprecord(oai_id = oai_id,
+                                                            date_inserted = date_inserted,
+                                                            ln=ln,
+                                                            confirm=confirm),
+                    uid=uid,
+                    language=ln,
+                    req=req,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__)
+    else:
+        return page_not_authorized(req=req, text=auth[1], navtrail=navtrail_previous_links)
+
 
 def reharvest(req, oai_src_id=None, ln=CFG_SITE_LANG, confirm=0, **records):
     navtrail_previous_links = bhc.getnavtrail() + """&gt; <a class="navtrail" href="%s/admin/bibharvest/bibharvestadmin.py">BibHarvest Admin Interface</a> """ % (CFG_SITE_URL)

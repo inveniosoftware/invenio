@@ -290,7 +290,15 @@ class Template:
         return "</table>\n"
 
     def tmpl_history_day_details_link(self, ln, date, oai_src_id):
-        return self.tmpl_link_with_args(ln, "/admin/bibharvest/bibharvestadmin.py/viewhistoryday", "View next entries...", [["ln", ln], ["oai_src_id", str(oai_src_id)], ["year", str(date.year)], ["month", str(date.month)], ["day",  str(date.day)], ["start", str(10)]])
+        return self.tmpl_link_with_args(ln, \
+                                            "/admin/bibharvest/bibharvestadmin.py/viewhistoryday",\
+                                            "View next entries...", \
+                                            [["ln", ln], \
+                                                 ["oai_src_id", str(oai_src_id)], \
+                                                 ["year", str(date.year)], \
+                                                 ["month", str(date.month)], \
+                                                 ["day",  str(date.day)], \
+                                                 ["start", str(10)]])
 
     def tmpl_history_table_output_day_cell(self, date, number_of_records, oai_src_id, ln, show_details = False):
         inner_text = "<b>" + self.format_date(date)
@@ -480,3 +488,4 @@ class Template:
         if datetime == None:
             return "(None)"
         return self.format_al_twodigits(datetime.hour) + ":" + self.format_al_twodigits(datetime.minute) + ":" + self.format_al_twodigits(datetime.second)
+

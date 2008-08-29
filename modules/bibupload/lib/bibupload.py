@@ -40,9 +40,10 @@ tables according to options.
      -s, --stage=STAGE       stage to start from in the algorithm
         (0: always done; 1: FMT tags;
          2: FFT tags; 3: BibFmt; 4: Metadata update; 5: time update)
-     -n,  --notimechange     do not change record last modification date
+     -n, --notimechange      do not change record last modification date
         when updating
-
+     -o, --holdingpen        Makes bibupload insert into holding pen instead
+                             the normal database
     Scheduling options:
      -u, --user=USER         user name to store task, password needed
 
@@ -105,6 +106,7 @@ stat['nb_records_to_upload'] = 0
 stat['nb_records_updated'] = 0
 stat['nb_records_inserted'] = 0
 stat['nb_errors'] = 0
+stat['nb_holdingpen'] = 0
 stat['exectime'] = time.localtime()
 
 ## Let's set a reasonable timeout for URL request (e.g. FFT)
@@ -151,7 +153,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
     Return (error_code, recID) of the processed record.
     """
     assert(opt_mode in ('insert', 'replace', 'replace_or_insert', 'reference',
-        'correct', 'append', 'format'))
+        'correct', 'append', 'format', 'holdingpen'))
     error = None
     # If there are special tags to proceed check if it exists in the record
     if opt_tag is not None and not(record.has_key(opt_tag)):
@@ -381,15 +383,24 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             update_database_with_metadata(rec_old, rec_id, oai_rec_id)
             write_message("   Restored original record", verbose=1, stream=sys.stderr)
 
+def insert_record_into_holding_pen(record, oai_id):
+    query = "INSERT INTO oaiHOLDINGPEN (oai_id, date_inserted, record_XML) VALUES (%s, NOW(), %s)"
+    xml_record = record_xml_output(record)
+    run_sql(query, (oai_id, xml_record))
+    # record_id is logged as 0! ( We are not inserting into the main database)
+    log_record_uploading(oai_id, task_get_task_param('task_id', 0), 0, 'H')
+    stat['nb_holdingpen'] += 1
+
 def print_out_bibupload_statistics():
     """Print the statistics of the process"""
     out = "Task stats: %(nb_input)d input records, %(nb_updated)d updated, " \
-          "%(nb_inserted)d inserted, %(nb_errors)d errors.  " \
+          "%(nb_inserted)d inserted, %(nb_errors)d errors, %(nb_holdingpen)d inserted to holding pen.  " \
           "Time %(nb_sec).2f sec." % { \
               'nb_input': stat['nb_records_to_upload'],
               'nb_updated': stat['nb_records_updated'],
               'nb_inserted': stat['nb_records_inserted'],
               'nb_errors': stat['nb_errors'],
+              'nb_holdingpen': stat['nb_holdingpen'],
               'nb_sec': time.time() - time.mktime(stat['exectime']) }
     write_message(out)
 
@@ -1637,9 +1648,10 @@ Examples:
   -S, --stage=STAGE\tstage to start from in the algorithm (0: always done; 1: FMT tags;
 \t\t\t2: FFT tags; 3: BibFmt; 4: Metadata update; 5: time update)
   -n, --notimechange\tdo not change record last modification date when updating
+  -o, --holdingpen\t\tInsert record into holding pen instead of the normal database
 """,
             version=__revision__,
-            specific_params=("ircazS:fn",
+            specific_params=("ircazS:fno",
                  [
                    "insert",
                    "replace",
@@ -1649,6 +1661,7 @@ Examples:
                    "stage=",
                    "format",
                    "notimechange",
+                   "holdingpen",
                  ]),
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
             task_run_fnc=task_run_core)
@@ -1688,7 +1701,12 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
             task_set_option('mode', 'replace')
         fix_argv_paths([args[0]])
         task_set_option('file_path', os.path.realpath(args[0]))
-
+    # Holding pen mode option
+    elif key in ("-o", "--holdingpen"):
+        print "Holding pen mode"
+        task_set_option('mode', 'holdingpen')
+        fix_argv_paths([args[0]])
+        task_set_option('file_path', os.path.realpath(args[0]))
     # Correct mode option
     elif key in ("-c", "--correct"):
         task_set_option('mode', 'correct')
@@ -1766,43 +1784,50 @@ def task_run_core():
     write_message("STAGE 0:", verbose=2)
 
     if task_get_option('file_path') is not None:
+        print "start preocessing"
         recs = xml_marc_to_records(open_marc_file(task_get_option('file_path')))
         stat['nb_records_to_upload'] = len(recs)
         write_message("   -Open XML marc: DONE", verbose=2)
         task_sleep_now_if_required(can_stop_too=True)
-
+        print "Entering records loop"
         if recs is not None:
             # We proceed each record by record
             for record in recs:
                 record_id = record_extract_oai_id(record)
                 task_sleep_now_if_required(can_stop_too=True)
-                error = bibupload(
-                    record,
-                    opt_tag=task_get_option('tag'),
-                    opt_mode=task_get_option('mode'),
-                    opt_stage_to_start_from=task_get_option('stage_to_start_from'),
-                    opt_notimechange=task_get_option('notimechange'),
-                    oai_rec_id = record_id)
-                if error[0] == 1:
-                    if record:
-                        write_message(record_xml_output(record),
-                            stream=sys.stderr)
-                    else:
-                        write_message("Record could not have been parsed",
-                            stream=sys.stderr)
-                    stat['nb_errors'] += 1
-                elif error[0] == 2:
-                    if record:
-                        write_message(record_xml_output(record),
-                            stream=sys.stderr)
-                    else:
-                        write_message("Record could not have been parsed",
-                            stream=sys.stderr)
+                if task_get_option("mode") == "holdingpen":
+                    #inserting into the holding pen
+                    print "Inserting into holding pen"
+                    insert_record_into_holding_pen(record, record_id)
+                else:
+                    print "Inserting into main database"
+                    error = bibupload(
+                        record,
+                        opt_tag=task_get_option('tag'),
+                        opt_mode=task_get_option('mode'),
+                        opt_stage_to_start_from=task_get_option('stage_to_start_from'),
+                        opt_notimechange=task_get_option('notimechange'),
+                        oai_rec_id = record_id)
+                    if error[0] == 1:
+                        if record:
+                            write_message(record_xml_output(record),
+                                          stream=sys.stderr)
+                        else:
+                            write_message("Record could not have been parsed",
+                                          stream=sys.stderr)
+                            stat['nb_errors'] += 1
+                    elif error[0] == 2:
+                        if record:
+                            write_message(record_xml_output(record),
+                                          stream=sys.stderr)
+                        else:
+                            write_message("Record could not have been parsed",
+                                          stream=sys.stderr)
 
-                task_update_progress("Done %d out of %d." % \
-                                    (stat['nb_records_inserted'] + \
-                                    stat['nb_records_updated'],
-                                    stat['nb_records_to_upload']))
+                            task_update_progress("Done %d out of %d." % \
+                                                     (stat['nb_records_inserted'] + \
+                                                      stat['nb_records_updated'],
+                                                      stat['nb_records_to_upload']))
         else:
             write_message("   Error bibupload failed: No record found",
                         verbose=1, stream=sys.stderr)

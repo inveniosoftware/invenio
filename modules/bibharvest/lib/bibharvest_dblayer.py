@@ -133,3 +133,22 @@ def get_entry_logs_size(oai_id):
     for entry in query_result:
         return int(entry[0])
     return 0
+
+def get_holdingpen_entries(start = 0, limit = 0):
+    query = "SELECT oai_id, date_inserted FROM oaiHOLDINGPEN ORDER BY date_inserted"
+    if limit > 0 or start > 0:
+        query += " LIMIT " + str(start) + "," + str(limit)
+
+    query_results = run_sql(query)
+    results = []
+    for row in query_results:
+        results.append((row[0], row[1]))
+    return results
+
+def get_holdingpen_entry(oai_id, date_inserted):
+    query = "SELECT record_XML FROM oaiHOLDINGPEN WHERE date_inserted = %s AND oai_id = %s"
+    return run_sql(query, (str(date_inserted), str(oai_id)))[0][0]
+
+def delete_holdingpen_entry(oai_id, date_inserted):
+    query = "DELETE FROM oaiHOLDINGPEN where oai_id = %s AND date_inserted = %s"
+    run_sql(query, (str(oai_id), str(date_inserted)))
