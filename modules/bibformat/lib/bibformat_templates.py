@@ -2342,7 +2342,7 @@ class Template:
         if (leftorright=='left'):
             gen = _("The left side of the rule ")+" ("+left+") "
         else:
-            gen = _("The right side of the rule ")+" ("+left+"=>"+right+") "
+            gen = _("The right side of the rule ")+" ("+right+") "
         gen+=_("already appears in these knowledge bases:")+"<br/>"
         inkbs = []
         dontdoit = False
@@ -2353,7 +2353,9 @@ class Template:
                 #two rules with same left side in the same kb? no.
             if inkbs.count(kb)==0:
                 inkbs.append(kb)
-        gen+=" ".join(inkbs)
+        kbstr=" ".join(inkbs)
+        kbstr="<strong>"+kbstr+"</strong>"
+        gen+=kbstr
         message = _("Please select action")
         optreplace = _("Replace the selected rules with this rule")
         optadd = _("Add this rule in the current knowledge base")+" ("+current+")"
