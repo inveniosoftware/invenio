@@ -2933,7 +2933,6 @@ class Template:
   <input type="hidden" name="RN" value="%(rn)s" />
   <input type="hidden" name="apptype" value="%(apptype)s" />
   <input type="hidden" name="action" value="%(action)s" />
-  <input type="hidden" name="validate" value="go" />
   <input type="hidden" name="ln" value="%(ln)s" />
   <div style="float: left; vertical-align:text-top; margin-right: 10px;">
     <table class="mailbox">
@@ -3001,6 +3000,14 @@ class Template:
           </td>
         </tr>
         <tr class="mailboxfooter">
+         <td>
+             <select name="validate">
+                 <option> %(select)s</option>
+                 <option value="approve">%(approve)s</option>
+                 <option value="reject">%(reject)s</option>
+             </select>
+          </td>
+
           <td colspan="2" class="mailboxfoot">
             <input type="submit" name="send_button" value="%(send_label)s" class="formbutton"/>
           </td>
@@ -3020,6 +3027,9 @@ class Template:
                                  'subject_label': _("Subject:"),
                                  'message_label': _("Message:"),
                                  'send_label': _("SEND"),
+                                 'select' : _("Select:"),
+                                 'approve' : _("approve"),
+                                 'reject' : _("reject"),
                                  'ln': ln,
                                 }
 

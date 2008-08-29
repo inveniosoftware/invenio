@@ -926,9 +926,14 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
             group_addr = ""
             TEXT_RefereeRecom_MSG_SUBJECT = ""
 
-        if validate == "go":
+        if validate == "approve" or validate == "reject":
             if dRefereeRecom == None:
                 perform_request_send (uid, user_addr, group_addr, msg_subject, msg_body, 0, 0, 0, ln, 1)
+
+                if validate == "approve":
+                    msg_body = "Approved : " + msg_body
+                else:
+                    msg_body = "Rejected : " + msg_body
 
                 #Get the Project Leader's email address
                 email = ""
@@ -1023,7 +1028,13 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         else:
             TEXT_PubComRecom_MSG_SUBJECT = ""
 
-        if validate == "go":
+        if validate == "approve" or validate == "reject":
+
+            if validate == "approve":
+                msg_body = "Approved : " + msg_body
+            else:
+                msg_body = "Rejected : " + msg_body
+
             if dPubComRecom == None:
                 perform_request_send (uid, user_addr, "", msg_subject, msg_body, 0, 0, 0, ln, 1)
                 sendMailToProjectLeader(doctype, categ, RN, user_addr, authors, "publication committee chair", msg_body)
