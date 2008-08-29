@@ -30,6 +30,8 @@ from invenio import bibformatadminlib, \
                     bibformat_dblayer,\
                     bibformat_engine
 
+import os
+import re
 from invenio.bibrankadminlib import check_user
 from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, page_not_authorized, collect_user_info
@@ -1314,13 +1316,34 @@ def kb_export(req, ln=config.CFG_SITE_LANG):
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
     else:
+        #first create a export/kb directory ..
+        exportsubdir = "/export/kb"
+        exportdir = webdir+exportsubdir
+        if os.path.isfile(exportdir):
+            raise OSError("Cannot create directory "+exportdir+" since a file with the same name exists.")
+        if os.path.isdir(exportdir):
+            pass
+        else:
+            #create it..
+            os.makedirs(exportdir)
+
         kbs = bibformat_dblayer.get_kbs()
         for kb in kbs:
             name = kb['name']
             #make this a filename
-            fname = webdir+"/"+name+".kb"
+            fname = name
+            #sanitize
+            fname = re.sub('\s','_',fname)
+            fname = fname.replace('*','_')
+            fname = fname.replace('\\','_')
+            fname = fname.replace('&','_')
+            fname = fname.replace('.','_')
+            fname = fname.replace('/','_')
+            fname = fname+".kb"
             #and name for URL to access it..
-            urlname=config.CFG_SITE_URL+"/"+name+".kb"
+            urlname=config.CFG_SITE_URL+exportsubdir+"/"+fname
+            #ok, filename
+            fname = exportdir+"/"+fname
             try:
                 f = open(fname,"w")
                 mappings = bibformat_dblayer.get_kb_mappings(name)
