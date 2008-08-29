@@ -23,23 +23,228 @@ __revision__ = "$Id$"
 
 __lastupdated__ = """$Date$"""
 from mod_python import apache
-
-from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_SITE_LANG, \
+import os
+from invenio.config import CFG_SITE_URL, \
                            CFG_ACCESS_CONTROL_LEVEL_SITE, \
                            CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
-                           CFG_SITE_SECURE_URL
+                           CFG_SITE_SECURE_URL, CFG_PREFIX
 from invenio.messages import gettext_set_language
 from invenio.webpage import page
 from invenio.webuser import getUid, page_not_authorized, isGuestUser
-from invenio.webbasket import *
+from invenio.webbasket import \
+     check_user_can_comment, \
+     check_sufficient_rights, \
+     perform_request_display, \
+     create_guest_warning_box, \
+     create_basket_navtrail, \
+     perform_request_display_item, \
+     create_guest_warning_box, \
+     perform_request_write_comment, \
+     perform_request_save_comment, \
+     perform_request_delete_comment, \
+     perform_request_add_group, \
+     perform_request_edit, \
+     perform_request_list_public_baskets, \
+     perform_request_unsubscribe, \
+     perform_request_subscribe, \
+     create_infobox, \
+     perform_request_display_public, \
+     delete_record, \
+     move_record, \
+     perform_request_add, \
+     perform_request_create_basket
 from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES, \
-                                     CFG_WEBBASKET_ACTIONS
-from invenio.webbasket_dblayer import get_basket_name
+                                     CFG_WEBBASKET_ACTIONS, \
+                                     CFG_WEBBASKET_SHARE_LEVELS
+from invenio.webbasket_dblayer import get_basket_name, \
+     get_max_user_rights_on_basket
 from invenio.urlutils import get_referer, redirect_to_url, make_canonical_urlargd
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webstat import register_customevent
 from invenio.errorlib import register_exception
 from invenio.webuser import collect_user_info
+from invenio.webcomment import check_user_can_attach_file_to_comments
+try:
+    from invenio.fckeditor_invenio_connector import FCKeditorConnectorInvenio
+    fckeditor_available = True
+except ImportError, e:
+    fckeditor_available = False
+from invenio.bibdocfile import stream_file
+
+class WebInterfaceBasketCommentsFiles(WebInterfaceDirectory):
+    """Handle upload and access to files for comments in WebBasket.
+
+       The upload is currently only available through the FCKeditor.
+    """
+
+    def _lookup(self, component, path):
+        """ This handler is invoked for the dynamic URLs (for getting
+        and putting attachments) Eg:
+        /yourbaskets/attachments/get/31/652/5/file/myfile.pdf
+        /yourbaskets/attachments/get/31/552/5/image/myfigure.png
+                                 bskid/recid/uid/
+
+        /yourbaskets/attachments/put/31/550/
+                                   bskid/recid
+        """
+        if component == 'get' and len(path) > 4:
+            bskid = path[0] # Basket id
+            recid = path[1] # Record id
+            uid = path[2]   # uid of the submitter
+            file_type = path[3]  # file, image, flash or media (as
+                                 # defined by FCKeditor)
+
+            if file_type in ['file', 'image', 'flash', 'media']:
+                file_name = '/'.join(path[4:]) # the filename
+
+                def answer_get(req, form):
+                    """Accessing files attached to comments."""
+                    form['file'] = file_name
+                    form['type'] = file_type
+                    form['uid'] = uid
+                    form['recid'] = recid
+                    form['bskid'] = bskid
+                    return self._get(req, form)
+
+                return answer_get, []
+
+        elif component == 'put' and len(path) > 1:
+            bskid = path[0] # Basket id
+            recid = path[1] # Record id
+
+            def answer_put(req, form):
+                """Attaching file to a comment."""
+                form['recid'] = recid
+                form['bskid'] = bskid
+                return self._put(req, form)
+
+            return answer_put, []
+
+        # All other cases: file not found
+        return None, []
+
+    def _get(self, req, form):
+        """
+        Returns a file attached to a comment.
+
+        A file is attached to a comment of a record of a basket, by a
+        user (who is the author of the comment), and is of a certain
+        type (file, image, etc). Therefore these 5 values are part of
+        the URL. Eg:
+        CFG_SITE_URL/yourbaskets/attachments/get/31/91/5/file/myfile.pdf
+                                             bskid/recid/uid
+        """
+        argd = wash_urlargd(form, {'file': (str, None),
+                                   'type': (str, None),
+                                   'uid': (int, 0),
+                                   'bskid': (int, 0),
+                                   'recid': (int, 0)})
+
+        _ = gettext_set_language(argd['ln'])
+
+        # Can user view this basket & record & comment, i.e. can user
+        # access its attachments?
+        uid = getUid(req)
+        user_info = collect_user_info(req)
+        rights = get_max_user_rights_on_basket(argd['uid'], argd['bskid'])
+
+        if user_info['email'] == 'guest' and not user_info['apache_user']:
+            # Ask to login
+            target = '/youraccount/login' + \
+                     make_canonical_urlargd({'ln' : argd['ln'], 'referer' : \
+                                             CFG_SITE_URL + user_info['uri']}, {})
+            return redirect_to_url(req, target)
+
+        elif not(check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READITM'])):
+            return page_not_authorized(req, "../", \
+                                       text = _("You are not authorized to view this attachment"))
+
+        if not argd['file'] is None:
+            # Prepare path to file on disk. Normalize the path so that
+            # ../ and other dangerous components are removed.
+            path = os.path.abspath('/opt/cds-invenio/var/data/baskets/comments/' + \
+                                   str(argd['bskid']) + '/'  + str(argd['recid']) + '/' + \
+                                   str(argd['uid']) + '/' + argd['type'] + '/' + \
+                                   argd['file'])
+
+            # Check that we are really accessing attachements
+            # directory, for the declared basket and record.
+            if path.startswith('/opt/cds-invenio/var/data/baskets/comments/' + \
+                               str(argd['bskid']) + '/' + str(argd['recid'])) and \
+                               os.path.exists(path):
+                return stream_file(req, path)
+
+        # Send error 404 in all other cases
+        return(apache.HTTP_NOT_FOUND)
+
+    def _put(self, req, form):
+        """
+        Process requests received from FCKeditor to upload files, etc.
+
+        URL eg:
+        CFG_SITE_URL/yourbaskets/attachments/put/31/91/
+                                             bskid/recid/
+        """
+        if not fckeditor_available:
+            return
+
+        argd = wash_urlargd(form, {'bskid': (int, 0),
+                                   'recid': (int, 0)})
+
+        uid = getUid(req)
+
+        # URL where the file can be fetched after upload
+        user_files_path = '%(CFG_SITE_URL)s/yourbaskets/attachments/get/%(bskid)s/%(recid)i/%(uid)s' % \
+                          {'uid': uid,
+                           'recid': argd['recid'],
+                           'bskid': argd['bskid'],
+                           'CFG_SITE_URL': CFG_SITE_URL}
+        # Path to directory where uploaded files are saved
+        user_files_absolute_path = '%(CFG_PREFIX)s/var/data/baskets/comments/%(bskid)s/%(recid)s/%(uid)s' % \
+                                   {'uid': uid,
+                                    'recid': argd['recid'],
+                                    'bskid': argd['bskid'],
+                                    'CFG_PREFIX': CFG_PREFIX}
+        # Create a Connector instance to handle the request
+        conn = FCKeditorConnectorInvenio(form, recid=argd['recid'], uid=uid,
+                                         allowed_commands=['QuickUpload'],
+                                         allowed_types = ['File', 'Image', 'Flash', 'Media'],
+                                         user_files_path = user_files_path,
+                                         user_files_absolute_path = user_files_absolute_path)
+
+        # Check that user can
+        # 1. is logged in
+        # 2. comment records of this basket (to simplify, we use
+        #    WebComment function to check this, even if it is not
+        #    entirely adequate)
+        # 3. attach files
+
+        user_info = collect_user_info(req)
+        (auth_code, auth_msg) = check_user_can_attach_file_to_comments(user_info, argd['recid'])
+
+        if user_info['email'] == 'guest' and not user_info['apache_user']:
+            # 1. User is guest: must login prior to upload
+            data = conn.sendUploadResults(1, '', '', 'Please login before uploading file.')
+        elif not check_user_can_comment(uid, argd['bskid']):
+            # 2. User cannot edit comment of this basket
+            data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to submit files')
+        elif auth_code:
+            # 3. User cannot submit
+            data = conn.sendUploadResults(1, '', '', 'Sorry, you are not allowed to submit files.')
+        else:
+            # Process the upload and get the response
+            data = conn.doResponse()
+
+        # Transform the headers into something ok for mod_python
+        for header in conn.headers:
+            if not header is None:
+                if header[0] == 'Content-Type':
+                    req.content_type = header[1]
+                else:
+                    req.headers_out[header[0]] = header[1]
+        # Send our response
+        req.send_http_header()
+        req.write(data)
 
 
 class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
@@ -48,7 +253,10 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
     _exports = ['', 'display', 'display_item', 'write_comment',
                 'save_comment', 'delete_comment', 'add', 'delete',
                 'modify', 'edit', 'create_basket', 'display_public',
-                'list_public_baskets', 'unsubscribe', 'subscribe']
+                'list_public_baskets', 'unsubscribe', 'subscribe',
+                'attachments']
+
+    attachments = WebInterfaceBasketCommentsFiles()
 
     def index(self, req, form):
         """Index page."""
@@ -538,7 +746,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                         ln=argd['ln'])
         if argd['confirmed']:
             url = CFG_SITE_URL
-            url += '/yourbaskets/display?category=%s&topic=%i&group=%i&ln=%s' %\
+            url += '/yourbaskets/display?category=%s&topic=%i&group=%i&ln=%s' % \
                    (argd['category'], argd['topic'], argd['group'], argd['ln'])
             redirect_to_url(req, url)
         else:
@@ -607,7 +815,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                     "ln" : argd['ln']}, {})))
 
         url = CFG_SITE_URL
-        url += '/yourbaskets/display?category=%s&topic=%i&group=%i&ln=%s' %\
+        url += '/yourbaskets/display?category=%s&topic=%i&group=%i&ln=%s' % \
                (argd['category'], argd['topic'], argd['group'], argd['ln'])
         if argd['action'] == CFG_WEBBASKET_ACTIONS['DELETE']:
             delete_record(uid, argd['bskid'], argd['recid'])
@@ -707,7 +915,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
             redirect_to_url(req, url)
         elif argd['delete']:
             url = CFG_SITE_URL
-            url += '/yourbaskets/delete?bskid=%i&category=%s&topic=%i&ln=%s' %\
+            url += '/yourbaskets/delete?bskid=%i&category=%s&topic=%i&ln=%s' % \
                    (argd['bskid'], CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                    argd['topic'], argd['ln'])
             redirect_to_url(req, url)
@@ -742,7 +950,7 @@ class WebInterfaceYourBasketsPages(WebInterfaceDirectory):
                                          ln=argd['ln'])
             if argd['new_topic'] != -1:
                 argd['topic'] = argd['new_topic']
-            url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%i&ln=%s' %\
+            url = CFG_SITE_URL + '/yourbaskets/display?category=%s&topic=%i&ln=%s' % \
                   (CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                    argd['topic'], argd['ln'])
             redirect_to_url(req, url)

@@ -35,9 +35,9 @@ from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_SHARE_LEVELS_ORDERED, \
                                      CFG_WEBBASKET_CATEGORIES, \
                                      CFG_WEBBASKET_WARNING_MESSAGES
-from invenio.webuser import isGuestUser
+from invenio.webuser import isGuestUser, collect_user_info
 from invenio.search_engine import record_exists
-
+from invenio.webcomment import check_user_can_attach_file_to_comments
 import invenio.webbasket_dblayer as db
 try:
     import invenio.template
@@ -199,11 +199,11 @@ def __display_basket(bskid, name, date_modification, nb_views,
                                            date_modification,
                                            nb_views,
                                            nb_items, last_added,
-                                           (__check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
-                                            __check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['MANAGE']),
-                                            __check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
-                                            __check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['ADDITM']),
-                                            __check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['DELITM'])),
+                                           (check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READITM']),
+                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['MANAGE']),
+                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
+                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['ADDITM']),
+                                            check_sufficient_rights(share_level, CFG_WEBBASKET_SHARE_LEVELS['DELITM'])),
                                            nb_bsk_cmts, last_cmt,
                                            group_sharing_level,
                                            category, selected_topic, selected_group_id,
@@ -228,7 +228,7 @@ def perform_request_display_item(uid, bskid, recid, format='hb',
     warnings = []
 
     rights = db.get_max_user_rights_on_basket(uid, bskid)
-    if not(__check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READITM'])):
+    if not(check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READITM'])):
         errors.append('ERR_WEBBASKET_NO_RIGHTS')
         return (body, errors, warnings)
     if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
@@ -256,9 +256,9 @@ def perform_request_display_item(uid, bskid, recid, format='hb',
     item_html = webbasket_templates.tmpl_item(basket,
                                               recid, record, comments,
                                               group_sharing_level,
-                                              (__check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
-                                               __check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']),
-                                               __check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['DELCMT'])),
+                                              (check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['READCMT']),
+                                               check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']),
+                                               check_sufficient_rights(rights, CFG_WEBBASKET_SHARE_LEVELS['DELCMT'])),
                                               selected_category=category, selected_topic=topic, selected_group_id=group_id,
                                               ln=ln)
     body = webbasket_templates.tmpl_display(topicsbox=topicsbox, baskets=[item_html],
@@ -288,7 +288,7 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
     textual_msg = '' # initial value in replies
     html_msg = '' # initial value  in replies (if FCKeditor)
     title = '' # initial title in replies
-    if not __check_user_can_comment(uid, bskid):
+    if not check_user_can_comment(uid, bskid):
         errors.append(('ERR_WEBBASKET_CANNOT_COMMENT'))
         return (body, errors, warnings)
     if cmtid:
@@ -316,6 +316,10 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
             warning = (CFG_WEBBASKET_WARNING_MESSAGES['ERR_WEBBASKET_cmtid_INVALID'], cmtid)
             warnings.append(warning)
     record = db.get_basket_record(bskid, recid, 'hb')
+    # Check that user can attach file. To simplify we use the same
+    # checking as in WebComment, though it is not completely adequate.
+    user_info = collect_user_info(uid)
+    can_attach_files = check_user_can_attach_file_to_comments(user_info, recid)
     body = webbasket_templates.tmpl_write_comment(bskid=bskid,
                                                   recid=recid,
                                                   cmt_title=title,
@@ -325,7 +329,8 @@ def perform_request_write_comment(uid, bskid, recid, cmtid=0,
                                                   selected_category=category,
                                                   selected_topic=topic,
                                                   selected_group_id=group_id,
-                                                  warnings=warnings)
+                                                  warnings=warnings,
+                                                  can_attach_files=can_attach_files)
     if category == CFG_WEBBASKET_CATEGORIES['PRIVATE']:
         topics_list = db.get_personal_topics_infos(uid)
         if not topic and len(topics_list):
@@ -357,7 +362,7 @@ def perform_request_save_comment(uid, bskid, recid, title='', text='',
     _ = gettext_set_language(ln)
     errors = []
     infos = []
-    if not __check_user_can_comment(uid, bskid):
+    if not check_user_can_comment(uid, bskid):
         errors.append(('ERR_WEBBASKET_CANNOT_COMMENT'))
         return (errors, infos)
 
@@ -740,7 +745,7 @@ def perform_request_unsubscribe(uid, bskid):
     """unsubscribe from external basket bskid"""
     db.unsubscribe(uid, bskid)
 
-def __check_user_can_comment(uid, bskid):
+def check_user_can_comment(uid, bskid):
     """ Private function. check if a user can comment """
     min_right = CFG_WEBBASKET_SHARE_LEVELS['ADDCMT']
     rights = db.get_max_user_rights_on_basket(uid, bskid)
@@ -758,7 +763,7 @@ def __check_user_can_perform_action(uid, bskid, rights):
             return 1
     return 0
 
-def __check_sufficient_rights(rights_user_has, rights_needed):
+def check_sufficient_rights(rights_user_has, rights_needed):
     """Private function, check if the rights are sufficient."""
     try:
         out = CFG_WEBBASKET_SHARE_LEVELS_ORDERED.index(rights_user_has) >= \

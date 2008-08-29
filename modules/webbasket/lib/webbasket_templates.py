@@ -940,7 +940,8 @@ class Template:
                            selected_category=CFG_WEBBASKET_CATEGORIES['PRIVATE'],
                            selected_topic=0, selected_group_id=0,
                            ln=CFG_SITE_LANG,
-                           warnings=[]):
+                           warnings=[],
+                           can_attach_files=False):
         """Display interface to write a comment.
         @param bskid: basket id (int)
         @param recid: record id (int)
@@ -952,7 +953,8 @@ class Template:
         @param selected_topic: # of topic
         @param selected_group_id: in case of category: group, id of selected group
         @param ln: language
-        @param warnings: list of warnings"""
+        @param warnings: list of warnings
+        @param can_attach_files if user can attach file or not"""
         _ = gettext_set_language(ln)
         action = '%s/yourbaskets/save_comment?bskid=%i&amp;recid=%i' % (CFG_SITE_URL, bskid, recid)
         action += '&amp;category=%s&amp;topic=%i&amp;group=%i&amp;ln=%s' % ( selected_category, selected_topic, selected_group_id, ln)
@@ -962,10 +964,10 @@ class Template:
             warnings_box = ''
 
         file_upload_url = None
-##         if can_attach_files:
-##             # Can only upload files when user is logged in
-##             file_upload_url = '%s/record/%i/comments/attachments/put' % \
-##                               (CFG_SITE_URL, recID)
+        if can_attach_files:
+            # Can only upload files when user is logged in
+            file_upload_url = '%s/yourbaskets/attachments/put/%i/%i' % \
+                              (CFG_SITE_URL, bskid, recid)
 
         editor = get_html_text_editor(name='text',
                                       content=cmt_body_html,
@@ -1322,7 +1324,7 @@ class Template:
 <tr>
   <td class="bskcontentcol">%s</td>
   <td class="bskcontentcol"><input type="text" name="new_name" value="%s"/></td>
-</tr>""" % (_("Basket's name"), cgi.escape(bsk_name,1))
+</tr>""" % (_("Basket's name"), cgi.escape(bsk_name, 1))
             topics_selection = zip(range(len(topics)), topics)
             topics_selection.insert(0, (-1, _("Choose topic")))
             topics_body = """
