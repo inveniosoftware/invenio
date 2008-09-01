@@ -29,10 +29,12 @@ this exporting method.
 
 from datetime import datetime
 from urllib import quote
+from ConfigParser import ConfigParser
+import os
 
 from invenio.search_engine import get_collection_reclist
 from invenio.dbquery import run_sql
-from invenio.config import CFG_SITE_URL, CFG_WEBDIR
+from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_ETCDIR
 from invenio.intbitset import intbitset
 from invenio.websearch_webcoll import Collection
 from invenio.messages import language_list_long
@@ -386,9 +388,37 @@ def generate_sitemaps_index(collection_list, fulltext_filter=None):
 
 def run_export_method(jobname):
     """Main function, reading params and running the task."""
-    # FIXME: read jobname's cfg file to detect collection and fulltext status arguments
     write_message("bibexport_sitemap: job %s started." % jobname)
-    collections = [Collection().name,]
-    fulltext_type = ''
+
+    collections = get_config_parameter(jobname = "sitemap", parameter_name = "collection", is_parameter_collection = True)
+    fulltext_type = get_config_parameter(jobname = "sitemap", parameter_name = "fulltext_status")
+
     generate_sitemaps_index(collections, fulltext_type)
+
     write_message("bibexport_sitemap: job %s finished." % jobname)
+
+def get_config_parameter(jobname, parameter_name, is_parameter_collection = False):
+    """Detect export method of JOBNAME.  Basically, parse JOBNAME.cfg
+       and return export_method.  Return None if problem found."""
+    jobconfig = ConfigParser()
+    jobconffile = CFG_ETCDIR + os.sep + 'bibexport' + os.sep + jobname + '.cfg'
+
+    if not os.path.exists(jobconffile):
+        write_message("ERROR: cannot find config file %s." % jobconffile)
+        return None
+
+    jobconfig.read(jobconffile)
+
+    if is_parameter_collection:
+        all_items = jobconfig.items(section = 'export_job')
+
+        parameters = []
+
+        for item_name, item_value in all_items:
+            if item_name.startswith(parameter_name):
+                parameters.append(item_value)
+
+        return parameters
+    else:
+        parameter = jobconfig.get('export_job', parameter_name)
+        return parameter
