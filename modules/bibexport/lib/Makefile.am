@@ -22,7 +22,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = bibexport.py \
              bibexport_method_sitemap.py \
              bibexport_method_googlescholar.py \
-             google_scholar_exporter.py
+             field_exporter_webinterface.py
 
 EXTRA_DIST = $(pylib_DATA)
 
