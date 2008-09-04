@@ -233,6 +233,7 @@ update-v0.90.1-tables:
 	echo "ALTER TABLE oaiARCHIVE CHANGE m3 m3 text NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "UPDATE bibdoc SET status=0 WHERE status='';" | ${prefix}/bin/dbexec
 	echo "UPDATE bibdoc SET status=1 WHERE status='deleted';" | ${prefix}/bin/dbexec
+	echo "ALTER TABLE fmtKNOWLEDGEBASES add COLUMN kbtype char;" | ${prefix}/bin/dbexec
 
 update-v0.92.0-tables:
 	echo "UPDATE bibdoc SET status=0 WHERE status='';" | ${prefix}/bin/dbexec
