@@ -84,12 +84,12 @@ def get_modification_date(sysno):
 
 ## Knowledge base access functions
 def get_kbs():
-    """Returns all kbs as list of dictionaries {id, name, description}"""
+    """Returns all kbs as list of dictionaries {id, name, description, kbtype}"""
     out = []
     query = "SELECT * FROM fmtKNOWLEDGEBASES ORDER BY name"
     res = run_sql(query)
     for row in res:
-        out.append({'id': row[0], 'name':row[1], 'description': row[2]})
+        out.append({'id': row[0], 'name':row[1], 'description': row[2], 'kbtype': row[3]})
         # out.append(row)
     return out
 
@@ -142,7 +142,8 @@ def get_kb_description(kb_name):
     res = run_sql(query)
     return res[0][0]
 
-def add_kb(kb_name, kb_description):
+
+def add_kb(kb_name, kb_description, kb_type=None):
     """
     Adds a new kb with given name and description. Returns the id of
     the kb.
@@ -153,8 +154,15 @@ def add_kb(kb_name, kb_description):
     @param kb_description a description for the kb
     @return the id of the newly created kb
     """
-    run_sql("""REPLACE INTO fmtKNOWLEDGEBASES (name, description)
-                VALUES (%s,%s)""", (kb_name, kb_description))
+
+    kb_db = 'w' #the typical written_as - change_to
+    if not kb_type:
+        pass
+    else:
+        if kb_type == 'taxonomy':
+            kb_db='t'
+    run_sql("""REPLACE INTO fmtKNOWLEDGEBASES (name, description, kbtype)
+                VALUES (%s,%s,%s)""", (kb_name, kb_description, kb_db))
     return get_kb_id(kb_name)
 
 def delete_kb(kb_name):

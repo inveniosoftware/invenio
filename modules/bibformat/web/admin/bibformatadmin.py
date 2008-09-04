@@ -946,7 +946,7 @@ def kb_manage(req, ln=config.CFG_SITE_LANG):
                                    navtrail=navtrail_previous_links)
 
 
-def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG, startat=0):
+def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG, startat=0, kb_type=None):
     """
     Shows the content of the given knowledge base id. Check for authentication and kb existence.
     Before displaying the content of the knowledge base, check if a form was submitted asking for
@@ -955,7 +955,8 @@ def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG, startat=0):
     @param ln language
     @param kb the kb id to show
     @param sortby the sorting criteria ('from' or 'to')
-    @startat the number from which start showing mapping rules in kb
+    @param startat the number from which start showing mapping rules in kb
+    @param kb_type: None or taxonomy
     """
 
     ln = wash_language(ln)
@@ -985,7 +986,7 @@ def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG, startat=0):
 
         return page(title=_("Knowledge Base %s" % kb_name),
                 body=bibformatadminlib.perform_request_knowledge_base_show(ln=ln,
-                kb_id=kb_id, sortby=sortby, startat=startat),
+                kb_id=kb_id, sortby=sortby, startat=startat, kb_type=kb_type),
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
@@ -1088,7 +1089,7 @@ def kb_show_dependencies(req, kb, ln=config.CFG_SITE_LANG, sortby="to"):
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG, forcetype=None, replacements=None):
+def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG, forcetype=None, replacements=None, kb_type=None):
     """
     Adds a new mapping to a kb.
 
@@ -1097,6 +1098,9 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG
     @param sortby the sorting criteria ('from' or 'to')
     @param forcetype indicates if this function should ask about replacing left/right sides (None or 'no')
                      replace in current kb ('curr') or in all ('all')
+    @param replacements an object containing kbname+++left+++right strings.
+                     Can be a string or an array of strings
+    @param kb_type None for normal from-to kb's, 't' for taxonomies
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -1132,6 +1136,10 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG
 
         if (len(right_sides) == 0) and (len(left_sides) == 0):
             #no problems, just add in current
+            forcetype="curr"
+
+        #likewise, if this is a taxonomy, just pass on
+        if kb_type == 't':
             forcetype="curr"
 
         if forcetype and not forcetype=="no":
@@ -1172,9 +1180,10 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG
                         if not bibformat_dblayer.kb_mapping_exists(rkbname, key):
                             bibformatadminlib.add_kb_mapping(rkbname, key, value)
 
-        redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s" % {'ln':ln,
+        redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s&kb_type=%(kb_type)s" % {'ln':ln,
                                                                                 'kb':kb_id,
-                                                                                'sortby':sortby})
+                                                                                'sortby':sortby,
+                                                                                'kb_type':kb_type})
     else:
         return page_not_authorized(req=req,
                                    text=auth_msg,
@@ -1363,12 +1372,13 @@ def kb_export(req, ln=config.CFG_SITE_LANG):
 	       message=message)
 
 
-def kb_add(req, ln=config.CFG_SITE_LANG, sortby="to"):
+def kb_add(req, ln=config.CFG_SITE_LANG, sortby="to", kbtype=""):
     """
     Adds a new kb
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
+
     navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.CFG_SITE_URL, ln, _("Manage Knowledge Bases")))
 
     try:
@@ -1378,7 +1388,7 @@ def kb_add(req, ln=config.CFG_SITE_LANG, sortby="to"):
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
-        kb_id = bibformatadminlib.add_kb()
+        kb_id = bibformatadminlib.add_kb(kb_type=kbtype)
         redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
     else:
         navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.CFG_SITE_URL, ln, _("Manage Knowledge Bases")))

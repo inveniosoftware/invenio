@@ -1826,7 +1826,7 @@ class Template:
                 kb_attributes['siteurl'] = CFG_SITE_URL
                 row_content = '''<tr>
                 <td class="admintdright" style="vertical-align: middle; %(style)s">&nbsp;</td>
-                <td class="admintdleft" style="vertical-align: middle; %(style)s white-space: nowrap;"><a href="kb_show?ln=%(ln)s&amp;amp;kb=%(id)s">%(name)s</a></td>
+                <td class="admintdleft" style="vertical-align: middle; %(style)s white-space: nowrap;"><a href="kb_show?ln=%(ln)s&amp;amp;kb=%(id)s;kb_type=%(kbtype)s">%(name)s</a></td>
                 <td class="admintdleft"style="vertical-align: middle; %(style)s">%(description)s</td>
                 <td class="admintd" style="vertical-align: middle; %(style)s white-space: nowrap;">
                 <form action="kb_delete?ln=%(ln)s" type="POST">
@@ -1850,17 +1850,25 @@ class Template:
         <input class="adminbutton" type="submit" value="Export to text files"/>
         </form>
         </td>
+
         <td align="right">
         <form action="kb_add?ln=%(ln)s">
         <input class="adminbutton" type="submit" value="Add New Knowledge Base"/>
         </form>
         </td>
+
+        <td align="right">
+        <form method="post" action="kb_add?ln=%(ln)s&amp;kbtype=taxonomy">
+        <input class="adminbutton" type="submit" value="Add New Taxonomy"/>
+        </form>
+        </td>
+
         </tr>
         </table>''' % {'ln': ln}
 
         return out
 
-    def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby, startat=0):
+    def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby, startat=0, kb_type=None):
         """
         Returns the content of a knowledge base.
 
@@ -1870,6 +1878,7 @@ class Template:
         @param content a list of dictionaries with mappings
         @param sortby the sorting criteria ('from' or 'to')
         @startat start showing the mappings from number x. Usefull for large kb's.
+        @kb_type None or 't' meaning taxonomy. If taxonomy, show 'broader term/narrower term' instead of map from/to
         @return main management console as html
         """
 
@@ -1906,20 +1915,25 @@ class Template:
         <td width="300" valign="top">
 
         <form name="addNewMapping"
-        action="kb_add_mapping?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s&amp;forcetype=no" method="post">''' % {'ln':ln,
-                                                                                                      'kb_id':kb_id,
-                                                                                                      'sortby':sortby}
+        action="kb_add_mapping?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s&amp;forcetype=no&amp;kb_type=%(kb_type)s"
+        method="post">''' % {'ln':ln, 'kb_id':kb_id, 'sortby':sortby, 'kb_type': kb_type}
+
+        mapfromstring = _("Map From")
+        maptostring = _("To")
+        if kb_type == 't':
+            mapfromstring = _("Broader term")
+            maptostring = _("Narrower term")
         out += '''
         <table class="admin_wvar" width="100%%" cellspacing="0">
         <tr>
         <th colspan="2" class="adminheaderleft">Add New Mapping &nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#addMappingKB">?</a>]</th>
         </tr>
         <tr>
-        <td class="admintdright"><label for="mapFrom"><span style="white-space: nowrap;">Map From</span></label>:&nbsp;</td>
+        <td class="admintdright"><label for="mapFrom"><span style="white-space: nowrap;">%(mapfrom)s</span></label>:&nbsp;</td>
         <td><input tabindex="1" name="mapFrom" type="text" id="mapFrom" size="25"/></td>
         </tr>
         <tr>
-        <td class="admintdright"><label for="mapTo">To</label>:&nbsp;</td>
+        <td class="admintdright"><label for="mapTo">%(mapto)s</label>:&nbsp;</td>
         <td><input tabindex="2" name="mapTo" type="text" id="mapTo" size="25"/></td>
         </tr>
         <tr>
@@ -1928,7 +1942,7 @@ class Template:
         </table>
         </form>
         </td>
-        ''' % {'siteurl':CFG_SITE_URL}
+        ''' % {'siteurl':CFG_SITE_URL, 'mapfrom': mapfromstring, 'mapto': maptostring }
 
         #Second column: mappings table
         #header and footer
@@ -1939,9 +1953,9 @@ class Template:
         <thead>
         <tr>
         <th class="adminheaderleft" width="25">&nbsp;</th>
-        <th class="adminheaderleft" width="34%%"><a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=from">Map From</a></th>
+        <th class="adminheaderleft" width="34%%"><a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=from">%(mapfrom)s</a></th>
         <th class="adminheaderleft">&nbsp;</th>
-        <th class="adminheaderleft" width="34%%"><a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=to">To</a></th>
+        <th class="adminheaderleft" width="34%%"><a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=to">%(mapto)s</a></th>
         <th class="adminheadercenter" width="25%%">Action&nbsp;&nbsp;&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#removeMappingKB">?</a>]</th>
         </tr>
         </thead>
@@ -1953,7 +1967,7 @@ class Template:
         <tbody>
         ''' % {'ln':ln,
                'kb_id':kb_id,
-               'siteurl':CFG_SITE_URL}
+               'siteurl':CFG_SITE_URL, 'mapfrom': mapfromstring, 'mapto': maptostring }
 
         try:
             startati = int(startat)

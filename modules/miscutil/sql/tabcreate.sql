@@ -2722,6 +2722,7 @@ CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASES (
   id mediumint(8) unsigned NOT NULL auto_increment,
   name varchar(255) default '',
   description text default '',
+  kbtype char(1),
   PRIMARY KEY  (id),
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;

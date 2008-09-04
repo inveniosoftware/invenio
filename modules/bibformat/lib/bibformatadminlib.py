@@ -658,20 +658,21 @@ def perform_request_knowledge_bases_management(ln=CFG_SITE_LANG):
 
     return bibformat_templates.tmpl_admin_kbs_management(ln, kbs)
 
-def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to", startat=0):
+def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to", startat=0, kb_type=None):
     """
     Show the content of a knowledge base
 
     @param ln language
     @param kb a knowledge base id
     @param sortby the sorting criteria ('from' or 'to')
-    @startat start showing mapping rules at what number
+    @param startat start showing mapping rules at what number
+    @param kb_type type of the kb, None or 'taxonomy'
     @return the content of the given knowledge base
     """
     name = bibformat_dblayer.get_kb_name(kb_id)
     mappings = bibformat_dblayer.get_kb_mappings(name, sortby)
 
-    return bibformat_templates.tmpl_admin_kb_show(ln, kb_id, name, mappings, sortby, startat)
+    return bibformat_templates.tmpl_admin_kb_show(ln, kb_id, name, mappings, sortby, startat, kb_type)
 
 
 def perform_request_knowledge_base_show_attributes(kb_id, ln=CFG_SITE_LANG, sortby="to"):
@@ -991,13 +992,14 @@ def update_kb_attributes(kb_name, new_name, new_description):
     """
     bibformat_dblayer.update_kb(kb_name, new_name, new_description)
 
-def add_kb(kb_name="Untitled"):
+def add_kb(kb_name="Untitled", kb_type=None):
     """
     Adds a new kb in database, and returns its id
     The name of the kb will be 'Untitled#'
     such that it is unique.
 
     @param kb_name the name of the kb
+    @param kb_type the type of the kb, incl 'taxonomy'. None for typical.
     @return the id of the newly created kb
     """
     name = kb_name
@@ -1006,7 +1008,7 @@ def add_kb(kb_name="Untitled"):
         name = kb_name + " " + str(i)
         i += 1
 
-    kb_id = bibformat_dblayer.add_kb(name, "")
+    kb_id = bibformat_dblayer.add_kb(name, "", kb_type)
 
     return kb_id
 
