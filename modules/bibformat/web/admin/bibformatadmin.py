@@ -986,7 +986,7 @@ def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG, startat=0, kb_type=No
 
         return page(title=_("Knowledge Base %s" % kb_name),
                 body=bibformatadminlib.perform_request_knowledge_base_show(ln=ln,
-                kb_id=kb_id, sortby=sortby, startat=startat, kb_type=kb_type),
+                kb_id=kb_id, sortby=sortby, startat=startat),
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
@@ -1243,7 +1243,7 @@ def kb_edit_mapping(req, kb, key, mapFrom, mapTo,
                                    navtrail=navtrail_previous_links)
 
 def kb_update_attributes(req, kb="", name="", description="", sortby="to",
-                         ln=config.CFG_SITE_LANG, chosen_option=None):
+                         ln=config.CFG_SITE_LANG, chosen_option=None, kb_type=None):
     """
     Update the attributes of the kb
 
@@ -1271,7 +1271,7 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
         if chosen_option is not None:
 	    # Update could not be performed.
 	    # Redirect to kb attributes page
-            redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
+            redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s&kb_type=%(kb_type)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby, 'kb_type':kb_type})
 
 
         kb_name = bibformatadminlib.get_kb_name(kb_id)
@@ -1388,7 +1388,10 @@ def kb_add(req, ln=config.CFG_SITE_LANG, sortby="to", kbtype=""):
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
-        kb_id = bibformatadminlib.add_kb(kb_type=kbtype)
+        name = "Untitled"
+        if kbtype:
+            name = "Untitled Taxonomy"
+        kb_id = bibformatadminlib.add_kb(kb_name=name, kb_type=kbtype)
         redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
     else:
         navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.CFG_SITE_URL, ln, _("Manage Knowledge Bases")))

@@ -1826,7 +1826,7 @@ class Template:
                 kb_attributes['siteurl'] = CFG_SITE_URL
                 row_content = '''<tr>
                 <td class="admintdright" style="vertical-align: middle; %(style)s">&nbsp;</td>
-                <td class="admintdleft" style="vertical-align: middle; %(style)s white-space: nowrap;"><a href="kb_show?ln=%(ln)s&amp;amp;kb=%(id)s;kb_type=%(kbtype)s">%(name)s</a></td>
+                <td class="admintdleft" style="vertical-align: middle; %(style)s white-space: nowrap;"><a href="kb_show?ln=%(ln)s&amp;kb=%(id)s">%(name)s</a></td>
                 <td class="admintdleft"style="vertical-align: middle; %(style)s">%(description)s</td>
                 <td class="admintd" style="vertical-align: middle; %(style)s white-space: nowrap;">
                 <form action="kb_delete?ln=%(ln)s" type="POST">
@@ -2063,7 +2063,7 @@ class Template:
 
         return out
 
-    def tmpl_admin_kb_show_attributes(self, ln, kb_id, kb_name, description, sortby):
+    def tmpl_admin_kb_show_attributes(self, ln, kb_id, kb_name, description, sortby, kb_type=None):
         """
         Returns the attributes of a knowledge base.
 
@@ -2072,6 +2072,7 @@ class Template:
         @param kb_name the name of the kb
         @param description the description of the kb
         @param sortby the sorting criteria ('from' or 'to')
+        @param kb_type: None or taxonomy
         @return main management console as html
         """
 
@@ -2097,13 +2098,14 @@ class Template:
 
         out += '''
         <form name="updateAttributes"
-        action="kb_update_attributes?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s" method="post">
+        action="kb_update_attributes?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s&kb_type=%(kb_type)s" method="post">
         <table class="admin_wvar" cellspacing="0">
         <tr>
 
         ''' % {'ln':ln,
                'kb_id':kb_id,
-               'sortby':sortby}
+               'sortby':sortby,
+               'kb_type':kb_type}
 
         out += '''
         <th colspan="2" class="adminheaderleft">%(kb_name)s attributes&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#attrsKB">?</a>]</th>''' % {'kb_name': kb_name,

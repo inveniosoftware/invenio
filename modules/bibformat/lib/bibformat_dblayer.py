@@ -115,6 +115,15 @@ def get_kb_name(kb_id):
     else:
         return None
 
+def get_kb_type(kb_id):
+    """Returns the type of the kb with given id"""
+    res = run_sql("""SELECT kbtype FROM fmtKNOWLEDGEBASES WHERE id=%s""",
+                  (kb_id,))
+    if len(res) > 0:
+        return res[0][0]
+    else:
+        return None
+
 def get_kb_mappings(kb_name, sortby="to"):
     """Returns a list of all mappings from the given kb, ordered by key
 
