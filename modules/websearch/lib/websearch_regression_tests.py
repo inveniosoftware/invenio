@@ -1314,6 +1314,14 @@ class WebSearchSummarizerTest(unittest.TestCase):
         self.assertEqual((('Enqvist, K', 1), ('Ibanez, L E', 1), ('Nanopoulos, D V', 1), ('Ross, G G', 1)),
                          get_most_popular_field_values((9, 14, 18), ('100__a', '700__a'), ('Ellis, J')))
 
+    def test_most_popular_field_values_multitag_countrepetitive(self):
+        """websearch - most popular field values, multiple tags, counting repetitive occurrences"""
+        from invenio.search_engine import get_most_popular_field_values
+        self.assertEqual((('THESIS', 2), ('REPORT', 1)),
+                         get_most_popular_field_values((41,), ('690C_a', '980__a'), count_repetitive_values=True))
+        self.assertEqual((('REPORT', 1), ('THESIS', 1)),
+                         get_most_popular_field_values((41,), ('690C_a', '980__a'), count_repetitive_values=False))
+
 
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
