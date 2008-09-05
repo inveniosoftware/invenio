@@ -4316,13 +4316,17 @@ def get_most_popular_values_for_code(recids, tag):
         sortedvalues.append(k)
     return sortedvalues
 
-def get_most_popular_field_values(recids, tags, exclude_value_list=None):
+def get_most_popular_field_values(recids, tags, exclude_values=None, count_repetitive_values=True):
     """
     Analyze RECIDS and look for TAGS and return most popular values
     and the frequency with which they occur sorted according to
     descending frequency.
 
-    If a value is found in EXCLUDE_VALUE_LIST, then do not count it.
+    If a value is found in EXCLUDE_VALUES, then do not count it.
+
+    If COUNT_REPETITIVE_VALUES is True, then we could every occurrence
+    of value in the tags.  If False, then we could the value only once
+    regardless of the number of times it may appear in a record.
 
     Example:
      >>> get_most_popular_field_values(range(11,20), '980__a')
@@ -4347,14 +4351,23 @@ def get_most_popular_field_values(recids, tags, exclude_value_list=None):
         tags = (tags,)
     # find values and their frequencies:
     for recid in recids:
+        vals_in_rec = []
         for tag in tags:
             for val in get_fieldvalues(recid, tag):
-                if (not exclude_value_list) or \
-                   (exclude_value_list and val not in exclude_value_list):
-                    if valuefreqdict.has_key(val):
-                        valuefreqdict[val] += 1
-                    else:
-                        valuefreqdict[val] = 1
+                vals_in_rec.append(val)
+        if not count_repetitive_values:
+            # do not count repetitive values
+            dtmp = {}
+            for val in vals_in_rec:
+                dtmp[val] = 1
+            vals_in_rec = dtmp.keys()
+        for val in vals_in_rec:
+            if (not exclude_values) or \
+               (exclude_values and val not in exclude_values):
+                if valuefreqdict.has_key(val):
+                    valuefreqdict[val] += 1
+                else:
+                    valuefreqdict[val] = 1
     # sort by descending frequency of values:
     out = ()
     vals = valuefreqdict.keys()
