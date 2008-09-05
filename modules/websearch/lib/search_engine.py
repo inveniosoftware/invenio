@@ -4316,6 +4316,53 @@ def get_most_popular_values_for_code(recids, tag):
         sortedvalues.append(k)
     return sortedvalues
 
+def get_most_popular_field_values(recids, tags, exclude_value_list=None):
+    """
+    Analyze RECIDS and look for TAGS and return most popular values
+    and the frequency with which they occur sorted according to
+    descending frequency.
+
+    If a value is found in EXCLUDE_VALUE_LIST, then do not count it.
+
+    Example:
+     >>> get_most_popular_field_values(range(11,20), '980__a')
+     (('PREPRINT', 10), ('THESIS', 7), ...)
+     >>> get_most_popular_field_values(range(11,20), ('100__a', '700__a'))
+     (('Ellis, J', 10), ('Ellis, N', 7), ...)
+     >>> get_most_popular_field_values(range(11,20), ('100__a', '700__a'), ('Ellis, J'))
+     (('Ellis, N', 7), ...)
+    """
+
+    def _get_most_popular_field_values_helper_sorter(val1, val2):
+        "Compare VAL1 and VAL2 according to, firstly, frequency, then secondly, alphabetically."
+        compared_via_frequencies = cmp(valuefreqdict[val2], valuefreqdict[val1])
+        if compared_via_frequencies == 0:
+            return cmp(val1.lower(), val2.lower())
+        else:
+            return compared_via_frequencies
+
+    valuefreqdict = {}
+    # sanity check:
+    if isinstance(tags, str):
+        tags = (tags,)
+    # find values and their frequencies:
+    for recid in recids:
+        for tag in tags:
+            for val in get_fieldvalues(recid, tag):
+                if (not exclude_value_list) or \
+                   (exclude_value_list and val not in exclude_value_list):
+                    if valuefreqdict.has_key(val):
+                        valuefreqdict[val] += 1
+                    else:
+                        valuefreqdict[val] = 1
+    # sort by descending frequency of values:
+    out = ()
+    vals = valuefreqdict.keys()
+    vals.sort(_get_most_popular_field_values_helper_sorter)
+    for val in vals:
+        out += (val, valuefreqdict[val]),
+    return out
+
 def profile(p="", f="", c=CFG_SITE_NAME):
     """Profile search time."""
     import profile
