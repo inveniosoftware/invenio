@@ -1287,6 +1287,34 @@ class WebSearchStemmedIndexQueryTest(unittest.TestCase):
                          test_web_page_content(CFG_SITE_URL + '/search?of=id&p=DASSE',
                                                expected_text="[25, 26]"))
 
+class WebSearchSummarizerTest(unittest.TestCase):
+    """Test of the search results summarizer functions."""
+
+    def test_most_popular_field_values_singletag(self):
+        """websearch - most popular field values, simple tag"""
+        from invenio.search_engine import get_most_popular_field_values
+        self.assertEqual((('PREPRINT', 36), ('ARTICLE', 27), ('BOOK', 14), ('THESIS', 8), ('PICTURE', 6), ('POETRY', 2), ('REPORT', 2)),
+                         get_most_popular_field_values(range(0,100), '980__a'))
+
+    def test_most_popular_field_values_singletag_multiexclusion(self):
+        """websearch - most popular field values, simple tag, multiple exclusions"""
+        from invenio.search_engine import get_most_popular_field_values
+        self.assertEqual((('PREPRINT', 36), ('ARTICLE', 27), ('BOOK', 14), ('REPORT', 2)),
+                         get_most_popular_field_values(range(0,100), '980__a', ('THESIS', 'PICTURE', 'POETRY')))
+
+    def test_most_popular_field_values_multitag(self):
+        """websearch - most popular field values, multiple tags"""
+        from invenio.search_engine import get_most_popular_field_values
+        self.assertEqual((('Ellis, J', 3), ('Enqvist, K', 1), ('Ibanez, L E', 1), ('Nanopoulos, D V', 1), ('Ross, G G', 1)),
+                         get_most_popular_field_values((9, 14, 18), ('100__a', '700__a')))
+
+    def test_most_popular_field_values_multitag_singleexclusion(self):
+        """websearch - most popular field values, multiple tags, single exclusion"""
+        from invenio.search_engine import get_most_popular_field_values
+        self.assertEqual((('Enqvist, K', 1), ('Ibanez, L E', 1), ('Nanopoulos, D V', 1), ('Ross, G G', 1)),
+                         get_most_popular_field_values((9, 14, 18), ('100__a', '700__a'), ('Ellis, J')))
+
+
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
                              WebSearchTestBrowse,
@@ -1311,7 +1339,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchResultsRecordGroupingTest,
                              WebSearchSpecialTermsQueryTest,
                              WebSearchJournalQueryTest,
-                             WebSearchStemmedIndexQueryTest)
+                             WebSearchStemmedIndexQueryTest,
+                             WebSearchSummarizerTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
