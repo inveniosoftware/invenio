@@ -1279,23 +1279,23 @@ def record_field_diff(rec1, rec2, field):
        If the fields are identical ( that means have the same order, the same
         subfields), empty list is returned.
        If the field is removed in second record, [(field, 'r')] is returned
-       If the field is added in second record, [(field, 'a')] is returned
-       If the field is changed [(field, 'c')] is returned
+       If the field is added in second record, [(field, 'a', new_value)] is returned
+       If the field is changed [(field, 'c', new_value)] is returned
     """
     subfields1 = choose(rec1[0].has_key(field), lambda: rec1[0][field], lambda: [])
     subfields2 = choose(rec2[0].has_key(field), lambda: rec2[0][field], lambda: [])
     if subfields1 == [] and subfields2 == []:
         return []
     if subfields1 == []:
-        return [(field, 'a')]
+        return [(field, 'a', subfields2)]
     if subfields2 == []:
-        return [(field, 'r')]
+        return [(field, 'r', subfields1)]
     #we can not use simple == operator due to the numeric field which can be different in both records
     #hopefully, we can compare element by element because order of subfields must be preserved
     #   comparer function compares the exact values and indicators 1 and 2
     are_identical = compare_lists(subfields1, subfields2, lambda el1,el2: \
                                   (el1[0] == el2[0]) and (el1[1] == el2[1]) and (el1[2] == el2[2]))
-    return choose(are_identical, lambda: [], lambda: [(field, 'c')])
+    return choose(are_identical, lambda: [], lambda: [(field, 'c', subfields1,  subfields2)])
 
 def record_diff(rec1, rec2):
     """  Compares two given records
@@ -1305,16 +1305,17 @@ def record_diff(rec1, rec2):
 
          @return list of differences. Each difference is of a form:
           (field_id, 'r') - if field field_id exists in rec1 but not in rec2
-          (field_id, 'a') - if field field_id exists in rec2 but not in rec1
-          (field_id, 'c') - if field field_id exists in both records, but
+          (field_id, 'a', new_value) - if field field_id exists in rec2 but not in rec1
+          (field_id, 'c', new_value) - if field field_id exists in both records, but
           it's value has changed
+          new_value describes the new value of a given field ( which allows to reconstruct new record from the old one)
     """
     result = []
     for field in rec1[0].keys():
-        result.extend(record_field_diff(rec1, rec2, field))
+        result += record_field_diff(rec1, rec2, field)
     for field in rec2[0].keys():
         if not rec1[0].has_key(field):
-            result.append((field, 'a'))
+            result += [(field, 'a', rec2[0][field] )]
     return result
 
 def record_extract_oai_id(record):
@@ -1329,9 +1330,6 @@ def record_extract_oai_id(record):
         if re.match(oai_id_regexp, str(id).strip()) != None:
             return str(id).strip()
     return ""
-
-
-
 
 if psycho_available == 1:
     #psyco.full()
