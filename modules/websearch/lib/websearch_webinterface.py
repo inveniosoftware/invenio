@@ -168,7 +168,7 @@ class WebInterfaceAuthorPages(WebInterfaceDirectory):
         #search the publications by this author
         pubs = search_engine.perform_request_search(req=req, p=self.authorname, f="author")
         #get most frequent first authors of these pubs
-        authors = [authorfreq[0] for authorfreq in search_engine.get_most_popular_field_values(pubs, (AUTHOR_TAG, COAUTHOR_TAG))]
+        authors = [authorfreq[0] for authorfreq in search_engine.get_most_popular_field_values(pubs, (AUTHOR_TAG, COAUTHOR_TAG), count_repetitive_values=False)]
         #and publication venues
         venuedict =  search_engine.get_values_for_code_dict(pubs, VENUE_TAG)
         #and keywords
