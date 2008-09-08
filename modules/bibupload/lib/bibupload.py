@@ -1703,7 +1703,7 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
         task_set_option('file_path', os.path.realpath(args[0]))
     # Holding pen mode option
     elif key in ("-o", "--holdingpen"):
-        print "Holding pen mode"
+        write_message("Holding pen mode", verbose=3)
         task_set_option('mode', 'holdingpen')
         fix_argv_paths([args[0]])
         task_set_option('file_path', os.path.realpath(args[0]))
@@ -1784,12 +1784,12 @@ def task_run_core():
     write_message("STAGE 0:", verbose=2)
 
     if task_get_option('file_path') is not None:
-        print "start preocessing"
+        write_message("start preocessing", verbose=3)
         recs = xml_marc_to_records(open_marc_file(task_get_option('file_path')))
         stat['nb_records_to_upload'] = len(recs)
         write_message("   -Open XML marc: DONE", verbose=2)
         task_sleep_now_if_required(can_stop_too=True)
-        print "Entering records loop"
+        write_message("Entering records loop", verbose=3)
         if recs is not None:
             # We proceed each record by record
             for record in recs:
@@ -1797,10 +1797,10 @@ def task_run_core():
                 task_sleep_now_if_required(can_stop_too=True)
                 if task_get_option("mode") == "holdingpen":
                     #inserting into the holding pen
-                    print "Inserting into holding pen"
+                    write_message("Inserting into holding pen", verbose=3)
                     insert_record_into_holding_pen(record, record_id)
                 else:
-                    print "Inserting into main database"
+                    write_message("Inserting into main database", verbose=3)
                     error = bibupload(
                         record,
                         opt_tag=task_get_option('tag'),
