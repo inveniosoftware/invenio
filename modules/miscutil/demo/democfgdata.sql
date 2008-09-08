@@ -1661,9 +1661,9 @@ INSERT INTO collection_externalcollection (id_collection,id_externalcollection,t
 INSERT INTO collection_externalcollection (id_collection,id_externalcollection,type) VALUES (18,18,1);
 
 
-INSERT INTO fmtKNOWLEDGEBASES VALUES ('1','DBCOLLID2COLL','DbCollID to Coll name correspondance.');
-INSERT INTO fmtKNOWLEDGEBASES VALUES ('2','EJOURNALS','Knowledge base of all known electronic journals.  Useful for reference linking.');
-INSERT INTO fmtKNOWLEDGEBASES VALUES ('3','DBCOLLID2BIBTEX','Mapping between the 980 field and BibTeX entry types.');
+INSERT INTO fmtKNOWLEDGEBASES VALUES ('1','DBCOLLID2COLL','DbCollID to Coll name correspondance.', NULL);
+INSERT INTO fmtKNOWLEDGEBASES VALUES ('2','EJOURNALS','Knowledge base of all known electronic journals.  Useful for reference linking.', NULL);
+INSERT INTO fmtKNOWLEDGEBASES VALUES ('3','DBCOLLID2BIBTEX','Mapping between the 980 field and BibTeX entry types.', NULL);
 
 INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES ('ARTICLE','Published Article', '1');
 INSERT INTO fmtKNOWLEDGEBASEMAPPINGS (m_key,m_value,id_fmtKNOWLEDGEBASES) VALUES ('PREPRINT','Preprint', '1');
