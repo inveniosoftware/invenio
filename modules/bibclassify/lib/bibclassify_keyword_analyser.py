@@ -1,0 +1,204 @@
+# -*- coding: utf-8 -*-
+##
+## This file is part of CDS Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
+##
+## CDS Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## CDS Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""
+Bibclassify keyword analysing methods.
+"""
+
+__revision__ = "$Id$"
+
+import sys
+
+try:
+    from bibclassify_config import CFG_BIBCLASSIFY_VALID_SEPARATORS, \
+                                   CFG_BIBCLASSIFY_EXPLICIT_KW_START, \
+                                   CFG_BIBCLASSIFY_EXPLICIT_KW_END, \
+                                   CFG_BIBCLASSIFY_EXPLICIT_KW_SEPARATION
+except ImportError, err:
+    print >> sys.stderr, "Error: %s" % err
+    sys.exit(1)
+
+_MAXIMUM_SEPARATOR_LENGTH = max([len(_separator)
+    for _separator in CFG_BIBCLASSIFY_VALID_SEPARATORS])
+
+def _get_ckw_span(fulltext, spans):
+    """Returns the span of the composite keyword if it is valid. Returns
+    None otherwise."""
+    if spans[0] < spans[1]:
+        words = (spans[0], spans[1])
+        dist = spans[1][0] - spans[0][1]
+    else:
+        words = (spans[1], spans[0])
+        dist = spans[0][0] - spans[1][1]
+
+    if dist == 0:
+        # Two keywords are adjacent. We have a match.
+        return (min(words[0] + words[1]), max(words[0] + words[1]))
+    elif dist <= _MAXIMUM_SEPARATOR_LENGTH:
+        separator = fulltext[words[0][1]:words[1][0] + 1]
+        # Check the separator.
+        if separator.strip() in CFG_BIBCLASSIFY_VALID_SEPARATORS:
+            return (min(words[0] + words[1]), max(words[0] + words[1]))
+
+    # There is no inclusion.
+    return None
+
+def get_composite_keywords(ckw_db, fulltext, skw_spans):
+    """Returns a list of composite keywords bound with the number of
+    occurrences found in the text string.
+    Format of the output list is (subject, count, component counts)."""
+    # Build the list of composite candidates
+    ckw_list = []
+
+    skw_as_components = []
+
+    for subject, composite in ckw_db.iteritems():
+        # Counters for the composite keyword. First count is for the
+        # number of occurrences in the whole document and second count
+        # is for the human defined keywords.
+        ckw_count = 0
+        matched_spans = []
+
+        # Check the alternative labels.
+        for regex in composite.regex:
+            for match in regex.finditer(fulltext):
+                span = list(match.span())
+                span[1] -= 1
+                span = tuple(span)
+                if not span in matched_spans:
+                    ckw_count += 1
+                    matched_spans.append(span)
+
+        # Get the single keywords locations.
+        try:
+            components = ckw_db[subject].compositeof
+        except AttributeError:
+            print >> sys.stderr, ("Cached ontology is corrupted. Please "
+                "remove the cached ontology in your temporary file.")
+            sys.exit(1)
+        try:
+            spans = [skw_spans[component] for component in components]
+        except KeyError:
+            # The keyword components are not to be found in the text.
+            # This is not a dramatic exception and we can safely ignore
+            # it.
+            pass
+        else:
+            ckw_spans = []
+            for index in range(len(spans) - 1):
+                if ckw_spans:
+                    previous_spans = ckw_spans
+                else:
+                    previous_spans = spans[index]
+
+                ckw_spans = []
+                for new_span in [(span0, span1) for span0 in previous_spans
+                                                for span1 in spans[index + 1]]:
+                    span = _get_ckw_span(fulltext, new_span)
+                    if span is not None:
+                        ckw_spans.append(span)
+
+            for span in [span for span in ckw_spans
+                              if not span in matched_spans]:
+                ckw_count += 1
+                matched_spans.append(span)
+
+        if ckw_count:
+            # Gather the component counts.
+            component_counts = []
+            for component in components:
+                skw_as_components.append(component)
+                # Get the single keyword count.
+                try:
+                    component_counts.append(len(skw_spans[component]))
+                except KeyError:
+                    component_counts.append(0)
+
+            # Store the composite keyword
+            ckw_list.append((subject, ckw_count, component_counts))
+
+    # Remove the single keywords that appear as components from the list
+    # of single keywords.
+    for skw in skw_as_components:
+        try:
+            del skw_spans[skw]
+        except KeyError:
+            pass
+
+    return ckw_list
+
+def get_explicit_keywords(fulltext):
+    """Finds out human defined keyowrds in a text string. Searches for
+    the string "Keywords:" and its declinations and matches the
+    following words."""
+    split_string = CFG_BIBCLASSIFY_EXPLICIT_KW_START.split(fulltext, 1)
+    if len(split_string) == 1:
+        return []
+
+    kw_string = split_string[1]
+
+    for regex in CFG_BIBCLASSIFY_EXPLICIT_KW_END:
+        parts = regex.split(kw_string, 1)
+        kw_string = parts[0]
+
+    # We separate the keywords.
+    return CFG_BIBCLASSIFY_EXPLICIT_KW_SEPARATION.split(kw_string)
+
+def _contains_span(span0, span1):
+    """Return true if span0 contains span1, False otherwise."""
+    if (span0 == span1 or
+        span0[0] > span1[0] or
+        span0[1] < span1[1]):
+        return False
+    return True
+
+def get_single_keywords(skw_db, fulltext):
+    """Returns a dictionary of single keywords bound with the positions
+    of the matches in the fulltext.
+    Format of the output dictionary is (subject: positions)."""
+    # Matched span -> subject
+    records = []
+
+    for subject, single_keyword in skw_db.iteritems():
+        for regex in single_keyword.regex:
+            for match in regex.finditer(fulltext):
+                # Modify the right index to put it on the last letter
+                # of the word.
+                span = (match.span()[0], match.span()[1] - 1)
+
+                # Remove the previous records contained by this span
+                records = [record for record in records
+                                  if not _contains_span(span, record[0])]
+
+                add = True
+                for previous_record in records:
+                    if ((span, subject) == previous_record or
+                        _contains_span(previous_record[0], span)):
+                        # Match is contained by a previous match.
+                        add = False
+                        break
+
+                if add:
+                    records.append((span, subject))
+
+    # List of single_keywords: {spans: subject}
+    single_keywords = {}
+    for span, subject in records:
+        single_keywords.setdefault(subject, []).append(span)
+    return single_keywords
