@@ -297,7 +297,7 @@ def get_words_from_fulltext(url_direct_or_indirect, stemming_language=None):
     if bibdocfile_url_p(url_direct_or_indirect):
         write_message("... url %s is an internal url" % url_direct_or_indirect, verbose=9)
         ext = decompose_bibdocfile_url(url_direct_or_indirect)[2]
-        if ext[0] == '.':
+        if ext.startswith('.'):
             ext = ext[1:].lower()
         fulltext_urls = [(ext, url_direct_or_indirect)]
     else:
