@@ -37,7 +37,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBSESSION_RESET_PASSWORD_EXPIRE_IN_DAYS, \
      CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS, \
-     CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS
+     CFG_WEBSESSION_DIFFERENTIATE_BETWEEN_GUESTS, \
+     CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
         CFG_EXTERNAL_AUTH_LOGOUT_SSO
 from invenio.urlutils import make_canonical_urlargd
@@ -281,12 +282,13 @@ class Template:
           'show_helpbox' : _("Show collection help boxes"),
           'checked_helpbox' : show_helpbox and 'checked="checked"' or '',
         }
-        for i in 10, 20, 50, 100, 200:
-            out += """<option %(selected)s>%(i)s</option>
-                """ % {
-                    'selected' : current == i and 'selected="selected"' or '',
-                    'i' : i
-                }
+        for i in 10, 25, 50, 100, 250, 500:
+            if i <= CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS:
+                out += """<option %(selected)s>%(i)s</option>
+                    """ % {
+                        'selected' : current == i and 'selected="selected"' or '',
+                        'i' : i
+                    }
         out += """</select></td><td valign="top"><strong><label for="group_records">%(select_group_records)s</label></strong></td></tr>
               <tr><td></td><td><input class="formbutton" type="submit" value="%(update_settings)s" /></td></tr>
               </table>

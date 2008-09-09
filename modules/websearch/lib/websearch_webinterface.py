@@ -59,12 +59,13 @@ from invenio.config import \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBDIR, \
-     CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS
+     CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
+     CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 from invenio.dbquery import Error
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd, drop_default_urlargd, create_html_link
 from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
-    collect_user_info, http_check_credentials, logoutUser
+    collect_user_info, http_check_credentials, logoutUser, isUserSuperAdmin
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
@@ -312,6 +313,9 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
 
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
+            argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
+
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \
@@ -379,6 +383,9 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
             except (KeyError, ValueError):
                 pass
 
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
+            argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
+
         record_primary_collection = search_engine.guess_primary_collection_of_a_record(self.recid)
 
         if collection_restricted_p(record_primary_collection):
@@ -430,6 +437,9 @@ class WebInterfaceSearchResultsPages(WebInterfaceDirectory):
                     argd['rg'] = int(pref['websearch_group_records'])
             except (KeyError, ValueError):
                 pass
+
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
+            argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
 
         involved_collections = Set()
         involved_collections.update(argd['c'])
@@ -1023,6 +1033,10 @@ class WebInterfaceRecordExport(WebInterfaceDirectory):
         # collection.  If yes, redirect to the authenticated URL.
         user_info = collect_user_info(req)
         (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
+
+        if argd['rg'] > CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS and not isUserSuperAdmin(user_info):
+            argd['rg'] = CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
+
         if auth_code and user_info['email'] == 'guest' and not user_info['apache_user']:
             cookie = mail_cookie_create_authorize_action(VIEWRESTRCOLL, {'collection' : search_engine.guess_primary_collection_of_a_record(self.recid)})
             target = CFG_SITE_SECURE_URL + '/youraccount/login' + \

@@ -52,7 +52,9 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_INSPIRE_SITE, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
-     CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES
+     CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
+     CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
+
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
 #from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES
@@ -2119,7 +2121,8 @@ class Template:
 
             rgs = []
             for i in [10, 25, 50, 100, 250, 500]:
-                rgs.append({ 'value' : i, 'text' : "%d %s" % (i, _("results"))})
+                if i <= CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS:
+                    rgs.append({ 'value' : i, 'text' : "%d %s" % (i, _("results"))})
 
             # sort by:
             out += """<table class="searchbox">
