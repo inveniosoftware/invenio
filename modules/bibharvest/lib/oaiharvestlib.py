@@ -110,7 +110,7 @@ def task_run_core():
         if postmode == "h" or postmode == "h-c" or \
                postmode == "h-u" or postmode == "h-c-u" or \
                postmode == "h-c-f-u":
-            harvestpath = CFG_TMPDIR + "/oaiharvest" + str(os.getpid())
+            harvestpath = CFG_TMPDIR + "/oaiharvest" + str(os.getpid()) + '_' + str(j)
 
             if dateflag == 1:
                 task_update_progress("Harvesting %s from %s to %s (%i/%i)" % \
@@ -228,8 +228,8 @@ def task_run_core():
 
         if postmode == "h-c" or postmode == "h-c-u" or postmode == "h-c-f-u":
             convert_dir = CFG_TMPDIR
-            convertpath = convert_dir + os.sep +"bibconvertrun" + \
-                str(os.getpid())
+            convertpath = convert_dir + os.sep + "bibconvertrun" + \
+                          str(os.getpid()) + '_' + str(j)
             converted_files = []
             i = 0
             for harvested_file in harvested_files:
@@ -274,6 +274,7 @@ def task_run_core():
                                           len(converted_files)))
                     res += call_bibupload(converted_file, oai_src_id = repos[0][0])
                     uploaded = True
+
             if len(converted_files) > 0:
                 if res == 0:
                     if uploaded:
@@ -466,7 +467,8 @@ def call_bibconvert(config, harvestpath, convertpath):
 
 def create_bibharvest_log(task_id, oai_src_id, marcxmlfile):
     """
-    Funcion which creates the harvesting logs
+    Function which creates the harvesting logs
+    @param task_id bibupload task id
     """
     file = open(marcxmlfile, "r")
     xml_content = file.read(-1)
@@ -475,7 +477,8 @@ def create_bibharvest_log(task_id, oai_src_id, marcxmlfile):
 
 def create_bibharvest_log_str(task_id, oai_src_id, xml_content):
     """
-    Funcion which creates the harvesting logs
+    Function which creates the harvesting logs
+    @param task_id bibupload task id
     """
     try:
         records = create_records(xml_content)
@@ -485,11 +488,15 @@ def create_bibharvest_log_str(task_id, oai_src_id, xml_content):
             run_sql(query, (str(oai_src_id),str(oai_id), str(task_id)))
     except Exception, msg:
         print "Logging exception : %s   " % (str(msg), )
-def call_bibupload(marcxmlfile, mode = ["-r", "-i"],  oai_src_id = -1):
+
+def call_bibupload(marcxmlfile, mode = None,  oai_src_id = -1):
     """Call bibupload in insert mode on MARCXMLFILE."""
+    if mode is None:
+        mode = ["-r", "-i"]
     if os.path.exists(marcxmlfile):
         try:
             args = mode
+            print marcxmlfile
             args.append(marcxmlfile)
             task_id = task_low_level_submission_tuple("bibupload", "oaiharvest", tuple(args))
             create_bibharvest_log(task_id, oai_src_id, marcxmlfile)
@@ -648,16 +655,15 @@ def get_repository_names(repositories):
         user at the command line """
     repository_names = []
     if repositories:
-        names = repositories.split(", ")
+        names = repositories.split(",")
         for name in names:
             ### take into account both single word names and multiple word
             ### names (which get wrapped around "" or '')
-            quote = "'"
-            doublequote = '"'
-            if name.find(quote)==0 and name.find(quote)==len(name):
-                name = name.split(quote)[1]
-            if name.find(doublequote)==0 and name.find(doublequote)==len(name):
-                name = name.split(doublequote)[1]
+            name = name.strip()
+            if name.startswith("'"):
+                name = name.strip("'")
+            elif name.startswith('"'):
+                name = name.strip('"')
             repository_names.append(name)
     else:
         repository_names = None
@@ -672,7 +678,7 @@ def main():
             description="""Examples:
     oaiharvest -r arxiv -s 24h
     oaiharvest -r pubmed -d 2005-05-05:2005-05-10 -t 10m\n""",
-            help_specific_usage='  -r, --repository=REPOS_ONE, "REPOS TWO"     '
+            help_specific_usage='  -r, --repository=REPOS_ONE,"REPOS TWO"     '
                 'name of the OAI repositories to be harvested (default=all)\n'
                 '  -d, --dates=yyyy-mm-dd:yyyy-mm-dd          '
                 'harvest repositories between specified dates '
