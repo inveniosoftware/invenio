@@ -10,7 +10,7 @@
 ##
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
@@ -23,794 +23,844 @@ Bibclassify keyword extractor command line entry point.
 
 __revision__ = "$Id$"
 
-import getopt
-import string
 import os
+import rdflib
 import re
+import random
+import cPickle
 import sys
-import time
-import copy
-import shelve
+import tempfile
 
-# Please point the following variables to the correct paths if using standalone (Invenio-independent) version
-TMPDIR_STANDALONE = "/tmp"
-PDFTOTEXT_STANDALONE = "/usr/bin/pdftotext"
+try:
+    from bibclassify_text_normalizer import normalize_fulltext, cut_references
+    from bibclassify_keyword_analyser import get_single_keywords, \
+                                             get_composite_keywords, \
+                                             get_explicit_keywords
+    from bibclassify_config import CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, \
+        CFG_BIBCLASSIFY_EXCEPTIONS, \
+        CFG_BIBCLASSIFY_GENERAL_REGULAR_EXPRESSIONS, \
+        CFG_BIBCLASSIFY_INVARIABLE_WORDS, \
+        CFG_BIBCLASSIFY_PARTIAL_TEXT, \
+        CFG_BIBCLASSIFY_SEPARATORS, \
+        CFG_BIBCLASSIFY_SYMBOLS, \
+        CFG_BIBCLASSIFY_UNCHANGE_REGULAR_EXPRESSIONS, \
+        CFG_BIBCLASSIFY_WORD_WRAP
+except ImportError, err:
+    print >> sys.stderr, "Error: %s" % err
+    sys.exit(1)
 
-fontSize = [12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
+# Global variables.
+_SKWS = {}
+_CKWS = {}
 
-def write_message(msg, stream=sys.stdout):
-    """Write message and flush output stream (may be sys.stdout or sys.stderr).
-    Useful for debugging stuff."""
-    if stream == sys.stdout or stream == sys.stderr:
-        stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ",
-            time.localtime()))
+_contains_digit = re.compile("\d")
+_starts_with_non = re.compile("(?i)^non[a-z]")
+_starts_with_anti = re.compile("(?i)^anti[a-z]")
+_split_by_punctuation = re.compile("(\W+)")
+
+class SingleKeyword:
+    """A single keyword element that treats and stores information fields
+    retrieved from the RDF/SKOS ontology."""
+    def __init__(self, store, namespace, subject):
+        basic_labels = []
+        for label in store.objects(subject, namespace["prefLabel"]):
+            basic_labels.append(str(label))
+
+        # The concept (==human-readable label of the keyword) is the first
+        # prefLabel.
+        self.concept = basic_labels[0]
+
+        for label in store.objects(subject, namespace["altLabel"]):
+            basic_labels.append(str(label))
+
+        hidden_labels = []
+        for label in store.objects(subject, namespace["hiddenLabel"]):
+            hidden_labels.append(unicode(label))
+
+        self.regex = get_searchable_regex(basic_labels, hidden_labels)
+
+        note = str(store.value(subject, namespace["note"], any=True))
+        if note is not None:
+            self.nostandalone = (note.lower() in
+                                ("nostandalone", "nonstandalone"))
+
+        spires = store.value(subject, namespace["spiresLabel"], any=True)
+        if spires is not None:
+            self.spires = str(spires)
+
+
+    def __repr__(self):
+        return "".join(["<SingleKeyword: ", self.concept, ">"])
+
+class CompositeKeyword:
+    """A composite keyword element that treats and stores information fields
+    retrieved from the RDF/SKOS ontology."""
+    def __init__(self, store, namespace, subject):
         try:
-            stream.write("%s\n" % msg)
-        except UnicodeEncodeError:
-            stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
-        stream.flush()
-    else:
-        sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
+            self.concept = store.value(subject, namespace["prefLabel"],
+                                       any=True)
+        except KeyError:
+            # Keyword has no prefLabel. We can discard that error.
+            print >> sys.stderr, ("Keyword with subject %s has no prefLabel" %
+                subject)
 
-def usage(code, msg=''):
-    "Prints usage for this module."
-    if msg:
-        sys.stderr.write("Error: %s.\n" % msg)
-    usagetext =    """
-Usage: bibclassify [options]
+        small_subject = subject.split("#Composite.")[-1]
+        component_positions = []
+        for label in store.objects(subject, namespace["compositeOf"]):
+            strlabel = str(label).split("#")[-1]
+            component_name = label.split("#")[-1]
+            component_positions.append((small_subject.find(component_name),
+                strlabel))
 
- Examples:
-      bibclassify -f file.pdf -k thesaurus.txt -o TEXT
-      bibclassify -f file.txt -K taxonomy.rdf -l 120 -m FULL
+        self.compositeof = []
+        component_positions.sort()
+        for position in component_positions:
+            self.compositeof.append(position[1])
 
- Specific options:
- -f, --file=FILENAME         name of the file to be classified (Use '.pdf' extension for PDF files; every other extension is treated as text)
- -k, --thesaurus=FILENAME    name of the text thesaurus (one keyword per line)
- -K, --taxonomy=FILENAME     name of the RDF SKOS taxonomy/ontology (a local file or URL)
- -o, --output=HTML|TEXT|MARCXML      output list of keywords in either HTML, text, or MARCXML
- -l, --limit=INTEGER         maximum number of keywords that will be processed to generate results (the higher the l, the higher the number of possible composite keywords)
- -n, --nkeywords=INTEGER     maximum number of single keywords that will be generated
- -m, --mode=FULL|PARTIAL     processing mode: PARTIAL (run on abstract and selected pages), FULL (run on whole document - more accurate, but slower)
- -q, --spires                outputs composite keywords in the SPIRES standard format (ckw1, ckw2)
+        spires = store.value(subject, namespace["spiresLabel"], any=True)
+        if spires is not None:
+            self.spires = spires
 
- General options:
- -h,  --help               print this help and exit
- -V,  --version            print version and exit
- -v, --verbose=LEVEL       Verbose level (0=min, 1=default, 9=max).
-"""
-    sys.stderr.write(usagetext)
-    sys.exit(code)
+        self.regex = []
+        for label in store.objects(subject, namespace["altLabel"]):
+            pattern = get_regex_pattern(label)
+            self.regex.append(re.compile(CFG_BIBCLASSIFY_WORD_WRAP % pattern))
 
+    def __repr__(self):
+        return "".join(["<CompositeKeyword: ", self.concept, ">"])
 
-def generate_keywords(textfile, dictfile, verbose=0):
-    """ A method that generates a sorted list of keywords of a document (textfile) based on a simple thesaurus (dictfile). """
-    keylist = []
-    keyws = []
-    wordlista = os.popen("more " + dictfile)
-    thesaurus = [x[:-1] for x in wordlista.readlines()]
-    for keyword in thesaurus:
-        try:
-            string.atoi(keyword)
-        except ValueError:
-            dummy = 1
-        else:
-            continue
-        if len(keyword)<=1: #whitespace or one char - get rid of
-            continue
-        else:
-            dictOUT = os.popen('grep -iwc "' +keyword.strip()+'" '+textfile).read()
-            try:
-                occur = int(dictOUT)
-                if occur != 0:
-                    keylist.append([occur, keyword])
-            except ValueError:
-                continue
-    keylist.sort()
-    keylist.reverse()
-
-    for item in keylist:
-        keyws.append(item[1])
-
-    return keyws
-
-def generate_keywords_rdf(textfile, dictfile, output, limit, nkeywords, mode, spires, verbose=0, ontology=None):
-    """ A method that generates a sorted list of keywords (text or html output) based on a RDF thesaurus. """
-
-    import rdflib
-    keylist = []
-    ckwlist = {}
-    outlist = []
-    compositesOUT = []
-    compositesTOADD = []
-
-    keys2drop = []
-    raw = []
-    composites = {}
-    compositesIDX = {}
-
-    text_out = ""
-    html_out = []
-    store = None
-    reusing_compiled_ontology_p = False
-    compiled_ontology_db = None
-    compiled_ontology_db_file = dictfile + '.db'
-    namespace = rdflib.Namespace("http://www.w3.org/2004/02/skos/core#")
-    if True:
-        # FIXME: there is a bad bug in ontology compilation below - it
-        # stores objects for the given input file, not for
-        # input-file-independent ontology regexps.  So let us remove
-        # the precompiled ontology file here in order not to reuse it
-        # for another file.  This workaround should be removed only
-        # after the issue is fixed.
-        if os.path.exists(compiled_ontology_db_file):
-            os.remove(compiled_ontology_db_file)
-    if not(os.access(dictfile,os.F_OK) and os.access(compiled_ontology_db_file,os.F_OK) and os.path.getmtime(compiled_ontology_db_file) > os.path.getmtime(dictfile)):
-        # changed graph type, recommended by devel team
+def build_cache(ontology_file, no_cache=False, checking=False):
+    """Builds the cached data by parsing the RDF ontology file."""
+    if checking:
+        print ("Building graph with Python RDFLib version %s" %
+            rdflib.__version__)
+    if rdflib.__version__ >= '2.3.2':
         store = rdflib.ConjunctiveGraph()
-        store.parse(dictfile)
-        compiled_ontology_db = shelve.open(compiled_ontology_db_file)
-        compiled_ontology_db['graph'] = store
-        if verbose >= 3:
-            write_message("Creating compiled ontology %s for the first time" % compiled_ontology_db_file, sys.stderr)
     else:
-        if verbose >= 3:
-            write_message("Reusing compiled ontology %s" % compiled_ontology_db_file, sys.stderr)
-        reusing_compiled_ontology_p = True
-        compiled_ontology_db = shelve.open(compiled_ontology_db_file)
-        store = compiled_ontology_db['graph']
+        store = rdflib.Graph()
+    store.parse(ontology_file)
 
-    size = int(os.stat(textfile).st_size)
+    namespace = rdflib.Namespace("http://www.w3.org/2004/02/skos/core#")
 
-    rtmp = open(textfile, 'r')
-    atmp = open(textfile, 'r')
+    if checking:
+        print "Graph was successfully built."
+        perform_ontology_check(store)
 
-    # ASSUMPTION: Guessing that the first 10% of file contains title and abstract
-    abstract = " " + str(atmp.read(int(size*0.1))) + " "
+    single_count = 0
+    composite_count = 0
+    regex_count = 0
 
-    if mode == 1:
-        # Partial mode: analysing only abstract + title + middle portion of document
-        # Abstract and title is generally never more than 20% of whole document.
-        text_string = " " + str(rtmp.read(int(size*0.2)))
-        throw_away = str(rtmp.read(int(size*0.25)))
-        text_string += str(rtmp.read(int(size*0.2)))
+    for subject_object in store.subject_objects(namespace["prefLabel"]):
+        # Keep only the single keywords.
+        # TODO: Remove or alter that condition in order to allow using other
+        # ontologies that do not have this composite notion (such as
+        # NASA-subjects.rdf)
+        if not store.value(subject_object[0], namespace["compositeOf"],
+            any=True):
+            strsubject = str(subject_object[0]).split("#")[-1]
+            _SKWS[strsubject] = SingleKeyword(store, namespace,
+                subject_object[0])
+            single_count += 1
+            regex_count += len(_SKWS[strsubject].regex)
 
-    else:
-        # Full mode: get all document
-        text_string = " " + str(rtmp.read()) + " "
+    # Let's go through the composite keywords.
+    for subject, pref_label in store.subject_objects(namespace["prefLabel"]):
+        # Keep only the single keywords.
+        if store.value(subject, namespace["compositeOf"], any=True):
+            strsubject = str(subject).split("#")[-1]
+            _CKWS[strsubject] = CompositeKeyword(store, namespace, subject)
+            composite_count += 1
+            regex_count += len(_CKWS[strsubject].regex)
 
-    atmp.close()
-    rtmp.close()
+    store.close()
 
-    try:
-        # Here we are trying to match the human-assigned keywords
-        # These are generally found in a document after the key phrase "keywords" or similar
-        if text_string.find("Keywords:"):
-            safe_keys = text_string.split("Keywords:")[1].split("\n")[0]
-        elif text_string.find("Key words:"):
-            safe_keys = text_string.split("Key words:")[1].split("\n")[0]
-        elif text_string.find("Key Words:"):
-            safe_keys = text_string.split("Key Words:")[1].split("\n")[0]
-    except:
-        safe_keys = ""
+    cached_data = {}
+    cached_data["single"] = _SKWS
+    cached_data["composite"] = _CKWS
 
-    if safe_keys != "":
-        if verbose >= 8:
-            write_message("Author keyword string detected: %s" % safe_keys)
-
-    # Here we start the big for loop around all concepts in the RDF ontology
-    if not reusing_compiled_ontology_p:
-        # we have to compile ontology first:
-        for s,pref in store.subject_objects(namespace["prefLabel"]):
-
-            dictOUT = 0
-            safeOUT = 0
-            hideOUT = 0
-            candidates = []
-            wildcard = ""
-            regex = False
-            nostandalone = False
-
-            # For each concept, we gather the candidates (i.e. prefLabel, hiddenLabel and altLabel)
-            candidates.append(pref.strip())
-
-            # If the candidate is a ckw and it has no altLabel, we are not interested at this point, go to the next item
-            if store.value(s,namespace["compositeOf"],default=False,any=True) and not store.value(s,namespace["altLabel"],default=False,any=True):
-                continue
-
-            if str(store.value(s,namespace["note"],any=True)) == "nostandalone":
-                nostandalone = True
-
-            for alt in store.objects(s, namespace["altLabel"]):
-                candidates.append(alt.strip())
-
-            for hid in store.objects(s, namespace["hiddenLabel"]):
-                candidates.append(hid.strip())
-
-            # We then create a regex pattern for each candidate and we match it in the document
-            # First we match any possible candidate containing regex. These have to be handled a priori
-            # (because they might cause double matching, e.g. "gauge theor*" will match "gauge theory"
-            for candidate in candidates:
-                if candidate.find("/", 0, 1) > -1:
-                    # We have a wildcard or other regex, do not escape chars
-                    # Wildcards matched with '\w*'. These truncations should go into hidden labels in the ontology
-                    regex = True
-                    pattern = makePattern(candidate, 3)
-                    wildcard = pattern
-                    hideOUT += len(re.findall(pattern,text_string))
-                    # print "HIDEOUT: " + str(candidate) + " " + str(hideOUT)
-
-            for candidate in candidates:
-                # Different patterns are created according to the type of candidate keyword encountered
-
-                if candidate.find("/", 0, 1) > -1:
-                    # We have already taken care of this
-                    continue
-
-                elif regex and candidate.find("/", 0, 1) == -1 and len(re.findall(wildcard," " + candidate + " ")) > 0:
-                    # The wildcard in hiddenLabel matches this candidate: skip it
-                    # print "\ncase 2 touched\n"
-                    continue
-
-                elif candidate.find("-") > -1:
-                    # We have an hyphen -> e.g. "word-word". Look for: "word-word", "wordword", "word word" (case insensitive)
-                    pattern = makePattern(candidate, 2)
-
-                elif candidate[:2].isupper() or len(candidate) < 3:
-                    # First two letters are uppercase or very short keyword. This could be an acronym. Better leave case untouched
-                    pattern = makePattern(candidate, 1)
-
-                else:
-                    # Let's do some plain case insensitive search
-                    pattern = makePattern(candidate, 0)
-
-                if len(candidate) < 3:
-                    # We have a short keyword
-                    if len(re.findall(pattern,abstract))> 0:
-                        # The short keyword appears in the abstract/title, retain it
-                        dictOUT += len(re.findall(pattern,text_string))
-                        safeOUT += len(re.findall(pattern,safe_keys))
-
-                else:
-                    dictOUT += len(re.findall(pattern,text_string))
-                    safeOUT += len(re.findall(pattern,safe_keys))
-
-            dictOUT += hideOUT
-
-            if dictOUT > 0 and store.value(s,namespace["compositeOf"],default=False,any=True):
-                # This is a ckw whose altLabel occurs in the text
-                ckwlist[s.strip()] = dictOUT
-
-            elif dictOUT > 0:
-                keylist.append([dictOUT, s.strip(), pref.strip(), safeOUT, candidates, nostandalone])
-
-            regex = False
-        keylist.sort()
-        keylist.reverse()
-        compiled_ontology_db['keylist'] = keylist
-        compiled_ontology_db.close()
-    else:
-        # we can reuse compiled ontology:
-        keylist = compiled_ontology_db['keylist']
-        compiled_ontology_db.close()
-
-    if limit > len(keylist):
-        limit = len(keylist)
-
-    if nkeywords > limit:
-        nkeywords = limit
-
-    # Sort out composite keywords based on limit (default=70)
-    # Work out whether among l single keywords, there are possible composite combinations
-    # Generate compositesIDX dictionary of the form:   s (URI) : keylist
-    for i in range(limit):
+    if not no_cache:
+        # Serialize
         try:
-            if store.value(rdflib.Namespace(keylist[i][1]),namespace["composite"],default=False,any=True):
-                compositesIDX[keylist[i][1]] = keylist[i]
-                for composite in store.objects(rdflib.Namespace(keylist[i][1]),namespace["composite"]):
-                    if composites.has_key(composite):
-                        composites[composite].append(keylist[i][1])
-                    else:
-                        composites[composite]=[keylist[i][1]]
+            filestream = open(get_cache_file(ontology_file), "w")
+            cPickle.dump(cached_data, filestream, 1)
+            filestream.close()
+        except IOError:
+            # Impossible to write the cache.
+            return cached_data
 
-            elif store.value(rdflib.Namespace(keylist[i][1]),namespace["compositeOf"],default=False,any=True):
-                compositesIDX[keylist[i][1]] = keylist[i]
+    return cached_data
 
-            else:
-                outlist.append(keylist[i])
-
-        except:
-            write_message("Problem with composites.. : %s" % keylist[i][1])
-
-    for s_CompositeOf in composites:
-
-        if len(composites.get(s_CompositeOf)) > 2:
-            write_message("%s - Sorry! Only composite combinations of max 2 keywords are supported at the moment." % s_CompositeOf)
-        elif len(composites.get(s_CompositeOf)) > 1:
-            # We have a composite match. Need to look for composite1 near composite2
-            comp_one = compositesIDX[composites.get(s_CompositeOf)[0]][2]
-            comp_two = compositesIDX[composites.get(s_CompositeOf)[1]][2]
-
-            # Now check that comp_one and comp_two really correspond to ckw1 : ckw2
-            if store.value(rdflib.Namespace(s_CompositeOf),namespace["prefLabel"],default=False,any=True).split(":")[0].strip() == comp_one:
-                # order is correct
-                searchables_one = compositesIDX[composites.get(s_CompositeOf)[0]][4]
-                searchables_two = compositesIDX[composites.get(s_CompositeOf)[1]][4]
-                comp_oneOUT = compositesIDX[composites.get(s_CompositeOf)[0]][0]
-                comp_twoOUT = compositesIDX[composites.get(s_CompositeOf)[1]][0]
-            else:
-                # reverse order
-                comp_one = compositesIDX[composites.get(s_CompositeOf)[1]][2]
-                comp_two = compositesIDX[composites.get(s_CompositeOf)[0]][2]
-                searchables_one = compositesIDX[composites.get(s_CompositeOf)[1]][4]
-                searchables_two = compositesIDX[composites.get(s_CompositeOf)[0]][4]
-                comp_oneOUT = compositesIDX[composites.get(s_CompositeOf)[1]][0]
-                comp_twoOUT = compositesIDX[composites.get(s_CompositeOf)[0]][0]
-
-            compOUT = 0
-            wildcards = []
-            phrases = []
-
-            for searchable_one in searchables_one:
-                # Work out all possible combination of comp1 near comp2
-                c1 = searchable_one
-                if searchable_one.find("/", 0, 1) > -1: m1 = 3
-                elif searchable_one.find("-") > -1: m1 = 2
-                elif searchable_one[:2].isupper() or len(searchable_one) < 3: m1 = 1
-                else: m1 = 0
-                for searchable_two in searchables_two:
-                    c2 = searchable_two
-                    if searchable_two.find("/", 0, 1) > -1: m2 = 3
-                    elif searchable_two.find("-") > -1: m2 = 2
-                    elif searchable_two[:2].isupper() or len(searchable_two) < 3: m2 = 1
-                    else: m2 = 0
-
-                    c = [c1,c2]
-                    m = [m1,m2]
-
-                    patterns = makeCompPattern(c, m)
-                    if m1 == 3 or m2 == 3:
-                        # One of the composites had a wildcard inside
-                        wildcards.append(patterns[0])
-                        wildcards.append(patterns[1])
-                    else:
-                        # No wildcards
-                        phrase1 = c1 + " " + c2
-                        phrase2 = c2 + " " + c1
-                        phrases.append([phrase1, patterns[0]])
-                        phrases.append([phrase2, patterns[1]])
-
-                    THIScomp = len(re.findall(patterns[0],text_string)) + len(re.findall(patterns[1],text_string))
-                    compOUT += THIScomp
-
-            if len(wildcards)>0:
-                for wild in wildcards:
-                    for phrase in phrases:
-                        if len(re.findall(wild," " + phrase[0] + " ")) > 0:
-                            compOUT = compOUT - len(re.findall(phrase[1],text_string))
-
-            # Add extra results due to altLabels, calculated in the first part
-            if ckwlist.get(s_CompositeOf, 0) > 0:
-                # Add count and pop the item out of the dictionary
-                compOUT += ckwlist.pop(s_CompositeOf)
-
-            if compOUT > 0 and spires:
-                # Output ckws in spires standard output mode (,)
-                if store.value(rdflib.Namespace(s_CompositeOf),namespace["spiresLabel"],default=False,any=True):
-                    compositesOUT.append([compOUT, store.value(rdflib.Namespace(s_CompositeOf),namespace["spiresLabel"],default=False,any=True), comp_one, comp_two, comp_oneOUT, comp_twoOUT])
-                else:
-                    compositesOUT.append([compOUT, store.value(rdflib.Namespace(s_CompositeOf),namespace["prefLabel"],default=False,any=True).replace(":",","), comp_one, comp_two, comp_oneOUT, comp_twoOUT])
-                keys2drop.append(comp_one.strip())
-                keys2drop.append(comp_two.strip())
-
-            elif compOUT > 0:
-                # Output ckws in bibclassify mode (:)
-                compositesOUT.append([compOUT, store.value(rdflib.Namespace(s_CompositeOf),namespace["prefLabel"],default=False,any=True), comp_one, comp_two, comp_oneOUT, comp_twoOUT])
-                keys2drop.append(comp_one.strip())
-                keys2drop.append(comp_two.strip())
-
-    # Deal with ckws that only occur as altLabels
-    ckwleft = len(ckwlist)
-    while ckwleft > 0:
-        compositesTOADD.append(ckwlist.popitem())
-        ckwleft = ckwleft - 1
-
-    for s_CompositeTOADD, compTOADD_OUT in compositesTOADD:
-        if spires:
-            compositesOUT.append([compTOADD_OUT, store.value(rdflib.Namespace(s_CompositeTOADD),namespace["prefLabel"],default=False,any=True).replace(":",","), "null", "null", 0, 0])
+def capitalize_first_letter(word):
+    """Returns a regex pattern with the first letter accepting both lowercase
+    and uppercase."""
+    if word[0].isalpha():
+        # These two cases are necessary in order to get a regex pattern
+        # starting with '[xX]' and not '[Xx]'. This allows to check for
+        # colliding regex afterwards.
+        if word[0].isupper():
+            return "["+ word[0].swapcase() + word[0] +"]" + word[1:]
         else:
-            compositesOUT.append([compTOADD_OUT, store.value(rdflib.Namespace(s_CompositeTOADD),namespace["prefLabel"],default=False,any=True), "null", "null", 0, 0])
+            return "["+ word[0] + word[0].swapcase() +"]" + word[1:]
+    return word
 
-    compositesOUT.sort()
-    compositesOUT.reverse()
-    # Some more keylist filtering: inclusion, e.g subtract "magnetic" if have "magnetic field"
-    for i in keylist:
-        pattern_to_match = " " + i[2].strip() + " "
-        for j in keylist:
-            test_key = " " + j[2].strip() + " "
-            if test_key.strip() != pattern_to_match.strip() and test_key.find(pattern_to_match) > -1:
-                keys2drop.append(pattern_to_match.strip())
+def convert_punctuation(punctuation, conversion_table):
+    """Returns a regular expression for a punctuation string."""
+    if punctuation in conversion_table:
+        return conversion_table[punctuation]
+    return re.escape(punctuation)
 
+def convert_word(word):
+    """Returns the plural form of the word if it exists, the word itself
+    otherwise."""
+    out = None
 
-    text_out += "\nComposite keywords:\n"
-    for ncomp, pref_cOf_label, comp_one, comp_two, comp_oneOUT, comp_twoOUT in compositesOUT:
-        safe_comp_mark = " "
-        safe_one_mark = ""
-        safe_two_mark = ""
-        if safe_keys.find(pref_cOf_label)>-1:
-            safe_comp_mark = "*"
-        if safe_keys.find(comp_one)>-1:
-            safe_one_mark = "*"
-        if safe_keys.find(comp_two)>-1:
-            safe_two_mark = "*"
-        raw.append([str(ncomp),str(pref_cOf_label)])
-        text_out += str(ncomp) + safe_comp_mark + " " + str(pref_cOf_label) + " [" + str(comp_oneOUT)  + safe_one_mark + ", " + str(comp_twoOUT) + safe_two_mark + "]\n"
-        if safe_comp_mark == "*": html_out.append([ncomp, str(pref_cOf_label), 1])
-        else: html_out.append([ncomp, str(pref_cOf_label), 0])
+    # Acronyms.
+    if word.isupper():
+        out = word + "s?"
+    # Proper nouns or word with digits.
+    elif word.istitle() or _contains_digit.search(word):
+        out = word
 
-    text_out += "\n\nSingle keywords:\n"
-    for i in range(limit):
-        safe_mark = " "
-        try:
-            idx = keys2drop.index(keylist[i][2].strip())
-        except:
-            idx = -1
+    if out is not None:
+        return out
 
-        if safe_keys.find(keylist[i][2])>-1:
-            safe_mark = "*"
+    # Words with non or anti prefixes.
+    if _starts_with_non.search(word):
+        word = "non-?" + capitalize_first_letter(convert_word(word[3:]))
+    elif _starts_with_anti.search(word):
+        word = "anti-?" + capitalize_first_letter(convert_word(word[4:]))
 
-        if idx == -1 and nkeywords > 0 and not keylist[i][5]:
-            text_out += str(keylist[i][0]) + safe_mark + " " + keylist[i][2] + "\n"
-            raw.append([keylist[i][0], keylist[i][2]])
-            if safe_mark == "*": html_out.append([keylist[i][0], keylist[i][2], 1])
-            else: html_out.append([keylist[i][0], keylist[i][2], 0])
-            nkeywords = nkeywords - 1
+    if out is not None:
+        return capitalize_first_letter(out)
 
+    # A few invariable words.
+    if word in CFG_BIBCLASSIFY_INVARIABLE_WORDS:
+        return capitalize_first_letter(word)
 
-    if output == 0:
-        # Output some text
-        return text_out
-    elif output == 2:
-        # return marc xml output.
-        xml = ""
-        for key in raw:
-            xml += """
-            <datafield tag="653" ind1="1" ind2=" ">
-              <subfield code="a">%s</subfield>
-              <subfield code="9">BibClassify/%s</subfield>
-            </datafield>""" % (key[1],os.path.splitext(os.path.basename(ontology))[0])
-        return xml
+    # Some exceptions that would not produce good results with the set of
+    # general_regular_expressions.
+    if word in CFG_BIBCLASSIFY_EXCEPTIONS:
+        return capitalize_first_letter(CFG_BIBCLASSIFY_EXCEPTIONS[word])
+
+    for regex in CFG_BIBCLASSIFY_UNCHANGE_REGULAR_EXPRESSIONS:
+        if regex.search(word) is not None:
+            return capitalize_first_letter(word)
+
+    for regex, replacement in CFG_BIBCLASSIFY_GENERAL_REGULAR_EXPRESSIONS:
+        stemmed = regex.sub(replacement, word)
+        if stemmed != word:
+            return capitalize_first_letter(stemmed)
+
+    return capitalize_first_letter(word + "s?")
+
+def get_cache(ontology_file):
+    """Get the cached ontology using the cPickle module. No check is done at
+    that stage."""
+    filestream = open(get_cache_file(ontology_file), "r")
+    try:
+        cached_data = cPickle.load(filestream)
+    except (cPickle.UnpicklingError, AttributeError, DeprecationWarning):
+        print >> sys.stderr, "Problem with existing cache. Regenerating."
+        filestream.close()
+        os.remove(get_cache_file(ontology_file))
+        return build_cache(ontology_file)
+    filestream.close()
+
+    global _SKWS, _CKWS
+    _SKWS = cached_data["single"]
+    _CKWS = cached_data["composite"]
+
+    return cached_data
+
+def get_cache_file(ontology_file):
+    """Returns the file name of the cached ontology."""
+    temp_dir = tempfile.gettempdir()
+    cache_file = os.path.basename(ontology_file) + ".db"
+    return os.path.join(temp_dir, cache_file)
+
+def get_keywords_from_text(text_lines, ontology_file="", output_mode="text",
+                           output_limit=CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER,
+                           spires=False, match_mode="full", no_cache=False,
+                           with_explicit=False):
+    """Returns a formatted string containing the keywords for a single
+    document. If 'ontology_file' has not been specified, the method
+    'get_regular_expressions' must have been run in order to build or
+    get the cached ontology."""
+    if not ontology_file:
+        if not _SKWS or not _CKWS:
+            # Cache was not read/created.
+            print >> sys.stderr, ("Please specify an ontology file or "
+                "use the method 'get_regular_expressions' before "
+                "searching for keywords.")
+            sys.exit(1)
     else:
-        # Output some HTML
-        html_out.sort()
-        html_out.reverse()
-        return make_tag_cloud(html_out)
+        get_regular_expressions(ontology_file, no_cache)
 
-def make_tag_cloud(entries):
-    """Using the counts for each of the tags, write a simple HTML page to
-    standard output containing a tag cloud representation. The CSS
+    text_lines = cut_references(text_lines)
+    fulltext = normalize_fulltext("\n".join(text_lines))
+
+    explicit_keywords = None
+    if with_explicit:
+        explicit_keywords = get_explicit_keywords(fulltext)
+
+    if match_mode == "partial":
+        fulltext = get_partial_text(fulltext)
+
+    single_keywords = get_single_keywords(_SKWS, fulltext)
+
+    composite_keywords = get_composite_keywords(_CKWS, fulltext,
+                                                single_keywords)
+
+    return get_keywords_output(single_keywords, composite_keywords,
+        explicit_keywords, output_mode, output_limit, spires)
+
+def get_keywords_output(single_keywords, composite_keywords,
+                        explicit_keywords=None, style="text",
+                        output_limit=0, spires=False):
+    """Returns a formatted string representing the keywords according
+    to the style chosen."""
+
+    # Filter the "nonstandalone" keywords
+    single_keywords = filter_nostandalone(single_keywords)
+
+    # Limit the number of keywords to nkeywords.
+    single_keywords = resize_keywords_for_output(single_keywords,
+        output_limit, single=True)
+    composite_keywords = resize_keywords_for_output(composite_keywords,
+        output_limit, composite=True)
+
+    if style == "text":
+        return output_text(single_keywords, composite_keywords,
+            explicit_keywords, spires)
+    elif style == "marcxml":
+        return output_marc(single_keywords, composite_keywords, spires)
+    elif style == "html":
+        return output_html(single_keywords, composite_keywords, spires)
+
+def get_partial_text(fulltext):
+    """Returns a shortened version of the fulltext used with the partial
+    matching mode. The version is composed of 20% in the beginning and
+    20% in the middle of the text."""
+    length = len(fulltext)
+
+    get_index = lambda x: int(float(x) / 100 * length)
+
+    partial_text = [fulltext[get_index(start):get_index(end)]
+                    for start, end in CFG_BIBCLASSIFY_PARTIAL_TEXT]
+
+    return "\n".join(partial_text)
+
+def get_regular_expressions(ontology_file, rebuild=False, no_cache=False):
+    """Returns a list of patterns compiled from the RDF/SKOS taxonomy.
+    Uses cache if it exists and if the taxonomy hasn't changed."""
+    if os.access(ontology_file, os.R_OK):
+        if rebuild or no_cache:
+            return build_cache(ontology_file, no_cache)
+
+        if os.access(get_cache_file(ontology_file), os.R_OK):
+            if (os.path.getmtime(get_cache_file(ontology_file)) >
+               os.path.getmtime(ontology_file)):
+                # Cache is more recent than the ontology: use cache.
+                return get_cache(ontology_file)
+            else:
+                # Ontology is more recent than the cache: rebuild cache.
+                return build_cache(ontology_file, no_cache)
+        else:
+            # Cache does not exist. Build cache.
+            return build_cache(ontology_file, no_cache)
+    else:
+        if os.access(get_cache_file(ontology_file), os.R_OK):
+            # Ontology file not found. Use the cache instead.
+            return get_cache(ontology_file)
+        else:
+            # Cannot access the ontology nor the cache. Exit.
+            print >> sys.stderr, "Neither ontology file nor cache can be read."
+            sys.exit(-1)
+            return None
+
+def get_searchable_regex(basic_labels, hidden_labels):
+    """Returns the searchable regular expressions for the single
+    keyword."""
+    # Hidden labels are used to store regular expressions.
+    hidden_regex_dict = {}
+    for hidden_label in hidden_labels:
+        if is_regex(hidden_label):
+            hidden_regex_dict[hidden_label] = \
+                re.compile(CFG_BIBCLASSIFY_WORD_WRAP % hidden_label[1:-1])
+        else:
+            pattern = get_regex_pattern(hidden_label)
+            hidden_regex_dict[hidden_label] = \
+                re.compile(CFG_BIBCLASSIFY_WORD_WRAP % pattern)
+
+    # We check if the basic label (preferred or alternative) is matched
+    # by a hidden label regex. If yes, discard it.
+    regex_dict = {}
+    # Create regex for plural forms and add them to the hidden labels.
+    for label in basic_labels:
+        pattern = get_regex_pattern(label)
+        regex_dict[label] = re.compile(CFG_BIBCLASSIFY_WORD_WRAP % pattern)
+
+    # Merge both dictionaries.
+    regex_dict.update(hidden_regex_dict)
+
+    return regex_dict.values()
+
+def get_regex_pattern(label):
+    """Returns a regular expression of the label that takes care of
+    plural and different kinds of separators."""
+    parts = _split_by_punctuation.split(label)
+    parts_number = len(parts)
+
+    for index, part in enumerate(parts):
+        if index % 2 == 0:
+            # Word
+            if not parts[index].isdigit():
+                parts[index] = convert_word(parts[index])
+        else:
+            # Punctuation
+            if not parts[index + 1]:
+                # The separator is not followed by another word. Treat
+                # it as a symbol.
+                parts[index] = convert_punctuation(parts[index],
+                    CFG_BIBCLASSIFY_SYMBOLS)
+            else:
+                parts[index] = convert_punctuation(parts[index],
+                    CFG_BIBCLASSIFY_SEPARATORS)
+
+    return "".join(parts)
+
+def is_regex(string):
+    """Checks if a concept is a regular expression."""
+    return string[0] == "/" and string[-1] == "/"
+
+def output_html(single_keywords, composite_keywords, spires=False):
+    """Using the counts for each of the tags, write a simple HTML page
+    to standard output containing a tag cloud representation. The CSS
     describes ten levels, each of which has differing font-size's,
-    line-height's and font-weight's.
-    """
+    line-height's and font-weight's."""
 
-    max_occurrence = int(entries[0][0])
-    ret = "<html>\n"
-    ret += "<head>\n"
-    ret += "<title>Keyword Cloud</title>\n"
-    ret += "<style type=\"text/css\">\n"
-    ret += "<!--"
-    ret += 'a{color:#003DF5; text-decoration:none;}\n'
-    ret += 'a:hover{color:#f1f1f1; text-decoration:none; background-color:#003DF5;}\n'
-    ret += '.pagebox {color: #000;   margin-left: 1em;   margin-bottom: 1em;    border: 1px solid #000;    padding: 1em;    background-color: #f1f1f1;    font-family: arial, sans-serif;   max-width: 700px;   margin: 10px;   padding-left: 10px;   float: left;}\n'
-    ret += '.pagebox1 {color: #B5B5B5;   margin-left: 1em;   margin-bottom: 1em;    border: 1px dotted #B5B5B5;    padding: 1em;    background-color: #f2f2f2;    font-family: arial, sans-serif;   max-width: 300px;   margin: 10px;   padding-left: 10px;   float: left;}\n'
-    ret += '.pagebox2 {color: #000;   margin-left: 1em;   margin-bottom: 1em;    border: 0px solid #000;    padding: 1em;    fond-size: x-small, font-family: arial, sans-serif;   margin: 10px;   padding-left: 10px;   float: left;}\n'
+    lines = []
+    lines.append('''<html>
+  <head>
+    <title>Keyword Cloud</title>
+    <style type="text/css">
+      <!--
+        a { color: #003DF5; text-decoration: none; }
+        a:hover { color: #f1f1f1; text-decoration: none;
+          background-color: #003DF5; }
+        .pagebox { color: #000; margin-left: 1em; margin-bottom: 1em;
+          border: 1px solid #000; padding: 1em;
+          background-color: #f1f1f1; font-family: arial, sans-serif;
+          max-width: 700px; margin: 10px; padding-left: 10px;
+          float: left; }
+        .pagebox1 { color: #B5B5B5; margin-left: 1em;
+          margin-bottom: 1em; border: 1px dotted #B5B5B5;
+          padding: 1em; background-color: #f2f2f2;
+          font-family: arial, sans-serif; max-width: 300px;
+          margin: 10px; padding-left: 10px; float: left; }
+        .pagebox2 { color: #000; margin-left: 1em; margin-bottom: 1em;
+          border: 0px solid #000; padding: 1em; font-size: x-small;
+          font-family: arial, sans-serif; margin: 10px;
+          padding-left: 10px; float: left; }''')
 
-    for i in range(0, 10):
-        ret += ".level%d\n" % i
-        ret += "{  color:#003DF5;\n"
-        ret += "  font-size:%dpx;\n" % fontSize[i]
-        ret += "  line-height:%dpx;\n" % (fontSize[i] + 5)
+    level = (
+'''        .level%d { color:#003DF5; font-size:%dpx; line-height:%dpx;
+          font-weight:bold; }''')
 
-        if i > 5:
-            ret += "  font-weight:bold;\n"
+    for index, size in enumerate(range(12, 40, 3)):
+        lines.append(level % (index, size, size + 5))
 
-        ret += "}\n"
+    level_list = (10, 7.5, 5, 4, 3, 2, 1.7, 1.5, 1.3, 1)
+    keyword = ('          <span class="level%d" style="color:%s !important">'
+        '%s </span>')
 
-    ret += "-->\n"
-    ret += "</style>\n"
-    ret += "</head>\n"
-    ret += "<body>\n"
-    ret += "<table>\n"
+    lines.append("      -->")
+    lines.append("    </style>")
+    lines.append("  </head>")
+    lines.append("  <body>")
+    lines.append("    <table>")
+    lines.append("      <tr>")
+    lines.append('        <div class="pagebox" align="top" />')
 
-    cloud = ""
-    cloud_list = []
+    tags = []
 
-    cloud += '<tr><div class="pagebox" align="top">'
-    # Generate some ad-hoc count distribution
-    for i in range(0, len(entries)):
-        count = int(entries[i][0])
-        tag = str(entries[i][1])
-        color = int(entries[i][2])
-        if count < (max_occurrence/10):
-            cloud_list.append([tag,0,color])
-        elif count < (max_occurrence/7.5):
-            cloud_list.append([tag,1,color])
-        elif count < (max_occurrence/5):
-            cloud_list.append([tag,2,color])
-        elif count < (max_occurrence/4):
-            cloud_list.append([tag,3,color])
-        elif count < (max_occurrence/3):
-            cloud_list.append([tag,4,color])
-        elif count < (max_occurrence/2):
-            cloud_list.append([tag,5,color])
-        elif count < (max_occurrence/1.7):
-            cloud_list.append([tag,6,color])
-        elif count < (max_occurrence/1.5):
-            cloud_list.append([tag,7,color])
-        elif count < (max_occurrence/1.3):
-            cloud_list.append([tag,8,color])
+    max_counts = [len(single_keywords[0][1]), composite_keywords[0][1]]
+
+    # Add the single tags
+    color = "#b5b5b5"
+    for subject, spans in single_keywords:
+        for index, value in enumerate(level_list):
+            if len(spans) <= max_counts[0] / value:
+                if spires:
+                    obj = spires_label(subject)
+                else:
+                    obj = _SKWS[subject].concept
+                obj = obj.replace(" ", "&#160")
+                tags.append(keyword % (index, color, obj))
+                break
+
+    # Add the composite tags
+    color = "#003df5"
+    for subject, count, components in composite_keywords:
+        for index, value in enumerate(level_list):
+            if count <= max_counts[1] / value:
+                if spires:
+                    obj = spires_label(subject)
+                else:
+                    obj = _CKWS[subject].concept
+                obj = obj.replace(" ", "&#160")
+                tags.append(keyword % (index, color, obj))
+                break
+
+    # Appends the keywords in a random way (in order to create the cloud
+    # effect)
+    while tags:
+        index = random.randint(0, len(tags) - 1)
+        lines.append(tags[index])
+        tags[index] = tags[-1]
+        del tags[-1]
+
+    lines.append(" " * 8 + "</div>")
+    lines.append(" " * 6 + "</tr>")
+    lines.append(" " * 4 + "</table>")
+    lines.append(" " * 2 + "</body>")
+    lines.append("</html>")
+
+    return "\n".join(lines)
+
+def output_marc(single_keywords, composite_keywords, spires=False):
+    """Outputs the keywords in the MARCXML format."""
+    marc_pattern = ('<datafield tag="653" ind1="1" ind2=" ">\n'
+                    '    <subfield code="a">%s</subfield>\n'
+                    '    <subfield code="9">BibClassify/HEP</subfield>\n'
+                    '</datafield>\n')
+
+    output = []
+
+    for subject, spans in single_keywords:
+        if spires:
+            output.append(spires_label(subject))
         else:
-            cloud_list.append([tag,9,color])
+            output.append(_SKWS[subject].concept)
 
-    cloud_list.sort()
-    for i in range(0, len(cloud_list)):
-        cloud += '<span class=\"level%s\" ' % cloud_list[i][1]
-        if int(cloud_list[i][2]) > 0:
-            cloud += 'style="color:red" '
-        cloud += '><a href=""> %s </a></span>' % cloud_list[i][0]
-    cloud += '</div></tr>'
+    for subject, count, components in composite_keywords:
+        if spires:
+            output.append(spires_label(subject))
+        else:
+            output.append(_CKWS[subject].concept)
 
-    ret += cloud + '\n'
-    ret += "</table></body>\n"
-    ret += "</html>\n"
+    return "".join([marc_pattern % keyword for keyword in output])
 
-    return ret
+def output_text(single_keywords=None, composite_keywords=None,
+                explicit_keywords=None, spires=False):
+    """Outputs the results obtained in text format."""
+    output = []
 
+    if explicit_keywords is not None:
+        output.append("\n\nExplicit keywords:")
+        for keyword in explicit_keywords:
+            output.append(keyword)
 
-def makeCompPattern(candidates, modes):
-    """Takes a set of two composite keywords (candidates) and compiles a REGEX expression around it, according to the chosen modes for each one:
-        - 0 : plain case-insensitive search
-        - 1 : plain case-sensitive search
-        - 2 : hyphen
-        - 3 : wildcard"""
-
-    begREGEX = '(?:[^A-Za-z0-9\+-])('
-    endREGEX = ')(?=[^A-Za-z0-9\+-])'
-
-    pattern_text = []
-    patterns = []
-
-    for i in range(2):
-
-        if modes[i] == 0:
-            pattern_text.append(str(re.escape(candidates[i]) + 's?'))
-
-        if modes[i] == 1:
-            pattern_text.append(str(re.escape(candidates[i])))
-
-        if modes[i] == 2:
-            hyphen = True
-            parts = candidates[i].split("-")
-            pattern_string = ""
-            for part in parts:
-                if len(part)<1 or part.find(" ", 0, 1)> -1:
-                    # This is not really a hyphen, maybe a minus sign: treat as isupper().
-                    hyphen = False
-                pattern_string = pattern_string + re.escape(part) + "[- \t]?"
-            if hyphen:
-                pattern_text.append(pattern_string)
+    if composite_keywords is not None:
+        output.append("\n\nComposite keywords:")
+        # TODO integrate this in get_composite_keywords
+        for subject, count, components in composite_keywords:
+            if spires:
+                concept = spires_label(subject)
             else:
-                pattern_text.append(re.escape(candidates[i]))
+                concept = _CKWS[subject].concept
+            output.append("%d  %s %s" % (count, concept, components))
 
-        if modes[i] == 3:
-            pattern_text.append(candidates[i].replace("/",""))
-
-    pattern_one = re.compile(begREGEX + pattern_text[0] + "s?[ \s,-]*" + pattern_text[1] + endREGEX, re.I)
-    pattern_two = re.compile(begREGEX + pattern_text[1] + "s?[ \s,-]*" + pattern_text[0] + endREGEX, re.I)
-
-    patterns.append(pattern_one)
-    patterns.append(pattern_two)
-
-    return patterns
-
-
-def makePattern(candidate, mode):
-    """Takes a keyword (candidate) and compiles a REGEX expression around it, according to the chosen mode:
-        - 0 : plain case-insensitive search
-        - 1 : plain case-sensitive search
-        - 2 : hyphen
-        - 3 : wildcard"""
-
-    # NB. At the moment, some patterns are compiled having an optional trailing "s".
-    #     This is a very basic method to find plurals in English.
-    #     If this program is to be used in other languages, please remove the "s?" from the REGEX
-    #     Also, inclusion of plurals at the ontology level would be preferred.
-
-    begREGEX = '(?:[^A-Za-z0-9\+-])('
-    endREGEX = ')(?=[^A-Za-z0-9\+-])'
-    try:
-        if mode == 0:
-            pattern = re.compile(begREGEX + re.escape(candidate) + 's?' + endREGEX, re.I)
-
-        if mode == 1:
-            pattern = re.compile(begREGEX + re.escape(candidate) + endREGEX)
-
-        if mode == 2:
-            hyphen = True
-            parts = candidate.split("-")
-            pattern_string = begREGEX
-            for part in parts:
-                if len(part)<1 or part.find(" ", 0, 1)> -1:
-                    # This is not really a hyphen, maybe a minus sign: treat as isupper().
-                    hyphen = False
-                pattern_string = pattern_string + re.escape(part) + "[- \t]?"
-            pattern_string += endREGEX
-            if hyphen:
-                pattern = re.compile(pattern_string, re.I)
+    if single_keywords is not None:
+        output.append("\n\nSingle keywords:")
+        for subject, spans in single_keywords:
+            if spires:
+                concept = spires_label(subject)
             else:
-                pattern = re.compile(begREGEX + re.escape(candidate) + endREGEX, re.I)
+                concept = _SKWS[subject].concept
+            output.append("%d  %s" % (len(spans), concept))
 
-        if mode == 3:
-            pattern = re.compile(begREGEX + candidate.replace("/","") + endREGEX, re.I)
+    return "\n".join(output) + "\n"
 
-    except:
-        print "Invalid thesaurus term: " + re.escape(candidate) + "<br />"
+def perform_ontology_check(store):
+    """Checks the consistency of the ontology and outputs a list of
+    errors and warnings."""
+    prefLabel = "prefLabel"
+    hiddenLabel = "hiddenLabel"
+    altLabel = "altLabel"
+    composite = "composite"
+    compositeOf = "compositeOf"
+    note = "note"
 
-    return pattern
+    both_skw_and_ckw = []
 
+    # Build a dictionary we will reason on later.
+    uniq_subjects = {}
+    for subject in store.subjects():
+        uniq_subjects[subject] = None
 
+    subjects = {}
+    for subject in uniq_subjects:
+        strsubject = str(subject).split("#Composite.")[-1]
+        strsubject = strsubject.split("#")[-1]
+        if (strsubject == "http://cern.ch/thesauri/HEPontology.rdf" or
+            strsubject == "compositeOf"):
+            continue
+        components = {}
+        for predicate, value in store.predicate_objects(subject):
+            strpredicate = str(predicate).split("#")[-1]
+            strobject = str(value).split("#Composite.")[-1]
+            strobject = strobject.split("#")[-1]
+            components.setdefault(strpredicate, []).append(strobject)
+        if strsubject in subjects:
+            both_skw_and_ckw.append(strsubject)
+        else:
+            subjects[strsubject] = components
 
-def profile(t="", d=""):
-    import profile
-    import pstats
-    profile.run("generate_keywords_rdf(textfile='%s',dictfile='%s')" % (t, d), "bibclassify_profile")
-    p = pstats.Stats("bibclassify_profile")
-    p.strip_dirs().sort_stats("cumulative").print_stats()
-    return 0
+    print "Ontology contains %s concepts." % len(subjects)
 
-def main():
-    """Main function """
+    no_prefLabel = []
+    multiple_prefLabels = []
+    multiple_notes = []
+    bad_notes = []
+    # Subjects with no composite or compositeOf predicate
+    lonely = []
+    both_composites = []
+    bad_hidden_labels = {}
+    bad_alt_labels = {}
+    # Problems with composite keywords
+    composite_problem1 = []
+    composite_problem2 = []
+    composite_problem3 = []
+    composite_problem4 = {}
+    composite_problem5 = []
+    composite_problem6 = []
 
-    global options
-    long_flags =["file=",
-                 "thesaurus=","ontology=",
-                 "output=","limit=", "nkeywords=", "mode=",
-                 "spires", "help", "version"]
-    short_flags ="f:k:K:o:l:n:m:qhVv:"
-    spires = False
-    limit = 70
-    nkeywords = 25
-    input_file = ""
-    dict_file = ""
-    output = 0
-    mode = 0
-    verbose = 0
+    stemming_collisions = []
+    interconcept_collisions = {}
 
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], short_flags, long_flags)
-    except getopt.GetoptError, err:
-        write_message(err, sys.stderr)
-        usage(1)
-    if args:
-        usage(1)
+    for subject, predicates in subjects.iteritems():
+        # No prefLabel or multiple prefLabels
+        try:
+            if len(predicates[prefLabel]) > 1:
+                multiple_prefLabels.append(subject)
+        except KeyError:
+            no_prefLabel.append(subject)
 
-    try:
-        from invenio.config import CFG_TMPDIR, CFG_PATH_PDFTOTEXT, CFG_VERSION
-        version_bibclassify = 0.1
-        bibclassify_engine_version = "CDS Invenio/%s bibclassify/%s" % (CFG_VERSION, version_bibclassify)
+        # Lonely and both composites.
+        if not composite in predicates and not compositeOf in predicates:
+            lonely.append(subject)
+        elif composite in predicates and compositeOf in predicates:
+            both_composites.append(subject)
 
-    except:
-        CFG_TMPDIR = TMPDIR_STANDALONE
-        CFG_PATH_PDFTOTEXT = PDFTOTEXT_STANDALONE
+        # Multiple or bad notes
+        if note in predicates:
+            if len(predicates[note]) > 1:
+                multiple_notes.append(subject)
+            for n in predicates[note]:
+                if n != "nostandalone":
+                    bad_notes.append((subject, n))
 
-    temp_text = CFG_TMPDIR + '/bibclassify.pdftotext.' + str(os.getpid())
+        # Bad hidden labels
+        if hiddenLabel in predicates:
+            for lbl in predicates[hiddenLabel]:
+                if (lbl[0] == "/") ^ (lbl[-1] == "/"):
+                    bad_hidden_labels.setdefault(subject, []).append(lbl)
 
-    try:
-        for opt in opts:
+        # Bad alt labels
+        if altLabel in predicates:
+            for lbl in predicates[altLabel]:
+                if len(re.findall("/", lbl)) >= 2 or ":" in lbl:
+                    bad_alt_labels.setdefault(subject, []).append(lbl)
 
-            if opt == ("-h","")  or opt == ("--help",""):
-                usage(1)
-            elif opt == ("-V","")  or opt == ("--version",""):
-                print bibclassify_engine_version
-                sys.exit(1)
-            elif opt[0] in [ "-v", "--verbose" ]:
-                verbose = opt[1]
-            elif opt[0] in [ "-f", "--file" ]:
-                if opt[1].find(".pdf")>-1:
-                    # Treat as PDF
-                    cmd = "%s " % CFG_PATH_PDFTOTEXT + opt[1] + " " + temp_text
-                    errcode = os.system(cmd)
-                    if errcode == 0 and os.path.exists("%s" % temp_text):
-                        input_file = temp_text
+        # Check composite
+        if composite in predicates:
+            for ckw in predicates[composite]:
+                if ckw in subjects:
+                    if compositeOf in subjects[ckw]:
+                        if not subject in subjects[ckw][compositeOf]:
+                            composite_problem3.append((subject, ckw))
                     else:
-                        print "Error while running %s.\n" % cmd
-                        sys.exit(1)
+                        if not ckw in both_skw_and_ckw:
+                            composite_problem2.append((subject, ckw))
                 else:
-                    # Treat as text
-                    input_file = opt[1]
+                    composite_problem1.append((subject, ckw))
 
-            elif opt[0] in [ "-k", "--thesaurus" ]:
-                if dict_file=="":
-                    dict_file = opt[1]
+        # Check compositeOf
+        if compositeOf in predicates:
+            for skw in predicates[compositeOf]:
+                if skw in subjects:
+                    if composite in subjects[skw]:
+                        if not subject in subjects[skw][composite]:
+                            composite_problem6.append((subject, skw))
+                    else:
+                        if not skw in both_skw_and_ckw:
+                            composite_problem5.append((subject, skw))
                 else:
-                    print "Either a text thesaurus or an ontology (in .rdf format)"
-                    sys.exit(1)
+                    composite_problem4.setdefault(skw, []).append(subject)
 
-            elif opt[0] in [ "-K", "--taxonomy" ]:
-                if dict_file=="" and opt[1].find(".rdf")!=-1:
-                    dict_file = opt[1]
+        # Check for stemmed labels
+        if compositeOf in predicates:
+            labels = (altLabel, hiddenLabel)
+        else:
+            labels = (prefLabel, altLabel, hiddenLabel)
+
+        patterns = {}
+        for label in [lbl for lbl in labels if lbl in predicates]:
+            for expression in [expr for expr in predicates[label]
+                                    if not is_regex(expr)]:
+                pattern = get_regex_pattern(expression)
+                interconcept_collisions.setdefault(pattern,
+                    []).append((subject, label))
+                if pattern in patterns:
+                    stemming_collisions.append((subject,
+                        patterns[pattern],
+                        (label, expression)
+                        ))
                 else:
-                    print "Either a text thesaurus or an ontology (in .rdf format)"
-                    sys.exit(1)
+                    patterns[pattern] = (label, expression)
 
-            elif opt[0] in [ "-o", "--output" ]:
-                try:
-                    if str(opt[1]).lower().strip() == "html":
-                        output = 1
-                    elif str(opt[1]).lower().strip() == "text":
-                        output = 0
-                    elif str(opt[1]).lower().strip() == "marcxml":
-                        output = 2
-                    else:
-                        write_message('Output mode (-o) can only be "HTML", "TEXT", or "MARCXML". Using default output mode (HTML)')
-                except:
-                    write_message('Output mode (-o) can only be "HTML", "TEXT", or "MARCXML". Using default output mode (HTML)')
+    print "\n==== ERRORS ===="
 
-            elif opt[0] in [ "-m", "--mode" ]:
-                try:
-                    if str(opt[1]).lower().strip() == "partial":
-                        mode = 1
-                    elif str(opt[1]).lower().strip() == "full":
-                        mode = 0
-                    else:
-                        write_message('Processing mode (-m) can only be "PARTIAL" or "FULL". Using default output mode (FULL)')
-                except:
-                    write_message('Processing mode (-m) can only be "PARTIAL" or "FULL". Using default output mode (FULL)')
+    if no_prefLabel:
+        print "\nConcepts with no prefLabel: %d" % len(no_prefLabel)
+        print "\n".join("   %s" % subj1 for subj1 in no_prefLabel)
+    if multiple_prefLabels:
+        print ("\nConcepts with multiple prefLabels: %d" %
+            len(multiple_prefLabels))
+        print "\n".join("   %s" % subj2 for subj2 in multiple_prefLabels)
+    if both_composites:
+        print ("\nConcepts with both composite properties: %d" %
+            len(both_composites))
+        print "\n".join("   %s" % subj3 for subj3 in both_composites)
+    if bad_hidden_labels:
+        print "\nConcepts with bad hidden labels: %d" % len(bad_hidden_labels)
+        for kw, lbls in bad_hidden_labels.iteritems():
+            print "   %s:" % kw
+            print "\n".join("      '%s'" % lbl1 for lbl1 in lbls)
+    if bad_alt_labels:
+        print "\nConcepts with bad alt labels: %d" % len(bad_alt_labels)
+        for kw, lbls in bad_alt_labels.iteritems():
+            print "   %s:" % kw
+            print "\n".join("      '%s'" % lbl2 for lbl2 in lbls)
+    if both_skw_and_ckw:
+        print ("\nKeywords that are both skw and ckw: %d" %
+            len(both_skw_and_ckw))
+        print "\n".join("   %s" % subj4 for subj4 in both_skw_and_ckw)
 
-            elif opt[0] in [ "-q", "--spires" ]:
-                spires = True
+    print
 
-            elif opt[0] in [ "-l", "--limit" ]:
-                try:
-                    num = int(opt[1])
-                    if num>1:
-                        limit = num
-                    else:
-                        write_message("Number of keywords for processing (--limit) must be an integer higher than 1. Using default value of 70...")
+    if composite_problem1:
+        print "\n".join("SKW '%s' references an unexisting CKW '%s'." %
+            (skw, ckw) for skw, ckw in composite_problem1)
+    if composite_problem2:
+        print "\n".join("SKW '%s' references a SKW '%s'." %
+            (skw, ckw) for skw, ckw in composite_problem2)
+    if composite_problem3:
+        print "\n".join("SKW '%s' is not composite of CKW '%s'." %
+            (skw, ckw) for skw, ckw in composite_problem3)
+    if composite_problem4:
+        for skw, ckws in composite_problem4.iteritems():
+            print "SKW '%s' does not exist but is " "referenced by:" % skw
+            print "\n".join("    %s" % ckw for ckw in ckws)
+    if composite_problem5:
+        print "\n".join("CKW '%s' references a CKW '%s'." % kw
+            for kw in composite_problem5)
+    if composite_problem6:
+        print "\n".join("CKW '%s' is not composed by SKW '%s'." % kw
+            for kw in composite_problem6)
 
-                except ValueError:
-                    write_message("Number of keywords for processing (-n) must be an integer. Using default value of 70...")
+    print "\n==== WARNINGS ===="
 
-            elif opt[0] in [ "-n", "--nkeywords" ]:
-                try:
-                    num = int(opt[1])
-                    if num>1:
-                        nkeywords = num
-                    else:
-                        write_message("Number of keywords (--nkeywords) must be an integer higher than 1. Using default value of 25...")
+    if multiple_notes:
+        print "\nConcepts with multiple notes: %d" % len(multiple_notes)
+        print "\n".join("   %s" % subj for subj in multiple_notes)
+    if bad_notes:
+        print ("\nConcepts with bad notes: %d" % len(bad_notes))
+        print "\n".join("   '%s': '%s'" % note for note in bad_notes)
+    if stemming_collisions:
+        print ("\nFollowing keywords have unnecessary labels that have "
+            "already been generated by BibClassify.")
+        for subj in stemming_collisions:
+            print "   %s:\n     %s\n     and %s" % subj
 
-                except ValueError:
-                    write_message("Number of keywords (--n) must be an integer. Using default value of 25...")
+    print "\nFinished."
+    sys.exit(0)
 
-    except StandardError, e:
-        write_message(e, sys.stderr)
+def filter_nostandalone(keywords):
+    """Returns a copy of the keywords data structure stripped from its
+    nonstandalone components."""
+    filtered_keywords = {}
+
+    for subject, spans in keywords.iteritems():
+        if not _SKWS[subject].nostandalone:
+            filtered_keywords[subject] = spans
+
+    return filtered_keywords
+
+def compare_skw(skw0, skw1):
+    """Compare 2 single keywords records. First compare the
+    occurrences, then the length of the word."""
+    list_comparison = cmp(len(skw1[1]), len(skw0[1]))
+    if list_comparison:
+        return list_comparison
+    else:
+        return cmp(len(skw1[0]), len(skw0[0]))
+
+def compare_ckw(ckw0, ckw1):
+    """Compare 2 composite keywords records. First compare the
+    occurrences, then the length of the word, at last the component
+    counts."""
+    count_comparison = cmp(ckw1[1], ckw0[1])
+    if count_comparison:
+        return count_comparison
+    component_avg0 = sum(ckw0[2]) / len(ckw0[2])
+    component_avg1 = sum(ckw1[2]) / len(ckw1[2])
+    component_comparison =  cmp(component_avg1, component_avg0)
+    if component_comparison:
+        return component_comparison
+    else:
+        return cmp(len(ckw1[0]), len(ckw0[0]))
+
+def resize_keywords_for_output(keywords, limit=20, single=False,
+                               composite=False):
+    """Returns a resized version of data structures of keywords to the
+    given length.  This method takes care of the 'nonstandalone' option
+    of the keywords. The single keywords with this option set are
+    removed from the dictionary."""
+    if not (single ^ composite):
+        print >> sys.stderr, "Problem in resize_keywords_for_output."
         sys.exit(1)
 
-    if input_file == "" or dict_file == "":
-        write_message("Need to enter the name of an input file AND a thesaurus file \n")
-        usage(1)
+    if single:
+        keywords = list(keywords.items())
+        keywords.sort(compare_skw)
+    elif composite:
+        keywords.sort(compare_ckw)
 
-    # Weak method to detect dict_file. Need to improve this (e.g. by looking inside the metadata with rdflib?)
-    if dict_file.find(".rdf")!=-1:
-        outcome = generate_keywords_rdf(input_file, dict_file, output, limit, nkeywords, mode, spires, verbose, dict_file)
-    else: # Treat as text
-        outcome = generate_keywords(input_file, dict_file, verbose)
+    if limit:
+        return keywords[:limit]
+    else:
+        return keywords
 
-    # Print the results
-    print outcome
+def spires_label(subject):
+    """Returns the SPIRES representation of a keyword. If the
+    spiresLabel is set, then it returns that value otherwise it replaces
+    the colon in the prefLabel by a comma."""
+    try:
+        if subject in _SKWS:
+            return _SKWS[subject].spires
+    except AttributeError:
+        # The keyword doesn't have a SPIRES label.
+        return _SKWS[subject].concept
 
-    return
+    try:
+        return _CKWS[subject].spires
+    except AttributeError:
+        # The keyword doesn't have a SPIRES label. Build "comp1, comp2".
+        components = _CKWS[subject].compositeof
+        spires_labels = [spires_label(component) for component in components]
+        return ", ".join(spires_labels)
 
-if __name__ == '__main__':
-    main()
-
-
+if __name__ == "__main__":
+    print >> sys.stderr, "Please use bibclassifycli from now on."
