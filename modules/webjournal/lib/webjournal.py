@@ -212,7 +212,7 @@ def perform_request_popup(req, ln, journal_name, record):
         try:
             popup_page_template = config_strings["popup"][0]
         except:
-            raise InvenioWebJournalNoPopupTemplateError(ln)
+            raise InvenioWebJournalNoPopupTemplateError(ln, journal_name)
     except InvenioWebJournalNoPopupTemplateError, e:
         register_exception(req=req)
         return e.user_box()
