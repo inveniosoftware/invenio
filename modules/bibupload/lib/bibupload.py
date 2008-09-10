@@ -296,7 +296,8 @@ def bibupload(record, opt_tag=None, opt_mode=None,
 
         # Have a look if we have FFT tags
         write_message("Stage 2B: Start (Synchronize 8564 tags).", verbose=2)
-        if opt_stage_to_start_from <= 2 and (record_had_FFT or extract_tag_from_record(record, '856') is not None):
+        has_bibdocs = run_sql("SELECT count(id_bibdoc) FROM bibrec_bibdoc JOIN bibdoc ON id_bibdoc=id WHERE id_bibrec=%s AND status<>'DELETED'", (rec_id, ))[0][0] > 0
+        if opt_stage_to_start_from <= 2 and (has_bibdocs or record_had_FFT or extract_tag_from_record(record, '856') is not None):
             try:
                 record = synchronize_8564(rec_id, record, record_had_FFT)
             except Exception, e:
