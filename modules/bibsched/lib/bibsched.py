@@ -851,6 +851,8 @@ class BibSched:
             if _refresh_tasks:
                 ## Some tasks have finished. Better refresh things...
                 return True
+            if priority < 0:
+                return False
             if res:
                 ## All bibupload must finish before.
                 for (atask_id, astatus) in res:
