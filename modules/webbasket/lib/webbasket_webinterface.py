@@ -52,7 +52,8 @@ from invenio.webbasket import \
      delete_record, \
      move_record, \
      perform_request_add, \
-     perform_request_create_basket
+     perform_request_create_basket, \
+     perform_request_delete
 from invenio.webbasket_config import CFG_WEBBASKET_CATEGORIES, \
                                      CFG_WEBBASKET_ACTIONS, \
                                      CFG_WEBBASKET_SHARE_LEVELS
