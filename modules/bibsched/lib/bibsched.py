@@ -794,7 +794,7 @@ class BibSched:
             if to_stop:
                 return to_stop, {}
             else:
-                {min_task_id : (min_proc, min_prio)}
+                return {}, {min_task_id : (min_proc, min_prio)}
 
     def get_running_tasks(self, task_status):
         running_tasks = {}
