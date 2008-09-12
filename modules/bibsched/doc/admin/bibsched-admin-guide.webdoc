@@ -116,16 +116,16 @@ selecting you're given different actions.</p>
 <h2>Bibsched command line interface</h2>
 <pre>
     Usage: /soft/cdsweb/bin/bibsched [options] [start|stop|restart|monitor|status]
-
+    
     The following commands are available for bibsched:
-
+    
     start      start bibsched in background
     stop       stop a running bibsched
     restart    restart a running bibsched
     monitor    enter the interactive monitor
     status     get report about current status of the queue
     purge      purge the scheduler queue from old tasks
-
+    
     Command options:
     -d, --daemon           Launch BibSched in the daemon mode (deprecated, use 'start')
     General options:
