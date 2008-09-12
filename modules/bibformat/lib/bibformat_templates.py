@@ -1871,7 +1871,7 @@ class Template:
         @param kb_name the name of the kb
         @param content a list of dictionaries with mappings
         @param sortby the sorting criteria ('from' or 'to')
-        @startat start showing the mappings from number x. Usefull for large kb's.
+        @param startat start showing the mappings from number x. Usefull for large kb's.
         @kb_type None or 't' meaning taxonomy. If taxonomy, show 'broader term/narrower term' instead of map from/to
         @return main management console as html
         """
