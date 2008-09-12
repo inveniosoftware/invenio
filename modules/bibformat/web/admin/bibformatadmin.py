@@ -1142,7 +1142,7 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG
         if kb_type == 't':
             forcetype="curr"
 
-        if forcetype and not forcetype=="no":
+        if forcetype and not forcetype == "no":
             pass
         else:
             if len(left_sides) > 0:
@@ -1161,9 +1161,9 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=config.CFG_SITE_LANG
                         lastupdated=__lastupdated__,
                         req=req)
 
-        if forcetype=="curr":
+        if forcetype == "curr":
             bibformatadminlib.add_kb_mapping(kb_name, key, value)
-        if forcetype=="all":
+        if forcetype == "all":
             #a bit tricky.. remove the rules given in param replacement and add the current
             #rule in the same kb's
             if replacements:
@@ -1307,70 +1307,44 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def kb_export(req, ln=config.CFG_SITE_LANG):
+def kb_export(req, kbname="", format="", ln=config.CFG_SITE_LANG):
     """
-    Exports the knowledge bases into text files.
+    Exports the given kb so that it is listed in stdout (the browser).
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
     webdir = config.CFG_WEBDIR
     names = ""
     errors = ""
-    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
-    if auth_code:
-	#return "not authorized"
-        navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.CFG_SITE_URL, ln, _("Manage Knowledge Bases")))
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.CFG_SITE_URL, ln, _("Manage Knowledge Bases")))
+    if not kbname:
+        return page(title=_("Knowledge base name missing"),
+                    body = """Required parameter kbname
+                              is missing.""",
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
 
-        return page_not_authorized(req=req,
-                                   text=auth_msg,
-                                   navtrail=navtrail_previous_links)
+    #in order to make 'wget' downloads easy we do not require authorization
+    #get the kb and print it
+    mappings = bibformat_dblayer.get_kb_mappings(kbname)
+    if not mappings:
+        return page(title=_("No such knowledge base"),
+                    body = "There is no knowledge base named "+kbname+" or it is empty",
+                    language=ln,
+                    navtrail = navtrail_previous_links,
+                    lastupdated=__lastupdated__,
+                    req=req)
+
     else:
-        #first create a export/kb directory ..
-        exportsubdir = "/export/kb"
-        exportdir = webdir+exportsubdir
-        if os.path.isfile(exportdir):
-            raise OSError("Cannot create directory "+exportdir+" since a file with the same name exists.")
-        if os.path.isdir(exportdir):
-            pass
-        else:
-            #create it..
-            os.makedirs(exportdir)
-
-        kbs = bibformat_dblayer.get_kbs()
-        for kb in kbs:
-            name = kb['name']
-            #make this a filename
-            fname = name
-            #sanitize
-            fname = re.sub('\s','_',fname)
-            fname = fname.replace('*','_')
-            fname = fname.replace('\\','_')
-            fname = fname.replace('&','_')
-            fname = fname.replace('.','_')
-            fname = fname.replace('/','_')
-            fname = fname+".kb"
-            #and name for URL to access it..
-            urlname=config.CFG_SITE_URL+exportsubdir+"/"+fname
-            #ok, filename
-            fname = exportdir+"/"+fname
-            try:
-                f = open(fname,"w")
-                mappings = bibformat_dblayer.get_kb_mappings(name)
-                for m in mappings:
-                    mkey = m['key']
-                    mvalue = m['value']
-                    f.write(mkey+"---"+mvalue+"\n")
-                f.close()
-                names = names+"<br/>"+urlname
-            except:
-                errors = errors+"<br/>"+name
-        message = "Exports OK <br/>"+names
-        if errors:
-            message = message+"<br/>Not exported :"+errors
-        return dialog_box(req=req, ln=ln,
-               title="Knowledge Bases",
-	       message=message)
-
+        for m in mappings:
+            mkey = m['key']
+            mvalue = m['value']
+            if format == "right" or format == "kba":
+                req.write(mvalue+"\n")
+            else:
+                req.write(mkey+"---"+mvalue+"\n")
 
 def kb_add(req, ln=config.CFG_SITE_LANG, sortby="to", kbtype=""):
     """
