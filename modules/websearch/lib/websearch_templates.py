@@ -1705,9 +1705,17 @@ class Template:
                                                                {},
                                                                cgi.escape(phrase))}
 
+            # now display last hit as "previous term":
+            phrase, nbhits = browsed_phrases_in_colls[0]
+            query_previous = {'c': colls,
+                     'ln': ln,
+                     'p': phrase,
+                     'f': f,
+                     'rg' : rg}
+
             # now display last hit as "next term":
             phrase, nbhits = browsed_phrases_in_colls[-1]
-            query = {'c': colls,
+            query_next = {'c': colls,
                      'ln': ln,
                      'p': phrase,
                      'f': f,
@@ -1717,10 +1725,13 @@ class Template:
                             &nbsp;
                           </td>
                           <td class="normal">
+                            %(link_previous)s
+                            <img src="%(siteurl)s/img/sp.gif" alt="" border="0" />
                             <img src="%(siteurl)s/img/sn.gif" alt="" border="0" />
-                            %(link)s
+                            %(link_next)s
                           </td>
-                      </tr>""" % {'link': create_html_link(self.build_search_url(query, action='browse'),
+                      </tr>""" % {'link_previous': create_html_link(self.build_search_url(query_previous, action='browse'), {}, _("Previous")),
+                      'link_next': create_html_link(self.build_search_url(query_next, action='browse'),
                                                            {}, _("next")),
                                   'siteurl' : CFG_SITE_URL}
         out += """</tbody>

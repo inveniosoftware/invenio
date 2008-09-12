@@ -1543,12 +1543,13 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
 
     p_orig = p
     ## okay, "real browse" follows:
-    browsed_phrases = get_nearest_terms_in_bibxxx(p, f, rg, 1)
+    ## FIXME: the maths in the get_nearest_terms_in_bibxxx is just a test
+    browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
     while not browsed_phrases:
         # try again and again with shorter and shorter pattern:
         try:
             p = p[:-1]
-            browsed_phrases = get_nearest_terms_in_bibxxx(p, f, rg, 1)
+            browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
         except:
             # probably there are no hits at all:
             req.write(_("No values found."))
@@ -1578,7 +1579,7 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
     ## display results now:
     out = websearch_templates.tmpl_browse_pattern(
             f=f,
-            fn=get_field_i18nname(f, ln),
+            fn=get_field_i18nname(get_field_name(f), ln),
             ln=ln,
             browsed_phrases_in_colls=browsed_phrases_in_colls,
             colls=colls,
@@ -2158,11 +2159,11 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
     if t == 'w':
         nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)
         if not nearest_terms:
-            return "%s %s." % (_("No words index available for"), get_field_i18nname(f, ln))
+            return "%s %s." % (_("No words index available for"), get_field_i18nname(get_field_name(f), ln))
     else:
         nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
         if not nearest_terms:
-            return "%s %s." % (_("No phrase index available for"), get_field_i18nname(f, ln))
+            return "%s %s." % (_("No phrase index available for"), get_field_i18nname(get_field_name(f), ln))
 
     terminfo = []
     for term in nearest_terms:
@@ -2196,7 +2197,7 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
         if f:
             intro = _("Search term %(x_term)s inside index %(x_index)s did not match any record. Nearest terms in any collection are:") % \
                      {'x_term': "<em>" + cgi.escape(p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>",
-                      'x_index': "<em>" + cgi.escape(get_field_i18nname(f, ln)) + "</em>"}
+                      'x_index': "<em>" + cgi.escape(get_field_i18nname(get_field_name(f), ln)) + "</em>"}
         else:
             intro = _("Search term %s did not match any record. Nearest terms in any collection are:") % \
                      ("<em>" + cgi.escape(p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>")
@@ -2433,6 +2434,15 @@ def get_fieldcodes():
     for row in res:
         out.append(row[0])
     return out
+
+def get_field_name(code):
+    """Return the corresponding field_name given the field code.
+    e.g. reportnumber -> report number."""
+    res = run_sql("SELECT name FROM field WHERE code=%s", (code, ))
+    if res:
+        return res[0][0]
+    else:
+        return ""
 
 def get_field_tags(field):
     """Returns a list of MARC tags for the field code 'field'.
