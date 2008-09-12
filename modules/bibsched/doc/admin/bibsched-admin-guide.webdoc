@@ -22,25 +22,6 @@
 <!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/admin<lang:link/>">_(Admin Area)_</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
-   <p><table class="errorbox">
-   <thead>
-   <tr>
-   <th class="errorboxheader">
-     WARNING: THIS ADMIN GUIDE IS NOT FULLY COMPLETED
-   </th>
-   </tr>
-   </thead>
-   <tbody>
-   <tr>
-   <td class="errorboxbody">
-     This Admin Guide is not yet completed.  If you are interested
-     in seeing some specific things implemented with high priority,
-     please contact us at <CFG_SITE_SUPPORT_EMAIL>.  Thanks for your interest!
-   </td>
-   </tr>
-   </tbody>
-   </table>
-
 <h2>Overview</h2>
 
 <p>BibSched -- the bibliographic task scheduler -- is central unit of the
@@ -60,7 +41,122 @@ $ bibsched
 </pre>
 </blockquote>
 
-<p>The <code>bibsched</code> can run in two modes: auto and manual.  In
-the auto mode, it will execute tasks automatically as they arrive in
+<p>Note that in general you should run bibsched with the same rights of the
+Apache user of your system.</p>
+
+<p>The <code>bibsched</code> can run in two modes: <em>automatic</em> and <em>manual</em>.  In
+the automatic mode, it will execute tasks automatically as they arrive in
 the waiting queue.  In the manual mode, the administrator has to
 launch the tasks manually.</p>
+
+<h2>Bibsched graphical interface</h2>
+
+<p>bibsched interface is text mode graphical interface to display running tasks.
+It has three views, one for listing done tasks, one for scheduled/running/failed
+tasks and a third one for displaying archived tasks. You can switch among these
+three views by pressing respectively "<tt>1</tt>", "<tt>2</tt>" or "<tt>3</tt>".</p>
+
+<p>With the harrows you can move from one task to the other</p>
+
+<p>By pressing "<tt>O</tt>" you can see all the details of the selected task</p>
+
+<p>If the task is running or is already run, you can press "l" (lower case "<tt>l</tt>")
+to access the standard output produced by the task, if any. You can press "<tt>L</tt>"
+(upper case "<tt>L</tt>") to access the standard error produced by the task, if any.</p>
+
+<p>By pressing "<tt>P</tt>" you can clean the list of DONE tasks and archive/delete
+them.</p>
+
+<p>By pressing "<tt>Q</tt>" you can Quit the interface.</p>
+
+<p>By pressing "<tt>A</tt>" you can switch from Auto to Manual mode and viceversa.</p>
+
+<h3>Manual mode</h3>
+<p>In manual mode, depending on the status of the task you are currently
+selecting you're given different actions.</p>
+
+<p>You can press "<tt>R</tt>" for running Waiting tasks</p>
+
+<p>You can press "<tt>D</tt>" for deleting non running tasks</p>
+
+<p>You can press "<tt>N</tt>" for changing the priority of a waiting task. (the equivalent of the UNIX renice command)</p>
+
+<p>On a running task you can press "<tt>K</tt>" to kill the task immediately in case of emergency. "<tt>T</tt>" for stopping it cleanly. "<tt>S</tt>" for putting it temporarily to sleep. A sleeping task can be waken up by pressing "<tt>W</tt>". Note that for stopping or putting to sleep a task, a signal is sent to the given bibtask and this, in turn, will acknowledge it and decide to stop or go to sleep whenever it thinks it's safe.</p>
+
+<p>On a failed task you can press "<tt>K</tt>" the acknowledge the error. This is necessary in case you wish to put bibsched back to automatic mode.</p>
+
+<h3>Automatic mode</h3>
+<p>In automatic mode bibsched will take care of launching tasks based on their priority and runtime schedule. The available option are only those that allow you to query a given task (see the logs and the options).</p>
+
+<p>If you have configured bibsched to allow for the execution of concurrent bibtasks, bibsched will take care of launching compatible tasks concurrently (note that this feature is currently experimental). Bibupload tasks will always be executed in the chronological order (to preserve input consistency).</p>
+
+<h2>Bibsched maintenance</h2>
+<p>bibsched produce two log files. bibsched.log and bibsched.err, located under the usual log directory of your CDS Invenio installation. The former will contain all the actions (either automatic of manual) that bibsched has performed. The latter will contain all the exceptional errors.</p>
+
+<p>In case of a bibtask failing while bibsched is in automatic mode, bibsched will stop turning into manual mode, and sending an email to the administrator (and an emergency SMS in case it is configured to do so). Note that in case of failed bibtasks, bibsched will refuse to be put back to automatic mode, until either the task is reinitialized, or deleted or the error is acknowledged.</p>
+
+<h2>Priorities</h2>
+<p>A task can be scheduled with a given <em>priority</em>, represented by an integer number. When at a given time two or more tasks might be executed, the task with higher priority will be executed first.</p>
+
+<p>If this task as priority higher than 10 and there are currently other task running, conflicting with the execution of this task (because either the maximum number of task runnable is already reached or because the other tasks should not run concurrently with this task), then the other tasks are stopped.</p>
+
+<p>If the priority is less than 0 than the task will never be executed automatically.</p>
+
+<p>Bibupload tasks are not affected by priority with respect to each other and will always be executed in the proper order.</p>
+
+<h2>Task logging</h2>
+<p>When executed each tasks will produced (if necessary) a couple of log files. One called <tt>bibsched_task_{task_id}.log</tt> and the other <tt>bibsched_task_{task_id}.err</tt>. In case of reschedulable task, each time the task is rescheduled it is being assigned the same task_id. That means that log information of successive execution of the given task will be appended at the end of already existing log files.</p>
+
+<h2>Task concurrency</h2>
+<p>A recent experimental feature of bibsched is the concurrent execution of compatible tasks. The current definition of when two tasks are considered compatible is: "If a two tasks have the same name (e.g. bibupload) then they're incompatible."</p> <p>Sometimes you might want to consider compatible two tasks even when they have the same name. For this you can add a name specification via the bibtask command line option <tt>--task_specific_name</tt>. E.g. you might want to distinguish a generic bibupload from a bibupload carrying only preformatting information. For this just launch bibupload -N "bibformat", and it will be considered compatible with all the other bibuploads.</p>
+
+<h2>Configuration</h2>
+<p>Bibsched can be tweaked by adjusting some variables in the usual <tt>invenio(-local).conf</tt> file. Please refer to the documentation associated with each variable inside this file.</p>
+
+<h2>Bibsched command line interface</h2>
+<pre>
+    Usage: /soft/cdsweb/bin/bibsched [options] [start|stop|restart|monitor|status]
+
+    The following commands are available for bibsched:
+
+    start      start bibsched in background
+    stop       stop a running bibsched
+    restart    restart a running bibsched
+    monitor    enter the interactive monitor
+    status     get report about current status of the queue
+    purge      purge the scheduler queue from old tasks
+
+    Command options:
+    -d, --daemon           Launch BibSched in the daemon mode (deprecated, use 'start')
+    General options:
+    -h, --help             Print this help.
+    -V, --version          Print version information.
+    Status options:
+    -s, --status=LIST      Which BibTask status should be considered (default is Running,waiting)
+    -S, --since=TIME       Since how long time to consider tasks e.g.: 30m, 2h, 1d (default
+    is all)
+    -t, --tasks=LIST       Comma separated list of BibTask to consider (default
+    is all)
+    Purge options:
+    -s, --status=LIST      Which BibTask status should be considered (default is DONE)
+    -S, --since=TIME       Since how long time to consider tasks e.g.: 30m, 2h, 1d (default
+    is 30 days)
+    -t, --tasks=LIST       Comma separated list of BibTask to consider (default
+    is bibindex,bibreformat,webcoll,bibrank,inveniogc,bibupload,oaiarchive)
+</pre>
+
+<h2>Bibtasks command line interface</h2>
+<p>Each bibtask has a common command interface in addition to the proper bibtask related options.
+<pre>
+    Scheduling options:
+    -u, --user=USER       User name to submit the task as, password needed.
+    -t, --runtime=TIME    Time to execute the task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26
+    -s, --sleeptime=SLEEP Sleeping frequency after which to repeat task (no), e.g.: 30m, 2h, 1d
+    -P, --priority=PRIORITY       Priority level (an integer, 0 is default)
+    -N, --task_specific_name=TASK_SPECIFIC_NAME   Advanced option
+    General options:
+    -h, --help            Print this help.
+    -V, --version         Print version information.
+    -v, --verbose=LEVEL   Verbose level (0=min, 1=default, 9=max).
+</pre>
+</p>
