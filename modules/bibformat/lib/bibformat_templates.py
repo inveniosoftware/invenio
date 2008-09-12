@@ -1846,12 +1846,6 @@ class Template:
         '''
         out += '''
         <td align="left">
-        <form action="kb_export?ln=%(ln)s">
-        <input class="adminbutton" type="submit" value="Export to text files"/>
-        </form>
-        </td>
-
-        <td align="right">
         <form action="kb_add?ln=%(ln)s">
         <input class="adminbutton" type="submit" value="Add New Knowledge Base"/>
         </form>
@@ -2053,6 +2047,9 @@ class Template:
         </tr>
         </table>
         '''
+        #add a note about exporting
+        out += "<p>"+_("You can get a these mappings in textual format by: ")
+        out += CFG_SITE_URL+"/admin/bibformat/bibformatadmin.py/kb_export?kbname="+kb_name+"</p>"
 
         #add script that will put focus on first field of "add mapping" form
         out += '''
