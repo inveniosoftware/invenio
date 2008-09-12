@@ -19,7 +19,7 @@
 
 
 <!-- WebDoc-Page-Title: BibDocFile API -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> &gt;  <a class="navtrail" href="miscutil-internals">BibDocFile API</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
 <!-- WebDoc-Page-Navbar-Select: hacking-websubmit-bibdocfile -->
 
 <p>BibDocFile library handles every interaction relation between records and related fulltext document files.</p>
