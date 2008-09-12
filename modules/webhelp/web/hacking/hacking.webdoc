@@ -79,6 +79,9 @@ the taxonomy extensions we use, how the keyword extraction algorithm works.
 ranking methods available in bibrank works, and how they can
 be tweaked to give various output.</dd>
 
+<dt><a href="bibedit-internals">BibEdit Internals</a></dt>
+<dd>Describes information useful to manipulate single records.</dd>
+
 <dt><a href="miscutil-internals">MiscUtil Internals</a></dt>
 <dd>Describes information useful to understand what can be found inside the miscellaneous utilities
 module, like database access, error management, date handling library, etc.</dd>
