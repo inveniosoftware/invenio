@@ -211,7 +211,9 @@ def convert_word(word):
     if word.isupper():
         out = word + "s?"
     # Proper nouns or word with digits.
-    elif word.istitle() or _contains_digit.search(word):
+    elif word.istitle():
+        out = word + "('?s)?"
+    elif _contains_digit.search(word):
         out = word
 
     if out is not None:
@@ -555,7 +557,6 @@ def output_text(single_keywords=None, composite_keywords=None,
 
     if composite_keywords is not None:
         output.append("\n\nComposite keywords:")
-        # TODO integrate this in get_composite_keywords
         for subject, count, components in composite_keywords:
             if spires:
                 concept = spires_label(subject)
