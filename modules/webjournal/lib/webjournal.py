@@ -37,6 +37,7 @@ from invenio.webjournal_config import \
      InvenioWebJournalNoIssueNumberTagError, \
      InvenioWebJournalNoArticleTemplateError, \
      InvenioWebJournalNoArticleRuleError, \
+     InvenioWebJournalNoContactTemplateError, \
      InvenioWebJournalNoPopupTemplateError, \
      InvenioWebJournalNoSearchTemplateError
 from invenio.webjournal_utils import get_xml_from_config
@@ -202,6 +203,36 @@ def perform_request_article(req, journal_name, issue_number, ln,
                            recid, issue_number, ln)
 
     return html_out
+
+def perform_request_contact(req, ln, journal_name, verbose=0):
+    """
+    Display contact information
+    """
+    config_strings = get_xml_from_config(["contact"], journal_name)
+    try:
+        try:
+            contact_page_template = config_strings["contact"][0]
+        except:
+            raise InvenioWebJournalNoContactTemplateError(ln, journal_name)
+    except InvenioWebJournalNoContactTemplateError, e:
+        register_exception(req=req)
+        return e.user_box()
+
+    contact_page_template_path = 'webjournal/%s' % contact_page_template
+    user_info = collect_user_info(req)
+    temp_marc = '''<record>
+                       <controlfield tag="001">0</controlfield>
+                   </record>'''
+    bfo = BibFormatObject(0,
+                          ln=ln,
+                          xml_record=temp_marc,
+                          user_info=user_info)
+    bfo.req = req
+    html = format_with_format_template(contact_page_template_path,
+                                       bfo,
+                                       verbose)[0]
+
+    return html
 
 def perform_request_popup(req, ln, journal_name, record):
     """

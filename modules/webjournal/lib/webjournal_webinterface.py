@@ -59,6 +59,7 @@ from invenio.webjournal_washer import \
 from invenio.webjournal import \
      perform_request_index, \
      perform_request_article, \
+     perform_request_contact, \
      perform_request_popup, \
      perform_request_search
 
@@ -74,7 +75,7 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
     category = None
     article_id = None
 
-    _exports = ['popup', 'search']
+    _exports = ['popup', 'search', 'contact']
 
     def _lookup(self, component, path):
         """ This handler is invoked for the dynamic URLs """
@@ -235,6 +236,29 @@ class WebInterfaceJournalPages(WebInterfaceDirectory):
                                            article_id,
                                            editor,
                                            verbose=argd['verbose'])
+        return html
+
+    def contact(self, req, form):
+        """
+        Display contact information for the journal.
+        """
+        argd = wash_urlargd(form, {'name': (str, ""),
+                                   'ln': (str, ""),
+                                   'verbose': (int, 0)
+                                   })
+        try:
+            ln = wash_journal_language(argd['ln'])
+            journal_name = wash_journal_name(ln, argd['name'])
+        except InvenioWebJournalNoJournalOnServerError, e:
+            register_exception(req=req)
+            return e.user_box()
+        except InvenioWebJournalNoNameError, e:
+            register_exception(req=req)
+            return e.user_box()
+
+        html = perform_request_contact(req, ln, journal_name,
+                                      verbose=argd['verbose'])
+
         return html
 
     def popup(self, req, form):

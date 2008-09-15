@@ -854,9 +854,9 @@ def parse_url_string(uri):
                 args['journal_name'] = arg_and_value[1]
 
     arg_list = uri_middle_part.split("/")
-    if len(arg_list) > 1 and arg_list[1] != 'search':
+    if len(arg_list) > 1 and arg_list[1] not in ['search', 'contact']:
         args['journal_name'] = urllib.unquote(arg_list[1])
-    elif arg_list[1] != 'search':
+    elif arg_list[1] not in ['search', 'contact']:
         args['journal_name'] = guess_journal_name(args['ln'])
     if len(arg_list) > 2:
         args['issue_year'] = urllib.unquote(arg_list[2])

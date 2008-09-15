@@ -504,6 +504,7 @@ def perform_request_configure(journal_name, xml_config, action, ln=CFG_SITE_LANG
             <detailed>CERN_Bulletin_Detailed.bft</detailed>
             <search>CERN_Bulletin_Search.bft</search>
             <popup>CERN_Bulletin_Popup.bft</popup>
+            <contact>CERN_Bulletin_Contact.bft</contact>
         </format_template>
     </view>
 

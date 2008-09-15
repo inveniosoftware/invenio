@@ -63,12 +63,12 @@ class InvenioWebJournalNoIndexTemplateError(Exception):
         _('There is no format configured for this journals index page'),
         'Admin did not provide a template for the index page of journal: %s. \
         The path to such a file should be given in the config.xml of\
-        this journal under the tag <format_template><index>...\
-        </index></format_template>' % escape_html(self.journal))
+        this journal under the tag &lt;format_template>&lt;index>...\
+        &lt;/index>&lt;/format_template>' % cgi.escape(self.journal))
 
 class InvenioWebJournalNoArticleTemplateError(Exception):
     """
-    Exception if an article was called without its order number.
+    Exception if no article template is specified in the config.
     """
     def __init__(self, ln, journal_name):
         """
@@ -95,12 +95,12 @@ class InvenioWebJournalNoArticleTemplateError(Exception):
             _('There is no format configured for this journals index page'),
             'Admin did not provide a template for the index page of journal: %s. \
         The path to such a file should be given in the config.xml of\
-        this journal under the tag <format_template><index>...\
-        </index></format_template>' % escape_html(self.journal))
+        this journal under the tag &lt;format_template>&lt;index>...\
+        &lt;/index>&lt;/format_template>' % cgi.escape(self.journal))
 
 class InvenioWebJournalNoSearchTemplateError(Exception):
     """
-    Exception if an article was called without its order number.
+    Exception if no search template is specified in the config.
     """
     def __init__(self, journal_name, ln=CFG_SITE_LANG):
         """
@@ -127,12 +127,48 @@ class InvenioWebJournalNoSearchTemplateError(Exception):
             _('There is no format configured for this journals search page'),
             'Admin did not provide a template for the search page of journal: %s. \
         The path to such a file should be given in the config.xml of\
-        this journal under the tag <format_template><search>...\
-        </search></format_template>' % escape_html(self.journal))
+        this journal under the tag &lt;format_template>&lt;search>...\
+        &lt;/search>&lt;/format_template>' % cgi.escape(self.journal))
+
+
+class InvenioWebJournalNoContactTemplateError(Exception):
+    """
+    Exception if no contact template is specified in the config.
+    """
+    def __init__(self, ln, journal_name):
+        """
+        Initialisation.
+        """
+        self.journal = journal_name
+        self.ln = ln
+
+    def __str__(self):
+        """
+        String representation.
+        """
+        return 'Admin did not provide a template for the contact view page \
+        of journal: %s. \
+        The path to such a file should be given in the config.xml of this \
+        journal under the tag \
+        <format_template><contact>...</contact></format_template>' % repr(
+            self.journal)
+
+    def user_box(self):
+        """
+        user-friendly error message with formatting.
+        """
+        _ = gettext_set_language(self.ln)
+        return webjournal_templates.tmpl_webjournal_error_box(self.ln,
+        _('Internal configuration error'),
+        _('There is no format configured for this journals contact page'),
+        'Admin did not provide a template for the contact page of journal: %s. \
+        The path to such a file should be given in the config.xml of\
+        this journal under the tag &lt;format_template>&lt;contact>...\
+        &lt;/contact>&lt;/format_template>' % cgi.escape(self.journal))
 
 class InvenioWebJournalNoPopupTemplateError(Exception):
     """
-    Exception if an article was called without its order number.
+    Exception if no popup template is specified in the config.
     """
     def __init__(self, ln, journal_name):
         """
@@ -149,8 +185,7 @@ class InvenioWebJournalNoPopupTemplateError(Exception):
         of journal: %s. \
         The path to such a file should be given in the config.xml of this \
         journal under the tag \
-        <format_template><popup>...</popup></format_template>' % repr(
-            self.journal)
+        <format_template><popup>...</popup></format_template>' % repr(self.journal)
 
     def user_box(self):
         """
@@ -162,8 +197,8 @@ class InvenioWebJournalNoPopupTemplateError(Exception):
         _('There is no format configured for this journals popup page'),
         'Admin did not provide a template for the popup page of journal: %s. \
         The path to such a file should be given in the config.xml of\
-        this journal under the tag <format_template><popup>...\
-        </popup></format_template>' % escape_html(self.journal))
+        this journal under the tag &lt;format_template>&lt;popup>...\
+        &lt;/popup>&lt;/format_template>' % cgi.escape(self.journal))
 
 class InvenioWebJournalNoArticleRuleError(Exception):
     """
@@ -183,7 +218,7 @@ class InvenioWebJournalNoArticleRuleError(Exception):
         article rules. These rules are needed to associate collections from \
         your Invenio installation to navigable article types. A rule should \
         have the form of <rule>NameOfArticleType, \
-        marc_tag:ExpectedContentOfMarcTag' % escape_html(self.journal)
+        marc_tag:ExpectedContentOfMarcTag' % cgi.escape(self.journal)
 
     def user_box(self):
         """
@@ -221,7 +256,7 @@ class InvenioWebJournalNoIssueNumberTagError(Exception):
          to deduce the issue number from. WebJournal is an issue number based \
         system, meaning you have to give some form of numbering system in a \
         dedicated marc tag, so the system can see which is the active journal \
-        publication of the date.' % repr(self.journal)
+        publication of the date.' % cgi.escape(self.journal)
 
     def user_box(self):
         """
@@ -274,7 +309,7 @@ class InvenioWebJournalNoArticleNumberError(Exception):
               report this to the admin. If you got this link through some \
               external resource, e.g. an email, you can try to put in a number \
               for the article in the url by hand or just visit the front \
-              page at %s/journal/?name=%s' % (CFG_SITE_URL, self.journal))
+              page at %s/journal/?name=%s' % (CFG_SITE_URL, cgi.escape(self.journal)))
 
 class InvenioWebJournalNoJournalOnServerError(Exception):
     """
@@ -389,7 +424,7 @@ class InvenioWebJournalIssueNumberBadlyFormedError(Exception):
                     'The issue number you provided in the url seems to be badly\
                     formed. Issue numbers have to be in the form of ww/YYYY, so\
                     e.g. 50/2007. You provided the issue number like so: \
-                    %s.' % escape_html(self.issue))
+                    %s.' % cgi.escape(self.issue))
 
 class InvenioWebJournalArchiveDateWronglyFormedError (Exception):
     """
@@ -419,7 +454,7 @@ class InvenioWebJournalArchiveDateWronglyFormedError (Exception):
                     'The archive date you provided in the form seems to be badly\
                     formed. Archive dates have to be in the form of dd/mm/YYYY, so\
                     e.g. 02/12/2007. You provided the archive date like so: \
-                    %s.' % escape_html(self.date))
+                    %s.' % cgi.escape(self.date))
 
 class InvenioWebJournalNoPopupRecordError(Exception):
     """
