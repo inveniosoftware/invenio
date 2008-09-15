@@ -474,6 +474,32 @@ class BibRecDocs:
                 )
         return t
 
+    def fix_format(self, docname):
+        """Algorithm that fix a docname in case the list of recognized
+        extension is altered.
+        Return False if fixing wasn't necessary
+        """
+        ## First let's check if it is necessary
+        bibdoc = self.get_bibdoc(docname)
+        for filename in os.listdir(bibdoc.basedir):
+            if filename[0] != '.' and ';' in filename:
+                name, version = filename.split(';')
+                if file_strip_ext(name) != docname:
+                    ## We found at least a file to be fixed
+                    break
+        else:
+            return False
+        ## Something must be fixed
+        if file_strip_ext(docname) != docname:
+            ## the docname contains an extension that is now recognized
+            if file_strip_ext(docname) in self.get_bibdoc_names():
+                ## The correct docname already exist, hence
+                ## physical files with new recognized extensions
+                ## must be moved there
+                other_bibdoc = self.get_bibdoc(file_strip_ext(docname))
+                for afile in bibdoc.list_all_files():
+                    shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name))
+
     def fix(self, docname):
         """Algorithm that transform an a broken/old bibdoc into a coherent one:
         i.e. the corresponding folder will have files named after the bibdoc
@@ -1693,10 +1719,13 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
         if headers['unless-modified-since'] and headers['unless-modified-since'] < mtime:
             return normal_streaming(size)
         if headers['range']:
-            if headers['if-range']:
-                if etag is None or etag not in headers['if-range']:
-                    return normal_streaming(size)
-            ranges = fix_ranges(headers['range'], size)
+            try:
+                if headers['if-range']:
+                    if etag is None or etag not in headers['if-range']:
+                        return normal_streaming(size)
+                ranges = fix_ranges(headers['range'], size)
+            except:
+                return normal_streaming(size)
             if len(ranges) > 1:
                 return multiple_ranges(size, ranges, mime)
             elif ranges:
