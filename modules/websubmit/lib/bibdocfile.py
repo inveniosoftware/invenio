@@ -73,16 +73,27 @@ CFG_BIBDOCFILE_STRONG_FORMAT_NORMALIZATION = False
 
 KEEP_OLD_VALUE = 'KEEP-OLD-VALUE'
 
-_mimes = MimeTypes()
-_mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
-_mimes.encodings_map.update({'.bz2' : 'bzip2'})
-_extensions = _mimes.encodings_map.keys() + \
-              _mimes.suffix_map.keys() + \
-              _mimes.types_map[1].keys() + \
-              CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS
-_extensions.sort()
-_extensions.reverse()
-_extensions = set([ext.lower() for ext in _extensions])
+def _generate_extensions():
+    _mimes = MimeTypes()
+    _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
+    _mimes.encodings_map.update({'.bz2' : 'bzip2'})
+    _tmp_extensions = _mimes.encodings_map.keys() + \
+                _mimes.suffix_map.keys() + \
+                _mimes.types_map[1].keys() + \
+                CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS
+    _extensions = []
+    for ext in _tmp_extensions:
+        if ext.startswith('.'):
+            _extensions.append(ext)
+        else:
+            _extensions.append('.' + ext)
+    _extensions.sort()
+    _extensions.reverse()
+    _extensions = set([ext.lower() for ext in _extensions])
+    return _extensions
+
+_extensions = _generate_extensions()
+
 
 class InvenioWebSubmitFileError(Exception):
     pass
