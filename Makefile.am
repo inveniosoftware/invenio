@@ -25,7 +25,7 @@ SUBDIRS = po config modules
 EXTRA_DIST = UNINSTALL THANKS RELEASE-NOTES configure-tests.py config.nice.in
 
 # current jsMath version and packages
-JSMV = v3.5
+JSMV = v3.6
 JSMFV = 1.3
 JSMATH = jsMath-$(JSMV).zip
 JSMATHFONTS = jsMath-fonts-$(JSMFV).zip
