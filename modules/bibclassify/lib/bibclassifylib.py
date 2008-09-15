@@ -129,11 +129,8 @@ class CompositeKeyword:
     def __repr__(self):
         return "".join(["<CompositeKeyword: ", self.concept, ">"])
 
-def build_cache(ontology_file, no_cache=False, checking=False):
+def build_cache(ontology_file, no_cache=False):
     """Builds the cached data by parsing the RDF ontology file."""
-    if checking:
-        print ("Building graph with Python RDFLib version %s" %
-            rdflib.__version__)
     if rdflib.__version__ >= '2.3.2':
         store = rdflib.ConjunctiveGraph()
     else:
@@ -141,10 +138,6 @@ def build_cache(ontology_file, no_cache=False, checking=False):
     store.parse(ontology_file)
 
     namespace = rdflib.Namespace("http://www.w3.org/2004/02/skos/core#")
-
-    if checking:
-        print "Graph was successfully built."
-        perform_ontology_check(store)
 
     single_count = 0
     composite_count = 0
@@ -409,7 +402,6 @@ def get_regex_pattern(label):
     """Returns a regular expression of the label that takes care of
     plural and different kinds of separators."""
     parts = _split_by_punctuation.split(label)
-    parts_number = len(parts)
 
     for index, part in enumerate(parts):
         if index % 2 == 0:
@@ -582,9 +574,19 @@ def output_text(single_keywords=None, composite_keywords=None,
 
     return "\n".join(output) + "\n"
 
-def perform_ontology_check(store):
+def check_ontology(ontology_file):
     """Checks the consistency of the ontology and outputs a list of
     errors and warnings."""
+    print "Building graph with Python RDFLib version %s" % rdflib.__version__
+    if rdflib.__version__ >= '2.3.2':
+        store = rdflib.ConjunctiveGraph()
+    else:
+        store = rdflib.Graph()
+
+    store.parse(ontology_file)
+
+    print "Graph was successfully built."
+
     prefLabel = "prefLabel"
     hiddenLabel = "hiddenLabel"
     altLabel = "altLabel"
@@ -657,14 +659,13 @@ def perform_ontology_check(store):
         if note in predicates:
             if len(predicates[note]) > 1:
                 multiple_notes.append(subject)
-            for n in predicates[note]:
-                if n != "nostandalone":
-                    bad_notes.append((subject, n))
+            bad_notes += [(subject, n) for n in predicates[note]
+                          if n != "nostandalone"]
 
         # Bad hidden labels
         if hiddenLabel in predicates:
             for lbl in predicates[hiddenLabel]:
-                if (lbl[0] == "/") ^ (lbl[-1] == "/"):
+                if lbl.startswith("/") ^ lbl.endswith("/"):
                     bad_hidden_labels.setdefault(subject, []).append(lbl)
 
         # Bad alt labels
@@ -724,60 +725,60 @@ def perform_ontology_check(store):
 
     if no_prefLabel:
         print "\nConcepts with no prefLabel: %d" % len(no_prefLabel)
-        print "\n".join("   %s" % subj1 for subj1 in no_prefLabel)
+        print "\n".join(["   %s" % subj for subj in no_prefLabel])
     if multiple_prefLabels:
         print ("\nConcepts with multiple prefLabels: %d" %
             len(multiple_prefLabels))
-        print "\n".join("   %s" % subj2 for subj2 in multiple_prefLabels)
+        print "\n".join(["   %s" % subj for subj in multiple_prefLabels])
     if both_composites:
         print ("\nConcepts with both composite properties: %d" %
             len(both_composites))
-        print "\n".join("   %s" % subj3 for subj3 in both_composites)
+        print "\n".join(["   %s" % subj for subj in both_composites])
     if bad_hidden_labels:
         print "\nConcepts with bad hidden labels: %d" % len(bad_hidden_labels)
         for kw, lbls in bad_hidden_labels.iteritems():
             print "   %s:" % kw
-            print "\n".join("      '%s'" % lbl1 for lbl1 in lbls)
+            print "\n".join(["      '%s'" % lbl for lbl in lbls])
     if bad_alt_labels:
         print "\nConcepts with bad alt labels: %d" % len(bad_alt_labels)
         for kw, lbls in bad_alt_labels.iteritems():
             print "   %s:" % kw
-            print "\n".join("      '%s'" % lbl2 for lbl2 in lbls)
+            print "\n".join(["      '%s'" % lbl for lbl in lbls])
     if both_skw_and_ckw:
         print ("\nKeywords that are both skw and ckw: %d" %
             len(both_skw_and_ckw))
-        print "\n".join("   %s" % subj4 for subj4 in both_skw_and_ckw)
+        print "\n".join(["   %s" % subj for subj in both_skw_and_ckw])
 
     print
 
     if composite_problem1:
-        print "\n".join("SKW '%s' references an unexisting CKW '%s'." %
-            (skw, ckw) for skw, ckw in composite_problem1)
+        print "\n".join(["SKW '%s' references an unexisting CKW '%s'." %
+            (skw, ckw) for skw, ckw in composite_problem1])
     if composite_problem2:
-        print "\n".join("SKW '%s' references a SKW '%s'." %
-            (skw, ckw) for skw, ckw in composite_problem2)
+        print "\n".join(["SKW '%s' references a SKW '%s'." %
+            (skw, ckw) for skw, ckw in composite_problem2])
     if composite_problem3:
-        print "\n".join("SKW '%s' is not composite of CKW '%s'." %
-            (skw, ckw) for skw, ckw in composite_problem3)
+        print "\n".join(["SKW '%s' is not composite of CKW '%s'." %
+            (skw, ckw) for skw, ckw in composite_problem3])
     if composite_problem4:
         for skw, ckws in composite_problem4.iteritems():
             print "SKW '%s' does not exist but is " "referenced by:" % skw
-            print "\n".join("    %s" % ckw for ckw in ckws)
+            print "\n".join(["    %s" % ckw for ckw in ckws])
     if composite_problem5:
-        print "\n".join("CKW '%s' references a CKW '%s'." % kw
-            for kw in composite_problem5)
+        print "\n".join(["CKW '%s' references a CKW '%s'." % kw
+            for kw in composite_problem5])
     if composite_problem6:
-        print "\n".join("CKW '%s' is not composed by SKW '%s'." % kw
-            for kw in composite_problem6)
+        print "\n".join(["CKW '%s' is not composed by SKW '%s'." % kw
+            for kw in composite_problem6])
 
     print "\n==== WARNINGS ===="
 
     if multiple_notes:
         print "\nConcepts with multiple notes: %d" % len(multiple_notes)
-        print "\n".join("   %s" % subj for subj in multiple_notes)
+        print "\n".join(["   %s" % subj for subj in multiple_notes])
     if bad_notes:
         print ("\nConcepts with bad notes: %d" % len(bad_notes))
-        print "\n".join("   '%s': '%s'" % note for note in bad_notes)
+        print "\n".join(["   '%s': '%s'" % note for note in bad_notes])
     if stemming_collisions:
         print ("\nFollowing keywords have unnecessary labels that have "
             "already been generated by BibClassify.")
