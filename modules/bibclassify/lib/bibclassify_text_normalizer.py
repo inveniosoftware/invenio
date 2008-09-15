@@ -27,16 +27,13 @@ import sys
 import re
 
 try:
-    from refextract import replace_undesirable_characters
+    from invenio.refextract import replace_undesirable_characters
 except ImportError, e1:
     print >> sys.stderr, "Error: %s" % e1
     sys.exit(1)
 
 def normalize_fulltext(fulltext):
     """Returns a 'cleaned' version of the output provided by pdftotext."""
-
-    fulltext = replace_greek_characters(fulltext)
-
     # We recognize keywords by the spaces. We need these to match the
     # first and last words of the document.
     fulltext = " " + fulltext + " "
@@ -46,63 +43,72 @@ def normalize_fulltext(fulltext):
     # Replace the greek characters by their name.
     fulltext = replace_greek_characters(fulltext)
 
-    # Reformat the punctuation.
-    fulltext = re.sub(r" *([,.]) *", r"\1 ", fulltext)
-    # Replace non with non-. This allows a better detection of keywords
-    # such as nonabelian.
-    fulltext = re.sub(r"(\snon)[- ](\w+)", r"\1\2", fulltext)
-    fulltext = re.sub(r"(\santi)[- ](\w+)", r"\1\2", fulltext)
-    # Remove all leading numbers (e.g. 2-pion -> pion)
-    fulltext = re.sub(r"\s\d-", " ", fulltext)
+    washing_regex = [
+        (re.compile(r" *([,.]) *"), r"\1 "),
+        # Replace non and anti with non- and anti-. This allows a better
+        # detection of keywords such as nonabelian.
+        (re.compile(r"(\snon)[- ](\w+)"), r"\1\2"),
+        (re.compile(r"(\santi)[- ](\w+)"), r"\1\2"),
+        # Remove all leading numbers (e.g. 2-pion -> pion).
+        (re.compile(r"\s\d-"), " "),
+        # Remove multiple spaces.
+        (re.compile(r" +"), " "),
+    ]
 
-    # Remove multiple spaces
-    fulltext = re.sub(r" +", " ", fulltext)
-
-    ## Remove spaces in particle names,
+    # Remove spaces in particle names.
     # Particles with -/+/*
-    for name in ("c", "muon", "s", "B", "D", "K", "Lambda", "Mu", "Omega",
-                 "Pi", "Sigma", "Tau", "W", "Xi"):
-        fulltext = re.sub(r"(%s) ([-+*])" % name, r"\1\2", fulltext)
-    # Particles followed directly by a number.
-    for name in ("a", "b", "c", "f", "h", "s", "B", "D", "H", "K", "L",
-                 "Phi", "Pi", "Psi","Rho", "Stor", "UA", "Xi", "Z"):
-        fulltext = re.sub(r"(%s) ([0-9]\W)" % name, r"\1\2", fulltext)
+    washing_regex += [(re.compile(r"(%s) ([-+*])" % name), r"\1\2")
+                      for name in ("c", "muon", "s", "B", "D", "K", "Lambda",
+                          "Mu", "Omega", "Pi", "Sigma", "Tau", "W", "Xi")]
+
+    # Particles followed by numbers
+    washing_regex += [(re.compile(r"(%s) ([0-9]\W)" % name), r"\1\2")
+                      for name in ("a", "b", "c", "f", "h", "s", "B", "D", "H",
+                          "K", "L", "Phi", "Pi", "Psi","Rho", "Stor", "UA",
+                          "Xi", "Z")]
+    washing_regex += [(re.compile(r"(\W%s) ?\( ?([0-9]+) ?\)[A-Z]?" % name),
+                      r"\1(\2)")
+                      for name in ("CP", "E", "G", "O", "S", "SL", "SO",
+                          "Spin", "SU", "U", "W", "Z")]
+
     # Particles with '
-    for name in ("Eta", "W", "Z"):
-        fulltext = re.sub(r"(\W%s) ('\W)" % name, r"\1\2", fulltext)
+    washing_regex += [(re.compile(r"(\W%s) ('\W)" % name), r"\1\2")
+                      for name in ("Eta", "W", "Z")]
+
     # Particles with (N)
-    for name in ("CP", "GL", "O", "SL", "SO", "Sp", "Spin", "SU", "U", "W",
-                 "Z"):
-        fulltext = re.sub(r"(\W%s) ?\( ?N ?\)[A-Z]?" % name, r"\1(N)", fulltext)
-    # Particles with ([0-9]+)
-    for name in ("CP", "E", "G", "O", "S", "SL", "SO", "Spin", "SU", "U", "W",
-                 "Z"):
-        fulltext = re.sub(r"(\W%s) ?\( ?([0-9]+) ?\)[A-Z]?" % name, r"\1(\2)",
-                          fulltext)
+    washing_regex += [(re.compile(r"(\W%s) ?\( ?N ?\)[A-Z]?" % name), r"\1(N)")
+                      for name in ("CP", "GL", "O", "SL", "SO", "Sp", "Spin",
+                          "SU", "U", "W", "Z")]
 
     # All names followed by ([0-9]{3,4})
-    fulltext = re.sub(r"([A-Za-z]) (\([0-9]{3,4}\)\+?)\s", r"\1\2 ", fulltext)
+    washing_regex.append((re.compile(r"([A-Za-z]) (\([0-9]{3,4}\)\+?)\s"),
+                          r"\1\2 "))
 
     # Some weird names followed by ([0-9]{3,4})
-    for name in ("a0", "Ds1", "Ds2", "K*"):
-        fulltext = re.sub(r"%s (\([0-9]{3,4}\))" % re.escape(name),
-                          r"%s\1 " % name, fulltext)
+    washing_regex += [(re.compile(r"\(%s\) (\([0-9]{3,4}\))" % name),
+                      r"\1\2 ")
+                      for name in ("a0", "Ds1", "Ds2", "K\*")]
 
-    # Remove all lonel operators (usually these are errors introduced by
-    # pdftotext.)
-    fulltext = re.sub(r" [+*] ", r" ", fulltext)
+    washing_regex += [
+        # Remove all lonel operators (usually these are errors
+        # introduced by pdftotext.)
+        (re.compile(r" [+*] "), r" "),
+        # Remove multiple spaces.
+        (re.compile(r" +"), " "),
+        # Remove multiple line breaks.
+        (re.compile(r"\n+"), r"\n"),
+    ]
 
-    # Remove multiple spaces.
-    fulltext = re.sub(r" +", " ", fulltext)
-    # Remove multiple line breaks.
-    fulltext = re.sub(r"\n+", r"\n", fulltext)
+    # Apply the regular expressions to the fulltext.
+    for regex, replacement in washing_regex:
+        fulltext = regex.sub(replacement, fulltext)
 
     return fulltext
 
 def cut_references(text_lines):
     """Returns the text lines with the references cut."""
     try:
-        from refextract import find_reference_section, \
+        from invenio.refextract import find_reference_section, \
             find_end_of_reference_section
     except ImportError:
         print >> sys.stderr, ("Impossible to import refextract. Working on "
