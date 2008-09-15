@@ -72,11 +72,11 @@ CFG_BIBDOCFILE_MD5_BUFFER = 1024 * 1024
 CFG_BIBDOCFILE_STRONG_FORMAT_NORMALIZATION = False
 
 KEEP_OLD_VALUE = 'KEEP-OLD-VALUE'
+_mimes = MimeTypes()
+_mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
+_mimes.encodings_map.update({'.bz2' : 'bzip2'})
 
 def _generate_extensions():
-    _mimes = MimeTypes()
-    _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
-    _mimes.encodings_map.update({'.bz2' : 'bzip2'})
     _tmp_extensions = _mimes.encodings_map.keys() + \
                 _mimes.suffix_map.keys() + \
                 _mimes.types_map[1].keys() + \
