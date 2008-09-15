@@ -480,6 +480,7 @@ class BibRecDocs:
         Return False if fixing wasn't necessary
         """
         ## First let's check if it is necessary
+        return
         bibdoc = self.get_bibdoc(docname)
         for filename in os.listdir(bibdoc.basedir):
             if filename[0] != '.' and ';' in filename:
