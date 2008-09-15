@@ -30,10 +30,9 @@ import time
 
 try:
     from bibclassifylib import get_regular_expressions, \
-                               get_keywords_from_text
+        get_keywords_from_text, check_ontology
     from bibclassify_text_extractor import text_lines_from_local_file, \
-                                           text_lines_from_url, \
-                                           is_pdf
+        text_lines_from_url, is_pdf
 except ImportError, err:
     print >> sys.stderr, "Error: %s" % err
     sys.exit(1)
@@ -59,6 +58,8 @@ in the directory.
                               to set no limit
   -m, --matching-mode TYPE  changes the search mode to TYPE (full or partial)
                               (=full)
+  --with-explicit           detect keywords that are explicitely written in the
+                              document
   --rebuild-cache           ignores the existing cache and regenerates it
   --no-cache                don't cache the ontology
 
@@ -80,6 +81,7 @@ def main():
     if _OPTIONS["check_ontology"]:
         print >> sys.stdout, ("Checking ontology file %s" %
             _OPTIONS["ontology_file"])
+        check_ontology(_OPTIONS["ontology_file"])
     # End of ontology check.
 
     # Initialize cache
@@ -87,31 +89,33 @@ def main():
                             _OPTIONS["rebuild_cache"],
                             _OPTIONS["no_cache"])
 
+    sources = {}
     for entry in _OPTIONS["text_files"]:
         text_lines = None
-        source = ""
         if os.path.isdir(entry):
             for filename in os.listdir(entry):
                 if (os.path.isfile(entry + filename) and
                     is_pdf(entry + filename)):
-                    source = filename
                     text_lines = text_lines_from_local_file(entry + filename)
+                    sources[filename] = text_lines
         elif os.path.isfile(entry):
             text_lines = text_lines_from_local_file(entry)
-            source = os.path.basename(entry)
+            sources[os.path.basename(entry)] = text_lines
         else:
             # Treat as a URL.
             text_lines = text_lines_from_url(entry)
-            source = entry.split("/")[-1]
+            sources[entry.split("/")[-1]] = text_lines
 
-        if text_lines is not None:
+    # For each identified source, check the keywords and output them.
+    for source, text_lines in sources.iteritems():
+        if _OPTIONS["output_mode"] == "text":
             print >> sys.stdout, source
-            print >> sys.stdout, get_keywords_from_text(text_lines,
-                output_mode=_OPTIONS["output_mode"],
-                output_limit=_OPTIONS["output_limit"],
-                spires=_OPTIONS["spires"],
-                match_mode=_OPTIONS["match_mode"],
-                with_explicit=_OPTIONS["with_explicit"])
+        print >> sys.stdout, get_keywords_from_text(text_lines,
+            output_mode=_OPTIONS["output_mode"],
+            output_limit=_OPTIONS["output_limit"],
+            spires=_OPTIONS["spires"],
+            match_mode=_OPTIONS["match_mode"],
+            with_explicit=_OPTIONS["with_explicit"])
 
 def read_options(options_string):
     """Reads the options, test if the specified values are consistent and
@@ -149,8 +153,12 @@ def read_options(options_string):
         if opt in ("-h", "--help"):
             display_help()
         elif opt in ("-V", "--version"):
-            # TODO Fix version
-            print >> sys.stdout, "Should output the version."
+            try:
+                from invenio.config import CFG_VERSION
+                print >> sys.stdout, ("CDS Invenio/%s bibclassify/%s" %
+                    (CFG_VERSION, CFG_VERSION))
+            except ImportError:
+                print >> sys.stdout, "CDS Invenio bibclassify/standalone"
             sys.exit(1)
         elif opt in ("-v", "--verbose"):
             _OPTIONS["verbose"] = arg
@@ -238,13 +246,5 @@ def write_message(msg, stream=sys.stdout, verbose=1):
                              "sys.stderr]\n" % stream)
 
 if __name__ == '__main__':
-#   import cProfile
-#   cProfile.run('main()', 'profile_dump')
-#   import pstats
-#   p = pstats.Stats('profile_dump')
-#   p.sort_stats('time').print_stats(15)
-#   p.sort_stats('cumulative').print_stats(15)
-#   p.sort_stats('calls').print_stats(15)
     main()
-
 
