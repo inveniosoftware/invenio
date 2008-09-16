@@ -916,11 +916,12 @@ def format_element_test(req, bfe, ln=config.CFG_SITE_LANG, param_values=None):
                                    text=auth_msg,
                                    navtrail=navtrail_previous_links)
 
-def kb_manage(req, ln=config.CFG_SITE_LANG):
+def kb_manage(req, ln=config.CFG_SITE_LANG, search=""):
     """
     Main page for knowledge bases management. Check for authentication.
 
-    @param ln: language
+    @param ln language
+    @param search search for this in kb's
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -934,7 +935,7 @@ def kb_manage(req, ln=config.CFG_SITE_LANG):
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         return page(title=_("Manage Knowledge Bases"),
-                body=bibformatadminlib.perform_request_knowledge_bases_management(ln=ln),
+                body=bibformatadminlib.perform_request_knowledge_bases_management(ln=ln, search=search),
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
@@ -946,7 +947,7 @@ def kb_manage(req, ln=config.CFG_SITE_LANG):
                                    navtrail=navtrail_previous_links)
 
 
-def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG, startat=0, kb_type=None):
+def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG, startat=0, kb_type=None, search=""):
     """
     Shows the content of the given knowledge base id. Check for authentication and kb existence.
     Before displaying the content of the knowledge base, check if a form was submitted asking for
@@ -956,7 +957,8 @@ def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG, startat=0, kb_type=No
     @param kb the kb id to show
     @param sortby the sorting criteria ('from' or 'to')
     @param startat the number from which start showing mapping rules in kb
-    @param kb_type: None or taxonomy
+    @param kb_type None or taxonomy
+    @param search search for these in the kb
     """
 
     ln = wash_language(ln)
@@ -986,7 +988,7 @@ def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG, startat=0, kb_type=No
 
         return page(title=_("Knowledge Base %s" % kb_name),
                 body=bibformatadminlib.perform_request_knowledge_base_show(ln=ln,
-                kb_id=kb_id, sortby=sortby, startat=startat),
+                kb_id=kb_id, sortby=sortby, startat=startat, search=search),
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
@@ -1338,13 +1340,20 @@ def kb_export(req, kbname="", format="", ln=config.CFG_SITE_LANG):
                     req=req)
 
     else:
+        seq = [] #sequence: right sides need to made unique
         for m in mappings:
             mkey = m['key']
             mvalue = m['value']
             if format == "right" or format == "kba":
-                req.write(mvalue+"\n")
+                seq.append(mvalue)
             else:
                 req.write(mkey+"---"+mvalue+"\n")
+        #make unique seq and print it
+        seqdict = {}
+        for s in seq:
+            seqdict[s] = 1
+        for s in sorted(seqdict.keys()):
+            req.write(s+"\n")
 
 def kb_add(req, ln=config.CFG_SITE_LANG, sortby="to", kbtype=""):
     """

@@ -1774,12 +1774,13 @@ class Template:
 
         return out
 
-    def tmpl_admin_kbs_management(self, ln, kbs):
+    def tmpl_admin_kbs_management(self, ln, kbs, search=""):
         """
         Returns the main management console for knowledge bases.
 
         @param ln language
         @param kbs a list of dictionaries with knowledge bases attributes
+        @param search hunt for this string in kb's
         @return main management console as html
         """
 
@@ -1796,19 +1797,34 @@ class Template:
         <td>3.&nbsp;<small>%(manage_knowledge_bases)s</small>&nbsp;</td>
         </tr>
         </table>
+
+        <!--make a search box-->
+        <table class="admin_wvar" cellspacing="0">
+                 <tr><td>
+                 <form action="kb_manage">
+                 Search for a term in knowledge bases:
+                 <input type="text" name="search" value="%(search)s" />
+                 <input type="hidden" name="ln" value="%(ln)s" />
+                 <input type="submit" class="adminbutton" value="Search">
+                 </form>
+                 </td></tr></table>
+
+
         <table class="admin_wvar" width="95%%" cellspacing="0">
         <tr>
         <th class="adminheaderleft" >&nbsp;</th>
         <th class="adminheaderleft" >Name</th>
         <th class="adminheaderleft" >Description</th>
         <th class="adminheadercenter" >Action&nbsp;&nbsp;&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#KBs">?</a>]</th>
-        </tr>''' % {'ln':ln,
-                    'menu':_("Menu"),
-                    'manage_output_formats':_("Manage Output Formats"),
-                    'manage_format_templates':_("Manage Format Templates"),
-                    'format_elements_documentation':_("Format Elements Documentation"),
-                    'manage_knowledge_bases':_("Manage Knowledge Bases"),
-                    'siteurl':CFG_SITE_URL}
+        </tr>''' % {'ln': ln,
+                    'search': search,
+                    'menu': _("Menu"),
+                    'manage_output_formats': _("Manage Output Formats"),
+                    'manage_format_templates': _("Manage Format Templates"),
+                    'format_elements_documentation': _("Format Elements Documentation"),
+                    'manage_knowledge_bases': _("Manage Knowledge Bases"),
+                    'siteurl': CFG_SITE_URL}
+
 
         #table content: kb names, description and actions
         if len(kbs) == 0:
@@ -1824,9 +1840,10 @@ class Template:
                 line += 1
                 kb_attributes['ln'] = ln
                 kb_attributes['siteurl'] = CFG_SITE_URL
+                kb_attributes['search'] = search
                 row_content = '''<tr>
                 <td class="admintdright" style="vertical-align: middle; %(style)s">&nbsp;</td>
-                <td class="admintdleft" style="vertical-align: middle; %(style)s white-space: nowrap;"><a href="kb_show?ln=%(ln)s&amp;kb=%(id)s">%(name)s</a></td>
+                <td class="admintdleft" style="vertical-align: middle; %(style)s white-space: nowrap;"><a href="kb_show?ln=%(ln)s&amp;kb=%(id)s&amp;search=%(search)s">%(name)s</a></td>
                 <td class="admintdleft"style="vertical-align: middle; %(style)s">%(description)s</td>
                 <td class="admintd" style="vertical-align: middle; %(style)s white-space: nowrap;">
                 <form action="kb_delete?ln=%(ln)s" type="POST">
@@ -1862,23 +1879,40 @@ class Template:
 
         return out
 
-    def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby, startat=0, kb_type=None):
+    def tmpl_prevnextlink(self, porn, ln, kb_id, sortby, startat):
+        """
+        An aux routine to make "Next" link
+        @param porn p for previous, n for next
+        @param ln language
+        @param kb_id knowledge base id
+        @param sortby sort by to or from
+        @param startat start at this pair
+        """
+        _ = gettext_set_language(ln)    # load the right message language
+        label = _("Next")
+        if porn == 'p':
+            label = _("Previous")
+        return '<a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s&amp;startat=%(newstart)s">%(label)s</a>'% { 'ln':ln, 'kb_id':kb_id, 'sortby':sortby, 'newstart': str(startat), 'label': label }
+
+    def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby, startat=0, kb_type=None, search=""):
         """
         Returns the content of a knowledge base.
 
         @param ln language
         @param kb_id the id of the kb
         @param kb_name the name of the kb
-        @param content a list of dictionaries with mappings
+        @param mappings a list of dictionaries with mappings
         @param sortby the sorting criteria ('from' or 'to')
         @param startat start showing the mappings from number x. Usefull for large kb's.
-        @kb_type None or 't' meaning taxonomy. If taxonomy, show 'broader term/narrower term' instead of map from/to
+        @param kb_type None or 't' meaning taxonomy. If taxonomy, show 'broader term/narrower term' instead of map from/to
+        @param search focus on this left side if it is in the KB
         @return main management console as html
         """
 
         _ = gettext_set_language(ln)    # load the right message language
 
         #top of the page and  main table that split screen in two parts
+
         out = '''
         <table class="admin_wvar" cellspacing="0">
         <tr><th colspan="4" class="adminheaderleft">%(menu)s</th></tr>
@@ -1897,9 +1931,16 @@ class Template:
                         'dependencies':_("Knowledge Base Dependencies"),
                         'menu': _("Menu")}
 
+        #Define some constants
+        try:
+            startati = int(startat)
+        except ValueError:
+            startati = 0
+
+        hereyoucan = _("Here you can add new mappings to this base and change the base attributes.")
 
         out += '''
-        <p>Here you can add new mappings to this base and change the base attributes.</p>
+        <p>
         <table width="100%" align="center">
         <tr>
         '''
@@ -1922,6 +1963,7 @@ class Template:
         <tr>
         <th colspan="2" class="adminheaderleft">Add New Mapping &nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#addMappingKB">?</a>]</th>
         </tr>
+
         <tr>
         <td class="admintdright"><label for="mapFrom"><span style="white-space: nowrap;">%(mapfrom)s</span></label>:&nbsp;</td>
         <td><input tabindex="1" name="mapFrom" type="text" id="mapFrom" size="25"/></td>
@@ -1930,6 +1972,7 @@ class Template:
         <td class="admintdright"><label for="mapTo">%(mapto)s</label>:&nbsp;</td>
         <td><input tabindex="2" name="mapTo" type="text" id="mapTo" size="25"/></td>
         </tr>
+
         <tr>
         <td colspan="2" align="right"><input tabindex="3" class="adminbutton" type="submit" value="Add new Mapping"/></td>
         </tr>
@@ -1938,6 +1981,22 @@ class Template:
         </td>
         ''' % {'siteurl':CFG_SITE_URL, 'mapfrom': mapfromstring, 'mapto': maptostring }
 
+        #calculate if prev/next are needed
+        #add prev/next buttons if needed
+        prevlink = ""
+        nextlink = ""
+
+        if startati > 0:
+            newstart=startati-MAX_MAPPINGS
+            if newstart < 0:
+                newstart = 0
+            prevlink = self.tmpl_prevnextlink('p', ln, kb_id, sortby, newstart)
+
+        if len(mappings) > startati+MAX_MAPPINGS:
+            #all of them were not shown yet
+            newstart = startati+MAX_MAPPINGS
+            nextlink = self.tmpl_prevnextlink('n', ln, kb_id, sortby, newstart)
+
         #Second column: mappings table
         #header and footer
         out += '''
@@ -1945,6 +2004,11 @@ class Template:
 
         <table class="admin_wvar">
         <thead>
+        <!--prev/next-->
+        <tr>
+        <td>%(prevlink)s</td><td>%(nextlink)s</td>
+        </tr>
+
         <tr>
         <th class="adminheaderleft" width="25">&nbsp;</th>
         <th class="adminheaderleft" width="34%%"><a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=from">%(mapfrom)s</a></th>
@@ -1961,12 +2025,9 @@ class Template:
         <tbody>
         ''' % {'ln':ln,
                'kb_id':kb_id,
-               'siteurl':CFG_SITE_URL, 'mapfrom': mapfromstring, 'mapto': maptostring }
-
-        try:
-            startati = int(startat)
-        except ValueError:
-            startati = 0
+               'siteurl':CFG_SITE_URL,
+               'mapfrom': mapfromstring, 'mapto': maptostring,
+               'prevlink': prevlink, 'nextlink': nextlink }
 
         #table content: key, value and actions
         if len(mappings) == 0:
@@ -1991,7 +2052,6 @@ class Template:
                     tabindex_key += 3
                     tabindex_value += 3
                     tabindex_save_button += 3
-
                     row_content = '''
                     <tr>
                     <td colspan="5">
@@ -2028,18 +2088,7 @@ class Template:
         #End of table
         out += '</tbody></table>'
 
-        #add prev/next buttons if needed
-        if startati > 0:
-            newstart=startati-MAX_MAPPINGS
-            if newstart < 0:
-                newstart = 0
-            out += '<a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s">%(Previous)s</a>' % { 'ln':ln, 'kb_id':kb_id, 'sortby':sortby, 'Previous': _("Previous") }
-
-        if len(mappings) > startati+MAX_MAPPINGS:
-            #all of them were not shown yet
-            out += '&nbsp;'
-            newstart = startati+MAX_MAPPINGS
-            out += '<a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s&amp;startat=%(newstart)s">%(Next)s</a>' % { 'ln':ln, 'kb_id':kb_id, 'sortby':sortby, 'newstart':str(newstart), 'Next': _("Next") }
+        out += prevlink+"&nbsp;"+nextlink
 
         out += '</td>'
         out+= '''
@@ -2048,8 +2097,12 @@ class Template:
         </table>
         '''
         #add a note about exporting
+        export = CFG_SITE_URL+"/admin/bibformat/bibformatadmin.py/kb_export?kbname="+kb_name
         out += "<p>"+_("You can get a these mappings in textual format by: ")
-        out += CFG_SITE_URL+"/admin/bibformat/bibformatadmin.py/kb_export?kbname="+kb_name+"</p>"
+        out += "<a href=\""+export+"\">"+export+"</a><br/>"
+        out += _("And the KBA version by:")+" "
+        export = export+"&format=kba"
+        out += "<a href=\""+export+"\">"+export+"</a><br/>"
 
         #add script that will put focus on first field of "add mapping" form
         out += '''
@@ -2351,12 +2404,12 @@ class Template:
         """
         _ = gettext_set_language(ln)    # load the right message language
 
-        gen=""
+        gen= _("Your rule")+": "+left+"->"+right+"<p>"
         if (leftorright=='left'):
-            gen = _("The left side of the rule ")+" ("+left+") "
+            gen += _("The left side of the rule ")+" ("+left+") "
         else:
-            gen = _("The right side of the rule ")+" ("+right+") "
-        gen+=_("already appears in these knowledge bases:")+"<br/>"
+            gen += _("The right side of the rule ")+" ("+right+") "
+        gen += _("already appears in these knowledge bases")+":<br/>"
         inkbs = []
         dontdoit = False
         for t in tuples:

@@ -647,18 +647,39 @@ def perform_request_output_format_show_attributes(bfo, ln=CFG_SITE_LANG):
                                                                         visible)
 
 
-def perform_request_knowledge_bases_management(ln=CFG_SITE_LANG):
+def perform_request_knowledge_bases_management(ln=CFG_SITE_LANG, search=""):
     """
     Returns the main page for knowledge bases management.
 
     @param ln language
+    @param search search for this string in kb's
     @return the main page for knowledge bases management
     """
     kbs = bibformat_dblayer.get_kbs()
 
-    return bibformat_templates.tmpl_admin_kbs_management(ln, kbs)
+    #if search is nonempty, filter out kb's that do not have the
+    #the string that we search
+    newkbs = []
+    if search:
+        for kb in kbs:
+            kbname = kb['name']
+            #get mappings
+            mappings = bibformat_dblayer.get_kb_mappings(kbname)
+            skip = 0
+            for mapping in mappings:
+                if skip == 0:
+                    key =  mapping['key']
+                    value = mapping['value']
+                    if key.count(search)> 0 or value.count(search)> 0:
+                        #add this in newkbs
+                        newkbs.append(kb)
+                        #skip the rest, we know there's ok stuff in this kb
+                        skip = 1
+        kbs = newkbs
 
-def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to", startat=0):
+    return bibformat_templates.tmpl_admin_kbs_management(ln, kbs, search)
+
+def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to", startat=0, search=""):
     """
     Show the content of a knowledge base
 
@@ -666,12 +687,24 @@ def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to", st
     @param kb a knowledge base id
     @param sortby the sorting criteria ('from' or 'to')
     @param startat start showing mapping rules at what number
+    @param search search for this string in kb
     @return the content of the given knowledge base
     """
     name = bibformat_dblayer.get_kb_name(kb_id)
     mappings = bibformat_dblayer.get_kb_mappings(name, sortby)
     kb_type = bibformat_dblayer.get_kb_type(kb_id)
-    return bibformat_templates.tmpl_admin_kb_show(ln, kb_id, name, mappings, sortby, startat, kb_type)
+    #filter in only the requested rules if the user is searching..
+    if search:
+        newmappings = []
+        for mapping in mappings:
+            key =  mapping['key']
+            value = mapping['value']
+            if key.count(search)> 0 or value.count(search)> 0:
+                newmappings.append(mapping)
+        #we were searching, so replace
+        mappings = newmappings
+
+    return bibformat_templates.tmpl_admin_kb_show(ln, kb_id, name, mappings, sortby, startat, kb_type, search)
 
 
 def perform_request_knowledge_base_show_attributes(kb_id, ln=CFG_SITE_LANG, sortby="to"):
