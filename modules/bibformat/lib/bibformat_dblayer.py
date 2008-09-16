@@ -151,7 +151,6 @@ def get_kb_description(kb_name):
     res = run_sql(query)
     return res[0][0]
 
-
 def add_kb(kb_name, kb_description, kb_type=None):
     """
     Adds a new kb with given name and description. Returns the id of
@@ -666,8 +665,9 @@ def get_preformatted_record(recID, of, decompress=zlib.decompress):
     @return formatted record as String, or None if not exist
     """
     # Try to fetch preformatted record
-    query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, of)
-    res = run_sql(query)
+    query = "SELECT value FROM bibfmt WHERE id_bibrec=%s AND format=%s"
+    params = (recID, of)
+    res = run_sql(query, params)
     if res:
 	# record 'recID' is formatted in 'of', so return it
         return "%s" % decompress(res[0][0])
