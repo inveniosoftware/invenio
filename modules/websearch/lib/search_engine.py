@@ -3809,7 +3809,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
-        if record_exists(p[6:]) != 1:
+        if p[6:].isdigit() and record_exists(p[6:]) != 1:
             # record does not exist
             if of.startswith("h"):
                 if req.header_only:
