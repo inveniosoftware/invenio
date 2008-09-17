@@ -182,7 +182,7 @@ def save_kb_coll_config(kb_id, coll_id, leftside, rightside):
 def get_kb_description(kb_name):
     """Returns the description of the given kb"""
     k_id = get_kb_id(kb_name)
-    query = """SELECT description FROM fmtKNOWLEDGEBASES WHERE k_id='%s'""" % k_id
+    query = """SELECT description FROM fmtKNOWLEDGEBASES WHERE id='%s'""" % k_id
     res = run_sql(query)
     return res[0][0]
 

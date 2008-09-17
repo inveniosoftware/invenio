@@ -1946,13 +1946,13 @@ class Template:
 
         if kb_type == 'c':
             #it's a collection. Create a config form
-            coll_id = None
+            coll_id = ""
             if coll_config.has_key('coll_id'):
                 coll_id = coll_config['coll_id']
-            leftside = None
+            leftside = ""
             if coll_config.has_key('leftside'):
                 leftside = coll_config['leftside']
-            rightside = None
+            rightside = ""
             if coll_config.has_key('rightside'):
                 rightside = coll_config['rightside']
 
