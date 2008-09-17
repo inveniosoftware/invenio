@@ -988,7 +988,7 @@ def kb_show(req, kb, sortby="to", ln=config.CFG_SITE_LANG, startat=0, kb_type=No
 
         return page(title=_("Knowledge Base %s" % kb_name),
                 body=bibformatadminlib.perform_request_knowledge_base_show(ln=ln,
-                kb_id=kb_id, sortby=sortby, startat=startat, search=search),
+                kb_id=kb_id, sortby=sortby, startat=startat, search_term=search),
                 uid=uid,
                 language=ln,
                 navtrail = navtrail_previous_links,
@@ -1044,12 +1044,49 @@ def kb_show_attributes(req, kb, ln=config.CFG_SITE_LANG, sortby="to"):
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
+def kb_collection_update(req, kb_id, coll_id, leftside, rightside, ln=config.CFG_SITE_LANG):
+    """
+    Updates the configuration of a collection based KB by checking user rights and calling bibadminlib..
+    @param req request
+    @param kb_id knowledge base id
+    @param coll_id collection id
+    @param leftside the field in the collection's records that matches with the left side
+    @param rightside the field in the collection's records that matches with the right side
+    @param ln language
+    """
+    ln = wash_language(ln)
+    _ = gettext_set_language(ln)
+    navtrail_previous_links = bibformatadminlib.getnavtrail(''' &gt; <a class="navtrail" href="%s/admin/bibformat/bibformatadmin.py/kb_manage?ln=%s">%s</a>''' % (config.CFG_SITE_URL, ln, _("Manage Knowledge Bases")))
+
+    try:
+        uid = getUid(req)
+    except MySQLdb.Error, e:
+        return error_page(req)
+    (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
+    if not auth_code:
+        #actual config call
+        err = bibformatadminlib.perform_update_kb_config(kb_id, coll_id, leftside, rightside)
+        if err:
+            return page(title=_("Error"),
+                        body = err,
+                        language=ln,
+                        navtrail = navtrail_previous_links,
+                        lastupdated=__lastupdated__,
+                        req=req)
+
+        else:
+            redirect_to_url(req, "kb_show?ln=%(ln)s&kb=%(kb_id)s" % {'ln':ln, 'kb_id': kb_id })
+    else:
+        return page_not_authorized(req=req,
+                                   text=auth_msg,
+                                   navtrail=navtrail_previous_links)
+
 def kb_show_dependencies(req, kb, ln=config.CFG_SITE_LANG, sortby="to"):
     """
     Shows the dependencies of a given kb
 
-    @param ln language
     @param kb the kb id to show
+    @param ln language
     @param sortby the sorting criteria ('from' or 'to')
     """
     ln = wash_language(ln)
@@ -1063,7 +1100,6 @@ def kb_show_dependencies(req, kb, ln=config.CFG_SITE_LANG, sortby="to"):
 
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
-
         kb_id = wash_url_argument(kb, 'int')
         kb_name = bibformatadminlib.get_kb_name(kb_id)
 
@@ -1358,6 +1394,10 @@ def kb_export(req, kbname="", format="", ln=config.CFG_SITE_LANG):
 def kb_add(req, ln=config.CFG_SITE_LANG, sortby="to", kbtype=""):
     """
     Adds a new kb
+    @param req the request
+    @param ln language
+    @param sortby to or from
+    @kbtype type of knowledge base: "", taxonomy, collection
     """
     ln = wash_language(ln)
     _ = gettext_set_language(ln)
@@ -1372,8 +1412,10 @@ def kb_add(req, ln=config.CFG_SITE_LANG, sortby="to", kbtype=""):
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         name = "Untitled"
-        if kbtype:
+        if kbtype == "taxonomy":
             name = "Untitled Taxonomy"
+        if kbtype == "collection":
+            name = "collection"
         kb_id = bibformatadminlib.add_kb(kb_name=name, kb_type=kbtype)
         redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby})
     else:

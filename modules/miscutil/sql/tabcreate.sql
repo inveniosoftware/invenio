@@ -2727,6 +2727,16 @@ CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASES (
   UNIQUE KEY name (name)
 ) TYPE=MyISAM;
 
+--a collection based knowledge base
+CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASECOLL (
+  kb_id mediumint(8) unsigned NOT NULL,
+  coll_id mediumint(9),
+  leftside text default '',
+  rightside text default '',
+  PRIMARY KEY  (kb_id)
+) TYPE=MyISAM;
+
+
 CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASEMAPPINGS (
   id mediumint(8) unsigned NOT NULL auto_increment,
   m_key varchar(255) NOT NULL default '',
