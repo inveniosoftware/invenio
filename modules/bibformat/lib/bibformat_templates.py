@@ -1970,11 +1970,7 @@ class Template:
 
         hereyoucan = _("Here you can add new mappings to this base and change the base attributes.")
 
-        out += '''
-        <p> %(hereyoucan)s
-        <table width="100%" align="center">
-        <tr>
-        ''' % { 'hereyoucan': hereyoucan }
+        out += '<p>'+hereyoucan+'<table width="100%" align="center"><tr>'
 
         #First column of table: add mapping form
         out += '''
