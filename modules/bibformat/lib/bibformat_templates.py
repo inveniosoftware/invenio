@@ -1774,13 +1774,13 @@ class Template:
 
         return out
 
-    def tmpl_admin_kbs_management(self, ln, kbs, search=""):
+    def tmpl_admin_kbs_management(self, ln, kbs, lookup_term=""):
         """
         Returns the main management console for knowledge bases.
 
         @param ln language
         @param kbs a list of dictionaries with knowledge bases attributes
-        @param search hunt for this string in kb's
+        @param lookup_term hunt for this string in kb's
         @return main management console as html
         """
 
@@ -1817,7 +1817,7 @@ class Template:
         <th class="adminheaderleft" >Description</th>
         <th class="adminheadercenter" >Action&nbsp;&nbsp;&nbsp;[<a href="%(siteurl)s/help/admin/bibformat-admin-guide#KBs">?</a>]</th>
         </tr>''' % {'ln': ln,
-                    'search': search,
+                    'search': lookup_term,
                     'menu': _("Menu"),
                     'manage_output_formats': _("Manage Output Formats"),
                     'manage_format_templates': _("Manage Format Templates"),
@@ -1840,7 +1840,7 @@ class Template:
                 line += 1
                 kb_attributes['ln'] = ln
                 kb_attributes['siteurl'] = CFG_SITE_URL
-                kb_attributes['search'] = search
+                kb_attributes['search'] = lookup_term
                 row_content = '''<tr>
                 <td class="admintdright" style="vertical-align: middle; %(style)s">&nbsp;</td>
                 <td class="admintdleft" style="vertical-align: middle; %(style)s white-space: nowrap;"><a href="kb_show?ln=%(ln)s&amp;kb=%(id)s&amp;search=%(search)s">%(name)s</a></td>
@@ -1879,10 +1879,10 @@ class Template:
 
         return out
 
-    def tmpl_prevnextlink(self, porn, ln, kb_id, sortby, startat):
+    def tmpl_kb_prevnextlink(self, p_or_n, ln, kb_id, sortby, startat):
         """
         An aux routine to make "Next" link
-        @param porn p for previous, n for next
+        @param p_or_n p for previous, n for next
         @param ln language
         @param kb_id knowledge base id
         @param sortby sort by to or from
@@ -1890,11 +1890,11 @@ class Template:
         """
         _ = gettext_set_language(ln)    # load the right message language
         label = _("Next")
-        if porn == 'p':
+        if p_or_n == 'p':
             label = _("Previous")
         return '<a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s&amp;startat=%(newstart)s">%(label)s</a>'% { 'ln':ln, 'kb_id':kb_id, 'sortby':sortby, 'newstart': str(startat), 'label': label }
 
-    def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby, startat=0, kb_type=None, search=""):
+    def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby, startat=0, kb_type=None, lookup_term=""):
         """
         Returns the content of a knowledge base.
 
@@ -1905,7 +1905,7 @@ class Template:
         @param sortby the sorting criteria ('from' or 'to')
         @param startat start showing the mappings from number x. Usefull for large kb's.
         @param kb_type None or 't' meaning taxonomy. If taxonomy, show 'broader term/narrower term' instead of map from/to
-        @param search focus on this left side if it is in the KB
+        @param lookup_term focus on this left side if it is in the KB
         @return main management console as html
         """
 
@@ -1990,12 +1990,12 @@ class Template:
             newstart=startati-MAX_MAPPINGS
             if newstart < 0:
                 newstart = 0
-            prevlink = self.tmpl_prevnextlink('p', ln, kb_id, sortby, newstart)
+            prevlink = self.tmpl_kb_prevnextlink('p', ln, kb_id, sortby, newstart)
 
         if len(mappings) > startati+MAX_MAPPINGS:
             #all of them were not shown yet
             newstart = startati+MAX_MAPPINGS
-            nextlink = self.tmpl_prevnextlink('n', ln, kb_id, sortby, newstart)
+            nextlink = self.tmpl_kb_prevnextlink('n', ln, kb_id, sortby, newstart)
 
         #Second column: mappings table
         #header and footer
