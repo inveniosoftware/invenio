@@ -58,7 +58,7 @@ in the directory.
                               to set no limit
   -m, --matching-mode TYPE  changes the search mode to TYPE (full or partial)
                               (=full)
-  --with-explicit           detect keywords that are explicitely written in the
+  --detect-author-keywords  detect keywords that are explicitely written in the
                               document
   --rebuild-cache           ignores the existing cache and regenerates it
   --no-cache                don't cache the ontology
@@ -115,7 +115,7 @@ def main():
             output_limit=_OPTIONS["output_limit"],
             spires=_OPTIONS["spires"],
             match_mode=_OPTIONS["match_mode"],
-            with_explicit=_OPTIONS["with_explicit"])
+            with_author_keywords=_OPTIONS["with_author_keywords"])
 
 def read_options(options_string):
     """Reads the options, test if the specified values are consistent and
@@ -133,7 +133,7 @@ def read_options(options_string):
     _OPTIONS["rebuild_cache"] = False
     _OPTIONS["no_cache"] = False
     _OPTIONS["check_ontology"] = False
-    _OPTIONS["with_explicit"] = False
+    _OPTIONS["with_author_keywords"] = False
 
     output_modes = ("html", "text", "marcxml")
     modes = ("full", "partial")
@@ -142,7 +142,7 @@ def read_options(options_string):
         long_flags = ["ontology=", "output-mode=", "verbose=", "spires",
                       "keywords-number=", "matching-mode=", "help", "version",
                       "file", "rebuild-cache", "no-limit", "no-cache",
-                      "check-ontology", "with-explicit"]
+                      "check-ontology", "detect-author-keywords"]
         short_flags = "f:k:o:n:m:v:sqhV"
         opts, args = getopt.gnu_getopt(options_string, short_flags, long_flags)
     except getopt.GetoptError, err1:
@@ -184,8 +184,8 @@ def read_options(options_string):
             _OPTIONS["text_files"].append(arg)
         elif opt == "--check-ontology":
             _OPTIONS["check_ontology"] = True
-        elif opt == "--with-explicit":
-            _OPTIONS["with_explicit"] = True
+        elif opt == "--detect-author-keywords":
+            _OPTIONS["with_author_keywords"] = True
 
     if not opts and not args:
         display_help()
