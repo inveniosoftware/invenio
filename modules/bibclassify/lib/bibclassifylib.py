@@ -35,7 +35,7 @@ try:
     from bibclassify_text_normalizer import normalize_fulltext, cut_references
     from bibclassify_keyword_analyser import get_single_keywords, \
                                              get_composite_keywords, \
-                                             get_explicit_keywords
+                                             get_author_keywords
     from bibclassify_config import CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, \
         CFG_BIBCLASSIFY_EXCEPTIONS, \
         CFG_BIBCLASSIFY_GENERAL_REGULAR_EXPRESSIONS, \
@@ -276,7 +276,7 @@ def get_cache_file(ontology_file):
 def get_keywords_from_text(text_lines, ontology_file="", output_mode="text",
                            output_limit=CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER,
                            spires=False, match_mode="full", no_cache=False,
-                           with_explicit=False):
+                           with_author_keywords=False):
     """Returns a formatted string containing the keywords for a single
     document. If 'ontology_file' has not been specified, the method
     'get_regular_expressions' must have been run in order to build or
@@ -294,9 +294,9 @@ def get_keywords_from_text(text_lines, ontology_file="", output_mode="text",
     text_lines = cut_references(text_lines)
     fulltext = normalize_fulltext("\n".join(text_lines))
 
-    explicit_keywords = None
-    if with_explicit:
-        explicit_keywords = get_explicit_keywords(fulltext)
+    author_keywords = None
+    if with_author_keywords:
+        author_keywords = get_author_keywords(fulltext)
 
     if match_mode == "partial":
         fulltext = get_partial_text(fulltext)
@@ -307,10 +307,10 @@ def get_keywords_from_text(text_lines, ontology_file="", output_mode="text",
                                                 single_keywords)
 
     return get_keywords_output(single_keywords, composite_keywords,
-        explicit_keywords, output_mode, output_limit, spires)
+        author_keywords, output_mode, output_limit, spires)
 
 def get_keywords_output(single_keywords, composite_keywords,
-                        explicit_keywords=None, style="text",
+                        author_keywords=None, style="text",
                         output_limit=0, spires=False):
     """Returns a formatted string representing the keywords according
     to the style chosen."""
@@ -326,7 +326,7 @@ def get_keywords_output(single_keywords, composite_keywords,
 
     if style == "text":
         return output_text(single_keywords, composite_keywords,
-            explicit_keywords, spires)
+            author_keywords, spires)
     elif style == "marcxml":
         return output_marc(single_keywords, composite_keywords, spires)
     elif style == "html":
@@ -546,13 +546,13 @@ def output_marc(single_keywords, composite_keywords, spires=False):
     return "".join([marc_pattern % keyword for keyword in output])
 
 def output_text(single_keywords=None, composite_keywords=None,
-                explicit_keywords=None, spires=False):
+                author_keywords=None, spires=False):
     """Outputs the results obtained in text format."""
     output = []
 
-    if explicit_keywords is not None:
+    if author_keywords is not None:
         output.append("\n\nExplicit keywords:")
-        for keyword in explicit_keywords:
+        for keyword in author_keywords:
             output.append(keyword)
 
     if composite_keywords is not None:

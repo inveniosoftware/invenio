@@ -27,9 +27,9 @@ import sys
 
 try:
     from bibclassify_config import CFG_BIBCLASSIFY_VALID_SEPARATORS, \
-                                   CFG_BIBCLASSIFY_EXPLICIT_KW_START, \
-                                   CFG_BIBCLASSIFY_EXPLICIT_KW_END, \
-                                   CFG_BIBCLASSIFY_EXPLICIT_KW_SEPARATION
+                                   CFG_BIBCLASSIFY_AUTHOR_KW_START, \
+                                   CFG_BIBCLASSIFY_AUTHOR_KW_END, \
+                                   CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION
 except ImportError, err:
     print >> sys.stderr, "Error: %s" % err
     sys.exit(1)
@@ -143,22 +143,22 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans):
 
     return ckw_list
 
-def get_explicit_keywords(fulltext):
+def get_author_keywords(fulltext):
     """Finds out human defined keyowrds in a text string. Searches for
     the string "Keywords:" and its declinations and matches the
     following words."""
-    split_string = CFG_BIBCLASSIFY_EXPLICIT_KW_START.split(fulltext, 1)
+    split_string = CFG_BIBCLASSIFY_AUTHOR_KW_START.split(fulltext, 1)
     if len(split_string) == 1:
         return []
 
     kw_string = split_string[1]
 
-    for regex in CFG_BIBCLASSIFY_EXPLICIT_KW_END:
+    for regex in CFG_BIBCLASSIFY_AUTHOR_KW_END:
         parts = regex.split(kw_string, 1)
         kw_string = parts[0]
 
     # We separate the keywords.
-    return CFG_BIBCLASSIFY_EXPLICIT_KW_SEPARATION.split(kw_string)
+    return CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION.split(kw_string)
 
 def _contains_span(span0, span1):
     """Return true if span0 contains span1, False otherwise."""
