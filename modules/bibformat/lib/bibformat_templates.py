@@ -1869,6 +1869,12 @@ class Template:
         </td>
 
         <td align="right">
+        <form method="post" action="kb_add?ln=%(ln)s&amp;kbtype=collection">
+        <input class="adminbutton" type="submit" value="Configure Collection KB"/>
+        </form>
+        </td>
+
+        <td align="right">
         <form method="post" action="kb_add?ln=%(ln)s&amp;kbtype=taxonomy">
         <input class="adminbutton" type="submit" value="Add New Taxonomy"/>
         </form>
@@ -1894,7 +1900,7 @@ class Template:
             label = _("Previous")
         return '<a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s&amp;startat=%(newstart)s">%(label)s</a>'% { 'ln':ln, 'kb_id':kb_id, 'sortby':sortby, 'newstart': str(startat), 'label': label }
 
-    def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby, startat=0, kb_type=None, lookup_term=""):
+    def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby, startat=0, kb_type=None, lookup_term="", coll_config=None):
         """
         Returns the content of a knowledge base.
 
@@ -1906,6 +1912,7 @@ class Template:
         @param startat start showing the mappings from number x. Usefull for large kb's.
         @param kb_type None or 't' meaning taxonomy. If taxonomy, show 'broader term/narrower term' instead of map from/to
         @param lookup_term focus on this left side if it is in the KB
+        @param coll_config collection configuration for collection kb's
         @return main management console as html
         """
 
@@ -1937,13 +1944,37 @@ class Template:
         except ValueError:
             startati = 0
 
+        if kb_type == 'c':
+            #it's a collection. Create a config form
+            coll_id = None
+            if coll_config.has_key('coll_id'):
+                coll_id = coll_config['coll_id']
+            leftside = None
+            if coll_config.has_key('leftside'):
+                leftside = coll_config['leftside']
+            rightside = None
+            if coll_config.has_key('rightside'):
+                rightside = coll_config['rightside']
+
+            pleaseconf = _("Please configure")
+            pleaseconf += '''<form action="kb_collection_update">
+                             Collection: <input name="coll_id" value="%(coll_id)s"/>
+                             Left side: <input name="leftside" value="%(leftside)s"/>
+                             Right side: <input name="rightside" value="%(rightside)s"/>
+                             <input type="hidden" name="ln" value="%(ln)s"/>
+                             <input type="hidden" name="kb_id" value="%(kb_id)s"/>
+                             <input type="submit" name="submit" value="ok"/>
+                             </form>''' % { 'coll_id': coll_id, 'kb_id': kb_id, 'leftside': leftside,
+                                            'rightside': rightside, 'ln': ln }
+            return pleaseconf
+
         hereyoucan = _("Here you can add new mappings to this base and change the base attributes.")
 
         out += '''
-        <p>
+        <p> %(hereyoucan)s
         <table width="100%" align="center">
         <tr>
-        '''
+        ''' % { 'hereyoucan': hereyoucan }
 
         #First column of table: add mapping form
         out += '''

@@ -679,7 +679,7 @@ def perform_request_knowledge_bases_management(ln=CFG_SITE_LANG, search=""):
 
     return bibformat_templates.tmpl_admin_kbs_management(ln, kbs, search)
 
-def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to", startat=0, search=""):
+def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to", startat=0, search_term=""):
     """
     Show the content of a knowledge base
 
@@ -687,24 +687,27 @@ def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to", st
     @param kb a knowledge base id
     @param sortby the sorting criteria ('from' or 'to')
     @param startat start showing mapping rules at what number
-    @param search search for this string in kb
+    @param search_term search for this string in kb
     @return the content of the given knowledge base
     """
     name = bibformat_dblayer.get_kb_name(kb_id)
     mappings = bibformat_dblayer.get_kb_mappings(name, sortby)
     kb_type = bibformat_dblayer.get_kb_type(kb_id)
     #filter in only the requested rules if the user is searching..
-    if search:
+    if search_term:
         newmappings = []
         for mapping in mappings:
             key =  mapping['key']
             value = mapping['value']
-            if key.count(search)> 0 or value.count(search)> 0:
+            if key.count(search_term)> 0 or value.count(search_term)> 0:
                 newmappings.append(mapping)
         #we were searching, so replace
         mappings = newmappings
-
-    return bibformat_templates.tmpl_admin_kb_show(ln, kb_id, name, mappings, sortby, startat, kb_type, search)
+    #if this bk is a collection, get the configuration from the DB
+    coll_config = None
+    if kb_type == 'c':
+        coll_config = bibformat_dblayer.get_kb_coll_config(kb_id)
+    return bibformat_templates.tmpl_admin_kb_show(ln, kb_id, name, mappings, sortby, startat, kb_type, search_term, coll_config)
 
 
 def perform_request_knowledge_base_show_attributes(kb_id, ln=CFG_SITE_LANG, sortby="to"):
@@ -1031,7 +1034,7 @@ def add_kb(kb_name="Untitled", kb_type=None):
     such that it is unique.
 
     @param kb_name the name of the kb
-    @param kb_type the type of the kb, incl 'taxonomy'. None for typical.
+    @param kb_type the type of the kb, incl 'taxonomy' and 'collection'. None for typical.
     @return the id of the newly created kb
     """
     name = kb_name
@@ -1677,3 +1680,10 @@ def perform_request_verify_rule(ln, kbid, left, right, leftorright, currentname,
     @tuples a list containing "kb - rule" tuples
     """
     return bibformat_templates.tmpl_select_rule_action(ln, kbid, left, right, leftorright, currentname, tuples)
+
+def perform_update_kb_config(kb_id, coll_id, leftside, rightside):
+    """
+    Updates config by calling a db function.
+    """
+    #this will complain if the collection does not exist
+    return bibformat_dblayer.save_kb_coll_config(kb_id, coll_id, leftside, rightside)

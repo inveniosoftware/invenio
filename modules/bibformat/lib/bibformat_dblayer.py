@@ -116,7 +116,10 @@ def get_kb_name(kb_id):
         return None
 
 def get_kb_type(kb_id):
-    """Returns the type of the kb with given id"""
+    """Returns the type of the kb with given id
+    @param kb_id knowledge base id
+    @return kb_type
+    """
     res = run_sql("""SELECT kbtype FROM fmtKNOWLEDGEBASES WHERE id=%s""",
                   (kb_id,))
     if len(res) > 0:
@@ -144,10 +147,42 @@ def get_kb_mappings(kb_name, sortby="to"):
         out.append({'id':row[0], 'key':row[1], 'value': row[2]})
     return out
 
+def get_kb_coll_config(kb_id):
+    """
+       Returns a dictionary of 'coll_id'=> x, 'leftside'=> y, 'rightside'=> z
+       for a knowledge base of type "collection".
+    """
+    query = """SELECT coll_id, leftside, rightside
+               FROM fmtKNOWLEDGEBASECOLL where
+               kb_id = '%(kb_id)s'""" % { 'kb_id': kb_id }
+    res = run_sql(query)
+    mydict = {}
+    for row in res:
+        mydict['coll_id'] = row[0]
+        mydict['leftside'] = row[1]
+        mydict['rightside'] = row[2]
+    return mydict
+
+def save_kb_coll_config(kb_id, coll_id, leftside, rightside):
+    """Saves a collection based knowledge base configuration"""
+    #check that the colection actually exists
+    que = """select id from collection where id = '%s'""" % (coll_id)
+    res = run_sql(que)
+    if not res:
+        return "NOSUCHCOLL"
+    dele = """DELETE FROM fmtKNOWLEDGEBASECOLL where kb_id = '%s'""" % (kb_id)
+    res = run_sql(dele)
+    inse = """insert into
+              fmtKNOWLEDGEBASECOLL(kb_id, coll_id, leftside, rightside)
+              values ('%(kb_id)s','%(coll_id)s','%(leftside)s','%(rightside)s')""" % {'kb_id': kb_id,
+              'coll_id': coll_id, 'leftside': leftside, 'rightside': rightside}
+    res = run_sql(inse)
+    return ""
+
 def get_kb_description(kb_name):
     """Returns the description of the given kb"""
     k_id = get_kb_id(kb_name)
-    query = """SELECT description FROM fmtKNOWLEDGEBASES WHERE id='%s'""" % k_id
+    query = """SELECT description FROM fmtKNOWLEDGEBASES WHERE k_id='%s'""" % k_id
     res = run_sql(query)
     return res[0][0]
 
@@ -169,6 +204,8 @@ def add_kb(kb_name, kb_description, kb_type=None):
     else:
         if kb_type == 'taxonomy':
             kb_db='t'
+        if kb_type == 'collection':
+            kb_db='c'
     run_sql("""REPLACE INTO fmtKNOWLEDGEBASES (name, description, kbtype)
                 VALUES (%s,%s,%s)""", (kb_name, kb_description, kb_db))
     return get_kb_id(kb_name)
