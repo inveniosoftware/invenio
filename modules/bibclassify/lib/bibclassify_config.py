@@ -82,8 +82,8 @@ CFG_BIBCLASSIFY_EXCEPTIONS = {
     "gas": r"gas(s?es)?",
     "lens": r"lens(es)?",
     "matrix": r"matri(x(es)?|ces)",
-    "muon": r"mu(on)?s?",
-    "neutrino": r"n(eutrino|u)s?",
+    "muon": r"muons?",
+    "neutrino": r"neutrinos?",
     "reflexion": r"refle(x|ct)ions?",
     "ring": r"rings?",
     "status": r"status(es)?",
@@ -160,15 +160,15 @@ CFG_BIBCLASSIFY_VALID_SEPARATORS = (
     "of new", "of other",  "of many", "of both", "of these", "of each", "is"
     )
 
-# EXPLICIT KEYWORDS
+# AUTHOR KEYWORDS
 
 # When looking for the keywords already defined in the document, we run the
 # following set of regex.
 
-CFG_BIBCLASSIFY_EXPLICIT_KW_START = \
+CFG_BIBCLASSIFY_AUTHOR_KW_START = \
     re.compile(r"(?i)key[ -]*words?[a-z ]*[.:] *")
 
-CFG_BIBCLASSIFY_EXPLICIT_KW_END = (
+CFG_BIBCLASSIFY_AUTHOR_KW_END = (
     re.compile(r"\n"),
     re.compile(r"\."),
     re.compile(r"\sPACS"),
@@ -176,5 +176,5 @@ CFG_BIBCLASSIFY_EXPLICIT_KW_END = (
     re.compile(r"(?i)mathematics subject classification\W"),
     )
 
-CFG_BIBCLASSIFY_EXPLICIT_KW_SEPARATION = re.compile(" ?; ?| ?, ?| ?- ")
+CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION = re.compile(" ?; ?| ?, ?| ?- ")
 
