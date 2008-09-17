@@ -59,3 +59,6 @@
 <p>In order to write back such a record into the system you should use the BibUpload utility.</p>
 
 <p>Please referer to bibrecord.py for a complete and up-to-date description of the API.</p>
+
+<p>As always, a good entry point to the bibrecord library and its record structure manipulating functions 
+is to read the unit test cases that are located in <code>bibrecord_tests.py</code> and <code>bibupload_regression_tests.py</code>.</p>
