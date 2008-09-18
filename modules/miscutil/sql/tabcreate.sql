@@ -2731,8 +2731,8 @@ CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASES (
 CREATE TABLE IF NOT EXISTS fmtKNOWLEDGEBASECOLL (
   kb_id mediumint(8) unsigned NOT NULL,
   coll_id mediumint(9),
-  leftside text default '',
-  rightside text default '',
+  thefield text default '',
+  expression text default '',
   PRIMARY KEY  (kb_id)
 ) TYPE=MyISAM;
 
