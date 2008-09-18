@@ -136,8 +136,9 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                                 'multipage-icon-delay' : 100,
                                 'verbosity' : 0,
                             })
-                        except InvenioWebSubmitIconCreatorError, e:
+                        except Exception, e:
                             register_exception(prefix='Impossible to create icon for %s' % fullpath, alert_admin=True)
+                            continue
                         iconpath = os.path.join(iconpath, iconname)
                         docname = decompose_file(fullpath)[1]
                         try:
