@@ -1944,6 +1944,9 @@ class Template:
         except ValueError:
             startati = 0
 
+        #to note about exporting..
+        export = CFG_SITE_URL+"/admin/bibformat/bibformatadmin.py/kb_export?kbname="+kb_name
+
         if kb_type == 'c':
             #it's a collection. Create a config form
             coll_id = ""
@@ -1958,7 +1961,7 @@ class Template:
 
             pleaseconf = _("Please configure")+"<P>"
             pleaseconf += _("A collection based knowledge base is a list of canonical values that is generated dynamically by searching a given field in all records of a collection, optionally using an expression.")+"<br>"
-            pleaseconf += _("Example: if there is a collection Institutes where records have a field 270__c for the name of the institute, and the expression is France, a list of institutes in France will we created.")
+            pleaseconf += _("Example: if there is a collection Institutes where records have a field 270__a for the address of the institute, and the expression is Paris, a list of institutes in Paris will be created.")
             #find the collection that corresponds to the coll_id..
             coll_select = ""
             if coll_dict:
@@ -1980,6 +1983,8 @@ class Template:
                              <input type="submit" name="submit" value="ok"/>
                              </form>''' % { 'coll_id': coll_id, 'kb_id': kb_id, 'expression': expression,
                                             'field': field, 'ln': ln, 'coll_select': coll_select }
+            pleaseconf += "<p>"+_("Exporting: ")
+            pleaseconf += "<a href=\""+export+"\">"+export+"</a><br/>"
             return pleaseconf
 
         hereyoucan = _("Here you can add new mappings to this base and change the base attributes.")
@@ -2138,7 +2143,6 @@ class Template:
         </table>
         '''
         #add a note about exporting
-        export = CFG_SITE_URL+"/admin/bibformat/bibformatadmin.py/kb_export?kbname="+kb_name
         out += "<p>"+_("You can get a these mappings in textual format by: ")
         out += "<a href=\""+export+"\">"+export+"</a><br/>"
         out += _("And the KBA version by:")+" "
