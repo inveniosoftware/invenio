@@ -1900,7 +1900,7 @@ class Template:
             label = _("Previous")
         return '<a href="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s&amp;sortby=%(sortby)s&amp;startat=%(newstart)s">%(label)s</a>'% { 'ln':ln, 'kb_id':kb_id, 'sortby':sortby, 'newstart': str(startat), 'label': label }
 
-    def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby, startat=0, kb_type=None, lookup_term="", coll_config=None):
+    def tmpl_admin_kb_show(self, ln, kb_id, kb_name, mappings, sortby, startat=0, kb_type=None, lookup_term="", coll_config=None, coll_dict=None):
         """
         Returns the content of a knowledge base.
 
@@ -1910,7 +1910,7 @@ class Template:
         @param mappings a list of dictionaries with mappings
         @param sortby the sorting criteria ('from' or 'to')
         @param startat start showing the mappings from number x. Usefull for large kb's.
-        @param kb_type None or 't' meaning taxonomy. If taxonomy, show 'broader term/narrower term' instead of map from/to
+        @param kb_type None or 't' meaning taxonomy, or 'c' meaning collection. If taxonomy, show 'taxonomy config' instead of map from/to
         @param lookup_term focus on this left side if it is in the KB
         @param coll_config collection configuration for collection kb's
         @return main management console as html
@@ -1956,16 +1956,30 @@ class Template:
             if coll_config.has_key('rightside'):
                 rightside = coll_config['rightside']
 
-            pleaseconf = _("Please configure")
+            pleaseconf = _("Please configure")+"<P>"
+            pleaseconf += _("A collection based knowledge base is a list of canonical values that is generated dynamically by searching a given field in all records of a collection, optionally using an expression.")+"<br>"
+            pleaseconf += _("Example: if there is a collection Institutes where records have a field 270__c for the name of the institute, and the expression is France, a list of institutes in France will we created.)
+            #find the collection that corresponds to the coll_id..
+            coll_select = ""
+            if coll_dict:
+                coll_select = "<select name=\"coll_id\">"
+                for k in coll_dict.keys():
+                    collname = coll_dict[k]
+                    coll_select += "<option value=\""+str(k)+"\""
+                    if coll_id == k:
+                        coll_select += " selected=\"true\" "
+                    coll_select += ">"+collname+"</option>"
+                coll_select += "</select>"
+
             pleaseconf += '''<form action="kb_collection_update">
-                             Collection: <input name="coll_id" value="%(coll_id)s"/>
-                             Left side: <input name="leftside" value="%(leftside)s"/>
-                             Right side: <input name="rightside" value="%(rightside)s"/>
+                             Collection: %(coll_select)s
+                             Field: <input name="field" value="%(field)s"/>
+                             Expression (optional): <input name="expression" value="%(expression)s"/>
                              <input type="hidden" name="ln" value="%(ln)s"/>
                              <input type="hidden" name="kb_id" value="%(kb_id)s"/>
                              <input type="submit" name="submit" value="ok"/>
                              </form>''' % { 'coll_id': coll_id, 'kb_id': kb_id, 'leftside': leftside,
-                                            'rightside': rightside, 'ln': ln }
+                                            'rightside': rightside, 'ln': ln, 'coll_select': coll_select }
             return pleaseconf
 
         hereyoucan = _("Here you can add new mappings to this base and change the base attributes.")

@@ -40,9 +40,10 @@ from invenio.bibformat_config import \
 from invenio.urlutils import wash_url_argument
 from invenio.errorlib import get_msgs_for_code_list
 from invenio.messages import gettext_set_language, wash_language, language_list_long
-from invenio.search_engine import perform_request_search, encode_for_xml
+from invenio.search_engine import perform_request_search, encode_for_xml, get_alphabetically_ordered_collection_list
 from invenio import bibformat_dblayer
 from invenio import bibformat_engine
+from invenio.websearch_webcoll import get_collection
 
 import invenio.template
 bibformat_templates = invenio.template.load('bibformat')
@@ -705,9 +706,18 @@ def perform_request_knowledge_base_show(kb_id, ln=CFG_SITE_LANG, sortby="to", st
         mappings = newmappings
     #if this bk is a collection, get the configuration from the DB
     coll_config = None
+    coll_dict = None
     if kb_type == 'c':
         coll_config = bibformat_dblayer.get_kb_coll_config(kb_id)
-    return bibformat_templates.tmpl_admin_kb_show(ln, kb_id, name, mappings, sortby, startat, kb_type, search_term, coll_config)
+        #get collections to make a dictionary
+        clist = get_alphabetically_ordered_collection_list()
+        coll_dict = {}
+        for c in clist:
+            [cname,foo] = c
+            coll = get_collection(cname)
+            coll_id = coll.id
+            coll_dict[coll_id] = cname
+    return bibformat_templates.tmpl_admin_kb_show(ln, kb_id, name, mappings, sortby, startat, kb_type, search_term, coll_config, coll_dict)
 
 
 def perform_request_knowledge_base_show_attributes(kb_id, ln=CFG_SITE_LANG, sortby="to"):
