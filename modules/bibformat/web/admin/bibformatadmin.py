@@ -1044,14 +1044,14 @@ def kb_show_attributes(req, kb, ln=config.CFG_SITE_LANG, sortby="to"):
     else:
         return page_not_authorized(req=req, text=auth_msg, navtrail=navtrail_previous_links)
 
-def kb_collection_update(req, kb_id, coll_id, leftside, rightside, ln=config.CFG_SITE_LANG):
+def kb_collection_update(req, kb_id, coll_id, field, expression, ln=config.CFG_SITE_LANG):
     """
     Updates the configuration of a collection based KB by checking user rights and calling bibadminlib..
     @param req request
     @param kb_id knowledge base id
     @param coll_id collection id
-    @param leftside the field in the collection's records that matches with the left side
-    @param rightside the field in the collection's records that matches with the right side
+    @param field the field in the collection's records
+    @param expression expression in the field
     @param ln language
     """
     ln = wash_language(ln)
@@ -1065,7 +1065,7 @@ def kb_collection_update(req, kb_id, coll_id, leftside, rightside, ln=config.CFG
     (auth_code, auth_msg) = check_user(req, 'cfgbibformat')
     if not auth_code:
         #actual config call
-        err = bibformatadminlib.perform_update_kb_config(kb_id, coll_id, leftside, rightside)
+        err = bibformatadminlib.perform_update_kb_config(kb_id, coll_id, field, expression)
         if err:
             return page(title=_("Error"),
                         body = err,

@@ -1949,16 +1949,16 @@ class Template:
             coll_id = ""
             if coll_config.has_key('coll_id'):
                 coll_id = coll_config['coll_id']
-            leftside = ""
-            if coll_config.has_key('leftside'):
-                leftside = coll_config['leftside']
-            rightside = ""
-            if coll_config.has_key('rightside'):
-                rightside = coll_config['rightside']
+            field = ""
+            if coll_config.has_key('field'):
+                field = coll_config['field']
+            expression = ""
+            if coll_config.has_key('expression'):
+                expression = coll_config['expression']
 
             pleaseconf = _("Please configure")+"<P>"
             pleaseconf += _("A collection based knowledge base is a list of canonical values that is generated dynamically by searching a given field in all records of a collection, optionally using an expression.")+"<br>"
-            pleaseconf += _("Example: if there is a collection Institutes where records have a field 270__c for the name of the institute, and the expression is France, a list of institutes in France will we created.)
+            pleaseconf += _("Example: if there is a collection Institutes where records have a field 270__c for the name of the institute, and the expression is France, a list of institutes in France will we created.")
             #find the collection that corresponds to the coll_id..
             coll_select = ""
             if coll_dict:
@@ -1978,8 +1978,8 @@ class Template:
                              <input type="hidden" name="ln" value="%(ln)s"/>
                              <input type="hidden" name="kb_id" value="%(kb_id)s"/>
                              <input type="submit" name="submit" value="ok"/>
-                             </form>''' % { 'coll_id': coll_id, 'kb_id': kb_id, 'leftside': leftside,
-                                            'rightside': rightside, 'ln': ln, 'coll_select': coll_select }
+                             </form>''' % { 'coll_id': coll_id, 'kb_id': kb_id, 'expression': expression,
+                                            'field': field, 'ln': ln, 'coll_select': coll_select }
             return pleaseconf
 
         hereyoucan = _("Here you can add new mappings to this base and change the base attributes.")

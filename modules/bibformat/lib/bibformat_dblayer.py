@@ -149,21 +149,21 @@ def get_kb_mappings(kb_name, sortby="to"):
 
 def get_kb_coll_config(kb_id):
     """
-       Returns a dictionary of 'coll_id'=> x, 'leftside'=> y, 'rightside'=> z
+       Returns a dictionary of 'coll_id'=> x, 'field'=> y, 'expression'=> z
        for a knowledge base of type "collection".
     """
-    query = """SELECT coll_id, leftside, rightside
+    query = """SELECT coll_id, thefield, expression
                FROM fmtKNOWLEDGEBASECOLL where
                kb_id = '%(kb_id)s'""" % { 'kb_id': kb_id }
     res = run_sql(query)
     mydict = {}
     for row in res:
         mydict['coll_id'] = row[0]
-        mydict['leftside'] = row[1]
-        mydict['rightside'] = row[2]
+        mydict['field'] = row[1]
+        mydict['expression'] = row[2]
     return mydict
 
-def save_kb_coll_config(kb_id, coll_id, leftside, rightside):
+def save_kb_coll_config(kb_id, coll_id, field, expression):
     """Saves a collection based knowledge base configuration"""
     #check that the colection actually exists
     que = """select id from collection where id = '%s'""" % (coll_id)
@@ -173,9 +173,9 @@ def save_kb_coll_config(kb_id, coll_id, leftside, rightside):
     dele = """DELETE FROM fmtKNOWLEDGEBASECOLL where kb_id = '%s'""" % (kb_id)
     res = run_sql(dele)
     inse = """insert into
-              fmtKNOWLEDGEBASECOLL(kb_id, coll_id, leftside, rightside)
-              values ('%(kb_id)s','%(coll_id)s','%(leftside)s','%(rightside)s')""" % {'kb_id': kb_id,
-              'coll_id': coll_id, 'leftside': leftside, 'rightside': rightside}
+              fmtKNOWLEDGEBASECOLL(kb_id, coll_id, thefield, expression)
+              values ('%(kb_id)s','%(coll_id)s','%(field)s','%(expression)s')""" % {'kb_id': kb_id,
+              'coll_id': coll_id, 'field': field, 'expression': expression }
     res = run_sql(inse)
     return ""
 

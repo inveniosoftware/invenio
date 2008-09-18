@@ -1691,9 +1691,9 @@ def perform_request_verify_rule(ln, kbid, left, right, leftorright, currentname,
     """
     return bibformat_templates.tmpl_select_rule_action(ln, kbid, left, right, leftorright, currentname, tuples)
 
-def perform_update_kb_config(kb_id, coll_id, leftside, rightside):
+def perform_update_kb_config(kb_id, coll_id, field, expression):
     """
     Updates config by calling a db function.
     """
     #this will complain if the collection does not exist
-    return bibformat_dblayer.save_kb_coll_config(kb_id, coll_id, leftside, rightside)
+    return bibformat_dblayer.save_kb_coll_config(kb_id, coll_id, field, expression)
