@@ -188,9 +188,7 @@ def get_files(bfo):
                 format = format[1:]
 
             descr = ''
-            if complete_url.has_key('z'): # Let's take the description
-                descr = complete_url['z']
-            elif complete_url.has_key('y'):
+            if complete_url.has_key('y'):
                 descr = complete_url['y']
             if not url.startswith(CFG_SITE_URL): # Not a bibdoc?
                 if not descr: # For not bibdoc let's have a description
