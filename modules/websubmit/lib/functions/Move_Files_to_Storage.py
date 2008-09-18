@@ -137,7 +137,7 @@ def Move_Files_to_Storage(parameters, curdir, form, user_info=None):
                                 'verbosity' : 0,
                             })
                         except Exception, e:
-                            register_exception(prefix='Impossible to create icon for %s' % fullpath, alert_admin=True)
+                            register_exception(prefix='Impossible to create icon for %s (record %s)' % (fullpath, sysno), alert_admin=True)
                             continue
                         iconpath = os.path.join(iconpath, iconname)
                         docname = decompose_file(fullpath)[1]
