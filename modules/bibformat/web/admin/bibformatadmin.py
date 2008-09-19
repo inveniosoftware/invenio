@@ -41,6 +41,7 @@ from invenio.search_engine import search_pattern, \
                            get_alphabetically_ordered_collection_list, \
                            get_fieldvalues, perform_request_search
 from invenio.websearch_webcoll import get_collection
+from invenio.bibrank_downloads_indexer import uniq
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 
 try:
@@ -1399,10 +1400,8 @@ def kb_export(req, kbname="", format="", ln=CFG_SITE_LANG):
                 else:
                     req.write(mkey+"---"+mvalue+"\n")
             #make unique seq and print it
-            seqdict = {}
-            for s in seq:
-                seqdict[s] = 1
-            for s in sorted(seqdict.keys()):
+            useq = uniq(seq)
+            for s in useq:
                 req.write(s+"\n")
     if kbtype == 'c': #collection type: call export
         #get the config of this KB
@@ -1452,13 +1451,18 @@ def kb_export(req, kbname="", format="", ln=CFG_SITE_LANG):
             res2 = search_pattern(p=pattern, f=cconfig['field'])
         if res2:
             res = list(Set(res)&Set(res2))
-        #get the field that was configured
+
+        seq = [] #sequence of values to be printed
         for recid in res:
+            #get the field that was configured
             myvals = get_fieldvalues(recid, cconfig['field'])
             #print it
             myval = " ".join(myvals)
             if myval:
-                req.write(myval+"\n")
+                seq.append(myval)
+        useq = uniq(seq)
+        for s in useq:
+            req.write(s+"\n")
 
 def kb_add(req, ln=CFG_SITE_LANG, sortby="to", kbtype=""):
     """
