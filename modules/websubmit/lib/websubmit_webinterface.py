@@ -388,6 +388,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
         myQuery = req.args
         if myQuery:
+            param = ''
             if re.search("@",myQuery):
                 param = re.sub("@.*","",myQuery)
                 IN = re.sub(".*@","",myQuery)
