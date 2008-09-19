@@ -98,8 +98,10 @@ _extensions = _generate_extensions()
 class InvenioWebSubmitFileError(Exception):
     pass
 
-def file_strip_ext(afile):
+def file_strip_ext(afile, skip_version=False):
     """Strip in the best way the extension from a filename"""
+    if skip_version:
+        afile = afile.split(';')[0]
     lowfile = afile.lower()
     ext = '.'
     while ext:
@@ -138,10 +140,12 @@ def normalize_version(version):
             return ''
     return str(version)
 
-def decompose_file(afile):
+def decompose_file(afile, skip_version=False):
     """Decompose a file into dirname, basename and extension.
     Note that if provided with a URL, the scheme in front will be part
     of the dirname."""
+    if skip_version:
+        afile = afile.split(';')[0]
     basename = os.path.basename(afile)
     dirname = afile[:-len(basename)-1]
     base = file_strip_ext(basename)
@@ -320,6 +324,51 @@ class BibRecDocs:
             goodname = "%s_%s" % (docname, i)
         return goodname
 
+    def merge_bibdocs(self, docname1, docname2):
+        """This method merge docname2 into docname1.
+        Given all the formats of the latest version of docname2 the files
+        are added as new formats into docname1.
+        Docname2 is marked as deleted.
+        This method fails if at least one format in docname2 already exists
+        in docname1. (In this case the two bibdocs are preserved)
+        Comments and descriptions are also copied and if docname2 has an icon
+        and docname1 has not, the icon is imported.
+        If docname2 has a restriction(status) and docname1 has not the
+        restriction is imported."""
+
+        bibdoc1 = self.get_bibdoc(docname1)
+        bibdoc2 = self.get_bibdoc(docname2)
+
+        ## Check for possibility
+        for bibdocfile in bibdoc2.list_latest_files():
+            format = bibdocfile.get_format()
+            if bibdoc1.format_already_exists_p(format):
+                raise InvenioWebSubmitFileError('Format %s already exists in bibdoc %s of record %s. It\'s impossible to merge bibdoc %s into it.' % (format, docname1, self.id, docname2))
+
+        ## Importing Icon if needed.
+        icon1 = bibdoc1.get_icon()
+        icon2 = bibdoc2.get_icon()
+        if icon2 is not None and icon1 is None:
+            icon = icon2.list_latest_files()[0]
+            bibdoc1.add_icon(icon.get_full_path(), format=icon.get_format())
+
+        ## Importing restriction if needed.
+        restriction1 = bibdoc1.get_status()
+        restriction2 = bibdoc2.get_status()
+        if restriction2 and not restriction1:
+            bibdoc1.set_status(restriction2)
+
+        ## Importing formats
+        for bibdocfile in bibdoc2.list_latest_files():
+            format = bibdocfile.get_format()
+            comment = bibdocfile.get_comment()
+            description = bibdocfile.get_description()
+            bibdoc1.add_new_format(bibdocfile.get_full_path(), description=description, comment=comment, format=format)
+
+        ## Finally deleting old bibdoc2
+        bibdoc2.delete()
+        self.build_bibdoc_list()
+
     def get_docid(self, docname):
         """Returns the docid corresponding to the given docname, if the docname
         is valid.
@@ -385,7 +434,7 @@ class BibRecDocs:
             register_exception()
             raise InvenioWebSubmitFileError(str(e))
 
-    def add_new_file(self, fullpath, doctype="Main", docname='', never_fail=False, description=None, comment=None):
+    def add_new_file(self, fullpath, doctype="Main", docname=None, never_fail=False, description=None, comment=None, format=None):
         """Adds a new file with the following policy: if the docname is not set
         it is retrieved from the name of the file. If bibdoc with the given
         docname doesn't exist, it is created and the file is added to it.
@@ -395,47 +444,53 @@ class BibRecDocs:
         number as a suffix and the file is added to it. The elaborated bibdoc
         is returned.
         """
-        if not docname:
+        if docname is None:
             docname = decompose_file(fullpath)[1]
+        if format is None:
+            format = decompose_file(format)[2]
         docname = normalize_docname(docname)
         try:
             bibdoc = self.get_bibdoc(docname)
         except InvenioWebSubmitFileError:
             # bibdoc doesn't already exists!
             bibdoc = self.add_bibdoc(doctype, docname, False)
-            bibdoc.add_file_new_version(fullpath, description=description, comment=comment)
+            bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format)
         else:
             try:
-                bibdoc.add_file_new_format(fullpath, description=description, comment=comment)
+                bibdoc.add_file_new_format(fullpath, description=description, comment=comment, format=format)
             except InvenioWebSubmitFileError, e:
                 # Format already exist!
                 if never_fail:
                     bibdoc = self.add_bibdoc(doctype, docname, True)
-                    bibdoc.add_file_new_version(fullpath, description=description, comment=comment)
+                    bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format)
                 else:
                     raise e
         return bibdoc
 
-    def add_new_version(self, fullpath, docname=None, description=None, comment=None):
+    def add_new_version(self, fullpath, docname=None, description=None, comment=None, format=None):
         """Adds a new fullpath file to an already existent docid making the
         previous files associated with the same bibdocids obsolete.
         It returns the bibdoc object.
         """
         if docname is None:
             docname = decompose_file(fullpath)[1]
+        if format is None:
+            format = decompose_file(fullpath)[2]
         bibdoc = self.get_bibdoc(docname=docname)
-        bibdoc.add_file_new_version(fullpath, description, comment)
+        bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format)
         return bibdoc
 
-    def add_new_format(self, fullpath, docname=None, description=None, comment=None):
+    def add_new_format(self, fullpath, docname=None, description=None, comment=None, format=None):
         """Adds a new format for a fullpath file to an already existent
         docid along side already there files.
         It returns the bibdoc object.
         """
         if docname is None:
             docname = decompose_file(fullpath)[1]
+        if format is None:
+            format = decompose_file(fullpath)[2]
         bibdoc = self.get_bibdoc(docname=docname)
-        bibdoc.add_file_new_format(fullpath, description=description, comment=comment)
+        bibdoc.add_file_new_format(fullpath, description=description, comment=comment, format=format)
         return bibdoc
 
     def list_latest_files(self, doctype=''):
@@ -484,33 +539,6 @@ class BibRecDocs:
                   verbose_files=verbose_files
                 )
         return t
-
-    def fix_format(self, docname):
-        """Algorithm that fix a docname in case the list of recognized
-        extension is altered.
-        Return False if fixing wasn't necessary
-        """
-        ## First let's check if it is necessary
-        return
-        bibdoc = self.get_bibdoc(docname)
-        for filename in os.listdir(bibdoc.basedir):
-            if filename[0] != '.' and ';' in filename:
-                name, version = filename.split(';')
-                if file_strip_ext(name) != docname:
-                    ## We found at least a file to be fixed
-                    break
-        else:
-            return False
-        ## Something must be fixed
-        if file_strip_ext(docname) != docname:
-            ## the docname contains an extension that is now recognized
-            if file_strip_ext(docname) in self.get_bibdoc_names():
-                ## The correct docname already exist, hence
-                ## physical files with new recognized extensions
-                ## must be moved there
-                other_bibdoc = self.get_bibdoc(file_strip_ext(docname))
-                for afile in bibdoc.list_all_files():
-                    shutil.move('%s/%s' % (bibdoc.basedir, filename), '%s/%s' % (bibdoc.basedir, new_name))
 
     def fix(self, docname):
         """Algorithm that transform an a broken/old bibdoc into a coherent one:
@@ -633,6 +661,37 @@ class BibRecDocs:
                     register_exception()
                     raise InvenioWebSubmitFileError, "Error in importing description and comment from %s for record %s: %s" % (repr(bibdoc), self.id, e)
         return res
+
+    def fix_format(self, docname):
+        """In case CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS is
+        altered or Python version changes, it might happen that a docname
+        contains files which are no more docname + .format ; version, simply
+        because the .format is now recognized (and it was not before, so
+        it was contained into the docname). Fixing this situation require
+        different steps, because docname might already exists.
+        This algorithm try to fix this situation."""
+        need_fix = False
+        bibdoc = self.get_docname(docname)
+        correct_docname = decompose_file(docname)[1]
+        if docname != correct_docname:
+            need_fix = True
+        if not need_fix:
+            for filename in os.listdir(bibdoc.basedir):
+                if not filename.startswith('.'):
+                    filename = filename.split(';')[0]
+                    format = decompose_file(filename)[2]
+                    if correct_docname + format != filename:
+                        need_fix = True
+                        break
+        if need_fix:
+            ## TODO:
+            ## If correct_docname is available
+            ## just run_sql to update the docname
+            ## rename the internal files preserving format and versions
+            ## if it's not available generate new unique docname,
+            ## do as above and then merge new unique docname
+            ## into correct_docname with merge_bibdocs.
+            pass
 
 class BibDoc:
     """this class represents one file attached to a record
@@ -795,7 +854,7 @@ class BibDoc:
             self._build_file_list()
             self._build_related_file_list()
 
-    def add_file_new_version(self, filename, description=None, comment=None):
+    def add_file_new_version(self, filename, description=None, comment=None, format=None):
         """Add a new version of a file."""
         try:
             latestVersion = self.get_latest_version()
@@ -806,7 +865,8 @@ class BibDoc:
             if os.path.exists(filename):
                 if not os.path.getsize(filename) > 0:
                     raise InvenioWebSubmitFileError, "%s seems to be empty" % filename
-                dummy, dummy, format = decompose_file(filename)
+                if format is None:
+                    format = decompose_file(filename)[2]
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, myversion)
                 try:
                     shutil.copyfile(filename, destination)
@@ -937,7 +997,7 @@ class BibDoc:
                 self.set_description(global_description, format, version)
         self._build_file_list('init')
 
-    def add_file_new_format(self, filename, version=None, description=None, comment=None):
+    def add_file_new_format(self, filename, version=None, description=None, comment=None, format=None):
         """add a new format of a file to an archive"""
         try:
             if version is None:
@@ -947,7 +1007,8 @@ class BibDoc:
             if os.path.exists(filename):
                 if not os.path.getsize(filename) > 0:
                     raise InvenioWebSubmitFileError, "%s seems to be empty" % filename
-                dummy, dummy, format = decompose_file(filename)
+                if format is None:
+                    format = decompose_file(filename)[2]
                 destination = "%s/%s%s;%i" % (self.basedir, self.docname, format, version)
                 if os.path.exists(destination):
                     raise InvenioWebSubmitFileError, "A file for docname '%s' for the recid '%s' already exists for the format '%s'" % (self.docname, self.recid, format)
@@ -973,17 +1034,19 @@ class BibDoc:
         else:
             return None
 
-    def add_icon(self, filename, basename=''):
+    def add_icon(self, filename, basename=None, format=None):
         """Links an icon with the bibdoc object. Return the icon bibdoc"""
         #first check if an icon already exists
         existing_icon = self.get_icon()
         if existing_icon is not None:
             existing_icon.delete()
         #then add the new one
-        if not basename:
-            basename = decompose_file(filename)[1]
+        if basename is None:
+            basename = 'icon-%s' % self.docname
+        if format is None:
+            format = decompose_file(filename)[2]
         newicon = BibDoc(doctype='Icon', docname=basename)
-        newicon.add_file_new_version(filename)
+        newicon.add_file_new_version(filename, format=format)
         try:
             try:
                 old_umask = os.umask(022)
