@@ -60,6 +60,7 @@ in the directory.
                               (=full)
   --detect-author-keywords  detect keywords that are explicitely written in the
                               document
+  --check-ontology          checks the ontology and reports warnings and errors
   --rebuild-cache           ignores the existing cache and regenerates it
   --no-cache                don't cache the ontology
 
