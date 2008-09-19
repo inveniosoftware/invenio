@@ -39,7 +39,7 @@ from invenio.urlutils import wash_url_argument, redirect_to_url
 from invenio.search_engine import search_pattern, \
                            create_basic_search_units, \
                            get_alphabetically_ordered_collection_list, \
-                           get_fieldvalues
+                           get_fieldvalues, perform_request_search
 from invenio.websearch_webcoll import get_collection
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 
@@ -1439,7 +1439,12 @@ def kb_export(req, kbname="", format="", ln=CFG_SITE_LANG):
         expr = ""
         if cconfig.has_key('expression'):
             expr = cconfig['expression']
-        res = search_pattern(p=colldbquery)
+        res = ""
+        #if colldbquery is empty search_pattern will return infinite..
+        if colldbquery:
+            res = search_pattern(p=colldbquery)
+        else:
+            res = perform_request_search() #just return id's
         #if there is an expression, query again using it and combine..
         res2 = ""
         if expr:
@@ -1452,7 +1457,8 @@ def kb_export(req, kbname="", format="", ln=CFG_SITE_LANG):
             myvals = get_fieldvalues(recid, cconfig['field'])
             #print it
             myval = " ".join(myvals)
-            req.write(myval+"\n")
+            if myval:
+                req.write(myval+"\n")
 
 def kb_add(req, ln=CFG_SITE_LANG, sortby="to", kbtype=""):
     """
