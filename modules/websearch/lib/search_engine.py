@@ -56,7 +56,7 @@ from invenio.config import \
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES, InvenioWebSearchUnknownCollectionError
 from invenio.search_engine_summarizer import summarize_records
 from invenio.bibrecord import create_records, record_get_field_value, record_get_field_values
-from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records
+from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records, is_method_valid
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
 from invenio.bibformat import format_record, format_records, get_output_format_content_type, create_excel
@@ -3710,6 +3710,10 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
     p3 = wash_pattern(p3)
     f3 = wash_field(f3)
     datetext1, datetext2 = wash_dates(d1, d1y, d1m, d1d, d2, d2y, d2m, d2d)
+
+    # wash ranking method:
+    if not is_method_valid(None, rm):
+        rm = ""
 
     _ = gettext_set_language(ln)
 
