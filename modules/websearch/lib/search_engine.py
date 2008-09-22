@@ -478,8 +478,8 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                     opfts.append(['|', word, f, 'w']) # '|' in further units
         else:
             if of.startswith("h"):
-                print_warning(req, "Matching type '%s' is not implemented yet." % m, "Warning")
-            opfts.append(['+', "%" + p + "%", f, 'a'])
+                print_warning(req, "Matching type '%s' is not implemented yet." % cgi.escape(m), "Warning")
+            opfts.append(['+', "%" + p + "%", f, 'w'])
     else:
         ## B - matching type is not known: let us try to determine it by some heuristics
         if f and p[0] == '"' and p[-1] == '"':
@@ -1651,7 +1651,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     basic_search_units = create_basic_search_units(req, p, f, m, of)
     if verbose and of.startswith("h"):
         t2 = os.times()[4]
-        print_warning(req, "Search stage 1: basic search units are: %s" % basic_search_units)
+        print_warning(req, "Search stage 1: basic search units are: %s" % cgi.escape(repr(basic_search_units)))
         print_warning(req, "Search stage 1: execution took %.2f seconds." % (t2 - t1))
     # search stage 2: do search for each search unit and verify hit presence:
     if verbose and of.startswith("h"):
@@ -1661,7 +1661,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
         if verbose >= 9 and of.startswith("h"):
-            print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (bsu_p, basic_search_unit_hitset))
+            print_warning(req, "Search stage 1: pattern %s gave hitlist %s" % (cgi.escape(bsu_p), basic_search_unit_hitset))
         if len(basic_search_unit_hitset) > 0 or \
            ap==0 or \
            bsu_o=="|" or \
@@ -1680,7 +1680,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
                 else: # it is WRD query
                     bsu_pn = re.sub(r'[^a-zA-Z0-9\s\:]+', " ", bsu_p)
                 if verbose and of.startswith('h') and req:
-                    print_warning(req, "trying (%s,%s,%s)" % (bsu_pn, bsu_f, bsu_m))
+                    print_warning(req, "trying (%s,%s,%s)" % (cgi.escape(bsu_pn), cgi.escape(bsu_f), cgi.escape(bsu_m)))
                 basic_search_unit_hitset = search_pattern(req=None, p=bsu_pn, f=bsu_f, m=bsu_m, of="id", ln=ln)
                 if len(basic_search_unit_hitset) > 0:
                     # we retain the new unit instead
@@ -1731,7 +1731,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
             hitset_in_any_collection.union_update(this_unit_hitset)
         else:
             if of.startswith("h"):
-                print_warning(req, "Invalid set operation %s." % this_unit_operation, "Error")
+                print_warning(req, "Invalid set operation %s." % cgi.escape(this_unit_operation), "Error")
     if len(hitset_in_any_collection) == 0:
         # no hits found, propose alternative boolean query:
         if of.startswith('h'):
@@ -2159,11 +2159,11 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
     if t == 'w':
         nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)
         if not nearest_terms:
-            return "%s %s." % (_("No words index available for"), get_field_i18nname(get_field_name(f), ln))
+            return "%s %s." % (_("No words index available for"), cgi.escape(get_field_i18nname(get_field_name(f), ln)))
     else:
         nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
         if not nearest_terms:
-            return "%s %s." % (_("No phrase index available for"), get_field_i18nname(get_field_name(f), ln))
+            return "%s %s." % (_("No phrase index available for"), cgi.escape(get_field_i18nname(get_field_name(f), ln)))
 
     terminfo = []
     for term in nearest_terms:
@@ -2725,12 +2725,12 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
                     tags.append(row[0])
             else:
                 if of.startswith('h'):
-                    print_warning(req, _("Sorry, %s does not seem to be a valid sort option. Choosing title sort instead.") % sort_field, "Error")
+                    print_warning(req, _("Sorry, %s does not seem to be a valid sort option. Choosing title sort instead.") % cgi.escape(sort_field), "Error")
                 tags.append("245__a")
     if verbose >= 3:
-        print_warning(req, "Sorting by tags %s." % tags)
+        print_warning(req, "Sorting by tags %s." % cgi.escape(repr(tags)))
         if sort_pattern:
-            print_warning(req, "Sorting preferentially by %s." % sort_pattern)
+            print_warning(req, "Sorting preferentially by %s." % cgi.escape(sort_pattern))
 
     ## check if we have sorting tag defined:
     if tags:
@@ -3934,7 +3934,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                         results_in_any_collection.difference_update(results_tmp)
                     else:
                         if of.startswith("h"):
-                            print_warning(req, "Invalid set operation %s." % op1, "Error")
+                            print_warning(req, "Invalid set operation %s." % cgi.escape(op1), "Error")
                     if len(results_in_any_collection) == 0:
                         if of.startswith("h"):
                             perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
@@ -3953,7 +3953,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                         results_in_any_collection.difference_update(results_tmp)
                     else:
                         if of.startswith("h"):
-                            print_warning(req, "Invalid set operation %s." % op2, "Error")
+                            print_warning(req, "Invalid set operation %s." % cgi.escape(op2), "Error")
             except:
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
@@ -4037,7 +4037,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
         if pl:
             pl = wash_pattern(pl)
             if verbose and of.startswith("h"):
-                print_warning(req, "Search stage 5: applying search pattern limit %s..." % (pl,))
+                print_warning(req, "Search stage 5: applying search pattern limit %s..." % cgi.escape(pl))
             try:
                 results_final = intersect_results_with_hitset(req,
                                                               results_final,
