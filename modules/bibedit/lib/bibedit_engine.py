@@ -85,14 +85,11 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, format
                         subcode = dict_value.get("add_subcode", '')
                         value   = dict_value.get("add_value"  , '')
                         another = dict_value.get("addanother" , '')
-                        if tag != '' and subcode != '' and value != '':
-                            #add these in the record, take the instance number
-                            tag = tag[:3]
-                            new_field_number = record_add_field(record, tag, ind1, ind2, [(subcode, value)])
-                            record  = add_subfield(recid, uid, tag, record, new_field_number, subcode, value)
+                        if tag and subcode and value:
+                            (record, new_field_number) = add_field(recid, uid, record, tag, ind1, ind2, subcode, value)
                             if another:
                                 #if the user pressed 'another' instead of 'done', take to editing
-                                return perform_request_edit(ln, recid, uid, tag, new_field_number, 0, 'marc', True, None, 0, dict_value)
+                                return perform_request_edit(ln, recid, uid, tag, new_field_number, 0, 'marc', None, 0, dict_value)
                     # Compare original record with version in tmp file, to
                     # determine if it has been edited.
                     if record != original_record:
@@ -270,11 +267,11 @@ def add_field(recid, uid, record, tag, ind1, ind2, subcode, value_subfield):
     tag = tag[:3]
 
     new_field_number = record_add_field(record, tag, ind1, ind2)
-    record  = add_subfield(recid, uid, tag, record, new_field_number, subcode, value_subfield)
+    record = add_subfield(recid, uid, tag, record, new_field_number, subcode, value_subfield)
 
     save_temp_record(record, uid, "%s.tmp" % get_file_path(recid))
 
-    return record
+    return record, new_field_number
 
 
 def add_subfield(recid, uid, tag, record, num_field, subcode, value):
