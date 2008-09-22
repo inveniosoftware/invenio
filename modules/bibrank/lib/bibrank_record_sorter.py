@@ -126,7 +126,13 @@ def create_rnkmethod_cache():
                 i += 1
 
 def is_method_valid(colID, rank_method_code):
-    """Checks if a method is valid for the collection given"""
+    """
+    Check if RANK_METHOD_CODE method is valid for the collection given.
+    If colID is None, then check for existence regardless of collection.
+    """
+
+    if colID is None:
+        return run_sql("SELECT COUNT(*) FROM rnkMETHOD WHERE name=%s", (rank_method_code,))[0][0]
 
     enabled_colls = dict(run_sql("SELECT id_collection, score from collection_rnkMETHOD,rnkMETHOD WHERE id_rnkMETHOD=rnkMETHOD.id AND name='%s'" % rank_method_code))
 
@@ -146,15 +152,18 @@ def is_method_valid(colID, rank_method_code):
                 colID = colID[0][0]
     return 0
 
-def get_bibrank_methods(collection, ln=CFG_SITE_LANG):
-    """Returns a list of rank methods and the name om them in the language defined by the ln parameter, if collection is given, only methods enabled for that collection is returned."""
+def get_bibrank_methods(colID, ln=CFG_SITE_LANG):
+    """
+    Return a list of rank methods enabled for collection colID and the
+    name of them in the language defined by the ln parameter.
+    """
 
     if not globals().has_key('methods'):
         create_rnkmethod_cache()
 
     avail_methods = []
     for (rank_method_code, options) in methods.iteritems():
-        if options.has_key("function") and is_method_valid(collection, rank_method_code):
+        if options.has_key("function") and is_method_valid(colID, rank_method_code):
             if options.has_key(ln):
                 avail_methods.append((rank_method_code, options[ln]))
             elif options.has_key(CFG_SITE_LANG):
