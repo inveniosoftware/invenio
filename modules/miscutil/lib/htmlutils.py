@@ -151,11 +151,14 @@ class HTMLWasher(HTMLParser):
         @param allowed_tag_whitelist: list of allowed tags
         @param allowed_attribute_whitelist: list of allowed attributes
         """
+        self.reset()
         self.result = ''
         self.render_unallowed_tags = render_unallowed_tags
         self.allowed_tag_whitelist = allowed_tag_whitelist
         self.allowed_attribute_whitelist = allowed_attribute_whitelist
-        HTMLParser.feed(self, html_buffer)
+        self.feed(html_buffer)
+        self.close()
+
         return self.result
 
     def handle_starttag(self, tag, attrs):
