@@ -533,7 +533,7 @@ class Collection:
         for (code, name) in get_bibrank_methods(self.id, ln):
             values.append({'value' : code, 'text': name})
         box = websearch_templates.tmpl_select(
-                   fieldname = 'sf',
+                   fieldname = 'rm',
                    css_class = 'address',
                    values = values
                   )
