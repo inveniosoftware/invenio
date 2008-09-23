@@ -165,7 +165,7 @@ class SearchQueryParenthesisedParser:
             return [self._DEFAULT_OPERATOR, query]
 
         self._init_parsing(query)
-        # all operator symbols recognized in expression
+        # flag indicating if we are inside quotes
         inside_quotes = False
         # used for detecting escape sequences. Contains previously processed character.
         previous_character = ""
@@ -190,11 +190,12 @@ class SearchQueryParenthesisedParser:
                 if not inside_quotes:
                     inside_quotes = True
                     current_quotes_symbol = character
-                    self._assign_default_values_for_operators_if_necessary()
                 # in case we are inside quotes this is the closing quote
                 elif inside_quotes and character == current_quotes_symbol:
                     inside_quotes = False
                     current_quotes_symbol = ""
+                #asssign values to operators if necessary
+                self._assign_default_values_for_operators_if_necessary()
             elif '(' == character and previous_character != '\\':
                 self._handle_open_parenthesis()
             elif ')' == character and previous_character != '\\':

@@ -71,7 +71,9 @@ class TestSearchQueryParenthesisedParser(unittest.TestCase):
 
         self.assertEqual(parser.parse_query('(expr1) - expr2 + (expr3 | expr4) | "expr5 + expr6"'),
                          ['+', 'expr1', '-', 'expr2', '+', 'expr3 | expr4', '|', '"expr5 + expr6"'])
-
+        # test special cases - parentheses after quotas
+        self.assertEqual(parser.parse_query('"expr1" (expr2) expr3'),
+                         ['+', '"expr1"', '+', 'expr2', '+', 'expr3'])
         # test parsing of queries with missing operators.
         # in this case default operator + should be included on place of the missing one
         self.assertEqual(parser.parse_query('(expr1) expr2 (expr3) | expr4'),
