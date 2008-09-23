@@ -123,7 +123,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 msg = "<p>%s</p><p>%s</p>" % (
                     _("The system has encountered an error in retrieving the list of files for this document."),
                     _("The error has been logged and will be taken in consideration as soon as possible."))
-                return errorMsg(str(msg), req, ln)
+                return print_warning(msg)
 
             docname = ''
             format = ''
@@ -162,7 +162,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             docfile = doc.get_file(format, version)
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req, alert_admin=True)
-                            return errorMsg(str(msg), req, ln)
+                            return warningMsg(_("An error has happened in trying to retrieve the requested file."), req, CFG_SITE_NAME, ln)
 
                         if docfile.get_status() == '':
                             # The file is not resticted, let's check for
@@ -184,7 +184,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             return docfile.stream(req)
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req, alert_admin=True)
-                            return errorMsg(str(msg), req, ln)
+                            return warningMsg(_("An error has happened in trying to stream the request file."), req, CFG_SITE_NAME, ln)
 
                     elif doc.get_icon() is not None and doc.get_icon().docname in filename:
                         icon = doc.get_icon()
@@ -192,7 +192,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             iconfile = icon.get_file('gif', args['version'])
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req, alert_admin=True)
-                            return errorMsg(str(msg), req, ln)
+                            return warningMsg(_("An error has happened in trying to retrieve the corresponding icon."), req, CFG_SITE_NAME, ln)
 
                         if iconfile.get_status() == '':
                             # The file is not resticted, let's check for
@@ -214,7 +214,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             return iconfile.stream(req)
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req, alert_admin=True)
-                            return errorMsg(str(msg), req, ln)
+                            return warningMsg(_("An error has happened in trying to stream the corresponding icon."), req, CFG_SITE_NAME, ln)
 
             if docname and format:
                 req.status = apache.HTTP_NOT_FOUND
@@ -303,9 +303,9 @@ def websubmit_legacy_getfile(req, form):
                     bibdoc = BibDoc(docid=docid)
                     recid = bibdoc.get_recid()
                 except InvenioWebSubmitFileError, e:
-                    return errorMsg(e, req, ln)
+                    return warningMsg(_("An error has happened in trying to retrieve the requested file."), req, CFG_SITE_NAME, ln)
             else:
-                return errorMsg(_('Not enough information to retrieve the document'), req, ln)
+                return warningMsg(_('Not enough information to retrieve the document'), req, CFG_SITE_NAME, ln)
         else:
             if not name and docid:
                 ## Let's obtain the name from the docid
@@ -313,7 +313,7 @@ def websubmit_legacy_getfile(req, form):
                     bibdoc = BibDoc(docid)
                     name = bibdoc.get_docname()
                 except InvenioWebSubmitFileError, e:
-                    return errorMsg(e, req, ln)
+                    return warningMsg(_("An error has happened in trying to retrieving the requested file."), req, CFG_SITE_NAME, ln)
 
         format = normalize_format(format)
 
@@ -345,10 +345,10 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
         myQuery = req.args
         if sub == "":
-            return errorMsg("Sorry parameter missing...", req)
+            return warningMsg("Sorry parameter missing...", req)
         res = run_sql("select docname,actname from sbmIMPLEMENT where subname=%s", (sub,))
         if len(res)==0:
-            return errorMsg("Sorry. Cannot analyse parameter", req)
+            return warningMsg("Sorry. Cannot analyse parameter", req)
         else:
             # get document type
             doctype = res[0][0]
@@ -411,11 +411,17 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../summary.py/index",
+            return page_not_authorized(req, "../summary",
                                        navmenuid='submit')
 
         t=""
-        curdir  = "%s/%s/%s/%s" % (CFG_WEBSUBMIT_STORAGEDIR,args['indir'],args['doctype'],args['access'])
+        curdir  = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, args['indir'], args['doctype'], args['access'])
+        try:
+            assert(curdir == os.path.abspath(curdir))
+        except AssertionError:
+            register_exception(req, alert_admin=True, prefix='Possible cracking tentative: indir="%s", doctype="%s", access="%s"' % (args['indir'], args['doctype'], args['access']))
+            return warningMsg("Invalid parameters")
+
         subname = "%s%s" % (args['act'], args['doctype'])
 
         res = run_sql("select sdesc,fidesc,pagenb,level from sbmFIELD where subname=%s "
@@ -431,8 +437,8 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
                        'page' : arr[2],
                        'name' : arr[0],
                       }
-                if os.path.exists("%s/%s" % (curdir,arr[1])):
-                    fd = open("%s/%s" % (curdir,arr[1]),"r")
+                if os.path.exists(os.path.join(curdir, curdir,arr[1])):
+                    fd = open(os.path.join(curdir, arr[1]),"r")
                     value = fd.read()
                     fd.close()
                     value = value.replace("\n"," ")
