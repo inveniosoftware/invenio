@@ -447,7 +447,7 @@ class BibRecDocs:
         if docname is None:
             docname = decompose_file(fullpath)[1]
         if format is None:
-            format = decompose_file(format)[2]
+            format = decompose_file(fullpath)[2]
         docname = normalize_docname(docname)
         try:
             bibdoc = self.get_bibdoc(docname)
