@@ -54,7 +54,7 @@ from invenio.bibrankadminlib import addadminbox, tupletotable, \
 from invenio.access_control_firerole import compile_role_definition, \
     repair_role_definitions, serialize
 from invenio.messages import gettext_set_language
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, OperationalError
 from invenio.webpage import page
 from invenio.webuser import getUid, isGuestUser, page_not_authorized
 from invenio.webuser import email_valid_p, get_user_preferences, \
@@ -318,8 +318,11 @@ def perform_userarea(req, email_user_pattern=''):
                             button="search for users")
 
     if email_user_pattern:
-        users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s
-            ORDER BY email LIMIT %s""", (email_user_pattern, MAXPAGEUSERS+1))
+        try:
+            users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s
+                ORDER BY email LIMIT %s""", (email_user_pattern, MAXPAGEUSERS+1))
+        except OperationalError:
+            users1 = ()
 
         if not users1:
             output += '<p>no matching users</p>'
@@ -1054,6 +1057,7 @@ def perform_modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=MAXP
                             button="search for accounts")
 
     if limit_to not in [-1, "-1"] and maxpage:
+        options = []
         users1 = "SELECT id,email,note FROM user WHERE "
         if limit_to == "enabled":
             users1 += " email!='' AND note=1"
@@ -1064,9 +1068,14 @@ def perform_modifyaccounts(req, email_user_pattern='', limit_to=-1, maxpage=MAXP
         else:
             users1 += " email!=''"
         if email_user_pattern:
-            users1 += " AND email RLIKE '%s'" % (email_user_pattern)
-        users1 += " ORDER BY email LIMIT %s" % (maxpage * page + 1)
-        users1 = run_sql(users1)
+            users1 += " AND email RLIKE %s"
+            options += [email_user_pattern]
+        users1 += " ORDER BY email LIMIT %s"
+        options += [maxpage * page + 1]
+        try:
+            users1 = run_sql(users1, tuple(options))
+        except OperationalError:
+            users1 = ()
         if not users1:
             output += '<b><span class="info">There are no accounts matching the email given.</span></b>'
         else:
@@ -1334,13 +1343,18 @@ def perform_delegate_adduserrole(req, id_role=0, email_user_pattern='', id_user=
             # pattern is entered
             if email_user_pattern:
                 # users with matching email-address
-                users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+                try:
+                    users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+                except OperationalError:
+                    users1 = ()
                 # users that are connected
-                users2 = run_sql("""SELECT DISTINCT u.id, u.email
-                FROM user u LEFT JOIN user_accROLE ur ON u.id = ur.id_user
-                WHERE ur.id_accROLE = %s AND u.email RLIKE %s
-                ORDER BY u.email """,  (id_role, email_user_pattern))
-
+                try:
+                    users2 = run_sql("""SELECT DISTINCT u.id, u.email
+                    FROM user u LEFT JOIN user_accROLE ur ON u.id = ur.id_user
+                    WHERE ur.id_accROLE = %s AND u.email RLIKE %s
+                    ORDER BY u.email """,  (id_role, email_user_pattern))
+                except OperationalError:
+                    users2 = ()
                 # no users that match the pattern
                 if not (users1 or users2):
                     output += '<p>no qualified users, try new search.</p>'
@@ -1966,12 +1980,18 @@ def perform_adduserrole(req, id_role='0', email_user_pattern='', id_user='0', co
         # pattern is entered
         if email_user_pattern:
             # users with matching email-address
-            users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+            try:
+                users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+            except OperationalError:
+                users1 = ()
             # users that are connected
-            users2 = run_sql("""SELECT DISTINCT u.id, u.email
-            FROM user u LEFT JOIN user_accROLE ur ON u.id = ur.id_user
-            WHERE ur.id_accROLE = %s AND u.email RLIKE %s
-            ORDER BY u.email """, (id_role, email_user_pattern))
+            try:
+                users2 = run_sql("""SELECT DISTINCT u.id, u.email
+                FROM user u LEFT JOIN user_accROLE ur ON u.id = ur.id_user
+                WHERE ur.id_accROLE = %s AND u.email RLIKE %s
+                ORDER BY u.email """, (id_role, email_user_pattern))
+            except OperationalError:
+                users2 = ()
 
             # no users that match the pattern
             if not (users1 or users2):
@@ -2087,7 +2107,10 @@ def perform_addroleuser(req, email_user_pattern='', id_user='0', id_role='0', co
     if email_user_pattern:
         subtitle = 'step 2 - select user'
 
-        users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+        try:
+            users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+        except OperationalError:
+            users1 = ()
         users = []
         for (id, email) in users1: users.append([id, email, ''])
 

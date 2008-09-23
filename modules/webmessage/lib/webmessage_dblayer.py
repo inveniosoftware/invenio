@@ -29,7 +29,7 @@ from time import localtime, mktime
 from invenio.config import \
      CFG_WEBMESSAGE_MAX_NB_OF_MESSAGES, \
      CFG_WEBMESSAGE_DAYS_BEFORE_DELETE_ORPHANS
-from invenio.dbquery import run_sql
+from invenio.dbquery import run_sql, OperationalError
 from invenio.webmessage_config import CFG_WEBMESSAGE_STATUS_CODE, \
                                       CFG_WEBMESSAGE_ROLES_WITHOUT_QUOTA
 from invenio.dateutils import datetext_default, \
@@ -537,7 +537,10 @@ def update_user_inbox_for_reminders(uid):
 def get_nicknames_like(pattern):
     """get nicknames like pattern"""
     if pattern:
-        res = run_sql("SELECT nickname FROM user WHERE nickname RLIKE %s", (pattern,))
+        try:
+            res = run_sql("SELECT nickname FROM user WHERE nickname RLIKE %s", (pattern,))
+        except OperationalError:
+            res = ()
         return res
     return ()
 
@@ -548,14 +551,20 @@ def get_groupnames_like(uid, pattern):
     if pattern:
         # For this use case external groups are like invisible one
         query1 = "SELECT id, name FROM usergroup WHERE name RLIKE %s AND join_policy like 'V%%' AND join_policy<>'VE'"
-        res = run_sql(query1, (pattern,))
+        try:
+            res = run_sql(query1, (pattern,))
+        except OperationalError:
+            res = ()
         # The line belows inserts into groups dictionary every tuple the database returned,
         # assuming field0=key and field1=value
         map(lambda x: groups.setdefault(x[0], x[1]), res)
         query2 = """SELECT g.id, g.name
                     FROM usergroup g, user_usergroup ug
                     WHERE g.id=ug.id_usergroup AND ug.id_user=%s AND g.name RLIKE %s"""
-        res = run_sql(query2, (uid, pattern))
+        try:
+            res = run_sql(query2, (uid, pattern))
+        except OperationalError:
+            res = ()
         map(lambda x: groups.setdefault(x[0], x[1]), res)
     return groups
 

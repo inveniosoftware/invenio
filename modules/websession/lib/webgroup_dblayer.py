@@ -29,7 +29,7 @@ from zlib import decompress
 from invenio.config import \
      CFG_SITE_LANG, \
      CFG_VERSION
-from invenio.dbquery import run_sql, run_sql_cached
+from invenio.dbquery import run_sql, run_sql_cached, OperationalError
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.messages import gettext_set_language
 from invenio.websession_config import CFG_WEBSESSION_GROUP_JOIN_POLICY
@@ -196,7 +196,10 @@ def get_visible_group_list(uid, pattern=""):
         query2 += """ AND id NOT IN %s""" % str(tuple(grpID))
 
     if pattern:
-        res2 = run_sql(query2 + """ AND name RLIKE %s ORDER BY name""", (pattern,))
+        try:
+            res2 = run_sql(query2 + """ AND name RLIKE %s ORDER BY name""", (pattern,))
+        except OperationalError:
+            res2 = ()
     else:
         res2 = run_sql(query2 + """ ORDER BY name""")
 

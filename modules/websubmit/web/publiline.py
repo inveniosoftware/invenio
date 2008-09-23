@@ -51,7 +51,7 @@ from invenio.config import \
      CFG_SITE_SUPPORT_EMAIL, \
      CFG_SITE_SECURE_URL, \
      CFG_VERSION
-from invenio.dbquery import run_sql, Error
+from invenio.dbquery import run_sql, Error, OperationalError
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import *
 from invenio.webpage import page, create_error_box
@@ -696,12 +696,18 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         # pattern is entered
         if email_user_pattern:
             # users with matching email-address
-            users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+            try:
+                users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+            except OperationalError:
+                users1 = ()
             # users that are connected
-            users2 = run_sql("""SELECT DISTINCT u.id, u.email
-            FROM user u LEFT JOIN user_usergroup ug ON u.id = ug.id_user
-            WHERE ug.id_usergroup = %s AND u.email RLIKE %s
-            ORDER BY u.email """, (id_EdBoardGroup, email_user_pattern))
+            try:
+                users2 = run_sql("""SELECT DISTINCT u.id, u.email
+                FROM user u LEFT JOIN user_usergroup ug ON u.id = ug.id_user
+                WHERE ug.id_usergroup = %s AND u.email RLIKE %s
+                ORDER BY u.email """, (id_EdBoardGroup, email_user_pattern))
+            except OperationalError:
+                users2 = ()
 
             # no users that match the pattern
             if not (users1 or users2):
@@ -821,8 +827,10 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         # pattern is entered
         if email_user_pattern:
             # users with matching email-address
-            users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s ORDER BY email """, (email_user_pattern, ))
-
+            try:
+                users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+            except OperationalError:
+                users1 = ()
             # no users that match the pattern
             if not users1:
                 stopon1 = '<p>%s</p>' % _("no qualified users, try new search.")
