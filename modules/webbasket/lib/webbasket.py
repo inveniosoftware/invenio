@@ -59,6 +59,7 @@ def perform_request_display(uid,
     warnings = []
     errors = []
     baskets_html = []
+    baskets = []
 
     _ = gettext_set_language(ln)
     nb_groups = db.count_groups_user_member_of(uid)
