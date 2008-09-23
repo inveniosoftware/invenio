@@ -297,6 +297,30 @@ check_only_uid_p - hidden parameter needed to only check against uids without
         # none of the zeroargs tests succeded
         if verbose: print ' - not authorization without arguments'
         return (5, "%s %s" % (CFG_WEBACCESS_WARNING_MSGS[5], (called_from and "%s" % (CFG_WEBACCESS_MSGS[1] or ""))))
+    else:
+        ## Let's also check if call has provided arguments but the action is available
+        ## also with optional arguments, to see if the user is authorized anyway.
+        if optional == 'yes':
+            if verbose: print ' - action with optional arguments'
+            if check_only_uid_p:
+                connection = run_sql_cached("""SELECT id_accROLE FROM accROLE_accACTION_accARGUMENT
+                        WHERE id_accROLE IN (%s) AND
+                        id_accACTION = %s AND
+                        id_accARGUMENT = -1 AND
+                        argumentlistid = -1 """ % (str_roles, id_action), affected_tables=['accROLE_accACTION_accARGUMENT'])
+
+                if connection and 1:
+                    return (0, CFG_WEBACCESS_WARNING_MSGS[0])
+            else:
+                connection = run_sql_cached("""SELECT id_accROLE FROM
+                        accROLE_accACTION_accARGUMENT
+                        WHERE id_accACTION = %s AND
+                        id_accARGUMENT = -1 AND
+                        argumentlistid = -1 """ % id_action, affected_tables=['accROLE_accACTION_accARGUMENT'])
+
+                for id_accROLE in connection:
+                    if access_control_firerole.acc_firerole_check_user(user_info, access_control_firerole.load_role_definition(id_accROLE[0])):
+                        return (0, CFG_WEBACCESS_WARNING_MSGS[0])
 
     # TASK 4: create list of keyword and values that satisfy part of the authentication and create or-string
     if verbose: print 'task 4 - create keyword=value pairs'
