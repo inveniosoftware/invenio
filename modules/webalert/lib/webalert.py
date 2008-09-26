@@ -50,10 +50,10 @@ def check_alert_name(alert_name, uid, ln=CFG_SITE_LANG):
 
     sql = """select id_query
            from user_query_basket
-           where id_user=%s and alert_name='%s'"""%(uid, alert_name.strip())
-    res =  run_sql(sql)
+           where id_user=%s and alert_name=%s"""
+    res =  run_sql(sql, (uid, alert_name.strip()))
     if len(res) > 0:
-        raise AlertError( _("You already have an alert named %s.") % ('<b>' + alert_name + '</b>',) )
+        raise AlertError( _("You already have an alert named %s.") % ('<b>' + cgi.escape(alert_name) + '</b>',) )
 
 def get_textual_query_info_from_urlargs(urlargs, ln=CFG_SITE_LANG):
     """Return nicely formatted search pattern and catalogue from urlargs of the search query.
@@ -86,18 +86,20 @@ def perform_display(permanent, uid, ln=CFG_SITE_LANG):
         pass
 
     # query for queries:
+    params = ()
     if permanent == "n":
         SQL_query = "SELECT DISTINCT(q.id),q.urlargs "\
                     "FROM query q, user_query uq "\
-                    "WHERE uq.id_user='%s' "\
+                    "WHERE uq.id_user=%s "\
                     "AND uq.id_query=q.id "\
-                    "ORDER BY q.id DESC" % uid
+                    "ORDER BY q.id DESC"
+        params = (uid,)
     else:
         # permanent="y"
         SQL_query = "SELECT q.id,q.urlargs "\
                     "FROM query q "\
                     "WHERE q.type='p'"
-    query_result = run_sql(SQL_query)
+    query_result = run_sql(SQL_query, params)
 
     queries = []
     if len(query_result) > 0:
@@ -129,7 +131,7 @@ def perform_display(permanent, uid, ln=CFG_SITE_LANG):
              guesttxt = warning_guest_user(type="alerts", ln=ln)
            )
 
-def perform_input_alert(action, id_query, alert_name, frequency, notification, id_basket,uid, old_id_basket=None, ln = CFG_SITE_LANG):
+def perform_input_alert(action, id_query, alert_name, frequency, notification, id_basket, uid, old_id_basket=None, ln = CFG_SITE_LANG):
     """get the alert settings
     input:  action="add" for a new alert (blank form), action="modify" for an update
             (get old values)
@@ -168,8 +170,8 @@ def check_alert_is_unique(id_basket, id_query, uid, ln=CFG_SITE_LANG ):
     sql = """select id_query
             from user_query_basket
             where id_user = %s and id_query = %s
-            and id_basket= %s"""%(uid, id_query, id_basket)
-    res =  run_sql(sql)
+            and id_basket = %s"""
+    res =  run_sql(sql, (uid, id_query, id_basket))
     if len(res):
         raise AlertError(_("You already have an alert defined for the specified query and basket."))
 
@@ -201,11 +203,11 @@ def perform_add_alert(alert_name, frequency, notification,
     query = """INSERT INTO user_query_basket (id_user, id_query, id_basket,
                                               frequency, date_creation, date_lastrun,
                                               alert_name, notification)
-               VALUES ('%s','%s','%s','%s','%s','','%s','%s')"""
-    query %= (uid, id_query, id_basket,
+               VALUES (%s,%s,%s,%s,%s,'',%s,%s)"""
+    params = (uid, id_query, id_basket,
               frequency, convert_datestruct_to_datetext(time.localtime()),
               alert_name, notification)
-    run_sql(query)
+    run_sql(query, params)
     out = _("The alert %s has been added to your profile.")
     out %= '<b>' + cgi.escape(alert_name) + '</b>'
     out += perform_list_alerts(uid, ln=ln)
@@ -224,9 +226,9 @@ def perform_list_alerts(uid, ln=CFG_SITE_LANG):
                        DATE_FORMAT(a.date_lastrun,'%%Y-%%m-%%d %%H:%%i:%%s')
                 FROM user_query_basket a LEFT JOIN query q ON a.id_query=q.id
                                          LEFT JOIN bskBASKET b ON a.id_basket=b.id
-                WHERE a.id_user='%s'
-                ORDER BY a.alert_name ASC """ % uid
-    res = run_sql(query)
+                WHERE a.id_user=%s
+                ORDER BY a.alert_name ASC """
+    res = run_sql(query, (uid,))
     alerts = []
     for (qry_id, qry_args,
          bsk_id, bsk_name,
@@ -274,18 +276,18 @@ def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=CFG_SITE_LANG)
         return out
     # remove a row from the alerts table: user_query_basket
     query = """DELETE FROM user_query_basket
-               WHERE id_user='%s' AND id_query='%s' AND id_basket='%s'"""
-    query %= (uid, id_query, id_basket)
-    res = run_sql(query)
+               WHERE id_user=%s AND id_query=%s AND id_basket=%s"""
+    params = (uid, id_query, id_basket)
+    res = run_sql(query, params)
     if res:
-        out += "The alert <b>%s</b> has been removed from your profile.<br /><br />\n" % alert_name
+        out += "The alert <b>%s</b> has been removed from your profile.<br /><br />\n" % cgi.escape(alert_name)
     else:
-        out += "Unable to remove alert <b>%s</b>.<br /><br />\n" % alert_name
+        out += "Unable to remove alert <b>%s</b>.<br /><br />\n" % cgi.escape(alert_name)
     out += perform_list_alerts(uid, ln=ln)
     return out
 
 
-def perform_update_alert(alert_name, frequency, notification, id_basket, id_query, old_id_basket,uid, ln = CFG_SITE_LANG):
+def perform_update_alert(alert_name, frequency, notification, id_basket, id_query, old_id_basket, uid, ln = CFG_SITE_LANG):
     """update alert settings into the database
     input:  the name of the new alert;
             alert frequency: 'month', 'week' or 'day';
@@ -312,9 +314,9 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
             from user_query_basket
             where id_user=%s
             and id_basket=%s
-            and id_query=%s"""%( uid, old_id_basket, id_query )
+            and id_query=%s"""
     try:
-        old_alert_name = run_sql( sql )[0][0]
+        old_alert_name = run_sql(sql, (uid, old_id_basket, id_query))[0][0]
     except IndexError:
         # FIXME: I18N since this technique of the below raise message,
         # since this technique (detecting old alert IDs) is not nice
@@ -327,16 +329,16 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
 
     # update a row into the alerts table: user_query_basket
     query = """UPDATE user_query_basket
-               SET alert_name='%s',frequency='%s',notification='%s',
-                   date_creation='%s',date_lastrun='',id_basket='%s'
-               WHERE id_user='%s' AND id_query='%s' AND id_basket='%s'"""
-    query %= (alert_name, frequency, notification,
+               SET alert_name=%s,frequency=%s,notification=%s,
+                   date_creation=%s,date_lastrun='',id_basket=%s
+               WHERE id_user=%s AND id_query=%s AND id_basket=%s"""
+    params = (alert_name, frequency, notification,
               convert_datestruct_to_datetext(time.localtime()),
               id_basket, uid, id_query, old_id_basket)
 
-    run_sql(query)
+    run_sql(query, params)
 
-    out += _("The alert %s has been successfully updated.") % ("<b>" + alert_name + "</b>",)
+    out += _("The alert %s has been successfully updated.") % ("<b>" + cgi.escape(alert_name) + "</b>",)
     out += "<br /><br />\n" + perform_list_alerts(uid, ln=ln)
     return out
 
@@ -359,9 +361,9 @@ def account_list_alerts(uid, ln=CFG_SITE_LANG):
                        DATE_FORMAT(a.date_lastrun,'%%d %%b %%Y'),
                        a.id_basket
                 FROM query q, user_query_basket a
-                WHERE a.id_user='%s' AND a.id_query=q.id
-                ORDER BY a.alert_name ASC """ % uid
-    res = run_sql(query)
+                WHERE a.id_user=%s AND a.id_query=q.id
+                ORDER BY a.alert_name ASC """
+    res = run_sql(query, (uid,))
     alerts = []
     if len(res):
         for row in res:
@@ -376,7 +378,7 @@ def account_list_searches(uid, ln=CFG_SITE_LANG):
     """ account_list_searches: list the searches of the user
         input:  the user id
         output: resume of the searches"""
-    out =""
+    out = ""
   # first detect number of queries:
     nb_queries_total = 0
     res = run_sql("SELECT COUNT(*) FROM user_query WHERE id_user=%s", (uid,), 1)

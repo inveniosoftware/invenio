@@ -209,9 +209,9 @@ def perform_request_vote(cmt_id, client_ip_address, value, uid=-1):
         query = """INSERT INTO cmtACTIONHISTORY (id_cmtRECORDCOMMENT,
                     id_bibrec, id_user, client_host, action_time,
                     action_code)
-                   VALUES (%i, NULL ,%i, inet_aton('%s'), '%s', '%s')"""
-        query %= (cmt_id, uid, client_ip_address, action_date, action_code)
-        run_sql(query)
+                   VALUES (%s, NULL ,%s, inet_aton(%s), %s, %s)"""
+        params = (cmt_id, uid, client_ip_address, action_date, action_code)
+        run_sql(query, params)
         return query_record_useful_review(cmt_id, value)
     else:
         return 0
@@ -231,15 +231,18 @@ def check_user_can_comment(recID, client_ip_address, uid=-1):
     action_code = CFG_WEBCOMMENT_ACTION_CODE['ADD_COMMENT']
     query = """SELECT id_bibrec
                FROM cmtACTIONHISTORY
-               WHERE id_bibrec=%i AND
-                     action_code='%s' AND
-                     action_time>'%s'
-            """ % (recID, action_code, max_action_time)
+               WHERE id_bibrec=%s AND
+                     action_code=%s AND
+                     action_time>%s
+            """
+    params = (recID, action_code, max_action_time)
     if uid < 0:
-        query += " AND client_host=inet_aton('%s')" % client_ip_address
+        query += " AND client_host=inet_aton(%s)"
+        params += (client_ip_address,)
     else:
-        query += " AND id_user=%i" % uid
-    res = run_sql(query)
+        query += " AND id_user=%s"
+        params += (uid,)
+    res = run_sql(query, params)
     return len(res) == 0
 
 def check_user_can_review(recID, client_ip_address, uid=-1):
@@ -252,14 +255,17 @@ def check_user_can_review(recID, client_ip_address, uid=-1):
     action_code = CFG_WEBCOMMENT_ACTION_CODE['ADD_REVIEW']
     query = """SELECT id_bibrec
                FROM cmtACTIONHISTORY
-               WHERE id_bibrec=%i AND
-                     action_code='%s'
-            """ % (recID, action_code)
+               WHERE id_bibrec=%s AND
+                     action_code=%s
+            """
+    params = (recID, action_code)
     if uid < 0:
-        query += " AND client_host=inet_aton('%s')" % client_ip_address
+        query += " AND client_host=inet_aton(%s)"
+        params += (client_ip_address,)
     else:
-        query += " AND id_user=%i" % uid
-    res = run_sql(query)
+        query += " AND id_user=%s"
+        params += (uid,)
+    res = run_sql(query, params)
     return len(res) == 0
 
 def check_user_can_vote(cmt_id, client_ip_address, uid=-1):
@@ -273,12 +279,15 @@ def check_user_can_vote(cmt_id, client_ip_address, uid=-1):
     uid = wash_url_argument(uid, 'int')
     query = """SELECT id_cmtRECORDCOMMENT
                FROM cmtACTIONHISTORY
-               WHERE id_cmtRECORDCOMMENT=%i""" % cmt_id
+               WHERE id_cmtRECORDCOMMENT=%s"""
+    params = (cmt_id,)
     if uid < 0:
-        query += " AND client_host=inet_aton('%s')" % client_ip_address
+        query += " AND client_host=inet_aton(%s)"
+        params += (client_ip_address,)
     else:
-        query += " AND id_user=%i" % uid
-    res = run_sql(query)
+        query += " AND id_user=%s"
+        params += (uid, )
+    res = run_sql(query, params)
     return (len(res) == 0)
 
 def perform_request_report(cmt_id, client_ip_address, uid=-1):
@@ -302,9 +311,9 @@ def perform_request_report(cmt_id, client_ip_address, uid=-1):
     action_code = CFG_WEBCOMMENT_ACTION_CODE['REPORT_ABUSE']
     query = """INSERT INTO cmtACTIONHISTORY (id_cmtRECORDCOMMENT, id_bibrec,
                   id_user, client_host, action_time, action_code)
-               VALUES (%i, NULL, %i, inet_aton('%s'), '%s', '%s')"""
-    query %= (cmt_id, uid, client_ip_address, action_date, action_code)
-    run_sql(query)
+               VALUES (%s, NULL, %s, inet_aton(%s), %s, %s)"""
+    params = (cmt_id, uid, client_ip_address, action_date, action_code)
+    run_sql(query, params)
     if nb_abuse_reports % CFG_WEBCOMMENT_NB_REPORTS_BEFORE_SEND_EMAIL_TO_ADMIN == 0:
         (cmt_id2,
          id_bibrec,
@@ -379,12 +388,15 @@ def check_user_can_report(cmt_id, client_ip_address, uid=-1):
     uid = wash_url_argument(uid, 'int')
     query = """SELECT id_cmtRECORDCOMMENT
                FROM cmtACTIONHISTORY
-               WHERE id_cmtRECORDCOMMENT=%i""" % cmt_id
+               WHERE id_cmtRECORDCOMMENT=%s"""
+    params = (uid,)
     if uid < 0:
-        query += " AND client_host=inet_aton('%s')" % client_ip_address
+        query += " AND client_host=inet_aton(%s)"
+        params += (client_ip_address,)
     else:
-        query += " AND id_user=%i" % uid
-    res = run_sql(query)
+        query += " AND id_user=%s"
+        params += (uid,)
+    res = run_sql(query, params)
     return (len(res) == 0)
 
 def query_get_user_contact_info(uid):
@@ -547,24 +559,22 @@ def query_retrieve_comments_or_remarks (recID, display_order='od', display_since
         display_order = order_dict['od']
     query = """SELECT user.nickname,
                       cmt.id_user,
-                      DATE_FORMAT(cmt.date_creation, '%%Y-%%m-%%d %%H:%%i:%%s'),
+                      DATE_FORMAT(cmt.date_creation, '%%%%Y-%%%%m-%%%%d %%%%H:%%%%i:%%%%s'),
                       cmt.body,
                       %(ranking)s cmt.id
                FROM   %(table)s cmt LEFT JOIN user ON
                                               user.id=cmt.id_user
-               WHERE %(id_bibrec)s=%(recID)i
+               WHERE %(id_bibrec)s=%%s
                %(ranking_only)s
                %(display_since)s
-               ORDER BY %(display_order)s"""
-    params = {  'ranking'       : ranking and ' cmt.nb_votes_yes, cmt.nb_votes_total, cmt.star_score, cmt.title, ' or '',
-                'ranking_only'  : ranking and ' AND cmt.star_score>0 ' or ' AND cmt.star_score=0 ',
-                'id_bibrec'     : recID > 0 and 'cmt.id_bibrec' or 'cmt.id_bibrec_or_bskEXTREC',
-                'table'         : recID > 0 and 'cmtRECORDCOMMENT' or 'bskRECORDCOMMENT',
-                'recID'         : recID,
-                'display_since' : display_since=='0000-00-00 00:00:00' and ' ' or 'AND cmt.date_creation>=\'%s\' ' % display_since,
-                'display_order' : display_order
-            }
-    res = run_sql(query % params)
+               ORDER BY %%s
+               """ % {'ranking'       : ranking and ' cmt.nb_votes_yes, cmt.nb_votes_total, cmt.star_score, cmt.title, ' or '',
+                      'ranking_only'  : ranking and ' AND cmt.star_score>0 ' or ' AND cmt.star_score=0 ',
+                      'id_bibrec'     : recID > 0 and 'cmt.id_bibrec' or 'cmt.id_bibrec_or_bskEXTREC',
+                      'table'         : recID > 0 and 'cmtRECORDCOMMENT' or 'bskRECORDCOMMENT',
+                      'display_since' : display_since == '0000-00-00 00:00:00' and ' ' or 'AND cmt.date_creation>=\'%s\' ' % display_since}
+    params = (recID, display_order)
+    res = run_sql(query, params)
     if res:
         return res
     return ()
@@ -615,9 +625,9 @@ def query_add_comment_or_remark(reviews=0, recID=0, uid=-1, msg="",
         action_time = convert_datestruct_to_datetext(time.localtime())
         query2 = """INSERT INTO cmtACTIONHISTORY  (id_cmtRECORDCOMMENT,
                      id_bibrec, id_user, client_host, action_time, action_code)
-                    VALUES ('', %i, %i, inet_aton('%s'), '%s', '%s')"""
+                    VALUES ('', %s, %s, inet_aton(%s), %s, %s)"""
         params2 = (recID, uid, client_ip_address, action_time, action_code)
-        run_sql(query2%params2)
+        run_sql(query2, params2)
         return int(res)
 
 def calculate_start_date(display_since):
@@ -678,8 +688,8 @@ def count_comments(recID):
     """
     recID = int(recID)
     query = """SELECT count(id) FROM cmtRECORDCOMMENT
-                                WHERE id_bibrec=%i AND star_score=0"""
-    return run_sql(query % recID)[0][0]
+                                WHERE id_bibrec=%s AND star_score=0"""
+    return run_sql(query, (recID,))[0][0]
 
 def count_reviews(recID):
     """
@@ -687,8 +697,8 @@ def count_reviews(recID):
     """
     recID = int(recID)
     query = """SELECT count(id) FROM cmtRECORDCOMMENT
-                                WHERE id_bibrec=%i AND star_score>0"""
-    return run_sql(query % recID)[0][0]
+                                WHERE id_bibrec=%s AND star_score>0"""
+    return run_sql(query, (recID,))[0][0]
 
 def get_first_comments_or_remarks(recID=-1,
                                   ln=CFG_SITE_LANG,
@@ -744,7 +754,7 @@ def get_first_comments_or_remarks(recID=-1,
         elif reported == 0:
             warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
         if CFG_WEBCOMMENT_ALLOW_COMMENTS: # normal comments
-            comments = webcomment_templates.tmpl_get_first_comments_without_ranking(recID, ln, first_res_comments, nb_res_comments, warnings, can_attach_files=can_attach_files)
+            comments = webcomment_templates.tmpl_get_first_comments_without_ranking(recID, ln, first_res_comments, nb_res_comments, warnings)
         if CFG_WEBCOMMENT_ALLOW_REVIEWS: # ranked comments
             #calculate average score
             avg_score = calculate_avg_score(res_reviews)
@@ -752,7 +762,7 @@ def get_first_comments_or_remarks(recID=-1,
                 warnings.append(('WRN_WEBCOMMENT_FEEDBACK_RECORDED_GREEN_TEXT',))
             elif voted == 0:
                 warnings.append(('WRN_WEBCOMMENT_FEEDBACK_NOT_RECORDED_RED_TEXT',))
-            reviews = webcomment_templates.tmpl_get_first_comments_with_ranking(recID, ln, first_res_reviews, nb_res_reviews, avg_score, warnings, can_attach_files=can_attach_files)
+            reviews = webcomment_templates.tmpl_get_first_comments_with_ranking(recID, ln, first_res_reviews, nb_res_reviews, avg_score, warnings)
         return (comments, reviews)
     # remark
     else:
@@ -979,8 +989,8 @@ RECORD CONCERNED:
 ADMIN OPTIONS:
 To delete comment go to %(siteurl)s/admin/webcomment/webcommentadmin.py/delete?comid=%(comID)s
     ''' % \
-        {   'comment_or_review'     : star_score>0 and 'review' or 'comment',
-            'comment_or_review_caps': star_score>0 and 'REVIEW' or 'COMMENT',
+        {   'comment_or_review'     : star_score >  0 and 'review' or 'comment',
+            'comment_or_review_caps': star_score > 0 and 'REVIEW' or 'COMMENT',
             'date'                  : date_creation,
             'nickname'              : nickname,
             'email'                 : email,
@@ -988,7 +998,7 @@ To delete comment go to %(siteurl)s/admin/webcomment/webcommentadmin.py/delete?c
             'recID'                 : id_bibrec,
             'record_details'        : record,
             'comID'                 : comID2,
-            'review_stuff'          : star_score>0 and review_stuff or "",
+            'review_stuff'          : star_score > 0 and review_stuff or "",
             'body'                  : body.replace('<br />','\n'),
             'siteurl'                : CFG_SITE_URL
         }

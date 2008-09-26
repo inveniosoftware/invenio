@@ -179,10 +179,9 @@ def get_visible_group_list(uid, pattern=""):
     #list the group the user is member of"""
     query = """SELECT distinct(id_usergroup)
                FROM user_usergroup
-               WHERE id_user=%i """
+               WHERE id_user=%s """
     uid = int(uid)
-    query %= uid
-    res = run_sql(query)
+    res = run_sql(query, (uid,))
     map(lambda x: grpID.append(int(x[0])), res)
     query2 = """SELECT id,name
                 FROM usergroup
@@ -208,10 +207,10 @@ def get_visible_group_list(uid, pattern=""):
 
 
 def insert_new_group(uid,
-                      new_group_name,
-                      new_group_description,
-                      join_policy,
-                      login_method='INTERNAL'):
+                     new_group_name,
+                     new_group_description,
+                     join_policy,
+                     login_method='INTERNAL'):
     """Create a new group and affiliate a user."""
     query1 = """INSERT INTO usergroup (id, name, description, join_policy,
                    login_method)
@@ -293,11 +292,11 @@ def update_group_infos(grpID,
 def get_user_status(uid, grpID):
     """Get the status of the user for the given group."""
     query = """SELECT user_status FROM user_usergroup
-                WHERE id_user = %i
-                AND id_usergroup=%i"""
+                WHERE id_user = %s
+                AND id_usergroup=%s"""
     uid = int(uid)
     grpID = int(grpID)
-    res = run_sql(query% (uid, grpID))
+    res = run_sql(query, (uid, grpID))
     return res
 
 
@@ -325,25 +324,25 @@ def get_users_by_status(grpID, status, ln=CFG_SITE_LANG):
 def delete_member(grpID, member_id):
     """Delete member."""
     query = """DELETE FROM user_usergroup
-               WHERE id_usergroup = %i
-               AND id_user = %i"""
+               WHERE id_usergroup = %s
+               AND id_user = %s"""
     grpID = int(grpID)
     member_id = int(member_id)
-    res = run_sql(query% (grpID, member_id))
+    res = run_sql(query, (grpID, member_id))
     return res
 
 
 def delete_group_and_members(grpID):
     """Delete the group and its members."""
     query = """DELETE FROM usergroup
-               WHERE id = %i
+               WHERE id = %s
                """
     grpID = int(grpID)
-    res = run_sql(query% grpID)
+    res = run_sql(query, (grpID,))
     query = """DELETE FROM user_usergroup
-               WHERE id_usergroup = %i
+               WHERE id_usergroup = %s
                """
-    res = run_sql(query% grpID)
+    res = run_sql(query, (grpID,))
     return res
 
 def add_pending_member(grpID, member_id, user_status):
@@ -361,11 +360,11 @@ def add_pending_member(grpID, member_id, user_status):
 def leave_group(grpID, uid):
     """Remove user from the group member list."""
     query = """DELETE FROM user_usergroup
-               WHERE id_usergroup=%i
-               AND id_user=%i"""
+               WHERE id_usergroup=%s
+               AND id_user=%s"""
     grpID = int(grpID)
     uid = int(uid)
-    res = run_sql(query% (grpID, uid))
+    res = run_sql(query, (grpID, uid))
     return res
 
 def drop_external_groups(userId):
