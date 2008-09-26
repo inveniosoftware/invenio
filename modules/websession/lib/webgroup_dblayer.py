@@ -127,13 +127,13 @@ def get_groups(uid):
     res = list(res)
     return res
 
-def get_group_id(group_name, login_method):
+def get_group_id(group_name, login_method='INTERNAL'):
     """@return the id of the group called group_name with given login_method."""
     return run_sql("""
         SELECT id FROM usergroup
         WHERE  login_method = %s AND name = %s""", (login_method, group_name,))
 
-def get_login_method_groups(uid, login_method):
+def get_login_method_groups(uid, login_method='INTERNAL'):
     """Select all the external groups of a particular login_method for which
     the user is subscrided.
     @return ((group_name, group_id))
@@ -380,9 +380,8 @@ def group_name_exist(group_name, login_method='INTERNAL'):
     query = """SELECT id
                FROM usergroup
                WHERE login_method=%s AND name=%s"""
-    res = run_sql(query, (group_name, login_method,))
+    res = run_sql(query, (login_method, group_name))
     return res
-
 
 def get_group_login_method(grpID):
     """Return the login_method of the group or None if the grpID doesn't exist."""
