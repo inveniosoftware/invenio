@@ -31,6 +31,7 @@ from invenio.config import \
      CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
 from invenio.messages import gettext_set_language
 from invenio.htmlparser import get_as_text, wrap
+from invenio.urlutils import create_html_link
 
 class Template:
     def tmpl_errorMsg(self, ln, error_msg, rest = ""):
@@ -181,7 +182,7 @@ class Template:
               <table style="border: 0px; padding:10px;">
                 <tr>
                    <td style="text-align: right; vertical-align:top; font-weight: bold;">%(alert_name)s</td>
-                   <td><input type="text" name="name" size="20" maxlength="50" value="%(alert)s" /></td>
+                   <td><input type="text" name="name" size="20" maxlength="30" value="%(alert)s" /></td>
                 </tr>
                 <tr>
                   <td style="text-align: right; font-weight: bold;">%(freq)s</td>
@@ -351,8 +352,8 @@ class Template:
                               <td style="text-wrap:none;">%(created)s</td>
                               <td>%(textargs)s</td>
                               <td>
-                                 <a href="./remove?ln=%(ln)s&amp;name=%(alertname)s&amp;idq=%(queryid)d&amp;idb=%(basketid)d">%(remove)s</a><br />
-                                 <a href="./modify?ln=%(ln)s&amp;idq=%(queryid)d&amp;name=%(alertname)s&amp;freq=%(freq)s&amp;notif=%(notif)s&amp;idb=%(basketid)d&amp;old_idb=%(basketid)d">%(modify)s</a><br />
+                                 %(remove_link)s<br />
+                                 %(modify_link)s<br />
                                  <a href="%(siteurl)s/search?%(queryargs)s&amp;ln=%(ln)s" style="white-space:nowrap">%(search)s</a>
                              </td>
                             </tr>""" % {
@@ -370,8 +371,21 @@ class Template:
                     'freq' : alert['frequency'],
                     'notif' : alert['notification'],
                     'ln' : ln,
-                    'remove' : _("Remove"),
-                    'modify' : _("Modify"),
+                    'modify_link': create_html_link("./modify",
+                                                    {'ln': ln,
+                                                     'idq': alert['queryid'],
+                                                     'name': alert['alertname'],
+                                                     'freq': frequency,
+                                                     'notif':notification,
+                                                     'idb':alert['basketid'],
+                                                     'old_idb':alert['basketid']},
+                                                    _("Modify")),
+                    'remove_link': create_html_link("./remove",
+                                                    {'ln': ln,
+                                                     'idq': alert['queryid'],
+                                                     'name': alert['alertname'],
+                                                     'idb':alert['basketid']},
+                                                    _("Remove")),
                     'siteurl' : CFG_SITE_URL,
                     'search' : _("Execute search"),
                     'queryargs' : cgi.escape(alert['queryargs'])
