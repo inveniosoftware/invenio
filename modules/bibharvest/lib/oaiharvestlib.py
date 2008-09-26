@@ -42,7 +42,7 @@ from invenio.bibtask import \
      task_init, \
      task_sleep_now_if_required, \
      task_update_progress, \
-     task_low_level_submission_tuple
+     task_low_level_submission
 from invenio.bibrecord import record_extract_oai_id, create_records
 
 ## precompile some often-used regexp for speed reasons:
@@ -498,7 +498,7 @@ def call_bibupload(marcxmlfile, mode = None,  oai_src_id = -1):
             args = mode
             print marcxmlfile
             args.append(marcxmlfile)
-            task_id = task_low_level_submission_tuple("bibupload", "oaiharvest", tuple(args))
+            task_id = task_low_level_submission("bibupload", "oaiharvest", *tuple(args))
             create_bibharvest_log(task_id, oai_src_id, marcxmlfile)
         except Exception, msg:
             write_message("An exception during submitting bibharvest task occured : %s " % (str(msg)))
