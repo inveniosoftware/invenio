@@ -55,7 +55,8 @@ CFG_WEBBASKET_WARNING_MESSAGES = {
     'WRN_WEBBASKET_NO_RECORD': '_("No records to add")',
     'WRN_WEBBASKET_NO_GIVEN_TOPIC':
             '_("Please select an existing topic or create a new one")',
-    'WRN_WEBBASKET_NO_BASKET_SELECTED':  '_("No basket has been selected")'
+    'WRN_WEBBASKET_NO_BASKET_SELECTED':  '_("No basket has been selected")',
+    'WRN_WEBBASKET_NO_RIGHTS_TO_ADD_THIS_RECORD':  '_("Sorry, you don\'t have sufficient rights to add record #%i")'
 }
 
 # pylint: disable-msg=C0301
