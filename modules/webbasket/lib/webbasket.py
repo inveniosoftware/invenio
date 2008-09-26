@@ -36,7 +36,9 @@ from invenio.webbasket_config import CFG_WEBBASKET_SHARE_LEVELS, \
                                      CFG_WEBBASKET_CATEGORIES, \
                                      CFG_WEBBASKET_WARNING_MESSAGES
 from invenio.webuser import isGuestUser, collect_user_info
-from invenio.search_engine import record_exists
+from invenio.search_engine import \
+     record_exists, \
+     check_user_can_view_record
 from invenio.webcomment import check_user_can_attach_file_to_comments
 import invenio.webbasket_dblayer as db
 try:
@@ -417,6 +419,14 @@ def perform_request_add(uid, recids=[], bskids=[], referer='',
         recid = int(recid)
         if record_exists(recid) == 1:
             validated_recids.append(recid)
+
+    user_info = collect_user_info(uid)
+    for recid in validated_recids:
+        (auth_code, auth_msg) = check_user_can_view_record(user_info, recid)
+        if auth_code:
+            # User not authorized to view record
+            validated_recids.remove(recid)
+            warnings.append(('WRN_WEBBASKET_NO_RIGHTS_TO_ADD_THIS_RECORD', recid))
 
     if not(len(validated_recids)):
         warnings.append('WRN_WEBBASKET_NO_RECORD')
