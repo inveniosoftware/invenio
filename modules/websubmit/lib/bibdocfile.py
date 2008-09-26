@@ -1,4 +1,4 @@
-## $Id$
+## $Id: bibdocfile.py,v 1.92 2008/09/19 17:17:48 kaplun Exp $
 
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
@@ -145,7 +145,12 @@ def decompose_file(afile, skip_version=False):
     Note that if provided with a URL, the scheme in front will be part
     of the dirname."""
     if skip_version:
-        afile = afile.split(';')[0]
+        version = afile.split(';')[-1]
+        try:
+            int(version)
+            afile = afile[:-len(version)]
+        except ValueError:
+            pass
     basename = os.path.basename(afile)
     dirname = afile[:-len(basename)-1]
     base = file_strip_ext(basename)
@@ -153,6 +158,23 @@ def decompose_file(afile, skip_version=False):
     if extension:
         extension = '.' + extension
     return (dirname, base, extension)
+
+def decompose_file_with_version(afile):
+    """Decompose a file into dirname, basename, extension and version.
+    In case version does not exist it will raise ValueError.
+    Note that if provided with a URL, the scheme in front will be part
+    of the dirname."""
+    version_str = afile.split(';')[-1]
+    version = int(version_str)
+    afile = afile[:-len(version_str)]
+    basename = os.path.basename(afile)
+    dirname = afile[:-len(basename)-1]
+    base = file_strip_ext(basename)
+    extension = basename[len(base) + 1:]
+    if extension:
+        extension = '.' + extension
+    return (dirname, base, extension, version)
+
 
 def propose_next_docname(docname):
     """Propose a next docname docname"""
@@ -662,36 +684,101 @@ class BibRecDocs:
                     raise InvenioWebSubmitFileError, "Error in importing description and comment from %s for record %s: %s" % (repr(bibdoc), self.id, e)
         return res
 
-    def fix_format(self, docname):
+    def check_format(self, docname):
         """In case CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS is
         altered or Python version changes, it might happen that a docname
         contains files which are no more docname + .format ; version, simply
         because the .format is now recognized (and it was not before, so
-        it was contained into the docname). Fixing this situation require
-        different steps, because docname might already exists.
-        This algorithm try to fix this situation."""
-        need_fix = False
+        it was contained into the docname).
+        This algorithm verify if it is necessary to fix.
+        Return True if format is correct. False if a fix is needed."""
         bibdoc = self.get_docname(docname)
         correct_docname = decompose_file(docname)[1]
         if docname != correct_docname:
-            need_fix = True
-        if not need_fix:
-            for filename in os.listdir(bibdoc.basedir):
-                if not filename.startswith('.'):
-                    filename = filename.split(';')[0]
-                    format = decompose_file(filename)[2]
-                    if correct_docname + format != filename:
-                        need_fix = True
-                        break
-        if need_fix:
-            ## TODO:
-            ## If correct_docname is available
-            ## just run_sql to update the docname
-            ## rename the internal files preserving format and versions
-            ## if it's not available generate new unique docname,
-            ## do as above and then merge new unique docname
-            ## into correct_docname with merge_bibdocs.
-            pass
+            return False
+        for filename in os.listdir(bibdoc.basedir):
+            if not filename.startswith('.'):
+                format = decompose_file(filename, skip_version=True)[2]
+                if correct_docname + format != filename:
+                    return False
+        return True
+
+    def check_duplicate_docnames(self):
+        """Check wethever the record is connected with at least tho bibdoc
+        with the same docname.
+        Return True if everything is fine.
+        """
+        docnames = set()
+        for docname in self.get_bibdoc_names():
+            if docname in docnames:
+                return False
+            else:
+                docnames.add(docname)
+        return True
+
+    def uniformize_bibdoc(self, docname):
+        """This algorithm correct wrong file name belonging to a bibdoc."""
+        bibdoc = self.get_bibdoc(docname)
+        for filename in os.listdir(bibdoc.get_full_path()):
+            if not filename.startswith('.'):
+                try:
+                    basename, format, version = decompose_file_with_version(docname)
+                except ValueError:
+                    register_exception(alert_admin=True, prefix=                "Strange file '%s' is stored in %s" % (filename, bibdoc.get_full_path()))
+                else:
+                    os.rename(os.path.join(bibdoc.get_full_path(), filename), os.path.join(bibdoc.get_full_path(), '%s%s;%i' % (docname, format, version)))
+        Md5Folder(bibdoc.basedir).update()
+        bibdoc.touch()
+        bibdoc._build_file_list('rename')
+
+    def fix_format(self, docname, skip_check=False):
+        """ Fixing this situation require
+        different steps, because docname might already exists.
+        This algorithm try to fix this situation.
+        In case a merging is needed the algorithm return False if the merging
+        is not possible.
+        """
+        if not skip_check:
+            if self.check_format(docname):
+                return True
+        bibdoc = self.get_bibdoc(docname)
+        correct_docname = decompose_file(docname)[1]
+        need_merge = False
+        if correct_docname != docname:
+            need_merge = self.has_docname_p(correct_docname)
+            if need_merge:
+                proposed_docname = self.propose_unique_docname(correct_docname)
+                run_sql('UPDATE bibdoc SET docname=%s WHERE id=%s' % (proposed_docname, bibdoc.id))
+                self.build_bibdoc_list()
+                self.uniformize_bibdoc(proposed_docname)
+                try:
+                    self.merge_bibdocs(docname, proposed_docname)
+                except InvenioWebSubmitFileError:
+                    return False
+            else:
+                run_sql('UPDATE bibdoc SET docname=%s WHERE id=%s' % (correct_docname, bibdoc.id))
+                self.build_bibdoc_list()
+                self.uniformize_bibdoc(proposed_docname)
+        else:
+            self.uniformize_bibdoc(docname)
+        return True
+
+    def fix_duplicate_docnames(self, skip_check=False):
+        """Algotirthm to fix duplicate docnames.
+        If a record is connected with at least two bibdoc having the same
+        docname, the algorithm will try to merge them.
+        """
+        if not skip_check:
+            if self.check_duplicate_docnames():
+                return
+        docnames = set()
+        for bibdoc in self.list_bibdocs():
+            docname = bibdoc.docname
+            if docname in docnames:
+                new_docname = self.propose_unique_docname(bibdoc.docname)
+                bibdoc.change_name(new_docname)
+                self.merge_bibdocs(docname, new_docname)
+            docnames.add(docname)
 
 class BibDoc:
     """this class represents one file attached to a record
@@ -1128,8 +1215,12 @@ class BibDoc:
                 raise InvenioWebSubmitFileError, "A bibdoc called %s already exists for recid %s" % (newname, self.recid)
             try:
                 for f in os.listdir(self.basedir):
-                    if f.startswith(self.docname):
-                        shutil.move('%s/%s' % (self.basedir, f), '%s/%s' % (self.basedir, f.replace(self.docname, newname, 1)))
+                    try:
+                        (dummy, base, extension, version) = decompose_file_with_version(f)
+                    except ValueError:
+                        register_exception(alert_admin=True, prefix="Strange file '%s' is stored in %s" % (f, self.basedir))
+                    else:
+                        shutil.move(os.path.join(self.basedir, f), os.path.join(self.basedir, '%s%s;%i' % (newname, extension, version)))
             except Exception, e:
                 register_exception()
                 raise InvenioWebSubmitFileError("Error in renaming the bibdoc %s to %s for recid %s: %s" % (self.docname, newname, self.recid, e))
