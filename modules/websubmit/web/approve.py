@@ -26,6 +26,7 @@ import sys
 import time
 import types
 import re
+import urllib
 from mod_python import apache
 
 from invenio.config import \
@@ -33,23 +34,30 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_URL, \
-     CFG_VERSION
+     CFG_VERSION, \
+     CFG_SITE_NAME_INTL
 from invenio.dbquery import run_sql
 from invenio.access_control_engine import acc_authorize_action
 from invenio.access_control_admin import acc_is_role
 from invenio.websubmit_config import *
 from invenio.webpage import page, create_error_box
 from invenio.webuser import getUid, get_email, page_not_authorized
-from invenio.messages import wash_language
+from invenio.messages import wash_language, gettext_set_language
+from invenio.errorlib import register_exception
+from invenio.urlutils import redirect_to_url
 
-def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
+def index(req, c=CFG_SITE_NAME, ln=CFG_SITE_LANG):
+    """Approval web Interface.
+    GET params:
 
+    """
     uid = getUid(req)
     if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
         return page_not_authorized(req, "../approve.py/index",
                                    navmenuid='yourapprovals')
 
     ln = wash_language(ln)
+    _ = gettext_set_language(ln)
     form = req.form
     if form.keys():
         # form keys can be a list of 'access pw' and ln, so remove 'ln':
@@ -57,28 +65,37 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
             if key != 'ln':
                 access = key
         if access == "":
-            return errorMsg("approve.py: cannot determine document reference",req)
+            return warningMsg(_("approve.py: cannot determine document reference"), req)
         res = run_sql("select doctype,rn from sbmAPPROVAL where access=%s",(access,))
         if len(res) == 0:
-            return errorMsg("approve.py: cannot find document in database",req)
+            return warningMsg(_("approve.py: cannot find document in database"), req)
         else:
             doctype = res[0][0]
             rn = res[0][1]
         res = run_sql("select value from sbmPARAMETERS where name='edsrn' and doctype=%s",(doctype,))
         edsrn = res[0][0]
-        url = "%s/submit/sub?%s=%s&password=%s@APP%s&ln=%s" % (CFG_SITE_URL,edsrn,rn,access,doctype, ln)
-        req.err_headers_out.add("Location", url)
-        raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
-        return ""
+        url = "%s/submit/sub?%s" % (CFG_SITE_URL, urllib.urlencode({
+            edsrn: rn,
+            'password': '%s@APP%s' % (access, doctype),
+            'ln' : ln
+        }))
+        redirect_to_url(req, url)
     else:
-        return errorMsg("Sorry parameter missing...", req, c, ln)
+        return warningMsg(_("Sorry parameter missing..."), req, c, ln)
 
-def errorMsg(title,req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG):
-    return page(title="error",
-                    body = create_error_box(req, title=title,verbose=0, ln=ln),
-                    description="%s - Internal Error" % c,
-                    keywords="%s, Internal Error" % c,
-                    language=ln,
-                    req=req,
-                    navmenuid='yourapprovals')
+def warningMsg(title, req, c=None, ln=CFG_SITE_LANG):
+    # load the right message language
+    _ = gettext_set_language(ln)
+
+    if c is None:
+        c = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
+
+    return page(title = _("Warning"),
+                body = title,
+                description="%s - Internal Error" % c,
+                keywords="%s, Internal Error" % c,
+                uid = getUid(req),
+                language=ln,
+                req=req,
+                navmenuid='submit')
 

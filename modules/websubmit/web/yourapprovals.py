@@ -59,38 +59,35 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
     except Error, e:
         return errorMsg(str(e), req, ln = ln)
 
-    res = run_sql("select sdocname,ldocname from sbmDOCTYPE")
+    res = run_sql("SELECT sdocname,ldocname FROM sbmDOCTYPE ORDER BY ldocname")
     referees = []
     for row in res:
         doctype = row[0]
         docname = row[1]
         reftext = ""
-        if isReferee(req,doctype,"*"):
+        if isReferee(req, doctype, "*"):
             referees.append ({'doctype': doctype,
                               'docname': docname,
                               'categories': None})
         else:
-            res2 = run_sql("select sname,lname from sbmCATEGORIES where doctype=%s",(doctype,))
+            res2 = run_sql("select sname,lname from sbmCATEGORIES where doctype=%s", (doctype,))
             categories = []
             for row2 in res2:
                 category = row2[0]
                 categname = row2[1]
-                if isReferee(req,doctype,category):
+                if isReferee(req, doctype, category):
                     categories.append({
                                         'id' : category,
                                         'name' : categname,
                                       })
-            referees.append({
+            if categories:
+                referees.append({
                             'doctype' : doctype,
                             'docname' : docname,
                             'categories' : categories
                            })
 
-
-    t = websubmit_templates.tmpl_yourapprovals(
-          ln = ln,
-          referees = referees
-        )
+    t = websubmit_templates.tmpl_yourapprovals(ln=ln, referees=referees)
     return page(title=_("Your Approvals"),
                 navtrail= """<a class="navtrail" href="%(sitesecureurl)s/youraccount/display">%(account)s</a>""" % {
                              'sitesecureurl' : CFG_SITE_SECURE_URL,
@@ -104,8 +101,8 @@ def index(req,c=CFG_SITE_NAME,ln=CFG_SITE_LANG,order="",doctype="",deletedId="",
                 req=req,
                 navmenuid='yourapprovals')
 
-def isReferee(req,doctype="",categ=""):
-    (auth_code, auth_message) = acc_authorize_action(req, "referee",verbose=0,doctype=doctype, categ=categ)
+def isReferee(req, doctype="", categ=""):
+    (auth_code, auth_message) = acc_authorize_action(req, "referee", verbose=0, doctype=doctype, categ=categ)
     if auth_code == 0:
         return 1
     else:

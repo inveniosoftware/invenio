@@ -32,7 +32,7 @@ except ImportError:
     pass
 
 import sys
-from urllib import quote, unquote
+from urllib import quote, unquote, urlencode
 
 from invenio.config import \
      CFG_ACCESS_CONTROL_LEVEL_SITE, \
@@ -332,74 +332,74 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
 
 
     def direct(self, req, form):
-
+        """Directly redirected to an initialized submission."""
         args = wash_urlargd(form, {'sub': (str, ''),
-                                   'ln': (str, CFG_SITE_LANG)})
+                                   'access' : (str, '')})
+
         sub = args['sub']
+        access = args['access']
         ln = args['ln']
+
+        _ = gettext_set_language(ln)
 
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
-            return page_not_authorized(req, "../direct.py/index",
+            return page_not_authorized(req, "direct",
                                            navmenuid='submit')
 
         myQuery = req.args
-        if sub == "":
-            return warningMsg("Sorry parameter missing...", req)
-        res = run_sql("select docname,actname from sbmIMPLEMENT where subname=%s", (sub,))
-        if len(res)==0:
-            return warningMsg("Sorry. Cannot analyse parameter", req)
+        if not sub:
+            return warningMsg(_("Sorry, 'sub' parameter missing..."), req, ln=ln)
+        res = run_sql("SELECT docname,actname FROM sbmIMPLEMENT WHERE subname=%s", (sub,))
+        if not res:
+            return warningMsg(_("Sorry. Cannot analyse parameter"), req, ln=ln)
         else:
             # get document type
             doctype = res[0][0]
             # get action name
             action = res[0][1]
         # retrieve other parameter values
-        params = re.sub("sub=[^&]*","",myQuery)
+        params = dict(form)
         # find existing access number
-        result = re.search("access=([^&]*)",params)
-        if result is not None:
-            access = result.group(1)
-            params = re.sub("access=[^&]*","",params)
-        else:
+        if not access:
             # create 'unique' access number
             pid = os.getpid()
             now = time.time()
             access = "%i_%s" % (now,pid)
         # retrieve 'dir' value
-        res = run_sql ("select dir from sbmACTION where sactname=%s",(action,))
+        res = run_sql ("SELECT dir FROM sbmACTION WHERE sactname=%s", (action,))
         dir = res[0][0]
-        try:
-            mainmenu = req.headers_in['Referer']
-        except:
-            mainmenu = ""
-        url = "/submit?doctype=%s&dir=%s&access=%s&act=%s&startPg=1%s&mainmenu=%s&ln=%s" % (
-            doctype,dir,access,action,params,quote(mainmenu), ln)
-        req.err_headers_out.add("Location", url)
-        raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
-        return ""
 
+        mainmenu = req.headers_in.get('referer')
+
+        params['access'] = access
+        params['act'] = action
+        params['doctype'] = doctype
+        params['startPg'] = '1'
+        params['mainmenu'] = mainmenu
+        params['ln'] = ln
+        params['indir'] = dir
+
+        url = "%s/submit?%s" % (CFG_SITE_URL, urlencode(params))
+        redirect_to_url(req, url)
 
     def sub(self, req, form):
+        args = wash_urlargd(form, {'password': (str, '')})
         uid = getUid(req)
         if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE >= 1:
             return page_not_authorized(req, "../sub/",
                                        navmenuid='submit')
 
-        myQuery = req.args
-        if myQuery:
-            param = ''
-            if re.search("@",myQuery):
-                param = re.sub("@.*","",myQuery)
-                IN = re.sub(".*@","",myQuery)
-            else:
-                IN = myQuery
-            url = "%s/submit/direct?sub=%s&%s" % (CFG_SITE_URL,IN,param)
-            req.err_headers_out.add("Location", url)
-            raise apache.SERVER_RETURN, apache.HTTP_MOVED_PERMANENTLY
-            return ""
+        #DEMOBOO_RN=DEMO-BOOK-2008-001&ln=en&password=1223993532.26572%40APPDEMOBOO
+        params = dict(form)
+        del params['password']
+        password = args['password']
+        if "@" in password:
+            params['access'], params['sub'] = password.split('@', 1)
         else:
-            return "<html>Illegal page access</html>"
+            params['sub'] = password
+        url = "%s/submit/direct?%s" % (CFG_SITE_URL, urlencode(params))
+        redirect_to_url(req, url)
 
 
     def summary(self, req, form):
@@ -419,7 +419,7 @@ class WebInterfaceSubmitPages(WebInterfaceDirectory):
         try:
             assert(curdir == os.path.abspath(curdir))
         except AssertionError:
-            register_exception(req, alert_admin=True, prefix='Possible cracking tentative: indir="%s", doctype="%s", access="%s"' % (args['indir'], args['doctype'], args['access']))
+            register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: indir="%s", doctype="%s", access="%s"' % (args['indir'], args['doctype'], args['access']))
             return warningMsg("Invalid parameters")
 
         subname = "%s%s" % (args['act'], args['doctype'])

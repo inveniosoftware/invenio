@@ -263,7 +263,7 @@ def interface(req,
     try:
         assert(curdir == os.path.abspath(curdir))
     except AssertionError:
-        register_exception(req, alert_admin=True, prefix='Possible cracking tentative: indir="%s", doctype="%s", access="%s"' % (indir, doctype, access))
+        register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: indir="%s", doctype="%s", access="%s"' % (indir, doctype, access))
         return warningMsg(_("Invalid parameters"), req, c, ln)
 
     ## if this submission comes from another one (fromdir is then set)
@@ -273,7 +273,7 @@ def interface(req,
         try:
             assert(olddir == os.path.abspath(olddir))
         except AssertionError:
-            register_exception(req, alert_admin=True, prefix='Possible cracking tentative: fromdir="%s", doctype="%s", access="%s"' % (fromdir, doctype, access))
+            register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: fromdir="%s", doctype="%s", access="%s"' % (fromdir, doctype, access))
             return warningMsg(_("Invalid parameters"), req, c, ln)
 
         if os.path.exists(olddir):
@@ -332,7 +332,7 @@ def interface(req,
             assert(file_to_open == os.path.abspath(file_to_open))
             assert(file_to_open.startswith(CFG_WEBSUBMIT_STORAGEDIR))
         except AssertionError:
-            register_exception(req, alert_admin=True, prefix='Possible cracking tentative: curdir="%s", filename="%s"' % (curdir, filename))
+            register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: curdir="%s", filename="%s"' % (curdir, filename))
             return warningMsg(_("Invalid parameters"), req, c, ln)
 
         # the field is an array
@@ -356,13 +356,13 @@ def interface(req,
                 assert(dir_to_open == os.path.abspath(dir_to_open))
                 assert(dir_to_open.startswith(CFG_WEBSUBMIT_STORAGEDIR))
             except AssertionError:
-                register_exception(req, alert_admin=True, prefix='Possible cracking tentative: curdir="%s", key="%s"' % (curdir, key))
+                register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: curdir="%s", key="%s"' % (curdir, key))
                 return warningMsg(_("Invalid parameters"), req, c, ln)
             if not os.path.exists(dir_to_open):
                 try:
                     os.makedirs(dir_to_open)
                 except:
-                    register_exception(req, alert_admin=True)
+                    register_exception(req=req, alert_admin=True)
                     return warningMsg(_("Cannot create submission directory. The administrator has been alerted."), req, c, ln)
             filename = formfields.filename
             ## Before saving the file to disc, wash the filename (in particular
@@ -407,7 +407,7 @@ def interface(req,
             assert(element_descr is not None)
         except AssertionError:
             msg = _("Unknown form field found on submission page.")
-            register_exception(req, alert_admin=True, prefix=msg)
+            register_exception(req=req, alert_admin=True, prefix=msg)
             ## The form field doesn't seem to exist - return with error message:
             return warningMsg(_("Unknown form field found on submission page."), req, c, ln)
 
@@ -537,7 +537,7 @@ def interface(req,
                     assert(element_descr is not None)
                 except AssertionError:
                     msg = _("Unknown form field found on submission page.")
-                    register_exception(req, alert_admin=True, prefix=msg)
+                    register_exception(req=req, alert_admin=True, prefix=msg)
                     ## The form field doesn't seem to exist - return with error message:
                     return warningMsg(_("Unknown form field found on submission page."), req, c, ln)
                 if element_descr[3] in ['D', 'R']:
@@ -780,7 +780,7 @@ def endaction(req,
         curdir = os.path.abspath(curdir)
         assert(curdir.startswith(CFG_WEBSUBMIT_STORAGEDIR))
     except AssertionError:
-        register_exception(req, alert_admin=True, prefix='Possible cracking tentative: indir="%s", doctype=%s, access=%s' % (indir, doctype, access))
+        register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: indir="%s", doctype=%s, access=%s' % (indir, doctype, access))
         return warningMsg(_("Invalid parameters"), req, c, ln)
 
     ## If the submission directory still does not exist, we create it
@@ -832,7 +832,7 @@ def endaction(req,
             assert(file_to_open == os.path.abspath(file_to_open))
             assert(file_to_open.startswith(CFG_WEBSUBMIT_STORAGEDIR))
         except AssertionError:
-            register_exception(req, alert_admin=True, prefix='Possible cracking tentative: curdir="%s", filename="%s"' % (curdir, filename))
+            register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: curdir="%s", filename="%s"' % (curdir, filename))
             return warningMsg(_("Invalid parameters"), req, c, ln)
 
         # the field is an array
@@ -856,14 +856,14 @@ def endaction(req,
                 assert(dir_to_open == os.path.abspath(dir_to_open))
                 assert(dir_to_open.startswith(CFG_WEBSUBMIT_STORAGEDIR))
             except AssertionError:
-                register_exception(req, alert_admin=True, prefix='Possible cracking tentative: curdir="%s", key="%s"' % (curdir, key))
+                register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: curdir="%s", key="%s"' % (curdir, key))
                 return warningMsg(_("Invalid parameters"), req, c, ln)
 
             if not os.path.exists(dir_to_open):
                 try:
                     os.makedirs(dir_to_open)
                 except:
-                    register_exception(req, alert_admin=True)
+                    register_exception(req=req, alert_admin=True)
                     return warningMsg(_("Cannot create submission directory. The administrator has been alerted."), req, c, ln)
             filename = formfields.filename
             ## Before saving the file to disc, wash the filename (in particular
@@ -938,9 +938,9 @@ def endaction(req,
                                                 start_time=start_time,
                                                 ln=ln)
     except InvenioWebSubmitFunctionError, e:
-        register_exception(req, alert_admin=True, prefix='doctype="%s", action="%s", step="%s", form="%s", start_time="%s"' % (doctype, act, step, form, start_time))
+        register_exception(req=req, alert_admin=True, prefix='doctype="%s", action="%s", step="%s", form="%s", start_time="%s"' % (doctype, act, step, form, start_time))
         ## There was a serious function-error. Execution ends.
-        return warningMsg(_("A serious function-error has been encountered. Adminstrators have been alerted"), req, c, ln)
+        return warningMsg(_("A serious function-error has been encountered. Adminstrators have been alerted. <br /><em>Please not that this might be due to wrong characters inserted into the form</em> (e.g. by copy and pasting some text from a PDF file)."), req, c, ln)
     except InvenioWebSubmitFunctionStop, e:
         ## For one reason or another, one of the functions has determined that
         ## the data-processing phase (i.e. the functions execution) should be
