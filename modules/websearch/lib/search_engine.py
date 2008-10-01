@@ -1522,37 +1522,48 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
     p_orig = p
     ## okay, "real browse" follows:
     ## FIXME: the maths in the get_nearest_terms_in_bibxxx is just a test
-    browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
-    while not browsed_phrases:
-        # try again and again with shorter and shorter pattern:
-        try:
-            p = p[:-1]
-            browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
-        except:
-            # probably there are no hits at all:
-            req.write(_("No values found."))
-            return
 
-    ## try to check hits in these particular collection selection:
-    browsed_phrases_in_colls = []
-    if 0:
-        for phrase in browsed_phrases:
-            phrase_hitset = HitSet()
-            phrase_hitsets = search_pattern("", phrase, f, 'e')
-            for coll in colls:
-                phrase_hitset.union_update(phrase_hitsets[coll])
-            if len(phrase_hitset) > 0:
-                # okay, this phrase has some hits in colls, so add it:
-                browsed_phrases_in_colls.append([phrase, len(phrase_hitset)])
+    if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
+        f, p = string.split(p, ":", 1)
+    index_id = get_index_id_from_field(f)
+    if index_id != 0:
+        coll = HitSet()
+        for coll_name in colls:
+            coll |= get_collection_reclist(coll_name)
+        browsed_phrases_in_colls = get_nearest_terms_in_idxphrase_with_collection(p, index_id, rg/2, rg/2, coll)
+        #req.write("<pre>p=%s, index_id=%s, rg=%s, colls=%s, coll=%s, browsed_phrases_in_colls=%s</pre>" % (p, index_id, rg, colls, coll, browsed_phrases_in_colls))
+    else:
+        browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
+        while not browsed_phrases:
+            # try again and again with shorter and shorter pattern:
+            try:
+                p = p[:-1]
+                browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
+            except:
+                # probably there are no hits at all:
+                req.write(_("No values found."))
+                return
 
-    ## were there hits in collections?
-    if browsed_phrases_in_colls == []:
-        if browsed_phrases != []:
-            #print_warning(req, """<p>No match close to <em>%s</em> found in given collections.
-            #Please try different term.<p>Displaying matches in any collection...""" % p_orig)
-            ## try to get nbhits for these phrases in any collection:
+        ## try to check hits in these particular collection selection:
+        browsed_phrases_in_colls = []
+        if 0:
             for phrase in browsed_phrases:
-                browsed_phrases_in_colls.append([phrase, get_nbhits_in_bibxxx(phrase, f)])
+                phrase_hitset = HitSet()
+                phrase_hitsets = search_pattern("", phrase, f, 'e')
+                for coll in colls:
+                    phrase_hitset.union_update(phrase_hitsets[coll])
+                if len(phrase_hitset) > 0:
+                    # okay, this phrase has some hits in colls, so add it:
+                    browsed_phrases_in_colls.append([phrase, len(phrase_hitset)])
+
+        ## were there hits in collections?
+        if browsed_phrases_in_colls == []:
+            if browsed_phrases != []:
+                #print_warning(req, """<p>No match close to <em>%s</em> found in given collections.
+                #Please try different term.<p>Displaying matches in any collection...""" % p_orig)
+                ## try to get nbhits for these phrases in any collection:
+                for phrase in browsed_phrases:
+                    browsed_phrases_in_colls.append([phrase, get_nbhits_in_bibxxx(phrase, f)])
 
     ## display results now:
     out = websearch_templates.tmpl_browse_pattern(
@@ -1635,7 +1646,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
     basic_search_units_hitsets = []
-    for idx_unit in range(0, len(basic_search_units)):
+    for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
         if verbose >= 9 and of.startswith("h"):
@@ -1698,7 +1709,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     # let the initial set be the complete universe:
     hitset_in_any_collection = HitSet(trailing_bits=1)
     hitset_in_any_collection.discard(0)
-    for idx_unit in range(0, len(basic_search_units)):
+    for idx_unit in xrange(len(basic_search_units)):
         this_unit_operation = basic_search_units[idx_unit][0]
         this_unit_hitset = basic_search_units_hitsets[idx_unit]
         if this_unit_operation == '+':
@@ -1817,8 +1828,13 @@ def search_unit(p, f=None, m=None):
     set = HitSet()
     if not p: # sanity checking
         return set
-    if m == 'a' or m == 'r':
-        # we are doing either direct bibxxx search or phrase search or regexp search
+    if m == 'a':
+        index_id = get_index_id_from_field(f)
+        if index_id != 0:
+            set = search_unit_in_idxphrases(p, f)
+        else:
+            set = search_unit_in_bibxxx(p, f, m)
+    elif m == 'r':
         set = search_unit_in_bibxxx(p, f, m)
     elif p.startswith("cited:"):
         # we are doing search by the citation count
@@ -1875,6 +1891,40 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
         else:
             res = run_sql("SELECT term,hitlist FROM %s WHERE term=%%s" % bibwordsX,
                           (wash_index_term(word),))
+    # fill the result set:
+    for word, hitlist in res:
+        hitset_bibwrd = HitSet(hitlist)
+        # add the results:
+        if set_used:
+            set.union_update(hitset_bibwrd)
+        else:
+            set = hitset_bibwrd
+            set_used = 1
+    # okay, return result set:
+    return set
+
+def search_unit_in_idxphrases(phrase, f):
+    """Searches for 'word' inside idxPHRASEXXR table for field 'f' and returns hitset of recIDs."""
+    from invenio.bibindex_engine import get_phrases_from_phrase
+    set = HitSet() # will hold output result set
+    set_used = 0 # not-yet-used flag, to be able to circumvent set operations
+    # deduce into which bibwordsX table we will search:
+    stemming_language = get_index_stemming_language(get_index_id_from_field("anyfield"))
+    idxphraseX = "idxPHRASE%02dF" % get_index_id_from_field("anyfield")
+    if f:
+        index_id = get_index_id_from_field(f)
+        if index_id:
+            idxphraseX = "idxPHRASE%02dF" % index_id
+            stemming_language = get_index_stemming_language(index_id)
+        else:
+            return HitSet() # word index f does not exist
+
+        phrases = get_phrases_from_phrase(phrase, stemming_language)
+        if len(phrases) > 0:
+            phrase = phrases[0]
+
+        res = run_sql("SELECT term,hitlist FROM %s WHERE term=%%s" % idxphraseX,
+                        (phrase,))
     # fill the result set:
     for word, hitlist in res:
         hitset_bibwrd = HitSet(hitlist)
@@ -2209,6 +2259,39 @@ def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
         nearest_words.append(row[0])
     return nearest_words
 
+def get_nearest_terms_in_idxphrase(p, index_id, n_below, n_above):
+    """Browse (-n_above, +n_below) closest bibliographic phrases
+       for the given pattern p in the given field idxPHRASE table,
+       regardless of collection.
+       Return list of [phrase1, phrase2, ... , phrase_n]."""
+    idxphraseX = "idxPHRASE%02dF" % index_id
+    res_above = run_sql("SELECT term FROM %s WHERE term<%%s ORDER BY term DESC LIMIT %%s" % idxphraseX, (p, n_above))
+    res_above = map(lambda x: x[0], res_above)
+    res_above.reverse()
+
+    res_below = run_sql("SELECT term FROM %s WHERE term>=%%s ORDER BY term ASC LIMIT %%s" % idxphraseX, (p, n_below))
+    res_below = map(lambda x: x[0], res_below)
+
+    return res_above + res_below
+
+def get_nearest_terms_in_idxphrase_with_collection(p, index_id, n_below, n_above, collection):
+    """Browse (-n_above, +n_below) closest bibliographic phrases
+       for the given pattern p in the given field idxPHRASE table,
+       considering the collection (HitSet).
+       Return list of [(phrase1, hitset), (phrase2, hitset), ... , (phrase_n, hitset)]."""
+    idxphraseX = "idxPHRASE%02dF" % index_id
+    res_above = run_sql("SELECT term,hitlist FROM %s WHERE term<%%s ORDER BY term DESC LIMIT %%s" % idxphraseX, (p, n_above * 3))
+    res_above = [(term, HitSet(hitlist) & collection) for term, hitlist in res_above]
+    res_above = [(term, len(hitlist)) for term, hitlist in res_above if hitlist]
+
+    res_below = run_sql("SELECT term,hitlist FROM %s WHERE term>=%%s ORDER BY term ASC LIMIT %%s" % idxphraseX, (p, n_below * 3))
+    res_below = [(term, HitSet(hitlist) & collection) for term, hitlist in res_below]
+    res_below = [(term, len(hitlist)) for term, hitlist in res_below if hitlist]
+
+    res_above.reverse()
+    return res_above[-n_above:] + res_below[:n_below]
+
+
 def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
     """Browse (-n_above, +n_below) closest bibliographic phrases
        for the given pattern p in the given field f, regardless
@@ -2226,6 +2309,11 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
     ## values to ferch from bibXXx.  This is needed to work around
     ## MySQL UTF-8 sorting troubles in 4.0.x.  Proper solution is to
     ## use MySQL 4.1.x or our own idxPHRASE in the future.
+
+    index_id = get_index_id_from_field(f)
+    if index_id:
+        return get_nearest_terms_in_idxphrase(p, index_id, n_below, n_above)
+
     n_fetch = 2*max(n_below, n_above)
     ## construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
