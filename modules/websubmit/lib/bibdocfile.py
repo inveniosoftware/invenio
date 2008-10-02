@@ -148,7 +148,7 @@ def decompose_file(afile, skip_version=False):
         version = afile.split(';')[-1]
         try:
             int(version)
-            afile = afile[:-len(version)]
+            afile = afile[:-len(version)-1]
         except ValueError:
             pass
     basename = os.path.basename(afile)
@@ -166,7 +166,7 @@ def decompose_file_with_version(afile):
     of the dirname."""
     version_str = afile.split(';')[-1]
     version = int(version_str)
-    afile = afile[:-len(version_str)]
+    afile = afile[:-len(version_str)-1]
     basename = os.path.basename(afile)
     dirname = afile[:-len(basename)-1]
     base = file_strip_ext(basename)
@@ -385,7 +385,7 @@ class BibRecDocs:
             format = bibdocfile.get_format()
             comment = bibdocfile.get_comment()
             description = bibdocfile.get_description()
-            bibdoc1.add_new_format(bibdocfile.get_full_path(), description=description, comment=comment, format=format)
+            bibdoc1.add_file_new_format(bibdocfile.get_full_path(), description=description, comment=comment, format=format)
 
         ## Finally deleting old bibdoc2
         bibdoc2.delete()
@@ -692,14 +692,17 @@ class BibRecDocs:
         it was contained into the docname).
         This algorithm verify if it is necessary to fix.
         Return True if format is correct. False if a fix is needed."""
-        bibdoc = self.get_docname(docname)
+        bibdoc = self.get_bibdoc(docname)
         correct_docname = decompose_file(docname)[1]
         if docname != correct_docname:
             return False
         for filename in os.listdir(bibdoc.basedir):
             if not filename.startswith('.'):
-                format = decompose_file(filename, skip_version=True)[2]
-                if correct_docname + format != filename:
+                try:
+                    dummy, dummy, format, version = decompose_file_with_version(filename)
+                except:
+                    raise InvenioWebSubmitFileError('Incorrect filename "%s" for docname %s for recid %i' % (filename, docname, self.id))
+                if '%s%s;%i' % (correct_docname, format, version) != filename:
                     return False
         return True
 
@@ -719,14 +722,14 @@ class BibRecDocs:
     def uniformize_bibdoc(self, docname):
         """This algorithm correct wrong file name belonging to a bibdoc."""
         bibdoc = self.get_bibdoc(docname)
-        for filename in os.listdir(bibdoc.get_full_path()):
+        for filename in os.listdir(bibdoc.basedir):
             if not filename.startswith('.'):
                 try:
-                    basename, format, version = decompose_file_with_version(docname)
+                    dummy, dummy, format, version = decompose_file_with_version(filename)
                 except ValueError:
-                    register_exception(alert_admin=True, prefix=                "Strange file '%s' is stored in %s" % (filename, bibdoc.get_full_path()))
+                    register_exception(alert_admin=True, prefix= "Strange file '%s' is stored in %s" % (filename, bibdoc.basedir))
                 else:
-                    os.rename(os.path.join(bibdoc.get_full_path(), filename), os.path.join(bibdoc.get_full_path(), '%s%s;%i' % (docname, format, version)))
+                    os.rename(os.path.join(bibdoc.basedir, filename), os.path.join(bibdoc.basedir, '%s%s;%i' % (docname, format, version)))
         Md5Folder(bibdoc.basedir).update()
         bibdoc.touch()
         bibdoc._build_file_list('rename')
@@ -748,7 +751,7 @@ class BibRecDocs:
             need_merge = self.has_docname_p(correct_docname)
             if need_merge:
                 proposed_docname = self.propose_unique_docname(correct_docname)
-                run_sql('UPDATE bibdoc SET docname=%s WHERE id=%s' % (proposed_docname, bibdoc.id))
+                run_sql('UPDATE bibdoc SET docname=%s WHERE id=%s', (proposed_docname, bibdoc.id))
                 self.build_bibdoc_list()
                 self.uniformize_bibdoc(proposed_docname)
                 try:
@@ -756,9 +759,9 @@ class BibRecDocs:
                 except InvenioWebSubmitFileError:
                     return False
             else:
-                run_sql('UPDATE bibdoc SET docname=%s WHERE id=%s' % (correct_docname, bibdoc.id))
+                run_sql('UPDATE bibdoc SET docname=%s WHERE id=%s', (correct_docname, bibdoc.id))
                 self.build_bibdoc_list()
-                self.uniformize_bibdoc(proposed_docname)
+                self.uniformize_bibdoc(correct_docname)
         else:
             self.uniformize_bibdoc(docname)
         return True
@@ -1215,12 +1218,13 @@ class BibDoc:
                 raise InvenioWebSubmitFileError, "A bibdoc called %s already exists for recid %s" % (newname, self.recid)
             try:
                 for f in os.listdir(self.basedir):
-                    try:
-                        (dummy, base, extension, version) = decompose_file_with_version(f)
-                    except ValueError:
-                        register_exception(alert_admin=True, prefix="Strange file '%s' is stored in %s" % (f, self.basedir))
-                    else:
-                        shutil.move(os.path.join(self.basedir, f), os.path.join(self.basedir, '%s%s;%i' % (newname, extension, version)))
+                    if not f.startswith('.'):
+                        try:
+                            (dummy, base, extension, version) = decompose_file_with_version(f)
+                        except ValueError:
+                            register_exception(alert_admin=True, prefix="Strange file '%s' is stored in %s" % (f, self.basedir))
+                        else:
+                            shutil.move(os.path.join(self.basedir, f), os.path.join(self.basedir, '%s%s;%i' % (newname, extension, version)))
             except Exception, e:
                 register_exception()
                 raise InvenioWebSubmitFileError("Error in renaming the bibdoc %s to %s for recid %s: %s" % (self.docname, newname, self.recid, e))
@@ -1328,6 +1332,7 @@ class BibDoc:
         """undelete a deleted file (only if it was actually deleted). The
         previous status, i.e. the restriction key can be provided.
         Otherwise the bibdoc will pe public."""
+        bibrecdocs = BibRecDocs(self.recid)
         try:
             run_sql("UPDATE bibdoc SET status=%s WHERE id=%s AND status='DELETED'", (self.id, previous_status))
         except Exception, e:
@@ -1337,6 +1342,7 @@ class BibDoc:
             try:
                 # Let's remove DELETED-20080214144322- in front of the docname
                 original_name = '-'.join(self.docname.split('-')[2:])
+                original_name = bibrecdocs.propose_unique_docname(original_name)
                 self.change_name(original_name)
             except Exception, e:
                 register_exception()

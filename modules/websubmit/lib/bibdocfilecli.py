@@ -121,13 +121,17 @@ _actions = [('get-info', 'print all the informations about the record/bibdoc/fil
             #'get-icons',
             ('get-history', 'print the document history'),
             ('delete', 'delete the specified docname'),
-            #'undelete',
+            ('undelete', 'undelete the specified docname'),
             #'purge',
             #'expunge',
             ('check-md5', 'check md5 checksum validity of files'),
+            ('check-format', 'check if any format-related inconsistences exists'),
+            ('check-duplicate-docnames', 'check for duplicate docnames associated with the same record'),
             ('update-md5', 'update md5 checksum of files'),
             ('fix-all', 'fix inconsistences in filesystem vs database vs MARC'),
-            ('fix-marc', 'synchronize MARC after filesystem/database')]
+            ('fix-marc', 'synchronize MARC after filesystem/database'),
+            ('fix-format', 'fix format related inconsistences'),
+            ('fix-duplicate-docnames', 'fix duplicate docnames associated with the same record')]
 
 _actions_with_parameter = {
     #'set-doctype' : 'doctype',
@@ -136,7 +140,8 @@ _actions_with_parameter = {
     #'set-description' : 'description',
     #'set-restriction' : 'restriction',
     'append' : ('append_path', 'specify the URL/path of the file that will appended to the bibdoc'),
-    'revise' : ('revise_path', 'specify the URL/path of the file that will revise the bibdoc')
+    'revise' : ('revise_path', 'specify the URL/path of the file that will revise the bibdoc'),
+    'merge-into' : ('into_docname', 'merge the docname speficied --docname into_docname'),
 }
 
 class OptionParserSpecial(OptionParser):
@@ -166,6 +171,7 @@ on top of the bibdocfile command line interfaces, you will probably need to
 revise them with the next release of CDS Invenio.""", 'WARNING')
     query_options = OptionGroup(parser, 'Query parameters')
     query_options.add_option('-a', '--all', action='store_true', dest='all', help='Select all the records')
+    query_options.add_option('--show-deleted', action='store_true', dest='show_deleted', help='Show deleted docname, too')
     query_options.add_option('-p', '--pattern', dest='pattern', help='select by specifying the search pattern')
     query_options.add_option('-c', '--collection', dest='collection', help='select by collection')
     query_options.add_option('-r', '--recid', type='int', dest='recid', help='select the recid (or the first recid in a range)')
@@ -221,7 +227,7 @@ def get_recids_from_query(pattern, collection, recid, recid2, docid, docid2):
     else:
         return intbitset(run_sql('select id from bibrec'))
 
-def get_docids_from_query(recid_set, docid, docid2):
+def get_docids_from_query(recid_set, docid, docid2, show_deleted=False):
     """Given a set of recid and an optional range of docids
     return a corresponding docids set. The range of docids
     takes precedence over the recid_set."""
@@ -240,7 +246,7 @@ def get_docids_from_query(recid_set, docid, docid2):
     else:
         ret = intbitset()
         for recid in recid_set:
-            bibrec = BibRecDocs(recid)
+            bibrec = BibRecDocs(recid, deleted_too=show_deleted)
             for bibdoc in bibrec.list_bibdocs():
                 ret.add(bibdoc.get_id())
                 icon = bibdoc.get_icon()
@@ -407,6 +413,81 @@ def cli_fix_marc(recid_set):
             ffts[recid].append({'docname' : docname, 'doctype' : 'FIX-MARC'})
     return bibupload_ffts(ffts, append=False)
 
+def cli_check_format(recid_set):
+    """Check if any format-related inconsistences exists."""
+    count = 0
+    duplicate = False
+    for recid in recid_set:
+        bibrecdocs = BibRecDocs(recid)
+        if not bibrecdocs.check_duplicate_docnames():
+            print >> sys.stderr, "recid %s has duplicate docnames!"
+            broken = True
+            duplicate = True
+        else:
+            broken = False
+        for docname in bibrecdocs.get_bibdoc_names():
+            if not bibrecdocs.check_format(docname):
+                print >> sys.stderr, "recid %s with docname %s need format fixing" % (recid, docname)
+                broken = True
+        if broken:
+            count += 1
+    if count:
+        result = "%d out of %d records need their formats to be fixed." % (count, len(recid_set))
+    else:
+        result = "All records appear to be correct with respect to formats."
+    if duplicate:
+        result += " Note however that at least one record appear to have duplicate docnames. You should better fix this situation by using --fix-duplicate-docnames."
+    print wrap_text_in_a_box(result, style="conclusion")
+    return not(duplicate or count)
+
+def cli_check_duplicate_docnames(recid_set):
+    """Check if some record is connected with bibdoc having the same docnames."""
+    count = 0
+    for recid in recid_set:
+        bibrecdocs = BibRecDocs(recid)
+        if bibrecdocs.check_duplicate_docnames():
+            count += 1
+            print sys.stderr, "recid %s has duplicate docnames!"
+    if count:
+        result = "%d out of %d records have duplicate docnames." % (count, len(recid_set))
+        return False
+    else:
+        result = "All records appear to be correct with respect to duplicate docnames."
+        return True
+
+def cli_fix_format(recid_set):
+    """Fix format-related inconsistences."""
+    fixed = intbitset()
+    for recid in recid_set:
+        bibrecdocs = BibRecDocs(recid)
+        for docname in bibrecdocs.get_bibdoc_names():
+            if not bibrecdocs.check_format(docname):
+                if bibrecdocs.fix_format(docname, skip_check=True):
+                    print >> sys.stderr, "%i has been fixed for docname %s" % (recid, docname)
+                else:
+                    print >> sys.stderr, "%i has been fixed for docname %s. However note that a new bibdoc might have been created." % (recid, docname)
+                fixed.add(recid)
+    if fixed:
+        print "Now we need to synchronize MARC to reflect current changes."
+        cli_fix_marc(fixed)
+    print wrap_text_in_a_box("%i out of %i record needed to be fixed." % (len(recid_set), len(fixed)), style="conclusion")
+    return not fixed
+
+def cli_fix_duplicate_docnames(recid_set):
+    """Fix duplicate docnames."""
+    fixed = intbitset()
+    for recid in recid_set:
+        bibrecdocs = BibRecDocs(recid)
+        if not bibrecdocs.check_duplicate_docnames():
+            bibrecdocs.fix_duplicate_docnames(skip_check=True)
+            print >> sys.stderr, "%i has been fixed for duplicate docnames." % recid
+            fixed.add(recid)
+    if fixed:
+        print "Now we need to synchronize MARC to reflect current changes."
+        cli_fix_marc(fixed)
+    print wrap_text_in_a_box("%i out of %i record needed to be fixed." % (len(recid_set), len(fixed)), style="conclusion")
+    return not fixed
+
 def cli_delete(recid, docname):
     """Delete the given docname of the given recid."""
     if docname in BibRecDocs(recid).get_bibdoc_names():
@@ -414,12 +495,34 @@ def cli_delete(recid, docname):
         ffts[recid] = [{'docname' : docname, 'doctype' : 'DELETE'}]
         return bibupload_ffts(ffts, append=False)
     else:
-        print >> sys.stderr('%s is not a valid docname for recid %s' % (docname, recid))
+        print >> sys.stderr, '%s is not a valid docname for recid %s' % (docname, recid)
 
-def cli_get_info(recid_set):
+def cli_undelete(recid, docname, status):
+    """Delete the given docname of the given recid."""
+    bibrecdocs = BibRecDocs(recid, deleted_too=True)
+    bibdoc = bibrecdocs.get_bibdoc(docname)
+    bibdoc.undelete(status)
+    cli_fix_marc(intbitset((recid,)))
+    print wrap_text_in_a_box("docname %s of recid %i successfuly undeleted with status '%s'" % (docname, recid, status), style="conclusion")
+
+def cli_merge_into(recid, docname, into_docname):
+    """Merge docname into_docname for the given recid."""
+    bibrecdocs = BibRecDocs(recid)
+    docnames = bibrecdocs.get_bibdoc_names()
+    if docname in docnames and into_docname in docnames:
+        try:
+            bibrecdocs.merge_bibdocs(into_docname, docname)
+        except InvenioWebSubmitFileError, e:
+            print >> sys.stderr, e
+        else:
+            cli_fix_marc(intbitset((recid)))
+    else:
+        print >> sys.stderr, 'Either %s or %s is not a valid docname for recid %s' % (docname, into_docname, recid)
+
+def cli_get_info(recid_set, show_deleted=False):
     """Print all the info of a recid_set."""
     for recid in recid_set:
-        print BibRecDocs(recid)
+        print BibRecDocs(recid, deleted_too=show_deleted)
 
 def cli_get_docnames(docid_set):
     """Print all the docnames of a docid_set."""
@@ -472,6 +575,24 @@ def cli_update_md5(docid_set):
             wait_for_user('Updating the md5s of this document can hide real problems.')
             bibdoc.md5s.update(only_new=False)
 
+def cli_assert_recid(options):
+    """Check for recid to be correctly set."""
+    try:
+        assert(int(options.recid) > 0)
+        return True
+    except:
+        print >> sys.stderr, 'recid not correctly set: "%s"' % options.recid
+        return False
+
+def cli_assert_docname(options):
+    """Check for recid to be correctly set."""
+    try:
+        assert(options.docname)
+        return True
+    except:
+        print >> sys.stderr, 'docname not correctly set: "%s"' % options.docname
+        return False
+
 def get_all_recids():
     """Return all the existing recids."""
     return intbitset(run_sql('select id from bibrec'))
@@ -483,37 +604,59 @@ def main():
         recid_set = get_all_recids()
     else:
         recid_set = get_recids_from_query(options.pattern, options.collection, options.recid, options.recid2, options.docid, options.docid2)
-    docid_set = get_docids_from_query(recid_set, options.docid, options.docid2)
-    if options.action == 'get-history':
-        cli_get_history(docid_set)
-    elif options.action == 'get-info':
-        cli_get_info(recid_set)
-    elif options.action == 'get-docnames':
-        cli_get_docnames(docid_set)
-    elif options.action == 'get-disk-usage':
-        cli_get_disk_usage(docid_set)
-    elif options.action == 'check-md5':
-        cli_check_md5(docid_set)
-    elif options.action == 'update-md5':
-        cli_update_md5(docid_set)
-    elif options.action == 'fix-all':
-        cli_fix_all(recid_set)
-    elif options.action == 'fix-marc':
-        cli_fix_marc(recid_set)
-    elif options.action == 'delete':
-        cli_delete(options.recid, options.docname)
-    elif options.append_path:
-        res = cli_append(options.recid, options.docid, options.docname, options.doctype, options.append_path, options.format, options.icon, options.description, options.comment, options.restriction)
-        if not res:
+    docid_set = get_docids_from_query(recid_set, options.docid, options.docid2, options.show_deleted == True)
+    try:
+        if options.action == 'get-history':
+            cli_get_history(docid_set)
+        elif options.action == 'get-info':
+            cli_get_info(recid_set, options.show_deleted == True)
+        elif options.action == 'get-docnames':
+            cli_get_docnames(docid_set)
+        elif options.action == 'get-disk-usage':
+            cli_get_disk_usage(docid_set)
+        elif options.action == 'check-md5':
+            cli_check_md5(docid_set)
+        elif options.action == 'update-md5':
+            cli_update_md5(docid_set)
+        elif options.action == 'fix-all':
+            cli_fix_all(recid_set)
+        elif options.action == 'fix-marc':
+            cli_fix_marc(recid_set)
+        elif options.action == 'delete':
+            cli_delete(options.recid, options.docname)
+        elif options.action == 'fix-duplicate-docnames':
+            cli_fix_duplicate_docnames(recid_set)
+        elif options.action == 'fix-format':
+            cli_fix_format(recid_set)
+        elif options.action == 'check-duplicate-docnames':
+            cli_check_duplicate_docnames(recid_set)
+        elif options.action == 'check-format':
+            cli_check_format(recid_set)
+        elif options.action == 'undelete':
+            if cli_assert_recid(options) and cli_assert_docname(options):
+                cli_undelete(options.recid, options.docname, options.restriction or "")
+        elif options.append_path:
+            if cli_assert_recid(options):
+                res = cli_append(options.recid, options.docid, options.docname, options.doctype, options.append_path, options.format, options.icon, options.description, options.comment, options.restriction)
+                if not res:
+                    sys.exit(1)
+        elif options.revise_path:
+            if cli_assert_recid(options):
+                res = cli_revise(options.recid, options.docid, options.docname,
+                options.newdocname, options.doctype, options.revise_path, options.format,
+                options.icon, options.description, options.comment, options.restriction)
+                if not res:
+                    sys.exit(1)
+        elif options.into_docname:
+            if options.recid and options.docname:
+                cli_merge_into(options.recid, options.docname, options.into_docname)
+            else:
+                print >> sys.stderr, "You have to specify both the recid and a docname for using --merge-into"
+        else:
+            print >> sys.stderr, "Action %s is not valid" % options.action
             sys.exit(1)
-    elif options.revise_path:
-        res = cli_revise(options.recid, options.docid, options.docname,
-        options.newdocname, options.doctype, options.revise_path, options.format,
-        options.icon, options.description, options.comment, options.restriction)
-        if not res:
-            sys.exit(1)
-    else:
-        print >> sys.stderr, "Action %s is not valid" % options.action
+    except InvenioWebSubmitFileError, e:
+        print >> sys.stderr, e
         sys.exit(1)
 
 if __name__=='__main__':
