@@ -615,15 +615,19 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                     remove_from_missing(p)
                     if not result.has_key(rec_id[0]):
                         result[rec_id[0]] = 0
-                    result[rec_id[0]] += 1
                     # Citation list should have rec_id[0] but check anyway
                     if not citation_list.has_key(rec_id[0]):
                         citation_list[rec_id[0]] = []
-                    citation_list[rec_id[0]].append(recid)
+                    #append unless this key already has the item
+                    if not recid in citation_list[rec_id[0]]:
+                        citation_list[rec_id[0]].append(recid)
+                        #and update result
+                        result[rec_id[0]] += 1
 
                     if not reference_list.has_key(recid):
                         reference_list[recid] = []
-                    reference_list[recid].append(rec_id[0])
+                    if not rec_id[0] in reference_list[recid]:
+                        reference_list[recid].append(rec_id[0])
                 else:
                     #the reference we wanted was not found among our records.
                     #put the reference in the "missing".. however, it will look
@@ -690,18 +694,19 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 #check citation and reference for this..
                 if rec_id and rec_id[0]:
                     #the above should always hold
+                    if not result.has_key(rec_id[0]):
+                        result[rec_id[0]] = 0
                     if not citation_list.has_key(rec_id[0]):
                         citation_list[rec_id[0]] = []
                     if not recid in citation_list[rec_id[0]]:
                         citation_list[rec_id[0]].append(recid) #append actual list
-                    if not result.has_key(rec_id[0]):
-                        result[rec_id[0]] = 0
-                    result[rec_id[0]] += 1 #add count for this..
+                        result[rec_id[0]] += 1 #add count for this..
 
                     #update reference_list accordingly
                     if not reference_list.has_key(recid):
                         reference_list[recid] = []
-                    reference_list[recid].append(rec_id[0])
+                    if not rec_id[0] in reference_list[recid]:
+                        reference_list[recid].append(rec_id[0])
     mesg = "d_references_s done fully"
     write_message(mesg)
     task_update_progress(mesg)
@@ -730,15 +735,18 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
 
                 if recid_list:
                     for recid in recid_list:
+                        #normal checks..
                         if not citation_list.has_key(rec_id):
                             citation_list[rec_id] = []
-                        if not recid in citation_list[rec_id]:
-                            if not result.has_key(rec_id):
-                                result[rec_id] = 0
-                            result[rec_id] += 1
-                            citation_list[rec_id].append(recid)
                         if not reference_list.has_key(recid):
                             reference_list[recid] = []
+                        if not result.has_key(rec_id):
+                             result[rec_id] = 0
+
+                        #normal updates
+                        if not recid in citation_list[rec_id]:
+                            result[rec_id] += 1
+                            citation_list[rec_id].append(recid)
                         if not rec_id in reference_list[recid]:
                             reference_list[recid].append(rec_id)
 
@@ -763,14 +771,15 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         write_message("These records match "+p+" in "+pubreftag+" : "+str(rec_ids), verbose=9)
         if rec_ids:
             for rec_id in rec_ids:
+                #normal checks
+                if not result.has_key(recid):
+                    result[recid] = 0
                 if not citation_list.has_key(recid):
                     citation_list[recid] = []
-                    result[recid] = 0
                 if not reference_list.has_key(rec_id):
                     reference_list[rec_id] = []
+
                 if not rec_id in citation_list[recid]:
-                    if not result.has_key(recid):
-                        result[recid] = 0
                     result[recid] += 1
                     citation_list[recid].append(rec_id)
                 if not recid in reference_list[rec_id]:
@@ -817,7 +826,8 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         for v in vlist:
             if selfcitedbydic.has_key(v):
                 tmplist = selfcitedbydic[v]
-                tmplist.append(k)
+                if not k in tmplist:
+                    tmplist.append(k)
             else:
                 tmplist = [k]
             selfcitedbydic[v] = tmplist
