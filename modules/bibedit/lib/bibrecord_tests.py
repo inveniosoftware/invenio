@@ -593,6 +593,157 @@ class BibRecordDeleteFieldTest(unittest.TestCase):
         self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", " ", " ", ""),
                          ['SzGeCERN2'])
 
+class BibRecordAddSubfieldIntoTest(unittest.TestCase):
+    """ bibrecord - testing subfield addition """
+
+    def setUp(self):
+        # pylint: disable-msg=C0103
+        """Initialize stuff"""
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe2, John</subfield>
+        <subfield code="b">editor</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="1">
+        <subfield code="a">On the foo and bar1</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="2">
+        <subfield code="a">On the foo and bar2</subfield>
+        </datafield>
+        </record>
+        """
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+
+    def test_add_subfield_into(self):
+        """bibrecord - adding subfield into position"""
+        bibrecord.record_add_subfield_into(self.rec, "100", 3, "b", "Samekniv")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "b")[0],
+                         'editor')
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "b")[1],
+                         'Samekniv')
+        bibrecord.record_add_subfield_into(self.rec, "245", 4, "x", "Elgokse")
+        bibrecord.record_add_subfield_into(self.rec, "245", 4, "z", "Ulriken", 1)
+        bibrecord.record_add_subfield_into(self.rec, "245", 4, "z", "Stortinget", 999)
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "1", "%")[1],
+                         'Ulriken')
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "1", "%")[2],
+                         'Elgokse')
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "1", "%")[3],
+                         'Stortinget')
+
+class BibRecordModifySubfieldTest(unittest.TestCase):
+    """ bibrecord - testing subfield modification """
+
+    def setUp(self):
+        # pylint: disable-msg=C0103
+        """Initialize stuff"""
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe2, John</subfield>
+        <subfield code="b">editor</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="1">
+        <subfield code="a">On the foo and bar1</subfield>
+        <subfield code="b">On writing unit tests</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="2">
+        <subfield code="a">On the foo and bar2</subfield>
+        </datafield>
+        </record>
+        """
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+
+    def test_modify_subfield(self):
+        """bibrecord - modify subfield"""
+        bibrecord.record_modify_subfield(self.rec, "245", 4, "a", "Holmenkollen", 0)
+        bibrecord.record_modify_subfield(self.rec, "245", 4, "x", "Brann", 1)
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "1", "%")[0],
+                         'Holmenkollen')
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "1", "%")[1],
+                         'Brann')
+
+class BibRecordDeleteSubfieldFromTest(unittest.TestCase):
+    """ bibrecord - testing subfield deletion """
+
+    def setUp(self):
+        # pylint: disable-msg=C0103
+        """Initialize stuff"""
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe2, John</subfield>
+        <subfield code="b">editor</subfield>
+        <subfield code="z">Skal vi danse?</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="1">
+        <subfield code="a">On the foo and bar1</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="2">
+        <subfield code="a">On the foo and bar2</subfield>
+        </datafield>
+        </record>
+        """
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+
+    def test_delete_subfield_from(self):
+        """bibrecord - delete subfield from position"""
+        bibrecord.record_delete_subfield_from(self.rec, "100", 3, 2)
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "z"),
+                         [])
+        bibrecord.record_delete_subfield_from(self.rec, "100", 3, 0)
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "%"),
+                         ['editor'])
+        bibrecord.record_delete_subfield_from(self.rec, "100", 3, 0)
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "%"),
+                         [])
+
+class BibRecordMoveSubfieldTest(unittest.TestCase):
+    """ bibrecord - testing subfield moving """
+
+    def setUp(self):
+        # pylint: disable-msg=C0103
+        """Initialize stuff"""
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe2, John</subfield>
+        <subfield code="b">editor</subfield>
+        <subfield code="c">fisk</subfield>
+        <subfield code="d">eple</subfield>
+        <subfield code="e">hammer</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="1">
+        <subfield code="a">On the foo and bar1</subfield>
+        </datafield>
+        </record>
+        """
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+
+    def test_move_subfield(self):
+        """bibrecord - move subfields"""
+        bibrecord.record_move_subfield(self.rec, "100", 3, 2, 4)
+        bibrecord.record_move_subfield(self.rec, "100", 3, 1, 0)
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "100", " ", " ", "%"),
+                         ['editor', 'Doe2, John', 'eple', 'hammer', 'fisk'])
+
 class BibRecordSpecialTagParsingTest(unittest.TestCase):
     """ bibrecord - parsing special tags (FMT, FFT)"""
 
@@ -890,6 +1041,10 @@ TEST_SUITE = make_test_suite(BibRecordSanityTest,
                              BibRecordGettingFieldValuesViaWildcardsTest,
                              BibRecordAddFieldTest,
                              BibRecordDeleteFieldTest,
+                             BibRecordAddSubfieldIntoTest,
+                             BibRecordModifySubfieldTest,
+                             BibRecordDeleteSubfieldFromTest,
+                             BibRecordMoveSubfieldTest,
                              BibRecordAccentedUnicodeLettersTest,
                              BibRecordSpecialTagParsingTest,
                              BibRecordPrintingTest,

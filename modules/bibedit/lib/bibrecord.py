@@ -226,7 +226,7 @@ def record_has_field(rec, tag):
     """checks whether record 'rec' contains tag 'tag'"""
     return rec.has_key(tag)
 
-def record_add_field(rec, tag, ind1="", ind2="",
+def record_add_field(rec, tag, ind1=' ', ind2=' ',
                      controlfield_value="",
                      datafield_subfield_code_value_tuples=None,
                      desired_field_number=-1):
@@ -281,7 +281,7 @@ def record_add_field(rec, tag, ind1="", ind2="",
     # return new field number:
     return newfield_number
 
-def record_delete_field(rec, tag, ind1="", ind2="", field_number=None):
+def record_delete_field(rec, tag, ind1=' ', ind2=' ', field_number=None):
     """
     Delete all/some fields defined with MARC tag 'tag' and indicators
     'ind1' and 'ind2' from record 'rec'. If 'field_number' is None,
@@ -298,11 +298,15 @@ def record_delete_field(rec, tag, ind1="", ind2="", field_number=None):
                     newlist.append(field)
         else:
             for field in rec[tag]:
-                if not (field[1]==ind1 and field[2]==ind2 and field[3]==field_number):
+                if not (field[1]==ind1 and field[2]==ind2 and field[4]==field_number):
                     newlist.append(field)
-        rec[tag] = newlist
+        if newlist:
+            rec[tag] = newlist
+        else:
+            del rec[tag]
 
-def record_delete_subfield(rec, tag, subfield, ind1="", ind2=""):
+def record_delete_subfield(rec, tag, subfield, ind1=' ', ind2=' '):
+    ind1, ind2 = wash_indicators(ind1, ind2)
     newlist = []
     if rec.has_key(tag):
         for field in rec[tag]:
@@ -317,6 +321,20 @@ def record_delete_subfield(rec, tag, subfield, ind1="", ind2=""):
                 newlist.append(field)
         rec[tag] = newlist
 
+def record_delete_subfield_from(rec, tag, field_number, subfield_index):
+    'Delete subfield from position specified by field number and subfield index.'
+    if rec.has_key(tag):
+        for field in rec[tag]:
+            if field[4] == field_number:
+                try:
+                    field[0].pop(subfield_index)
+                except IndexError:
+                    pass
+                if not field[0]:
+                    rec[tag].remove(field)
+                    if not rec[tag]:
+                        del rec[tag]
+
 def record_add_or_modify_subfield(record, field, subfield, ind1, ind2, value):
     """
        Modifies ( if exists) or creates ( if does not exist) subfield of a given field of record.
@@ -327,6 +345,7 @@ def record_add_or_modify_subfield(record, field, subfield, ind1, ind2, value):
        @ind2
        @value : value to be added
     """
+    ind1, ind2 = wash_indicators(ind1, ind2)
     if (record.has_key(field)):
         subfields = record_get_field_instances(rec = record, \
                                                      tag = field, \
@@ -353,6 +372,7 @@ def record_add_subfield(record, field, ind1, ind2, subfield, value):
        Adds a subfield to given fiels
 
     """
+    ind1, ind2 = wash_indicators(ind1, ind2)
     if (record.has_key(field)):
         record[field][0][0].append((subfield, value))
     else:
@@ -360,6 +380,43 @@ def record_add_subfield(record, field, ind1, ind2, subfield, value):
                              ind1 = ind1, ind2 = ind2, \
                              datafield_subfield_code_value_tuples= \
                              [(subfield, value)])
+
+def record_add_subfield_into(rec, tag, field_number, subfield, value,
+                             subfield_index=None):
+    '''
+    Add subfield into position specified by field number and optionally by
+    subfield index.
+    '''
+    if rec.has_key(tag):
+        for field in rec[tag]:
+            if field[4] == field_number:
+                if subfield_index:
+                    field[0].insert(subfield_index, (subfield, value))
+                else:
+                    field[0].append((subfield, value))
+
+def record_modify_subfield(rec, tag, field_number, subfield, value,
+                           subfield_index):
+    'Modify subfield at position specified by field number and subfield index.'
+    if rec.has_key(tag):
+        for field in rec[tag]:
+            if field[4] == field_number:
+                try:
+                    field[0][subfield_index] = (subfield, value)
+                except IndexError:
+                    pass
+
+def record_move_subfield(rec, tag, field_number, subfield_index, new_subfield_index):
+    '''Move subfield at position specified by field number and subfield index to
+    new subfield index.'''
+    if rec.has_key(tag):
+        for field in rec[tag]:
+            if field[4] == field_number:
+                try:
+                    subfield = field[0].pop(subfield_index)
+                    field[0].insert(new_subfield_index, subfield)
+                except IndexError:
+                    pass
 
 def record_does_field_exist(record, field, ind1, ind2):
     """
