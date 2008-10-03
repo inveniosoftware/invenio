@@ -33,8 +33,14 @@ import tempfile
 import cPickle
 import base64
 import binascii
+try:
+    import magic
+    CFG_HAS_MAGIC = True
+except ImportError:
+    CFG_HAS_MAGIC = False
 from datetime import datetime
 from mimetypes import MimeTypes
+from thread import get_ident
 
 try:
     from mod_python import apache
@@ -72,9 +78,25 @@ CFG_BIBDOCFILE_MD5_BUFFER = 1024 * 1024
 CFG_BIBDOCFILE_STRONG_FORMAT_NORMALIZATION = False
 
 KEEP_OLD_VALUE = 'KEEP-OLD-VALUE'
-_mimes = MimeTypes()
+_mimes = MimeTypes(strict=False)
 _mimes.suffix_map.update({'.tbz2' : '.tar.bz2'})
 _mimes.encodings_map.update({'.bz2' : 'bzip2'})
+
+_magic_cookies = {}
+def get_magic_cookies():
+    """Return a tuple of magic object.
+    ... not real magic. Just see: man file(1)"""
+    thread_id = get_ident()
+    if thread_id not in _magic_cookies:
+        _magic_cookies[thread_id] = {
+            magic.MAGIC_NONE : magic.open(magic.MAGIC_NONE),
+            magic.MAGIC_COMPRESS : magic.open(magic.MAGIC_COMPRESS),
+            magic.MAGIC_MIME : magic.open(magic.MAGIC_MIME),
+            magic.MAGIC_COMPRESS + magic.MAGIC_MIME : magic.open(magic.MAGIC_COMPRESS + magic.MAGIC_MIME)
+        }
+        for key in _magic_cookies[thread_id].keys():
+            _magic_cookies[thread_id][key].load()
+    return _magic_cookies[thread_id]
 
 def _generate_extensions():
     _tmp_extensions = _mimes.encodings_map.keys() + \
@@ -1573,6 +1595,7 @@ class BibDocFile:
             (self.mime, self.encoding) = _mimes.guess_type(self.fullname)
             if self.mime is None:
                 self.mime = "application/octet-stream"
+        self.magic = None
 
     def __repr__(self):
         return ('BibDocFile(%s, %s, %i, %s, %s, %i, %i, %s, %s, %s, %s)' % (repr(self.fullpath), repr(self.doctype), self.version, repr(self.name), repr(self.format), self.recid, self.docid, repr(self.status), repr(self.checksum), repr(self.description), repr(self.comment)))
@@ -1586,6 +1609,8 @@ class BibDocFile:
         out += '%s:%s:%s:%s:size=%s\n' % (self.recid, self.docid, self.version, self.format, nice_size(self.size))
         out += '%s:%s:%s:%s:creation time=%s\n' % (self.recid, self.docid, self.version, self.format, self.cd)
         out += '%s:%s:%s:%s:modification time=%s\n' % (self.recid, self.docid, self.version, self.format, self.md)
+        out += '%s:%s:%s:%s:magic=%s\n' % (self.recid, self.docid, self.version, self.format, self.get_magic())
+        out += '%s:%s:%s:%s:mime=%s\n' % (self.recid, self.docid, self.version, self.format, self.mime)
         out += '%s:%s:%s:%s:encoding=%s\n' % (self.recid, self.docid, self.version, self.format, self.encoding)
         out += '%s:%s:%s:%s:url=%s\n' % (self.recid, self.docid, self.version, self.format, self.url)
         out += '%s:%s:%s:%s:fullurl=%s\n' % (self.recid, self.docid, self.version, self.format, self.fullurl)
@@ -1668,6 +1693,17 @@ class BibDocFile:
         """Returns the status of the file, i.e. either '', 'DELETED' or a
         restriction keyword."""
         return self.status
+
+    def get_magic(self):
+        """Return all the possible guesses from the magic library about
+        the content of the file."""
+        if self.magic is None and CFG_HAS_MAGIC:
+            magic_cookies = get_magic_cookies()
+            magic_result = []
+            for key in magic_cookies.keys():
+                magic_result.append(magic_cookies[key].file(self.fullpath))
+            self.magic = tuple(magic_result)
+        return self.magic
 
     def check(self):
         """Return True if the checksum corresponds to the file."""
