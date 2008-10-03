@@ -531,9 +531,12 @@ def get_phrases_from_phrase(phrase, stemming_language=None):
                     for block3 in block2.split():
                         block3 = block3.strip()
                         if block3:
-                            block3 = apply_stemming_and_stopwords_and_length_check(block3, stemming_language)
-                            if block3:
-                                new_words.append(block3)
+                            new_words.append(block3)
+                            ## FIXME: For the time being stemming
+                            ## should not be applied to idxPHRASEs
+                            #block3 = apply_stemming_and_stopwords_and_length_check(block3, stemming_language)
+                            #if block3:
+                                #new_words.append(block3)
             block1 = ' '.join(new_words)
         if block1:
             words[block1] = 1
