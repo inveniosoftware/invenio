@@ -192,7 +192,6 @@ class GoogleScholarExporter:
             index_file = open(output_directory + os.sep +file_name_pattern+"-index.html", "w")
             index_file.write("<html><body>\n")
 
-            print number_of_files
             for file_number in xrange(1, number_of_files + 1):
                 file_name = self._get_part_file_name(file_name_pattern, file_number)
                 index_file.write('<a href="%s">%s</a><br>\n' % (file_name, file_name))
