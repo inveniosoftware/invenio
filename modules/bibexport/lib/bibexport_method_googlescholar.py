@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 ##
-## $Id$
-##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -36,22 +34,22 @@ this:
 
 * all exportable records:
 
-    /export/google-scholar/all-index.nlm.html   - links to parts below
-    /export/google-scholar/all-part1.nlm.xml.gz - first batch of 1000 records
-    /export/google-scholar/all-part2.nlm.xml.gz - second batch of 1000 records
+    /export/googlescholar/all-index.html   - links to parts below
+    /export/googlescholar/all-part1.xml.gz - first batch of 1000 records
+    /export/googlescholar/all-part2.xml.gz - second batch of 1000 records
     ...
-    /export/google-scholar/all-partM.nlm.xml.gz - last batch of 1000 records
+    /export/googlescholar/all-partM.xml.gz - last batch of 1000 records
 
 * records modified in the last month:
 
-    /export/google-scholar/lastmonth-index.nlm.html   - links to parts below
-    /export/google-scholar/lastmonth-part1.nlm.xml.gz - first batch of 1000 records
-    /export/google-scholar/lastmonth-part2.nlm.xml.gz - second batch of 1000 records
+    /export/googlescholar/lastmonth-index.html   - links to parts below
+    /export/googlescholar/lastmonth-part1.xml.gz - first batch of 1000 records
+    /export/googlescholar/lastmonth-part2.xml.gz - second batch of 1000 records
     ...
-    /export/google-scholar/lastmonth-partN.nlm.xml.gz - last batch of 1000 records
+    /export/googlescholar/lastmonth-partN.xml.gz - last batch of 1000 records
 """
 
-from invenio.config import CFG_WEBDIR
+from invenio.config import CFG_WEBDIR, CFG_CERN_SITE
 from invenio.bibtask import write_message
 from invenio.search_engine import perform_request_search, print_record
 import os
@@ -64,7 +62,7 @@ def run_export_method(jobname):
     write_message("bibexport_sitemap: job %s started." % jobname)
 
     try:
-        output_directory = CFG_WEBDIR + os.sep + "export" + os.sep + "google-scholar"
+        output_directory = CFG_WEBDIR + os.sep + "export" + os.sep + "googlescholar"
         exporter = GoogleScholarExporter(output_directory)
         exporter.export()
     except GoogleScholarExportException, ex:
@@ -79,6 +77,8 @@ class GoogleScholarExporter:
     _records_with_fulltext_only = True
     #FIXME: Read collections from configuration file
     _collections = ["Theses"]
+    if CFG_CERN_SITE:
+        _collections = ["CERN Theses"]
 
     def __init__(self, output_directory):
         """Constructor of GoogleScholarExporter
@@ -178,10 +178,10 @@ class GoogleScholarExporter:
 
         file_number - the number of the file in the sequence of files
 
-        The result is filename like lastmonth-part2.nlm.xml.gz
+        The result is filename like lastmonth-part2.xml.gz
         where lastmonth is the file_name_pattern and 2 is the file_number
         """
-        file_name = "%s-part%d.nlm.xml.gz" % (file_name_pattern, file_number)
+        file_name = "%s-part%d.xml.gz" % (file_name_pattern, file_number)
 
         return file_name
 
@@ -189,14 +189,15 @@ class GoogleScholarExporter:
         """Creates HTML file containing links to all files containing records"""
 
         try:
-            index_file = open(output_directory + os.sep +file_name_pattern+"-index.nlm.html", "w")
-            index_file.write("<html><body>")
+            index_file = open(output_directory + os.sep +file_name_pattern+"-index.html", "w")
+            index_file.write("<html><body>\n")
 
-            for file_number in xrange(1, number_of_files):
+            print number_of_files
+            for file_number in xrange(1, number_of_files + 1):
                 file_name = self._get_part_file_name(file_name_pattern, file_number)
-                index_file.write('<a href="%s">%s</a><br>' % (file_name, file_name))
+                index_file.write('<a href="%s">%s</a><br>\n' % (file_name, file_name))
 
-            index_file.write("</body></html>")
+            index_file.write("</body></html>\n")
         except (IOError, OSError), exception:
             self._report_error("Failed to create index file.", exception)
 
