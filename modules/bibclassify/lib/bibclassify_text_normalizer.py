@@ -29,8 +29,11 @@ import re
 try:
     from invenio.refextract import replace_undesirable_characters
 except ImportError, e1:
-    print >> sys.stderr, "Error: %s" % e1
-    sys.exit(1)
+    try:
+        from refextract import replace_undesirable_characters
+    except ImportError, err:
+        print >> sys.stderr, "Error: %s" % err
+        sys.exit(1)
 
 def normalize_fulltext(fulltext):
     """Returns a 'cleaned' version of the output provided by pdftotext."""
@@ -111,9 +114,16 @@ def cut_references(text_lines):
         from invenio.refextract import find_reference_section, \
             find_end_of_reference_section
     except ImportError:
-        print >> sys.stderr, ("Impossible to import refextract. Working on "
-            "full document.")
-        return text_lines
+        # Needed for bibclassify to run in standalone mode.
+        try:
+            from refextract import find_reference_section, \
+                find_end_of_reference_section
+        except ImportError, err1:
+            print >> sys.stderr, "Error: %s" % err1
+            sys.exit(1)
+            print >> sys.stderr, ("Impossible to import refextract. Working on "
+                "full document.")
+            return text_lines
 
     ref_sect_start = find_reference_section(text_lines)
     if ref_sect_start is not None:
@@ -229,8 +239,8 @@ def replace_greek_characters(line):
     for greek_char, replacement in _GREEK_REPLACEMENTS.iteritems():
         try:
             line = line.replace(greek_char, replacement)
-        except UnicodeDecodeError, err:
-            print err
+        except UnicodeDecodeError, err1:
+            print err1
             return ""
 
     return line
