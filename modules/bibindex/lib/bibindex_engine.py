@@ -1529,9 +1529,7 @@ def task_run_core():
                     task_sleep_now_if_required(can_stop_too=True)
                 else:
                     wordTable.add_recIDs_by_date(task_get_option("modified"), task_get_option("flush"))
-                    # only update last_updated if run via automatic mode:
-                    task_sleep_now_if_required(can_stop_too=True)
-                    #wordTable.update_last_updated(task_get_task_param('task_starting_time'))
+                    task_sleep_now_if_required(can_stop_too=True)))
             elif task_get_option("cmd") == "repair":
                 wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
@@ -1585,10 +1583,7 @@ def task_run_core():
                     task_sleep_now_if_required(can_stop_too=True)
                 else:
                     wordTable.add_recIDs_by_date(task_get_option("modified"), task_get_option("flush"))
-                    # only update last_updated if run via automatic mode:
-                    if not task_get_option("reindex"):
-                        ## If reindex we update after swapping reindexing tables.
-                        wordTable.update_last_updated(task_get_task_param('task_starting_time'))
+                    task_sleep_now_if_required(can_stop_too=True)
             elif task_get_option("cmd") == "repair":
                 wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
