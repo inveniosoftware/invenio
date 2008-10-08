@@ -30,6 +30,7 @@ import calendar
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION
 from invenio.messages import gettext_set_language
+from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
 from invenio.bibrank_grapher import *
@@ -57,7 +58,13 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         # remove images older than 10 minutes
         remove_old_img("download")
         # download count graph
-        id_bibdocs = run_sql("select distinct id_bibdoc from rnkDOWNLOADS where id_bibrec=%s;" % id_bibrec)
+        id_bibdocs = intbitset(run_sql("select distinct id_bibdoc from rnkDOWNLOADS where id_bibrec=%s", (id_bibrec, )))
+
+        id_existing_bibdocs = intbitset(run_sql("SELECT id_bibdoc FROM bibrec_bibdoc JOIN bibdoc ON id_bibdoc=id WHERE id_bibrec=%s AND status<>'DELETED'", (id_bibrec, )))
+
+        ## FIXME: when bibdocs are deleted we loose the stats. What shall we do with them?
+        id_bibdocs &= id_existing_bibdocs
+
         history_analysis_results = ()
         if id_bibdocs == ():
             pass
