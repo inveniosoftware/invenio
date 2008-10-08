@@ -1409,8 +1409,16 @@ def main():
             ]),
             task_stop_helper_fnc=task_stop_table_close_fnc,
             task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
-            task_run_fnc=task_run_core)
+            task_run_fnc=task_run_core,
+            task_submit_check_options_fnc=task_submit_check_options)
 
+def task_submit_check_options():
+    """Check for options compatibility."""
+    if task_get_option("reindex"):
+        if task_get_option("cmd") != "add" or task_get_option('id') or task_get_option('collection'):
+            print >> sys.stderr, "ERROR: You can use --reindex only when adding modified record."
+            return False
+    return True
 
 def task_submit_elaborate_specific_parameter(key, value, opts, args):
     """ Given the string key it checks it's meaning, eventually using the
@@ -1529,7 +1537,7 @@ def task_run_core():
                     task_sleep_now_if_required(can_stop_too=True)
                 else:
                     wordTable.add_recIDs_by_date(task_get_option("modified"), task_get_option("flush"))
-                    task_sleep_now_if_required(can_stop_too=True)))
+                    task_sleep_now_if_required(can_stop_too=True)
             elif task_get_option("cmd") == "repair":
                 wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
