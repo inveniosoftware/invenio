@@ -466,6 +466,61 @@ def get_nothing_from_phrase(phrase, stemming_language=None):
     8564_u)."""
     return []
 
+
+def swap_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
+    """Atomically swap reindexed temporary table with the original one.
+    Delete the now-old one."""
+    write_message("Swapping re-indexing tables for id %s" % index_id, verbose=2)
+    run_sql(
+        "RENAME TABLE " +
+        "idxWORD%02dR TO old_idxWORD%02dR," % (index_id, index_id) +
+        "%sidxWORD%02dR TO idxWORD%02dR," % (reindex_prefix, index_id, index_id) +
+        "idxWORD%02dF TO old_idxWORD%02dF," % (index_id, index_id) +
+        "%sidxWORD%02dF TO idxWORD%02dF," % (reindex_prefix, index_id, index_id) +
+        "idxPHRASE%02dR TO old_idxPHRASE%02dR," % (index_id, index_id) +
+        "%sidxPHRASE%02dR TO idxPHRASE%02dR," % (reindex_prefix, index_id, index_id) +
+        "idxPHRASE%02dF TO old_idxPHRASE%02dF," % (index_id, index_id) +
+        "%sidxPHRASE%02dF TO idxPHRASE%02dF;" % (reindex_prefix, index_id, index_id)
+    )
+    write_message("Dropping old re-indexed tables for id %s" % index_id, verbose=2)
+    run_sql("DROP TABLE old_idxWORD%02dR, old_idxWORD%02dF, old_idxPHRASE%02dR, old_idxPHRASE%02dF" % (index_id, index_id, index_id, index_id)
+    )
+
+def init_temporary_reindex_tables(index_id, reindex_prefix="tmp_"):
+    """Create reindexing temporary tables."""
+    write_message("Creating new re-indexing tables for id %s" % index_id, verbose=2)
+    res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxWORD%02dF (
+                        id mediumint(9) unsigned NOT NULL auto_increment,
+                        term varchar(50) default NULL,
+                        hitlist longblob,
+                        PRIMARY KEY  (id),
+                        UNIQUE KEY term (term)
+                        ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
+
+    res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxWORD%02dR (
+                        id_bibrec mediumint(9) unsigned NOT NULL,
+                        termlist longblob,
+                        type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+                        PRIMARY KEY (id_bibrec,type)
+                        ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
+
+    res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxPHRASE%02dF (
+                        id mediumint(9) unsigned NOT NULL auto_increment,
+                        term text default NULL,
+                        hitlist longblob,
+                        PRIMARY KEY  (id),
+                        KEY term (term(50))
+                        ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
+
+    res = run_sql("""CREATE TABLE IF NOT EXISTS %sidxPHRASE%02dR (
+                        id_bibrec mediumint(9) unsigned NOT NULL default '0',
+                        termlist longblob,
+                        type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+                        PRIMARY KEY  (id_bibrec,type)
+                        ) ENGINE=MyISAM""" % (reindex_prefix, index_id))
+    run_sql("UPDATE idxINDEX SET last_updated='0000-00-00 00:00:00' WHERE id=%s", (index_id,))
+
+
 latex_formula_re = re.compile(r'\$.*?\$|\\\[.*?\\\]')
 def get_words_from_phrase(phrase, stemming_language=None):
     """Return list of words found in PHRASE.  Note that the phrase is
@@ -693,6 +748,17 @@ def truncate_index_table(index_name):
         run_sql("TRUNCATE idxPHRASE%02dF" % index_id)
         run_sql("TRUNCATE idxPHRASE%02dR" % index_id)
 
+def update_index_last_updated(index_id, starting_time=None):
+    """Update last_updated column of the index table in the database.
+    Puts starting time there so that if the task was interrupted for record download,
+    the records will be reindexed next time."""
+    if starting_time is None:
+        return None
+    write_message("updating last_updated to %s..." % starting_time, verbose=9)
+    return run_sql("UPDATE idxINDEX SET last_updated=%s WHERE id=%s",
+                    (starting_time, index_id,))
+
+
 class WordTable:
     "A class to hold the words table."
 
@@ -895,16 +961,6 @@ class WordTable:
         else:
             write_message("The word '%s' does not exist in the word file."\
                               % word)
-
-    def update_last_updated(self, starting_time=None):
-        """Update last_updated column of the index table in the database.
-        Puts starting time there so that if the task was interrupted for record download,
-        the records will be reindexed next time."""
-        if starting_time is None:
-            return None
-        write_message("updating last_updated to %s..." % starting_time, verbose=9)
-        return run_sql("UPDATE idxINDEX SET last_updated=%s WHERE id=%s",
-                       (starting_time, self.index_id,))
 
     def add_recIDs(self, recIDs, opt_flush):
         """Fetches records which id in the recIDs range list and adds
@@ -1432,22 +1488,14 @@ def task_run_core():
         _last_word_table = None
         return True
 
-    if task_get_option("reindex"):
-        if task_get_option("windex"):
-            for index_name in task_get_option("windex").split(','):
-                truncate_index_table(index_name)
-                task_sleep_now_if_required()
-
-        else:
-            for index_name in get_all_indexes():
-                truncate_index_table(index_name)
-                task_sleep_now_if_required()
-
-
     # Let's work on single words!
     wordTables = get_word_tables(task_get_option("windex"))
     for index_id, index_tags in wordTables:
-        wordTable = WordTable(index_id, index_tags, 'idxWORD%02dF', get_words_from_phrase, {'8564_u': get_words_from_fulltext})
+        reindex_prefix = ""
+        if task_get_option("reindex"):
+            reindex_prefix = "tmp_"
+            init_temporary_reindex_tables(index_id, reindex_prefix)
+        wordTable = WordTable(index_id, index_tags, reindex_prefix + 'idxWORD%02dF', get_words_from_phrase, {'8564_u': get_words_from_fulltext})
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
         try:
@@ -1502,10 +1550,8 @@ def task_run_core():
         wordTable.report_on_table_consistency()
         task_sleep_now_if_required(can_stop_too=True)
 
-    # Let's work on phrases now
-    wordTables = get_word_tables(task_get_option("windex"))
-    for index_id, index_tags in wordTables:
-        wordTable = WordTable(index_id, index_tags, 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
+        # Let's work on phrases now
+        wordTable = WordTable(index_id, index_tags, reindex_prefix + 'idxPHRASE%02dF', get_phrases_from_phrase, {'8564_u': get_nothing_from_phrase}, False)
         _last_word_table = wordTable
         wordTable.report_on_table_consistency()
         try:
@@ -1540,8 +1586,9 @@ def task_run_core():
                 else:
                     wordTable.add_recIDs_by_date(task_get_option("modified"), task_get_option("flush"))
                     # only update last_updated if run via automatic mode:
-                    wordTable.update_last_updated(task_get_task_param('task_starting_time'))
-                    task_sleep_now_if_required(can_stop_too=True)
+                    if not task_get_option("reindex"):
+                        ## If reindex we update after swapping reindexing tables.
+                        wordTable.update_last_updated(task_get_task_param('task_starting_time'))
             elif task_get_option("cmd") == "repair":
                 wordTable.repair(task_get_option("flush"))
                 task_sleep_now_if_required(can_stop_too=True)
@@ -1558,6 +1605,11 @@ def task_run_core():
             sys.exit(1)
 
         wordTable.report_on_table_consistency()
+        task_sleep_now_if_required(can_stop_too=True)
+
+        if task_get_option("reindex"):
+            swap_temporary_reindex_tables(index_id, reindex_prefix)
+            update_index_last_updated(index_id, task_get_task_param('task_starting_time'))
         task_sleep_now_if_required(can_stop_too=True)
 
     _last_word_table = None
