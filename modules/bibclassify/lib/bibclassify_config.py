@@ -22,6 +22,10 @@ BibClassify configuration file.
 When writing changes, please either delete the cached ontology in your
 temporary directory or use the rebuild-cache option in order to
 regenerate the cached ontology.
+
+If you want to change this configuration, we recommend to create a
+local configuration file names 'bibclassify_config_local.py' that
+contains the changes to apply.
 """
 
 __revision__ = "$Id$"

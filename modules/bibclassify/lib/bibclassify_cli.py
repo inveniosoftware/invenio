@@ -33,9 +33,17 @@ try:
         get_keywords_from_text, check_ontology
     from bibclassify_text_extractor import text_lines_from_local_file, \
         text_lines_from_url, is_pdf
+    from bibclassify_config import *
 except ImportError, err:
     print >> sys.stderr, "Error: %s" % err
     sys.exit(1)
+
+# Retrieve the custom configuration if it exists.
+try:
+    from bibclassify_config_local import *
+except ImportError:
+    # No local configuration was found.
+    pass
 
 _OPTIONS = {}
 
@@ -104,7 +112,8 @@ def main():
             sources[os.path.basename(entry)] = text_lines
         else:
             # Treat as a URL.
-            text_lines = text_lines_from_url(entry)
+            text_lines = text_lines_from_url(entry,
+                user_agent=CFG_BIBCLASSIFY_USER_AGENT)
             sources[entry.split("/")[-1]] = text_lines
 
     # For each identified source, check the keywords and output them.

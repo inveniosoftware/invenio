@@ -26,13 +26,17 @@ __revision__ = "$Id$"
 import sys
 
 try:
-    from bibclassify_config import CFG_BIBCLASSIFY_VALID_SEPARATORS, \
-                                   CFG_BIBCLASSIFY_AUTHOR_KW_START, \
-                                   CFG_BIBCLASSIFY_AUTHOR_KW_END, \
-                                   CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION
+    from bibclassify_config import *
 except ImportError, err:
     print >> sys.stderr, "Error: %s" % err
     sys.exit(1)
+
+# Retrieve the custom configuration if it exists.
+try:
+    from bibclassify_config_local import *
+except ImportError:
+    # No local configuration was found.
+    pass
 
 _MAXIMUM_SEPARATOR_LENGTH = max([len(_separator)
     for _separator in CFG_BIBCLASSIFY_VALID_SEPARATORS])

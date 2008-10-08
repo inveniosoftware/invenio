@@ -36,18 +36,18 @@ try:
     from bibclassify_keyword_analyser import get_single_keywords, \
                                              get_composite_keywords, \
                                              get_author_keywords
-    from bibclassify_config import CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, \
-        CFG_BIBCLASSIFY_EXCEPTIONS, \
-        CFG_BIBCLASSIFY_GENERAL_REGULAR_EXPRESSIONS, \
-        CFG_BIBCLASSIFY_INVARIABLE_WORDS, \
-        CFG_BIBCLASSIFY_PARTIAL_TEXT, \
-        CFG_BIBCLASSIFY_SEPARATORS, \
-        CFG_BIBCLASSIFY_SYMBOLS, \
-        CFG_BIBCLASSIFY_UNCHANGE_REGULAR_EXPRESSIONS, \
-        CFG_BIBCLASSIFY_WORD_WRAP
+    from bibclassify_config import *
 except ImportError, err:
     print >> sys.stderr, "Error: %s" % err
     sys.exit(1)
+
+# Retrieve the custom configuration if it exists.
+try:
+    from bibclassify_config_local import *
+except ImportError:
+    # No local configuration was found.
+    pass
+
 
 # Global variables.
 _SKWS = {}
@@ -145,9 +145,9 @@ def build_cache(ontology_file, no_cache=False):
 
     for subject_object in store.subject_objects(namespace["prefLabel"]):
         # Keep only the single keywords.
-        # TODO: Remove or alter that condition in order to allow using other
-        # ontologies that do not have this composite notion (such as
-        # NASA-subjects.rdf)
+        # FIXME: Remove or alter that condition in order to allow using
+        # other ontologies that do not have this composite notion (such
+        # as NASA-subjects.rdf)
         if not store.value(subject_object[0], namespace["compositeOf"],
             any=True):
             strsubject = str(subject_object[0]).split("#")[-1]
