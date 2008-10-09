@@ -18,23 +18,33 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 <!-- WebDoc-Page-Title: BibClassify Internals -->
-<!-- WebDoc-Page-Navtrail: <a class="navtrail" href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
+<!-- WebDoc-Page-Navtrail: <a class="navtrail"
+    href="<CFG_SITE_URL>/help/hacking">Hacking CDS Invenio</a> -->
 <!-- WebDoc-Page-Revision: $Id$ -->
 
 <p>This page collects some information relative to the development of the
-BibClassify module and the high energy physics (HEP) taxonomy.</p>
+BibClassify module and the High-Energy Physics (HEP) taxonomy.</p>
 
-<blockquote> <dl>
-<dt><a href="bibclassify-hep-taxonomy">The HEP taxonomy: rationale and extensions</a>
-<dd>This guide presents the general architecture of the HEP taxonomy
-and the RDF SKOS extensions adopted.  </dd></dt>
+<blockquote>
+<dl>
+<dt><a href="bibclassify-hep-taxonomy">The HEP taxonomy: rationale and
+extensions</a>
+<dd>This guide presents the general architecture of the HEP taxonomy and the
+RDF/SKOS extensions adopted.</dd></dt>
 
-<dt><a href="bibclassify-extraction-algorithm">The code behind BibClassify: the extraction algorithm</a>
-<dd>This guide illustrates in detail the <em>modus
-operandi</em> of BibClassify.</dd></dt>
-</dl> </blockquote>
+<dt><a href="bibclassify-extraction-algorithm">The code behind BibClassify:
+the extraction algorithm</a>
+<dd>This guide illustrates in detail the <em>modus operandi</em> of
+BibClassify.
+</dd>
+</dt>
+</dl>
+</blockquote>
 
-<span class="warning">WARNING. This guides are intended mainly for
-developers, wishing to find out about specific details of the
-system.<br /> If you are looking for a general usage guide, please refer to the <a
-href="<CFG_SITE_URL>/help/admin/bibclassify-admin-guide">BibClassify Admin Guide</a>.</span>
+<span class="warning">
+WARNING: This guides are intended mainly for developers, wishing to find out
+about specific details of the system.<br /> If you are looking for a general
+usage guide, please refer to the
+<a href="<CFG_SITE_URL>/help/admin/bibclassify-admin-guide">BibClassify Admin
+Guide</a>.
+</span>

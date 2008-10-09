@@ -267,15 +267,19 @@ def _read_options(options_string):
             stream=sys.stderr, verbose=0)
         sys.exit(0)
     # Output mode is correct?
-    elif options["output_mode"] not in ("html", "text", "marcxml"):
-        write_message("ERROR: output (-o) should be TEXT, MARCXML or HTML.",
-            stream=sys.stderr, verbose=0)
-        sys.exit(0)
+    elif options["output_mode"]:
+        options["output_mode"] = options["output_mode"].lower() # sanity
+        if options["output_mode"] not in ("text", "marcxml", "html"):
+            write_message("ERROR: output (-o) should be TEXT, MARCXML or HTML.",
+                          stream=sys.stderr, verbose=0)
+            sys.exit(0)
     # Match mode is correct?
-    elif options["match_mode"] not in ("full", "partial"):
-        write_message("ERROR: mode (-m) should be FULL or PARTIAL.",
-            stream=sys.stderr, verbose=0)
-        sys.exit(0)
+    elif options["match_mode"]:
+        options["match_mode"] = options["match_mode"].lower() # sanity
+        if options["match_mode"] not in ("full", "partial"):
+            write_message("ERROR: mode (-m) should be FULL or PARTIAL.",
+                          stream=sys.stderr, verbose=0)
+            sys.exit(0)
     # Output limit is correct?
     try:
         options["output_limit"] = int(options["output_limit"])
