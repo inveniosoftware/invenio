@@ -292,7 +292,7 @@ def record_delete_field(rec, tag, ind1=' ', ind2=' ', field_number=None):
 
     newlist = []
     if rec.has_key(tag):
-        if not field_number:
+        if field_number is None:
             for field in rec[tag]:
                 if not (field[1]==ind1 and field[2]==ind2):
                     newlist.append(field)
@@ -390,10 +390,10 @@ def record_add_subfield_into(rec, tag, field_number, subfield, value,
     if rec.has_key(tag):
         for field in rec[tag]:
             if field[4] == field_number:
-                if subfield_index:
-                    field[0].insert(subfield_index, (subfield, value))
-                else:
+                if subfield_index is None:
                     field[0].append((subfield, value))
+                else:
+                    field[0].insert(subfield_index, (subfield, value))
 
 def record_modify_subfield(rec, tag, field_number, subfield, value,
                            subfield_index):
