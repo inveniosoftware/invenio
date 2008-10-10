@@ -255,3 +255,18 @@ def wait_for_user(msg=""):
         sys.stderr.write("ERROR: Aborted.\n")
         sys.exit(1)
     return
+
+def guess_minimum_encoding(text, charsets=('ascii', 'latin1', 'utf8')):
+    """Try to guess the minimum charset that is able to represent the given
+    text using the provided charsets. text is supposed to be encoded in utf8.
+    Returns (encoded_text, charset) where charset is the first charset
+    in the sequence being able to encode text.
+    Returns (text, 'utf8') in case no charset is able to encode text.
+    """
+    encoded_text = text.decode('utf8')
+    for charset in charsets:
+        try:
+            return (encoded_text.encode(charset), charset)
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            pass
+    return (text, 'utf8')

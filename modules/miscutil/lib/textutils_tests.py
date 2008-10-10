@@ -25,8 +25,16 @@ __revision__ = "$Id$"
 
 import unittest
 
-from invenio.textutils import wrap_text_in_a_box
+from invenio.textutils import wrap_text_in_a_box, guess_minimum_encoding
 from invenio.testutils import make_test_suite, run_test_suite
+
+class GuessMinimumEncodingTest(unittest.TestCase):
+    """Test functions related to guess_minimum_encoding function."""
+    def test_guess_minimum_encoding(self):
+        """textutils - guess_minimum_encoding."""
+        self.assertEqual(guess_minimum_encoding('patata'), ('patata', 'ascii'))
+        self.assertEqual(guess_minimum_encoding('àèéìòù'), ('\xe0\xe8\xe9\xec\xf2\xf9', 'latin1'))
+        self.assertEqual(guess_minimum_encoding('Ιθάκη'), ('Ιθάκη', 'utf8'))
 
 class WrapTextInABoxTest(unittest.TestCase):
     """Test functions related to wrap_text_in_a_box function."""
@@ -192,7 +200,7 @@ If you would like to try it out yourself, please feel free to download our lates
 """
         self.assertEqual(wrap_text_in_a_box(text), result)
 
-TEST_SUITE = make_test_suite(WrapTextInABoxTest,)
+TEST_SUITE = make_test_suite(WrapTextInABoxTest, GuessMinimumEncodingTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
