@@ -119,7 +119,7 @@ def main():
     # For each identified source, check the keywords and output them.
     for source, text_lines in sources.iteritems():
         if _OPTIONS["output_mode"] == "text":
-            print >> sys.stdout, source
+            print >> sys.stdout, "Input file: " + source
         print >> sys.stdout, get_keywords_from_text(text_lines,
             output_mode=_OPTIONS["output_mode"],
             output_limit=_OPTIONS["output_limit"],
@@ -173,7 +173,16 @@ def read_options(options_string):
         elif opt in ("-v", "--verbose"):
             _OPTIONS["verbose"] = arg
         elif opt in ("-k", "--ontology"):
-            _OPTIONS["ontology_file"] = arg
+            if os.access(arg, os.R_OK):
+                _OPTIONS["ontology_file"] = arg
+            else:
+                try:
+                    from invenio.config import CFG_ETCDIR
+                except ImportError:
+                    # bibclassifylib takes care of error messages.
+                    _OPTIONS["ontology_file"] = arg
+                else:
+                    _OPTIONS["ontology_file"] = CFG_ETCDIR + os.sep + arg
         elif opt in ("-o", "--output-mode"):
             _OPTIONS["output_mode"] = arg.lower()
         elif opt in ("-m", "--matching-mode"):
