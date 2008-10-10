@@ -12,16 +12,16 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""CDS Invenio BibClassify.  
+"""CDS Invenio BibClassify.
         It extracts keywords from a pdf or text file based on a thesaurus.
 
-Usage: bibclassify [options] 
+Usage: bibclassify [options]
  Examples:
       bibclassify -f file.pdf -k thesaurus.txt -o TEXT
       bibclassify -t file.txt -K ontology.rdf -m SLOW
@@ -33,7 +33,7 @@ Usage: bibclassify [options]
  -K, --ontology=FILENAME     name of the RDF or OWL ontology (experimental)
  -o, --output=HTML|TEXT      output list of keywords in either HTML or text
  -n, --nkeywords=NUMBER      max number of keywords to be found
- -m, --mode=FAST|SLOW        processing mode: FAST (run on abstract and selected pages), SLOW (run on whole document - more accurate) 
+ -m, --mode=FAST|SLOW        processing mode: FAST (run on abstract and selected pages), SLOW (run on whole document - more accurate)
 
  General options:
  -h,  --help               print this help and exit
@@ -43,7 +43,7 @@ Usage: bibclassify [options]
 
 try:
     import sys
-    from invenio.bibclassifylib import main
+    from invenio.bibclassify_cli import main
 except ImportError, e:
     print "Error: %s" % e
     import sys
