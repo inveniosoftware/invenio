@@ -30,6 +30,7 @@ import calendar
 
 from invenio.config import CFG_SITE_URL, CFG_SITE_LANG, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS_CLIENT_IP_DISTRIBUTION
 from invenio.messages import gettext_set_language
+from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql
 from invenio.bibrank_downloads_indexer import database_tuples_to_single_list
 from invenio.bibrank_grapher import *
@@ -57,11 +58,17 @@ def create_download_history_graph_and_box(id_bibrec, ln=CFG_SITE_LANG):
         # remove images older than 10 minutes
         remove_old_img("download")
         # download count graph
-        id_bibdocs = run_sql("select distinct id_bibdoc from rnkDOWNLOADS where id_bibrec=%s;" % id_bibrec)
+        id_bibdocs = intbitset(run_sql("select distinct id_bibdoc from rnkDOWNLOADS where id_bibrec=%s", (id_bibrec, )))
+
+        id_existing_bibdocs = intbitset(run_sql("SELECT id_bibdoc FROM bibrec_bibdoc JOIN bibdoc ON id_bibdoc=id WHERE id_bibrec=%s AND status<>'DELETED'", (id_bibrec, )))
+
+        ## FIXME: when bibdocs are deleted we loose the stats. What shall we do with them?
+        id_bibdocs &= id_existing_bibdocs
+
         history_analysis_results = ()
-        if id_bibdocs == ():
+        if id_bibdocs:
             pass
-        elif len(id_bibdocs) <= cfg_id_bibdoc_id_bibrec and (0, ) not in id_bibdocs:
+        elif len(id_bibdocs) <= cfg_id_bibdoc_id_bibrec and 0 not in id_bibdocs:
             history_analysis_results = draw_downloads_statistics(id_bibrec, list(id_bibdocs))
         else:
             history_analysis_results = draw_downloads_statistics(id_bibrec, [])
@@ -151,9 +158,9 @@ def draw_downloads_statistics(id_bibrec, id_bibdoc_list):
         docfile_name_list = record_name
     else :
         for i in range(len(id_bibdoc_list)):
-            datas = create_list_tuple_data(intervals, id_bibrec, id_bibdoc_query_addition="and id_bibdoc=%s" % id_bibdoc_list[i][0])
+            datas = create_list_tuple_data(intervals, id_bibrec, id_bibdoc_query_addition="and id_bibdoc=%s" % id_bibdoc_list[i])
             coordinates_list.append(datas)
-            docname = run_sql("select docname from bibdoc where id=%s;" % id_bibdoc_list[i][0])
+            docname = run_sql("select docname from bibdoc where id=%s;" % id_bibdoc_list[i])
             docfile_name_list.append(docname[0][0])
         #In case of multiple id_bibdocs datas_max will be used to draw a line which is the total of the others lines
         if not (len(intervals)==1 or len(id_bibdoc_list)==1):
