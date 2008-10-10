@@ -19,9 +19,14 @@
 
 pylibdir = $(libdir)/python/invenio
 
-pylib_DATA = bibclassifylib.py \
+pylib_DATA = bibclassify_cli.py \
+             bibclassify_config.py \
              bibclassify_daemon.py \
-             bibclassify_regression_tests.py
+             bibclassify_keyword_analyser.py \
+             bibclassify_regression_tests.py \
+             bibclassify_text_extractor.py \
+             bibclassify_text_normalizer.py \
+             bibclassifylib.py
 
 EXTRA_DIST = $(pylib_DATA)
 
