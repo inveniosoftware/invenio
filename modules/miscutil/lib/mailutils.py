@@ -52,6 +52,7 @@ from invenio.config import \
      CFG_VERSION
 
 from invenio.messages import wash_language, gettext_set_language
+from invenio.textutils import guess_minimum_encoding
 from invenio.errorlib import get_msgs_for_code_list, register_errors, register_exception
 
 def send_email(fromaddr,
@@ -69,6 +70,7 @@ def send_email(fromaddr,
                attempt_sleeptime=10,
                debug_level=0,
                ln=CFG_SITE_LANG,
+               charset=None
                ):
     """Send an forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
     header and footer.
@@ -87,6 +89,8 @@ def send_email(fromaddr,
     @attempt_sleeptime: [int] seconds in between tries
     @debug_level: [int] debug level
     @ln: [string] invenio language
+    @charset: [string] the content charset. By default is None which means
+    to try to encode the email as ascii, then latin1 then utf-8.
 
     If sending fails, try to send it ATTEMPT_TIMES, and wait for
     ATTEMPT_SLEEPTIME seconds in between tries.
@@ -103,7 +107,7 @@ def send_email(fromaddr,
             toaddr += ",%s" % (CFG_SITE_ADMIN_EMAIL,)
         else:
             toaddr = CFG_SITE_ADMIN_EMAIL
-    body = forge_email(fromaddr, toaddr, subject, content, html_content, html_images, usebcc, header, footer, html_header, html_footer, ln)
+    body = forge_email(fromaddr, toaddr, subject, content, html_content, html_images, usebcc, header, footer, html_header, html_footer, ln, charset)
     toaddr = toaddr.split(",")
     if attempt_times < 1 or len(toaddr[0]) == 0:
         log('ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL', fromaddr, toaddr, body)
@@ -200,7 +204,8 @@ def email_html_footer(ln=CFG_SITE_LANG):
 
 def forge_email(fromaddr, toaddr, subject, content, html_content='',
                 html_images={}, usebcc=False, header=None, footer=None,
-                html_header=None, html_footer=None, ln=CFG_SITE_LANG):
+                html_header=None, html_footer=None, ln=CFG_SITE_LANG,
+                charset=None):
     """Prepare email. Add header and footer if needed.
     @param fromaddr: [string] sender
     @param toaddr: [string] receivers separated by ,
@@ -212,6 +217,8 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     @param header: [string] None for the default header
     @param footer: [string] None for the default footer
     @param ln: language
+    @charset: [string] the content charset. By default is None which means
+    to try to encode the email as ascii, then latin1 then utf-8.
     @return forged email as a string"""
     if header is None:
         content = email_header(ln) + content
@@ -222,11 +229,10 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     else:
         content += footer
 
-    try:
-        content = content.encode('ascii')
-        charset = 'ascii'
-    except (UnicodeEncodeError, UnicodeDecodeError):
-        charset = 'utf-8'
+    if charset is None:
+        (content, content_charset) = guess_minimum_encoding(content)
+    else:
+        content_charset = charset
 
     try:
         subject = subject.encode('ascii')
@@ -253,11 +259,10 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
         else:
             html_content += html_footer
 
-        try:
-            html_content = html_content.encode('ascii')
-            charset = 'ascii'
-        except (UnicodeEncodeError, UnicodeDecodeError):
-            charset = 'utf-8'
+        if charset is None:
+            (html_content, html_content_charset) = guess_minimum_encoding(html_content)
+        else:
+            html_content_charset = charset
 
         msg_root = MIMEMultipart('related')
         msg_root['Subject'] = subject
@@ -272,10 +277,10 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
         msg_alternative = MIMEMultipart('alternative')
         msg_root.attach(msg_alternative)
 
-        msg_text = MIMEText(content, _charset=charset)
+        msg_text = MIMEText(content, _charset=content_charset)
         msg_alternative.attach(msg_text)
 
-        msg_text = MIMEText(html_content, 'html', _charset=charset)
+        msg_text = MIMEText(html_content, 'html', _charset=html_content_charset)
         msg_alternative.attach(msg_text)
 
         for image_id, image_path in html_images.iteritems():
@@ -284,7 +289,7 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
             msg_image.add_header('Content-Disposition', 'attachment', filename=os.path.split(image_path)[1])
             msg_root.attach(msg_image)
     else:
-        msg_root = MIMEText(content, _charset=charset)
+        msg_root = MIMEText(content, _charset=content_charset)
         msg_root['From'] = fromaddr
         if usebcc:
             msg_root['Bcc'] = toaddr
