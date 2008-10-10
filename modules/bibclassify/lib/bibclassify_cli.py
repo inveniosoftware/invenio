@@ -33,7 +33,7 @@ try:
         get_keywords_from_text, check_ontology
     from bibclassify_text_extractor import text_lines_from_local_file, \
         text_lines_from_url, is_pdf
-    from bibclassify_config import *
+    from bibclassify_config import CFG_BIBCLASSIFY_USER_AGENT
 except ImportError, err:
     print >> sys.stderr, "Error: %s" % err
     sys.exit(1)

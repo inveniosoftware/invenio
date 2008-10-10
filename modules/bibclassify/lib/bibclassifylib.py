@@ -36,7 +36,15 @@ try:
     from bibclassify_keyword_analyser import get_single_keywords, \
                                              get_composite_keywords, \
                                              get_author_keywords
-    from bibclassify_config import *
+    from bibclassify_config import CFG_BIBCLASSIFY_WORD_WRAP, \
+        CFG_BIBCLASSIFY_INVARIABLE_WORDS, \
+        CFG_BIBCLASSIFY_EXCEPTIONS, \
+        CFG_BIBCLASSIFY_UNCHANGE_REGULAR_EXPRESSIONS, \
+        CFG_BIBCLASSIFY_GENERAL_REGULAR_EXPRESSIONS, \
+        CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, \
+        CFG_BIBCLASSIFY_PARTIAL_TEXT, \
+        CFG_BIBCLASSIFY_SYMBOLS, \
+        CFG_BIBCLASSIFY_SEPARATORS
 except ImportError, err:
     print >> sys.stderr, "Error: %s" % err
     sys.exit(1)

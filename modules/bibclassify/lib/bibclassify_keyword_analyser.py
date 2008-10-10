@@ -26,7 +26,10 @@ __revision__ = "$Id$"
 import sys
 
 try:
-    from bibclassify_config import *
+    from bibclassify_config import CFG_BIBCLASSIFY_VALID_SEPARATORS, \
+        CFG_BIBCLASSIFY_AUTHOR_KW_START, \
+        CFG_BIBCLASSIFY_AUTHOR_KW_END, \
+        CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION
 except ImportError, err:
     print >> sys.stderr, "Error: %s" % err
     sys.exit(1)
