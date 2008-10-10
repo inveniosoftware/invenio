@@ -69,7 +69,6 @@ def send_email(fromaddr,
                attempt_sleeptime=10,
                debug_level=0,
                ln=CFG_SITE_LANG,
-               charset='utf-8'
                ):
     """Send an forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
     header and footer.
@@ -88,7 +87,6 @@ def send_email(fromaddr,
     @attempt_sleeptime: [int] seconds in between tries
     @debug_level: [int] debug level
     @ln: [string] invenio language
-    @param charset: which charset to use in message ('utf-8' by default)
 
     If sending fails, try to send it ATTEMPT_TIMES, and wait for
     ATTEMPT_SLEEPTIME seconds in between tries.
@@ -105,7 +103,7 @@ def send_email(fromaddr,
             toaddr += ",%s" % (CFG_SITE_ADMIN_EMAIL,)
         else:
             toaddr = CFG_SITE_ADMIN_EMAIL
-    body = forge_email(fromaddr, toaddr, subject, content, html_content, html_images, usebcc, header, footer, html_header, html_footer, ln, charset)
+    body = forge_email(fromaddr, toaddr, subject, content, html_content, html_images, usebcc, header, footer, html_header, html_footer, ln)
     toaddr = toaddr.split(",")
     if attempt_times < 1 or len(toaddr[0]) == 0:
         log('ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL', fromaddr, toaddr, body)
@@ -202,8 +200,7 @@ def email_html_footer(ln=CFG_SITE_LANG):
 
 def forge_email(fromaddr, toaddr, subject, content, html_content='',
                 html_images={}, usebcc=False, header=None, footer=None,
-                html_header=None, html_footer=None, ln=CFG_SITE_LANG,
-                charset='utf-8'):
+                html_header=None, html_footer=None, ln=CFG_SITE_LANG):
     """Prepare email. Add header and footer if needed.
     @param fromaddr: [string] sender
     @param toaddr: [string] receivers separated by ,
@@ -215,7 +212,6 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     @param header: [string] None for the default header
     @param footer: [string] None for the default footer
     @param ln: language
-    @param charset: which charset to use in message ('utf-8' by default)
     @return forged email as a string"""
     if header is None:
         content = email_header(ln) + content
@@ -225,6 +221,28 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
         content += email_footer(ln)
     else:
         content += footer
+
+    try:
+        content = content.encode('ascii')
+        charset = 'ascii'
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        charset = 'utf-8'
+
+    try:
+        subject = subject.encode('ascii')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        subject = Header(subject, 'utf-8')
+
+    try:
+        fromaddr = fromaddr.encode('ascii')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        fromaddr = Header(fromaddr, 'utf-8')
+
+    try:
+        toaddr = toaddr.encode('ascii')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        toaddr = Header(toaddr, 'utf-8')
+
     if html_content:
         if html_header is None:
             html_content = email_html_header(ln) + html_content
@@ -235,11 +253,18 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
         else:
             html_content += html_footer
 
+        try:
+            html_content = html_content.encode('ascii')
+            charset = 'ascii'
+        except (UnicodeEncodeError, UnicodeDecodeError):
+            charset = 'utf-8'
+
         msg_root = MIMEMultipart('related')
-        msg_root['Subject'] = Header(subject, charset)
+        msg_root['Subject'] = subject
         msg_root['From'] = fromaddr
         if usebcc:
             msg_root['Bcc'] = toaddr
+            msg_root['To'] = 'Undisclosed.Recipients:'
         else:
             msg_root['To'] = toaddr
         msg_root.preamble = 'This is a multi-part message in MIME format.'
@@ -263,10 +288,11 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
         msg_root['From'] = fromaddr
         if usebcc:
             msg_root['Bcc'] = toaddr
+            msg_root['To'] = 'Undisclosed.Recipients:'
         else:
             msg_root['To'] = toaddr
-        msg_root['Subject'] = Header(subject, charset)
-    msg_root.add_header('User-Agent', 'CDS Invenio %s' % CFG_VERSION)
+        msg_root['Subject'] = subject
+    msg_root['User-Agent'] = 'CDS Invenio %s at %s' % (CFG_VERSION, CFG_SITE_URL)
     return msg_root.as_string()
 
 RE_NEWLINES = re.compile(r'<br\s*/?>|</p>', re.I)
