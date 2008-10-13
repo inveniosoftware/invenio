@@ -593,6 +593,52 @@ class BibRecordDeleteFieldTest(unittest.TestCase):
         self.assertEqual(bibrecord.record_get_field_values(self.rec_empty, "003", " ", " ", ""),
                          ['SzGeCERN2'])
 
+
+class BibRecordDeleteFieldFromTest(unittest.TestCase):
+    """ bibrecord - testing field deletion from position"""
+
+    def setUp(self):
+        # pylint: disable-msg=C0103
+        """Initialize stuff"""
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe1, John</subfield>
+        </datafield>
+        <datafield tag="100" ind1=" " ind2=" ">
+        <subfield code="a">Doe2, John</subfield>
+        <subfield code="b">editor</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="1">
+        <subfield code="a">On the foo and bar1</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="2">
+        <subfield code="a">On the foo and bar2</subfield>
+        </datafield>
+        </record>
+        """
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+
+    def test_delete_field_from(self):
+        """bibrecord - deleting field from position"""
+        bibrecord.record_delete_field_from(self.rec, "100", 4)
+        self.assertEqual(self.rec['100'], [([('a', 'Doe1, John')], ' ', ' ', '', 3)])
+        bibrecord.record_delete_field_from(self.rec, "100", 3)
+        self.assertFalse(self.rec.has_key('100'))
+        bibrecord.record_delete_field_from(self.rec, "001", 1)
+        bibrecord.record_delete_field_from(self.rec, "245", 6)
+        self.assertFalse(self.rec.has_key('001'))
+        self.assertEqual(self.rec['245'], [([('a', 'On the foo and bar1')], ' ', '1', '', 5)])
+
+        # Some crash tests
+        bibrecord.record_delete_field_from(self.rec, '999', 1)
+        bibrecord.record_delete_field_from(self.rec, '245', 999)
+
+
 class BibRecordAddSubfieldIntoTest(unittest.TestCase):
     """ bibrecord - testing subfield addition """
 
@@ -1036,16 +1082,30 @@ class BibRecordComparingTest(unittest.TestCase):
             return True
 
         self.assertEqual(bibrecord.record_diff(self.record1, self.record1), [])
-        self.assertEqual(bibrecord.record_diff(self.record1, self.record3), [("035", "a")])
-        self.assertEqual(bibrecord.record_diff(self.record1, self.record4), [("035", "a")])
-        self.assertEqual(bibrecord.record_diff(self.record1, self.record2), [("035", "a")])
-        self.assertEqual(bibrecord.record_diff(self.record2, self.record1), [("035", "r")])
-        self.assertEqual(bibrecord.record_diff(self.record2, self.record3), [("035", "c")])
-        self.assertEqual(bibrecord.record_diff(self.record3, self.record4), [("035", "c")])
-        self.assertEqual(bibrecord.record_diff(self.record4, self.record5), [("773", "a")])
-        self.assertEqual(bibrecord.record_diff(self.record5, self.record4), [("773", "r")])
-        self.failUnless(compare_lists2(bibrecord.record_diff(self.record1, self.record5), [("035", "a"), ("773", "a")]))
-        self.failUnless(compare_lists2(bibrecord.record_diff(self.record5, self.record1), [("035", "r"), ("773", "r")]))
+        self.assertEqual(bibrecord.record_diff(self.record1, self.record3), [("035", "a",
+            [([('9', 'arX'), ('a', 'oai:arXiv.org:0704.0299')], ' ', ' ', '', 2)])])
+        self.assertEqual(bibrecord.record_diff(self.record1, self.record4), [("035", "a",
+            [([('9', 'arX')], ' ', ' ', '', 2)])])
+        self.assertEqual(bibrecord.record_diff(self.record1, self.record2), [("035", "a",
+            [([('9', 'arXiv'), ('a', 'oai:arXiv.org:0704.0299')], ' ', ' ', '', 2)])])
+        self.assertEqual(bibrecord.record_diff(self.record2, self.record1), [("035", "r",
+            [([('9', 'arXiv'), ('a', 'oai:arXiv.org:0704.0299')], ' ', ' ', '', 2)])])
+        self.assertEqual(bibrecord.record_diff(self.record2, self.record3), [("035", "c",
+            [([('9', 'arXiv'), ('a', 'oai:arXiv.org:0704.0299')], ' ', ' ', '', 2)],
+            [([('9', 'arX'), ('a', 'oai:arXiv.org:0704.0299')], ' ', ' ', '', 2)])])
+        self.assertEqual(bibrecord.record_diff(self.record3, self.record4), [("035", "c",
+            [([('9', 'arX'), ('a', 'oai:arXiv.org:0704.0299')], ' ', ' ', '', 2)],
+            [([('9', 'arX')], ' ', ' ', '', 2)])])
+        self.assertEqual(bibrecord.record_diff(self.record4, self.record5), [("773", "a",
+            [([('p', 'Journal of Applied Philosobhy')], ' ', ' ', '', 3)])])
+        self.assertEqual(bibrecord.record_diff(self.record5, self.record4), [("773", "r",
+            [([('p', 'Journal of Applied Philosobhy')], ' ', ' ', '', 3)])])
+        self.failUnless(compare_lists2(bibrecord.record_diff(self.record1, self.record5),
+            [('773', 'a', [([('p', 'Journal of Applied Philosobhy')], ' ', ' ', '', 3)]),
+                ('035', 'a', [([('9', 'arX')], ' ', ' ', '', 2)])]))
+        self.failUnless(compare_lists2(bibrecord.record_diff(self.record5, self.record1),
+            [('773', 'r', [([('p', 'Journal of Applied Philosobhy')], ' ', ' ', '', 3)]),
+                ('035', 'r', [([('9', 'arX')], ' ', ' ', '', 2)])]))
 
 TEST_SUITE = make_test_suite(BibRecordSanityTest,
                              BibRecordSuccessTest,
@@ -1054,6 +1114,7 @@ TEST_SUITE = make_test_suite(BibRecordSanityTest,
                              BibRecordGettingFieldValuesViaWildcardsTest,
                              BibRecordAddFieldTest,
                              BibRecordDeleteFieldTest,
+                             BibRecordDeleteFieldFromTest,
                              BibRecordAddSubfieldIntoTest,
                              BibRecordModifySubfieldTest,
                              BibRecordDeleteSubfieldFromTest,
