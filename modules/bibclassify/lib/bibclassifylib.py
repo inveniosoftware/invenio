@@ -287,7 +287,7 @@ def get_cache_file(ontology_file):
                 os.mkdir(temp_dir)
             except:
                 print >> sys.stderr, ("Warning: impossible to write in the "
-                    "temporary directory.")
+                    "cache directory %s." % temp_dir)
     except ImportError:
         temp_dir = tempfile.gettempdir()
     cache_file = os.path.basename(ontology_file) + ".db"

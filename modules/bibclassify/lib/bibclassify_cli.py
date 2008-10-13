@@ -77,9 +77,9 @@ Backward compatibility (using these options is discouraged):
   -f FILE URL               sets the file to read the keywords from
 
 Example:
-    python bibclassifycli.py -k etc/HEP.rdf http://arxiv.org/pdf/0808.1825
-    python bibclassifycli.py -k etc/HEP.rdf article.pdf
-    python bibclassifycli.py -k etc/HEP.rdf directory/"""
+    $ bibclassify -k HEP.rdf http://arxiv.org/pdf/0808.1825
+    $ bibclassify -k HEP.rdf article.pdf
+    $ bibclassify -k HEP.rdf directory/"""
     sys.exit(0)
 
 def main():
@@ -182,7 +182,8 @@ def read_options(options_string):
                     # bibclassifylib takes care of error messages.
                     _OPTIONS["ontology_file"] = arg
                 else:
-                    _OPTIONS["ontology_file"] = CFG_ETCDIR + os.sep + arg
+                    _OPTIONS["ontology_file"] = CFG_ETCDIR + os.sep + \
+                                                'bibclassify' + os.sep + arg
         elif opt in ("-o", "--output-mode"):
             _OPTIONS["output_mode"] = arg.lower()
         elif opt in ("-m", "--matching-mode"):
