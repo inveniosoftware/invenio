@@ -22,7 +22,7 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = bibclassify_cli.py \
              bibclassify_config.py \
              bibclassify_daemon.py \
-             bibclassify_keyword_analyser.py \
+             bibclassify_keyword_analyzer.py \
              bibclassify_regression_tests.py \
              bibclassify_text_extractor.py \
              bibclassify_text_normalizer.py \

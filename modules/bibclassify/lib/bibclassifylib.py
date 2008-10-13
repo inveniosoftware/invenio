@@ -33,7 +33,7 @@ import tempfile
 
 try:
     from bibclassify_text_normalizer import normalize_fulltext, cut_references
-    from bibclassify_keyword_analyser import get_single_keywords, \
+    from bibclassify_keyword_analyzer import get_single_keywords, \
                                              get_composite_keywords, \
                                              get_author_keywords
     from bibclassify_config import CFG_BIBCLASSIFY_WORD_WRAP, \
@@ -187,6 +187,7 @@ def build_cache(ontology_file, no_cache=False):
             filestream.close()
         except IOError:
             # Impossible to write the cache.
+            print >> sys.stderr, "Warning: impossible to write cache file."
             return cached_data
 
     return cached_data
@@ -277,7 +278,18 @@ def get_cache(ontology_file):
 
 def get_cache_file(ontology_file):
     """Returns the file name of the cached ontology."""
-    temp_dir = tempfile.gettempdir()
+    temp_dir = ""
+    try:
+        from invenio.config import CFG_CACHEDIR
+        temp_dir = CFG_CACHEDIR + os.sep + "bibclassify"
+        if not os.path.exists(temp_dir):
+            try:
+                os.mkdir(temp_dir)
+            except:
+                print >> sys.stderr, ("Warning: impossible to write in the "
+                    "temporary directory.")
+    except ImportError:
+        temp_dir = tempfile.gettempdir()
     cache_file = os.path.basename(ontology_file) + ".db"
     return os.path.join(temp_dir, cache_file)
 
@@ -367,17 +379,23 @@ def get_regular_expressions(ontology_file, rebuild=False, no_cache=False):
                 return get_cache(ontology_file)
             else:
                 # Ontology is more recent than the cache: rebuild cache.
+                if not no_cache:
+                    print >> sys.stderr, "Ontology changed. Rebuilding cache."
                 return build_cache(ontology_file, no_cache)
         else:
             # Cache does not exist. Build cache.
+            print >> sys.stderr, "Building cache."
             return build_cache(ontology_file, no_cache)
     else:
         if os.access(get_cache_file(ontology_file), os.R_OK):
             # Ontology file not found. Use the cache instead.
+            print >> sys.stderr, ("Warning: ontology not found. Using cache "
+                "instead.")
             return get_cache(ontology_file)
         else:
             # Cannot access the ontology nor the cache. Exit.
-            print >> sys.stderr, "Neither ontology file nor cache can be read."
+            print >> sys.stderr, ("Error: Neither ontology file nor cache can "
+                "be read.")
             sys.exit(-1)
             return None
 
