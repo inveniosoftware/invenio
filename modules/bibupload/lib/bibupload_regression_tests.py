@@ -280,7 +280,7 @@ class BibUploadAppendModeTest(unittest.TestCase):
         # We call the function which should retrieve the record id
         rec_id = bibupload.retrieve_rec_id(recs[0], 'append')
         # We compare the value found with None
-        self.assertEqual(str(self.test_recid), rec_id)
+        self.assertEqual(self.test_recid, rec_id)
         # clean up after ourselves:
         bibupload.wipe_out_record_from_all_tables(self.test_recid)
         return

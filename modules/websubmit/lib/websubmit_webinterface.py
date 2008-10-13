@@ -93,7 +93,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 verbose = 0
 
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE > 1:
-                return page_not_authorized(req, "../getfile.py/index",
+                return page_not_authorized(req, "/record/%s" % self.recid,
                                            navmenuid='submit')
 
             (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
