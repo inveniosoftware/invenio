@@ -61,7 +61,6 @@ import sys
 import time
 from zlib import compress
 import urllib2
-import urllib
 import socket
 import marshal
 
@@ -85,7 +84,6 @@ from invenio.bibrecord import create_records, \
                               record_get_field_instances, \
                               record_get_field_values, \
                               field_get_subfield_values, \
-                              field_get_subfield_instances, \
                               record_extract_oai_id
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
@@ -97,8 +95,8 @@ from invenio.bibtask import task_init, write_message, \
     task_update_progress, task_sleep_now_if_required, fix_argv_paths
 from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, \
     get_docname_from_url, get_format_from_url, check_valid_url, download_url, \
-    KEEP_OLD_VALUE, decompose_bibdocfile_old_url, decompose_bibdocfile_url, \
-    bibdocfile_url_p, InvenioWebSubmitFileError
+    KEEP_OLD_VALUE, decompose_bibdocfile_url, bibdocfile_url_p, \
+    InvenioWebSubmitFileError
 
 #Statistic variables
 stat = {}
@@ -499,37 +497,47 @@ def find_records_from_extoaiid(extoaiid, extoaisrc=None):
     Try to find records in the database from the external EXTOAIID number.
     Return list of record ID if found, None otherwise.
     """
+    from invenio.search_engine import print_record
+    assert(CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[:5] == CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[:5])
     bibxxx = 'bib'+CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:2]+'x'
-    bibxxx2 = 'bib'+CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[0:2]+'x'
     bibrec_bibxxx = 'bibrec_' + bibxxx
-    bibrec_bibxxx2 = 'bibrec_' + bibxxx2
     try:
+        write_message('   Looking for extoaiid="%s" with extoaisrc="%s"' % (extoaiid, extoaisrc), verbose=9)
         id_bibrecs = intbitset(run_sql("""SELECT bb.id_bibrec FROM %(bibrec_bibxxx)s AS bb,
             %(bibxxx)s AS b WHERE b.tag=%%s AND b.value=%%s
             AND bb.id_bibxxx=b.id""" % \
                       {'bibxxx': bibxxx,
                        'bibrec_bibxxx': bibrec_bibxxx},
                       (CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, extoaiid,)))
-        write_message('Partially found %s for extoaiid="%s"' % (id_bibrecs, extoaiid), verbose=9)
-        if extoaisrc and id_bibrecs:
-            ret = intbitset()
-            for id_bibrec in id_bibrecs:
-                res = run_sql("""SELECT bb.id_bibrec FROM %(bibrec_bibxxx)s AS bb,
-                    %(bibxxx)s AS b WHERE bb.id_bibrec=%%s AND b.tag=%%s AND
-                    b.value=%%s AND bb.id_bibxxx=b.id""" % \
-                        {'bibxxx' : bibxxx2,
-                        'bibrec_bibxxx' : bibrec_bibxxx2},
-                        (id_bibrec, CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, extoaisrc,))
-                if res:
-                    write_message('Found %s for extsrcid="%s"' % (res, extoaiid), verbose=9)
-                    ret.add(res[0][0])
-            return ret
-        else:
-            return id_bibrecs
+        write_message('   Partially found %s for extoaiid="%s"' % (id_bibrecs, extoaiid), verbose=9)
+        ret = intbitset()
+        for id_bibrec in id_bibrecs:
+            record = create_record(print_record(id_bibrec, 'xm'))[0]
+            instances = record_get_field_instances(record, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4])
+            write_message('   recid %s -> instances "%s"' % (id_bibrec, instances), verbose=9)
+            for instance in instances:
+                provenance = field_get_subfield_values(instance, CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG[5])
+                write_message('   recid %s -> provenance "%s"' % (id_bibrec, provenance), verbose=9)
+                provenance = provenance and provenance[0] or None
+                if provenance is None:
+                    if extoaisrc is None:
+                        write_message('Found recid %s for extoaiid="%s"' % (id_bibrec, extoaiid), verbose=9)
+                        ret.add(id_bibrec)
+                        break
+                    else:
+                        raise Error('Found recid %s for extoaiid="%s" that doesn\'t specify any provenance, while input record does.' % (id_bibrec, extoaiid))
+                else:
+                    if extoaiid is None:
+                        raise Error('Found recid %s for extoaiid="%s" that specify as provenance "%s", while input record does not specify any provenance.' % (id_bibrec, extoaiid, provenance))
+                    elif provenance == extoaisrc:
+                        write_message('Found recid %s for extoaiid="%s" with provenance="%s"' % (id_bibrec, extoaiid, extoaisrc), verbose=9)
+                        ret.add(id_bibrec)
+                        break
+        return ret
     except Error, error:
         write_message("   Error during find_records_from_extoaiid(): %s "
             % error, verbose=1, stream=sys.stderr)
-        return intbitset()
+        raise
 
 def find_record_from_oaiid(oaiid):
     """
@@ -642,7 +650,11 @@ def retrieve_rec_id(record, opt_mode):
                         extoaisrc = None
                     write_message("   -Checking if EXTOAIID %s (%s) exists in the database" % (extoaiid, extoaisrc), verbose=9)
                     # try to find the corresponding rec id from the database
-                    rec_ids = find_records_from_extoaiid(extoaiid, extoaisrc)
+                    try:
+                        rec_ids = find_records_from_extoaiid(extoaiid, extoaisrc)
+                    except Error, e:
+                        write_message(e, verbose=1, stream=sys.stderr)
+                        return -1
                     if rec_ids:
                         # rec_id found
                         rec_id = rec_ids.pop()
