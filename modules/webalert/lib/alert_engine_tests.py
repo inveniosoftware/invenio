@@ -45,6 +45,18 @@ class TestWashHTMLtoText(unittest.TestCase):
 
         self.assertEqual('\nDetailed record : <%s>' % CFG_SITE_URL, htparser.result)
 
+    def test_entity_ref_conversion(self):
+        """webalert - convert entity reference to text (Eg: '&lt;' -> '<')"""
+        htparser = RecordHTMLParser()
+        htparser.feed(u'<strong>a &lt; b &gt; c</strong> &copy;CERN')
+        self.assertEqual(u'a < b > c ©CERN', htparser.result)
+
+    def test_character_ref_conversion(self):
+        """webalert - convert character reference to text (Eg: '&#97;' -> 'a')"""
+        htparser = RecordHTMLParser()
+        htparser.feed('&#80;ython is co&#111;l')
+        self.assertEqual('Python is cool', htparser.result)
+
 TEST_SUITE = make_test_suite(TestWashHTMLtoText)
 
 if __name__ == "__main__":
