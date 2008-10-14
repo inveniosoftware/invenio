@@ -96,8 +96,35 @@ class CharactersEscapingTest(unittest.TestCase):
         for char in nmtoken:
             self.assert_(char in ['.', '-', '_', ':'] or char.isalnum())
 
+class HTMLWashingTest(unittest.TestCase):
+    """Test functions related to general washing of HTML source"""
+
+    def __init__(self, methodName='test'):
+        self.washer = HTMLWasher()
+        unittest.TestCase.__init__(self, methodName)
+
+    def test_wash_html(self):
+        """htmlutils - washing HTML tags"""
+
+        # Simple test case
+        test_str = 'Spam and <b><blink>eggs</blink></b>'
+        self.assertEqual(self.washer.wash(html_buffer=test_str),
+                         'Spam and <b>eggs</b>')
+
+        # Show 'escaped' tags
+        test_str = 'Spam and <b><blink>eggs</blink></b>'
+        self.assertEqual(self.washer.wash(html_buffer=test_str,
+                                          render_unallowed_tags=True),
+                         'Spam and <b>&lt;blink&gt;eggs&lt;/blink&gt;</b>')
+
+        # Keep entity and character references
+        test_str = '<b> a &lt; b &gt; c </b> &#247;'
+        self.assertEqual(self.washer.wash(html_buffer=test_str),
+                         '<b> a &lt; b &gt; c </b> &#247;')
+
 TEST_SUITE = make_test_suite(XSSEscapingTest,
-                             CharactersEscapingTest,)
+                             CharactersEscapingTest,
+                             HTMLWashingTest,)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)
