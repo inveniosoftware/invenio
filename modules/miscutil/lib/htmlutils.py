@@ -93,9 +93,9 @@ class HTMLWasher(HTMLParser):
 
     Examples:
         a.wash('Spam and <b><blink>eggs</blink></b>')
-        => 'Spam and <b>eggs&lt;u&gt;</b>'
+        => 'Spam and <b>eggs</b>'
         a.wash('Spam and <b><blink>eggs</blink></b>', True)
-        => 'Spam and <b>&lt;blink&gt;eggs&lt;blink&gt;</b>'
+        => 'Spam and <b>&lt;blink&gt;eggs&lt;/blink&gt;</b>'
         a.wash('Spam and <b><a href="python.org">eggs</u></b>')
         => 'Spam and <b><a href="python.org">eggs</a></b>'
         a.wash('Spam and <b><a href="javascript:xss();">eggs</a></b>')
@@ -213,6 +213,15 @@ class HTMLWasher(HTMLParser):
         if self.re_js.match(value) or self.re_vb.match(value):
             return ''
         return value
+
+    def handle_charref(self, name):
+        """Process character references of the form "&#ref;". Return it as it is."""
+        self.result += '&#' + name + ';'
+
+    def handle_entityref(self, name):
+        """Process a general entity reference of the form "&name;".
+        Return it as it is."""
+        self.result += '&' + name + ';'
 
 def get_html_text_editor(name, id=None, content='', textual_content=None, width='300px', height='200px',
                          enabled=True, file_upload_url=None, toolbar_set="Basic"):
