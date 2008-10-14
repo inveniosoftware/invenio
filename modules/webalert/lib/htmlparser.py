@@ -26,6 +26,7 @@ import re
 from HTMLParser import HTMLParser
 from string import split
 import textwrap
+import htmlentitydefs
 
 from invenio.config import \
      CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL, \
@@ -113,6 +114,20 @@ class RecordHTMLParser(HTMLParser):
         elif 'END_NOT_FOR_TEXT' == data.upper().strip():
             self.silent = False
 
+    def handle_charref(self, name):
+        """Process character references of the form "&#ref;". Transform to text whenever possible."""
+        try:
+            self.result += unichr(int(name))
+        except:
+            return
+
+    def handle_entityref(self, name):
+        """Process a general entity reference of the form "&name;".
+        Transform to text whenever possible."""
+        char_code = htmlentitydefs.name2codepoint.get(name, None)
+        if char_code is not None:
+            self.result += unichr(char_code)
+
 
 def get_as_text(record_id, ln=CFG_SITE_LANG):
     """Return the record in a textual format"""
@@ -123,6 +138,7 @@ def get_as_text(record_id, ln=CFG_SITE_LANG):
     htparser = RecordHTMLParser()
     try:
         htparser.feed(rec_in_hb)
+        htparser.close()
         out = htparser.result
     except:
         out = re_html.sub(' ', rec_in_hb)
