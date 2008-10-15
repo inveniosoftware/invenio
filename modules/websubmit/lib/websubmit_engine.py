@@ -777,8 +777,6 @@ def endaction(req,
     curdir = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, indir, doctype, access)
     try:
         assert(curdir == os.path.abspath(curdir))
-        curdir = os.path.abspath(curdir)
-        assert(curdir.startswith(CFG_WEBSUBMIT_STORAGEDIR))
     except AssertionError:
         register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: indir="%s", doctype=%s, access=%s' % (indir, doctype, access))
         return warningMsg(_("Invalid parameters"), req, c, ln)
@@ -1556,12 +1554,13 @@ def Propose_Next_Action (doctype, action_score, access, currentlevel, indir, ln=
     return t
 
 def specialchars(text):
+    from invenio.refextract import replace_undesirable_characters
     text = string.replace(text, "&#147;", "\042");
     text = string.replace(text, "&#148;", "\042");
     text = string.replace(text, "&#146;", "\047");
     text = string.replace(text, "&#151;", "\055");
     text = string.replace(text, "&#133;", "\056\056\056");
-    return text
+    return replace_undesirable_characters(text)
 
 def log_function(curdir, message, start_time, filename="function_log"):
     """Write into file the message and the difference of time
