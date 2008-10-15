@@ -48,8 +48,8 @@ class TestWashHTMLtoText(unittest.TestCase):
     def test_entity_ref_conversion(self):
         """webalert - convert entity reference to text (Eg: '&lt;' -> '<')"""
         htparser = RecordHTMLParser()
-        htparser.feed(u'<strong>a &lt; b &gt; c</strong> &copy;CERN')
-        self.assertEqual(u'a < b > c ©CERN', htparser.result)
+        htparser.feed('<strong>a &lt; b &gt; c</strong> &copy;CERN')
+        self.assertEqual('a < b > c ©CERN', htparser.result)
 
     def test_character_ref_conversion(self):
         """webalert - convert character reference to text (Eg: '&#97;' -> 'a')"""

@@ -117,7 +117,7 @@ class RecordHTMLParser(HTMLParser):
     def handle_charref(self, name):
         """Process character references of the form "&#ref;". Transform to text whenever possible."""
         try:
-            self.result += unichr(int(name))
+            self.result += unichr(int(name)).encode("utf-8")
         except:
             return
 
@@ -126,8 +126,10 @@ class RecordHTMLParser(HTMLParser):
         Transform to text whenever possible."""
         char_code = htmlentitydefs.name2codepoint.get(name, None)
         if char_code is not None:
-            self.result += unichr(char_code)
-
+            try:
+                self.result += unichr(char_code).encode("utf-8")
+            except:
+                return
 
 def get_as_text(record_id, ln=CFG_SITE_LANG):
     """Return the record in a textual format"""
