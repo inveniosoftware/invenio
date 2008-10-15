@@ -31,7 +31,7 @@
      <li>1.2&nbsp;&nbsp;<a href="#overview_page_layout">HTML Page Layout</a>
          <ul style="list-style-type:None">
              <li>1.2.1&nbsp;&nbsp;&nbsp;&nbsp;<a href="#overview_page_layout_stat">Layout of HTML Static Pages</a></li>
-             <li>1.2.3&nbsp;&nbsp;&nbsp;&nbsp;<a href="#overview_page_layout_dyn">Layout of Python Dynamic Pages</a></li>
+             <li>1.2.2&nbsp;&nbsp;&nbsp;&nbsp;<a href="#overview_page_layout_dyn">Layout of Python Dynamic Pages</a></li>
          </ul>
      </li>
      <li>1.3&nbsp;&nbsp;<a href="#overview_bib">Look of Bibliographic References</a></li>
