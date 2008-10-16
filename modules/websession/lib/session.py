@@ -49,7 +49,10 @@ __revision__ = "$Id$"
 DEFAULT_SESSION_COOKIE_NAME = "CDSSESSION"
 DEFAULT_SESSION_COOKIE_DOMAIN = None
 DEFAULT_SESSION_COOKIE_PATH = "/"
-DEFAULT_CHECK_SESSION_ADDR = 1
+
+## Set the following to the number of bits you want the IP address check to
+## discard. 0 means full IP address check, 32 or above means no IP address check.
+DEFAULT_CHECK_SESSION_ADDR = 8
 
 import re
 from time import time, gmtime, localtime, strftime, clock
@@ -96,6 +99,12 @@ def parse_cookie (text):
 
     return result
 
+def _mkip(ip):
+    """ Compute a numerical value for a dotted IP """
+    num = 0L
+    for i in map(int, ip.split('.')):
+        num = (num << 8) + i
+    return num
 
 def packbytes(s):
     "convert a string of bytes into a long integer"
@@ -277,12 +286,6 @@ class SessionManager:
         """
         return DEFAULT_SESSION_COOKIE_NAME
 
-    def _getSessionCheckAddress(self):
-        """Indicates whether the IP address of the session must be checked
-            to ensure a session is only allowed in the scope of a single IP
-        """
-        return DEFAULT_CHECK_SESSION_ADDR
-
     def _getSessionCookieDomain(self):
         """Returns the preferred cookie domain for the sessions
         """
@@ -364,9 +367,8 @@ class SessionManager:
                 # exceptions -- SessionError.format() by default -- is
                 # responsible for revoking the session cookie.  Yuck.
                 raise SessionError(session_id=sessid)
-            if (self._getSessionCheckAddress() and
-                session.get_remote_address() != \
-                request.get_environ("REMOTE_ADDR")):
+            if (session.get_remote_address() >> DEFAULT_CHECK_SESSION_ADDR !=
+                request.get_environ("REMOTE_ADDR") >> DEFAULT_CHECK_SESSION_ADDR):
                 raise SessionError("Remote IP address does not match the "
                                    "IP address that created the session",
                                    session_id=sessid)
@@ -677,8 +679,7 @@ class RequestWrapper:
         except KeyError:
             self.cookies = {}
         self.environ = {}
-        self.environ["REMOTE_ADDR"] = \
-               self.__request.get_remote_host(apache.REMOTE_NOLOOKUP)
+        self.environ["REMOTE_ADDR"] = _mkip(self.__request.get_remote_host(apache.REMOTE_NOLOOKUP))
         self.response = ResponseWrapper( request )
         try:
             self.session = request.session
