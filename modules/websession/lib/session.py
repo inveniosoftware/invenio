@@ -101,10 +101,15 @@ def parse_cookie (text):
 
 def _mkip(ip):
     """ Compute a numerical value for a dotted IP """
-    num = 0L
-    for i in map(int, ip.split('.')):
-        num = (num << 8) + i
-    return num
+    try:
+        num = 0L
+        for i in map(int, ip.split('.')):
+            num = (num << 8) + i
+        return num
+    except ValueError:
+        ## Nowadays this is due mainly because of IPV6 ::1 address
+        ## when browsing from localhost with IPV6 enabled machine.
+        return 2130706433
 
 def packbytes(s):
     "convert a string of bytes into a long integer"
