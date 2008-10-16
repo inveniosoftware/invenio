@@ -29,11 +29,12 @@ from zlib import decompress, error
 
 from invenio.dbquery import run_sql, serialize_via_marshal, \
                             deserialize_via_marshal
-from invenio.search_engine import print_record, search_pattern, get_fieldvalues, \
+from invenio.search_engine import search_pattern, get_fieldvalues, \
                            search_unit
 from invenio.bibformat_utils import parse_tag
-from invenio.bibtask import write_message, task_get_option, task_update_progress, task_sleep_now_if_required, task_get_task_param
-from invenio.bibrecord import create_records
+from invenio.bibtask import write_message, task_get_option, \
+                     task_update_progress, task_sleep_now_if_required, \
+                     task_get_task_param
 
 try:
     Set = set
@@ -72,9 +73,9 @@ def get_citation_weight(rank_method_code, config):
     if last_modified_records or task_get_option("id"):
         if task_get_option("id"):
             #construct a range of records to index
-            id = task_get_option("id")
-            first = id[0][0]
-            last = id[0][1]
+            taskid = task_get_option("id")
+            first = taskid[0][0]
+            last = taskid[0][1]
             #make range, last+1 so that e.g. -i 1-2 really means [1,2] not [1]
             updated_recid_list = range(first, last+1)
         else:
@@ -85,8 +86,8 @@ def get_citation_weight(rank_method_code, config):
                        str(len(updated_recid_list)))
 
         #write_message("updated_recid_list: "+str(updated_recid_list))
-        result_intermediate = last_updated_result(rank_method_code,
-                                                  updated_recid_list)
+        result_intermediate = last_updated_result(rank_method_code)
+
         #result_intermed should be warranted to exists!
         citation_weight_dic_intermediate = result_intermediate[0]
         citation_list_intermediate = result_intermediate[1]
@@ -95,12 +96,15 @@ def get_citation_weight(rank_method_code, config):
         #citations and references in the updated_recid's (but nothing else)!
         if task_get_task_param('verbose') >= 9:
             write_message("Entering get_citation_informations")
-        citation_informations = get_citation_informations(updated_recid_list, config)
+        citation_informations = get_citation_informations(updated_recid_list, 
+                                                          config)
         #write_message("citation_informations: "+str(citation_informations))
-        #create_analysis_tables() #temporary.. needed to test how much faster in-mem indexing is
-        #call the analyser that uses the citation_informations to really search x-cites-y in the coll..
+        #create_analysis_tables() #temporary.. 
+                                  #test how much faster in-mem indexing is
         if task_get_task_param('verbose') >= 9:
             write_message("Entering ref_analyzer")
+        #call the analyser that uses the citation_informations to really 
+        #search x-cites-y in the coll..
         dic = ref_analyzer(citation_informations,
                            citation_weight_dic_intermediate,
                            citation_list_intermediate,
@@ -127,14 +131,14 @@ def get_bibrankmethod_lastupdate(rank_method_code):
     return r
 
 def get_last_modified_rec(bibrank_method_lastupdate):
-    """ return the list of recods which have been modified after the last execution
-        of bibrank method. The result is expected to have ascending numerical order.
+    """ return the list of recods which have been modified after the last exec
+        of bibrank method. The result is expected to have ascending num order.
     """
     query = """SELECT id FROM bibrec
                WHERE modification_date >= '%s' """ % bibrank_method_lastupdate
     query += "order by id ASC"
-    list = run_sql(query)
-    return list
+    ilist = run_sql(query)
+    return ilist
 
 def create_recordid_list(rec_ids):
     """Create a list of record ids out of RECIDS.
@@ -145,11 +149,11 @@ def create_recordid_list(rec_ids):
         rec_list.append(row[0])
     return rec_list
 
-def create_record_tuple(list):
+def create_record_tuple(ilist):
     """Creates a tuple of record id from a list of id.
        The result is expected to have ascending numerical order.
     """
-    list_length = len(list)
+    list_length = len(ilist)
     if list_length:
         rec_tuple = '('
         for row in list[0:list_length-1]:
@@ -160,20 +164,20 @@ def create_record_tuple(list):
     else: rec_tuple = '()'
     return rec_tuple
 
-def last_updated_result(rank_method_code, recid_list):
+def last_updated_result(rank_method_code):
     """ return the last value of dictionary in rnkMETHODDATA table if it exists and
-        initialize the value of last updated records by zero,otherwise an initial dictionary
-        with zero as value for all recids
+        initialize the value of last updated records by zero, 
+        otherwise an initial dictionary with zero as value for all recids
     """
     result = [{}, {}, {}]
     query = """select relevance_data from rnkMETHOD, rnkMETHODDATA where
                rnkMETHOD.id = rnkMETHODDATA.id_rnkMETHOD
                and rnkMETHOD.Name = '%s'"""% rank_method_code
-    dict = run_sql(query)
-    if dict and dict[0] and dict[0][0]:
+    rdict = run_sql(query)
+    if rdict and rdict[0] and rdict[0][0]:
         #has to be prepared for corrupted data!
         try:
-            dic = marshal.loads(decompress(dict[0][0]))
+            dic = marshal.loads(decompress(rdict[0][0]))
         except error:
             return [{}, {}, {}]
         query = "select object_value from rnkCITATIONDATA where object_name='citationdict'"
@@ -191,20 +195,22 @@ def last_updated_result(rank_method_code, recid_list):
     return result
 
 def get_citation_informations(recid_list, config):
-    """scans the collections searching references (999C5x -fields) and citations for
-       items in the recid_list
-       returns a 4 list of dictionaries that contains the citation information of cds records
+    """scans the collections searching references (999C5x -fields) and
+       citations for items in the recid_list
+       returns a 4 list of dictionaries that contains the citation information
+       of cds records
        examples: [ {} {} {} {} ]
-                 [ {5: 'SUT-DP-92-70-5'}, { 93: ['astro-ph/9812088']}, { 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
-
+                 [ {5: 'SUT-DP-92-70-5'}, 
+                   { 93: ['astro-ph/9812088']}, 
+                   { 93: ['Phys. Rev. Lett. 96 (2006) 081301'] }, {} ]
         NB: stuff here is for analysing new or changed records.
         see "ref_analyzer" for more.
     """
     begin_time = os.times()[4]
-    d_reports_numbers = {}
-    d_references_report_numbers = {}
-    d_references_s = {}
-    d_records_s = {}
+    d_reports_numbers = {} #dict of recid -> institute-given-report-code
+    d_references_report_numbers = {} #dict of recid -> ['astro-ph/xyz'] 
+    d_references_s = {} #dict of recid -> list_of_the_entries_of_this_recs_bibliography
+    d_records_s = {} #dict of recid -> this_records_publication_info
     citation_informations = []
 
     if task_get_task_param('verbose') >= 9:
@@ -213,7 +219,7 @@ def get_citation_informations(recid_list, config):
     try:
         function = config.get("rank_method", "function")
     except:
-        print "critical error. cfg section [rank_method] has no attr function"
+        print "critical error. cfg section [rank_method] has no attribute called function"
         raise "config error"
     record_pri_number_tag = ""
     try:
@@ -343,7 +349,8 @@ def get_citation_informations(recid_list, config):
             for i in range (0, len(publication_format_string)):
                 current = publication_format_string[i]
                 #these are supported
-                if current == "p" or current=="c" or current=="v" or current=="y":
+                if current == "p" or current == "c" or current=="v" \
+                                  or current=="y":
                     if tagsvalues[current]:
                         #add the value in the string
                         publ += tagsvalues[current]
@@ -568,7 +575,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         print "critical error. cfg section "+function+" has no attr reference_via_pubinfo"
         raise "cfg error"
 
-    #pubrefntag is prob 999C5r, pubreftag 999C5s
+    #pubrefntag is often 999C5r, pubreftag 999C5s
     if task_get_task_param('verbose') >= 9:
         write_message("pubrefntag "+pubrefntag)
         write_message("pubreftag "+pubreftag)
@@ -576,19 +583,20 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     citation_list = initial_citationlist
     reference_list = initial_referencelist
     result = initialresult
-    d_reports_numbers = citation_informations[0]
-    d_references_report_numbers = citation_informations[1]
+    d_reports_numbers = citation_informations[0] #dict of recid -> institute_give_publ_id
+    d_references_report_numbers = citation_informations[1] #dict of recid -> ['astro-ph/xyz'..]
     d_references_s = citation_informations[2]
-       #of type: {77: ['Nucl. Phys. B 72 (1974) 461','blah blah'], 93: ['..'], ..}
-    d_records_s = citation_informations[3]
+       #dict of recid -> publication_infos_in_its_bibliography
+    d_records_s = citation_informations[3] #recid -> its publication inf
     t1 = os.times()[4]
+
     write_message("Phase 1: d_references_report_numbers")
     #d_references_report_numbers: e.g 8 -> ([astro-ph/9889],[hep-ph/768])
     #meaning: rec 8 contains these in bibliography
 
     done = 0
     numrecs = len(d_references_report_numbers)
-    for recid, refnumbers in d_references_report_numbers.iteritems():
+    for thisrecid, refnumbers in d_references_report_numbers.iteritems():
         if (done % 1000 == 0):
             mesg =  "d_references_report_numbers done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
@@ -607,25 +615,25 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 #sanitise p
                 p.replace("\n",'')
                 #search for "hep-th/5644654 or such" in existing records
-                rec_id = get_recids_matching_query(p, f)
-                if rec_id and rec_id[0]:
-                    write_citer_cited(recid, rec_id[0])
+                rec_ids = get_recids_matching_query(p, f)
+                if rec_ids and rec_ids[0]:
+                    write_citer_cited(thisrecid, rec_ids[0])
                     remove_from_missing(p)
-                    if not result.has_key(rec_id[0]):
-                        result[rec_id[0]] = 0
-                    # Citation list should have rec_id[0] but check anyway
-                    if not citation_list.has_key(rec_id[0]):
-                        citation_list[rec_id[0]] = []
+                    if not result.has_key(rec_ids[0]):
+                        result[rec_ids[0]] = 0
+                    # Citation list should have rec_ids[0] but check anyway
+                    if not citation_list.has_key(rec_ids[0]):
+                        citation_list[rec_ids[0]] = []
                     #append unless this key already has the item
-                    if not recid in citation_list[rec_id[0]]:
-                        citation_list[rec_id[0]].append(recid)
+                    if not thisrecid in citation_list[rec_ids[0]]:
+                        citation_list[rec_ids[0]].append(thisrecid)
                         #and update result
-                        result[rec_id[0]] += 1
+                        result[rec_ids[0]] += 1
 
-                    if not reference_list.has_key(recid):
-                        reference_list[recid] = []
-                    if not rec_id[0] in reference_list[recid]:
-                        reference_list[recid].append(rec_id[0])
+                    if not reference_list.has_key(thisrecid):
+                        reference_list[thisrecid] = []
+                    if not rec_ids[0] in reference_list[thisrecid]:
+                        reference_list[thisrecid].append(rec_ids[0])
                 else:
                     #the reference we wanted was not found among our records.
                     #put the reference in the "missing".. however, it will look
@@ -633,7 +641,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                     #This should really be done in the next loop d_references_s
                     #but the 999C5s fields are not yet normalized
 
-                    #rectext = print_record(recid, format='hm', ot=pubreftag[:-1])
+                    #rectext = print_record(thisrecid, format='hm', ot=pubreftag[:-1])
                     rectext = "" # print_record() call disabled to speed things up
                     lines = rectext.split("\n")
                     rpart = p #to be used..
@@ -645,7 +653,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                                 if (end == st):
                                     end = len(l)
                                 rpart = l[st+2:end]
-                    insert_into_missing(recid, rpart)
+                    insert_into_missing(thisrecid, rpart)
 
     mesg = "d_references_report_numbers done fully"
     write_message(mesg)
@@ -657,7 +665,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     write_message("Phase 2: d_references_s")
     done = 0
     numrecs = len(d_references_s)
-    for recid, refss in d_references_s.iteritems():
+    for thisrecid, refss in d_references_s.iteritems():
         if (done % 1000 == 0):
             mesg = "d_references_s done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
@@ -676,35 +684,35 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 matches = re.compile("(.*)(-\d+$)").findall(p)
                 if matches and matches[0]:
                     p = matches[0][0]
-                rec_id=None
+                rec_id = None
                 try:
-                    rec_id = list(search_unit(p, 'journal'))
+                    rec_ids = list(search_unit(p, 'journal'))
                 except:
-                    rec_id=None
+                    rec_ids = None
                 write_message("These match searching "+p+" in journal: "+str(rec_id), verbose=9)
-                if rec_id and rec_id[0]:
+                if rec_ids and rec_ids[0]:
                     #the refered publication is in our collection, remove
                     #from missing
                     remove_from_missing(p)
                 else:
                     #it was not found so add in missing
-                    insert_into_missing(recid, p)
+                    insert_into_missing(thisrecid, p)
                 #check citation and reference for this..
-                if rec_id and rec_id[0]:
+                if rec_ids and rec_ids[0]:
                     #the above should always hold
-                    if not result.has_key(rec_id[0]):
-                        result[rec_id[0]] = 0
-                    if not citation_list.has_key(rec_id[0]):
-                        citation_list[rec_id[0]] = []
-                    if not recid in citation_list[rec_id[0]]:
-                        citation_list[rec_id[0]].append(recid) #append actual list
-                        result[rec_id[0]] += 1 #add count for this..
+                    if not result.has_key(rec_ids[0]):
+                        result[rec_ids[0]] = 0
+                    if not citation_list.has_key(rec_ids[0]):
+                        citation_list[rec_ids[0]] = []
+                    if not thisrecid in citation_list[rec_ids[0]]:
+                        citation_list[rec_ids[0]].append(thisrecid) #append actual list
+                        result[rec_ids[0]] += 1 #add count for this..
 
                     #update reference_list accordingly
-                    if not reference_list.has_key(recid):
-                        reference_list[recid] = []
-                    if not rec_id[0] in reference_list[recid]:
-                        reference_list[recid].append(rec_id[0])
+                    if not reference_list.has_key(thisrecid):
+                        reference_list[thisrecid] = []
+                    if not rec_ids[0] in reference_list[thisrecid]:
+                        reference_list[thisrecid].append(rec_ids[0])
     mesg = "d_references_s done fully"
     write_message(mesg)
     task_update_progress(mesg)
@@ -715,38 +723,37 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     write_message("Phase 3: d_reports_numbers")
 
     #search for stuff like CERN-TH-4859/87 in list of refs
-    for rec_id, recnumbers in d_reports_numbers.iteritems():
+    for thisrecid, reportcodes in d_reports_numbers.iteritems():
         if (done % 1000 == 0):
             mesg = "d_report_numbers done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
             task_update_progress(mesg)
         done = done+1
 
-        for recnumber in recnumbers:
-            if recnumber:
-                p = recnumber
-                recid_list = []
+        for reportcode in reportcodes:
+            if reportcode:
+                rec_ids = []
                 try:
-                    recid_list = get_recids_matching_query(p, pubrefntag)
+                    rec_ids = get_recids_matching_query(reportcode, pubrefntag)
                 except:
-                    recid_list = []
+                    rec_ids = []
 
-                if recid_list:
-                    for recid in recid_list:
+                if rec_ids:
+                    for recid in rec_ids:
                         #normal checks..
-                        if not citation_list.has_key(rec_id):
-                            citation_list[rec_id] = []
+                        if not citation_list.has_key(thisrecid):
+                            citation_list[thisrecid] = []
                         if not reference_list.has_key(recid):
                             reference_list[recid] = []
-                        if not result.has_key(rec_id):
-                             result[rec_id] = 0
+                        if not result.has_key(thisrecid):
+                            result[thisrecid] = 0
 
                         #normal updates
-                        if not recid in citation_list[rec_id]:
-                            result[rec_id] += 1
-                            citation_list[rec_id].append(recid)
+                        if not recid in citation_list[thisrecid]:
+                            result[thisrecid] += 1
+                            citation_list[thisrecid].append(recid)
                         if not rec_id in reference_list[recid]:
-                            reference_list[recid].append(rec_id)
+                            reference_list[recid].append(thisrecid)
 
     mesg = "d_report_numbers done fully"
     write_message(mesg)
@@ -757,7 +764,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     done = 0
     numrecs = len(d_records_s)
     t4 = os.times()[4]
-    for recid, recs in d_records_s.iteritems():
+    for thisrecid, recs in d_records_s.iteritems():
         if (done % 1000 == 0):
             mesg = "d_records_s done "+str(done)+" of "+str(numrecs)
             write_message(mesg)
@@ -770,18 +777,18 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
         if rec_ids:
             for rec_id in rec_ids:
                 #normal checks
-                if not result.has_key(recid):
-                    result[recid] = 0
-                if not citation_list.has_key(recid):
-                    citation_list[recid] = []
+                if not result.has_key(thisrecid):
+                    result[thisrecid] = 0
+                if not citation_list.has_key(thisrecid):
+                    citation_list[thisrecid] = []
                 if not reference_list.has_key(rec_id):
                     reference_list[rec_id] = []
 
-                if not rec_id in citation_list[recid]:
+                if not rec_id in citation_list[thisrecid]:
                     result[recid] += 1
                     citation_list[recid].append(rec_id)
                 if not recid in reference_list[rec_id]:
-                    reference_list[rec_id].append(recid)
+                    reference_list[rec_id].append(thisrecid)
 
     mesg = "d_records_s done fully"
     write_message(mesg)
@@ -808,7 +815,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
     #add new records to selfdic
     acit = task_get_option("author-citations")
     if not acit:
-        print "Self cite processing disabled. Use -A option to enable it."
+        write_message("Self cite processing disabled. Use -A option to enable it.")
     else:
         write_message("self cite and author citations enabled")
         selfdic = get_self_citations(updated_rec_list, citation_list,
@@ -892,12 +899,6 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
 
     return result
 
-def get_decompressed_xml(xml):
-    """return a decompressed content of xml into a xml content
-    """
-    decompressed_xml = create_records(decompress(xml))
-    return decompressed_xml
-
 def insert_cit_ref_list_intodb(citation_dic, reference_dic, selfcbdic,
                                selfdic, authorcitdic):
     """Insert the reference and citation list into the database"""
@@ -967,17 +968,16 @@ def get_cit_dict(name):
 
 def get_initial_author_dict():
     """read author->citedinlist dict from the db"""
-    dict = {}
+    adict = {}
     try:
         ah = run_sql("select aterm,hitlist from rnkAUTHORDATA")
         for (a, h) in ah:
-            dict[a] = deserialize_via_marshal(h)
-        return dict
+            adict[a] = deserialize_via_marshal(h)
+        return adict
     except:
         print "Critical error: could not read rnkAUTHORDATA"
         traceback.print_tb(sys.exc_info()[2])
-        dict = {}
-        return dict
+        return {}
 
 
 def insert_into_missing(recid, report):
