@@ -95,7 +95,7 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, temp, 
                         if tag != '' and subcode != '' and value != '':
                             #add these in the record, take the instance number
                             tag = tag[:3]
-                            new_field_number = record_add_field(record, tag, ind1, ind2, [(subcode,value)])
+                            new_field_number = record_add_field(record, tag, ind1, ind2, datafield_subfield_code_value_tuples=[(subcode,value)])
                             record  = add_subfield(recid, uid, tag, record, new_field_number, subcode, value)
                             if another and another != '':
                                 #if the user pressed 'another' instead of 'done', take to editing
