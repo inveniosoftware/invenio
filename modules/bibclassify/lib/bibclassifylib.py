@@ -34,17 +34,13 @@ import tempfile
 try:
     from bibclassify_text_normalizer import normalize_fulltext, cut_references
     from bibclassify_keyword_analyzer import get_single_keywords, \
-                                             get_composite_keywords, \
-                                             get_author_keywords
+        get_composite_keywords, get_author_keywords
     from bibclassify_config import CFG_BIBCLASSIFY_WORD_WRAP, \
-        CFG_BIBCLASSIFY_INVARIABLE_WORDS, \
-        CFG_BIBCLASSIFY_EXCEPTIONS, \
+        CFG_BIBCLASSIFY_INVARIABLE_WORDS, CFG_BIBCLASSIFY_EXCEPTIONS, \
         CFG_BIBCLASSIFY_UNCHANGE_REGULAR_EXPRESSIONS, \
         CFG_BIBCLASSIFY_GENERAL_REGULAR_EXPRESSIONS, \
-        CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, \
-        CFG_BIBCLASSIFY_PARTIAL_TEXT, \
-        CFG_BIBCLASSIFY_SYMBOLS, \
-        CFG_BIBCLASSIFY_SEPARATORS
+        CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, CFG_BIBCLASSIFY_SEPARATORS, \
+        CFG_BIBCLASSIFY_PARTIAL_TEXT, CFG_BIBCLASSIFY_SYMBOLS
 except ImportError, err:
     print >> sys.stderr, "Error: %s" % err
     sys.exit(1)
@@ -55,7 +51,6 @@ try:
 except ImportError:
     # No local configuration was found.
     pass
-
 
 # Global variables.
 _SKWS = {}
@@ -68,41 +63,46 @@ _split_by_punctuation = re.compile("(\W+)")
 
 class SingleKeyword:
     """A single keyword element that treats and stores information fields
-    retrieved from the RDF/SKOS ontology."""
-    def __init__(self, store, namespace, subject):
-        basic_labels = []
-        for label in store.objects(subject, namespace["prefLabel"]):
-            basic_labels.append(str(label))
+    retrieved from the RDF/SKOS taxonomy."""
+    def __init__(self, subject, store=None, namespace=None):
+        if store is None:
+            self.concept = subject
+            self.regex = get_searchable_regex(basic=[subject])
+            self.nostandalone = False
+            self.spires = subject
+        else:
+            basic_labels = []
+            for label in store.objects(subject, namespace["prefLabel"]):
+                basic_labels.append(str(label))
 
-        # The concept (==human-readable label of the keyword) is the first
-        # prefLabel.
-        self.concept = basic_labels[0]
+            # The concept (==human-readable label of the keyword) is the first
+            # prefLabel.
+            self.concept = basic_labels[0]
 
-        for label in store.objects(subject, namespace["altLabel"]):
-            basic_labels.append(str(label))
+            for label in store.objects(subject, namespace["altLabel"]):
+                basic_labels.append(str(label))
 
-        hidden_labels = []
-        for label in store.objects(subject, namespace["hiddenLabel"]):
-            hidden_labels.append(unicode(label))
+            hidden_labels = []
+            for label in store.objects(subject, namespace["hiddenLabel"]):
+                hidden_labels.append(unicode(label))
 
-        self.regex = get_searchable_regex(basic_labels, hidden_labels)
+            self.regex = get_searchable_regex(basic_labels, hidden_labels)
 
-        note = str(store.value(subject, namespace["note"], any=True))
-        if note is not None:
-            self.nostandalone = (note.lower() in
-                                ("nostandalone", "nonstandalone"))
+            note = str(store.value(subject, namespace["note"], any=True))
+            if note is not None:
+                self.nostandalone = (note.lower() in
+                                    ("nostandalone", "nonstandalone"))
 
-        spires = store.value(subject, namespace["spiresLabel"], any=True)
-        if spires is not None:
-            self.spires = str(spires)
-
+            spires = store.value(subject, namespace["spiresLabel"], any=True)
+            if spires is not None:
+                self.spires = str(spires)
 
     def __repr__(self):
         return "".join(["<SingleKeyword: ", self.concept, ">"])
 
 class CompositeKeyword:
     """A composite keyword element that treats and stores information fields
-    retrieved from the RDF/SKOS ontology."""
+    retrieved from the RDF/SKOS taxonomy."""
     def __init__(self, store, namespace, subject):
         try:
             self.concept = store.value(subject, namespace["prefLabel"],
@@ -137,43 +137,52 @@ class CompositeKeyword:
     def __repr__(self):
         return "".join(["<CompositeKeyword: ", self.concept, ">"])
 
-def build_cache(ontology_file, no_cache=False):
-    """Builds the cached data by parsing the RDF ontology file."""
-    if rdflib.__version__ >= '2.3.2':
-        store = rdflib.ConjunctiveGraph()
+def build_cache(source_file, type="taxonomy", no_cache=False):
+    """Builds the cached data by parsing the RDF taxonomy file or a
+    vocabulary file."""
+    if type == "taxonomy":
+        if rdflib.__version__ >= '2.3.2':
+            store = rdflib.ConjunctiveGraph()
+        else:
+            store = rdflib.Graph()
+        store.parse(source_file)
+
+        namespace = rdflib.Namespace("http://www.w3.org/2004/02/skos/core#")
+
+        single_count = 0
+        composite_count = 0
+        regex_count = 0
+
+        for subject_object in store.subject_objects(namespace["prefLabel"]):
+            # Keep only the single keywords.
+            # FIXME: Remove or alter that condition in order to allow using
+            # other ontologies that do not have this composite notion (such
+            # as NASA-subjects.rdf)
+            if not store.value(subject_object[0], namespace["compositeOf"],
+                any=True):
+                strsubject = str(subject_object[0]).split("#")[-1]
+                _SKWS[strsubject] = SingleKeyword(subject_object[0],
+                    store=store, namespace=namespace)
+                single_count += 1
+                regex_count += len(_SKWS[strsubject].regex)
+
+        # Let's go through the composite keywords.
+        for subject, pref_label in \
+            store.subject_objects(namespace["prefLabel"]):
+            # Keep only the single keywords.
+            if store.value(subject, namespace["compositeOf"], any=True):
+                strsubject = str(subject).split("#")[-1]
+                _CKWS[strsubject] = CompositeKeyword(store, namespace, subject)
+                composite_count += 1
+                regex_count += len(_CKWS[strsubject].regex)
+
+        store.close()
+
     else:
-        store = rdflib.Graph()
-    store.parse(ontology_file)
-
-    namespace = rdflib.Namespace("http://www.w3.org/2004/02/skos/core#")
-
-    single_count = 0
-    composite_count = 0
-    regex_count = 0
-
-    for subject_object in store.subject_objects(namespace["prefLabel"]):
-        # Keep only the single keywords.
-        # FIXME: Remove or alter that condition in order to allow using
-        # other ontologies that do not have this composite notion (such
-        # as NASA-subjects.rdf)
-        if not store.value(subject_object[0], namespace["compositeOf"],
-            any=True):
-            strsubject = str(subject_object[0]).split("#")[-1]
-            _SKWS[strsubject] = SingleKeyword(store, namespace,
-                subject_object[0])
-            single_count += 1
-            regex_count += len(_SKWS[strsubject].regex)
-
-    # Let's go through the composite keywords.
-    for subject, pref_label in store.subject_objects(namespace["prefLabel"]):
-        # Keep only the single keywords.
-        if store.value(subject, namespace["compositeOf"], any=True):
-            strsubject = str(subject).split("#")[-1]
-            _CKWS[strsubject] = CompositeKeyword(store, namespace, subject)
-            composite_count += 1
-            regex_count += len(_CKWS[strsubject].regex)
-
-    store.close()
+        filestream = open(source_file, "r")
+        for line in filestream:
+            keyword = line.strip()
+            _SKWS[keyword] = SingleKeyword(keyword)
 
     cached_data = {}
     cached_data["single"] = _SKWS
@@ -182,7 +191,7 @@ def build_cache(ontology_file, no_cache=False):
     if not no_cache:
         # Serialize
         try:
-            filestream = open(get_cache_file(ontology_file), "w")
+            filestream = open(get_cache_file(source_file), "w")
             cPickle.dump(cached_data, filestream, 1)
             filestream.close()
         except IOError:
@@ -257,17 +266,17 @@ def convert_word(word):
 
     return capitalize_first_letter(word + "s?")
 
-def get_cache(ontology_file):
-    """Get the cached ontology using the cPickle module. No check is done at
+def get_cache(source_file):
+    """Get the cached taxonomy using the cPickle module. No check is done at
     that stage."""
-    filestream = open(get_cache_file(ontology_file), "r")
+    filestream = open(get_cache_file(source_file), "r")
     try:
         cached_data = cPickle.load(filestream)
     except (cPickle.UnpicklingError, AttributeError, DeprecationWarning):
         print >> sys.stderr, "Problem with existing cache. Regenerating."
         filestream.close()
-        os.remove(get_cache_file(ontology_file))
-        return build_cache(ontology_file)
+        os.remove(get_cache_file(source_file))
+        return build_cache(source_file)
     filestream.close()
 
     global _SKWS, _CKWS
@@ -276,8 +285,8 @@ def get_cache(ontology_file):
 
     return cached_data
 
-def get_cache_file(ontology_file):
-    """Returns the file name of the cached ontology."""
+def get_cache_file(source_file):
+    """Returns the file name of the cached taxonomy."""
     temp_dir = ""
     try:
         from invenio.config import CFG_CACHEDIR
@@ -290,27 +299,14 @@ def get_cache_file(ontology_file):
                     "cache directory %s." % temp_dir)
     except ImportError:
         temp_dir = tempfile.gettempdir()
-    cache_file = os.path.basename(ontology_file) + ".db"
+    cache_file = os.path.basename(source_file) + ".db"
     return os.path.join(temp_dir, cache_file)
 
-def get_keywords_from_text(text_lines, ontology_file="", output_mode="text",
-                           output_limit=CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER,
-                           spires=False, match_mode="full", no_cache=False,
-                           with_author_keywords=False):
+def get_keywords_from_text(text_lines, output_mode="text",
+    output_limit=CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, spires=False,
+    match_mode="full", no_cache=False, with_author_keywords=False):
     """Returns a formatted string containing the keywords for a single
-    document. If 'ontology_file' has not been specified, the method
-    'get_regular_expressions' must have been run in order to build or
-    get the cached ontology."""
-    if not ontology_file:
-        if not _SKWS or not _CKWS:
-            # Cache was not read/created.
-            print >> sys.stderr, ("Please specify an ontology file or "
-                "use the method 'get_regular_expressions' before "
-                "searching for keywords.")
-            sys.exit(1)
-    else:
-        get_regular_expressions(ontology_file, no_cache)
-
+    document."""
     text_lines = cut_references(text_lines)
     fulltext = normalize_fulltext("\n".join(text_lines))
 
@@ -365,46 +361,64 @@ def get_partial_text(fulltext):
 
     return "\n".join(partial_text)
 
-def get_regular_expressions(ontology_file, rebuild=False, no_cache=False):
+def get_regular_expressions(taxonomy="", vocabulary="", rebuild=False,
+    no_cache=False):
     """Returns a list of patterns compiled from the RDF/SKOS taxonomy.
     Uses cache if it exists and if the taxonomy hasn't changed."""
-    if os.access(ontology_file, os.R_OK):
-        if rebuild or no_cache:
-            return build_cache(ontology_file, no_cache)
+    if not (taxonomy or vocabulary):
+        print >> sys.stderr, "Error: no taxonomy was specified."
+        sys.exit(-1)
+    if taxonomy and vocabulary:
+        print >> sys.stderr, ("Error: bibclassify doesn't support both an "
+            "taxonomy and a vocabulary.")
+        sys.exit(-1)
 
-        if os.access(get_cache_file(ontology_file), os.R_OK):
-            if (os.path.getmtime(get_cache_file(ontology_file)) >
-               os.path.getmtime(ontology_file)):
-                # Cache is more recent than the ontology: use cache.
-                return get_cache(ontology_file)
+    source_file = taxonomy or vocabulary
+    source_type = taxonomy and "taxonomy" or "vocabulary"
+
+    if os.access(source_file, os.R_OK):
+        if rebuild or no_cache:
+            return build_cache(source_file, type=source_type,
+                no_cache=no_cache)
+
+        if os.access(get_cache_file(source_file), os.R_OK):
+            if (os.path.getmtime(get_cache_file(source_file)) >
+               os.path.getmtime(source_file)):
+                # Cache is more recent than the taxonomy: use cache.
+                return get_cache(source_file)
             else:
-                # Ontology is more recent than the cache: rebuild cache.
+                # taxonomy is more recent than the cache: rebuild cache.
                 if not no_cache:
-                    print >> sys.stderr, "Ontology changed. Rebuilding cache."
-                return build_cache(ontology_file, no_cache)
+                    print >> sys.stderr, "taxonomy changed. Rebuilding cache."
+                return build_cache(source_file, type=source_type,
+                    no_cache=no_cache)
         else:
             # Cache does not exist. Build cache.
             print >> sys.stderr, "Building cache."
-            return build_cache(ontology_file, no_cache)
+            return build_cache(source_file, type=source_type,
+                no_cache=no_cache)
     else:
-        if os.access(get_cache_file(ontology_file), os.R_OK):
-            # Ontology file not found. Use the cache instead.
-            print >> sys.stderr, ("Warning: ontology not found. Using cache "
+        if os.access(get_cache_file(source_file), os.R_OK):
+            # taxonomy file not found. Use the cache instead.
+            print >> sys.stderr, ("Warning: taxonomy not found. Using cache "
                 "instead.")
-            return get_cache(ontology_file)
+            return get_cache(source_file)
         else:
-            # Cannot access the ontology nor the cache. Exit.
-            print >> sys.stderr, ("Error: Neither ontology file nor cache can "
+            # Cannot access the taxonomy nor the cache. Exit.
+            print >> sys.stderr, ("Error: Neither taxonomy file nor cache can "
                 "be read.")
             sys.exit(-1)
             return None
 
-def get_searchable_regex(basic_labels, hidden_labels):
+def get_searchable_regex(basic=None, hidden=None):
     """Returns the searchable regular expressions for the single
     keyword."""
     # Hidden labels are used to store regular expressions.
+    basic = basic or []
+    hidden = hidden or []
+
     hidden_regex_dict = {}
-    for hidden_label in hidden_labels:
+    for hidden_label in hidden:
         if is_regex(hidden_label):
             hidden_regex_dict[hidden_label] = \
                 re.compile(CFG_BIBCLASSIFY_WORD_WRAP % hidden_label[1:-1])
@@ -417,7 +431,7 @@ def get_searchable_regex(basic_labels, hidden_labels):
     # by a hidden label regex. If yes, discard it.
     regex_dict = {}
     # Create regex for plural forms and add them to the hidden labels.
-    for label in basic_labels:
+    for label in basic:
         pattern = get_regex_pattern(label)
         regex_dict[label] = re.compile(CFG_BIBCLASSIFY_WORD_WRAP % pattern)
 
@@ -601,8 +615,8 @@ def output_text(single_keywords=None, composite_keywords=None,
 
     return "\n".join(output) + "\n"
 
-def check_ontology(ontology_file):
-    """Checks the consistency of the ontology and outputs a list of
+def check_taxonomy(taxonomy):
+    """Checks the consistency of the taxonomy and outputs a list of
     errors and warnings."""
     print "Building graph with Python RDFLib version %s" % rdflib.__version__
     if rdflib.__version__ >= '2.3.2':
@@ -610,7 +624,7 @@ def check_ontology(ontology_file):
     else:
         store = rdflib.Graph()
 
-    store.parse(ontology_file)
+    store.parse(taxonomy)
 
     print "Graph was successfully built."
 
@@ -646,7 +660,7 @@ def check_ontology(ontology_file):
         else:
             subjects[strsubject] = components
 
-    print "Ontology contains %s concepts." % len(subjects)
+    print "Taxonomy contains %s concepts." % len(subjects)
 
     no_prefLabel = []
     multiple_prefLabels = []

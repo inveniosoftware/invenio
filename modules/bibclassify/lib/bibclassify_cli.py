@@ -30,7 +30,7 @@ import time
 
 try:
     from bibclassifylib import get_regular_expressions, \
-        get_keywords_from_text, check_ontology
+        get_keywords_from_text, check_taxonomy
     from bibclassify_text_extractor import text_lines_from_local_file, \
         text_lines_from_url, is_pdf
     from bibclassify_config import CFG_BIBCLASSIFY_USER_AGENT
@@ -58,7 +58,9 @@ in the directory.
   -h, --help                display this help and exit
   -V, --version             output version information and exit
   -v, --verbose LEVEL       sets the verbose to LEVEL (=0)
-  -k, --ontology FILE       sets the FILE to read the ontology from
+  -k, --skos-taxonomy FILE  sets the FILE to read the RDF/SKOS taxonomy from
+  -K, --vocabulary FILE     sets the FILE to read the controlled vocabulary
+                              from
   -o, --output-mode TYPE    changes the output format to TYPE (text, marcxml or
                               html) (=text)
   -s, --spires              outputs keywords in the SPIRES format
@@ -68,9 +70,9 @@ in the directory.
                               (=full)
   --detect-author-keywords  detect keywords that are explicitely written in the
                               document
-  --check-ontology          checks the ontology and reports warnings and errors
+  --check-taxonomy          checks the taxonomy and reports warnings and errors
   --rebuild-cache           ignores the existing cache and regenerates it
-  --no-cache                don't cache the ontology
+  --no-cache                don't cache the taxonomy
 
 Backward compatibility (using these options is discouraged):
   -q                        equivalent to -s
@@ -86,18 +88,19 @@ def main():
     """Main function """
     read_options(sys.argv[1:])
 
-    # Ontology check
-    if _OPTIONS["check_ontology"]:
-        print >> sys.stdout, ("Checking ontology file %s" %
-            _OPTIONS["ontology_file"])
-        check_ontology(_OPTIONS["ontology_file"])
-    # End of ontology check.
+    # taxonomy check
+    if _OPTIONS["check_taxonomy"]:
+        print >> sys.stdout, ("Checking taxonomy file %s" %
+            _OPTIONS["taxonomy"])
+        check_taxonomy(_OPTIONS["taxonomy"])
+    # End of taxonomy check.
 
     # Initialize cache
-    get_regular_expressions(_OPTIONS["ontology_file"],
-                            _OPTIONS["rebuild_cache"],
-                            _OPTIONS["no_cache"])
+    get_regular_expressions(taxonomy=_OPTIONS["taxonomy"],
+        vocabulary=_OPTIONS["vocabulary"],
+        rebuild=_OPTIONS["rebuild_cache"], no_cache=_OPTIONS["no_cache"])
 
+    # Get the fulltext for each source.
     sources = {}
     for entry in _OPTIONS["text_files"]:
         text_lines = None
@@ -131,29 +134,32 @@ def read_options(options_string):
     """Reads the options, test if the specified values are consistent and
     populates the options dictionary."""
     global _OPTIONS
-    _OPTIONS = {}
-    _OPTIONS["spires"] = False
-    _OPTIONS["output_limit"] = 20
-    _OPTIONS["text_files"] = []
-    _OPTIONS["ontology_file"] = ""
-    _OPTIONS["output_mode"] = "text"
-    _OPTIONS["verbose"] = 0
-    _OPTIONS["match_mode"] = "full"
-    _OPTIONS["output_prefix"] = None
-    _OPTIONS["rebuild_cache"] = False
-    _OPTIONS["no_cache"] = False
-    _OPTIONS["check_ontology"] = False
-    _OPTIONS["with_author_keywords"] = False
+    _OPTIONS = {
+        "check_taxonomy": False,
+        "spires": False,
+        "output_limit": 20,
+        "text_files": [],
+        "taxonomy": "",
+        "vocabulary": "",
+        "output_mode": "text",
+        "verbose": 0,
+        "match_mode": "full",
+        "output_prefix": None,
+        "rebuild_cache": False,
+        "no_cache": False,
+        "with_author_keywords": False,
+    }
 
     output_modes = ("html", "text", "marcxml")
     modes = ("full", "partial")
 
     try:
-        long_flags = ["ontology=", "output-mode=", "verbose=", "spires",
+        long_flags = ["taxonomy=", "output-mode=", "verbose=", "spires",
                       "keywords-number=", "matching-mode=", "help", "version",
                       "file", "rebuild-cache", "no-limit", "no-cache",
-                      "check-ontology", "detect-author-keywords"]
-        short_flags = "f:k:o:n:m:v:sqhV"
+                      "check-taxonomy", "detect-author-keywords",
+                      "vocabulary="]
+        short_flags = "f:k:t:o:n:m:v:sqhV"
         opts, args = getopt.gnu_getopt(options_string, short_flags, long_flags)
     except getopt.GetoptError, err1:
         print >> sys.stderr, "Options problem: %s" % err1
@@ -172,18 +178,18 @@ def read_options(options_string):
             sys.exit(1)
         elif opt in ("-v", "--verbose"):
             _OPTIONS["verbose"] = arg
-        elif opt in ("-k", "--ontology"):
+        elif opt in ("-k", "--taxonomy"):
             if os.access(arg, os.R_OK):
-                _OPTIONS["ontology_file"] = arg
+                _OPTIONS["taxonomy"] = arg
             else:
                 try:
                     from invenio.config import CFG_ETCDIR
                 except ImportError:
                     # bibclassifylib takes care of error messages.
-                    _OPTIONS["ontology_file"] = arg
+                    _OPTIONS["taxonomy"] = arg
                 else:
-                    _OPTIONS["ontology_file"] = CFG_ETCDIR + os.sep + \
-                                                'bibclassify' + os.sep + arg
+                    _OPTIONS["taxonomy"] = CFG_ETCDIR + os.sep + \
+                        'bibclassify' + os.sep + arg
         elif opt in ("-o", "--output-mode"):
             _OPTIONS["output_mode"] = arg.lower()
         elif opt in ("-m", "--matching-mode"):
@@ -202,10 +208,22 @@ def read_options(options_string):
         # -f for compatibility reasons
         elif opt in ("-f", "--file"):
             _OPTIONS["text_files"].append(arg)
-        elif opt == "--check-ontology":
-            _OPTIONS["check_ontology"] = True
+        elif opt == "--check-taxonomy":
+            _OPTIONS["check_taxonomy"] = True
         elif opt == "--detect-author-keywords":
             _OPTIONS["with_author_keywords"] = True
+        elif opt in("-t", "--vocabulary"):
+            if os.access(arg, os.R_OK):
+                _OPTIONS["vocabulary"] = arg
+            else:
+                try:
+                    from invenio.config import CFG_ETCDIR
+                except ImportError:
+                    # bibclassifylib takes care of error messages.
+                    _OPTIONS["vocabulary"] = arg
+                else:
+                    _OPTIONS["vocabulary"] = CFG_ETCDIR + os.sep + \
+                        'bibclassify' + os.sep + arg
 
     if not opts and not args:
         display_help()
@@ -214,11 +232,11 @@ def read_options(options_string):
 
     # Test if the options are consistent.
     if not args:
-        if not _OPTIONS["check_ontology"] and not _OPTIONS["text_files"]:
+        if not _OPTIONS["check_taxonomy"] and not _OPTIONS["text_files"]:
             print >> sys.stderr, "ERROR: please specify a file or directory."
             usage()
-    if not _OPTIONS["ontology_file"]:
-        print >> sys.stderr, "ERROR: please specify an ontology file (-k)."
+    if not (_OPTIONS["taxonomy"] or _OPTIONS["vocabulary"]):
+        print >> sys.stderr, "ERROR: please specify a taxonomy file (-k)."
         usage()
     if _OPTIONS["output_mode"] not in output_modes:
         print >> sys.stderr, ("ERROR: output (-o) should be TEXT, MARCXML or "
@@ -226,6 +244,10 @@ def read_options(options_string):
         usage()
     if _OPTIONS["match_mode"] not in modes:
         print >> sys.stderr, "ERROR: mode (-m) should be FULL or PARTIAL."
+        usage()
+    if _OPTIONS["taxonomy"] and _OPTIONS["vocabulary"]:
+        print >> sys.stderr, ("ERROR: bibclassify doesn't support both a "
+            "taxonomy file and a vocabulary file.")
         usage()
     try:
         _OPTIONS["output_limit"] = int(_OPTIONS["output_limit"])
