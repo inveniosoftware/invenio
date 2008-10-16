@@ -427,6 +427,8 @@ class SessionManager:
             request.response.set_cookie(self._getSessionCookieName(), session_id,
                                     domain = self._getSessionCookieDomain(),
                                     path = self._getSessionCookiePath(),
+                                    secure = True,
+                                    HttpOnly = True,
                                     expires = strftime('%a, %d-%b-%Y %H:%M:%S GMT', gmtime(time() +
                                     CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER*86400)))
         else:
@@ -745,8 +747,10 @@ class ResponseWrapper:
             if name in ("expires", "path"):
                 name = name.replace("_", "-")
                 options += "; %s=%s" % (name, value)
-            elif name =="secure" and value:
+            elif name == "secure" and value:
                 options += "; secure"
+            elif name == "HttpOnly" and value:
+                options += "; HttpOnly"
         cookie_str = "%s=%s%s" % (cookie_name, cookie_value, options)
         self.request.headers_out.add("Set-Cookie", cookie_str)
         if 'expires' not in attrs or attrs['expires'] != 0:
