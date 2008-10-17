@@ -500,7 +500,7 @@ def errorMsg(title, req, c=None, ln=CFG_SITE_LANG):
         c = CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME)
 
     return page(title = _("Error"),
-                body = create_error_box(req, title=title, verbose=0, ln=ln),
+                body = create_error_box(req, title=str(title), verbose=0, ln=ln),
                 description="%s - Internal Error" % c,
                 keywords="%s, Internal Error" % c,
                 uid = getUid(req),
