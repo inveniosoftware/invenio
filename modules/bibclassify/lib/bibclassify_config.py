@@ -28,8 +28,6 @@ local configuration file names 'bibclassify_config_local.py' that
 contains the changes to apply.
 """
 
-__revision__ = "$Id$"
-
 import re
 
 # USER AGENT

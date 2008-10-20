@@ -18,10 +18,15 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-BibClassify Text Extractor.
-"""
+BibClassify text extractor.
 
-__revision__ = "$Id$"
+This module provides method to extract the fulltext from local or remote
+documents. Currently 2 formats of documents are supported: PDF and text
+documents.
+
+2 methods provide the functionality of the module: text_lines_from_local_file
+and text_lines_from_url.
+"""
 
 import os
 import re
@@ -29,37 +34,41 @@ import sys
 import tempfile
 import urllib2
 
-def executable_exists(executable):
-    """Tests if an executable is available on the system."""
-    for directory in os.getenv("PATH").split(":"):
-        if os.path.exists(os.path.join(directory, executable)):
-            return True
-    return False
+from bibclassify_utils import write_message
 
-def is_pdf(document):
-    """Checks if a document is a PDF file. Returns True if is is."""
-    if not executable_exists:
-        print >> sys.stderr, ("Warning: GNU file was not found on the system. "
-            "Weak test.")
-        if document.lower().endswith(".pdf"):
-            return True
-        return False
-    # Tested with file version >= 4.10. First test is secure and works
-    # with file version 4.25. Second condition is tested for file
-    # version 4.10.
-    file_output = os.popen('file ' + document).read()
+_ONE_WORD = re.compile("[A-Za-z]{2,}")
+
+def text_lines_from_local_file(document):
+    """Returns the fulltext of the local file."""
     try:
-        filetype = file_output.split(":")[1]
-    except IndexError:
-        print >> sys.stderr, ("Your version of the 'file' utility seems "
-            "to be unsupported. Please report this cds.support@cern.ch.")
-        sys.exit(1)
+        if _is_pdf(document):
+            if not _executable_exists("pdftotext"):
+                write_message("ERROR: pdftotext is not available on the "
+                    "system.", stream=sys.stderr, verbose=1)
+            cmd = "pdftotext -q -enc UTF-8 %s -" % document
+            filestream = os.popen(cmd)
+        else:
+            filestream = open(document, "r")
+    except:
+        write_message("ERROR: Unable to read from file %s." % document,
+            stream=sys.stderr, verbose=1)
+        return None
 
-    pdf = filetype.find("PDF") > -1
-    # This is how it should be done however this is incompatible with
-    # file version 4.10.
-    #os.popen('file -bi ' + document).read().find("application/pdf")
-    return pdf
+    lines = [line.decode("utf-8") for line in filestream]
+    filestream.close()
+
+    line_nb = len(lines)
+    word_nb = 0
+    for line in lines:
+        word_nb += len(re.findall("\S+", line))
+
+    write_message("INFO: Document has %d lines and %d words." % (line_nb,
+        word_nb), stream=sys.stderr, verbose=3)
+
+    # Discard lines that do not contain at least one word.
+    lines = [line for line in lines if _ONE_WORD.search(line) is not None]
+
+    return lines
 
 def text_lines_from_url(url, user_agent=""):
     """Returns the fulltext of the file found at the URL."""
@@ -73,35 +82,56 @@ def text_lines_from_url(url, user_agent=""):
         local_stream = open(local_file, "w")
         local_stream.write(distant_stream.read())
         local_stream.close()
+    except:
+        write_message("ERROR: Unable to read from URL %s." % url,
+            stream=sys.stderr, verbose=1)
+        return None
+    else:
         # Read lines from the temporary file.
         lines = text_lines_from_local_file(local_file)
         os.remove(local_file)
+
+        line_nb = len(lines)
+        word_nb = 0
+        for line in lines:
+            word_nb += len(re.findall("\S+", line))
+
+        write_message("INFO: Document has %d lines and %d words." % (line_nb,
+            word_nb), stream=sys.stderr, verbose=3)
+
         return lines
-    except:
-        print >> sys.stderr, "Unable to read from URL '%s'." % url
-        return None
 
-_ONE_WORD = re.compile("[A-Za-z]{2,}")
+def _executable_exists(executable):
+    """Tests if an executable is available on the system."""
+    for directory in os.getenv("PATH").split(":"):
+        if os.path.exists(os.path.join(directory, executable)):
+            return True
+    return False
 
-def text_lines_from_local_file(document):
-    """Returns the fulltext of the local file."""
+def _is_pdf(document):
+    """Checks if a document is a PDF file. Returns True if is is."""
+    if not _executable_exists:
+        write_message("WARNING: GNU file was not found on the system. "
+            "Switching to a weak file extension test.", stream=sys.stderr,
+            verbose=2)
+        if document.lower().endswith(".pdf"):
+            return True
+        return False
+    # Tested with file version >= 4.10. First test is secure and works
+    # with file version 4.25. Second condition is tested for file
+    # version 4.10.
+    file_output = os.popen('file ' + document).read()
     try:
-        if is_pdf(document):
-            if not executable_exists("pdftotext"):
-                print >> sys.stderr, ("Error: pdftotext is not available on "
-                    "the system.")
-            cmd = "pdftotext -q -enc UTF-8 %s -" % document
-            filestream = os.popen(cmd)
-        else:
-            filestream = open(document, "r")
-    except:
-        print >> sys.stderr, "Unable to read from file '%s'." % document
-        return None
+        filetype = file_output.split(":")[1]
+    except IndexError:
+        write_message("WARNING: Your version of the 'file' utility seems to "
+            "be unsupported. Please report this to cds.support@cern.ch.",
+            stream=sys.stderr, verbose=2)
+        sys.exit(1)
 
-    lines = [line.decode("utf-8") for line in filestream]
-    filestream.close()
+    pdf = filetype.find("PDF") > -1
+    # This is how it should be done however this is incompatible with
+    # file version 4.10.
+    #os.popen('file -bi ' + document).read().find("application/pdf")
+    return pdf
 
-    # Discard lines that do not contain at least one word.
-    lines = [line for line in lines if _ONE_WORD.search(line) is not None]
-
-    return lines

@@ -1,4 +1,4 @@
-## $Id$
+## $iD$
 
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -22,11 +22,13 @@ pylibdir = $(libdir)/python/invenio
 pylib_DATA = bibclassify_cli.py \
              bibclassify_config.py \
              bibclassify_daemon.py \
+             bibclassify_engine.py \
              bibclassify_keyword_analyzer.py \
              bibclassify_regression_tests.py \
+             bibclassify_taxonomy_reader.py \
              bibclassify_text_extractor.py \
              bibclassify_text_normalizer.py \
-             bibclassifylib.py
+             bibclassify_utils.py
 
 EXTRA_DIST = $(pylib_DATA)
 

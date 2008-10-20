@@ -18,22 +18,35 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Bibclassify text_normalizer
-"""
+BibClassify text_normalizer.
 
-__revision__ = "$Id$"
+This module provides methods to clean the text lines. Currently, the methods
+are tuned to work with the output of pdftotext and documents in the HEP field.
+Methods can be tuned to your needs through the configuration file.
+
+This modules uses the refextract module of BibEdit in order to find the
+references section and to replace unicode characters.
+"""
 
 import sys
 import re
 
 try:
-    from invenio.refextract import replace_undesirable_characters
+    from bibclassify_utils import write_message
+except ImportError, err:
+    print >> sys.stderr, "Import error: %s" % err
+    sys.exit(0)
+
+try:
+    from invenio.refextract import replace_undesirable_characters, \
+        find_reference_section, find_end_of_reference_section
 except ImportError, e1:
     try:
-        from refextract import replace_undesirable_characters
+        from invenio.refextract import replace_undesirable_characters, \
+            find_reference_section, find_end_of_reference_section
     except ImportError, err:
-        print >> sys.stderr, "Error: %s" % err
-        sys.exit(1)
+        print >> sys.stderr, "Import error: %s" % err
+        sys.exit(0)
 
 def normalize_fulltext(fulltext):
     """Returns a 'cleaned' version of the output provided by pdftotext."""
@@ -44,7 +57,7 @@ def normalize_fulltext(fulltext):
     # Replace some weird unicode characters.
     fulltext = replace_undesirable_characters(fulltext)
     # Replace the greek characters by their name.
-    fulltext = replace_greek_characters(fulltext)
+    fulltext = _replace_greek_characters(fulltext)
 
     washing_regex = [
         (re.compile(r" *([,.]) *"), r"\1 "),
@@ -110,30 +123,15 @@ def normalize_fulltext(fulltext):
 
 def cut_references(text_lines):
     """Returns the text lines with the references cut."""
-    try:
-        from invenio.refextract import find_reference_section, \
-            find_end_of_reference_section
-    except ImportError:
-        # Needed for bibclassify to run in standalone mode.
-        try:
-            from refextract import find_reference_section, \
-                find_end_of_reference_section
-        except ImportError, err1:
-            print >> sys.stderr, "Error: %s" % err1
-            sys.exit(1)
-            print >> sys.stderr, ("Impossible to import refextract. Working on "
-                "full document.")
-            return text_lines
-
     ref_sect_start = find_reference_section(text_lines)
     if ref_sect_start is not None:
         start = ref_sect_start["start_line"]
-        end = find_end_of_reference_section(text_lines,
-            start, ref_sect_start["marker"],
-            ref_sect_start["marker_pattern"])
+        end = find_end_of_reference_section(text_lines, start,
+            ref_sect_start["marker"], ref_sect_start["marker_pattern"])
         del text_lines[start:end + 1]
     else:
-        print >> sys.stderr, "No references could be found."
+        write_message("WARNING: No references could be found.",
+            stream=sys.stderr, verbose=2)
         return text_lines
 
     return text_lines
@@ -234,13 +232,14 @@ _GREEK_REPLACEMENTS = {
     u'\u221D' : u' Alpha ',
     }
 
-def replace_greek_characters(line):
+def _replace_greek_characters(line):
     """Replace greek characters in a string."""
     for greek_char, replacement in _GREEK_REPLACEMENTS.iteritems():
         try:
             line = line.replace(greek_char, replacement)
         except UnicodeDecodeError, err1:
-            print err1
+            write_message("WARNING: Unicode decoding error.",
+                stream=sys.stderr, verbose=2)
             return ""
 
     return line

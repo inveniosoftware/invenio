@@ -18,25 +18,22 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Bibclassify keyword extractor command line entry point.
-"""
+BibClassify command-line interface.
 
-__revision__ = "$Id$"
+This modules provides a CLI for BibClassify. It reads the options and calls
+the method output_keywords_for_sources from bibclassify_engine.
+"""
 
 import getopt
 import os
 import sys
-import time
 
 try:
-    from bibclassifylib import get_regular_expressions, \
-        get_keywords_from_text, check_taxonomy
-    from bibclassify_text_extractor import text_lines_from_local_file, \
-        text_lines_from_url, is_pdf
-    from bibclassify_config import CFG_BIBCLASSIFY_USER_AGENT
+    from bibclassify_engine import output_keywords_for_sources
+    from bibclassify_utils import write_message, set_verbose_level
 except ImportError, err:
-    print >> sys.stderr, "Error: %s" % err
-    sys.exit(1)
+    print >> sys.stderr, "Import error: %s" % err
+    sys.exit(0)
 
 # Retrieve the custom configuration if it exists.
 try:
@@ -45,9 +42,21 @@ except ImportError:
     # No local configuration was found.
     pass
 
-_OPTIONS = {}
+def main():
+    """Main function """
+    options = _read_options(sys.argv[1:])
 
-def display_help():
+    output_keywords_for_sources(options["text_files"],
+        options["taxonomy"],
+        rebuild_cache=options["rebuild_cache"],
+        no_cache=options["no_cache"],
+        output_mode=options["output_mode"],
+        output_limit=options["output_limit"],
+        spires=options["spires"],
+        match_mode=options["match_mode"],
+        with_author_keywords=options["with_author_keywords"])
+
+def _display_help():
     """Prints the help message for this module."""
     print >> sys.stdout, """Usage: bibclassify [OPTION]... [FILE/URL]...
   or:  bibclassify [OPTION]... [DIRECTORY]...
@@ -58,9 +67,9 @@ in the directory.
   -h, --help                display this help and exit
   -V, --version             output version information and exit
   -v, --verbose LEVEL       sets the verbose to LEVEL (=0)
-  -k, --skos-taxonomy FILE  sets the FILE to read the RDF/SKOS taxonomy from
-  -K, --vocabulary FILE     sets the FILE to read the controlled vocabulary
-                              from
+  -k, --taxonomy FILE       sets the FILE to read the taxonomy from. It can be
+                              a simple controlled vocabulary file or a
+                              descriptive RDF/SKOS file.
   -o, --output-mode TYPE    changes the output format to TYPE (text, marcxml or
                               html) (=text)
   -s, --spires              outputs keywords in the SPIRES format
@@ -82,67 +91,27 @@ Example:
     $ bibclassify -k HEP.rdf http://arxiv.org/pdf/0808.1825
     $ bibclassify -k HEP.rdf article.pdf
     $ bibclassify -k HEP.rdf directory/"""
-    sys.exit(0)
+    sys.exit(1)
 
-def main():
-    """Main function """
-    read_options(sys.argv[1:])
+def _display_version():
+    """Display BibClassify version and exit."""
+    try:
+        from invenio.config import CFG_VERSION
+        print "\nCDS Invenio/%s bibclassify/%s\n" % (CFG_VERSION, CFG_VERSION)
+    except ImportError:
+        print >> sys.stdout, "CDS Invenio bibclassify/standalone"
+    sys.exit(1)
 
-    # taxonomy check
-    if _OPTIONS["check_taxonomy"]:
-        print >> sys.stdout, ("Checking taxonomy file %s" %
-            _OPTIONS["taxonomy"])
-        check_taxonomy(_OPTIONS["taxonomy"])
-    # End of taxonomy check.
-
-    # Initialize cache
-    get_regular_expressions(taxonomy=_OPTIONS["taxonomy"],
-        vocabulary=_OPTIONS["vocabulary"],
-        rebuild=_OPTIONS["rebuild_cache"], no_cache=_OPTIONS["no_cache"])
-
-    # Get the fulltext for each source.
-    sources = {}
-    for entry in _OPTIONS["text_files"]:
-        text_lines = None
-        if os.path.isdir(entry):
-            for filename in os.listdir(entry):
-                if (os.path.isfile(entry + filename) and
-                    is_pdf(entry + filename)):
-                    text_lines = text_lines_from_local_file(entry + filename)
-                    sources[filename] = text_lines
-        elif os.path.isfile(entry):
-            text_lines = text_lines_from_local_file(entry)
-            sources[os.path.basename(entry)] = text_lines
-        else:
-            # Treat as a URL.
-            text_lines = text_lines_from_url(entry,
-                user_agent=CFG_BIBCLASSIFY_USER_AGENT)
-            sources[entry.split("/")[-1]] = text_lines
-
-    # For each identified source, check the keywords and output them.
-    for source, text_lines in sources.iteritems():
-        if _OPTIONS["output_mode"] == "text":
-            print >> sys.stdout, "Input file: " + source
-        print >> sys.stdout, get_keywords_from_text(text_lines,
-            output_mode=_OPTIONS["output_mode"],
-            output_limit=_OPTIONS["output_limit"],
-            spires=_OPTIONS["spires"],
-            match_mode=_OPTIONS["match_mode"],
-            with_author_keywords=_OPTIONS["with_author_keywords"])
-
-def read_options(options_string):
+def _read_options(options_string):
     """Reads the options, test if the specified values are consistent and
     populates the options dictionary."""
-    global _OPTIONS
-    _OPTIONS = {
+    options = {
         "check_taxonomy": False,
         "spires": False,
         "output_limit": 20,
         "text_files": [],
         "taxonomy": "",
-        "vocabulary": "",
         "output_mode": "text",
-        "verbose": 0,
         "match_mode": "full",
         "output_prefix": None,
         "rebuild_cache": False,
@@ -150,142 +119,108 @@ def read_options(options_string):
         "with_author_keywords": False,
     }
 
-    output_modes = ("html", "text", "marcxml")
-    modes = ("full", "partial")
-
     try:
+        short_flags = "f:k:o:n:m:v:sqhV"
         long_flags = ["taxonomy=", "output-mode=", "verbose=", "spires",
-                      "keywords-number=", "matching-mode=", "help", "version",
-                      "file", "rebuild-cache", "no-limit", "no-cache",
-                      "check-taxonomy", "detect-author-keywords",
-                      "vocabulary="]
-        short_flags = "f:k:t:o:n:m:v:sqhV"
+            "keywords-number=", "matching-mode=", "help", "version", "file",
+            "rebuild-cache", "no-limit", "no-cache", "check-taxonomy",
+            "detect-author-keywords"]
         opts, args = getopt.gnu_getopt(options_string, short_flags, long_flags)
     except getopt.GetoptError, err1:
         print >> sys.stderr, "Options problem: %s" % err1
-        usage()
+        _display_help()
 
-    for opt, arg in opts:
-        if opt in ("-h", "--help"):
-            display_help()
-        elif opt in ("-V", "--version"):
-            try:
-                from invenio.config import CFG_VERSION
-                print >> sys.stdout, ("CDS Invenio/%s bibclassify/%s" %
-                    (CFG_VERSION, CFG_VERSION))
-            except ImportError:
-                print >> sys.stdout, "CDS Invenio bibclassify/standalone"
-            sys.exit(1)
-        elif opt in ("-v", "--verbose"):
-            _OPTIONS["verbose"] = arg
-        elif opt in ("-k", "--taxonomy"):
-            if os.access(arg, os.R_OK):
-                _OPTIONS["taxonomy"] = arg
-            else:
-                try:
-                    from invenio.config import CFG_ETCDIR
-                except ImportError:
-                    # bibclassifylib takes care of error messages.
-                    _OPTIONS["taxonomy"] = arg
-                else:
-                    _OPTIONS["taxonomy"] = CFG_ETCDIR + os.sep + \
-                        'bibclassify' + os.sep + arg
-        elif opt in ("-o", "--output-mode"):
-            _OPTIONS["output_mode"] = arg.lower()
-        elif opt in ("-m", "--matching-mode"):
-            _OPTIONS["match_mode"] = arg.lower()
-        # -q for backward compatibility
-        elif opt in ("-s", "--spires", "-q"):
-            _OPTIONS["spires"] = True
-        elif opt in ("-n", "--nkeywords"):
-            _OPTIONS["output_limit"] = arg
-        elif opt == "--rebuild-cache":
-            _OPTIONS["rebuild_cache"] = True
-        elif opt == "--no-cache":
-            _OPTIONS["no_cache"] = True
-        elif opt == "--write-to-file":
-            _OPTIONS["output_prefix"] = arg
-        # -f for compatibility reasons
-        elif opt in ("-f", "--file"):
-            _OPTIONS["text_files"].append(arg)
-        elif opt == "--check-taxonomy":
-            _OPTIONS["check_taxonomy"] = True
-        elif opt == "--detect-author-keywords":
-            _OPTIONS["with_author_keywords"] = True
-        elif opt in("-t", "--vocabulary"):
-            if os.access(arg, os.R_OK):
-                _OPTIONS["vocabulary"] = arg
-            else:
-                try:
-                    from invenio.config import CFG_ETCDIR
-                except ImportError:
-                    # bibclassifylib takes care of error messages.
-                    _OPTIONS["vocabulary"] = arg
-                else:
-                    _OPTIONS["vocabulary"] = CFG_ETCDIR + os.sep + \
-                        'bibclassify' + os.sep + arg
+    # 2 dictionaries containing the option linked to its destination in the
+    # options dictionary.
+    with_argument = {
+        "-k": "taxonomy",
+        "--taxonomy": "taxonomy",
+        "-o": "output_mode",
+        "--output-mode": "output_mode",
+        "-m": "match_mode",
+        "--matching-mode": "match_mode",
+        "-n": "output_limit",
+        "--nkeywords": "output_limit",
+    }
 
-    if not opts and not args:
-        display_help()
+    without_argument = {
+        "-s": "spires",
+        "--spires": "spires",
+        "-q": "spires",
+        "--rebuild-cache": "rebuild_cache",
+        "--no-cache": "no_cache",
+        "--check-taxonomy": "check_taxonomy",
+        "--detect-author-keywords": "with_author_keywords",
+    }
 
-    _OPTIONS["text_files"] += args
+    for option, argument in opts:
+        if option in ("-h", "--help"):
+            _display_help()
+        elif option in ("-V", "--version"):
+            _display_version()
+        elif option in ("-v", "--verbose"):
+            set_verbose_level(argument)
+        elif option in ("-f", "--file"):
+            options["text_files"].append(argument)
+        elif option in with_argument:
+            options[with_argument[option]] = argument
+        elif option in without_argument:
+            options[without_argument[option]] = True
+        else:
+            # This shouldn't happen as gnu_getopt should already handle
+            # that case.
+            write_message("ERROR: option unrecognized -- %s" % option,
+                stream=sys.stderr, verbose=1)
+
+    # Collect the text inputs.
+    options["text_files"] = args
 
     # Test if the options are consistent.
+    # No file input. Checking the taxonomy or using old-style text
+    # input?
     if not args:
-        if not _OPTIONS["check_taxonomy"] and not _OPTIONS["text_files"]:
-            print >> sys.stderr, "ERROR: please specify a file or directory."
-            usage()
-    if not (_OPTIONS["taxonomy"] or _OPTIONS["vocabulary"]):
-        print >> sys.stderr, "ERROR: please specify a taxonomy file (-k)."
-        usage()
-    if _OPTIONS["output_mode"] not in output_modes:
-        print >> sys.stderr, ("ERROR: output (-o) should be TEXT, MARCXML or "
-            "HTML.")
-        usage()
-    if _OPTIONS["match_mode"] not in modes:
-        print >> sys.stderr, "ERROR: mode (-m) should be FULL or PARTIAL."
-        usage()
-    if _OPTIONS["taxonomy"] and _OPTIONS["vocabulary"]:
-        print >> sys.stderr, ("ERROR: bibclassify doesn't support both a "
-            "taxonomy file and a vocabulary file.")
-        usage()
+        if not options["check_taxonomy"] and not options["text_files"]:
+            write_message("ERROR: please specify a file or directory.",
+                stream=sys.stderr, verbose=0)
+            sys.exit(0)
+    # No taxonomy input.
+    elif not options["taxonomy"]:
+        write_message("ERROR: please specify a taxonomy file.",
+            stream=sys.stderr, verbose=0)
+        sys.exit(0)
+    # Output mode is correct?
+    elif options["output_mode"] not in ("html", "text", "marcxml"):
+        write_message("ERROR: output (-o) should be TEXT, MARCXML or HTML.",
+            stream=sys.stderr, verbose=0)
+        sys.exit(0)
+    # Match mode is correct?
+    elif options["match_mode"] not in ("full", "partial"):
+        write_message("ERROR: mode (-m) should be FULL or PARTIAL.",
+            stream=sys.stderr, verbose=0)
+        sys.exit(0)
+    # Output limit is correct?
     try:
-        _OPTIONS["output_limit"] = int(_OPTIONS["output_limit"])
-        if _OPTIONS["output_limit"] < 0:
-            print >> sys.stderr, ("ERROR: output limit must be a positive "
-                "integer.")
+        options["output_limit"] = int(options["output_limit"])
+        if options["output_limit"] < 0:
+            write_message("ERROR: output limit must be a positive integer.",
+                stream=sys.stderr, verbose=0)
+            sys.exit(0)
     except ValueError:
-        print >> sys.stderr, ("ERROR: output limit must be a positive "
-            "integer.")
-        usage()
-
-def usage():
-    """Displays usage (single line) and exit."""
-    # TODO: write usage
-    display_help()
-    sys.exit(1)
-
-def version():
-    """Display BibClassify version and exit."""
-    # TODO
-    display_help()
-    sys.exit(0)
-
-def write_message(msg, stream=sys.stdout, verbose=1):
-    """Write message and flush output stream (may be sys.stdout or sys.stderr).
-    Useful for debugging stuff. Copied from bibtask.py."""
-    if msg and _OPTIONS["verbose"] >= verbose:
-        if stream == sys.stdout or stream == sys.stderr:
-            stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ",
-                                       time.localtime()))
-            try:
-                stream.write("%s\n" % msg)
-            except UnicodeEncodeError:
-                stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
-                stream.flush()
+        write_message("ERROR: output limit must be a positive integer.",
+            stream=sys.stderr, verbose=0)
+        sys.exit(0)
+    # Ontology file is accessible?
+    if not os.access(options["taxonomy"], os.R_OK):
+        try:
+            from invenio.config import CFG_ETCDIR
+        except ImportError:
+            write_message("ERROR: The ontology file could not be accesssed.")
+            sys.exit(0)
         else:
-            sys.stderr.write("Unknown stream %s. [must be sys.stdout or "
-                             "sys.stderr]\n" % stream)
+            options["taxonomy"] = os.path.join(CFG_ETCDIR, 'bibclassify',
+                options["taxonomy"])
+
+    return options
 
 if __name__ == '__main__':
     main()

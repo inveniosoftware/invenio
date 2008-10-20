@@ -18,18 +18,22 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Bibclassify keyword analysing methods.
+BibClassify keyword analyser.
+
+This module contains methods to extract keywords from texts. It provides 3
+different methods for 3 different types of keywords: single keywords, composite
+keywords and author keywords.
 """
 
-__revision__ = "$Id$"
-
 import sys
+import time
 
 try:
     from bibclassify_config import CFG_BIBCLASSIFY_VALID_SEPARATORS, \
         CFG_BIBCLASSIFY_AUTHOR_KW_START, \
         CFG_BIBCLASSIFY_AUTHOR_KW_END, \
         CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION
+    from bibclassify_utils import write_message
 except ImportError, err:
     print >> sys.stderr, "Error: %s" % err
     sys.exit(1)
@@ -44,35 +48,56 @@ except ImportError:
 _MAXIMUM_SEPARATOR_LENGTH = max([len(_separator)
     for _separator in CFG_BIBCLASSIFY_VALID_SEPARATORS])
 
-def _get_ckw_span(fulltext, spans):
-    """Returns the span of the composite keyword if it is valid. Returns
-    None otherwise."""
-    if spans[0] < spans[1]:
-        words = (spans[0], spans[1])
-        dist = spans[1][0] - spans[0][1]
-    else:
-        words = (spans[1], spans[0])
-        dist = spans[0][0] - spans[1][1]
+def get_single_keywords(skw_db, fulltext):
+    """Returns a dictionary of single keywords bound with the positions
+    of the matches in the fulltext.
+    Format of the output dictionary is (subject: positions)."""
+    timer_start = time.clock()
 
-    if dist == 0:
-        # Two keywords are adjacent. We have a match.
-        return (min(words[0] + words[1]), max(words[0] + words[1]))
-    elif dist <= _MAXIMUM_SEPARATOR_LENGTH:
-        separator = fulltext[words[0][1]:words[1][0] + 1]
-        # Check the separator.
-        if separator.strip() in CFG_BIBCLASSIFY_VALID_SEPARATORS:
-            return (min(words[0] + words[1]), max(words[0] + words[1]))
+    # Matched span -> subject
+    records = []
 
-    # There is no inclusion.
-    return None
+    for subject, single_keyword in skw_db.iteritems():
+        for regex in single_keyword.regex:
+            for match in regex.finditer(fulltext):
+                # Modify the right index to put it on the last letter
+                # of the word.
+                span = (match.span()[0], match.span()[1] - 1)
+
+                # Remove the previous records contained by this span
+                records = [record for record in records
+                                  if not _contains_span(span, record[0])]
+
+                add = True
+                for previous_record in records:
+                    if ((span, subject) == previous_record or
+                        _contains_span(previous_record[0], span)):
+                        # Match is contained by a previous match.
+                        add = False
+                        break
+
+                if add:
+                    records.append((span, subject))
+
+    # List of single_keywords: {spans: subject}
+    single_keywords = {}
+    for span, subject in records:
+        single_keywords.setdefault(subject, []).append(span)
+
+    write_message("INFO: Matching single keywords... %d keywords found in "
+        "%.1f sec." % (len(single_keywords), time.clock() - timer_start),
+        stream=sys.stderr, verbose=3)
+
+    return single_keywords
 
 def get_composite_keywords(ckw_db, fulltext, skw_spans):
     """Returns a list of composite keywords bound with the number of
     occurrences found in the text string.
     Format of the output list is (subject, count, component counts)."""
+    timer_start = time.clock()
+
     # Build the list of composite candidates
     ckw_list = []
-
     skw_as_components = []
 
     for subject, composite in ckw_db.iteritems():
@@ -148,14 +173,22 @@ def get_composite_keywords(ckw_db, fulltext, skw_spans):
         except KeyError:
             pass
 
+    write_message("INFO: Matching composite keywords... %d keywords found in "
+        "%.1f sec." % (len(ckw_list), time.clock() - timer_start),
+        stream=sys.stderr, verbose=3)
+
     return ckw_list
 
 def get_author_keywords(fulltext):
     """Finds out human defined keyowrds in a text string. Searches for
     the string "Keywords:" and its declinations and matches the
     following words."""
+    timer_start = time.clock()
+
     split_string = CFG_BIBCLASSIFY_AUTHOR_KW_START.split(fulltext, 1)
     if len(split_string) == 1:
+        write_message("INFO: Matching author keywords... No keywords found.",
+        stream=sys.stderr, verbose=3)
         return []
 
     kw_string = split_string[1]
@@ -165,7 +198,35 @@ def get_author_keywords(fulltext):
         kw_string = parts[0]
 
     # We separate the keywords.
-    return CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION.split(kw_string)
+    author_keywords = CFG_BIBCLASSIFY_AUTHOR_KW_SEPARATION.split(kw_string)
+
+    write_message("INFO: Matching author keywords... %d keywords found in "
+        "%.1f sec." % (len(author_keywords), time.clock() - timer_start),
+        stream=sys.stderr, verbose=3)
+
+    return author_keywords
+
+def _get_ckw_span(fulltext, spans):
+    """Returns the span of the composite keyword if it is valid. Returns
+    None otherwise."""
+    if spans[0] < spans[1]:
+        words = (spans[0], spans[1])
+        dist = spans[1][0] - spans[0][1]
+    else:
+        words = (spans[1], spans[0])
+        dist = spans[0][0] - spans[1][1]
+
+    if dist == 0:
+        # Two keywords are adjacent. We have a match.
+        return (min(words[0] + words[1]), max(words[0] + words[1]))
+    elif dist <= _MAXIMUM_SEPARATOR_LENGTH:
+        separator = fulltext[words[0][1]:words[1][0] + 1]
+        # Check the separator.
+        if separator.strip() in CFG_BIBCLASSIFY_VALID_SEPARATORS:
+            return (min(words[0] + words[1]), max(words[0] + words[1]))
+
+    # There is no inclusion.
+    return None
 
 def _contains_span(span0, span1):
     """Return true if span0 contains span1, False otherwise."""
@@ -174,38 +235,3 @@ def _contains_span(span0, span1):
         span0[1] < span1[1]):
         return False
     return True
-
-def get_single_keywords(skw_db, fulltext):
-    """Returns a dictionary of single keywords bound with the positions
-    of the matches in the fulltext.
-    Format of the output dictionary is (subject: positions)."""
-    # Matched span -> subject
-    records = []
-
-    for subject, single_keyword in skw_db.iteritems():
-        for regex in single_keyword.regex:
-            for match in regex.finditer(fulltext):
-                # Modify the right index to put it on the last letter
-                # of the word.
-                span = (match.span()[0], match.span()[1] - 1)
-
-                # Remove the previous records contained by this span
-                records = [record for record in records
-                                  if not _contains_span(span, record[0])]
-
-                add = True
-                for previous_record in records:
-                    if ((span, subject) == previous_record or
-                        _contains_span(previous_record[0], span)):
-                        # Match is contained by a previous match.
-                        add = False
-                        break
-
-                if add:
-                    records.append((span, subject))
-
-    # List of single_keywords: {spans: subject}
-    single_keywords = {}
-    for span, subject in records:
-        single_keywords.setdefault(subject, []).append(span)
-    return single_keywords

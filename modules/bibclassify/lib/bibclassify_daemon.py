@@ -25,8 +25,6 @@ FIXME: the code below requires collection table to be updated to add column:
 This is not clean and should be fixed.
 """
 
-__revision__ = "$Id$"
-
 import sys
 import time
 import os
@@ -35,7 +33,7 @@ from invenio.dbquery import run_sql
 from invenio.bibtask import task_init, write_message, get_datetime, \
     task_set_option, task_get_option, task_update_status, \
     task_update_progress
-from invenio.bibclassifylib import generate_keywords_rdf
+from invenio.bibclassify_engine import get_keywords_from_text
 from invenio.config import CFG_BINDIR, CFG_ETCDIR, CFG_TMPDIR, CFG_PATH_PDFTOTEXT
 from invenio.intbitset import intbitset
 from invenio.search_engine import get_collection_reclist
@@ -133,9 +131,14 @@ def analyse_documents(recs, ontology, collection, outfilename, outfiledesc):
                     if errcode != 0 or not os.path.exists("%s" % temp_text):
                         write_message("Error while executing command %s Error code was: %s " % (cmd, errcode))
                     write_message('Generating keywords for %s' % f.get_full_path())
-                    print >> outfiledesc, generate_keywords_rdf(temp_text, CFG_ETCDIR + '/bibclassify/' + ontology + '.rdf', 2, 70, 25, 0, False, verbose=0, ontology=ontology)
+
+def get_keywords_from_text(text_lines, output_mode="text",
+    output_limit=CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, spires=False,
+    match_mode="full", no_cache=False, with_author_keywords=False):
+
+                    print >> outfiledesc, get_keywords_from_text(temp_text, CFG_ETCDIR + '/bibclassify/' + ontology + '.rdf', 2, 70, 25, 0, False, verbose=0, ontology=ontology)
                 print >> outfiledesc, '</record>'
-            task_update_progress("Done %s of %s for collction  %s." % (counter, amax, collection))
+            task_update_progress("Done %s of %s for collection  %s." % (counter, amax, collection))
             counter += 1
     else:
         write_message("Nothing to be done, move along")
@@ -154,7 +157,7 @@ def main():
               description="""Examples:
         %s -u admin
 """ % (sys.argv[0],),
-              version=__revision__,
+              version="",
               task_run_fnc = task_run_core)
 
 if __name__ == '__main__':

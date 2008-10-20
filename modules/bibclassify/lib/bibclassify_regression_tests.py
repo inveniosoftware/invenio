@@ -21,8 +21,6 @@
 
 """BibClassify Regression Test Suite."""
 
-__revision__ = "$Id$"
-
 import unittest
 
 from invenio.config import CFG_SITE_URL
