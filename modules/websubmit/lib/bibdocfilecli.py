@@ -57,6 +57,7 @@ def _xml_fft_creator(fft):
     out += _xml_mksubfield('comment', 'z', fft)
     out += _xml_mksubfield('restriction', 'r', fft)
     out += _xml_mksubfield('icon', 'x', fft)
+    out += _xml_mksubfield('options', 'o', fft)
     out += '\t</datafield>\n'
     return out
 
@@ -73,35 +74,6 @@ def ffts_to_xml(ffts):
                 out += _xml_fft_creator(fft)
             out += '</record>\n'
     return out
-
-def get_usage():
-    """Return a nicely formatted string for printing the help of bibdocadmin"""
-    return """usage: %prog <query> <action> [options]
-  <query>: --pattern <pattern>, --collection <collection>, --recid <recid>,
-           --recid2 <recid>, --docid <docid>, --all
-           --docid2 <docid>, --docname <docname>,
- <action>: --get-info, --get-stats, --get-usage, --get-docnames
-           --get-docids, --get-recids, --get-doctypes, --get-revisions,
-           --get-last-revisions, --get-formats, --get-comments,
-           --get-descriptions, --get-restrictions, --get-icons,
-           --get-history,
-           --delete, --undelete, --purge, --expunge, --revert <revision>,
-           --check-md5, --update-md5,
-           --set-doctype <doctype>, --set-docname <docname>,
-           --set-comment <comment>, --set-description <description>,
-           --set-restriction <tag>, --set-icon <path>,
-           --append <path>, --revise <path>,
-[options]: --with-stamp-template <template>, --with-stamp-parameters <parameters>,
-           --verbose <level>, --force, --interactive, --with-icon-size <size>,
-           --with-related-formats
-With <query> you select the range of record/docnames/single files to work on.
-Note that some actions e.g. delete, append, revise etc. works at the docname
-level, while others like --set-comment, --set-description, at single file level
-and other can be applied in an iterative way to many records in a single run.
-
-Note that specifying docid(2) takes precedence over recid(2) which in turns
-takes precedence over pattern/collection search.
-"""
 
 _actions = [('get-info', 'print all the informations about the record/bibdoc/file structure'),
             #'get-stats',
@@ -139,6 +111,7 @@ _actions_with_parameter = {
     #'set-restriction' : 'restriction',
     'append' : ('append_path', 'specify the URL/path of the file that will appended to the bibdoc'),
     'revise' : ('revise_path', 'specify the URL/path of the file that will revise the bibdoc'),
+    'revise_hide_previous' : ('revise_hide_path', 'specify the URL/path of the file that will revise the bibdoc, previous revisions will be hidden'),
     'merge-into' : ('into_docname', 'merge the docname speficied --docname into_docname'),
 }
 
@@ -326,7 +299,7 @@ def cli_append(recid=None, docid=None, docname=None, doctype=None, url=None, for
     ffts = {recid : [fft]}
     return bibupload_ffts(ffts, append=True)
 
-def cli_revise(recid=None, docid=None, docname=None, new_docname=None, doctype=None, url=None, format=None, icon=None, description=None, comment=None, restriction=None):
+def cli_revise(recid=None, docid=None, docname=None, new_docname=None, doctype=None, url=None, format=None, icon=None, description=None, comment=None, restriction=None, hide_previous=False):
     """Create a bibupload FFT task submission for appending a format."""
     if docid is not None:
         bibdoc = BibDoc(docid)
@@ -382,6 +355,8 @@ def cli_revise(recid=None, docid=None, docname=None, new_docname=None, doctype=N
         'restriction' : restriction,
         'doctype' : doctype
     }
+    if hide_previous:
+        fft['options'] = 'HIDE_PREVIOUS'
     ffts = {recid : [fft]}
     return bibupload_ffts(ffts, append=False)
 
@@ -643,6 +618,13 @@ def main():
                 res = cli_revise(options.recid, options.docid, options.docname,
                 options.newdocname, options.doctype, options.revise_path, options.format,
                 options.icon, options.description, options.comment, options.restriction)
+                if not res:
+                    sys.exit(1)
+        elif options.revise_hide_path:
+            if cli_assert_recid(options):
+                res = cli_revise(options.recid, options.docid, options.docname,
+                options.newdocname, options.doctype, options.revise_path, options.format,
+                options.icon, options.description, options.comment, options.restriction, True)
                 if not res:
                     sys.exit(1)
         elif options.into_docname:
