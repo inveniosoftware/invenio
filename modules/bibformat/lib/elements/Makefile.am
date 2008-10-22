@@ -39,4 +39,4 @@ tmp_DATA = test_1.py bfe_test_2.py bfe_test_4.py test3.py test_5.py \
 
 EXTRA_DIST = $(pylib_DATA) $(tmp_DATA)
 
-CLEANFILES = *~ *.tmp
+CLEANFILES = *~ *.tmp *.pyc

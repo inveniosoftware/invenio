@@ -23,4 +23,4 @@ webapp_DATA = webjournaladmin.py
 
 EXTRA_DIST = webjournaladmin.py
 
-CLEANFILES = *~ *.tmp
+CLEANFILES = *~ *.tmp *.pyc

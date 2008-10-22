@@ -40,4 +40,4 @@ test_DATA = test.pdf \
 
 EXTRA_DIST = $(doc_DATA) $(test_DATA)
 
-CLEANFILES = *~ *.tmp
+CLEANFILES = *~ *.tmp *.pyc
