@@ -322,7 +322,7 @@ def interface(req,
 
     # Save the form fields entered in the previous submission page
     # If the form was sent with the GET method
-    form = req.form
+    form = dict(req.form)
     value = ""
     # we parse all the form variables
     for key, formfields in form.items():
