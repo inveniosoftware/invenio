@@ -182,8 +182,8 @@ class WebSearchTestLegacyURLs(unittest.TestCase):
 
         # /search.py is redirected on /search
         # Note that `as' is a reserved word in Python 2.5
-        check(make_url('/search.py', p='nuclear') + 'as=1',
-              make_url('/search', p='nuclear') + 'as=1')
+        check(make_url('/search.py', p='nuclear', ln='en') + 'as=1',
+              make_url('/search', p='nuclear', ln='en') + 'as=1')
 
         # direct recid searches are redirected to /record
         check(make_url('/search.py', recid=1, ln='es'),
@@ -502,7 +502,7 @@ class WebSearchTestSearch(unittest.TestCase):
 
         # the target query should be the current query without any c
         # or cc specified.
-        for f in ('cc', 'c', 'action_search', 'ln'):
+        for f in ('cc', 'c', 'action_search'):
             if f in current_q:
                 del current_q[f]
 
@@ -565,7 +565,8 @@ class WebSearchTestSearch(unittest.TestCase):
 
         self.failUnlessEqual(q, {'cc': ['ISOLDE'],
                                  'p': ['tandem'],
-                                 'f': ['title']})
+                                 'f': ['title'],
+                                 'ln': ['en']})
 
     def test_switch_to_advanced_search(self):
         """ websearch - switch to advanced search """
@@ -585,7 +586,8 @@ class WebSearchTestSearch(unittest.TestCase):
         self.failUnlessEqual(q, {'cc': ['ISOLDE'],
                                  'p1': ['tandem'],
                                  'f1': ['title'],
-                                 'as': ['1']})
+                                 'as': ['1'],
+                                 'ln' : ['en']})
 
     def test_no_boolean_hits(self):
         """ websearch - check the 'no boolean hits' proposed links """
@@ -606,8 +608,6 @@ class WebSearchTestSearch(unittest.TestCase):
         for bsu in ('quasinormal', 'muon'):
             l = browser.find_link(text=bsu)
             q['p'] = bsu
-            if 'ln' in q:
-                del q['ln']
 
             if not same_urls_p(l.url, make_url('/search', **q)):
                 self.fail(repr((l.url, make_url('/search', **q))))
@@ -626,7 +626,8 @@ class WebSearchTestSearch(unittest.TestCase):
         l = browser.find_link(text="Ellis, R S")
         self.failUnless(same_urls_p(l.url, make_url('/search',
                                                     p="Ellis, R S",
-                                                    f='author')))
+                                                    f='author',
+                                                    ln='en')))
 
 class WebSearchNearestTermsTest(unittest.TestCase):
     """Check various alternatives of searches leading to the nearest
@@ -643,7 +644,7 @@ class WebSearchNearestTermsTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellisz',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=embed",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=embed",
                                                expected_link_label='embed'))
 
     def test_nearest_terms_box_in_unsuccessful_structured_query(self):
@@ -651,12 +652,12 @@ class WebSearchNearestTermsTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=ellisz&f=author',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=fabbro&f=author",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=fabbro&f=author",
                                                expected_link_label='fabbro'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=author%3Aellisz',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=author%3Afabbro",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=author%3Afabbro",
                                                expected_link_label='fabbro'))
 
     def test_nearest_terms_box_in_unsuccessful_phrase_query(self):
@@ -664,12 +665,12 @@ class WebSearchNearestTermsTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=author%3A%22Ellis%2C+Z%22',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=author%3A%22Enqvist%2C+K%22",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=author%3A%22Enqvist%2C+K%22",
                                                expected_link_label='Enqvist, K'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=%22ellisz%22&f=author',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=%22Enqvist%2C+K%22&f=author",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=%22Enqvist%2C+K%22&f=author",
                                                expected_link_label='Enqvist, K'))
 
     def test_nearest_terms_box_in_unsuccessful_boolean_query(self):
@@ -677,22 +678,22 @@ class WebSearchNearestTermsTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aellisz+author%3Aellisz',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergi+author%3Aellisz",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aellisz",
                                                expected_link_label='energi'))
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aenergi+author%3Aenergie',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergi+author%3Aenqvist",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aenqvist",
                                                expected_link_label='enqvist'))
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aellisz+author%3Aellisz&f=keyword',
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=title%3Aellisz+author%3Aellisz&f=keyword',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergi+author%3Aellisz&f=keyword",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aellisz&f=keyword",
                                                expected_link_label='energi'))
         self.assertEqual([],
-                         test_web_page_content(CFG_SITE_URL + '/search?p=title%3Aenergi+author%3Aenergie&f=keyword',
+                         test_web_page_content(CFG_SITE_URL + '/search?ln=en&p=title%3Aenergi+author%3Aenergie&f=keyword',
                                                expected_text="Nearest terms in any collection are",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=title%3Aenergi+author%3Aenqvist&f=keyword",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=title%3Aenergi+author%3Aenqvist&f=keyword",
                                                expected_link_label='enqvist'))
 
 class WebSearchBooleanQueryTest(unittest.TestCase):
@@ -719,13 +720,13 @@ class WebSearchAuthorQueryTest(unittest.TestCase):
         self.assertEqual([],
                          test_web_page_content(CFG_SITE_URL + '/search?p=Ellis%2C+R&f=author',
                                                expected_text="See also: similar author names",
-                                               expected_link_target=CFG_SITE_URL+"/search?p=Ellis%2C+R+K&f=author",
+                                               expected_link_target=CFG_SITE_URL+"/search?ln=en&p=Ellis%2C+R+K&f=author",
                                                expected_link_label="Ellis, R K"))
 
     def test_do_not_propose_similar_author_names_box(self):
         """ websearch - do not propose similar author names box """
         errmsgs = test_web_page_content(CFG_SITE_URL + '/search?p=author%3A%22Ellis%2C+R%22',
-                                        expected_link_target=CFG_SITE_URL+"/search?p=Ellis%2C+R+K&f=author",
+                                        expected_link_target=CFG_SITE_URL+"/search?ln=en&p=Ellis%2C+R+K&f=author",
                                         expected_link_label="Ellis, R K")
         if errmsgs[0].find("does not contain link to") > -1:
             pass
@@ -1292,7 +1293,7 @@ class WebSearchSummarizerTest(unittest.TestCase):
     def test_most_popular_field_values_singletag(self):
         """websearch - most popular field values, simple tag"""
         from invenio.search_engine import get_most_popular_field_values
-        self.assertEqual((('PREPRINT', 36), ('ARTICLE', 27), ('BOOK', 14), ('THESIS', 8), ('PICTURE', 6), ('POETRY', 2), ('REPORT', 2)),
+        self.assertEqual((('PREPRINT', 36), ('ARTICLE', 27), ('BOOK', 14), ('THESIS', 8), ('PICTURE', 7), ('POETRY', 2), ('REPORT', 2)),
                          get_most_popular_field_values(range(0,100), '980__a'))
 
     def test_most_popular_field_values_singletag_multiexclusion(self):

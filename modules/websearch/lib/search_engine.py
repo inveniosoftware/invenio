@@ -72,6 +72,7 @@ from invenio.webinterface_handler import wash_urlargd
 from invenio.urlutils import make_canonical_urlargd
 from invenio.dbquery import DatabaseError
 from invenio.access_control_engine import acc_authorize_action
+from invenio.errorlib import register_exception
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -1923,7 +1924,7 @@ def search_unit_in_idxphrases(phrase, f):
         if len(phrases) > 0:
             phrase = phrases[0]
 
-        res = run_sql("SELECT term,hitlist FROM %s WHERE term=%%s" % idxphraseX,
+        res = run_sql("SELECT term,hitlist FROM %s WHERE term LIKE %%s" % idxphraseX,
                         (phrase,))
     # fill the result set:
     for word, hitlist in res:
@@ -2183,13 +2184,18 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
     nearest_terms = []
     if not p: # sanity check
         p = "."
+    index_id = get_index_id_from_field(f)
     # look for nearest terms:
     if t == 'w':
         nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)
         if not nearest_terms:
             return "%s %s." % (_("No words index available for"), cgi.escape(get_field_i18nname(get_field_name(f), ln)))
     else:
-        nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
+        nearest_terms = []
+        if index_id:
+            nearest_terms = get_nearest_terms_in_idxphrase(p, index_id, n, n)
+        if not nearest_terms:
+            nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
         if not nearest_terms:
             return "%s %s." % (_("No phrase index available for"), cgi.escape(get_field_i18nname(get_field_name(f), ln)))
 
@@ -2198,7 +2204,10 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
         if t == 'w':
             hits = get_nbhits_in_bibwords(term, f)
         else:
-            hits = get_nbhits_in_bibxxx(term, f)
+            if index_id:
+                hits = get_nbhits_in_idxphrases(term, f)
+            else:
+                hits = get_nbhits_in_bibxxx(term, f)
 
         argd = {}
         argd.update(urlargd)
@@ -2385,6 +2394,24 @@ def get_nbhits_in_bibwords(word, f):
             return 0
     if word:
         res = run_sql("SELECT hitlist FROM %s WHERE term=%%s" % bibwordsX,
+                      (word,))
+        for hitlist in res:
+            out += len(HitSet(hitlist[0]))
+    return out
+
+def get_nbhits_in_idxphrases(word, f):
+    """Return number of hits for word 'word' inside phrase index for field 'f'."""
+    out = 0
+    # deduce into which bibwordsX table we will search:
+    idxphraseX = "idxPHRASE%02dF" % get_index_id_from_field("anyfield")
+    if f:
+        index_id = get_index_id_from_field(f)
+        if index_id:
+            idxphraseX = "idxPHRASE%02dF" % index_id
+        else:
+            return 0
+    if word:
+        res = run_sql("SELECT hitlist FROM %s WHERE term=%%s" % idxphraseX,
                       (word,))
         for hitlist in res:
             out += len(HitSet(hitlist[0]))
@@ -3821,7 +3848,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
         title, description, keywords = \
                websearch_templates.tmpl_record_page_header_content(req, recid, ln)
 
-        if not req.header_only:
+        if req is not None and not req.header_only:
             page_start(req, of, cc, as, ln, uid, title, description, keywords, recid, tab)
         # Default format is hb but we are in detailed -> change 'of'
         if of == "hb":
@@ -3863,6 +3890,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             else:
                 browse_pattern(req, colls_to_search, p, f, rg, ln)
         except:
+            register_exception(req=req, alert_admin=True)
             if of.startswith("h"):
                 req.write(create_error_box(req, verbose=verbose, ln=ln))
             elif of.startswith("x"):
@@ -4021,6 +4049,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                         if of.startswith("h"):
                             print_warning(req, "Invalid set operation %s." % cgi.escape(op2), "Error")
             except:
+                register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
@@ -4035,6 +4064,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             try:
                 results_in_any_collection = search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln)
             except:
+                register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
@@ -4062,6 +4092,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
         try:
             results_final = intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, ap, of, verbose, ln)
         except:
+            register_exception(req=req, alert_admin=True)
             if of.startswith("h"):
                 req.write(create_error_box(req, verbose=verbose, ln=ln))
                 perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
@@ -4089,6 +4120,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                                                                         "discarding this condition..."),
                                                               of=of)
             except:
+                register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
@@ -4113,6 +4145,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                                                                        "discarding this condition..."),
                                                               of=of)
             except:
+                register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
