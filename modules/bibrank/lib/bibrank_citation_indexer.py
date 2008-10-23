@@ -89,9 +89,15 @@ def get_citation_weight(rank_method_code, config):
         result_intermediate = last_updated_result(rank_method_code)
 
         #result_intermed should be warranted to exists!
+        #but if the user entered a "-R" (do all) option, we need to
+        #make an empty start set
+        if task_get_option("quick") == "no":
+            result_intermediate = [{}, {}, {}]
+
         citation_weight_dic_intermediate = result_intermediate[0]
         citation_list_intermediate = result_intermediate[1]
         reference_list_intermediate = result_intermediate[2]
+
         #call the procedure that does the hard work by reading fields of
         #citations and references in the updated_recid's (but nothing else)!
         if task_get_task_param('verbose') >= 9:
@@ -752,7 +758,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                         if not recid in citation_list[thisrecid]:
                             result[thisrecid] += 1
                             citation_list[thisrecid].append(recid)
-                        if not rec_id in reference_list[recid]:
+                        if not thisrecid in reference_list[recid]:
                             reference_list[recid].append(thisrecid)
 
     mesg = "d_report_numbers done fully"
@@ -787,7 +793,7 @@ def ref_analyzer(citation_informations, initialresult, initial_citationlist,
                 if not rec_id in citation_list[thisrecid]:
                     result[recid] += 1
                     citation_list[recid].append(rec_id)
-                if not recid in reference_list[rec_id]:
+                if not thisrecid in reference_list[rec_id]:
                     reference_list[rec_id].append(thisrecid)
 
     mesg = "d_records_s done fully"
