@@ -29,14 +29,16 @@ try:
     import sys
     import re
     import getopt
+    import getpass
     import time
+    import base64
 except ImportError, e:
     print "Error: %s" % e
     import sys
     sys.exit(1)
 
 try:
-    from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_VERSION, CFG_SITE_NAME
+    from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_VERSION
 except ImportError, e:
     print "Error: %s" % e
     import sys
@@ -49,6 +51,7 @@ http_response_status_code = {
     "100" : "Continue",
     "200" : "OK",
     "302" : "Redirect",
+    "401" : "Authentication Required",
     "403" : "Forbidden",
     "404" : "Not Found",
     "500" : "Error",
@@ -68,28 +71,13 @@ def http_param_resume(http_param_dict, resumptionToken):
 def http_request_parameters(http_param_dict, method="POST"):
     "Assembly http request parameters for http method used"
 
-    params = ""
-
-    if method == "GET":
-        for key in http_param_dict.keys():
-            if params:
-                params = "%s&" % (params)
-            if key:
-                params = "%s%s=%s" % (params, key, http_param_dict[key])
-
-    elif method == "POST":
-        http_param = {}
-        for key in http_param_dict.keys():
-            if http_param_dict[key]:
-                http_param[key] = http_param_dict[key]
-        params = urllib.urlencode(http_param)
-
-    return params
+    return urllib.urlencode(http_param_dict)
 
 def OAI_Session(server, script, http_param_dict , method="POST", output="",
-        stylesheet="", resume_request_nbr=0):
+                resume_request_nbr=0, secure=False, user=None, password=None,
+                cert_file=None, key_file=None):
     """Handle one OAI session (1 request, which might lead
-    to multiple answers)
+    to multiple answers because of resumption tokens)
 
     If output filepath is given, each answer of the oai repository is saved
     in corresponding filepath, with a unique number appended at the end.
@@ -104,7 +92,8 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
         http_request_parameters(http_param_dict)))
 
     a = OAI_Request(server, script,
-        http_request_parameters(http_param_dict, method), method)
+                    http_request_parameters(http_param_dict, method), method,
+                    secure, user, password, cert_file, key_file)
 
     rt_obj = re.search('<resumptionToken.*>(.+)</resumptionToken>',
         a, re.DOTALL)
@@ -132,7 +121,8 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
         http_param_dict = http_param_resume(http_param_dict, rt_obj.group(1))
 
         a = OAI_Request(server, script,
-            http_request_parameters(http_param_dict, method), method)
+                        http_request_parameters(http_param_dict, method), method,
+                        secure, user, password, cert_file, key_file)
 
         rt_obj = re.search('<resumptionToken.*>(.+)</resumptionToken>',
             a, re.DOTALL)
@@ -152,7 +142,8 @@ def OAI_Session(server, script, http_param_dict , method="POST", output="",
     return i
 
 def harvest(server, script, http_param_dict , method="POST", output="",
-        stylesheet="", sets=[]):
+            sets=None, secure=False, user=None, password=None,
+            cert_file=None, key_file=None):
     """
     Handle multiple OAI sessions (multiple requests, which might lead to
     multiple answers).
@@ -160,18 +151,71 @@ def harvest(server, script, http_param_dict , method="POST", output="",
     Needed for harvesting multiple sets in one row.
 
     Returns the number of files created by the harvesting
+
+        Parameters:
+
+         server - *str* the server URL to harvest
+                  eg: cdsweb.cern.ch
+
+         script - *str* path to the OAI script on the server to harvest
+                  eg: /oai2d
+
+http_param_dict - *dict* the URL parameters to send to the OAI script
+                  eg: {'verb':'ListRecords', 'from'='2004-04-01'}
+                  EXCLUDING the setSpec parameters. See 'sets'
+                  parameter below.
+
+         method - *str* if we harvest using POST or GET
+                  eg: POST
+
+         output - *str* the path (and base name) where results are
+                  saved. To handle multiple answers (for eg. triggered
+                  by multiple sets harvesting or OAI resumption
+                  tokens), this base name is suffixed with a sequence
+                  number. Eg output='/tmp/z.xml' ->
+                  '/tmp/z.xml.0000000', '/tmp/z.xml.0000001', etc.
+                  If file at given path already exists, it is
+                  overwritten.
+                  When this parameter is left empty, the results are
+                  returned on the standard output.
+
+           sets - *list* the sets to harvest. Since this function
+                  offers multiple sets harvesting in one row, the OAI
+                  'setSpec' cannot be defined in the 'http_param_dict'
+                  dict where other OAI parameters are.
+
+         secure - *bool* of we should use HTTPS (True) or HTTP (false)
+
+           user - *str* username to use to login to the server to
+                  harvest in case it requires Basic authentication.
+
+       password - *str* a password (in clear) of the server to harvest
+                  in case it requires Basic authentication.
+
+       key_file - *str* a path to a PEM file that contain your private
+                  key to connect to the server in case it requires
+                  certificate-based authentication
+                  (If provided, 'cert_file' must also be provided)
+
+       cert_file - *str* a path to a PEM file that contain your public
+                  key in case the server to harvest requires
+                  certificate-based authentication
+                  (If provided, 'key_file' must also be provided)
     """
     if sets:
         i = 0
         for set in sets:
             http_param_dict['set'] = set
             i = OAI_Session(server, script, http_param_dict, method,
-                output, stylesheet, i)
+                            output, i, secure, user, password,
+                            cert_file, key_file)
             i += 1
         return i
     else:
         OAI_Session(server, script, http_param_dict, method,
-            output, stylesheet)
+                    output, secure=secure, user=user,
+                    password=password, cert_file=cert_file,
+                    key_file=key_file)
         return 1
 
 def write_file(filename="harvest", a=""):
@@ -181,48 +225,90 @@ def write_file(filename="harvest", a=""):
     f.write(a)
     f.close()
 
-def help():
-    "Print out info"
+def OAI_Request(server, script, params, method="POST", secure=False,
+                user=None, password=None,
+                key_file=None, cert_file=None):
+    """Handle OAI request
 
-    print "\n  bibharvest -fhimoprsuv baseURL\n"
-    print "  -h                 print this help"
-    print "  -V                 print version number"
-    print "  -o<outputfilename> specify output file"
-    print "  -v<verb>           OAI verb to be executed"
-    print "  -m<method>         http method (default POST)"
-    print "  -p<metadataPrefix> metadata format"
-    print "  -i<identifier>     OAI identifier"
-    print "  -s<set(s)>         OAI set(s). Whitespace-separated list"
-    print "  -r<resuptionToken> Resume previous harvest"
-    print "  -f<from>           from date (datestamp)"
-    print "  -u<until>          until date (datestamp)\n"
-    print "  Example:"
-    print "    bibharvest -vListRecords -f2004-04-01 -u2004-04-02 -pmarcxml -o/tmp/z.xml http://cdsweb.cern.ch/oai2d\n"
+    Parameters:
 
+        server - *str* the server URL to harvest
+                 eg: cdsweb.cern.ch
 
-def OAI_Request(server, script, params, method="POST"):
-    "Handle OAI request"
+        script - *str* path to the OAI script on the server to harvest
+                 eg: /oai2d
+
+        params - *str* the URL parameters to send to the OAI script
+                 eg: verb=ListRecords&from=2004-04-01
+
+        method - *str* if we harvest using POST or GET
+                 eg: POST
+
+        secure - *bool* of we should use HTTPS (True) or HTTP (false)
+
+          user - *str* username to use to login to the server to
+                 harvest in case it requires Basic authentication.
+
+      password - *str* a password (in clear) of the server to harvest
+                 in case it requires Basic authentication.
+
+      key_file - *str* a path to a PEM file that contain your private
+                 key to connect to the server in case it requires
+                 certificate-based authentication
+                 (If provided, 'cert_file' must also be provided)
+
+      cert_file - *str* a path to a PEM file that contain your public
+                 key in case the server to harvest requires
+                 certificate-based authentication
+                 (If provided, 'key_file' must also be provided)
+    """
 
     headers = {"Content-type":"application/x-www-form-urlencoded",
-        "Accept":"text/xml",
-        "From": CFG_SITE_ADMIN_EMAIL,
-        "User-Agent":"CDS Invenio %s" % CFG_VERSION}
+               "Accept":"text/xml",
+               "From": CFG_SITE_ADMIN_EMAIL,
+               "User-Agent":"CDS Invenio %s" % CFG_VERSION}
+
+    if password:
+        # We use basic authentication
+        headers["Authorization"] = "Basic " + base64.encodestring(user + ":" + password).strip()
 
     i = 0
     while i < 10:
         i = i + 1
-        conn = httplib.HTTPConnection(server)
+        if secure and not (key_file and cert_file):
+            # Basic authentication over HTTPS
+            try:
+                conn = httplib.HTTPSConnection(server)
+            except httplib.HTTPException, e:
+                sys.stderr.write("An error occured when trying to connect to %s: %s" % (server, e))
+                sys.exit(0)
+        elif secure and key_file and cert_file:
+            # Certificate-based authentication
+            try:
+                conn = httplib.HTTPSConnection(server,
+                                               key_file=key_file,
+                                               cert_file=cert_file)
+            except httplib.HTTPException, e:
+                sys.stderr.write("An error occured when trying to connect to %s: %s" % (server, e))
+                sys.exit(0)
+        else:
+            # Unsecured connection
+            try:
+                conn = httplib.HTTPConnection(server)
+            except httplib.HTTPException, e:
+                sys.stderr.write("An error occured when trying to connect to %s: %s" % (server, e))
+                sys.exit(0)
+
         if method == "GET":
-            conn.putrequest(method, script + "?" + params)
-            conn.putheader("Content-type", "application/x-www-form-urlencoded")
-            conn.putheader("Accept", "text/xml")
-            conn.putheader("From", CFG_SITE_ADMIN_EMAIL)
-            conn.putheader("User-Agent", CFG_SITE_NAME)
-            conn.endheaders()
+            conn.request("GET", script + "?" + params, headers=headers)
         elif method == "POST":
             conn.request("POST", script, params, headers)
 
-        response = conn.getresponse()
+        try:
+            response = conn.getresponse()
+        except httplib.HTTPException, e:
+            sys.stderr.write("An error occured when trying to read response from %s: %s" % (server, e))
+            sys.exit(0)
 
         status = "%d" % response.status
 
@@ -257,6 +343,23 @@ def OAI_Request(server, script, params, method="POST"):
             script    = "/" + \
                 "/".join(response.getheader("Location").split("/")[3:])
 
+        elif response.status == 401:
+            if user is not None:
+                sys.stderr.write("Try again\n")
+            if not secure:
+                sys.stderr.write("*WARNING* Your password will be sent in clear!\n")
+            # getting input from user
+            sys.stderr.write('User:')
+            try:
+                user = raw_input()
+                password = getpass.getpass()
+            except EOFError, e:
+                sys.stderr.write("\n")
+                sys.exit(1)
+            except KeyboardInterrupt, e:
+                sys.stderr.write("\n")
+                sys.exit(1)
+            headers["Authorization"] = "Basic " + base64.encodestring(user + ":" + password).strip()
         else:
             sys.stderr.write("Retry in 10 seconds...\n")
             time.sleep(10)
@@ -267,12 +370,43 @@ def OAI_Request(server, script, params, method="POST"):
 
     sys.exit(1)
 
+
+def usage(exitcode=0, msg=""):
+    "Print out info"
+
+    if msg:
+        sys.stderr.write(msg + "\n")
+
+    sys.stderr.write("""
+Usage: bibharvest [options] baseURL
+Example:
+       bibharvest -vListRecords -f2004-04-01 -u2004-04-02 -pmarcxml -o/tmp/z.xml http://cdsweb.cern.ch/oai2d
+
+Options:
+ -h, --help           print this help
+ -V, --version        print version number
+ -o, --output         specify output file
+ -v, --verb           OAI verb to be executed
+ -m, --method         http method (default POST)
+ -p, --metadataPrefix metadata format
+ -i, --identifier     OAI identifier
+ -s, --set            OAI set(s). Whitespace-separated list
+ -r, --resuptionToken Resume previous harvest
+ -f, --from           from date (datestamp)
+ -u, --until          until date (datestamp)
+ -c, --certificate    path to public certificate (in case of certificate-based harvesting)
+ -k, --key            path to private key (in case of certificate-based harvesting)
+ -l, --user           username (in case of password-protected harvesting)
+ -w, --password       password (in case of password-protected harvesting)
+""")
+
+    sys.exit(exitcode)
+
 def main():
     "Main"
 
-
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hVo:v:m:p:i:s:f:u:r:x:",
+        opts, args = getopt.getopt(sys.argv[1:], "hVo:v:m:p:i:s:f:u:r:x:c:k:w:l:",
                  [
                    "help",
                    "version",
@@ -284,60 +418,89 @@ def main():
                    "set",
                    "from",
                    "until",
-                   "resumptionToken"
+                   "resumptionToken",
+                   "certificate",
+                   "key",
+                   "user",
+                   "password"
                  ]
         )
-    except getopt.error:
-        help()
-        sys.exit(1)
+    except getopt.error, e:
+        usage(1, e)
 
     http_param_dict        = {}
     method                 = "POST"
     output                 = ""
-    stylesheet             = ""
+    user                   = None
+    password               = None
+    cert_file              = None
+    key_file               = None
     sets = []
 
     # get options and arguments
     for opt, opt_value in opts:
-        if   opt == "-v":
+        if   opt in ["-v", "--version"]:
             http_param_dict['verb']             = opt_value
-        elif opt == "-m":
+        elif opt in ["-m", '--method']:
             if opt_value == "GET" or opt_value == "POST":
                 method                          = opt_value
-        elif opt == "-p":
+        elif opt in ["-p", "--metadataPrefix"]:
             http_param_dict['metadataPrefix']   = opt_value
-        elif opt == "-i":
+        elif opt in ["-i", "--identifier"]:
             http_param_dict['identifier']       = opt_value
-        elif opt == "-s":
+        elif opt in ["-s", "--set"]:
             sets                                = opt_value.split()
-        elif opt == "-f":
+        elif opt in ["-f", "--from"]:
             http_param_dict['from']             = opt_value
-        elif opt == "-u":
+        elif opt in ["-u", "--until"]:
             http_param_dict['until']            = opt_value
-        elif opt == "-r":
+        elif opt in ["-r", "--resumptionToken"]:
             http_param_dict['resumptionToken']  = opt_value
-        elif opt == "-o":
+        elif opt in ["-o", "--output"]:
             output                              = opt_value
-        elif opt == "-x":
-            stylesheet                          = opt_value
+        elif opt in ["-c", "--certificate"]:
+            cert_file                           = opt_value
+        elif opt in ["-k", "--key"]:
+            key_file                            = opt_value
+        elif opt in ["-l", "--user"]:
+            user                                = opt_value
+        elif opt in ["-w", "--password"]:
+            password                            = opt_value
         elif opt in ["-V", "--version"]:
             print __revision__
             sys.exit(0)
         else:
-            help()
-            sys.exit()
+            usage(1, "Option %s is not allowed" % opt)
 
     if len(args) > 0:
         server    = args[-1].split("/")[2]
+        secure    = args[-1].lower().strip().startswith('https')
+
+        if (cert_file and not key_file) or \
+           (key_file and not cert_file):
+            # Both are needed if one specified
+            usage(1, "You must specify both certificate and key files")
+
+        if password and not user:
+            # User must be specified when password is given
+            usage(1, "You must specify a username")
+        elif user and not password:
+            if not secure:
+                sys.stderr.write("*WARNING* Your password will be sent in clear!\n")
+            try:
+                password = getpass.getpass()
+            except KeyboardInterrupt, e:
+                sys.stderr.write("\n")
+                sys.exit(0)
+
         script    = "/" + "/".join(args[0].split("/")[3:])
         harvest(server, script, http_param_dict, method, output,
-            stylesheet, sets)
+                sets, secure, user, password, cert_file, key_file)
         sys.stderr.write("Harvesting successfully completed at: %s\n\n" %
             time.strftime("%Y-%m-%d %H:%M:%S --> ", time.localtime()))
 
     else:
-        help()
-        sys.exit()
+        usage(1, "You must specify the URL to harvest")
 
 if __name__ == '__main__':
     main()
