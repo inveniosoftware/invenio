@@ -429,7 +429,14 @@ def authenticate(user, authorization_action, authorization_msg=""):
         print "=" * len(authorization_msg)
     if user == "":
         print >> sys.stdout, "\rUsername: ",
-        user = sys.stdin.readline().lower().strip()
+        try:
+            user = sys.stdin.readline().lower().strip()
+        except EOFError:
+            sys.stderr.write("\n")
+            sys.exit(1)
+        except KeyboardInterrupt:
+            sys.stderr.write("\n")
+            sys.exit(1)
     else:
         print >> sys.stdout, "\rUsername:", user
     ## first check user:
@@ -451,7 +458,14 @@ def authenticate(user, authorization_action, authorization_msg=""):
             if res:
                 ok = True
         if not ok:
-            password_entered = getpass.getpass()
+            try:
+                password_entered = getpass.getpass()
+            except EOFError:
+                sys.stderr.write("\n")
+                sys.exit(1)
+            except KeyboardInterrupt:
+                sys.stderr.write("\n")
+                sys.exit(1)
             if not CFG_EXTERNAL_AUTHENTICATION[login_method][0]:
                 res = run_sql("select id from user where id=%s "
                         "and password=AES_ENCRYPT(email, %s)",
