@@ -170,7 +170,7 @@ The OAI Repository corresponds to a set of metadata exposed for periodical harve
 
 <a name="3.1"></a><h3>3.1. Definition of OAI sets</h3>
 
-The OAI repository is composed of OAI sets that correspond to a part of your metadata base. OAI sets can be configured via the <a href="oaiarchiveadmin.py">OAI Repository Admin Interface</a>, featuring essential OAI repository maintenance tasks.
+The OAI repository is composed of OAI sets that correspond to a part of your metadata base. OAI sets can be configured via the <a href="<CFG_SITE_URL>/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a>, featuring essential OAI repository maintenance tasks.
 
 
 <p>Each OAI set is defined by one or a union of several definitions. Each such definition is provided separately and corresponds to one line as displayed in the OAI Repository Admin overview page. The following information displays:
