@@ -54,10 +54,12 @@ import signal
 import sys
 import time
 import traceback
+import logging
+import logging.handlers
 
 from invenio.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_PREFIX, CFG_BINDIR
+from invenio.config import CFG_PREFIX, CFG_BINDIR, CFG_LOGDIR
 from invenio.errorlib import register_exception
 
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
@@ -354,14 +356,18 @@ def write_message(msg, stream=sys.stdout, verbose=1):
     """Write message and flush output stream (may be sys.stdout or sys.stderr).
     Useful for debugging stuff."""
     if msg and _task_params['verbose'] >= verbose:
-        if stream == sys.stdout or stream == sys.stderr:
-            stream.write(time.strftime("%Y-%m-%d %H:%M:%S --> ",
-                time.localtime()))
+        if stream == sys.stdout:
+            print msg
             try:
-                stream.write("%s\n" % msg)
+                logging.info(msg)
             except UnicodeEncodeError:
-                stream.write("%s\n" % msg.encode('ascii', 'backslashreplace'))
-            stream.flush()
+                logging.info(msg.encode('ascii', 'backslashreplace'))
+        elif stream == sys.stderr:
+            print >> sys.stderr, msg
+            try:
+                logging.error(msg)
+            except UnicodeEncodeError:
+                logging.error(msg.encode('ascii', 'backslashreplace'))
         else:
             sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
 
@@ -547,6 +553,17 @@ def _task_run(task_run_fnc):
         register_exception(alert_admin=True)
         task_update_status("ERROR")
         return False
+
+    ## Setting up the logging system
+    logger = logging.getLogger()
+    stderr_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _task_params['task_id']), 'a', 1*1024*1024, 10)
+    stdout_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _task_params['task_id']), 'a', 1*1024*1024, 10)
+    formatter = logging.Formatter('%(asctime)s --> %(message)s')
+    stderr_logger.setFormatter(formatter)
+    stdout_logger.setFormatter(formatter)
+    logger.addHandler(stderr_logger)
+    logger.addHandler(stdout_logger)
+    logger.setLevel(logging.INFO)
 
     ## check task status:
     task_status = task_read_status()

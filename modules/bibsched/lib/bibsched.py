@@ -99,11 +99,6 @@ def get_task_pid(task_name, task_id, ignore_error=False):
         register_exception()
         return get_my_pid(task_name, str(task_id))
 
-def get_output_channelnames(task_id):
-    "Construct and return filename for stdout and stderr for the task 'task_id'."
-    filenamebase = "%s/bibsched_task_%d" % (CFG_LOGDIR, task_id)
-    return [filenamebase + ".log", filenamebase + ".err"]
-
 def is_task_scheduled(task_name):
     """Check if a certain task_name is due for execution (WAITING or RUNNING)"""
     sql = "SELECT COUNT(proc) FROM schTASK WHERE proc = %s AND (status='WAITING' OR status='RUNNING')"
@@ -473,8 +468,7 @@ class Manager:
         if status in ("SCHEDULED", "WAITING"):
             if process in self.helper_modules:
                 program = os.path.join(CFG_BINDIR, process)
-                fdout, fderr = get_output_channelnames(task_id)
-                COMMAND = "%s %s >> %s 2>> %s &" % (program, str(task_id), fdout, fderr)
+                COMMAND = "%s %s > /dev/null 2> /dev/null &" % (program, str(task_id))
                 os.system(COMMAND)
                 Log("manually running task #%d (%s)" % (task_id, process))
             else:
@@ -906,10 +900,9 @@ class BibSched:
                     return True
                 elif procname in self.helper_modules:
                     program = os.path.join(CFG_BINDIR, procname)
-                    fdout, fderr = get_output_channelnames(task_id)
                     ## Trick to log in bibsched.log the task exiting
                     exit_str = '&& echo "`date "+%%Y-%%m-%%d %%H:%%M:%%S"` --> Task #%d (%s) exited" >> %s/bibsched.log' % (task_id, proc, CFG_LOGDIR)
-                    COMMAND = "%s %s >> %s 2>> %s %s &" % (program, str(task_id), fdout, fderr, exit_str)
+                    COMMAND = "%s %s > /dev/null 2> /dev/null &" % (program, str(task_id), exit_str)
                     bibsched_set_status(task_id, "SCHEDULED")
                     Log("Task #%d (%s) started" % (task_id, proc))
                     os.system(COMMAND)

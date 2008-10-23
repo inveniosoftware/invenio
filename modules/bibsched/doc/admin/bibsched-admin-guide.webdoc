@@ -107,6 +107,10 @@ selecting you're given different actions.</p>
 <h2>Task logging</h2>
 <p>When executed each tasks will produced (if necessary) a couple of log files. One called <tt>bibsched_task_{task_id}.log</tt> and the other <tt>bibsched_task_{task_id}.err</tt>. In case of reschedulable task, each time the task is rescheduled it is being assigned the same task_id. That means that log information of successive execution of the given task will be appended at the end of already existing log files.</p>
 
+<p>A log-rotation algorithm is applied when writing into the log file. By default
+each log will be no bigger than 1MB. After this limit is reached the log is rotated. Note that when viewing the log file inside the bibsched monitor
+interface, only the latest log will be displayed.</p>
+
 <h2>Task concurrency</h2>
 <p>A recent experimental feature of bibsched is the concurrent execution of compatible tasks. The current definition of when two tasks are considered compatible is: "If a two tasks have the same name (e.g. bibupload) then they're incompatible."</p> <p>Sometimes you might want to consider compatible two tasks even when they have the same name. For this you can add a name specification via the bibtask command line option <tt>--task_specific_name</tt>. E.g. you might want to distinguish a generic bibupload from a bibupload carrying only preformatting information. For this just launch bibupload -N "bibformat", and it will be considered compatible with all the other bibuploads.</p>
 
@@ -116,16 +120,16 @@ selecting you're given different actions.</p>
 <h2>Bibsched command line interface</h2>
 <pre>
     Usage: /soft/cdsweb/bin/bibsched [options] [start|stop|restart|monitor|status]
-    
+
     The following commands are available for bibsched:
-    
+
     start      start bibsched in background
     stop       stop a running bibsched
     restart    restart a running bibsched
     monitor    enter the interactive monitor
     status     get report about current status of the queue
     purge      purge the scheduler queue from old tasks
-    
+
     Command options:
     -d, --daemon           Launch BibSched in the daemon mode (deprecated, use 'start')
     General options:
