@@ -1024,7 +1024,7 @@ def get_format_element(element_name, verbose=0, with_built_in_params=False):
         except AttributeError, e:
             errors = get_msgs_for_code_list([("ERR_BIBFORMAT_FORMAT_ELEMENT_FORMAT_FUNCTION",
                                               element_name)],
-                                            stream='warning', ln=CFG_SITE_LANG)
+                                            stream='error', ln=CFG_SITE_LANG)
             if verbose == 0:
                 register_errors(errors, 'error')
             elif verbose >= 5:
