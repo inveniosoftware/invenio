@@ -49,15 +49,17 @@ import getopt
 import getpass
 import marshal
 import os
+import pwd
 import re
 import signal
 import sys
 import time
+import popen2
 import traceback
 
 from invenio.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
-from invenio.config import CFG_PREFIX, CFG_BINDIR
+from invenio.config import CFG_PREFIX, CFG_BINDIR, CFG_BIBSCHED_PROCESS_USER
 from invenio.errorlib import register_exception
 
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
@@ -537,6 +539,7 @@ def _task_run(task_run_fnc):
     Return True in case of success and False in case of failure."""
 
     ## We prepare the pid file inside /prefix/var/run/taskname_id.pid
+    check_running_as_apache_process_user()
     try:
         pidfile_name = os.path.join(CFG_PREFIX, 'var', 'run',
             'bibsched_task_%d.pid' % _task_params['task_id'])
@@ -702,3 +705,42 @@ def _task_sig_unknown(sig, frame):
     # do nothing for unknown signals:
     write_message("unknown signal %d (frame %s) ignored" % (sig, frame))
 
+_RE_PSLINE = re.compile('^\s*(.+?)\s+(.+?)\s*$')
+def guess_apache_process_user_from_ps():
+    """Parse the ps call looking for the Apache process user."""
+    apache_users = []
+    try:
+        # Tested on Linux, Sun and MacOS X
+        for line in os.popen('ps -A -o user,comm').readlines():
+            g = _RE_PSLINE.match(line)
+            if g:
+                username = g.group(2)
+                process = os.path.basename(g.group(1))
+                if process in ('apache', 'apache2', 'httpd') :
+                    if username not in apache_users and username != 'root':
+                        apache_users.append(username)
+    except Exception, e:
+        print >> sys.stderr, "WARNING: %s" % e
+    return tuple(apache_users)
+
+def guess_apache_process_user():
+    """Return the possible name of the user running the Apache server."""
+    if CFG_BIBSCHED_PROCESS_USER:
+        apache_users = (CFG_BIBSCHED_PROCESS_USER, )
+    else:
+        apache_users = guess_apache_process_user_from_ps() + ('apache2', 'apache', 'www-data')
+    for username in apache_users:
+        try:
+            userline = pwd.getpwnam(username)
+            return userline[2]
+        except KeyError:
+            pass
+    print >> sys.stderr, "ERROR: It's impossible to discover the name of the user running the Apache webserver process. Please set the correct value in CFG_BIBSCHED_PROCESS_USER"
+    sys.exit(1)
+
+def check_running_as_apache_process_user():
+    """Check that the user running this program is the same of that running the
+    Apache webserver."""
+    if os.getuid() != guess_apache_process_user():
+        print >> sys.stderr,"ERROR: You must run \"%s\" with credentials compatible with the user running the Apache webserver process!" % os.path.basename(sys.argv[0])
+        sys.exit(1)
