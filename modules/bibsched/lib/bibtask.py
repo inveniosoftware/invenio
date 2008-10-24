@@ -491,6 +491,10 @@ def authenticate(user, authorization_action, authorization_msg=""):
 def _task_submit(argv, authorization_action, authorization_msg):
     """Submits task to the BibSched task queue.  This is what people will
         be invoking via command line."""
+
+    ## check as whom we want to submit?
+    check_running_process_user()
+
     ## sanity check: remove eventual "task" option:
 
     ## authenticate user:
@@ -539,7 +543,7 @@ def _task_run(task_run_fnc):
     Return True in case of success and False in case of failure."""
 
     ## We prepare the pid file inside /prefix/var/run/taskname_id.pid
-    check_running_as_apache_process_user()
+    check_running_process_user()
     try:
         pidfile_name = os.path.join(CFG_PREFIX, 'var', 'run',
             'bibsched_task_%d.pid' % _task_params['task_id'])
@@ -707,7 +711,7 @@ def _task_sig_unknown(sig, frame):
 
 _RE_PSLINE = re.compile('^\s*(.+?)\s+(.+?)\s*$')
 def guess_apache_process_user_from_ps():
-    """Parse the ps call looking for the Apache process user."""
+    """Guess Apache process user by parsing the list of running processes."""
     apache_users = []
     try:
         # Tested on Linux, Sun and MacOS X
@@ -724,23 +728,45 @@ def guess_apache_process_user_from_ps():
     return tuple(apache_users)
 
 def guess_apache_process_user():
-    """Return the possible name of the user running the Apache server."""
-    if CFG_BIBSCHED_PROCESS_USER:
-        apache_users = (CFG_BIBSCHED_PROCESS_USER, )
-    else:
-        apache_users = guess_apache_process_user_from_ps() + ('apache2', 'apache', 'www-data')
+    """
+    Return the possible name of the user running the Apache server process.
+    (Look at running OS processes or look at OS users defined in /etc/passwd.)
+    """
+    apache_users = guess_apache_process_user_from_ps() + ('apache2', 'apache', 'www-data')
     for username in apache_users:
         try:
             userline = pwd.getpwnam(username)
-            return userline[2]
+            return userline[0]
         except KeyError:
             pass
-    print >> sys.stderr, "ERROR: It's impossible to discover the name of the user running the Apache webserver process. Please set the correct value in CFG_BIBSCHED_PROCESS_USER"
+    print >> sys.stderr, "ERROR: Cannot detect Apache server process user. Please set the correct value in CFG_BIBSCHED_PROCESS_USER."
     sys.exit(1)
 
-def check_running_as_apache_process_user():
-    """Check that the user running this program is the same of that running the
-    Apache webserver."""
-    if os.getuid() != guess_apache_process_user():
-        print >> sys.stderr,"ERROR: You must run \"%s\" with credentials compatible with the user running the Apache webserver process!" % os.path.basename(sys.argv[0])
+def check_running_process_user():
+    """
+    Check that the user running this program is the same as the user
+    configured in CFG_BIBSCHED_PROCESS_USER or as the user running the
+    Apache webserver process.
+    """
+    running_as_user = pwd.getpwuid(os.getuid())[0]
+    if CFG_BIBSCHED_PROCESS_USER and running_as_user != CFG_BIBSCHED_PROCESS_USER:
+        print >> sys.stderr, """ERROR: You must run "%(x_proc)s" as the user set up in your
+       CFG_BIBSCHED_PROCESS_USER (seems to be "%(x_user)s").
+
+       You may want to do "sudo -u %(x_user)s %(x_proc)s ..." to do so.
+
+       If you think this is not right, please set CFG_BIBSCHED_PROCESS_USER
+       appropriately and rerun "inveniocfg --update-config-py".""" % \
+        {'x_proc': os.path.basename(sys.argv[0]), 'x_user': CFG_BIBSCHED_PROCESS_USER}
         sys.exit(1)
+    elif running_as_user != guess_apache_process_user():
+        print >> sys.stderr, """ERROR: You must run "%(x_proc)s" as the same user that runs your Apache server
+       process (seems to be "%(x_user)s").
+
+       You may want to do "sudo -u %(x_user)s %(x_proc)s ..." to do so.
+
+       If you think this is not right, please set CFG_BIBSCHED_PROCESS_USER
+       appropriately and rerun "inveniocfg --update-config-py".""" % \
+        {'x_proc': os.path.basename(sys.argv[0]), 'x_user': guess_apache_process_user()}
+        sys.exit(1)
+    return

@@ -1207,8 +1207,8 @@ def restart(verbose = True):
     return
 
 def main():
-    from invenio.bibtask import check_running_as_apache_process_user
-    check_running_as_apache_process_user()
+    from invenio.bibtask import check_running_process_user
+    check_running_process_user()
 
     verbose = True
     status = None
