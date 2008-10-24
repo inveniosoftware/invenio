@@ -30,12 +30,15 @@ def format(bfo, style):
     """
     from invenio.config import CFG_SITE_URL
     from invenio.access_control_engine import acc_authorize_action
+    from invenio.search_engine import guess_primary_collection_of_a_record
 
     out = ""
 
     user_info = bfo.user_info
-    (auth_code, auth_message) = acc_authorize_action(user_info['uid'], \
-                                                     'runbibedit')
+    collection = guess_primary_collection_of_a_record(bfo.recID)
+    (auth_code, auth_message) = acc_authorize_action(user_info,
+                                                     'runbibedit',
+                                                     collection=collection)
     if auth_code == 0:
         print_style = ''
         if style != '':
