@@ -59,7 +59,7 @@ except ImportError:
 
 
 from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
-    CFG_WEBSESSION_CHECK_SESSION_ADDR
+    CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS
 
 _qparm_re = re.compile(r'([\0- ]*'
                        r'([^\0- ;,=\"]+)="([^"]*)"'
@@ -369,8 +369,8 @@ class SessionManager:
                 # exceptions -- SessionError.format() by default -- is
                 # responsible for revoking the session cookie.  Yuck.
                 raise SessionError(session_id=sessid)
-            if (session.get_remote_address() >> CFG_WEBSESSION_CHECK_SESSION_ADDR !=
-                request.get_environ("REMOTE_ADDR") >> CFG_WEBSESSION_CHECK_SESSION_ADDR):
+            if (session.get_remote_address() >> CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS !=
+                request.get_environ("REMOTE_ADDR") >> CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS):
                 raise SessionError("Remote IP address does not match the "
                                    "IP address that created the session",
                                    session_id=sessid)
