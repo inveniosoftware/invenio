@@ -675,7 +675,7 @@ def oaiidentify(args):
     out = ""
 
     repositoryname        = "  <repositoryName>" + CFG_SITE_NAME + "</repositoryName>\n"
-    baseurl               = "  <baseURL>%s/oai2d/</baseURL>\n" % CFG_SITE_URL
+    baseurl               = "  <baseURL>%s/oai2d</baseURL>\n" % CFG_SITE_URL
     protocolversion       = "  <protocolVersion>2.0</protocolVersion>\n"
     adminemailtxt         = "  <adminEmail>%s</adminEmail>\n" % CFG_SITE_SUPPORT_EMAIL
     earliestdst		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()
