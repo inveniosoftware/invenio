@@ -357,17 +357,11 @@ def write_message(msg, stream=sys.stdout, verbose=1):
     Useful for debugging stuff."""
     if msg and _task_params['verbose'] >= verbose:
         if stream == sys.stdout:
-            print msg
-            try:
-                logging.info(msg)
-            except UnicodeEncodeError:
-                logging.info(msg.encode('ascii', 'backslashreplace'))
+            print "%s --> %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg)
+            logging.info(msg)
         elif stream == sys.stderr:
-            print >> sys.stderr, msg
-            try:
-                logging.error(msg)
-            except UnicodeEncodeError:
-                logging.error(msg.encode('ascii', 'backslashreplace'))
+            print >> sys.stderr, "%s --> %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg)
+            logging.error(msg)
         else:
             sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
 
@@ -558,7 +552,7 @@ def _task_run(task_run_fnc):
     logger = logging.getLogger()
     stderr_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _task_params['task_id']), 'a', 1*1024*1024, 10)
     stdout_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _task_params['task_id']), 'a', 1*1024*1024, 10)
-    formatter = logging.Formatter('%(asctime)s --> %(message)s')
+    formatter = logging.Formatter('%(asctime)s --> %(message)s', '%Y-%m-%d %H:%M:%S')
     stderr_logger.setFormatter(formatter)
     stdout_logger.setFormatter(formatter)
     logger.addHandler(stderr_logger)
