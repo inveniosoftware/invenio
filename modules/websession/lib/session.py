@@ -49,7 +49,6 @@ __revision__ = "$Id$"
 DEFAULT_SESSION_COOKIE_NAME = "CDSSESSION"
 DEFAULT_SESSION_COOKIE_DOMAIN = None
 DEFAULT_SESSION_COOKIE_PATH = "/"
-DEFAULT_CHECK_SESSION_ADDR = 1
 
 import re
 from time import time, gmtime, localtime, strftime, clock
@@ -59,7 +58,8 @@ except ImportError:
     pass
 
 
-from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER
+from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
+    CFG_WEBSESSION_CHECK_SESSION_ADDR
 
 _qparm_re = re.compile(r'([\0- ]*'
                        r'([^\0- ;,=\"]+)="([^"]*)"'
@@ -96,6 +96,17 @@ def parse_cookie (text):
 
     return result
 
+def _mkip(ip):
+    """ Compute a numerical value for a dotted IP """
+    try:
+        num = 0L
+        for i in map(int, ip.split('.')):
+            num = (num << 8) + i
+        return num
+    except ValueError:
+        ## Nowadays this is due mainly because of IPV6 ::1 address
+        ## when browsing from localhost with IPV6 enabled machine.
+        return 2130706433
 
 def packbytes(s):
     "convert a string of bytes into a long integer"
@@ -277,12 +288,6 @@ class SessionManager:
         """
         return DEFAULT_SESSION_COOKIE_NAME
 
-    def _getSessionCheckAddress(self):
-        """Indicates whether the IP address of the session must be checked
-            to ensure a session is only allowed in the scope of a single IP
-        """
-        return DEFAULT_CHECK_SESSION_ADDR
-
     def _getSessionCookieDomain(self):
         """Returns the preferred cookie domain for the sessions
         """
@@ -364,9 +369,8 @@ class SessionManager:
                 # exceptions -- SessionError.format() by default -- is
                 # responsible for revoking the session cookie.  Yuck.
                 raise SessionError(session_id=sessid)
-            if (self._getSessionCheckAddress() and
-                session.get_remote_address() != \
-                request.get_environ("REMOTE_ADDR")):
+            if (session.get_remote_address() >> CFG_WEBSESSION_CHECK_SESSION_ADDR !=
+                request.get_environ("REMOTE_ADDR") >> CFG_WEBSESSION_CHECK_SESSION_ADDR):
                 raise SessionError("Remote IP address does not match the "
                                    "IP address that created the session",
                                    session_id=sessid)
@@ -427,6 +431,8 @@ class SessionManager:
             request.response.set_cookie(self._getSessionCookieName(), session_id,
                                     domain = self._getSessionCookieDomain(),
                                     path = self._getSessionCookiePath(),
+                                    secure = True,
+                                    HttpOnly = True,
                                     expires = strftime('%a, %d-%b-%Y %H:%M:%S GMT', gmtime(time() +
                                     CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER*86400)))
         else:
@@ -675,8 +681,7 @@ class RequestWrapper:
         except KeyError:
             self.cookies = {}
         self.environ = {}
-        self.environ["REMOTE_ADDR"] = \
-               self.__request.get_remote_host(apache.REMOTE_NOLOOKUP)
+        self.environ["REMOTE_ADDR"] = _mkip(self.__request.get_remote_host(apache.REMOTE_NOLOOKUP))
         self.response = ResponseWrapper( request )
         try:
             self.session = request.session
@@ -745,8 +750,10 @@ class ResponseWrapper:
             if name in ("expires", "path"):
                 name = name.replace("_", "-")
                 options += "; %s=%s" % (name, value)
-            elif name =="secure" and value:
+            elif name == "secure" and value:
                 options += "; secure"
+            elif name == "HttpOnly" and value:
+                options += "; HttpOnly"
         cookie_str = "%s=%s%s" % (cookie_name, cookie_value, options)
         self.request.headers_out.add("Set-Cookie", cookie_str)
         if 'expires' not in attrs or attrs['expires'] != 0:
