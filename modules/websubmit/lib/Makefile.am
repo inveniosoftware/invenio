@@ -40,4 +40,4 @@ noinst_DATA = fulltext_files_migration_kit.py
 
 EXTRA_DIST = $(pylib_DATA) $(noinst_DATA)
 
-CLEANFILES = *~ *.tmp
+CLEANFILES = *~ *.tmp *.pyc

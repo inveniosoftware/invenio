@@ -11,7 +11,7 @@
 ## CDS Invenio is distributed in the hope that it will be useful, but
 ## WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.  
+## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
@@ -21,4 +21,4 @@ bin_SCRIPTS = authaction webaccessadmin
 
 EXTRA_DIST = authaction.in webaccessadmin.in
 
-CLEANFILES = *~ *.tmp authactionc
+CLEANFILES = *~ *.tmp
