@@ -1,4 +1,3 @@
-## $Id$
 act---<:act:>
 SuE---<:SuE:>
 comboDEMOPIC---<:comboDEMOPIC:>

@@ -1,5 +1,3 @@
-## $Id$
-##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -23,8 +21,6 @@ Python modules for running CDS Invenio.  Warn the user if there are
 eventual troubles.  Exit status: 0 if okay, 1 if not okay.  Useful for
 running from configure.ac.
 """
-
-__revision__ = "$Id$"
 
 ## minimally recommended/required versions:
 cfg_min_python_version = "2.3"

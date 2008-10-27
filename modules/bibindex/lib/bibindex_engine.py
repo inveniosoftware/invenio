@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-##
-## $Id$
 ## BibIndxes bibliographic data, reference and fulltext indexing utility.
 ##
 ## This file is part of CDS Invenio.

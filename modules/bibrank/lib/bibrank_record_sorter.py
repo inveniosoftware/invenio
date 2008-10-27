@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-##
-## $Id$
 ## Ranking of records using different parameters and methods on the fly.
 ##
 ## This file is part of CDS Invenio.

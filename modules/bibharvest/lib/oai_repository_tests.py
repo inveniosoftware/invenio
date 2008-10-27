@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-##
-## $Id$
 ## CDS Invenio OAI repository unit tests.
 ##
 ## This file is part of CDS Invenio.

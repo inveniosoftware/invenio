@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-## $Id$
 ##
 ## handles rendering of webmessage module
 ##

@@ -1,4 +1,3 @@
-## $Id$
 SN---<:SN:>
 SuE---<:SuE:>
 DEMOBOO_RN---<:DEMOBOO_RN:>

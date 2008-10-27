@@ -1,5 +1,3 @@
-## $Id$
-##
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -27,8 +25,6 @@ The sentences to translate are marked with the following tag:
 
 These tags can span several lines. Extra whitespace is discarded.
 """
-
-__revision__ = "$Id$"
 
 import sys, re, os
 

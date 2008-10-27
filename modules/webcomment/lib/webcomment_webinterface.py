@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-## $Id$
 ## Comments and reviews for records.
 
 ## This file is part of CDS Invenio.

@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-
-## $Id$
 ## CDS Invenio bibconvert unit tests.
 
 ## This file is part of CDS Invenio.

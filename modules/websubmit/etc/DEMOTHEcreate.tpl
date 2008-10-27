@@ -1,4 +1,3 @@
-## $Id$
 START::DEFP()---<record>
 001::REPL(EOL,)---<controlfield tag="001"><:SN::SN:></controlfield>
 037a::REPL(EOL,)::MINLW(82)---<datafield tag="037" ind1=" " ind2=" "><subfield code="a"><:DEMOTHE_RN::DEMOTHE_RN:></subfield></datafield>

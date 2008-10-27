@@ -1,5 +1,3 @@
-## $Id$
-
 ## CDS Invenio utility to run SQL queries.  The core is taken from
 ## modpython FAQ and modified to suit our needs.  The insert_id() is
 ## inspired by Erik Forsberg's mod_python slides.

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-## $Id$
 ##
 ## Every db-related function of module webmessage
 ##

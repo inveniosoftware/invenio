@@ -1,14 +1,12 @@
-CDS Invenio INSTALLATION
-========================
-
-Revision: $Id$
+CDS Invenio v0.99.1 INSTALL
+===========================
 
 About
 =====
 
 This document specifies how to build, customize, and install CDS
-Invenio for the first time.  See RELEASE-NOTES if you are upgrading
-from a previous CDS Invenio release.
+Invenio v0.99.1 for the first time.  See RELEASE-NOTES if you are 
+upgrading from a previous CDS Invenio release.
 
 Contents
 ========
