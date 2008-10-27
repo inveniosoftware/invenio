@@ -286,10 +286,10 @@ def update_arguments(argstr, date_from, date_until):
 
 def log(msg):
     try:
-        log = open(CFG_LOGDIR + '/alertengine.log', 'a')
-        log.write(strftime('%Y%m%d%H%M%S#'))
-        log.write(msg + '\n')
-        log.close()
+        logfile = open(CFG_LOGDIR + '/alertengine.log', 'a')
+        logfile.write(strftime('%Y%m%d%H%M%S#'))
+        logfile.write(msg + '\n')
+        logfile.close()
     except Exception:
         register_exception()
 
