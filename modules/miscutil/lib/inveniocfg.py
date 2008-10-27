@@ -551,6 +551,8 @@ def cli_cmd_create_demo_site(conf):
     from invenio.config import CFG_PREFIX
     from invenio.dbquery import run_sql
     run_sql("TRUNCATE schTASK")
+    run_sql("TRUNCATE session")
+    run_sql("DELETE FROM user WHERE email=''")
     for cmd in ["%s/bin/dbexec < %s/lib/sql/invenio/democfgdata.sql" % \
                    (CFG_PREFIX, CFG_PREFIX),]:
         if os.system(cmd):
