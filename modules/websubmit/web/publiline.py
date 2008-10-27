@@ -612,7 +612,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
     TEXT_RSN_RefereeSel_MSG_GROUP_SUBJECT = "Please, review this publication"
     TEXT_RSN_RefereeSel_MSG_GROUP_BODY = "Please, review the following publication"
     TEXT_RSN_RefereeRecom_MSG_PUBCOM_SUBJECT = "Final recommendation from the referee"
-    TEXT_RSN_PubComRecom_MSG_PRJLEADER_SUBJECT = "Final recommendation from the publication board"
+    TEXT_RSN_PubComRecom_MSG_PRJLEADER_SUBJECT = "Final recommendation from the publication board : "
     TEXT_RSN_ProjectLeaderDecision_MSG_SUBJECT = "Final decision from the project leader"
 
     TEXT_RPB_EdBoardSel_MSG_EDBOARD_SUBJECT = "You have been selected in a editorial board"
@@ -697,14 +697,14 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         if email_user_pattern:
             # users with matching email-address
             try:
-                users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+                users1 = run_sql("""SELECT id, email FROM user WHERE email<>'' AND email RLIKE %s ORDER BY email """, (email_user_pattern, ))
             except OperationalError:
                 users1 = ()
             # users that are connected
             try:
                 users2 = run_sql("""SELECT DISTINCT u.id, u.email
                 FROM user u LEFT JOIN user_usergroup ug ON u.id = ug.id_user
-                WHERE ug.id_usergroup = %s AND u.email RLIKE %s
+                WHERE u.email<>'' AND ug.id_usergroup = %s AND u.email RLIKE %s
                 ORDER BY u.email """, (id_EdBoardGroup, email_user_pattern))
             except OperationalError:
                 users2 = ()
@@ -739,7 +739,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
 
         usersremove = run_sql("""SELECT DISTINCT u.id, u.email
                             FROM user u LEFT JOIN user_usergroup ug ON u.id = ug.id_user
-                            WHERE ug.id_usergroup = %s and user_status != 'A' AND user_status != 'P'
+                            WHERE u.email <> "" AND ug.id_usergroup = %s and user_status != 'A' AND user_status != 'P'
                             ORDER BY u.email """, (id_EdBoardGroup, ))
 
         try: id_user_remove = int(id_user_remove)
@@ -782,14 +782,14 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
             TEXT_RefereeSel_MSG_REFEREE_SUBJECT = TEXT_RSN_RefereeSel_MSG_REFEREE_SUBJECT
             TEXT_RefereeSel_MSG_REFEREE_BODY = TEXT_RSN_RefereeSel_MSG_REFEREE_BODY + " " + "\"" + item_details['title'] + "\""
             TEXT_RefereeSel_MSG_GROUP_SUBJECT = TEXT_RSN_RefereeSel_MSG_GROUP_SUBJECT
-            TEXT_RefereeSel_MSG_GROUP_BODY = TEXT_RSN_RefereeSel_MSG_GROUP_BODY
+            TEXT_RefereeSel_MSG_GROUP_BODY = TEXT_RSN_RefereeSel_MSG_GROUP_BODY + " " + "\"" + item_details['title'] + "\""
         elif apptype == "RPB":
             to_check = __is_EdBoard (uid, id_EdBoardGroup)
             TEXT_RefereeSel_BASKET_DESCR = TEXT_RSN_RefereeSel_BASKET_DESCR
             TEXT_RefereeSel_MSG_REFEREE_SUBJECT = TEXT_RSN_RefereeSel_MSG_REFEREE_SUBJECT
-            TEXT_RefereeSel_MSG_REFEREE_BODY = TEXT_RSN_RefereeSel_MSG_REFEREE_BODY
+            TEXT_RefereeSel_MSG_REFEREE_BODY = TEXT_RSN_RefereeSel_MSG_REFEREE_BODY + " " + "\"" + item_details['title'] + "\""
             TEXT_RefereeSel_MSG_GROUP_SUBJECT = TEXT_RSN_RefereeSel_MSG_GROUP_SUBJECT
-            TEXT_RefereeSel_MSG_GROUP_BODY = TEXT_RSN_RefereeSel_MSG_GROUP_BODY
+            TEXT_RefereeSel_MSG_GROUP_BODY = TEXT_RSN_RefereeSel_MSG_GROUP_BODY + " " + "\"" + item_details['title'] + "\""
         else:
             to_check = None
 
@@ -809,6 +809,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
 
                 email_address = run_sql("""SELECT email FROM user WHERE id = %s """, (id_user_val, ))[0][0]
                 perform_request_send (uid, email_address, "", TEXT_RefereeSel_MSG_REFEREE_SUBJECT, TEXT_RefereeSel_MSG_REFEREE_BODY, 0, 0, 0, ln, 1)
+		sendMailToReferee(doctype,categ,RN,email_address,authors)
 
                 group_name = run_sql("""SELECT name FROM usergroup WHERE id = %s""", (id_group, ))[0][0]
                 perform_request_send (int(id_user_val), "", group_name, TEXT_RefereeSel_MSG_GROUP_SUBJECT, TEXT_RefereeSel_MSG_GROUP_BODY)
@@ -828,7 +829,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
         if email_user_pattern:
             # users with matching email-address
             try:
-                users1 = run_sql("""SELECT id, email FROM user WHERE email RLIKE %s ORDER BY email """, (email_user_pattern, ))
+                users1 = run_sql("""SELECT id, email FROM user WHERE email <> "" AND email RLIKE %s ORDER BY email """, (email_user_pattern, ))
             except OperationalError:
                 users1 = ()
             # no users that match the pattern
@@ -944,10 +945,10 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
                     msg_body = "Rejected : " + msg_body
 
                 #Get the Project Leader's email address
-                email = ""
-                for user in acc_get_role_users(acc_get_role_id("projectleader_%s_%s" % (doctype,categ))):
-                    email += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
-                sendMailToProjectLeader(doctype, categ, RN, email, authors, "referee", msg_body)
+#                email = ""
+#                for user in acc_get_role_users(acc_get_role_id("projectleader_%s_%s" % (doctype,categ))):
+#                    email += run_sql("""SELECT email FROM user WHERE id = %s """, (user[0], ))[0][0] + ","
+#                sendMailToProjectLeader(doctype, categ, RN, email, authors, "referee", msg_body)
                 sendMailtoCommitteeChair(doctype, categ, RN, user_addr, authors)
                 __db_set_RefereeRecom_time (key)
             return displayCplxDocument(req, doctype,categ,RN,apptype, reply, commentId, ln)
@@ -1086,7 +1087,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
                 'categ' : categ,
                 'rn' : RN,
                 'apptype' : apptype,
-                'button_label' : _("Come back to the document"),
+                'button_label' : _("Back to the document"),
                }
 
         if validate == "approve":
@@ -1648,7 +1649,7 @@ def sendMailToReferee(doctype,categ,RN,email,authors):
 
     message = """
     Scientific Note approval for document %s has been submitted to the CERN Document Server.
-    Your reccommendation is requested on it.
+    Your recommendation is requested on it.
 
     Requested subcategory: %s
 
@@ -1756,6 +1757,10 @@ def sendMailToProjectLeader(doctype, categ, RN, email, authors, actor, recommend
 
     You can approve this document by visiting this page:
     <%s>
+
+    You can also check the status of the document from:
+    <%s>
+
     """ % (str(RN),
            str(categ),
            str(item_details['title']),
@@ -1764,7 +1769,8 @@ def sendMailToProjectLeader(doctype, categ, RN, email, authors, actor, recommend
            str(item_details['recid']),
            actor,
            recommendation,
-           str(CFG_SITE_URL + "/publiline.py?flow=cplx&doctype="+doctype+"&ln=en&apptype=RRP&categ="+categ+"&RN="+RN+"&action=ProjectLeaderDecision"))
+           str(CFG_SITE_URL + "/publiline.py?flow=cplx&doctype="+doctype+"&ln=en&apptype=RRP&categ="+categ+"&RN="+RN+"&action=ProjectLeaderDecision"),
+           str(CFG_SITE_URL + "/publiline.py?flow=cplx&doctype="+doctype+"&ln=en&apptype=RRP&categ="+categ+"&RN="+RN))
 
     # send mails to all members of the ATLAS group
     send_email(FROMADDR, email,"Request for approval/rejection of document %s" % (RN),message)

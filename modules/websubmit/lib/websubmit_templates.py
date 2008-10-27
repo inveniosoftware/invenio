@@ -1564,7 +1564,7 @@ class Template:
                     'docname' : doctype['docname'],
                     'doctype' : doctype['doctype'],
                     'generalref' : _("You are a general referee"),
-                    'ln_link': (ln != CFG_SITE_LANG and '&amp;ln=' + ln) or ''}
+                    'ln_link': '&amp;ln=' + ln}
 
             else:
                 for category in doctype['categories']:
@@ -1572,7 +1572,7 @@ class Template:
                         'referee' : _("You are a referee for category:") + ' ' + str(category['name']) + ' (' + str(category['id']) + ')',
 			'doctype' : doctype['doctype'],
                         'categ' : category['id'],
-                        'ln_link': (ln != CFG_SITE_LANG and '&amp;ln=' + ln) or ''}
+                        'ln_link': '&amp;ln=' + ln}
 
             out += "</ul><br /></li></ul>"
 
