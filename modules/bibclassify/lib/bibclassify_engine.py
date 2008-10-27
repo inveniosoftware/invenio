@@ -76,7 +76,7 @@ def output_keywords_for_sources(input_sources, taxonomy, rebuild_cache=False,
         source = ""
         if os.path.isdir(entry):
             for filename in os.listdir(entry):
-                if (os.path.isfile(entry + filename):
+                if os.path.isfile(entry + filename):
                     text_lines = text_lines_from_local_file(entry + filename)
                     if text_lines:
                         source = filename
