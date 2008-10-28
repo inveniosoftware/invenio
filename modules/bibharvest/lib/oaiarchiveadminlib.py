@@ -456,28 +456,6 @@ def createform(action="", text="", button="func", cnfrm='', **hidden):
 
     return out
 
-
-def oai_table(ln=CFG_SITE_LANG):
-    """"""
-
-    titlebar = bibharvest_templates.tmpl_draw_titlebar(ln = CFG_SITE_LANG, title = "OAI repository", guideurl = guideurl, extraname = "add new OAI set" , extraurl = "admin/bibharvest/oaiarchiveadmin.py/addset" )
-    header = ['id', 'setSpec', 'setName', 'setCollection', 'p1', 'f1', 'm1', 'op1', 'p2', 'f2', 'm2', 'p3', 'op2', 'f3', 'm3', '', '']
-    oai_set = get_oai_set()
-
-    sets = []
-    for (id, setSpec, setName, setCollection, setDescription, p1,f1,m1, p2,f2,m2, p3,f3,m3, op1, op2) in oai_set:
-        del_request = '<a href="' + CFG_SITE_URL + "/" + "admin/bibharvest/oaiarchiveadmin.py/delset?ln=" + ln + "&amp;oai_set_id=" + str(id) + '">delete</a>'
-
-        sets.append([id, setSpec, setName, setCollection, p1,f1,m1, op1, p2,f2,m2, op2, p3,f3,m3, del_request])
-
-    add_request = '<a href="' + CFG_SITE_URL + "/" + "admin/bibharvest/oaiarchiveadmin.py/addset?ln=" + ln + '">Add new OAI set definition</a>'
-    sets.append(['',add_request,'','','','','','','','','','','',''])
-
-    out = transform_tuple(header=header, tuple=sets)
-    out += "<br /><br />"
-
-    return out
-
 def input_text(ln, title, name, value):
     """"""
     if name is None:
