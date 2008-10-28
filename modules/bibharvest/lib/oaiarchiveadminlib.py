@@ -67,7 +67,7 @@ def perform_request_index(ln=CFG_SITE_LANG):
                                                        extraname = "add new OAI set",
                                                        extraurl = "admin/bibharvest/oaiarchiveadmin.py/addset")
 
-    header = ['id','setSpec','setName','setCollection','p1','f1','m1', 'op1', 'p2','f2','m2', 'op2','p3','f3','m3','','']
+    header = ['id','setSpec','setName','collection','p1','f1','m1', 'op1', 'p2','f2','m2', 'op2','p3','f3','m3','','']
 
     oai_set = get_oai_set()
     sets = []
