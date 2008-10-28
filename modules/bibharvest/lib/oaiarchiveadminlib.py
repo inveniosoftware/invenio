@@ -200,6 +200,10 @@ def perform_request_editset(oai_set_id=None, oai_set_name='', oai_set_spec='', o
             out += bibharvest_templates.tmpl_print_info(CFG_SITE_LANG,
                                                         "OAI set definition #%s edited." % oai_set_id)
             out += "<br />"
+        else:
+            out += bibharvest_templates.tmpl_print_warning(CFG_SITE_LANG,
+                                                           "A problem was encountered: <br/>" + cgi.escape(res[1]))
+            out += "<br />"
 
     lnargs = [["ln", ln]]
     out += "<br />"
@@ -334,7 +338,7 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec, oai_set_collection, o
                          'm3=' + oai_set_m3  + ';'
         res = run_sql("""UPDATE oaiARCHIVE SET
                             setName=%s,
-                            setSpec=%s',
+                            setSpec=%s,
                             setCollection=%s,
                             setDescription=%s,
                             setDefinition=%s,
@@ -366,7 +370,7 @@ def modify_oai_set(oai_set_id, oai_set_name, oai_set_spec, oai_set_collection, o
 
         return (1, "")
     except StandardError, e:
-        return (0, e)
+        return (0, str(e))
 
 def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection, oai_set_description, oai_set_definition, oai_set_reclist, oai_set_p1, oai_set_f1,oai_set_m1, oai_set_p2, oai_set_f2,oai_set_m2, oai_set_p3, oai_set_f3, oai_set_m3, oai_set_op1, oai_set_op2):
     """Add a definition into the OAI archive"""
@@ -379,6 +383,7 @@ def add_oai_set(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descript
                          'p2=' + oai_set_p2  + ';' + \
                          'f2=' + oai_set_f2  + ';' + \
                          'm2=' + oai_set_m2  + ';' + \
+                         'op2='+ oai_set_op2 + ';' + \
                          'p3=' + oai_set_p3  + ';' + \
                          'f3=' + oai_set_f3  + ';' + \
                          'm3=' + oai_set_m3  + ';'
@@ -562,13 +567,13 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
         fields.append(['','selected','Field'])
 
     if (oai_set_m1):
-        mode_dropdown.append([oai_set_m1,'selected',modes[oai_set_m1]])
+        mode_dropdown_m1 = [[oai_set_m1, 'selected', modes[oai_set_m1]]]
     else:
-        mode_dropdown.append(['','selected','Mode'])
+        mode_dropdown_m1 = [['', 'selected', 'Mode']]
 
     text += drop_down_menu("oai_set_f1", fields)
     text += "</td><td>"
-    text += drop_down_menu("oai_set_m1", mode_dropdown)
+    text += drop_down_menu("oai_set_m1", mode_dropdown + mode_dropdown_m1)
 
     text += "</td><td>"
     if (oai_set_op1):
@@ -587,13 +592,13 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
     else:
         fields.append(['','selected','Field'])
     if (oai_set_m2):
-        mode_dropdown.append([oai_set_m2,'selected',modes[oai_set_m2]])
+        mode_dropdown_m2 = [[oai_set_m2, 'selected', modes[oai_set_m2]]]
     else:
-        mode_dropdown.append(['','selected','Mode'])
+        mode_dropdown_m2 = [['', 'selected', 'Mode']]
 
     text += drop_down_menu("oai_set_f2", fields)
     text += "</td><td>"
-    text += drop_down_menu("oai_set_m2", mode_dropdown)
+    text += drop_down_menu("oai_set_m2", mode_dropdown + mode_dropdown_m2)
 
     text += "</td><td>"
     if (oai_set_op2):
@@ -612,13 +617,13 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
     else:
         fields.append(['','selected','Field'])
     if (oai_set_m3):
-        mode_dropdown.append([oai_set_m3,'selected',modes[oai_set_m3]])
+        mode_dropdown_m3 = [[oai_set_m3,  'selected', modes[oai_set_m3]]]
     else:
-        mode_dropdown.append(['','selected','Mode'])
+        mode_dropdown_m3 = [['', 'selected', 'Mode']]
 
     text += drop_down_menu("oai_set_f3", fields)
     text += "</td><td>"
-    text += drop_down_menu("oai_set_m3", mode_dropdown)
+    text += drop_down_menu("oai_set_m3", mode_dropdown + mode_dropdown_m3)
 
     text += "</td></tr></table>"
 
