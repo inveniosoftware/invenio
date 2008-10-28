@@ -169,26 +169,23 @@ The OAI Repository corresponds to a set of metadata exposed for periodical harve
 
 <a name="3.1"></a><h3>3.1. Definition of OAI sets</h3>
 
-The OAI repository is composed of OAI sets that correspond to a part of your metadata base. OAI sets can be configured via the <a href="<CFG_SITE_URL>/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a>, featuring essential OAI repository maintenance tasks.
+<p>The definition of the OAI sets in the <a href="<CFG_SITE_URL>/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a> lets you choose:
+<ol>
+  <li>which records are to be exposed via OAI, by using the standard <a href="<CFG_SITE_URL>/help/search-guide">CDS Invenio search syntax</a>.</li>
+  <li>which <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Set">OAI sets</a> are available in your repository. Simply specify the <code>setSpec</code> and <code>setName</code> of the set.</li>
+</ol>
+</p>
 
+<p>Let's say you want to expose all the records in the collection "<code>Articles</code>" that have a report number starting with <a href="<CFG_SITE_URL>/search?f1=reportnumber&amp;c=Articles&amp;p1=hep-*&amp;as=1">'<code>hep-</code>'</a>: simply add a new set definition in the <a href="<CFG_SITE_URL>/admin/bibharvest/oaiarchiveadmin.py">OAI Repository Admin Interface</a>, choose the <code>setName</code> (Eg: "HEP Articles") and <code>setSpec</code> (Eg: "articles:hep"), and fill in the <code>collection</code> field with "Articles", the first <code>Phrase</code> field with "hep-*" and choose search field "report number".<p>
 
-<p>Each OAI set is defined by one or a union of several definitions. Each such definition is provided separately and corresponds to one line as displayed in the OAI Repository Admin overview page. The following information displays:
+<p>If you want to export all the records in your repository, just leave all the query parameters blank. You can also omit the OAI setSpec and setName if you do not want to organize your repository into a hierarchy.</p>
 
-<br /><ul>
-<li><strong>id: </strong>OAI set definition identifier (unique).<br /><br />
-<li><strong>setSpec: </strong>OAI set identifier; OAI set is defined as a union of definitions with the same setSpec.<br /><br /><li><strong>setName: </strong>OAI set name; a human readable label<br /><br />
-<li><strong>setCollection: </strong>Restriction to a particular data collection<br /><br />
-<li><strong>p(N): </strong>phrase N; phrases are combined by logical AND<br /><br />
-<li><strong>f(N): </strong>field that corresponds to phrase N<br /><br />
-<li><strong>m(N): </strong>syntactic mode of phrase N<br /><br />
-</ul>
-
-<p>
+<p>Tip: since the exposed records are retrieved using the CDS Invenio search engine, you can test your query definition in the <a href="<CFG_SITE_URL>/?as=1">advanced search interface</a> of your repostory.</p>
 
 <a name="3.2"></a><h3>3.2. Exposing metadata via OAI Repository Gateway</h3>
 
 <a name="3.2.1"></a><h4>3.2.1 oaiarchive commmand-line tool</h4>
-<p>Once OAI Repository is defined, the next step is to expose corresponding metadata via the OAI Repository Gateway. This is done by launching the <code>oaiarchive</code> script.<br />
+<p>Once the settings of the OAI Repository are defined, the next step is to expose corresponding metadata via the OAI Repository Gateway. This is done by launching the <code>oaiarchive</code> script, that will add the OAI identifier and OAI setSpec(s) to the records to be exposed (according to the settings defined in the OAI Repository admin interface).<br />
 
 <br />
 <b>Oaiarchive usage</b>
