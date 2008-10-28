@@ -513,10 +513,15 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
     text = "<br />"
     text += "<table><tr><td>"
     text += input_text(ln = CFG_SITE_LANG, title = "OAI Set spec:", name = "oai_set_spec", value = oai_set_spec)
+    text += '</td><td colspan="3"><small><small><em>Optional: leave blank if not needed</em> [<a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Set" target="_blank">?</a>]</small></small>'
     text += "</td></tr><tr><td>"
     text += input_text(ln = CFG_SITE_LANG, title = "OAI Set name:", name = "oai_set_name", value = oai_set_name)
+    text += '</td><td colspan="3"><small><small><em>Optional: leave blank if not needed</em> [<a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#Set" target="_blank">?</a>]</small></small>'
 
     text += "</td></tr><tr><td>&nbsp;</td></tr><tr><td>"
+    text += '</td></tr><tr><td colspan="4">Choose below the search query that defines the records that belong to this set:</td></tr><tr><td>'
+    text += "</td></tr><tr><td>&nbsp;</td></tr><tr><td>"
+
 #    text += input_text(ln = CFG_SITE_LANG, title = "OAI Set description", name = "oai_set_description", value = oai_set_description)
 
     #text += "</td><td colspan=2>"
@@ -533,7 +538,7 @@ def input_form(oai_set_name, oai_set_spec, oai_set_collection, oai_set_descripti
 
     #text += drop_down_menu("oai_set_collection", menu)
 
-    text += '</td><td colspan="3"><small>Eg: <code>Published Articles, Preprints, Theses</code></small></td></tr><tr><td>'
+    text += '</td><td colspan="3"><small><small>Eg:</small> <code>Published Articles, Preprints, Theses</code><br/><small><em>(collections <b>identifiers</b>, not collections names/translations).</em></small></small></td></tr><tr><td>'
     text += input_text(ln = CFG_SITE_LANG, title = "Phrase:", name = "oai_set_p1", value = oai_set_p1)
     text += "</td><td>"
 
