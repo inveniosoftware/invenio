@@ -252,11 +252,6 @@ class TestCollectionUtils(unittest.TestCase):
         self.failUnless(search_engine.collection_restricted_p('Theses'), True)
         self.failIf(search_engine.collection_restricted_p('Books & Reports'))
 
-    def test_coll_restricted_group(self):
-        """search engine - coll_restricted_group"""
-        self.assertEqual(search_engine.coll_restricted_group('Theses'), 'theses')
-        self.assertEqual(search_engine.coll_restricted_group('Books & Reports'), None)
-
     def test_guess_primary_collection_of_a_record(self):
         """search engine - guess_primary_collection_of_a_record"""
         self.assertEqual(search_engine.guess_primary_collection_of_a_record(96), 'Articles')

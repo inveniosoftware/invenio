@@ -1051,12 +1051,12 @@ def wash_colls(cc, c, split_colls=0):
                                         collection_collection AS cc,
                                         collection AS ccc
                      WHERE c.id=cc.id_son AND cc.id_dad=ccc.id
-                       AND ccc.name=%s AND cc.type='r'
-                       AND c.restricted IS NULL""", (cc,))
+                       AND ccc.name=%s AND cc.type='r'""", (cc,))
     l_cc_nonrestricted_sons = []
     l_c = colls
     for row in res:
-        l_cc_nonrestricted_sons.append(row[0])
+        if not collection_restricted_p(row[0]):
+            l_cc_nonrestricted_sons.append(row[0])
     l_c.sort()
     l_cc_nonrestricted_sons.sort()
     if l_cc_nonrestricted_sons == l_c:
@@ -1359,12 +1359,11 @@ def get_coll_sons(coll, type='r', public_only=1):
             "LEFT JOIN collection_collection AS cc ON c.id=cc.id_son "\
             "LEFT JOIN collection AS ccc ON ccc.id=cc.id_dad "\
             "WHERE cc.type=%s AND ccc.name=%s"
-    if public_only:
-        query += " AND c.restricted IS NULL "
     query += " ORDER BY cc.score DESC"
     res = run_sql(query, (type, coll))
     for name in res:
-        coll_sons.append(name[0])
+        if not public_only or not collection_restricted_p(name[0]):
+            coll_sons.append(name[0])
     return coll_sons
 
 def get_coll_real_descendants(coll):
@@ -1412,26 +1411,6 @@ def get_collection_reclist(coll):
         return collection_reclist_cache[coll]
     except KeyError:
         return HitSet()
-
-def coll_restricted_p(coll):
-    "Predicate to test if the collection coll is restricted or not."
-    if not coll:
-        return 0
-    res = run_sql("SELECT restricted FROM collection WHERE name=%s", (coll,))
-    if res and res[0][0] is not None:
-        return 1
-    else:
-        return 0
-
-def coll_restricted_group(coll):
-    "Return Apache group to which the collection is restricted.  Return None if it's public."
-    if not coll:
-        return None
-    res = run_sql("SELECT restricted FROM collection WHERE name=%s", (coll,))
-    if res:
-        return res[0][0]
-    else:
-        return None
 
 def create_collection_reclist_cache():
     """Creates list of records belonging to collections.  Called on startup

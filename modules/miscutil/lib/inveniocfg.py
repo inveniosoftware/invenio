@@ -332,8 +332,8 @@ def cli_cmd_reset_sitename(conf):
     # reset CFG_SITE_NAME:
     sitename = conf.get("Invenio", "CFG_SITE_NAME")
     try:
-        run_sql("""INSERT INTO collection (id, name, dbquery, reclist, restricted) VALUES
-                                          (1,%s,NULL,NULL,NULL)""", (sitename,))
+        run_sql("""INSERT INTO collection (id, name, dbquery, reclist) VALUES
+                                          (1,%s,NULL,NULL)""", (sitename,))
     except IntegrityError:
         run_sql("""UPDATE collection SET name=%s WHERE id=1""", (sitename,))
     # reset CFG_SITE_NAME_INTL:
