@@ -27,22 +27,22 @@ INSERT INTO user VALUES (8,'balthasar.montague@cds.cern.ch',AES_ENCRYPT(email,'b
 INSERT INTO usergroup VALUES (1,'Theses viewers','Theses viewers internal group','VO','INTERNAL');
 INSERT INTO user_usergroup VALUES (2,1,'M',NOW());
 
-INSERT INTO collection VALUES (2,'Preprints','collection:PREPRINT',NULL,NULL,NULL);
-INSERT INTO collection VALUES (3,'Books','collection:BOOK',NULL,NULL,NULL);
-INSERT INTO collection VALUES (4,'Theses','collection:THESIS',NULL,NULL,'theses');
-INSERT INTO collection VALUES (5,'Reports','collection:REPORT',NULL,NULL,NULL);
-INSERT INTO collection VALUES (6,'Articles','collection:ARTICLE',NULL,NULL,NULL);
-INSERT INTO collection VALUES (8,'Pictures','collection:PICTURE',NULL,NULL,NULL);
-INSERT INTO collection VALUES (9,'CERN Divisions',NULL,NULL,NULL,NULL);
-INSERT INTO collection VALUES (10,'CERN Experiments',NULL,NULL,NULL,NULL);
-INSERT INTO collection VALUES (11,'Theoretical Physics (TH)','division:TH',NULL,NULL,NULL);
-INSERT INTO collection VALUES (12,'Experimental Physics (EP)','division:EP',NULL,NULL,NULL);
-INSERT INTO collection VALUES (13,'ISOLDE','experiment:ISOLDE',NULL,NULL,NULL);
-INSERT INTO collection VALUES (14,'ALEPH','experiment:ALEPH',NULL,NULL,NULL);
-INSERT INTO collection VALUES (15,'Articles & Preprints',NULL,NULL,NULL,NULL);
-INSERT INTO collection VALUES (16,'Books & Reports',NULL,NULL,NULL,NULL);
-INSERT INTO collection VALUES (17,'Multimedia & Arts',NULL,NULL,NULL,NULL);
-INSERT INTO collection VALUES (18,'Poetry','collection:POETRY',NULL,NULL,NULL);
+INSERT INTO collection VALUES (2,'Preprints','collection:PREPRINT',NULL,NULL);
+INSERT INTO collection VALUES (3,'Books','collection:BOOK',NULL,NULL);
+INSERT INTO collection VALUES (4,'Theses','collection:THESIS',NULL,NULL);
+INSERT INTO collection VALUES (5,'Reports','collection:REPORT',NULL,NULL);
+INSERT INTO collection VALUES (6,'Articles','collection:ARTICLE',NULL,NULL);
+INSERT INTO collection VALUES (8,'Pictures','collection:PICTURE',NULL,NULL);
+INSERT INTO collection VALUES (9,'CERN Divisions',NULL,NULL,NULL);
+INSERT INTO collection VALUES (10,'CERN Experiments',NULL,NULL,NULL);
+INSERT INTO collection VALUES (11,'Theoretical Physics (TH)','division:TH',NULL,NULL);
+INSERT INTO collection VALUES (12,'Experimental Physics (EP)','division:EP',NULL,NULL);
+INSERT INTO collection VALUES (13,'ISOLDE','experiment:ISOLDE',NULL,NULL);
+INSERT INTO collection VALUES (14,'ALEPH','experiment:ALEPH',NULL,NULL);
+INSERT INTO collection VALUES (15,'Articles & Preprints',NULL,NULL,NULL);
+INSERT INTO collection VALUES (16,'Books & Reports',NULL,NULL,NULL);
+INSERT INTO collection VALUES (17,'Multimedia & Arts',NULL,NULL,NULL);
+INSERT INTO collection VALUES (18,'Poetry','collection:POETRY',NULL,NULL);
 
 INSERT INTO clsMETHOD VALUES (1,'HEP','','High Energy Physics Taxonomy','0000-00-00 00:00:00');
 INSERT INTO clsMETHOD VALUES (2,'NASA-subjects','','NASA Subjects','0000-00-00 00:00:00');
