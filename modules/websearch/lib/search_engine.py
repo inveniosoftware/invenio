@@ -303,8 +303,8 @@ class CollectionRecListDataCacher(DataCacher):
         if not cache[coll]:
             # not yet it the cache, so calculate it and fill the cache:
             set = HitSet()
-            query = "SELECT nbrecs,reclist FROM collection WHERE name='%s'" % coll
-            res = run_sql(query, None, 1)
+            query = "SELECT nbrecs,reclist FROM collection WHERE name=%s"
+            res = run_sql(query, (coll, ), 1)
             if res:
                 try:
                     set = HitSet(res[0][1])
@@ -386,8 +386,8 @@ def get_nicely_ordered_collection_list(collid=1, level=0, ln=CFG_SITE_LANG):
        Suitable for create_search_box()."""
     colls_nicely_ordered = []
     query = "SELECT c.name,cc.id_son FROM collection_collection AS cc, collection AS c "\
-            " WHERE c.id=cc.id_son AND cc.id_dad='%s' ORDER BY score DESC" % collid
-    res = run_sql(query)
+            " WHERE c.id=cc.id_son AND cc.id_dad=%s ORDER BY score DESC"
+    res = run_sql(query, (collid, ))
     for c, cid in res:
         # make a nice printable name (e.g. truncate c_printable for
         # long collection names in given language):
@@ -1399,8 +1399,8 @@ def get_collection_reclist(coll):
     try:
         if not collection_reclist_cache[coll]:
             # not yet it the cache, so calculate it and fill the cache:
-            query = "SELECT nbrecs,reclist FROM collection WHERE name='%s'" % coll
-            res = run_sql(query, None, 1)
+            query = "SELECT nbrecs,reclist FROM collection WHERE name=%s"
+            res = run_sql(query, (coll, ), 1)
             if res:
                 try:
                     set = HitSet(res[0][1])
@@ -2454,9 +2454,9 @@ def get_fieldvalues(recID, tag):
         bx = "bib%sx" % digits
         bibx = "bibrec_bib%sx" % digits
         query = "SELECT bx.value FROM %s AS bx, %s AS bibx " \
-                " WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag LIKE '%s' " \
-                " ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx, recID, tag)
-        res = run_sql(query)
+                " WHERE bibx.id_bibrec=%%s AND bx.id=bibx.id_bibxxx AND bx.tag LIKE %%s " \
+                " ORDER BY bibx.field_number, bx.tag ASC" % (bx, bibx)
+        res = run_sql(query, (recID, tag))
         for row in res:
             out.append(row[0])
     return out
@@ -2510,9 +2510,9 @@ def get_fieldvalues_alephseq_like(recID, tags_in):
             bx = "bib%sx" % digits
             bibx = "bibrec_bib%sx" % digits
             query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
-                    "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '%s%%' "\
-                    "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx, recID, tag)
-            res = run_sql(query)
+                    "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s%%%% "\
+                    "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx)
+            res = run_sql(query, (recID, tag))
             # go through fields:
             field_number_old = -999
             field_old = ""
@@ -2695,9 +2695,9 @@ def sort_records(req, recIDs, sort_field='', sort_order='d', sort_pattern='', ve
         else:
             # let us check the 'field' table
             query = """SELECT DISTINCT(t.value) FROM tag AS t, field_tag AS ft, field AS f
-                        WHERE f.code='%s' AND ft.id_field=f.id AND t.id=ft.id_tag
-                        ORDER BY ft.score DESC""" % sort_field
-            res = run_sql(query)
+                        WHERE f.code=%s AND ft.id_field=f.id AND t.id=ft.id_tag
+                        ORDER BY ft.score DESC"""
+            res = run_sql(query, (sort_field, ))
             if res:
                 for row in res:
                     tags.append(row[0])
@@ -3115,8 +3115,8 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
 
     if format.startswith("xm") or format == "marcxml":
         # look for detailed format existence:
-        query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
-        res = run_sql(query, None, 1)
+        query = "SELECT value FROM bibfmt WHERE id_bibrec=%s AND format=%s"
+        res = run_sql(query, (recID, format), 1)
         if res and record_exist_p == 1:
             # record 'recID' is formatted in 'format', so print it
             out += "%s" % decompress(res[0][0])
@@ -3138,9 +3138,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
             else:
                 # controlfields
                 query = "SELECT b.tag,b.value,bb.field_number FROM bib00x AS b, bibrec_bib00x AS bb "\
-                        "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '00%%' "\
-                        "ORDER BY bb.field_number, b.tag ASC" % recID
-                res = run_sql(query)
+                        "WHERE bb.id_bibrec=%s AND b.id=bb.id_bibxxx AND b.tag LIKE '00%%' "\
+                        "ORDER BY bb.field_number, b.tag ASC"
+                res = run_sql(query, (recID, ))
                 for row in res:
                     field, value = row[0], row[1]
                     value = encode_for_xml(value)
@@ -3156,9 +3156,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                         bx = "bib%d%dx" % (digit1, digit2)
                         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
                         query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
-                                "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '%s%%' "\
-                                "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx, recID, str(digit1)+str(digit2))
-                        res = run_sql(query)
+                                "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s%%%% "\
+                                "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx)
+                        res = run_sql(query, (recID, str(digit1)+str(digit2)))
                         field_number_old = -999
                         field_old = ""
                         for row in res:
@@ -3256,8 +3256,8 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
             out += _("The record has been deleted.")
         else:
             # look for detailed format existence:
-            query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
-            res = run_sql(query, None, 1)
+            query = "SELECT value FROM bibfmt WHERE id_bibrec=%s AND format=%s"
+            res = run_sql(query, (recID, format), 1)
             if res:
                 # record 'recID' is formatted in 'format', so print it
                 out += "%s" % decompress(res[0][0])
@@ -3340,8 +3340,8 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
         if record_exist_p == -1:
             out += _("The record has been deleted.")
         else:
-            query = "SELECT value FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, format)
-            res = run_sql(query)
+            query = "SELECT value FROM bibfmt WHERE id_bibrec=%s AND format=%s"
+            res = run_sql(query, (recID, format))
             if res:
                 # record 'recID' is formatted in 'format', so print it
                 out += "%s" % decompress(res[0][0])
