@@ -1512,10 +1512,6 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
     # load the right message language
     _ = gettext_set_language(ln)
 
-    ## do we search in words indexes?
-    if not f:
-        return browse_in_bibwords(req, p, f)
-
     ## is p enclosed in quotes? (coming from exact search)
     if p.startswith('"') and p.endswith('"'):
         p = p[1:-1]
@@ -1526,13 +1522,17 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
 
     if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
         f, p = string.split(p, ":", 1)
+
+    ## do we search in words indexes?
+    if not f:
+        return browse_in_bibwords(req, p, f)
+
     index_id = get_index_id_from_field(f)
     if index_id != 0:
         coll = HitSet()
         for coll_name in colls:
             coll |= get_collection_reclist(coll_name)
         browsed_phrases_in_colls = get_nearest_terms_in_idxphrase_with_collection(p, index_id, rg/2, rg/2, coll)
-        #req.write("<pre>p=%s, index_id=%s, rg=%s, colls=%s, coll=%s, browsed_phrases_in_colls=%s</pre>" % (p, index_id, rg, colls, coll, browsed_phrases_in_colls))
     else:
         browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
         while not browsed_phrases:
