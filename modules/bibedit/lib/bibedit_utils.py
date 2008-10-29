@@ -31,7 +31,7 @@ import commands
 import cPickle
 import marshal
 import os
-import sre
+import re
 import time
 
 from invenio.bibedit_config import CFG_BIBEDIT_TMPFILENAMEPREFIX
@@ -44,10 +44,10 @@ from invenio.config import CFG_BINDIR, CFG_BIBEDIT_LOCKLEVEL, \
 from invenio.search_engine import get_fieldvalues
 
 # Precompile regexp:
-re_taskid = sre.compile('ID="(\d+)"')
-re_file_option = sre.compile(r'^/')
-re_filename_suffix = sre.compile('_(\d+)\.xml$')
-re_date = sre.compile('\.(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
+re_taskid = re.compile('ID="(\d+)"')
+re_file_option = re.compile(r'^/')
+re_filename_suffix = re.compile('_(\d+)\.xml$')
+re_date = re.compile('\.(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 
 def get_file_path(recid):
     """Return the file path of a records tmp file."""

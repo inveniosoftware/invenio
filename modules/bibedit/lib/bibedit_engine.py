@@ -24,7 +24,7 @@ __revision__ = "$Id$"
 import cPickle
 import difflib
 import os
-import sre
+import re
 import time
 import zlib
 
@@ -41,8 +41,8 @@ from invenio.search_engine import print_record, record_exists
 import invenio.template
 
 # Precompile regexp:
-re_revid_split = sre.compile('^(\d+)\.(\d{14})$')
-re_revdate_split = sre.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
+re_revid_split = re.compile('^(\d+)\.(\d{14})$')
+re_revdate_split = re.compile('^(\d\d\d\d)(\d\d)(\d\d)(\d\d)(\d\d)(\d\d)')
 
 bibedit_templates = invenio.template.load('bibedit')
 
