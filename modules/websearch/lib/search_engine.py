@@ -2510,9 +2510,9 @@ def get_fieldvalues_alephseq_like(recID, tags_in):
             bx = "bib%sx" % digits
             bibx = "bibrec_bib%sx" % digits
             query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
-                    "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s%%%% "\
+                    "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s"\
                     "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx)
-            res = run_sql(query, (recID, tag))
+            res = run_sql(query, (recID, str(tag)+'%'))
             # go through fields:
             field_number_old = -999
             field_old = ""
@@ -3156,9 +3156,9 @@ def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.de
                         bx = "bib%d%dx" % (digit1, digit2)
                         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
                         query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
-                                "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s%%%% "\
+                                "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s"\
                                 "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx)
-                        res = run_sql(query, (recID, str(digit1)+str(digit2)))
+                        res = run_sql(query, (recID, str(digit1)+str(digit2)+'%'))
                         field_number_old = -999
                         field_old = ""
                         for row in res:
