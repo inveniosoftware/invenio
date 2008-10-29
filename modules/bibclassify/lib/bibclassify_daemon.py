@@ -131,11 +131,6 @@ def analyse_documents(recs, ontology, collection, outfilename, outfiledesc):
                     if errcode != 0 or not os.path.exists("%s" % temp_text):
                         write_message("Error while executing command %s Error code was: %s " % (cmd, errcode))
                     write_message('Generating keywords for %s' % f.get_full_path())
-
-def get_keywords_from_text(text_lines, output_mode="text",
-    output_limit=CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, spires=False,
-    match_mode="full", no_cache=False, with_author_keywords=False):
-
                     print >> outfiledesc, get_keywords_from_text(temp_text, CFG_ETCDIR + '/bibclassify/' + ontology + '.rdf', 2, 70, 25, 0, False, verbose=0, ontology=ontology)
                 print >> outfiledesc, '</record>'
             task_update_progress("Done %s of %s for collection  %s." % (counter, amax, collection))
