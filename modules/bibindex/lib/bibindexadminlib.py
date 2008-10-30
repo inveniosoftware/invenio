@@ -552,7 +552,7 @@ def perform_showdetailsfieldtag(fldID, tagID, ln=CFG_SITE_LANG, callback="yes", 
 
     fld_dict = dict(get_def_name('', "field"))
     fldID = int(fldID)
-    tagname = run_sql("SELECT name from tag where id=%s" % tagID)[0][0]
+    tagname = run_sql("SELECT name from tag where id=%s", (tagID, ))[0][0]
 
     output = ""
     subtitle = """<a name="4.1"></a>Showing details for MARC tag '%s'""" % tagname
@@ -565,15 +565,15 @@ def perform_showdetailsfieldtag(fldID, tagID, ln=CFG_SITE_LANG, callback="yes", 
         exist[id_field] = 1
 
     output += "<br /><b>This MARC tag is used indirectly in these logical fields:</b>&nbsp;"
-    tag = run_sql("SELECT value from tag where id=%s" % id_tag)
+    tag = run_sql("SELECT value from tag where id=%s", (id_tag, ))
     tag = tag[0][0]
     for i in range(0, len(tag) - 1):
-        res = run_sql("SELECT id_field,id_tag FROM field_tag,tag WHERE tag.id=field_tag.id_tag AND tag.value='%s%%'" % tag[0:i])
+        res = run_sql("SELECT id_field,id_tag FROM field_tag,tag WHERE tag.id=field_tag.id_tag AND tag.value=%s", ('%s%%' % tag[0:i], ))
         for (id_field, id_tag) in res:
             output += "%s, " % fld_dict[int(id_field)]
             exist[id_field] = 1
 
-    res = run_sql("SELECT id_field,id_tag FROM field_tag,tag WHERE tag.id=field_tag.id_tag AND tag.value like '%s'" % tag)
+    res = run_sql("SELECT id_field,id_tag FROM field_tag,tag WHERE tag.id=field_tag.id_tag AND tag.value like %s", (tag, ))
     for (id_field, id_tag) in res:
         if not exist.has_key(id_field):
             output += "%s, " % fld_dict[int(id_field)]
@@ -671,7 +671,7 @@ def perform_deletefield(fldID, ln=CFG_SITE_LANG, callback='yes', confirm=0):
     if fldID:
         fldID = int(fldID)
         if confirm in ["0", 0]:
-            check = run_sql("SELECT id_field from idxINDEX_field where id_field=%s" % fldID)
+            check = run_sql("SELECT id_field from idxINDEX_field where id_field=%s", (fldID, ))
             text = ""
             if check:
                 text += """<b><span class="info">This field is used in an index, deletion may cause problems.</span></b><br />"""
@@ -741,8 +741,8 @@ def perform_showfieldoverview(ln=CFG_SITE_LANG, callback='', confirm=0):
     fld_dict = dict(get_def_name('', "field"))
 
     for field_id,field_name in res:
-        query = "SELECT tag.value FROM tag, field_tag WHERE tag.id=field_tag.id_tag AND field_tag.id_field=%d ORDER BY field_tag.score DESC,tag.value ASC" % field_id
-        res = run_sql(query)
+        query = "SELECT tag.value FROM tag, field_tag WHERE tag.id=field_tag.id_tag AND field_tag.id_field=%s ORDER BY field_tag.score DESC,tag.value ASC"
+        res = run_sql(query, (field_id, ))
         field_tags = ""
         for row in res:
             field_tags = field_tags + row[0] + ", "
@@ -1219,8 +1219,8 @@ def perform_switchtagscore(fldID, id_1, id_2, ln=CFG_SITE_LANG):
     type - like "format" """
 
     output = ""
-    name_1 = run_sql("select name from tag where id=%s" % id_1)[0][0]
-    name_2 = run_sql("select name from tag where id=%s" % id_2)[0][0]
+    name_1 = run_sql("select name from tag where id=%s", (id_1, ))[0][0]
+    name_2 = run_sql("select name from tag where id=%s", (id_2, ))[0][0]
     res = switch_score(fldID, id_1, id_2)
     output += write_outcome(res)
     return perform_modifyfieldtags(fldID, ln, content=output)
@@ -1303,22 +1303,26 @@ def get_col_fld(colID=-1, type = '', id_field=''):
 
     sql = "SELECT id_collection,id_field,id_fieldvalue,type,score,score_fieldvalue FROM collection_field_fieldvalue, field WHERE id_field=field.id"
 
+    params = []
     try:
         if id_field:
-            sql += " AND id_field=%s" % id_field
+            sql += " AND id_field=%s"
+            params.append(id_field)
         sql += " ORDER BY type, score desc, score_fieldvalue desc"
-        res = run_sql(sql)
+        res = run_sql(sql, tuple(params))
         return res
     except StandardError, e:
         return ""
 
 def get_idx(idxID=''):
     sql = "SELECT id,name,description,last_updated,stemming_language FROM idxINDEX"
+    params = []
     try:
         if idxID:
-            sql += " WHERE id=%s" % idxID
+            sql += " WHERE id=%s"
+            params.append(idxID)
         sql += " ORDER BY id asc"
-        res = run_sql(sql)
+        res = run_sql(sql, tuple(params))
         return res
     except StandardError, e:
         return ""
@@ -1329,14 +1333,17 @@ def get_fld_tags(fldID='', tagID=''):
     tagID - tag id"""
 
     sql = "SELECT id_field,id_tag, tag.name, tag.value, score FROM field_tag,tag  WHERE tag.id=field_tag.id_tag"
+    params = []
 
     try:
         if fldID:
-            sql += " AND id_field=%s" % fldID
+            sql += " AND id_field=%s"
+            params.append(fldID)
         if tagID:
-            sql += " AND id_tag=%s" % tagID
+            sql += " AND id_tag=%s"
+            params.append(tagID)
         sql += " ORDER BY score desc, tag.value, tag.name"
-        res = run_sql(sql)
+        res = run_sql(sql, tuple(params))
         return res
     except StandardError, e:
         return ""
@@ -1347,12 +1354,14 @@ def get_tags(tagID=''):
     ln - language id"""
 
     sql = "SELECT id, name, value FROM tag"
+    params = []
 
     try:
         if tagID:
-            sql += " WHERE id=%s" % tagID
+            sql += " WHERE id=%s"
+            params.append(tagID)
         sql += " ORDER BY name, value"
-        res = run_sql(sql)
+        res = run_sql(sql, tuple(params))
         return res
     except StandardError, e:
         return ""
@@ -1364,7 +1373,7 @@ def get_fld(fldID=''):
         if not fldID:
             res = run_sql("SELECT id, name, code FROM field ORDER by name, code")
         else:
-            res = run_sql("SELECT id, name, code FROM field WHERE id=%s ORDER by name, code" % fldID)
+            res = run_sql("SELECT id, name, code FROM field WHERE id=%s ORDER by name, code", (fldID, ))
         return res
     except StandardError, e:
         return ""
@@ -1374,9 +1383,11 @@ def get_fld_value(fldvID = ''):
 
     try:
         sql = "SELECT id, name, value FROM fieldvalue"
+        params = []
         if fldvID:
-            sql += " WHERE id=%s" % fldvID
-        res = run_sql(sql)
+            sql += " WHERE id=%s"
+            params.append(fldvID)
+        res = run_sql(sql, tuple(params))
         return res
     except StandardError, e:
         return ""
@@ -1385,10 +1396,12 @@ def get_idx_fld(idxID=''):
     """Return a list of fields associated with one or all indexes"""
     try:
         sql = "SELECT id_idxINDEX, idxINDEX.name, id_field, field.name, regexp_punctuation, regexp_alphanumeric_separators FROM idxINDEX, field, idxINDEX_field WHERE idxINDEX.id = idxINDEX_field.id_idxINDEX AND field.id = idxINDEX_field.id_field"
+        params = []
         if idxID:
-            sql += " AND id_idxINDEX=%s" % idxID
+            sql += " AND id_idxINDEX=%s"
+            params.append(idxID)
         sql += " ORDER BY id_idxINDEX asc"
-        res = run_sql(sql)
+        res = run_sql(sql, tuple(params))
         return res
     except StandardError, e:
         return ""
@@ -1429,10 +1442,12 @@ def remove_fld(colID,fldID, fldvID=''):
     fldID - the field which should be removed from the collection."""
 
     try:
-        sql = "DELETE FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s" % (colID, fldID)
+        sql = "DELETE FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s"
+        params = [colID, fldID]
         if fldvID:
-            sql += " AND id_fieldvalue=%s" % fldvID
-        res = run_sql(sql)
+            sql += " AND id_fieldvalue=%s"
+            params.append(fldvID)
+        res = run_sql(sql, tuple(params))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -1443,8 +1458,8 @@ def remove_idxfld(idxID, fldID):
     fldID - field id from field table"""
 
     try:
-        sql = "DELETE FROM idxINDEX_field WHERE id_field=%s and id_idxINDEX=%s" % (fldID, idxID)
-        res = run_sql(sql)
+        sql = "DELETE FROM idxINDEX_field WHERE id_field=%s and id_idxINDEX=%s"
+        res = run_sql(sql, (fldID, idxID))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -1455,8 +1470,8 @@ def remove_fldtag(fldID,tagID):
     tagID - the tag which should be removed from the field."""
 
     try:
-        sql = "DELETE FROM field_tag WHERE id_field=%s AND id_tag=%s" % (fldID, tagID)
-        res = run_sql(sql)
+        sql = "DELETE FROM field_tag WHERE id_field=%s AND id_tag=%s"
+        res = run_sql(sql, (fldID, tagID))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -1466,7 +1481,7 @@ def delete_tag(tagID):
     fldID - delete all data in the tables associated with field and this id """
 
     try:
-        res = run_sql("DELETE FROM tag where id=%s" % tagID)
+        res = run_sql("DELETE FROM tag where id=%s", (tagID, ))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -1474,13 +1489,13 @@ def delete_tag(tagID):
 def delete_idx(idxID):
     """Deletes all data for the given index together with the idxWORDXXR and idxWORDXXF tables"""
     try:
-        res = run_sql("DELETE FROM idxINDEX WHERE id=%s" % idxID)
-        res = run_sql("DELETE FROM idxINDEXNAME WHERE id_idxINDEX=%s" % idxID)
-        res = run_sql("DELETE FROM idxINDEX_field WHERE id_idxINDEX=%s" % idxID)
-        res = run_sql("DROP TABLE idxWORD%sF" % (idxID < 10 and "0%s" % idxID or idxID))
-        res = run_sql("DROP TABLE idxWORD%sR" % (idxID < 10 and "0%s" % idxID or idxID))
-        res = run_sql("DROP TABLE idxPHRASE%sF" % (idxID < 10 and "0%s" % idxID or idxID))
-        res = run_sql("DROP TABLE idxPHRASE%sR" % (idxID < 10 and "0%s" % idxID or idxID))
+        res = run_sql("DELETE FROM idxINDEX WHERE id=%s", (idxID, ))
+        res = run_sql("DELETE FROM idxINDEXNAME WHERE id_idxINDEX=%s", (idxID, ))
+        res = run_sql("DELETE FROM idxINDEX_field WHERE id_idxINDEX=%s", (idxID, ))
+        res = run_sql("DROP TABLE idxWORD%02dF" % idxID)
+        res = run_sql("DROP TABLE idxWORD%02dR" % idxID)
+        res = run_sql("DROP TABLE idxPHRASE%02dF" % idxID)
+        res = run_sql("DROP TABLE idxPHRASE%02dR" % idxID)
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -1491,10 +1506,10 @@ def delete_fld(fldID):
     fldID - delete all data in the tables associated with field and this id """
 
     try:
-        res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_field=%s" % fldID)
-        res = run_sql("DELETE FROM field_tag WHERE id_field=%s" % fldID)
-        res = run_sql("DELETE FROM idxINDEX_field WHERE id_field=%s" % fldID)
-        res = run_sql("DELETE FROM field WHERE id=%s" % fldID)
+        res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_field=%s", (fldID, ))
+        res = run_sql("DELETE FROM field_tag WHERE id_field=%s", (fldID, ))
+        res = run_sql("DELETE FROM idxINDEX_field WHERE id_field=%s", (fldID, ))
+        res = run_sql("DELETE FROM field WHERE id=%s", (fldID, ))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -1511,8 +1526,8 @@ def add_idx(idxNAME):
             return (0, (0, "A index with the given name already exists."))
 
         for i in range(1, 100):
-            res = run_sql("SELECT id from idxINDEX WHERE id=%s" % i)
-            res2 = get_table_status_info("idxWORD%s%%" % (i < 10 and "0%s" % i or i))
+            res = run_sql("SELECT id from idxINDEX WHERE id=%s", (i, ))
+            res2 = get_table_status_info("idxWORD%02d%%" % i)
             if not res and not res2:
                 idxID = i
                 break
@@ -1524,39 +1539,39 @@ def add_idx(idxNAME):
         res = run_sql("INSERT INTO idxINDEXNAME (id_idxINDEX, ln, type, value) VALUES (%s,%s,%s,%s)",
                       (idxID, CFG_SITE_LANG, type, idxNAME))
 
-        res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%sF (
+        res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%02dF (
                          id mediumint(9) unsigned NOT NULL auto_increment,
                          term varchar(50) default NULL,
                          hitlist longblob,
                          PRIMARY KEY  (id),
                          UNIQUE KEY term (term)
-                         ) TYPE=MyISAM""" % (idxID < 10 and "0%s" % idxID or idxID))
+                         ) TYPE=MyISAM""" % idxID)
 
-        res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%sR (
+        res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%02dR (
                          id_bibrec mediumint(9) unsigned NOT NULL,
                          termlist longblob,
                          type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
                          PRIMARY KEY (id_bibrec,type)
-                         ) TYPE=MyISAM""" % (idxID < 10 and "0%s" % idxID or idxID))
+                         ) TYPE=MyISAM""" % idxID)
 
-        res = run_sql("""CREATE TABLE `idxPHRASE%sF` (
+        res = run_sql("""CREATE TABLE `idxPHRASE%02dF` (
                          `id` mediumint(9) unsigned NOT NULL auto_increment,
                          `term` text default NULL,
                          `hitlist` longblob,
                          PRIMARY KEY  (`id`),
                          KEY `term` (`term`(50))
-                         ) TYPE=MyISAM""" % (idxID < 10 and "0%s" % idxID or idxID))
+                         ) TYPE=MyISAM""" % idxID)
 
-        res = run_sql("""CREATE TABLE `idxPHRASE%sR` (
+        res = run_sql("""CREATE TABLE `idxPHRASE%02dR` (
                          `id_bibrec` mediumint(9) unsigned NOT NULL default '0',
                          `termlist` longblob,
                          `type` enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
                          PRIMARY KEY  (`id_bibrec`,`type`)
-                         ) TYPE=MyISAM""" % (idxID < 10 and "0%s" % idxID or idxID))
+                         ) TYPE=MyISAM""" % idxID)
 
-        res = run_sql("SELECT id from idxINDEX WHERE id=%s" % idxID)
-        res2 = get_table_status_info("idxWORD%sF" % (idxID < 10 and "0%s" % idxID or idxID))
-        res3 = get_table_status_info("idxWORD%sR" % (idxID < 10 and "0%s" % idxID or idxID))
+        res = run_sql("SELECT id from idxINDEX WHERE id=%s", (idxID, ))
+        res2 = get_table_status_info("idxWORD%02dF" % idxID)
+        res3 = get_table_status_info("idxWORD%02dR" % idxID)
         if res and res2 and res3:
             return (1, res[0][0])
         elif not res:
@@ -1592,7 +1607,7 @@ def add_fld_tag(fldID, name, value):
     score - the score of the format, decides sorting, if not given, place the format on top"""
 
     try:
-        res = run_sql("SELECT score FROM field_tag WHERE id_field=%s ORDER BY score desc" % (fldID))
+        res = run_sql("SELECT score FROM field_tag WHERE id_field=%s ORDER BY score desc", (fldID, ))
         if res:
             score = int(res[0][0]) + 1
         else:
@@ -1604,7 +1619,7 @@ def add_fld_tag(fldID, name, value):
             res = run_sql("INSERT INTO tag (name, value) VALUES (%s,%s)", (name,  value))
             res = run_sql("SELECT id FROM tag WHERE value=%s", (value,))
 
-        res = run_sql("INSERT INTO field_tag(id_field, id_tag, score) values(%s, %s, %s)" % (fldID, res[0][0], score))
+        res = run_sql("INSERT INTO field_tag(id_field, id_tag, score) values(%s, %s, %s)",  (fldID, res[0][0], score))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -1649,9 +1664,9 @@ def modify_fld(fldID, code):
     code - the new code"""
 
     try:
-        sql = "UPDATE field SET code='%s'" % code
-        sql += " WHERE id=%s" % fldID
-        res = run_sql(sql)
+        sql = "UPDATE field SET code=%s"
+        sql += " WHERE id=%s"
+        res = run_sql(sql, (code, fldID))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -1663,10 +1678,10 @@ def modify_tag(tagID, name, value):
     value - the new value of the tag"""
 
     try:
-        sql = "UPDATE tag SET name='%s' WHERE id=%s" % (name, tagID)
-        res = run_sql(sql)
-        sql = "UPDATE tag SET value='%s' WHERE id=%s" % (value, tagID)
-        res = run_sql(sql)
+        sql = "UPDATE tag SET name=%s WHERE id=%s"
+        res = run_sql(sql, (name, tagID))
+        sql = "UPDATE tag SET value=%s WHERE id=%s"
+        res = run_sql(sql, (value, tagID))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -1677,16 +1692,16 @@ def switch_score(fldID, id_1, id_2):
     id_1/id_2 - id field from tables like format..portalbox...
     table - name of the table"""
     try:
-        res1 = run_sql("SELECT score FROM field_tag WHERE id_field=%s and id_tag=%s" % (fldID, id_1))
-        res2 = run_sql("SELECT score FROM field_tag WHERE id_field=%s and id_tag=%s" % (fldID, id_2))
-        res = run_sql("UPDATE field_tag SET score=%s WHERE id_field=%s and id_tag=%s" % (res2[0][0], fldID, id_1))
-        res = run_sql("UPDATE field_tag SET score=%s WHERE id_field=%s and id_tag=%s" % (res1[0][0], fldID, id_2))
+        res1 = run_sql("SELECT score FROM field_tag WHERE id_field=%s and id_tag=%s", (fldID, id_1))
+        res2 = run_sql("SELECT score FROM field_tag WHERE id_field=%s and id_tag=%s", (fldID, id_2))
+        res = run_sql("UPDATE field_tag SET score=%s WHERE id_field=%s and id_tag=%s", (res2[0][0], fldID, id_1))
+        res = run_sql("UPDATE field_tag SET score=%s WHERE id_field=%s and id_tag=%s", (res1[0][0], fldID, id_2))
         return (1, "")
     except StandardError, e:
         return (0, e)
 
 def get_lang_list(table, field, id):
-    langs = run_sql("select ln from %s where %s=%s" % (table, field, id))
+    langs = run_sql("select ln from %s where %s=%%s" % (table, field), (id, ))
     exists = {}
     lang = ''
     for lng in langs:

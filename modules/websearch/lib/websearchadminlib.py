@@ -995,8 +995,8 @@ def perform_switchfldvaluescore(colID, id_1, id_fldvalue_1, id_fldvalue_2, ln):
     colID - the current collection
     id_1/id_2 - the id's to change the score for."""
 
-    name_1 = run_sql("SELECT name from fieldvalue where id=%s" % id_fldvalue_1)[0][0]
-    name_2 = run_sql("SELECT name from fieldvalue where id=%s" % id_fldvalue_2)[0][0]
+    name_1 = run_sql("SELECT name from fieldvalue where id=%s", (id_fldvalue_1, ))[0][0]
+    name_2 = run_sql("SELECT name from fieldvalue where id=%s", (id_fldvalue_2, ))[0][0]
     res = switch_fld_value_score(colID, id_1, id_fldvalue_1, id_fldvalue_2)
     output = write_outcome(res)
     return perform_modifyfield(colID, fldID=id_1, ln=ln, content=output)
@@ -1202,7 +1202,7 @@ def perform_rearrangefieldvalue(colID, fldID, ln, callback='yes', confirm=-1):
         vscore = len(col_fldv)
         for (fldvID, name) in fldv_names:
             if col_fldv.has_key(fldvID):
-                run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (vscore, colID, fldID, fldvID))
+                run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s", (vscore, colID, fldID, fldvID))
                 vscore -= 1
         output += write_outcome((1, ""))
     else:
@@ -1227,7 +1227,7 @@ def perform_rearrangefield(colID, ln, fmeth, callback='yes', confirm=-1):
         score = len(col_fld)
         for (fldID, name) in fld_names:
             if col_fld.has_key(fldID):
-                run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (score, colID, fldID))
+                run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s", (score, colID, fldID))
                 score -= 1
         output += write_outcome((1, ""))
     else:
@@ -1503,7 +1503,7 @@ def perform_showsearchoptions(colID, ln, callback='yes', content='', confirm=-1)
     lang = dict(sitelangs)
 
     fld_type_list = fld_type.items()
-    fld_distinct = run_sql("SELECT distinct(id_field) FROM collection_field_fieldvalue WHERE type='seo' AND id_collection=%s ORDER by score desc" % colID)
+    fld_distinct = run_sql("SELECT distinct(id_field) FROM collection_field_fieldvalue WHERE type='seo' AND id_collection=%s ORDER by score desc", (colID, ))
 
     if len(fld_distinct) > 0:
         i = 0
@@ -1775,9 +1775,9 @@ def perform_update_detailed_record_options(colID, ln, tabs, recurse):
         tabs.append('metadata')
 
     def update_settings(colID, tabs, recurse):
-        run_sql("DELETE FROM collectiondetailedrecordpagetabs WHERE id_collection='%s'" % colID)
+        run_sql("DELETE FROM collectiondetailedrecordpagetabs WHERE id_collection=%s", (colID, ))
         run_sql("REPLACE INTO collectiondetailedrecordpagetabs" + \
-                " SET id_collection='%s', tabs='%s'" % (colID, ';'.join(tabs)))
+                " SET id_collection=%s, tabs=%s", (colID, ';'.join(tabs)))
  ##        for enabled_tab in tabs:
 ##             run_sql("REPLACE INTO collectiondetailedrecordpagetabs" + \
 ##                 " SET id_collection='%s', tabs='%s'" % (colID, ';'.join(tabs)))
@@ -1965,7 +1965,7 @@ def perform_index(colID=1, ln=CFG_SITE_LANG, mtype='', content='', confirm=0):
         else:
             return "Cannot create root collection, please check database."
     if CFG_SITE_NAME != run_sql("SELECT name from collection WHERE id=1")[0][0]:
-        res = run_sql("update collection set name='%s' where id=1" % CFG_SITE_NAME)
+        res = run_sql("update collection set name=%s where id=1", (CFG_SITE_NAME, ))
         if res:
             fin_output += """<b><span class="info">The name of the root collection has been modified to be the same as the %(sitename)s installation name given prior to installing %(sitename)s.</span><b><br />""" % {'sitename' : CFG_SITE_NAME}
         else:
@@ -2194,8 +2194,8 @@ def perform_deletecollection(colID, ln, confirm=-1, callback='yes'):
     if colID != 1 and colID and col_dict.has_key(int(colID)):
         colID = int(colID)
         subtitle = """<a name="4">4. Delete collection '%s'</a>&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/websearch-admin-guide#3.4">?</a>]</small>""" % (col_dict[colID], CFG_SITE_URL)
-        res = run_sql("SELECT * from collection_collection WHERE id_dad=%s" % colID)
-        res2 = run_sql("SELECT * from collection_collection WHERE id_son=%s" % colID)
+        res = run_sql("SELECT * from collection_collection WHERE id_dad=%s", (colID, ))
+        res2 = run_sql("SELECT * from collection_collection WHERE id_son=%s", (colID, ))
 
         if not res and not res2:
             if confirm in ["-1", -1]:
@@ -2467,7 +2467,7 @@ def perform_checkcollectionstatus(colID, ln, confirm=0, callback='yes'):
         vir_sons = len(get_col_tree(id, 'v'))
         status = ""
 
-        langs = run_sql("SELECT ln from collectionname where id_collection=%s" % id)
+        langs = run_sql("SELECT ln from collectionname where id_collection=%s", (id, ))
         i8n = ""
 
         if len(langs) > 0:
@@ -2529,9 +2529,9 @@ def get_col_tree(colID, rtype=''):
         while len(stack) > 0:
             ccolID = stack.pop()
             if ccolID == colID and rtype:
-                res = run_sql("SELECT id_son, score, type FROM collection_collection WHERE id_dad=%s AND type='%s' ORDER BY score ASC,id_son" % (ccolID, rtype))
+                res = run_sql("SELECT id_son, score, type FROM collection_collection WHERE id_dad=%s AND type=%s ORDER BY score ASC,id_son", (ccolID, rtype))
             else:
-                res = run_sql("SELECT id_son, score, type FROM collection_collection WHERE id_dad=%s ORDER BY score ASC,id_son" % ccolID)
+                res = run_sql("SELECT id_son, score, type FROM collection_collection WHERE id_dad=%s ORDER BY score ASC,id_son", (ccolID, ))
             ssize += 1
             ntree = []
             for i in range(0, len(res)):
@@ -2560,13 +2560,13 @@ def add_col_dad_son(add_dad, add_son, rtype):
     rtype - either regular or virtual"""
 
     try:
-        res = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s ORDER BY score ASC" % add_dad)
+        res = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s ORDER BY score ASC", (add_dad, ))
         highscore = 0
         for score in res:
             if int(score[0]) > highscore:
                 highscore = int(score[0])
         highscore += 1
-        res = run_sql("INSERT INTO collection_collection(id_dad,id_son,score,type) values(%s,%s,%s,'%s')" % (add_dad, add_son, highscore, rtype))
+        res = run_sql("INSERT INTO collection_collection(id_dad,id_son,score,type) values(%s,%s,%s,%s)", (add_dad, add_son, highscore, rtype))
         return (1, highscore)
     except StandardError, e:
         return (0, e)
@@ -2583,15 +2583,19 @@ def get_col_fld(colID=-1, type = '', id_field=''):
 
     sql = "SELECT id_field,id_fieldvalue,type,score,score_fieldvalue FROM collection_field_fieldvalue, field WHERE id_field=field.id"
 
+    params = []
     try:
         if colID > -1:
-            sql += " AND id_collection=%s" % colID
+            sql += " AND id_collection=%s"
+            params.append(colID)
         if id_field:
-            sql += " AND id_field=%s" % id_field
+            sql += " AND id_field=%s"
+            params.append(id_field)
         if type:
-            sql += " AND type='%s'" % type
+            sql += " AND type=%s"
+            params.append(type)
         sql += " ORDER BY type, score desc, score_fieldvalue desc"
-        res = run_sql(sql)
+        res = run_sql(sql, tuple(params))
         return res
     except StandardError, e:
         return ""
@@ -2603,15 +2607,19 @@ def get_col_pbx(colID=-1, ln='', position = ''):
 
     sql = "SELECT id_portalbox, id_collection, ln, score, position, title, body FROM collection_portalbox, portalbox WHERE id_portalbox = portalbox.id"
 
+    params = []
     try:
         if colID > -1:
-            sql += " AND id_collection=%s" % colID
+            sql += " AND id_collection=%s"
+            params.append(colID)
         if ln:
-            sql += " AND ln='%s'" % ln
+            sql += " AND ln=%s"
+            params.append(ln)
         if position:
-            sql += " AND position='%s'" % position
+            sql += " AND position=%s"
+            params.append(positon)
         sql += " ORDER BY position, ln, score desc"
-        res = run_sql(sql)
+        res = run_sql(sql, tuple(params))
         return res
     except StandardError, e:
         return ""
@@ -2622,7 +2630,7 @@ def get_col_fmt(colID=-1):
 
     try:
         if colID not in [-1, "-1"]:
-            res = run_sql("SELECT id_format, id_collection, code, score FROM collection_format, format WHERE id_format = format.id AND id_collection=%s ORDER BY score desc" % colID)
+            res = run_sql("SELECT id_format, id_collection, code, score FROM collection_format, format WHERE id_format = format.id AND id_collection=%s ORDER BY score desc", (colID, ))
         else:
             res = run_sql("SELECT id_format, id_collection, code, score FROM collection_format, format WHERE id_format = format.id ORDER BY score desc")
         return res
@@ -2634,7 +2642,7 @@ def get_col_rnk(colID, ln):
     colID - id from collection"""
 
     try:
-        res1 = dict(run_sql("SELECT id_rnkMETHOD, '' FROM collection_rnkMETHOD WHERE id_collection=%s" % colID))
+        res1 = dict(run_sql("SELECT id_rnkMETHOD, '' FROM collection_rnkMETHOD WHERE id_collection=%s", (colID, )))
         res2 = get_def_name('', "rnkMETHOD")
         result = filter(lambda x: res1.has_key(x[0]), res2)
         return result
@@ -2655,10 +2663,12 @@ def get_fld_value(fldvID = ''):
 
     try:
         sql = "SELECT id, name, value FROM fieldvalue"
+        params = []
         if fldvID:
-            sql += " WHERE id=%s" % fldvID
+            sql += " WHERE id=%s"
+            params.append(fldvID)
         sql += " ORDER BY name"
-        res = run_sql(sql)
+        res = run_sql(sql, tuple(params))
         return res
     except StandardError, e:
         return ""
@@ -2731,13 +2741,13 @@ def remove_col_subcol(id_son, id_dad, type):
     try:
         if id_son != id_dad:
             tree = get_col_tree(id_son)
-            res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (id_son, id_dad))
+            res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s", (id_son, id_dad))
         else:
             tree = get_col_tree(id_son, type)
-            res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s and type='%s'" % (id_son, id_dad, type))
-        if not run_sql("SELECT * from collection_collection WHERE id_son=%s and type='%s'" % (id_son, type)):
+            res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s and type=%s", (id_son, id_dad, type))
+        if not run_sql("SELECT * from collection_collection WHERE id_son=%s and type=%s", (id_son, type)):
             for (id, up, down, dad, rtype) in tree:
-                res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (id, dad))
+                res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s", (id, dad))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -2749,12 +2759,12 @@ def check_col(add_dad, add_son):
 
     try:
         stack = [add_dad]
-        res = run_sql("SELECT id_dad FROM collection_collection WHERE id_dad=%s AND id_son=%s" % (add_dad, add_son))
+        res = run_sql("SELECT id_dad FROM collection_collection WHERE id_dad=%s AND id_son=%s", (add_dad, add_son))
         if res:
             raise StandardError
         while len(stack) > 0:
             colID = stack.pop()
-            res = run_sql("SELECT id_dad FROM collection_collection WHERE id_son=%s" % colID)
+            res = run_sql("SELECT id_dad FROM collection_collection WHERE id_son=%s", (colID, ))
             for id in res:
                 if int(id[0]) == int(add_son):
                     raise StandardError
@@ -2770,7 +2780,7 @@ def attach_rnk_col(colID, rnkID):
     colID - id of collection, as in collection table """
 
     try:
-        res = run_sql("INSERT INTO collection_rnkMETHOD(id_collection, id_rnkMETHOD) values (%s,%s)" % (colID, rnkID))
+        res = run_sql("INSERT INTO collection_rnkMETHOD(id_collection, id_rnkMETHOD) values (%s,%s)", (colID, rnkID))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -2781,17 +2791,17 @@ def detach_rnk_col(colID, rnkID):
     colID - id of collection, as in collection table """
 
     try:
-        res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s AND id_rnkMETHOD=%s" % (colID, rnkID))
+        res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s AND id_rnkMETHOD=%s", (colID, rnkID))
         return (1, "")
     except StandardError, e:
         return (0, e)
 
 def switch_col_treescore(col_1, col_2):
     try:
-        res1 = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s and id_son=%s" % (col_1[3], col_1[0]))
-        res2 = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s and id_son=%s" % (col_2[3], col_2[0]))
-        res = run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s and id_son=%s" % (res2[0][0], col_1[3], col_1[0]))
-        res = run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s and id_son=%s" % (res1[0][0], col_2[3], col_2[0]))
+        res1 = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s and id_son=%s", (col_1[3], col_1[0]))
+        res2 = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s and id_son=%s", (col_2[3], col_2[0]))
+        res = run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s and id_son=%s", (res2[0][0], col_1[3], col_1[0]))
+        res = run_sql("UPDATE collection_collection SET score=%s WHERE id_dad=%s and id_son=%s", (res1[0][0], col_2[3], col_2[0]))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -2803,7 +2813,7 @@ def move_col_tree(col_from, col_to, move_to_rtype=''):
     move_to_rtype - either virtual or regular collection"""
 
     try:
-        res = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s ORDER BY score asc" % col_to[0])
+        res = run_sql("SELECT score FROM collection_collection WHERE id_dad=%s ORDER BY score asc", (col_to[0], ))
         highscore = 0
         for score in res:
             if int(score[0]) > highscore:
@@ -2811,8 +2821,8 @@ def move_col_tree(col_from, col_to, move_to_rtype=''):
         highscore += 1
         if not move_to_rtype:
             move_to_rtype = col_from[4]
-        res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s" % (col_from[0], col_from[3]))
-        res = run_sql("INSERT INTO collection_collection(id_dad,id_son,score,type) values(%s,%s,%s,'%s')" % (col_to[0], col_from[0], highscore, move_to_rtype))
+        res = run_sql("DELETE FROM collection_collection WHERE id_son=%s and id_dad=%s", (col_from[0], col_from[3]))
+        res = run_sql("INSERT INTO collection_collection(id_dad,id_son,score,type) values(%s,%s,%s,%s)", (col_to[0], col_from[0], highscore, move_to_rtype))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -2824,7 +2834,7 @@ def remove_pbx(colID, pbxID, ln):
     ln - the language of the portalbox to be removed"""
 
     try:
-        res = run_sql("DELETE FROM collection_portalbox WHERE id_collection=%s AND id_portalbox=%s AND ln='%s'" % (colID, pbxID, ln))
+        res = run_sql("DELETE FROM collection_portalbox WHERE id_collection=%s AND id_portalbox=%s AND ln=%s", (colID, pbxID, ln))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -2835,7 +2845,7 @@ def remove_fmt(colID, fmtID):
     fmtID - the format which should be removed from the collection."""
 
     try:
-        res = run_sql("DELETE FROM collection_format WHERE id_collection=%s AND id_format=%s" % (colID, fmtID))
+        res = run_sql("DELETE FROM collection_format WHERE id_collection=%s AND id_format=%s", (colID, fmtID))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -2846,13 +2856,15 @@ def remove_fld(colID, fldID, fldvID=''):
     fldID - the field which should be removed from the collection."""
 
     try:
-        sql = "DELETE FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s" % (colID, fldID)
+        sql = "DELETE FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s"
+        params = [colID, fldID]
         if fldvID:
             if fldvID != "None":
-                sql += " AND id_fieldvalue=%s" % fldvID
+                sql += " AND id_fieldvalue=%s"
+                params.append(fldvID)
             else:
                 sql += " AND id_fieldvalue is NULL"
-        res = run_sql(sql)
+        res = run_sql(sql, tuple(params))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -2862,8 +2874,8 @@ def delete_fldv(fldvID):
     fldvID - delete all data in the tables associated with fieldvalue and this id"""
 
     try:
-        res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_fieldvalue=%s" % fldvID)
-        res = run_sql("DELETE FROM fieldvalue WHERE id=%s" % fldvID)
+        res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_fieldvalue=%s", (fldvID, ))
+        res = run_sql("DELETE FROM fieldvalue WHERE id=%s", (fldvID, ))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -2873,8 +2885,8 @@ def delete_pbx(pbxID):
     pbxID - delete all data in the tables associated with portalbox and this id """
 
     try:
-        res = run_sql("DELETE FROM collection_portalbox WHERE id_portalbox=%s" % pbxID)
-        res = run_sql("DELETE FROM portalbox WHERE id=%s" % pbxID)
+        res = run_sql("DELETE FROM collection_portalbox WHERE id_portalbox=%s", (pbxID, ))
+        res = run_sql("DELETE FROM portalbox WHERE id=%s", (pbxID, ))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -2884,9 +2896,9 @@ def delete_fmt(fmtID):
     fmtID - delete all data in the tables associated with format and this id """
 
     try:
-        res = run_sql("DELETE FROM format WHERE id=%s" % fmtID)
-        res = run_sql("DELETE FROM collection_format WHERE id_format=%s" % fmtID)
-        res = run_sql("DELETE FROM formatname WHERE id_format=%s" % fmtID)
+        res = run_sql("DELETE FROM format WHERE id=%s", (fmtID, ))
+        res = run_sql("DELETE FROM collection_format WHERE id_format=%s", (fmtID, ))
+        res = run_sql("DELETE FROM formatname WHERE id_format=%s", (fmtID, ))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -2896,14 +2908,14 @@ def delete_col(colID):
     colID - delete all data in the tables associated with collection and this id """
 
     try:
-        res = run_sql("DELETE FROM collection WHERE id=%s" % colID)
-        res = run_sql("DELETE FROM collectionname WHERE id_collection=%s" % colID)
-        res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s" % colID)
-        res = run_sql("DELETE FROM collection_collection WHERE id_dad=%s" % colID)
-        res = run_sql("DELETE FROM collection_collection WHERE id_son=%s" % colID)
-        res = run_sql("DELETE FROM collection_portalbox WHERE id_collection=%s" % colID)
-        res = run_sql("DELETE FROM collection_format WHERE id_collection=%s" % colID)
-        res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_collection=%s" % colID)
+        res = run_sql("DELETE FROM collection WHERE id=%s", (colID, ))
+        res = run_sql("DELETE FROM collectionname WHERE id_collection=%s", (colID, ))
+        res = run_sql("DELETE FROM collection_rnkMETHOD WHERE id_collection=%s", (colID, ))
+        res = run_sql("DELETE FROM collection_collection WHERE id_dad=%s", (colID, ))
+        res = run_sql("DELETE FROM collection_collection WHERE id_son=%s", (colID, ))
+        res = run_sql("DELETE FROM collection_portalbox WHERE id_collection=%s", (colID, ))
+        res = run_sql("DELETE FROM collection_format WHERE id_collection=%s", (colID, ))
+        res = run_sql("DELETE FROM collection_field_fieldvalue WHERE id_collection=%s", (colID, ))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -3000,14 +3012,14 @@ def add_col_pbx(colID, pbxID, ln, position, score=''):
 
     try:
         if score:
-            res = run_sql("INSERT INTO collection_portalbox(id_portalbox, id_collection, ln, score, position) values (%s,%s,'%s',%s,'%s')" % (pbxID, colID, ln, score, position))
+            res = run_sql("INSERT INTO collection_portalbox(id_portalbox, id_collection, ln, score, position) values (%s,%s,'%s',%s,%s)", (pbxID, colID, ln, score, position))
         else:
-            res = run_sql("SELECT score FROM collection_portalbox WHERE id_collection=%s and ln='%s' and position='%s' ORDER BY score desc, ln, position" % (colID, ln, position))
+            res = run_sql("SELECT score FROM collection_portalbox WHERE id_collection=%s and ln=%s and position=%s ORDER BY score desc, ln, position", (colID, ln, position))
             if res:
                 score = int(res[0][0])
             else:
                 score = 0
-            res = run_sql("INSERT INTO collection_portalbox(id_portalbox, id_collection, ln, score, position) values (%s,%s,'%s',%s,'%s')" % (pbxID, colID, ln, (score + 1), position))
+            res = run_sql("INSERT INTO collection_portalbox(id_portalbox, id_collection, ln, score, position) values (%s,%s,%s,%s,%s)", (pbxID, colID, ln, (score + 1), position))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -3022,14 +3034,14 @@ def add_col_fmt(colID, fmtID, score=''):
 
     try:
         if score:
-            res = run_sql("INSERT INTO collection_format(id_format, id_collection, score) values (%s,%s,%s)" % (fmtID, colID, score))
+            res = run_sql("INSERT INTO collection_format(id_format, id_collection, score) values (%s,%s,%s)", (fmtID, colID, score))
         else:
-            res = run_sql("SELECT score FROM collection_format WHERE id_collection=%s ORDER BY score desc" % colID)
+            res = run_sql("SELECT score FROM collection_format WHERE id_collection=%s ORDER BY score desc", (colID, ))
             if res:
                 score = int(res[0][0])
             else:
                 score = 0
-            res = run_sql("INSERT INTO collection_format(id_format, id_collection, score) values (%s,%s,%s)" % (fmtID, colID, (score + 1)))
+            res = run_sql("INSERT INTO collection_format(id_format, id_collection, score) values (%s,%s,%s)", (fmtID, colID, (score + 1)))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -3044,31 +3056,31 @@ def add_col_fld(colID, fldID, type, fldvID=''):
 
     try:
         if fldvID and fldvID not in [-1, "-1"]:
-            run_sql("DELETE FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s and type='%s' and id_fieldvalue is NULL" % (colID, fldID, type))
-            res = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s and type='%s' ORDER BY score desc" % (colID, fldID, type))
+            run_sql("DELETE FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s and type=%s and id_fieldvalue is NULL", (colID, fldID, type))
+            res = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s and type=%s ORDER BY score desc", (colID, fldID, type))
             if res:
                 score = int(res[0][0])
-                res = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s and type='%s' ORDER BY score_fieldvalue desc" % (colID, fldID, type))
+                res = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s AND id_field=%s and type=%s ORDER BY score_fieldvalue desc", (colID, fldID, type))
             else:
-                res = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and type='%s' ORDER BY score desc" % (colID, type))
+                res = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and type=%s ORDER BY score desc", (colID, type))
                 if res:
                     score = int(res[0][0]) + 1
                 else:
                     score = 1
 
-            res = run_sql("SELECT * FROM collection_field_fieldvalue where id_field=%s and id_collection=%s and type='%s' and id_fieldvalue=%s" % (fldID, colID, type, fldvID))
+            res = run_sql("SELECT * FROM collection_field_fieldvalue where id_field=%s and id_collection=%s and type=%s and id_fieldvalue=%s", (fldID, colID, type, fldvID))
             if not res:
-                run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=score_fieldvalue+1 WHERE id_field=%s AND id_collection=%s and type='%s'" % (fldID, colID, type))
-                res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_fieldvalue, id_collection, type, score, score_fieldvalue) values (%s,%s,%s,'%s',%s,%s)" % (fldID, fldvID, colID, type, score, 1))
+                run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=score_fieldvalue+1 WHERE id_field=%s AND id_collection=%s and type=%s", (fldID, colID, type))
+                res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_fieldvalue, id_collection, type, score, score_fieldvalue) values (%s,%s,%s,%s,%s,%s)", (fldID, fldvID, colID, type, score, 1))
             else:
                 return (0, (1, "Already exists"))
         else:
-            res = run_sql("SELECT * FROM collection_field_fieldvalue WHERE id_collection=%s AND type='%s' and id_field=%s and id_fieldvalue is NULL" % (colID, type, fldID))
+            res = run_sql("SELECT * FROM collection_field_fieldvalue WHERE id_collection=%s AND type=%s and id_field=%s and id_fieldvalue is NULL", (colID, type, fldID))
             if res:
                 return (0, (1, "Already exists"))
             else:
                 run_sql("UPDATE collection_field_fieldvalue SET score=score+1")
-                res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_collection, type, score,score_fieldvalue) values (%s,%s,'%s',%s, 0)" % (fldID, colID, type, 1))
+                res = run_sql("INSERT INTO collection_field_fieldvalue(id_field, id_collection, type, score,score_fieldvalue) values (%s,%s,%s,%s, 0)", (fldID, colID, type, 1))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -3102,9 +3114,9 @@ def modify_pbx(colID, pbxID, sel_ln, score='', position='', title='', body=''):
         if body:
             res = run_sql("UPDATE portalbox SET body=%s WHERE id=%s", (body, pbxID))
         if score:
-            res = run_sql("UPDATE collection_portalbox SET score='%s' WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (score, colID, pbxID, sel_ln))
+            res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln=%s", (score, colID, pbxID, sel_ln))
         if position:
-            res = run_sql("UPDATE collection_portalbox SET position='%s' WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (position, colID, pbxID, sel_ln))
+            res = run_sql("UPDATE collection_portalbox SET position=%s WHERE id_collection=%s and id_portalbox=%s and ln=%s", (position, colID, pbxID, sel_ln))
         return (1, "")
     except Exception, e:
         return (0, e)
@@ -3116,13 +3128,13 @@ def switch_fld_score(colID, id_1, id_2):
     table - name of the table"""
 
     try:
-        res1 = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s" % (colID, id_1))
-        res2 = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s" % (colID, id_2))
+        res1 = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s", (colID, id_1))
+        res2 = run_sql("SELECT score FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s", (colID, id_2))
         if res1[0][0] == res2[0][0]:
             return (0, (1, "Cannot rearrange the selected fields, either rearrange by name or use the mySQL client to fix the problem."))
         else:
-            res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res2[0][0], colID, id_1))
-            res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s" % (res1[0][0], colID, id_2))
+            res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s", (res2[0][0], colID, id_1))
+            res = run_sql("UPDATE collection_field_fieldvalue SET score=%s WHERE id_collection=%s and id_field=%s", (res1[0][0], colID, id_2))
         return (1, "")
     except StandardError, e:
         return (0, e)
@@ -3134,13 +3146,13 @@ def switch_fld_value_score(colID, id_1, fldvID_1, fldvID_2):
     table - name of the table"""
 
     try:
-        res1 = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (colID, id_1, fldvID_1))
-        res2 = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (colID, id_1, fldvID_2))
+        res1 = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s", (colID, id_1, fldvID_1))
+        res2 = run_sql("SELECT score_fieldvalue FROM collection_field_fieldvalue WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s", (colID, id_1, fldvID_2))
         if res1[0][0] == res2[0][0]:
             return (0, (1, "Cannot rearrange the selected fields, either rearrange by name or use the mySQL client to fix the problem."))
         else:
-            res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res2[0][0], colID, id_1, fldvID_1))
-            res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s" % (res1[0][0], colID, id_1, fldvID_2))
+            res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s", (res2[0][0], colID, id_1, fldvID_1))
+            res = run_sql("UPDATE collection_field_fieldvalue SET score_fieldvalue=%s WHERE id_collection=%s and id_field=%s and id_fieldvalue=%s", (res1[0][0], colID, id_1, fldvID_2))
         return (1, "")
     except Exception, e:
         return (0, e)
@@ -3152,12 +3164,12 @@ def switch_pbx_score(colID, id_1, id_2, sel_ln):
     table - name of the table"""
 
     try:
-        res1 = run_sql("SELECT score FROM collection_portalbox WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (colID, id_1, sel_ln))
-        res2 = run_sql("SELECT score FROM collection_portalbox WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (colID, id_2, sel_ln))
+        res1 = run_sql("SELECT score FROM collection_portalbox WHERE id_collection=%s and id_portalbox=%s and ln=%s", (colID, id_1, sel_ln))
+        res2 = run_sql("SELECT score FROM collection_portalbox WHERE id_collection=%s and id_portalbox=%s and ln=%s", (colID, id_2, sel_ln))
         if res1[0][0] == res2[0][0]:
             return (0, (1, "Cannot rearrange the selected fields, either rearrange by name or use the mySQL client to fix the problem."))
-        res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (res2[0][0], colID, id_1, sel_ln))
-        res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln='%s'" % (res1[0][0], colID, id_2, sel_ln))
+        res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln=%s", (res2[0][0], colID, id_1, sel_ln))
+        res = run_sql("UPDATE collection_portalbox SET score=%s WHERE id_collection=%s and id_portalbox=%s and ln=%s", (res1[0][0], colID, id_2, sel_ln))
         return (1, "")
     except Exception, e:
         return (0, e)
@@ -3169,12 +3181,12 @@ def switch_score(colID, id_1, id_2, table):
     table - name of the table"""
 
     try:
-        res1 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%s and id_%s=%s" % (table, colID, table, id_1))
-        res2 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%s and id_%s=%s" % (table, colID, table, id_2))
+        res1 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%%s and id_%s=%%s" % (table, table), (colID, id_1))
+        res2 = run_sql("SELECT score FROM collection_%s WHERE id_collection=%%s and id_%s=%%s" % (table, table), (colID, id_2))
         if res1[0][0] == res2[0][0]:
             return (0, (1, "Cannot rearrange the selected fields, either rearrange by name or use the mySQL client to fix the problem."))
-        res = run_sql("UPDATE collection_%s SET score=%s WHERE id_collection=%s and id_%s=%s" % (table, res2[0][0], colID, table, id_1))
-        res = run_sql("UPDATE collection_%s SET score=%s WHERE id_collection=%s and id_%s=%s" % (table, res1[0][0], colID, table, id_2))
+        res = run_sql("UPDATE collection_%s SET score=%%s WHERE id_collection=%%s and id_%s=%%s" % (table, table), (res2[0][0], colID, id_1))
+        res = run_sql("UPDATE collection_%s SET score=%%s WHERE id_collection=%%s and id_%s=%%s" % (table, table), (res1[0][0], colID, id_2))
         return (1, "")
     except Exception, e:
         return (0, e)
@@ -3207,7 +3219,7 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
             }
 
     res = run_sql("SELECT tabs FROM collectiondetailedrecordpagetabs " + \
-                  "WHERE id_collection='%s'" % colID)
+                  "WHERE id_collection=%s", (colID, ))
 
     if len(res) > 0:
         tabs_state = res[0][0].split(';')

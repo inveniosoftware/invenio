@@ -184,7 +184,7 @@ def superuser_account_warnings():
 
     #Check if the admin password is empty
     res = run_sql("SELECT password, email from user where nickname = 'admin'")
-    res1 = run_sql("SELECT email from user where nickname = 'admin' and password = AES_ENCRYPT('%s','')" % (res[0][1]))
+    res1 = run_sql("SELECT email from user where nickname = 'admin' and password = AES_ENCRYPT(%s,'')", (res[0][1], ))
 
     for user in res1:
         warning_array.append("warning_empty_admin_password")

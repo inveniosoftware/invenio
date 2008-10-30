@@ -328,7 +328,7 @@ def get_table_update_time(tablename):
     # MySQL-5.0, we can employ a much cleaner technique of using
     # SELECT UPDATE_TIME FROM INFORMATION_SCHEMA.TABLES WHERE
     # table_name='collection'.
-    res = run_sql("SHOW TABLE STATUS LIKE '%s'" % tablename)
+    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename, ))
     update_times = [] # store all update times
     for row in res:
         if type(row[10]) is long or \
@@ -349,7 +349,7 @@ def get_table_status_info(tablename):
        etc.  If TABLENAME does not exist, return empty dict.
     """
     # Note: again a hack so that it works on all MySQL 4.0, 4.1, 5.0
-    res = run_sql("SHOW TABLE STATUS LIKE '%s'" % tablename)
+    res = run_sql("SHOW TABLE STATUS LIKE %s", (tablename, ))
     table_status_info = {} # store all update times
     for row in res:
         if type(row[10]) is long or \
