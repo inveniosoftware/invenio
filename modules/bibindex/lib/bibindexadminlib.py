@@ -1489,6 +1489,7 @@ def delete_tag(tagID):
 def delete_idx(idxID):
     """Deletes all data for the given index together with the idxWORDXXR and idxWORDXXF tables"""
     try:
+        idxID = int(idxID)
         res = run_sql("DELETE FROM idxINDEX WHERE id=%s", (idxID, ))
         res = run_sql("DELETE FROM idxINDEXNAME WHERE id_idxINDEX=%s", (idxID, ))
         res = run_sql("DELETE FROM idxINDEX_field WHERE id_idxINDEX=%s", (idxID, ))
@@ -1525,7 +1526,7 @@ def add_idx(idxNAME):
         if res:
             return (0, (0, "A index with the given name already exists."))
 
-        for i in range(1, 100):
+        for i in xrange(1, 100):
             res = run_sql("SELECT id from idxINDEX WHERE id=%s", (i, ))
             res2 = get_table_status_info("idxWORD%02d%%" % i)
             if not res and not res2:
