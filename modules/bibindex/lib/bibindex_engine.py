@@ -573,6 +573,8 @@ def get_phrases_from_phrase(phrase, stemming_language=None):
        split into groups depending on the alphanumeric characters and
        punctuation characters definition present in the config file.
     """
+    return [phrase]
+    ## FIXME: for the time being phrase are already ok. No need to break them.
     words = {}
     phrase = strip_accents(phrase)
     # 1st split phrase into blocks according to whitespace
