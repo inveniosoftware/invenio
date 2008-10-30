@@ -1739,6 +1739,128 @@ class BibUploadUpperLowerCaseTest(unittest.TestCase):
         bibupload.wipe_out_record_from_all_tables(recid1)
         bibupload.wipe_out_record_from_all_tables(recid2)
 
+class BibUploadProtectedTagsTest(unittest.TestCase):
+    """Testing treatment of protected tags in the correct mode."""
+
+    def setUp(self):
+        """Initialize the MARCXML test record."""
+        self.testrec1_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, Jane</subfield>
+          <subfield code="u">Test Institute</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">Test title</subfield>
+         </datafield>
+         <datafield tag="653" ind1=" " ind2=" ">
+          <subfield code="a">blabla</subfield>
+          <subfield code="9">sam</subfield>
+         </datafield>
+         <datafield tag="653" ind1=" " ind2=" ">
+          <subfield code="a">blublu</subfield>
+          <subfield code="9">sim</subfield>
+         </datafield>
+         <datafield tag="653" ind1=" " ind2=" ">
+          <subfield code="a">human</subfield>
+         </datafield>
+        </record>
+        """
+        self.testrec1_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, Jane$$uTest Institute
+        245__ $$aTest title
+        653__ $$9sam$$ablabla
+        653__ $$9sim$$ablublu
+        653__ $$ahuman
+        """
+        self.testrec1_xm_to_correct = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+         <datafield tag="653" ind1=" " ind2=" ">
+          <subfield code="a">bleble</subfield>
+          <subfield code="9">sim</subfield>
+         </datafield>
+         <datafield tag="653" ind1=" " ind2=" ">
+          <subfield code="a">bloblo</subfield>
+          <subfield code="9">som</subfield>
+         </datafield>
+        </record>
+        """
+        self.testrec1_corrected_xm = """
+        <record>
+        <controlfield tag="001">123456789</controlfield>
+        <controlfield tag="003">SzGeCERN</controlfield>
+         <datafield tag="100" ind1=" " ind2=" ">
+          <subfield code="a">Test, Jane</subfield>
+          <subfield code="u">Test Institute</subfield>
+         </datafield>
+         <datafield tag="245" ind1=" " ind2=" ">
+          <subfield code="a">Test title</subfield>
+         </datafield>
+         <datafield tag="653" ind1=" " ind2=" ">
+          <subfield code="a">blabla</subfield>
+          <subfield code="9">sam</subfield>
+         </datafield>
+         <datafield tag="653" ind1=" " ind2=" ">
+          <subfield code="a">human</subfield>
+         </datafield>
+         <datafield tag="653" ind1=" " ind2=" ">
+          <subfield code="a">bleble</subfield>
+          <subfield code="9">sim</subfield>
+         </datafield>
+         <datafield tag="653" ind1=" " ind2=" ">
+          <subfield code="a">bloblo</subfield>
+          <subfield code="9">som</subfield>
+         </datafield>
+        </record>
+        """
+        self.testrec1_corrected_hm = """
+        001__ 123456789
+        003__ SzGeCERN
+        100__ $$aTest, Jane$$uTest Institute
+        245__ $$aTest title
+        653__ $$9sam$$ablabla
+        653__ $$ahuman
+        653__ $$9sim$$ableble
+        653__ $$9som$$abloblo
+        """
+        # insert test record:
+        task_set_task_param('verbose', 0)
+        test_record_xm = self.testrec1_xm.replace('<controlfield tag="001">123456789</controlfield>',
+                                                  '')
+        recs = bibupload.xml_marc_to_records(test_record_xm)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='insert')
+        # replace test buffers with real recID:
+        self.testrec1_xm = self.testrec1_xm.replace('123456789', str(recid))
+        self.testrec1_hm = self.testrec1_hm.replace('123456789', str(recid))
+        self.testrec1_xm_to_correct = self.testrec1_xm_to_correct.replace('123456789', str(recid))
+        self.testrec1_corrected_xm = self.testrec1_corrected_xm.replace('123456789', str(recid))
+        self.testrec1_corrected_hm = self.testrec1_corrected_hm.replace('123456789', str(recid))
+        # test of the inserted record:
+        inserted_xm = print_record(recid, 'xm')
+        inserted_hm = print_record(recid, 'hm')
+        self.assertEqual(compare_xmbuffers(inserted_xm, self.testrec1_xm), '')
+        self.assertEqual(compare_hmbuffers(inserted_hm, self.testrec1_hm), '')
+
+    def test_protected_tags_persistence(self):
+        """bibupload - protected tags, persistence in correct mode"""
+        # correct metadata tags; will the protected tags be kept?
+        task_set_task_param('verbose', 0)
+        recs = bibupload.xml_marc_to_records(self.testrec1_xm_to_correct)
+        err, recid = bibupload.bibupload(recs[0], opt_mode='correct')
+        corrected_xm = print_record(recid, 'xm')
+        corrected_hm = print_record(recid, 'hm')
+        # did it work?
+        self.assertEqual(compare_xmbuffers(corrected_xm, self.testrec1_corrected_xm), '')
+        self.assertEqual(compare_hmbuffers(corrected_hm, self.testrec1_corrected_hm), '')
+        # clean up after ourselves:
+        bibupload.wipe_out_record_from_all_tables(recid)
+
+
 class BibUploadStrongTagsTest(unittest.TestCase):
     """Testing treatment of strong tags and the replace mode."""
 
@@ -3092,6 +3214,7 @@ TEST_SUITE = make_test_suite(BibUploadInsertModeTest,
                              BibUploadFMTModeTest,
                              BibUploadIndicatorsTest,
                              BibUploadUpperLowerCaseTest,
+                             BibUploadProtectedTagsTest,
                              BibUploadStrongTagsTest,
                              BibUploadFFTModeTest)
 

@@ -194,7 +194,7 @@ def record_get_field_instances(rec, tag="", ind1="", ind2=""):
     @param ind1 a 1 character long string
     @param ind2 a 1 character long string
     @param code a 1 character long string
-    @return a list of field tuples (Subfields, ind1, ind2, value) where subfields is list of (code, value)
+    @return a list of field tuples (Subfields, ind1, ind2, value, field_number) where subfields is list of (code, value)
     """
     out = []
 
