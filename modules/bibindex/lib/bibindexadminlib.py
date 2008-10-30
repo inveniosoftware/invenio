@@ -770,11 +770,12 @@ def perform_modifyindex(idxID, ln=CFG_SITE_LANG, idxNAME='', idxDESC='', callbac
 
     subtitle  = ""
     output  = ""
-
+    idx = get_idx(idxID)
+    if not idx:
+        idxID = -1
     if idxID not in [-1, "-1"]:
         subtitle = """<a name="2"></a>1. Modify index name.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
         if confirm in [-1, "-1"]:
-            idx = get_idx(idxID)
             idxNAME = idx[0][1]
             idxDESC = idx[0][2]
         text = """
@@ -817,10 +818,12 @@ def perform_modifyindexstemming(idxID, ln=CFG_SITE_LANG, idxSTEM='', callback='y
     stemming_language_map = get_stemming_language_map()
     stemming_language_map['None'] = ''
 
+    idx = get_idx(idxID)
+    if not idx:
+        idxID = -1
     if idxID not in [-1, "-1"]:
         subtitle = """<a name="4"></a>4. Modify index stemming language.&nbsp;&nbsp;&nbsp;<small>[<a title="See guide" href="%s/help/admin/bibindex-admin-guide">?</a>]</small>""" % CFG_SITE_URL
         if confirm in [-1, "-1"]:
-            idx = get_idx(idxID)
             idxSTEM = idx[0][4]
         if not idxSTEM:
             idxSTEM = ''
