@@ -52,6 +52,7 @@ import re
 import signal
 import sys
 import time
+import datetime
 import popen2
 import traceback
 import logging
@@ -179,6 +180,7 @@ def task_init(
         "sleeptime" : '',
         "runtime" : time.strftime("%Y-%m-%d %H:%M:%S"),
         "priority" : 0,
+        "runtime_limit" : None
     }
     to_be_submitted = True
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
@@ -245,7 +247,7 @@ def _task_build_params(
     # set user-defined options:
     try:
         (short_params, long_params) = specific_params
-        opts, args = getopt.gnu_getopt(argv[1:], "hVv:u:s:t:P:N:" +
+        opts, args = getopt.gnu_getopt(argv[1:], "hVv:u:s:t:P:N:L:" +
             short_params, [
                 "help",
                 "version",
@@ -253,32 +255,35 @@ def _task_build_params(
                 "user=",
                 "sleep=",
                 "time=",
-                "priority="
-                "task_specific_name="
+                "priority=",
+                "task-specific-name=",
+                "runtime-limit="
             ] + long_params)
     except getopt.GetoptError, err:
         _usage(1, err, help_specific_usage=help_specific_usage, description=description)
     try:
         for opt in opts:
-            if opt[0] in ["-h", "--help"]:
+            if opt[0] in ("-h", "--help"):
                 _usage(0, help_specific_usage=help_specific_usage, description=description)
-            elif opt[0] in ["-V", "--version"]:
+            elif opt[0] in ("-V", "--version"):
                 print _task_params["version"]
                 sys.exit(0)
-            elif opt[0] in [ "-u", "--user"]:
+            elif opt[0] in ("-u", "--user"):
                 _task_params["user"] = opt[1]
-            elif opt[0] in ["-v", "--verbose"]:
+            elif opt[0] in ("-v", "--verbose"):
                 _task_params["verbose"] = int(opt[1])
-            elif opt[0] in [ "-s", "--sleeptime" ]:
+            elif opt[0] in ("-s", "--sleeptime"):
                 if task_name not in CFG_TASK_IS_NOT_A_DEAMON:
                     get_datetime(opt[1]) # see if it is a valid shift
                     _task_params["sleeptime"] = opt[1]
-            elif opt[0] in [ "-t", "--runtime" ]:
+            elif opt[0] in ("-t", "--runtime"):
                 _task_params["runtime"] = get_datetime(opt[1])
             elif opt[0] in ("-P", "--priority"):
                 _task_params["priority"] = int(opt[1])
-            elif opt[0] in ("-N", "--task_name"):
+            elif opt[0] in ("-N", "--task-specific-name"):
                 _task_params["task_specific_name"] = opt[1]
+            elif opt[0] in ("-L", "--runtime-limit"):
+                _task_params["runtime_limit"] = parse_smart_datetime(opt[1])
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                     opt[1], opts, args):
@@ -366,14 +371,14 @@ def write_message(msg, stream=sys.stdout, verbose=1):
         else:
             sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
 
-_shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
+_RE_SHIFT = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
     """Returns a date string according to the format string.
        It can handle normal date strings and shifts with respect
        to now."""
     date = time.time()
     factors = {"d":24*3600, "h":3600, "m":60, "s":1}
-    m = _shift_re.match(var)
+    m = _RE_SHIFT.match(var)
     if m:
         sign = m.groups()[0] == "-" and -1 or 1
         factor = factors[m.groups()[2]]
@@ -384,6 +389,57 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         date = time.strptime(var, format_string)
         date = time.strftime(format_string, date)
     return date
+
+_RE_SMART_DATETIME = re.compile(r"(?P<weekday>\w+)(\s+(?P<start>\d\d?(:\d\d?)?)(-(?P<end>\d\d?(:\d\d?)?))?)?")
+_RE_SMART_HOUR = re.compile(r'(?P<hour>\d\d?):(?P<minutes>\d\d?)')
+def parse_smart_datetime(value):
+    """
+    value could be something like: Sunday 23:00-05:00.
+    The function would return the first range datetime in which now() is
+    contained.
+    """
+    def extract_time(value):
+        value = _RE_SMART_HOUR.search(value).groupdict()
+        hour = int(value['hour']) % 24
+        minutes = (value['minutes'] is not None and int(value['minutes']) or 0) % 60
+        return hour * 3600 + minutes * 60
+
+    today = datetime.datetime.today()
+    g = _RE_SMART_DATETIME.search(value)
+    if g:
+        pieces = g.groupdict()
+        weekday = {
+            'mo' : 0,
+            'tu' : 1,
+            'we' : 2,
+            'th' : 3,
+            'fr' : 4,
+            'sa' : 5,
+            'su' : 6,
+        }[pieces['weekday'][:2].lower()]
+        today_weekday = today.isoweekday() - 1
+        first_occasion_day = -((today_weekday - weekday) % 7) * 24 * 3600
+        next_occasion_day = first_occasion_day + 7 * 24 * 3600
+        if pieces['start'] is None:
+            pieces['start'] = '00:00'
+        if pieces['end'] is None:
+            pieces['end'] = '00:00'
+        starting_time = extract_time(pieces['start'])
+        ending_time = extract_time(pieces['end'])
+        if starting_time >= ending_time:
+            ending_time += 24 * 3600
+        reference_time = time.mktime(datetime.datetime(today.year, today.month, today.day).timetuple())
+        first_range = (
+            reference_time + first_occasion_day + starting_time,
+            reference_time + first_occasion_day + ending_time
+        )
+        second_range = (
+            reference_time + next_occasion_day + starting_time,
+            reference_time + next_occasion_day + ending_time
+        )
+        return first_range, second_range
+    else:
+        raise ValueError, '"%s" is not a correct value for parse_smart_datetime' % value
 
 def task_sleep_now_if_required(can_stop_too=False):
     """This function should be called during safe state of BibTask,
@@ -571,6 +627,24 @@ def _task_run(task_run_fnc):
         write_message("Error: The task #%d is %s.  I expected WAITING or SCHEDULED." %
             (_task_params['task_id'], task_status), sys.stderr)
         return False
+
+    if _task_params['runtime_limit'] is not None:
+        if not _task_params['runtime_limit'][0][0] <= time.time() <= _task_params['runtime_limit'][0][1]:
+            new_runtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(_task_params['runtime_limit'][1][0]))
+            progress = run_sql("SELECT progress FROM schTASK WHERE id=%s", (_task_params['task_id'], ))
+            if progress:
+                progress = progress[0][0]
+            else:
+                progress = ''
+            g =  re.match(r'Postponed \d+ time\(s\)', progress)
+            if g:
+                postponed_times = int(g.group(1))
+            else:
+                postponed_times = 0
+            run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s WHERE id=%s", (new_runtime, 'Postponed %d time(s)' % (postponed_times + 1), _task_params['task_id']))
+            write_message("Task #%d postponed because outside of running-range" % _task_params['task_id'])
+            return True
+
     ## initialize signal handler:
     _task_params['signal_request'] = None
     signal.signal(signal.SIGUSR1, _task_sig_sleep)
@@ -646,8 +720,11 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
         " task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26\n")
     sys.stderr.write("  -s, --sleeptime=SLEEP\tSleeping frequency after"
         " which to repeat task (no), e.g.: 30m, 2h, 1d\n")
+    sys.stderr.write("  -L  --runtime-limit=LIMIT\tRange of time when it's"
+        " allowed to execute the task, e.g.: Sunday 23:00-5:00\n"
+        "\t\t\t\twith the syntax We[ekday][ fh[:fm][-th:[tm]]]\n")
     sys.stderr.write("  -P, --priority=PRIORITY\tPriority level (an integer, 0 is default)\n")
-    sys.stderr.write("  -N, --task_specific_name=TASK_SPECIFIC_NAME\tAdvanced option\n")
+    sys.stderr.write("  -N, --task-specific-name=TASK_SPECIFIC_NAME\tAdvanced option\n")
     sys.stderr.write("General options:\n")
     sys.stderr.write("  -h, --help\t\tPrint this help.\n")
     sys.stderr.write("  -V, --version\t\tPrint version information.\n")

@@ -99,7 +99,7 @@ def send_sms(phone_number, msg):
     it should be reimplemented in your own instituition.
     """
     if not CFG_CERN_SITE:
-        raise NotImplemented, "Implement this function with your own method"
+        raise NotImplementedError, "Implement this function with your own method"
     if phone_number[0] == '+':
         phone_number = '00' + phone_number[1:]
     if phone_number[0] != '0':

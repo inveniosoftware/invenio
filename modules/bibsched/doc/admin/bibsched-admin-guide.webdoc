@@ -111,9 +111,29 @@ each log will be no bigger than 1MB. After this limit is reached the log is rota
 interface, only the latest log will be displayed.</p>
 
 <h2>Task concurrency</h2>
-<p>A recent experimental feature of bibsched is the concurrent execution of compatible tasks. The current definition of when two tasks are considered compatible is: "If a two tasks have the same name (e.g. bibupload) then they're incompatible."</p> <p>Sometimes you might want to consider compatible two tasks even when they have the same name. For this you can add a name specification via the bibtask command line option <tt>--task_specific_name</tt>. E.g. you might want to distinguish a generic bibupload from a bibupload carrying only preformatting information. For this just launch bibupload -N "bibformat", and it will be considered compatible with all the other bibuploads.</p>
+<p>A recent experimental feature of bibsched is the concurrent execution of compatible tasks. The current definition of when two tasks are considered compatible is: "If a two tasks have the same name (e.g. bibupload) then they're incompatible."</p> <p>Sometimes you might want to consider compatible two tasks even when they have the same name. For this you can add a name specification via the bibtask command line option <tt>--task-specific-name</tt>. E.g. you might want to distinguish a generic bibupload from a bibupload carrying only preformatting information. For this just launch bibupload -N "bibformat", and it will be considered compatible with all the other bibuploads.</p>
+
+<h2>Submitting BibTasks</h2>
+<p>All the BibTasks have a common command line interface
+<pre>
+Scheduling options:
+  -u, --user=USER       User name to submit the task as, password needed.
+  -t, --runtime=TIME    Time to execute the task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26
+  -s, --sleeptime=SLEEP Sleeping frequency after which to repeat task (no), e.g.: 30m, 2h, 1d
+  -L  --runtime-limit=LIMIT     Range of time when it's to execute the task, e.g.: Sunday 23:00-5:00
+                                with the syntax We[ekday][ fh[:fm][-th:[tm]]]
+  -P, --priority=PRIORITY       Priority level (an integer, 0 is default)
+  -N, --task-specific-name=TASK_SPECIFIC_NAME   Advanced option
+General options:
+  -h, --help            Print this help.
+  -V, --version         Print version information.
+  -v, --verbose=LEVEL   Verbose level (0=min, 1=default, 9=max).
+</pre>
+</p>
 
 <h2>Configuration</h2>
+
+
 <p>Bibsched can be tweaked by adjusting some variables in the usual <tt>invenio(-local).conf</tt> file. Please refer to the documentation associated with each variable inside this file.</p>
 
 <h2>Bibsched command line interface</h2>
