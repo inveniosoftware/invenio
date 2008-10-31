@@ -249,7 +249,11 @@ def wait_for_user(msg=""):
     if '--yes-i-know' in sys.argv:
         return
     print msg
-    answer = raw_input("Please confirm by typing 'Yes, I know!': ")
+    try:
+        answer = raw_input("Please confirm by typing 'Yes, I know!': ")
+    except KeyboardInterrupt:
+        print
+        answer = ''
     if answer != 'Yes, I know!':
         sys.stderr.write("ERROR: Aborted.\n")
         sys.exit(1)
