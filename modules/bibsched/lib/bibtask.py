@@ -632,9 +632,13 @@ def _task_run(task_run_fnc):
             (_task_params['task_id'], task_status), sys.stderr)
         return False
 
+    time_now = time.time()
     if _task_params['runtime_limit'] is not None:
-        if not _task_params['runtime_limit'][0][0] <= time.time() <= _task_params['runtime_limit'][0][1]:
-            new_runtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(_task_params['runtime_limit'][1][0]))
+        if not _task_params['runtime_limit'][0][0] <= time_now <= _task_params['runtime_limit'][0][1]:
+            if time_now <= _task_params['runtime_limit'][0][0]:
+                new_runtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(_task_params['runtime_limit'][0][0]))
+            else:
+                new_runtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(_task_params['runtime_limit'][1][0]))
             progress = run_sql("SELECT progress FROM schTASK WHERE id=%s", (_task_params['task_id'], ))
             if progress:
                 progress = progress[0][0]
