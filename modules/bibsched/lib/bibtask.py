@@ -283,7 +283,7 @@ def _task_build_params(
             elif opt[0] in ("-N", "--task-specific-name"):
                 _task_params["task_specific_name"] = opt[1]
             elif opt[0] in ("-L", "--runtime-limit"):
-                _task_params["runtime_limit"] = parse_smart_datetime(opt[1])
+                _task_params["runtime_limit"] = parse_runtime_limit(opt[1])
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                     opt[1], opts, args):
@@ -390,56 +390,60 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         date = time.strftime(format_string, date)
     return date
 
-_RE_SMART_DATETIME = re.compile(r"(?P<weekday>\w+)(\s+(?P<start>\d\d?(:\d\d?)?)(-(?P<end>\d\d?(:\d\d?)?))?)?")
-_RE_SMART_HOUR = re.compile(r'(?P<hour>\d\d?):(?P<minutes>\d\d?)')
-def parse_smart_datetime(value):
+_RE_RUNTIMELIMIT_FULL = re.compile(r"(?P<weekday>\w+)(\s+(?P<begin>\d\d?(:\d\d?)?)(-(?P<end>\d\d?(:\d\d?)?))?)?")
+_RE_RUNTIMELIMIT_HOUR = re.compile(r'(?P<hour>\d\d?):(?P<minutes>\d\d?)')
+def parse_runtime_limit(value):
     """
-    value could be something like: Sunday 23:00-05:00.
+    Parsing CLI option for runtime limit, supplied as VALUE.
+    Value could be something like: Sunday 23:00-05:00, the format being
+    Wee[kday][ hh[:mm][-hh:[mm]]].
     The function would return the first range datetime in which now() is
     contained.
     """
     def extract_time(value):
-        value = _RE_SMART_HOUR.search(value).groupdict()
+        value = _RE_RUNTIMELIMIT_HOUR.search(value).groupdict()
         hour = int(value['hour']) % 24
         minutes = (value['minutes'] is not None and int(value['minutes']) or 0) % 60
         return hour * 3600 + minutes * 60
 
     today = datetime.datetime.today()
-    g = _RE_SMART_DATETIME.search(value)
-    if g:
+    try:
+        g = _RE_RUNTIMELIMIT_FULL.search(value)
+        if not g:
+            raise ValueError
         pieces = g.groupdict()
         weekday = {
-            'mo' : 0,
-            'tu' : 1,
-            'we' : 2,
-            'th' : 3,
-            'fr' : 4,
-            'sa' : 5,
-            'su' : 6,
-        }[pieces['weekday'][:2].lower()]
+            'mon' : 0,
+            'tue' : 1,
+            'wed' : 2,
+            'thu' : 3,
+            'fri' : 4,
+            'sat' : 5,
+            'sun' : 6,
+        }[pieces['weekday'][:3].lower()]
         today_weekday = today.isoweekday() - 1
         first_occasion_day = -((today_weekday - weekday) % 7) * 24 * 3600
         next_occasion_day = first_occasion_day + 7 * 24 * 3600
-        if pieces['start'] is None:
-            pieces['start'] = '00:00'
+        if pieces['begin'] is None:
+            pieces['begin'] = '00:00'
         if pieces['end'] is None:
             pieces['end'] = '00:00'
-        starting_time = extract_time(pieces['start'])
+        beginning_time = extract_time(pieces['begin'])
         ending_time = extract_time(pieces['end'])
-        if starting_time >= ending_time:
+        if beginning_time >= ending_time:
             ending_time += 24 * 3600
         reference_time = time.mktime(datetime.datetime(today.year, today.month, today.day).timetuple())
         first_range = (
-            reference_time + first_occasion_day + starting_time,
+            reference_time + first_occasion_day + beginning_time,
             reference_time + first_occasion_day + ending_time
         )
         second_range = (
-            reference_time + next_occasion_day + starting_time,
+            reference_time + next_occasion_day + beginning_time,
             reference_time + next_occasion_day + ending_time
         )
         return first_range, second_range
-    else:
-        raise ValueError, '"%s" is not a correct value for parse_smart_datetime' % value
+    except:
+        raise ValueError, '"%s" does not seem to be correct format for parse_runtime_limit() (Wee[kday][ hh[:mm][-hh:[mm]]]).' % value
 
 def task_sleep_now_if_required(can_stop_too=False):
     """This function should be called during safe state of BibTask,
@@ -642,7 +646,7 @@ def _task_run(task_run_fnc):
             else:
                 postponed_times = 0
             run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress=%s WHERE id=%s", (new_runtime, 'Postponed %d time(s)' % (postponed_times + 1), _task_params['task_id']))
-            write_message("Task #%d postponed because outside of running-range" % _task_params['task_id'])
+            write_message("Task #%d postponed because outside of runtime limit" % _task_params['task_id'])
             return True
 
     ## initialize signal handler:
@@ -717,12 +721,12 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     sys.stderr.write("  -u, --user=USER\tUser name to submit the"
         " task as, password needed.\n")
     sys.stderr.write("  -t, --runtime=TIME\tTime to execute the"
-        " task (now), e.g.: +15s, 5m, 3h, 2002-10-27 13:57:26\n")
+        " task (now), e.g. +15s, 5m, 3h, 2002-10-27 13:57:26\n")
     sys.stderr.write("  -s, --sleeptime=SLEEP\tSleeping frequency after"
         " which to repeat task (no), e.g.: 30m, 2h, 1d\n")
-    sys.stderr.write("  -L  --runtime-limit=LIMIT\tRange of time when it's"
-        " allowed to execute the task, e.g.: Sunday 23:00-5:00\n"
-        "\t\t\t\twith the syntax We[ekday][ fh[:fm][-th:[tm]]]\n")
+    sys.stderr.write("  -L  --runtime-limit=LIMIT\tTime limit when it is"
+        " allowed to execute the task, e.g. Sunday 01:00-05:00\n"
+        "\t\t\t\twith the syntax Wee[kday][ hh[:mm][-hh:[mm]]]\n")
     sys.stderr.write("  -P, --priority=PRIORITY\tPriority level (an integer, 0 is default)\n")
     sys.stderr.write("  -N, --task-specific-name=TASK_SPECIFIC_NAME\tAdvanced option\n")
     sys.stderr.write("General options:\n")
