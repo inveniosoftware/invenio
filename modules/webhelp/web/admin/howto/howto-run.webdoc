@@ -125,11 +125,11 @@ ranking weights for old records aren't recalculated by default in
 order to speed up the insertion of new records.  This may influence a
 bit the precision of word similarity searches.  It is therefore
 advised to expressely run bibrank in the recalculating mode once in a
-while by doing:
+while during a relatively quiet site operation day, by doing:
 
 <blockquote>
 <pre>
-$ bibrank -R -wwrd -s15d -L Sunday
+$ bibrank -R -wwrd -s14d -L Sunday
 </pre>
 </blockquote>
 
@@ -144,11 +144,11 @@ percent.
 <p>Guest users create a lot of entries in CDS Invenio tables that are
 related to their web sessions, their search history, personal baskets,
 etc.  This data has to be garbage-collected periodically.  You can run this,
-say every week, via:
+say every Sunday between 01:00 and 05:00, via:
 
 <blockquote>
 <pre>
-$ inveniogc -s7d -L Sunday
+$ inveniogc -s7d -L Sunday 01:00-05:00
 </pre>
 </blockquote>
 </p>
@@ -160,7 +160,7 @@ and <code>/opt/cds-invenio/var/tmp</code> directory that is good to clean up fro
 
 <blockquote>
 <pre>
-$ inveniogc -s7d -d -L Sunday
+$ inveniogc -s7d -d -L Sunday 01:00-05:00
 </pre>
 </blockquote>
 </p>
