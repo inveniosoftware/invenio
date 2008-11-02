@@ -129,7 +129,7 @@ while by doing:
 
 <blockquote>
 <pre>
-$ bibrank -R -wwrd
+$ bibrank -R -wwrd -s15d -L Sunday
 </pre>
 </blockquote>
 
@@ -144,11 +144,11 @@ percent.
 <p>Guest users create a lot of entries in CDS Invenio tables that are
 related to their web sessions, their search history, personal baskets,
 etc.  This data has to be garbage-collected periodically.  You can run this,
-say every day, via:
+say every week, via:
 
 <blockquote>
 <pre>
-$ inveniogc -s1d
+$ inveniogc -s7d -L Sunday
 </pre>
 </blockquote>
 </p>
@@ -160,7 +160,7 @@ and <code>/opt/cds-invenio/var/tmp</code> directory that is good to clean up fro
 
 <blockquote>
 <pre>
-$ inveniogc -s1d -d
+$ inveniogc -s7d -d -L Sunday
 </pre>
 </blockquote>
 </p>

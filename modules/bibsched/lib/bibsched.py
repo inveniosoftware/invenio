@@ -900,7 +900,7 @@ class BibSched:
                     program = os.path.join(CFG_BINDIR, procname)
                     ## Trick to log in bibsched.log the task exiting
                     exit_str = '&& echo "`date "+%%Y-%%m-%%d %%H:%%M:%%S"` --> Task #%d (%s) exited" >> %s/bibsched.log' % (task_id, proc, CFG_LOGDIR)
-                    COMMAND = "%s %s > /dev/null 2> /dev/null &" % (program, str(task_id), exit_str)
+                    COMMAND = "(%s %s > /dev/null 2> /dev/null %s)&" % (program, str(task_id), exit_str)
                     bibsched_set_status(task_id, "SCHEDULED")
                     Log("Task #%d (%s) started" % (task_id, proc))
                     os.system(COMMAND)
@@ -960,8 +960,11 @@ class BibSched:
                         break
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
         except:
-            register_emergency('Emergency from %s: BibSched had to halt!' % CFG_SITE_URL)
             register_exception(alert_admin=True)
+            try:
+                register_emergency('Emergency from %s: BibSched had to halt!' % CFG_SITE_URL)
+            except NotImplementedError:
+                pass
             raise
 
 class TimedOutExc(Exception):
