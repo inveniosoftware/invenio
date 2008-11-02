@@ -148,7 +148,7 @@ say every Sunday between 01:00 and 05:00, via:
 
 <blockquote>
 <pre>
-$ inveniogc -s7d -L Sunday 01:00-05:00
+$ inveniogc -s7d -L 'Sunday 01:00-05:00'
 </pre>
 </blockquote>
 </p>
@@ -160,7 +160,7 @@ and <code>/opt/cds-invenio/var/tmp</code> directory that is good to clean up fro
 
 <blockquote>
 <pre>
-$ inveniogc -s7d -d -L Sunday 01:00-05:00
+$ inveniogc -s7d -d -L 'Sunday 01:00-05:00'
 </pre>
 </blockquote>
 </p>
