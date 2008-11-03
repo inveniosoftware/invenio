@@ -1755,15 +1755,15 @@ class BibUploadControlledProvenanceTest(unittest.TestCase):
          <datafield tag="245" ind1=" " ind2=" ">
           <subfield code="a">Test title</subfield>
          </datafield>
-         <datafield tag="653" ind1=" " ind2=" ">
+         <datafield tag="653" ind1="1" ind2=" ">
           <subfield code="a">blabla</subfield>
           <subfield code="9">sam</subfield>
          </datafield>
-         <datafield tag="653" ind1=" " ind2=" ">
+         <datafield tag="653" ind1="1" ind2=" ">
           <subfield code="a">blublu</subfield>
           <subfield code="9">sim</subfield>
          </datafield>
-         <datafield tag="653" ind1=" " ind2=" ">
+         <datafield tag="653" ind1="1" ind2=" ">
           <subfield code="a">human</subfield>
          </datafield>
         </record>
@@ -1773,18 +1773,18 @@ class BibUploadControlledProvenanceTest(unittest.TestCase):
         003__ SzGeCERN
         100__ $$aTest, Jane$$uTest Institute
         245__ $$aTest title
-        653__ $$9sam$$ablabla
-        653__ $$9sim$$ablublu
-        653__ $$ahuman
+        6531_ $$9sam$$ablabla
+        6531_ $$9sim$$ablublu
+        6531_ $$ahuman
         """
         self.testrec1_xm_to_correct = """
         <record>
         <controlfield tag="001">123456789</controlfield>
-         <datafield tag="653" ind1=" " ind2=" ">
+         <datafield tag="653" ind1="1" ind2=" ">
           <subfield code="a">bleble</subfield>
           <subfield code="9">sim</subfield>
          </datafield>
-         <datafield tag="653" ind1=" " ind2=" ">
+         <datafield tag="653" ind1="1" ind2=" ">
           <subfield code="a">bloblo</subfield>
           <subfield code="9">som</subfield>
          </datafield>
@@ -1801,18 +1801,18 @@ class BibUploadControlledProvenanceTest(unittest.TestCase):
          <datafield tag="245" ind1=" " ind2=" ">
           <subfield code="a">Test title</subfield>
          </datafield>
-         <datafield tag="653" ind1=" " ind2=" ">
+         <datafield tag="653" ind1="1" ind2=" ">
           <subfield code="a">blabla</subfield>
           <subfield code="9">sam</subfield>
          </datafield>
-         <datafield tag="653" ind1=" " ind2=" ">
+         <datafield tag="653" ind1="1" ind2=" ">
           <subfield code="a">human</subfield>
          </datafield>
-         <datafield tag="653" ind1=" " ind2=" ">
+         <datafield tag="653" ind1="1" ind2=" ">
           <subfield code="a">bleble</subfield>
           <subfield code="9">sim</subfield>
          </datafield>
-         <datafield tag="653" ind1=" " ind2=" ">
+         <datafield tag="653" ind1="1" ind2=" ">
           <subfield code="a">bloblo</subfield>
           <subfield code="9">som</subfield>
          </datafield>
@@ -1823,10 +1823,10 @@ class BibUploadControlledProvenanceTest(unittest.TestCase):
         003__ SzGeCERN
         100__ $$aTest, Jane$$uTest Institute
         245__ $$aTest title
-        653__ $$9sam$$ablabla
-        653__ $$ahuman
-        653__ $$9sim$$ableble
-        653__ $$9som$$abloblo
+        6531_ $$9sam$$ablabla
+        6531_ $$ahuman
+        6531_ $$9sim$$ableble
+        6531_ $$9som$$abloblo
         """
         # insert test record:
         task_set_task_param('verbose', 0)
