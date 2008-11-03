@@ -214,7 +214,7 @@ def task_init(
         except Exception, e:
             write_message("Unexpected error occurred: %s." % e, sys.stderr)
             write_message("Traceback is:", sys.stderr)
-            traceback.print_tb(sys.exc_info()[2])
+            write_messages(''.join(traceback.format_tb(sys.exc_info()[2])), sys.stderr)
             write_message("Exiting.", sys.stderr)
             task_update_status("ERROR")
 
