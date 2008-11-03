@@ -690,6 +690,9 @@ def _task_run(task_run_fnc):
                 ## It has finished in a good way. We recycle the database row
                 run_sql("UPDATE schTASK SET runtime=%s, status='WAITING', progress='' WHERE id=%s", (new_runtime, _task_params['task_id']))
                 write_message("Task #%d finished and resubmitted." % _task_params['task_id'])
+            elif task_status == 'STOPPED':
+                run_sql("UPDATE schTASK SET status='WAITING', progress='' WHERE id=%s", (_task_params['task_id'], ))
+                write_message("Task #%d stopped and resubmitted." % _task_params['task_id'])
             else:
                 ## We keep the bad result and we resubmit with another id.
                 #res = run_sql('SELECT proc,user,sleeptime,arguments,priority FROM schTASK WHERE id=%s', (_task_params['task_id'], ))

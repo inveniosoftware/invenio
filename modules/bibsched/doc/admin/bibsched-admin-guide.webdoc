@@ -143,7 +143,8 @@ General options:
     The following commands are available for bibsched:
 
     start      start bibsched in background
-    stop       stop a running bibsched
+    stop       stop running bibtasks and the bibsched daemon safely
+    halt       halt running bibsched while keeping bibtasks running
     restart    restart a running bibsched
     monitor    enter the interactive monitor
     status     get report about current status of the queue

@@ -899,8 +899,8 @@ class BibSched:
                 elif procname in self.helper_modules:
                     program = os.path.join(CFG_BINDIR, procname)
                     ## Trick to log in bibsched.log the task exiting
-                    exit_str = '&& echo "`date "+%%Y-%%m-%%d %%H:%%M:%%S"` --> Task #%d (%s) exited" >> %s/bibsched.log' % (task_id, proc, CFG_LOGDIR)
-                    COMMAND = "(%s %s > /dev/null 2> /dev/null %s)&" % (program, str(task_id), exit_str)
+                    exit_str = '&& echo "`date "+%%Y-%%m-%%d %%H:%%M:%%S"` --> Task #%d (%s) exited" >> %s' % (task_id, proc, os.path.join(CFG_LOGDIR, 'bibsched.log'))
+                    COMMAND = "(%s %s > /dev/null 2> /dev/null %s) &" % (program, str(task_id), exit_str)
                     bibsched_set_status(task_id, "SCHEDULED")
                     Log("Task #%d (%s) started" % (task_id, proc))
                     os.system(COMMAND)
@@ -917,11 +917,24 @@ class BibSched:
                         bibsched_send_signal(proc, other_task_id, signal.SIGUSR1)
                 return True
 
+    def uniformize_bibupload_priorities(self):
+        """
+        If a biupload with priority 10 happens to be submitted
+        after a bibupload with priority less than 10 (say 9), the first
+        bibupload is blocked until the second is executed. To give real
+        priority to the first bibupload, we should rise the priority of the
+        second one up to the priority of the first.
+        """
+        max_priority = run_sql("SELECT max(priority) FROM schTASK WHERE proc='bibupload' AND status NOT LIKE 'DONE' AND status NOT like '%DELETED%' AND (runtime <= NOW() OR status='WAITING' OR status='SCHEDULED')")
+        if max_priority:
+            max_priority = max_priority[0][0]
+            run_sql("UPDATE schTASK SET priority=%s WHERE proc='bibupload' AND status NOT LIKE 'DONE' AND status NOT like '%%DELETED%%' AND (runtime <= NOW() OR status='WAITING' OR status='SCHEDULED')", (max_priority, ))
+
     def watch_loop(self):
         global _refresh_tasks
         def get_rows():
             """Return all the rows to work on."""
-            return run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%%DELETED%%' AND (runtime<=NOW() OR status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='SCHEDULED') ORDER BY priority DESC, runtime ASC, id ASC")
+            return run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%DELETED%' AND (runtime<=NOW() OR status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='SCHEDULED' OR status='CONTINUING') ORDER BY priority DESC, runtime ASC, id ASC")
 
         def get_task_status(rows):
             """Return a handy data structure to analize the task status."""
@@ -949,6 +962,7 @@ class BibSched:
 
         try:
             while True:
+                self.uniformize_bibupload_priorities()
                 rows = get_rows()
                 _refresh_tasks = False
                 task_status = get_task_status(rows)
@@ -1013,8 +1027,9 @@ Usage: %s [options] [start|stop|restart|monitor|status]
 The following commands are available for bibsched:
 
    start      start bibsched in background
-   stop       stop a running bibsched
-   restart    restart a running bibsched
+   stop       stop running bibtasks and the bibsched daemon safely
+   halt       halt running bibsched while keeping bibtasks running
+   restart    restart running bibsched
    monitor    enter the interactive monitor
    status     get report about current status of the queue
    purge      purge the scheduler queue from old tasks
@@ -1103,7 +1118,7 @@ def start(verbose = True):
 
     return
 
-def stop(verbose=True, soft=False):
+def halt(verbose=True, soft=False):
     pid = server_pid()
     if not pid:
         if soft:
@@ -1196,8 +1211,34 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
     return
 
 def restart(verbose = True):
-    stop(verbose, soft=True)
+    halt(verbose, soft=True)
     start(verbose)
+    return
+
+def stop(verbose=True):
+    """
+    * Stop bibsched
+    * Send stop signal to all the running tasks
+    * wait for all the tasks to stop
+    * return
+    """
+    if verbose:
+        print "Stopping BibSched if running"
+    stop(verbose, soft=True)
+    run_sql("UPDATE schTASK SET status='WAITING' WHERE status='SCHEDULED'")
+    res = run_sql("SELECT id,proc FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%%DELETED%%' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')")
+    if verbose:
+        print "Stopping all running BibTasks"
+    for task_id, proc in res:
+        bibsched_send_signal(proc, task_id, signal.SIGTERM)
+    while run_sql("SELECT id FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%%DELETED%%' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')"):
+        if verbose:
+            sys.stdout.write('.')
+            sys.stdout.flush()
+            time.sleep(1)
+    if verbose:
+        print "\nStopped"
+    Log("BibSched and all BibTasks stopped")
     return
 
 def main():
@@ -1257,7 +1298,8 @@ def main():
             } [cmd] (verbose, status, since, tasks)
         else:
             {'start':   start,
-            'stop':    stop,
+            'halt':    halt,
+            'stop': stop,
             'restart': restart,
             'monitor': monitor} [cmd] (verbose)
     except KeyError:
