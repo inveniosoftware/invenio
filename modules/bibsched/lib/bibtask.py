@@ -390,15 +390,14 @@ def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
         date = time.strftime(format_string, date)
     return date
 
-_RE_RUNTIMELIMIT_FULL = re.compile(r"(?P<weekday>\w+)(\s+(?P<begin>\d\d?(:\d\d?)?)(-(?P<end>\d\d?(:\d\d?)?))?)?")
-_RE_RUNTIMELIMIT_HOUR = re.compile(r'(?P<hour>\d\d?):(?P<minutes>\d\d?)')
+_RE_RUNTIMELIMIT_FULL = re.compile(r"(?P<weekday>[a-z]+)?\s*((?P<begin>\d\d?(:\d\d?)?)(-(?P<end>\d\d?(:\d\d?)?))?)?", re.I)
+_RE_RUNTIMELIMIT_HOUR = re.compile(r'(?P<hour>\d\d?)(:(?P<minutes>\d\d?))?')
 def parse_runtime_limit(value):
     """
     Parsing CLI option for runtime limit, supplied as VALUE.
     Value could be something like: Sunday 23:00-05:00, the format being
-    Wee[kday][ hh[:mm][-hh:[mm]]].
-    The function would return the first range datetime in which now() is
-    contained.
+    [Wee[kday]] [hh[:mm][-hh[:mm]]].
+    The function will return two valid time ranges. The first could be in the past, containing the present or in the future. The second is always in the future.
     """
     def extract_time(value):
         value = _RE_RUNTIMELIMIT_HOUR.search(value).groupdict()
@@ -406,24 +405,36 @@ def parse_runtime_limit(value):
         minutes = (value['minutes'] is not None and int(value['minutes']) or 0) % 60
         return hour * 3600 + minutes * 60
 
+    def extract_weekday(value):
+        try:
+            return {
+                'mon' : 0,
+                'tue' : 1,
+                'wed' : 2,
+                'thu' : 3,
+                'fri' : 4,
+                'sat' : 5,
+                'sun' : 6,
+            }[value[:3].lower()]
+        except KeyError:
+            raise ValueError, "%s is not a good weekday name." % value
+
     today = datetime.datetime.today()
     try:
         g = _RE_RUNTIMELIMIT_FULL.search(value)
         if not g:
             raise ValueError
         pieces = g.groupdict()
-        weekday = {
-            'mon' : 0,
-            'tue' : 1,
-            'wed' : 2,
-            'thu' : 3,
-            'fri' : 4,
-            'sat' : 5,
-            'sun' : 6,
-        }[pieces['weekday'][:3].lower()]
         today_weekday = today.isoweekday() - 1
-        first_occasion_day = -((today_weekday - weekday) % 7) * 24 * 3600
-        next_occasion_day = first_occasion_day + 7 * 24 * 3600
+        if pieces['weekday'] is None:
+            ## No weekday specified. So either today or tomorrow
+            first_occasion_day = 0
+            next_occasion_day = 24 * 3600
+        else:
+            ## Weekday specified. So either this week or next
+            weekday = extract_weekday(pieces['weekday'])
+            first_occasion_day = -((today_weekday - weekday) % 7) * 24 * 3600
+            next_occasion_day = first_occasion_day + 7 * 24 * 3600
         if pieces['begin'] is None:
             pieces['begin'] = '00:00'
         if pieces['end'] is None:
@@ -431,6 +442,7 @@ def parse_runtime_limit(value):
         beginning_time = extract_time(pieces['begin'])
         ending_time = extract_time(pieces['end'])
         if beginning_time >= ending_time:
+            ## end < begin we add a 24-hours watch tour.
             ending_time += 24 * 3600
         reference_time = time.mktime(datetime.datetime(today.year, today.month, today.day).timetuple())
         first_range = (
@@ -442,8 +454,10 @@ def parse_runtime_limit(value):
             reference_time + next_occasion_day + ending_time
         )
         return first_range, second_range
+    except ValueError:
+        raise
     except:
-        raise ValueError, '"%s" does not seem to be correct format for parse_runtime_limit() (Wee[kday][ hh[:mm][-hh:[mm]]]).' % value
+        raise ValueError, '"%s" does not seem to be correct format for parse_runtime_limit() [Wee[kday]] [hh[:mm][-hh[:mm]]]).' % value
 
 def task_sleep_now_if_required(can_stop_too=False):
     """This function should be called during safe state of BibTask,
@@ -733,7 +747,7 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
         " which to repeat task (no), e.g.: 30m, 2h, 1d\n")
     sys.stderr.write("  -L  --runtime-limit=LIMIT\tTime limit when it is"
         " allowed to execute the task, e.g. Sunday 01:00-05:00\n"
-        "\t\t\t\twith the syntax Wee[kday][ hh[:mm][-hh:[mm]]]\n")
+        "\t\t\t\twith the syntax [Wee[kday]] [hh[:mm][-hh[:mm]]]\n")
     sys.stderr.write("  -P, --priority=PRIORITY\tPriority level (an integer, 0 is default)\n")
     sys.stderr.write("  -N, --task-specific-name=TASK_SPECIFIC_NAME\tAdvanced option\n")
     sys.stderr.write("General options:\n")
