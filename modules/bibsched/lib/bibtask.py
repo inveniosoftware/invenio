@@ -658,7 +658,7 @@ def _task_run(task_run_fnc):
                 progress = progress[0][0]
             else:
                 progress = ''
-            g =  re.match(r'Postponed \d+ time\(s\)', progress)
+            g =  re.match(r'Postponed (\d+) time\(s\)', progress)
             if g:
                 postponed_times = int(g.group(1))
             else:
