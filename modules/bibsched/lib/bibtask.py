@@ -647,7 +647,7 @@ def _task_run(task_run_fnc):
         return False
 
     time_now = time.time()
-    if _task_params['runtime_limit'] is not None:
+    if _task_params['runtime_limit'] is not None and os.environ.get('BIBSCHED_MODE', 'manual') != 'manual':
         if not _task_params['runtime_limit'][0][0] <= time_now <= _task_params['runtime_limit'][0][1]:
             if time_now <= _task_params['runtime_limit'][0][0]:
                 new_runtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(_task_params['runtime_limit'][0][0]))

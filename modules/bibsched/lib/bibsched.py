@@ -684,6 +684,7 @@ class Manager:
         self.stdscr.refresh()
 
     def start(self, stdscr):
+        os.environ['BIBSCHED_MODE'] = 'manual'
         if self.curses.has_colors():
             self.curses.start_color()
             self.curses.init_pair(8, self.curses.COLOR_WHITE, self.curses.COLOR_BLACK)
@@ -758,6 +759,7 @@ class BibSched:
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.scheduled = None
         signal.signal(signal.SIGUSR2, _bibsched_sig_info)
+        os.environ['BIBSCHED_MODE'] = 'automatic'
 
     def tasks_safe_p(self, proc1, proc2):
         """Return True when the two tasks can run concurrently."""
@@ -1224,7 +1226,7 @@ def stop(verbose=True):
     """
     if verbose:
         print "Stopping BibSched if running"
-    stop(verbose, soft=True)
+    halt(verbose, soft=True)
     run_sql("UPDATE schTASK SET status='WAITING' WHERE status='SCHEDULED'")
     res = run_sql("SELECT id,proc FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%%DELETED%%' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')")
     if verbose:
