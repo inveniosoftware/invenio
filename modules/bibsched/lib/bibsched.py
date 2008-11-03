@@ -1027,7 +1027,8 @@ Usage: %s [options] [start|stop|restart|monitor|status]
 The following commands are available for bibsched:
 
    start      start bibsched in background
-   stop       stop a running bibsched
+   stop       stop a running bibsched and all the running bibtasks
+   halt       stop a running bibsched
    restart    restart a running bibsched
    monitor    enter the interactive monitor
    status     get report about current status of the queue
@@ -1117,7 +1118,7 @@ def start(verbose = True):
 
     return
 
-def stop(verbose=True, soft=False):
+def halt(verbose=True, soft=False):
     pid = server_pid()
     if not pid:
         if soft:
@@ -1210,11 +1211,11 @@ def report_queue_status(verbose=True, status=None, since=None, tasks=None):
     return
 
 def restart(verbose = True):
-    stop(verbose, soft=True)
+    halt(verbose, soft=True)
     start(verbose)
     return
 
-def graceful_stop(verbose=True):
+def stop(verbose=True):
     """
     * Stop bibsched
     * Send stop signal to all the running tasks
@@ -1237,6 +1238,7 @@ def graceful_stop(verbose=True):
             time.sleep(1)
     if verbose:
         print "\nStopped"
+    Log("BibSched and all BibTasks stopped")
     return
 
 def main():
@@ -1296,8 +1298,8 @@ def main():
             } [cmd] (verbose, status, since, tasks)
         else:
             {'start':   start,
-            'stop':    stop,
-            'graceful': graceful_stop,
+            'halt':    halt,
+            'stop': stop,
             'restart': restart,
             'monitor': monitor} [cmd] (verbose)
     except KeyError:

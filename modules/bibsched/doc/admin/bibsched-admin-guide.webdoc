@@ -123,7 +123,8 @@ interface, only the latest log will be displayed.</p>
     The following commands are available for bibsched:
 
     start      start bibsched in background
-    stop       stop a running bibsched
+    stop       stop a running bibsched and all the running bibtasks
+    halt       stop a running bibsched
     restart    restart a running bibsched
     monitor    enter the interactive monitor
     status     get report about current status of the queue
