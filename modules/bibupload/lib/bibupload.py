@@ -68,7 +68,8 @@ from invenio.config import CFG_OAI_ID_FIELD, CFG_SITE_URL, \
      CFG_BIBUPLOAD_EXTERNAL_SYSNO_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, \
-     CFG_BIBUPLOAD_STRONG_TAGS
+     CFG_BIBUPLOAD_STRONG_TAGS, \
+     CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS
 
 from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
     CFG_BIBUPLOAD_SPECIAL_TAGS
@@ -1561,16 +1562,57 @@ def delete_tags_to_correct(record, rec_old, opt_tag):
     so that fields with the same tags but different indicators are not
     deleted.
     """
+    ## Some fields are controlled via provenance information.
+    ## We should re-add saved fields at the end.
+    fields_to_readd = {}
+    for tag in CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS:
+        if tag[:3] in record:
+            tmp_field_instances = record_get_field_instances(record, tag[:3], tag[3], tag[4]) ## Let's discover the provenance that will be updated
+            provenances_to_update = []
+            for instance in tmp_field_instances:
+                for code, value in instance[0]:
+                    if code == tag[5]:
+                        if value not in provenances_to_update:
+                            provenances_to_update.append(value)
+                        break
+                else:
+                    ## The provenance is not specified.
+                    ## let's add the special empty provenance.
+                    if '' not in provenances_to_update:
+                        provenances_to_update.append('')
+            potential_fields_to_readd = record_get_field_instances(rec_old, tag[:3], tag[3], tag[4]) ## Let's take all the field corresponding to tag
+            ## Let's save apart all the fields that should be updated, but
+            ## since they have a different provenance not mentioned in record
+            ## they should be preserved.
+            fields = []
+            for sf_vals, ind1, ind2, dummy_cf, dummy_line in potential_fields_to_readd:
+                for code, value in sf_vals:
+                    if code == tag[5]:
+                        if value not in provenances_to_update:
+                            fields.append(sf_vals)
+                        break
+                else:
+                    if '' not in provenances_to_update:
+                        ## Empty provenance, let's protect in any case
+                        fields.append(sf_vals)
+            fields_to_readd[tag] = fields
+
     # browse through all the tags from the MARCXML file:
-    for tag in record.keys():
+    for tag in record:
         # do we have to delete only a special tag or any tag?
         if opt_tag is None or opt_tag == tag:
             # check if the tag exists in the old record too:
-            if rec_old.has_key(tag) and tag != '001':
+            if tag in rec_old and tag != '001':
                 # the tag does exist, so delete all record's tag+ind1+ind2 combinations from rec_old
-                for dummy_sf_vals, ind1, ind2, dummy_cf, dummy_field_number in record[tag]:
+                for dummy_sf_vals, ind1, ind2, dummy_cf, field_number in record[tag]:
                     write_message("      Delete tag: " + tag + " ind1=" + ind1 + " ind2=" + ind2, verbose=9)
                     record_delete_field(rec_old, tag, ind1, ind2)
+
+    ## Ok, we readd necessary fields!
+    for tag, fields in fields_to_readd.iteritems():
+        for sf_vals in fields:
+            write_message("      Adding tag: " + tag[:3] + " ind1=" + tag[3] + " ind2=" + tag[4] + " code=" + str(sf_vals), verbose=9)
+            record_add_field(rec_old, tag[:3], tag[3], tag[4], datafield_subfield_code_value_tuples=sf_vals)
 
 def delete_bibrec_bibxxx(record, id_bibrec):
     """Delete the database record from the table bibxxx given in parameters"""
