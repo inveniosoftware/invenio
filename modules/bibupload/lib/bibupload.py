@@ -1868,7 +1868,7 @@ def task_run_core():
                         else:
                             write_message("Record could not have been parsed",
                                           stream=sys.stderr)
-                            stat['nb_errors'] += 1
+                        stat['nb_errors'] += 1
                     elif error[0] == 2:
                         if record:
                             write_message(record_xml_output(record),

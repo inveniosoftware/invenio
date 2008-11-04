@@ -31,6 +31,7 @@ from invenio.bibdocfile import BibRecDocs, list_versions_from_array, list_types_
 from invenio.websubmit_functions.Shared_Functions import createRelatedFormats, createIcon
 
 def Upload_Files(parameters, curdir, form, user_info=None):
+    """DEPRECATED: Use FFT instead."""
     global doctype,access,act,dir
     minsize=parameters['minsize']
     maxsize=parameters['maxsize']
