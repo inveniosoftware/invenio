@@ -318,6 +318,12 @@ def interface(req,
         ## Submission doesn't exist in log - create it:
         log_new_pending_submission(doctype, act, access, uid_email)
 
+    ## Let's write in curdir file under curdir the curdir value
+    ## in case e.g. it is needed in FFT.
+    fp = open(os.path.join(curdir, "curdir"), "w")
+    fp.write(curdir)
+    fp.close()
+
     # Save the form fields entered in the previous submission page
     # If the form was sent with the GET method
     form = dict(req.form)
@@ -328,7 +334,6 @@ def interface(req,
         file_to_open = os.path.join(curdir, filename)
         try:
             assert(file_to_open == os.path.abspath(file_to_open))
-            assert(file_to_open.startswith(CFG_WEBSUBMIT_STORAGEDIR))
         except AssertionError:
             register_exception(req=req, alert_admin=True, prefix='Possible cracking tentative: curdir="%s", filename="%s"' % (curdir, filename))
             return warningMsg(_("Invalid parameters"), req, c, ln)
@@ -369,9 +374,9 @@ def interface(req,
             filename = filename.strip()
             if filename != "":
                 # This may be dangerous if the file size is bigger than the available memory
-                data = formfields.file.read()
                 fp = open(os.path.join(dir_to_open, filename), "w")
-                fp.write(data)
+                while formfields.file:
+                    fp.write(formfields.file.read(10240))
                 fp.close()
                 fp = open(os.path.join(curdir, "lastuploadedfile"), "w")
                 fp.write(filename)
@@ -813,6 +818,12 @@ def endaction(req,
     ## Determine whether the action is finished
     ## (ie there are no other steps after the current one):
     finished = function_step_is_last(doctype, act, step)
+
+    ## Let's write in curdir file under curdir the curdir value
+    ## in case e.g. it is needed in FFT.
+    fp = open(os.path.join(curdir, "curdir"), "w")
+    fp.write(curdir)
+    fp.close()
 
     # Save the form fields entered in the previous submission page
     # If the form was sent with the GET method

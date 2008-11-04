@@ -12,6 +12,6 @@ START::DEFP()---<record>
 6531xa::REP(EOL,)::MINLW(82)---<datafield tag="653" ind1="1" ind2=" "><subfield code="a"><:DEMOART_KW*::DEMOART_KW:></subfield></datafield>
 700a::REP(EOL,)::RANGE(2,1999)::MINLW(82)---<datafield tag="700" ind1=" " ind2=" "><subfield code="a"><:DEMOART_AU*::DEMOART_AU:></subfield></datafield>
 856f::REPL(EOL,)---<datafield tag="856" ind1="0" ind2=" "><subfield code="f"><:SuE::SuE:></subfield></datafield>
-8564u::REPL(EOL,)---<datafield tag="856" ind1="4" ind2=" "><subfield code="u">http://localhost/record/<:SN::SN:>/files/<:DEMOART_FILE_RENAMED::DEMOART_FILE_RENAMED:></subfield><subfield code="z">Access to files</subfield></datafield>
 980::REPL(EOL,)---<datafield tag="980" ind1=" " ind2=" "><subfield code="a"><:comboDEMOART::comboDEMOART:></subfield></datafield>
+FFT::REPL(EOL,)---<datafield tag="FFT" ind1=" " ind2=" "><subfield code="a"><:curdir::curdir:>/files/DEMOART_FILE/<:DEMOART_FILE::DEMOART_FILE:></subfield><subfield code="n"><:DEMOART_RN::DEMOART_RN:></subfield></datafield>
 END::DEFP()---</record>

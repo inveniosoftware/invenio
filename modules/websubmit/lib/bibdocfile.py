@@ -67,7 +67,8 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS, \
     CFG_WEBSUBMIT_FILESYSTEM_BIBDOC_GROUP_LIMIT, CFG_SITE_SECURE_URL, \
     CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS, \
-    CFG_TMPDIR, CFG_PATH_MD5SUM
+    CFG_TMPDIR, CFG_PATH_MD5SUM, \
+    CFG_WEBSUBMIT_STORAGEDIR
 from invenio.bibformat import format_record
 import invenio.template
 websubmit_templates = invenio.template.load('websubmit')
@@ -2193,7 +2194,7 @@ def check_valid_url(url):
             path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
             if os.path.realpath(path) != path:
                 raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
-            for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR]:
+            for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR, CFG_WEBSUBMIT_STORAGEDIR]:
                 if path.startswith(allowed_path):
                     dummy_fd = open(path)
                     dummy_fd.close()
@@ -2238,7 +2239,7 @@ def download_url(url, format, user=None, password=None, sleep=2):
                 path = urllib2.urlparse.urlsplit(urllib.unquote(url))[2]
                 if os.path.realpath(path) != path:
                     raise StandardError, "%s is not a normalized path (would be %s)." % (path, os.path.normpath(path))
-                for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR]:
+                for allowed_path in CFG_BIBUPLOAD_FFT_ALLOWED_LOCAL_PATHS + [CFG_TMPDIR, CFG_WEBSUBMIT_STORAGEDIR]:
                     if path.startswith(allowed_path):
                         shutil.copy(path, tmppath)
                         if os.path.getsize(tmppath) > 0:
