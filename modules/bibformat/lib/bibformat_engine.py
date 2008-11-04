@@ -1781,12 +1781,11 @@ class BibFormatObject:
 
         @return the record structure as returned by BibRecord
         """
+        from invenio.search_engine import get_record
         # Create record if necessary
         if self.record is None:
             # on-the-fly creation if current output is xm
-            record = create_record(record_get_xml(self.recID, 'xm',
-                                                  on_the_fly=(self.format.lower() == 'xm')))
-            self.record = record[0]
+            self.record = get_record(self.recID)
 
         return self.record
 

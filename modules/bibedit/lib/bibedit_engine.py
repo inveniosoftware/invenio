@@ -37,7 +37,7 @@ from invenio.bibrecord import record_xml_output, create_record, \
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_TIMEOUT
 from invenio.dateutils import convert_datetext_to_dategui
-from invenio.search_engine import print_record, record_exists
+from invenio.search_engine import print_record, record_exists, get_record as se_get_record
 import invenio.template
 
 # Precompile regexp:
@@ -179,7 +179,7 @@ def get_record(recid, uid):
     Returns original and tmp record dict. If returned tmp record dict is
     empty, that indicates another user editing the record.
     """
-    original_record = create_record(print_record(recid, 'xm'))[0]
+    original_record = se_get_record(recid)
     tmp_record = ''
     file_path = get_file_path(recid)
 

@@ -42,7 +42,8 @@ from invenio.config import \
      CFG_TMPDIR
 from invenio.search_engine import \
      perform_request_search, \
-     get_fieldvalues
+     get_fieldvalues, \
+     get_record
 from invenio.intbitset import intbitset as HitSet
 from invenio.dbquery import run_sql
 from invenio.bibtask import \
@@ -54,8 +55,7 @@ from invenio.bibtask import \
      task_sleep_now_if_required
 from invenio.bibrecord import \
      record_delete_subfield, \
-     field_xml_output, \
-     create_record
+     field_xml_output
 from invenio.bibformat import format_record
 
 DATAFIELD_SET_HEAD = \
@@ -455,7 +455,7 @@ def marcxml_filter_out_tags(recid, fields):
     """
     out = ''
 
-    record = create_record(format_record(recid, 'xm'), 2)[0]
+    record = get_record(recid)
 
     # Delete subfields that we want to replace
     for field in fields:

@@ -58,7 +58,7 @@ except NameError:
 from invenio.shellutils import escape_shell_arg
 from invenio.dbquery import run_sql, DatabaseError, blob_to_string
 from invenio.errorlib import register_exception
-from invenio.bibrecord import create_record, record_get_field_instances, \
+from invenio.bibrecord import record_get_field_instances, \
     field_get_subfield_values, field_get_subfield_instances, \
     encode_for_xml
 from invenio.access_control_engine import acc_authorize_action
@@ -246,9 +246,9 @@ class BibRecDocs:
     def get_xml_8564(self):
         """Return a snippet of XML representing the 8564 corresponding to the
         current state"""
+        from invenio.search_engine import get_record
         out = ''
-        xml = format_record(self.id, of='xm')
-        record = create_record(xml)[0]
+        record = get_record(self.id)
         fields = record_get_field_instances(record, '856', '4', ' ')
         for field in fields:
             url = field_get_subfield_values(field, 'u')
@@ -1060,9 +1060,9 @@ class BibDoc:
         if record is passed it is directly used, otherwise it is
         calculated after the xm stored in the database."""
         ## Let's get the record
+        from invenio.search_engine import get_record
         if record is None:
-            xml = format_record(self.id, of='xm')
-            record = create_record(xml)[0]
+            record = get_record(self.id)
         fields = record_get_field_instances(record, '856', '4', ' ')
 
         global_comment = None
