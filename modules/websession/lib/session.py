@@ -427,7 +427,6 @@ class SessionManager:
             request.response.set_cookie(self._getSessionCookieName(), session_id,
                                     domain = self._getSessionCookieDomain(),
                                     path = self._getSessionCookiePath(),
-                                    secure = True,
                                     HttpOnly = True,
                                     expires = strftime('%a, %d-%b-%Y %H:%M:%S GMT', gmtime(time() +
                                     CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER*86400)))
