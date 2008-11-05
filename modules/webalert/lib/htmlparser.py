@@ -21,7 +21,6 @@ __revision__ = "$Id$"
 
 import re
 from HTMLParser import HTMLParser
-from string import split
 import textwrap
 import htmlentitydefs
 
@@ -46,7 +45,7 @@ def wrap_records(text):
     """Limits the number of characters per line in given text.
     The function preserves new lines.
     """
-    lines = split(text, '\n')
+    lines = text.split('\n')
     result_lines = []
     for l in lines:
         newlines = textwrap.wrap(l, CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL)
