@@ -21,7 +21,6 @@ __revision__ = "$Id$"
 
 import re
 from HTMLParser import HTMLParser
-from string import split
 import textwrap
 import htmlentitydefs
 
@@ -44,14 +43,15 @@ def wrap(text):
 
 def wrap_records(text):
     """Limits the number of characters per line in given text.
-    The function preserves new lines."""
-    lines = split(text, '\n')
-    result = ''
+    The function preserves new lines.
+    """
+    lines = text.split('\n')
+    result_lines = []
     for l in lines:
         newlines = textwrap.wrap(l, CFG_WEBALERT_MAX_NUM_OF_CHARS_PER_LINE_IN_ALERT_EMAIL)
         for ll in newlines:
-            result += ll + '\n'
-    return result
+            result_lines.append(ll)
+    return '\n'.join(result_lines)
 
 class RecordHTMLParser(HTMLParser):
     """A parser for the HTML returned by invenio.search_engine.print_record.
@@ -62,6 +62,8 @@ class RecordHTMLParser(HTMLParser):
     """
 
     silent = False
+    new_line = True # Are we at the beginning of a new line? (after
+                    # <br/>, </p> or at the beginning of the text)
 
     def __init__(self):
         HTMLParser.__init__(self)
@@ -75,9 +77,9 @@ class RecordHTMLParser(HTMLParser):
             self.printURL = 0
             self.unclosedBracket = 0
             for f in attrs:
-                if f[1] == 'note':
-                    self.result += 'Fulltext : <'
-                    self.unclosedBracket = 1
+                #if f[1] == 'note':
+                #    self.result += 'Fulltext : <'
+                #    self.unclosedBracket = 1
                 if f[1] == 'moreinfo':
                     self.result += 'Detailed record : '
                     self.printURL = 1
@@ -87,6 +89,15 @@ class RecordHTMLParser(HTMLParser):
             self.result += '\n'
         elif tag == 'style' or tag == 'script':
             self.silent = True
+        elif tag == 'p':
+            if not self.new_line:
+                self.result += '\n'
+                self.new_line = True
+
+    def handle_startendtag(self, tag, attrs):
+        if tag == 'br':
+            self.result += '\n'
+            self.new_line = True
 
     def handle_endtag(self, tag):
         if tag == 'strong':
@@ -98,12 +109,21 @@ class RecordHTMLParser(HTMLParser):
                 self.unclosedBracket = 0
         elif tag == 'style' or tag == 'script':
             self.silent = False
+        elif tag == 'p':
+            self.result += '\n'
+            self.new_line = True
 
     def handle_data(self, data):
         if data.lower() in  ['detailed record', 'similar record', 'cited by']:
             pass
         elif self.silent == False:
-            self.result += data
+            cleaned_data = data.strip()
+            last_data = cleaned_data
+            if len(cleaned_data) != 0:
+                self.result += ((data.startswith(' ') and not self.new_line) and ' ' or '') + \
+                               cleaned_data + \
+                               (data.endswith(' ') and ' ' or '')
+                self.new_line = False
 
     def handle_comment(self, data):
         if 'START_NOT_FOR_TEXT' == data.upper().strip():
@@ -141,6 +161,9 @@ def get_as_text(record_id, ln=CFG_SITE_LANG):
         out = htparser.result
     except:
         out = re_html.sub(' ', rec_in_hb)
+
+    out = out.strip('\n').strip() # Remove trailing whitespace and
+                                  # linefeeds
     out = re.sub(r"[\-:]?\s*%s\s*[\-:]?" % _("Detailed record"), "", out)
     out = re.sub(r"[\-:]?\s*%s\s*[\-:]?" % _("Similar records"), "", out)
     out = re.sub(r"[\-:]?\s*%s\s*[\-:]?" % _("Cited by"), "", out)

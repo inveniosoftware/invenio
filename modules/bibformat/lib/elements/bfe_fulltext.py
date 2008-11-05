@@ -111,6 +111,10 @@ def format(bfo, style, separator='; ', show_icons='no'):
     if out.endswith('<br />'):
         out = out[:-len('<br />')]
 
+    # When exported to text (eg. in WebAlert emails) we do not want to
+    # display the link to the fulltext:
+    out = '<!--START_NOT_FOR_TEXT-->' + out + '<!--END_NOT_FOR_TEXT-->'
+
     return out
 
 def escape_values(bfo):

@@ -568,6 +568,6 @@ Need human intervention?  Contact <%s>
     def tmpl_alert_email_record(self, recid):
         """ Format a single record."""
 
-        out = wrap(get_as_text(recid))
+        out = wrap_records(get_as_text(recid))
         out += "Detailed record: <%s/record/%s>" % (CFG_SITE_URL, recid)
         return out
