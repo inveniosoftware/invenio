@@ -1777,16 +1777,15 @@ class BibFormatObject:
 
     def get_record(self):
         """
-        Returns the record of this BibFormatObject instance
+        Returns the record structure of this BibFormatObject instance
 
-        @return the record structure as returned by BibRecord
+        @return the record structure as defined by BibRecord library
         """
+        from invenio.search_engine import get_record
         # Create record if necessary
         if self.record is None:
             # on-the-fly creation if current output is xm
-            record = create_record(record_get_xml(self.recID, 'xm',
-                                                  on_the_fly=(self.format.lower() == 'xm')))
-            self.record = record[0]
+            self.record = get_record(self.recID)
 
         return self.record
 

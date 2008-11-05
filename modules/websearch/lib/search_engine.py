@@ -47,14 +47,14 @@ from invenio.config import \
      CFG_WEBSEARCH_NB_RECORDS_TO_SORT, \
      CFG_WEBSEARCH_SEARCH_CACHE_SIZE, \
      CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS, \
+     CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE, \
      CFG_BIBRANK_SHOW_DOWNLOAD_GRAPHS, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_LOGDIR, \
      CFG_SITE_URL
 from invenio.search_engine_config import CFG_EXPERIMENTAL_FEATURES, InvenioWebSearchUnknownCollectionError
-from invenio.search_engine_summarizer import summarize_records
-from invenio.bibrecord import create_records, record_get_field_value, record_get_field_values
+from invenio.bibrecord import create_record, create_records, record_get_field_value, record_get_field_values
 from invenio.bibrank_record_sorter import get_bibrank_methods, rank_records, is_method_valid
 from invenio.bibrank_downloads_similarity import register_page_view_event, calculate_reading_similarity_list
 from invenio.bibindex_engine_stemmer import stem
@@ -3058,9 +3058,26 @@ def print_records_epilogue(req, format):
         epilogue = websearch_templates.tmpl_xml_default_epilogue()
     req.write(epilogue)
 
+def get_record(recid):
+    """Directly the record object corresponding to the recid."""
+    from marshal import loads, dumps
+    from zlib import compress, decompress
+    if CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE:
+        value = run_sql('SELECT value FROM bibfmt WHERE id_bibrec=%s AND FORMAT=\'recstruct\'',  (recid, ))
+        if value:
+            try:
+                return loads(decompress(value[0][0]))
+            except:
+                ### In case of corruption, let's rebuild it!
+                pass
+    return create_record(print_record(recid, 'xm'))[0]
+
 def print_record(recID, format='hb', ot='', ln=CFG_SITE_LANG, decompress=zlib.decompress,
                  search_pattern=None, user_info=None, verbose=0):
     """Prints record 'recID' formatted accoding to 'format'."""
+
+    if format == 'recstruct':
+        return get_record(recID)
 
     _ = gettext_set_language(ln)
 

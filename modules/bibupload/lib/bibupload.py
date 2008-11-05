@@ -69,14 +69,14 @@ from invenio.config import CFG_OAI_ID_FIELD, CFG_SITE_URL, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
      CFG_BIBUPLOAD_EXTERNAL_OAIID_PROVENANCE_TAG, \
      CFG_BIBUPLOAD_STRONG_TAGS, \
-     CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS
+     CFG_BIBUPLOAD_CONTROLLED_PROVENANCE_TAGS, \
+     CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE
 
 from invenio.bibupload_config import CFG_BIBUPLOAD_CONTROLFIELD_TAGS, \
     CFG_BIBUPLOAD_SPECIAL_TAGS
 from invenio.dbquery import run_sql, \
                             Error
 from invenio.bibrecord import create_records, \
-                              create_record, \
                               record_add_field, \
                               record_delete_field, \
                               record_xml_output, \
@@ -84,6 +84,7 @@ from invenio.bibrecord import create_records, \
                               record_get_field_values, \
                               field_get_subfield_values, \
                               record_extract_oai_id
+from invenio.search_engine import get_record
 from invenio.dateutils import convert_datestruct_to_datetext
 from invenio.errorlib import register_exception
 from invenio.bibformat import format_record
@@ -213,7 +214,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
         insert_mode_p = False
         # Update Mode
         # Retrieve the old record to update
-        rec_old = create_record(format_record(int(rec_id), 'xm'), 2)[0]
+        rec_old = get_record(rec_id)
         if rec_old is None:
             write_message("   Failed during the creation of the old record!",
                         verbose=1, stream=sys.stderr)
@@ -318,12 +319,17 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             # Update bibfmt with the format xm of this record
             if opt_mode != 'format':
                 error = update_bibfmt_format(rec_id, rec_xml_new, 'xm')
-            if error == 1:
-                write_message("   Failed: error during update_bibfmt_format",
-                            verbose=1, stream=sys.stderr)
-                return (1, int(rec_id))
-            # archive MARCXML format of this record for version history purposes:
-            if opt_mode != 'format':
+                if error == 1:
+                    write_message("   Failed: error during update_bibfmt_format 'xm'",
+                                verbose=1, stream=sys.stderr)
+                    return (1, int(rec_id))
+                if CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE:
+                    error = update_bibfmt_format(rec_id, marshal.dumps(record), 'recstruct')
+                    if error == 1:
+                        write_message("   Failed: error during update_bibfmt_format 'recstruct'",
+                                    verbose=1, stream=sys.stderr)
+                        return (1, int(rec_id))
+                # archive MARCXML format of this record for version history purposes:
                 error = archive_marcxml_for_history(rec_id)
                 if error == 1:
                     write_message("   Failed to archive MARCXML for history",
@@ -511,7 +517,7 @@ def find_records_from_extoaiid(extoaiid, extoaisrc=None):
         write_message('   Partially found %s for extoaiid="%s"' % (id_bibrecs, extoaiid), verbose=9)
         ret = intbitset()
         for id_bibrec in id_bibrecs:
-            record = create_record(print_record(id_bibrec, 'xm'))[0]
+            record = get_record(id_bibrec)
             instances = record_get_field_instances(record, CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[0:3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[3], CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG[4])
             write_message('   recid %s -> instances "%s"' % (id_bibrec, instances), verbose=9)
             for instance in instances:

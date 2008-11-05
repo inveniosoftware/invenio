@@ -37,7 +37,7 @@ from invenio.bibrecord import record_xml_output, create_record, \
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_BIBEDIT_TIMEOUT
 from invenio.dateutils import convert_datetext_to_dategui
-from invenio.search_engine import print_record, record_exists
+from invenio.search_engine import print_record, record_exists, get_record
 import invenio.template
 
 # Precompile regexp:
@@ -60,7 +60,7 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, format
         if confirm_delete != 0:
             body = bibedit_templates.confirm(ln, 'delete', delete, format_tag)
         else:
-            (record, junk) = get_record(delete, uid)
+            (record, junk) = get_temp_and_orig_records(delete, uid)
             add_field(delete, uid, record, "980", "", "", "c", "DELETED")
             save_temp_record(record, uid, "%s.tmp" % get_file_path(delete))
             return perform_request_submit(ln, delete, deleting=True)
@@ -69,7 +69,7 @@ def perform_request_index(ln, recid, cancel, delete, confirm_delete, uid, format
         if recid != 0 :
             if record_exists(recid) > 0:
                 body = ''
-                (record, original_record) = get_record(recid, uid)
+                (record, original_record) = get_temp_and_orig_records(recid, uid)
                 if record and not record_locked_p(recid):
                     if edit_tag is not None and dict_value is not None:
                         record = edit_record(recid, uid, record, edit_tag, dict_value, num_field)
@@ -131,7 +131,7 @@ def perform_request_edit(ln, recid, uid, tag, num_field, num_subfield,
     warnings = []
     body = ''
 
-    (record, junk) = get_record(recid, uid)
+    (record, junk) = get_temp_and_orig_records(recid, uid)
 
     if act_subfield is not None:
         if act_subfield == 'delete':
@@ -174,12 +174,12 @@ def save_temp_record(record, uid, file_path):
     cPickle.dump([uid, record], file_temp)
     file_temp.close()
 
-def get_record(recid, uid):
+def get_temp_and_orig_records(recid, uid):
     """
-    Returns original and tmp record dict. If returned tmp record dict is
+    Returns tmp and original record dict. If returned tmp record dict is
     empty, that indicates another user editing the record.
     """
-    original_record = create_record(print_record(recid, 'xm'))[0]
+    original_record = get_record(recid)
     tmp_record = ''
     file_path = get_file_path(recid)
 

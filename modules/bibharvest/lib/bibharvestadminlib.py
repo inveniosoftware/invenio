@@ -60,12 +60,13 @@ from invenio.bibharvest_dblayer import get_history_entries, \
     HistoryEntry, get_month_logs_size, get_history_entries_for_day, \
     get_day_logs_size, get_entry_history, get_entry_logs_size, \
     get_holdingpen_entries, delete_holdingpen_entry, get_holdingpen_entry
-from invenio.search_engine import search_pattern
+from invenio.search_engine import search_pattern, get_record
 import invenio.template
 from invenio import oaiharvestlib
 from invenio.xmlmarc2textmarclib import recxml2recmarc, create_marc_record
 from invenio import bibformat
 from invenio.bibrecord import create_record
+
 bibharvest_templates = invenio.template.load('bibharvest')
 
 tmppath = CFG_TMPDIR + '/bibharvestadmin.' + str(os.getpid())
@@ -975,7 +976,7 @@ def perform_request_viewhprecord(oai_id, date_inserted, ln = CFG_SITE_LANG, conf
     result = ""
     record_id = int(search_pattern( p = oai_id, f = CFG_BIBUPLOAD_EXTERNAL_OAIID_TAG, \
                                         m = 'e' ).tolist()[0])
-    db_rec = create_record(bibformat.format_record(record_id ,"xm"))
+    db_rec = get_record(record_id)
     db_MARC = create_marc_record(db_rec[0], record_id, {"text-marc": 1, "aleph-marc": 0})
     db_content = bibharvest_templates.tmpl_output_preformatted(db_MARC.encode("utf-8"))
     db_label = "Database version of record" + bibharvest_templates.tmpl_print_brs(ln, 1)

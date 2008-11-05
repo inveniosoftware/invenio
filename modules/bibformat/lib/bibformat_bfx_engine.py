@@ -644,7 +644,7 @@ class MARCTranslator:
         if self.recIDs:
             self.recID_index = 0
             self.recID = self.recIDs[self.recID_index]
-            self.record = get_record(self.recID)
+            self.record = get_bfx_record(self.recID)
             if self.preprocess:
                 self.preprocess(self.record)
         return None
@@ -716,7 +716,7 @@ class MARCTranslator:
         '''
         if name == 'record':
             for self.recID in self.recIDs:
-                self.record = get_record(self.recID)
+                self.record = get_bfx_record(self.recID)
                 if self.preprocess:
                     self.preprocess(self.record)
                 yield str(self.recID)
@@ -888,7 +888,7 @@ def convert_record(old_record):
                 fields[new_tag].append(new_field_instance)
     return fields
 
-def get_record(recID):
+def get_bfx_record(recID):
     '''
     Get a record with a specific recID.
     @param recID the ID of the record
@@ -897,7 +897,7 @@ def get_record(recID):
     bfo = BibFormatObject(recID)
     return convert_record(bfo.get_record())
 
-def print_record(record):
+def print_bfx_record(record):
     '''
     Print a record.
     '''
