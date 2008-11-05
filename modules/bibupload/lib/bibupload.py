@@ -591,7 +591,7 @@ def retrieve_rec_id(record, opt_mode):
             # we try to match rec_id against the database:
             if find_record_from_recid(rec_id) is not None:
                 # okay, 001 corresponds to some known record
-                return rec_id
+                return int(rec_id)
             else:
                 # The record doesn't exist yet. We shall have try to check
                 # the SYSNO or OAI id later.
@@ -712,7 +712,7 @@ def retrieve_rec_id(record, opt_mode):
                           " (-h for help)", verbose=1, stream=sys.stderr)
             return -1
 
-    return rec_id
+    return rec_id and int(rec_id) or None
 
 ### Insert functions
 
@@ -845,16 +845,20 @@ def synchronize_8564(rec_id, record, record_had_FFT):
     for field in tags8564s:
         to_be_removed = False
         for value in field_get_subfield_values(field, 'u') + field_get_subfield_values(field, 'q'):
-            if value.startswith('%s/record/%s/files/' % (CFG_SITE_URL, rec_id)) or \
-                value.startswith('%s/record/%s/files/' % (CFG_SITE_SECURE_URL, rec_id)):
-                if not record_had_FFT and bibdocfile_url_p(value):
-                    ## If the submission didn't have FFTs, i.e. could be
-                    ## not FFTs aware, and it specify 8564s pointing to local
-                    ## owned files, then we should import comment and
-                    ## description from the 8564s tags.
-                    ## Anything else will be discarded.
-                    merge_marc_into_bibdocfile(field)
-                to_be_removed = True
+            try:
+                recid, docname, format = decompose_bibdocfile_url(value)
+                if recid == rec_id:
+                    if not record_had_FFT:
+                        ## If the submission didn't have FFTs, i.e. could be
+                        ## not FFTs aware, and it specify 8564s pointing to local
+                        ## owned files, then we should import comment and
+                        ## description from the 8564s tags.
+                        ## Anything else will be discarded.
+                        merge_marc_into_bibdocfile(field)
+                    to_be_removed = True
+            except InvenioWebSubmitFileError:
+                ## The URL is not a bibdocfile URL.
+                pass
         if not to_be_removed:
             filtered_tags8564s.append(field)
 

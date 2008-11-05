@@ -163,6 +163,7 @@ DEF_ACTIONS = (
                ('attachcommentfile', 'attach files to comments', 'collection', 'no'),
                ('cfgbibexport', 'configure BibExport', '', 'no'),
                ('runbibexport', 'run BibExport', '', 'no'),
+               ('fulltext', 'administrate Fulltext', '', 'no')
               )
 
 # Default authorizations

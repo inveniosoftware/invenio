@@ -88,12 +88,12 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
             user_info = collect_user_info(req)
 
             verbose = args['verbose']
-            if verbose >= 1 and not isUserSuperAdmin(user_info):
+            if verbose >= 1 and acc_authorize_action(user_info, 'fulltext')[0] != 0:
                 # Only SuperUser can see all the details!
                 verbose = 0
 
             if uid == -1 or CFG_ACCESS_CONTROL_LEVEL_SITE > 1:
-                return page_not_authorized(req, "../getfile.py/index",
+                return page_not_authorized(req, "/record/%s" % self.recid,
                                            navmenuid='submit')
 
             (auth_code, auth_msg) = check_user_can_view_record(user_info, self.recid)
@@ -152,6 +152,8 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 if version != 'all':
                     version = ''
 
+            display_hidden = acc_authorize_action(user_info, 'fulltext')[0] == 0
+
             if version != 'all':
                 # search this filename in the complete list of files
                 for doc in bibarchive.list_bibdocs():
@@ -160,7 +162,6 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             docfile = doc.get_file(format, version)
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req, alert_admin=True)
-                            return warningMsg(_("An error has happened in trying to retrieve the requested file."), req, CFG_SITE_NAME, ln)
 
                         if docfile.get_status() == '':
                             # The file is not resticted, let's check for
@@ -175,14 +176,17 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             if auth_code != 0:
                                 return warningMsg(_("This file is restricted: ") + auth_message, req, CFG_SITE_NAME, ln)
 
-                        if not readonly:
-                            ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
-                            res = doc.register_download(ip, version, format, uid)
-                        try:
-                            return docfile.stream(req)
-                        except InvenioWebSubmitFileError, msg:
-                            register_exception(req=req, alert_admin=True)
-                            return warningMsg(_("An error has happened in trying to stream the request file."), req, CFG_SITE_NAME, ln)
+                        if display_hidden or not docfile.hidden_p():
+                            if not readonly:
+                                ip = str(req.get_remote_host(apache.REMOTE_NOLOOKUP))
+                                res = doc.register_download(ip, version, format, uid)
+                            try:
+                                return docfile.stream(req)
+                            except InvenioWebSubmitFileError, msg:
+                                register_exception(req=req, alert_admin=True)
+                                return warningMsg(_("An error has happened in trying to stream the request file."), req, CFG_SITE_NAME, ln)
+                        else:
+                            warn = print_warning(_("The requested file is hidden and you don't have the proper rights to access it."))
 
                     elif doc.get_icon() is not None and doc.get_icon().docname in filename:
                         icon = doc.get_icon()
@@ -214,12 +218,12 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                             register_exception(req=req, alert_admin=True)
                             return warningMsg(_("An error has happened in trying to stream the corresponding icon."), req, CFG_SITE_NAME, ln)
 
-            if docname and format:
+            if docname and format and display_hidden:
                 req.status = apache.HTTP_NOT_FOUND
                 warn = print_warning(_("Requested file does not seem to exist."))
             else:
                 warn = ''
-            filelist = bibarchive.display("", args['version'], ln=ln, verbose=verbose)
+            filelist = bibarchive.display("", args['version'], ln=ln, verbose=verbose, display_hidden=display_hidden)
 
             t = warn + websubmit_templates.tmpl_filelist(
                 ln=ln,

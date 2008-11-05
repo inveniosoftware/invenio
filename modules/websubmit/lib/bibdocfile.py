@@ -1,5 +1,3 @@
-## $Id: bibdocfile.py,v 1.92 2008/09/19 17:17:48 kaplun Exp $
-
 ## This file is part of CDS Invenio.
 ## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
 ##
@@ -33,6 +31,8 @@ import tempfile
 import cPickle
 import base64
 import binascii
+import cgi
+
 try:
     import magic
     CFG_HAS_MAGIC = True
@@ -512,7 +512,7 @@ class BibRecDocs:
                     raise e
         return bibdoc
 
-    def add_new_version(self, fullpath, docname=None, description=None, comment=None, format=None):
+    def add_new_version(self, fullpath, docname=None, description=None, comment=None, format=None, hide_previous_versions=False):
         """Adds a new fullpath file to an already existent docid making the
         previous files associated with the same bibdocids obsolete.
         It returns the bibdoc object.
@@ -522,7 +522,7 @@ class BibRecDocs:
         if format is None:
             format = decompose_file(fullpath)[2]
         bibdoc = self.get_bibdoc(docname=docname)
-        bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format)
+        bibdoc.add_file_new_version(fullpath, description=description, comment=comment, format=format, hide_previous_versions=hide_previous_versions)
         return bibdoc
 
     def add_new_format(self, fullpath, docname=None, description=None, comment=None, format=None):
@@ -547,7 +547,7 @@ class BibRecDocs:
             docfiles += bibdoc.list_latest_files()
         return docfiles
 
-    def display(self, docname="", version="", doctype="", ln=CFG_SITE_LANG, verbose=0):
+    def display(self, docname="", version="", doctype="", ln=CFG_SITE_LANG, verbose=0, display_hidden=True):
         """Returns a formatted panel with information and links about a given
         docid of a particular version (or any), of a particular doctype (or any)
         """
@@ -570,7 +570,7 @@ class BibRecDocs:
                 for bibdoc in bibdocs:
                     if mytype == bibdoc.get_type():
                         fulltype['content'].append(bibdoc.display(version,
-                            ln = ln))
+                            ln=ln, display_hidden=display_hidden))
                 fulltypes.append(fulltype)
 
             if verbose >= 9:
@@ -967,7 +967,7 @@ class BibDoc:
             self._build_file_list()
             self._build_related_file_list()
 
-    def add_file_new_version(self, filename, description=None, comment=None, format=None):
+    def add_file_new_version(self, filename, description=None, comment=None, format=None, hide_previous_versions=False):
         """Add a new version of a file."""
         try:
             latestVersion = self.get_latest_version()
@@ -989,6 +989,11 @@ class BibDoc:
                     raise InvenioWebSubmitFileError, "Encountered an exception while copying '%s' to '%s': '%s'" % (filename, destination, e)
                 self.more_info.set_description(description, format, myversion)
                 self.more_info.set_comment(comment, format, myversion)
+                for afile in self.list_all_files():
+                    format = afile.get_format()
+                    version = afile.get_version()
+                    if version < myversion:
+                        self.more_info.set_hidden(hide_previous_versions, format, myversion)
             else:
                 raise InvenioWebSubmitFileError, "'%s' does not exists!" % filename
         finally:
@@ -1004,6 +1009,7 @@ class BibDoc:
                 if afile.get_version() < version:
                     self.more_info.unset_comment(afile.get_format(), afile.get_version())
                     self.more_info.unset_description(afile.get_format(), afile.get_version())
+                    self.more_info.unset_hidden(afile.get_format(), afile.get_version())
                     try:
                         os.remove(afile.get_full_path())
                     except Exception, e:
@@ -1188,16 +1194,16 @@ class BibDoc:
         self.touch()
         self._build_related_file_list()
 
-    def display(self, version="", ln = CFG_SITE_LANG):
+    def display(self, version="", ln=CFG_SITE_LANG, display_hidden=True):
         """Returns a formatted representation of the files linked with
         the bibdoc.
         """
         t = ""
         if version == "all":
-            docfiles = self.list_all_files()
+            docfiles = self.list_all_files(list_hidden=display_hidden)
         elif version != "":
             version = int(version)
-            docfiles = self.list_version_files(version)
+            docfiles = self.list_version_files(version, list_hidden=display_hidden)
         else:
             docfiles = self.list_latest_files()
         existing_icon = self.get_icon()
@@ -1275,6 +1281,14 @@ class BibDoc:
         self.touch()
         self._build_file_list('init')
 
+    def set_hidden(self, hidden, format, version=None):
+        """Update the hidden flag for format/version."""
+        if version is None:
+            version = self.get_latest_version()
+        self.more_info.set_hidden(hidden, format, version)
+        self.touch()
+        self._build_file_list('init')
+
     def get_comment(self, format, version=None):
         """Get a comment for a given format/version."""
         if version is None:
@@ -1286,6 +1300,12 @@ class BibDoc:
         if version is None:
             version = self.get_latest_version()
         return self.more_info.get_description(format, version)
+
+    def hidden_p(self, format, version=None):
+        """Is the format/version hidden?"""
+        if version is None:
+            version = self.get_latest_version()
+        return self.more_info.hidden_p(format, version)
 
     def get_docname(self):
         """retrieve bibdoc name"""
@@ -1464,10 +1484,11 @@ class BibDoc:
                         (dirname, basename, format) = decompose_file(fullname)
                         comment = self.more_info.get_comment(format, fileversion)
                         description = self.more_info.get_description(format, fileversion)
+                        hidden = self.more_info.hidden_p(format, fileversion)
                         # we can append file:
                         self.docfiles.append(BibDocFile(filepath, self.doctype,
                             fileversion, basename, format,
-                            self.recid, self.id, self.status, checksum, description, comment))
+                            self.recid, self.id, self.status, checksum, description, comment, hidden))
                     except Exception, e:
                         register_exception()
         if context == 'init':
@@ -1521,18 +1542,21 @@ class BibDoc:
             ret += bibdocfile.get_size()
         return ret
 
-    def list_all_files(self):
+    def list_all_files(self, list_hidden=True):
         """Returns all the docfiles linked with the given bibdoc."""
-        return self.docfiles
+        if list_hidden:
+            return self.docfiles
+        else:
+            return [afile for afile in self.docfiles if not afile.hidden_p()]
 
     def list_latest_files(self):
         """Returns all the docfiles within the last version."""
         return self.list_version_files(self.get_latest_version())
 
-    def list_version_files(self, version):
+    def list_version_files(self, version, list_hidden=True):
         """Return all the docfiles of a particular version."""
         version = int(version)
-        return [docfile for docfile in self.docfiles if docfile.get_version() == version]
+        return [docfile for docfile in self.docfiles if docfile.get_version() == version and (list_hidden or not docfile.hidden_p)]
 
     def get_latest_version(self):
         """ Returns the latest existing version number for the given bibdoc.
@@ -1565,7 +1589,7 @@ class BibDocFile:
     """This class represents a physical file in the CDS Invenio filesystem.
     It should never be instantiated directly"""
 
-    def __init__(self, fullpath, doctype, version, name, format, recid, docid, status, checksum, description=None, comment=None):
+    def __init__(self, fullpath, doctype, version, name, format, recid, docid, status, checksum, description=None, comment=None, hidden=False):
         self.fullpath = fullpath
         self.doctype = doctype
         self.docid = docid
@@ -1575,6 +1599,7 @@ class BibDocFile:
         self.checksum = checksum
         self.description = description
         self.comment = comment
+        self.hidden = hidden
         self.size = os.path.getsize(fullpath)
         self.md = datetime.fromtimestamp(os.path.getmtime(fullpath))
         try:
@@ -1599,7 +1624,7 @@ class BibDocFile:
         self.magic = None
 
     def __repr__(self):
-        return ('BibDocFile(%s, %s, %i, %s, %s, %i, %i, %s, %s, %s, %s)' % (repr(self.fullpath), repr(self.doctype), self.version, repr(self.name), repr(self.format), self.recid, self.docid, repr(self.status), repr(self.checksum), repr(self.description), repr(self.comment)))
+        return ('BibDocFile(%s, %s, %i, %s, %s, %i, %i, %s, %s, %s, %s, %s)' % (repr(self.fullpath), repr(self.doctype), self.version, repr(self.name), repr(self.format), self.recid, self.docid, repr(self.status), repr(self.checksum), repr(self.description), repr(self.comment), repr(self.hidden)))
 
     def __str__(self):
         out = '%s:%s:%s:%s:fullpath=%s\n' % (self.recid, self.docid, self.version, self.format, self.fullpath)
@@ -1617,6 +1642,7 @@ class BibDocFile:
         out += '%s:%s:%s:%s:fullurl=%s\n' % (self.recid, self.docid, self.version, self.format, self.fullurl)
         out += '%s:%s:%s:%s:description=%s\n' % (self.recid, self.docid, self.version, self.format, self.description)
         out += '%s:%s:%s:%s:comment=%s\n' % (self.recid, self.docid, self.version, self.format, self.comment)
+        out += '%s:%s:%s:%s:hidden=%s\n' % (self.recid, self.docid, self.version, self.format, self.hidden)
         out += '%s:%s:%s:%s:etag=%s\n' % (self.recid, self.docid, self.version, self.format, self.etag)
         return out
 
@@ -1639,6 +1665,9 @@ class BibDocFile:
             return (1, 'File has ben deleted')
         else:
             return (0, '')
+
+    def hidden_p(self):
+        return self.hidden
 
     def get_url(self):
         return self.url
@@ -1918,7 +1947,7 @@ def stream_file(req, fullpath, fullname=None, mime=None, encoding=None, etag=Non
             try:
                 raise Exception, '%s exists but is empty' % fullpath
             except Exception:
-                register_exception(req, alert_admin=True)
+                register_exception(req=req, alert_admin=True)
             raise apache.SERVER_RETURN, apache.HTTP_NOT_FOUND
         if headers['if-modified-since'] and headers['if-modified-since'] >= mtime:
             raise apache.SERVER_RETURN, apache.HTTP_NOT_MODIFIED
@@ -2125,6 +2154,8 @@ def bibdocfile_url_to_fullpath(url):
 def bibdocfile_url_p(url):
     """Return True when the url is a potential valid url pointing to a
     fulltext owned by a system."""
+    if url.startswith('%s/getfile.py' % CFG_SITE_URL) or url.startswith('%s/getfile.py' % CFG_SITE_SECURE_URL):
+        return True
     if not (url.startswith('%s/record/' % CFG_SITE_URL) or url.startswith('%s/record/' % CFG_SITE_SECURE_URL)):
         return False
     splitted_url = url.split('/files/')
@@ -2132,6 +2163,8 @@ def bibdocfile_url_p(url):
 
 def decompose_bibdocfile_url(url):
     """Given a bibdocfile_url return a triple (recid, docname, format)."""
+    if url.startswith('%s/getfile.py' % CFG_SITE_URL) or url.startswith('%s/getfile.py' % CFG_SITE_SECURE_URL):
+        return decompose_bibdocfile_very_old_url(url)
     if url.startswith('%s/record/' % CFG_SITE_URL):
         recid_file = url[len('%s/record/' % CFG_SITE_URL):]
     elif url.startswith('%s/record/' % CFG_SITE_SECURE_URL):
@@ -2150,6 +2183,37 @@ def decompose_bibdocfile_old_url(url):
     if g:
         return int(g.group(1))
     raise InvenioWebSubmitFileError('%s is not a valid old bibdocfile url' % url)
+
+def decompose_bibdocfile_very_old_url(url):
+    """Decompose an old /getfile.py? URL"""
+    if url.startswith('%s/getfile.py' % CFG_SITE_URL) or url.startswith('%s/getfile.py' % CFG_SITE_SECURE_URL):
+        params = urllib.splitquery(url)[1]
+        if params:
+            try:
+                params = cgi.parse_qs(params)
+                if 'docid' in params:
+                    docid = int(params['docid'][0])
+                    bibdoc = BibDoc(docid)
+                    recid = bibdoc.get_recid()
+                    docname = bibdoc.get_docname()
+                elif 'recid' in params:
+                    recid = int(params['recid'][0])
+                    if 'name' in params:
+                        docname = params['name'][0]
+                    else:
+                        docname = ''
+                else:
+                    raise InvenioWebSubmitFileError('%s has not enough params to correspond to a bibdocfile.' % url)
+                format = normalize_format(params.get('format', [''])[0])
+                return (recid, docname, format)
+            except Exception, e:
+                raise InvenioWebSubmitFileError('Problem with %s: %s' % (url, e))
+        else:
+            raise InvenioWebSubmitFileError('%s has no params to correspond to a bibdocfile.' % url)
+    else:
+        raise InvenioWebSubmitFileError('%s is not a valid very old bibdocfile url' % url)
+
+
 
 def nice_size(size):
     """Return a nicely printed size in kilo."""
@@ -2289,6 +2353,8 @@ class BibDocMoreInfo:
                 self.more_info['descriptions'] = {}
             if 'comments' not in self.more_info:
                 self.more_info['comments'] = {}
+            if 'hidden' not in self.more_info:
+                self.more_info['hidden'] = {}
         except:
             register_exception()
             raise
@@ -2301,6 +2367,7 @@ class BibDocMoreInfo:
         """Return the comment corresponding to the given docid/format/version."""
         try:
             assert(type(version) is int)
+            format = normalize_format(format)
             return self.more_info['comments'].get(version, {}).get(format)
         except:
             register_exception()
@@ -2310,7 +2377,18 @@ class BibDocMoreInfo:
         """Return the description corresponding to the given docid/format/version."""
         try:
             assert(type(version) is int)
+            format = normalize_format(format)
             return self.more_info['descriptions'].get(version, {}).get(format)
+        except:
+            register_exception()
+            raise
+
+    def hidden_p(self, format, version):
+        """Is the format/version hidden?"""
+        try:
+            assert(type(version) is int)
+            format = normalize_format(format)
+            return self.more_info['hidden'].get(version, {}).get(format, False)
         except:
             register_exception()
             raise
@@ -2319,6 +2397,7 @@ class BibDocMoreInfo:
         """Store a comment corresponding to the given docid/format/version."""
         try:
             assert(type(version) is int and version > 0)
+            format = normalize_format(format)
             if comment == KEEP_OLD_VALUE:
                 comment = self.get_comment(format, version) or self.get_comment(format, version - 1)
             if not comment:
@@ -2337,6 +2416,7 @@ class BibDocMoreInfo:
         """Store a description corresponding to the given docid/format/version."""
         try:
             assert(type(version) is int and version > 0)
+            format = normalize_format(format)
             if description == KEEP_OLD_VALUE:
                 description = self.get_description(format, version) or self.get_description(format, version - 1)
             if not description:
@@ -2346,6 +2426,23 @@ class BibDocMoreInfo:
             if not version in self.more_info['descriptions']:
                 self.more_info['descriptions'][version] = {}
             self.more_info['descriptions'][version][format] = description
+            self.flush()
+        except:
+            register_exception()
+            raise
+
+    def set_hidden(self, hidden, format, version):
+        """Store wethever the docid/format/version is hidden."""
+        try:
+            assert(type(version) is int and version > 0)
+            format = normalize_format(format)
+            if not hidden:
+                self.unset_hidden(format, version)
+                self.flush()
+                return
+            if not version in self.more_info['hidden']:
+                self.more_info['hidden'][version] = {}
+            self.more_info['hidden'][version][format] = hidden
             self.flush()
         except:
             register_exception()
@@ -2368,6 +2465,18 @@ class BibDocMoreInfo:
         try:
             assert(type(version) is int and version > 0)
             del self.more_info['descriptions'][version][format]
+            self.flush()
+        except KeyError:
+            pass
+        except:
+            register_exception()
+            raise
+
+    def unset_hidden(self, format, version):
+        """Remove hidden flag."""
+        try:
+            assert(type(version) is int and version > 0)
+            del self.more_info['hidden'][version][format]
             self.flush()
         except KeyError:
             pass
