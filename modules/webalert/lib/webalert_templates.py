@@ -19,7 +19,6 @@ __revision__ = "$Id$"
 
 import cgi
 import time
-import string
 
 from invenio.config import \
      CFG_WEBALERT_ALERT_ENGINE_EMAIL, \
@@ -28,7 +27,7 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_WEBALERT_MAX_NUM_OF_RECORDS_IN_ALERT_EMAIL
 from invenio.messages import gettext_set_language
-from invenio.htmlparser import get_as_text, wrap
+from invenio.htmlparser import get_as_text, wrap, wrap_records
 from invenio.urlutils import create_html_link
 
 class Template:
@@ -70,25 +69,25 @@ class Template:
 
         out = ""
         if args.has_key('p'):
-            out += "<strong>" + _("Pattern") + ":</strong> " + string.join(args['p'], "; ") + "<br />"
+            out += "<strong>" + _("Pattern") + ":</strong> " + "; ".join(args['p']) + "<br />"
         if args.has_key('f'):
-            out += "<strong>" + _("Field") + ":</strong> " + string.join(args['f'], "; ") + "<br />"
+            out += "<strong>" + _("Field") + ":</strong> " + "; ".join(args['f']) + "<br />"
         if args.has_key('p1'):
-            out += "<strong>" + _("Pattern 1") + ":</strong> " + string.join(args['p1'], "; ") + "<br />"
+            out += "<strong>" + _("Pattern 1") + ":</strong> " + "; ".join(args['p1']) + "<br />"
         if args.has_key('f1'):
-            out += "<strong>" + _("Field 1") + ":</strong> " + string.join(args['f1'], "; ") + "<br />"
+            out += "<strong>" + _("Field 1") + ":</strong> " + "; ".join(args['f1']) + "<br />"
         if args.has_key('p2'):
-            out += "<strong>" + _("Pattern 2") + ":</strong> " + string.join(args['p2'], "; ") + "<br />"
+            out += "<strong>" + _("Pattern 2") + ":</strong> " + "; ".join(args['p2']) + "<br />"
         if args.has_key('f2'):
-            out += "<strong>" + _("Field 2") + ":</strong> " + string.join(args['f2'], "; ") + "<br />"
+            out += "<strong>" + _("Field 2") + ":</strong> " + "; ".join(args['f2']) + "<br />"
         if args.has_key('p3'):
-            out += "<strong>" + _("Pattern 3") + ":</strong> " + string.join(args['p3'], "; ") + "<br />"
+            out += "<strong>" + _("Pattern 3") + ":</strong> " + "; ".join(args['p3']) + "<br />"
         if args.has_key('f3'):
-            out += "<strong>" + _("Field 3") + ":</strong> " + string.join(args['f3'], "; ") + "<br />"
+            out += "<strong>" + _("Field 3") + ":</strong> " + "; ".join(args['f3']) + "<br />"
         if args.has_key('c'):
-            out += "<strong>" + _("Collections") + ":</strong> " + string.join(args['c'], "; ") + "<br />"
+            out += "<strong>" + _("Collections") + ":</strong> " + "; ".join(args['c']) + "<br />"
         elif args.has_key('cc'):
-            out += "<strong>" + _("Collection") + ":</strong> " + string.join(args['cc'], "; ") + "<br />"
+            out += "<strong>" + _("Collection") + ":</strong> " + "; ".join(args['cc']) + "<br />"
         return out
 
     def tmpl_account_list_alerts(self, ln, alerts):
@@ -569,5 +568,5 @@ Need human intervention?  Contact <%s>
         """ Format a single record."""
 
         out = wrap_records(get_as_text(recid))
-        out += "Detailed record: <%s/record/%s>" % (CFG_SITE_URL, recid)
+        out += "\nDetailed record: <%s/record/%s>" % (CFG_SITE_URL, recid)
         return out
