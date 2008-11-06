@@ -187,7 +187,7 @@ class WebInterfaceYourAccountPages(WebInterfaceDirectory):
             body=webaccount.perform_back(
                 _("The password was successfully set! "
                 "You can now proceed with the login."),
-                '/youraccout/login?ln=%s' % args['ln'], _('login'), args['ln']),
+                '/youraccount/login?ln=%s' % args['ln'], _('login'), args['ln']),
             req=req,
             language=args['ln'],
             lastupdated=__lastupdated__,
