@@ -31,6 +31,8 @@ from invenio.bibformat import format_record
 from invenio.bibindex_engine import re_html
 from invenio.messages import gettext_set_language
 
+whitespaces_pattern = re.compile(r'\s+')
+
 def wrap(text):
     """Limits the number of characters per line in given text.
     The function does not preserve new lines.
@@ -118,7 +120,7 @@ class RecordHTMLParser(HTMLParser):
             pass
         elif self.silent == False:
             cleaned_data = data.strip()
-            last_data = cleaned_data
+            cleaned_data = whitespaces_pattern.sub(' ', cleaned_data)
             if len(cleaned_data) != 0:
                 self.result += ((data.startswith(' ') and not self.new_line) and ' ' or '') + \
                                cleaned_data + \
