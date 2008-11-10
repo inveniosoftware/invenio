@@ -1328,7 +1328,9 @@ def get_brief_doc_details_from_pending(doctype, reportnumber):
             records = create_records(xmltext, 1, 1)
             try:
                 record = records[0][0]
-            except IndexError:
+                if record is None:
+                    raise ValueError
+            except (IndexError, ValueError):
                 ## Bibrecord couldn't successfully represent the record
                 ## contained in the xmltext string. The record must have
                 ## been empty or badly formed (or something).
