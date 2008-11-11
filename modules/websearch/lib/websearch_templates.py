@@ -25,6 +25,7 @@ import time
 import cgi
 import gettext
 import string
+import re
 import locale
 from urllib import quote, urlencode
 
@@ -52,7 +53,8 @@ from invenio.config import \
      CFG_INSPIRE_SITE, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE, \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
-     CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS
+     CFG_WEBSEARCH_MAX_RECORDS_IN_GROUPS, \
+     CFG_BIBINDEX_CHARS_PUNCTUATION
 
 from invenio.dbquery import run_sql
 from invenio.messages import gettext_set_language
@@ -65,6 +67,8 @@ from invenio.intbitset import intbitset
 
 from invenio.websearch_external_collections import external_collection_get_state
 
+_RE_PUNCTUATION = re.compile(CFG_BIBINDEX_CHARS_PUNCTUATION)
+_RE_SPACES = re.compile(r"\s+")
 
 def get_fieldvalues(recID, tag):
     """Return list of field values for field TAG inside record RECID.
@@ -244,6 +248,27 @@ class Template:
         """ Return an Invenio url corresponding to a search with the data
         included in the openurl form map.
         """
+        def isbn_to_isbn13_isbn10(isbn):
+            isbn = isbn.replace(' ', '').replace('-', '')
+            if len(isbn) == 10 and isbn.isdigit():
+                ## We already have isbn10
+                return ('', isbn)
+            if len(isbn) != 13 and isbn.isdigit():
+                return ('', '')
+            isbn13, isbn10 = isbn, isbn[3:-1]
+            checksum = 0
+            weight = 10
+            for char in isbn10:
+                checksum += int(char) * weight
+                weight -= 1
+            checksum = 11 - (checksum % 11)
+            if checksum == 10:
+                isbn10 += 'X'
+            if checksum == 11:
+                isbn10 += '0'
+            else:
+                isbn10 += str(checksum)
+            return (isbn13, isbn10)
 
         from invenio.search_engine import perform_request_search
         doi = ''
@@ -298,6 +323,7 @@ class Template:
                 openurl_data['title']
         if title:
             title_query = 'title:"%s"' % title
+            title_query_cleaned = 'title:"%s"' % _RE_SPACES.sub(' ', _RE_PUNCTUATION.sub(' ', title))
         else:
             title_query = ''
 
@@ -314,9 +340,11 @@ class Template:
         ## Building isbn query
         isbn = isbn or openurl_data['rft.isbn'] or \
                openurl_data['isbn']
-        isbn = isbn.replace(' ', '').replace('-', '')
-        if isbn:
-            isbn_query = 'isbn:"%s"' % isbn
+        isbn13, isbn10 = isbn_to_isbn13_isbn10(isbn)
+        if isbn13:
+            isbn_query = 'isbn:"%s" or isbn:"%s"' % (isbn13, isbn10)
+        elif isbn10:
+            isbn_query = 'isbn:"%s"' % isbn10
         else:
             isbn_query = ''
 
@@ -358,7 +386,7 @@ class Template:
                     'of' : 'hd'}))
         if coden_query:
             if perform_request_search(p=coden_query):
-                return '%s/search?' % (CFG_SITE_URL, urlencode({
+                return '%s/search?%s' % (CFG_SITE_URL, urlencode({
                     'p' : coden_query,
                     'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                     'of' : 'hd'}))
@@ -380,21 +408,16 @@ class Template:
                     'p' : title_query,
                     'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                     'of' : 'hb'}))
-        if title:
-            return '%s/search?%s' % (CFG_SITE_URL, urlencode({
-                    'p' : title,
-                    'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
-                    'of' : 'hb'}))
 
         ## Nothing worked, let's return a search that the user can improve
         if author_query and title_query:
             return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
-                'p' : '%s and %s' % (title_query, author_query),
+                'p' : '%s and %s' % (title_query_cleaned, author_query),
                 'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                 'of' : 'hb'}, {}))
         elif title_query:
             return '%s/search%s' % (CFG_SITE_URL, make_canonical_urlargd({
-                'p' : title_query,
+                'p' : title_query_cleaned,
                 'sc' : CFG_WEBSEARCH_SPLIT_BY_COLLECTION,
                 'of' : 'hb'}, {}))
         else:
