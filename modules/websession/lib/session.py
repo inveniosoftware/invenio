@@ -54,8 +54,7 @@ except ImportError:
     pass
 
 
-from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER, \
-    CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS
+from invenio.config import CFG_WEBSESSION_EXPIRY_LIMIT_REMEMBER
 
 _qparm_re = re.compile(r'([\0- ]*'
                        r'([^\0- ;,=\"]+)="([^"]*)"'
@@ -91,18 +90,6 @@ def parse_cookie (text):
             result[name] = value
 
     return result
-
-def _mkip(ip):
-    """ Compute a numerical value for a dotted IP """
-    try:
-        num = 0L
-        for i in map(int, ip.split('.')):
-            num = (num << 8) + i
-        return num
-    except ValueError:
-        ## Nowadays this is due mainly because of IPV6 ::1 address
-        ## when browsing from localhost with IPV6 enabled machine.
-        return 2130706433
 
 def packbytes(s):
     "convert a string of bytes into a long integer"
@@ -365,11 +352,24 @@ class SessionManager:
                 # exceptions -- SessionError.format() by default -- is
                 # responsible for revoking the session cookie.  Yuck.
                 raise SessionError(session_id=sessid)
-            if (session.get_remote_address() >> CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS !=
-                request.get_environ("REMOTE_ADDR") >> CFG_WEBSESSION_IPADDR_CHECK_SKIP_BITS):
-                raise SessionError("Remote IP address does not match the "
+            if request.is_https():
+                address = session.get_remote_https_address()
+                if address is not None:
+                    if address != request.get_environ("REMOTE_HTTPS_ADDR"):
+                        raise SessionError("Remote IP address does not match the "
                                    "IP address that created the session",
                                    session_id=sessid)
+                else:
+                    session.__remote_https_address = request.get_environ("REMOTE_HTTPS_ADDR")
+            else:
+                address = session.get_remote_http_address()
+                if address is not None:
+                    if address != request.get_environ("REMOTE_HTTP_ADDR"):
+                        raise SessionError("Remote IP address does not match the "
+                                   "IP address that created the session",
+                                   session_id=sessid)
+                else:
+                    session.__remote_http_address = request.get_environ("REMOTE_HTTP_ADDR")
 
         if sessid is None or session is None:
             # Generate a session ID and create the session.
@@ -520,7 +520,12 @@ class Session:
 
     def __init__ (self, request, id):
         self.id = id
-        self.__remote_address = request.get_environ("REMOTE_ADDR")
+        if request.is_https():
+            self.__remote_https_address = request.get_environ("REMOTE_HTTPS_ADDR")
+            self.__remote_http_address = None
+        else:
+            self.__remote_http_address = request.get_environ("REMOTE_HTTP_ADDR")
+            self.__remote_https_address = None
         self.__creation_time = self.__access_time = time()
 
     def __repr__ (self):
@@ -554,11 +559,17 @@ class Session:
 
     # -- Simple accessors and modifiers --------------------------------
 
-    def get_remote_address (self):
+    def get_remote_http_address (self):
         """Return the IP address (dotted-quad string) that made the
         initial request in this session.
         """
-        return self.__remote_address
+        return self.__remote_http_address
+
+    def get_remote_https_address (self):
+        """Return the IP address (dotted-quad string) that made the
+        initial request in this session.
+        """
+        return self.__remote_https_address
 
     def get_creation_time (self):
         """Return the time that this session was created (seconds
@@ -676,7 +687,13 @@ class RequestWrapper:
         except KeyError:
             self.cookies = {}
         self.environ = {}
-        self.environ["REMOTE_ADDR"] = _mkip(self.__request.get_remote_host(apache.REMOTE_NOLOOKUP))
+        if self.is_https():
+            self.environ["REMOTE_HTTPS_ADDR"] = self.__request.get_remote_host(apache.REMOTE_NOLOOKUP)
+            self.environ["REMOTE_HTTP_ADDR"] = None
+        else:
+            self.environ["REMOTE_HTTP_ADDR"] = self.__request.get_remote_host(apache.REMOTE_NOLOOKUP)
+            self.environ["REMOTE_HTTPS_ADDR"] = None
+
         self.response = ResponseWrapper( request )
         try:
             self.session = request.session
@@ -687,6 +704,10 @@ class RequestWrapper:
 
     def __str__(self):
         return 'request: %s, cookies: %s, environ: %s, session: %s' % (self.__request, self.cookies, self.environ, self.session)
+
+    def is_https(self):
+        return self.__request.subprocess_env.has_key('HTTPS') \
+                        and self.__request.subprocess_env['HTTPS'] == 'on'
 
     def getWrapper( req ):
         """Returns a RequestWrapper for a given request.
