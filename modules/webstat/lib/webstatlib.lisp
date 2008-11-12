@@ -1,5 +1,3 @@
-;;; $Id$
-;;;
 ;;; webstatlib.lisp -- library with httpd log file analyzer to gather
 ;;; CDS usage stats.  Another functionality is to parse old Apache log
 ;;; files and prepare Detailed record page views statistics for
@@ -7,22 +5,22 @@
 ;;;
 ;;; This file is part of CDS Invenio.
 ;;; Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2008 CERN.
-;;; 
+;;;
 ;;; CDS Invenio is free software; you can redistribute it and/or
 ;;; modify it under the terms of the GNU General Public License as
 ;;; published by the Free Software Foundation; either version 2 of the
 ;;; License, or (at your option) any later version.
-;;; 
+;;;
 ;;; CDS Invenio is distributed in the hope that it will be useful, but
 ;;; WITHOUT ANY WARRANTY; without even the implied warranty of
 ;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-;;; General Public License for more details.  
-;;; 
+;;; General Public License for more details.
+;;;
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ;;; 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-;; 
+;;
 ;; Auxiliary functions come first.
 
 #-gcl (in-package #:cl-user)
@@ -82,7 +80,7 @@ when values are integers, as in histograms."
         (sum-of-values 0))
     (declare (type fixnum number-of-keys sum-of-values))
     (maphash (lambda (key val)
-               (if apply-predicate-to-vals                   
+               (if apply-predicate-to-vals
                    (when (funcall predicate val)
                      (incf number-of-keys)
                      (incf sum-of-values val))
@@ -101,6 +99,16 @@ between them.  Taken from Common Lisp Cookbook."
           as j = (position #\Space string :start i)
           collect (subseq string i j)
           while j))
+
+(defun split-string-by-equal-sign (string)
+    "Return list of two substrings of STRING around one equal sign,
+stripping any whitespace. Return nil if the equal sign was not found."
+    (declare (type simple-base-string string))
+    (let ((pos (position #\= string)))
+      (if pos
+          (values (string-trim " " (subseq string 0 pos))
+                  (string-trim " " (subseq string (1+ pos))))
+          nil)))
 
 (defun string-substitute (string substring replacement-string)
   "Taken from c.l.l."
@@ -189,7 +197,7 @@ URL-STRING, return list of empty string."
           (push (string-decode-url (subseq url-string
                                            (+ (length url-arg) 1 position-pattern-beg)
                                            position-pattern-end))
-                
+
                 out)))
     (if return-empty-value
         out
@@ -264,7 +272,7 @@ a simple search or a detailed record page is selected."
           (if (search "p1=" httpd-log-request-string)
               ;; advanced search happened:
               (progn
-                (incf *number-of-advanced-searches*)                
+                (incf *number-of-advanced-searches*)
                 (setf out (append (get-urlarg-value-from-url-string url-string "p1")
                                   (get-urlarg-value-from-url-string url-string "p2")
                                   (get-urlarg-value-from-url-string url-string "p3"))))
@@ -288,7 +296,7 @@ wash it out."
   "Structure representing Apache combined log entry."
   (ip "" :type simple-base-string)
   (datetime 0 :type integer)             ; YYYYMMDD              (FIXME: get rid of this)
-  (datetimee "" :type simple-base-string) ; YYYY-MM-DD HH:MM:SS   
+  (datetimee "" :type simple-base-string) ; YYYY-MM-DD HH:MM:SS
   (request "" :type simple-base-string)
   (status 0 :type integer)
   (bytes 0 :type integer)
@@ -395,7 +403,7 @@ from those IPs are excluded."
     (format t "~&Filename: ~A" httpd-log-filename)
     (unless (null exclude-ip-list)
       (format t "~&Excluding search engine hits from ~A." exclude-ip-list))
-    (with-open-file (input-stream httpd-log-filename :direction :input)  
+    (with-open-file (input-stream httpd-log-filename :direction :input)
       (do ((line (read-line input-stream nil)
                  (read-line input-stream nil)))
           ((not line))
@@ -491,7 +499,7 @@ interesting statistics with respect to collections."
                     *home-collection*
                     *nb-histogram-items-to-print*))
   (let ((httpd-log-entries (append (filter-httpd-log-entries httpd-all-log-entries *search-engine-url*)
-                                   (filter-httpd-log-entries httpd-all-log-entries *search-engine-url-old-style*)))          
+                                   (filter-httpd-log-entries httpd-all-log-entries *search-engine-url-old-style*)))
         (collection-histogram (make-hash-table :test #'equalp)))
     ;; build histogram:
     (dolist (httpd-log-entry httpd-log-entries)
@@ -624,7 +632,7 @@ interesting statistics."
             (format t "~&There are ~D wildcard query patterns out of ~D query patterns. (~4F\%)"
                     number-of-wildcard-patterns
                     number-of-patterns
-                    (* 100 (/ number-of-wildcard-patterns number-of-patterns))))      
+                    (* 100 (/ number-of-wildcard-patterns number-of-patterns))))
           ;; g - punctuation-like queries and patterns
           (multiple-value-bind (number-of-punctuation-patterns number-of-punctuation-searches)
               (hash-table-key-val-stats pattern-histogram #'(lambda (x)
@@ -672,7 +680,7 @@ interesting statistics."
     ;; build basket users histogram:
     (dolist (httpd-log-entry-item httpd-log-entries)
       (incf (gethash (httpd-log-entry-ip httpd-log-entry-item)
-                     basket-user-histogram 0)))    
+                     basket-user-histogram 0)))
     (format t "~&~%** USER BASKETS STATS")
     ;; print basket usage summary info:
     (format t "~&There were ~D user basket page hits." (length httpd-log-entries))
@@ -688,7 +696,7 @@ interesting statistics."
     (format t "~&There were ~D displays of baskets, out of which ~D public baskets accesses."
             (length (filter-httpd-log-entries httpd-log-entries *display-basket-url*))
             (length (filter-httpd-log-entries httpd-log-entries *display-public-basket-url*)))))
-  
+
 (defun print-alert-stats (httpd-all-log-entries)
   "Read HTTPD-LOG-ENTRIES and print stats related to user alerts."
   (declare (special *alert-url*
@@ -701,7 +709,7 @@ interesting statistics."
     ;; build alert users histogram:
     (dolist (httpd-log-entry-item httpd-log-entries)
       (incf (gethash (httpd-log-entry-ip httpd-log-entry-item)
-                     alert-user-histogram 0)))    
+                     alert-user-histogram 0)))
     (format t "~&~%** USER ALERTS STATS")
     ;; print alert usage summary info:
     (format t "~&There were ~D user alert page hits." (length httpd-log-entries))
@@ -738,7 +746,7 @@ count events coming from those IPs."
   (flet ((extract-recid-from-detailed-record-page-url (url)
            (declare (type simple-base-string url))
            (if (search "GET /record/" url)
-               (or (parse-integer (subseq url (length "GET /record/")) :junk-allowed t) 0)               
+               (or (parse-integer (subseq url (length "GET /record/")) :junk-allowed t) 0)
                (if (search "GET /search.py?recid=" url) ; compatibility with old style URLs
                    (or (parse-integer (subseq url (length "GET /search.py?recid=")) :junk-allowed t) 0)
                    0))))
@@ -746,7 +754,7 @@ count events coming from those IPs."
     (format t "~&-- Filename: ~A" httpd-log-filename)
     (unless (null exclude-ip-list)
       (format t "~&-- Excluding search engine hits from ~A." exclude-ip-list))
-    (with-open-file (input-stream httpd-log-filename :direction :input)  
+    (with-open-file (input-stream httpd-log-filename :direction :input)
       (do ((line (read-line input-stream nil)
                  (read-line input-stream nil)))
           ((not line))
@@ -763,7 +771,24 @@ count events coming from those IPs."
                       (httpd-log-entry-ip httpd-log-entry-item)
                       (httpd-log-entry-datetimee httpd-log-entry-item)))))))
   (format t "~&-- DONE"))
-  
+
+(defun read-conf-file (analyzer-config-file)
+  "Read ANALYZER-CONFIG-FILE and initialize variables found there.
+  E.g. line there saying `detailed-record-url = \"/record/\"' will get
+  parsed as (setf *detailed-record-url* \"/record/\")."
+  (with-open-file (input-stream analyzer-config-file :direction :input)
+    (let ((inside-apache-log-analyzer-section nil))
+      (do ((line (read-line input-stream nil)
+                 (read-line input-stream nil)))
+          ((not line))
+        (if (string= line "[apache_log_analyzer]")
+            (setf inside-apache-log-analyzer-section t))
+        (when inside-apache-log-analyzer-section
+          (multiple-value-bind (lhs rhs) (split-string-by-equal-sign line)
+            (when lhs
+              (setf (symbol-value (intern (string-upcase (concatenate 'string "*" lhs "*"))))
+                    (read-from-string rhs)))))))))
+
 ;; Main entry point:
 
 (defun analyze-httpd-log-file (analyzer-config-file httpd-log-file)
@@ -784,7 +809,7 @@ instructions presented in ANALYZER-CONFIG-FILE."
                     *alert-url*
                     *display-your-alerts-url*
                     *display-your-searches-url*))
-  (load analyzer-config-file :verbose nil :print nil)
+  (read-conf-file analyzer-config-file)
   (when *profile*
     #+cmu (profile:profile-all)
     #+fixmeclisp (mon:monitor-all)

@@ -19,7 +19,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 ## fill config variables:
-VERSION='$Id$'
+VERSION='0.1'
 LISPIMAGEDIR=@prefix@/lib/lisp/invenio
 CONFIGDIR=@prefix@/etc/webstat
 CLISP=@CLISP@
@@ -56,8 +56,7 @@ if [ ! -n "$1" ]; then
 fi
 
 ## are input files okay?
-FILEORIG=${CONFIGDIR}/webstat.cfg
-FILECFG=`tempfile`
+FILECFG=${CONFIGDIR}/webstat.cfg
 FILELOG=$1
 if [ ! -f $FILECFG ]; then 
     echo "Error: config file ${FILECFG} not found."
@@ -67,36 +66,6 @@ if [ ! -f $FILELOG ]; then
     echo "Error: httpd log file ${FILELOG} not found."
     exit 1
 fi
-
-## create config file for Lisp
-echo ";;; -*- Mode: LISP; Syntax: COMMON-LISP; -*-" > $FILECFG
-echo ";;;" >> $FILECFG
-echo ";;; webstat config file" >> $FILECFG
-echo "" >> $FILECFG
-apache_section=""
-exec 3<&0
-exec 0<$FILEORIG
-while read line
-do
-    if [ "`echo $line |grep '\[.*\]'`" ]
-    then
-        apache_section=""
-    fi
-    if [ $apache_section ]
-    then
-        if [ "`echo $line|grep '='`" ]
-        then
-        echo $line |sed 's/^/(defvar */'|sed 's/$/)/'|sed 's/ = /* /' >> $FILECFG
-        fi
-    fi
-    if [ "`echo $line |grep '\[apache_log_analyzer\]'`" ]
-    then
-        apache_section="True"
-    fi
-done
-exec 0<&3
-echo "" >> $FILECFG
-echo ";;; end of file" >> $FILECFG
 
 ## check which Common Lisp implementation to use?
 if [ "$LISP" == "" ]; then 
@@ -127,5 +96,3 @@ else
     echo "Error: $LISP not supported.  Please read README."
     exit 1
 fi
-
-rm $FILECFG
