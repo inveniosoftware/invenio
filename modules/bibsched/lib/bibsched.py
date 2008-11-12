@@ -29,7 +29,6 @@ import time
 import re
 import marshal
 import getopt
-import copy
 from socket import gethostname
 import signal
 
@@ -148,9 +147,12 @@ def gc_tasks(verbose=False, statuses=None, since=None, tasks=None):
             write_message('Archived %s %s tasks (created before %s) with %s' % (res, task, date, status_query))
 
 
-def bibsched_set_status(task_id, status):
+def bibsched_set_status(task_id, status, when_status_is=None):
     """Update the status of task_id."""
-    return run_sql("UPDATE schTASK SET status=%s WHERE id=%s", (status, task_id))
+    if when_status_is is None:
+        return run_sql("UPDATE schTASK SET status=%s WHERE id=%s", (status, task_id))
+    else:
+        return run_sql("UPDATE schTASK SET status=%s WHERE id=%s AND status=%s", (status, task_id, when_status_is))
 
 def bibsched_set_progress(task_id, progress):
     """Update the progress of task_id."""
@@ -478,7 +480,7 @@ class Manager:
         task_id = self.currentrow[0]
         status = self.currentrow[5]
         if status in ('ERROR', 'DONE WITH ERRORS'):
-            bibsched_set_status(task_id, 'ACK ' + status)
+            bibsched_set_status(task_id, 'ACK ' + status, status)
             self.display_in_footer("Acknowledged error")
 
     def sleep(self):
@@ -486,7 +488,7 @@ class Manager:
         process = self.currentrow[1].split(':')[0]
         status = self.currentrow[5]
         if status in ('RUNNING', 'CONTINUING'):
-            bibsched_send_signal(process, task_id, signal.SIGUSR1)
+            bibsched_set_status(task_id, 'ABOUT TO SLEEP', status)
             self.display_in_footer("SLEEP signal sent to task #%s" % task_id)
         else:
             self.display_in_footer("Cannot put to sleep non-running processes")
@@ -508,8 +510,8 @@ class Manager:
         process = self.currentrow[1]
         status = self.currentrow[5]
         if status in ('RUNNING', 'CONTINUING'):
-            bibsched_send_signal(process, task_id, signal.SIGTERM)
-            self.display_in_footer("TERM signal sent to task #%s" % task_id)
+            bibsched_set_status(task_id, 'ABOUT TO STOP', status)
+            self.display_in_footer("STOP signal sent to task #%s" % task_id)
         else:
             self.display_in_footer("Cannot stop non-running processes")
 
@@ -517,7 +519,7 @@ class Manager:
         task_id = self.currentrow[0]
         status = self.currentrow[5]
         if status not in ('RUNNING', 'CONTINUING', 'SLEEPING', 'SCHEDULED', 'ABOUT TO STOP', 'ABOUT TO SLEEP'):
-            bibsched_set_status(task_id, "%s_DELETED" % status)
+            bibsched_set_status(task_id, "%s_DELETED" % status, status)
             self.display_in_footer("process deleted")
             self.selected_line = max(self.selected_line, 2)
         else:
@@ -747,18 +749,10 @@ class Manager:
                 char = -1
             self.handle_keys(char)
 
-_refresh_tasks = True
-def _bibsched_sig_info(sig, frame):
-    """Signal handler for the 'USR2' signal sent by a finished task."""
-    global _refresh_tasks
-    _refresh_tasks = True
-    write_message('A task has terminated. Refreshing the task list.')
-
 class BibSched:
     def __init__(self):
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.scheduled = None
-        signal.signal(signal.SIGUSR2, _bibsched_sig_info)
         os.environ['BIBSCHED_MODE'] = 'automatic'
 
     def tasks_safe_p(self, proc1, proc2):
@@ -766,48 +760,51 @@ class BibSched:
         return proc1 != proc2 and not proc1.startswith('bibupload') and not proc2.startswith('bibupload')
 
     def get_tasks_to_sleep_and_stop(self, proc, task_set):
-        """Among the task_set, return the dict of task to stop and the dict
+        """Among the task_set, return the lists of task to stop and the lists
         of task to sleep.
         """
         min_prio = None
         min_task_id = None
         min_proc = None
-        to_stop = {}
-        for this_task_id, (this_proc, this_priority) in task_set.iteritems():
+        min_status = None
+        to_stop = []
+        for (this_task_id, this_proc, this_priority, this_status) in task_set:
             if self.tasks_safe_p(proc, this_proc):
                 if min_prio is None or this_priority < min_prio:
                     min_prio = this_priority
                     min_task_id = this_task_id
                     min_proc = this_proc
+                    min_status = this_status
             else:
-                to_stop[this_task_id] = (this_proc, this_priority)
+                to_stop.append((this_task_id, this_proc, this_priority, this_status))
         if len(task_set) < CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS and not to_stop:
             ## All the task are safe and there are enough resources
-            return {}, {}
+            return [], []
         else:
             if to_stop:
-                return to_stop, {}
+                return to_stop, []
             else:
-                return {}, {min_task_id : (min_proc, min_prio)}
+                return [], [(min_task_id, min_proc, min_prio, min_status)]
 
     def get_running_tasks(self, task_status):
-        running_tasks = {}
+        """Return a list of running tasks."""
         for status in ('RUNNING', 'CONTINUING', 'SLEEPING', 'ABOUT TO SLEEP', 'ABOUT TO STOP', 'SCHEDULED'):
-            running_tasks.update(copy.deepcopy(task_status.get(status, {})))
-        return running_tasks
+            for id, (proc, dummy, priority) in task_status[status].iteritems():
+                yield (id, proc, priority, status)
+        raise StopIteration
 
     def split_running_tasks_by_priority(self, task_status, task_id, priority):
-        """Return two sets (by dict): the set of task_ids with lower priority and
+        """Return two lists: the list of task_ids with lower priority and
         those with higher or equal priority."""
-        higher = {}
-        lower = {}
-        for other_task_id, (task_proc, dummy, task_priority) in self.get_running_tasks(task_status).iteritems():
+        higher = []
+        lower = []
+        for other_task_id, task_proc, task_priority, status in self.get_running_tasks(task_status):
             if task_id == other_task_id:
                 continue
             if task_priority < priority:
-                lower[other_task_id] = (task_proc, task_priority)
+                lower.append((other_task_id, task_proc, task_priority, status))
             else:
-                higher[other_task_id] = (task_proc, task_priority)
+                higher.append((other_task_id, task_proc, task_priority, status))
         return lower, higher
 
     def bibupload_in_the_queue(self, task_id, runtime):
@@ -842,9 +839,6 @@ class BibSched:
 
             nothing_was_scheduled = self.scheduled is None
             res = self.bibupload_in_the_queue(task_id, runtime)
-            if _refresh_tasks:
-                ## Some tasks have finished. Better refresh things...
-                return True
             if priority < 0:
                 return False
             if res:
@@ -865,7 +859,7 @@ class BibSched:
             lower, higher = self.split_running_tasks_by_priority(task_status, task_id, priority)
             #write_message('lower: %s' % lower)
             #write_message('higher: %s' % higher)
-            for other_task_id, (other_proc, dummy) in higher.iteritems():
+            for other_task_id, other_proc, dummy, status in higher:
                 if not self.tasks_safe_p(proc, other_proc):
                     ## There's at least a higher priority task running that
                     ## cannot run at the same time of the given task.
@@ -895,6 +889,7 @@ class BibSched:
             if not tasks_to_stop and not tasks_to_sleep:
                 self.scheduled = None
                 if status in ("SLEEPING", "ABOUT TO SLEEP"):
+                    bibsched_set_status(task_id, "CONTINUING", status)
                     bibsched_send_signal(proc, task_id, signal.SIGCONT)
                     Log("Task #%d (%s) woken up" % (task_id, proc))
                     return True
@@ -909,14 +904,10 @@ class BibSched:
                     return True
             else:
                 ## It's not still safe to run the task.
-                for other_task_id in tasks_to_stop:
-                    if other_task_id not in task_status['ABOUT TO STOP']:
-                        bibsched_set_status(other_task_id, 'ABOUT TO STOP')
-                        bibsched_send_signal(proc, other_task_id, signal.SIGTERM)
-                for other_task_id in tasks_to_sleep:
-                    if other_task_id not in task_status['ABOUT TO SLEEP']:
-                        bibsched_set_status(other_task_id, 'ABOUT TO SLEEP')
-                        bibsched_send_signal(proc, other_task_id, signal.SIGUSR1)
+                for (other_task_id, other_proc, other_priority, other_status) in tasks_to_stop:
+                    bibsched_set_status(other_task_id, 'ABOUT TO STOP', other_status)
+                for (other_task_id, other_proc, other_priority, other_status) in tasks_to_sleep:
+                    bibsched_set_status(other_task_id, 'ABOUT TO SLEEP', other_status)
                 return True
 
     def uniformize_bibupload_priorities(self):
@@ -933,7 +924,6 @@ class BibSched:
             run_sql("UPDATE schTASK SET priority=%s WHERE proc='bibupload' AND status NOT LIKE 'DONE' AND status NOT like '%%DELETED%%' AND (runtime <= NOW() OR status='WAITING' OR status='SCHEDULED')", (max_priority, ))
 
     def watch_loop(self):
-        global _refresh_tasks
         def get_rows():
             """Return all the rows to work on."""
             return run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%DELETED%' AND (runtime<=NOW() OR status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='SCHEDULED' OR status='CONTINUING') ORDER BY priority DESC, runtime ASC, id ASC")
@@ -966,12 +956,11 @@ class BibSched:
             while True:
                 self.uniformize_bibupload_priorities()
                 rows = get_rows()
-                _refresh_tasks = False
                 task_status = get_task_status(rows)
                 if task_status['ERROR'] or task_status['DONE WITH ERRORS']:
                     raise StandardError('BibSched had to halt because at least a task is in status ERROR (%s) or DONE WITH ERRORS (%s)' % (task_status['ERROR'], task_status['DONE WITH ERRORS']))
                 for row in rows:
-                    if _refresh_tasks or self.handle_row(task_status, *row):
+                    if self.handle_row(task_status, *row):
                         # Things have changed let's restart
                         break
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
@@ -1228,16 +1217,19 @@ def stop(verbose=True):
         print "Stopping BibSched if running"
     halt(verbose, soft=True)
     run_sql("UPDATE schTASK SET status='WAITING' WHERE status='SCHEDULED'")
-    res = run_sql("SELECT id,proc FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%%DELETED%%' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')")
+    res = run_sql("SELECT id,proc,status FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%%DELETED%%' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')")
     if verbose:
         print "Stopping all running BibTasks"
-    for task_id, proc in res:
-        bibsched_send_signal(proc, task_id, signal.SIGTERM)
+    for task_id, proc, status in res:
+        if status == 'SLEEPING':
+            bibsched_send_signal(proc, task_id, signal.SIGCONT)
+        bibsched_set_status(task_id, 'ABOUT TO STOP')
     while run_sql("SELECT id FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%%DELETED%%' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')"):
         if verbose:
             sys.stdout.write('.')
             sys.stdout.flush()
             time.sleep(1)
+
     if verbose:
         print "\nStopped"
     Log("BibSched and all BibTasks stopped")

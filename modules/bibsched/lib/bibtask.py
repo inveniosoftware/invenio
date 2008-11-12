@@ -53,7 +53,6 @@ import signal
 import sys
 import time
 import datetime
-import popen2
 import traceback
 import logging
 import logging.handlers
@@ -196,10 +195,18 @@ def task_init(
         # where stored in DB and _options dictionary was stored instead.
         _options = argv
     else:
-        _task_build_params(_task_params['task_name'], argv, description,
-            help_specific_usage, version, specific_params,
-            task_submit_elaborate_specific_parameter_fnc,
-            task_submit_check_options_fnc)
+        try:
+            _task_build_params(_task_params['task_name'], argv, description,
+                help_specific_usage, version, specific_params,
+                task_submit_elaborate_specific_parameter_fnc,
+                task_submit_check_options_fnc)
+        except Exception, e:
+            register_exception(alert_admin=True)
+            write_message("Error in parsing the parameters: %s." % e, sys.stderr)
+            write_message("Exiting.", sys.stderr)
+            if not to_be_submitted:
+                task_update_status("ERROR")
+            raise
 
     write_message('argv=%s' % (argv, ), verbose=9)
     write_message('_options=%s' % (_options, ), verbose=9)
@@ -212,6 +219,7 @@ def task_init(
             if not _task_run(task_run_fnc):
                 write_message("Error occurred.  Exiting.", sys.stderr)
         except Exception, e:
+            register_exception(alert_admin=True)
             write_message("Unexpected error occurred: %s." % e, sys.stderr)
             write_message("Traceback is:", sys.stderr)
             write_messages(''.join(traceback.format_tb(sys.exc_info()[2])), sys.stderr)
@@ -463,31 +471,25 @@ def task_sleep_now_if_required(can_stop_too=False):
     """This function should be called during safe state of BibTask,
     e.g. after flushing caches or outside of run_sql calls.
     """
-    write_message('Entering task_sleep_now_if_required with signal_request=%s' % _task_params['signal_request'], verbose=9)
-    if _task_params['signal_request'] == 'sleep':
-        _task_params['signal_request'] = None
+    status = task_read_status()
+    write_message('Entering task_sleep_now_if_required with status=%s' % status, verbose=9)
+    if status == 'ABOUT TO SLEEP':
         write_message("sleeping...")
         task_update_status("SLEEPING")
-        signal.pause() # wait for wake-up signal
-    elif _task_params['signal_request'] == 'ctrlz':
-        _task_params['signal_request'] = None
         signal.signal(signal.SIGTSTP, signal.SIG_DFL)
-        write_message("sleeping...")
-        task_update_status("SLEEPING")
         os.kill(os.getpid(), signal.SIGTSTP)
         time.sleep(1)
-    elif _task_params['signal_request'] == 'ctrlc' and can_stop_too:
-        _task_params['signal_request'] = None
-        signal.signal(signal.SIGINT, signal.SIG_DFL)
-        write_message("stopped")
-        task_update_status("STOPPED")
-        os.kill(os.getpid(), signal.SIGINT)
-        time.sleep(1)
-    elif _task_params['signal_request'] == 'stop' and can_stop_too:
-        _task_params['signal_request'] = None
+    elif status == 'ABOUT TO STOP' and can_stop_too:
         write_message("stopped")
         task_update_status("STOPPED")
         sys.exit(0)
+    runtime_limit = task_get_option("runtime_limit")
+    if runtime_limit is not None:
+        if not (runtime_limit[0] <= time.time() <= runtime_limit[1]):
+            if can_stop_too:
+                write_message("stopped (outside runtime limit)")
+                task_update_status("STOPPED")
+                sys.exit(0)
 
 def authenticate(user, authorization_action, authorization_msg=""):
     """Authenticate the user against the user database.
@@ -668,15 +670,13 @@ def _task_run(task_run_fnc):
             return True
 
     ## initialize signal handler:
-    _task_params['signal_request'] = None
-    signal.signal(signal.SIGUSR1, _task_sig_sleep)
     signal.signal(signal.SIGUSR2, signal.SIG_IGN)
-    signal.signal(signal.SIGTSTP, _task_sig_ctrlz)
+    signal.signal(signal.SIGTSTP, _task_sig_sleep)
     signal.signal(signal.SIGTERM, _task_sig_stop)
     signal.signal(signal.SIGQUIT, _task_sig_stop)
     signal.signal(signal.SIGABRT, _task_sig_suicide)
     signal.signal(signal.SIGCONT, _task_sig_wakeup)
-    signal.signal(signal.SIGINT, _task_sig_ctrlc)
+    signal.signal(signal.SIGINT, _task_sig_stop)
     ## we can run the task now:
     write_message("Task #%d started." % _task_params['task_id'])
     task_update_status("RUNNING")
@@ -722,12 +722,6 @@ def _task_run(task_run_fnc):
             write_message("Task #%d finished. [%s]" % (_task_params['task_id'], task_status))
         ## Removing the pid
         os.remove(pidfile_name)
-        try:
-            # Let's signal bibsched that we have finished.
-            from invenio.bibsched import pidfile
-            os.kill(int(open(pidfile).read()), signal.SIGUSR2)
-        except:
-            pass
     return True
 
 def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
@@ -764,37 +758,17 @@ def _task_sig_sleep(sig, frame):
     write_message("task_sig_sleep(), got signal %s frame %s"
             % (sig, frame), verbose=9)
     write_message("sleeping as soon as possible...")
-    _task_params['signal_request'] = 'sleep'
     _db_login(1)
     task_update_status("ABOUT TO SLEEP")
 
-def _task_sig_ctrlz(sig, frame):
-    """Signal handler for the 'ctrlz' signal sent by BibSched."""
-    write_message("task_sig_ctrlz(), got signal %s frame %s"
-            % (sig, frame), verbose=9)
-    write_message("sleeping as soon as possible...")
-    _task_params['signal_request'] = 'ctrlz'
-    _db_login(1)
-    task_update_status("ABOUT TO STOP")
-
 def _task_sig_wakeup(sig, frame):
     """Signal handler for the 'wakeup' signal sent by BibSched."""
-    signal.signal(signal.SIGTSTP, _task_sig_ctrlz)
+    signal.signal(signal.SIGTSTP, _task_sig_sleep)
     write_message("task_sig_wakeup(), got signal %s frame %s"
             % (sig, frame), verbose=9)
     write_message("continuing...")
-    _task_params['signal_request'] = None
     _db_login(1)
     task_update_status("CONTINUING")
-
-def _task_sig_ctrlc(sig, frame):
-    """Signal handler for the 'stop' signal sent by BibSched."""
-    write_message("task_sig_ctrlc(), got signal %s frame %s"
-            % (sig, frame), verbose=9)
-    write_message("stopping as soon as possible...")
-    _db_login(1) # To avoid concurrency with an interrupted run_sql call
-    task_update_status("STOPPING")
-    _task_params['signal_request'] = 'ctrlc'
 
 def _task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
@@ -802,8 +776,7 @@ def _task_sig_stop(sig, frame):
             % (sig, frame), verbose=9)
     write_message("stopping as soon as possible...")
     _db_login(1) # To avoid concurrency with an interrupted run_sql call
-    task_update_status("STOPPING")
-    _task_params['signal_request'] = 'stop'
+    task_update_status("ABOUT TO STOP")
 
 def _task_sig_suicide(sig, frame):
     """Signal handler for the 'suicide' signal sent by BibSched."""
@@ -814,7 +787,7 @@ def _task_sig_suicide(sig, frame):
     write_message("suicided")
     _db_login(1)
     task_update_status("SUICIDED")
-    sys.exit(0)
+    sys.exit(1)
 
 def _task_sig_unknown(sig, frame):
     """Signal handler for the other unknown signals sent by shell or user."""
