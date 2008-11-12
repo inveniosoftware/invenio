@@ -354,22 +354,18 @@ class SessionManager:
                 raise SessionError(session_id=sessid)
             if request.is_https():
                 address = session.get_remote_https_address()
-                if address is not None:
-                    if address != request.get_environ("REMOTE_HTTPS_ADDR"):
-                        raise SessionError("Remote IP address does not match the "
-                                   "IP address that created the session",
-                                   session_id=sessid)
-                else:
-                    session.__remote_https_address = request.get_environ("REMOTE_HTTPS_ADDR")
             else:
                 address = session.get_remote_http_address()
-                if address is not None:
-                    if address != request.get_environ("REMOTE_HTTP_ADDR"):
-                        raise SessionError("Remote IP address does not match the "
-                                   "IP address that created the session",
-                                   session_id=sessid)
+            if address is not None:
+                if address != request.get_environ("REMOTE_ADDR"):
+                    raise SessionError("Remote IP address does not match the "
+                                "IP address that created the session",
+                                session_id=sessid)
+            else:
+                if request.is_https():
+                    session.set_remote_https_address(request.get_environ("REMOTE_ADDR"))
                 else:
-                    session.__remote_http_address = request.get_environ("REMOTE_HTTP_ADDR")
+                    session.set_remote_http_address(request.get_environ("REMOTE_ADDR"))
 
         if sessid is None or session is None:
             # Generate a session ID and create the session.
@@ -521,10 +517,10 @@ class Session:
     def __init__ (self, request, id):
         self.id = id
         if request.is_https():
-            self.__remote_https_address = request.get_environ("REMOTE_HTTPS_ADDR")
+            self.__remote_https_address = request.get_environ("REMOTE_ADDR")
             self.__remote_http_address = None
         else:
-            self.__remote_http_address = request.get_environ("REMOTE_HTTP_ADDR")
+            self.__remote_http_address = request.get_environ("REMOTE_ADDR")
             self.__remote_https_address = None
         self.__creation_time = self.__access_time = time()
 
@@ -532,7 +528,7 @@ class Session:
         return "<%s at %x: %s>" % (self.__class__.__name__, id(self), self.id)
 
     def __str__ (self):
-        return "session %s, remote address: %s, creation time: %s" % (self.id, self.__remote_address, self.__creation_time)
+        return "session %s, remote http address: %s, remote https address: %s, creation time: %s" % (self.id, self.__remote_http_address, self.__remote_https_address, self.__creation_time)
 
     def has_info (self):
         """has_info() -> boolean
@@ -558,6 +554,13 @@ class Session:
         return 0
 
     # -- Simple accessors and modifiers --------------------------------
+    def set_remote_http_address (self, address):
+        self.__remote_http_address = address
+        self.__dirty = 1
+
+    def set_remote_https_address (self, address):
+        self.__remote_https_address = address
+        self.__dirty = 1
 
     def get_remote_http_address (self):
         """Return the IP address (dotted-quad string) that made the
@@ -687,13 +690,7 @@ class RequestWrapper:
         except KeyError:
             self.cookies = {}
         self.environ = {}
-        if self.is_https():
-            self.environ["REMOTE_HTTPS_ADDR"] = self.__request.get_remote_host(apache.REMOTE_NOLOOKUP)
-            self.environ["REMOTE_HTTP_ADDR"] = None
-        else:
-            self.environ["REMOTE_HTTP_ADDR"] = self.__request.get_remote_host(apache.REMOTE_NOLOOKUP)
-            self.environ["REMOTE_HTTPS_ADDR"] = None
-
+        self.environ["REMOTE_ADDR"] = self.__request.get_remote_host(apache.REMOTE_NOLOOKUP)
         self.response = ResponseWrapper( request )
         try:
             self.session = request.session
@@ -782,5 +779,3 @@ class SessionError(Exception):
 
     def __init__(self, msg="", **args):
         pass
-
-
