@@ -600,7 +600,7 @@ class Collection:
         values = [{'value' : '', 'text' : get_field_i18nname("any field", ln)}]
         if res:
             for row in res:
-                values.append({'value' : row[0], 'text' : row[1]})
+                values.append({'value' : row[0], 'text' : get_field_i18nname(row[1], ln)})
         else:
             if CFG_CERN_SITE:
                 for tmp in ['title', 'author', 'abstract', 'report number', 'year']:
