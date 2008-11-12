@@ -3780,10 +3780,10 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
 
     elif action == "browse":
         ## 2 - browse needed
+        of = 'hb'
         page_start(req, of, cc, as, ln, uid, _("Browse"))
-        if of.startswith("h"):
-            req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
-                                        p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
+        req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
+                                    p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
         try:
             if as == 1 or (p1 or p2 or p3):
                 browse_pattern(req, colls_to_search, p1, f1, rg, ln)
@@ -3792,12 +3792,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             else:
                 browse_pattern(req, colls_to_search, p, f, rg, ln)
         except:
-            if of.startswith("h"):
-                req.write(create_error_box(req, verbose=verbose, ln=ln))
-            elif of.startswith("x"):
-                # Print empty, but valid XML
-                print_records_prologue(req, of)
-                print_records_epilogue(req, of)
+            req.write(create_error_box(req, verbose=verbose, ln=ln))
             return page_end(req, of, ln)
 
     elif rm and p.startswith("recid:"):
