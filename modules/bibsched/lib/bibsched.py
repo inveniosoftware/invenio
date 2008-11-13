@@ -549,7 +549,7 @@ class Manager:
     def change_auto_mode(self):
         if self.auto_mode:
             program = os.path.join(CFG_BINDIR, "bibsched")
-            COMMAND = "%s -q stop" % program
+            COMMAND = "%s -q halt" % program
             os.system(COMMAND)
 
             self.auto_mode = 0
