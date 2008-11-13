@@ -43,7 +43,8 @@ from invenio import bibformat_utils
 from invenio.errorlib import register_exception
 from invenio.config import \
      CFG_SITE_LANG, \
-     CFG_PATH_PHP
+     CFG_PATH_PHP, \
+     CFG_SITE_URL
 from invenio.bibformat_config import \
      CFG_BIBFORMAT_USE_OLD_BIBFORMAT, \
      CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT
@@ -305,7 +306,7 @@ def format_records(recIDs, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
 
     return prologue + formatted_records + epilogue
 
-def create_excel(recIDs, req=None, ln=CFG_SITE_LANG):
+def create_excel(recIDs, req=None, ln=CFG_SITE_LANG, ot=None, ot_sep="; "):
     """
     Returns an Excel readable format containing the given recIDs.
     If 'req' is given, also prints the output in 'req' while individual
@@ -316,7 +317,13 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG):
     The excel format is a basic HTML table that most spreadsheets
     applications can parse.
 
+    If 'ot' is given, the BibFormat engine is overridden and the
+    output is produced on the basis of the fields that 'ot' defines
+    (see search_engine.perform_request_search(..) 'ot' param).
+
     @param recIDs a list of record IDs
+    @param ot a list of fields that should be included in the excel output as columns(see perform_request_search 'ot' param)
+    @param ot_sep a separator used to separate values for the same record, in the same columns, if any
     @return a string in Excel format
     """
     # Prepare the column headers to display in the Excel file
@@ -336,11 +343,33 @@ def create_excel(recIDs, req=None, ln=CFG_SITE_LANG):
     column_headers = '<table style="border-collapse: collapse;">\n'+ '<td style="border-color:black; border-style:solid; border-width:thin; background-color:black;color:white"><b>' + column_headers + '</b></td>'
     footer = '</table>'
 
-    #Apply content_type and print column headers
+    # Apply content_type and print column headers
     if req is not None:
         req.content_type = get_output_format_content_type('excel')
         req.headers_out["Content-Disposition"] = "inline; filename=%s" % 'results.xls'
         req.send_http_header()
+
+    if ot is not None and len(ot) > 0:
+        # Skip BibFormat engine, produce our own output based on
+        # specified fields. Each field will be a column of the
+        # output. If a field has multiple values, then they are joined
+        # into the same cell.
+        out = "<table>"
+        if req: req.write("<table>")
+        for recID in recIDs:
+            row = '<tr>'
+            row += '<td><a href="%(CFG_SITE_URL)s/record/%(recID)i">%(recID)i</a></td>' % \
+                   {'recID': recID, 'CFG_SITE_URL': CFG_SITE_URL}
+            for field in ot:
+                row += '<td>' + \
+                       ot_sep.join(bibformat_utils.get_all_fieldvalues(recID, field)) + \
+                       '</td>'
+            row += '</tr>'
+            out += row
+            if req: req.write(row)
+        out += '</table>'
+        if req: req.write('</table>')
+        return out
 
     #Format the records
     excel_formatted_records = format_records(recIDs, 'excel', ln=CFG_SITE_LANG,
@@ -449,8 +478,6 @@ def main():
             usage(1, "-i argument is needed")
     except StandardError, e:
         usage(e)
-
-
 
     print format_records(recIDs=options["recID"],
                          of=options["output"],

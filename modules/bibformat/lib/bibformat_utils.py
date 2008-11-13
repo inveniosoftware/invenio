@@ -416,3 +416,63 @@ def parse_tag(tag):
             p_tag[2] = ind2
 
     return p_tag
+
+def get_all_fieldvalues(recID, tags_in):
+    """
+    Returns list of values that belong to fields in tags_in for record
+    with given recID.
+
+    Note that when a partial 'tags_in' is specified (eg. '100__'), the
+    subfields of all corresponding datafields are returned all 'mixed'
+    together. Eg. with:
+      123 100__ $a Ellis, J $u CERN
+      123 100__ $a Smith, K
+    >> get_all_fieldvalues(123, '100__')
+       ['Ellis, J', 'CERN', 'Smith, K']
+    """
+    out = []
+    if type(tags_in) is not list:
+        tags_in = [tags_in,]
+
+    dict_of_tags_out = {}
+    if not tags_in:
+        for i in range(0, 10):
+            for j in range(0, 10):
+                dict_of_tags_out["%d%d%%" % (i, j)] = '%'
+    else:
+        for tag in tags_in:
+            if len(tag) == 0:
+                for i in range(0, 10):
+                    for j in range(0, 10):
+                        dict_of_tags_out["%d%d%%" % (i, j)] = '%'
+            elif len(tag) == 1:
+                for j in range(0, 10):
+                    dict_of_tags_out["%s%d%%" % (tag, j)] = '%'
+            elif len(tag) <= 5:
+                dict_of_tags_out["%s%%" % tag] = '%'
+            else:
+                dict_of_tags_out[tag[0:5]] = tag[5:6]
+    tags_out = dict_of_tags_out.keys()
+    tags_out.sort()
+    # search all bibXXx tables as needed:
+    for tag in tags_out:
+        digits = tag[0:2]
+        try:
+            intdigits = int(digits)
+            if intdigits < 0 or intdigits > 99:
+                raise ValueError
+        except ValueError:
+            # invalid tag value asked for
+            continue
+        bx = "bib%sx" % digits
+        bibx = "bibrec_bib%sx" % digits
+        query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
+                "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s"\
+                "ORDER BY bb.field_number, b.tag ASC" % (bx, bibx)
+        res = run_sql(query, (recID, str(tag)+dict_of_tags_out[tag]))
+        # go through fields:
+        for row in res:
+            field, value, field_number = row[0], row[1], row[2]
+            out.append(value)
+
+    return out

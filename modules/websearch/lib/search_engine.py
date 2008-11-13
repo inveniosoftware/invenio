@@ -2832,7 +2832,7 @@ def print_records(req, recIDs, jrec=1, rg=10, format='hb', ot='', ln=CFG_SITE_LA
                     req.write('\n')
         elif format == 'excel':
             recIDs_to_print = [recIDs[x] for x in range(irec_max, irec_min, -1)]
-            create_excel(recIDs=recIDs_to_print, req=req, ln=ln)
+            create_excel(recIDs=recIDs_to_print, req=req, ln=ln, ot=ot)
         else:
             # we are doing HTML output:
             if format == 'hp' or format.startswith("hb_") or format.startswith("hd_"):
