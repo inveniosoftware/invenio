@@ -690,7 +690,7 @@ class RequestWrapper:
         except KeyError:
             self.cookies = {}
         self.environ = {}
-        self.environ["REMOTE_ADDR"] = self.__request.get_remote_host(apache.REMOTE_NOLOOKUP)
+        self.environ["REMOTE_ADDR"] = self.__request.connection.remote_ip
         self.response = ResponseWrapper( request )
         try:
             self.session = request.session
