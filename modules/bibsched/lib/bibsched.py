@@ -753,6 +753,9 @@ class BibSched:
     def __init__(self):
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.scheduled = None
+        self.task_status = {}
+        self.bibuploads = []
+        self.rows = []
         os.environ['BIBSCHED_MODE'] = 'automatic'
 
     def tasks_safe_p(self, proc1, proc2):
@@ -786,19 +789,19 @@ class BibSched:
             else:
                 return [], [(min_task_id, min_proc, min_prio, min_status)]
 
-    def get_running_tasks(self, task_status):
+    def get_running_tasks(self):
         """Return a list of running tasks."""
         for status in ('RUNNING', 'CONTINUING', 'SLEEPING', 'ABOUT TO SLEEP', 'ABOUT TO STOP', 'SCHEDULED'):
-            for id, (proc, dummy, priority) in task_status[status].iteritems():
+            for id, (proc, dummy, priority) in self.task_status[status].iteritems():
                 yield (id, proc, priority, status)
         raise StopIteration
 
-    def split_running_tasks_by_priority(self, task_status, task_id, priority):
+    def split_running_tasks_by_priority(self, task_id, priority):
         """Return two lists: the list of task_ids with lower priority and
         those with higher or equal priority."""
         higher = []
         lower = []
-        for other_task_id, task_proc, task_priority, status in self.get_running_tasks(task_status):
+        for other_task_id, task_proc, task_priority, status in self.get_running_tasks():
             if task_id == other_task_id:
                 continue
             if task_priority < priority:
@@ -807,30 +810,26 @@ class BibSched:
                 higher.append((other_task_id, task_proc, task_priority, status))
         return lower, higher
 
-    def bibupload_in_the_queue(self, task_id, runtime):
-        """Check if bibupload is scheduled/running before runtime.
-        This is useful in order to enforce bibupload order."""
-        return run_sql("SELECT id, status FROM schTASK WHERE proc='bibupload' AND runtime<=%s AND id<%s AND (status='RUNNING' OR status='WAITING' OR status='CONTINUING' OR  status='SLEEPING' OR status='SCHEDULED' OR status='ABOUT TO SLEEP' OR status='ABOUT TO STOP' OR status='ERROR' OR status='DONE WITH ERRORS')", (runtime, task_id))
-
     def task_really_running_p(self, proc, task_id):
         """Ping the task and update its status to error if necessary."""
-        if run_sql("SELECT id FROM schTASK WHERE id=%s AND status in ('CONTINUING', 'RUNNING', 'ABOUT TO STOP', 'SLEEPING', 'ABOUT TO SLEEP')", (task_id, )):
+        res = run_sql("SELECT status FROM schTASK WHERE id=%s AND status in ('CONTINUING', 'RUNNING', 'ABOUT TO STOP', 'SLEEPING', 'ABOUT TO SLEEP')", (task_id, ))
+        if res:
             if not get_task_pid(proc, task_id):
-                bibsched_set_status(task_id, "ERROR")
+                bibsched_set_status(task_id, "ERROR", res[0][0])
                 return False
             return True
         return False
 
-    def handle_row(self, task_status, task_id, proc, runtime, status, priority):
+    def handle_row(self, task_id, proc, runtime, status, priority):
         """Perform needed action of the row representing a task.
         Return True when task_status need to be refreshed"""
         #write_message('%s id: %s, proc: %s, runtime: %s, status: %s, priority: %s' % (task_status, task_id, proc, runtime, status, priority))
         #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s" % (task_id, proc, runtime, status, priority))
-        if task_id in task_status['RUNNING'] or task_id in task_status['CONTINUING']:
+        if task_id in self.task_status['RUNNING'] or task_id in self.task_status['CONTINUING']:
             if not self.task_really_running_p(proc, task_id):
                 #write_message('update required')
                 return True
-        elif task_id in task_status['WAITING'] or task_id in task_status['SLEEPING']:
+        elif task_id in self.task_status['WAITING'] or task_id in self.task_status['SLEEPING']:
             #write_message("Trying to run %s" % task_id)
             if self.scheduled is not None and task_id != self.scheduled:
                 ## Another task is scheduled for running.
@@ -838,16 +837,7 @@ class BibSched:
                 return False
 
             nothing_was_scheduled = self.scheduled is None
-            res = self.bibupload_in_the_queue(task_id, runtime)
             if priority < 0:
-                return False
-            if res:
-                ## All bibupload must finish before.
-                for (atask_id, astatus) in res:
-                    if astatus in ('ERROR', 'DONE WITH ERRORS'):
-                        raise StandardError('BibSched had to halt because a bibupload with id %s has status %s. Please do your checks and delete/reinitialize the failed bibupload.' % (atask_id, astatus))
-                #write_message("cannot run because these bibupload are scheduled: %s" % res)
-                Log("Task #%d (%s) not yet run because there is a bibupload in the queue" % (task_id, proc))
                 return False
 
             self.scheduled = task_id
@@ -856,7 +846,7 @@ class BibSched:
             #write_message('Scheduled task %s' % self.scheduled)
             ## Schedule the task for running.
 
-            lower, higher = self.split_running_tasks_by_priority(task_status, task_id, priority)
+            lower, higher = self.split_running_tasks_by_priority(task_id, priority)
             #write_message('lower: %s' % lower)
             #write_message('higher: %s' % higher)
             for other_task_id, other_proc, dummy, status in higher:
@@ -897,11 +887,17 @@ class BibSched:
                     program = os.path.join(CFG_BINDIR, procname)
                     ## Trick to log in bibsched.log the task exiting
                     exit_str = '&& echo "`date "+%%Y-%%m-%%d %%H:%%M:%%S"` --> Task #%d (%s) exited" >> %s' % (task_id, proc, os.path.join(CFG_LOGDIR, 'bibsched.log'))
-                    COMMAND = "(%s %s > /dev/null 2> /dev/null %s) &" % (program, str(task_id), exit_str)
+                    if proc == 'bibupload':
+                        ## bibupload mode: serial monotask.
+                        COMMAND = "(%s %s > /dev/null 2> /dev/null %s)" % (program, str(task_id), exit_str)
+                    else:
+                        COMMAND = "(%s %s > /dev/null 2> /dev/null %s) &" % (program, str(task_id), exit_str)
                     bibsched_set_status(task_id, "SCHEDULED")
                     Log("Task #%d (%s) started" % (task_id, proc))
                     os.system(COMMAND)
                     return True
+                else:
+                    raise StandardError, "%s is not in the allowed modules" % procname
             else:
                 ## It's not still safe to run the task.
                 for (other_task_id, other_proc, other_priority, other_status) in tasks_to_stop:
@@ -910,27 +906,14 @@ class BibSched:
                     bibsched_set_status(other_task_id, 'ABOUT TO SLEEP', other_status)
                 return True
 
-    def uniformize_bibupload_priorities(self):
-        """
-        If a biupload with priority 10 happens to be submitted
-        after a bibupload with priority less than 10 (say 9), the first
-        bibupload is blocked until the second is executed. To give real
-        priority to the first bibupload, we should rise the priority of the
-        second one up to the priority of the first.
-        """
-        max_priority = run_sql("SELECT max(priority) FROM schTASK WHERE proc='bibupload' AND status NOT LIKE 'DONE' AND status NOT like '%DELETED%' AND (runtime <= NOW() OR status='WAITING' OR status='SCHEDULED')")
-        if max_priority:
-            max_priority = max_priority[0][0]
-            run_sql("UPDATE schTASK SET priority=%s WHERE proc='bibupload' AND status NOT LIKE 'DONE' AND status NOT like '%%DELETED%%' AND (runtime <= NOW() OR status='WAITING' OR status='SCHEDULED')", (max_priority, ))
-
     def watch_loop(self):
-        def get_rows():
+        def calculate_rows():
             """Return all the rows to work on."""
-            return run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%DELETED%' AND (runtime<=NOW() OR status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='SCHEDULED' OR status='CONTINUING') ORDER BY priority DESC, runtime ASC, id ASC")
+            self.rows = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%DELETED%' AND (runtime<=NOW() OR status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='SCHEDULED' OR status='CONTINUING') ORDER BY priority DESC, runtime ASC, id ASC")
 
-        def get_task_status(rows):
+        def calculate_task_status():
             """Return a handy data structure to analize the task status."""
-            ret = {
+            self.task_status = {
                 'RUNNING' : {},
                 'CONTINUING' : {},
                 'SLEEPING' : {},
@@ -942,11 +925,22 @@ class BibSched:
                 'SCHEDULED' : {}
             }
 
-            for (id, proc, runtime, status, priority) in rows:
-                if status not in ret:
-                    ret[status] = {}
-                ret[status][id] = (proc, runtime, priority)
-            return ret
+            for (id, proc, runtime, status, priority) in self.rows:
+                if status not in self.task_status:
+                    self.task_status[status] = {}
+                self.task_status[status][id] = (proc, runtime, priority)
+
+        def calculate_bibuploads():
+            """Return the bibupload to be considered."""
+            bibuploads = {}
+            for id, proc, runtime, status, priority in self.rows:
+                if proc == 'bibupload':
+                    bibuploads[id] = (id, proc, runtime, status, priority)
+            ids = bibuploads.keys()
+            ids.sort()
+            self.bibuploads = []
+            for id in ids:
+                self.bibuploads.append(bibuploads[id])
 
         ## Cleaning up scheduled task not run because of bibsched being
         ## interrupted in the middle.
@@ -954,13 +948,17 @@ class BibSched:
 
         try:
             while True:
-                self.uniformize_bibupload_priorities()
-                rows = get_rows()
-                task_status = get_task_status(rows)
-                if task_status['ERROR'] or task_status['DONE WITH ERRORS']:
-                    raise StandardError('BibSched had to halt because at least a task is in status ERROR (%s) or DONE WITH ERRORS (%s)' % (task_status['ERROR'], task_status['DONE WITH ERRORS']))
-                for row in rows:
-                    if self.handle_row(task_status, *row):
+                calculate_rows()
+                calculate_task_status()
+                if self.task_status['ERROR'] or self.task_status['DONE WITH ERRORS']:
+                    raise StandardError('BibSched had to halt because at least a task is in status ERROR (%s) or DONE WITH ERRORS (%s)' % (self.task_status['ERROR'], self.task_status['DONE WITH ERRORS']))
+                calculate_bibuploads()
+                for row in self.rows:
+                    if row[1] == 'bibupload':
+                        ## We switch in bibupload serial mode!
+                        if self.handle_row(*self.bibuploads[0]):
+                            break
+                    if self.handle_row(*row):
                         # Things have changed let's restart
                         break
                 time.sleep(CFG_BIBSCHED_REFRESHTIME)
