@@ -48,7 +48,7 @@ from invenio.dbquery import run_sql, escape_string
 from invenio.textutils import wrap_text_in_a_box
 from invenio.errorlib import register_exception, register_emergency
 
-CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING', 'DELETED %', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED', 'SLEEPING', 'KILLED')
+CFG_VALID_STATUS = ('WAITING', 'SCHEDULED', 'RUNNING', 'CONTINUING', '% DELETED', 'ABOUT TO STOP', 'ABOUT TO SLEEP', 'STOPPED', 'SLEEPING', 'KILLED')
 
 shift_re = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
@@ -720,7 +720,7 @@ class Manager:
                     table = "hstTASK"
                     order = "runtime DESC"
                     where = ''
-                self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments,priority FROM %s WHERE status NOT LIKE '%%DELETED%%' %s ORDER BY %s""" % (table, where, order))
+                self.rows = run_sql("""SELECT id,proc,user,runtime,sleeptime,status,progress,arguments,priority FROM %s WHERE status NOT LIKE '%%_DELETED' %s ORDER BY %s""" % (table, where, order))
                 ring = 0
                 self.repaint()
             ring += 1
@@ -912,7 +912,7 @@ class BibSched:
             """Return all the rows to work on."""
             if run_sql("SELECT count(id) FROM schTASK WHERE status='ERROR' OR status='DONE WITH ERRORS'")[0][0] > 0:
                 raise StandardError('BibSched had to halt because at least a task is in status ERROR or DONE WITH ERRORS')
-            self.next_bibupload = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status='WAITING' AND runtime<=NOW() ORDER BY id ASC LIMIT 1", n=1)
+            self.next_bibupload = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status='WAITING' AND proc='bibupload' AND runtime<=NOW() ORDER BY id ASC LIMIT 1", n=1)
             self.waitings = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status='WAITING' AND runtime<=NOW() ORDER BY priority DESC, runtime ASC, id ASC")
             self.rows = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status IN ('RUNNING','CONTINUING','SCHEDULED','SLEEPING','ABOUT TO STOP','ABOUT TO SLEEP')")
 
@@ -944,12 +944,14 @@ class BibSched:
                         break
                 else:
                     for row in self.waitings:
-                        if row[1] == 'bibupload':
+                        if row[1] == 'bibupload' and self.next_bibupload:
                             ## We switch in bibupload serial mode!
-                            ## which means we exe
-                            self.handle_row(*self.next_bibupload[0])
-                            break
+                            ## which means we execute the first next bibupload.
+                            if self.handle_row(*self.next_bibupload[0]):
+                                ## Something has changed
+                                break
                         elif self.handle_row(*row):
+                            ## Something has changed
                             break
                     else:
                         time.sleep(CFG_BIBSCHED_REFRESHTIME)
@@ -1206,14 +1208,14 @@ def stop(verbose=True):
         print "Stopping BibSched if running"
     halt(verbose, soft=True)
     run_sql("UPDATE schTASK SET status='WAITING' WHERE status='SCHEDULED'")
-    res = run_sql("SELECT id,proc,status FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%%DELETED%%' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')")
+    res = run_sql("SELECT id,proc,status FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%_DELETED' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')")
     if verbose:
         print "Stopping all running BibTasks"
     for task_id, proc, status in res:
         if status == 'SLEEPING':
             bibsched_send_signal(proc, task_id, signal.SIGCONT)
         bibsched_set_status(task_id, 'ABOUT TO STOP')
-    while run_sql("SELECT id FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%%DELETED%%' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')"):
+    while run_sql("SELECT id FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%_DELETED' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')"):
         if verbose:
             sys.stdout.write('.')
             sys.stdout.flush()
