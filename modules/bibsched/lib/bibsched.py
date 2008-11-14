@@ -754,8 +754,9 @@ class BibSched:
         self.helper_modules = CFG_BIBTASK_VALID_TASKS
         self.scheduled = None
         self.task_status = {}
-        self.bibuploads = []
-        self.rows = []
+        self.next_bibupload = ()
+        self.waitings = ()
+        self.rows = ()
         os.environ['BIBSCHED_MODE'] = 'automatic'
 
     def tasks_safe_p(self, proc1, proc2):
@@ -909,7 +910,11 @@ class BibSched:
     def watch_loop(self):
         def calculate_rows():
             """Return all the rows to work on."""
-            self.rows = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%DELETED%' AND (runtime<=NOW() OR status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='SCHEDULED' OR status='CONTINUING') ORDER BY priority DESC, runtime ASC, id ASC")
+            if run_sql("SELECT count(id) FROM schTASK WHERE status='ERROR' OR status='DONE WITH ERRORS'")[0][0] > 0:
+                raise StandardError('BibSched had to halt because at least a task is in status ERROR or DONE WITH ERRORS')
+            self.next_bibupload = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status='WAITING' AND runtime<=NOW() ORDER BY id ASC LIMIT 1", n=1)
+            self.waitings = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status='WAITING' AND runtime<=NOW() ORDER BY priority DESC, runtime ASC, id ASC")
+            self.rows = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status IN ('RUNNING','CONTINUING','SCHEDULED','SLEEPING','ABOUT TO STOP','ABOUT TO SLEEP')")
 
         def calculate_task_status():
             """Return a handy data structure to analize the task status."""
@@ -920,27 +925,11 @@ class BibSched:
                 'WAITING' : {},
                 'ABOUT TO STOP' : {},
                 'ABOUT TO SLEEP' : {},
-                'ERROR' : {},
-                'DONE WITH ERRORS' : {},
                 'SCHEDULED' : {}
             }
 
-            for (id, proc, runtime, status, priority) in self.rows:
-                if status not in self.task_status:
-                    self.task_status[status] = {}
+            for (id, proc, runtime, status, priority) in self.rows + self.waitings:
                 self.task_status[status][id] = (proc, runtime, priority)
-
-        def calculate_bibuploads():
-            """Return the bibupload to be considered."""
-            bibuploads = {}
-            for id, proc, runtime, status, priority in self.rows:
-                if proc == 'bibupload':
-                    bibuploads[id] = (id, proc, runtime, status, priority)
-            ids = bibuploads.keys()
-            ids.sort()
-            self.bibuploads = []
-            for id in ids:
-                self.bibuploads.append(bibuploads[id])
 
         ## Cleaning up scheduled task not run because of bibsched being
         ## interrupted in the middle.
@@ -950,18 +939,20 @@ class BibSched:
             while True:
                 calculate_rows()
                 calculate_task_status()
-                if self.task_status['ERROR'] or self.task_status['DONE WITH ERRORS']:
-                    raise StandardError('BibSched had to halt because at least a task is in status ERROR (%s) or DONE WITH ERRORS (%s)' % (self.task_status['ERROR'], self.task_status['DONE WITH ERRORS']))
-                calculate_bibuploads()
                 for row in self.rows:
-                    if row[1] == 'bibupload':
-                        ## We switch in bibupload serial mode!
-                        if self.handle_row(*self.bibuploads[0]):
-                            break
                     if self.handle_row(*row):
-                        # Things have changed let's restart
                         break
-                time.sleep(CFG_BIBSCHED_REFRESHTIME)
+                else:
+                    for row in self.waitings:
+                        if row[1] == 'bibupload':
+                            ## We switch in bibupload serial mode!
+                            ## which means we exe
+                            self.handle_row(*self.next_bibupload[0])
+                            break
+                        elif self.handle_row(*row):
+                            break
+                    else:
+                        time.sleep(CFG_BIBSCHED_REFRESHTIME)
         except:
             register_exception(alert_admin=True)
             try:
