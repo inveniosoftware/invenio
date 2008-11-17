@@ -60,7 +60,7 @@ import logging.handlers
 from invenio.dbquery import run_sql, _db_login
 from invenio.access_control_engine import acc_authorize_action
 from invenio.config import CFG_PREFIX, CFG_BINDIR, CFG_LOGDIR, \
-    CFG_BIBSCHED_PROCESS_USER
+    CFG_BIBSCHED_PROCESS_USER, CFG_TMPDIR
 from invenio.errorlib import register_exception
 
 from invenio.access_control_config import CFG_EXTERNAL_AUTH_USING_SSO, \
@@ -179,7 +179,8 @@ def task_init(
         "sleeptime" : '',
         "runtime" : time.strftime("%Y-%m-%d %H:%M:%S"),
         "priority" : 0,
-        "runtime_limit" : None
+        "runtime_limit" : None,
+        "profile" : [],
     }
     to_be_submitted = True
     if len(sys.argv) == 2 and sys.argv[1].isdigit():
@@ -216,7 +217,48 @@ def task_init(
         _task_submit(argv, authorization_action, authorization_msg)
     else:
         try:
-            if not _task_run(task_run_fnc):
+            if task_get_task_param('profile'):
+                try:
+                    from cStringIO import StringIO
+                    import pstats
+                    filename = os.path.join(CFG_TMPDIR, 'bibsched_task_%s.pyprof' % _task_params['task_id'])
+                    existing_sorts = pstats.Stats.sort_arg_dict_default.keys()
+                    required_sorts = []
+                    profile_dump = []
+                    for sort in task_get_task_param('profile'):
+                        if sort not in existing_sorts:
+                            sort = 'cumulative'
+                        if sort not in required_sorts:
+                            required_sorts.append(sort)
+                    if sys.hexversion < 0x02050000:
+                        import hotshot, hotshot.stats
+                        pr = hotshot.Profile(filename)
+                        ret = pr.runcall(_task_run, task_run_fnc)
+                        for sort_type in required_sorts:
+                            tmp_out = sys.stdout
+                            sys.stdout = StringIO()
+                            hotshot.stats.load(filename).strip_dirs().sort_stats(sort_type).print_stats()
+                            profile_dump.append(sys.stdout.getvalue())
+                            sys.stdout = tmp_out
+                    else:
+                        import cProfile
+                        pr = cProfile.Profile()
+                        ret = pr.runcall(_task_run, task_run_fnc)
+                        pr.dump_stats(filename)
+                        for sort_type in required_sorts:
+                            strstream = StringIO()
+                            pstats.Stats(filename, stream=strstream).strip_dirs().sort_stats(sort_type).print_stats()
+                            profile_dump.append(strstream.getvalue())
+                    profile_dump = '\n'.join(profile_dump)
+                    profile_dump += '\nYou can use profile=%s' % existing_sorts
+                    open(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _task_params['task_id']), 'a').write("%s" % profile_dump)
+                    os.remove(filename)
+                except ImportError:
+                    ret = _task_run(task_run_fnc)
+                    write_message("ERROR: The Python Profiler is not installed!", stream=sys.stderr)
+            else:
+                ret = _task_run(task_run_fnc)
+            if not ret:
                 write_message("Error occurred.  Exiting.", sys.stderr)
         except Exception, e:
             register_exception(alert_admin=True)
@@ -265,7 +307,8 @@ def _task_build_params(
                 "time=",
                 "priority=",
                 "task-specific-name=",
-                "runtime-limit="
+                "runtime-limit=",
+                "profile="
             ] + long_params)
     except getopt.GetoptError, err:
         _usage(1, err, help_specific_usage=help_specific_usage, description=description)
@@ -292,6 +335,8 @@ def _task_build_params(
                 _task_params["task_specific_name"] = opt[1]
             elif opt[0] in ("-L", "--runtime-limit"):
                 _task_params["runtime_limit"] = parse_runtime_limit(opt[1])
+            elif opt[0] in ("--profile", ):
+                _task_params["profile"] += opt[1].split(',')
             elif not callable(task_submit_elaborate_specific_parameter_fnc) or \
                 not task_submit_elaborate_specific_parameter_fnc(opt[0],
                     opt[1], opts, args):
@@ -749,6 +794,7 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     sys.stderr.write("  -V, --version\t\tPrint version information.\n")
     sys.stderr.write("  -v, --verbose=LEVEL\tVerbose level (0=min,"
         " 1=default, 9=max).\n")
+    sys.stderr.write("      --profile=SORT\tDump profile information. SORT is a comma-separated\n\t\t\tlist of desired sorting (calls, cumulative, file,\n\t\t\tline, module, name, nfl, pcalls, stdname, time)")
     if description:
         sys.stderr.write(description)
     sys.exit(exitcode)
