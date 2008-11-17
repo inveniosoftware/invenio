@@ -104,16 +104,18 @@ def _generate_extensions():
                 _mimes.suffix_map.keys() + \
                 _mimes.types_map[1].keys() + \
                 CFG_WEBSUBMIT_ADDITIONAL_KNOWN_FILE_EXTENSIONS
-    _extensions = []
+    extensions = []
     for ext in _tmp_extensions:
         if ext.startswith('.'):
-            _extensions.append(ext)
+            extensions.append(ext)
         else:
-            _extensions.append('.' + ext)
-    _extensions.sort()
-    _extensions.reverse()
-    _extensions = set([ext.lower() for ext in _extensions])
-    return _extensions
+            extensions.append('.' + ext)
+    extensions.sort()
+    extensions.reverse()
+    extensions = set([ext.lower() for ext in extensions])
+    extensions = '\\' + '$|\\'.join(extensions) + '$'
+    extensions = extensions.replace('+', '\\+')
+    return re.compile(extensions, re.I)
 
 _extensions = _generate_extensions()
 
@@ -125,16 +127,13 @@ def file_strip_ext(afile, skip_version=False):
     """Strip in the best way the extension from a filename"""
     if skip_version:
         afile = afile.split(';')[0]
-    lowfile = afile.lower()
-    ext = '.'
-    while ext:
-        ext = ''
-        for c_ext in _extensions:
-            if lowfile.endswith(c_ext):
-                lowfile = lowfile[0:-len(c_ext)]
-                ext = c_ext
-                break
-    return afile[:len(lowfile)]
+    nextfile = _extensions.sub('', afile)
+    while nextfile != afile:
+        nextfile = _extensions.sub('', afile)
+        afile = nextfile
+    else:
+        nextfile = afile.split('.')[0]
+    return nextfile
 
 def normalize_format(format):
     """Normalize the format."""
