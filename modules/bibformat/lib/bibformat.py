@@ -109,7 +109,7 @@ def format_record(recID, of, ln=CFG_SITE_LANG, verbose=0, search_pattern=None,
         of.lower() == 'xm' or \
         CFG_BIBFORMAT_USE_OLD_BIBFORMAT or \
         (CFG_BIBFORMAT_ENABLE_I18N_BRIEF_FORMAT == False and of.lower() == 'hb')):
-	# Try to fetch preformatted record
+        # Try to fetch preformatted record
         # Only possible for records formatted in CFG_SITE_LANG
         # language (other are never stored), or of='xm' which does not
         # depend on language.
