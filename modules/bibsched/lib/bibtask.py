@@ -794,7 +794,7 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
     sys.stderr.write("  -V, --version\t\tPrint version information.\n")
     sys.stderr.write("  -v, --verbose=LEVEL\tVerbose level (0=min,"
         " 1=default, 9=max).\n")
-    sys.stderr.write("      --profile=SORT\tDump profile information. SORT is a comma-separated\n\t\t\tlist of desired sorting (calls, cumulative, file,\n\t\t\tline, module, name, nfl, pcalls, stdname, time)")
+    sys.stderr.write("      --profile=STATS\tPrint profile information. STATS is a comma-separated\n\t\t\tlist of desired output stats (calls, cumulative,\n\t\t\tfile, line, module, name, nfl, pcalls, stdname, time).\n")
     if description:
         sys.stderr.write(description)
     sys.exit(exitcode)
