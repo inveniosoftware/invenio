@@ -92,7 +92,7 @@ def get_task_pid(task_name, task_id, ignore_error=False):
         return pid
     except (OSError, IOError):
         if ignore_error:
-            return None
+            return 0
         register_exception()
         return get_my_pid(task_name, str(task_id))
 
@@ -164,13 +164,14 @@ def bibsched_set_priority(task_id, priority):
 
 def bibsched_send_signal(proc, task_id, signal):
     """Send a signal to a given task."""
-    try:
-        pid = get_task_pid(proc, task_id, True)
-        os.kill(pid, signal)
-    except OSError:
-        pass
-    except KeyError:
-        register_exception()
+    pid = get_task_pid(proc, task_id, True)
+    if pid:
+        try:
+            os.kill(pid, signal)
+            return True
+        except OSError:
+            return False
+    return False
 
 class Manager:
     def __init__(self, old_stdout):
@@ -384,7 +385,8 @@ class Manager:
         #if self.count_processes('RUNNING') + self.count_processes('CONTINUING') >= 1:
             #self.display_in_footer("a process is already running!")
         if status == "SLEEPING":
-            bibsched_send_signal(process, task_id, signal.SIGCONT)
+            if not bibsched_send_signal(process, task_id, signal.SIGCONT):
+                bibsched_set_status(task_id, "ERROR", "SLEEPING")
             self.display_in_footer("process woken up")
         else:
             self.display_in_footer("process is not sleeping")
@@ -881,7 +883,10 @@ class BibSched:
                 self.scheduled = None
                 if status in ("SLEEPING", "ABOUT TO SLEEP"):
                     bibsched_set_status(task_id, "CONTINUING", status)
-                    bibsched_send_signal(proc, task_id, signal.SIGCONT)
+                    if not bibsched_send_signal(proc, task_id, signal.SIGCONT):
+                        bibsched_set_status(task_id, "ERROR", "CONTINUING")
+                        Log ("Task #%d (%s) woken up but didn't existed anymore" % (task_id, proc))
+                        return True
                     Log("Task #%d (%s) woken up" % (task_id, proc))
                     return True
                 elif procname in self.helper_modules:
@@ -1214,6 +1219,7 @@ def stop(verbose=True):
     for task_id, proc, status in res:
         if status == 'SLEEPING':
             bibsched_send_signal(proc, task_id, signal.SIGCONT)
+            time.sleep(1)
         bibsched_set_status(task_id, 'ABOUT TO STOP')
     while run_sql("SELECT id FROM schTASK WHERE status NOT LIKE 'DONE' AND status NOT LIKE '%_DELETED' AND (status='RUNNING' OR status='ABOUT TO STOP' OR status='ABOUT TO SLEEP' OR status='SLEEPING' OR status='CONTINUING')"):
         if verbose:
