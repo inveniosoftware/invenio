@@ -299,7 +299,7 @@ def bibupload(record, opt_tag=None, opt_mode=None,
             try:
                 record = synchronize_8564(rec_id, record, record_had_FFT)
             except Exception, e:
-                register_exception()
+                register_exception(alert_admin=True)
                 write_message("   Stage 2B failed: Error while synchronizing 8564 tags: %s" % e,
                     verbose=1, stream=sys.stderr)
                 return (1, int(rec_id))

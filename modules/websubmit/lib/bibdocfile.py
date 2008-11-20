@@ -2172,6 +2172,9 @@ def decompose_bibdocfile_url(url):
         raise InvenioWebSubmitFileError, "Url %s doesn't correspond to a valid record inside the system." % url
     recid_file = recid_file.replace('/files/', '/')
     recid, docname, format = decompose_file(urllib.unquote(recid_file))
+    if not recid and docname.isdigit():
+        ## If the URL was something similar to CFG_SITE_URL/record/123
+        return (int(docname), '', '')
     return (int(recid), docname, format)
 
 re_bibdocfile_old_url = re.compile(r'/record/(\d*)/files/')
