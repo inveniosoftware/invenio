@@ -54,6 +54,7 @@ Options to update DB tables:
    --reset-sitename         reset tables to take account of new CFG_SITE_NAME*
    --reset-siteadminemail   reset tables to take account of new CFG_SITE_ADMIN_EMAIL
    --reset-fieldnames       reset tables to take account of new I18N names from PO files
+   --reset-recstruct-cache  reset the record structure cache used to speed up record retrieval
 
 Options to help the work:
    --list                   print names and values of all options from conf files
@@ -70,6 +71,8 @@ import re
 import shutil
 import socket
 import sys
+import zlib
+import marshal
 
 def print_usage():
     """Print help."""
@@ -349,6 +352,35 @@ def cli_cmd_reset_sitename(conf):
                     (sitename_lang, lang))
     print "You may want to restart Apache now."
     print ">>> CFG_SITE_NAME and CFG_SITE_NAME_INTL* reset successfully."
+
+def cli_cmd_reset_recstruct_cache(conf):
+    """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
+    will adapt the database to either store or not store the recstruct
+    format."""
+    from invenio.intbitset import intbitset
+    from invenio.dbquery import run_sql
+    from invenio.search_engine import get_record
+    enable_recstruct_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
+    enable_recstruct_cache = enable_recstruct_cache in ('True', '1')
+    print ">>> Cleaning recstruct cache..."
+    run_sql("DELETE FROM bibfmt WHERE format='recstruct'")
+    if enable_recstruct_cache:
+        recids = intbitset(run_sql("SELECT id FROM bibrec"))
+        print ">>> Generating recstruct cache..."
+        tot = len(recids)
+        count = 0
+        for recid in recids:
+            value = zlib.compress(marshal.dumps(get_record(recid)))
+            run_sql("INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, 'recstruct', NOW(), %s)", (recid, value))
+            count += 1
+            if count % 1000 == 0:
+                print "    ... done records %s/%s" % (count, tot)
+        if count % 1000 != 0:
+            print "    ... done records %s/%s" % (count, tot)
+        print ">>> recstruct cache generated successfully."
+
+    else:
+        print ">>> recstruct cache disabled in invenio(-local).conf"
 
 def cli_cmd_reset_siteadminemail(conf):
     """
@@ -1005,6 +1037,7 @@ def main():
                 cli_cmd_reset_sitename(conf)
                 cli_cmd_reset_siteadminemail(conf)
                 cli_cmd_reset_fieldnames(conf)
+                cli_cmd_reset_recstruct_cache(conf)
                 done = True
             elif opt == '--reset-sitename':
                 cli_cmd_reset_sitename(conf)
@@ -1014,6 +1047,9 @@ def main():
                 done = True
             elif opt == '--reset-fieldnames':
                 cli_cmd_reset_fieldnames(conf)
+                done = True
+            elif opt == '--reset-recstruct-cache':
+                cli_cmd_reset_recstruct_cache(conf)
                 done = True
             elif opt == '--create-apache-conf':
                 cli_cmd_create_apache_conf(conf)
