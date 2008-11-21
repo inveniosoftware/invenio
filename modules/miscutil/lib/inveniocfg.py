@@ -183,8 +183,12 @@ def cli_cmd_update_config_py(conf):
         conf.set("Invenio", "CFG_SITE_SECURE_URL",
                  conf.get("Invenio", "CFG_SITE_URL"))
     ## process all the options normally:
-    for section in conf.sections():
-        for option in conf.options(section):
+    sections = conf.sections()
+    sections.sort()
+    for section in sections:
+        options = conf.options(section)
+        options.sort()
+        for option in options:
             if not option.startswith('CFG_DATABASE_'):
                 # put all options except for db credentials into config.py
                 line_out = convert_conf_option(option, conf.get(section, option))
@@ -789,9 +793,13 @@ def cli_cmd_list(conf):
     """
     Print a list of all conf options and values from CONF.
     """
-    for section in conf.sections():
-        for option in conf.options(section):
-            print option, '=', conf.get(section, option)
+    sections = conf.sections()
+    sections.sort()
+    for section in sections:
+        options = conf.options(section)
+        options.sort()
+        for option in options:
+            print option.upper(), '=', conf.get(section, option)
 
 def _grep_version_from_executable(path_to_exec, version_regexp):
     """
