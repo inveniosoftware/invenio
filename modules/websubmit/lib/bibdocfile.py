@@ -128,11 +128,11 @@ def file_strip_ext(afile, skip_version=False):
     if skip_version:
         afile = afile.split(';')[0]
     nextfile = _extensions.sub('', afile)
+    if nextfile == afile:
+        nextfile = os.path.splitext(afile)[0]
     while nextfile != afile:
-        nextfile = _extensions.sub('', afile)
         afile = nextfile
-    else:
-        nextfile = afile.split('.')[0]
+        nextfile = _extensions.sub('', afile)
     return nextfile
 
 def normalize_format(format):
@@ -142,7 +142,11 @@ def normalize_format(format):
     if CFG_BIBDOCFILE_STRONG_FORMAT_NORMALIZATION:
         if format not in ('.Z', '.H', '.C', '.CC'):
             format = format.lower()
-        format = format.replace('.jpg', '.jpeg')
+        format = {
+            '.jpg' : '.jpeg',
+            '.htm' : '.html',
+            '.tif' : '.tiff'
+        }.get(format, format)
     return format
 
 _docname_re = re.compile(r'[^-\w.]*')
