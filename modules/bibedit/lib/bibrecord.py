@@ -154,12 +154,17 @@ def create_record(xmltext,
     try:
         if parser == 2:
             ## the following is because of DTD validation
-            t = """<?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE collection SYSTEM "file://%s">
-            <collection>\n""" % CFG_MARC21_DTD
-            t += str(xmltext)
-            t += "</collection>"
-            xmltext = t
+            if correct:
+                ## Note that with pyRXP < 1.13 a memory leak
+                ## has been found involving DTD parsing.
+                ## So enable correction only if you have
+                ## pyRXP 1.13 or greater.
+                t = """<?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE collection SYSTEM "file://%s">
+                <collection>\n""" % CFG_MARC21_DTD
+                t += str(xmltext)
+                t += "</collection>"
+                xmltext = t
             (rec, er) = create_record_RXP(xmltext, verbose, correct)
         elif parser == 1:
             (rec, er) = create_record_4suite(xmltext, verbose, correct)
