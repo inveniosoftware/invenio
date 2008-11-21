@@ -269,6 +269,45 @@ def setUid(req, uid, remember_me=False):
     sm.maintain_session(req, s, remember_me)
     return uid
 
+def session_param_set(req, key, value):
+    """
+    Associate a VALUE to the session param KEY for the current session.
+    """
+    sm = session.MPSessionManager(pSession, pSessionMapping())
+    try:
+        s = sm.get_session(req)
+    except SessionError:
+        sm.revoke_session_cookie(req)
+        s = sm.get_session(req)
+    s.param_set(key, value)
+    remember_me = s.getRememberMe()
+    sm.maintain_session(req, s, remember_me)
+
+def session_param_get(req, key):
+    """
+    Return session parameter value associated with session parameter KEY for the current session.
+    If the key doesn't exists raise KeyError.
+    """
+    sm = session.MPSessionManager(pSession, pSessionMapping())
+    try:
+        s = sm.get_session(req)
+    except SessionError:
+        sm.revoke_session_cookie(req)
+        s = sm.get_session(req)
+    return s.param_get(key)
+
+def session_param_list(req):
+    """
+    List all available session parameters.
+    """
+    sm = session.MPSessionManager(pSession, pSessionMapping())
+    try:
+        s = sm.get_session(req)
+    except SessionError:
+        sm.revoke_session_cookie(req)
+        s = sm.get_session(req)
+    return s.param_list()
+
 def get_last_login(uid):
     """Return the last_login datetime for uid if any, otherwise return the Epoch."""
     res = run_sql('SELECT last_login FROM user WHERE id=%s', (uid, ), 1)

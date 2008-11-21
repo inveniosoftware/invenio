@@ -76,6 +76,7 @@ class pSession(Session):
         self.__dirty_remember_me = 0
         self.__apache_user = None
         self.__remember_me = False
+        self.__params = {}
 
     def __str__(self):
         return '%s, uid: %s, dirty: %s, dirty remember me: %s, apache user: %s, remember me: %s' % (Session.__str__(self), self.__uid, self.__dirty, self.__dirty_remember_me, self.__apache_user, self.__remember_me)
@@ -120,6 +121,16 @@ class pSession(Session):
     def getRememberMe( self ):
         return self.__remember_me
 
+    def param_set(self, key, value):
+        self.__params[key] = value
+        self.__dirty = 1
+
+    def param_get(self, key):
+        return self.__params[key]
+
+    def param_list(self):
+        return self.__params.keys()
+
     def retrieve( cls, sessionId ):
         """method for retrieving a session from the DB for the given
            id. If the id has no corresponding session an exception is
@@ -137,11 +148,6 @@ class pSession(Session):
                                  sessionId)
         try:
             s = cPickle.loads(blob_to_string(res[0][0]))
-            try: # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
-                s.__remember_me
-            except AttributeError:
-                s.__remember_me = False
-                s.__dirty_remember_me = True
         except cPickle.UnpicklingError:
             raise SessionNotInDb("Session %s is broken" % \
                                  sessionId)
