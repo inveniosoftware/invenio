@@ -173,7 +173,7 @@ a double quote, etc."
         ((string= month-name "Dec") 12)
         (t 0)))
 
-(defun get-urlarg-value-from-url-string (url-string url-arg
+(defun get-urlarg-values-from-url-string (url-string url-arg
                                           &optional (return-empty-value nil))
   "Return list of values of URL-ARG in the URL-STRING.  For example,
 if URL-STRING contains 'search?p=ellis&f=title', and URL-ARG is
@@ -227,17 +227,22 @@ URL-STRING, return list of empty string."
     (format nil "~A-~A-~A ~A" yyyy mm dd hms)))
 
 (defun get-current-collection-from-httpd-log-request-string (httpd-log-request-string)
-  "Return current collection found in HTTPD-LOG-REQUEST-STRING."
+  "Return current collection found in HTTPD-LOG-REQUEST-STRING.
+Examples of input: 'search?cc=Books', '/?c=Books', '/collection/Books?ln=en'."
   (declare (special *home-collection*))
   (let ((out nil)
         (url-string (subseq httpd-log-request-string
                             (position #\space httpd-log-request-string)
                             (position #\space httpd-log-request-string :from-end t))))
     (if (search "?cc=" url-string)
-        (setf out (get-urlarg-value-from-url-string url-string "cc" t))
+        (setf out (get-urlarg-values-from-url-string url-string "cc" t))
         (if (search "?c=" url-string)
-            (setf out (get-urlarg-value-from-url-string url-string "c" t))
-            (setf out (list *home-collection*))))
+            (setf out (get-urlarg-values-from-url-string url-string "c" t))
+            (if (search "/collection/" url-string)
+                (setf out (list (string-decode-url (subseq url-string
+                                                           (+ (search "/collection/" url-string) (length "/collection/"))
+                                                           (search "?ln=" url-string :from-end t)))))
+                (setf out (list *home-collection*)))))
     (if (string= (car out) "")
         (setf out (list *home-collection*)))
     out))
@@ -273,13 +278,13 @@ a simple search or a detailed record page is selected."
               ;; advanced search happened:
               (progn
                 (incf *number-of-advanced-searches*)
-                (setf out (append (get-urlarg-value-from-url-string url-string "p1")
-                                  (get-urlarg-value-from-url-string url-string "p2")
-                                  (get-urlarg-value-from-url-string url-string "p3"))))
+                (setf out (append (get-urlarg-values-from-url-string url-string "p1")
+                                  (get-urlarg-values-from-url-string url-string "p2")
+                                  (get-urlarg-values-from-url-string url-string "p3"))))
               ;; simple search happened:
               (progn
                 (incf *number-of-simple-searches*)
-                (setf out (get-urlarg-value-from-url-string url-string "p" t))))))
+                (setf out (get-urlarg-values-from-url-string url-string "p" t))))))
     out))
 
 (defun wash-httpd-log-line (httpd-log-line)
@@ -460,9 +465,11 @@ the total number of hits, etc."
   "Read HTTPD-ALL-LOG-ENTRIES, analyze search interface usage and print
 interesting statistics."
   (declare (special *search-interface-url*
+                    *search-interface-url-old-style*
                     *home-collection*
                     *nb-histogram-items-to-print*))
-  (let ((httpd-log-entries (filter-httpd-log-entries httpd-all-log-entries *search-interface-url*))
+  (let ((httpd-log-entries (append (filter-httpd-log-entries httpd-all-log-entries *search-interface-url*)
+                                   (filter-httpd-log-entries httpd-all-log-entries *search-interface-url-old-style*)))
         (collection-histogram (make-hash-table :test #'equalp)))
     ;; build histogram:
     (dolist (httpd-log-entry httpd-log-entries)
@@ -471,7 +478,7 @@ interesting statistics."
                                     httpd-log-entry)))
         (incf (gethash current-collection collection-histogram 0))))
     ;; print summary info:
-    (format t "~&~%** SEARCH COLLECTIONS USAGE ANALYSIS")
+    (format t "~&~%** SEARCH INTERFACE COLLECTIONS USAGE ANALYSIS")
     (let ((number-of-interface-visits
            (reduce #'+ (hash-table-values collection-histogram))))
       (format t "~&There were ~D visits of search interface pages."
@@ -510,7 +517,7 @@ interesting statistics with respect to collections."
                                         httpd-log-entry)))
             (incf (gethash current-collection collection-histogram 0)))))
     ;; print summary info:
-    (format t "~&~%** SEARCH COLLECTIONS USAGE ANALYSIS")
+    (format t "~&~%** SEARCH ENGINE COLLECTIONS USAGE ANALYSIS")
     (let ((number-of-interface-visits
            (reduce #'+ (hash-table-values collection-histogram))))
       (format t "~&There were ~D search engine hits."
@@ -799,6 +806,7 @@ instructions presented in ANALYZER-CONFIG-FILE."
                     *exclude-ip-list*
                     *home-collection*
                     *search-interface-url*
+                    *search-interface-url-old-style*
                     *search-engine-url*
                     *search-engine-url-old-style*
                     *detailed-record-url*
@@ -825,7 +833,7 @@ instructions presented in ANALYZER-CONFIG-FILE."
              (sb-profile:profile GET-MONTH-NUMBER-FROM-MONTH-NAME)
              (sb-profile:profile MAKE-HTTPD-LOG-ENTRY)
              (sb-profile:profile PARSE-INTEGER-OR-ZERO)
-             (sb-profile:profile GET-URLARG-VALUE-FROM-URL-STRING)
+             (sb-profile:profile GET-URLARG-VALUES-FROM-URL-STRING)
              (sb-profile:profile HASH-TABLE-KEYS)
              (sb-profile:profile HASH-TABLE-KEY-VAL-STATS)
              (sb-profile:profile STRING-SUBSTITUTE)))
