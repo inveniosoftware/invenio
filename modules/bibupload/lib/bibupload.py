@@ -1022,7 +1022,7 @@ def elaborate_fft_tags(record, rec_id, mode):
             if description != []:
                 description = description[0]
             else:
-                if mode == 'correct':
+                if mode == 'correct' and doctype != 'FIX-MARC':
                     ## If the user require to correct, and do not specify
                     ## a description this means she really want to
                     ## modify the description.
@@ -1070,7 +1070,7 @@ def elaborate_fft_tags(record, rec_id, mode):
                     except StandardError, e:
                         raise StandardError, "fft '%s' specify an icon ('%s') with problems: %s" % (fft, icon, e)
             else:
-                if mode == 'correct':
+                if mode == 'correct' and doctype != 'FIX-MARC':
                     ## See comment on description
                     icon = ''
                 else:
@@ -1081,7 +1081,7 @@ def elaborate_fft_tags(record, rec_id, mode):
             if comment != []:
                 comment = comment[0]
             else:
-                if mode == 'correct':
+                if mode == 'correct' and doctype != 'FIX-MARC':
                     ## See comment on description
                     comment = ''
                 else:
@@ -1092,7 +1092,7 @@ def elaborate_fft_tags(record, rec_id, mode):
             if restriction != []:
                 restriction = restriction[0]
             else:
-                if mode == 'correct':
+                if mode == 'correct' and doctype != 'FIX-MARC':
                     ## See comment on description
                     restriction = ''
                 else:
