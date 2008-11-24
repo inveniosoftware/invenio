@@ -1,9 +1,0 @@
-Makefile
-Makefile.in
-z_*
-*.O
-*~
-xmlmarclint
-refextract
-xmlmarc2textmarc
-bibedit

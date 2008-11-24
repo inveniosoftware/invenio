@@ -1,9 +1,0 @@
-*.gmo
-POTFILES
-POTFILES-*
-Makefile
-Makefile.in
-*.sed
-*.pyc
-messages.mo
-stamp-po

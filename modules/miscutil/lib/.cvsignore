@@ -1,9 +1,0 @@
-Makefile
-Makefile.in
-z_*
-*.O
-*~
-*.pyc
-*.shtml
-*.php
-build
