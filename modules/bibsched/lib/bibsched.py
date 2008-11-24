@@ -1050,19 +1050,20 @@ def error(msg):
     print >> sys.stderr, "error: " + msg
     sys.exit(1)
 
-def server_pid():
+def server_pid(ping_the_process=True):
     # The pid must be stored on the filesystem
     try:
         pid = int(open(pidfile).read())
     except IOError:
         return None
 
-    # Even if the pid is available, we check if it corresponds to an
-    # actual process, as it might have been killed externally
-    try:
-        os.kill(pid, signal.SIGCONT)
-    except OSError:
-        return None
+    if ping_the_process:
+        # Even if the pid is available, we check if it corresponds to an
+        # actual process, as it might have been killed externally
+        try:
+            os.kill(pid, signal.SIGCONT)
+        except OSError:
+            return None
 
     return pid
 
@@ -1075,9 +1076,13 @@ def start(verbose = True):
         sys.stdout.write("starting bibsched: ")
         sys.stdout.flush()
 
-    pid = server_pid()
+    pid = server_pid(ping_the_process=False)
     if pid:
-        error("another instance of bibsched (pid %d) is running" % pid)
+        pid = server_pid()
+        if pid:
+            error("another instance of bibsched (pid %d) is running" % pid)
+        else:
+            error("%s exist but the corresponding bibsched (pid %d) seems not be running" % (pidfile, pid))
 
     # start the child process using the "double fork" technique
     pid = os.fork()

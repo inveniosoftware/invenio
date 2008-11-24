@@ -360,12 +360,20 @@ def cli_cmd_reset_recstruct_cache(conf):
     from invenio.intbitset import intbitset
     from invenio.dbquery import run_sql
     from invenio.search_engine import get_record
+    from invenio.bibsched import server_pid, pidfile
     enable_recstruct_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
     enable_recstruct_cache = enable_recstruct_cache in ('True', '1')
-    print ">>> Cleaning recstruct cache..."
-    run_sql("DELETE FROM bibfmt WHERE format='recstruct'")
+    pid = server_pid(ping_the_process=False)
+    if pid:
+        print >> sys.stderr, "ERROR: bibsched seems to run with pid %d, according to the file %s." % (pid, pidfile)
+        print >> sys.stderr, "       Please, stop bibsched before running this procedure."
+        sys.exit(1)
     if enable_recstruct_cache:
-        recids = intbitset(run_sql("SELECT id FROM bibrec"))
+        print ">>> Searching record which need recstruct cache to be generated..."
+        print "    ... note this might take a while..."
+        all_recids = intbitset(run_sql("SELECT id FROM bibrec"))
+        good_recids = intbitset(run_sql("SELECT bibrec.id FROM bibrec JOIN bibfmt ON bibrec.id = bibfmt.id_bibrec WHERE format='recstruct' AND modification_date < last_updated"))
+        recids = all_recids - good_recids
         print ">>> Generating recstruct cache..."
         tot = len(recids)
         count = 0
@@ -378,9 +386,9 @@ def cli_cmd_reset_recstruct_cache(conf):
         if count % 1000 != 0:
             print "    ... done records %s/%s" % (count, tot)
         print ">>> recstruct cache generated successfully."
-
     else:
-        print ">>> recstruct cache disabled in invenio(-local).conf"
+        print ">>> Cleaning recstruct cache..."
+        run_sql("DELETE FROM bibfmt WHERE format='recstruct'")
 
 def cli_cmd_reset_siteadminemail(conf):
     """
