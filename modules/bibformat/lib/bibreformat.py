@@ -31,37 +31,29 @@ try:
          CFG_TMPDIR,\
          CFG_BINDIR
 
+    from invenio.intbitset import intbitset
     from invenio.search_engine import perform_request_search, search_pattern
-    from invenio.search_engine import print_record, encode_for_xml
+    from invenio.search_engine import print_record
     from invenio.bibformat import format_record
-    from invenio.bibformat_utils import encode_for_xml
     from invenio.bibformat_config import CFG_BIBFORMAT_USE_OLD_BIBFORMAT
     from invenio.bibtask import task_init, write_message, task_set_option, \
             task_get_option, task_update_progress, task_has_option, \
-            task_low_level_submission, task_sleep_now_if_required
-    import sys
+            task_low_level_submission, task_sleep_now_if_required, \
+            task_get_task_param
     import os
     import time
+    import zlib
 except ImportError, e:
     print "Error: %s" % e
     sys.exit(1)
 
-sql_queries    = []                           # holds SQL queries to be executed
-cds_query      = {}                           # holds CDS query parameters (fields, collection, pattern)
-process_format = 0                            # flag, process records without created format
-process        = 1                            # flag, process records (unless count only)
-fmt            = "hb"                         # default format to be processed
-
-
 ### run the bibreformat task bibsched scheduled
 ###
 
-def bibreformat_task(sql, sql_queries, cds_query, process_format, recids):
+def bibreformat_task(fmt, sql, sql_queries, cds_query, process_format, process, recids):
     """
     BibReformat main task
     """
-    global process, fmt
-
     t1 = os.times()[4]
 
 
@@ -85,24 +77,20 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format, recids):
             # even in private collections
             res = search_pattern(p=cds_query['pattern'],
                                  f=cds_query['field'],
-                                 m=cds_query['matching']).tolist()
+                                 m=cds_query['matching'])
         else:
             # use perform_request_search when '-c' argument has been
             # defined, as it is not supported by search_pattern()
-            res = perform_request_search(req=None, of='id',
+            res = intbitset(perform_request_search(req=None, of='id',
                                          c=cds_query['collection'],
                                          p=cds_query['pattern'],
-                                         f=cds_query['field'])
+                                         f=cds_query['field']))
 
-
-        for item in res:
-            recIDs.append(item)
+        recIDs |= res
 
     for sql_query in sql_queries:
-        write_message("Querying database (SQL query) ...")
-        res = run_sql(sql_query)
-        for item in res:
-            recIDs.append(item[0])
+        write_message("Querying database (%s) ..." % sql_query, verbose=2)
+        recIDs |= intbitset(run_sql(sql_query))
 
 ### list of corresponding record IDs was retrieved
 ### now format the selected records
@@ -170,33 +158,6 @@ def bibreformat_task(sql, sql_queries, cds_query, process_format, recids):
     write_message(message)
 
 
-### Result set operations
-###
-
-def lhdiff(l1, l2):
-    "Does list difference via intermediate hash."
-    d = {}
-    ld = []
-    for e in l2:
-        d[e] = 1
-    for e in l1:
-        if not d.has_key(e):
-            ld.append(e)
-    return ld
-
-
-### Result set operations
-###
-
-def ldiff(l1, l2):
-    "Returns l1 - l2."
-
-    ld = []
-    for e in l1:
-        if not e in l2:
-            ld.append(e)
-    return ld
-
 ### Identify recIDs of records with missing format
 ###
 
@@ -210,12 +171,12 @@ def without_fmt(sql):
     q2 = sql['q2']
 
     ## get complete recID list
-    all_rec_ids = [x[0] for x in run_sql(q1)]
+    all_rec_ids = intbitset(run_sql(q1))
 
     ## get complete recID list of formatted records
-    rec_ids_with_cache = [x[0] for x in run_sql(q2)]
+    rec_ids_with_cache = intbitset(run_sql(q2))
 
-    return lhdiff(all_rec_ids, rec_ids_with_cache)
+    return all_rec_ids - rec_ids_with_cache
 
 
 ### Bibreformat all selected records (using new python bibformat)
@@ -225,80 +186,31 @@ def iterate_over_new(list, fmt):
     "Iterate over list of IDs"
     global total_rec
 
-    n_it_rec       = 0          # Number of records for current iteration
-    n_it_max       = 10000      # Number of max records in one iteration
-    total_rec      = 0          # Number of formatted records
     formatted_records = ''      # (string-)List of formatted record of an iteration
     tbibformat  = 0     # time taken up by external call
     tbibupload  = 0     # time taken up by external call
-    start_date = "1970-01-01 01:01:01" # Time at which the record was formatted
+    start_date = task_get_task_param('task_starting_time') # Time at which the record was formatted
 
+    tot = len(list)
+    count = 0
     for recID in list:
-        total_rec += 1
-        n_it_rec += 1
-        task_update_progress('Formatting %s out of %s' %(total_rec, len(list)))
-
-        message = "Processing record %d with format %s (New BibFormat)" % (recID, fmt)
-        write_message(message, verbose=9)
-
-        ### bibformat external call
-        ###
-        task_sleep_now_if_required(can_stop_too=True)
         t1 = os.times()[4]
         start_date = time.strftime('%Y-%m-%d %H:%M:%S')
-        formatted_record = format_record(recID, fmt, on_the_fly=True)
+        formatted_record = zlib.compress(format_record(recID, fmt, on_the_fly=True))
+        if run_sql('SELECT id FROM bibfmt WHERE id_bibrec=%s AND format=%s', (recID, fmt)):
+            run_sql('UPDATE bibfmt SET last_updated=%s, value=%s WHERE id_bibrec=%s AND format=%s', (start_date, formatted_record, recID, fmt))
+        else:
+            run_sql('INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, %s, %s, %s)', (recID, fmt, start_date, formatted_record))
         t2 = os.times()[4]
-        task_sleep_now_if_required(can_stop_too=True)
-        tbibformat = tbibformat + (t2 - t1)
-
-        # Encapsulate record in xml tags that bibupload understands
-        prologue = '''
-    <record>
-       <controlfield tag="001">%s</controlfield>
-          <datafield tag="FMT" ind1=" " ind2=" ">
-             <subfield code="f">%s</subfield>
-             <subfield code="d">%s</subfield>
-             <subfield code="g">''' % (recID, fmt, start_date)
-        epilogue = '''
-          </subfield>
-       </datafield>
-    </record>'''
-
-        if formatted_record != '':
-            # Skip this record if its value is empty.
-            formatted_records += prologue + encode_for_xml(formatted_record) + epilogue
-
-        # every n_it_max record, upload all formatted records.
-        # also upload if recID is last one
-        if (n_it_rec > n_it_max or total_rec == len(list)) and \
-               formatted_records != '':
-
-            #Save formatted records to disk for bibupload
-            finalfilename = "%s/rec_fmt_%s.xml" % (CFG_TMPDIR, time.strftime('%Y%m%d_%H%M%S'))
-            filehandle = open(finalfilename, "w")
-            filehandle.write("<collection>" + \
-                             formatted_records + \
-                             "</collection>")
-            filehandle.close()
-
-            ### bibupload external call
-            ###
-            t1 = os.times()[4]
-            message = "START bibupload external call"
-            write_message(message, verbose=9)
-
-            task_id = task_low_level_submission('bibupload', 'bibreformat', '-f', finalfilename)
-            write_message("Task #%s submitted" % task_id)
-
-            t2 = os.times()[4]
-            tbibupload = tbibupload + (t2 - t1)
-            message = "END bibupload external call (time elapsed:%2f)" % (t2-t1)
-            write_message(message, verbose=9)
-
-            #Reset iteration state
-            n_it_rec = 0
-            formatted_records = ''
-    return (total_rec, tbibformat, tbibupload)
+        tbibformat += (t2 - t1)
+        count += 1
+        if (count % 100) == 0:
+            write_message("   ... formatted %s records out of %s" % (count, tot))
+            task_update_progress('Formatted %s out of %s' % (count, tot))
+            task_sleep_now_if_required(can_stop_too=True)
+    if (tot % 100) != 0:
+        write_message("   ... formatted %s records out of %s" % (count, tot))
+    return (tot, tbibformat, tbibupload)
 
 def iterate_over_old(list, fmt):
     "Iterate over list of IDs"
@@ -429,28 +341,19 @@ def iterate_over_old(list, fmt):
 def task_run_core():
     """Runs the task by fetching arguments from the BibSched task queue.  This is what BibSched will be invoking via daemon call."""
 
-    global process, fmt, process_format
     ## initialize parameters
 
-
     fmt = task_get_option('format')
-
     sql = {
-
         "all" : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt,
         "last": "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format='%s' and bf.last_updated < br.modification_date" % fmt,
         "q1"  : "select br.id from bibrec as br",
         "q2"  : "select br.id from bibrec as br, bibfmt as bf where bf.id_bibrec=br.id and bf.format ='%s'" % fmt
     }
-
+    sql_queries = []
+    cds_query = {}
     if task_has_option("all"):
         sql_queries.append(sql['all'])
-    if task_has_option("without"):
-        process_format = 1
-
-    if task_has_option("noprocess"):
-        process = 0
-
     if task_has_option("last"):
         sql_queries.append(sql['last'])
     if task_has_option("collection"):
@@ -473,20 +376,20 @@ def task_run_core():
     else:
         cds_query['matching']      = ""
 
-    recids = []
+    recids = intbitset()
     if task_has_option("recids"):
         for recid in task_get_option('recids').split(','):
             if ":" in recid:
                 start = int(recid.split(':')[0])
                 end = int(recid.split(':')[1])
-                recids.extend(range(start, end))
+                recids += range(start, end)
             else:
-                recids.append(int(recid))
+                recids.add(int(recid))
 
 ### sql commands to be executed during the script run
 ###
 
-    bibreformat_task(sql, sql_queries, cds_query, process_format, recids)
+    bibreformat_task(fmt, sql, sql_queries, cds_query, task_has_option('without'), not task_has_option('noprocess'), recids)
 
     return True
 

@@ -54,6 +54,7 @@ Options to update DB tables:
    --reset-sitename         reset tables to take account of new CFG_SITE_NAME*
    --reset-siteadminemail   reset tables to take account of new CFG_SITE_ADMIN_EMAIL
    --reset-fieldnames       reset tables to take account of new I18N names from PO files
+   --reset-recstruct-cache  reset record structure cache according to CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE
 
 Options to help the work:
    --list                   print names and values of all options from conf files
@@ -70,6 +71,8 @@ import re
 import shutil
 import socket
 import sys
+import zlib
+import marshal
 
 def print_usage():
     """Print help."""
@@ -354,6 +357,42 @@ def cli_cmd_reset_sitename(conf):
     print "You may want to restart Apache now."
     print ">>> CFG_SITE_NAME and CFG_SITE_NAME_INTL* reset successfully."
 
+def cli_cmd_reset_recstruct_cache(conf):
+    """If CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE is changed, this function
+    will adapt the database to either store or not store the recstruct
+    format."""
+    from invenio.intbitset import intbitset
+    from invenio.dbquery import run_sql
+    from invenio.search_engine import get_record
+    from invenio.bibsched import server_pid, pidfile
+    enable_recstruct_cache = conf.get("Invenio", "CFG_BIBUPLOAD_SERIALIZE_RECORD_STRUCTURE")
+    enable_recstruct_cache = enable_recstruct_cache in ('True', '1')
+    pid = server_pid(ping_the_process=False)
+    if pid:
+        print >> sys.stderr, "ERROR: bibsched seems to run with pid %d, according to %s." % (pid, pidfile)
+        print >> sys.stderr, "       Please stop bibsched before running this procedure."
+        sys.exit(1)
+    if enable_recstruct_cache:
+        print ">>> Searching records which need recstruct cache resetting; this may take a while..."
+        all_recids = intbitset(run_sql("SELECT id FROM bibrec"))
+        good_recids = intbitset(run_sql("SELECT bibrec.id FROM bibrec JOIN bibfmt ON bibrec.id = bibfmt.id_bibrec WHERE format='recstruct' AND modification_date < last_updated"))
+        recids = all_recids - good_recids
+        print ">>> Generating recstruct cache..."
+        tot = len(recids)
+        count = 0
+        for recid in recids:
+            value = zlib.compress(marshal.dumps(get_record(recid)))
+            run_sql("INSERT INTO bibfmt(id_bibrec, format, last_updated, value) VALUES(%s, 'recstruct', NOW(), %s)", (recid, value))
+            count += 1
+            if count % 1000 == 0:
+                print "    ... done records %s/%s" % (count, tot)
+        if count % 1000 != 0:
+            print "    ... done records %s/%s" % (count, tot)
+        print ">>> recstruct cache generated successfully."
+    else:
+        print ">>> Cleaning recstruct cache..."
+        run_sql("DELETE FROM bibfmt WHERE format='recstruct'")
+
 def cli_cmd_reset_siteadminemail(conf):
     """
     Reset user-related tables with new CFG_SITE_ADMIN_EMAIL read from conf files.
@@ -582,11 +621,10 @@ def cli_cmd_load_demo_records(conf):
                 "%s/bin/bibindex 2" % CFG_PREFIX,
                 "%s/bin/bibreformat -u admin -o HB" % CFG_PREFIX,
                 "%s/bin/bibreformat 3" % CFG_PREFIX,
-                "%s/bin/bibupload 4" % CFG_PREFIX,
                 "%s/bin/webcoll -u admin" % CFG_PREFIX,
-                "%s/bin/webcoll 5" % CFG_PREFIX,
+                "%s/bin/webcoll 4" % CFG_PREFIX,
                 "%s/bin/bibrank -u admin" % CFG_PREFIX,
-                "%s/bin/bibrank 6" % CFG_PREFIX,]:
+                "%s/bin/bibrank 5" % CFG_PREFIX,]:
         if os.system(cmd):
             print "ERROR: failed execution of", cmd
             sys.exit(1)
@@ -1013,6 +1051,7 @@ def main():
                 cli_cmd_reset_sitename(conf)
                 cli_cmd_reset_siteadminemail(conf)
                 cli_cmd_reset_fieldnames(conf)
+                cli_cmd_reset_recstruct_cache(conf)
                 done = True
             elif opt == '--reset-sitename':
                 cli_cmd_reset_sitename(conf)
@@ -1022,6 +1061,9 @@ def main():
                 done = True
             elif opt == '--reset-fieldnames':
                 cli_cmd_reset_fieldnames(conf)
+                done = True
+            elif opt == '--reset-recstruct-cache':
+                cli_cmd_reset_recstruct_cache(conf)
                 done = True
             elif opt == '--create-apache-conf':
                 cli_cmd_create_apache_conf(conf)

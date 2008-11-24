@@ -88,7 +88,7 @@ def create_records(xmltext,
     initiated by create_record() function; please see that function's
     docstring.
     """
-    global parser
+    global parser, err
     err = []
 
     if parser == -1:
@@ -149,17 +149,22 @@ def create_record(xmltext,
     @param correct 1 to enable correction of xmltext syntax. Else 0.
     @return a tuple (record, status_code, list_of_errors), where status_code is 0 where there are errors, 1 when no errors
     """
-    global parser
+    global parser, err
 
     try:
         if parser == 2:
             ## the following is because of DTD validation
-            t = """<?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE collection SYSTEM "file://%s">
-            <collection>\n""" % CFG_MARC21_DTD
-            t += str(xmltext)
-            t += "</collection>"
-            xmltext = t
+            if correct:
+                ## Note that with pyRXP < 1.13 a memory leak
+                ## has been found involving DTD parsing.
+                ## So enable correction only if you have
+                ## pyRXP 1.13 or greater.
+                t = """<?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE collection SYSTEM "file://%s">
+                <collection>\n""" % CFG_MARC21_DTD
+                t += str(xmltext)
+                t += "</collection>"
+                xmltext = t
             (rec, er) = create_record_RXP(xmltext, verbose, correct)
         elif parser == 1:
             (rec, er) = create_record_4suite(xmltext, verbose, correct)
@@ -168,10 +173,12 @@ def create_record(xmltext,
         else:
             (rec, er) = (None, "ERROR: No usable XML parsers found.")
         errs = warnings(er)
+        err = []
     except Exception, e:
         sys.stderr.write("%s" % e)
         sys.stderr.flush()
         errs = warnings(concat(err))
+        err = []
         return (None, 0, errs)
 
     if errs == []:
