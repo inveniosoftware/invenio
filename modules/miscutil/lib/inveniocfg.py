@@ -146,7 +146,7 @@ def convert_conf_option(option_name, option_value):
         option_value = '""' + option_value + '""'
 
     ## 3f) ignore some options:
-    if option_name == 'CFG_SITE_NAME_INTL':
+    if option_name.startswith('CFG_SITE_NAME_INTL'):
         # treated elsewhere
         return
 
