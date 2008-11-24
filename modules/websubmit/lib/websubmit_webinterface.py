@@ -188,7 +188,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                         else:
                             warn = print_warning(_("The requested file is hidden and you don't have the proper rights to access it."))
 
-                    elif doc.get_icon() is not None and doc.get_icon().docname in filename:
+                    elif doc.get_icon() is not None and doc.get_icon().docname == file_strip_ext(filename):
                         icon = doc.get_icon()
                         try:
                             iconfile = icon.get_file('gif', args['version'])
