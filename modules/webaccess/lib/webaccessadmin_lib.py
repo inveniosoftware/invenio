@@ -3403,7 +3403,7 @@ def send_account_activated_message(account_email, send_to, password, ln=CFG_SITE
     body = _("Your account earlier created on '%s' has been activated:") \
            % CFG_SITE_NAME + '\n\n'
     body += '   ' + _("Username/Email:") + " %s\n" % account_email
-    body += '   ' + _("Password:") + " %s\n" % ("*" * len(password))
+    body += '   ' + _("Password:") + " %s\n" % ("*" * len(str(password)))
     body += "\n---------------------------------"
     body += "\n%s" % CFG_SITE_NAME
 
@@ -3416,7 +3416,7 @@ def send_new_user_account_warning(new_account_email, send_to, password, ln=CFG_S
     sub = _("Account created on '%s'") % CFG_SITE_NAME
     body = _("An account has been created for you on '%s':") % CFG_SITE_NAME + '\n\n'
     body += '   ' + _("Username/Email:") + " %s\n" % new_account_email
-    body += '   ' + _("Password:") + " %s\n" % ("*" * len(password))
+    body += '   ' + _("Password:") + " %s\n" % ("*" * len(str(password)))
     body += "\n---------------------------------"
     body += "\n%s" % CFG_SITE_NAME
 
