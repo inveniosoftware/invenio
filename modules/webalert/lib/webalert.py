@@ -43,7 +43,7 @@ class AlertError(Exception):
 def check_alert_name(alert_name, uid, ln=CFG_SITE_LANG):
     """check this user does not have another alert with this name."""
 
-    # load the right message language
+    # load the right language
     _ = gettext_set_language(ln)
 
     sql = """select id_query
@@ -69,7 +69,7 @@ def perform_display(permanent, uid, ln=CFG_SITE_LANG):
     input:  default permanent="n"; permanent="y" display permanent queries(most popular)
     output: list of searches in formatted html
     """
-    # load the right message language
+    # load the right language
     _ = gettext_set_language(ln)
 
     # first detect number of queries:
@@ -129,6 +129,25 @@ def perform_display(permanent, uid, ln=CFG_SITE_LANG):
              guesttxt = warning_guest_user(type="alerts", ln=ln)
            )
 
+def check_user_can_add_alert(id_user, id_query):
+    """Check if ID_USER has really alert adding rights on ID_QUERY
+    (that is, the user made the query herself or the query is one of
+    predefined `popular' queries) and return True or False
+    accordingly.  Useful to filter out malicious users trying to guess
+    idq URL parameter values in order to access potentially restricted
+    query alerts."""
+    # is this a predefined popular query?
+    res = run_sql("""SELECT COUNT(*) FROM query
+                      WHERE id=%s AND type='p'""", (id_query,))
+    if res and res[0][0]:
+        return True
+    # has the user performed this query in the past?
+    res = run_sql("""SELECT COUNT(*) FROM user_query
+                      WHERE id_query=%s AND id_user=%s""", (id_query, id_user))
+    if res and res[0][0]:
+        return True
+    return False
+
 def perform_input_alert(action, id_query, alert_name, frequency, notification, id_basket, uid, old_id_basket=None, ln = CFG_SITE_LANG):
     """get the alert settings
     input:  action="add" for a new alert (blank form), action="modify" for an update
@@ -137,6 +156,11 @@ def perform_input_alert(action, id_query, alert_name, frequency, notification, i
             for the "modify" action specify old alert_name, frequency of checking,
             e-mail notification and basket id.
     output: alert settings input form"""
+    # load the right language
+    _ = gettext_set_language(ln)
+    # security check:
+    if not check_user_can_add_alert(uid, id_query):
+        raise AlertError(_("You do not have rights for this operation."))
     # display query information
     res = run_sql("SELECT urlargs FROM query WHERE id=%s", (id_query,))
     try:
@@ -183,15 +207,19 @@ def perform_add_alert(alert_name, frequency, notification,
             new basket name for this alert;
             identifier of the query to be alerted
     output: confirmation message + the list of alerts Web page"""
-    # load the right message language
-    _ = gettext_set_language(ln)
+    # sanity check
     if (None in (alert_name, frequency, notification, id_basket, id_query, uid)):
         return ''
-    #check the alert name is not empty
+    # load the right language
+    _ = gettext_set_language(ln)
+    # security check:
+    if not check_user_can_add_alert(uid, id_query):
+        raise AlertError(_("You do not have rights for this operation."))
+    # check the alert name is not empty
     alert_name = alert_name.strip()
     if alert_name == "":
         raise AlertError(_("The alert name cannot be empty."))
-    #check if the alert can be created
+    # check if the alert can be created
     check_alert_name(alert_name, uid, ln)
     check_alert_is_unique(id_basket, id_query, uid, ln)
     if id_basket != 0 and not check_user_owns_baskets(uid, id_basket):
@@ -268,6 +296,11 @@ def perform_remove_alert(alert_name, id_query, id_basket, uid, ln=CFG_SITE_LANG)
             identifier of the basket
             uid
     output: confirmation message + the list of alerts Web page"""
+    # load the right language
+    _ = gettext_set_language(ln)
+    # security check:
+    if not check_user_can_add_alert(uid, id_query):
+        raise AlertError(_("You do not have rights for this operation."))
     # set variables
     out = ""
     if (None in (alert_name, id_query, id_basket, uid)):
@@ -295,19 +328,23 @@ def perform_update_alert(alert_name, frequency, notification, id_basket, id_quer
             identifier of the query to be alerted
             old identifier of the basket associated to the alert
     output: confirmation message + the list of alerts Web page"""
-    #set variables
     out = ''
+    # sanity check
     if (None in (alert_name, frequency, notification, id_basket, id_query, old_id_basket, uid)):
         return out
 
-    # load the right message language
+    # load the right language
     _ = gettext_set_language(ln)
 
-    #check the alert name is not empty
+    # security check:
+    if not check_user_can_add_alert(uid, id_query):
+        raise AlertError(_("You do not have rights for this operation."))
+
+    # check the alert name is not empty
     if alert_name.strip() == "":
         raise AlertError(_("The alert name cannot be empty."))
 
-    #check if the alert can be created
+    # check if the alert can be created
     sql = """select alert_name
             from user_query_basket
             where id_user=%s
@@ -377,7 +414,7 @@ def account_list_searches(uid, ln=CFG_SITE_LANG):
         input:  the user id
         output: resume of the searches"""
     out = ""
-  # first detect number of queries:
+    # first detect number of queries:
     nb_queries_total = 0
     res = run_sql("SELECT COUNT(*) FROM user_query WHERE id_user=%s", (uid,), 1)
     try:
@@ -385,7 +422,7 @@ def account_list_searches(uid, ln=CFG_SITE_LANG):
     except:
         pass
 
-    # load the right message language
+    # load the right language
     _ = gettext_set_language(ln)
 
     out += _("You have made %(x_nb)s queries. A %(x_url_open)sdetailed list%(x_url_close)s is available with a possibility to (a) view search results and (b) subscribe to an automatic email alerting service for these queries.") % {'x_nb': nb_queries_total, 'x_url_open': '<a href="../youralerts/display?ln=%s">' % ln, 'x_url_close': '</a>'}
