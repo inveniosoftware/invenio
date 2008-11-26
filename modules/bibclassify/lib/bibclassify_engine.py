@@ -42,7 +42,7 @@ try:
         get_composite_keywords, get_author_keywords
     from bibclassify_config import CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, \
         CFG_BIBCLASSIFY_PARTIAL_TEXT, CFG_BIBCLASSIFY_USER_AGENT
-    from bibclassify_utils import write_message
+    from bibclassify_utils import write_message, set_verbose_level
 except ImportError, err:
     print >> sys.stderr, "Import error: %s" % err
     sys.exit(0)
@@ -60,8 +60,11 @@ _CKWS = {}
 def output_keywords_for_sources(input_sources, taxonomy, rebuild_cache=False,
     output_mode="text", output_limit=CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER,
     match_mode="full", no_cache=False, with_author_keywords=False,
-    spires=False):
+    spires=False, verbose=None):
     """Outputs the keywords for each source in sources."""
+    if verbose is not None:
+        set_verbose_level(verbose)
+
     # Initialize cache
     global _SKWS
     global _CKWS
@@ -101,17 +104,41 @@ def output_keywords_for_sources(input_sources, taxonomy, rebuild_cache=False,
                 match_mode=match_mode,
                 with_author_keywords=with_author_keywords)
 
+def output_keywords_for_local_file(local_file, taxonomy, rebuild_cache=False,
+    output_mode="text", output_limit=CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER,
+    match_mode="full", no_cache=False, with_author_keywords=False,
+    spires=False, verbose=None):
+    """Outputs the keywords for a local file."""
+    if verbose is not None:
+        set_verbose_level(verbose)
+
+    write_message("INFO: Analyzing keywords for local file %s." % local_file,
+        stream=sys.stderr, verbose=3)
+    text_lines = text_lines_from_local_file(local_file)
+
+    return get_keywords_from_text(text_lines,
+        output_mode=output_mode,
+        output_limit=output_limit,
+        taxonomy=taxonomy,
+        spires=spires,
+        match_mode=match_mode,
+        with_author_keywords=with_author_keywords)
+
 def get_keywords_from_text(text_lines, taxonomy=None, output_mode="text",
     output_limit=CFG_BIBCLASSIFY_DEFAULT_OUTPUT_NUMBER, spires=False,
     match_mode="full", no_cache=False, with_author_keywords=False,
     rebuild_cache=False):
     """Returns a formatted string containing the keywords for a single
     document."""
-    if taxonomy is not None:
-        global _SKWS
-        global _CKWS
-        _SKWS, _CKWS = get_regular_expressions(taxonomy, rebuild=rebuild_cache,
-                no_cache=no_cache)
+    global _SKWS
+    global _CKWS
+    if not _SKWS:
+        if taxonomy is not None:
+            _SKWS, _CKWS = get_regular_expressions(taxonomy,
+                rebuild=rebuild_cache, no_cache=no_cache)
+        else:
+            write_message("ERROR: Please specify an ontology in order to "
+                "extract keywords.", stream=sys.stderr, verbose=1)
 
     text_lines = cut_references(text_lines)
     fulltext = normalize_fulltext("\n".join(text_lines))

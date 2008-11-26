@@ -20,23 +20,36 @@
 """
 BibClassify ontology reader.
 
-The ontology reader reads currently either a RDF/SKOS taxonomy or a simple
-controlled vocabulary file (1 word per line). The first role of this module is
-to manage the cached version of the ontology file. The second role is to hold
-all methods responsible for the creation of regular expressions. These methods
-are grammatically related as we take care of different forms of the same words.
-The grammatical rules can be configured via the configuration file.
+The ontology reader reads currently either a RDF/SKOS taxonomy or a
+simple controlled vocabulary file (1 word per line). The first role of
+this module is to manage the cached version of the ontology file. The
+second role is to hold all methods responsible for the creation of
+regular expressions. These methods are grammatically related as we take
+care of different forms of the same words.  The grammatical rules can be
+configured via the configuration file.
 
 The main method from this module is get_regular_expressions.
 """
 
+from datetime import datetime, timedelta
+import cPickle
 import os
 import rdflib
 import re
-import cPickle
 import sys
 import tempfile
 import time
+import urllib2
+
+try:
+    from invenio.config import CFG_CACHEDIR
+    from invenio.dbquery import run_sql
+except ImportError:
+    # Running in standalone.
+    CFG_CACHEDIR = tempfile.gettempdir()
+    STANDALONE = True
+else:
+    STANDALONE = False
 
 try:
     from bibclassify_config import CFG_BIBCLASSIFY_WORD_WRAP, \
@@ -63,47 +76,122 @@ _split_by_punctuation = re.compile("(\W+)")
 
 _cache_location = None
 
-def get_regular_expressions(taxonomy, rebuild=False, no_cache=False):
-    """Returns a list of patterns compiled from the RDF/SKOS taxonomy.
-    Uses cache if it exists and if the taxonomy hasn't changed."""
-    if os.access(taxonomy, os.R_OK):
+def get_regular_expressions(ontology, rebuild=False, no_cache=False):
+    """Returns a list of patterns compiled from the RDF/SKOS ontology.
+    Uses cache if it exists and if the ontology hasn't changed."""
+
+    # Translate the ontology name into a local path. Check if the name
+    # relates to an existing ontology.
+    ontology_names = _get_ontology_path(ontology)
+    if ontology_names is not None:
+        onto_short_name, onto_long_name, onto_url = ontology_names
+        onto_path = os.path.join(CFG_CACHEDIR, 'bibclassify', onto_long_name)
+    else:
+        write_message("ERROR: Unable to understand the ontology name "
+            "provided: '%s'." % ontology, stream=sys.stderr, verbose=0)
+        sys.exit(0)
+
+    # If a new remote ontology can be found, then download it.
+    new_ontology = _download_remote_ontology(onto_url)
+
+    if new_ontology:
+        # A new ontology has been downloaded. Rebuild the cache.
+        return _build_cache(onto_path, no_cache=no_cache)
+
+    if os.access(onto_path, os.R_OK):
+        # Can read from the ontology.
         if rebuild or no_cache:
             write_message("INFO: Cache generation is manually forced.",
                 stream=sys.stderr, verbose=3)
-            return _build_cache(taxonomy, no_cache=no_cache)
+            return _build_cache(onto_path, no_cache=no_cache)
 
-        if os.access(_get_cache_file(taxonomy), os.R_OK):
-            if (os.path.getmtime(_get_cache_file(taxonomy)) >
-                os.path.getmtime(taxonomy)):
-                # Cache is more recent than the taxonomy: use cache.
-                return _get_cache(taxonomy)
+        if os.access(_get_cache_path(onto_path), os.R_OK):
+            if (os.path.getmtime(_get_cache_path(onto_path)) >
+                os.path.getmtime(onto_path)):
+                # Cache is more recent than the ontology: use cache.
+                return _get_cache(onto_path)
             else:
-                # taxonomy is more recent than the cache: rebuild cache.
+                # Ontology is more recent than the cache: rebuild cache.
                 if not no_cache:
-                    write_message("WARNING: the ontology has changed since "
-                        "the last cache generation.", stream=sys.stderr,
-                        verbose=2)
-                return _build_cache(taxonomy, no_cache=no_cache)
+                    write_message("WARNING: The ontology '%s' has changed "
+                        "since the last cache generation." % ontology,
+                        stream=sys.stderr, verbose=2)
+                return _build_cache(onto_path, no_cache=no_cache)
         else:
             # Cache does not exist. Build cache.
-            return _build_cache(taxonomy, no_cache=no_cache)
+            return _build_cache(onto_path, no_cache=no_cache)
     else:
-        if os.access(_get_cache_file(taxonomy), os.R_OK):
-            # taxonomy file not found. Use the cache instead.
+        if os.access(_get_cache_path(onto_path), os.R_OK):
+            # ontology file not found. Use the cache instead.
             write_message("WARNING: The ontology couldn't be located. However "
-                " a cached version of it is available. Using it as a "
+                "a cached version of it is available. Using it as a "
                 "reference.", stream=sys.stderr, verbose=2)
-            return _get_cache(taxonomy)
+            return _get_cache(onto_path)
         else:
-            # Cannot access the taxonomy nor the cache. Exit.
+            # Cannot access the ontology nor the cache. Exit.
             write_message("ERROR: Neither the ontology file nor a cached "
                 "version of it could be found.", stream=sys.stderr, verbose=0)
             sys.exit(0)
             return None
 
+def _download_remote_ontology(onto_url, time_difference=None):
+    """Checks if the online ontology is more recent than the local ontology. If
+    yes, try to download and store it in Invenio's cache directory. Return a
+    boolean describing the success of the operation."""
+    if onto_url is None:
+        return False
+
+    dl_dir = ((CFG_CACHEDIR or tempfile.gettempdir()) + os.sep +
+        "bibclassify" + os.sep)
+    if not os.path.exists(dl_dir):
+        os.mkdir(dl_dir)
+
+    local_file = dl_dir + os.path.basename(onto_url)
+    remote_modif_time = _get_last_modification_date(onto_url)
+    try:
+        local_modif_seconds = os.path.getmtime(local_file)
+    except OSError:
+        # The local file does not exist. Download the ontology.
+        download = True
+        write_message("INFO: The local ontology could not be found.",
+            stream=sys.stderr, verbose=3)
+    else:
+        local_modif_time = datetime(*time.gmtime(local_modif_seconds)[0:6])
+        # Let's set a time delta of 1 hour and 10 minutes.
+        time_difference = time_difference or timedelta(hours=1, minutes=10)
+        download = remote_modif_time > local_modif_time + time_difference
+        if download:
+            write_message("INFO: The remote ontology '%s' is more recent "
+                "than the local ontology.", onto_url, stream=sys.stderr,
+                verbose=3)
+
+    if download:
+        return _download_ontology(onto_url, local_file)
+    else:
+        return False
+
+def _get_ontology_path(ontology):
+    """Returns the path to the short ontology name."""
+    if not STANDALONE:
+        result = run_sql("SELECT name, location from clsMETHOD")
+        for onto_short_name, onto_url in result:
+            onto_long_name = os.path.basename(onto_url)
+            if ontology in (onto_short_name, onto_long_name, onto_url):
+                return (onto_short_name, onto_long_name, onto_url)
+        return None
+    # FIXME write for standalone
+    else:
+        if not os.access(ontology, os.R_OK):
+            write_message("ERROR: The ontology is not accessible. When "
+                "running in standalone mode, please use the path to the "
+                "ontology file.", stream=sys.stderr, verbose=0)
+            sys.exit(0)
+        else:
+            return (os.path.basename(ontology), ontology, None)
+
 class SingleKeyword:
-    """A single keyword element that treats and stores information fields
-    retrieved from the RDF/SKOS taxonomy."""
+    """A single keyword element that treats and stores information
+    fields retrieved from the RDF/SKOS taxonomy."""
     def __init__(self, subject, store=None, namespace=None):
         if store is None:
             self.concept = subject
@@ -141,8 +229,8 @@ class SingleKeyword:
         return "".join(["<SingleKeyword: ", self.concept, ">"])
 
 class CompositeKeyword:
-    """A composite keyword element that treats and stores information fields
-    retrieved from the RDF/SKOS taxonomy."""
+    """A composite keyword element that treats and stores information
+    fields retrieved from the RDF/SKOS taxonomy."""
     def __init__(self, store, namespace, subject):
         small_subject = subject.split("#Composite.")[-1]
 
@@ -192,11 +280,14 @@ def _build_cache(source_file, no_cache=False):
     composite_keywords = {}
 
     try:
+        write_message("INFO: Building RDFLib's conjunctive graph.",
+            stream=sys.stderr, verbose=3)
         store.parse(source_file)
     except:
         # File is not a RDF file. We assume it is a controlled vocabulary.
-        write_message("INFO: Building cache from controlled vocabulary file "
-            "%s." % source_file, stream=sys.stderr, verbose=3)
+        write_message("INFO: The ontology file is not a valid RDF file. "
+            "Assuming it is a controlled vocabulary file.", stream=sys.stderr,
+            verbose=3)
         filestream = open(source_file, "r")
         for line in filestream:
             keyword = line.strip()
@@ -246,15 +337,15 @@ def _build_cache(source_file, no_cache=False):
     if not no_cache:
         # Serialize.
         try:
-            filestream = open(_get_cache_file(source_file), "w")
+            filestream = open(_get_cache_path(source_file), "w")
         except IOError:
             # Impossible to write the cache.
             write_message("ERROR: Impossible to write cache to %s." %
-                _get_cache_file(source_file), stream=sys.stderr, verbose=1)
+                _get_cache_path(source_file), stream=sys.stderr, verbose=1)
             return (single_keywords, composite_keywords)
         else:
             write_message("INFO: Writing cache to file %s." %
-                _get_cache_file(source_file), stream=sys.stderr, verbose=3)
+                _get_cache_path(source_file), stream=sys.stderr, verbose=3)
             cPickle.dump(cached_data, filestream, 1)
             filestream.close()
 
@@ -330,7 +421,7 @@ def _get_cache(source_file):
     that stage."""
     timer_start = time.clock()
 
-    cache_file = _get_cache_file(source_file)
+    cache_file = _get_cache_path(source_file)
     filestream = open(cache_file, "r")
     try:
         cached_data = cPickle.load(filestream)
@@ -339,14 +430,14 @@ def _get_cache(source_file):
             "Rebuilding it." %
             cache_file, stream=sys.stderr, verbose=3)
         filestream.close()
-        os.remove(_get_cache_file(source_file))
+        os.remove(cache_file)
         return _build_cache(source_file)
     filestream.close()
 
     single_keywords = cached_data["single"]
     composite_keywords = cached_data["composite"]
 
-    write_message("INFO: Found cache created on %s." %
+    write_message("INFO: Found ontology cache created on %s." %
         time.asctime(cached_data["creation_time"]), stream=sys.stderr,
         verbose=3)
 
@@ -356,7 +447,7 @@ def _get_cache(source_file):
 
     return (single_keywords, composite_keywords)
 
-def _get_cache_file(source_file):
+def _get_cache_path(source_file):
     """Returns the file name of the cached taxonomy."""
     global _cache_location
 
@@ -369,10 +460,9 @@ def _get_cache_file(source_file):
     else:
         # Find the most probable location of the cache. First consider
         # Invenio's temp directory then the system temp directory.
-        try:
-            from invenio.config import CFG_CACHEDIR
+        if CFG_CACHEDIR:
             tmp_dir = CFG_CACHEDIR
-        except ImportError:
+        else:
             tmp_dir = tempfile.gettempdir()
 
         absolute_dir = os.path.join(tmp_dir, relative_dir)
@@ -399,6 +489,32 @@ def _get_cache_file(source_file):
                 verbose=2)
             _cache_location = ""
             return _cache_location
+
+def _get_last_modification_date(url):
+    """Get the last modification date of the ontology."""
+    request = urllib2.Request(url)
+    request.get_method = lambda: "HEAD"
+    http_file = urllib2.urlopen(request)
+    date_string = http_file.headers["last-modified"]
+    parsed = time.strptime(date_string, "%a, %d %b %Y %H:%M:%S %Z")
+    return datetime(*(parsed)[0:6])
+
+def _download_ontology(url, local_file):
+    """Downloads the ontology and stores it in CFG_CACHEDIR."""
+    write_message("INFO: Copying remote ontology '%s' to file '%s'." % (url,
+        local_file), stream=sys.stderr, verbose=3)
+    try:
+        url_desc = urllib2.urlopen(url)
+        file_desc = open(local_file, 'w')
+        file_desc.write(url_desc.read())
+        file_desc.close()
+    except:
+        write_message("WARNING: Unable to download the ontology. '%s'" %
+            sys.exc_info()[0], stream=sys.stderr, verbose=2)
+        return False
+    else:
+        write_message("INFO: Done copying.", stream=sys.stderr, verbose=3)
+        return True
 
 def _get_searchable_regex(basic=None, hidden=None):
     """Returns the searchable regular expressions for the single
@@ -438,7 +554,7 @@ def _get_regex_pattern(label):
     for index, part in enumerate(parts):
         if index % 2 == 0:
             # Word
-            if not parts[index].isdigit():
+            if not parts[index].isdigit() and len(parts[index]) > 1:
                 parts[index] = _convert_word(parts[index])
         else:
             # Punctuation

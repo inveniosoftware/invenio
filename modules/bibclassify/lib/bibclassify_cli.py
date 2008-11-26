@@ -25,7 +25,6 @@ the method output_keywords_for_sources from bibclassify_engine.
 """
 
 import getopt
-import os
 import sys
 
 try:
@@ -35,6 +34,15 @@ except ImportError, err:
     print >> sys.stderr, "Import error: %s" % err
     sys.exit(0)
 
+STANDALONE = False
+
+try:
+    from invenio.bibclassify_daemon import bibclassify_daemon
+except ImportError:
+    write_message("WARNING: Running in standalone mode.", stream=sys.stderr,
+        verbose = 2)
+    STANDALONE = True
+
 # Retrieve the custom configuration if it exists.
 try:
     from bibclassify_config_local import *
@@ -42,46 +50,104 @@ except ImportError:
     # No local configuration was found.
     pass
 
+def get_recids_list(recids_string):
+    """Returns a list of recIDs."""
+    recids = {}
+    elements = recids_string.split(",")
+    for element in elements:
+        bounds = element.split("-")
+        bounds_nb = len(bounds)
+        if bounds_nb == 1:
+            # Single record.
+            recids[int(element)] = None
+        elif bounds_nb == 2:
+            # Range
+            min_bound = int(bounds[0])
+            max_bound = int(bounds[1])
+            if min_bound > max_bound:
+                min_bound, max_bound = max_bound, min_bound
+            elif min_bound == max_bound:
+                recids[min_bound] = None
+            else:
+                for i in range(int(bounds[0]), int(bounds[1]) + 1):
+                    recids[i] = None
+        else:
+            raise ValueError("Format error in recids ranges.")
+
+    return recids.keys()
+
 def main():
     """Main function """
-    options = _read_options(sys.argv[1:])
+    daemon = False
 
-    output_keywords_for_sources(options["text_files"],
-        options["taxonomy"],
-        rebuild_cache=options["rebuild_cache"],
-        no_cache=options["no_cache"],
-        output_mode=options["output_mode"],
-        output_limit=options["output_limit"],
-        spires=options["spires"],
-        match_mode=options["match_mode"],
-        with_author_keywords=options["with_author_keywords"])
+    # Check if running in standalone or daemon mode.
+    # No arguments.
+    if len(sys.argv) == 1:
+        daemon = True
+
+    # Running the task with its PID number (bibsched style).
+    if len(sys.argv) == 2:
+        try:
+            int(sys.argv[1])
+        except ValueError:
+            daemon = False
+        else:
+            daemon = True
+
+    # Using an option specific to the daemon.
+    daemon_options = ('-i', '--recid', '-c', '--collection')
+    for option in daemon_options:
+        if option in sys.argv[1:]:
+            daemon = True
+
+    if daemon:
+        # DAEMON
+        bibclassify_daemon()
+    else:
+        # STANDALONE
+        options = _read_options(sys.argv[1:])
+
+        output_keywords_for_sources(options["text_files"],
+            options["taxonomy"],
+            rebuild_cache=options["rebuild_cache"],
+            no_cache=options["no_cache"],
+            output_mode=options["output_mode"],
+            output_limit=options["output_limit"],
+            spires=options["spires"],
+            match_mode=options["match_mode"],
+            with_author_keywords=options["with_author_keywords"])
 
 def _display_help():
     """Prints the help message for this module."""
-    print >> sys.stdout, """Usage: bibclassify [OPTION]... [FILE/URL]...
+    print """Usage: bibclassify [OPTION]... [FILE/URL]...
   or:  bibclassify [OPTION]... [DIRECTORY]...
 Searches keywords in FILEs and/or files in DIRECTORY(ies). If a directory is
 specified, BibClassify will generate keywords for all PDF documents contained
 in the directory.
 
+General options:
   -h, --help                display this help and exit
   -V, --version             output version information and exit
   -v, --verbose LEVEL       sets the verbose to LEVEL (=0)
   -k, --taxonomy FILE       sets the FILE to read the taxonomy from. It can be
-                              a simple controlled vocabulary file or a
-                              descriptive RDF/SKOS file.
+                            a simple controlled vocabulary file or a
+                            descriptive RDF/SKOS file.
+Standalone specific options:
   -o, --output-mode TYPE    changes the output format to TYPE (text, marcxml or
-                              html) (=text)
+                            html) (=text)
   -s, --spires              outputs keywords in the SPIRES format
   -n, --keywords-number INT sets the number of keywords displayed (=20), use 0
-                              to set no limit
+                            to set no limit
   -m, --matching-mode TYPE  changes the search mode to TYPE (full or partial)
-                              (=full)
+                            (=full)
   --detect-author-keywords  detect keywords that are explicitely written in the
-                              document
+                            document
   --check-taxonomy          checks the taxonomy and reports warnings and errors
   --rebuild-cache           ignores the existing cache and regenerates it
   --no-cache                don't cache the taxonomy
+Daemon specific options:
+  -i, --recid ID            keywords are extracted from this record
+  -c, --collection COLL     keywords are extracted from this collection
 
 Backward compatibility (using these options is discouraged):
   -q                        equivalent to -s
@@ -99,7 +165,7 @@ def _display_version():
         from invenio.config import CFG_VERSION
         print "\nCDS Invenio/%s bibclassify/%s\n" % (CFG_VERSION, CFG_VERSION)
     except ImportError:
-        print >> sys.stdout, "CDS Invenio bibclassify/standalone"
+        print "CDS Invenio bibclassify/standalone"
     sys.exit(1)
 
 def _read_options(options_string):
@@ -120,11 +186,11 @@ def _read_options(options_string):
     }
 
     try:
-        short_flags = "f:k:o:n:m:v:sqhV"
+        short_flags = "m:f:k:o:n:m:v:sqhV"
         long_flags = ["taxonomy=", "output-mode=", "verbose=", "spires",
             "keywords-number=", "matching-mode=", "help", "version", "file",
             "rebuild-cache", "no-limit", "no-cache", "check-taxonomy",
-            "detect-author-keywords"]
+            "detect-author-keywords", "id:", "collection:", "modified:" ]
         opts, args = getopt.gnu_getopt(options_string, short_flags, long_flags)
     except getopt.GetoptError, err1:
         print >> sys.stderr, "Options problem: %s" % err1
@@ -209,16 +275,6 @@ def _read_options(options_string):
         write_message("ERROR: output limit must be a positive integer.",
             stream=sys.stderr, verbose=0)
         sys.exit(0)
-    # Ontology file is accessible?
-    if not os.access(options["taxonomy"], os.R_OK):
-        try:
-            from invenio.config import CFG_ETCDIR
-        except ImportError:
-            write_message("ERROR: The ontology file could not be accesssed.")
-            sys.exit(0)
-        else:
-            options["taxonomy"] = os.path.join(CFG_ETCDIR, 'bibclassify',
-                options["taxonomy"])
 
     return options
 

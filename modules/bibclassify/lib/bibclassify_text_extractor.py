@@ -26,6 +26,9 @@ documents.
 
 2 methods provide the functionality of the module: text_lines_from_local_file
 and text_lines_from_url.
+
+This module also provides the utility 'is_pdf' that uses GNU file in order to
+determine if a local file is a PDF file.
 """
 
 import os
@@ -38,14 +41,14 @@ from bibclassify_utils import write_message
 
 _ONE_WORD = re.compile("[A-Za-z]{2,}")
 
-def text_lines_from_local_file(document):
+def text_lines_from_local_file(document, remote=False):
     """Returns the fulltext of the local file."""
     try:
-        if _is_pdf(document):
-            if not _executable_exists("pdftotext"):
+        if is_pdf(document):
+            if not executable_exists("pdftotext"):
                 write_message("ERROR: pdftotext is not available on the "
                     "system.", stream=sys.stderr, verbose=1)
-            cmd = "pdftotext -q -enc UTF-8 %s -" % document
+            cmd = "pdftotext -q -enc UTF-8 %s -" % re.escape(document)
             filestream = os.popen(cmd)
         else:
             filestream = open(document, "r")
@@ -62,11 +65,12 @@ def text_lines_from_local_file(document):
     for line in lines:
         word_nb += len(re.findall("\S+", line))
 
-    write_message("INFO: Document has %d lines and %d words." % (line_nb,
-        word_nb), stream=sys.stderr, verbose=3)
-
     # Discard lines that do not contain at least one word.
     lines = [line for line in lines if _ONE_WORD.search(line) is not None]
+
+    if not remote:
+        write_message("INFO: Local file has %d lines and %d words." % (line_nb,
+            word_nb), stream=sys.stderr, verbose=3)
 
     return lines
 
@@ -88,7 +92,7 @@ def text_lines_from_url(url, user_agent=""):
         return None
     else:
         # Read lines from the temporary file.
-        lines = text_lines_from_local_file(local_file)
+        lines = text_lines_from_local_file(local_file, remote=True)
         os.remove(local_file)
 
         line_nb = len(lines)
@@ -96,21 +100,21 @@ def text_lines_from_url(url, user_agent=""):
         for line in lines:
             word_nb += len(re.findall("\S+", line))
 
-        write_message("INFO: Document has %d lines and %d words." % (line_nb,
-            word_nb), stream=sys.stderr, verbose=3)
+        write_message("INFO: Remote file has %d lines and %d words." %
+            (line_nb, word_nb), stream=sys.stderr, verbose=3)
 
         return lines
 
-def _executable_exists(executable):
+def executable_exists(executable):
     """Tests if an executable is available on the system."""
     for directory in os.getenv("PATH").split(":"):
         if os.path.exists(os.path.join(directory, executable)):
             return True
     return False
 
-def _is_pdf(document):
+def is_pdf(document):
     """Checks if a document is a PDF file. Returns True if is is."""
-    if not _executable_exists:
+    if not executable_exists:
         write_message("WARNING: GNU file was not found on the system. "
             "Switching to a weak file extension test.", stream=sys.stderr,
             verbose=2)
@@ -120,7 +124,7 @@ def _is_pdf(document):
     # Tested with file version >= 4.10. First test is secure and works
     # with file version 4.25. Second condition is tested for file
     # version 4.10.
-    file_output = os.popen('file ' + document).read()
+    file_output = os.popen('file ' + re.escape(document)).read()
     try:
         filetype = file_output.split(":")[1]
     except IndexError:
