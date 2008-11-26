@@ -191,7 +191,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                     elif doc.get_icon() is not None and doc.get_icon().docname == file_strip_ext(filename):
                         icon = doc.get_icon()
                         try:
-                            iconfile = icon.get_file('gif', args['version'])
+                            iconfile = icon.get_file(format, args['version'])
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req, alert_admin=True)
                             return warningMsg(_("An error has happened in trying to retrieve the corresponding icon."), req, CFG_SITE_NAME, ln)
