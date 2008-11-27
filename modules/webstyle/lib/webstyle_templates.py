@@ -276,6 +276,7 @@ class Template:
  <link rel="stylesheet" href="%(cssurl)s/img/cds.css" type="text/css" />
  <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+ <meta http-equiv="Content-Language" content="%(ln)s" />
  <meta name="description" content="%(description)s" />
  <meta name="keywords" content="%(keywords)s" />
  %(metaheaderadd)s
