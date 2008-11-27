@@ -3342,6 +3342,7 @@ class Template:
            kwtuples - keyword tuples like ('HIGGS BOSON',[3,4]) where 3 and 4 are recids
            authors - a list of authors that have collaborated with authorname
         """
+        from invenio.search_engine import perform_request_search
         _ = gettext_set_language(ln)
         #make a authoraff string that looks like CERN (1), Caltech (2) etc
         authoraff = ""
@@ -3383,8 +3384,9 @@ class Template:
                 if collabstr:
                     collabstr += '<br>'
                 #do not add this person him/herself in the list
-                if not (c == authorname):
-                    collabstr = collabstr + " <a href=\"/author/"+c+"\">"+c+"</a>"
+                if not c == authorname:
+                    commpubs = intbitset(pubs) & intbitset(perform_request_search(p="author:\"%s\" author:\"%s\"" % (authorname, c)))
+                    collabstr = collabstr + " <a href=\"/author/"+c+"\">"+c+" ("+str(len(commpubs))+")</a>"
             banner = self.tmpl_print_searchresultbox("<strong>" + _("Frequent co-authors:") + "</strong>", collabstr)
             req.write(banner)
 
