@@ -70,7 +70,7 @@ def User_is_Record_Owner_or_Curator(parameters, curdir, form, user_info=None):
     doctype = form['doctype']
     act = form['act']
     ## Get the current user's e-mail address:
-    user_email = user_info["email"]
+    user_email = user_info["email"].lower()
     ## Now get the email address(es) of the record submitter(s)/owner(s) from
     ## the record itself:
     record_owners = print_record(sysno, 'tm', \
