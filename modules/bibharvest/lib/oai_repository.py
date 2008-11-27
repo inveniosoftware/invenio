@@ -167,9 +167,9 @@ def get_field(sysno, field):
 
     bibbx = "bib%sx" % digit
     bibx  = "bibrec_bib%sx" % digit
-    query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec='%s' AND bx.id=bibx.id_bibxxx AND bx.tag='%s'" % (bibbx, bibx, sysno, field)
+    query = "SELECT bx.value FROM %s AS bx, %s AS bibx WHERE bibx.id_bibrec=%%s AND bx.id=bibx.id_bibxxx AND bx.tag=%%s" % (bibbx, bibx)
 
-    res = run_sql(query)
+    res = run_sql(query, (sysno, field))
 
     for row in res:
 
@@ -382,9 +382,9 @@ def print_record(sysno, format='marcxml', record_exists_result=None):
                         bibbx = "bib%d%dx" % (digit1, digit2)
                         bibx = "bibrec_bib%d%dx" % (digit1, digit2)
                         query = "SELECT b.tag,b.value,bb.field_number FROM %s AS b, %s AS bb "\
-                                "WHERE bb.id_bibrec='%s' AND b.id=bb.id_bibxxx AND b.tag LIKE '%s%%' "\
-                                "ORDER BY bb.field_number, b.tag ASC" % (bibbx, bibx, sysno, str(digit1)+str(digit2))
-                        res = run_sql(query)
+                                "WHERE bb.id_bibrec=%%s AND b.id=bb.id_bibxxx AND b.tag LIKE %%s "\
+                                "ORDER BY bb.field_number, b.tag ASC" % (bibbx, bibx)
+                        res = run_sql(query, (sysno, '%d%d%%' % (digit1, digit2)))
                         field_number_old = -999
                         field_old = ""
                         for row in res:
@@ -497,7 +497,7 @@ def oailistrecords(args):
     sysno  = []
     # check if the resumptionToken did not expire
     if arg['resumptionToken']:
-        filename = "%s/RTdata/%s" % (CFG_CACHEDIR, arg['resumptionToken'])
+        filename = os.path.join(CFG_CACHEDIR, 'RTdata', arg['resumptionToken'])
         if os.path.exists(filename) == 0:
             out = oai_error("badResumptionToken", "ResumptionToken expired")
             out = oai_error_header(args, "ListRecords") + out + oai_error_footer("ListRecords")
@@ -606,7 +606,7 @@ def oailistidentifiers(args):
     sysnos = []
 
     if arg['resumptionToken']:
-        filename = "%s/RTdata/%s" % (CFG_CACHEDIR, arg['resumptionToken'])
+        filename = os.path.join(CFG_CACHEDIR, 'RTdata', arg['resumptionToken'])
         if os.path.exists(filename) == 0:
             out = out + oai_error("badResumptionToken", "ResumptionToken expired")
             out = oai_error_header(args, "ListIdentifiers") + out + oai_error_footer("ListIdentifiers")
@@ -722,8 +722,8 @@ def oaigetsysno(identifier):
     "Returns the first database BIB ID for the OAI identifier 'identifier', if it exists."
     sysno = None
     if identifier:
-        query = "SELECT DISTINCT(bb.id_bibrec) FROM bib%sx AS bx, bibrec_bib%sx AS bb WHERE bx.tag='%s' AND bb.id_bibxxx=bx.id AND bx.value='%s'" % (CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD, identifier)
-        res = run_sql(query)
+        query = "SELECT DISTINCT(bb.id_bibrec) FROM bib%sx AS bx, bibrec_bib%sx AS bb WHERE bx.tag=%%s AND bb.id_bibxxx=bx.id AND bx.value=%%s" % (CFG_OAI_ID_FIELD[0:2], CFG_OAI_ID_FIELD[0:2])
+        res = run_sql(query, (CFG_OAI_ID_FIELD, identifier))
         for row in res:
             sysno = row[0]
     return sysno
@@ -759,7 +759,7 @@ def oaigenresumptionToken():
 def oaicachein(resumptionToken, sysnos):
     "Stores or adds sysnos in cache.  Input is a string of sysnos separated by commas."
 
-    filename = "%s/RTdata/%s" % (CFG_CACHEDIR, resumptionToken)
+    filename = os.path.join(CFG_CACHEDIR, 'RTdata', resumptionToken)
 
     fil = open(filename, "w")
     cPickle.dump(sysnos, fil)
@@ -772,7 +772,7 @@ def oaicacheout(resumptionToken):
 
     sysnos = []
 
-    filename = "%s/RTdata/%s" % (CFG_CACHEDIR, resumptionToken)
+    filename = os.path.join(CFG_CACHEDIR, 'RTdata', resumptionToken)
 
     if oaicachestatus(resumptionToken):
         fil = open(filename, "r")
@@ -786,12 +786,12 @@ def oaicacheout(resumptionToken):
 def oaicacheclean():
     "Removes cached resumptionTokens older than specified"
 
-    directory = "%s/RTdata" % CFG_CACHEDIR
+    directory = os.path.join(CFG_CACHEDIR, 'RTdata')
 
     files = os.listdir(directory)
 
     for file_ in files:
-        filename = directory + "/" + file_
+        filename = os.path.join(directory, file_)
         # cache entry expires when not modified during a specified period of time
         if ((time.time() - os.path.getmtime(filename)) > CFG_OAI_EXPIRE):
             try:
@@ -805,7 +805,7 @@ def oaicacheclean():
 def oaicachestatus(resumptionToken):
     "Checks cache status.  Returns 0 for empty, 1 for full."
 
-    filename = "%s/RTdata/%s" % (CFG_CACHEDIR, resumptionToken)
+    filename = os.path.join(CFG_CACHEDIR, 'RTdata', resumptionToken)
 
     if os.path.exists(filename):
         if os.path.getsize(filename) > 0:
