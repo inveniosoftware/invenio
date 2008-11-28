@@ -5067,9 +5067,9 @@ def usage(wmsg="", err_code=0):
    -h, --help     print this help
    -V, --version  print version information
    -v, --verbose  verbosity level (0=mute, 1=default info msg,
-		  2=display reference section extraction analysis,
+                  2=display reference section extraction analysis,
                   3=display reference line citation processing analysis,
-		  9=max information)
+                  9=max information)
    -r, --output-raw-refs
                   output raw references, as extracted from the document.
                   No MARC XML mark-up - just each extracted line, prefixed

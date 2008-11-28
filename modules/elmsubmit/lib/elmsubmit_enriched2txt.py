@@ -180,48 +180,48 @@ def enriched2txt(string):
 # #include <string.h>
 
 # main() {
-# 	int c, i, paramct=0, newlinect=0, nofill=0;
-# 	char token[62], *p;
+#         int c, i, paramct=0, newlinect=0, nofill=0;
+#         char token[62], *p;
 
-# 	while ((c=getc(stdin)) != EOF) {
-# 		if (c == '<') {
-# 			if (newlinect == 1) putc(' ', stdout);
-# 			newlinect = 0;
-# 			c = getc(stdin);
-# 			if (c == '<') {
-# 				if (paramct <= 0) putc(c, stdout);
-# 			} else {
-# 				 ungetc(c, stdin);
-# 				 for (i=0, p=token; (c=getc(stdin)) != EOF && c != '>'; i++) {
-# 					if (i < sizeof(token)-1)
-# 						*p++ = isupper(c) ? tolower(c) : c;
-# 				 }
-# 				 *p = '\0';
-# 				 if (c == EOF) break;
-# 				 if (strcmp(token, "param") == 0)
-# 					 paramct++;
-# 				 else if (strcmp(token, "nofill") == 0)
-# 					 nofill++;
-# 				 else if (strcmp(token, "/param") == 0)
-# 					 paramct--;
-# 				 else if (strcmp(token, "/nofill") == 0)
-# 					 nofill--;
-# 			 }
-# 		} else {
-# 			if (paramct > 0)
-# 				; /* ignore params */
-# 			else if (c == '\n' && nofill <= 0) {
-# 				if (++newlinect > 1) putc(c, stdout);
-# 			} else {
-# 				if (newlinect == 1) putc(' ', stdout);
-# 				newlinect = 0;
-# 				putc(c, stdout);
-# 			}
-# 		}
-# 	}
-# 	/* The following line is only needed with line-buffering */
-# 	putc('\n', stdout);
-# 	exit(0);
+#         while ((c=getc(stdin)) != EOF) {
+#                 if (c == '<') {
+#                         if (newlinect == 1) putc(' ', stdout);
+#                         newlinect = 0;
+#                         c = getc(stdin);
+#                         if (c == '<') {
+#                                 if (paramct <= 0) putc(c, stdout);
+#                         } else {
+#                                  ungetc(c, stdin);
+#                                  for (i=0, p=token; (c=getc(stdin)) != EOF && c != '>'; i++) {
+#                                         if (i < sizeof(token)-1)
+#                                                 *p++ = isupper(c) ? tolower(c) : c;
+#                                  }
+#                                  *p = '\0';
+#                                  if (c == EOF) break;
+#                                  if (strcmp(token, "param") == 0)
+#                                          paramct++;
+#                                  else if (strcmp(token, "nofill") == 0)
+#                                          nofill++;
+#                                  else if (strcmp(token, "/param") == 0)
+#                                          paramct--;
+#                                  else if (strcmp(token, "/nofill") == 0)
+#                                          nofill--;
+#                          }
+#                 } else {
+#                         if (paramct > 0)
+#                                 ; /* ignore params */
+#                         else if (c == '\n' && nofill <= 0) {
+#                                 if (++newlinect > 1) putc(c, stdout);
+#                         } else {
+#                                 if (newlinect == 1) putc(' ', stdout);
+#                                 newlinect = 0;
+#                                 putc(c, stdout);
+#                         }
+#                 }
+#         }
+#         /* The following line is only needed with line-buffering */
+#         putc('\n', stdout);
+#         exit(0);
 # }
 
 

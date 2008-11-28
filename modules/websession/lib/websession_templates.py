@@ -2194,7 +2194,7 @@ class Template:
             message += _("Warning : The password set for MySQL is the same as the default CDS-Invenio password. For security purposes, you might want to change the password.")
             message += "</font></p>"
 
-		#Try and connect to the invenio database with the default invenio password
+        #Try and connect to the invenio database with the default invenio password
         if "warning_invenio_password_equal_to_default" in warning_list:
             message += "<p><font color=red>"
             message += _("Warning : The password set for the CDS Invenio database is the same as the default CDS-Invenio password. For security purposes, you might want to change the password.")

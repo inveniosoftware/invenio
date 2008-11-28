@@ -284,20 +284,20 @@ class Template:
         return out
 
     def tmpl_admin_format_template_show_attributes(self, ln, name, description, filename, editable,
-						   all_templates=[], new=False):
+                                                   all_templates=[], new=False):
         """
         Returns a page to change format template name and description
 
-	If template is new, offer a way to create a duplicate from an
-	existing template
+        If template is new, offer a way to create a duplicate from an
+        existing template
 
         @param ln language
         @param name the name of the format
         @param description the description of the format
         @param filename the filename of the template
         @param editable True if we let user edit, else False
-	@param all_templates a list of tuples (filename, name) of all other templates
-	@param new if True, the format template has just been added (is new)
+        @param all_templates a list of tuples (filename, name) of all other templates
+        @param new if True, the format template has just been added (is new)
         @return editor for 'format'
         """
         _ = gettext_set_language(ln)    # load the right message language
@@ -332,8 +332,8 @@ class Template:
 
         out += '''
         <form action="format_template_update_attributes?ln=%(ln)s&amp;bft=%(filename)s" method="POST">
-	''' % {'ln':ln,
-	       'filename':filename}
+        ''' % {'ln':ln,
+               'filename':filename}
 
         if new:
             #Offer the possibility to make a duplicate of existing format template code
@@ -763,23 +763,23 @@ class Template:
 
         <script type="text/javascript">
 
-	function toggle_visibility(element, show, r,g,b){
-	var children = element.childNodes
-	var child
-	for(x=0; x<children.length; x++){
-	  if (children[x].id == 'params'){
-	    child = children[x]
-	  }
-	}
-	if (show=='show'){
-	element.style.background='rgb(201, 218, 255)'
-	element.style.cursor='pointer'
-	child.style.display=''
-	} else {
-	element.style.background="rgb("+r+","+g+","+b+")"
-	child.style.display='none'
-	}
-	}
+        function toggle_visibility(element, show, r,g,b){
+        var children = element.childNodes
+        var child
+        for(x=0; x<children.length; x++){
+          if (children[x].id == 'params'){
+            child = children[x]
+          }
+        }
+        if (show=='show'){
+        element.style.background='rgb(201, 218, 255)'
+        element.style.cursor='pointer'
+        child.style.display=''
+        } else {
+        element.style.background="rgb("+r+","+g+","+b+")"
+        child.style.display='none'
+        }
+        }
         ///// FROM JS QuickTags ///////
 
         // Copyright (c) 2002-2005 Alex King
@@ -2487,13 +2487,13 @@ class Template:
         formadd = '''<form action="kb_add_mapping?ln=%(ln)s&amp;kb=%(kb_id)s&amp;forcetype=curr" method="post">
                     <input type="hidden" name="mapFrom" value="%(left)s"/>
                     <input type="hidden" name="mapTo" value="%(right)s"/>
-	            <input class="adminbutton"
+                    <input class="adminbutton"
                      type="submit" value="%(opt)s"/></form>''' % { 'opt':optadd, 'ln':ln,
                                                                     'kb_id':kbid,
                                                                     'left':left, 'right':right }
         formcancel = '''<form action="kb_show?ln=%(ln)s&amp;kb=%(kb_id)s">
                     <input type="hidden" name="kb" value="%(kb_id)s">
-	            <input  class="adminbutton"
+                    <input  class="adminbutton"
                      type="submit" value="%(opt)s"/></form>''' % { 'ln': ln, 'kb_id':kbid, 'opt':optcancel }
 
         if dontdoit:

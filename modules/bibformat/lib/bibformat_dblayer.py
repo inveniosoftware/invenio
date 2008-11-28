@@ -704,7 +704,7 @@ def get_preformatted_record(recID, of, decompress=zlib.decompress):
     params = (recID, of)
     res = run_sql(query, params)
     if res:
-	# record 'recID' is formatted in 'of', so return it
+        # record 'recID' is formatted in 'of', so return it
         return "%s" % decompress(res[0][0])
     else:
         return None
@@ -725,7 +725,7 @@ def get_preformatted_record_date(recID, of):
     query = "SELECT last_updated FROM bibfmt WHERE id_bibrec='%s' AND format='%s'" % (recID, of)
     res = run_sql(query)
     if res:
-	# record 'recID' is formatted in 'of', so return it
+        # record 'recID' is formatted in 'of', so return it
         return "%s" % res[0][0]
     else:
         return None

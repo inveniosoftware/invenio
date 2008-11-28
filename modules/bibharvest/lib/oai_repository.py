@@ -51,7 +51,7 @@ from invenio.bibformat import format_record
 ##     "ListMetadataFormats" : ["resumptionToken"],
 ##     "ListRecords"         : ["resumptionToken"],
 ##     "ListIdentifiers"     : ["resumptionToken"],
-##     "GetRecord"	          : [""]
+##     "GetRecord"           : [""]
 ## }
 
 verbs = {
@@ -676,7 +676,7 @@ def oaiidentify(args):
     baseurl               = "  <baseURL>%s/oai2d/</baseURL>\n" % CFG_SITE_URL
     protocolversion       = "  <protocolVersion>2.0</protocolVersion>\n"
     adminemailtxt         = "  <adminEmail>%s</adminEmail>\n" % CFG_SITE_SUPPORT_EMAIL
-    earliestdst		  = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()
+    earliestdst           = "  <earliestDatestamp>%s</earliestDatestamp>\n" % get_earliest_datestamp()
     deletedrecord         = "  <deletedRecord>%s</deletedRecord>\n" % CFG_OAI_DELETED_POLICY
     repositoryidentifier  = "%s" % CFG_OAI_ID_PREFIX
     sampleidentifier      = CFG_OAI_SAMPLE_IDENTIFIER

@@ -62,8 +62,8 @@ def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
          msg_status) = db.get_message(uid, msgid)
 
         if (msg_id == ""):
-	    # The message exists in table user_msgMESSAGE
-	    # but not in table msgMESSAGE => table inconsistency
+            # The message exists in table user_msgMESSAGE
+            # but not in table msgMESSAGE => table inconsistency
             errors.append(('ERR_WEBMESSAGE_NOMESSAGE',))
         else:
             if (msg_status == CFG_WEBMESSAGE_STATUS_CODE['NEW']):
@@ -73,13 +73,13 @@ def perform_request_display_msg(uid, msgid, ln=CFG_SITE_LANG):
                                                 msg_id,
                                                 msg_from_id,
                                                 msg_from_nickname,
-							                    msg_sent_to,
-							                    msg_sent_to_group,
-							                    msg_subject,
-							                    msg_body,
-							                    msg_sent_date,
-							                    msg_received_date,
-							                    ln)
+                                                msg_sent_to,
+                                                msg_sent_to_group,
+                                                msg_subject,
+                                                msg_body,
+                                                msg_sent_date,
+                                                msg_received_date,
+                                                ln)
     return (body, errors, warnings)
 
 def perform_request_display(uid, errors=[], warnings=[], infos=[], ln=CFG_SITE_LANG):

@@ -1175,7 +1175,7 @@ def kb_add_mapping(req, kb, mapFrom, mapTo, sortby="to", ln=CFG_SITE_LANG, force
         key = wash_url_argument(mapFrom, 'str')
         value = wash_url_argument(mapTo, 'str')
 
-	#check if key or value already exists in some KB
+        #check if key or value already exists in some KB
         left_sides = bibformat_dblayer.kb_key_rules(key)
         right_sides = bibformat_dblayer.kb_value_rules(value)
 
@@ -1314,8 +1314,8 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
     if not auth_code:
         kb_id = wash_url_argument(kb, 'int')
         if chosen_option is not None:
-	    # Update could not be performed.
-	    # Redirect to kb attributes page
+            # Update could not be performed.
+            # Redirect to kb attributes page
             redirect_to_url(req, "kb_show_attributes?ln=%(ln)s&kb=%(kb)s&sortby=%(sortby)s&kb_type=%(kb_type)s" % {'ln':ln, 'kb':kb_id, 'sortby':sortby, 'kb_type':kb_type})
 
 
@@ -1332,17 +1332,17 @@ def kb_update_attributes(req, kb="", name="", description="", sortby="to",
 
         new_name = wash_url_argument(name, 'str')
         if kb_name != new_name and bibformatadminlib.kb_exists(new_name):
-	    #A knowledge base with that name already exist
-	    #Do not update
+            #A knowledge base with that name already exist
+            #Do not update
             return dialog_box(req=req,
-			      ln=ln,
-			      title="Name already in use",
-			      message="""<i>%s</i> cannot be renamed to %s:
+                              ln=ln,
+                              title="Name already in use",
+                              message="""<i>%s</i> cannot be renamed to %s:
                               Another knowledge base already has that name.
                               <br/>Please choose another name.""" % (kb_name,
                                                                    new_name),
-			      navtrail=navtrail_previous_links,
-			      options=[ _("Ok")])
+                              navtrail=navtrail_previous_links,
+                              options=[ _("Ok")])
 
         new_desc = wash_url_argument(description, 'str')
         bibformatadminlib.update_kb_attributes(kb_name, new_name, new_desc)

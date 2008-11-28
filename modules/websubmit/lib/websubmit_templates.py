@@ -1568,7 +1568,7 @@ class Template:
                 for category in doctype['categories']:
                     out += """<li><a href="publiline.py?doctype=%(doctype)s&amp;categ=%(categ)s%(ln_link)s">%(referee)s</a></li>""" % {
                         'referee' : _("You are a referee for category:") + ' ' + str(category['name']) + ' (' + str(category['id']) + ')',
-			'doctype' : doctype['doctype'],
+                        'doctype' : doctype['doctype'],
                         'categ' : category['id'],
                         'ln_link': '&amp;ln=' + ln}
 
@@ -1908,7 +1908,7 @@ class Template:
                 out += "</small></td></tr>"
 
             out += """
-				</table>
+                                </table>
                                 </td>
                             </tr>
                             </table>

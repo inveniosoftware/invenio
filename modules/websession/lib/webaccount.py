@@ -174,9 +174,9 @@ def superuser_account_warnings():
     #Try and connect to the invenio database with the default invenio password
     try:
         conn = MySQLdb.connect (host = CFG_DATABASE_HOST,
-	                            user = "cdsinvenio",
-				                passwd = "my123p$ss",
-				                db = CFG_DATABASE_NAME)
+                                user = "cdsinvenio",
+                                passwd = "my123p$ss",
+                                db = CFG_DATABASE_NAME)
         conn.close ()
         warning_array.append("warning_invenio_password_equal_to_default")
     except:

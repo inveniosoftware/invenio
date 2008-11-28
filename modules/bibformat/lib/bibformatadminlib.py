@@ -228,9 +228,9 @@ def perform_request_format_template_show_attributes(bft, ln=CFG_SITE_LANG, new=F
             return [(x[1], x[0]) for x in intermed]
 
         all_templates = sort_by_name(all_templates_attrs.values(), all_templates_attrs.keys())
-	#keys = all_templates_attrs.keys()
-	#keys.sort()
-	#all_templates = map(lambda x: (x, all_templates_attrs.get(x)['attrs']['name']), keys)
+        #keys = all_templates_attrs.keys()
+        #keys.sort()
+        #all_templates = map(lambda x: (x, all_templates_attrs.get(x)['attrs']['name']), keys)
 
     format_template = bibformat_engine.get_format_template(filename=bft, with_attributes=True)
     name = format_template['attrs']['name']
@@ -242,8 +242,8 @@ def perform_request_format_template_show_attributes(bft, ln=CFG_SITE_LANG, new=F
                                                                           description,
                                                                           bft,
                                                                           editable,
-									  all_templates,
-									  new)
+                                                                          all_templates,
+                                                                          new)
 
 
 def perform_request_format_template_show_short_doc(ln=CFG_SITE_LANG, search_doc_pattern=""):

@@ -797,21 +797,21 @@ URI: http://%(host)s%(page)s
         <br />
 <div class="detailedrecordminipanel">
 <div class="top-left"></div><div class="top-right"></div>
-		<div class="inside">
+                <div class="inside">
 
         <div id="detailedrecordminipanelfile" style="width:33%%;float:left;text-align:center;margin-top:0">
              %(files)s
         </div>
-	<div id="detailedrecordminipanelreview" style="width:30%%;float:left;text-align:center">
+        <div id="detailedrecordminipanelreview" style="width:30%%;float:left;text-align:center">
              %(reviews)s
-	</div>
-
-	<div id="detailedrecordminipanelactions" style="width:36%%;float:right;text-align:right;">
-             %(actions)s
-	</div>
-	<div style="clear:both;margin-bottom: 0;"></div>
         </div>
-	<div class="bottom-left"></div><div class="bottom-right"></div>
+
+        <div id="detailedrecordminipanelactions" style="width:36%%;float:right;text-align:right;">
+             %(actions)s
+        </div>
+        <div style="clear:both;margin-bottom: 0;"></div>
+        </div>
+        <div class="bottom-left"></div><div class="bottom-right"></div>
         </div>
         """ % {
         'siteurl': CFG_SITE_URL,

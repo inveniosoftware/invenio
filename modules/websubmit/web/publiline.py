@@ -807,7 +807,7 @@ def doCplxAction(req, doctype, categ, RN, apptype, action, email_user_pattern, i
 
                 email_address = run_sql("""SELECT email FROM user WHERE id = %s """, (id_user_val, ))[0][0]
                 perform_request_send (uid, email_address, "", TEXT_RefereeSel_MSG_REFEREE_SUBJECT, TEXT_RefereeSel_MSG_REFEREE_BODY, 0, 0, 0, ln, 1)
-		sendMailToReferee(doctype,categ,RN,email_address,authors)
+                sendMailToReferee(doctype,categ,RN,email_address,authors)
 
                 group_name = run_sql("""SELECT name FROM usergroup WHERE id = %s""", (id_group, ))[0][0]
                 perform_request_send (int(id_user_val), "", group_name, TEXT_RefereeSel_MSG_GROUP_SUBJECT, TEXT_RefereeSel_MSG_GROUP_BODY)

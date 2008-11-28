@@ -193,8 +193,8 @@ function checkAdd()
     }
     else if (document.forms[0].fileAction.value == "Select:")
     {
-	alert("please select the type of action (form field #1)");
-	return false;
+        alert("please select the type of action (form field #1)");
+        return false;
     }
     else
     {

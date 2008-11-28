@@ -565,7 +565,7 @@ def modifyfield(req, colID, fldID, fldvID='', ln=CFG_SITE_LANG, callback='yes', 
     auth = check_user(req,'cfgwebsearch')
     if not auth[0]:
         return page(title="Edit Collection",
-        	body=wsc.perform_modifyfield(colID=colID,
+                body=wsc.perform_modifyfield(colID=colID,
                                              fldID=fldID,
                                              fldvID=fldvID,
                                              ln=ln,
@@ -761,7 +761,7 @@ def addnewfieldvalue(req, colID, fldID, ln=CFG_SITE_LANG, name='', value='', cal
     if not auth[0]:
         return page(title="Edit Collection",
                     body=wsc.perform_addnewfieldvalue(colID=colID,
-  					      fldID=fldID,
+                                              fldID=fldID,
                                               ln=ln,
                                               name=name,
                                               value=value,
@@ -787,7 +787,7 @@ def modifyfieldvalue(req, colID, fldID, fldvID, ln=CFG_SITE_LANG, name='', value
     if not auth[0]:
         return page(title="Edit Collection",
                     body=wsc.perform_modifyfieldvalue(colID=colID,
-  					      fldID=fldID,
+                                              fldID=fldID,
                                               fldvID=fldvID,
                                               ln=ln,
                                               name=name,

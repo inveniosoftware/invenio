@@ -80,7 +80,7 @@ class FCKeditorConnectorInvenio(FCKeditorConnectorBase,
                             automatically)
         """
         self.request = args
-        self.headers = []  	     # Clean Headers
+        self.headers = [] # Clean Headers
         self.uid = uid
         self.recid = recid
         self.allowed_commands = allowed_commands
