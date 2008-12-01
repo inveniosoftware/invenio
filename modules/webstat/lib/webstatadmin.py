@@ -49,7 +49,7 @@ def main():
                                   "                          (e.g. -a country,person,car)\n",
               version=__revision__,
               specific_params=("n:r:Sl:a:c:de", ["new-event=", "remove-event=", "show-events",
-                                                  "event-label", "args", "cache-events=", "dump-config",
+                                                  "event-label=", "args=", "cache-events=", "dump-config",
                                                   "load-config" ]),
               task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
               task_submit_check_options_fnc=task_submit_check_options,
