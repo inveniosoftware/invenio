@@ -201,10 +201,10 @@ display-your-searches-url = "/youralerts/display"
                 if name:
                     res = run_sql("SELECT COUNT(id) FROM staEVENT WHERE id = %s", (name,))
                     if res[0][0] == 0:
-                        # name don't exist, create customevent
+                        # name does not exist, create customevent
                         webstat.create_customevent(name, name, cols)
                     else:
-                        # name already exist, update customevent
+                        # name already exists, update customevent
                         webstat.modify_customevent(name, cols=cols)
 
         sys.exit(0)

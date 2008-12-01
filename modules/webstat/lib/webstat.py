@@ -299,7 +299,7 @@ def register_customevent(id, *arguments):
     """
     res = run_sql("SELECT CONCAT('staEVENT', number),cols FROM staEVENT WHERE id = %s",  (id,))
     if not res:
-        return # the id don't exist
+        return # the id does not exist
     tbl_name = res[0][0]
     if res[0][1]:
         col_titles = cPickle.loads(res[0][1])
