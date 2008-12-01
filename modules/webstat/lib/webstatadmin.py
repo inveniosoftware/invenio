@@ -199,8 +199,8 @@ display-your-searches-url = "/youralerts/display"
                             cols.append("")
                         cols[index] = value
                 if name:
-                    res = run_sql("SELECT NULL FROM staEVENT WHERE id = %s", (name,))
-                    if len(res) == 0:
+                    res = run_sql("SELECT COUNT(id) FROM staEVENT WHERE id = %s", (name,))
+                    if res[0][0] == 0:
                         # name don't exist, create customevent
                         webstat.create_customevent(name, name, cols)
                     else:
