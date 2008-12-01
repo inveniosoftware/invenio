@@ -191,7 +191,7 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                     elif doc.get_icon() is not None and doc.get_icon().docname == file_strip_ext(filename):
                         icon = doc.get_icon()
                         try:
-                            iconfile = icon.get_file(format, args['version'])
+                            iconfile = icon.get_file(format, version)
                         except InvenioWebSubmitFileError, msg:
                             register_exception(req=req, alert_admin=True)
                             return warningMsg(_("An error has happened in trying to retrieve the corresponding icon."), req, CFG_SITE_NAME, ln)
@@ -223,13 +223,13 @@ class WebInterfaceFilesPages(WebInterfaceDirectory):
                 warn = print_warning(_("Requested file does not seem to exist."))
             else:
                 warn = ''
-            filelist = bibarchive.display("", args['version'], ln=ln, verbose=verbose, display_hidden=display_hidden)
+            filelist = bibarchive.display("", version, ln=ln, verbose=verbose, display_hidden=display_hidden)
 
             t = warn + websubmit_templates.tmpl_filelist(
                 ln=ln,
                 recid=self.recid,
                 docname=args['docname'],
-                version=args['version'],
+                version=version,
                 filelist=filelist)
 
             cc = guess_primary_collection_of_a_record(self.recid)
