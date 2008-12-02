@@ -49,7 +49,7 @@ def main():
                                   "                          (e.g. -a country,person,car)\n",
               version=__revision__,
               specific_params=("n:r:Sl:a:c:de", ["new-event=", "remove-event=", "show-events",
-                                                  "event-label", "args", "cache-events=", "dump-config",
+                                                  "event-label=", "args=", "cache-events=", "dump-config",
                                                   "load-config" ]),
               task_submit_elaborate_specific_parameter_fnc=task_submit_elaborate_specific_parameter,
               task_submit_check_options_fnc=task_submit_check_options,
@@ -199,12 +199,12 @@ display-your-searches-url = "/youralerts/display"
                             cols.append("")
                         cols[index] = value
                 if name:
-                    res = run_sql("SELECT NULL FROM staEVENT WHERE id = %s", (name,))
-                    if len(res) == 0:
-                        # name don't exist, create customevent
+                    res = run_sql("SELECT COUNT(id) FROM staEVENT WHERE id = %s", (name,))
+                    if res[0][0] == 0:
+                        # name does not exist, create customevent
                         webstat.create_customevent(name, name, cols)
                     else:
-                        # name already exist, update customevent
+                        # name already exists, update customevent
                         webstat.modify_customevent(name, cols=cols)
 
         sys.exit(0)
