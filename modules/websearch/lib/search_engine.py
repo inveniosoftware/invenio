@@ -596,14 +596,15 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
     return opfts
 
 def page_start(req, of, cc, as, ln, uid, title_message=None,
-               description='', keywords='', recID=-1, tab=''):
+               description='', keywords='', recID=-1, tab='', p=''):
     "Start page according to given output format."
     _ = gettext_set_language(ln)
 
-    if not title_message: title_message = _("Search Results")
-
     if not req:
         return # we were called from CLI
+
+    if not title_message:
+        title_message = _("Search Results")
 
     content_type = get_output_format_content_type(of)
 
@@ -635,17 +636,14 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
         if not keywords:
             keywords = "%s, WebSearch, %s" % (get_coll_i18nname(CFG_SITE_NAME, ln), get_coll_i18nname(cc, ln))
 
+        ## generate RSS URL:
         argd = {}
         if req.args:
             argd = cgi.parse_qs(req.args)
         rssurl = websearch_templates.build_rss_url(argd)
 
-        navtrail = create_navtrail_links(cc, as, ln)
-        navtrail_append_title_p = 1
-
-        # FIXME: Find a good point to put this code.
-        # This is a nice hack to trigger jsMath only when displaying single
-        # records.
+        ## add jsmath if displaying single records (FIXME: find
+        ## eventual better place to this code)
         if of.lower() in CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS:
             metaheaderadd = """
   <script type='text/javascript'>
@@ -657,14 +655,19 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
 """
         else:
             metaheaderadd = ''
+
+        ## generate navtrail:
+        navtrail = create_navtrail_links(cc, as, ln)
+        if navtrail != '':
+            navtrail += ' &gt; '
         if (tab != '' or ((of != '' or of.lower() != 'hd') and of != 'hb')) and \
                recID != -1:
             # If we are not in information tab in HD format, customize
             # the nav. trail to have a link back to main record. (Due
             # to the way perform_request_search() works, hb
             # (lowercase) is equal to hd)
-            if navtrail != '':
-                navtrail += ' &gt; '
+            navtrail += ' <a class="navtrail" href="%s/record/%s">%s</a>' % \
+                            (CFG_SITE_URL, recID, title_message)
             if (of != '' or of.lower() != 'hd') and of != 'hb':
                 # Export
                 format_name = of
@@ -672,15 +675,20 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
                 res = run_sql(query, (of,))
                 if res:
                     format_name = res[0][0]
-                navtrail += ' <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
-                            (CFG_SITE_URL, recID, title_message, format_name)
+                navtrail += ' &gt; ' + format_name
             else:
                 # Discussion, citations, etc. tabs
                 tab_label = get_detailed_page_tabs(cc, ln=ln)[tab]['label']
-                navtrail += ' <a class="navtrail" href="%s/record/%s">%s</a> &gt; %s' % \
-                            (CFG_SITE_URL, recID, title_message, _(tab_label))
-            navtrail_append_title_p = 0
+                navtrail += ' &gt; ' + _(tab_label)
+        else:
+            navtrail += title_message
 
+        if p:
+            # we are serving search/browse results pages, so insert pattern:
+            navtrail += ": " + cgi.escape(p)
+            title_message = cgi.escape(p) + " - " + title_message
+
+        ## finally, print page header:
         req.write(pageheaderonly(req=req, title=title_message,
                                  navtrail=navtrail,
                                  description=description,
@@ -689,8 +697,7 @@ def page_start(req, of, cc, as, ln, uid, title_message=None,
                                  uid=uid,
                                  language=ln,
                                  navmenuid='search',
-                                 navtrail_append_title_p=\
-                                 navtrail_append_title_p,
+                                 navtrail_append_title_p=0,
                                  rssurl=rssurl))
         req.write(websearch_templates.tmpl_search_pagestart(ln=ln))
     #else:
@@ -706,6 +713,22 @@ def page_end(req, of="hb", ln=CFG_SITE_LANG):
         req.write(websearch_templates.tmpl_search_pageend(ln = ln)) # pagebody end
         req.write(pagefooteronly(lastupdated=__lastupdated__, language=ln, req=req))
     return "\n"
+
+def create_page_title_search_pattern_info(p, p1, p2, p3):
+    """Create the search pattern bit for the page <title> web page
+    HTML header.  Basically combine p and (p1,p2,p3) together so that
+    the page header may be filled whether we are in the Simple Search
+    or Advanced Search interface contexts."""
+    out = ""
+    if p:
+        out = p
+    else:
+        out = p1
+        if p2:
+            out += ' ' + p2
+        if p3:
+            out += ' ' + p3
+    return out
 
 def create_inputdate_box(name="d1", selected_year=0, selected_month=0, selected_day=0, ln=CFG_SITE_LANG):
     "Produces 'From Date', 'Until Date' kind of selection box.  Suitable for search options."
@@ -3781,7 +3804,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
     elif action == "browse":
         ## 2 - browse needed
         of = 'hb'
-        page_start(req, of, cc, as, ln, uid, _("Browse"))
+        page_start(req, of, cc, as, ln, uid, _("Browse"), p=create_page_title_search_pattern_info(p, p1, p2, p3))
         req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                     p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
         try:
@@ -3796,9 +3819,9 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             return page_end(req, of, ln)
 
     elif rm and p.startswith("recid:"):
-        ## 3-ter - similarity search needed
+        ## 3-ter - similarity search or citation search needed
         if not req.header_only:
-            page_start(req, of, cc, as, ln, uid, _("Search Results"))
+            page_start(req, of, cc, as, ln, uid, _("Search Results"), p=create_page_title_search_pattern_info(p, p1, p2, p3))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
@@ -3851,7 +3874,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
 
     elif p.startswith("cocitedwith:"):  #WAS EXPERIMENTAL
         ## 3-terter - cited by search needed
-        page_start(req, of, cc, as, ln, uid, _("Search Results"))
+        page_start(req, of, cc, as, ln, uid, _("Search Results"), p=create_page_title_search_pattern_info(p, p1, p2, p3))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))
@@ -3896,7 +3919,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                     print_records_epilogue(req, of)
     else:
         ## 3 - common search needed
-        page_start(req, of, cc, as, ln, uid, _("Search Results"))
+        page_start(req, of, cc, as, ln, uid, p=create_page_title_search_pattern_info(p, p1, p2, p3))
         if of.startswith("h"):
             req.write(create_search_box(cc, colls_to_display, p, f, rg, sf, so, sp, rm, of, ot, as, ln, p1, f1, m1, op1,
                                         p2, f2, m2, op2, p3, f3, m3, sc, pl, d1y, d1m, d1d, d2y, d2m, d2d, dt, jrec, ec, action))

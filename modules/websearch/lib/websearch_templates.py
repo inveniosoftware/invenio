@@ -506,7 +506,7 @@ class Template:
         title = get_fieldvalues(recid, "245__a")
 
         if title:
-            title = _("Record") + '#%d: %s' %(recid, cgi.escape(title[0]))
+            title = cgi.escape(title[0])
         else:
             title = _("Record") + ' #%d' % recid
 

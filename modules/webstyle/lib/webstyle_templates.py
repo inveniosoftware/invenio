@@ -263,15 +263,12 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
-        if headertitle == CFG_SITE_NAME_INTL.get(ln, CFG_SITE_NAME):
-            headertitle = _("Home")
-
         out = """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
- <title>%(sitename)s: %(headertitle)s</title>
+ <title>%(headertitle)s - %(sitename)s</title>
  <link rev="made" href="mailto:%(sitesupportemail)s" />
  <link rel="stylesheet" href="%(cssurl)s/img/cds.css" type="text/css" />
  <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
