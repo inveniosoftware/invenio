@@ -58,7 +58,7 @@ def send_email(fromaddr,
                subject="",
                content="",
                html_content='',
-               html_images={},
+               html_images=None,
                header=None,
                footer=None,
                html_header=None,
@@ -73,7 +73,8 @@ def send_email(fromaddr,
     """Send an forged email to TOADDR from FROMADDR with message created from subjet, content and possibly
     header and footer.
     @param fromaddr: [string] sender
-    @param toaddr: [string] receivers separated by ,
+    @param toaddr: [string or list-of-strings] list of receivers (if string, then
+                   receivers are separated by ',')
     @param subject: [string] subject of the email
     @param content: [string] content of the email
     @param html_content: [string] html version of the email
@@ -98,15 +99,16 @@ def send_email(fromaddr,
 
     @return [bool]: True if email was sent okay, False if it was not.
     """
-    toaddr = toaddr.strip()
-    usebcc = ',' in toaddr # More than one address, let's use Bcc in place of To
+
+    if html_images is None:
+        html_images = {}
+
+    if type(toaddr) is str:
+        toaddr = toaddr.strip().split(',')
+    usebcc = len(toaddr) > 1  # More than one address, let's use Bcc in place of To
     if copy_to_admin:
-        if len(toaddr) > 0:
-            toaddr += ",%s" % (CFG_SITE_ADMIN_EMAIL,)
-        else:
-            toaddr = CFG_SITE_ADMIN_EMAIL
+        toaddr.append(CFG_SITE_ADMIN_EMAIL)
     body = forge_email(fromaddr, toaddr, subject, content, html_content, html_images, usebcc, header, footer, html_header, html_footer, ln, charset)
-    toaddr = toaddr.split(",")
     if attempt_times < 1 or len(toaddr[0]) == 0:
         log('ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL', fromaddr, toaddr, body)
         return False
@@ -201,12 +203,13 @@ def email_html_footer(ln=CFG_SITE_LANG):
 
 
 def forge_email(fromaddr, toaddr, subject, content, html_content='',
-                html_images={}, usebcc=False, header=None, footer=None,
+                html_images=None, usebcc=False, header=None, footer=None,
                 html_header=None, html_footer=None, ln=CFG_SITE_LANG,
                 charset=None):
     """Prepare email. Add header and footer if needed.
     @param fromaddr: [string] sender
-    @param toaddr: [string] receivers separated by ,
+    @param toaddr: [string or list-of-strings] list of receivers (if string, then
+                   receivers are separated by ',')
     @param usebcc: [bool] True for using Bcc in place of To
     @param subject: [string] subject of the email
     @param content: [string] content of the email
@@ -218,6 +221,10 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     @charset: [string] the content charset. By default is None which means
     to try to encode the email as ascii, then latin1 then utf-8.
     @return forged email as a string"""
+
+    if html_images is None:
+        html_images = {}
+
     if header is None:
         content = email_header(ln) + content
     else:
@@ -242,6 +249,8 @@ def forge_email(fromaddr, toaddr, subject, content, html_content='',
     except (UnicodeEncodeError, UnicodeDecodeError):
         fromaddr = Header(fromaddr, 'utf-8')
 
+    if type(toaddr) is not str:
+        toaddr = ','.join(toaddr)
     try:
         toaddr = toaddr.encode('ascii')
     except (UnicodeEncodeError, UnicodeDecodeError):
