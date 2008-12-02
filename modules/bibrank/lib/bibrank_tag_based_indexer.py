@@ -30,13 +30,57 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_ETCDIR
 from invenio.search_engine import perform_request_search, HitSet
-from invenio.bibrank_citation_indexer import get_citation_weight, print_missing
+from invenio.bibrank_citation_indexer import get_citation_weight, print_missing, get_cit_dict, insert_into_cit_db
 from invenio.bibrank_downloads_indexer import *
 from invenio.dbquery import run_sql, serialize_via_marshal, deserialize_via_marshal
 from invenio.bibtask import task_get_option, write_message, task_sleep_now_if_required
 
 
 options = {}
+
+def remove_auto_cites(dic):
+    """Remove auto-cites and dedupe."""
+    for key in dic.keys():
+        new_list = dic.fromkeys(dic[key]).keys()
+        try:
+            new_list.remove(key)
+        except ValueError, e:
+            pass
+        dic[key] = new_list
+    return dic
+
+def citation_repair_exec():
+    """Repair citation ranking method"""
+    ## repair citations
+    for rowname in ["citationdict","reversedict"]:
+        ## get dic
+        dic = get_cit_dict(rowname)
+        ## repair
+        write_message("Repairing %s" % rowname)
+        dic = remove_auto_cites(dic)
+        ## store healthy citation dic
+        insert_into_cit_db(dic, rowname)
+    return
+
+def download_weight_filtering_user_repair_exec ():
+    """Repair download weight filtering user ranking method"""
+    write_message("Repairing for this ranking method is not defined. Skipping.")
+    return
+
+def download_weight_total_repair_exec():
+    """Repair download weight total ranking method"""
+    write_message("Repairing for this ranking method is not defined. Skipping.")
+    return
+
+def file_similarity_by_times_downloaded_repair_exec():
+    """Repair file similarity by times downloaded ranking method"""
+    write_message("Repairing for this ranking method is not defined. Skipping.")
+    return
+
+def single_tag_rank_method_repair_exec():
+    """Repair single tag ranking method"""
+    write_message("Repairing for this ranking method is not defined. Skipping.")
+    return
 
 def citation_exec(rank_method_code, name, config):
     """Rank method for citation analysis"""
@@ -302,6 +346,7 @@ def bibrank_engine(run):
 
             cfg_short = rank_method_code
             cfg_function = config.get("rank_method", "function") + "_exec"
+            cfg_repair_function = config.get("rank_method", "function") + "_repair_exec"
             cfg_name = getName(cfg_short)
             options["validset"] = get_valid_range(rank_method_code)
 
@@ -340,7 +385,8 @@ def bibrank_engine(run):
                 func_object = globals().get(cfg_function)
                 func_object(rank_method_code, cfg_name, config)
             elif task_get_option("cmd") == "repair":
-                pass
+                func_object = globals().get(cfg_repair_function)
+                func_object()
             else:
                 write_message("Invalid command found processing %s" % rank_method_code, sys.stderr)
                 raise StandardError
