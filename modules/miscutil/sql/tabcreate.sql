@@ -3000,7 +3000,7 @@ CREATE TABLE IF NOT EXISTS sbmCOOKIES (
 CREATE TABLE IF NOT EXISTS schTASK (
   id int(15) unsigned NOT NULL auto_increment,
   proc varchar(20) NOT NULL,
-  host varchar(255) NOT NULL,
+  host varchar(255) NOT NULL default '',
   user varchar(50) NOT NULL,
   runtime datetime NOT NULL,
   sleeptime varchar(20),
@@ -3017,7 +3017,7 @@ CREATE TABLE IF NOT EXISTS schTASK (
 CREATE TABLE IF NOT EXISTS hstTASK (
   id int(15) unsigned NOT NULL,
   proc varchar(20) NOT NULL,
-  host varchar(255) NOT NULL,
+  host varchar(255) NOT NULL default '',
   user varchar(50) NOT NULL,
   runtime datetime NOT NULL,
   sleeptime varchar(20),
