@@ -1625,6 +1625,26 @@ input.hyperlinkformSubmitButton {
     padding: 3px;
 }
 /* end of WebAlert module */
+/* BibClassify module */
+.tagCloud {
+    margin: auto;
+    clear: both;
+}
+.tagCloud span {
+    font-family: Arial, Helvetica, sans-serif;
+    text-decoration: none;
+    margin-right: 6px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    padding: 0;
+}
+.tagCloud a {
+    text-decoration: none;
+}
+.tagCloud a:hover {
+    text-decoration: underline;
+}
+/* end of BibClassify module */
 
 /* externalcollections */
 .externalcollectionsbox {
@@ -2041,9 +2061,9 @@ text-decoration:underline;
 	padding:0;
 	position:relative;
 	padding-bottom:9px;
-        
+
         }
-        
+
         .bibcirctable {
         color: #79d;
         font-size: 82%;
@@ -2051,7 +2071,7 @@ text-decoration:underline;
         margin:auto;
         max-width: 1280px;
         }
-        
+
         .bibcirctable_contents {
         color: #79d;
         font-size: small;
@@ -2066,7 +2086,7 @@ text-decoration:underline;
         font-weight: bold;
         font-variant: small-caps;
         }
-        
+
         .bibcircwarning {
         color: #f11010;
         }
@@ -2074,17 +2094,17 @@ text-decoration:underline;
 	 .bibcircpending {
         color: #f16f10;
         }
-  
 
-        
+
+
         .bibcircok {
         color: #060;
         }
-        
+
         .bibcirccontent {
         color: black;
         }
-        
+
 
         .formbutton {
         color: #fff;
@@ -2101,8 +2121,8 @@ text-decoration:underline;
         font-variant: small-caps;
         padding-bottom:2px;
         }
-        
-        
+
+
         div.subtitle {
         width: 600px;
         padding-left: 5px;

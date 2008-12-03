@@ -717,7 +717,6 @@ def print_rec(rec, format=1, tags=None):
        format = 2 -- HTML (not implemented)
        @tags: list of tags to be printed
       """
-
     if tags is None:
         tags = []
     if format == 1:
@@ -750,6 +749,8 @@ def record_xml_output(rec, tags=None):
     @rec: record
     @tags: list of tags to be printed
     """
+    if isinstance(tags, str):
+        tags = [tags]
     if tags is None:
         tags = []
     xmltext = "<record>\n"

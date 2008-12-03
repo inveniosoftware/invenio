@@ -69,6 +69,7 @@ from invenio.webuser import getUid, page_not_authorized, get_user_preferences, \
     session_param_get
 from invenio import search_engine
 from invenio.websubmit_webinterface import WebInterfaceFilesPages
+from invenio.bibclassify_webinterface import WebInterfaceKeywordsPages
 from invenio.webcomment_webinterface import WebInterfaceCommentsPages
 from invenio.bibcirculation_webinterface import WebInterfaceHoldingsPages
 from invenio.webpage import page, create_error_box
@@ -332,7 +333,8 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /record/<recid> URL fragment """
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
-                'references', 'export', 'citations', 'holdings', 'edit']
+                'references', 'export', 'citations', 'holdings', 'edit',
+                'keywords']
 
     #_exports.extend(output_formats)
 
@@ -348,6 +350,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.usage = self
         self.references = self
         self.holdings = WebInterfaceHoldingsPages(self.recid)
+        self.keywords = WebInterfaceKeywordsPages(self.recid)
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
         self.edit = WebInterfaceEditPages(self.recid)
@@ -406,7 +409,8 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
-                'references', 'export', 'citations', 'holdings', 'edit']
+                'references', 'export', 'citations', 'holdings', 'edit',
+                'keywords']
 
     #_exports.extend(output_formats)
 
@@ -420,6 +424,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.comments = WebInterfaceCommentsPages(self.recid)
         self.usage = self
         self.references = self
+        self.keywords = WebInterfaceKeywordsPages(self.recid)
         self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
@@ -761,7 +766,8 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             tab = ''
             try:
                 if path[1] in ['', 'files', 'reviews', 'comments', 'usage',
-                               'references', 'citations', 'holdings', 'edit']:
+                               'references', 'citations', 'holdings', 'edit',
+                               'keywords']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''

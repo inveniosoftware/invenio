@@ -3212,10 +3212,11 @@ def get_detailed_page_tabs(colID=None, recID=None, ln=CFG_SITE_LANG):
     tabs = {'metadata'  : {'label': _('Information'),      'visible': False, 'enabled': True, 'order': 1},
             'references': {'label': _('References'),       'visible': False, 'enabled': True, 'order': 2},
             'citations' : {'label': _('Citations'),        'visible': False, 'enabled': True, 'order': 3},
-            'comments'  : {'label': _('Discussion'),       'visible': False, 'enabled': True, 'order': 4},
-            'usage'     : {'label': _('Usage statistics'), 'visible': False, 'enabled': True, 'order': 5},
-            'files'     : {'label': _('Fulltext'),         'visible': False, 'enabled': True, 'order': 6},
-            'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 7}
+            'keywords'  : {'label': _('Keywords'),         'visible': False, 'enabled': True, 'order': 4},
+            'comments'  : {'label': _('Discussion'),       'visible': False, 'enabled': True, 'order': 5},
+            'usage'     : {'label': _('Usage statistics'), 'visible': False, 'enabled': True, 'order': 6},
+            'files'     : {'label': _('Fulltext'),         'visible': False, 'enabled': True, 'order': 7},
+            'holdings'  : {'label': _('Holdings'),         'visible': False, 'enabled': True, 'order': 8},
             }
 
     res = run_sql("SELECT tabs FROM collectiondetailedrecordpagetabs " + \
