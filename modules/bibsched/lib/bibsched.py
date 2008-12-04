@@ -23,7 +23,6 @@
 __revision__ = "$Id$"
 
 import os
-import string
 import sys
 import time
 import re
@@ -77,11 +76,11 @@ def get_my_pid(process, args=''):
         COMMAND = "ps -o pid,args | grep '%s %s' | grep -v 'grep' | sed -n 1p" % (process, args)
     else:
         COMMAND = "ps -C %s o '%%p%%a' | grep '%s %s' | grep -v 'grep' | sed -n 1p" % (process, process, args)
-    answer = string.strip(os.popen(COMMAND).read())
+    answer = os.popen(COMMAND).read().strip()
     if answer == '':
         answer = 0
     else:
-        answer = answer[:string.find(answer,' ')]
+        answer = answer[:answer.find(' ')]
     return int(answer)
 
 def get_task_pid(task_name, task_id, ignore_error=False):
@@ -763,7 +762,7 @@ class BibSched:
 
     def tasks_safe_p(self, proc1, proc2):
         """Return True when the two tasks can run concurrently."""
-        return proc1 != proc2 and not proc1.startswith('bibupload') and not proc2.startswith('bibupload')
+        return proc1 != proc2 # and not proc1.startswith('bibupload') and not proc2.startswith('bibupload')
 
     def get_tasks_to_sleep_and_stop(self, proc, task_set):
         """Among the task_set, return the lists of task to stop and the lists
@@ -774,23 +773,27 @@ class BibSched:
         min_proc = None
         min_status = None
         to_stop = []
+        ## For all the lower priority tasks...
         for (this_task_id, this_proc, this_priority, this_status) in task_set:
-            if self.tasks_safe_p(proc, this_proc):
-                if min_prio is None or this_priority < min_prio:
-                    min_prio = this_priority
-                    min_task_id = this_task_id
-                    min_proc = this_proc
-                    min_status = this_status
-            else:
+            if not self.tasks_safe_p(this_proc, proc):
                 to_stop.append((this_task_id, this_proc, this_priority, this_status))
+            elif (min_prio is None or this_priority < min_prio) and this_status not in ('SLEEPING', 'ABOUT TO SLEEP'):
+                ## We don't put to sleep already sleeping task :-)
+                min_prio = this_priority
+                min_task_id = this_task_id
+                min_proc = this_proc
+                min_status = this_status
+
         if len(task_set) < CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS and not to_stop:
             ## All the task are safe and there are enough resources
             return [], []
         else:
             if to_stop:
                 return to_stop, []
-            else:
+            elif min_task_id:
                 return [], [(min_task_id, min_proc, min_prio, min_status)]
+            else:
+                return [], []
 
     def get_running_tasks(self):
         """Return a list of running tasks."""
@@ -836,7 +839,7 @@ class BibSched:
             #write_message("Trying to run %s" % task_id)
             if self.scheduled is not None and task_id != self.scheduled:
                 ## Another task is scheduled for running.
-                #write_message("cannot run because %s is already scheduled" % self.scheduled)
+                Log("Cannot run %s because %s is already scheduled" % (task_id, self.scheduled))
                 return False
 
             nothing_was_scheduled = self.scheduled is None
@@ -846,36 +849,36 @@ class BibSched:
             self.scheduled = task_id
             if nothing_was_scheduled:
                 Log("Task #%d (%s) scheduled for running" % (task_id, proc))
-            #write_message('Scheduled task %s' % self.scheduled)
+            #Log('Scheduled task %s' % self.scheduled)
             ## Schedule the task for running.
 
             lower, higher = self.split_running_tasks_by_priority(task_id, priority)
-            #write_message('lower: %s' % lower)
-            #write_message('higher: %s' % higher)
+            #Log('lower: %s' % lower)
+            #Log('higher: %s' % higher)
             for other_task_id, other_proc, dummy, status in higher:
                 if not self.tasks_safe_p(proc, other_proc):
                     ## There's at least a higher priority task running that
                     ## cannot run at the same time of the given task.
                     ## We give up
-                    #write_message("cannot run because task_id: %s, proc: %s is the queue and incompatible" % (other_task_id, other_proc))
+                    #Log("Cannot run because task_id: %s, proc: %s is the queue and incompatible" % (other_task_id, other_proc))
                     return False
 
             ## No higer priority task have issue with the given task.
             if len(higher) >= CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS:
                 ## Not enough resources.
-                #write_message("cannot run because all resource (%s) are used (%s), higher: %s" % (CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(higher), higher))
+                #Log("Cannot run because all resource (%s) are used (%s), higher: %s" % (CFG_BIBSCHED_MAX_NUMBER_CONCURRENT_TASKS, len(higher), higher))
                 return False
 
             ## We check if it is necessary to stop/put to sleep some lower priority
             ## task.
             tasks_to_stop, tasks_to_sleep = self.get_tasks_to_sleep_and_stop(proc, lower)
-            #write_message('tasks_to_stop: %s' % tasks_to_stop)
-            #write_message('tasks_to_sleep: %s' % tasks_to_sleep)
+            #Log('tasks_to_stop: %s' % tasks_to_stop)
+            #Log('tasks_to_sleep: %s' % tasks_to_sleep)
 
-            if tasks_to_stop and priority < 10:
-                ## Only tasks with priority higher than 10 have the power
+            if tasks_to_stop and priority < 100:
+                ## Only tasks with priority higher than 100 have the power
                 ## to put task to stop.
-                #write_message("cannot run because there are task to stop: %s and priority < 10" % tasks_to_stop)
+                #Log("Cannot run because there are task to stop: %s and priority < 100" % tasks_to_stop)
                 return False
 
             procname = proc.split(':')[0]
@@ -885,7 +888,7 @@ class BibSched:
                     bibsched_set_status(task_id, "CONTINUING", status)
                     if not bibsched_send_signal(proc, task_id, signal.SIGCONT):
                         bibsched_set_status(task_id, "ERROR", "CONTINUING")
-                        Log ("Task #%d (%s) woken up but didn't existed anymore" % (task_id, proc))
+                        Log("Task #%d (%s) woken up but didn't existed anymore" % (task_id, proc))
                         return True
                     Log("Task #%d (%s) woken up" % (task_id, proc))
                     return True
@@ -906,10 +909,15 @@ class BibSched:
                     raise StandardError, "%s is not in the allowed modules" % procname
             else:
                 ## It's not still safe to run the task.
+                ## We first need to stop task that should be stopped
+                ## and to put to sleep task that should be put to sleep
                 for (other_task_id, other_proc, other_priority, other_status) in tasks_to_stop:
+                    Log("Send STOP signal to #%d (%s) which was in status %s" % (other_task_id, other_proc, other_status))
                     bibsched_set_status(other_task_id, 'ABOUT TO STOP', other_status)
                 for (other_task_id, other_proc, other_priority, other_status) in tasks_to_sleep:
+                    Log("Send SLEEP signal to #%d (%s) which was in status %s" % (other_task_id, other_proc, other_status))
                     bibsched_set_status(other_task_id, 'ABOUT TO SLEEP', other_status)
+                time.sleep(CFG_BIBSCHED_REFRESHTIME)
                 return True
 
     def watch_loop(self):
@@ -942,6 +950,7 @@ class BibSched:
 
         try:
             while True:
+                #Log("New bibsched cycle")
                 calculate_rows()
                 calculate_task_status()
                 for row in self.rows:
@@ -1078,11 +1087,11 @@ def start(verbose = True):
 
     pid = server_pid(ping_the_process=False)
     if pid:
-        pid = server_pid()
-        if pid:
-            error("another instance of bibsched (pid %d) is running" % pid)
+        pid2 = server_pid()
+        if pid2:
+            error("another instance of bibsched (pid %d) is running" % pid2)
         else:
-            error("%s exist but the corresponding bibsched (pid %d) seems not be running" % (pidfile, pid))
+            error("%s exist but the corresponding bibsched (pid %s) seems not be running" % (pidfile, pid))
 
     # start the child process using the "double fork" technique
     pid = os.fork()

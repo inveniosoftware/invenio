@@ -190,6 +190,33 @@ def task_init(
     else:
         argv = sys.argv
 
+    ## Setting up the logging system
+    logger = logging.getLogger()
+    for handler in logger.handlers:
+        ## Let's clean the handlers in case some piece of code has already
+        ## fired any write_message, i.e. any call to debug, info, etc.
+        ## which triggered a call to logging.basicConfig()
+        logger.removeHandler(handler)
+    formatter = logging.Formatter('%(asctime)s --> %(message)s', '%Y-%m-%d %H:%M:%S')
+    if _task_params.get('task_id'):
+        err_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _task_params['task_id']), 'a', 1*1024*1024, 10)
+        log_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _task_params['task_id']), 'a', 1*1024*1024, 10)
+        log_logger.setFormatter(formatter)
+        log_logger.setLevel(logging.DEBUG)
+        err_logger.setFormatter(formatter)
+        err_logger.setLevel(logging.WARNING)
+        logger.addHandler(err_logger)
+        logger.addHandler(log_logger)
+    stdout_logger = logging.StreamHandler(sys.stdout)
+    stdout_logger.setFormatter(formatter)
+    stdout_logger.setLevel(logging.DEBUG)
+    stderr_logger = logging.StreamHandler(sys.stderr)
+    stderr_logger.setFormatter(formatter)
+    stderr_logger.setLevel(logging.WARNING)
+    logger.addHandler(stderr_logger)
+    logger.addHandler(stdout_logger)
+    logger.setLevel(logging.INFO)
+
     if type(argv) is dict:
         # FIXME: REMOVE AFTER MAJOR RELEASE 1.0
         # This is needed for old task submitted before CLI parameters
@@ -201,6 +228,8 @@ def task_init(
                 help_specific_usage, version, specific_params,
                 task_submit_elaborate_specific_parameter_fnc,
                 task_submit_check_options_fnc)
+        except SystemExit:
+            raise
         except Exception, e:
             register_exception(alert_admin=True)
             write_message("Error in parsing the parameters: %s." % e, sys.stderr)
@@ -267,6 +296,7 @@ def task_init(
             write_messages(''.join(traceback.format_tb(sys.exc_info()[2])), sys.stderr)
             write_message("Exiting.", sys.stderr)
             task_update_status("ERROR")
+        logging.shutdown()
 
 def _task_build_params(
     task_name,
@@ -416,13 +446,13 @@ def write_message(msg, stream=sys.stdout, verbose=1):
     Useful for debugging stuff."""
     if msg and _task_params['verbose'] >= verbose:
         if stream == sys.stdout:
-            print "%s --> %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg)
             logging.info(msg)
         elif stream == sys.stderr:
-            print >> sys.stderr, "%s --> %s" % (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), msg)
             logging.error(msg)
         else:
             sys.stderr.write("Unknown stream %s.  [must be sys.stdout or sys.stderr]\n" % stream)
+    else:
+        logging.debug(msg)
 
 _RE_SHIFT = re.compile("([-\+]{0,1})([\d]+)([dhms])")
 def get_datetime(var, format_string="%Y-%m-%d %H:%M:%S"):
@@ -521,9 +551,12 @@ def task_sleep_now_if_required(can_stop_too=False):
     if status == 'ABOUT TO SLEEP':
         write_message("sleeping...")
         task_update_status("SLEEPING")
-        signal.signal(signal.SIGTSTP, signal.SIG_DFL)
-        os.kill(os.getpid(), signal.SIGTSTP)
+        signal.signal(signal.SIGTSTP, _task_sig_dumb)
+        os.kill(os.getpid(), signal.SIGSTOP)
         time.sleep(1)
+        task_update_status("CONTINUING")
+        write_message("... continuing...")
+        signal.signal(signal.SIGTSTP, _task_sig_sleep)
     elif status == 'ABOUT TO STOP' and can_stop_too:
         write_message("stopped")
         task_update_status("STOPPED")
@@ -675,17 +708,6 @@ def _task_run(task_run_fnc):
         task_update_status("ERROR")
         return False
 
-    ## Setting up the logging system
-    logger = logging.getLogger()
-    stderr_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.err' % _task_params['task_id']), 'a', 1*1024*1024, 10)
-    stdout_logger = logging.handlers.RotatingFileHandler(os.path.join(CFG_LOGDIR, 'bibsched_task_%d.log' % _task_params['task_id']), 'a', 1*1024*1024, 10)
-    formatter = logging.Formatter('%(asctime)s --> %(message)s', '%Y-%m-%d %H:%M:%S')
-    stderr_logger.setFormatter(formatter)
-    stdout_logger.setFormatter(formatter)
-    logger.addHandler(stderr_logger)
-    logger.addHandler(stdout_logger)
-    logger.setLevel(logging.INFO)
-
     ## check task status:
     task_status = task_read_status()
     if task_status not in ("WAITING", "SCHEDULED"):
@@ -720,7 +742,6 @@ def _task_run(task_run_fnc):
     signal.signal(signal.SIGTERM, _task_sig_stop)
     signal.signal(signal.SIGQUIT, _task_sig_stop)
     signal.signal(signal.SIGABRT, _task_sig_suicide)
-    signal.signal(signal.SIGCONT, _task_sig_wakeup)
     signal.signal(signal.SIGINT, _task_sig_stop)
     ## we can run the task now:
     write_message("Task #%d started." % _task_params['task_id'])
@@ -801,20 +822,12 @@ def _usage(exitcode=1, msg="", help_specific_usage="", description=""):
 
 def _task_sig_sleep(sig, frame):
     """Signal handler for the 'sleep' signal sent by BibSched."""
+    signal.signal(signal.SIGTSTP, signal.SIG_IGN)
     write_message("task_sig_sleep(), got signal %s frame %s"
             % (sig, frame), verbose=9)
     write_message("sleeping as soon as possible...")
     _db_login(1)
     task_update_status("ABOUT TO SLEEP")
-
-def _task_sig_wakeup(sig, frame):
-    """Signal handler for the 'wakeup' signal sent by BibSched."""
-    signal.signal(signal.SIGTSTP, _task_sig_sleep)
-    write_message("task_sig_wakeup(), got signal %s frame %s"
-            % (sig, frame), verbose=9)
-    write_message("continuing...")
-    _db_login(1)
-    task_update_status("CONTINUING")
 
 def _task_sig_stop(sig, frame):
     """Signal handler for the 'stop' signal sent by BibSched."""
@@ -835,10 +848,9 @@ def _task_sig_suicide(sig, frame):
     task_update_status("SUICIDED")
     sys.exit(1)
 
-def _task_sig_unknown(sig, frame):
-    """Signal handler for the other unknown signals sent by shell or user."""
-    # do nothing for unknown signals:
-    write_message("unknown signal %d (frame %s) ignored" % (sig, frame))
+def _task_sig_dumb(sig, frame):
+    """Dumb signal handler."""
+    pass
 
 _RE_PSLINE = re.compile('^\s*(.+?)\s+(.+?)\s*$')
 def guess_apache_process_user_from_ps():
