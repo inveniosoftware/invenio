@@ -753,7 +753,10 @@ def word_index(run):
 
     global languages
 
-    max_recid = int(run_sql("SELECT max(id) FROM bibrec")[0][0])
+    max_recid = 0
+    res = run_sql("SELECT max(id) FROM bibrec")
+    if res and res[0][0]:
+        max_recid = int(res[0][0])
 
     options["run"] = []
     options["run"].append(run)

@@ -286,7 +286,10 @@ def rank_by_method(rank_method_code, lwords, hitset, rank_limit_relevance,verbos
     if not rnkdict:
         return (None, "Warning: Could not load ranking data for method %s." % rank_method_code, "", voutput)
 
-    max_recid = int(run_sql("SELECT max(id) FROM bibrec")[0][0])
+    max_recid = 0
+    res = run_sql("SELECT max(id) FROM bibrec")
+    if res and res[0][0]:
+        max_recid = int(res[0][0])
 
     lwords_hitset = None
     for j in range(0, len(lwords)): #find which docs to search based on ranges..should be done in search_engine...
