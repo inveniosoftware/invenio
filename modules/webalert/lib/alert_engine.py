@@ -300,7 +300,14 @@ def process_alerts(alerts):
             add_records_to_basket(alerts['records'], a[2])
         if alert_use_notification_p(a):
             argstr = update_arguments(alerts['argstr'], alerts['date_from'], alerts['date_until'])
-            email_notify(a, alerts['records'], argstr)
+            try:
+                email_notify(a, alerts['records'], argstr)
+            except Exception:
+                # There were troubles sending this alert, so register
+                # this exception and continue with other alerts:
+                register_exception(alert_admin=True,
+                                   prefix="Error when sending alert %s, %s\n." % \
+                                   (repr(a), repr(argstr)))
 
         update_date_lastrun(a)
 
