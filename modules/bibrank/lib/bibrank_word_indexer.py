@@ -580,7 +580,7 @@ class WordTable:
         else:
             nb_bad_records = 999999999
         if nb_bad_records:
-            write_message("EMERGENCY: %s needs to repair %d of %d records" % \
+            write_message("EMERGENCY: %s needs to repair %d of %d index records" % \
                 (self.tablename, nb_bad_records, nb_records))
         else:
             write_message("%s is in consistent state" % (self.tablename))
@@ -698,14 +698,14 @@ class WordTable:
             if not 'TEMPORARY' in state[recID]:
                 if 'FUTURE' in state[recID]:
                     if 'CURRENT' not in state[recID]:
-                        write_message("EMERGENCY: Record %d is in inconsistent state. Can't repair it" % recID)
+                        write_message("EMERGENCY: Index record %d is in inconsistent state. Can't repair it" % recID)
                         ok = 0
                     else:
-                        write_message("EMERGENCY: Inconsistency in record %d detected" % recID)
+                        write_message("EMERGENCY: Inconsistency in index record %d detected" % recID)
                         query = """DELETE FROM %sR
                         WHERE id_bibrec='%d'""" % (self.tablename[:-1], recID)
                         run_sql(query)
-                        write_message("EMERGENCY: Inconsistency in record %d repaired." % recID)
+                        write_message("EMERGENCY: Inconsistency in index record %d repaired." % recID)
             else:
                 if 'FUTURE' in state[recID] and not 'CURRENT' in state[recID]:
                     self.recIDs_in_mem.append([recID,recID])
@@ -730,8 +730,9 @@ class WordTable:
 
         if not ok:
             write_message("""EMERGENCY: Unrepairable errors found. You should check consistency
-                of the %s - %sR tables. Deleting affected records is
-                recommended.""" % (self.tablename, self.tablename[:-1]))
+                of the %s - %sR tables. Deleting affected TEMPORARY and FUTURE entries
+                from these tables is recommended; see the BibIndex Admin Guide.
+                (The repairing procedure is similar for bibrank word indexes.)""" % (self.tablename, self.tablename[:-1]))
             raise StandardError
 
 def word_index(run):
