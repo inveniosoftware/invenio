@@ -37,6 +37,7 @@ from invenio.config import \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
      CFG_SITE_URL, \
+     CFG_SITE_LANGS, \
      CFG_WEBSEARCH_ENABLED_SEARCH_INTERFACES, \
      CFG_WEBSEARCH_DEFAULT_SEARCH_INTERFACE
 from invenio.messages import gettext_set_language, language_list_long
@@ -271,7 +272,7 @@ class Collection:
         for lang, lang_fullname in language_list_long():
 
             # but only if some concrete language was not chosen only:
-            if task_get_option("language", lang) == lang:
+            if lang in task_get_option("language", [lang]):
 
                 if self.dbquery and CFG_WEBSEARCH_I18N_LATEST_ADDITIONS:
                     self.create_latest_additions_info(ln=lang)
@@ -824,7 +825,7 @@ def main():
                     "  -p, --part\t\t Update only certain cache parts (1=reclist,"
                     " 2=webpage). [both]\n"
                     "  -l, --language\t Update pages in only certain language"
-                    " (e.g. fr). [all]\n",
+                    " (e.g. fr,it,...). [all]\n",
             version=__revision__,
             specific_params=("c:fp:l:", [
                     "collection=",
@@ -855,7 +856,13 @@ def task_submit_elaborate_specific_parameter(key, value, opts, args):
     elif key in ("-p", "--part"):
         task_set_option("part", int(value))
     elif key in ("-l", "--language"):
-        task_set_option("language", value)
+        languages = task_get_option("language", [])
+        languages += value.split(',')
+        for ln in languages:
+            if ln not in CFG_SITE_LANGS:
+                print 'ERROR: "%s" is not a recognized language code' % ln
+                return False
+        task_set_option("language", languages)
     else:
         return False
     return True
@@ -864,7 +871,7 @@ def task_submit_check_options():
     if task_has_option('collection'):
         coll = get_collection(task_get_option("collection"))
         if coll.id is None:
-            print 'Collection "%s" does not exist' % coll.name
+            print 'ERROR: Collection "%s" does not exist' % coll.name
             return False
     return True
 
