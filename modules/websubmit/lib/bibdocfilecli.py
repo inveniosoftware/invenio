@@ -26,8 +26,8 @@ __revision__ = "$Id$"
 import sys
 import os
 import time
+import fnmatch
 from optparse import OptionParser, OptionGroup
-from tempfile import mkstemp
 
 from invenio.config import CFG_TMPDIR
 from invenio.bibdocfile import BibRecDocs, BibDoc, InvenioWebSubmitFileError, \
@@ -61,12 +61,15 @@ def _xml_fft_creator(fft):
     out += '\t</datafield>\n'
     return out
 
-def ffts_to_xml(ffts):
+def ffts_to_xml(ffts_dict):
     """Transform a dictionary: recid -> ffts where ffts is a list of fft dictionary
     into xml.
     """
     out = ''
-    for recid, ffts in ffts.iteritems():
+    recids = ffts_dict.keys()
+    recids.sort()
+    for recid in recids:
+        ffts = ffts_dict[recid]
         if ffts:
             out += '<record>\n'
             out += '\t<controlfield tag="001">%i</controlfield>\n' % recid
@@ -133,6 +136,8 @@ Examples:
     $ bibdocfile --append foo.tar.gz --recid=1
     $ bibdocfile --revise http://foo.com?search=123 --docname='sam'
             --format=pdf --recid=3 --new-docname='pippo'
+    $ bibdocfile --delete *sam --all
+    $ bibdocfile --undelete -c "Test Collection"
     """
     parser.trailing_text += wrap_text_in_a_box("""
 The bibdocfile command line tool is in a state of high developement. Please
@@ -194,15 +199,24 @@ def get_recids_from_query(pattern, collection, recid, recid2, docid, docid2):
         recid_set &= recid_range
         return recid_set
     elif pattern or collection:
-        return intbitset(perform_request_search(cc=collection, p=pattern))
+        return intbitset(perform_request_search(cc=collection or "", p=pattern or ""))
     else:
-        return intbitset(run_sql('select id from bibrec'))
+        print >> sys.stderr, "ERROR: no record specified."
+        sys.exit(1)
 
-def get_docids_from_query(recid_set, docid, docid2, show_deleted=False):
+def get_docids_from_query(recid_set, docname, docid, docid2, show_deleted=False):
     """Given a set of recid and an optional range of docids
     return a corresponding docids set. The range of docids
     takes precedence over the recid_set."""
-    if docid:
+    if docname:
+        ret = intbitset()
+        for recid in recid_set:
+            bibrec = BibRecDocs(recid, deleted_too=show_deleted)
+            for bibdoc in bibrec.list_bibdocs():
+                if fnmatch.fnmatch(bibdoc.get_docname(), docname):
+                    ret.add(bibdoc.get_id())
+        return ret
+    elif docid:
         ret = intbitset()
         if not docid2:
             docid2 = docid
@@ -232,17 +246,20 @@ def print_info(recid, docid, info):
 def bibupload_ffts(ffts, append=False):
     """Given an ffts dictionary it creates the xml and submit it."""
     xml = ffts_to_xml(ffts)
-    print xml
-    tmp_file = os.path.join(CFG_TMPDIR, "bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"))
-    open(tmp_file, 'w').write(xml)
-    if append:
-        wait_for_user("This will be appended via BibUpload")
-        task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file)
-        print "BibUpload append submitted with id %s" % task
+    if xml:
+        print xml
+        tmp_file = os.path.join(CFG_TMPDIR, "bibdocfile_%s" % time.strftime("%Y-%m-%d_%H:%M:%S"))
+        open(tmp_file, 'w').write(xml)
+        if append:
+            wait_for_user("This will be appended via BibUpload")
+            task = task_low_level_submission('bibupload', 'bibdocfile', '-a', tmp_file)
+            print "BibUpload append submitted with id %s" % task
+        else:
+            wait_for_user("This will be corrected via BibUpload")
+            task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file)
+            print "BibUpload correct submitted with id %s" % task
     else:
-        wait_for_user("This will be corrected via BibUpload")
-        task = task_low_level_submission('bibupload', 'bibdocfile', '-c', tmp_file)
-        print "BibUpload correct submitted with id %s" % task
+        print "WARNING: no MARC to upload."
     return True
 
 def cli_append(recid=None, docid=None, docname=None, doctype=None, url=None, format=None, icon=None, description=None, comment=None, restriction=None):
@@ -461,22 +478,37 @@ def cli_fix_duplicate_docnames(recid_set):
     print wrap_text_in_a_box("%i out of %i record needed to be fixed." % (len(recid_set), len(fixed)), style="conclusion")
     return not fixed
 
-def cli_delete(recid, docname):
-    """Delete the given docname of the given recid."""
-    if docname in BibRecDocs(recid).get_bibdoc_names():
-        ffts = {}
-        ffts[recid] = [{'docname' : docname, 'doctype' : 'DELETE'}]
+def cli_delete(docid_set):
+    """Delete the given docid_set."""
+    ffts = {}
+    for docid in docid_set:
+        bibdoc = BibDoc(docid)
+        if not bibdoc.icon_p():
+            ## Icons are indirectly deleted with the relative bibdoc.
+            docname = bibdoc.get_docname()
+            recid = bibdoc.get_recid()
+            ffts[recid] = [{'docname' : docname, 'doctype' : 'DELETE'}]
+    if ffts:
         return bibupload_ffts(ffts, append=False)
     else:
-        print >> sys.stderr, '%s is not a valid docname for recid %s' % (docname, recid)
+        print >> sys.stderr, 'ERROR: nothing to delete'
+    return False
 
-def cli_undelete(recid, docname, status):
-    """Delete the given docname of the given recid."""
-    bibrecdocs = BibRecDocs(recid, deleted_too=True)
-    bibdoc = bibrecdocs.get_bibdoc(docname)
-    bibdoc.undelete(status)
-    cli_fix_marc(intbitset((recid,)))
-    print wrap_text_in_a_box("docname %s of recid %i successfuly undeleted with status '%s'" % (docname, recid, status), style="conclusion")
+def cli_undelete(recid_set, docname, status):
+    """Delete the given docname"""
+    fix_marc = intbitset()
+    count = 0
+    if not docname.startswith('DELETED-'):
+        docname = 'DELETED-*-' + docname
+    for recid in recid_set:
+        bibrecdocs = BibRecDocs(recid, deleted_too=True)
+        for bibdoc in bibrecdocs.list_bibdocs():
+            if bibdoc.get_status() == 'DELETED' and fnmatch.fnmatch(bibdoc.get_docname(), docname):
+                bibdoc.undelete(status)
+                fix_marc.add(recid)
+                count += 1
+    cli_fix_marc(fix_marc)
+    print wrap_text_in_a_box("%s bibdoc successfuly undeleted with status '%s'" % (count, status), style="conclusion")
 
 def cli_merge_into(recid, docname, into_docname):
     """Merge docname into_docname for the given recid."""
@@ -490,7 +522,7 @@ def cli_merge_into(recid, docname, into_docname):
         else:
             cli_fix_marc(intbitset((recid)))
     else:
-        print >> sys.stderr, 'Either %s or %s is not a valid docname for recid %s' % (docname, into_docname, recid)
+        print >> sys.stderr, 'ERROR: Either %s or %s is not a valid docname for recid %s' % (docname, into_docname, recid)
 
 def cli_get_info(recid_set, show_deleted=False):
     """Print all the info of a recid_set."""
@@ -554,7 +586,7 @@ def cli_assert_recid(options):
         assert(int(options.recid) > 0)
         return True
     except:
-        print >> sys.stderr, 'recid not correctly set: "%s"' % options.recid
+        print >> sys.stderr, 'ERROR: recid not correctly set: "%s"' % options.recid
         return False
 
 def cli_assert_docname(options):
@@ -563,7 +595,7 @@ def cli_assert_docname(options):
         assert(options.docname)
         return True
     except:
-        print >> sys.stderr, 'docname not correctly set: "%s"' % options.docname
+        print >> sys.stderr, 'ERROR: docname not correctly set: "%s"' % options.docname
         return False
 
 def get_all_recids():
@@ -577,12 +609,12 @@ def main():
         recid_set = get_all_recids()
     else:
         recid_set = get_recids_from_query(options.pattern, options.collection, options.recid, options.recid2, options.docid, options.docid2)
-    docid_set = get_docids_from_query(recid_set, options.docid, options.docid2, options.show_deleted == True)
+    docid_set = get_docids_from_query(recid_set, options.docname, options.docid, options.docid2, options.show_deleted is True or options.action == 'undelete')
     try:
         if options.action == 'get-history':
             cli_get_history(docid_set)
         elif options.action == 'get-info':
-            cli_get_info(recid_set, options.show_deleted == True)
+            cli_get_info(recid_set, options.show_deleted is True)
         elif options.action == 'get-docnames':
             cli_get_docnames(docid_set)
         elif options.action == 'get-disk-usage':
@@ -596,7 +628,7 @@ def main():
         elif options.action == 'fix-marc':
             cli_fix_marc(recid_set)
         elif options.action == 'delete':
-            cli_delete(options.recid, options.docname)
+            cli_delete(docid_set)
         elif options.action == 'fix-duplicate-docnames':
             cli_fix_duplicate_docnames(recid_set)
         elif options.action == 'fix-format':
@@ -606,8 +638,7 @@ def main():
         elif options.action == 'check-format':
             cli_check_format(recid_set)
         elif options.action == 'undelete':
-            if cli_assert_recid(options) and cli_assert_docname(options):
-                cli_undelete(options.recid, options.docname, options.restriction or "")
+            cli_undelete(recid_set, options.docname or '*', options.restriction or '')
         elif options.append_path:
             if cli_assert_recid(options):
                 res = cli_append(options.recid, options.docid, options.docname, options.doctype, options.append_path, options.format, options.icon, options.description, options.comment, options.restriction)
@@ -631,13 +662,13 @@ def main():
             if options.recid and options.docname:
                 cli_merge_into(options.recid, options.docname, options.into_docname)
             else:
-                print >> sys.stderr, "You have to specify both the recid and a docname for using --merge-into"
+                print >> sys.stderr, "ERROR: You have to specify both the recid and a docname for using --merge-into"
         else:
-            print >> sys.stderr, "Action %s is not valid" % options.action
+            print >> sys.stderr, "ERROR: Action %s is not valid" % options.action
             sys.exit(1)
     except InvenioWebSubmitFileError, e:
-        print >> sys.stderr, e
+        print >> sys.stderr, 'ERROR: Exception caught: %s' % e
         sys.exit(1)
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()

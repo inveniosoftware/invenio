@@ -1310,6 +1310,11 @@ class BibDoc:
             version = self.get_latest_version()
         return self.more_info.hidden_p(format, version)
 
+    def icon_p(self):
+        """Return True if this bibdoc correspond to an icon which is linked
+        to another bibdoc."""
+        return run_sql("SELECT count(id_bibdoc2) FROM bibdoc_bibdoc WHERE id_bibdoc2=%s AND type='Icon'", (self.id, ))[0][0] > 0
+
     def get_docname(self):
         """retrieve bibdoc name"""
         return self.docname
@@ -1380,9 +1385,8 @@ class BibDoc:
         Otherwise the bibdoc will pe public."""
         bibrecdocs = BibRecDocs(self.recid)
         try:
-            run_sql("UPDATE bibdoc SET status=%s WHERE id=%s AND status='DELETED'", (self.id, previous_status))
+            run_sql("UPDATE bibdoc SET status=%s WHERE id=%s AND status='DELETED'", (previous_status, self.id))
         except Exception, e:
-            register_exception()
             raise InvenioWebSubmitFileError, "It's impossible to undelete bibdoc %s: %s" % (self.id, e)
         if self.docname.startswith('DELETED-'):
             try:
@@ -1391,7 +1395,6 @@ class BibDoc:
                 original_name = bibrecdocs.propose_unique_docname(original_name)
                 self.change_name(original_name)
             except Exception, e:
-                register_exception()
                 raise InvenioWebSubmitFileError, "It's impossible to restore the previous docname %s. %s kept as docname because: %s" % (original_name, self.docname, e)
         else:
             raise InvenioWebSubmitFileError, "Strange just undeleted docname isn't called DELETED-somedate-docname but %s" % self.docname
