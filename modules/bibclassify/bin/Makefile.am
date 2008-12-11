@@ -15,8 +15,8 @@
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-bin_SCRIPTS = bibclassify bibclassifyd
+bin_SCRIPTS = bibclassify
 
-EXTRA_DIST = bibclassify.in bibclassifyd.in
+EXTRA_DIST = bibclassify.in
 
 CLEANFILES = *~ *.tmp

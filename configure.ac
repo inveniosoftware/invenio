@@ -453,8 +453,7 @@ AC_CONFIG_FILES([config.nice  \
 	  modules/bibclassify/doc/Makefile \
 	  modules/bibclassify/doc/admin/Makefile \
 	  modules/bibclassify/doc/hacking/Makefile \
-	  modules/bibclassify/etc/Makefile
-	  modules/bibclassify/lib/Makefile
+	  modules/bibclassify/lib/Makefile \
 	  modules/bibconvert/Makefile \
 	  modules/bibconvert/bin/Makefile \
 	  modules/bibconvert/bin/bibconvert \

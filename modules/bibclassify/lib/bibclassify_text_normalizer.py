@@ -40,12 +40,11 @@ except ImportError, err:
 try:
     from invenio.refextract import replace_undesirable_characters, \
         find_reference_section, find_end_of_reference_section
-except ImportError, e1:
+except ImportError:
     try:
-        from invenio.refextract import replace_undesirable_characters, \
+        from refextract import replace_undesirable_characters, \
             find_reference_section, find_end_of_reference_section
-    except ImportError, err:
-        print >> sys.stderr, "Import error: %s" % err
+    except ImportError:
         sys.exit(0)
 
 def normalize_fulltext(fulltext):
@@ -237,7 +236,7 @@ def _replace_greek_characters(line):
     for greek_char, replacement in _GREEK_REPLACEMENTS.iteritems():
         try:
             line = line.replace(greek_char, replacement)
-        except UnicodeDecodeError, err1:
+        except UnicodeDecodeError:
             write_message("WARNING: Unicode decoding error.",
                 stream=sys.stderr, verbose=2)
             return ""

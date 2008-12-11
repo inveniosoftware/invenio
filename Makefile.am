@@ -298,5 +298,8 @@ update-v0.99.1-tables:
 	echo "ALTER TABLE collection DROP COLUMN restricted;" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE schTASK CHANGE host host varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec
 	echo "ALTER TABLE hstTASK CHANGE host host varchar(255) NOT NULL default '';" | ${prefix}/bin/dbexec
+	echo "UPDATE clsMETHOD SET location='http://cdsware.cern.ch/download/invenio-demo-site-files/HEP.rdf' WHERE name='HEP' AND location='';" | ${prefix}/bin/dbexec
+	echo "UPDATE clsMETHOD SET location='http://cdsware.cern.ch/download/invenio-demo-site-files/NASA-subjects.rdf' WHERE name='NASA-subjects' AND location='';" | ${prefix}/bin/dbexec
+
 
 CLEANFILES = *~ *.pyc *.tmp
