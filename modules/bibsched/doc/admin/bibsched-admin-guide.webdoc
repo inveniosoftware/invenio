@@ -92,12 +92,14 @@ selecting you're given different actions.</p>
 <h2>Bibsched maintenance</h2>
 <p>bibsched produce two log files. bibsched.log and bibsched.err, located under the usual log directory of your CDS Invenio installation. The former will contain all the actions (either automatic of manual) that bibsched has performed. The latter will contain all the exceptional errors.</p>
 
-<p>In case of a bibtask failing while bibsched is in automatic mode, bibsched will stop turning into manual mode, and sending an email to the administrator (and an emergency SMS in case it is configured to do so). Note that in case of failed bibtasks, bibsched will refuse to be put back to automatic mode, until either the task is reinitialized, or deleted or the error is acknowledged.</p>
+<p>In case of a bibtask failing while bibsched is in automatic mode, bibsched will stop by switching to manual mode, and will send an email to the administrator (and an emergency SMS in case it is configured to do so). Note that in case of failed bibtasks, bibsched will refuse to be put back to automatic mode, until either the task is reinitialized, or deleted or the error is acknowledged.</p>
 
 <h2>Priorities</h2>
 <p>A task can be scheduled with a given <em>priority</em>, represented by an integer number. When at a given time two or more tasks might be executed, the task with higher priority will be executed first.</p>
 
-<p>If this task as priority higher than 10 and there are currently other task running, conflicting with the execution of this task (because either the maximum number of task runnable is already reached or because the other tasks should not run concurrently with this task), then the other tasks are stopped.</p>
+<p>When a task is running and is not a bibupload, the scheduler will allow to run higher priority tasks that don't conflict with the former task, by first putting to sleep the former task, if the resources are not enough.</p>
+
+<p>If a task has priority higher than 100 and there are currently other task running, conflicting with the execution of this task (because the other tasks should not run concurrently with this task), then the other tasks are stopped (unless they are bibuploads).</p>
 
 <p>If the priority is less than 0 than the task will never be executed automatically.</p>
 
