@@ -61,12 +61,15 @@ def _xml_fft_creator(fft):
     out += '\t</datafield>\n'
     return out
 
-def ffts_to_xml(ffts):
+def ffts_to_xml(ffts_dict):
     """Transform a dictionary: recid -> ffts where ffts is a list of fft dictionary
     into xml.
     """
     out = ''
-    for recid, ffts in ffts.iteritems():
+    recids = ffts_dict.keys()
+    recids.sort()
+    for recid in recids:
+        ffts = ffts_dict[recid]
         if ffts:
             out += '<record>\n'
             out += '\t<controlfield tag="001">%i</controlfield>\n' % recid
@@ -133,6 +136,8 @@ Examples:
     $ bibdocfile --append foo.tar.gz --recid=1
     $ bibdocfile --revise http://foo.com?search=123 --docname='sam'
             --format=pdf --recid=3 --new-docname='pippo'
+    $ bibdocfile --delete *sam --all
+    $ bibdocfile --undelete -c "Test Collection"
     """
     parser.trailing_text += wrap_text_in_a_box("""
 The bibdocfile command line tool is in a state of high developement. Please
@@ -196,7 +201,8 @@ def get_recids_from_query(pattern, collection, recid, recid2, docid, docid2):
     elif pattern or collection:
         return intbitset(perform_request_search(cc=collection or "", p=pattern or ""))
     else:
-        return intbitset(run_sql('select id from bibrec'))
+        print >> sys.stderr, "ERROR: no record specified."
+        sys.exit(1)
 
 def get_docids_from_query(recid_set, docname, docid, docid2, show_deleted=False):
     """Given a set of recid and an optional range of docids
@@ -477,9 +483,11 @@ def cli_delete(docid_set):
     ffts = {}
     for docid in docid_set:
         bibdoc = BibDoc(docid)
-        docname = bibdoc.get_docname()
-        recid = bibdoc.get_recid()
-        ffts[recid] = [{'docname' : docname, 'doctype' : 'DELETE'}]
+        if not bibdoc.icon_p():
+            ## Icons are indirectly deleted with the relative bibdoc.
+            docname = bibdoc.get_docname()
+            recid = bibdoc.get_recid()
+            ffts[recid] = [{'docname' : docname, 'doctype' : 'DELETE'}]
     if ffts:
         return bibupload_ffts(ffts, append=False)
     else:
@@ -490,6 +498,8 @@ def cli_undelete(recid_set, docname, status):
     """Delete the given docname"""
     fix_marc = intbitset()
     count = 0
+    if not docname.startswith('DELETED-'):
+        docname = 'DELETED-*-' + docname
     for recid in recid_set:
         bibrecdocs = BibRecDocs(recid, deleted_too=True)
         for bibdoc in bibrecdocs.list_bibdocs():
@@ -628,7 +638,7 @@ def main():
         elif options.action == 'check-format':
             cli_check_format(recid_set)
         elif options.action == 'undelete':
-            cli_undelete(recid_set, options.docname or '', options.restriction or '')
+            cli_undelete(recid_set, options.docname or '*', options.restriction or '')
         elif options.append_path:
             if cli_assert_recid(options):
                 res = cli_append(options.recid, options.docid, options.docname, options.doctype, options.append_path, options.format, options.icon, options.description, options.comment, options.restriction)
