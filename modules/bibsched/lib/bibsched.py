@@ -1115,7 +1115,13 @@ def start(verbose = True):
     redirect_stdout_and_stderr()
 
     sched = BibSched()
-    sched.watch_loop()
+    try:
+        sched.watch_loop()
+    finally:
+        try:
+            os.remove(pidfile)
+        except OSError:
+            pass
 
     return
 
