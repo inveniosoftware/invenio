@@ -904,6 +904,10 @@ class BibSched:
                     bibsched_set_status(task_id, "SCHEDULED")
                     Log("Task #%d (%s) started" % (task_id, proc))
                     os.system(COMMAND)
+                    while run_sql("SELECT status FROM schTASK WHERE id=%s AND status='SCHEDULED'", (task_id, )):
+                        ## Polling to wait for the task to really start,
+                        ## in order to avoid race conditions.
+                        time.sleep(CFG_BIBSCHED_REFRESHTIME)
                     return True
                 else:
                     raise StandardError, "%s is not in the allowed modules" % procname
