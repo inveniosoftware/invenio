@@ -892,24 +892,27 @@ def check_running_process_user():
     Apache webserver process.
     """
     running_as_user = pwd.getpwuid(os.getuid())[0]
-    if CFG_BIBSCHED_PROCESS_USER and running_as_user != CFG_BIBSCHED_PROCESS_USER:
-        print >> sys.stderr, """ERROR: You must run "%(x_proc)s" as the user set up in your
-       CFG_BIBSCHED_PROCESS_USER (seems to be "%(x_user)s").
+    if CFG_BIBSCHED_PROCESS_USER:
+        # We have the expected bibsched process user defined in config,
+        # so check against her, not against Apache.
+        if running_as_user != CFG_BIBSCHED_PROCESS_USER:
+            print >> sys.stderr, """ERROR: You must run "%(x_proc)s" as the user set up in your
+CFG_BIBSCHED_PROCESS_USER (seems to be "%(x_user)s").
 
-       You may want to do "sudo -u %(x_user)s %(x_proc)s ..." to do so.
+You may want to do "sudo -u %(x_user)s %(x_proc)s ..." to do so.
 
-       If you think this is not right, please set CFG_BIBSCHED_PROCESS_USER
-       appropriately and rerun "inveniocfg --update-config-py".""" % \
-        {'x_proc': os.path.basename(sys.argv[0]), 'x_user': CFG_BIBSCHED_PROCESS_USER}
-        sys.exit(1)
-    elif running_as_user != guess_apache_process_user():
+If you think this is not right, please set CFG_BIBSCHED_PROCESS_USER
+appropriately and rerun "inveniocfg --update-config-py".""" % \
+            {'x_proc': os.path.basename(sys.argv[0]), 'x_user': CFG_BIBSCHED_PROCESS_USER}
+            sys.exit(1)
+    elif running_as_user != guess_apache_process_user(): # not defined in config, check against Apache
         print >> sys.stderr, """ERROR: You must run "%(x_proc)s" as the same user that runs your Apache server
-       process (seems to be "%(x_user)s").
+process (seems to be "%(x_user)s").
 
-       You may want to do "sudo -u %(x_user)s %(x_proc)s ..." to do so.
+You may want to do "sudo -u %(x_user)s %(x_proc)s ..." to do so.
 
-       If you think this is not right, please set CFG_BIBSCHED_PROCESS_USER
-       appropriately and rerun "inveniocfg --update-config-py".""" % \
+If you think this is not right, please set CFG_BIBSCHED_PROCESS_USER
+appropriately and rerun "inveniocfg --update-config-py".""" % \
         {'x_proc': os.path.basename(sys.argv[0]), 'x_user': guess_apache_process_user()}
         sys.exit(1)
     return
