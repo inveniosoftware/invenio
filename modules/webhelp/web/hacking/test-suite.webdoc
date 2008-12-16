@@ -503,8 +503,7 @@ use Selenium IDE test recording capabilities: you surf in Firefox as a
 normal user would, and you add simple tests for the presence of
 certain text on the pages as you go.  Selenium IDE can record and
 store tests for further replaying.  (You can watch an explanatory
-movie
-on <a href="http://wiki.openqa.org/download/attachments/400/Selenium+IDE.swf">how
+screencast on <a href="http://seleniumhq.org/movies/intro.mov">how
 to record a test</a>.)
 
 <p>(Note that one inconvenience with recording test cases is that this
