@@ -108,7 +108,6 @@ CFG_BIBCLASSIFY_UNCHANGE_REGULAR_EXPRESSIONS = (
 # "al$" -> "al(ly)?"
 
 CFG_BIBCLASSIFY_GENERAL_REGULAR_EXPRESSIONS = (
-    (re.compile("ing$"), r"(e|er|ing)?"),
     (re.compile("ional"), r"ional(ly)?"),
     (re.compile("([ae])n(ce|t)$"), r"\1n(t|ces?)"),
     (re.compile("og(ue)?$"), r"og(ue)?s?"),
