@@ -2973,7 +2973,7 @@ class Template:
         """ % {'sitename': CFG_SITE_NAME,
                'siteurl': CFG_SITE_URL,
                'sitelang': CFG_SITE_LANG,
-               'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S %Z", time.localtime()),
+               'timestamp': time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime()),
                'version': CFG_VERSION,
                'sitesupportemail': CFG_SITE_SUPPORT_EMAIL,
                'timetolive': CFG_WEBSEARCH_RSS_TTL,
