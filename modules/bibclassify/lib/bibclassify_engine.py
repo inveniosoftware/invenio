@@ -381,12 +381,12 @@ def _resize_single_keywords(keywords, limit=20):
     given length."""
     keywords = list(keywords.items())
     keywords.sort(_single_keywords_comparator)
-    return keywords[:limit]
+    return limit and keywords[:limit] or keywords
 
 def _resize_composite_keywords(keywords, limit=20):
     """Returns a resized version of the composite_keywords list."""
     keywords.sort(_composite_keywords_comparator)
-    return keywords[:limit]
+    return limit and keywords[:limit] or keywords
 
 def _spires_label(subject):
     """Returns the SPIRES representation of a keyword. If the

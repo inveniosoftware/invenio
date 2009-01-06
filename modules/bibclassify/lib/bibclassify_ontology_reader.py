@@ -47,9 +47,6 @@ try:
 except ImportError:
     # Running in standalone.
     CFG_CACHEDIR = tempfile.gettempdir()
-    STANDALONE = True
-else:
-    STANDALONE = False
 
 try:
     from bibclassify_config import CFG_BIBCLASSIFY_WORD_WRAP, \
@@ -172,22 +169,15 @@ def _download_remote_ontology(onto_url, time_difference=None):
 
 def _get_ontology_path(ontology):
     """Returns the path to the short ontology name."""
-    if not STANDALONE:
+    if os.access(ontology, os.R_OK):
+        return (os.path.basename(ontology), ontology, None)
+    else:
         result = run_sql("SELECT name, location from clsMETHOD")
         for onto_short_name, onto_url in result:
             onto_long_name = os.path.basename(onto_url)
             if ontology in (onto_short_name, onto_long_name, onto_url):
                 return (onto_short_name, onto_long_name, onto_url)
         return None
-    # FIXME write for standalone
-    else:
-        if not os.access(ontology, os.R_OK):
-            write_message("ERROR: The ontology is not accessible. When "
-                "running in standalone mode, please use the path to the "
-                "ontology file.", stream=sys.stderr, verbose=0)
-            sys.exit(0)
-        else:
-            return (os.path.basename(ontology), ontology, None)
 
 class SingleKeyword:
     """A single keyword element that treats and stores information
@@ -460,13 +450,13 @@ def _get_cache_path(source_file):
     else:
         # Find the most probable location of the cache. First consider
         # Invenio's temp directory then the system temp directory.
-        if CFG_CACHEDIR:
+        if os.access(CFG_CACHEDIR, os.W_OK):
             tmp_dir = CFG_CACHEDIR
         else:
             tmp_dir = tempfile.gettempdir()
 
         absolute_dir = os.path.join(tmp_dir, relative_dir)
-        # Test bibclassify's directory in the tempo directory.
+        # Test bibclassify's directory in the temp directory.
         if not os.path.exists(absolute_dir):
             try:
                 os.mkdir(absolute_dir)

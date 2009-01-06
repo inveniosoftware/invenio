@@ -218,7 +218,7 @@ def _read_options(options_string):
         "-m": "match_mode",
         "--matching-mode": "match_mode",
         "-n": "output_limit",
-        "--nkeywords": "output_limit",
+        "--keywords-number": "output_limit",
     }
 
     without_argument = {
@@ -292,4 +292,3 @@ def _read_options(options_string):
 
 if __name__ == '__main__':
     main()
-
