@@ -81,7 +81,7 @@ if processor_type == -1:
 ##################################################################
 # Support for 'creation_date' and 'modification_date' functions  #
 
-def get_creation_date_libxslt(ctx, recID):
+def get_creation_date_libxslt(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
     """
     libxslt extension function:
     Bridge between BibFormat and XSL stylesheets.
@@ -102,7 +102,12 @@ def get_creation_date_libxslt(ctx, recID):
         else:
             recID_int = libxml2.xmlNode(_obj=recID[0]).children.content
 
-        return get_creation_date(recID_int)
+        if isinstance(fmt, str):
+            fmt_str = fmt
+        else:
+            fmt_str = libxml2.xmlNode(_obj=recID[0]).children.content
+
+        return get_creation_date(recID_int, fmt_str)
     except Exception, err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
@@ -110,7 +115,7 @@ def get_creation_date_libxslt(ctx, recID):
 
         return ''
 
-def get_creation_date_4suite(ctx, recID):
+def get_creation_date_4suite(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
     """
     4suite extension function:
     Bridge between BibFormat and XSL stylesheets.
@@ -129,9 +134,16 @@ def get_creation_date_4suite(ctx, recID):
             if recID_int is None:
                 return ''
         else:
-            recID_int = int(recID_int)
+            recID_int = int(recID)
 
-        return get_creation_date(recID_int)
+        if len(fmt) > 0 and isinstance(fmt[0], Node):
+            fmt_str = fmt[0].firstChild.nodeValue
+            if fmt_str is None:
+                fmt_str = "%Y-%m-%dT%H:%M:%SZ"
+        else:
+            fmt_str = str(fmt)
+
+        return get_creation_date(recID_int, fmt_str)
     except Exception, err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
@@ -139,7 +151,7 @@ def get_creation_date_4suite(ctx, recID):
 
         return ''
 
-def get_modification_date_libxslt(ctx, recID):
+def get_modification_date_libxslt(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
     """
     libxslt extension function:
     Bridge between BibFormat and XSL stylesheets.
@@ -160,7 +172,12 @@ def get_modification_date_libxslt(ctx, recID):
         else:
             recID_int = libxml2.xmlNode(_obj=recID[0]).children.content
 
-        return get_modification_date(recID_int)
+        if isinstance(fmt, str):
+            fmt_str = fmt
+        else:
+            fmt_str = libxml2.xmlNode(_obj=recID[0]).children.content
+
+        return get_modification_date(recID_int, fmt_str)
     except Exception, err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \
@@ -168,7 +185,7 @@ def get_modification_date_libxslt(ctx, recID):
 
         return ''
 
-def get_modification_date_4suite(ctx, recID):
+def get_modification_date_4suite(ctx, recID, fmt="%Y-%m-%dT%H:%M:%SZ"):
     """
     4suite extension function:
     Bridge between BibFormat and XSL stylesheets.
@@ -189,7 +206,14 @@ def get_modification_date_4suite(ctx, recID):
         else:
             recID_int = int(recID_int)
 
-        return get_modification_date(recID_int)
+        if len(fmt) > 0 and isinstance(fmt[0], Node):
+            fmt_str = fmt[0].firstChild.nodeValue
+            if fmt_str is None:
+                fmt_str = "%Y-%m-%dT%H:%M:%SZ"
+        else:
+            fmt_str = str(fmt)
+
+        return get_modification_date(recID_int, fmt_str)
     except Exception, err:
         sys.stderr.write("Error during formatting function evaluation: " + \
                          str(err) + \

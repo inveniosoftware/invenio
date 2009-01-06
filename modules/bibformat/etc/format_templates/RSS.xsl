@@ -74,7 +74,7 @@ exclude-result-prefixes="marc fn">
                 <xsl:value-of select="datafield[(@tag='100' or @tag='700') and @ind1=' ' and @ind2=' ']/subfield[@code='a']"/>
         </author>
         <pubDate>
-                <xsl:value-of select="fn:creation_date(controlfield[@tag=001])"/>
+                <xsl:value-of select="fn:creation_date(controlfield[@tag=001], '%a, %d %b %Y %H:%M:%S GMT')"/>
         </pubDate>
         <guid>
                 <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />

@@ -46,7 +46,7 @@ def get_fieldvalues(recID, tag):
         out.append(row[0])
     return out
 
-def localtime_to_utc(date):
+def localtime_to_utc(date, fmt="%Y-%m-%dT%H:%M:%SZ"):
     "Convert localtime to UTC"
 
     ldate = date.split(" ")[0]
@@ -60,24 +60,24 @@ def localtime_to_utc(date):
     lmonth  = ldate.split("-")[1]
     lday    = ldate.split("-")[2]
 
-    timetoconvert = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, -1))))
+    timetoconvert = time.strftime(fmt, time.gmtime(time.mktime((int(lyear), int(lmonth), int(lday), int(lhour), int(lminute), int(lsec), 0, 0, -1))))
 
     return timetoconvert
 
-def get_creation_date(sysno):
+def get_creation_date(sysno, fmt="%Y-%m-%dT%H:%M:%SZ"):
     "Returns the creation date of the record 'sysno'."
     out   = ""
     res = run_sql("SELECT DATE_FORMAT(creation_date, '%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (sysno,), 1)
     if res[0][0]:
-        out = localtime_to_utc(res[0][0])
+        out = localtime_to_utc(res[0][0], fmt)
     return out
 
-def get_modification_date(sysno):
+def get_modification_date(sysno, fmt="%Y-%m-%dT%H:%M:%SZ"):
     "Returns the date of last modification for the record 'sysno'."
     out = ""
     res = run_sql("SELECT DATE_FORMAT(modification_date,'%%Y-%%m-%%d %%H:%%i:%%s') FROM bibrec WHERE id=%s", (sysno,), 1)
     if res and res[0][0]:
-        out = localtime_to_utc(res[0][0])
+        out = localtime_to_utc(res[0][0], fmt)
     return out
 
 ## Knowledge base access functions
