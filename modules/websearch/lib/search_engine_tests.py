@@ -140,7 +140,7 @@ class TestQueryParser(unittest.TestCase):
     def test_parsing_exact_phrase_query_in_any_field(self):
         "search engine - parsing exact phrase in any field"
         self._check('"the word"', '', None,
-                    [['+', 'the word', 'anyfield', 'a']])
+                    [['+', 'the word', '', 'a']])
 
     def test_parsing_partial_phrase_query(self):
         "search engine - parsing partial phrase"
@@ -152,11 +152,11 @@ class TestQueryParser(unittest.TestCase):
         self._check("'the word", 'title', None,
                     [['+', "'the", 'title', 'w'],
                      ['+', "word", 'title', 'w']])
+
     def test_parsing_partial_phrase_query_in_any_field(self):
         "search engine - parsing partial phrase in any field"
         self._check("'the word'", '', None,
-                    [['+', "'the", '', 'w'],
-                     ['+', "word'", '', 'w']])
+                    [['+', '%the word%', '', 'a']])
 
     def test_parsing_regexp_query(self):
         "search engine - parsing regex matches"
@@ -172,8 +172,7 @@ class TestQueryParser(unittest.TestCase):
     def test_parsing_regexp_query_in_any_field(self):
         "search engine - parsing regexp searches in any field"
         self._check("/the word/", '', None,
-                    [['+', "/the", '', 'w'],
-                     ['+', "word/", '', 'w']])
+                    [['+', 'the word', '', 'r']])
 
     def test_parsing_boolean_query(self):
         "search engine - parsing boolean query with several words"

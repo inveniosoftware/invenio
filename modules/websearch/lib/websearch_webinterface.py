@@ -84,6 +84,7 @@ from invenio.bibupload import find_record_from_sysno
 from invenio.bibrank_citation_searcher import get_author_cited_by, get_cited_by_list
 from invenio.bibrank_downloads_indexer import get_download_weight_total
 from invenio.search_engine_summarizer import summarize_records
+from invenio.errorlib import register_exception
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -766,6 +767,7 @@ def display_collection(req, c, as, verbose, ln):
         elif uid > 0:
             user_preferences = get_user_preferences(uid)
     except Error:
+        register_exception(req=req, alert_admin=True)
         return page(title=_("Internal Error"),
                     body = create_error_box(req, verbose=verbose, ln=ln),
                     description="%s - Internal Error" % CFG_SITE_NAME,
@@ -865,6 +867,7 @@ def display_collection(req, c, as, verbose, ln):
             req.write("<br />ln=%s" % ln)
             req.write("<br />colID=%s" % colID)
             req.write("<br />uid=%s" % uid)
+        register_exception(req=req, alert_admin=True)
         return page(title=_("Internal Error"),
                     body = create_error_box(req, ln=ln),
                     description="%s - Internal Error" % CFG_SITE_NAME,

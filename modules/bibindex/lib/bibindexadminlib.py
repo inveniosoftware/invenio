@@ -1544,34 +1544,34 @@ def add_idx(idxNAME):
                       (idxID, CFG_SITE_LANG, type, idxNAME))
 
         res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%02dF (
-                         id mediumint(9) unsigned NOT NULL auto_increment,
-                         term varchar(50) default NULL,
-                         hitlist longblob,
-                         PRIMARY KEY  (id),
-                         UNIQUE KEY term (term)
-                         ) TYPE=MyISAM""" % idxID)
+                            id mediumint(9) unsigned NOT NULL auto_increment,
+                            term varchar(50) default NULL,
+                            hitlist longblob,
+                            PRIMARY KEY  (id),
+                            UNIQUE KEY term (term)
+                            ) ENGINE=MyISAM""" % idxID)
 
         res = run_sql("""CREATE TABLE IF NOT EXISTS idxWORD%02dR (
-                         id_bibrec mediumint(9) unsigned NOT NULL,
-                         termlist longblob,
-                         type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
-                         PRIMARY KEY (id_bibrec,type)
-                         ) TYPE=MyISAM""" % idxID)
+                            id_bibrec mediumint(9) unsigned NOT NULL,
+                            termlist longblob,
+                            type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+                            PRIMARY KEY (id_bibrec,type)
+                            ) ENGINE=MyISAM""" % idxID)
 
-        res = run_sql("""CREATE TABLE `idxPHRASE%02dF` (
-                         `id` mediumint(9) unsigned NOT NULL auto_increment,
-                         `term` text default NULL,
-                         `hitlist` longblob,
-                         PRIMARY KEY  (`id`),
-                         KEY `term` (`term`(50))
-                         ) TYPE=MyISAM""" % idxID)
+        res = run_sql("""CREATE TABLE IF NOT EXISTS idxPHRASE%02dF (
+                            id mediumint(9) unsigned NOT NULL auto_increment,
+                            term text default NULL,
+                            hitlist longblob,
+                            PRIMARY KEY  (id),
+                            KEY term (term(50))
+                            ) ENGINE=MyISAM""" % idxID)
 
-        res = run_sql("""CREATE TABLE `idxPHRASE%02dR` (
-                         `id_bibrec` mediumint(9) unsigned NOT NULL default '0',
-                         `termlist` longblob,
-                         `type` enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
-                         PRIMARY KEY  (`id_bibrec`,`type`)
-                         ) TYPE=MyISAM""" % idxID)
+        res = run_sql("""CREATE TABLE IF NOT EXISTS idxPHRASE%02dR (
+                            id_bibrec mediumint(9) unsigned NOT NULL default '0',
+                            termlist longblob,
+                            type enum('CURRENT','FUTURE','TEMPORARY') NOT NULL default 'CURRENT',
+                            PRIMARY KEY  (id_bibrec,type)
+                            ) ENGINE=MyISAM""" % idxID)
 
         res = run_sql("SELECT id from idxINDEX WHERE id=%s", (idxID, ))
         res2 = get_table_status_info("idxWORD%02dF" % idxID)

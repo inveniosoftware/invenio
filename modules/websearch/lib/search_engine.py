@@ -72,6 +72,7 @@ from invenio.webinterface_handler import wash_urlargd
 from invenio.urlutils import make_canonical_urlargd
 from invenio.dbquery import DatabaseError
 from invenio.access_control_engine import acc_authorize_action
+from invenio.errorlib import register_exception
 
 import invenio.template
 webstyle_templates = invenio.template.load('webstyle')
@@ -406,6 +407,8 @@ def get_index_id_from_field(field):
        Returns zero in case there is no table for this index.
        Example: field='author', output=4."""
     out = 0
+    if field == '':
+        field = 'anyfield' # empty string field means 'anyfield'
     res = run_sql("""SELECT w.id FROM idxINDEX AS w, idxINDEX_field AS wf, field AS f
                       WHERE f.code=%s AND wf.id_field=f.id AND w.id=wf.id_idxINDEX
                       LIMIT 1""", (field,))
@@ -443,14 +446,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
         opfts.append(['+', p, f, 'w'])
         return opfts
 
-    ## check arguments: if matching type phrase/string/regexp, do we have field defined?
-    if (m=='p' or m=='r' or m=='e') and not f:
-        m = 'a'
-        if of.startswith("h"):
-            print_warning(req, "This matching type cannot be used within <em>any field</em>.  I will perform a word search instead." )
-            print_warning(req, "If you want to phrase/substring/regexp search in a specific field, e.g. inside title, then please choose <em>within title</em> search option.")
-
-    ## is desired matching type set?
+    ## check arguments: is desired matching type set?
     if m:
         ## A - matching type is known; good!
         if m == 'e':
@@ -525,7 +521,7 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                     if fi in get_fieldcodes() or '00' <= fi[:2] <= '99':
                         pass
                     else:
-                        # it is not, so joint it back:
+                        # it is not, so join it back:
                         fi, pi = f, fi + ":" + pi
                 else:
                     fi, pi = f, pi
@@ -535,42 +531,22 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 # wash 'pi' argument:
                 if re_quotes.match(pi):
                     # B3a - quotes are found => do ACC search (phrase search)
-                    if fi:
-                        if pi[0] == '"' and pi[-1] == '"':
-                            pi = string.replace(pi, '"', '') # remove quote signs
-                            opfts.append([oi, pi, fi, 'a'])
-                        elif pi[0] == "'" and pi[-1] == "'":
-                            pi = string.replace(pi, "'", "") # remove quote signs
-                            opfts.append([oi, "%" + pi + "%", fi, 'a'])
-                        else: # unbalanced quotes, so do WRD query:
-                            opfts.append([oi, pi, fi, 'w'])
-                    else:
-                        # fi is not defined, look at where we are doing exact or subphrase search (single/double quotes):
-                        if pi[0] == '"' and pi[-1] == '"':
-                            opfts.append([oi, pi[1:-1], "anyfield", 'a'])
-                            if of.startswith("h"):
-                                print_warning(req, "Searching for an exact match inside any field may be slow.  You may want to search for words instead, or choose to search within specific field.")
-                        else:
-                            # nope, subphrase in global index is not possible => change back to WRD search
-                            pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed
-                            for pii in get_words_from_pattern(pi):
-                                # since there may be '-' and other chars that we do not index in WRD
-                                opfts.append([oi, pii, fi, 'w'])
-                            if of.startswith("h"):
-                                print_warning(req, "The partial phrase search does not work in any field.  I'll do a boolean AND searching instead.")
-                                print_warning(req, "If you want to do a partial phrase search in a specific field, e.g. inside title, then please choose 'within title' search option.", "Tip")
-                                print_warning(req, "If you want to do exact phrase matching, then please use double quotes.", "Tip")
+                    if pi[0] == '"' and pi[-1] == '"':
+                        pi = string.replace(pi, '"', '') # remove quote signs
+                        opfts.append([oi, pi, fi, 'a'])
+                    elif pi[0] == "'" and pi[-1] == "'":
+                        pi = string.replace(pi, "'", "") # remove quote signs
+                        opfts.append([oi, "%" + pi + "%", fi, 'a'])
+                    else: # unbalanced quotes, so fall back to WRD query:
+                        opfts.append([oi, pi, fi, 'w'])
                 elif fi and str(fi[0]).isdigit() and str(fi[0]).isdigit():
                     # B3b - fi exists and starts by two digits => do ACC search
                     opfts.append([oi, pi, fi, 'a'])
-                elif fi and not get_index_id_from_field(fi):
-                    # B3c - fi exists but there is no words table for fi => try ACC search
-                    opfts.append([oi, pi, fi, 'a'])
-                elif fi and pi.startswith('/') and pi.endswith('/'):
-                    # B3d - fi exists and slashes found => try regexp search
+                elif pi.startswith('/') and pi.endswith('/'):
+                    # B3c - pi has slashes around => do regexp search
                     opfts.append([oi, pi[1:-1], fi, 'r'])
                 else:
-                    # B3e - general case => do WRD search
+                    # B3d - general case => do WRD search
                     pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed
                     for pii in get_words_from_pattern(pi):
                         opfts.append([oi, pii, fi, 'w'])
@@ -1534,10 +1510,6 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
     # load the right message language
     _ = gettext_set_language(ln)
 
-    ## do we search in words indexes?
-    if not f:
-        return browse_in_bibwords(req, p, f)
-
     ## is p enclosed in quotes? (coming from exact search)
     if p.startswith('"') and p.endswith('"'):
         p = p[1:-1]
@@ -1545,42 +1517,57 @@ def browse_pattern(req, colls, p, f, rg, ln=CFG_SITE_LANG):
     p_orig = p
     ## okay, "real browse" follows:
     ## FIXME: the maths in the get_nearest_terms_in_bibxxx is just a test
-    browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
-    while not browsed_phrases:
-        # try again and again with shorter and shorter pattern:
-        try:
-            p = p[:-1]
-            browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
-        except:
-            # probably there are no hits at all:
-            req.write(_("No values found."))
-            return
 
-    ## try to check hits in these particular collection selection:
-    browsed_phrases_in_colls = []
-    if 0:
-        for phrase in browsed_phrases:
-            phrase_hitset = HitSet()
-            phrase_hitsets = search_pattern("", phrase, f, 'e')
-            for coll in colls:
-                phrase_hitset.union_update(phrase_hitsets[coll])
-            if len(phrase_hitset) > 0:
-                # okay, this phrase has some hits in colls, so add it:
-                browsed_phrases_in_colls.append([phrase, len(phrase_hitset)])
+    if not f and string.find(p, ":") > 0: # does 'p' contain ':'?
+        f, p = string.split(p, ":", 1)
 
-    ## were there hits in collections?
-    if browsed_phrases_in_colls == []:
-        if browsed_phrases != []:
-            #print_warning(req, """<p>No match close to <em>%s</em> found in given collections.
-            #Please try different term.<p>Displaying matches in any collection...""" % p_orig)
-            ## try to get nbhits for these phrases in any collection:
+    ## do we search in words indexes?
+    if not f:
+        return browse_in_bibwords(req, p, f)
+
+    index_id = get_index_id_from_field(f)
+    if index_id != 0:
+        coll = HitSet()
+        for coll_name in colls:
+            coll |= get_collection_reclist(coll_name)
+        browsed_phrases_in_colls = get_nearest_terms_in_idxphrase_with_collection(p, index_id, rg/2, rg/2, coll)
+    else:
+        browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
+        while not browsed_phrases:
+            # try again and again with shorter and shorter pattern:
+            try:
+                p = p[:-1]
+                browsed_phrases = get_nearest_terms_in_bibxxx(p, f, (rg+1)/2+1, (rg-1)/2+1)
+            except:
+                # probably there are no hits at all:
+                req.write(_("No values found."))
+                return
+
+        ## try to check hits in these particular collection selection:
+        browsed_phrases_in_colls = []
+        if 0:
             for phrase in browsed_phrases:
-                browsed_phrases_in_colls.append([phrase, get_nbhits_in_bibxxx(phrase, f)])
+                phrase_hitset = HitSet()
+                phrase_hitsets = search_pattern("", phrase, f, 'e')
+                for coll in colls:
+                    phrase_hitset.union_update(phrase_hitsets[coll])
+                if len(phrase_hitset) > 0:
+                    # okay, this phrase has some hits in colls, so add it:
+                    browsed_phrases_in_colls.append([phrase, len(phrase_hitset)])
+
+        ## were there hits in collections?
+        if browsed_phrases_in_colls == []:
+            if browsed_phrases != []:
+                #print_warning(req, """<p>No match close to <em>%s</em> found in given collections.
+                #Please try different term.<p>Displaying matches in any collection...""" % p_orig)
+                ## try to get nbhits for these phrases in any collection:
+                for phrase in browsed_phrases:
+                    browsed_phrases_in_colls.append([phrase, get_nbhits_in_bibxxx(phrase, f)])
 
     ## display results now:
     out = websearch_templates.tmpl_browse_pattern(
             f=f,
-            fn=get_field_i18nname(get_field_name(f), ln),
+            fn=get_field_i18nname(get_field_name(f) or f, ln),
             ln=ln,
             browsed_phrases_in_colls=browsed_phrases_in_colls,
             colls=colls,
@@ -1658,7 +1645,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     if verbose and of.startswith("h"):
         t1 = os.times()[4]
     basic_search_units_hitsets = []
-    for idx_unit in range(0, len(basic_search_units)):
+    for idx_unit in xrange(len(basic_search_units)):
         bsu_o, bsu_p, bsu_f, bsu_m = basic_search_units[idx_unit]
         basic_search_unit_hitset = search_unit(bsu_p, bsu_f, bsu_m)
         if verbose >= 9 and of.startswith("h"):
@@ -1721,7 +1708,7 @@ def search_pattern(req=None, p=None, f=None, m=None, ap=0, of="id", verbose=0, l
     # let the initial set be the complete universe:
     hitset_in_any_collection = HitSet(trailing_bits=1)
     hitset_in_any_collection.discard(0)
-    for idx_unit in range(0, len(basic_search_units)):
+    for idx_unit in xrange(len(basic_search_units)):
         this_unit_operation = basic_search_units[idx_unit][0]
         this_unit_hitset = basic_search_units_hitsets[idx_unit]
         if this_unit_operation == '+':
@@ -1841,8 +1828,12 @@ def search_unit(p, f=None, m=None):
     if not p: # sanity checking
         return set
     if m == 'a' or m == 'r':
-        # we are doing either direct bibxxx search or phrase search or regexp search
-        set = search_unit_in_bibxxx(p, f, m)
+        # we are doing either phrase search or regexp search
+        index_id = get_index_id_from_field(f)
+        if index_id != 0:
+            set = search_unit_in_idxphrases(p, f, m)
+        else:
+            set = search_unit_in_bibxxx(p, f, m)
     elif p.startswith("cited:"):
         # we are doing search by the citation count
         set = search_unit_by_times_cited(p[6:])
@@ -1906,6 +1897,53 @@ def search_unit_in_bibwords(word, f, decompress=zlib.decompress):
             set.union_update(hitset_bibwrd)
         else:
             set = hitset_bibwrd
+            set_used = 1
+    # okay, return result set:
+    return set
+
+def search_unit_in_idxphrases(p, f, type):
+    """Searches for phrase 'p' inside idxPHRASE*F table for field 'f' and returns hitset of recIDs found.
+    The search type is defined by 'type' (e.g. equals to 'r' for a regexp search)."""
+    set = HitSet() # will hold output result set
+    set_used = 0 # not-yet-used flag, to be able to circumvent set operations
+    # deduce in which idxPHRASE table we will search:
+    idxphraseX = "idxPHRASE%02dF" % get_index_id_from_field("anyfield")
+    if f:
+        index_id = get_index_id_from_field(f)
+        if index_id:
+            idxphraseX = "idxPHRASE%02dF" % index_id
+        else:
+            return HitSet() # phrase index f does not exist
+
+    # detect query type (exact phrase, partial phrase, regexp):
+    if type == 'r':
+        query_addons = "REGEXP %s"
+        query_params = (p,)
+    else:
+        p = string.replace(p, '*', '%') # we now use '*' as the truncation character
+        ps = string.split(p, "->", 1) # check for span query:
+        if len(ps) == 2:
+            query_addons = "BETWEEN %s AND %s"
+            query_params = (ps[0], ps[1])
+        else:
+            if string.find(p, '%') > -1:
+                query_addons = "LIKE %s"
+                query_params = (ps[0],)
+            else:
+                query_addons = "= %s"
+                query_params = (ps[0],)
+
+    # perform search:
+    res = run_sql("SELECT term,hitlist FROM %s WHERE term %s" % (idxphraseX, query_addons),
+                  query_params)
+    # fill the result set:
+    for word, hitlist in res:
+        hitset_bibphrase = HitSet(hitlist)
+        # add the results:
+        if set_used:
+            set.union_update(hitset_bibphrase)
+        else:
+            set = hitset_bibphrase
             set_used = 1
     # okay, return result set:
     return set
@@ -2156,22 +2194,32 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
     nearest_terms = []
     if not p: # sanity check
         p = "."
+    index_id = get_index_id_from_field(f)
     # look for nearest terms:
     if t == 'w':
         nearest_terms = get_nearest_terms_in_bibwords(p, f, n, n)
         if not nearest_terms:
-            return "%s %s." % (_("No words index available for"), cgi.escape(get_field_i18nname(get_field_name(f), ln)))
+            return _("No word index is available for %s.") % \
+                   ('<em>' + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln)) + '</em>')
     else:
-        nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
+        nearest_terms = []
+        if index_id:
+            nearest_terms = get_nearest_terms_in_idxphrase(p, index_id, n, n)
         if not nearest_terms:
-            return "%s %s." % (_("No phrase index available for"), cgi.escape(get_field_i18nname(get_field_name(f), ln)))
+            nearest_terms = get_nearest_terms_in_bibxxx(p, f, n, n)
+        if not nearest_terms:
+            return _("No phrase index is available for %s.") % \
+                   ('<em>' + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln)) + '</em>')
 
     terminfo = []
     for term in nearest_terms:
         if t == 'w':
             hits = get_nbhits_in_bibwords(term, f)
         else:
-            hits = get_nbhits_in_bibxxx(term, f)
+            if index_id:
+                hits = get_nbhits_in_idxphrases(term, f)
+            else:
+                hits = get_nbhits_in_bibxxx(term, f)
 
         argd = {}
         argd.update(urlargd)
@@ -2198,7 +2246,7 @@ def create_nearest_terms_box(urlargd, p, f, t='w', n=5, ln=CFG_SITE_LANG, intro_
         if f:
             intro = _("Search term %(x_term)s inside index %(x_index)s did not match any record. Nearest terms in any collection are:") % \
                      {'x_term': "<em>" + cgi.escape(p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>",
-                      'x_index': "<em>" + cgi.escape(get_field_i18nname(get_field_name(f), ln)) + "</em>"}
+                      'x_index': "<em>" + cgi.escape(get_field_i18nname(get_field_name(f) or f, ln)) + "</em>"}
         else:
             intro = _("Search term %s did not match any record. Nearest terms in any collection are:") % \
                      ("<em>" + cgi.escape(p.startswith("%") and p.endswith("%") and p[1:-1] or p) + "</em>")
@@ -2232,6 +2280,39 @@ def get_nearest_terms_in_bibwords(p, f, n_below, n_above):
         nearest_words.append(row[0])
     return nearest_words
 
+def get_nearest_terms_in_idxphrase(p, index_id, n_below, n_above):
+    """Browse (-n_above, +n_below) closest bibliographic phrases
+       for the given pattern p in the given field idxPHRASE table,
+       regardless of collection.
+       Return list of [phrase1, phrase2, ... , phrase_n]."""
+    idxphraseX = "idxPHRASE%02dF" % index_id
+    res_above = run_sql("SELECT term FROM %s WHERE term<%%s ORDER BY term DESC LIMIT %%s" % idxphraseX, (p, n_above))
+    res_above = map(lambda x: x[0], res_above)
+    res_above.reverse()
+
+    res_below = run_sql("SELECT term FROM %s WHERE term>=%%s ORDER BY term ASC LIMIT %%s" % idxphraseX, (p, n_below))
+    res_below = map(lambda x: x[0], res_below)
+
+    return res_above + res_below
+
+def get_nearest_terms_in_idxphrase_with_collection(p, index_id, n_below, n_above, collection):
+    """Browse (-n_above, +n_below) closest bibliographic phrases
+       for the given pattern p in the given field idxPHRASE table,
+       considering the collection (HitSet).
+       Return list of [(phrase1, hitset), (phrase2, hitset), ... , (phrase_n, hitset)]."""
+    idxphraseX = "idxPHRASE%02dF" % index_id
+    res_above = run_sql("SELECT term,hitlist FROM %s WHERE term<%%s ORDER BY term DESC LIMIT %%s" % idxphraseX, (p, n_above * 3))
+    res_above = [(term, HitSet(hitlist) & collection) for term, hitlist in res_above]
+    res_above = [(term, len(hitlist)) for term, hitlist in res_above if hitlist]
+
+    res_below = run_sql("SELECT term,hitlist FROM %s WHERE term>=%%s ORDER BY term ASC LIMIT %%s" % idxphraseX, (p, n_below * 3))
+    res_below = [(term, HitSet(hitlist) & collection) for term, hitlist in res_below]
+    res_below = [(term, len(hitlist)) for term, hitlist in res_below if hitlist]
+
+    res_above.reverse()
+    return res_above[-n_above:] + res_below[:n_below]
+
+
 def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
     """Browse (-n_above, +n_below) closest bibliographic phrases
        for the given pattern p in the given field f, regardless
@@ -2249,6 +2330,11 @@ def get_nearest_terms_in_bibxxx(p, f, n_below, n_above):
     ## values to ferch from bibXXx.  This is needed to work around
     ## MySQL UTF-8 sorting troubles in 4.0.x.  Proper solution is to
     ## use MySQL 4.1.x or our own idxPHRASE in the future.
+
+    index_id = get_index_id_from_field(f)
+    if index_id:
+        return get_nearest_terms_in_idxphrase(p, index_id, n_below, n_above)
+
     n_fetch = 2*max(n_below, n_above)
     ## construct 'tl' which defines the tag list (MARC tags) to search in:
     tl = []
@@ -2320,6 +2406,24 @@ def get_nbhits_in_bibwords(word, f):
             return 0
     if word:
         res = run_sql("SELECT hitlist FROM %s WHERE term=%%s" % bibwordsX,
+                      (word,))
+        for hitlist in res:
+            out += len(HitSet(hitlist[0]))
+    return out
+
+def get_nbhits_in_idxphrases(word, f):
+    """Return number of hits for word 'word' inside phrase index for field 'f'."""
+    out = 0
+    # deduce into which bibwordsX table we will search:
+    idxphraseX = "idxPHRASE%02dF" % get_index_id_from_field("anyfield")
+    if f:
+        index_id = get_index_id_from_field(f)
+        if index_id:
+            idxphraseX = "idxPHRASE%02dF" % index_id
+        else:
+            return 0
+    if word:
+        res = run_sql("SELECT hitlist FROM %s WHERE term=%%s" % idxphraseX,
                       (word,))
         for hitlist in res:
             out += len(HitSet(hitlist[0]))
@@ -3773,7 +3877,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
         title, description, keywords = \
                websearch_templates.tmpl_record_page_header_content(req, recid, ln)
 
-        if not req.header_only:
+        if req is not None and not req.header_only:
             page_start(req, of, cc, as, ln, uid, title, description, keywords, recid, tab)
         # Default format is hb but we are in detailed -> change 'of'
         if of == "hb":
@@ -3815,7 +3919,13 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             else:
                 browse_pattern(req, colls_to_search, p, f, rg, ln)
         except:
-            req.write(create_error_box(req, verbose=verbose, ln=ln))
+            register_exception(req=req, alert_admin=True)
+            if of.startswith("h"):
+                req.write(create_error_box(req, verbose=verbose, ln=ln))
+            elif of.startswith("x"):
+                # Print empty, but valid XML
+                print_records_prologue(req, of)
+                print_records_epilogue(req, of)
             return page_end(req, of, ln)
 
     elif rm and p.startswith("recid:"):
@@ -3968,6 +4078,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                         if of.startswith("h"):
                             print_warning(req, "Invalid set operation %s." % cgi.escape(op2), "Error")
             except:
+                register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
@@ -3982,6 +4093,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
             try:
                 results_in_any_collection = search_pattern_parenthesised(req, p, f, ap=ap, of=of, verbose=verbose, ln=ln)
             except:
+                register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
@@ -4009,6 +4121,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
         try:
             results_final = intersect_results_with_collrecs(req, results_in_any_collection, colls_to_search, ap, of, verbose, ln)
         except:
+            register_exception(req=req, alert_admin=True)
             if of.startswith("h"):
                 req.write(create_error_box(req, verbose=verbose, ln=ln))
                 perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
@@ -4036,6 +4149,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                                                                         "discarding this condition..."),
                                                               of=of)
             except:
+                register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)
@@ -4060,6 +4174,7 @@ def perform_request_search(req=None, cc=CFG_SITE_NAME, c=None, p="", f="", rg=10
                                                                        "discarding this condition..."),
                                                               of=of)
             except:
+                register_exception(req=req, alert_admin=True)
                 if of.startswith("h"):
                     req.write(create_error_box(req, verbose=verbose, ln=ln))
                     perform_external_collection_search(req, cc, [p, p1, p2, p3], f, ec, verbose, ln, selected_external_collections_infos)

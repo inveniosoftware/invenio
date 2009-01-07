@@ -1685,7 +1685,7 @@ class Template:
 
             query = {'c': colls,
                      'ln': ln,
-                     'p': phrase,
+                     'p': '"%s"' % phrase.replace('"', '\\"'),
                      'f': f,
                      'rg' : rg}
 
@@ -1708,7 +1708,7 @@ class Template:
             for phrase, nbhits in browsed_phrases_in_colls[:-1]:
                 query = {'c': colls,
                          'ln': ln,
-                         'p': phrase,
+                         'p': '"%s"' % phrase.replace('"', '\\"'),
                          'f': f,
                          'rg' : rg}
 
@@ -1731,7 +1731,7 @@ class Template:
             phrase, nbhits = browsed_phrases_in_colls[0]
             query_previous = {'c': colls,
                      'ln': ln,
-                     'p': phrase,
+                     'p': '"%s"' % phrase.replace('"', '\\"'),
                      'f': f,
                      'rg' : rg}
 
@@ -1739,7 +1739,7 @@ class Template:
             phrase, nbhits = browsed_phrases_in_colls[-1]
             query_next = {'c': colls,
                      'ln': ln,
-                     'p': phrase,
+                     'p': '"%s"' % phrase.replace('"', '\\"'),
                      'f': f,
                      'rg' : rg}
 
