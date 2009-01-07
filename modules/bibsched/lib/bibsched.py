@@ -797,7 +797,7 @@ class BibSched:
 
     def get_running_tasks(self):
         """Return a list of running tasks."""
-        for status in ('RUNNING', 'CONTINUING', 'SLEEPING', 'ABOUT TO SLEEP', 'ABOUT TO STOP', 'SCHEDULED'):
+        for status in ('RUNNING', 'CONTINUING', 'ABOUT TO SLEEP', 'ABOUT TO STOP', 'SCHEDULED'):
             for id, (proc, dummy, priority) in self.task_status[status].iteritems():
                 yield (id, proc, priority, status)
         raise StopIteration
@@ -829,17 +829,17 @@ class BibSched:
     def handle_row(self, task_id, proc, runtime, status, priority):
         """Perform needed action of the row representing a task.
         Return True when task_status need to be refreshed"""
-        #write_message('%s id: %s, proc: %s, runtime: %s, status: %s, priority: %s' % (task_status, task_id, proc, runtime, status, priority))
-        #write_message("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s" % (task_id, proc, runtime, status, priority))
+        #Log('%s id: %s, proc: %s, runtime: %s, status: %s, priority: %s' % (task_status, task_id, proc, runtime, status, priority))
+        #Log("task_id: %s, proc: %s, runtime: %s, status: %s, priority: %s" % (task_id, proc, runtime, status, priority))
         if task_id in self.task_status['RUNNING'] or task_id in self.task_status['CONTINUING']:
             if not self.task_really_running_p(proc, task_id):
-                #write_message('update required')
+                #Log('update required')
                 return True
         elif task_id in self.task_status['WAITING'] or task_id in self.task_status['SLEEPING']:
-            #write_message("Trying to run %s" % task_id)
+            #Log("Trying to run %s" % task_id)
             if self.scheduled is not None and task_id != self.scheduled:
                 ## Another task is scheduled for running.
-                Log("Cannot run %s because %s is already scheduled" % (task_id, self.scheduled))
+                #Log("Cannot run %s because %s is already scheduled" % (task_id, self.scheduled))
                 return False
 
             nothing_was_scheduled = self.scheduled is None
@@ -930,8 +930,8 @@ class BibSched:
             if run_sql("SELECT count(id) FROM schTASK WHERE status='ERROR' OR status='DONE WITH ERRORS'")[0][0] > 0:
                 raise StandardError('BibSched had to halt because at least a task is in status ERROR or DONE WITH ERRORS')
             self.next_bibupload = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status='WAITING' AND proc='bibupload' AND runtime<=NOW() ORDER BY id ASC LIMIT 1", n=1)
-            self.waitings = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status='WAITING' AND runtime<=NOW() ORDER BY priority DESC, runtime ASC, id ASC")
-            self.rows = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status IN ('RUNNING','CONTINUING','SCHEDULED','SLEEPING','ABOUT TO STOP','ABOUT TO SLEEP')")
+            self.waitings = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE (status='WAITING' AND runtime<=NOW()) OR status='SLEEPING' ORDER BY priority DESC, runtime ASC, id ASC")
+            self.rows = run_sql("SELECT id,proc,runtime,status,priority FROM schTASK WHERE status IN ('RUNNING','CONTINUING','SCHEDULED','ABOUT TO STOP','ABOUT TO SLEEP')")
 
         def calculate_task_status():
             """Return a handy data structure to analize the task status."""
@@ -957,10 +957,12 @@ class BibSched:
                 #Log("New bibsched cycle")
                 calculate_rows()
                 calculate_task_status()
+                ## Let's first handle running rows.
                 for row in self.rows:
                     if self.handle_row(*row):
                         break
                 else:
+                    # If nothing has changed we can go on to run tasks.
                     for row in self.waitings:
                         if row[1] == 'bibupload' and self.next_bibupload:
                             ## We switch in bibupload serial mode!
