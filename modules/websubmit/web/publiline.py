@@ -317,7 +317,7 @@ def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
     docname = res[0][0]
     if categ == "":
         categ = "unknown"
-    sth = run_sql("select rn,status,dFirstReq,dLastReq,dAction,access from sbmAPPROVAL where rn=%s",(RN,))
+    sth = run_sql("select rn,status,dFirstReq,dLastReq,dAction,access,note from sbmAPPROVAL where rn=%s",(RN,))
     if len(sth) > 0:
         arr = sth[0]
         rn = arr[0]
@@ -326,6 +326,7 @@ def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
         dLastReq = arr[3]
         dAction = arr[4]
         access = arr[5]
+        note = arr[6]
     else:
         return _("Approval has never been requested for this document.") + "<br />&nbsp;"
 
@@ -391,6 +392,7 @@ def displayDocument(req, doctype,categ,RN,send, ln = CFG_SITE_LANG):
           title = title,
           sysno = sysno,
           newrn = newrn,
+          note = note,
         )
     return t
 

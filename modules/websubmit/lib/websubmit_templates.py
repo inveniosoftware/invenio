@@ -2203,7 +2203,7 @@ class Template:
                  </table>"""
         return out
 
-    def tmpl_publiline_displaydoc(self, ln, doctype, docname, categ, rn, status, dFirstReq, dLastReq, dAction, access, confirm_send, auth_code, auth_message, authors, title, sysno, newrn):
+    def tmpl_publiline_displaydoc(self, ln, doctype, docname, categ, rn, status, dFirstReq, dLastReq, dAction, access, confirm_send, auth_code, auth_message, authors, title, sysno, newrn, note):
         """
         Displays the categories from a doctype that the user can select
 
@@ -2240,6 +2240,8 @@ class Template:
           - 'sysno' *string* - the unique database id for the record
 
           - 'newrn' *string* - the record number assigned to the submission
+
+          - 'note' *string* - Note about the approval request.
         """
 
         # load the right message language
@@ -2302,6 +2304,12 @@ class Template:
                      'ln' : ln,
                    }
 
+        if note and auth_code == 0:
+            out += """<table><tr><td valign="top"><strong class="headline">%(note_text)s</strong></td><td><em>%(note)s</em></td></tr></table>""" % {
+                     'note_text' : _("Approval note:"),
+                     'note' : cgi.escape(note).replace('\n', '<br />'),
+                   }
+
         if status == "waiting":
             out += _("This document is still %(x_fmt_open)swaiting for approval%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">',
                                                                                                      'x_fmt_close': '</strong>'}
@@ -2324,8 +2332,7 @@ class Template:
                          'ln' : ln
                        }
         if status == "approved":
-            out += _("This document has been %(x_fmt_open)sapproved%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">',
-                                                                                         'x_fmt_close': '</strong>'}
+            out += _("This document has been %(x_fmt_open)sapproved%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">', 'x_fmt_close': '</strong>'}
             out += '<br />' + _("Its approved reference is:") + ' <strong class="headline">' + str(newrn) + '</strong><br /><br />'
             out += _("It was first sent for approval on:") + ' <strong class="headline">' + str(dFirstReq) + '</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
@@ -2334,8 +2341,7 @@ class Template:
                 out += _("Last approval email was sent on:") + ' <strong class="headline">' + str(dLastReq) + '</strong><br />' +\
                        _("It was approved on:") + ' <strong class="headline">' + str(dAction) + '</strong><br />'
         if status == "rejected":
-            out += _("This document has been %(x_fmt_open)srejected%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">',
-                                                                                         'x_fmt_close': '</strong>'}
+            out += _("This document has been %(x_fmt_open)srejected%(x_fmt_close)s.") % {'x_fmt_open': '<strong class="headline">', 'x_fmt_close': '</strong>'}
             out += "<br /><br />"
             out += _("It was first sent for approval on:") + ' <strong class="headline">' + str(dFirstReq) +'</strong><br />'
             if dLastReq == "0000-00-00 00:00:00":
