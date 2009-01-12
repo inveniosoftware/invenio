@@ -216,6 +216,11 @@ class TestQueryParser(unittest.TestCase):
         self._check("title:muon", '', None,
                     [['+', 'muon', 'title', 'w']])
 
+    def test_parsing_structured_query_existing_field(self):
+        "search engine - parsing structured query, existing field, but no word index"
+        self._check("division:IT", '', None,
+                    [['+', 'IT', 'division', 'a']])
+
     def test_parsing_structured_query_nonexisting(self):
         "search engine - parsing structured query, non-existing index"
         self._check("foo:muon", '', None,

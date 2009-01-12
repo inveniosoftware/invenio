@@ -542,11 +542,14 @@ def create_basic_search_units(req, p, f, m=None, of='hb'):
                 elif fi and str(fi[0]).isdigit() and str(fi[0]).isdigit():
                     # B3b - fi exists and starts by two digits => do ACC search
                     opfts.append([oi, pi, fi, 'a'])
+                elif fi and not get_index_id_from_field(fi) and get_field_name(fi):
+                    # B3c - logical field fi exists but there is no WRD index for fi => try ACC search
+                    opfts.append([oi, pi, fi, 'a'])
                 elif pi.startswith('/') and pi.endswith('/'):
-                    # B3c - pi has slashes around => do regexp search
+                    # B3d - pi has slashes around => do regexp search
                     opfts.append([oi, pi[1:-1], fi, 'r'])
                 else:
-                    # B3d - general case => do WRD search
+                    # B3e - general case => do WRD search
                     pi = strip_accents(pi) # strip accents for 'w' mode, FIXME: delete when not needed
                     for pii in get_words_from_pattern(pi):
                         opfts.append([oi, pii, fi, 'w'])
@@ -2535,7 +2538,7 @@ def get_fieldcodes():
     """Returns a list of field codes that may have been passed as 'search options' in URL.
        Example: output=['subject','division']."""
     out = []
-    res = run_sql("SELECT DISTINCT(code) FROM field")
+    res = run_sql_cached("SELECT DISTINCT(code) FROM field")
     for row in res:
         out.append(row[0])
     return out
