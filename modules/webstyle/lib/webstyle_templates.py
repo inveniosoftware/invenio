@@ -272,6 +272,7 @@ class Template:
  <link rev="made" href="mailto:%(sitesupportemail)s" />
  <link rel="stylesheet" href="%(cssurl)s/img/cds.css" type="text/css" />
  <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
+ <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
  <meta http-equiv="Content-Language" content="%(ln)s" />
  <meta name="description" content="%(description)s" />
@@ -376,7 +377,7 @@ class Template:
           'msg_personalize' : _("Personalize"),
           'msg_help' : _("Help"),
           'languagebox' : self.tmpl_language_selection_box(req, ln),
-
+          'unAPIurl' : cgi.escape('%s/unapi' % CFG_SITE_URL)
         }
         return out
 

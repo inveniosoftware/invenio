@@ -180,12 +180,12 @@ INSERT INTO field_tag VALUES (19,131,100);
 
 INSERT INTO format VALUES (1,'HTML brief','hb', 'HTML brief output format, used for search results pages.', 'text/html', 1);
 INSERT INTO format VALUES (2,'HTML detailed','hd', 'HTML detailed output format, used for Detailed record pages.', 'text/html', 1);
+INSERT INTO format VALUES (3,'MARC','hm', 'HTML MARC.', 'text/html', 1);
+INSERT INTO format VALUES (4,'Dublin Core','xd', 'XML Dublin Core.', 'text/xml', 1);
+INSERT INTO format VALUES (5,'MARCXML','xm', 'XML MARC.', 'text/xml', 1);
 INSERT INTO format VALUES (6,'portfolio','hp', 'HTML portfolio-style output format for photos.', 'text/html', 1);
 INSERT INTO format VALUES (7,'photo captions only','hc', 'HTML caption-only output format for photos.', 'text/html', 1);
 INSERT INTO format VALUES (8,'BibTeX','hx', 'BibTeX.', 'text/html', 1);
-INSERT INTO format VALUES (4,'Dublin Core','xd', 'XML Dublin Core.', 'text/xml', 1);
-INSERT INTO format VALUES (3,'MARC','hm', 'HTML MARC.', 'text/html', 1);
-INSERT INTO format VALUES (5,'MARCXML','xm', 'XML MARC.', 'text/xml', 1);
 INSERT INTO format VALUES (9,'EndNote','xe', 'XML EndNote.', 'text/xml', 1);
 INSERT INTO format VALUES (10,'NLM','xn', 'XML NLM.', 'text/xml', 1);
 INSERT INTO format VALUES (11,'Excel','excel', 'Excel csv output', 'application/ms-excel', 0);
@@ -197,6 +197,7 @@ INSERT INTO format VALUES (16,'Actions mini-panel', 'hdact', 'Used to display ac
 INSERT INTO format VALUES (17,'References tab', 'hdref', 'Display record references in References tab.', 'text/html', 0);
 INSERT INTO format VALUES (18,'HTML citesummary','hcs', 'HTML cite summary format, used for search results pages.', 'text/html', 1);
 INSERT INTO format VALUES (19,'RefWorks','xw', 'RefWorks.', 'text/xml', 1);
+INSERT INTO format VALUES (20,'MODS', 'xo', 'Metadata Object Description Schema', 'application/xml', 1);
 
 INSERT INTO tag VALUES (1,'first author','100__%');
 INSERT INTO tag VALUES (2,'additional author','700__%');

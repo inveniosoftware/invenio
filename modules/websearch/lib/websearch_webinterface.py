@@ -128,6 +128,42 @@ def wash_search_urlargd(form):
 
     return argd
 
+class WebInterfaceUnAPIPages(WebInterfaceDirectory):
+    """ Handle /unAPI st of pages."""
+    _exports = ['']
+
+    def __call__(self, req, form):
+        argd = wash_urlargd(form, {
+            'id' : (int, 0),
+            'format' : (str, '')})
+
+        formats_dict = get_output_formats(True)
+        formats = {}
+        for format in formats_dict.values():
+            if format['attrs']['visibility']:
+                formats[format['attrs']['code'].lower()] = format['attrs']['content_type']
+        del formats_dict
+
+
+        if argd['id'] and argd['format']:
+            ## Translate back common format names
+            format = {
+                'nlm' : 'xn',
+                'marcxml' : 'xm',
+                'dc' : 'xd',
+                'endnote' : 'xe',
+                'mods' : 'xo'
+            }.get(argd['format'], argd['format'])
+            if format in formats:
+                redirect_to_url(req, '%s/record/%s/export/%s' % (CFG_SITE_URL, argd['id'], format))
+            else:
+                raise apache.SERVER_RETURN, apache.HTTP_NOT_ACCEPTABLE
+        elif argd['id']:
+            return websearch_templates.tmpl_unapi(formats, identifier=argd['id'])
+        else:
+            return websearch_templates.tmpl_unapi(formats)
+
+    index = __call__
 
 class WebInterfaceAuthorPages(WebInterfaceDirectory):
     """ Handle /author/Doe%2C+John etc set of pages."""

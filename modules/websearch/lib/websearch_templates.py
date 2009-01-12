@@ -28,6 +28,7 @@ import string
 import re
 import locale
 from urllib import quote, urlencode
+from xml.sax.saxutils import escape as xml_escape
 
 from invenio.config import \
      CFG_WEBSEARCH_LIGHTSEARCH_PATTERN_BOX_WIDTH, \
@@ -2579,9 +2580,12 @@ class Template:
         # load the right message language
         _ = gettext_set_language(ln)
 
+
         out = """
                 <tr><td valign="top" align="right" style="white-space: nowrap;">
                     <input name="recid" type="checkbox" value="%(recid)s" />
+                    <abbr class="unapi-id" title="%(recid)s"></abbr>
+
                 %(number)s.
                """ % {'recid': recid,
                       'number': row_number}
@@ -2877,7 +2881,9 @@ class Template:
         urls_z = get_fieldvalues(recID, "8564_z")
         urls_u = get_fieldvalues(recID, "8564_u")
 
-        return self.tmpl_record_body(
+        ## unAPI identifier
+        out = '<abbr class="unapi-id" title="%s"></abbr>\n' % recID
+        out += self.tmpl_record_body(
                  titles = titles,
                  authors = authors,
                  dates = dates,
@@ -2886,6 +2892,7 @@ class Template:
                  urls_u = urls_u,
                  urls_z = urls_z,
                  ln=ln)
+        return out
 
     def tmpl_print_record_brief_links(self, ln, recID):
         """Displays links for brief record on-the-fly
@@ -3013,6 +3020,16 @@ class Template:
         out = """\n</references>"""
         return out
 
+    def tmpl_xml_endnote_prologue(self):
+        """Creates XML EndNote prologue."""
+        out = """<records>\n"""
+        return out
+
+    def tmpl_xml_endnote_epilogue(self):
+        """Creates XML EndNote epilogue."""
+        out = """\n</records>"""
+        return out
+
     def tmpl_xml_marc_prologue(self):
         """Creates XML MARC prologue."""
         out = """<collection xmlns="http://www.loc.gov/MARC21/slim">\n"""
@@ -3021,6 +3038,16 @@ class Template:
     def tmpl_xml_marc_epilogue(self):
         """Creates XML MARC epilogue."""
         out = """\n</collection>"""
+        return out
+
+    def tmpl_xml_mods_prologue(self):
+        """Creates XML MODS prologue."""
+        out = """"""
+        return out
+
+    def tmpl_xml_mods_epilogue(self):
+        """Creates XML MODS epilogue."""
+        out = """"""
         return out
 
     def tmpl_xml_default_prologue(self):
@@ -3032,7 +3059,6 @@ class Template:
         """Creates XML default format epilogue. (Sanity calls only.)"""
         out = """\n</collection>"""
         return out
-
 
     def tmpl_collection_not_found_page_title(self, colname, ln=CFG_SITE_LANG):
         """
@@ -3115,7 +3141,9 @@ class Template:
         """
         _ = gettext_set_language(ln)
 
-        out = content
+        ## unAPI identifier
+        out = '<abbr class="unapi-id" title="%s"></abbr>\n' % recID
+        out += content
 
         return out
 
@@ -3535,4 +3563,52 @@ class Template:
         """HTML citesummary format, epilogue. A part of HCS format suite."""
         _ = gettext_set_language(ln)
         out = """</table>"""
+        return out
+
+    def tmpl_unapi(self, formats, identifier=None):
+        """
+        Provide a list of object format available from the unAPI service
+        for the object identified by IDENTIFIER
+        """
+        out = '<?xml version="1.0" encoding="UTF-8" ?>\n'
+        if identifier:
+            out += '<formats id="%i">\n' % (identifier)
+        else:
+            out += "<formats>\n"
+        for format_name, format_type in formats.iteritems():
+            docs = ''
+            if format_name == 'xn':
+                docs = 'http://www.nlm.nih.gov/databases/dtd/'
+                format_type = 'application/xml'
+                format_name = 'nlm'
+            elif format_name == 'xm':
+                docs = 'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd'
+                format_type = 'application/xml'
+                format_name = 'marcxml'
+            elif format_name == 'xr':
+                format_type = 'application/rss+xml'
+                docs = 'http://www.rssboard.org/rss-2-0/'
+            elif format_name == 'xw':
+                format_type = 'application/xml'
+                docs = 'http://www.refworks.com/RefWorks/help/RefWorks_Tagged_Format.htm'
+            elif format_name == 'xoaidc':
+                format_type = 'application/xml'
+                docs = 'http://www.openarchives.org/OAI/2.0/oai_dc.xsd'
+            elif format_name == 'xe':
+                format_type = 'application/xml'
+                docs= 'http://www.endnote.com/support/'
+                format_name = 'endnote'
+            elif format_name == 'xd':
+                format_type = 'application/xml'
+                docs = 'http://dublincore.org/schemas/'
+                format_name = 'dc'
+            elif format_name == 'xo':
+                format_type = 'application/xml'
+                docs = 'http://www.loc.gov/standards/mods/v3/mods-3-3.xsd'
+                format_name = 'mods'
+            if docs:
+                out += '<format name="%s" type="%s" docs="%s" />\n' % (xml_escape(format_name), xml_escape(format_type), xml_escape(docs))
+            else:
+                out += '<format name="%s" type="%s" />\n' % (xml_escape(format_name), xml_escape(format_type))
+        out += "</formats>"
         return out

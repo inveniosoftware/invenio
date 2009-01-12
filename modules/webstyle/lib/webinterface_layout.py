@@ -30,7 +30,8 @@ __revision__ = \
 from invenio.webinterface_handler import create_handler
 
 from invenio.websearch_webinterface import WebInterfaceSearchInterfacePages, \
-     WebInterfaceAuthorPages, WebInterfaceRSSFeedServicePages
+     WebInterfaceAuthorPages, WebInterfaceRSSFeedServicePages, \
+     WebInterfaceUnAPIPages
 from invenio.websubmit_webinterface import websubmit_legacy_getfile, \
      WebInterfaceSubmitPages
 from invenio.websession_webinterface import WebInterfaceYourAccountPages, \
@@ -69,7 +70,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
         'rss',
         'stats',
         'journal',
-        'help'
+        'help',
+        'unapi'
         ]
 
     def __init__(self):
@@ -105,6 +107,8 @@ class WebInterfaceInvenio(WebInterfaceSearchInterfacePages):
     journal = WebInterfaceJournalPages()
 
     help = WebInterfaceDocumentationPages()
+
+    unapi = WebInterfaceUnAPIPages()
 
 # This creates the 'handler' function, which will be invoked directly
 # by mod_python.
