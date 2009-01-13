@@ -604,7 +604,7 @@ def get_journal_info_path(journal_name):
     """
     # We must make sure we don't try to read outside of webjournal
     # cache dir
-    info_path = os.path.realpath("%s/webjournal/%s/info.dat"% \
+    info_path = os.path.realpath("%s/webjournal/%s/info.dat" % \
                                  (CFG_CACHEDIR, journal_name))
     if info_path.startswith(CFG_CACHEDIR + '/webjournal/'):
         return info_path

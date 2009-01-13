@@ -33,7 +33,8 @@ from invenio.config import \
      CFG_SITE_URL, \
      CFG_SITE_LANG, \
      CFG_SITE_NAME, \
-     CFG_ETCDIR
+     CFG_ETCDIR, \
+     CFG_CACHEDIR
 from invenio.messages import gettext_set_language
 from invenio.webjournal_config import \
      InvenioWebJournalJournalIdNotFoundDBError, \
@@ -477,6 +478,9 @@ def perform_request_configure(journal_name, xml_config, action, ln=CFG_SITE_LANG
             elif res == -2:
                 msg = '<span style="color:#f00">Configuration could not be written (no permission). Please manually copy your config to %s/webjournal/%s/config.xml</span><br/>' % (CFG_ETCDIR, journal_name)
                 action = 'edit'
+            elif res == -4:
+                msg = '<span style="color:#f00">Cache file could not be written (no permission). Please manually create directory %s/webjournal/%s/ and make it writable for your Apache user</span><br/>' % (CFG_CACHEDIR, journal_name)
+                action = 'edit'
             elif res > 0:
                 msg = '<span style="color:#0f0">Journal successfully added.</span>'
                 action = 'edit'
@@ -548,6 +552,7 @@ def add_journal(journal_name, xml_config):
          -1 if could not be added because journal name already exists
          -2 if config could not be saved
          -3 if could not be added for other reasons
+         -4 if database cache could not be added
     """
     try:
         get_journal_id(journal_name)
@@ -566,7 +571,15 @@ def add_journal(journal_name, xml_config):
             res = -2
         # And save some info in file in case database is down
         journal_info_path = get_journal_info_path(journal_name)
+        journal_info_dir = os.path.dirname(journal_info_path)
+        if not os.path.exists(journal_info_dir):
+            try:
+                os.makedirs(journal_info_dir)
+            except Exception:
+                if res <= 0:
+                    res = -4
         journal_info_file = open(journal_info_path, 'w')
+
         cPickle.dump({'journal_id': res,
                       'journal_name': journal_name,
                       'current_issue':'01/2000'}, journal_info_file)
