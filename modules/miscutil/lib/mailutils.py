@@ -107,32 +107,32 @@ def send_email(fromaddr,
         toaddr = toaddr.strip().split(',')
     usebcc = len(toaddr) > 1  # More than one address, let's use Bcc in place of To
     if copy_to_admin:
-        toaddr.append(CFG_SITE_ADMIN_EMAIL)
+        if CFG_SITE_ADMIN_EMAIL not in toaddr:
+            toaddr.append(CFG_SITE_ADMIN_EMAIL)
     body = forge_email(fromaddr, toaddr, subject, content, html_content, html_images, usebcc, header, footer, html_header, html_footer, ln, charset)
-    if attempt_times < 1 or len(toaddr[0]) == 0:
+    if attempt_times < 1 or not toaddr:
         log('ERR_MISCUTIL_NOT_ATTEMPTING_SEND_EMAIL', fromaddr, toaddr, body)
         return False
-    try:
-        server = smtplib.SMTP(CFG_MISCUTIL_SMTP_HOST, CFG_MISCUTIL_SMTP_PORT)
-        if debug_level > 2:
-            server.set_debuglevel(1)
-        else:
-            server.set_debuglevel(0)
-        server.sendmail(fromaddr, toaddr, body)
-        server.quit()
-    except (smtplib.SMTPException, socket.error):
-        if attempt_times > 1:
+    sent = False
+    while not sent and attempt_times > 0:
+        try:
+            server = smtplib.SMTP(CFG_MISCUTIL_SMTP_HOST, CFG_MISCUTIL_SMTP_PORT)
+            if debug_level > 2:
+                server.set_debuglevel(1)
+            else:
+                server.set_debuglevel(0)
+            server.sendmail(fromaddr, toaddr, body)
+            server.quit()
+            sent = True
+        except (smtplib.SMTPException, socket.error):
+            register_exception(alert_admin=True)
             if (debug_level > 1):
                 log('ERR_MISCUTIL_CONNECTION_SMTP', attempt_sleeptime, sys.exc_info()[0], fromaddr, toaddr, body)
             sleep(attempt_sleeptime)
-            return send_email(fromaddr, toaddr, body, attempt_times-1, attempt_sleeptime)
-        else:
-            log('ERR_MISCUTIL_SENDING_EMAIL', fromaddr, toaddr, body)
-            return False
-    except Exception:
-        register_exception()
-        return False
-    return True
+        attempt_times -= 1
+    if not sent:
+        log('ERR_MISCUTIL_SENDING_EMAIL', fromaddr, toaddr, body)
+    return sent
 
 def email_header(ln=CFG_SITE_LANG):
     """The header of the email
