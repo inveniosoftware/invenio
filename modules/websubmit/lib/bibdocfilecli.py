@@ -174,6 +174,7 @@ revise them with the next release of CDS Invenio.""", 'WARNING')
     parser.add_option_group(action_with_parameters)
     parser.add_option('-v', '--verbose', type='int', dest='verbose', default=1)
     parser.add_option('--yes-i-know', action='store_true', dest='yes-i-know')
+    parser.add_option('-H', '--human-readable', dest='human_readable', action='store_true', default=False, help='print sizes in human readable format (e.g., 1KB 234MB 2GB)')
     return parser
 
 def get_recids_from_query(pattern, collection, recid, recid2, docid, docid2):
@@ -524,10 +525,10 @@ def cli_merge_into(recid, docname, into_docname):
     else:
         print >> sys.stderr, 'ERROR: Either %s or %s is not a valid docname for recid %s' % (docname, into_docname, recid)
 
-def cli_get_info(recid_set, show_deleted=False):
+def cli_get_info(recid_set, show_deleted=False, human_readable=False):
     """Print all the info of a recid_set."""
     for recid in recid_set:
-        print BibRecDocs(recid, deleted_too=show_deleted)
+        print BibRecDocs(recid, deleted_too=show_deleted, human_readable=human_readable)
 
 def cli_get_docnames(docid_set):
     """Print all the docnames of a docid_set."""
@@ -535,7 +536,7 @@ def cli_get_docnames(docid_set):
         bibdoc = BibDoc(docid)
         print_info(bibdoc.get_recid(), docid, bibdoc.get_docname())
 
-def cli_get_disk_usage(docid_set):
+def cli_get_disk_usage(docid_set, human_readable=False):
     """Print the space usage of a docid_set."""
     total_size = 0
     total_latest_size = 0
@@ -545,10 +546,21 @@ def cli_get_disk_usage(docid_set):
         total_size += size
         latest_size = bibdoc.get_total_size_latest_version()
         total_latest_size += latest_size
-        print_info(bibdoc.get_recid(), docid, 'size %s, latest version size %s' % (nice_size(size), nice_size(total_latest_size)))
-    print wrap_text_in_a_box('total size: %s\n\nlatest version total size: %s'
-        % (nice_size(total_size), nice_size(total_latest_size)),
-        style='conclusion')
+        if human_readable:
+            print_info(bibdoc.get_recid(), docid, 'size=%s' % nice_size(size))
+            print_info(bibdoc.get_recid(), docid, 'latest version size=%s' % nice_size(latest_size))
+        else:
+            print_info(bibdoc.get_recid(), docid, 'size=%s' % size)
+            print_info(bibdoc.get_recid(), docid, 'latest version size=%s' % latest_size)
+    if human_readable:
+        print wrap_text_in_a_box('total size: %s\n\nlatest version total size: %s'
+            % (nice_size(total_size), nice_size(total_latest_size)),
+            style='conclusion')
+    else:
+        print wrap_text_in_a_box('total size: %s\n\nlatest version total size: %s'
+            % (total_size, total_latest_size),
+            style='conclusion')
+
 
 def cli_check_md5(docid_set):
     """Check the md5 sums of a docid_set."""
@@ -614,11 +626,11 @@ def main():
         if options.action == 'get-history':
             cli_get_history(docid_set)
         elif options.action == 'get-info':
-            cli_get_info(recid_set, options.show_deleted is True)
+            cli_get_info(recid_set, options.show_deleted is True, options.human_readable)
         elif options.action == 'get-docnames':
             cli_get_docnames(docid_set)
         elif options.action == 'get-disk-usage':
-            cli_get_disk_usage(docid_set)
+            cli_get_disk_usage(docid_set, options.human_readable)
         elif options.action == 'check-md5':
             cli_check_md5(docid_set)
         elif options.action == 'update-md5':

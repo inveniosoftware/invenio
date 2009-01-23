@@ -217,8 +217,9 @@ def propose_next_docname(docname):
 
 class BibRecDocs:
     """this class represents all the files attached to one record"""
-    def __init__(self, recid, deleted_too=False):
+    def __init__(self, recid, deleted_too=False, human_readable=False):
         self.id = recid
+        self.human_readable = human_readable
         self.deleted_too = deleted_too
         self.bibdocs = []
         self.build_bibdoc_list()
@@ -317,7 +318,7 @@ class BibRecDocs:
                          bibdoc ON id=id_bibdoc WHERE id_bibrec=%s AND
                          status<>'DELETED' ORDER BY docname ASC""", (self.id,))
         for row in res:
-            cur_doc = BibDoc(docid=row[0], recid=self.id, doctype=row[1])
+            cur_doc = BibDoc(docid=row[0], recid=self.id, doctype=row[1], human_readable=self.human_readable)
             self.bibdocs.append(cur_doc)
 
     def list_bibdocs(self, doctype=''):
@@ -475,7 +476,7 @@ class BibRecDocs:
             if docname in self.get_bibdoc_names():
                 raise InvenioWebSubmitFileError, "%s has already a bibdoc with docname %s" % (self.id, docname)
             else:
-                bibdoc = BibDoc(recid=self.id, doctype=doctype, docname=docname)
+                bibdoc = BibDoc(recid=self.id, doctype=doctype, docname=docname, human_readable=self.human_readable)
                 self.build_bibdoc_list()
                 return bibdoc
         except Exception, e:
@@ -814,7 +815,7 @@ class BibDoc:
         there is a one to one mapping between an instance of this class and
         an entry in the bibdoc db table"""
 
-    def __init__ (self, docid="", recid="", docname="file", doctype="Main"):
+    def __init__ (self, docid="", recid="", docname="file", doctype="Main", human_readable=False):
         """Constructor of a bibdoc. At least the docid or the recid/docname
         pair is needed."""
         # docid is known, the document already exists
@@ -822,6 +823,7 @@ class BibDoc:
         self.docfiles = []
         self.md5s = None
         self.related_files = []
+        self.human_readable = human_readable
         if docid != "":
             if recid == "":
                 recid = None
@@ -932,8 +934,12 @@ class BibDoc:
         out += '%s:%i:::creation date=%s\n' % (self.recid or '', self.id, self.cd)
         out += '%s:%i:::modification date=%s\n' % (self.recid or '', self.id, self.md)
         out += '%s:%i:::total file attached=%s\n' % (self.recid or '', self.id, len(self.docfiles))
-        out += '%s:%i:::total size latest version=%s\n' % (self.recid or '', self.id, nice_size(self.get_total_size_latest_version()))
-        out += '%s:%i:::total size all files=%s\n' % (self.recid or '', self.id, nice_size(self.get_total_size()))
+        if self.human_readable:
+            out += '%s:%i:::total size latest version=%s\n' % (self.recid or '', self.id, nice_size(self.get_total_size_latest_version()))
+            out += '%s:%i:::total size all files=%s\n' % (self.recid or '', self.id, nice_size(self.get_total_size()))
+        else:
+            out += '%s:%i:::total size latest version=%s\n' % (self.recid or '', self.id, self.get_total_size_latest_version())
+            out += '%s:%i:::total size all files=%s\n' % (self.recid or '', self.id, self.get_total_size())
         for docfile in self.docfiles:
             out += str(docfile)
         icon = self.get_icon()
@@ -1167,7 +1173,7 @@ class BibDoc:
             basename = 'icon-%s' % self.docname
         if format is None:
             format = decompose_file(filename)[2]
-        newicon = BibDoc(doctype='Icon', docname=basename)
+        newicon = BibDoc(doctype='Icon', docname=basename, human_readable=self.human_readable)
         newicon.add_file_new_version(filename, format=format)
         try:
             try:
@@ -1494,7 +1500,7 @@ class BibDoc:
                         # we can append file:
                         self.docfiles.append(BibDocFile(filepath, self.doctype,
                             fileversion, basename, format,
-                            self.recid, self.id, self.status, checksum, description, comment, hidden))
+                            self.recid, self.id, self.status, checksum, description, comment, hidden, human_readable=self.human_readable))
                     except Exception, e:
                         register_exception()
         if context == 'init':
@@ -1529,7 +1535,7 @@ class BibDoc:
             if row[2] != 'DELETED':
                 if not self.related_files.has_key(doctype):
                     self.related_files[doctype] = []
-                cur_doc = BibDoc(docid=docid)
+                cur_doc = BibDoc(docid=docid, human_readable=self.human_readable)
                 self.related_files[doctype].append(cur_doc)
 
     def get_total_size_latest_version(self):
@@ -1595,7 +1601,7 @@ class BibDocFile:
     """This class represents a physical file in the CDS Invenio filesystem.
     It should never be instantiated directly"""
 
-    def __init__(self, fullpath, doctype, version, name, format, recid, docid, status, checksum, description=None, comment=None, hidden=False):
+    def __init__(self, fullpath, doctype, version, name, format, recid, docid, status, checksum, description=None, comment=None, hidden=False, human_readable=False):
         self.fullpath = fullpath
         self.doctype = doctype
         self.docid = docid
@@ -1606,6 +1612,7 @@ class BibDocFile:
         self.description = description
         self.comment = comment
         self.hidden = hidden
+        self.human_readable = human_readable
         self.size = os.path.getsize(fullpath)
         self.md = datetime.fromtimestamp(os.path.getmtime(fullpath))
         try:
@@ -1630,7 +1637,7 @@ class BibDocFile:
         self.magic = None
 
     def __repr__(self):
-        return ('BibDocFile(%s, %s, %i, %s, %s, %i, %i, %s, %s, %s, %s, %s)' % (repr(self.fullpath), repr(self.doctype), self.version, repr(self.name), repr(self.format), self.recid, self.docid, repr(self.status), repr(self.checksum), repr(self.description), repr(self.comment), repr(self.hidden)))
+        return 'BibDocFile(%s, %s, %i, %s, %s, %i, %i, %s, %s, %s, %s, %s, %s)' % (repr(self.fullpath), repr(self.doctype), self.version, repr(self.name), repr(self.format), self.recid, self.docid, repr(self.status), repr(self.checksum), repr(self.description), repr(self.comment), repr(self.hidden), repr(self.human_readable))
 
     def __str__(self):
         out = '%s:%s:%s:%s:fullpath=%s\n' % (self.recid, self.docid, self.version, self.format, self.fullpath)
@@ -1638,7 +1645,10 @@ class BibDocFile:
         out += '%s:%s:%s:%s:name=%s\n' % (self.recid, self.docid, self.version, self.format, self.name)
         out += '%s:%s:%s:%s:status=%s\n' % (self.recid, self.docid, self.version, self.format, self.status)
         out += '%s:%s:%s:%s:checksum=%s\n' % (self.recid, self.docid, self.version, self.format, self.checksum)
-        out += '%s:%s:%s:%s:size=%s\n' % (self.recid, self.docid, self.version, self.format, nice_size(self.size))
+        if self.human_readable:
+            out += '%s:%s:%s:%s:size=%s\n' % (self.recid, self.docid, self.version, self.format, nice_size(self.size))
+        else:
+            out += '%s:%s:%s:%s:size=%s\n' % (self.recid, self.docid, self.version, self.format, self.size)
         out += '%s:%s:%s:%s:creation time=%s\n' % (self.recid, self.docid, self.version, self.format, self.cd)
         out += '%s:%s:%s:%s:modification time=%s\n' % (self.recid, self.docid, self.version, self.format, self.md)
         out += '%s:%s:%s:%s:magic=%s\n' % (self.recid, self.docid, self.version, self.format, self.get_magic())
@@ -2222,8 +2232,6 @@ def decompose_bibdocfile_very_old_url(url):
     else:
         raise InvenioWebSubmitFileError('%s is not a valid very old bibdocfile url' % url)
 
-
-
 def nice_size(size):
     """Return a nicely printed size in kilo."""
     unit = 'B'
@@ -2342,7 +2350,7 @@ def download_url(url, format, user=None, password=None, sleep=2):
 
 class BibDocMoreInfo:
     """Class to wrap the serialized bibdoc more_info. At the moment
-    it stores descriptions and comments for each BibDoc."""
+    it stores descriptions and comments for each ."""
     def __init__(self, docid, more_info=None):
         try:
             assert(type(docid) in (long, int) and docid > 0)
