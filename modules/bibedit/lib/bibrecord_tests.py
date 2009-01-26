@@ -679,6 +679,43 @@ class BibRecordAddSubfieldIntoTest(unittest.TestCase):
         bibrecord.record_add_subfield_into(self.rec, "245", 999, "x", "Crash")
 
 
+class BibRecordModifyControlfieldTest(unittest.TestCase):
+    """ bibrecord - testing controlfield modification """
+
+    def setUp(self):
+        # pylint: disable-msg=C0103
+        """Initialize stuff"""
+        xml_example_record = """
+        <record>
+        <controlfield tag="001">33</controlfield>
+        <controlfield tag="005">A Foo's Tale</controlfield>
+        <controlfield tag="008">Skeech Skeech</controlfield>
+        <controlfield tag="008">Whoop Whoop</controlfield>
+        <datafield tag="041" ind1=" " ind2=" ">
+        <subfield code="a">eng</subfield>
+        </datafield>
+        <datafield tag="245" ind1=" " ind2="2">
+        <subfield code="a">On the foo and bar2</subfield>
+        </datafield>
+        </record>
+        """
+        (self.rec, st, e) = bibrecord.create_record(xml_example_record, 1, 1)
+
+    def test_modify_controlfield(self):
+        """bibrecord - modify controlfield"""
+        bibrecord.record_modify_controlfield(self.rec, "001", 1, "34")
+        bibrecord.record_modify_controlfield(self.rec, "008", 3, "Foo Foo")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "001"), ["34"])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "005"), ["A Foo's Tale"])
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "008"), ["Foo Foo", "Whoop Whoop"])
+        # Some crash tests
+        bibrecord.record_modify_controlfield(self.rec, "187", 1, "Crash")
+        bibrecord.record_modify_controlfield(self.rec, "008", 10, "Test")
+        bibrecord.record_modify_controlfield(self.rec, "245", 5, "Burn")
+        self.assertEqual(bibrecord.record_get_field_values(self.rec, "245", " ", "2", "%"),
+                         ["On the foo and bar2"])
+
+
 class BibRecordModifySubfieldTest(unittest.TestCase):
     """ bibrecord - testing subfield modification """
 
@@ -1114,6 +1151,7 @@ TEST_SUITE = make_test_suite(BibRecordSanityTest,
                              BibRecordDeleteFieldTest,
                              BibRecordDeleteFieldFromTest,
                              BibRecordAddSubfieldIntoTest,
+                             BibRecordModifyControlfieldTest,
                              BibRecordModifySubfieldTest,
                              BibRecordDeleteSubfieldFromTest,
                              BibRecordMoveSubfieldTest,

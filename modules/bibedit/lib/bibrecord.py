@@ -311,7 +311,7 @@ def record_delete_field(rec, tag, ind1=' ', ind2=' ', field_number=None):
             del rec[tag]
 
 def record_delete_field_from(rec, tag, field_number):
-    'Delete field from position specified by tag and field number.'
+    """Delete field from position specified by tag and field number."""
 
     newlist = []
     if rec.has_key(tag):
@@ -340,7 +340,7 @@ def record_delete_subfield(rec, tag, subfield, ind1=' ', ind2=' '):
         rec[tag] = newlist
 
 def record_delete_subfield_from(rec, tag, field_number, subfield_index):
-    'Delete subfield from position specified by tag, field number and subfield index.'
+    """Delete subfield from position specified by tag, field number and subfield index."""
     if rec.has_key(tag):
         for field in rec[tag]:
             if field[4] == field_number:
@@ -401,10 +401,9 @@ def record_add_subfield(record, field, ind1, ind2, subfield, value):
 
 def record_add_subfield_into(rec, tag, field_number, subfield, value,
                              subfield_index=None):
-    '''
-    Add subfield into position specified by tag, field number and optionally by
-    subfield index.
-    '''
+    """
+    Add subfield into position specified by tag, field number and optionally by subfield index.
+    """
     if rec.has_key(tag):
         for field in rec[tag]:
             if field[4] == field_number:
@@ -413,9 +412,16 @@ def record_add_subfield_into(rec, tag, field_number, subfield, value,
                 else:
                     field[0].insert(subfield_index, (subfield, value))
 
+def record_modify_controlfield(rec, tag, field_number, value):
+    """Modify controlfield at position specified by tag and field number."""
+    if int(tag) < 10 and rec.has_key(tag):
+        for i in range(len(rec[tag])):
+            if rec[tag][i][4] == field_number:
+                rec[tag][i] = ([], " ", " ", value, rec[tag][i][4])
+
 def record_modify_subfield(rec, tag, field_number, subfield, value,
                            subfield_index):
-    'Modify subfield at position specified by tag, field number and subfield index.'
+    """Modify subfield at position specified by tag, field number and subfield index."""
     if rec.has_key(tag):
         for field in rec[tag]:
             if field[4] == field_number:
@@ -425,8 +431,7 @@ def record_modify_subfield(rec, tag, field_number, subfield, value,
                     pass
 
 def record_move_subfield(rec, tag, field_number, subfield_index, new_subfield_index):
-    '''Move subfield at position specified by tag, field number and subfield index to
-    new subfield index.'''
+    """Move subfield at position specified by tag, field number and subfield index to new subfield index."""
     if rec.has_key(tag):
         for field in rec[tag]:
             if field[4] == field_number:
