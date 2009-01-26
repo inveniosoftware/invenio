@@ -736,10 +736,7 @@ def perform_modifyaccountstatus(req, userID, email_user_pattern, limit_to, maxpa
             res2 = run_sql("UPDATE user SET note=1 WHERE id=%s", (userID, ))
             output += """<b><span class="info">The account '%s' has been activated.</span></b>""" % res[0][1]
             if CFG_ACCESS_CONTROL_NOTIFY_USER_ABOUT_ACTIVATION == 1:
-                password = int(random.random() * 1000000)
-                run_sql("UPDATE user SET password=AES_ENCRYPT(email, %s) "
-                    "WHERE id=%s", (password, userID))
-                emailsent = send_account_activated_message(res[0][1], res[0][1], password)
+                emailsent = send_account_activated_message(res[0][1], res[0][1], '*****')
                 if emailsent:
                     output += """<br /><b><span class="info">An email has been sent to the owner of the account.</span></b>"""
                 else:
