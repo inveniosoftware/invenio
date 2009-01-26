@@ -37,7 +37,9 @@ from invenio.testutils import make_test_suite, \
                               make_url, test_web_page_content, \
                               merge_error_messages
 from invenio.urlutils import same_urls_p
-from invenio.search_engine import perform_request_search
+from invenio.search_engine import perform_request_search, \
+    guess_primary_collection_of_a_record, guess_collection_of_a_record, \
+    collection_restricted_p
 
 def parse_url(url):
     parts = urlparse.urlparse(url)
@@ -895,6 +897,11 @@ class WebSearchRestrictedCollectionTest(unittest.TestCase):
             # if we got here, things are broken:
             self.fail("Oops, Mr.Hyde should not be able to access restricted detailed record page.")
 
+    def test_collection_restricted_p(self):
+        """websearch - collection_restricted_p"""
+        self.failUnless(collection_restricted_p('Theses'), True)
+        self.failIf(collection_restricted_p('Books & Reports'))
+
 class WebSearchRSSFeedServiceTest(unittest.TestCase):
     """Test of the RSS feed service."""
 
@@ -1319,6 +1326,21 @@ class WebSearchSummarizerTest(unittest.TestCase):
         self.assertEqual((('REPORT', 1), ('THESIS', 1)),
                          get_most_popular_field_values((41,), ('690C_a', '980__a'), count_repetitive_values=False))
 
+class WebSearchRecordCollectionGuessTest(unittest.TestCase):
+    """Collection Guessing tests."""
+
+    def test_guess_primary_collection_of_a_record(self):
+        """websearch - guess_primary_collection_of_a_record"""
+        self.assertEqual(guess_primary_collection_of_a_record(96), 'Articles')
+
+    def test_guess_collection_of_a_record(self):
+        """websearch - guess_collection_of_a_record"""
+        self.assertEqual(guess_collection_of_a_record(96), 'Articles')
+        self.assertEqual(guess_collection_of_a_record(96, '%s/collection/Theoretical Physics (TH)?ln=en' % CFG_SITE_URL), 'Articles')
+        self.assertEqual(guess_collection_of_a_record(12, '%s/collection/Theoretical Physics (TH)?ln=en' % CFG_SITE_URL), 'Theoretical Physics (TH)')
+        self.assertEqual(guess_collection_of_a_record(12, '%s/collection/Theoretical%%20Physics%%20%%28TH%%29?ln=en' % CFG_SITE_URL), 'Theoretical Physics (TH)')
+
+
 
 TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchTestSearch,
@@ -1345,7 +1367,8 @@ TEST_SUITE = make_test_suite(WebSearchWebPagesAvailabilityTest,
                              WebSearchSpecialTermsQueryTest,
                              WebSearchJournalQueryTest,
                              WebSearchStemmedIndexQueryTest,
-                             WebSearchSummarizerTest)
+                             WebSearchSummarizerTest,
+                             WebSearchRecordCollectionGuessTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE, warn_user=True)
