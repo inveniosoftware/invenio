@@ -370,7 +370,7 @@ class Manager:
     def change_priority(self):
         task_id = self.currentrow[0]
         priority = self.currentrow[8]
-        new_priority = self._display_ask_number_box("Insert the desired priority for task %s. The smaller the number the less the priority. Note that a negative number will mean to always postpone the task while a number bigger than 10 will mean some tasks with less priority could be stopped in order to let this task run. The current priority is %s. New value:" % (task_id, priority))
+        new_priority = self._display_ask_number_box("Insert the desired priority for task %s. The smaller the number the less the priority. Note that a number less than -10 will mean to always postpone the task while a number bigger than 10 will mean some tasks with less priority could be stopped in order to let this task run. The current priority is %s. New value:" % (task_id, priority))
         try:
             new_priority = int(new_priority)
         except ValueError:
@@ -843,7 +843,7 @@ class BibSched:
                 return False
 
             nothing_was_scheduled = self.scheduled is None
-            if priority < 0:
+            if priority < -10:
                 return False
 
             self.scheduled = task_id

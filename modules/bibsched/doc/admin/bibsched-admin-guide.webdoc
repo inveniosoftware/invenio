@@ -101,7 +101,7 @@ selecting you're given different actions.</p>
 
 <p>If a task has priority higher than 100 and there are currently other task running, conflicting with the execution of this task (because the other tasks should not run concurrently with this task), then the other tasks are stopped (unless they are bibuploads).</p>
 
-<p>If the priority is less than 0 than the task will never be executed automatically.</p>
+<p>If the priority is less than -10 than the task will never be executed automatically.</p>
 
 <p>Bibupload tasks are not affected by priority with respect to each other and will always be executed in the proper order.</p>
 
