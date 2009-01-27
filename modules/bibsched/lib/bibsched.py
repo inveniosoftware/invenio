@@ -777,7 +777,7 @@ class BibSched:
         for (this_task_id, this_proc, this_priority, this_status) in task_set:
             if not self.tasks_safe_p(this_proc, proc):
                 to_stop.append((this_task_id, this_proc, this_priority, this_status))
-            elif (min_prio is None or this_priority < min_prio) and this_status not in ('SLEEPING', 'ABOUT TO SLEEP'):
+            elif (min_prio is None or this_priority < min_prio) and this_status != 'SLEEPING':
                 ## We don't put to sleep already sleeping task :-)
                 min_prio = this_priority
                 min_task_id = this_task_id
