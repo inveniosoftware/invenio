@@ -799,7 +799,7 @@ CREATE TABLE IF NOT EXISTS bib85x (
   value text NOT NULL,
   PRIMARY KEY  (id),
   KEY kt (tag),
-  KEY kv (value(35))
+  KEY kv (value(100)) -- URLs need usually a larger index for speedy lookups
 ) TYPE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS bib86x (
