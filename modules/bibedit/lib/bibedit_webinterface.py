@@ -22,7 +22,10 @@ __revision__ = "$Id"
 
 __lastupdated__ = """$Date: 2008/08/12 09:26:46 $"""
 
-import simplejson as json
+try:
+    import simplejson as json
+except ImportError:
+    pass # okay, no AJAX app will be possible, but continue anyway
 
 from invenio.access_control_engine import acc_authorize_action
 from invenio.bibedit_engine import perform_request_init, \
