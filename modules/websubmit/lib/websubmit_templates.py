@@ -34,6 +34,7 @@ from invenio.config import \
      CFG_SITE_LANG
 from invenio.messages import gettext_set_language
 from invenio.dateutils import convert_datetext_to_dategui
+from invenio.urlutils import create_html_link
 from invenio.webmessage_mailutils import email_quoted_txt2html
 from invenio.htmlutils import escape_html
 import invenio.template
@@ -1480,7 +1481,14 @@ class Template:
             if submission['reference']:
                 reference = submission['reference']
             else:
-                reference = """<font color="red">%s</font>""" % _("Reference not yet given")
+                if submission['pending']:
+                    reference = submission['reference']
+                else:
+                    reference = create_html_link('%s/search' % CFG_SITE_URL, {
+                        'ln' : ln,
+                        'p' : submission['reference'],
+                        'f' : 'reportnumber'
+                    }, submission['reference'])
 
             cdate = str(submission['cdate']).replace(" ","&nbsp;")
             mdate= str(submission['mdate']).replace(" ","&nbsp;")
