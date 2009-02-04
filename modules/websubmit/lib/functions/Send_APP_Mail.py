@@ -100,20 +100,23 @@ def Send_APP_Mail (parameters, curdir, form, user_info=None):
             comment = ""
     else:
         ## Try to read the comments from the comments file:
-        try:
-            fh_comments = open("%s/%s" % (curdir, comments_filename), "r")
-            comment = fh_comments.read()
-            fh_comments.close()
-        except IOError:
-            ## Oops, unable to open the comments file.
-            comment = ""
-            exception_prefix = "Error in WebSubmit function " \
-                               "Send_APP_Mail. Tried to open comments " \
-                               "file [%s/%s] but was unable to." \
-                               % (curdir, comments_filename)
-            register_exception(prefix=exception_prefix)
+        if os.path.exists("%s/%s" % (curdir, comments_filename)):
+            try:
+                fh_comments = open("%s/%s" % (curdir, comments_filename), "r")
+                comment = fh_comments.read()
+                fh_comments.close()
+            except IOError:
+                ## Oops, unable to open the comments file.
+                comment = ""
+                exception_prefix = "Error in WebSubmit function " \
+                                "Send_APP_Mail. Tried to open comments " \
+                                "file [%s/%s] but was unable to." \
+                                % (curdir, comments_filename)
+                register_exception(prefix=exception_prefix)
+            else:
+                comment = comment.strip()
         else:
-            comment = comment.strip()
+            comment = ""
 
     ## Now try to read the decision from the decision_filename:
     if decision_filename in (None, "", "NULL"):
