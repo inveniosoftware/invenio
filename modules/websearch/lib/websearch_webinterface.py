@@ -85,6 +85,7 @@ from invenio.bibrank_citation_searcher import get_author_cited_by, get_cited_by_
 from invenio.bibrank_downloads_indexer import get_download_weight_total
 from invenio.search_engine_summarizer import summarize_records
 from invenio.errorlib import register_exception
+from invenio.bibedit_webinterface import WebInterfaceEditPages
 
 import invenio.template
 websearch_templates = invenio.template.load('websearch')
@@ -266,7 +267,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
     """ Handling of a /record/<recid> URL fragment """
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
-                'references', 'export', 'citations', 'holdings']
+                'references', 'export', 'citations', 'holdings', 'edit']
 
     #_exports.extend(output_formats)
 
@@ -284,6 +285,7 @@ class WebInterfaceRecordPages(WebInterfaceDirectory):
         self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
+        self.edit = WebInterfaceEditPages(self.recid)
 
         return
 
@@ -339,7 +341,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
     """ Handling of a /record-restricted/<recid> URL fragment """
 
     _exports = ['', 'files', 'reviews', 'comments', 'usage',
-                'references', 'export', 'citations', 'holdings']
+                'references', 'export', 'citations', 'holdings', 'edit']
 
     #_exports.extend(output_formats)
 
@@ -356,6 +358,7 @@ class WebInterfaceRecordRestrictedPages(WebInterfaceDirectory):
         self.holdings = WebInterfaceHoldingsPages(self.recid)
         self.citations = self
         self.export = WebInterfaceRecordExport(self.recid, self.format)
+        self.edit = WebInterfaceEditPages(self.recid)
 
         return
 
@@ -657,6 +660,9 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             return answer, []
 
 
+        elif component == 'record' and path[0] == 'edit':
+            return WebInterfaceEditPages(), path[1:]
+
         elif component == 'record' or component == 'record-restricted':
             try:
                 recid = int(path[0])
@@ -678,8 +684,8 @@ class WebInterfaceSearchInterfacePages(WebInterfaceDirectory):
             format = None
             tab = ''
             try:
-                if path[1] in ['', 'files', 'reviews', 'comments',
-                               'usage', 'references', 'citations', 'holdings']:
+                if path[1] in ['', 'files', 'reviews', 'comments', 'usage',
+                               'references', 'citations', 'holdings', 'edit']:
                     tab = path[1]
                 elif path[1] == 'export':
                     tab = ''

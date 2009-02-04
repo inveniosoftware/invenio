@@ -19,7 +19,7 @@
 
 # pylint: disable-msg=C0103
 """
-bibedit CLI tool.
+BibEdit CLI tool.
 
 Usage: bibedit [options]
 
@@ -34,16 +34,17 @@ Options to inspect record history:
                     [recidC.revdateD]    record A dated B and record C dated D
    --revert-to-revision [recid.revdate]  submit given record revision to
                                          become current revision
+
 """
 
 __revision__ = "$Id$"
 
 import sys
 
-from invenio.bibedit_engine import get_marcxml_of_revision_id, \
-    get_record_revision_ids, get_xml_comparison, \
-    revision_format_valid_p, save_xml_record, split_revid
-from invenio.bibedit_utils import record_in_use_p, record_locked_p
+from invenio.bibedit_utils import get_marcxml_of_revision_id, \
+    get_record_revision_ids, get_xml_comparison, record_in_use_p, \
+    record_locked_p, revision_format_valid_p, save_xml_record, \
+    split_revid
 
 def print_usage():
     """Print help."""
@@ -106,7 +107,7 @@ def cli_diff_revisions(revid1, revid2):
 
 def cli_revert_to_revision(revid):
     """
-    Submits specified revision for bibupload, to replace current version.
+    Submit specified revision for bibupload, to replace current version.
     """
     if not revision_format_valid_p(revid):
         print 'ERROR: revision %s is invalid; ' \

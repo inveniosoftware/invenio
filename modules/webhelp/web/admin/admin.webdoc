@@ -177,7 +177,7 @@ data are uploaded in CDS Invenio, you may want to modify them via
   record, do global replacements, and other cataloguing tasks.
 </td>
 <td>
-  <a href="<CFG_SITE_URL>/admin/bibedit/bibeditadmin.py">BibEdit Admin Interface</a>
+  <a href="<CFG_SITE_URL>/record/edit/">BibEdit Admin Interface</a>
 </td>
 <td>
   <a href="bibedit-admin-guide">BibEdit Admin Guide</a>

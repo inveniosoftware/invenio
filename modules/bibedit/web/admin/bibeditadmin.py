@@ -23,7 +23,7 @@ __revision__ = "$Id$"
 __lastupdated__ = """$Date$"""
 
 from invenio.access_control_engine import acc_authorize_action
-from invenio.bibedit_engine import perform_request_index, \
+from invenio.bibeditold_engine import perform_request_index, \
     perform_request_edit, perform_request_submit, perform_request_history
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL
 from invenio.messages import gettext_set_language, wash_language

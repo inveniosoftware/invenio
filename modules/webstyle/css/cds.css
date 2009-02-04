@@ -1463,6 +1463,199 @@ input.hyperlinkformSubmitButton {
 }
 
 /* end of BibEdit module*/
+/* BibEdit module new */
+.bibEditHidden {
+  visibility: hidden;
+}
+.bibEditBtnBold {
+  font-weight: bold
+}
+#bibEditMenu {
+  width: 136px;
+  position: fixed;
+  top: 220px;
+  left: 20px;
+  margin-bottom: 20px;
+  font-size: 0.8em;
+}
+.bibEditMenuSection {
+  margin-bottom: 10px;
+}
+.bibEditMenuSectionHeader {
+  font-weight: bold;
+}
+.bibEditMenuSection table {
+  width: 100%;
+}
+#bibEditMenu a, #bibEditMenu button, #bibEditMenu input {
+  font-size: 0.8em;
+}
+#bibEditMenu a, #bibEditMenu button, #bibEditMenu img,
+#bibEditMenu input {
+  margin: 1px;
+}
+#bibEditMenu button, #bibEditMenu input {
+  width: 100%;
+}
+#bibEditContent {
+  min-height: 250px;
+  margin-left: 150px;
+}
+#bibEditTable {
+  background-color: rgb(255, 255, 255);
+  border: 1px solid #A1A1A1;
+  border-collapse: collapse;
+  width: 100%;
+}
+.bibEditColFieldBox {
+  min-width: 14px;
+  max-width: 14px;
+  width: 14px;
+}
+#bibEditColFieldTag {
+  min-width: 48px;
+  max-width: 100px;
+  width: 48px;
+}
+#bibEditColSubfieldArrows {
+  width: 38px;
+  min-width: 38px;
+  max-width: 38px;
+  border-left: 1px solid #A1A1A1;
+  border-right: 1px solid #A1A1A1;
+}
+#bibEditColSubfieldTag {
+  width: 28px;
+  min-width: 28px;
+  max-width: 80px;
+  border-right: 1px solid #A1A1A1;
+}
+#bibEditColSubfieldAdd {
+  width: 16px;
+  min-width: 16px;
+  max-width: 16px;
+}
+#bibEditTable .bibEditFieldColored {
+  background-color: rgb(235, 235, 235);
+  border: 1px solid #A1A1A1;
+}
+#bibEditTable td {
+  padding: 1px 1px;
+  font-size: 0.8em;
+}
+.bibEditCellField, .bibEditCellFieldTag, .bibEditCellSubfield,
+.bibEditCellSubfieldTag {
+  vertical-align: top;
+}
+.bibEditCellFieldTag {
+  font-weight: bold;
+}
+.bibEditCellContentProtected {
+  font-weight: bold;
+}
+.bibEditCellAddSubfields {
+  vertical-align: bottom;
+}
+#bibEditTable img {
+  cursor: pointer;
+}
+#bibEditTable .bibEditBtnMoveSubfieldUp {
+  float: left;
+}
+#bibEditTable .bibEditBtnMoveSubfieldDown {
+  float: right;
+}
+#bibEditTable input[type="text"]:not(.bibEditInputError){
+  border: 2px inset grey;
+}
+#bibEditTable input[type="checkbox"] {
+  margin: 1px 0px 0px;
+  padding: 0px;
+}
+#bibEditTable .bibEditBtnClear {
+  margin-left: 20px;
+}
+#bibEditTable .bibEditTxtTag {
+  width: 34px;
+}
+#bibEditTable .bibEditTxtInd {
+  width: 14px;
+}
+#bibEditTable .bibEditCellAddSubfieldCode {
+  text-align: right;
+}
+#bibEditTable .bibEditTxtSubfieldCode {
+  width: 14px;
+}
+#bibEditTable .bibEditTxtValue {
+  width: 100%;
+}
+#bibEditTable .bibEditInputError {
+  border: 2px solid red;
+}
+#bibEditMessage {
+  background: rgb(250, 209, 99);
+}
+/* Some demo dialog CSS from jQuery */
+.flora .ui-dialog,
+.flora.ui-dialog {
+  background-color: #DCE5F6;
+}
+.ui-dialog-overlay {
+  background: black;
+  opacity: 0.5;
+}
+.flora .ui-dialog .ui-dialog-titlebar,
+.flora.ui-dialog .ui-dialog-titlebar {
+	border-bottom: 1px solid #d8d2aa;
+	background: #3366CC;
+	padding: 0px;
+	height: 28px;
+}
+.flora .ui-dialog .ui-dialog-titlebar-close,
+.flora.ui-dialog .ui-dialog-titlebar-close {
+	width: 16px;
+	height: 16px;
+	background: url(dialog-titlebar-close.png) no-repeat;
+	position:absolute;
+	top: 6px;
+	right: 7px;
+	cursor: default;
+}
+.flora .ui-dialog .ui-dialog-titlebar-close span,
+.flora.ui-dialog .ui-dialog-titlebar-close span {
+	display: none;
+}
+.flora .ui-dialog .ui-dialog-titlebar-close-hover,
+.flora.ui-dialog .ui-dialog-titlebar-close-hover {
+	background: url(dialog-titlebar-close-hover.png) no-repeat;
+}
+.flora .ui-dialog .ui-dialog-title,
+.flora.ui-dialog .ui-dialog-title {
+	margin-left: 5px;
+	color: white;
+	font-weight: bold;
+	position: relative;
+	top: 7px;
+	left: 4px;
+}
+.flora .ui-dialog .ui-dialog-content,
+.flora.ui-dialog .ui-dialog-content {
+	margin: 1.2em;
+}
+.flora .ui-dialog .ui-dialog-buttonpane,
+.flora.ui-dialog .ui-dialog-buttonpane {
+	position: absolute;
+	bottom: 8px;
+	right: 12px;
+	width: 100%;
+	text-align: right;
+}
+.flora .ui-dialog .ui-dialog-buttonpane button,
+.flora.ui-dialog .ui-dialog-buttonpane button {
+	margin: 6px;
+}
+/* end of BibEdit module*/
 /* WebAlert module */
 .alrtTable{
     border: 1px solid black;

@@ -186,7 +186,7 @@ DEF_DEMO_AUTHS = (
 
 _ = gettext_set_language(CFG_SITE_LANG)
 CFG_ACC_ACTIVITIES_URLS = {
-    'runbibedit' : (_("Run BibEdit"), "%s/admin/bibedit/bibeditadmin.py?ln=%%s" % CFG_SITE_URL),
+    'runbibedit' : (_("Run BibEdit"), "%s/record/edit/" % CFG_SITE_URL),
     'cfgbibformat' : (_("Configure BibFormat"), "%s/admin/bibformat/bibformatadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgbibharvest' : (_("Configure BibHarvest"), "%s/admin/bibharvest/bibharvestadmin.py?ln=%%s" % CFG_SITE_URL),
     'cfgoairepository' : (_("Configure OAI Repository"), "%s/admin/bibharvest/oaiarchiveadmin.py?ln=%%s" % CFG_SITE_URL),

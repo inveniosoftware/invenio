@@ -1027,7 +1027,7 @@ class Template:
             activities.sort(lambda x, y: cmp(string.lower(x), string.lower(y)))
             for action in activities:
                 if action == "runbibedit":
-                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibedit/bibeditadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Run BibEdit"))
+                    out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/record/edit/">%s</a>""" % (CFG_SITE_URL, _("Run BibEdit"))
                 if action == "cfgbibformat":
                     out += """<br />&nbsp;&nbsp;&nbsp; <a href="%s/admin/bibformat/bibformatadmin.py?ln=%s">%s</a>""" % (CFG_SITE_URL, ln, _("Configure BibFormat"))
                 if action == "cfgbibharvest":

@@ -14,45 +14,76 @@
 ## You should have received a copy of the GNU General Public License
 ## along with CDS Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-# pylint: disable-msg=C0103
-"""CDS Invenio BibEdit Database Layer."""
+"""bibedit DB layer"""
 
 __revision__ = "$Id$"
 
 from invenio.dbquery import run_sql
 
-def get_name_tags_all():
-    """This function returns a dictionary of all MARC tag's textual names.
+def get_name_tag(tag):
+    """This function returns a textual name of tag."""
+    result = run_sql("SELECT name FROM tag WHERE value='%s'" % tag)
 
-    If for any field, a name is specified for only one subfieldcode, the
-    subfieldcode will be replaced with a wildcard.
+    if len(result) != 0:
+        return result[0][0]
 
-    """
-    result = run_sql("SELECT name, value FROM tag")
+    else:
+        return tag
 
-    # Count how many subfields are specified for each field.
-    subfieldcount = {}
-    for el in result:
-        if len(el[1]) == 6 and el[1][5] != '%':
-            field_code = el[1][0:5]
-            if (subfieldcount.has_key(field_code)):
-                subfieldcount[field_code] += 1
-            else:
-                subfieldcount[field_code] = 1
+def get_tag_name(name):
+    """This function return a tag from the name of this tag."""
+    result = run_sql("SELECT value FROM tag WHERE name LIKE '%s'" % name)
 
-    # Collect names in a dictionary with field codes as keys.
-    nametags = {}
-    for el in result:
-        code = el[1]
-        if len(el[1]) == 6 and el[1][5] != '%':
-            field_code = el[1][0:5]
-            # If only one subfield is specified, replace with wildcard.
-            if subfieldcount[field_code] == 1:
-                code = field_code + '%'
-        nametags[code] = el[0]
+    if len(result) != 0:
+        return result[0][0]
 
-    return nametags
+    else:
+        return name
+
+def split_tag_to_marc(tag, ind1='', ind2='', subcode=''):
+    """This function make a marc tag with tag, ind1, ind2 and subcode."""
+    tag = get_tag_name(tag)
+
+    if len(tag) > 3:
+        tag = tag[:3]
+
+    if ind1 == ' ' or ind1 == '':
+        ind1 = '_'
+
+    if ind2 == ' ' or ind2 == '':
+        ind2 = '_'
+
+    if subcode == ' ' or subcode == '':
+        subcode = '_'
+
+    return "%s%s%s%s" % (tag, ind1, ind2, subcode)
+
+def marc_to_split_tag(tag):
+    """The inverse of split_tag_to_marc function."""
+    tag = get_tag_name(tag)
+    ind1 = ' '
+    ind2 = ' '
+    subcode = ''
+    len_tag = len(tag)
+
+    if len_tag > 3:
+
+        ind1 = tag[3]
+        if ind1 == '_' or ind1 == '':
+            ind1 = ' '
+
+        if len_tag > 4:
+
+            ind2 = tag[4]
+            if ind2 == '_' or ind2 == '':
+                ind2 = ' '
+
+            if len_tag > 5:
+                subcode = tag[5]
+
+    tag = tag[:3]
+
+    return (tag, ind1, ind2, subcode)
 
 def get_bibupload_task_opts(task_ids):
     """Returns a list with all options for a given list of task IDs."""
@@ -63,10 +94,9 @@ def get_bibupload_task_opts(task_ids):
     return res
 
 def get_marcxml_of_record_revision(recid, job_date):
-    """Return MARCXML string of revision.
-
-    Revision specified by recid and job date.
-
+    """
+    Return MARCXML string of revision corresponding to given recid
+    and job date.
     """
     return run_sql("""SELECT marcxml FROM hstRECORD
                        WHERE id_bibrec=%s AND job_date=%s""",

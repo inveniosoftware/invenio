@@ -37,7 +37,7 @@ single record, do global replacements, and other cataloguing tasks.</p>
 <a name="2"></a><h2>2. Edit records via Web interface</h2>
 
 <p>To edit records via the web interface, please go to <a
-href="<CFG_SITE_URL>/admin/bibedit/bibeditadmin.py">BibEdit Admin
+href="<CFG_SITE_URL>/record/edit/">BibEdit Admin
 Interface</a>.  This interface will let you to add, change or
 delete fields in a record.</p>
 

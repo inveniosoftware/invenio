@@ -24,13 +24,25 @@ pylib_DATA = bibrecord_config.py \
              refextract.py \
              xmlmarc2textmarclib.py \
              bibedit_config.py \
-             bibedit_engine.py \
+             bibeditold_dblayer.py \
              bibedit_dblayer.py \
-             bibedit_templates.py \
+             bibeditold_engine.py \
+             bibedit_engine.py \
              bibedit_regression_tests.py \
+             bibeditold_templates.py \
+             bibedit_templates.py \
              bibeditcli.py \
-             bibedit_utils.py
+             bibeditold_utils.py \
+             bibedit_utils.py \
+             bibedit_webinterface.py
 
-EXTRA_DIST = $(pylib_DATA)
+jsdir=$(localstatedir)/www/js
+
+js_DATA = bibedit_display.js \
+          bibedit_engine.js \
+          bibedit_menu.js
+
+EXTRA_DIST = $(pylib_DATA) \
+             $(js_DATA)
 
 CLEANFILES = *~ *.tmp *.pyc
