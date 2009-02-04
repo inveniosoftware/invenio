@@ -33,7 +33,7 @@ Contents
 
           $ sudo apt-get install libapache2-mod-python2.3 \
               apache2-mpm-prefork mysql-server-4.1 mysql-client-4.1 \
-              python2.3-mysqldb python2.3-4suite \
+              python2.3-mysqldb python2.3-4suite python-simplejson \
               python2.3-xml python2.3-libxml2 python2.3-libxslt1 \
               rxp gnuplot xpdf-utils gs-common antiword catdoc \
               wv html2text ppthtml xlhtml clisp gettext
@@ -83,6 +83,8 @@ Contents
              <http://www.reportlab.org/pyrxp.html>
           - (recommended) libxml2-python, for XML/XLST processing:
              <ftp://xmlsoft.org/libxml2/python/>
+          - (recommended) simplejson, for AJAX apps:
+             <http://undefined.org/python/#simplejson>
           - (recommended) Gnuplot.Py, for producing graphs:
              <http://gnuplot-py.sourceforge.net/>
           - (recommended) Snowball Stemmer, for stemming:
@@ -192,6 +194,7 @@ Contents
       $ make
       $ make install
       $ make install-jsmath-plugin     ## optional
+      $ make install-jquery-plugins    ## optional
       $ make install-fckeditor-plugin  ## optional
 
 1b. Configuration
@@ -374,7 +377,7 @@ Contents
           in the client browser.
 
           Check that the plugin files have proper permissions,
-          i.e. that Apache can read them. For eg:
+          i.e. that Apache can read them.  E.g.:
           $ sudo chgrp -R www-data /opt/cds-invenio/var/www/
           $ sudo chmod -R g+r /opt/cds-invenio/var/www/
 
@@ -384,14 +387,25 @@ Contents
           example:
           CFG_WEBSEARCH_USE_JSMATH_FOR_FORMATS = hd,hb
 
+      $ make install-jquery-plugins  ## optional
+
+          This will automatically download and install in the proper
+          place jQuery and related plugins.  They are used for AJAX
+          applications such as the record editor.
+
+          Check that the plugin files have proper permissions,
+          i.e. that Apache can read them. E.g.:
+          $ sudo chgrp -R www-data /opt/cds-invenio/var/www/
+          $ sudo chmod -R g+r /opt/cds-invenio/var/www/
+
       $ make install-fckeditor-plugin  ## optional
 
           This will automatically download and install in the proper
-          place FCKeditor, a WYSIWYG Javascript-based editor (Eg. for
+          place FCKeditor, a WYSIWYG Javascript-based editor (e.g. for
           the WebComment module).
 
           Check that the plugin files have proper permissions,
-          i.e. that Apache can read them. For eg:
+          i.e. that Apache can read them.  E.gg:
           $ sudo chgrp -R www-data /opt/cds-invenio/var/www/
           $ sudo chmod -R g+r /opt/cds-invenio/var/www/
 

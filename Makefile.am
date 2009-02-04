@@ -111,7 +111,38 @@ install-jsmath-plugin:
 uninstall-jsmath-plugin:
 	@rm -rvf ${prefix}/var/www/jsMath
 	@echo "***********************************************************"
-	@echo "** The jsMath plugin was successfully removed.           **"
+	@echo "** The jsMath plugin was successfully uninstalled.       **"
+	@echo "***********************************************************"
+
+install-jquery-plugins: uninstall-jquery-plugins
+	@echo "***********************************************************"
+	@echo "** Installing various jQuery plugins, please wait...     **"
+	@echo "***********************************************************"
+	mkdir -p ${prefix}/var/www/js
+	(cd ${prefix}/var/www/js && \
+	wget http://jqueryjs.googlecode.com/files/jquery-1.3.1.min.js && \
+	mv jquery-1.3.1.min.js jquery.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/effects.core.min.js && \
+	wget http://jquery-ui.googlecode.com/svn/tags/latest/ui/minified/effects.highlight.min.js && \
+	wget http://www.appelsiini.net/download/jquery.jeditable.mini.js && \
+	wget http://plugins.jquery.com/files/jquery.autogrow-1.2.2.zip && \
+	unzip jquery.autogrow-1.2.2.zip jquery.autogrow.js && \
+	rm jquery.autogrow-1.2.2.zip && \
+	wget http://json.org/json2.js)
+	@echo "***********************************************************"
+	@echo "** The jQuery plugins were successfully installed.       **"
+	@echo "***********************************************************"
+
+uninstall-jquery-plugins:
+	(cd ${prefix}/var/www/js && \
+	rm -f jquery.min.js && \
+	rm -f effects.core.min.js && \
+	rm -f effects.highlight.min.js && \
+	rm -f jquery.jeditable.mini.js && \
+	rm -f jquery.autogrow.js && \
+	rm -f json2.js)
+	@echo "***********************************************************"
+	@echo "** The jquery plugins were successfully uninstalled.     **"
 	@echo "***********************************************************"
 
 install-fckeditor-plugin:
@@ -146,7 +177,7 @@ uninstall-fckeditor-plugin:
 	@rm -rvf ${prefix}/var/www/fckeditor
 	@rm -rvf ${prefix}/lib/python/invenio/fckeditor
 	@echo "***********************************************************"
-	@echo "** The FCKeditor plugin was successfully removed.        **"
+	@echo "** The FCKeditor plugin was successfully uninstalled.    **"
 	@echo "***********************************************************"
 
 update-v0.3.0-tables update-v0.3.1-tables:
